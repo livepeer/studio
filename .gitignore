@@ -2,9 +2,6 @@
 node_modules
 lerna-debug.log
 package-lock.json
-**/sdk/lib
-**/graphql-sdk/lib
-**/chroma/lib
 **/*/main
 **/*/dist
 **/*/bin
@@ -15,6 +12,7 @@ coverage
 yarn-error.log
 .env
 .env.build
+.env.local
 .poosh.cache
 
 .idea
