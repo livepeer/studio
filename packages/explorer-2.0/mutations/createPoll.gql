@@ -1,3 +1,0 @@
-mutation createPoll($proposal: String!) {
-  tx: createPoll(proposal: $proposal)
-}

@@ -1,5 +1,0 @@
-query($block: Int) {
-  protocol(id: "0") {
-    totalStake(block: $block)
-  }
-}
