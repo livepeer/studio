@@ -1,7 +1,6 @@
 ---
 name: "\U0001F4AC Discussion"
 about: Ask a question, get community feedback, brainstorm, etc
-
 ---
 
 **What is this discussion about? (required)**

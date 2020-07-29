@@ -1,3 +1,0 @@
-mutation approve($type: String!, $amount: String!) {
-  tx: approve(type: $type, amount: $amount)
-}
