@@ -2,8 +2,5 @@
 **/build
 **/coverage
 **/dist
-**/sdk/lib
-**/graphql-sdk/lib
-**/chroma/lib
 **/public
 **/package.json
