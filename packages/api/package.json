@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@livepeer.com/api",
   "description": "Livepeer API node for controlling streams",
   "version": "1.0.0-alpha.7",

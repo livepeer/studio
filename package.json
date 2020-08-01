@@ -33,7 +33,7 @@
     "now:build-production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY",
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
-    "postinstall": "lerna run --stream postinstall"
+    "postinstall": "lerna run prepare"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
@@ -44,8 +44,7 @@
     "flow-bin": "^0.97.0",
     "husky": "^4.2.5",
     "lcov-result-merger": "^3.0.0",
-    "lerna": "^3.13.3",
-    "vercel": "^19.2.0",
+    "lerna": "^3.22.1",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1"
   },
