@@ -8,7 +8,7 @@ import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
 
-const baseRecordingsURL = "https://livepeer.monster/recordings"
+const baseRecordingsURL = "https://mdw-cdn.livepeer.monster/recordings"
 
 type RecordingURLProps = {
   manifestId: string;
