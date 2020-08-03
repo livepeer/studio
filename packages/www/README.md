@@ -1,4 +1,4 @@
-# livpeeer.com
+# livepeer.com
 
 ## Local Development
 
