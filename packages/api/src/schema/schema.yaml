@@ -219,6 +219,11 @@ components:
           index: true
         name:
           type: string
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which object store object was created
+          example: 1587667174725
 
     api-token:
       type: object

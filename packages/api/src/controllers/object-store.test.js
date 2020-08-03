@@ -151,11 +151,15 @@ describe('controllers/object-stores', () => {
 
     it('should create an object store', async () => {
       postMockStore.userId = adminUser.id
+      postMockStore.name = 'test name'
+      const now = Date.now()
       let res = await client.post('/object-store', { ...postMockStore })
       expect(res.status).toBe(201)
       const objStore = await res.json()
       expect(objStore.id).toBeDefined()
       expect(objStore.url).toEqual(null)
+      expect(objStore.name).toEqual('test name')
+      expect(objStore.createdAt).toBeGreaterThanOrEqual(now)
 
       const resp = await client.get(`/object-store/${objStore.id}`)
       expect(resp.status).toBe(200)
