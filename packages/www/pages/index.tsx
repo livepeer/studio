@@ -54,7 +54,7 @@ export async function getStaticProps({ preview = false }) {
       ...data.allPage[0],
       preview,
     },
-    revalidate: true,
+    revalidate: 1,
   };
 }
 

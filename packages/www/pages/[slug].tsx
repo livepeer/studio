@@ -70,7 +70,7 @@ export async function getStaticProps({ params, preview = false }) {
       ...data.allPage[0],
       preview,
     },
-    revalidate: true,
+    revalidate: 1,
   };
 }
 
