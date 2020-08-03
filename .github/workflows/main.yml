@@ -1,0 +1,56 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: "trust"
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: docker login
+        env:
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        run: |
+          # docker login
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile
+
+      - name: yarn test
+        run: |
+          yarn test
+
+      - name: docker build
+        env:
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          CF_EMAIL: ${{ secrets.CF_EMAIL }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        run: |
+          export DOCKER_TAG=$(echo $BRANCH | tr -cd '[:alnum:]_')
+          yarn run lerna-run docker:build
+          yarn run lerna-run docker:push
+
+          # Livepeer internal build alerting
+          curl -X POST https://holy-bread-207a.livepeer.workers.dev
