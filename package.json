@@ -33,7 +33,7 @@
     "now:build-production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY",
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
-    "postinstall": "lerna run prepare"
+    "postinstall": "lerna run --stream postinstall"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
