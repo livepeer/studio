@@ -43,11 +43,11 @@ export default () => {
             </Flex>
           </Box>
           <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
-            <Link href="/blog" passHref>
+            {/* <Link href="/blog" passHref>
               <a sx={{ textDecoration: "none", mr: 4, color: "accent" }}>
                 Blog
               </a>
-            </Link>
+            </Link> */}
             <Link href="/[slug]" as="/team" passHref>
               <a sx={{ textDecoration: "none", mr: 4, color: "accent" }}>
                 Team
