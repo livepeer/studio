@@ -224,6 +224,7 @@ app.post(
       userId: stream.userId,
       renditions: {},
       objectStoreId: stream.objectStoreId,
+      recordObjectStoreId: stream.recordObjectStoreId,
       record: stream.record,
       id,
       createdAt,
@@ -323,20 +324,24 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   res.end()
 })
 
-app.put('/:id/record', authMiddleware({}), async (req, res) => {
+app.patch('/:id/record', authMiddleware({}), async (req, res) => {
   const { id } = req.params
   const stream = await req.store.get(`stream/${id}`, false)
-  if (!stream || stream.deleted || !req.user.admin) {
+  if (!stream || stream.deleted) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
   if (stream.parentId) {
     res.status(400)
-    return res.json({ errors: ['can\'t set for session'] })
+    return res.json({ errors: ["can't set for session"] })
+  }
+  if (req.body.record === undefined) {
+    res.status(400)
+    return res.json({ errors: ['record field required'] })
   }
   console.log(`set stream ${id} record ${req.body.record}`)
 
-  stream.record = req.body.record
+  stream.record = !!req.body.record
   await req.store.replace(stream)
 
   res.status(204)
@@ -409,17 +414,18 @@ app.post('/hook', async (req, res) => {
     })
   }
 
-  if (live !== 'live') {
+  if (live !== 'live' && live !== 'recordings') {
     res.status(404)
     return res.json({ errors: ['ingest url must start with /live/'] })
   }
 
-  const stream = await req.store.get(`stream/${streamId}`)
+  const stream = await req.store.get(`stream/${streamId}`, false)
   if (!stream) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
-  let objectStore, recordObjectStore = undefined
+  let objectStore,
+    recordObjectStore = undefined
   if (stream.objectStoreId) {
     const os = await req.store.get(
       `object-store/${stream.objectStoreId}`,
@@ -435,8 +441,28 @@ app.post('/hook', async (req, res) => {
     }
     objectStore = os.url
   }
-  if (stream.record && req.config.recordObjectStore) {
-    recordObjectStore = req.config.recordObjectStore
+  if (
+    stream.record &&
+    req.config.recordObjectStoreId &&
+    !stream.recordObjectStoreId
+  ) {
+    stream.recordObjectStoreId = req.config.recordObjectStoreId
+    await req.store.replace(stream)
+  }
+  if (live === 'live' && stream.record && stream.recordObjectStoreId || live !== 'live' && stream.recordObjectStoreId) {
+    const ros = await req.store.get(
+      `object-store/${stream.recordObjectStoreId}`,
+      false,
+    )
+    if (!ros) {
+      res.status(500)
+      return res.json({
+        errors: [
+          `data integity error: record object store ${stream.recordObjectStoreId} not found`,
+        ],
+      })
+    }
+    recordObjectStore = ros.url
   }
 
   res.json({

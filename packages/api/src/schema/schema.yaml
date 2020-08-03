@@ -146,6 +146,10 @@ components:
           description: Should this stream be recorded? Uses default settings. For more customization, create and configure an object store.
           type: boolean
           example: false
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description: ID of object store where to which this stream was recorded
         wowza:
           type: object
           required:
@@ -213,6 +217,8 @@ components:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
+        name:
+          type: string
 
     api-token:
       type: object

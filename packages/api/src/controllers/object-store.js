@@ -71,6 +71,7 @@ app.post(
     await req.store.create({
       id: id,
       url: req.body.url,
+      name: req.body.name,
       userId: req.user.id,
       kind: `object-store`,
     })

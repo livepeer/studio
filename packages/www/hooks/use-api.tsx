@@ -280,7 +280,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async setRecord(streamId: string, record: boolean): Promise<[void | ApiError]> {
       const [res, body] = await context.fetch(`/stream/${streamId}/record`, {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({ record }),
         headers: {
           "content-type": "application/json"
@@ -288,7 +288,7 @@ const makeContext = (state: ApiState, setState) => {
       });
 
       if (res.status !== 204) {
-        return;
+        throw new Error(res.body ? body : `http status ${res.status}`);
       }
 
       return res;
