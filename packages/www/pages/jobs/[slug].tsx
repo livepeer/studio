@@ -79,7 +79,7 @@ export async function getStaticProps({ params, preview = false }) {
       ...data.allJob[0],
       preview,
     },
-    revalidate: true,
+    revalidate: 1,
   };
 }
 

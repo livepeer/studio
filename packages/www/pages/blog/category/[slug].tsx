@@ -36,7 +36,7 @@ export async function getStaticProps({ params }) {
       categories: categories.reverse(),
       posts,
     },
-    revalidate: true,
+    revalidate: 1,
   };
 }
 
