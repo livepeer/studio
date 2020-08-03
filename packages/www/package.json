@@ -3,6 +3,7 @@
   "name": "@livepeer.com/www",
   "version": "1.0.0-alpha.7",
   "scripts": {
+    "prepare": "cd ../api && yarn run prepare:babel",
     "dev": "next --port=3008",
     "build": "next build",
     "start": "next start"
