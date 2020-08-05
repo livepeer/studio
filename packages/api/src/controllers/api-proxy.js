@@ -26,7 +26,10 @@ app.use(geolocateMiddleware({ region: 'api-region' }), async (req, res) => {
     headers: upstreamHeaders,
   }
   // Oddly, req.body seems present even during GET and HEAD, so double-check
-  if (req.body && (req.method === 'POST' || req.method === 'PUT')) {
+  if (
+    req.body &&
+    (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH')
+  ) {
     params.body = JSON.stringify(req.body)
   }
   const upstreamRes = await fetch(upstreamUrl.toString(), params)
