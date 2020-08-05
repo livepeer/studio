@@ -1,0 +1,62 @@
+import DocsLayout from "../../../components/DocsLayout";
+
+<DocsLayout>
+
+### How to Create a Stream
+
+To create a stream, We'll send a POST requst to `https://livepeer.com/api/stream`.
+
+We will use the API key as a part of the authorization header, and use a JSON body to specify the configuration for the stream.  For example:
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_stream",
+  "profiles": [
+    {
+      "name": "720p",
+      "bitrate": 2000000,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "480p",
+      "bitrate": 1000000,
+      "fps": 30,
+      "width": 854,
+      "height": 480
+    },
+    {
+      "name": "360p",
+      "bitrate": 500000,
+      "fps": 30,
+      "width": 640,
+      "height": 360
+    }
+  ]
+}' \
+https://livepeer.com/api/stream
+```
+
+We'll get a stream object as a result.  For example:
+
+```jsx
+{
+	"name":"test_stream",
+	"profiles":[
+		{"name":"720p","bitrate":2000000,"fps":30,"width":1280,"height":720},
+		{"name":"480p","bitrate":1000000,"fps":30,"width":854,"height":480}],
+		{"name":"360p","bitrate":500000,"fps":30,"width":640,"height":360}],
+	"id":"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
+	"createdAt":1596081229373,
+	"streamKey":"rlmn-uimq-jtgy-x98v",
+	"playbackId":"emh3b2mxupongp5k"
+}
+```
+
+"streamKey", "playbackId", and "id" (aka "streamId") will be important to remember.
+
+</DocsLayout>
