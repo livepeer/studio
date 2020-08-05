@@ -34,7 +34,7 @@ app.use(geolocateMiddleware({ region: 'api-region' }), async (req, res) => {
   }
   const upstreamRes = await fetch(upstreamUrl.toString(), params)
   res.status(upstreamRes.status)
-  if (res.status === 204) {
+  if (upstreamRes.status === 204) {
     return res.end()
   }
   const resBody = await upstreamRes.json()
