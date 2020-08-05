@@ -278,6 +278,22 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async setRecord(streamId: string, record: boolean): Promise<[void | ApiError]> {
+      const [res, body] = await context.fetch(`/stream/${streamId}/record`, {
+        method: "PATCH",
+        body: JSON.stringify({ record }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      if (res.status !== 204) {
+        throw new Error(res.body ? body : `http status ${res.status}`);
+      }
+
+      return res;
+    },
+
     async getApiTokens(userId?: string): Promise<[ApiToken]> {
       const [res, tokens] = await context.fetch(
         `/api-token?${qs.stringify({ userId })}`

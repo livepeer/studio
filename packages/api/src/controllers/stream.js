@@ -36,7 +36,6 @@ const hackMistSettings = (req, profiles) => {
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   let { limit, cursor, streamsonly, sessionsonly, all } = req.query
 
-  logger.info(`cursor params ${cursor}, limit ${limit} all ${all}`)
   const filter1 = all ? (o) => o : (o) => !o[Object.keys(o)[0]].deleted
   let filter2 = (o) => o
   if (streamsonly) {
@@ -136,6 +135,7 @@ app.get('/:id', authMiddleware({}), async (req, res) => {
 
 // returns stream by steamKey
 app.get('/playback/:playbackId', authMiddleware({}), async (req, res) => {
+  console.log(`headers:`, req.headers)
   const {
     data: [stream],
   } = await req.store.queryObjects({
@@ -224,6 +224,8 @@ app.post(
       userId: stream.userId,
       renditions: {},
       objectStoreId: stream.objectStoreId,
+      recordObjectStoreId: stream.recordObjectStoreId,
+      record: stream.record,
       id,
       createdAt,
       parentId: stream.id,
@@ -322,6 +324,30 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   res.end()
 })
 
+app.patch('/:id/record', authMiddleware({}), async (req, res) => {
+  const { id } = req.params
+  const stream = await req.store.get(`stream/${id}`, false)
+  if (!stream || stream.deleted) {
+    res.status(404)
+    return res.json({ errors: ['not found'] })
+  }
+  if (stream.parentId) {
+    res.status(400)
+    return res.json({ errors: ["can't set for session"] })
+  }
+  if (req.body.record === undefined) {
+    res.status(400)
+    return res.json({ errors: ['record field required'] })
+  }
+  console.log(`set stream ${id} record ${req.body.record}`)
+
+  stream.record = !!req.body.record
+  await req.store.replace(stream)
+
+  res.status(204)
+  res.end()
+})
+
 app.delete('/:id', authMiddleware({}), async (req, res) => {
   const { id } = req.params
   const stream = await req.store.get(`stream/${id}`, false)
@@ -388,35 +414,63 @@ app.post('/hook', async (req, res) => {
     })
   }
 
-  if (live !== 'live') {
+  if (live !== 'live' && live !== 'recordings') {
     res.status(404)
     return res.json({ errors: ['ingest url must start with /live/'] })
   }
 
-  const stream = await req.store.get(`stream/${streamId}`)
+  const stream = await req.store.get(`stream/${streamId}`, false)
   if (!stream) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
-  let objectStore = undefined
-  if (stream.objectStoreId && stream.userId) {
-    const store = await req.store.get(
-      `objectstores/${stream.userId}/${stream.objectStoreId}`,
+  let objectStore,
+    recordObjectStore = undefined
+  if (stream.objectStoreId) {
+    const os = await req.store.get(
+      `object-store/${stream.objectStoreId}`,
+      false,
     )
-    if (store && 'type' in store && 'path' in store) {
-      objectStore = {
-        type: store.type,
-        path: store.path,
-        credentials: store.credentials,
-      }
+    if (!os) {
+      res.status(500)
+      return res.json({
+        errors: [
+          `data integity error: object store ${stream.objectStoreId} not found`,
+        ],
+      })
     }
+    objectStore = os.url
+  }
+  if (
+    stream.record &&
+    req.config.recordObjectStoreId &&
+    !stream.recordObjectStoreId
+  ) {
+    stream.recordObjectStoreId = req.config.recordObjectStoreId
+    await req.store.replace(stream)
+  }
+  if (live === 'live' && stream.record && stream.recordObjectStoreId || live !== 'live' && stream.recordObjectStoreId) {
+    const ros = await req.store.get(
+      `object-store/${stream.recordObjectStoreId}`,
+      false,
+    )
+    if (!ros) {
+      res.status(500)
+      return res.json({
+        errors: [
+          `data integity error: record object store ${stream.recordObjectStoreId} not found`,
+        ],
+      })
+    }
+    recordObjectStore = ros.url
   }
 
   res.json({
     manifestId: streamId,
     presets: stream.presets,
     profiles: stream.profiles,
-    objectStore: objectStore,
+    objectStore,
+    recordObjectStore,
   })
 })
 

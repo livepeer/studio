@@ -31,3 +31,10 @@ export function pathJoin(p1: string, p2: string): string {
   }
   return p1 + "/" + (p2 || "");
 }
+
+export function breakablePath(path: string): string {
+  if (!path) {
+    return path;
+  }
+  return path.split("/").join("/\u{200B}");
+}
