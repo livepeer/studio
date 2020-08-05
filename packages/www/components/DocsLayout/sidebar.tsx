@@ -105,6 +105,7 @@ export default () => {
               {listItem.children.map((listItem) => {
                 return (
                   <ListItem
+                    key={listItem.href}
                     active={asPath === listItem.href}
                     href={listItem.href}
                     label={listItem.label}
@@ -116,6 +117,7 @@ export default () => {
         } else {
           return (
             <ListItem
+              key={listItem.href}
               active={asPath === listItem.href}
               href={listItem.href}
               label={listItem.label}
@@ -150,7 +152,7 @@ function Category({ label, open = false, active, children }) {
           <path
             d="M1.4 8.56L4.67 5M1.4 1.23L4.66 4.7"
             stroke="#999"
-            stroke-linecap="square"
+            strokeLinecap="square"
           ></path>
         </svg>
         <Box sx={{ fontWeight: active ? "heading" : "body" }}>{label}</Box>
