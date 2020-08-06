@@ -411,7 +411,7 @@ describe('controllers/stream', () => {
 
     const sadCases = [
       [422, `rtmp://localhost/live/foo/bar/extra`],
-      [422, `http://localhost/live/foo/bar/extra/13984.ts`],
+      [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
       [422, 'nonsense://localhost/live'],
       [401, `https://localhost/live`],
       [404, `https://localhost/notlive/STREAM_ID/1324.ts`],
