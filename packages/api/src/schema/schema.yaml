@@ -20,9 +20,47 @@ tags:
     description: User Password Reset
   - name: make-admin
     description: Changes user admin status
+  - name: webhook
+    description: Webhooks endpoints
 
 components:
   schemas:
+    webhook:
+      type: object
+      required:
+        - name
+        - event
+        - url
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          example: webhook
+        name:
+          type: string
+        userId:
+          type: string
+          readOnly: true
+          index: true
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+        event:
+          type: string
+          enum:
+            - streamStarted
+        url:
+          type: string
+        deleted:
+          type: boolean
+          default: false
+
     stream:
       type: object
       required:
@@ -703,3 +741,106 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/api-token'
+
+  /webhook:
+    tags: 
+      - webhook
+    get:
+      description: gets a list of webhooks defined by the user
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/webhook'              
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      description: creates a new webhook
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /webhook/{id}:
+    tags: 
+      - webhook
+    get:
+      description: gets a specific webhook details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: updates a specific webhook
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: deletes a specific webhook details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'

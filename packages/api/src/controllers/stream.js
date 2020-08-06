@@ -5,13 +5,19 @@ import Router from 'express/lib/router'
 import logger from '../logger'
 import uuid from 'uuid/v4'
 import wowzaHydrate from './wowza-hydrate'
-import { makeNextHREF, trackAction } from './helpers'
+import { fetchWithTimeout } from '../util'
+import { makeNextHREF, trackAction, getWebhooks } from './helpers'
 import { generateStreamKey } from './generate-stream-key'
 import { geolocateMiddleware } from '../middleware'
 import { getBroadcasterHandler } from './broadcaster'
 
-const app = Router()
+const WEBHOOK_TIMEOUT = 5 * 1000
 
+const isLocalIP = require('is-local-ip')
+const { Resolver } = require('dns').promises;
+const resolver = new Resolver();
+
+const app = Router()
 const hackMistSettings = (req, profiles) => {
   // FIXME: tempoarily, Mist can only make passthrough FPS streams with 2-second gop sizes
   if (
@@ -311,6 +317,97 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   stream.isActive = req.body.active
   stream.lastSeen = +new Date()
   await req.store.replace(stream)
+  
+  if (req.body.active) {
+    // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+    // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+    
+    // basic sanitization.
+    let sanitized = {...stream}
+    delete sanitized.streamKey
+
+    const all = false // TODO remove hardcoding here 
+    const limit = 100 // hard limit so we won't spam endpoints, TODO , have a better adjustable limit 
+    
+    let webhooks = await getWebhooks(req.store, req.user.id, 'streamStarted')
+    let output = webhooks.data
+    let webhookResps
+    try {
+      webhookResps = await Promise.all(
+        output.map(async (webhook, key) => {
+          // console.log('webhook: ', webhook)
+          let ips, urlObj, isLocal
+          try {
+            urlObj = parseUrl(webhook.url)
+            if (urlObj.host) {
+              ips = await resolver.resolve4(urlObj.host)
+            }
+          } catch (e) {
+            console.error('error: ', e)
+            throw e
+          }
+
+          // This is mainly useful for local testing
+          if (req.isUIAdmin) {
+            isLocal = false
+          } else {
+            try {
+              if (ips && ips.length) {
+                isLocal = isLocalIP(ips[0])
+              } else {
+                isLocal = true
+              }
+            } catch (e) {
+              console.error('isLocal Error', isLocal, e)
+              throw e
+            }
+          }
+          if (isLocal) {
+            // don't fire this webhook.
+            console.log(`webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`)
+          } else {
+            console.log('preparing to fire webhook ', webhook.url)
+            // go ahead
+            let params = {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                'user-agent': 'livepeer.com'
+              },
+              timeout: WEBHOOK_TIMEOUT,
+              body: JSON.stringify({
+                id: webhook.id,
+                event: webhook.event,
+                stream: sanitized,
+              })
+            }
+      
+            try {
+              console.log(`webhook ${webhook.id} firing`)
+              let resp = await fetchWithTimeout(webhook.url, params)
+              if (resp.status >= 200 && resp.status < 300) { // 2xx requests are cool.
+                // all is good
+                console.log(`webhook ${webhook.id} fired successfully`)
+                return true
+              } else {
+                // block this
+                console.error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
+                throw new Error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
+              }
+            } catch (e) {
+              console.log('firing error', e)
+              throw e 
+            }
+          }
+        })
+      )
+    } catch (e) {
+      console.error('webhook loop error', e)
+      res.status(400)
+      return res.end()
+    }
+  }
+  
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false)
     if (pStream && !pStream.deleted) {
@@ -319,6 +416,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
       await req.store.replace(pStream)
     }
   }
+
 
   res.status(204)
   res.end()
