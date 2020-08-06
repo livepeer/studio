@@ -393,6 +393,8 @@ app.post('/hook', async (req, res) => {
   // http(s)://broadcaster.example.com/live/:streamId/:segNum.ts
   // rtmp://broadcaster.example.com/live/:streamId
   const [live, streamId, ...rest] = pathname.split('/').filter((x) => !!x)
+  // logger.info(`live=${live} streamId=${streamId} rest=${rest}`)
+
   if (!streamId) {
     res.status(401)
     return res.json({ errors: ['stream key is required'] })
@@ -405,7 +407,7 @@ app.post('/hook', async (req, res) => {
       ],
     })
   }
-  if (protocol === 'http:' && rest.length > 1) {
+  if (protocol === 'http:' && rest.length > 3) {
     res.status(422)
     return res.json({
       errors: [
