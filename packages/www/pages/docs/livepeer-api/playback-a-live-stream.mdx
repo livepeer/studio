@@ -1,0 +1,31 @@
+import DocsLayout from "../../../components/DocsLayout";
+
+<DocsLayout>
+
+### Playback a Live Stream
+
+Once the broadcast session is started, transcoding will automatically happen.  Users can view the live stream with any HLS video player by using the playback URL: `{playback_base_url}/{playbackId}/index.m3u8`.  (for example, with [video.js](https://videojs.github.io/videojs-contrib-hls/)) 
+
+You can use fetch and examine the playlist by using the playback URL, which should give you the full HLS playlist that includes all 4 different renditions.  For example:
+
+```bash
+curl "https://mdw-cdn.livepeer.com/hls/{playbackId}/index.m3u8"
+```
+
+You should see a response like:
+
+```bash
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2145120,RESOLUTION=1920x1080,FRAME-RATE=30,CODECS="avc1.4d4028,mp4a.40.2"
+1_0/index.m3u8?sessId=23351
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=2018712,RESOLUTION=1280x720,FRAME-RATE=29.97,CODECS="avc1.4d401f,mp4a.40.2"
+2_0/index.m3u8?sessId=23351
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1111792,RESOLUTION=854x480,FRAME-RATE=29.97,CODECS="avc1.4d401f,mp4a.40.2"
+3_0/index.m3u8?sessId=23351
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=638672,RESOLUTION=640x360,FRAME-RATE=29.97,CODECS="avc1.4d401e,mp4a.40.2"
+4_0/index.m3u8?sessId=23351
+```
+
+If you don't see a response like this, it's likely because the stream is not live.
+
+</DocsLayout>

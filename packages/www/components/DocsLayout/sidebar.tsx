@@ -6,62 +6,70 @@ import { useRouter } from "next/router";
 
 const listItems = [
   {
-    label: "Understanding RTMP ingest vs segment based transcoding",
+    label: "Using Livepeer for live streaming",
     href: "/docs",
   },
   {
-    label: "How to live stream with RTMP ingest",
+    label: "How to live stream with livepeer.com",
     open: true,
     children: [
       {
         label: "How to create a stream",
-        href: "/docs/rtmp/create-a-stream",
+        href: "/docs/livepeer-dot-com/create-a-stream",
       },
       {
-        href: "/docs/rtmp/stream-page-specifications",
+        href: "/docs/livepeer-dot-com/stream-page-specifications",
         label: "Understanding the stream page specifications",
       },
       {
-        href: "/docs/rtmp/broadcast-a-stream-session",
+        href: "/docs/livepeer-dot-com/broadcast-a-stream-session",
         label: "How to broadcast a stream session",
       },
       {
-        href: "/docs/rtmp/stream-rendition-properties",
+        href: "/docs/livepeer-dot-com/stream-rendition-properties",
         label: "How to set stream rendition properties",
       },
       {
-        href: "/docs/rtmp/playback-a-stream",
+        href: "/docs/livepeer-dot-com/playback-a-stream",
         label: "How to playback a stream",
       },
       {
-        href: "/docs/rtmp/delete-a-stream",
+        href: "/docs/livepeer-dot-com/delete-a-stream",
         label: "How to delete a stream",
       },
     ],
   },
   {
-    label: "How to live transcode with .ts segment based ingest",
+    label: "How to live stream with Livepeer API",
+    open: true,
     children: [
       {
-        href: "/docs/segment-based-ingest/authentication",
-        label: "How to authenticate with your API key",
+        label: "How to create an API key",
+        href: "/docs/livepeer-api/create-api-key",
       },
       {
-        href:
-          "/docs/segment-based-ingest/create-a-stream-and-define-renditions",
-        label: "How to create a stream and define renditions",
+        label: "How to get base urls",
+        href: "/docs/livepeer-api/base-urls",
       },
       {
-        href: "/docs/segment-based-ingest/get-a-list-of-broadcasters",
-        label: "How to get a list of broadcasters",
+        label: "How to create a stream",
+        href: "/docs/livepeer-api/create-a-stream",
       },
       {
-        href: "/docs/segment-based-ingest/transcode-ts-segments",
-        label: "How to transcode .ts segments",
+        label: "How to broadcast a live stream",
+        href: "/docs/livepeer-api/broadcast-a-live-stream",
       },
       {
-        href: "/docs/stream-status",
-        label: "How to understand stream status",
+        label: "How to playback a live stream",
+        href: "/docs/livepeer-api/playback-a-live-stream",
+      },
+      {
+        label: "How to list all streams",
+        href: "/docs/livepeer-api/list-all-streams",
+      },
+      {
+        label: "How to delete a stream",
+        href: "/docs/livepeer-api/delete-a-stream",
       },
     ],
   },

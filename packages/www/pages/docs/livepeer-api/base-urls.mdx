@@ -1,0 +1,24 @@
+import DocsLayout from "../../../components/DocsLayout";
+
+<DocsLayout>
+
+### How to Get Base URLs
+
+There are 2 types of base URLs:
+* The ingest base URL is a part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream. 
+* The playback base URL is a part of the playback URL, used for the viewers to watch the stream.
+
+You can get the base URLs by calling `https://livepeer.com/api/ingest`.  For example:
+```bash
+curl "https://livepeer.com/api/ingest"
+```
+
+And you should get results like
+
+```jsx
+[{"ingest":"rtmp://mdw-rtmp.livepeer.com/live",
+"playback":"https://mdw-cdn.livepeer.com/hls"}]
+```
+
+*Note: the results will depend on the location you issue the request from.* This is important, because the ingest point should be as close to the broadcaster as possible.
+</DocsLayout>
