@@ -8,8 +8,6 @@ import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
 
-const baseRecordingsURL = "https://mdw-cdn.livepeer.monster/recordings";
-
 type RecordingURLProps = {
   manifestId: string;
   baseUrl: string;
@@ -31,7 +29,7 @@ export const RecordingURL = ({
     }
   }, [isCopied]);
   const fullUrl = hasRecording
-    ? pathJoin(pathJoin(baseUrl, manifestId), "index.m3u8")
+    ? pathJoin(baseUrl, "recordings", manifestId, "index.m3u8")
     : "";
   const anchor = true;
   return (
@@ -89,7 +87,17 @@ export default ({
   mt?: string | number;
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
-  const { getStreamSessions } = useApi();
+  const [baseUrl, setBaseUrl] = useState(null);
+  const { getStreamSessions, getIngest } = useApi();
+  useEffect(() => {
+    getIngest()
+      .then((ingest) => {
+        if (ingest && ingest.length) {
+          setBaseUrl(ingest[0].playback)
+        }
+      })
+      .catch((err) => console.error(err)); // todo: surface this
+  }, [streamId]);
   useEffect(() => {
     getStreamSessions(streamId)
       .then(streams => setStreamsSessions(streams))
@@ -142,7 +150,7 @@ export default ({
               <RecordingURL
                 manifestId={stream.id}
                 hasRecording={!!stream.recordObjectStoreId}
-                baseUrl={baseRecordingsURL}
+                baseUrl={baseUrl}
               />
             </TableRow>
           );
