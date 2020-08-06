@@ -8,8 +8,9 @@ export default ({ teamMembers }) => {
         sx={{
           flex: 1,
           justifyContent: "flex-start",
-          alignItems: "stretch",
           flexWrap: "wrap",
+          maxWidth: 960,
+          margin: "0 auto",
         }}
       >
         {teamMembers.map((t, i) => (
@@ -22,7 +23,7 @@ export default ({ teamMembers }) => {
             linkedin={t.linkedin}
             github={t.github}
             medium={t.medium}
-            sx={{ flex: "1 1 25%" }}
+            sx={{ flex: ["1 1 100%", "1 1 50%", "1 1 25%"] }}
           />
         ))}
       </Flex>

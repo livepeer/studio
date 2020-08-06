@@ -60,7 +60,7 @@ export default ({
             {heading && (
               <Styled.h1
                 sx={{
-                  fontSize: [30, 30, 7],
+                  fontSize: [48, 56, 7],
                 }}
               >
                 {heading}
