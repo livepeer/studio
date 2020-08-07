@@ -26,7 +26,7 @@ app.get('/', authMiddleware({}), async (req, res) => {
       res.links({ next: makeNextHREF(req, resp.cursor) })
     }
     output = output.map((o) => o[Object.keys(o)[0]])
-    res.json(output)
+    return res.json(output)
   }
   
   let output = await getWebhooks(req.store, req.user.id, event, limit, cursor, all)
