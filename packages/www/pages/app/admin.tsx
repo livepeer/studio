@@ -22,6 +22,11 @@ export function getTabs(i: number): Array<TabType> {
       href: "/app/admin/streams",
       isActive: false,
     },
+    {
+      name: "Webhooks",
+      href: "/app/admin/webhooks",
+      isActive: false,
+    },
   ];
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }

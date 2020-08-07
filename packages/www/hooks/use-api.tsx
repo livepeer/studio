@@ -1,7 +1,7 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import fetch from "isomorphic-fetch";
 import jwt from "jsonwebtoken";
-import { User, Error as ApiError, ApiToken, Stream } from "@livepeer.com/api";
+import { User, Error as ApiError, ApiToken, Stream, Webhook } from "@livepeer.com/api";
 import qs from "qs";
 
 /**
@@ -292,6 +292,45 @@ const makeContext = (state: ApiState, setState) => {
       }
 
       return res;
+    },
+
+    async getWebhooks(allUsers, all: boolean): Promise<Array<Webhook>> {
+      let uri = `/webhook?`
+      if (allUsers) {
+        uri += `allUsers=1`
+      }
+      if (all) {
+        uri += `&all=1`
+      }
+      const [res, webhooks] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new Error(webhooks);
+      }
+      return webhooks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    },
+
+    async createWebhook(params): Promise<Webhook> {
+      const [res, webhook] = await context.fetch(`/webhook`, {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 201) {
+        throw new Error(webhook.errors.join(", "));
+      }
+      return webhook;
+    },
+
+    async deleteWebhook(id: string): Promise<void> {
+      const [res, body] = await context.fetch(`/webhook/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new Error(body.errors.join(", "));
+      }
     },
 
     async getApiTokens(userId?: string): Promise<[ApiToken]> {
