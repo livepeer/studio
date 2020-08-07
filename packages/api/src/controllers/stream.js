@@ -308,16 +308,13 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 
 app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   const { id } = req.params
+  // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
   const stream = await req.store.get(`stream/${id}`, false)
   if (!stream || stream.deleted || !req.user.admin) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
 
-  stream.isActive = req.body.active
-  stream.lastSeen = +new Date()
-  await req.store.replace(stream)
-  
   if (req.body.active) {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
@@ -407,6 +404,11 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
       return res.end()
     }
   }
+
+  stream.isActive = req.body.active
+  stream.lastSeen = +new Date()
+  await req.store.replace(stream)
+  
   
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false)
