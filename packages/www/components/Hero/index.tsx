@@ -145,7 +145,10 @@ function renderSwitch(cta) {
     default:
       return (
         <ScrollLink offset={-40} to={cta.anchorLink} spy smooth>
-          <Box variant="buttons.secondary" sx={{ mr: 4 }}>
+          <Box
+            variant="buttons.secondary"
+            sx={{ mr: [0, 0, 4], mb: [3, 3, 0] }}
+          >
             {cta.title}
           </Box>
         </ScrollLink>
