@@ -3,7 +3,7 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton
+  IconButton,
 } from "@theme-ui/components";
 import Link from "next/link";
 import Logo from "../../public/img/logo.svg";
@@ -33,7 +33,7 @@ export default () => {
           sx={{
             py: 3,
             justifyContent: "space-between",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <Link href="/" passHref>
@@ -44,7 +44,7 @@ export default () => {
                 color: "primary",
                 display: "flex",
                 alignItems: "center",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               <Logo sx={{ color: "primary" }} />
@@ -53,7 +53,7 @@ export default () => {
                   sx={{
                     ml: "12px",
                     fontWeight: 500,
-                    fontSize: "18px"
+                    fontSize: "18px",
                   }}
                 >
                   livepeer.com
@@ -67,7 +67,7 @@ export default () => {
                 width: "33.33%",
                 justifyContent: "center",
                 alignItems: "center",
-                display: ["none", "none", "flex"]
+                display: ["none", "none", "flex"],
               }}
             >
               <Link href="/docs" passHref>
@@ -91,7 +91,7 @@ export default () => {
                 display: ["none", "none", "flex"],
                 width: "33.33%",
                 justifyContent: "flex-end",
-                alignItems: "center"
+                alignItems: "center",
               }}
             >
               <Link href="/login" passHref>
@@ -112,7 +112,7 @@ export default () => {
                 width: "33%",
                 display: ["none", "none", "flex"],
                 alignItems: "center",
-                justifyContent: "flex-end"
+                justifyContent: "flex-end",
               }}
             >
               {isDashboard && (
@@ -134,7 +134,7 @@ export default () => {
                 </Link>
               )}
 
-              <A variant="nav" onClick={logout}>
+              <A variant="nav" onClick={() => logout()}>
                 Log Out
               </A>
               {!isDashboard && (
@@ -150,7 +150,7 @@ export default () => {
             sx={{
               color: "black",
               display: ["flex", "flex", "none"],
-              fontSize: 6
+              fontSize: 6,
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >
