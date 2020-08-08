@@ -14,20 +14,21 @@ export default () => {
       <Container>
         <Flex
           sx={{
-            flexDirection: ["column", "column", "row"],
+            flexDirection: ["column", "column", "column", "row"],
             alignItems: "center",
-            textAlign: ["center", "center", "left"],
+            textAlign: ["center", "center", "center", "left"],
             justifyContent: "space-between"
           }}
         >
           <Link href="/" passHref>
             <A
               sx={{
-                width: "33.33%",
+                width: ["100%", "100%", "100%", "33.33%"],
                 textDecoration: "none",
                 color: "white",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: ["center", "center", "center", "flex-start"],
                 cursor: "pointer"
               }}
             >
@@ -44,8 +45,14 @@ export default () => {
               </Box>
             </A>
           </Link>
-          <Box
-            sx={{ mb: 2, color: "white" }}
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              width: ["100%", "100%", "100%", "33.33%"],
+              my: [3, 3, 3, 0],
+              color: "white"
+            }}
             itemScope
             itemType="http://schema.org/Organization"
           >
@@ -62,8 +69,14 @@ export default () => {
               </Box>
               <Box itemProp="postalCode">10013</Box>
             </Flex>
-          </Box>
-          <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
+          </Flex>
+          <Flex
+            sx={{
+              width: ["100%", "100%", "100%", "33.33%"],
+              justifyContent: ["center", "center", "center", "flex-end"],
+              alignItems: "center"
+            }}
+          >
             {/* <Link href="/blog" passHref>
               <a sx={{ textDecoration: "none", mr: 4, color: "accent" }}>
                 Blog
