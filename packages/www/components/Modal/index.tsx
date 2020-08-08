@@ -25,17 +25,18 @@ export default ({ children, onClose }) => {
         backgroundColor: "rgba(0,0,0,0.5)",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100,
+        zIndex: 100
       }}
       onClick={onClose}
     >
       <Box
         sx={{
+          borderRadius: 6,
           backgroundColor: "white",
           padding: [4, 4],
-          maxWidth: "500px",
+          maxWidth: "500px"
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {children}
       </Box>

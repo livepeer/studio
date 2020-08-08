@@ -40,7 +40,7 @@ export default ({
         position: "relative",
         minWidth: "0",
         flexDirection: "column",
-        verticalAlign: "top",
+        verticalAlign: "top"
       }}
       {...props}
     >
@@ -50,8 +50,8 @@ export default ({
           zIndex: "1",
           transform:
             defaultValue || value || scopedValue || focused
-              ? "translate(20px, 18px) scale(0.75)"
-              : "translate(20px, 28px) scale(1)",
+              ? "translate(20px, 10px) scale(0.75)"
+              : "translate(20px, 20px) scale(1)",
           pointerEvents: "none",
           top: "0",
           left: "0",
@@ -62,8 +62,8 @@ export default ({
           transformOrigin: "top left",
           color: "#6f6f6f",
           padding: 0,
-          fontSize: 20,
-          lineHeight: 1,
+          fontSize: 16,
+          lineHeight: 1
         }}
         htmlFor={htmlFor}
         id={id}
@@ -94,7 +94,7 @@ export default ({
               "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
             borderBottom: "1px solid",
             borderColor: error ? "red" : "text",
-            pointerEvents: "none",
+            pointerEvents: "none"
           },
           "&:after": {
             left: "0",
@@ -106,8 +106,8 @@ export default ({
             transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
             borderBottom: "2px solid",
             borderColor: error ? "red" : "text",
-            pointerEvents: "none",
-          },
+            pointerEvents: "none"
+          }
         }}
       >
         <Box
@@ -120,12 +120,12 @@ export default ({
           required={required}
           defaultValue={defaultValue}
           value={value}
-          onChange={onChange ? onChange : (e) => setScopedValue(e.target.value)}
+          onChange={onChange ? onChange : e => setScopedValue(e.target.value)}
           ref={inputRef}
           name={name}
           sx={{
-            padding: "40px 20px 16px",
-            fontSize: 20,
+            padding: "28px 20px 12px",
+            fontSize: 16,
             color: "currentColor",
             width: "100%",
             border: "0",
@@ -135,7 +135,7 @@ export default ({
             background: "none",
             boxSizing: "content-box",
             animationName: "MuiInputBase-keyframes-auto-fill-cancel",
-            WebkitTapHighlightColor: "transparent",
+            WebkitTapHighlightColor: "transparent"
           }}
           id={id}
           type={type}
@@ -146,9 +146,9 @@ export default ({
           sx={{
             height: 16,
             color: error ? "red" : messageColor,
-            pt: "6px",
+            pt: "62px",
             pl: "12px",
-            fontSize: 0,
+            fontSize: 0
           }}
         >
           {message}

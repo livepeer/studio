@@ -29,10 +29,10 @@ export default () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
-          mx: [3, 0],
+          mx: [3, 0]
         }}
       >
-        <h3 sx={{ mb: [3, 3] }}>Log in to Livepeer</h3>
+        <h3 sx={{ mb: 4 }}>Log in</h3>
         <Login
           id="login"
           onSubmit={onSubmit}

@@ -1,10 +1,11 @@
 import { Styled } from "theme-ui";
-import { Grid, Flex, Container, Box } from "@theme-ui/components";
+import { Grid, Flex, Container, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import Button from "../Button";
 import { Link as ScrollLink } from "react-scroll";
 import ArrowRight from "../../public/img/arrow-right.svg";
+import Link from "next/link";
 
 type Props = {
   heading?: string;
@@ -32,7 +33,8 @@ export default ({
         overflow: "hidden",
         borderBottom: skinny ? "0" : "1px solid",
         borderColor: "muted",
-        pb: 5,
+        pt: skinny ? 4 : 0,
+        pb: 4
       }}
       {...props}
     >
@@ -41,7 +43,7 @@ export default ({
           columns={[1, 1, 1, centered ? 1 : 2]}
           sx={{
             alignItems: "center",
-            minHeight: ["auto", "auto", skinny ? 200 : 400],
+            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 97px)"]
           }}
         >
           <Box
@@ -53,14 +55,14 @@ export default ({
                 "center",
                 "center",
                 "center",
-                centered ? "center" : "left",
-              ],
+                centered ? "center" : "left"
+              ]
             }}
           >
             {heading && (
               <Styled.h1
                 sx={{
-                  fontSize: [48, 56, 7],
+                  fontSize: [48, 56, 7]
                 }}
               >
                 {heading}
@@ -70,7 +72,7 @@ export default ({
               <Box
                 sx={{
                   mt: 4,
-                  fontSize: "18px",
+                  fontSize: "18px"
                 }}
               >
                 {tagline}
@@ -85,10 +87,10 @@ export default ({
                     "center",
                     "center",
                     "center",
-                    centered ? "center" : "flex-start",
+                    centered ? "center" : "flex-start"
                   ],
                   width: "100%",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 {ctas.map((cta, i) => (
@@ -107,6 +109,8 @@ export default ({
                 height: ["auto", "auto", 525],
                 width: ["100%", "100%", "100%", centered ? "'100%'" : "auto"],
                 mr: [0, 0, -260],
+                position: "relative",
+                right: [0, 0, 0, -100]
               }}
               className="lazyload"
               data-src={builder.image(image).url()}
@@ -121,23 +125,29 @@ export default ({
 function renderSwitch(cta) {
   switch (true) {
     case !!cta.internalLink?.slug?.current:
-      return <Button variant="primary">{cta.title}</Button>;
+      return (
+        <Link href={cta.internalLink?.slug?.current} passHref>
+          <A variant="buttons.secondary">{cta.title}</A>
+        </Link>
+      );
     case !!cta.externalLink:
       return (
-        <Button
+        <A
+          sx={{ display: "flex", alignItems: "center" }}
           variant={cta.variant}
-          as="a"
           target="__blank"
           href={cta.externalLink}
         >
           {cta.title}
           <ArrowRight sx={{ ml: 2 }} />
-        </Button>
+        </A>
       );
     default:
       return (
         <ScrollLink offset={-40} to={cta.anchorLink} spy smooth>
-          <Button variant="primary">{cta.title}</Button>
+          <Box variant="buttons.secondary" sx={{ mr: 4 }}>
+            {cta.title}
+          </Box>
         </ScrollLink>
       );
   }

@@ -1,4 +1,4 @@
-import { Flex, Container, Box } from "@theme-ui/components";
+import { Flex, Container, Box, Link as A } from "@theme-ui/components";
 import Logo from "../../public/img/logo.svg";
 import Link from "next/link";
 
@@ -8,7 +8,7 @@ export default () => {
       sx={{
         py: 4,
         bg: "primary",
-        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)",
+        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)"
       }}
     >
       <Container>
@@ -17,12 +17,33 @@ export default () => {
             flexDirection: ["column", "column", "row"],
             alignItems: "center",
             textAlign: ["center", "center", "left"],
-            justifyContent: "space-between",
+            justifyContent: "space-between"
           }}
         >
-          <Box>
-            <Logo sx={{ color: "white" }} />
-          </Box>
+          <Link href="/" passHref>
+            <A
+              sx={{
+                width: "33.33%",
+                textDecoration: "none",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer"
+              }}
+            >
+              <Logo />
+              <Box
+                sx={{
+                  ml: "12px",
+                  fontWeight: 500,
+                  fontSize: "18px",
+                  color: "white"
+                }}
+              >
+                livepeer.com
+              </Box>
+            </A>
+          </Link>
           <Box
             sx={{ mb: 2, color: "white" }}
             itemScope

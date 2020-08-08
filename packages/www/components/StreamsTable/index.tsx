@@ -2,11 +2,10 @@ import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, Flex } from "@theme-ui/components";
+import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import Help from "../../public/img/help.svg";
-import Modal from "../Modal";
 import moment from "moment";
 import { Stream } from "@livepeer.com/api";
 
@@ -27,7 +26,7 @@ type Rendition = {
 const Profile = ({
   id,
   i,
-  rendition: { fps, name, width, height, bitrate },
+  rendition: { fps, name, width, height, bitrate }
 }: ProfileProps) => {
   return (
     <Box
@@ -37,7 +36,7 @@ const Profile = ({
         padding: "0.5em",
         display: "grid",
         alignItems: "space-around",
-        gridTemplateColumns: "auto auto",
+        gridTemplateColumns: "auto auto"
       }}
     >
       <Box>name:</Box>
@@ -65,7 +64,7 @@ export const RelativeTime = ({
   id,
   prefix,
   tm,
-  swap = false,
+  swap = false
 }: RelativeTimeProps) => {
   const idpref = `time-${prefix}-${id}`;
   let main = moment.unix(tm / 1000.0).fromNow();
@@ -101,7 +100,7 @@ export const RelativeTime = ({
 
 export const StreamName = ({
   stream,
-  admin = false,
+  admin = false
 }: {
   stream: Stream;
   admin?: boolean;
@@ -181,7 +180,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               sx={{
                 color: "muted",
                 cursor: "pointer",
-                ml: 1,
+                ml: 1
               }}
             />
           </Flex>
@@ -199,13 +198,13 @@ export default ({ userId, id }: { userId: string; id: string }) => {
   const { getStreams, deleteStream, getBroadcasters } = useApi();
   useEffect(() => {
     getBroadcasters()
-      .then((broadcasters) => setBroadcasters(broadcasters))
-      .catch((err) => console.error(err)); // todo: surface this
+      .then(broadcasters => setBroadcasters(broadcasters))
+      .catch(err => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
     getStreams(userId)
-      .then((streams) => setStreams(streams))
-      .catch((err) => console.error(err)); // todo: surface this
+      .then(streams => setStreams(streams))
+      .catch(err => console.error(err)); // todo: surface this
   }, [userId, deleteModal]);
   const close = () => {
     setDeleteModal(false);
@@ -218,19 +217,16 @@ export default ({ userId, id }: { userId: string; id: string }) => {
     }
     const interval = setInterval(() => {
       getStreams(userId)
-        .then((streams) => setStreams(streams))
-        .catch((err) => console.error(err)); // todo: surface this
+        .then(streams => setStreams(streams))
+        .catch(err => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
   }, [userId, isVisible]);
   return (
-    <Box
+    <Container
       id={id}
       sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto",
+        my: 2
       }}
     >
       {deleteModal && selectedStream && (
@@ -242,19 +238,16 @@ export default ({ userId, id }: { userId: string; id: string }) => {
           }}
         />
       )}
-      <Box sx={{ mt: "2em" }}>
-        <Link href="/app/stream/new-stream">
-          <a>
-            <Button variant="outlineSmall" sx={{ margin: 2 }}>
-              Create
-            </Button>
-          </a>
+      <Box sx={{ mb: 3 }}>
+        <Link href="/app/stream/new-stream" passHref>
+          <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
+            Create
+          </A>
         </Link>
         <Button
           variant="secondarySmall"
           aria-label="Delete Stream button"
           disabled={!selectedStream}
-          sx={{ margin: 2, mb: 4 }}
           onClick={() => selectedStream && setDeleteModal(true)}
         >
           Delete
@@ -277,7 +270,7 @@ export default ({ userId, id }: { userId: string; id: string }) => {
             sourceSegments,
             transcodedSegments,
             createdAt,
-            isActive,
+            isActive
           } = stream;
           const selected = selectedStream && selectedStream.id === id;
           return (
@@ -315,6 +308,6 @@ export default ({ userId, id }: { userId: string; id: string }) => {
           );
         })}
       </Table>
-    </Box>
+    </Container>
   );
 };

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import useApi from "../../../hooks/use-api";
-import { Flex, Button, Box, Grid, Input } from "@theme-ui/components";
+import {
+  Flex,
+  Button,
+  Box,
+  Grid,
+  Input,
+  Container,
+  Heading
+} from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { useRouter } from "next/router";
@@ -20,27 +28,23 @@ export default () => {
 
   return (
     <Layout>
-      <Box
+      <Container
         sx={{
-          width: "100%",
-          maxWidth: 958,
-          mb: [3, 3],
-          mx: "auto",
+          mt: 3
         }}
       >
-        <Box
-          sx={{ my: "2em", maxWidth: 958, width: "100%", fontWeight: "bold" }}
-        >
+        <Box sx={{ mb: 3 }}>
           <Link href={backLink}>
             <a>{"← stream list"}</a>
           </Link>
         </Box>
-        <p>
-          <strong>Create a new stream</strong>
-        </p>
+
+        <Heading as="h3" sx={{ mb: 4 }}>
+          Create a new stream
+        </Heading>
         <form
           id={"New Stream"}
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault();
             if (creating) {
               return;
@@ -54,74 +58,63 @@ export default () => {
                   fps: 0,
                   bitrate: 250000,
                   width: 426,
-                  height: 240,
+                  height: 240
                 },
                 {
                   name: "360p0",
                   fps: 0,
                   bitrate: 800000,
                   width: 640,
-                  height: 360,
+                  height: 360
                 },
                 {
                   name: "480p0",
                   fps: 0,
                   bitrate: 1600000,
                   width: 854,
-                  height: 480,
+                  height: 480
                 },
                 {
                   name: "720p0",
                   fps: 0,
                   bitrate: 3000000,
                   width: 1280,
-                  height: 720,
-                },
-              ],
+                  height: 720
+                }
+              ]
             })
-              .then((newStream) => {
+              .then(newStream => {
                 setCreating(false);
                 router.replace({
                   pathname: `/app/stream/${newStream.id}`,
-                  query: { admin: router.query.admin },
+                  query: { admin: router.query.admin }
                 });
               })
-              .catch((e) => {
+              .catch(e => {
                 setCreating(false);
               });
           }}
         >
-          <Grid
-            gap={2}
-            columns={[3, "1fr 3fr 3fr"]}
-            sx={{
-              alignItems: "center",
-            }}
-          >
-            <Box>Stream name</Box>
-            <Box>
-              <Input
-                autoFocus={true}
-                label="Stream name"
-                value={streamName}
-                sx={{
-                  border: "white",
-                  borderBottom: "2px solid black",
-                  borderRadius: "0px",
-                }}
-                onChange={(e) => setStreamName(e.target.value)}
-                placeholder="new-stream-name-123"
-              ></Input>
-            </Box>
-            <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
-          </Grid>
-          <Flex sx={{ justifyContent: "flex-beginning", py: 3 }}>
-            <Button type="submit" variant="outlineSmall">
+          <Box sx={{ mb: 2, fontWeight: "500" }}>Stream name</Box>
+          <Input
+            sx={{ mb: 2 }}
+            autoFocus={true}
+            label="Stream name"
+            value={streamName}
+            onChange={e => setStreamName(e.target.value)}
+            placeholder="new-stream-name-123"
+          />
+          <Box sx={{ fontSize: 1, color: "listText" }}>
+            (a-z, A-Z, 0-9, -, _, ~ only)
+          </Box>
+
+          <Flex sx={{ justifyContent: "flex-beginning", mt: 4 }}>
+            <Button type="submit" variant="outline">
               Save
             </Button>
           </Flex>
         </form>
-      </Box>
+      </Container>
     </Layout>
   );
 };
