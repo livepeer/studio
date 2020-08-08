@@ -114,7 +114,8 @@ export default ({ id }: { id: string }) => {
     createWebhook({
       event: "streamStarted",
       name: webhookName,
-      url: webhookUrl
+      url: webhookUrl,
+      blocking
     })
       .then(() => setMessage("Webhook created"))
       .catch(e => setMessage(`Error: ${e}`));
@@ -292,7 +293,7 @@ export default ({ id }: { id: string }) => {
           Delete
         </Button>
       </Box>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
+      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header} key="webhook header">
           <Box></Box>
           <Box
@@ -318,6 +319,9 @@ export default ({ id }: { id: string }) => {
             onClick={sortUrl}
           >
             URL ⭥
+          </Box>
+          <Box >
+            Blocking
           </Box>
           <Box
             sx={{
@@ -357,6 +361,7 @@ export default ({ id }: { id: string }) => {
                 <UserName id={userId} users={users} />
                 <Box>{name}</Box>
                 <Box>{url}</Box>
+                <Checkbox value={webhook.blocking} />
                 <RelativeTime
                   id={id}
                   prefix="createdat"

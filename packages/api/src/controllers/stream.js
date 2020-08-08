@@ -323,21 +323,17 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     let sanitized = {...stream}
     delete sanitized.streamKey
 
-    const all = false // TODO remove hardcoding here 
-    const limit = 100 // hard limit so we won't spam endpoints, TODO , have a better adjustable limit 
-    
-    let webhooks = await getWebhooks(req.store, req.user.id, 'streamStarted')
-    let output = webhooks.data
-    let webhookResps
+    const { data: webhooksList } = await getWebhooks(req.store, req.user.id, 'streamStarted')
     try {
-      webhookResps = await Promise.all(
-        output.map(async (webhook, key) => {
+      const responses = await Promise.all(
+        webhooksList.map(async (webhook, key) => {
           // console.log('webhook: ', webhook)
+          logger.info(`trying webhook ${webhook.name}: ${webhook.url}`)
           let ips, urlObj, isLocal
           try {
             urlObj = parseUrl(webhook.url)
             if (urlObj.host) {
-              ips = await resolver.resolve4(urlObj.host)
+              ips = await resolver.resolve4(urlObj.hostname)
             }
           } catch (e) {
             console.error('error: ', e)
@@ -345,7 +341,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
           }
 
           // This is mainly useful for local testing
-          if (req.isUIAdmin) {
+          if (req.user.admin) {
             isLocal = false
           } else {
             try {
@@ -380,24 +376,27 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
             }
       
             try {
-              console.log(`webhook ${webhook.id} firing`)
+              logger.info(`webhook ${webhook.id} firing`)
               let resp = await fetchWithTimeout(webhook.url, params)
               if (resp.status >= 200 && resp.status < 300) { // 2xx requests are cool.
                 // all is good
-                console.log(`webhook ${webhook.id} fired successfully`)
+                logger.info(`webhook ${webhook.id} fired successfully`)
                 return true
-              } else {
-                // block this
-                console.error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
-                throw new Error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
               }
+              console.error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
+              return !webhook.blocking
             } catch (e) {
               console.log('firing error', e)
-              throw e 
+              return !webhook.blocking
             }
           }
         })
       )
+      if (responses.some(o => !o)) {
+        // at least one of responses is false, blocking this stream
+        res.status(403)
+        return res.end()
+      }
     } catch (e) {
       console.error('webhook loop error', e)
       res.status(400)
@@ -408,8 +407,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   stream.isActive = req.body.active
   stream.lastSeen = +new Date()
   await req.store.replace(stream)
-  
-  
+
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false)
     if (pStream && !pStream.deleted) {
@@ -418,7 +416,6 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
       await req.store.replace(pStream)
     }
   }
-
 
   res.status(204)
   res.end()

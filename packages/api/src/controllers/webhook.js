@@ -64,6 +64,7 @@ app.post('/', authMiddleware({}), validatePost('webhook'), async (req, res) => {
     createdAt: createdAt,
     event: req.body.event,
     url: req.body.url,
+    blocking: req.body.blocking === undefined ? true : !!req.body.blocking,
   }
 
   try {
