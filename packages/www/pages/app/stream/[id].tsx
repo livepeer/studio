@@ -6,7 +6,8 @@ import {
   Button,
   Flex,
   Heading,
-  Container
+  Container,
+  Link as A,
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -26,7 +27,7 @@ import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
 import {
   RelativeTime,
-  RenditionsDetails
+  RenditionsDetails,
 } from "../../../components/StreamsTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
@@ -77,7 +78,7 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               cursor: "pointer",
               width: 14,
               height: 14,
-              color: "listText"
+              color: "listText",
             }}
           />
         </Flex>
@@ -99,7 +100,7 @@ export default () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord
+    setRecord,
   } = useApi();
   const router = useRouter();
   const { query, asPath } = router;
@@ -112,16 +113,16 @@ export default () => {
 
   useEffect(() => {
     getIngest()
-      .then(ingest => setIngest(ingest))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((ingest) => setIngest(ingest))
+      .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
   useEffect(() => {
     if (!id) {
       return;
     }
     getStream(id)
-      .then(stream => setStream(stream))
-      .catch(err => {
+      .then((stream) => setStream(stream))
+      .catch((err) => {
         if (err && err.status === 404) {
           setNotFound(true);
         }
@@ -135,8 +136,8 @@ export default () => {
     }
     const interval = setInterval(() => {
       getStream(id)
-        .then(stream => setStream(stream))
-        .catch(err => console.error(err)); // todo: surface this
+        .then((stream) => setStream(stream))
+        .catch((err) => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
   }, [id, isVisible]);
@@ -171,7 +172,7 @@ export default () => {
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
-      <Container sx={{ mt: 3 }}>
+      <Container>
         {deleteModal && stream && (
           <DeleteStreamModal
             streamName={stream.name}
@@ -211,18 +212,18 @@ export default () => {
             </Flex>
           </Modal>
         )}
-        <Box sx={{ mb: 3, fontWeight: 500 }}>
-          <Link href={backLink}>
-            <a>{"← stream list"}</a>
-          </Link>
-        </Box>
+        <Link href={backLink} passHref>
+          <A sx={{ fontWeight: 500, mb: 3, color: "text", display: "block" }}>
+            {"← stream list"}
+          </A>
+        </Link>
         {stream ? (
           <>
             <Flex
               sx={{
                 justifyContent: "flex-start",
                 alignItems: "baseline",
-                flexDirection: "column"
+                flexDirection: "column",
               }}
             >
               <Heading as="h3" sx={{ mb: "0.5em" }}>
@@ -234,7 +235,7 @@ export default () => {
                   alignItems: "center",
                   gridTemplateColumns: "10em auto",
                   width: "100%",
-                  fontSize: 0
+                  fontSize: 0,
                 }}
               >
                 <Cell>Stream name</Cell>
@@ -267,14 +268,14 @@ export default () => {
                     <Flex
                       sx={{
                         justifyContent: "flex-start",
-                        alignItems: "center"
+                        alignItems: "center",
                       }}
                     >
                       <Box
                         sx={{
                           minWidth: 125,
                           fontSize: 12,
-                          paddingRight: "1em"
+                          paddingRight: "1em",
                         }}
                       >
                         {getIngestURL(stream, false)}
@@ -296,7 +297,7 @@ export default () => {
                   sx={{
                     m: "0.4em",
                     justifySelf: "flex-start",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                   onClick={() => {
                     if (stream.record) {
@@ -329,7 +330,7 @@ export default () => {
                       sx={{
                         color: "muted",
                         cursor: "pointer",
-                        ml: 1
+                        ml: 1,
                       }}
                     />
                   </Flex>
@@ -360,60 +361,33 @@ export default () => {
                 <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
                 {user.admin ? (
                   <>
+                    <Cell> </Cell>
+                    <Cell>
+                      <strong>Admin only fields:</strong>
+                    </Cell>
                     <Cell>Deleted</Cell>
                     <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
+                    <Cell>Source segments</Cell>
+                    <Cell>{stream.sourceSegments || 0}</Cell>
+                    <Cell>Transcoded segments</Cell>
+                    <Cell>{stream.transcodedSegments || 0}</Cell>
+                    <Cell>Source duration</Cell>
+                    <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
+                    <Cell>Transcoded duration</Cell>
+                    <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
                   </>
                 ) : null}
               </Box>
-              <Cell>Renditions</Cell>
-              <Cell>
-                <RenditionsDetails stream={stream} />
-              </Cell>
-              <Cell>Created at</Cell>
-              <Cell>
-                <RelativeTime
-                  id="cat"
-                  prefix="createdat"
-                  tm={stream.createdAt}
-                  swap={true}
-                />
-              </Cell>
-              <Cell>Last seen</Cell>
-              <Cell>
-                <RelativeTime
-                  id="last"
-                  prefix="lastSeen"
-                  tm={stream.lastSeen}
-                  swap={true}
-                />
-              </Cell>
-              <Cell>Status</Cell>
-              <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-              {user.admin ? (
-                <>
-                  <Cell> </Cell>
-                  <Cell>
-                    <strong>Admin only fields:</strong>
-                  </Cell>
-                  <Cell>Deleted</Cell>
-                  <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
-                  <Cell>Source segments</Cell>
-                  <Cell>{stream.sourceSegments || 0}</Cell>
-                  <Cell>Transcoded segments</Cell>
-                  <Cell>{stream.transcodedSegments || 0}</Cell>
-                  <Cell>Source duration</Cell>
-                  <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
-                  <Cell>Transcoded duration</Cell>
-                  <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
-                </>
-              ) : null}
             </Flex>
-            <Flex>
+            <Flex
+              sx={{
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 type="button"
                 variant="outlineSmall"
                 onClick={() => setDeleteModal(true)}
-                sx={{ mr: 0, mt: 4 }}
               >
                 Delete
               </Button>

@@ -34,7 +34,7 @@ export default ({
         borderBottom: skinny ? "0" : "1px solid",
         borderColor: "muted",
         pt: skinny ? 4 : 0,
-        pb: 4
+        pb: skinny ? 4 : "65px",
       }}
       {...props}
     >
@@ -43,7 +43,7 @@ export default ({
           columns={[1, 1, 1, centered ? 1 : 2]}
           sx={{
             alignItems: "center",
-            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 97px)"]
+            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
           }}
         >
           <Box
@@ -55,14 +55,14 @@ export default ({
                 "center",
                 "center",
                 "center",
-                centered ? "center" : "left"
-              ]
+                centered ? "center" : "left",
+              ],
             }}
           >
             {heading && (
               <Styled.h1
                 sx={{
-                  fontSize: [48, 56, 7]
+                  fontSize: [48, 56, 7],
                 }}
               >
                 {heading}
@@ -72,7 +72,7 @@ export default ({
               <Box
                 sx={{
                   mt: 4,
-                  fontSize: "18px"
+                  fontSize: "18px",
                 }}
               >
                 {tagline}
@@ -87,10 +87,10 @@ export default ({
                     "center",
                     "center",
                     "center",
-                    centered ? "center" : "flex-start"
+                    centered ? "center" : "flex-start",
                   ],
                   width: "100%",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 {ctas.map((cta, i) => (
@@ -110,7 +110,7 @@ export default ({
                 width: ["100%", "100%", "100%", centered ? "'100%'" : "auto"],
                 mr: [0, 0, -260],
                 position: "relative",
-                right: [0, 0, 0, -100]
+                right: [0, 0, 0, -100],
               }}
               className="lazyload"
               data-src={builder.image(image).url()}
