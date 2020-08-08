@@ -12,7 +12,7 @@ export default ({ children }) => {
         sx={{
           borderBottom: "1px solid",
           borderColor: "muted",
-          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)"
+          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)",
         }}
       >
         <Container>
@@ -23,14 +23,14 @@ export default ({ children }) => {
               cursor: "pointer",
               pb: 3,
               pt: 2,
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <svg
               sx={{
                 mr: 3,
                 ml: "1px",
-                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)"
+                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
               }}
               width="6"
               height="10"
@@ -55,19 +55,19 @@ export default ({ children }) => {
               bg: "white",
               position: ["fixed", "fixed", "sticky"],
               top: [113, 113, 0],
-              height: ["calc(100vh - 258px)"],
+              height: ["calc(100vh - 113px)"],
               overflow: "scroll",
               minWidth: ["100%", "100%", 350],
               maxWidth: ["100%", "100%", 350],
               display: [
                 isOpen ? "block" : "none",
                 isOpen ? "block" : "none",
-                "block"
+                "block",
               ],
               left: 0,
               zIndex: 10,
               pt: 3,
-              px: 3
+              px: 3,
             }}
           >
             <Box sx={{ mb: 3 }}>
