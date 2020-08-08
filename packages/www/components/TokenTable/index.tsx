@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks";
-import { Box, Button, Flex, Input, Container } from "@theme-ui/components";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Container,
+  Heading
+} from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
 import CopyBox from "../CopyBox";
@@ -55,18 +62,21 @@ export default ({ userId, id }: TokenTableProps) => {
                   });
               }}
             >
-              <h3>Create token</h3>
-              <p>
+              <Heading as={"h3"} sx={{ mb: 2 }}>
+                Create token
+              </Heading>
+              <Box sx={{ mb: 3 }}>
                 Enter a name for your token to differentiate it from other
                 tokens.
-              </p>
+              </Box>
               <Input
+                sx={{ mb: 3 }}
                 label="Name"
                 value={tokenName}
                 onChange={e => setTokenName(e.target.value)}
                 placeholder="New Token"
               ></Input>
-              <Flex sx={{ justifyContent: "flex-end", py: 3 }}>
+              <Flex sx={{ justifyContent: "flex-end", pt: 3 }}>
                 <Button
                   type="button"
                   variant="outlineSmall"
