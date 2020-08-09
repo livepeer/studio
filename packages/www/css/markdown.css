@@ -137,12 +137,8 @@
 }
 
 .markdown-body a {
-  color: #0366d6;
+  color: #3f3fe2;
   text-decoration: none;
-}
-
-.markdown-body a:hover {
-  text-decoration: underline;
 }
 
 .markdown-body strong {
@@ -297,7 +293,7 @@
 .markdown-body :checked + .radio-label {
   position: relative;
   z-index: 1;
-  border-color: #0366d6;
+  border-color: #3f3fe2;
 }
 
 .markdown-body .border {

@@ -4,14 +4,8 @@ import { MDXProvider } from "@mdx-js/react";
 import CodeBlock from "../components/CodeBlock";
 import { Styled } from "theme-ui";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 const StyledA = ({ href, children }) => {
-  const router = useRouter();
-  let opacity = 0.65;
-  if (router.pathname === href) {
-    opacity = 1;
-  }
   const isInternal = href.startsWith("/");
   const internalA = (
     <a
@@ -20,8 +14,13 @@ const StyledA = ({ href, children }) => {
       sx={{
         textDecoration: "none",
         cursor: "pointer",
-        opacity: opacity,
-        "&:hover": { opacity: 1 },
+        opacity: 1,
+        transition: ".3s opacity",
+        "&:hover": {
+          textDecoration: "none",
+          transition: ".3s opacity",
+          opacity: 0.75,
+        },
       }}
     >
       {children}

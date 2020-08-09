@@ -202,7 +202,7 @@ export const theme = {
       lineHeight: "body",
     },
     a: {
-      color: "#0000ff",
+      color: "extremelyBlue",
     },
     pre: {
       borderRadius: 12,
