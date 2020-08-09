@@ -10,6 +10,9 @@ export default ({ children }) => {
     <Layout>
       <Box
         sx={{
+          position: "sticky",
+          top: 64,
+          bg: "white",
           borderBottom: "1px solid",
           borderColor: "muted",
           boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)",
@@ -22,7 +25,7 @@ export default ({ children }) => {
               display: ["flex", "flex", "none"],
               cursor: "pointer",
               pb: 3,
-              pt: 2,
+              pt: 3,
               alignItems: "center",
             }}
           >

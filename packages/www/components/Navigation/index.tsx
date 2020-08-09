@@ -8,17 +8,33 @@ import {
 import Link from "next/link";
 import Logo from "../../public/img/logo.svg";
 import { useApi } from "../../hooks";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Menu from "./menu";
 import { useRouter } from "next/router";
 
 export default () => {
   const { pathname } = useRouter();
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
+
+  const handleScroll = useCallback(() => {
+    const { scrollTop } = document.documentElement;
+    if (scrollTop > 0) setHasScrolled(true);
+    else setHasScrolled(false);
+  }, []);
+
+  useEffect(() => {
+    handleScroll();
+    document.addEventListener("scroll", handleScroll);
+
+    return () => {
+      document.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -29,8 +45,10 @@ export default () => {
   return (
     <Box
       sx={{
-        boxShadow:
-          "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px",
+        transition: "box-shadow .3s, top .3s",
+        boxShadow: hasScrolled
+          ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
+          : "none",
       }}
     >
       <Container>

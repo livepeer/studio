@@ -41,7 +41,6 @@ const listItems = [
   },
   {
     label: "How to live stream with Livepeer API",
-    open: true,
     children: [
       {
         label: "How to create an API key",
