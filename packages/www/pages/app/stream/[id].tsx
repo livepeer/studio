@@ -213,7 +213,15 @@ export default () => {
           </Modal>
         )}
         <Link href={backLink} passHref>
-          <A sx={{ fontWeight: 500, mb: 3, color: "text", display: "block" }}>
+          <A
+            sx={{
+              mt: 4,
+              fontWeight: 500,
+              mb: 3,
+              color: "text",
+              display: "block",
+            }}
+          >
             {"← stream list"}
           </A>
         </Link>

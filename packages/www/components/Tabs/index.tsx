@@ -20,12 +20,11 @@ export default ({ tabs }: TabsProps) => {
         alignItems: "center",
         width: "100%",
         mt: 2,
-        mb: [3, 3],
         mx: "auto",
         position: "relative",
         borderBottom: "1px solid",
         borderColor: "muted",
-        pb: 2
+        pb: 2,
       }}
     >
       <Container>
@@ -39,7 +38,7 @@ export default ({ tabs }: TabsProps) => {
                 fontSize: 1,
                 borderBottom: "3px solid",
                 textDecoration: "none",
-                borderColor: tab.isActive ? "primary" : "transparent"
+                borderColor: tab.isActive ? "primary" : "transparent",
               }}
             >
               {tab.name}

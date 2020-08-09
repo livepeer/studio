@@ -6,7 +6,7 @@ import {
   Flex,
   Input,
   Container,
-  Heading
+  Heading,
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
@@ -29,8 +29,8 @@ export default ({ userId, id }: TokenTableProps) => {
   const { getApiTokens, createApiToken, deleteApiToken } = useApi();
   useEffect(() => {
     getApiTokens(userId)
-      .then(tokens => setTokens(tokens))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((tokens) => setTokens(tokens))
+      .catch((err) => console.error(err)); // todo: surface this
   }, [userId, newToken, deleteModal]);
   const close = () => {
     setCreateModal(false);
@@ -40,24 +40,24 @@ export default ({ userId, id }: TokenTableProps) => {
     setCopyTime(null);
   };
   return (
-    <Container sx={{ mt: 2 }}>
+    <Container>
       {createModal && (
         <Modal onClose={close}>
           {!newToken && (
             <form
               id={id}
-              onSubmit={e => {
+              onSubmit={(e) => {
                 e.preventDefault();
                 if (creating) {
                   return;
                 }
                 setCreating(true);
                 createApiToken({ name: tokenName })
-                  .then(newToken => {
+                  .then((newToken) => {
                     setNewToken(newToken);
                     setCreating(false);
                   })
-                  .catch(e => {
+                  .catch((e) => {
                     setCreating(false);
                   });
               }}
@@ -73,7 +73,7 @@ export default ({ userId, id }: TokenTableProps) => {
                 sx={{ mb: 3 }}
                 label="Name"
                 value={tokenName}
-                onChange={e => setTokenName(e.target.value)}
+                onChange={(e) => setTokenName(e.target.value)}
                 placeholder="New Token"
               ></Input>
               <Flex sx={{ justifyContent: "flex-end", pt: 3 }}>
@@ -110,7 +110,7 @@ export default ({ userId, id }: TokenTableProps) => {
                 sx={{
                   justifyContent: "space-between",
                   alignItems: "center",
-                  py: 3
+                  py: 3,
                 }}
               >
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>
@@ -147,10 +147,7 @@ export default ({ userId, id }: TokenTableProps) => {
           </Flex>
         </Modal>
       )}
-      <Box sx={{ mb: 3 }}>
-        <strong>Note:</strong> These tokens allow other apps to control your
-        whole account. Treat them like you would a password.
-      </Box>
+
       <Box sx={{ mb: 3 }}>
         <Button
           variant="outlineSmall"
@@ -169,13 +166,17 @@ export default ({ userId, id }: TokenTableProps) => {
           Delete
         </Button>
       </Box>
+      <Box sx={{ color: "offBlack", mb: 3 }}>
+        <strong>Note:</strong> These tokens allow other apps to control your
+        whole account. Treat them like you would a password.
+      </Box>
       <Table sx={{ gridTemplateColumns: "auto 1fr auto" }}>
         <TableRow variant={TableRowVariant.Header}>
           <Box></Box>
           <Box>Name</Box>
           <Box>Last Active</Box>
         </TableRow>
-        {tokens.map(token => {
+        {tokens.map((token) => {
           const { id, name, lastSeen } = token;
           let formattedLastSeen = <em>unused</em>;
           if (lastSeen) {
