@@ -95,7 +95,7 @@ export default ({ ...props }) => {
   const { asPath } = useRouter();
   return (
     <Box sx={{ a: { textDecoration: "none" } }} {...props}>
-      <Styled.h5 as="h1" sx={{ mb: 3 }}>
+      <Styled.h5 as="h1" sx={{ mb: 4 }}>
         Documentation
       </Styled.h5>
       {listItems.map((listItem, i) => {

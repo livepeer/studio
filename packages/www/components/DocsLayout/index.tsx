@@ -69,7 +69,7 @@ export default ({ children }) => {
               ],
               left: 0,
               zIndex: 10,
-              pt: 3,
+              pt: 2,
               px: 3,
             }}
           >
