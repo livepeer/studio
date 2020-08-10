@@ -3,7 +3,7 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton,
+  IconButton
 } from "@theme-ui/components";
 import Link from "next/link";
 import Logo from "../../public/img/logo.svg";
@@ -48,7 +48,7 @@ export default () => {
         transition: "box-shadow .3s, top .3s",
         boxShadow: hasScrolled
           ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
-          : "none",
+          : "none"
       }}
     >
       <Container>
@@ -56,7 +56,7 @@ export default () => {
           sx={{
             py: 3,
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <Link href="/" passHref>
@@ -67,7 +67,7 @@ export default () => {
                 color: "primary",
                 display: "flex",
                 alignItems: "center",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
             >
               <Logo sx={{ color: "primary" }} />
@@ -76,7 +76,7 @@ export default () => {
                   sx={{
                     ml: "12px",
                     fontWeight: 500,
-                    fontSize: "18px",
+                    fontSize: "18px"
                   }}
                 >
                   livepeer.com
@@ -90,7 +90,7 @@ export default () => {
                 width: "33.33%",
                 justifyContent: "center",
                 alignItems: "center",
-                display: ["none", "none", "flex"],
+                display: ["none", "none", "flex"]
               }}
             >
               <Link href="/docs" passHref>
@@ -101,7 +101,7 @@ export default () => {
               <Link href="/#contactSection" passHref>
                 <A variant="nav">Contact Us</A>
               </Link>
-              <Link href="/jobs" passHref>
+              <Link href="/[slug]" as="/jobs" passHref>
                 <A variant="nav" sx={{ mr: 0 }}>
                   We're hiring
                 </A>
@@ -114,7 +114,7 @@ export default () => {
                 display: ["none", "none", "flex"],
                 width: "33.33%",
                 justifyContent: "flex-end",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <Link href="/login" passHref>
@@ -135,7 +135,7 @@ export default () => {
                 width: "33%",
                 display: ["none", "none", "flex"],
                 alignItems: "center",
-                justifyContent: "flex-end",
+                justifyContent: "flex-end"
               }}
             >
               {isDashboard && (
@@ -173,7 +173,7 @@ export default () => {
             sx={{
               color: "black",
               display: ["flex", "flex", "none"],
-              fontSize: 6,
+              fontSize: 6
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >
