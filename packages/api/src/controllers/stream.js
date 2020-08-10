@@ -388,6 +388,11 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
               if (resp.status >= 200 && resp.status < 300) { // 2xx requests are cool.
                 // all is good
                 console.log(`webhook ${webhook.id} fired successfully`)
+                if (stream.wildcard) {
+                  // capture the UGC defined playbackId here...
+                  stream.playbackId = `${stream.playbackId}+${resp.playbackId}`
+                  await req.store.replace(stream)
+                }
                 return true
               } else {
                 // block this
