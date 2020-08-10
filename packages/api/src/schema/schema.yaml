@@ -232,6 +232,8 @@ components:
           type: object
           additionalProperties:
             type: string
+        wildcard:
+          type: boolean
 
     error:
       required:
