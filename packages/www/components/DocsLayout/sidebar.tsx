@@ -71,6 +71,10 @@ const listItems = [
         label: "How to delete a stream",
         href: "/docs/livepeer-api/delete-a-stream",
       },
+      {
+        label: "Webhooks",
+        href: "/docs/livepeer-api/webhooks",
+      },
     ],
   },
   {

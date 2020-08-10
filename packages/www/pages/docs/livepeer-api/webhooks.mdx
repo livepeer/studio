@@ -1,0 +1,94 @@
+import DocsLayout from "../../../components/DocsLayout";
+
+<DocsLayout>
+
+### How to Create a Webhook
+
+To create a webhook, We'll send a POST requst to `https://livepeer.com/api/webhook`.
+
+We will use the API key as a part of the authorization header, and use a JSON body to specify the configuration for the stream.  For example:
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_webhook",
+  "event": "streamStarted",  
+  "url": "https://example.com/example_endpoint"
+}' \
+https://livepeer.com/api/webhook
+```
+
+If all goes well, you should receive a JSON response with the webhook id like this
+
+```json
+{ 
+  "id": "14294df9-8606-40b5-841e-d92e36ec587f",
+  "userId": "1db6db10-21b6-48cb-8b47-3224fa4cb0dc",
+  "kind": "webhook",
+  "name": "test_webhook",
+  "createdAt": 1597060307289,
+  "event": "streamStarted",
+  "url": "https://example.com/example_endpoint",
+}
+
+```
+
+### How to get a webhook's details?
+
+```bash
+curl -X GET \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+https://livepeer.com/api/webhook/{webhook_id}
+```
+
+### modifying a webhook 
+
+```bash
+curl -X PUT \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_webhook",
+  "event": "streamStarted",  
+  "url": "https://modified_endpoint_goes_here"
+}' \
+https://livepeer.com/api/webhook/{webhook_id}
+```
+
+### deleting a webhook
+
+```bash
+curl -X DELETE \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+https://livepeer.com/api/webhook/{webhook_id}
+```
+
+----------
+
+### Webhook payload
+
+Whenever a webhook is triggered, the payload received at the defined endpoint has the webhook `id` , `event` string, and the `stream` object.
+
+```json
+{
+  "id": "14294df9-8606-40b5-841e-d92e36ec587f",
+  "event": "streamStarted",
+  "stream": {
+    "name":"test_stream",
+    "profiles":[
+      {"name":"720p","bitrate":2000000,"fps":30,"width":1280,"height":720},
+      {"name":"480p","bitrate":1000000,"fps":30,"width":854,"height":480}],
+      {"name":"360p","bitrate":500000,"fps":30,"width":640,"height":360}],
+    "id":"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "createdAt":1596081229373,
+    "streamKey":"rlmn-uimq-jtgy-x98v",
+    "playbackId":"emh3b2mxupongp5k"
+  } 
+}
+```
+
+</DocsLayout>
