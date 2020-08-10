@@ -90,6 +90,10 @@ const listItems = [
       },
     ],
   },
+  {
+    label: "Feature Support Matrix",
+    href: "/docs/support-matrix",
+  },
 ];
 
 export default () => {
