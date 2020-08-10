@@ -30,7 +30,7 @@ export default () => {
             alignItems: "center",
             justifyContent: "center",
             flexGrow: 1,
-            flexDirection: "column",
+            flexDirection: "column"
           }}
         >
           Password reset link sent to your email.
@@ -45,10 +45,10 @@ export default () => {
           alignItems: "center",
           justifyContent: "center",
           flexGrow: 1,
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
-        <h3 sx={{ mb: [3, 3] }}>Reset your password</h3>
+        <h3 sx={{ mb: 4 }}>Reset your password</h3>
         <Login
           id="forgot-password"
           showEmail={true}

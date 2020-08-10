@@ -2,7 +2,7 @@
 import React from "react";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import theme from "prism-react-renderer/themes/vsDark";
-import { Styled } from "theme-ui";
+import { Box } from "@theme-ui/components";
 
 export default ({ children, className }) => {
   let language = null;
@@ -17,7 +17,7 @@ export default ({ children, className }) => {
       theme={theme}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <Styled.pre className={className} style={{ ...style, padding: "20px" }}>
+        <Box>
           {tokens.map((line, i) => {
             // Workaround for MDX rendering trailing lines on everything
             const lastLine = i === tokens.length - 1;
@@ -32,7 +32,7 @@ export default ({ children, className }) => {
               </div>
             );
           })}
-        </Styled.pre>
+        </Box>
       )}
     </Highlight>
   );

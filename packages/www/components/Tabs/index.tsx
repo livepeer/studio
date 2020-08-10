@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Box, Container } from "@theme-ui/components";
 
 export interface TabType {
   name: string;
@@ -13,37 +14,38 @@ type TabsProps = {
 
 export default ({ tabs }: TabsProps) => {
   return (
-    <div
+    <Box
       sx={{
         display: "flex",
         alignItems: "center",
         width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
+        mt: 2,
         mx: "auto",
         position: "relative",
         borderBottom: "1px solid",
         borderColor: "muted",
+        pb: 2,
       }}
     >
-      {tabs.map((tab: TabType, i: number) => (
-        <Link key={i} href={tab.href} as={tab.as} passHref>
-          <a
-            sx={{
-              color: "black",
-              mr: "22px",
-              pb: "1px",
-              fontSize: 1,
-              fontWeight: tab.isActive ? "bolder" : 300,
-              borderBottom: "2px solid",
-              textDecoration: "none",
-              borderColor: tab.isActive ? "primary" : "transparent",
-            }}
-          >
-            {tab.name}
-          </a>
-        </Link>
-      ))}
-    </div>
+      <Container>
+        {tabs.map((tab: TabType, i: number) => (
+          <Link key={i} href={tab.href} as={tab.as} passHref>
+            <a
+              sx={{
+                color: tab.isActive ? "black" : "rgba(0,0,0,.6)",
+                mr: "22px",
+                pb: 2,
+                fontSize: 1,
+                borderBottom: "3px solid",
+                textDecoration: "none",
+                borderColor: tab.isActive ? "primary" : "transparent",
+              }}
+            >
+              {tab.name}
+            </a>
+          </Link>
+        ))}
+      </Container>
+    </Box>
   );
 };

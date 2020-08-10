@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, IconButton, Flex } from "@theme-ui/components";
+import { Box, Container, Flex } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
 import { Stream } from "@livepeer.com/api";
 import { RelativeTime, RenditionsDetails } from "../StreamsTable";
@@ -8,7 +8,7 @@ import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
 
-const baseRecordingsURL = "https://mdw-cdn.livepeer.monster/recordings"
+const baseRecordingsURL = "https://mdw-cdn.livepeer.monster/recordings";
 
 type RecordingURLProps = {
   manifestId: string;
@@ -109,15 +109,7 @@ export default ({
   }, [streamId, isVisible]);
 
   return streamsSessions.length ? (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto",
-        mt
-      }}
-    >
+    <Container sx={{ mt: 2 }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
       <Table sx={{ gridTemplateColumns: "auto auto auto " }}>
         <TableRow variant={TableRowVariant.Header}>
@@ -156,6 +148,6 @@ export default ({
           );
         })}
       </Table>
-    </Box>
+    </Container>
   ) : null;
 };

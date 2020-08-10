@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks";
-import { Box, Button, Flex, Input } from "@theme-ui/components";
+import { Box, Button, Flex, Container } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
 
@@ -17,8 +17,8 @@ export default ({ userId, id }: UserTableProps) => {
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
     getUsers()
-      .then((users) => setUsers(users))
-      .catch((err) => console.error(err)); // todo: surface this
+      .then(users => setUsers(users))
+      .catch(err => console.error(err)); // todo: surface this
   }, [userId, adminModal, removeAdminModal, selectedUser]);
   const close = () => {
     setAdminModal(false);
@@ -26,13 +26,10 @@ export default ({ userId, id }: UserTableProps) => {
     setSelectedUser(null);
   };
   return (
-    <Box
+    <Container
       id={id}
       sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto",
+        my: 2
       }}
     >
       {adminModal && selectedUser && (
@@ -117,7 +114,7 @@ export default ({ userId, id }: UserTableProps) => {
             <Box>EmailValid</Box>
             <Box>Admin</Box>
           </TableRow>
-          {users.map((user) => {
+          {users.map(user => {
             const { id, email, emailValid, admin } = user;
             const selected = selectedUser && selectedUser.id === id;
             return (
@@ -142,6 +139,6 @@ export default ({ userId, id }: UserTableProps) => {
           })}
         </Table>
       )}
-    </Box>
+    </Container>
   );
 };

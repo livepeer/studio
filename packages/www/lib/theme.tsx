@@ -42,11 +42,15 @@ export const theme = {
       borderColor: "transparent",
       borderStyle: "solid",
       bg: "initial",
+      display: "inline-block",
+      borderRadius: 4,
+      lineHeight: 1.4,
+      letterSpacing: ".5px",
       fontWeight: 500,
       px: 4,
-      letterSpacing: 0.75,
       py: "10px",
       cursor: "pointer",
+      textDecoration: "none",
       ":focus": {
         outline: "none",
       },
@@ -62,8 +66,8 @@ export const theme = {
     },
     primary: {
       variant: "buttons.default",
-      color: "primary",
-      bg: "accent",
+      color: "white",
+      bg: "primary",
       py: "10px",
     },
     secondary: {
@@ -97,32 +101,36 @@ export const theme = {
       variant: "buttons.outline",
       fontSize: 14,
       px: 3,
-      py: 2,
+      py: "6px",
     },
     primarySmall: {
       variant: "buttons.primary",
       fontSize: 14,
       px: 3,
-      py: 2,
+      py: "6px",
     },
     secondarySmall: {
       variant: "buttons.secondary",
       fontSize: 14,
       px: 3,
-      py: 2,
+      py: "6px",
     },
   },
   forms: {
     input: {
-      padding: 3,
+      py: 2,
+      px: 3,
       borderColor: "listText",
+      borderRadius: 4,
     },
   },
   links: {
     nav: {
+      cursor: "pointer",
       color: "body",
       textDecoration: "none",
       mx: 3,
+      fontSize: 1,
     },
   },
   layout: {
@@ -194,7 +202,7 @@ export const theme = {
       lineHeight: "body",
     },
     a: {
-      color: "#0000ff",
+      color: "extremelyBlue",
     },
     pre: {
       borderRadius: 12,
@@ -258,12 +266,6 @@ const Reset = () => (
       },
       a: {
         color: "#131418",
-      },
-      button: {
-        border: 0,
-        padding: 0,
-        fontSize: "100%",
-        backgroundColor: "transparent",
       },
       ".react-reveal": {
         opacity: 0,

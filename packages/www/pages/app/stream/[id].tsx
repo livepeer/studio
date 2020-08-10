@@ -1,6 +1,14 @@
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
-import { Spinner, Box, Button, Flex, Heading } from "@theme-ui/components";
+import {
+  Spinner,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Container,
+  Link as A,
+} from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
@@ -92,7 +100,7 @@ export default () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord
+    setRecord,
   } = useApi();
   const router = useRouter();
   const { query, asPath } = router;
@@ -164,229 +172,245 @@ export default () => {
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
-      {deleteModal && stream && (
-        <DeleteStreamModal
-          streamName={stream.name}
-          onClose={close}
-          onDelete={() => {
-            deleteStream(stream.id).then(() => Router.replace("/app/user"));
-          }}
-        />
-      )}
-      {recordOffModal && stream && (
-        <Modal onClose={close}>
-          <h3>Are you sure you want to turn off recoding?</h3>
-          <p>
-            Future stream sessions will not be recorded. In progress stream
-            sessions will be recorded. Past sessions recordings will still be
-            available.
-          </p>
-          <Flex sx={{ justifyContent: "flex-end" }}>
-            <Button
-              type="button"
-              variant="outlineSmall"
-              onClick={close}
-              sx={{ mr: 2 }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="secondarySmall"
-              onClick={() => {
-                close();
-                doSetRecord(stream, false);
-              }}
-            >
-              Turn off recording
-            </Button>
-          </Flex>
-        </Modal>
-      )}
-      <Box sx={{ my: "2em", maxWidth: 958, width: "100%", fontWeight: "bold" }}>
-        <Link href={backLink}>
-          <a>{"← stream list"}</a>
-        </Link>
-      </Box>
-      {stream ? (
-        <>
-          <Flex
-            sx={{
-              justifyContent: "flex-start",
-              alignItems: "baseline",
-              maxWidth: 958,
-              width: "100%",
-              flexDirection: "column",
+      <Container>
+        {deleteModal && stream && (
+          <DeleteStreamModal
+            streamName={stream.name}
+            onClose={close}
+            onDelete={() => {
+              deleteStream(stream.id).then(() => Router.replace("/app/user"));
             }}
-          >
-            <Heading as="h3" sx={{ mb: "0.5em" }}>
-              {stream.name}
-            </Heading>
-            <Box
-              sx={{
-                display: "grid",
-                alignItems: "center",
-                gridTemplateColumns: "10em auto",
-                width: "100%",
-                fontSize: 0,
-              }}
-            >
-              <Cell>Stream name</Cell>
-              <Cell>{stream.name}</Cell>
-              <Cell>Stream key</Cell>
-              <Cell>
-                {keyRevealed ? (
-                  stream.streamKey
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outlineSmall"
-                    onClick={() => setKeyRevealed(true)}
-                    sx={{ mr: 0, py: "4px", fontSize: 0 }}
-                  >
-                    Show secret stream key
-                  </Button>
-                )}
-              </Cell>
-              <Cell>RTMP ingest URL</Cell>
-              <Cell>
-                {keyRevealed ? (
-                  <ShowURL
-                    text=""
-                    url={getIngestURL(stream, keyRevealed)}
-                    urlToCopy={getIngestURL(stream, true)}
-                    anchor={false}
-                  />
-                ) : (
-                  <Flex
-                    sx={{ justifyContent: "flex-start", alignItems: "center" }}
-                  >
-                    <Box
-                      sx={{ minWidth: 125, fontSize: 12, paddingRight: "1em" }}
-                    >
-                      {getIngestURL(stream, false)}
-                      <b>stream-key</b>
-                      <i sx={{ ml: "2em" }}>
-                        Reveal your stream key and the full URL via the button
-                        above.
-                      </i>
-                    </Box>
-                  </Flex>
-                )}
-              </Cell>
-              <Cell>Playback URL</Cell>
-              <Cell>
-                <ShowURL text="" url={getPlaybackURL(stream)} anchor={true} />
-              </Cell>
-              <Cell>Record stream</Cell>
-              <Box
-                sx={{
-                  m: "0.4em",
-                  justifySelf: "flex-start",
-                  cursor: "pointer"
-                }}
+          />
+        )}
+        {recordOffModal && stream && (
+          <Modal onClose={close}>
+            <h3>Are you sure you want to turn off recoding?</h3>
+            <p>
+              Future stream sessions will not be recorded. In progress stream
+              sessions will be recorded. Past sessions recordings will still be
+              available.
+            </p>
+            <Flex sx={{ justifyContent: "flex-end" }}>
+              <Button
+                type="button"
+                variant="outlineSmall"
+                onClick={close}
+                sx={{ mr: 2 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="secondarySmall"
                 onClick={() => {
-                  if (stream.record) {
-                    setRecordOffModal(true);
-                  } else {
-                    doSetRecord(stream, true);
-                  }
+                  close();
+                  doSetRecord(stream, false);
                 }}
               >
-                <Flex>
-                  <Checkbox value={stream.record} />
-                  <ReactTooltip
-                    id={`tooltip-record-${stream.id}`}
-                    className="tooltip"
-                    place="top"
-                    type="dark"
-                    effect="solid"
-                  >
-                    <p>When checked, transcoded streaming sessions will be recorded
-                    and stored by Livepeer.<br/> Each recorded session will have a
-                    recording .m3u8 URL for playback. <br/>This feature is currently
-                    in beta and free.</p>
-                  </ReactTooltip>
-                  <Help
-                    data-tip
-                    data-for={`tooltip-record-${stream.id}`}
-                    sx={{
-                      color: "muted",
-                      cursor: "pointer",
-                      ml: 1
-                    }}
-                  />
-                </Flex>
-              </Box>
-              <Cell>Renditions</Cell>
-              <Cell>
-                <RenditionsDetails stream={stream} />
-              </Cell>
-              <Cell>Created at</Cell>
-              <Cell>
-                <RelativeTime
-                  id="cat"
-                  prefix="createdat"
-                  tm={stream.createdAt}
-                  swap={true}
-                />
-              </Cell>
-              <Cell>Last seen</Cell>
-              <Cell>
-                <RelativeTime
-                  id="last"
-                  prefix="lastSeen"
-                  tm={stream.lastSeen}
-                  swap={true}
-                />
-              </Cell>
-              <Cell>Status</Cell>
-              <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-              {user.admin ? (
-                <>
-                  <Cell> </Cell>
-                  <Cell><strong>Admin only fields:</strong></Cell>
-                  <Cell>Deleted</Cell>
-                  <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
-                  <Cell>Source segments</Cell>
-                  <Cell>{stream.sourceSegments || 0}</Cell>
-                  <Cell>Transcoded segments</Cell>
-                  <Cell>{stream.transcodedSegments || 0}</Cell>
-                  <Cell>Source duration</Cell>
-                  <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
-                  <Cell>Transcoded duration</Cell>
-                  <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
-                </>
-              ) : null}
-            </Box>
-          </Flex>
-          <Flex
+                Turn off recording
+              </Button>
+            </Flex>
+          </Modal>
+        )}
+        <Link href={backLink} passHref>
+          <A
             sx={{
-              mb: "2em",
-              justifyContent: "flex-end",
-              maxWidth: 958,
-              width: "100%",
+              mt: 4,
+              fontWeight: 500,
+              mb: 3,
+              color: "text",
+              display: "block",
             }}
           >
-            <Button
-              type="button"
-              variant="outlineSmall"
-              onClick={() => setDeleteModal(true)}
-              sx={{ mr: 0, py: "4px", fontSize: 0 }}
+            {"← stream list"}
+          </A>
+        </Link>
+        {stream ? (
+          <>
+            <Flex
+              sx={{
+                justifyContent: "flex-start",
+                alignItems: "baseline",
+                flexDirection: "column",
+              }}
             >
-              Delete
-            </Button>
+              <Heading as="h3" sx={{ mb: "0.5em" }}>
+                {stream.name}
+              </Heading>
+              <Box
+                sx={{
+                  display: "grid",
+                  alignItems: "center",
+                  gridTemplateColumns: "10em auto",
+                  width: "100%",
+                  fontSize: 0,
+                }}
+              >
+                <Cell>Stream name</Cell>
+                <Cell>{stream.name}</Cell>
+                <Cell>Stream key</Cell>
+                <Cell>
+                  {keyRevealed ? (
+                    stream.streamKey
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outlineSmall"
+                      onClick={() => setKeyRevealed(true)}
+                      sx={{ mr: 0, py: "4px", fontSize: 0 }}
+                    >
+                      Show secret stream key
+                    </Button>
+                  )}
+                </Cell>
+                <Cell>RTMP ingest URL</Cell>
+                <Cell>
+                  {keyRevealed ? (
+                    <ShowURL
+                      text=""
+                      url={getIngestURL(stream, keyRevealed)}
+                      urlToCopy={getIngestURL(stream, true)}
+                      anchor={false}
+                    />
+                  ) : (
+                    <Flex
+                      sx={{
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          minWidth: 125,
+                          fontSize: 12,
+                          paddingRight: "1em",
+                        }}
+                      >
+                        {getIngestURL(stream, false)}
+                        <b>stream-key</b>
+                        <i sx={{ ml: "2em" }}>
+                          Reveal your stream key and the full URL via the button
+                          above.
+                        </i>
+                      </Box>
+                    </Flex>
+                  )}
+                </Cell>
+                <Cell>Playback URL</Cell>
+                <Cell>
+                  <ShowURL text="" url={getPlaybackURL(stream)} anchor={true} />
+                </Cell>
+                <Cell>Record stream</Cell>
+                <Box
+                  sx={{
+                    m: "0.4em",
+                    justifySelf: "flex-start",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    if (stream.record) {
+                      setRecordOffModal(true);
+                    } else {
+                      doSetRecord(stream, true);
+                    }
+                  }}
+                >
+                  <Flex>
+                    <Checkbox value={stream.record} />
+                    <ReactTooltip
+                      id={`tooltip-record-${stream.id}`}
+                      className="tooltip"
+                      place="top"
+                      type="dark"
+                      effect="solid"
+                    >
+                      <p>
+                        When checked, transcoded streaming sessions will be
+                        recorded and stored by Livepeer.
+                        <br /> Each recorded session will have a recording .m3u8
+                        URL for playback. <br />
+                        This feature is currently in beta and free.
+                      </p>
+                    </ReactTooltip>
+                    <Help
+                      data-tip
+                      data-for={`tooltip-record-${stream.id}`}
+                      sx={{
+                        color: "muted",
+                        cursor: "pointer",
+                        ml: 1,
+                      }}
+                    />
+                  </Flex>
+                </Box>
+                <Cell>Renditions</Cell>
+                <Cell>
+                  <RenditionsDetails stream={stream} />
+                </Cell>
+                <Cell>Created at</Cell>
+                <Cell>
+                  <RelativeTime
+                    id="cat"
+                    prefix="createdat"
+                    tm={stream.createdAt}
+                    swap={true}
+                  />
+                </Cell>
+                <Cell>Last seen</Cell>
+                <Cell>
+                  <RelativeTime
+                    id="last"
+                    prefix="lastSeen"
+                    tm={stream.lastSeen}
+                    swap={true}
+                  />
+                </Cell>
+                <Cell>Status</Cell>
+                <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
+                {user.admin ? (
+                  <>
+                    <Cell> </Cell>
+                    <Cell>
+                      <strong>Admin only fields:</strong>
+                    </Cell>
+                    <Cell>Deleted</Cell>
+                    <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
+                    <Cell>Source segments</Cell>
+                    <Cell>{stream.sourceSegments || 0}</Cell>
+                    <Cell>Transcoded segments</Cell>
+                    <Cell>{stream.transcodedSegments || 0}</Cell>
+                    <Cell>Source duration</Cell>
+                    <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
+                    <Cell>Transcoded duration</Cell>
+                    <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
+                  </>
+                ) : null}
+              </Box>
+            </Flex>
+            <Flex
+              sx={{
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                type="button"
+                variant="outlineSmall"
+                onClick={() => setDeleteModal(true)}
+              >
+                Delete
+              </Button>
+            </Flex>
+            <StreamSessionsTable streamId={stream.id} />
+          </>
+        ) : notFound ? (
+          <Box>Not found</Box>
+        ) : (
+          <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
+            <Spinner sx={{ mr: "1em" }} />
+            <div sx={{ color: "text" }}>Loading</div>
           </Flex>
-          <StreamSessionsTable streamId={stream.id} />
-        </>
-      ) : notFound ? (
-        <Box>Not found</Box>
-      ) : (
-        <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
-          <Spinner sx={{ mr: "1em" }} />
-          <div sx={{ color: "text" }}>Loading</div>
-        </Flex>
-      )}
+        )}
+      </Container>
     </TabbedLayout>
   );
 };

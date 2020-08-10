@@ -41,7 +41,6 @@ const listItems = [
   },
   {
     label: "How to live stream with Livepeer API",
-    open: true,
     children: [
       {
         label: "How to create an API key",
@@ -92,17 +91,18 @@ const listItems = [
   },
 ];
 
-export default () => {
+export default ({ ...props }) => {
   const { asPath } = useRouter();
   return (
-    <Box sx={{ a: { textDecoration: "none" } }}>
-      <Styled.h5 as="h1" sx={{ mb: 3 }}>
+    <Box sx={{ a: { textDecoration: "none" } }} {...props}>
+      <Styled.h5 as="h1" sx={{ mb: 4 }}>
         Documentation
       </Styled.h5>
       {listItems.map((listItem, i) => {
         if (listItem?.children) {
           return (
             <Category
+              key={i}
               active={listItem.children.some((l) => l.href === asPath)}
               label={listItem.label}
               open={
