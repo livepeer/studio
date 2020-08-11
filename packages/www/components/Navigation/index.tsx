@@ -64,7 +64,6 @@ export default () => {
           <Link href="/" passHref>
             <A
               sx={{
-                width: '33.33%',
                 textDecoration: 'none',
                 color: 'primary',
                 display: 'flex',
@@ -86,88 +85,57 @@ export default () => {
               )}
             </A>
           </Link>
-          {!isDashboard && (
-            <Flex
-              sx={{
-                width: '33.33%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: ['none', 'none', 'flex'],
-              }}
-            >
-              <Link href="/docs" passHref>
-                <A variant="nav" sx={{ ml: 0 }}>
-                  Docs
-                </A>
-              </Link>
-              <Link href="/#contactSection" passHref>
-                <A variant="nav" sx={{ mr: 0 }}>
-                  Contact Us
-                </A>
-              </Link>
-            </Flex>
-          )}
-          {!loggedIn && (
-            <Flex
-              sx={{
-                display: ['none', 'none', 'flex'],
-                width: '33.33%',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}
-            >
-              <Link href="/login" passHref>
-                <A variant="nav" sx={{ fontWeight: 600, ml: 0, mr: 3 }}>
-                  Log in
-                </A>
-              </Link>
-              <Link href="/register" passHref>
-                <A variant="buttons.secondarySmall" sx={{ m: 0 }}>
-                  Sign up
-                </A>
-              </Link>
-            </Flex>
-          )}
-          {loggedIn && (
-            <Flex
-              sx={{
-                width: '33%',
-                display: ['none', 'none', 'flex'],
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}
-            >
-              {isDashboard && (
-                <>
-                  <Link href="/docs" passHref>
-                    <A variant="nav" sx={{ ml: 0 }}>
-                      Docs
-                    </A>
-                  </Link>
-                  <Link href="/#contactSection" passHref>
-                    <A variant="nav">Contact Us</A>
-                  </Link>
-                </>
-              )}
-
-              {user && user.admin && !isDashboard && (
-                <Link href="/app/admin" passHref>
-                  <A variant="nav">Admin</A>
-                </Link>
-              )}
-
-              <A variant="nav" onClick={() => logout()}>
-                Log Out
+          <Flex
+            sx={{
+              display: ['none', 'none', 'flex'],
+              width: '100%',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}
+          >
+            <Link href="/docs" passHref>
+              <A variant="nav" sx={{ ml: 0 }}>
+                Docs
               </A>
-              {!isDashboard && (
-                <Link href="/app/user" passHref>
-                  <A variant="buttons.outlineSmall" sx={{ ml: 2 }}>
-                    Dashboard
+            </Link>
+            <Link href="/#contactSection" passHref>
+              <A variant="nav">Contact Us</A>
+            </Link>
+            {!loggedIn && (
+              <>
+                <Link href="/login" passHref>
+                  <A variant="nav" sx={{ fontWeight: 600, ml: 3, mr: 3 }}>
+                    Log in
                   </A>
                 </Link>
-              )}
-            </Flex>
-          )}
+                <Link href="/register" passHref>
+                  <A variant="buttons.secondarySmall" sx={{ m: 0 }}>
+                    Sign up
+                  </A>
+                </Link>
+              </>
+            )}
+            {loggedIn && (
+              <>
+                {user && user.admin && !isDashboard && (
+                  <Link href="/app/admin" passHref>
+                    <A variant="nav">Admin</A>
+                  </Link>
+                )}
+
+                <A variant="nav" onClick={() => logout()}>
+                  Log Out
+                </A>
+                {!isDashboard && (
+                  <Link href="/app/user" passHref>
+                    <A variant="buttons.outlineSmall" sx={{ ml: 2 }}>
+                      Dashboard
+                    </A>
+                  </Link>
+                )}
+              </>
+            )}
+          </Flex>
           <IconButton
             sx={{
               color: 'black',
