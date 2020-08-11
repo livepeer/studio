@@ -3,52 +3,52 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton
-} from "@theme-ui/components";
-import Button from "../Button";
-import Link from "next/link";
-import Logo from "../../public/img/logo.svg";
-import { FiX } from "react-icons/fi";
+  IconButton,
+} from '@theme-ui/components'
+import Button from '../Button'
+import Link from 'next/link'
+import Logo from '../../public/img/logo.svg'
+import { FiX } from 'react-icons/fi'
 
 const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
   <Box
     sx={{
-      bg: "white",
-      position: "fixed",
+      bg: 'white',
+      position: 'fixed',
       top: 0,
-      height: mobileMenuIsOpen ? "100vh" : 0,
-      transition: "height .2s",
-      overflow: "hidden",
-      width: "100%",
-      zIndex: "dropdown",
-      visibility: mobileMenuIsOpen ? "visible" : "hidden"
+      height: mobileMenuIsOpen ? '100vh' : 0,
+      transition: 'height .2s',
+      overflow: 'hidden',
+      width: '100%',
+      zIndex: 'dropdown',
+      visibility: mobileMenuIsOpen ? 'visible' : 'hidden',
     }}
   >
     <Container
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        py: 3
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        py: 3,
       }}
     >
       <Link href="/" passHref>
         <A
           sx={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            textDecoration: "none",
-            color: "text"
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            color: 'text',
           }}
         >
-          <Logo sx={{ color: "primary" }} />
+          <Logo sx={{ color: 'primary' }} />
           {!token && (
             <Box
               sx={{
-                ml: "12px",
+                ml: '12px',
                 fontWeight: 500,
-                fontSize: "18px"
+                fontSize: '18px',
               }}
             >
               livepeer.com
@@ -67,12 +67,12 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
       sx={{
         pt: 4,
         pb: 4,
-        display: "flex",
-        flexDirection: "column",
-        height: `calc(100vh -70px)`
+        display: 'flex',
+        flexDirection: 'column',
+        height: `calc(100vh -70px)`,
       }}
     >
-      <Flex sx={{ flexDirection: "column" }}>
+      <Flex sx={{ flexDirection: 'column' }}>
         {!token && (
           <>
             <Link href="/login" passHref>
@@ -90,7 +90,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
       <Flex
         sx={{
           py: 3,
-          flexDirection: "column"
+          flexDirection: 'column',
         }}
       >
         {!!token && (
@@ -100,8 +100,8 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
                 sx={{
                   py: 3,
                   mb: 0,
-                  color: "text",
-                  textDecoration: "none"
+                  color: 'text',
+                  textDecoration: 'none',
                 }}
               >
                 Dashboard
@@ -117,9 +117,9 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
         <Link href="/#contactSection" passHref>
           <A
             sx={{
-              color: "text",
-              textDecoration: "none",
-              py: 3
+              color: 'text',
+              textDecoration: 'none',
+              py: 3,
             }}
           >
             Contact
@@ -128,30 +128,18 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
         <Link href="/docs" passHref>
           <A
             sx={{
-              color: "text",
-              textDecoration: "none",
+              color: 'text',
+              textDecoration: 'none',
               py: 3,
-              mb: 0
+              mb: 0,
             }}
           >
             Docs
           </A>
         </Link>
-        <Link href="/jobs" passHref>
-          <A
-            sx={{
-              color: "text",
-              textDecoration: "none",
-              py: 3,
-              mb: 0
-            }}
-          >
-            Jobs
-          </A>
-        </Link>
       </Flex>
     </Container>
   </Box>
-);
+)
 
-export default Menu;
+export default Menu
