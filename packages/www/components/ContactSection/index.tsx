@@ -1,32 +1,32 @@
-import { useRef, useState, useEffect } from "react";
-import { Styled } from "theme-ui";
-import { Box, Flex, Container } from "@theme-ui/components";
-import Textfield from "../Textfield";
-import { useForm } from "react-hubspot";
-import Button from "../Button";
-import SimpleBlockContent from "../SimpleBlockContent";
-import Fade from "react-reveal/Fade";
+import { useRef, useState, useEffect } from 'react'
+import { Styled } from 'theme-ui'
+import { Box, Flex, Container } from '@theme-ui/components'
+import Textfield from '../Textfield'
+import { useForm } from 'react-hubspot'
+import Button from '../Button'
+import SimpleBlockContent from '../SimpleBlockContent'
+import Fade from 'react-reveal/Fade'
 
 export default ({ heading, body }) => {
-  const formEl = useRef(null);
+  const formEl = useRef(null)
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
-  });
+  })
 
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false)
   useEffect(() => {
     if (data) {
-      setSubmitted(true);
-      formEl.current.reset();
+      setSubmitted(true)
+      formEl.current.reset()
       let timer = setTimeout(() => {
-        setSubmitted(false);
-      }, 4500);
+        setSubmitted(false)
+      }, 4500)
       return () => {
-        clearTimeout(timer);
-      };
+        clearTimeout(timer)
+      }
     }
-  }, [data]);
+  }, [data])
 
   return (
     <Container
@@ -34,26 +34,26 @@ export default ({ heading, body }) => {
         py: 88,
       }}
     >
-      <Box sx={{ mb: 48, textAlign: "center" }}>
+      <Box sx={{ mb: 48, textAlign: 'center' }}>
         {heading && (
           <Styled.h2 sx={{ fontSize: [5, 5, 6], mb: 3 }}>{heading}</Styled.h2>
         )}
-        <Box sx={{ maxWidth: 512, margin: "0 auto" }}>
+        <Box sx={{ maxWidth: 512, margin: '0 auto' }}>
           {body && <SimpleBlockContent blocks={body} />}
         </Box>
       </Box>
       <form
         ref={formEl}
         onSubmit={handleSubmit}
-        sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}
+        sx={{ textAlign: 'center', maxWidth: 958, margin: '0 auto' }}
       >
         <Flex
-          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
+          sx={{ flexDirection: ['column', 'row'], mb: [3, 4], mx: [0, -3] }}
         >
           <Textfield
             htmlFor="firstname"
             id="firstname"
-            sx={{ width: ["100%", "50%"], mb: [3, 0], mx: [0, 3] }}
+            sx={{ width: ['100%', '50%'], mb: [3, 0], mx: [0, 3] }}
             name="firstname"
             type="text"
             label="First Name"
@@ -61,41 +61,41 @@ export default ({ heading, body }) => {
           <Textfield
             htmlFor="lastname"
             id="lastname"
-            sx={{ width: ["100%", "50%"], mx: [0, 3] }}
+            sx={{ width: ['100%', '50%'], mx: [0, 3] }}
             name="lastname"
             type="text"
             label="Last Name"
           />
         </Flex>
         <Flex
-          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
+          sx={{ flexDirection: ['column', 'row'], mb: [3, 4], mx: [0, -3] }}
         >
           <Textfield
             htmlFor="email"
             id="email"
-            sx={{ width: ["100%", "50%"], mb: [3, 0], mx: [0, 3] }}
+            sx={{ width: ['100%', '50%'], mb: [3, 0], mx: [0, 3] }}
             name="email"
             type="email"
-            label="Email"
+            label="Email*"
             required
           />
           <Textfield
             htmlFor="company"
             id="company"
-            sx={{ width: ["100%", "50%"], mx: [0, 3] }}
+            sx={{ width: ['100%', '50%'], mx: [0, 3] }}
             name="company"
             type="text"
-            label="Company"
+            label="Organization"
           />
         </Flex>
         <Textfield
           htmlFor="message"
           id="message"
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
           as="textarea"
           name="message"
           type="text"
-          label="Message"
+          label="Message*"
           required
         />
 
@@ -109,5 +109,5 @@ export default ({ heading, body }) => {
         </Fade>
       </form>
     </Container>
-  );
-};
+  )
+}
