@@ -1,10 +1,7 @@
 import serverPromise from '../test-server'
 import { TestClient, clearDatabase } from '../test-helpers'
-import uuid from 'uuid/v4'
 
 let server
-let store
-let mockUser
 let mockAdminUser
 let mockNonAdminUser
 let postMockStream
@@ -36,11 +33,6 @@ beforeAll(async () => {
     },
   ]
 
-  mockUser = {
-    email: `mock_user@gmail.com`,
-    password: 'z'.repeat(64),
-  }
-
   mockAdminUser = {
     email: 'user_admin@gmail.com',
     password: 'x'.repeat(64),
@@ -49,15 +41,6 @@ beforeAll(async () => {
   mockNonAdminUser = {
     email: 'user_non_admin@gmail.com',
     password: 'y'.repeat(64),
-  }
-
-  store = {
-    id: 'mock_store',
-    credentials: 'abc123/abc123',
-    path: 'us-west-1/my-bucket',
-    userId: mockAdminUser.id,
-    type: 's3',
-    kind: 'object-store',
   }
 
   mockWebhook = {
@@ -71,10 +54,6 @@ beforeAll(async () => {
   }
 })
 
-// afterEach(async () => {
-//   await clearDatabase(server)
-// })
-
 async function setupUsers(server) {
   const client = new TestClient({
     server,
@@ -85,7 +64,7 @@ async function setupUsers(server) {
 
   let tokenRes = await client.post(`/user/token`, { ...mockAdminUser })
   const adminToken = await tokenRes.json()
-  client.jwtAuth = `${adminToken['token']}`
+  client.jwtAuth = adminToken['token']
 
   const user = await server.store.get(`user/${adminUser.id}`, false)
   adminUser = { ...user, admin: true, emailValid: true }
@@ -109,7 +88,7 @@ async function setupUsers(server) {
 describe('controllers/webhook', () => {
   describe('CRUD', () => {
     let client, adminUser, adminToken, nonAdminUser, nonAdminToken,
-    generatedWebhook
+    generatedWebhook, generatedWebhook2, generatedWebhookNonAdmin
 
     beforeAll(async () => {
       ;({
@@ -127,11 +106,28 @@ describe('controllers/webhook', () => {
 
     it('create a webhook', async () => {
       // console.log('mockWebhook: ', mockWebhook)
-      const res = await client.post('/webhook', { ...mockWebhook })
+      let res = await client.post('/webhook', { ...mockWebhook })
       let resJson = await res.json()
       console.log('webhook body: ', resJson)
       expect(res.status).toBe(201)
+      expect(resJson.blocking).toBe(true)
       generatedWebhook = resJson
+      res = await client.post('/webhook', { ...mockWebhook, name: 'test 2', blocking: false })
+      resJson = await res.json()
+      expect(resJson.blocking).toBe(false)
+      console.log('webhook body: ', resJson)
+      expect(res.status).toBe(201)
+      expect(resJson.name).toBe('test 2')
+      generatedWebhook2 = resJson
+
+      client.jwtAuth = nonAdminToken['token']
+      res = await client.post('/webhook', { ...mockWebhook, name: 'test non admin' })
+      resJson = await res.json()
+      console.log('webhook body: ', resJson)
+      expect(res.status).toBe(201)
+      expect(resJson.name).toBe('test non admin')
+      generatedWebhookNonAdmin = resJson
+      client.jwtAuth = adminToken['token']
     })
 
     it('get webhook info', async () => {
@@ -140,6 +136,24 @@ describe('controllers/webhook', () => {
       expect(res.status).toBe(200)
       expect(resJson.id).toEqual(generatedWebhook.id)
       expect(resJson.userId).toEqual(generatedWebhook.userId)
+    })
+
+    it('get webhooks list', async () => {
+      const res = await client.get(`/webhook?limit=1`)
+      const resJson = await res.json()
+      expect(res.status).toBe(200)
+      expect(res.headers.get('link')).toEqual(expect.stringContaining('cursor='))
+      expect(resJson).toHaveLength(1)
+      expect(resJson[0].userId).toEqual(generatedWebhook.userId)
+      expect([generatedWebhook2.id, generatedWebhook.id].includes(resJson[0].id)).toBe(true)
+    })
+
+    it('get webhooks list all', async () => {
+      const res = await client.get(`/webhook?allUsers=1`)
+      const resJson = await res.json()
+      expect(res.status).toBe(200)
+      expect(resJson).toHaveLength(3)
+      expect(resJson.map(wh => wh.name).includes('test non admin')).toBe(true)
     })
     
     it('update a webhook', async () => {

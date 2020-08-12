@@ -72,7 +72,7 @@ async function setupUsers(server) {
 
   let tokenRes = await client.post(`/user/token`, { ...mockAdminUser })
   const adminToken = await tokenRes.json()
-  client.jwtAuth = `${adminToken['token']}`
+  client.jwtAuth = adminToken['token']
 
   const user = await server.store.get(`user/${adminUser.id}`, false)
   adminUser = { ...user, admin: true, emailValid: true }

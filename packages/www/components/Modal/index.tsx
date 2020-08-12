@@ -1,7 +1,7 @@
 import { Flex, Box } from "@theme-ui/components";
 import { useLayoutEffect, useRef } from "react";
 
-export default ({ children, onClose }) => {
+export default ({ children, onClose, maxWidth = "500px" }) => {
   // Slightly hacky mechanism for focusing first input when first opened, if present
   useLayoutEffect(() => {
     const { current } = outerRef;
@@ -34,7 +34,7 @@ export default ({ children, onClose }) => {
           borderRadius: 6,
           backgroundColor: "white",
           padding: [4, 4],
-          maxWidth: "500px"
+          maxWidth,
         }}
         onClick={e => e.stopPropagation()}
       >

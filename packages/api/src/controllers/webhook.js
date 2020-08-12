@@ -9,16 +9,33 @@ import { makeNextHREF, trackAction, getWebhooks } from './helpers'
 const app = Router()
 
 app.get('/', authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event } = req.query
+  let { limit, cursor, all, event, allUsers } = req.query
+
+  if (req.user.admin && allUsers) {
+    const filter = all ? (o) => o : (o) => !o[Object.keys(o)[0]].deleted
+    const resp = await req.store.list({
+      prefix: `webhook/`,
+      cursor,
+      limit,
+      filter,
+    })
+    let output = resp.data
+    res.status(200)
+
+    if (output.length > 0) {
+      res.links({ next: makeNextHREF(req, resp.cursor) })
+    }
+    output = output.map((o) => o[Object.keys(o)[0]])
+    return res.json(output)
+  }
   
   let output = await getWebhooks(req.store, req.user.id, event, limit, cursor, all)
   res.status(200)
 
-  if (output.length > 0) {
-    res.links({ next: makeNextHREF(req, resp.cursor) })
+  if (output.data.length > 0) {
+    res.links({ next: makeNextHREF(req, output.cursor) })
   }
-  output = output.map((o) => o[Object.keys(o)[0]])
-  res.json(output)
+  res.json(output.data)
 })
 
 app.post('/', authMiddleware({}), validatePost('webhook'), async (req, res) => {
@@ -47,6 +64,7 @@ app.post('/', authMiddleware({}), validatePost('webhook'), async (req, res) => {
     createdAt: createdAt,
     event: req.body.event,
     url: req.body.url,
+    blocking: req.body.blocking === undefined ? true : !!req.body.blocking,
   }
 
   try {
@@ -71,7 +89,7 @@ app.get('/:id', authMiddleware({}), async (req, res) => {
 
   const webhook = await req.store.get(`webhook/${req.params.id}`)
   if ( !webhook || (webhook.deleted ||
-    webhook.userId !== req.user.id) && !req.isUIAdmin)
+    webhook.userId !== req.user.id) && !req.user.admin)
   {
     res.status(404)
     return res.json({ errors: ['not found'] })

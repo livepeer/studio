@@ -60,6 +60,10 @@ components:
         deleted:
           type: boolean
           default: false
+        blocking:
+          type: boolean
+          default: true
+          description: If true, returning non 2xx value from webhook will prevent stream from starting
 
     stream:
       type: object
