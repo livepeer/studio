@@ -1,7 +1,7 @@
 import Layout from "../components/Layout";
 import Login from "../components/Login";
 import Link from "next/link";
-import { Flex, Box } from "@theme-ui/components";
+import { Flex, Box, Heading } from "@theme-ui/components";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 
@@ -32,7 +32,9 @@ export default () => {
           mx: [3, 0],
         }}
       >
-        <h3 sx={{ mb: [3, 3] }}>Log in to Livepeer</h3>
+        <Heading as="h3" sx={{ mb: 4 }}>
+          Log in
+        </Heading>
         <Login
           id="login"
           onSubmit={onSubmit}

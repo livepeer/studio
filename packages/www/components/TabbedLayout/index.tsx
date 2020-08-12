@@ -13,7 +13,7 @@ type TabbedLayoutProps = {
 const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   tabs,
   logout,
-  children,
+  children
 }) => {
   return (
     <Layout>
@@ -21,17 +21,11 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
         sx={{
           flexDirection: "column",
           flexGrow: 1,
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Tabs tabs={tabs} />
         {children}
-        <Box sx={{ flexGrow: 1 }}></Box>
-        <Box sx={{ margin: 3 }}>
-          <Button variant="outline" onClick={logout}>
-            Log Out
-          </Button>
-        </Box>
       </Flex>
     </Layout>
   );

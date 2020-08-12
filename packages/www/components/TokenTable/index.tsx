@@ -1,6 +1,13 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "../../hooks";
-import { Box, Button, Flex, Input } from "@theme-ui/components";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Container,
+  Heading,
+} from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
 import CopyBox from "../CopyBox";
@@ -33,14 +40,7 @@ export default ({ userId, id }: TokenTableProps) => {
     setCopyTime(null);
   };
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto",
-      }}
-    >
+    <Container>
       {createModal && (
         <Modal onClose={close}>
           {!newToken && (
@@ -62,18 +62,21 @@ export default ({ userId, id }: TokenTableProps) => {
                   });
               }}
             >
-              <h3>Create token</h3>
-              <p>
+              <Heading as={"h3"} sx={{ mb: 2 }}>
+                Create token
+              </Heading>
+              <Box sx={{ mb: 3 }}>
                 Enter a name for your token to differentiate it from other
                 tokens.
-              </p>
+              </Box>
               <Input
+                sx={{ mb: 3 }}
                 label="Name"
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
                 placeholder="New Token"
               ></Input>
-              <Flex sx={{ justifyContent: "flex-end", py: 3 }}>
+              <Flex sx={{ justifyContent: "flex-end", pt: 3 }}>
                 <Button
                   type="button"
                   variant="outlineSmall"
@@ -144,14 +147,11 @@ export default ({ userId, id }: TokenTableProps) => {
           </Flex>
         </Modal>
       )}
+
       <Box sx={{ mb: 3 }}>
-        <strong>Note:</strong> These tokens allow other apps to control your
-        whole account. Treat them like you would a password.
-      </Box>
-      <Box>
         <Button
           variant="outlineSmall"
-          sx={{ margin: 2 }}
+          sx={{ mr: 2 }}
           onClick={() => {
             setCreateModal(true);
           }}
@@ -161,11 +161,14 @@ export default ({ userId, id }: TokenTableProps) => {
         <Button
           variant="secondarySmall"
           disabled={!selectedToken}
-          sx={{ margin: 2, mb: 4 }}
           onClick={() => selectedToken && setDeleteModal(true)}
         >
           Delete
         </Button>
+      </Box>
+      <Box sx={{ color: "offBlack", mb: 3 }}>
+        <strong>Note:</strong> These tokens allow other apps to control your
+        whole account. Treat them like you would a password.
       </Box>
       <Table sx={{ gridTemplateColumns: "auto 1fr auto" }}>
         <TableRow variant={TableRowVariant.Header}>
@@ -204,6 +207,6 @@ export default ({ userId, id }: TokenTableProps) => {
           );
         })}
       </Table>
-    </Box>
+    </Container>
   );
 };

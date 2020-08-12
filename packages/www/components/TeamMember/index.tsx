@@ -23,7 +23,7 @@ export default ({
           width: 130,
           height: 130,
           objectFit: "cover",
-          mb: 2,
+          m: "0 auto 8px"
         }}
         width={130}
         height={130}
@@ -41,7 +41,7 @@ export default ({
           maxWidth: 120,
           margin: "0 auto",
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         {twitter && (

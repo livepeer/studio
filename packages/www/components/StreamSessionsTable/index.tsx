@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, IconButton, Flex } from "@theme-ui/components";
+import { Box, Container, Flex } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
 import { Stream } from "@livepeer.com/api";
 import { RelativeTime, RenditionsDetails } from "../StreamsTable";
 import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
-
-const baseRecordingsURL = "https://mdw-cdn.livepeer.monster/recordings"
 
 type RecordingURLProps = {
   manifestId: string;
@@ -31,7 +29,7 @@ export const RecordingURL = ({
     }
   }, [isCopied]);
   const fullUrl = hasRecording
-    ? pathJoin(pathJoin(baseUrl, manifestId), "index.m3u8")
+    ? pathJoin(baseUrl, "recordings", manifestId, "index.m3u8")
     : "";
   const anchor = true;
   return (
@@ -89,7 +87,17 @@ export default ({
   mt?: string | number;
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
-  const { getStreamSessions } = useApi();
+  const [baseUrl, setBaseUrl] = useState(null);
+  const { getStreamSessions, getIngest } = useApi();
+  useEffect(() => {
+    getIngest()
+      .then((ingest) => {
+        if (ingest && ingest.length) {
+          setBaseUrl(ingest[0].playback)
+        }
+      })
+      .catch((err) => console.error(err)); // todo: surface this
+  }, [streamId]);
   useEffect(() => {
     getStreamSessions(streamId)
       .then(streams => setStreamsSessions(streams))
@@ -109,15 +117,7 @@ export default ({
   }, [streamId, isVisible]);
 
   return streamsSessions.length ? (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto",
-        mt
-      }}
-    >
+    <Container sx={{ mt: 2 }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
       <Table sx={{ gridTemplateColumns: "auto auto auto " }}>
         <TableRow variant={TableRowVariant.Header}>
@@ -150,12 +150,12 @@ export default ({
               <RecordingURL
                 manifestId={stream.id}
                 hasRecording={!!stream.recordObjectStoreId}
-                baseUrl={baseRecordingsURL}
+                baseUrl={baseUrl}
               />
             </TableRow>
           );
         })}
       </Table>
-    </Box>
+    </Container>
   ) : null;
 };

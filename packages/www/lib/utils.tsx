@@ -19,7 +19,7 @@ export const getComponent = (component) => {
   }
 };
 
-export function pathJoin(p1: string, p2: string): string {
+export function pathJoin2(p1: string, p2: string): string {
   if (!p1) {
     return p2;
   }
@@ -30,6 +30,10 @@ export function pathJoin(p1: string, p2: string): string {
     p2 = p2.slice(1);
   }
   return p1 + "/" + (p2 || "");
+}
+
+export function pathJoin(...items: Array<string>): string {
+  return items.reduce(pathJoin2, '')
 }
 
 export function breakablePath(path: string): string {

@@ -1,5 +1,5 @@
 import { Styled } from "theme-ui";
-import { Box, Container } from "@theme-ui/components";
+import { Box, Container, Link as A } from "@theme-ui/components";
 import Button from "../Button";
 import { Link as ScrollLink } from "react-scroll";
 import ArrowRight from "../../public/img/arrow-right.svg";
@@ -10,7 +10,7 @@ export default ({ heading, cta }) => (
       textAlign: "center",
       position: "relative",
       py: 100,
-      bg: "secondary",
+      bg: "secondary"
     }}
   >
     <Container>
@@ -30,15 +30,15 @@ function renderSwitch(cta) {
       return <Button variant="outline">{cta.title}</Button>;
     case !!cta.externalLink:
       return (
-        <Button
-          variant="outline"
-          as="a"
+        <A
+          variant="buttons.outline"
+          sx={{ display: "inline-flex", alignItems: "center" }}
           target="__blank"
           href={cta.externalLink}
         >
           {cta.title}
           <ArrowRight sx={{ ml: 2 }} />
-        </Button>
+        </A>
       );
     default:
       return (

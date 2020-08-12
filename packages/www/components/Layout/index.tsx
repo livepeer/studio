@@ -82,7 +82,7 @@ export default ({
         <Box
           sx={{
             bg: "background",
-            zIndex: 2,
+            zIndex: 20,
             position: "sticky",
             top: 0,
             width: "100%",
