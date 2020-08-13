@@ -3,16 +3,19 @@ import logger from '../logger'
 import { NotFoundError } from './errors'
 import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
+import { IStore } from '../types/common'
 
 // Should be configurable, perhaps?
 const TABLE_NAME = 'api'
 const CONNECT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 100
 
-export default class PostgresStore {
+export default class PostgresStore implements IStore {
+  ready: Promise<void>
+  pool: BoundStore
   constructor({ postgresUrl, schema }) {
     if (!postgresUrl) {
-      throw new Error('no postgres url provided ')
+      throw new Error('no postgres url provided')
     }
     this.ready = (async () => {
       console.log('ensure database')

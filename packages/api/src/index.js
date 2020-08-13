@@ -34,6 +34,28 @@ export default async function makeApp(params) {
   } = params
   // Storage init
 
+  let listener
+  let listenPort
+
+  const close = async () => {
+    process.off('SIGTERM', sigterm)
+    process.off('unhandledRejection', unhandledRejection)
+    listener.close()
+    await store.close()
+  }
+
+  // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
+  const sigterm = handleSigterm(close)
+
+  process.on('SIGTERM', sigterm)
+
+  const unhandledRejection = err => {
+    logger.error('fatal, unhandled promise rejection: ', err)
+    err.stack && logger.error(err.stack)
+    sigterm()
+  }
+  process.on('unhandledRejection', unhandledRejection)
+
   const { router, store } = await appRouter(params)
   const app = express()
   app.use(
@@ -53,12 +75,9 @@ export default async function makeApp(params) {
   )
   app.use(router)
 
-  let listener
-  let listenPort
-
   if (listen) {
     await new Promise((resolve, reject) => {
-      listener = app.listen(port, (err) => {
+      listener = app.listen(port, err => {
         if (err) {
           logger.error('Error starting server', err)
           return reject(err)
@@ -72,25 +91,6 @@ export default async function makeApp(params) {
     })
   }
 
-  const close = async () => {
-    process.off('SIGTERM', sigterm)
-    process.off('unhandledRejection', unhandledRejection)
-    listener.close()
-    await store.close()
-  }
-
-  // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
-  const sigterm = handleSigterm(close)
-
-  process.on('SIGTERM', sigterm)
-
-  const unhandledRejection = (err) => {
-    logger.error('fatal, unhandled promise rejection: ', err)
-    err.stack && logger.error(err.stack)
-    sigterm()
-  }
-  process.on('unhandledRejection', unhandledRejection)
-
   return {
     ...params,
     app,
@@ -101,7 +101,7 @@ export default async function makeApp(params) {
   }
 }
 
-const handleSigterm = (close) => async () => {
+const handleSigterm = close => async () => {
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
   logger.info('Got SIGTERM. Graceful shutdown start')
   let timeout = setTimeout(() => {

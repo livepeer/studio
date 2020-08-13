@@ -20,6 +20,7 @@ import streamProxy from './controllers/stream-proxy'
 import apiProxy from './controllers/api-proxy'
 import proxy from 'http-proxy-middleware'
 import { getBroadcasterHandler } from './controllers/broadcaster'
+import schema from './schema/schema.json'
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -73,26 +74,7 @@ export default async function makeApp(params) {
 
   // Storage init
   const bodyParser = require('body-parser')
-  let store
-  if (storage === 'level') {
-    store = LevelStore({ dbPath })
-  } else if (storage === 'postgres') {
-    store = PostgresStore({ postgresUrl })
-  } else if (storage === 'cloudflare') {
-    store = CloudflareStore({
-      cloudflareNamespace,
-      cloudflareAccount,
-      cloudflareAuth,
-    })
-  } else if (storage === 'cloudflare-cluster') {
-    store = CloudflareClusterStore({
-      cloudflareNamespace,
-    })
-  } else if (storage === 'firestore') {
-    store = FirestoreStore({ firestoreCredentials, firestoreCollection })
-  } else {
-    throw new Error('Missing storage information')
-  }
+  const store = PostgresStore({ postgresUrl, schema })
   await store.ready
 
   // Logging, JSON parsing, store injection
