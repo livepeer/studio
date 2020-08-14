@@ -11,9 +11,13 @@ const CONNECT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 100
 
 export default class PostgresStore implements IStore {
+  postgresUrl: String
+  schema: any
   ready: Promise<void>
-  pool: BoundStore
+  pool: Pool
   constructor({ postgresUrl, schema }) {
+    this.postgresUrl = postgresUrl
+    this.schema = schema
     if (!postgresUrl) {
       throw new Error('no postgres url provided')
     }
@@ -27,11 +31,11 @@ export default class PostgresStore implements IStore {
         connectionString: postgresUrl,
       })
       await this.pool.query('SELECT NOW()')
+      await this.ensureIndices()
     })()
   }
 
   async close() {
-    // lol remove this
     await this.pool.end()
   }
 
@@ -112,6 +116,11 @@ export default class PostgresStore implements IStore {
     if (res.rowCount < 1) {
       throw new NotFoundError()
     }
+  }
+
+  async ensureIndices() {
+    console.log(this.schema)
+    process.exit(0)
   }
 }
 

@@ -25,7 +25,7 @@
     "compile-schemas": "node -r esm src/compile-schemas.js",
     "redoc": "nodemon -w src/schema/schema.yaml -x npm run prepare:redoc",
     "siserver": "nodemon -w dist -x node -r esm dist/stream-info-service.js -e js,yaml",
-    "dev:server": "nodemon -w src -x node -r esm src/cli.js -e js,yaml",
+    "dev:server": "nodemon -w dist -x node dist/cli.js -e js,yaml",
     "dev:babel": "babel --extensions '.ts,.js' --out-dir=dist --copy-files --source-maps=true --watch src",
     "dev:yaml-json": "nodemon -w src/schema/schema.yaml -x 'run-s compile-schemas'",
     "dev": "run-p \"dev:**\"",
