@@ -1,7 +1,13 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import fetch from "isomorphic-fetch";
 import jwt from "jsonwebtoken";
-import { User, Error as ApiError, ApiToken, Stream, Webhook } from "@livepeer.com/api";
+import {
+  User,
+  Error as ApiError,
+  ApiToken,
+  Stream,
+  Webhook,
+} from "@livepeer.com/api";
 import qs from "qs";
 
 /**
@@ -210,7 +216,9 @@ const makeContext = (state: ApiState, setState) => {
       return broadcasters;
     },
 
-    async getIngest(): Promise<Array<{ ingest: string; playback: string }>> {
+    async getIngest(): Promise<
+      Array<{ ingest: string; playback: string; base: string }>
+    > {
       const [res, ingest] = await context.fetch(`/ingest`);
       if (res.status !== 200) {
         throw new Error(ingest);
@@ -278,13 +286,16 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
-    async setRecord(streamId: string, record: boolean): Promise<[void | ApiError]> {
+    async setRecord(
+      streamId: string,
+      record: boolean
+    ): Promise<[void | ApiError]> {
       const [res, body] = await context.fetch(`/stream/${streamId}/record`, {
         method: "PATCH",
         body: JSON.stringify({ record }),
         headers: {
-          "content-type": "application/json"
-        }
+          "content-type": "application/json",
+        },
       });
 
       if (res.status !== 204) {
@@ -295,12 +306,12 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async getWebhooks(allUsers, all: boolean): Promise<Array<Webhook>> {
-      let uri = `/webhook?`
+      let uri = `/webhook?`;
       if (allUsers) {
-        uri += `allUsers=1`
+        uri += `allUsers=1`;
       }
       if (all) {
-        uri += `&all=1`
+        uri += `&all=1`;
       }
       const [res, webhooks] = await context.fetch(uri);
       if (res.status !== 200) {
