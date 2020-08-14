@@ -14,8 +14,12 @@ import { getBroadcasterHandler } from './broadcaster'
 const WEBHOOK_TIMEOUT = 5 * 1000
 
 const isLocalIP = require('is-local-ip')
-const { Resolver } = require('dns').promises;
-const resolver = new Resolver();
+let resolver
+const dns = require('dns')
+if (dns && dns.promises && dns.promises.Resolver) {
+  const Resolver = dns.promises.Resolver
+  resolver = new Resolver()
+}
 
 const app = Router()
 const hackMistSettings = (req, profiles) => {
@@ -318,12 +322,16 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   if (req.body.active) {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-    
+
     // basic sanitization.
-    let sanitized = {...stream}
+    let sanitized = { ...stream }
     delete sanitized.streamKey
 
-    const { data: webhooksList } = await getWebhooks(req.store, req.user.id, 'streamStarted')
+    const { data: webhooksList } = await getWebhooks(
+      req.store,
+      req.user.id,
+      'streamStarted',
+    )
     try {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {
@@ -357,7 +365,9 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
           }
           if (isLocal) {
             // don't fire this webhook.
-            console.log(`webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`)
+            console.log(
+              `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`,
+            )
           } else {
             console.log('preparing to fire webhook ', webhook.url)
             // go ahead
@@ -365,34 +375,37 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
               method: 'POST',
               headers: {
                 'content-type': 'application/json',
-                'user-agent': 'livepeer.com'
+                'user-agent': 'livepeer.com',
               },
               timeout: WEBHOOK_TIMEOUT,
               body: JSON.stringify({
                 id: webhook.id,
                 event: webhook.event,
                 stream: sanitized,
-              })
+              }),
             }
-      
+
             try {
               logger.info(`webhook ${webhook.id} firing`)
               let resp = await fetchWithTimeout(webhook.url, params)
-              if (resp.status >= 200 && resp.status < 300) { // 2xx requests are cool.
+              if (resp.status >= 200 && resp.status < 300) {
+                // 2xx requests are cool.
                 // all is good
                 logger.info(`webhook ${webhook.id} fired successfully`)
                 return true
               }
-              console.error(`webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`)
+              console.error(
+                `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`,
+              )
               return !webhook.blocking
             } catch (e) {
               console.log('firing error', e)
               return !webhook.blocking
             }
           }
-        })
+        }),
       )
-      if (responses.some(o => !o)) {
+      if (responses.some((o) => !o)) {
         // at least one of responses is false, blocking this stream
         res.status(403)
         return res.end()
@@ -548,7 +561,10 @@ app.post('/hook', async (req, res) => {
     stream.recordObjectStoreId = req.config.recordObjectStoreId
     await req.store.replace(stream)
   }
-  if (live === 'live' && stream.record && stream.recordObjectStoreId || live !== 'live' && stream.recordObjectStoreId) {
+  if (
+    (live === 'live' && stream.record && stream.recordObjectStoreId) ||
+    (live !== 'live' && stream.recordObjectStoreId)
+  ) {
     const ros = await req.store.get(
       `object-store/${stream.recordObjectStoreId}`,
       false,
