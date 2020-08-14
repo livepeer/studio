@@ -157,7 +157,7 @@ export default () => {
   };
   const getPlaybackURL = (stream: Stream): string => {
     return ingest.length
-      ? pathJoin(ingest[0].playback, 'hls', `${stream.playbackId}/index.m3u8`)
+      ? pathJoin(ingest[0].base, "hls", `${stream.playbackId}/index.m3u8`)
       : stream.playbackId || "";
   };
   const doSetRecord = async (stream: Stream, record: boolean) => {

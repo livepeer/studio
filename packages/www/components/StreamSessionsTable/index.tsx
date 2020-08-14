@@ -17,7 +17,7 @@ type RecordingURLProps = {
 export const RecordingURL = ({
   manifestId,
   baseUrl,
-  hasRecording
+  hasRecording,
 }: RecordingURLProps) => {
   const [isCopied, setCopied] = useState(0);
   useEffect(() => {
@@ -38,7 +38,7 @@ export const RecordingURL = ({
       sx={{
         justifyContent: "flex-start",
         alignItems: "center",
-        wordBreak: "break-all"
+        wordBreak: "break-all",
       }}
     >
       {fullUrl ? (
@@ -50,7 +50,7 @@ export const RecordingURL = ({
                   fontSize: 12,
                   fontFamily: "monospace",
                   mr: 1,
-                  wordBreak: "break-all"
+                  wordBreak: "break-all",
                 }}
                 href={fullUrl}
                 target="_blank"
@@ -68,7 +68,7 @@ export const RecordingURL = ({
                 cursor: "pointer",
                 width: 14,
                 height: 14,
-                color: "listText"
+                color: "listText",
               }}
             />
           </Flex>
@@ -81,7 +81,7 @@ export const RecordingURL = ({
 
 export default ({
   streamId,
-  mt = null
+  mt = null,
 }: {
   streamId: string;
   mt?: string | number;
@@ -93,15 +93,15 @@ export default ({
     getIngest()
       .then((ingest) => {
         if (ingest && ingest.length) {
-          setBaseUrl(ingest[0].playback)
+          setBaseUrl(ingest[0].base);
         }
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [streamId]);
   useEffect(() => {
     getStreamSessions(streamId)
-      .then(streams => setStreamsSessions(streams))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((streams) => setStreamsSessions(streams))
+      .catch((err) => console.error(err)); // todo: surface this
   }, [streamId]);
   const isVisible = usePageVisibility();
   useEffect(() => {
@@ -110,8 +110,8 @@ export default ({
     }
     const interval = setInterval(() => {
       getStreamSessions(streamId)
-        .then(streams => setStreamsSessions(streams))
-        .catch(err => console.error(err)); // todo: surface this
+        .then((streams) => setStreamsSessions(streams))
+        .catch((err) => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
   }, [streamId, isVisible]);
@@ -125,13 +125,13 @@ export default ({
           <Box>Last Active</Box>
           <Box>Recording URL</Box>
         </TableRow>
-        {streamsSessions.map(stream => {
+        {streamsSessions.map((stream) => {
           const {
             id,
             lastSeen,
             createdAt,
             sourceSegments,
-            transcodedSegments
+            transcodedSegments,
           } = stream;
           return (
             <TableRow key={id}>
