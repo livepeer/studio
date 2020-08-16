@@ -27,6 +27,7 @@ components:
   schemas:
     webhook:
       type: object
+      table: webhook
       required:
         - name
         - event
@@ -67,6 +68,7 @@ components:
 
     stream:
       type: object
+      table: stream
       required:
         - name
       additionalProperties: false
@@ -251,6 +253,7 @@ components:
 
     object-store:
       type: object
+      table: object_store
       required:
         - url
       additionalProperties: false
@@ -278,6 +281,7 @@ components:
     api-token:
       type: object
       additionalProperties: false
+      table: api_token
       properties:
         kind:
           type: string
@@ -380,6 +384,7 @@ components:
 
     user:
       type: object
+      table: user
       required:
         - email
         - password

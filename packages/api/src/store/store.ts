@@ -4,6 +4,7 @@ import { NotFoundError } from './errors'
 import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
 import { IStore } from '../types/common'
+import schema from '../schema/schema.json'
 
 // Should be configurable, perhaps?
 const TABLE_NAME = 'api'
@@ -12,36 +13,35 @@ const DEFAULT_LIMIT = 100
 
 export default class PostgresStore implements IStore {
   postgresUrl: String
-  schema: any
   ready: Promise<void>
   pool: Pool
-  constructor({ postgresUrl, schema }) {
+  constructor({ postgresUrl }) {
     this.postgresUrl = postgresUrl
-    this.schema = schema
+    console.log(postgresUrl)
     if (!postgresUrl) {
       throw new Error('no postgres url provided')
     }
     this.ready = (async () => {
-      console.log('ensure database')
       await ensureDatabase(postgresUrl)
-      await ensureTable(postgresUrl)
-      console.log('pool')
       this.pool = new Pool({
         connectionTimeoutMillis: CONNECT_TIMEOUT,
         connectionString: postgresUrl,
       })
-      await this.pool.query('SELECT NOW()')
-      await this.ensureIndices()
+      await this.query('SELECT NOW()')
+      await this.ensureTables()
     })()
   }
 
   async close() {
-    await this.pool.end()
+    if (!this.pool) {
+      return
+    }
+    // await this.pool.end()
   }
 
   async listKeys(prefix = '', cursor, limit = DEFAULT_LIMIT) {
     const listRes = await this.list(prefix, cursor, limit)
-    const keys = listRes.data.map(item => Object.keys(item)[0])
+    const keys = listRes.data.map((item) => Object.keys(item)[0])
     return [keys, listRes.cursor]
   }
 
@@ -49,12 +49,12 @@ export default class PostgresStore implements IStore {
     let res = null
 
     if (cursor) {
-      res = await this.pool.query(
+      res = await this.query(
         `SELECT * FROM ${TABLE_NAME} WHERE id LIKE $1 AND id > $2 ORDER BY id ASC LIMIT $3 `,
         [`${prefix}%`, `${cursor}`, `${limit}`],
       )
     } else {
-      res = await this.pool.query(
+      res = await this.query(
         `SELECT * FROM ${TABLE_NAME} WHERE id LIKE $1 ORDER BY id ASC LIMIT $2 `,
         [`${prefix}%`, `${limit}`],
       )
@@ -70,10 +70,9 @@ export default class PostgresStore implements IStore {
   }
 
   async get(id) {
-    const res = await this.pool.query(
-      `SELECT data FROM ${TABLE_NAME} WHERE id=$1`,
-      [id],
-    )
+    const res = await this.query(`SELECT data FROM ${TABLE_NAME} WHERE id=$1`, [
+      id,
+    ])
 
     if (res.rowCount < 1) {
       return null
@@ -83,7 +82,7 @@ export default class PostgresStore implements IStore {
 
   async create(key, data) {
     try {
-      await this.pool.query(
+      await this.query(
         `INSERT INTO ${TABLE_NAME} VALUES ($1, $2)`, //p
         [key, JSON.stringify(data)], //p
       )
@@ -97,7 +96,7 @@ export default class PostgresStore implements IStore {
   }
 
   async replace(key, data) {
-    const res = await this.pool.query(
+    const res = await this.query(
       `UPDATE ${TABLE_NAME} SET data = $1 WHERE id = $2`,
       [JSON.stringify(data), key],
     )
@@ -108,19 +107,52 @@ export default class PostgresStore implements IStore {
   }
 
   async delete(id) {
-    const res = await this.pool.query(
-      `DELETE FROM ${TABLE_NAME} WHERE id = $1`,
-      [id],
-    )
+    const res = await this.query(`DELETE FROM ${TABLE_NAME} WHERE id = $1`, [
+      id,
+    ])
 
     if (res.rowCount < 1) {
       throw new NotFoundError()
     }
   }
 
-  async ensureIndices() {
-    console.log(this.schema)
-    process.exit(0)
+  async ensureTables() {
+    const tables = Object.values(schema.components.schemas).filter(
+      (schema) => !!schema.table,
+    )
+    for (const table of tables) {
+      await this.ensureTable(table.table)
+    }
+    // await Promise.all(
+    //   tables.map(([_, schema]) => this.ensureTable(schema.table)),
+    // )
+    console.log('after all')
+  }
+
+  // Auto-create table if it doesn't exist
+  async ensureTable(tableName) {
+    let res
+    try {
+      res = await this.query(`
+      SELECT * FROM ${tableName} LIMIT 0;
+    `)
+    } catch (e) {
+      if (!e.message.includes('does not exist')) {
+        throw e
+      }
+      await this.query(`
+        CREATE TABLE ${tableName} (
+          id VARCHAR(128) PRIMARY KEY,
+          data JSONB
+        );
+      `)
+      logger.info(`Created table ${tableName}`)
+    }
+  }
+
+  async query(query) {
+    console.log(query)
+    return this.pool.query(query)
   }
 }
 
@@ -131,7 +163,7 @@ async function ensureDatabase(postgresUrl) {
     connectionTimeoutMillis: CONNECT_TIMEOUT,
   })
   try {
-    const res = await pool.query('SELECT NOW()').catch(err => console.log(err))
+    await pool.query('SELECT NOW()')
     // If we made it down here, the database exists. Cool.
     pool.end()
     return
@@ -155,31 +187,4 @@ async function ensureDatabase(postgresUrl) {
   pool.end()
   adminPool.end()
   // const adminPool = n
-}
-
-// Auto-create table if it doesn't exist
-async function ensureTable(postgresUrl) {
-  const pool = new Pool({
-    connectionString: postgresUrl,
-    connectionTimeoutMillis: CONNECT_TIMEOUT,
-  })
-  const res = await pool.query(`
-    SELECT EXISTS (
-      SELECT 1
-      FROM pg_tables
-      WHERE  schemaname = 'public'
-      AND tablename = '${TABLE_NAME}'
-    )
-  `)
-  const { exists } = res.rows[0]
-  if (!exists) {
-    await pool.query(`
-      CREATE TABLE ${TABLE_NAME}(
-        id VARCHAR(128) PRIMARY KEY,
-        data JSONB
-      )
-    `)
-    logger.info(`Created table ${TABLE_NAME}`)
-  }
-  pool.end()
 }
