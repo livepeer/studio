@@ -384,7 +384,7 @@ components:
 
     user:
       type: object
-      table: user
+      table: users # 'user' is a keyword in postgres, this causes problems otherwise
       required:
         - email
         - password

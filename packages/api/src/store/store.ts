@@ -120,34 +120,58 @@ export default class PostgresStore implements IStore {
     const tables = Object.values(schema.components.schemas).filter(
       (schema) => !!schema.table,
     )
-    for (const table of tables) {
-      await this.ensureTable(table.table)
-    }
-    // await Promise.all(
-    //   tables.map(([_, schema]) => this.ensureTable(schema.table)),
-    // )
+    await Promise.all(tables.map((schema) => this.ensureTable(schema)))
     console.log('after all')
   }
 
   // Auto-create table if it doesn't exist
-  async ensureTable(tableName) {
+  async ensureTable(schema) {
     let res
     try {
       res = await this.query(`
-      SELECT * FROM ${tableName} LIMIT 0;
+      SELECT * FROM ${schema.table} LIMIT 0;
     `)
     } catch (e) {
       if (!e.message.includes('does not exist')) {
         throw e
       }
       await this.query(`
-        CREATE TABLE ${tableName} (
+        CREATE TABLE ${schema.table} (
           id VARCHAR(128) PRIMARY KEY,
           data JSONB
         );
       `)
-      logger.info(`Created table ${tableName}`)
+      logger.info(`Created table ${schema.table}`)
     }
+    await Promise.all(
+      Object.entries(schema.properties).map(([name, prop]) =>
+        this.ensureIndex(schema, name, prop),
+      ),
+    )
+  }
+
+  async ensureIndex(schema, name, prop) {
+    if (!prop.index && !prop.unique) {
+      return
+    }
+    if (schema.table === 'user') {
+      return
+    }
+    let unique = ''
+    if (prop.unique) {
+      unique = 'unique'
+    }
+    try {
+      await this.query(`
+        CREATE ${unique} INDEX ${name} ON "${schema.table}" USING BTREE ((data->>'${name}'));
+      `)
+    } catch (e) {
+      if (!e.message.includes('already exists')) {
+        throw e
+      }
+      return
+    }
+    logger.info(`Created ${unique} index ${name} on ${schema.table}`)
   }
 
   async query(query) {
