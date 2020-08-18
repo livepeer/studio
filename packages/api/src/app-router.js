@@ -1,13 +1,7 @@
 // import 'express-async-errors' // it monkeypatches, i guess
 import Router from 'express/lib/router'
 import bearerToken from 'express-bearer-token'
-import {
-  LevelStore,
-  PostgresStore,
-  CloudflareStore,
-  CloudflareClusterStore,
-  FirestoreStore,
-} from './store'
+import makeStore from './store'
 import {
   healthCheck,
   kubernetes,

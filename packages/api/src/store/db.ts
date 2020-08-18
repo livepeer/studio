@@ -5,16 +5,25 @@ import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
 import { IStore } from '../types/common'
 import schema from '../schema/schema.json'
+import { Stream, ObjectStore, ApiToken, User } from '../schema/types'
+import Table from './table'
 
 // Should be configurable, perhaps?
 const TABLE_NAME = 'api'
 const CONNECT_TIMEOUT = 5000
 const DEFAULT_LIMIT = 100
 
-export default class PostgresStore implements IStore {
+export default class DB {
+  // Table objects
+  stream: Table<Stream>
+  objectStore: Table<ObjectStore>
+  apiToken: Table<ApiToken>
+  user: Table<User>
+
   postgresUrl: String
   ready: Promise<void>
   pool: Pool
+
   constructor({ postgresUrl }) {
     this.postgresUrl = postgresUrl
     console.log(postgresUrl)
@@ -36,7 +45,7 @@ export default class PostgresStore implements IStore {
     if (!this.pool) {
       return
     }
-    // await this.pool.end()
+    await this.pool.end()
   }
 
   async listKeys(prefix = '', cursor, limit = DEFAULT_LIMIT) {
@@ -80,48 +89,11 @@ export default class PostgresStore implements IStore {
     return res.rows[0].data
   }
 
-  async create(key, data) {
-    try {
-      await this.query(
-        `INSERT INTO ${TABLE_NAME} VALUES ($1, $2)`, //p
-        [key, JSON.stringify(data)], //p
-      )
-    } catch (e) {
-      if (e.message.includes('duplicate key value')) {
-        throw new Error(`${data.id} already exists`)
-      }
-      throw e
-    }
-    return data
-  }
-
-  async replace(key, data) {
-    const res = await this.query(
-      `UPDATE ${TABLE_NAME} SET data = $1 WHERE id = $2`,
-      [JSON.stringify(data), key],
-    )
-
-    if (res.rowCount < 1) {
-      throw new NotFoundError()
-    }
-  }
-
-  async delete(id) {
-    const res = await this.query(`DELETE FROM ${TABLE_NAME} WHERE id = $1`, [
-      id,
-    ])
-
-    if (res.rowCount < 1) {
-      throw new NotFoundError()
-    }
-  }
-
   async ensureTables() {
     const tables = Object.values(schema.components.schemas).filter(
       (schema) => !!schema.table,
     )
     await Promise.all(tables.map((schema) => this.ensureTable(schema)))
-    console.log('after all')
   }
 
   // Auto-create table if it doesn't exist
@@ -174,9 +146,9 @@ export default class PostgresStore implements IStore {
     logger.info(`Created ${unique} index ${name} on ${schema.table}`)
   }
 
-  async query(query) {
+  async query(query, params = []) {
     console.log(query)
-    return this.pool.query(query)
+    return this.pool.query(query, params)
   }
 }
 
