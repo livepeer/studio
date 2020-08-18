@@ -78,17 +78,6 @@ export default class DB {
     return { data, cursor: res.rows[data.length - 1].id }
   }
 
-  async get(id) {
-    const res = await this.query(`SELECT data FROM ${TABLE_NAME} WHERE id=$1`, [
-      id,
-    ])
-
-    if (res.rowCount < 1) {
-      return null
-    }
-    return res.rows[0].data
-  }
-
   async ensureTables() {
     const tables = Object.values(schema.components.schemas).filter(
       (schema) => !!schema.table,
