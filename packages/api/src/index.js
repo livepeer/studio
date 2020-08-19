@@ -49,14 +49,24 @@ export default async function makeApp(params) {
 
   process.on('SIGTERM', sigterm)
 
-  const unhandledRejection = err => {
+  const unhandledRejection = (err) => {
     logger.error('fatal, unhandled promise rejection: ', err)
     err.stack && logger.error(err.stack)
     sigterm()
   }
   process.on('unhandledRejection', unhandledRejection)
 
-  const { router, store } = await appRouter(params)
+  let router
+  let store
+  try {
+    const appRoute = await appRouter(params)
+    router = appRouter.router
+    store = appRouter.store
+  } catch (e) {
+    console.error('Error on startup')
+    console.error(e)
+    process.exit(1)
+  }
   const app = express()
   app.use(
     morgan('dev', {
@@ -77,7 +87,7 @@ export default async function makeApp(params) {
 
   if (listen) {
     await new Promise((resolve, reject) => {
-      listener = app.listen(port, err => {
+      listener = app.listen(port, (err) => {
         if (err) {
           logger.error('Error starting server', err)
           return reject(err)
@@ -101,7 +111,7 @@ export default async function makeApp(params) {
   }
 }
 
-const handleSigterm = close => async () => {
+const handleSigterm = (close) => async () => {
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
   logger.info('Got SIGTERM. Graceful shutdown start')
   let timeout = setTimeout(() => {

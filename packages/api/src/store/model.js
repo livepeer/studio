@@ -96,6 +96,9 @@ export default class Model {
     filter,
     cleanWriteOnly = true,
   }) {
+    if (filter) {
+      throw new Error('filter no longer supported, use db[table].find')
+    }
     const [queryKey, ...others] = Object.keys(query)
     if (others.length > 0) {
       throw new Error('you may only query() by one key')

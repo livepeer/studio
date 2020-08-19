@@ -16,6 +16,7 @@ interface ListQuery {
 
 interface ListOptions {
   cursor?: string
+  limit?: number
 }
 
 export default class Table<T extends DBObject> {
@@ -38,18 +39,18 @@ export default class Table<T extends DBObject> {
   }
 
   async list(query: ListQuery, opts: ListOptions) {
-    const { cursor } = opts
+    const { cursor, limit = 100 } = opts
     let res = null
 
     if (cursor) {
-      res = await this.query(
-        `SELECT * FROM ${this.schema.table} WHERE id LIKE $1 AND id > $2 ORDER BY id ASC LIMIT $3 `,
-        [`${prefix}%`, `${cursor}`, `${limit}`],
+      res = await this.db.query(
+        `SELECT * FROM ${this.schema.table} WHERE AND id > $2 ORDER BY id ASC LIMIT $3 `,
+        [`${cursor}`, `${limit}`],
       )
     } else {
-      res = await this.query(
-        `SELECT * FROM ${this.schema.table} WHERE id LIKE $1 ORDER BY id ASC LIMIT $2 `,
-        [`${prefix}%`, `${limit}`],
+      res = await this.db.query(
+        `SELECT * FROM ${this.schema.table} WHERE ORDER BY id ASC LIMIT $2 `,
+        [`${limit}`],
       )
     }
 
@@ -59,7 +60,7 @@ export default class Table<T extends DBObject> {
       return { data, cursor: null }
     }
 
-    return { data, cursor: res.rows[data.length - 1].id }
+    return [data, res.rows[data.length - 1].id]
   }
 
   async create(doc: T): Promise<T> {

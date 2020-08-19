@@ -68,8 +68,8 @@ export default async function makeApp(params) {
 
   // Storage init
   const bodyParser = require('body-parser')
-  const store = PostgresStore({ postgresUrl, schema })
-  await store.ready
+  const [db, store] = makeStore({ postgresUrl, schema })
+  await db.ready
 
   // Logging, JSON parsing, store injection
 

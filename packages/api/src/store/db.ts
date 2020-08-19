@@ -48,36 +48,6 @@ export default class DB {
     await this.pool.end()
   }
 
-  async listKeys(prefix = '', cursor, limit = DEFAULT_LIMIT) {
-    const listRes = await this.list(prefix, cursor, limit)
-    const keys = listRes.data.map((item) => Object.keys(item)[0])
-    return [keys, listRes.cursor]
-  }
-
-  async list(prefix = '', cursor = null, limit = DEFAULT_LIMIT) {
-    let res = null
-
-    if (cursor) {
-      res = await this.query(
-        `SELECT * FROM ${TABLE_NAME} WHERE id LIKE $1 AND id > $2 ORDER BY id ASC LIMIT $3 `,
-        [`${prefix}%`, `${cursor}`, `${limit}`],
-      )
-    } else {
-      res = await this.query(
-        `SELECT * FROM ${TABLE_NAME} WHERE id LIKE $1 ORDER BY id ASC LIMIT $2 `,
-        [`${prefix}%`, `${limit}`],
-      )
-    }
-
-    const data = res.rows.map(({ id, data }) => ({ [id]: data }))
-
-    if (data.length < 1) {
-      return { data, cursor: null }
-    }
-
-    return { data, cursor: res.rows[data.length - 1].id }
-  }
-
   async ensureTables() {
     const tables = Object.values(schema.components.schemas).filter(
       (schema) => !!schema.table,
@@ -122,9 +92,10 @@ export default class DB {
     if (prop.unique) {
       unique = 'unique'
     }
+    const indexName = `${schema.table}_${name}`
     try {
       await this.query(`
-        CREATE ${unique} INDEX ${name} ON "${schema.table}" USING BTREE ((data->>'${name}'));
+        CREATE ${unique} INDEX "${indexName}" ON "${schema.table}" USING BTREE ((data->>'${name}'));
       `)
     } catch (e) {
       if (!e.message.includes('already exists')) {
@@ -132,7 +103,7 @@ export default class DB {
       }
       return
     }
-    logger.info(`Created ${unique} index ${name} on ${schema.table}`)
+    logger.info(`Created ${unique} index ${indexName} on ${schema.table}`)
   }
 
   async query(query, params = []) {
