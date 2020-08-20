@@ -328,9 +328,10 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     let sanitized = { ...stream }
     delete sanitized.streamKey
 
-    const webhooksList = await getWebhooks(
+    const {data: webhooksList} = await getWebhooks(
       req.store,
-      req.user.id
+      stream.userId,
+      'streamStarted'
     )
 
     console.log('webhooksList: ', webhooksList)
