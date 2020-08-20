@@ -48,7 +48,16 @@ describe('DB', () => {
       example: 'test text',
     }
     await table.create(doc)
-    const retrieved = await table.get(doc.id)
-    expect(retrieved.example).toEqual(doc.example)
+    let ret = await table.get(doc.id)
+    expect(ret.example).toEqual(doc.example)
+    await table.replace({
+      id: doc.id,
+      example: 'changed text',
+    })
+    ret = await table.get(doc.id)
+    expect(ret.example).toEqual('changed text')
+    await table.delete(doc.id)
+    ret = await table.get(doc.id)
+    expect(ret).toEqual(null)
   })
 })
