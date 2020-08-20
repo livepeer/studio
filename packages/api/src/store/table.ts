@@ -32,7 +32,7 @@ export default class Table<T extends DBObject> {
 
   async get(id): Promise<T> {
     const res = await this.db.query(
-      sql`SELECT data FROM`.append(this.name).append(sql`WHERE id=${id}`),
+      sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`),
     )
 
     if (res.rowCount < 1) {
@@ -54,6 +54,8 @@ export default class Table<T extends DBObject> {
     for (const [key, value] of Object.values(query)) {
       q.append(sql`AND "${key}" = ${value}`)
     }
+
+    q.append(sql`LIMIT ${limit}`)
 
     const res = await this.db.query(q)
 

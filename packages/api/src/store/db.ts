@@ -60,9 +60,9 @@ export default class DB {
     )
   }
 
-  async query(query, params = []) {
+  async query(query, ...params) {
     console.log(query)
-    return this.pool.query(query, params)
+    return this.pool.query(query, ...params)
   }
 }
 

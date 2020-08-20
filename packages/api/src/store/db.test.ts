@@ -5,14 +5,33 @@ import { Pool } from 'pg'
 
 interface TestObject {
   id: string
-  data: string
+  example: string
+}
+
+const testSchema = {
+  type: 'object',
+  table: 'test_object',
+  required: ['id', 'example'],
+  properties: {
+    id: {
+      type: 'string',
+      readOnly: true,
+    },
+    example: {
+      type: 'string',
+      unique: true,
+    },
+  },
 }
 
 describe('DB', () => {
-  let db
+  let db: DB
+  let table: Table<TestObject>
   beforeEach(async () => {
     db = new DB({ postgresUrl: `postgresql://postgres@localhost/test` })
     await db.ready
+    table = new Table<TestObject>({ db, schema: testSchema })
+    await table.ensureTable()
   })
   afterEach(async () => {
     await db.close()
@@ -24,6 +43,12 @@ describe('DB', () => {
     await pool.end()
   })
   it('should do CRUD operations', async () => {
-    expect('foo').toEqual('foo')
+    const doc = <TestObject>{
+      id: uuid(),
+      example: 'test text',
+    }
+    await table.create(doc)
+    const retrieved = await table.get(doc.id)
+    expect(retrieved.example).toEqual(doc.example)
   })
 })
