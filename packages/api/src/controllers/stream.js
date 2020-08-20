@@ -330,8 +330,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
 
     const webhooksList = await getWebhooks(
       req.store,
-      req.user.id,
-      'streamStarted',
+      req.user.id
     )
 
     console.log('webhooksList: ', webhooksList)
