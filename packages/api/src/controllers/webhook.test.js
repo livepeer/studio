@@ -131,11 +131,11 @@ describe('controllers/webhook', () => {
     })
 
     it('get webhook info', async () => {
-      const res = await client.get(`/webhook/${generatedWebhook.id}`)
+      const res = await client.get(`/webhook/${generatedWebhookNonAdmin.id}`)
       const resJson = await res.json()
       expect(res.status).toBe(200)
-      expect(resJson.id).toEqual(generatedWebhook.id)
-      expect(resJson.userId).toEqual(generatedWebhook.userId)
+      expect(resJson.id).toEqual(generatedWebhookNonAdmin.id)
+      expect(resJson.userId).toEqual(generatedWebhookNonAdmin.userId)
     })
 
     it('get webhooks list', async () => {
@@ -223,7 +223,7 @@ describe('controllers/webhook', () => {
 
       
       // trigger
-      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {active: true})
+      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {Active: true})
       expect(setActiveRes).toBeDefined()
       expect(setActiveRes.status).toBe(204)
       // const setActiveResJson = await setActiveRes.json()

@@ -13,6 +13,7 @@ import { getBroadcasterHandler } from './broadcaster'
 
 const WEBHOOK_TIMEOUT = 5 * 1000
 
+const isIP = require('is-ip')
 const isLocalIP = require('is-local-ip')
 let resolver
 const dns = require('dns')
@@ -319,7 +320,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     return res.json({ errors: ['not found'] })
   }
 
-  if (req.body.active) {
+  if (req.body.Active) {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
@@ -337,10 +338,13 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
         webhooksList.map(async (webhook, key) => {
           // console.log('webhook: ', webhook)
           logger.info(`trying webhook ${webhook.name}: ${webhook.url}`)
-          let ips, urlObj, isLocal
+          let ips, urlObj, isLocal, isIp
           try {
+            isIp = isIP(webhook.url)
             urlObj = parseUrl(webhook.url)
-            if (urlObj.host) {
+            if (isIp && urlObj.hostname) {
+              ips = [urlObj.hostname]
+            } else {
               ips = await resolver.resolve4(urlObj.hostname)
             }
           } catch (e) {

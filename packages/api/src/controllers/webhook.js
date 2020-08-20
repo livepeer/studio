@@ -86,7 +86,6 @@ app.post('/', authMiddleware({}), validatePost('webhook'), async (req, res) => {
 app.get('/:id', authMiddleware({}), async (req, res) => {
   // get a specific webhook
   logger.info(`webhook params ${req.params.id}`)
-
   const webhook = await req.store.get(`webhook/${req.params.id}`)
   if ( !webhook || (webhook.deleted ||
     webhook.userId !== req.user.id) && !req.user.admin)
