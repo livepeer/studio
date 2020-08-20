@@ -7,11 +7,10 @@ import { IStore } from '../types/common'
 import schema from '../schema/schema.json'
 import { Stream, ObjectStore, ApiToken, User } from '../schema/types'
 import Table from './table'
+import { kebabToCamel } from '../util'
 
 // Should be configurable, perhaps?
-const TABLE_NAME = 'api'
 const CONNECT_TIMEOUT = 5000
-const DEFAULT_LIMIT = 100
 
 export default class DB {
   // Table objects
@@ -37,7 +36,7 @@ export default class DB {
         connectionString: postgresUrl,
       })
       await this.query('SELECT NOW()')
-      await this.ensureTables()
+      await this.makeTables()
     })()
   }
 
@@ -48,62 +47,17 @@ export default class DB {
     await this.pool.end()
   }
 
-  async ensureTables() {
-    const tables = Object.values(schema.components.schemas).filter(
-      (schema) => !!schema.table,
+  async makeTables() {
+    const tables = Object.entries(schema.components.schemas).filter(
+      ([name, schema]) => !!schema.table,
     )
-    await Promise.all(tables.map((schema) => this.ensureTable(schema)))
-  }
-
-  // Auto-create table if it doesn't exist
-  async ensureTable(schema) {
-    let res
-    try {
-      res = await this.query(`
-      SELECT * FROM ${schema.table} LIMIT 0;
-    `)
-    } catch (e) {
-      if (!e.message.includes('does not exist')) {
-        throw e
-      }
-      await this.query(`
-        CREATE TABLE ${schema.table} (
-          id VARCHAR(128) PRIMARY KEY,
-          data JSONB
-        );
-      `)
-      logger.info(`Created table ${schema.table}`)
-    }
     await Promise.all(
-      Object.entries(schema.properties).map(([name, prop]) =>
-        this.ensureIndex(schema, name, prop),
-      ),
+      tables.map(([name, schema]) => {
+        const camelName = kebabToCamel(name)
+        this[camelName] = new Table({ db: this, schema })
+        return this[camelName].ensureTable()
+      }),
     )
-  }
-
-  async ensureIndex(schema, name, prop) {
-    if (!prop.index && !prop.unique) {
-      return
-    }
-    if (schema.table === 'user') {
-      return
-    }
-    let unique = ''
-    if (prop.unique) {
-      unique = 'unique'
-    }
-    const indexName = `${schema.table}_${name}`
-    try {
-      await this.query(`
-        CREATE ${unique} INDEX "${indexName}" ON "${schema.table}" USING BTREE ((data->>'${name}'));
-      `)
-    } catch (e) {
-      if (!e.message.includes('already exists')) {
-        throw e
-      }
-      return
-    }
-    logger.info(`Created ${unique} index ${indexName} on ${schema.table}`)
   }
 
   async query(query, params = []) {
@@ -142,5 +96,4 @@ async function ensureDatabase(postgresUrl) {
   logger.info(`Created database ${dbName}`)
   pool.end()
   adminPool.end()
-  // const adminPool = n
 }
