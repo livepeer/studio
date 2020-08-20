@@ -323,7 +323,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   if (req.body.active) {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-    console.log('webhooks: sanitizing stream object..')
+    console.log('webhooks: sanitizing stream object..', stream)
     // basic sanitization.
     let sanitized = { ...stream }
     delete sanitized.streamKey
