@@ -195,8 +195,8 @@ export async function getWebhooks(store, userId, event, limit = 100, cursor = un
   const resp = await store.queryObjects({
     kind: 'webhook',
     query: { userId },
-    limit,
     cursor,
+    limit,
     filter
   })
   return resp
