@@ -319,8 +319,8 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
-
-  if (req.body.Active) {
+  console.log('/setactive req.body: ', req.body)
+  if (req.body.active) {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
