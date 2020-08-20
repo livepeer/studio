@@ -312,7 +312,7 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 
 app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   const { id } = req.params
-  // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
+  logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)} ua=${req.headers['user-agent']}`)
   const stream = await req.store.get(`stream/${id}`, false)
   if (!stream || stream.deleted || !req.user.admin) {
     res.status(404)
