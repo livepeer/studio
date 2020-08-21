@@ -329,14 +329,15 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
 
     const { data: webhooksList } = await getWebhooks(
       req.store,
-      req.user.id,
+      stream.userId,
       'streamStarted',
     )
+    console.log('webhooksList: ', webhooksList)
     try {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {
           // console.log('webhook: ', webhook)
-          logger.info(`trying webhook ${webhook.name}: ${webhook.url}`)
+          console.log(`trying webhook ${webhook.name}: ${webhook.url}`)
           let ips, urlObj, isLocal
           try {
             urlObj = parseUrl(webhook.url)
