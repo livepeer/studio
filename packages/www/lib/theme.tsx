@@ -68,7 +68,11 @@ export const theme = {
       variant: "buttons.default",
       color: "white",
       bg: "primary",
-      py: "10px"
+      py: "10px",
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
     },
     secondary: {
       variant: "buttons.default",
@@ -76,7 +80,11 @@ export const theme = {
       bg: "primary",
       borderWidth: "1px",
       borderColor: "primary",
-      borderStyle: "solid"
+      borderStyle: "solid",
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
     },
     outline: {
       variant: "buttons.default",
