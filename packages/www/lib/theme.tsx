@@ -25,9 +25,9 @@ export const theme = {
     heading: 1.125
   },
   colors: {
-    text: "#292929",
+    text: "#000",
     background: "#fff",
-    primary: "#131418",
+    primary: "#943CFF",
     secondary: "#FAF5EF",
     accent: "#00EB88",
     muted: "#eaeaea",
@@ -46,7 +46,7 @@ export const theme = {
       borderRadius: 4,
       lineHeight: 1.4,
       letterSpacing: ".5px",
-      fontWeight: 500,
+      fontWeight: 600,
       px: 4,
       py: "10px",
       cursor: "pointer",
@@ -129,8 +129,9 @@ export const theme = {
       cursor: "pointer",
       color: "body",
       textDecoration: "none",
-      mx: 3,
-      fontSize: 1
+      mr: 4,
+      fontSize: 1,
+      "&:last-of-type": { mr: 0 }
     }
   },
   layout: {
@@ -210,7 +211,7 @@ export const theme = {
       overflowX: "auto",
       padding: 4,
       cursor: "text",
-      backgroundColor: t => `${t.colors.primary} !important`,
+      backgroundColor: (t) => `${t.colors.primary} !important`,
       code: {
         color: "inherit",
         WebkitFontSmoothing: "antialiased"
@@ -266,7 +267,7 @@ const Reset = () => (
         fontSize: "100%"
       },
       a: {
-        color: "#131418"
+        color: "#000"
       },
       ".react-reveal": {
         opacity: 0

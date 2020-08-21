@@ -3,115 +3,127 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton,
-} from '@theme-ui/components'
-import Link from 'next/link'
-import Logo from '../../public/img/logo.svg'
-import { useApi } from '../../hooks'
-import React, { useCallback, useEffect, useState } from 'react'
-import { FiMenu } from 'react-icons/fi'
-import Menu from './menu'
-import { useRouter } from 'next/router'
+  IconButton
+} from "@theme-ui/components";
+import Link from "next/link";
+import Logo from "../../public/img/logo.svg";
+import { useApi } from "../../hooks";
+import React, { useCallback, useEffect, useState } from "react";
+import { FiMenu } from "react-icons/fi";
+import Menu from "./menu";
+import { useRouter } from "next/router";
+
+const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
 export default () => {
-  const { pathname } = useRouter()
-  const [hasScrolled, setHasScrolled] = useState(false)
-  const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false)
-  const [loggedIn, setLoggedIn] = useState(false)
-  const { token, user, logout } = useApi()
-  const isDashboard = pathname.includes('/app/')
+  const { pathname } = useRouter();
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const { token, user, logout } = useApi();
+  const isDashboard = pathname.includes("/app/");
 
   const handleScroll = useCallback(() => {
-    const { scrollTop } = document.documentElement
-    if (scrollTop > 0) setHasScrolled(true)
-    else setHasScrolled(false)
-  }, [])
+    const { scrollTop } = document.documentElement;
+    if (scrollTop > 0) setHasScrolled(true);
+    else setHasScrolled(false);
+  }, []);
 
   useEffect(() => {
-    handleScroll()
-    document.addEventListener('scroll', handleScroll)
+    handleScroll();
+    document.addEventListener("scroll", handleScroll);
 
     return () => {
-      document.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+      document.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (token) {
-      setLoggedIn(true)
+      setLoggedIn(true);
     } else {
-      setLoggedIn(false)
+      setLoggedIn(false);
     }
-  }, [token])
+  }, [token]);
 
   return (
     <Box
       sx={{
-        transition: 'box-shadow .3s, top .3s',
+        transition: "box-shadow .3s, top .3s, background-color .3s",
+        bg: hasScrolled ? "background" : "transparent",
         boxShadow: hasScrolled
-          ? 'rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px'
-          : 'none',
+          ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
+          : "none"
       }}
     >
       <Container>
         <Flex
           sx={{
             py: 3,
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: "space-between",
+            alignItems: "center"
           }}
         >
-          <Link href="/" passHref>
-            <A
-              sx={{
-                textDecoration: 'none',
-                color: 'primary',
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <Logo sx={{ color: 'primary' }} />
-              {!isDashboard && (
-                <Box
-                  sx={{
-                    ml: '12px',
-                    fontWeight: 500,
-                    fontSize: '18px',
-                  }}
-                >
-                  livepeer.com
-                </Box>
-              )}
-            </A>
-          </Link>
+          <div
+            sx={{ minWidth: sidesWidth, display: "flex", alignItems: "center" }}
+          >
+            <Link href="/" passHref>
+              <A
+                sx={{
+                  textDecoration: "none",
+                  color: "text",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  cursor: "pointer"
+                }}
+              >
+                <Logo sx={{ color: "text" }} />
+                {!isDashboard && (
+                  <Box
+                    sx={{
+                      ml: "12px",
+                      fontWeight: 800,
+                      fontSize: "22px"
+                    }}
+                  >
+                    Livepeer.com
+                  </Box>
+                )}
+              </A>
+            </Link>
+          </div>
           <Flex
             sx={{
-              display: ['none', 'none', 'flex'],
-              width: '100%',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
+              display: ["none", "none", "flex"],
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center"
             }}
           >
             <Link href="/docs" passHref>
-              <A variant="nav" sx={{ ml: 0 }}>
-                Docs
-              </A>
+              <A variant="nav">Docs</A>
             </Link>
             <Link href="/#contactSection" passHref>
               <A variant="nav">Contact Us</A>
             </Link>
+          </Flex>
+          <Flex
+            sx={{
+              display: ["none", "none", "flex"],
+              alignItems: "center",
+              justifyContent: "flex-end",
+              minWidth: sidesWidth
+            }}
+          >
             {!loggedIn && (
               <>
                 <Link href="/login" passHref>
-                  <A variant="nav" sx={{ fontWeight: 600, ml: 3, mr: 3 }}>
+                  <A variant="nav" sx={{ fontWeight: 600, mr: 3 }}>
                     Log in
                   </A>
                 </Link>
                 <Link href="/register" passHref>
-                  <A variant="buttons.secondarySmall" sx={{ m: 0 }}>
-                    Sign up
-                  </A>
+                  <A variant="buttons.secondarySmall">Sign up</A>
                 </Link>
               </>
             )}
@@ -138,9 +150,9 @@ export default () => {
           </Flex>
           <IconButton
             sx={{
-              color: 'black',
-              display: ['flex', 'flex', 'none'],
-              fontSize: 6,
+              color: "black",
+              display: ["flex", "flex", "none"],
+              fontSize: 6
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >
@@ -155,5 +167,5 @@ export default () => {
         token={token}
       />
     </Box>
-  )
-}
+  );
+};
