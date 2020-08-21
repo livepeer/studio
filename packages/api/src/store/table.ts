@@ -30,6 +30,7 @@ export default class Table<T extends DBObject> {
     this.name = schema.table
   }
 
+  // get a single document by id
   async get(id): Promise<T> {
     const res = await this.db.query(
       sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`),
@@ -41,6 +42,7 @@ export default class Table<T extends DBObject> {
     return res.rows[0].data
   }
 
+  // returns [docs, cursor]
   async find(
     query: FindQuery = {},
     opts: FindOptions,
@@ -104,7 +106,7 @@ export default class Table<T extends DBObject> {
     }
   }
 
-  // Auto-create table if it doesn't exist
+  // on startup: auto-create table if it doesn't exist
   async ensureTable() {
     let res
     try {
@@ -130,6 +132,7 @@ export default class Table<T extends DBObject> {
     )
   }
 
+  // on startup: auto-create indices if they don't exist
   async ensureIndex(propName, prop) {
     if (!prop.index && !prop.unique) {
       return

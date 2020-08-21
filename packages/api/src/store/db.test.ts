@@ -6,6 +6,7 @@ import { Pool } from 'pg'
 interface TestObject {
   id: string
   example: string
+  importance: number
 }
 
 const testSchema = {
@@ -21,6 +22,10 @@ const testSchema = {
       type: 'string',
       unique: true,
     },
+    importance: {
+      type: 'number',
+      index: true,
+    },
   },
 }
 
@@ -33,6 +38,7 @@ describe('DB', () => {
     table = new Table<TestObject>({ db, schema: testSchema })
     await table.ensureTable()
   })
+
   afterEach(async () => {
     await db.close()
     const pool = new Pool({
@@ -42,6 +48,7 @@ describe('DB', () => {
     await pool.query('DROP DATABASE test')
     await pool.end()
   })
+
   it('should do CRUD operations', async () => {
     const doc = <TestObject>{
       id: uuid(),
@@ -50,9 +57,11 @@ describe('DB', () => {
     await table.create(doc)
     let ret = await table.get(doc.id)
     expect(ret.example).toEqual(doc.example)
+    expect(ret.importance).toEqual(doc.importance)
     await table.replace({
       id: doc.id,
       example: 'changed text',
+      importance: 5,
     })
     ret = await table.get(doc.id)
     expect(ret.example).toEqual('changed text')
@@ -60,4 +69,6 @@ describe('DB', () => {
     ret = await table.get(doc.id)
     expect(ret).toEqual(null)
   })
+
+  it('should find() stuff', async () => {})
 })
