@@ -7,6 +7,7 @@ import ReactGA from "react-ga";
 import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router, { useRouter } from "next/router";
+import GradientBackgroundBox from "../GradientBackgroundBox";
 
 interface Props {
   title?: string;
@@ -72,7 +73,9 @@ export default ({
       }}
     >
       <DefaultSeo {...seo} />
-
+      <div sx={{ position: "absolute", top: 0, width: "100%" }}>
+        <GradientBackgroundBox sx={{ height: "1000px" }} />
+      </div>
       <Flex
         sx={{
           flexGrow: 1,
@@ -82,7 +85,7 @@ export default ({
       >
         <Box
           sx={{
-            bg: "background",
+            bg: "transparent",
             zIndex: 20,
             position: "sticky",
             top: 0,

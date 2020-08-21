@@ -2,7 +2,6 @@ import { Styled } from "theme-ui";
 import { Grid, Flex, Container, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
-import Button from "../Button";
 import { Link as ScrollLink } from "react-scroll";
 import ArrowRight from "../../public/img/arrow-right.svg";
 import Link from "next/link";
