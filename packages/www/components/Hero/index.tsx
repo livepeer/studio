@@ -33,89 +33,51 @@ export default ({
         borderBottom: skinny ? "0" : "1px solid",
         borderColor: "muted",
         pt: skinny ? 4 : 0,
-        pb: skinny ? 4 : "65px",
+        pb: skinny ? 4 : "65px"
       }}
       {...props}
     >
-      <Container>
-        <Grid
-          columns={[1, 1, 1, centered ? 1 : 2]}
+      <Container
+        sx={{
+          minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center"
+        }}
+      >
+        <Box
           sx={{
-            alignItems: "center",
-            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
+            mb: [4, 4, 4, 0],
+            maxWidth: 1000,
+            mx: "auto",
+            textAlign: "center"
           }}
         >
-          <Box
+          <Styled.h1
             sx={{
-              mb: [4, 4, 4, 0],
-              maxWidth: 700,
-              mx: ["auto", "auto", "auto", centered ? "auto" : "initial"],
-              textAlign: [
-                "center",
-                "center",
-                "center",
-                centered ? "center" : "left",
-              ],
+              fontSize: [48, 56, 64, 72]
             }}
           >
-            {heading && (
-              <Styled.h1
-                sx={{
-                  fontSize: [48, 56, 7],
-                }}
-              >
-                {heading}
-              </Styled.h1>
-            )}
-            {tagline && (
-              <Box
-                sx={{
-                  mt: 4,
-                  fontSize: "18px",
-                }}
-              >
-                {tagline}
-              </Box>
-            )}
-            {ctas && (
-              <Flex
-                sx={{
-                  mt: "44px",
-                  flexDirection: ["column", "row"],
-                  justifyContent: [
-                    "center",
-                    "center",
-                    "center",
-                    centered ? "center" : "flex-start",
-                  ],
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                {ctas.map((cta, i) => (
-                  <Box key={i}>{renderSwitch(cta)}</Box>
-                ))}
-              </Flex>
-            )}
-          </Box>
-          {image && (
-            <img
-              alt={image.alt}
-              width={525}
-              height={846}
+            <span sx={{ fontWeight: 400 }}>The platform built to power</span>
+            <br />
+            video-centric UGC applications at scale.
+          </Styled.h1>
+          {ctas && (
+            <Flex
               sx={{
-                mt: [2, 0],
-                height: ["auto", "auto", 525],
-                width: ["100%", "100%", "100%", centered ? "'100%'" : "auto"],
-                mr: [0, 0, -260],
-                position: "relative",
-                right: [0, 0, 0, -100],
+                mt: "44px",
+                flexDirection: ["column", "row"],
+                justifyContent: "center",
+                width: "100%",
+                alignItems: "center"
               }}
-              className="lazyload"
-              data-src={builder.image(image).url()}
-            />
+            >
+              {ctas.map((cta, i) => (
+                <Box key={i}>{renderSwitch(cta)}</Box>
+              ))}
+            </Flex>
           )}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );

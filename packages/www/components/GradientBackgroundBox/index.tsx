@@ -14,21 +14,21 @@ const GradientBackgroundBox = ({
         height: "100%",
         top: "-10vw",
         pointerEvents: "none",
-        zIndex: -1,
+        zIndex: -1
       }}
     >
       <Box
         sx={{
-          bg: "#BFA8FF",
-          opacity: 0.25,
+          bg: "#F5B9FF",
+          opacity: 0.5,
           filter: "blur(160px)",
           width: "30vw",
           height: "30vw",
           minWidth: "500px",
           minHeight: "500px",
           position: "absolute",
-          left: "50%",
-          top: "-5vw",
+          right: "75%",
+          top: "-5vw"
         }}
       />
       <Box
@@ -42,12 +42,12 @@ const GradientBackgroundBox = ({
           minHeight: "500px",
           position: "absolute",
           left: "50%",
-          transform: "translateX(-50%)",
+          transform: "translateX(-50%)"
         }}
       />
       <Box
         sx={{
-          bg: "#BFA8FF",
+          bg: "#B0B0FF",
           opacity: 0.25,
           filter: "blur(160px)",
           width: "30vw",
@@ -55,8 +55,8 @@ const GradientBackgroundBox = ({
           minWidth: "500px",
           minHeight: "500px",
           position: "absolute",
-          right: "50%",
-          top: "-5vw",
+          left: "75%",
+          top: "-5vw"
         }}
       />
     </div>

@@ -146,6 +146,11 @@ export const theme = {
     container: {
       maxWidth: 1200,
       px: [3, 3, 3, 3, 0]
+    },
+    content: {
+      maxWidth: 994,
+      px: [3, 3, 3, 3, 0],
+      mx: "auto"
     }
   },
   styles: {
