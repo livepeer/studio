@@ -1,4 +1,4 @@
-import sql from 'sql-template-strings'
+import sql, { SQLStatement } from 'sql-template-strings'
 import DB from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
@@ -48,18 +48,27 @@ export default class Table<T extends DBObject> {
 
   // returns [docs, cursor]
   async find(
-    query: FindQuery = {},
+    query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions,
   ): Promise<[Array<T>, string]> {
     const { cursor, limit = 100 } = opts
 
     const q = sql`SELECT * FROM `.append(this.name)
-    const filters = []
+    let filters = []
+
+    // We can either pass in an array of sql`` statements...
+    if (Array.isArray(query)) {
+      filters = [...query]
+    }
+
+    // ...or a {name: "whatever"} query
+    else {
+      for (const [key, value] of Object.entries(query)) {
+        filters.push(sql``.append(`data->>'${key}' = `).append(sql`${value}`))
+      }
+    }
     if (cursor) {
       filters.push(sql`id > ${cursor}`)
-    }
-    for (const [key, value] of Object.entries(query)) {
-      filters.push(sql``.append(`data->>'${key}' = `).append(sql`${value}`))
     }
     let first = true
     for (const filter of filters) {
@@ -70,6 +79,7 @@ export default class Table<T extends DBObject> {
       }
       first = false
       q.append(filter)
+      q.append(' ')
     }
 
     q.append(sql`LIMIT ${limit}`)
@@ -82,7 +92,6 @@ export default class Table<T extends DBObject> {
       return [docs, null]
     }
 
-    console.log(docs)
     return [docs, docs[docs.length - 1].id]
   }
 
@@ -98,7 +107,6 @@ export default class Table<T extends DBObject> {
       }
       throw e
     }
-    console.log(`returning ${JSON.stringify(doc)}`)
     return doc
   }
 
@@ -119,7 +127,7 @@ export default class Table<T extends DBObject> {
     ])
 
     if (res.rowCount < 1) {
-      throw new NotFoundError()
+      throw new NotFoundError(`couldn't find ${this.name} id=${id}`)
     }
   }
 

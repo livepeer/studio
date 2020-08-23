@@ -140,6 +140,7 @@ export default async function makeApp(params) {
       return res.json({ errors: [err.message] })
     }
     res.status(500)
+    console.error(err)
     return res.json({ errors: [err.stack] })
   })
 
