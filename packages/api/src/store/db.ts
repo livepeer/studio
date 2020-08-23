@@ -29,7 +29,12 @@ export default class DB {
       throw new Error('no postgres url provided')
     }
     this.ready = (async () => {
-      await ensureDatabase(postgresUrl)
+      try {
+        await ensureDatabase(postgresUrl)
+      } catch (e) {
+        console.error(`error in ensureDatabase: ${e.message}`)
+        throw e
+      }
       this.pool = new Pool({
         connectionTimeoutMillis: CONNECT_TIMEOUT,
         connectionString: postgresUrl,
