@@ -326,6 +326,7 @@ components:
 
     password-reset-token:
       type: object
+      table: password_reset_token
       required:
         - email
       additionalProperties: false

@@ -200,10 +200,10 @@ export async function getWebhooks(
   cursor = undefined,
   includeDeleted = false,
 ) {
-  const query = [
-    sql`data->>'event' = ${event}`,
-    sql`data->>'userId' = ${userId}`,
-  ]
+  const query = [sql`data->>'userId' = ${userId}`]
+  if (event) {
+    query.push(sql`data->>'event' = ${event}`)
+  }
   if (!includeDeleted) {
     query.push(sql`data->>'deleted' IS NULL`)
   }

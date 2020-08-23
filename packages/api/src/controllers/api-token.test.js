@@ -132,12 +132,6 @@ describe('controllers/api-token', () => {
       const resGet = await server.store.get(`api-token/${tokenRes.id}`)
       expect(resGet.id).toEqual(tokenRes.id)
 
-      // it should return an empty object, which indicates api-token+userId record exists
-      const tokenUserId = await server.store.get(
-        `api-token+userId/${tokenRes.userId}/${tokenRes.id}`,
-      )
-      expect(JSON.stringify(tokenUserId)).toBe('{}')
-
       // test that apiToken is deleted
       await server.store.delete(`api-token/${tokenRes.id}`)
       const deleted = await server.store.get(`api-token/${tokenRes.id}`)
@@ -151,11 +145,6 @@ describe('controllers/api-token', () => {
         deleteTokenErr = err
       }
       expect(deleteTokenErr.status).toBe(404)
-
-      const nullTokenUserId = await server.store.get(
-        `api-token+userId/${tokenRes.userId}/${tokenRes.id}`,
-      )
-      expect(nullTokenUserId).toBe(null)
 
       let replaceError
       try {

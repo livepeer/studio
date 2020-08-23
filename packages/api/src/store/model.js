@@ -54,16 +54,14 @@ export default class Model {
     if (filter) {
       throw new Error('filter no longer supported, use `db.find` instead')
     }
+    const [kind] = prefix.split('/')
     const [table] = this.getTable(prefix)
-    const [responses, nextCursor] = await this.db[table].find(
-      {},
-      { limit, cursor },
-    )
-    if (responses.data.length > 0 && cleanWriteOnly) {
-      return this.cleanWriteOnlyResponses(prefix, responses)
+    let [docs, nextCursor] = await this.db[table].find({}, { limit, cursor })
+    if (docs.length > 0 && cleanWriteOnly) {
+      docs = docs.map((doc) => this.cleanWriteOnlyResponses(kind, doc))
     }
     return {
-      data: responses,
+      data: docs,
       cursor: nextCursor,
     }
   }

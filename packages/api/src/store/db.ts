@@ -4,7 +4,14 @@ import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
 import { IStore } from '../types/common'
 import schema from '../schema/schema.json'
-import { Stream, ObjectStore, ApiToken, User, Webhook } from '../schema/types'
+import {
+  Stream,
+  ObjectStore,
+  ApiToken,
+  User,
+  Webhook,
+  PasswordResetToken,
+} from '../schema/types'
 import Table from './table'
 import { kebabToCamel } from '../util'
 
@@ -18,6 +25,7 @@ export class DB {
   apiToken: Table<ApiToken>
   user: Table<User>
   webhook: Table<Webhook>
+  passwordResetToken: Table<PasswordResetToken>
 
   postgresUrl: String
   ready: Promise<void>
