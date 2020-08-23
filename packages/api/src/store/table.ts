@@ -1,7 +1,7 @@
 import sql from 'sql-template-strings'
 import DB from './db'
-import { NotFoundError } from './errors'
 import logger from '../logger'
+import { BadRequestError, NotFoundError } from './errors'
 
 interface TableSchema {
   table: string
@@ -31,7 +31,11 @@ export default class Table<T extends DBObject> {
   }
 
   // get a single document by id
-  async get(id): Promise<T> {
+  async get(id: string): Promise<T> {
+    console.log(id)
+    if (!id) {
+      throw new Error('missing id')
+    }
     const res = await this.db.query(
       sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`),
     )
@@ -49,25 +53,37 @@ export default class Table<T extends DBObject> {
   ): Promise<[Array<T>, string]> {
     const { cursor, limit = 100 } = opts
 
-    const q = sql`SELECT * FROM`.append(this.name)
+    const q = sql`SELECT * FROM `.append(this.name)
+    const filters = []
     if (cursor) {
-      q.append(sql`WHERE id > ${cursor}`)
+      filters.push(sql`id > ${cursor}`)
     }
-    for (const [key, value] of Object.values(query)) {
-      q.append(sql`AND "${key}" = ${value}`)
+    for (const [key, value] of Object.entries(query)) {
+      filters.push(sql``.append(`data->>'${key}' = `).append(sql`${value}`))
+    }
+    let first = true
+    for (const filter of filters) {
+      if (first) {
+        q.append(' WHERE ')
+      } else {
+        q.append(' AND ')
+      }
+      first = false
+      q.append(filter)
     }
 
     q.append(sql`LIMIT ${limit}`)
 
     const res = await this.db.query(q)
 
-    const data = res.rows.map(({ id, data }) => ({ [id]: data }))
+    const docs = res.rows.map(({ data }) => data)
 
-    if (data.length < 1) {
-      return [data, null]
+    if (docs.length < 1) {
+      return [docs, null]
     }
 
-    return [data, res.rows[data.length - 1].id]
+    console.log(docs)
+    return [docs, docs[docs.length - 1].id]
   }
 
   async create(doc: T): Promise<T> {
@@ -78,10 +94,11 @@ export default class Table<T extends DBObject> {
       )
     } catch (e) {
       if (e.message.includes('duplicate key value')) {
-        throw new Error(`${doc.id} already exists`)
+        throw new BadRequestError(e.detail)
       }
       throw e
     }
+    console.log(`returning ${JSON.stringify(doc)}`)
     return doc
   }
 
@@ -92,7 +109,7 @@ export default class Table<T extends DBObject> {
     )
 
     if (res.rowCount < 1) {
-      throw new NotFoundError()
+      throw new NotFoundError(`${this.name} id=${doc.id} not found`)
     }
   }
 

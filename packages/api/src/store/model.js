@@ -61,46 +61,46 @@ export default class Model {
 
   async list({ prefix, cursor, limit, filter, cleanWriteOnly = true }) {
     if (filter) {
-      throw new Error('filter no longer supported, use `db` instead')
+      throw new Error('filter no longer supported, use `db.find` instead')
     }
-    while (true) {
-      const responses = await this.db.list(prefix, cursor, limit)
-      if (typeof filter == 'function') {
-        responses.data = responses.data.filter(filter)
-        if (!responses.data.length && responses.cursor) {
-          // filtered set are empty, but there is more in database,
-          // so let's try next page
-          cursor = responses.cursor
-          continue
-        }
-      }
-      if (responses.data.length > 0 && cleanWriteOnly) {
-        return this.cleanWriteOnlyResponses(prefix, responses)
-      }
-      return responses
+    const [table] = this.getTable(prefix)
+    const [responses, nextCursor] = await this.db[table].find(
+      {},
+      { limit, cursor },
+    )
+    if (responses.data.length > 0 && cleanWriteOnly) {
+      return this.cleanWriteOnlyResponses(prefix, responses)
+    }
+    return {
+      data: responses,
+      cursor: nextCursor,
     }
   }
 
   async listKeys(prefix, cursor, limit) {
-    return this.db.listKeys(prefix, cursor, limit)
+    const [table] = this.getTable(prefix)
+    const [response, nextCursor] = await this.db[table].find(
+      {},
+      { limit, cursor },
+    )
+    const keys = response.map((x) => x.id)
+    return [keys, nextCursor]
   }
 
   async query({ kind, query, cursor, limit }) {
-    const [queryKey, ...others] = Object.keys(query)
+    const [_, ...others] = Object.keys(query)
     if (others.length > 0) {
       throw new Error('you may only query() by one key')
     }
-    const queryValue = query[queryKey]
-    const prefix = `${kind}+${queryKey}/${queryValue}/`
+    const [table] = this.getTable(kind)
+    const [docs, cursorOut] = await this.db[table].find(query, {
+      cursor,
+      limit,
+    })
+    console.log(`back from find: ${JSON.stringify(docs)}`)
+    const keys = docs.map((x) => x.id)
 
-    const [keys, cursorOut] = await this.db.listKeys(prefix, cursor, limit)
-
-    const ids = []
-    for (let i = 0; i < keys.length; i++) {
-      ids.push(keys[i].split('/').pop())
-    }
-
-    return { data: ids, cursor: cursorOut }
+    return { data: keys, cursor: cursorOut }
   }
 
   async queryObjects({
@@ -118,28 +118,16 @@ export default class Model {
     if (others.length > 0) {
       throw new Error('you may only query() by one key')
     }
-    const queryValue = query[queryKey]
-    const prefix = `${kind}+${queryKey}/${queryValue}/`
+    const [table] = this.getTable(kind)
 
-    while (true) {
-      const [keys, cursorOut] = await this.db.listKeys(prefix, cursor, limit)
-
-      const documents = []
-      for (let i = 0; i < keys.length; i++) {
-        const id = keys[i].split('/').pop()
-        const doc = await this.db.get(`${kind}/${id}`)
-        if (doc && (typeof filter !== 'function' || filter(doc))) {
-          documents.push(
-            cleanWriteOnly ? this.cleanWriteOnlyResponses(kind, doc) : doc,
-          )
-        }
-      }
-      if (!documents.length && keys.length && cursorOut) {
-        cursor = cursorOut
-        continue
-      }
-      return { data: documents, cursor: cursorOut }
+    let [docs, cursorOut] = await this.db[table].find(
+      { query },
+      { cursor, limit },
+    )
+    if (cleanWriteOnly) {
+      docs = docs.map((doc) => this.cleanWriteOnlyResponses(kind, doc))
     }
+    return { data: docs, cursor: cursorOut }
   }
 
   async deleteKey(key) {
@@ -166,7 +154,6 @@ export default class Model {
     )
   }
 
-  // before sending object back to user, pipe it through function. Write-only.
   async create(doc) {
     if (typeof doc !== 'object' || typeof doc.id !== 'string') {
       throw new Error(`invalid values: ${JSON.stringify(doc)}`)
@@ -176,55 +163,8 @@ export default class Model {
       throw new Error(`Missing required values: id, kind`)
     }
 
-    const item = await this.get(`${kind}/${id}`)
-    if (item) {
-      throw new Error(`${id} already exists`)
-    }
-
-    const [properties] = this.getSchema(kind)
-    if (properties) {
-      for (const [fieldName, fieldArray] of Object.entries(properties)) {
-        const value = doc[fieldName]
-        if (fieldArray.unique && value) {
-          const [keys] = await this.db.listKeys(`${kind}+${fieldName}/${value}`)
-          if (keys.length > 0) {
-            throw new ForbiddenError(
-              `there is already a ${kind} with ${fieldName}=${value}`,
-            )
-          }
-        }
-      }
-    }
-
-    const operations = await this.getOperations(`${kind}/${id}`, doc)
-
-    await Promise.all(
-      operations.map(([key, value]) => {
-        return this.db.create(key, value)
-      }),
-    )
-  }
-
-  async getOperations(key, data) {
-    const [properties, kind] = this.getSchema(key)
-    if (!properties || properties.length) {
-      return null
-    }
-
-    const operations = [[key, data]]
-
-    if (properties) {
-      for (const [fieldName, fieldArray] of Object.entries(properties)) {
-        if (fieldArray.unique || fieldArray.index) {
-          operations.push(
-            // ex. user-emails/eli@iame.li/abc123
-            [`${kind}+${fieldName}/${data[fieldName]}/${data['id']}`, {}],
-          )
-        }
-      }
-    }
-
-    return operations
+    const [table] = this.getTable(kind)
+    return await this.db[table].create(doc)
   }
 
   getSchema(kind) {

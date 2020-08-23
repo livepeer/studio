@@ -139,6 +139,10 @@ export default async function makeApp(params) {
     if (typeof err.status === 'number') {
       res.status(err.status)
       return res.json({ errors: [err.message] })
+    } else {
+      res.status(500)
+      console.error(err)
+      return res.json({ errors: [err.stack] })
     }
 
     next(err)

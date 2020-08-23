@@ -1,6 +1,5 @@
 import { Pool } from 'pg'
 import logger from '../logger'
-import { NotFoundError } from './errors'
 import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
 import { IStore } from '../types/common'

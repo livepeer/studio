@@ -1,4 +1,17 @@
-export class NotFoundError extends Error {
+class APIError extends Error {
+  type: string
+  status: number
+}
+
+export class BadRequestError extends APIError {
+  constructor(message) {
+    super(message)
+    this.type = 'BadRequestError'
+    this.status = 400
+  }
+}
+
+export class NotFoundError extends APIError {
   constructor(message) {
     super(message)
     this.type = 'NotFoundError'
@@ -6,7 +19,7 @@ export class NotFoundError extends Error {
   }
 }
 
-export class ForbiddenError extends Error {
+export class ForbiddenError extends APIError {
   constructor(message) {
     super(message)
     this.type = 'NotFoundError'
@@ -15,7 +28,7 @@ export class ForbiddenError extends Error {
   }
 }
 
-export class InternalServerError extends Error {
+export class InternalServerError extends APIError {
   constructor(message) {
     super(message)
     this.type = 'InternalServerError'
