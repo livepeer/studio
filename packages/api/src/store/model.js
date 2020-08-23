@@ -1,14 +1,26 @@
+/**
+ * DEPRECATED. Use `db` for stuff instead of  `req.store`.
+ */
+
 import schema from '../schema/schema.json'
 import { NotFoundError, ForbiddenError, InternalServerError } from './errors'
+import { kebabToCamel } from '../util'
 
 export default class Model {
-  constructor(backend) {
-    this.backend = backend
-    this.ready = backend.ready
+  constructor(db) {
+    this.db = db
+    this.ready = db.ready
+  }
+
+  getTable(id) {
+    let [table, uuid] = id.split('/')
+    table = kebabToCamel(table)
+    return [table, uuid]
   }
 
   async get(id, cleanWriteOnly = true) {
-    const responses = await this.backend.get(id)
+    const [table, uuid] = this.getTable(id)
+    const responses = await this.db[table].get(uuid)
     if (responses && cleanWriteOnly) {
       return this.cleanWriteOnlyResponses(id, responses)
     }
@@ -26,30 +38,33 @@ export default class Model {
     }
 
     const key = `${kind}/${id}`
-    const record = await this.backend.get(key)
+    const record = await this.db.get(key)
 
     if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
 
-    return await this.backend.replace(key, data)
+    return await this.db.replace(key, data)
 
     // NOTE: uncomment code below when replacing objects saved from indexes becomes relevant
     // const operations = await this.getOperations(key, data)
     // if (!operations) {
-    // return await this.backend.replace(key, data)
+    // return await this.db.replace(key, data)
     // }
 
     // await Promise.all(
     //   operations.map(([key, value]) => {
-    //     return this.backend.replace(key, value)
+    //     return this.db.replace(key, value)
     //   }),
     // )
   }
 
   async list({ prefix, cursor, limit, filter, cleanWriteOnly = true }) {
+    if (filter) {
+      throw new Error('filter no longer supported, use `db` instead')
+    }
     while (true) {
-      const responses = await this.backend.list(prefix, cursor, limit)
+      const responses = await this.db.list(prefix, cursor, limit)
       if (typeof filter == 'function') {
         responses.data = responses.data.filter(filter)
         if (!responses.data.length && responses.cursor) {
@@ -67,7 +82,7 @@ export default class Model {
   }
 
   async listKeys(prefix, cursor, limit) {
-    return this.backend.listKeys(prefix, cursor, limit)
+    return this.db.listKeys(prefix, cursor, limit)
   }
 
   async query({ kind, query, cursor, limit }) {
@@ -78,7 +93,7 @@ export default class Model {
     const queryValue = query[queryKey]
     const prefix = `${kind}+${queryKey}/${queryValue}/`
 
-    const [keys, cursorOut] = await this.backend.listKeys(prefix, cursor, limit)
+    const [keys, cursorOut] = await this.db.listKeys(prefix, cursor, limit)
 
     const ids = []
     for (let i = 0; i < keys.length; i++) {
@@ -107,16 +122,12 @@ export default class Model {
     const prefix = `${kind}+${queryKey}/${queryValue}/`
 
     while (true) {
-      const [keys, cursorOut] = await this.backend.listKeys(
-        prefix,
-        cursor,
-        limit,
-      )
+      const [keys, cursorOut] = await this.db.listKeys(prefix, cursor, limit)
 
       const documents = []
       for (let i = 0; i < keys.length; i++) {
         const id = keys[i].split('/').pop()
-        const doc = await this.backend.get(`${kind}/${id}`)
+        const doc = await this.db.get(`${kind}/${id}`)
         if (doc && (typeof filter !== 'function' || filter(doc))) {
           documents.push(
             cleanWriteOnly ? this.cleanWriteOnlyResponses(kind, doc) : doc,
@@ -136,7 +147,7 @@ export default class Model {
     if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
-    return await this.backend.delete(key)
+    return await this.db.delete(key)
   }
 
   async delete(key) {
@@ -150,7 +161,7 @@ export default class Model {
 
     await Promise.all(
       operations.map(([key, value]) => {
-        return this.backend.delete(key)
+        return this.db.delete(key)
       }),
     )
   }
@@ -175,9 +186,7 @@ export default class Model {
       for (const [fieldName, fieldArray] of Object.entries(properties)) {
         const value = doc[fieldName]
         if (fieldArray.unique && value) {
-          const [keys] = await this.backend.listKeys(
-            `${kind}+${fieldName}/${value}`,
-          )
+          const [keys] = await this.db.listKeys(`${kind}+${fieldName}/${value}`)
           if (keys.length > 0) {
             throw new ForbiddenError(
               `there is already a ${kind} with ${fieldName}=${value}`,
@@ -191,7 +200,7 @@ export default class Model {
 
     await Promise.all(
       operations.map(([key, value]) => {
-        return this.backend.create(key, value)
+        return this.db.create(key, value)
       }),
     )
   }
@@ -262,6 +271,6 @@ export default class Model {
   }
 
   close() {
-    this.backend.close()
+    this.db.close()
   }
 }

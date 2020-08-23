@@ -3,6 +3,7 @@ import 'express-async-errors' // it monkeypatches, i guess
 import morgan from 'morgan'
 import logger from './logger'
 import appRouter from './app-router'
+import 'source-map-support/register'
 
 export default async function makeApp(params) {
   const {
@@ -58,10 +59,12 @@ export default async function makeApp(params) {
 
   let router
   let store
+  let db
   try {
     const appRoute = await appRouter(params)
-    router = appRouter.router
-    store = appRouter.store
+    router = appRoute.router
+    store = appRoute.store
+    db = appRoute.db
   } catch (e) {
     console.error('Error on startup')
     console.error(e)

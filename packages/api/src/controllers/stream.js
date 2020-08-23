@@ -14,12 +14,8 @@ import { getBroadcasterHandler } from './broadcaster'
 const WEBHOOK_TIMEOUT = 5 * 1000
 
 const isLocalIP = require('is-local-ip')
-let resolver
-const dns = require('dns')
-if (dns && dns.promises && dns.promises.Resolver) {
-  const Resolver = dns.promises.Resolver
-  resolver = new Resolver()
-}
+const { Resolver } = require('dns').promises
+const resolver = new Resolver()
 
 const app = Router()
 const hackMistSettings = (req, profiles) => {
@@ -329,10 +325,9 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
 
     const { data: webhooksList } = await getWebhooks(
       req.store,
-      stream.userId,
+      req.user.id,
       'streamStarted',
     )
-    console.log('webhooksList: ', webhooksList)
     try {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {

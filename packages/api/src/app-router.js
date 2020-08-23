@@ -147,5 +147,6 @@ export default async function makeApp(params) {
   return {
     router: app,
     store,
+    db,
   }
 }

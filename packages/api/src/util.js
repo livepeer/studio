@@ -64,5 +64,6 @@ export const kebabToCamel = (str) => {
       out += char
     }
   }
+  console.log('kebab: ' + out)
   return out
 }
