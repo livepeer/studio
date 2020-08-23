@@ -20,6 +20,9 @@ export default class Model {
 
   async get(id, cleanWriteOnly = true) {
     const [table, uuid] = this.getTable(id)
+    if (!this.db[table]) {
+      throw new Error(`table not found for ${id}`)
+    }
     const responses = await this.db[table].get(uuid)
     if (responses && cleanWriteOnly) {
       return this.cleanWriteOnlyResponses(id, responses)
@@ -38,25 +41,13 @@ export default class Model {
     }
 
     const key = `${kind}/${id}`
-    const record = await this.db.get(key)
+    const record = await this.get(key)
 
     if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
 
-    return await this.db.replace(key, data)
-
-    // NOTE: uncomment code below when replacing objects saved from indexes becomes relevant
-    // const operations = await this.getOperations(key, data)
-    // if (!operations) {
-    // return await this.db.replace(key, data)
-    // }
-
-    // await Promise.all(
-    //   operations.map(([key, value]) => {
-    //     return this.db.replace(key, value)
-    //   }),
-    // )
+    return await this.db[kind].replace(data)
   }
 
   async list({ prefix, cursor, limit, filter, cleanWriteOnly = true }) {
@@ -97,7 +88,6 @@ export default class Model {
       cursor,
       limit,
     })
-    console.log(`back from find: ${JSON.stringify(docs)}`)
     const keys = docs.map((x) => x.id)
 
     return { data: keys, cursor: cursorOut }
@@ -128,27 +118,16 @@ export default class Model {
   }
 
   async deleteKey(key) {
-    const record = await this.get(key)
-    if (!record) {
-      throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
-    }
-    return await this.db.delete(key)
+    return this.delete(key)
   }
 
   async delete(key) {
-    const [properties, kind] = this.getSchema(key)
-    const doc = await this.get(`${key}`)
-    if (!doc) {
+    const [table, id] = this.getTable(key)
+    const record = await this.db[table].get(id)
+    if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
-
-    const operations = await this.getOperations(key, doc)
-
-    await Promise.all(
-      operations.map(([key, value]) => {
-        return this.db.delete(key)
-      }),
-    )
+    return await this.db[table].delete(id)
   }
 
   async create(doc) {

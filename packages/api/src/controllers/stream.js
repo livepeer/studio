@@ -44,14 +44,17 @@ const hackMistSettings = (req, profiles) => {
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   let { limit, cursor, streamsonly, sessionsonly, all } = req.query
 
-  const query = [sql`data->>deleted IS NULL`]
+  const query = []
+  if (!all) {
+    query.push(sql`data->>'deleted' IS NULL`)
+  }
   if (streamsonly) {
-    query.push(sql`data->>parentId IS NULL`)
+    query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
-    query.push(sql`data->>parentId IS NOT NULL`)
+    query.push(sql`data->>'parentId' IS NOT NULL`)
   }
 
-  const [output, newCursor] = db.stream.find(query, { cursor, limit })
+  const [output, newCursor] = await db.stream.find(query, { cursor, limit })
 
   res.status(200)
 
@@ -267,8 +270,7 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 
   let objectStoreId
   if (req.body.objectStoreId) {
-    await req.store.get(`objectstores/${req.user.id}/${req.body.objectStoreId}`)
-    objectStoreId = req.body.objectStoreId
+    await req.store.get(`object-store/${req.body.objectStoreId}`)
   }
 
   const doc = wowzaHydrate({

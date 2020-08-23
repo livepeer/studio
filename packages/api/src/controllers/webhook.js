@@ -21,13 +21,11 @@ app.get('/', authMiddleware({}), async (req, res) => {
       filter,
     })
     const [output, newCursor] = db.stream.find([`data->>'deleted' IS NULL`])
-    let output = resp.data
     res.status(200)
 
     if (output.length > 0) {
-      res.links({ next: makeNextHREF(req, resp.cursor) })
+      res.links({ next: makeNextHREF(req, newCursor) })
     }
-    output = output.map((o) => o[Object.keys(o)[0]])
     return res.json(output)
   }
 

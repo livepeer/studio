@@ -234,7 +234,7 @@ describe('controllers/stream', () => {
           id: i + uuid(), // sort objects
           kind: 'stream',
           userId: i < 7 ? nonAdminUser.id : undefined,
-          deleted: i < 3,
+          deleted: i < 3 ? true : undefined,
         }
         await server.store.create(document)
         const res = await client.get(`/stream/${document.id}`)
@@ -243,10 +243,10 @@ describe('controllers/stream', () => {
       }
       client.jwtAuth = nonAdminToken['token']
 
-      const res = await client.get(`/stream/user/${nonAdminUser.id}?limit=4`)
+      const res = await client.get(`/stream/user/${nonAdminUser.id}?limit=3`)
       expect(res.status).toBe(200)
       const streams = await res.json()
-      expect(streams.length).toEqual(1)
+      expect(streams.length).toEqual(3)
       expect(streams[0]).toEqual(source[3])
       expect(streams[0].userId).toEqual(nonAdminUser.id)
       expect(res.headers._headers.link).toBeDefined()
@@ -256,8 +256,8 @@ describe('controllers/stream', () => {
       const nextRes = await client.get(nextLink.slice(si))
       expect(nextRes.status).toBe(200)
       const nextStreams = await nextRes.json()
-      expect(nextStreams.length).toEqual(3)
-      expect(nextStreams[0]).toEqual(source[4])
+      expect(nextStreams.length).toEqual(1)
+      expect(nextStreams[0]).toEqual(source[6])
       expect(nextStreams[0].userId).toEqual(nonAdminUser.id)
     })
 

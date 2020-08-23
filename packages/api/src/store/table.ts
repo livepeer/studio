@@ -32,7 +32,6 @@ export default class Table<T extends DBObject> {
 
   // get a single document by id
   async get(id: string): Promise<T> {
-    console.log(id)
     if (!id) {
       throw new Error('missing id')
     }
@@ -68,7 +67,8 @@ export default class Table<T extends DBObject> {
       }
     }
     if (cursor) {
-      filters.push(sql`id > ${cursor}`)
+      console.log(`CURSORRR: ${cursor}`)
+      filters.push(sql`data->>'id' > ${cursor}`)
     }
     let first = true
     for (const filter of filters) {
@@ -82,7 +82,8 @@ export default class Table<T extends DBObject> {
       q.append(' ')
     }
 
-    q.append(sql`LIMIT ${limit}`)
+    q.append(' ORDER BY id ASC')
+    q.append(sql` LIMIT ${limit}`)
 
     const res = await this.db.query(q)
 

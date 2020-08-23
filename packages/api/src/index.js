@@ -68,7 +68,8 @@ export default async function makeApp(params) {
   } catch (e) {
     console.error('Error on startup')
     console.error(e)
-    process.exit(1)
+    throw e
+    // process.exit(1)
   }
   const app = express()
   app.use(
@@ -111,6 +112,7 @@ export default async function makeApp(params) {
     port: listenPort,
     close,
     store,
+    db,
   }
 }
 
