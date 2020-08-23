@@ -1,5 +1,5 @@
 import uuid from 'uuid/v4'
-import DB from './db'
+import { DB } from './db'
 import Table from './table'
 import { Pool } from 'pg'
 
@@ -33,8 +33,8 @@ describe('DB', () => {
   let db: DB
   let table: Table<TestObject>
   beforeEach(async () => {
-    db = new DB({ postgresUrl: `postgresql://postgres@localhost/test` })
-    await db.ready
+    db = new DB()
+    await db.start({ postgresUrl: `postgresql://postgres@localhost/test` })
     table = new Table<TestObject>({ db, schema: testSchema })
     await table.ensureTable()
   })

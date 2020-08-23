@@ -1,8 +1,11 @@
 import Model from './model'
-import DB from './db'
+import db from './db'
 
-export default function makeStore(params) {
-  const db = new DB(params)
+export { db }
+
+// Helper function to start database and boot up legacy store
+export default async function makeStore(params) {
+  await db.start(params)
   const store = new Model(db)
   return [db, store]
 }

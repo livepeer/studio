@@ -120,10 +120,7 @@ export default class Model {
     }
     const [table] = this.getTable(kind)
 
-    let [docs, cursorOut] = await this.db[table].find(
-      { query },
-      { cursor, limit },
-    )
+    let [docs, cursorOut] = await this.db[table].find(query, { cursor, limit })
     if (cleanWriteOnly) {
       docs = docs.map((doc) => this.cleanWriteOnlyResponses(kind, doc))
     }

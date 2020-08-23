@@ -11,7 +11,7 @@ import { kebabToCamel } from '../util'
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000
 
-export default class DB {
+export class DB {
   // Table objects
   stream: Table<Stream>
   objectStore: Table<ObjectStore>
@@ -22,26 +22,28 @@ export default class DB {
   ready: Promise<void>
   pool: Pool
 
-  constructor({ postgresUrl }) {
+  constructor() {
+    // This is empty now so we can have a `db` singleton. All the former
+    // constructor logic has moved to start({}).
+  }
+
+  async start({ postgresUrl }) {
     this.postgresUrl = postgresUrl
-    console.log(postgresUrl)
     if (!postgresUrl) {
       throw new Error('no postgres url provided')
     }
-    this.ready = (async () => {
-      try {
-        await ensureDatabase(postgresUrl)
-      } catch (e) {
-        console.error(`error in ensureDatabase: ${e.message}`)
-        throw e
-      }
-      this.pool = new Pool({
-        connectionTimeoutMillis: CONNECT_TIMEOUT,
-        connectionString: postgresUrl,
-      })
-      await this.query('SELECT NOW()')
-      await this.makeTables()
-    })()
+    try {
+      await ensureDatabase(postgresUrl)
+    } catch (e) {
+      console.error(`error in ensureDatabase: ${e.message}`)
+      throw e
+    }
+    this.pool = new Pool({
+      connectionTimeoutMillis: CONNECT_TIMEOUT,
+      connectionString: postgresUrl,
+    })
+    await this.query('SELECT NOW()')
+    await this.makeTables()
   }
 
   async close() {
@@ -101,3 +103,5 @@ async function ensureDatabase(postgresUrl) {
   pool.end()
   adminPool.end()
 }
+
+export default new DB()
