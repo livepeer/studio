@@ -49,7 +49,7 @@ beforeAll(async () => {
     kind: 'webhook',
     createdAt: Date.now(),
     event: 'streamStarted',
-    url: 'https://winter-darkness-88ea.livepeer.workers.dev/'
+    url: 'https://winter-darkness-88ea.livepeer.workers.dev/',
     // url: 'https://livepeer.com/'
   }
 })
@@ -87,8 +87,14 @@ async function setupUsers(server) {
 
 describe('controllers/webhook', () => {
   describe('CRUD', () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken,
-    generatedWebhook, generatedWebhook2, generatedWebhookNonAdmin
+    let client,
+      adminUser,
+      adminToken,
+      nonAdminUser,
+      nonAdminToken,
+      generatedWebhook,
+      generatedWebhook2,
+      generatedWebhookNonAdmin
 
     beforeAll(async () => {
       ;({
@@ -112,7 +118,11 @@ describe('controllers/webhook', () => {
       expect(res.status).toBe(201)
       expect(resJson.blocking).toBe(true)
       generatedWebhook = resJson
-      res = await client.post('/webhook', { ...mockWebhook, name: 'test 2', blocking: false })
+      res = await client.post('/webhook', {
+        ...mockWebhook,
+        name: 'test 2',
+        blocking: false,
+      })
       resJson = await res.json()
       expect(resJson.blocking).toBe(false)
       console.log('webhook body: ', resJson)
@@ -121,7 +131,10 @@ describe('controllers/webhook', () => {
       generatedWebhook2 = resJson
 
       client.jwtAuth = nonAdminToken['token']
-      res = await client.post('/webhook', { ...mockWebhook, name: 'test non admin' })
+      res = await client.post('/webhook', {
+        ...mockWebhook,
+        name: 'test non admin',
+      })
       resJson = await res.json()
       console.log('webhook body: ', resJson)
       expect(res.status).toBe(201)
@@ -142,10 +155,14 @@ describe('controllers/webhook', () => {
       const res = await client.get(`/webhook?limit=1`)
       const resJson = await res.json()
       expect(res.status).toBe(200)
-      expect(res.headers.get('link')).toEqual(expect.stringContaining('cursor='))
+      expect(res.headers.get('link')).toEqual(
+        expect.stringContaining('cursor='),
+      )
       expect(resJson).toHaveLength(1)
       expect(resJson[0].userId).toEqual(generatedWebhook.userId)
-      expect([generatedWebhook2.id, generatedWebhook.id].includes(resJson[0].id)).toBe(true)
+      expect(
+        [generatedWebhook2.id, generatedWebhook.id].includes(resJson[0].id),
+      ).toBe(true)
     })
 
     it('get webhooks list all', async () => {
@@ -153,11 +170,11 @@ describe('controllers/webhook', () => {
       const resJson = await res.json()
       expect(res.status).toBe(200)
       expect(resJson).toHaveLength(3)
-      expect(resJson.map(wh => wh.name).includes('test non admin')).toBe(true)
+      expect(resJson.map((wh) => wh.name).includes('test non admin')).toBe(true)
     })
-    
+
     it('update a webhook', async () => {
-      let modifiedHook = {...generatedWebhook}
+      let modifiedHook = { ...generatedWebhook }
       modifiedHook.name = 'modified_name'
       const res = await client.put(`/webhook/${modifiedHook.id}`, modifiedHook)
       const resJson = await res.json()
@@ -168,19 +185,22 @@ describe('controllers/webhook', () => {
     it('delete a webhook', async () => {
       const res = await client.delete(`/webhook/${generatedWebhook.id}`)
       expect(res.status).toBe(204)
-      
+
       client.jwtAuth = nonAdminToken.token
       const res2 = await client.get(`/webhook/${generatedWebhook.id}`)
       const resJson2 = await res2.json()
-      
+
       expect(res2.status).toBe(404)
     })
- 
   })
 
   describe('webhook trigger', () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken,
-    generatedWebhook
+    let client,
+      adminUser,
+      adminToken,
+      nonAdminUser,
+      nonAdminToken,
+      generatedWebhook
 
     beforeAll(async () => {
       ;({
@@ -210,7 +230,7 @@ describe('controllers/webhook', () => {
 
       // create a stream object
       const now = Date.now()
-      postMockStream.name = 'eli_is_cool' // :D 
+      postMockStream.name = 'eli_is_cool' // :D
       const res = await client.post('/stream', { ...postMockStream })
       expect(res.status).toBe(201)
       const stream = await res.json()
@@ -221,14 +241,14 @@ describe('controllers/webhook', () => {
       const document = await server.store.get(`stream/${stream.id}`)
       expect(document).toEqual(stream)
 
-      
       // trigger
-      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {active: true})
+      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
+        active: true,
+      })
       expect(setActiveRes).toBeDefined()
       expect(setActiveRes.status).toBe(204)
       // const setActiveResJson = await setActiveRes.json()
       // expect(setActiveResJson).toBeDefined()
-      
     }, 20000)
 
     it('trigger webhook with localIP', async () => {
@@ -250,6 +270,5 @@ describe('controllers/webhook', () => {
       console.log('webhook created: ', webhookResJson)
       expect(webhookRes.status).toBe(406)
     })
-    
   })
 })
