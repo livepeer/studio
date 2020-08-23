@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown";
 const Page = ({ title, body, preview }) => {
   return (
     <Layout
-      title={`${title} - Livepeer`}
+      title={`${title} - Livepeer.com`}
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs`}
       preview={preview}

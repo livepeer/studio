@@ -1,11 +1,11 @@
 export default {
-  title: "Live Video Transcoding - Livepeer",
+  title: "Live Video Transcoding - Livepeer.com",
   description: "Scalable, secure live transcoding at a fraction of the cost",
   openGraph: {
     type: "website",
     locale: "en_IE",
     url: "https://livepeer.com",
-    title: "Live Video Transcoding - Livepeer",
+    title: "Live Video Transcoding - Livepeer.com",
     description: "Scalable, secure live transcoding at a fraction of the cost",
     defaultImageWidth: 1200,
     defaultImageHeight: 630,

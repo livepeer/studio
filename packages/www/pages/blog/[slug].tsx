@@ -33,7 +33,7 @@ const Post = ({
   const builder = imageUrlBuilder(client as any);
   return (
     <Layout
-      title={`${title} - Livepeer`}
+      title={`${title} - Livepeer.com`}
       description={excerpt}
       image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
       url={`https://livepeer.com${asPath}`}

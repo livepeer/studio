@@ -25,7 +25,7 @@ const BlogIndex = ({ categories, posts }) => {
 
   return (
     <Layout
-      title={`Blog - Livepeer`}
+      title={`Blog - Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
       url={`https://livepeer.com/blog`}
     >
