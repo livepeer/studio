@@ -33,8 +33,8 @@ const sortNameF = (a: Stream, b: Stream) =>
   ((a && a.name) || "").localeCompare((b && b.name) || "");
 
 const sortUserName = (users: Array<User>, a: Stream, b: Stream) => {
-  const userA = users.find(u => u.id === a.userId);
-  const userB = users.find(u => u.id === b.userId);
+  const userA = users.find((u) => u.id === a.userId);
+  const userB = users.find((u) => u.id === b.userId);
   if (userA && userB) {
     return userA.email.localeCompare(userB.email);
   }
@@ -63,23 +63,23 @@ export default ({ id }: { id: string }) => {
   const [sortFunc, setSortFunc] = useState(null);
   useEffect(() => {
     getUsers()
-      .then(users => setUsers(users))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((users) => setUsers(users))
+      .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
     getBroadcasters()
-      .then(broadcasters => setBroadcasters(broadcasters))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((broadcasters) => setBroadcasters(broadcasters))
+      .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
     getAdminStreams()
-      .then(streams => {
+      .then((streams) => {
         if (sortFunc) {
           streams.sort(sortFunc);
         }
         setStreams(streams);
       })
-      .catch(err => console.error(err)); // todo: surface this
+      .catch((err) => console.error(err)); // todo: surface this
   }, [deleteModal]);
   const close = () => {
     setDeleteModal(false);
@@ -92,13 +92,13 @@ export default ({ id }: { id: string }) => {
     }
     const interval = setInterval(() => {
       getAdminStreams()
-        .then(streams => {
+        .then((streams) => {
           if (sortFunc) {
             streams.sort(sortFunc);
           }
           setStreams(streams);
         })
-        .catch(err => console.error(err)); // todo: surface this
+        .catch((err) => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
   }, [isVisible, sortFunc]);
@@ -147,7 +147,7 @@ export default ({ id }: { id: string }) => {
     <Container
       id={id}
       sx={{
-        mt: 2
+        mt: 2,
       }}
     >
       {deleteModal && selectedStream && (
@@ -187,7 +187,7 @@ export default ({ id }: { id: string }) => {
           <Box></Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={sortUserId}
           >
@@ -195,7 +195,7 @@ export default ({ id }: { id: string }) => {
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={sortName}
           >
@@ -205,7 +205,7 @@ export default ({ id }: { id: string }) => {
           <Box>Segments</Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={sortCreated}
           >
@@ -213,7 +213,7 @@ export default ({ id }: { id: string }) => {
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={sortLastSeen}
           >
@@ -221,7 +221,7 @@ export default ({ id }: { id: string }) => {
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={sortActive}
           >
@@ -236,7 +236,7 @@ export default ({ id }: { id: string }) => {
             sourceSegments,
             transcodedSegments,
             createdAt,
-            isActive
+            isActive,
           } = stream;
           const selected = selectedStream && selectedStream.id === id;
           return (

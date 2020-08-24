@@ -33,7 +33,7 @@ export function pathJoin2(p1: string, p2: string): string {
 }
 
 export function pathJoin(...items: Array<string>): string {
-  return items.reduce(pathJoin2, '')
+  return items.reduce(pathJoin2, "");
 }
 
 export function breakablePath(path: string): string {

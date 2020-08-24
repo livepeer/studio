@@ -30,7 +30,7 @@ export default () => {
             alignItems: "center",
             justifyContent: "center",
             flexGrow: 1,
-            flexDirection: "column"
+            flexDirection: "column",
           }}
         >
           Password reset link sent to your email.
@@ -45,7 +45,7 @@ export default () => {
           alignItems: "center",
           justifyContent: "center",
           flexGrow: 1,
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <h3 sx={{ mb: 4 }}>Reset your password</h3>

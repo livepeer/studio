@@ -10,7 +10,7 @@ export default ({ heading, cta }) => (
       textAlign: "center",
       position: "relative",
       py: 100,
-      bg: "secondary"
+      bg: "secondary",
     }}
   >
     <Container>

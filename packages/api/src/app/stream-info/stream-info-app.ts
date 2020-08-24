@@ -1,24 +1,14 @@
-
 import express, { Router } from 'express'
 import 'express-async-errors' // it monkeypatches, i guess
 import morgan from 'morgan'
-import {
-  createStore
-} from '../store'
+import { createStore } from '../store'
 import { healthCheck } from '../../middleware'
 import logger from '../../logger'
-import {
-  Stream,
-} from '../../schema/types'
+import { Stream } from '../../schema/types'
 
-import {
-  IStore
-} from '../../types/common'
+import { IStore } from '../../types/common'
 
-import {
-  StatusResponse,
-  MasterPlaylist
-} from './livepeer-types'
+import { StatusResponse, MasterPlaylist } from './livepeer-types'
 
 const pollInterval = 5000
 const updateInterval = 60 * 1000
@@ -152,8 +142,10 @@ class statusPoller {
     }
     // console.log(`got status: `, status)
     for (const mid of Object.keys(status.Manifests)) {
-      let si, needUpdate = false
-      if (!this.seenStreams.has(mid)) { // new stream
+      let si,
+        needUpdate = false
+      if (!this.seenStreams.has(mid)) {
+        // new stream
         // console.log(`got new stream ${mid}`)
         si = newStreamInfo()
         this.seenStreams.set(mid, si)
@@ -171,26 +163,54 @@ class statusPoller {
         // console.log(`got stream info from store: `, storedInfo)
         if (storedInfo) {
           storedInfo.lastSeen = si.lastSeen.valueOf()
-          storedInfo.sourceSegments = (storedInfo.sourceSegments || 0) + si.sourceSegments - si.sourceSegmentsLastUpdated
-          storedInfo.transcodedSegments = (storedInfo.transcodedSegments || 0) + si.transcodedSegments - si.transcodedSegmentsLastUpdated
-          storedInfo.sourceSegmentsDuration = (storedInfo.sourceSegmentsDuration || 0) + si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated
-          storedInfo.transcodedSegmentsDuration = (storedInfo.transcodedSegmentsDuration || 0) + si.transcodedSegmentsDuration - si.transcodedSegmentsDurationLastUpdated
+          storedInfo.sourceSegments =
+            (storedInfo.sourceSegments || 0) +
+            si.sourceSegments -
+            si.sourceSegmentsLastUpdated
+          storedInfo.transcodedSegments =
+            (storedInfo.transcodedSegments || 0) +
+            si.transcodedSegments -
+            si.transcodedSegmentsLastUpdated
+          storedInfo.sourceSegmentsDuration =
+            (storedInfo.sourceSegmentsDuration || 0) +
+            si.sourceSegmentsDuration -
+            si.sourceSegmentsDurationLastUpdated
+          storedInfo.transcodedSegmentsDuration =
+            (storedInfo.transcodedSegmentsDuration || 0) +
+            si.transcodedSegmentsDuration -
+            si.transcodedSegmentsDurationLastUpdated
           await this.store.replace(storedInfo)
           if (storedInfo.parentId) {
-            const parentStream: Stream = await this.store.get(`stream/${storedInfo.parentId}`, false)
+            const parentStream: Stream = await this.store.get(
+              `stream/${storedInfo.parentId}`,
+              false,
+            )
             // console.log(`got parent stream store: `, storedInfo)
             parentStream.lastSeen = si.lastSeen.valueOf()
-            parentStream.sourceSegments = (parentStream.sourceSegments || 0) + si.sourceSegments - si.sourceSegmentsLastUpdated
-            parentStream.transcodedSegments = (parentStream.transcodedSegments || 0) + si.transcodedSegments - si.transcodedSegmentsLastUpdated
-            parentStream.sourceSegmentsDuration = (parentStream.sourceSegmentsDuration || 0) + si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated
-            parentStream.transcodedSegmentsDuration = (parentStream.transcodedSegmentsDuration || 0) + si.transcodedSegmentsDuration - si.transcodedSegmentsDurationLastUpdated
+            parentStream.sourceSegments =
+              (parentStream.sourceSegments || 0) +
+              si.sourceSegments -
+              si.sourceSegmentsLastUpdated
+            parentStream.transcodedSegments =
+              (parentStream.transcodedSegments || 0) +
+              si.transcodedSegments -
+              si.transcodedSegmentsLastUpdated
+            parentStream.sourceSegmentsDuration =
+              (parentStream.sourceSegmentsDuration || 0) +
+              si.sourceSegmentsDuration -
+              si.sourceSegmentsDurationLastUpdated
+            parentStream.transcodedSegmentsDuration =
+              (parentStream.transcodedSegmentsDuration || 0) +
+              si.transcodedSegmentsDuration -
+              si.transcodedSegmentsDurationLastUpdated
             await this.store.replace(parentStream)
           }
           si.lastUpdated = new Date()
           si.sourceSegmentsLastUpdated = si.sourceSegments
           si.transcodedSegmentsLastUpdated = si.transcodedSegments
           si.sourceSegmentsDurationLastUpdated = si.sourceSegmentsDuration
-          si.transcodedSegmentsDurationLastUpdated = si.transcodedSegmentsDuration
+          si.transcodedSegmentsDurationLastUpdated =
+            si.transcodedSegmentsDuration
         }
       }
     }
@@ -219,8 +239,6 @@ class statusPoller {
   }
 }
 
-
-
 export default async function makeApp(params) {
   const {
     storage,
@@ -246,15 +264,13 @@ export default async function makeApp(params) {
 
   if (listen) {
     await new Promise((resolve, reject) => {
-      listener = app.listen(port, err => {
+      listener = app.listen(port, (err) => {
         if (err) {
           logger.error('Error starting server', err)
           return reject(err)
         }
         listenPort = listener.address().port
-        logger.info(
-          `API server listening on http://0.0.0.0:${listenPort}`,
-        )
+        logger.info(`API server listening on http://0.0.0.0:${listenPort}`)
         resolve()
       })
     })
@@ -276,7 +292,7 @@ export default async function makeApp(params) {
 
   process.on('SIGTERM', sigterm)
 
-  const unhandledRejection = err => {
+  const unhandledRejection = (err) => {
     logger.error('fatal, unhandled promise rejection: ', err)
     err.stack && logger.error(err.stack)
     sigterm()
@@ -293,7 +309,7 @@ export default async function makeApp(params) {
   }
 }
 
-const handleSigterm = close => async () => {
+const handleSigterm = (close) => async () => {
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
   logger.info('Got SIGTERM. Graceful shutdown start')
   let timeout = setTimeout(() => {

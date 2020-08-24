@@ -25,7 +25,7 @@ export default ({ children, onClose, maxWidth = "500px" }) => {
         backgroundColor: "rgba(0,0,0,0.5)",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100
+        zIndex: 100,
       }}
       onClick={onClose}
     >
@@ -36,7 +36,7 @@ export default ({ children, onClose, maxWidth = "500px" }) => {
           padding: [4, 4],
           maxWidth,
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </Box>

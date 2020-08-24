@@ -1,4 +1,3 @@
-
 import makeApp from './app/stream-info/stream-info-app'
 import yargs from 'yargs'
 import path from 'path'
@@ -25,14 +24,12 @@ function parseCli() {
           type: 'number',
         },
         host: {
-          describe:
-            'host to bind to',
+          describe: 'host to bind to',
           type: 'string',
           default: 'localhost',
         },
         broadcaster: {
-          describe:
-            'broadcaster host:port to fetch info from',
+          describe: 'broadcaster host:port to fetch info from',
           type: 'string',
           default: 'localhost:7935',
         },
@@ -85,7 +82,6 @@ function parseCli() {
       .parse()
   )
 }
-
 
 function main() {
   require('dotenv').config()

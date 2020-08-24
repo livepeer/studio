@@ -13,7 +13,7 @@ export default ({
   buttonText,
   onSubmit,
   loading,
-  errors
+  errors,
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +21,7 @@ export default ({
   return (
     <Container>
       <form
-        onSubmit={async e => {
+        onSubmit={async (e) => {
           e.preventDefault();
           if (!showPassword) {
             return onSubmit({ email });
@@ -36,7 +36,7 @@ export default ({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mb: 3
+          mb: 3,
         }}
         id={id}
       >
@@ -50,7 +50,7 @@ export default ({
             label="Email"
             required
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         )}
         {showPassword && (
@@ -63,7 +63,7 @@ export default ({
             label="Password"
             required
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         )}
 

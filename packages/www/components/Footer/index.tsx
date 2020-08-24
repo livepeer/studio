@@ -8,7 +8,7 @@ export default () => {
       sx={{
         py: 4,
         bg: "primary",
-        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)"
+        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)",
       }}
     >
       <Container>
@@ -17,7 +17,7 @@ export default () => {
             flexDirection: ["column", "column", "column", "row"],
             alignItems: "center",
             textAlign: ["center", "center", "center", "left"],
-            justifyContent: "space-between"
+            justifyContent: "space-between",
           }}
         >
           <Link href="/" passHref>
@@ -29,7 +29,7 @@ export default () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: ["center", "center", "center", "flex-start"],
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               <Logo />
@@ -38,7 +38,7 @@ export default () => {
                   ml: "12px",
                   fontWeight: 500,
                   fontSize: "18px",
-                  color: "white"
+                  color: "white",
                 }}
               >
                 livepeer.com
@@ -51,7 +51,7 @@ export default () => {
               alignItems: "center",
               width: ["100%", "100%", "100%", "33.33%"],
               my: [3, 3, 3, 0],
-              color: "white"
+              color: "white",
             }}
             itemScope
             itemType="http://schema.org/Organization"
@@ -74,7 +74,7 @@ export default () => {
             sx={{
               width: ["100%", "100%", "100%", "33.33%"],
               justifyContent: ["center", "center", "center", "flex-end"],
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             {/* <Link href="/blog" passHref>

@@ -74,7 +74,7 @@ app.post(
       name: req.body.name,
       userId: req.user.id,
       kind: `object-store`,
-      createdAt:  Date.now(),
+      createdAt: Date.now(),
     })
 
     const store = await req.store.get(`object-store/${id}`)

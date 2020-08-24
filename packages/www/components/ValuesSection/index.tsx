@@ -11,7 +11,7 @@ const gridAreas = [
   "1 / 2 / 2 / 3",
   "2 / 1 / 3 / 2",
   "2 / 2 / 3 / 3",
-  "2 / 3 / 3 / 4"
+  "2 / 3 / 3 / 4",
 ];
 
 export default ({ heading, image, values }) => (
@@ -19,7 +19,7 @@ export default ({ heading, image, values }) => (
     sx={{
       pt: [60, 60, 120],
       pb: [60, 60, 170],
-      position: "relative"
+      position: "relative",
     }}
   >
     <img
@@ -30,7 +30,7 @@ export default ({ heading, image, values }) => (
         display: ["none", "none", "none", "block"],
         position: "absolute",
         top: 50,
-        right: 0
+        right: 0,
       }}
       className="lazyload"
       data-src={builder.image(image).url()}
@@ -40,7 +40,7 @@ export default ({ heading, image, values }) => (
         sx={{
           textAlign: ["center", "center", "left"],
           fontSize: [5, 5, 6],
-          mb: [50, 50, 80]
+          mb: [50, 50, 80],
         }}
       >
         {heading}
@@ -53,7 +53,7 @@ export default ({ heading, image, values }) => (
           sx={{
             alignItems: "flex-start",
             gridArea: ["auto", "auto", "auto", gridAreas[i]],
-            mb: 4
+            mb: 4,
           }}
         >
           <img
@@ -64,7 +64,7 @@ export default ({ heading, image, values }) => (
               height: "auto",
               mr: 4,
               width: [50, 50, 70],
-              minWidth: [50, 50, 70]
+              minWidth: [50, 50, 70],
             }}
             className="lazyload"
             data-src={builder.image(value.image).url()}
@@ -75,7 +75,7 @@ export default ({ heading, image, values }) => (
                 mt: [1, 1, 2],
                 fontSize: [4, 4, 5],
                 mb: 3,
-                fontWeight: 500
+                fontWeight: 500,
               }}
             >
               {value.heading}

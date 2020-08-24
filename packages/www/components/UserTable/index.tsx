@@ -17,8 +17,8 @@ export default ({ userId, id }: UserTableProps) => {
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
     getUsers()
-      .then(users => setUsers(users))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((users) => setUsers(users))
+      .catch((err) => console.error(err)); // todo: surface this
   }, [userId, adminModal, removeAdminModal, selectedUser]);
   const close = () => {
     setAdminModal(false);
@@ -29,7 +29,7 @@ export default ({ userId, id }: UserTableProps) => {
     <Container
       id={id}
       sx={{
-        my: 2
+        my: 2,
       }}
     >
       {adminModal && selectedUser && (
@@ -114,7 +114,7 @@ export default ({ userId, id }: UserTableProps) => {
             <Box>EmailValid</Box>
             <Box>Admin</Box>
           </TableRow>
-          {users.map(user => {
+          {users.map((user) => {
             const { id, email, emailValid, admin } = user;
             const selected = selectedUser && selectedUser.id === id;
             return (

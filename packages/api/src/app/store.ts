@@ -1,4 +1,3 @@
-
 import {
   LevelStore,
   PostgresStore,
@@ -7,9 +6,7 @@ import {
   FirestoreStore,
 } from '../store'
 
-import {
-  IStore
-} from '../types/common'
+import { IStore } from '../types/common'
 
 export function createStore(params: any): IStore {
   let store

@@ -40,7 +40,7 @@ export default ({
         position: "relative",
         minWidth: "0",
         flexDirection: "column",
-        verticalAlign: "top"
+        verticalAlign: "top",
       }}
       {...props}
     >
@@ -63,7 +63,7 @@ export default ({
           color: "#6f6f6f",
           padding: 0,
           fontSize: 16,
-          lineHeight: 1
+          lineHeight: 1,
         }}
         htmlFor={htmlFor}
         id={id}
@@ -94,7 +94,7 @@ export default ({
               "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
             borderBottom: "1px solid",
             borderColor: error ? "red" : "text",
-            pointerEvents: "none"
+            pointerEvents: "none",
           },
           "&:after": {
             left: "0",
@@ -106,8 +106,8 @@ export default ({
             transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
             borderBottom: "2px solid",
             borderColor: error ? "red" : "text",
-            pointerEvents: "none"
-          }
+            pointerEvents: "none",
+          },
         }}
       >
         <Box
@@ -120,7 +120,7 @@ export default ({
           required={required}
           defaultValue={defaultValue}
           value={value}
-          onChange={onChange ? onChange : e => setScopedValue(e.target.value)}
+          onChange={onChange ? onChange : (e) => setScopedValue(e.target.value)}
           ref={inputRef}
           name={name}
           sx={{
@@ -135,7 +135,7 @@ export default ({
             background: "none",
             boxSizing: "content-box",
             animationName: "MuiInputBase-keyframes-auto-fill-cancel",
-            WebkitTapHighlightColor: "transparent"
+            WebkitTapHighlightColor: "transparent",
           }}
           id={id}
           type={type}
@@ -148,7 +148,7 @@ export default ({
             color: error ? "red" : messageColor,
             pt: "62px",
             pl: "12px",
-            fontSize: 0
+            fontSize: 0,
           }}
         >
           {message}
