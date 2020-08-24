@@ -39,6 +39,7 @@ export default function parseCli(argv) {
           describe: 'url of a postgres database',
           type: 'string',
           demandOption: true,
+          default: 'postgresql://postgres@localhost/livepeer',
         },
         'client-id': {
           describe: 'google auth ID',
