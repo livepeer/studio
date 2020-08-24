@@ -1,6 +1,23 @@
 import Firestore from './firestore-store'
 import db from './db'
 import { kebabToCamel } from '../util'
+const params = {}
+let exit = false
+for (const key of [
+  'LP_FIRESTORE_CREDENTIALS',
+  'LP_FIRESTORE_COLLECTION',
+  'LP_POSTGRES_URL',
+]) {
+  params[key] = process.env[key]
+  if (!params[key]) {
+    console.log(`missing environment variable ${key}`)
+    exit = true
+  }
+}
+if (exit) {
+  process.exit(1)
+}
+
 const COLLECTIONS = {
   apiToken: 'api_token',
   objectStore: 'object_store',
@@ -12,7 +29,7 @@ const COLLECTIONS = {
 ;(async () => {
   const have = new Set()
   await db.start({
-    postgresUrl: 'postgresql://postgres@localhost/imported_db',
+    postgresUrl: params.LP_POSTGRES_URL,
   })
   await Promise.all(
     Object.entries(COLLECTIONS).map(async ([name, table]) => {
@@ -23,8 +40,8 @@ const COLLECTIONS = {
     }),
   )
   const store = new Firestore({
-    firestoreCredentials: process.env.LP_FIRESTORE_CREDENTIALS,
-    firestoreCollection: process.env.LP_FIRESTORE_COLLECTION,
+    firestoreCredentials: params.LP_FIRESTORE_CREDENTIALS,
+    firestoreCollection: params.LP_FIRESTORE_COLLECTION,
   })
   let i = 0
   for await (const doc of store.listWholeDatabase()) {
