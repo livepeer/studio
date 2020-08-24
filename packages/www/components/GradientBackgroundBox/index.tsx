@@ -1,70 +1,74 @@
 import { Box } from "@theme-ui/components";
+import VioletGradient from "./gradients/Violet";
+import Slider from "../Slider";
+import { SxStyleProp } from "theme-ui";
+import { useMemo } from "react";
+import ColorfulGradient from "./gradients/Colorful";
+
+export type Gradient = "violet" | "colorful" | null;
+
+type Props = {
+  children?: React.ReactNode;
+  gradient?: Gradient;
+  slide?: boolean;
+  sx?: SxStyleProp;
+};
 
 const GradientBackgroundBox = ({
   children = null,
-  sx = undefined,
-  withoutGradient = false,
+  sx,
+  slide = false,
+  gradient = "violet",
   ...moreProps
-}) => (
-  <Box sx={{ position: "relative", overflow: "hidden", ...sx }} {...moreProps}>
-    {!withoutGradient && (
-      <div
-        sx={{
-          position: "absolute",
-          width: "100%",
-          overflow: "hidden",
-          height: "100%",
-          top: "-10vw",
-          pointerEvents: "none",
-          zIndex: -1
-        }}
-      >
-        <Box
-          sx={{
-            bg: "#F5B9FF",
-            opacity: 0.5,
-            filter: "blur(160px)",
-            width: "30vw",
-            height: "30vw",
-            minWidth: "500px",
-            minHeight: "500px",
-            position: "absolute",
-            right: "75%",
-            top: "-5vw"
-          }}
-        />
-        <Box
-          sx={{
-            bg: "#BFA8FF",
-            opacity: 0.25,
-            filter: "blur(160px)",
-            width: "30vw",
-            height: "30vw",
-            minWidth: "500px",
-            minHeight: "500px",
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)"
-          }}
-        />
-        <Box
-          sx={{
-            bg: "#B0B0FF",
-            opacity: 0.25,
-            filter: "blur(160px)",
-            width: "30vw",
-            height: "30vw",
-            minWidth: "500px",
-            minHeight: "500px",
-            position: "absolute",
-            left: "75%",
-            top: "-5vw"
-          }}
-        />
-      </div>
-    )}
-    {children}
-  </Box>
-);
+}: Props) => {
+  const Gradient = useMemo(() => {
+    switch (gradient) {
+      case "violet":
+        return VioletGradient;
+      case "colorful":
+        return ColorfulGradient;
+      default:
+        return null;
+    }
+  }, [gradient]);
+
+  return (
+    <Box
+      sx={{ position: "relative", overflow: "hidden", ...sx }}
+      {...moreProps}
+    >
+      {gradient && (
+        <>
+          {slide ? (
+            <div
+              sx={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                pointerEvents: "none"
+              }}
+            >
+              <Slider duration={3}>
+                <Gradient />
+              </Slider>
+            </div>
+          ) : (
+            <div
+              sx={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                pointerEvents: "none"
+              }}
+            >
+              <Gradient />
+            </div>
+          )}
+        </>
+      )}
+      {children}
+    </Box>
+  );
+};
 
 export default GradientBackgroundBox;

@@ -91,7 +91,7 @@ const Page = ({ content, preview }) => {
           tag: "Benefits",
           cta: { children: "Sign up for free" }
         }}
-        withGradientBackground
+        gradient="colorful"
       >
         <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
           {benefitsListItems.map((item) => (
