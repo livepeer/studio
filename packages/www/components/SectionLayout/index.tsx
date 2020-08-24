@@ -5,7 +5,7 @@ import {
   Link as A,
   Container
 } from "@theme-ui/components";
-import GradientBackgroundBox from "../GradientBackgroundBox";
+import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
 
 type Props = {
@@ -15,19 +15,12 @@ type Props = {
     cta: ButtonProps;
   };
   children: React.ReactNode;
-  withGradientBackground?: boolean;
+  gradient?: Gradient;
 };
 
-const SectionLayout = ({
-  children,
-  heading,
-  withGradientBackground
-}: Props) => (
-  <GradientBackgroundBox withoutGradient={!withGradientBackground}>
-    <Container
-      variant="content"
-      sx={{ pt: withGradientBackground ? [6, 7] : undefined }}
-    >
+const SectionLayout = ({ children, heading, gradient }: Props) => (
+  <GradientBackgroundBox gradient={gradient ?? null} slide>
+    <Container variant="content" sx={{ pt: gradient ? [6, 7] : undefined }}>
       <div>
         <Text
           sx={{

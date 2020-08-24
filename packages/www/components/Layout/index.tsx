@@ -77,7 +77,7 @@ export default ({
       <DefaultSeo {...seo} />
       {withGradientBackground && (
         <div sx={{ position: "absolute", top: 0, width: "100%" }}>
-          <GradientBackgroundBox sx={{ height: "1000px" }} />
+          <GradientBackgroundBox gradient="violet" sx={{ height: "1000px" }} />
         </div>
       )}
       <Flex

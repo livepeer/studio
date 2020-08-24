@@ -1,10 +1,11 @@
-import { Button } from "@theme-ui/components";
+import { Button as ThemeUIButton } from "@theme-ui/components";
 import Ink from "react-ink";
 import Link from "next/link";
 import { SxStyleProp } from "theme-ui";
 
 type Base = {
   children: React.ReactNode;
+  variant?: string;
   ink?: boolean;
   sx?: SxStyleProp;
 };
@@ -14,11 +15,17 @@ type AsLink = Base & {
   href: string;
   isExternal?: boolean;
   asPath?: string;
-};
+} & React.DetailedHTMLProps<
+    React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    HTMLAnchorElement
+  >;
 
 type AsButton = Base & {
   isLink?: false;
-};
+} & React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >;
 
 export type ButtonProps = AsLink | AsButton;
 
@@ -26,29 +33,49 @@ const baseSx: SxStyleProp = {
   position: "relative"
 };
 
-export default ({ children, sx, ink = false, ...props }: ButtonProps) => {
+const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
   if (props.isLink) {
     if (props.isExternal) {
       return (
-        <Button href={props.href} as="a" sx={{ ...baseSx, ...sx }}>
+        <ThemeUIButton
+          {...props}
+          isLink={undefined}
+          isExternal={undefined}
+          as="a"
+          sx={{ ...baseSx, ...sx }}
+        >
           {ink && <Ink />}
           {children}
-        </Button>
+        </ThemeUIButton>
       );
     }
     return (
-      <Link href={props.href} as={props.asPath} passHref>
-        <Button as="a" sx={{ ...baseSx, ...sx }}>
+      <Link
+        href={props.href}
+        isLink={undefined}
+        isExternal={undefined}
+        as={props.asPath}
+        passHref
+      >
+        <ThemeUIButton
+          {...props}
+          href={undefined}
+          asPath={undefined}
+          as="a"
+          sx={{ ...baseSx, ...sx }}
+        >
           {ink && <Ink />}
           {children}
-        </Button>
+        </ThemeUIButton>
       </Link>
     );
   }
   return (
-    <Button {...props} sx={{ ...baseSx, ...sx }}>
+    <ThemeUIButton {...props} sx={{ ...baseSx, ...sx }}>
       {ink && <Ink />}
       {children}
-    </Button>
+    </ThemeUIButton>
   );
 };
+
+export default Button;
