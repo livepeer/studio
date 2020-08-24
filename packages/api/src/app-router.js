@@ -27,7 +27,6 @@ const GEOLOCATION_ENDPOINTS = [
   'orchestrator',
   'ingest',
   'geolocate',
-  'user',
 ]
 
 export default async function makeApp(params) {
