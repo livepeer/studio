@@ -5,6 +5,7 @@ import createStore from '../../store'
 import { healthCheck } from '../../middleware'
 import logger from '../../logger'
 import { Stream } from '../../schema/types'
+import fetch from 'isomorphic-fetch'
 
 import { IStore } from '../../types/common'
 
