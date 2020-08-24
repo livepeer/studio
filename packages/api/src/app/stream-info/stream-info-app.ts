@@ -19,7 +19,7 @@ const seenSegmentsTimeout = 60 * 1000
 async function makeRouter(params) {
   // Storage init
   const bodyParser = require('body-parser')
-  let store = await createStore(params)
+  let [db, store] = await createStore(params)
 
   // Logging, JSON parsing, store injection
 
