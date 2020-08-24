@@ -15,6 +15,9 @@ export default class Model {
   getTable(id) {
     let [table, uuid] = id.split('/')
     table = kebabToCamel(table)
+    if (!this.db[table]) {
+      throw new Error(`table not found: ${table}`)
+    }
     return [table, uuid]
   }
 
@@ -47,7 +50,8 @@ export default class Model {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
 
-    return await this.db[kind].replace(data)
+    const [table] = this.getTable(kind)
+    return await this.db[table].replace(data)
   }
 
   async list({ prefix, cursor, limit, filter, cleanWriteOnly = true }) {
