@@ -32,8 +32,11 @@ export const theme = {
     accent: "#00EB88",
     muted: "#eaeaea",
     gray: "#525252",
+<<<<<<< HEAD
     lightGray: "#919191",
     ultraLightGray: "#E6E6E6",
+=======
+>>>>>>> improve section layout
     listText: "#666666",
     extremelyBlue: "#3F3FE2"
   },
@@ -168,11 +171,19 @@ export const theme = {
   layout: {
     container: {
       maxWidth: 1328,
+<<<<<<< HEAD
       px: [4, null, 5]
     },
     content: {
       maxWidth: 1122,
       px: [4, null, 5],
+=======
+      px: [3, null, 5]
+    },
+    content: {
+      maxWidth: 1122,
+      px: [3, null, 5],
+>>>>>>> improve section layout
       py: [5, 6],
       mx: "auto"
     }

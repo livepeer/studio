@@ -15,7 +15,7 @@ type Props = {
   ctas?: [];
 };
 
-export default ({
+const Hero = ({
   heading,
   tagline,
   centered = false,
@@ -116,3 +116,5 @@ function renderSwitch(cta) {
       );
   }
 }
+
+export default Hero;
