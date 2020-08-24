@@ -5,35 +5,62 @@ import {
   Link as A,
   Container
 } from "@theme-ui/components";
+import GradientBackgroundBox from "../GradientBackgroundBox";
+import Button, { ButtonProps } from "../Button";
 
 type Props = {
   heading: {
     tag: string;
     title: string;
-    cta: {
-      label: React.ReactNode;
-      onClick?: () => void;
-      href?: string;
-      asPath?: string;
-    };
+    cta: ButtonProps;
   };
   children: React.ReactNode;
+  withGradientBackground?: boolean;
 };
 
-const SectionLayout = ({ children, heading }: Props) => (
-  <Container variant="content">
-    <Flex>
+const SectionLayout = ({
+  children,
+  heading,
+  withGradientBackground
+}: Props) => (
+  <GradientBackgroundBox withoutGradient={!withGradientBackground}>
+    <Container
+      variant="content"
+      sx={{ pt: withGradientBackground ? [6, 7] : undefined }}
+    >
       <div>
-        <Text>{heading.tag}</Text>
-        <Heading>{heading.title}</Heading>
+        <Text
+          sx={{
+            textTransform: "uppercase",
+            color: "primary",
+            fontWeight: "bold",
+            letterSpacing: "0.24em",
+            mb: 3,
+            fontSize: [1, 2]
+          }}
+        >
+          {heading.tag}
+        </Text>
+        <Flex
+          sx={{
+            alignItems: ["flex-start", "center"],
+            flexDirection: ["column", "row"]
+          }}
+        >
+          <Heading sx={{ fontWeight: "bold" }} variant="heading.section">
+            {heading.title}
+          </Heading>
+          {heading.cta && (
+            <Button
+              {...heading.cta}
+              sx={{ minWidth: "fit-content", ml: [0, 3], mt: [4, 0] }}
+            />
+          )}
+        </Flex>
       </div>
-      {heading.cta && (
-        // TODO check if it's link or button
-        <A onClick={heading.cta.onClick}>{heading.cta.label}</A>
-      )}
-    </Flex>
-    <div>{children}</div>
-  </Container>
+      <div sx={{ mt: 5 }}>{children}</div>
+    </Container>
+  </GradientBackgroundBox>
 );
 
 export default SectionLayout;

@@ -31,7 +31,7 @@ export const theme = {
     secondary: "#FAF5EF",
     accent: "#00EB88",
     muted: "#eaeaea",
-    gray: "#fafafa",
+    gray: "#525252",
     listText: "#666666",
     extremelyBlue: "#3F3FE2"
   },
@@ -139,18 +139,29 @@ export const theme = {
       textDecoration: "none",
       mr: 4,
       fontSize: 1,
+      fontWeight: 600,
       "&:last-of-type": { mr: 0 }
     }
   },
   layout: {
     container: {
-      maxWidth: 1200,
-      px: [3, 3, 3, 3, 0]
+      maxWidth: 1328,
+      px: [3, null, 5]
     },
     content: {
-      maxWidth: 994,
-      px: [3, 3, 3, 3, 0],
+      maxWidth: 1122,
+      px: [3, null, 5],
+      py: [5, 6],
       mx: "auto"
+    }
+  },
+  text: {
+    heading: {
+      section: {
+        fontSize: [5, 6],
+        color: "text",
+        fontWeight: "bold"
+      }
     }
   },
   styles: {

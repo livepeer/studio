@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 
 const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
-export default () => {
+const Navigation = () => {
   const { pathname } = useRouter();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
@@ -169,3 +169,5 @@ export default () => {
     </Box>
   );
 };
+
+export default Navigation;

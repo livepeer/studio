@@ -16,6 +16,7 @@ interface Props {
   image?: any;
   url?: string;
   preview?: boolean;
+  withGradientBackground?: boolean;
 }
 
 if (process.env.NODE_ENV === "production") {
@@ -41,6 +42,7 @@ export default ({
   image,
   url,
   preview,
+  withGradientBackground
 }: Props) => {
   const { asPath } = useRouter();
   useEffect(() => {
@@ -58,28 +60,30 @@ export default ({
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/share-icon.png",
-          alt: image ? image.alt : "Live Video Transcoding - Livepeer",
-        },
-      ],
-    },
+          alt: image ? image.alt : "Live Video Transcoding - Livepeer"
+        }
+      ]
+    }
   };
   return (
     <Flex
       sx={{
         minHeight: "100vh",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "space-between"
       }}
     >
       <DefaultSeo {...seo} />
-      <div sx={{ position: "absolute", top: 0, width: "100%" }}>
-        <GradientBackgroundBox sx={{ height: "1000px" }} />
-      </div>
+      {withGradientBackground && (
+        <div sx={{ position: "absolute", top: 0, width: "100%" }}>
+          <GradientBackgroundBox sx={{ height: "1000px" }} />
+        </div>
+      )}
       <Flex
         sx={{
           flexGrow: 1,
           flexDirection: "column",
-          justifyContent: "flex-start",
+          justifyContent: "flex-start"
         }}
       >
         <Box
@@ -88,7 +92,7 @@ export default ({
             zIndex: 20,
             position: "sticky",
             top: 0,
-            width: "100%",
+            width: "100%"
           }}
         >
           {preview && (
@@ -104,7 +108,7 @@ export default ({
                 fontWeight: "500",
                 bg: "extremelyBlue",
                 color: "white",
-                lineHeight: "32px",
+                lineHeight: "32px"
               }}
             >
               Preview Mode — Click to Exit
