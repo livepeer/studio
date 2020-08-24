@@ -35,49 +35,10 @@ export default function parseCli(argv) {
           demandOption: true,
           type: 'number',
         },
-        storage: {
-          describe: 'storage engine to use',
-          default: 'level',
-          demandOption: true,
-          type: 'string',
-          choices: [
-            'level',
-            'postgres',
-            'cloudflare',
-            'cloudflare-cluster',
-            'firestore',
-          ],
-        },
-        'db-path': {
-          describe: 'path to LevelDB database',
-          default: path.resolve(os.homedir(), '.livepeer', 'api'),
-          type: 'string',
-        },
         'postgres-url': {
           describe: 'url of a postgres database',
           type: 'string',
-        },
-        'cloudflare-namespace': {
-          describe: 'namespace of a cloudflare database',
-          type: 'string',
-        },
-        'cloudflare-account': {
-          describe: 'account id of a cloudflare database',
-          type: 'string',
-        },
-        'cloudflare-auth': {
-          describe: 'auth of a cloudflare database',
-          type: 'string',
-        },
-        'firestore-credentials': {
-          describe:
-            'JSON string of service account credentials for a GCP account',
-          type: 'string',
-        },
-        'firestore-collection': {
-          describe:
-            'name of the top-level firestore collection for storing our data',
-          type: 'string',
+          demandOption: true,
         },
         'client-id': {
           describe: 'google auth ID',
