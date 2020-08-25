@@ -17,6 +17,7 @@ import {
   FiCheckSquare,
   FiGlobe
 } from "react-icons/fi";
+import Prefooter from "../components/Prefooter";
 
 // TODO this data should come from Sanity
 const benefitsListItems: IconListItemProps[] = [
@@ -117,6 +118,7 @@ const HomePage = ({ content, preview }) => {
           ))}
         </Grid>
       </SectionLayout>
+      <Prefooter />
     </Layout>
   );
 };
