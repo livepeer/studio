@@ -25,9 +25,9 @@ const BlogIndex = ({ categories, posts }) => {
 
   return (
     <Layout
-      title={`Blog - Liveper`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com`}
+      title={`Blog - Livepeer`}
+      description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
+      url={`https://livepeer.com/blog`}
     >
       <Container
         sx={{
@@ -130,7 +130,7 @@ const BlogIndex = ({ categories, posts }) => {
                       />
                     )}
                     <Box>
-                      <Box sx={{ fontSize: 1, color: "grey", mb: 1 }}>
+                      <Box sx={{ fontSize: 1, color: "grey", mb: 2 }}>
                         {new Date(p._createdAt).toLocaleDateString("en-US", {
                           weekday: "long",
                           year: "numeric",

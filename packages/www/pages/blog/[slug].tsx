@@ -16,11 +16,12 @@ const Post = ({
   author,
   category,
   _createdAt,
+  excerpt,
   body,
   preview,
 }) => {
-  const router = useRouter();
-  if (router.isFallback) {
+  const { isFallback, asPath } = useRouter();
+  if (isFallback) {
     return (
       <Layout>
         <Spinner />
@@ -32,9 +33,10 @@ const Post = ({
   const builder = imageUrlBuilder(client as any);
   return (
     <Layout
-      title={`${title} - Liveper`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com`}
+      title={`${title} - Livepeer`}
+      description={excerpt}
+      image={{ url: builder.image(mainImage).url(), alt: mainImage.alt }}
+      url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
       <Box
