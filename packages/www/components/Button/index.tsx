@@ -50,15 +50,11 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
       );
     }
     return (
-      <Link
-        href={props.href}
-        isLink={undefined}
-        isExternal={undefined}
-        as={props.asPath}
-        passHref
-      >
+      <Link href={props.href} as={props.asPath} passHref>
         <ThemeUIButton
           {...props}
+          isLink={undefined}
+          isExternal={undefined}
           href={undefined}
           asPath={undefined}
           as="a"

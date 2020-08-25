@@ -7,6 +7,7 @@ import {
 } from "@theme-ui/components";
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
+import slugify from "@sindresorhus/slugify";
 
 type Props = {
   heading: {
@@ -19,7 +20,11 @@ type Props = {
 };
 
 const SectionLayout = ({ children, heading, gradient }: Props) => (
-  <GradientBackgroundBox gradient={gradient ?? null} slide>
+  <GradientBackgroundBox
+    id={slugify(heading.title)}
+    gradient={gradient ?? null}
+    slide
+  >
     <Container variant="content" sx={{ pt: gradient ? [6, 7] : undefined }}>
       <div>
         <Text
