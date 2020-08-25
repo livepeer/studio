@@ -12,6 +12,7 @@ type Props = {
   gradient?: Gradient;
   slide?: boolean;
   sx?: SxStyleProp;
+  id: string;
 };
 
 const GradientBackgroundBox = ({
@@ -19,6 +20,7 @@ const GradientBackgroundBox = ({
   sx,
   slide = false,
   gradient = "violet",
+  id,
   ...moreProps
 }: Props) => {
   const Gradient = useMemo(() => {
@@ -49,7 +51,7 @@ const GradientBackgroundBox = ({
               }}
             >
               <Slider duration={3}>
-                <Gradient />
+                <Gradient id={id} />
               </Slider>
             </div>
           ) : (
@@ -61,7 +63,7 @@ const GradientBackgroundBox = ({
                 pointerEvents: "none"
               }}
             >
-              <Gradient />
+              <Gradient id={id} />
             </div>
           )}
         </>

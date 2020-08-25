@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-export default ({
+const Layout = ({
   title,
   description,
   children,
@@ -76,7 +76,11 @@ export default ({
       <DefaultSeo {...seo} />
       {withGradientBackground && (
         <div sx={{ position: "absolute", top: 0, width: "100%" }}>
-          <GradientBackgroundBox gradient="violet" sx={{ height: "1000px" }} />
+          <GradientBackgroundBox
+            id="layout"
+            gradient="violet"
+            sx={{ height: "1000px" }}
+          />
         </div>
       )}
       <Flex
@@ -122,3 +126,5 @@ export default ({
     </Flex>
   );
 };
+
+export default Layout;

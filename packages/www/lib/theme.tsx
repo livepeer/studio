@@ -32,6 +32,7 @@ export const theme = {
     accent: "#00EB88",
     muted: "#eaeaea",
     gray: "#525252",
+    lightGray: "#919191",
     listText: "#666666",
     extremelyBlue: "#3F3FE2"
   },
