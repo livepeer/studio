@@ -13,14 +13,11 @@ app.get('/', authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers } = req.query
 
   if (req.user.admin && allUsers) {
-    const filter = all ? (o) => o : (o) => !o[Object.keys(o)[0]].deleted
-    const resp = await req.store.list({
-      prefix: `webhook/`,
-      cursor,
-      limit,
-      filter,
-    })
-    const [output, newCursor] = db.stream.find([`data->>'deleted' IS NULL`])
+    const query = []
+    if (!all) {
+      query.push(sql`data->>'deleted' IS NULL`)
+    }
+    const [output, newCursor] = await db.webhook.find(query, {cursor})
     res.status(200)
 
     if (output.length > 0) {
