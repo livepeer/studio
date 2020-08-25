@@ -100,7 +100,7 @@ const Post = ({
               <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
               <Box>{category.title}</Box>
             </Flex>
-            <h1 sx={{ fontSize: 48, my: 3 }}>{title}</h1>
+            <h1 sx={{ fontSize: [32, 32, 48], my: 3 }}>{title}</h1>
             <Flex sx={{ alignItems: "center" }}>
               <Flex sx={{ alignItems: "center" }}>
                 <img

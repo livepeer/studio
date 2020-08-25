@@ -113,7 +113,7 @@ const BlogIndex = ({ categories, posts }) => {
                   <Flex sx={{ flexDirection: ["column", "column", "row"] }}>
                     {p.mainImage && (
                       <img
-                        alt={p.mainImage.alt}
+                        alt={p.mainImage?.alt}
                         width={150}
                         height={200}
                         sx={{
@@ -130,21 +130,45 @@ const BlogIndex = ({ categories, posts }) => {
                       />
                     )}
                     <Box>
-                      <Box sx={{ fontSize: 1, color: "grey", mb: 2 }}>
+                      <Flex
+                        sx={{
+                          alignItems: "center",
+                          fontSize: 1,
+                          color: "grey",
+                          mb: 3,
+                        }}
+                      >
                         {new Date(p._createdAt).toLocaleDateString("en-US", {
                           weekday: "long",
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
-                      </Box>
+                        <Box
+                          sx={{
+                            display: ["block", "block", "none"],
+                            mx: 3,
+                            width: "1px",
+                            height: 16,
+                            bg: "grey",
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            display: ["block", "block", "none"],
+                            color: "grey",
+                          }}
+                        >
+                          {p.category.title}
+                        </Box>
+                      </Flex>
                       <h2 sx={{ fontSize: 5, mb: 3, transition: "color .3s" }}>
                         {p.title}
                       </h2>
                       <Box sx={{ mb: 3, color: "grey" }}>{p.excerpt}</Box>
                       <Flex sx={{ alignItems: "center" }}>
                         <img
-                          alt={p.author.image.alt}
+                          alt={p.author.image?.alt}
                           width={30}
                           height={30}
                           sx={{
@@ -162,9 +186,22 @@ const BlogIndex = ({ categories, posts }) => {
                         <Box
                           sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }}
                         />
-                        <Box sx={{ color: "grey" }}>{p.category.title}</Box>
                         <Box
-                          sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }}
+                          sx={{
+                            display: ["none", "none", "block"],
+                            color: "grey",
+                          }}
+                        >
+                          {p.category.title}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: ["none", "none", "block"],
+                            mx: 3,
+                            width: "1px",
+                            height: 16,
+                            bg: "grey",
+                          }}
                         />
                         <Box sx={{ color: "grey" }}>{stats.text}</Box>
                       </Flex>
