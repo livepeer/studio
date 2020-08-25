@@ -36,7 +36,7 @@ export default class Table<T extends DBObject> {
       throw new Error('missing id')
     }
     const res = await this.db.query(
-      sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`),
+      sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
     )
 
     if (res.rowCount < 1) {
