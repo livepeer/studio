@@ -21,7 +21,6 @@ beforeAll(async () => {
     random_prefix_bbb_160p:
       '/stream/305b9fa7-c6b3-4690-8b2e-5652a2556524/P144p30fps16x9.m3u8',
   }
-  postMockStream.objectStoreId = 'mock_store_stream'
   postMockStream.wowza.streamNameGroups = [
     {
       name: 'bbb_all',
@@ -165,110 +164,110 @@ describe('controllers/webhook', () => {
       ).toBe(true)
     })
 
-    // it('get webhooks list all', async () => {
-    //   const res = await client.get(`/webhook?allUsers=1`)
-    //   const resJson = await res.json()
-    //   expect(res.status).toBe(200)
-    //   expect(resJson).toHaveLength(3)
-    //   expect(resJson.map((wh) => wh.name).includes('test non admin')).toBe(true)
-    // })
+    it('get webhooks list all', async () => {
+      const res = await client.get(`/webhook?allUsers=1`)
+      const resJson = await res.json()
+      expect(res.status).toBe(200)
+      expect(resJson).toHaveLength(3)
+      expect(resJson.map((wh) => wh.name).includes('test non admin')).toBe(true)
+    })
 
-    // it('update a webhook', async () => {
-    //   let modifiedHook = { ...generatedWebhook }
-    //   modifiedHook.name = 'modified_name'
-    //   const res = await client.put(`/webhook/${modifiedHook.id}`, modifiedHook)
-    //   const resJson = await res.json()
-    //   expect(res.status).toBe(200)
-    //   expect(resJson.id).toEqual(generatedWebhook.id)
-    // })
+    it('update a webhook', async () => {
+      let modifiedHook = { ...generatedWebhook }
+      modifiedHook.name = 'modified_name'
+      const res = await client.put(`/webhook/${modifiedHook.id}`, modifiedHook)
+      const resJson = await res.json()
+      expect(res.status).toBe(200)
+      expect(resJson.id).toEqual(generatedWebhook.id)
+    })
 
-    // it('delete a webhook', async () => {
-    //   const res = await client.delete(`/webhook/${generatedWebhook.id}`)
-    //   expect(res.status).toBe(204)
+    it('delete a webhook', async () => {
+      const res = await client.delete(`/webhook/${generatedWebhook.id}`)
+      expect(res.status).toBe(204)
 
-    //   client.jwtAuth = nonAdminToken.token
-    //   const res2 = await client.get(`/webhook/${generatedWebhook.id}`)
-    //   const resJson2 = await res2.json()
+      client.jwtAuth = nonAdminToken.token
+      const res2 = await client.get(`/webhook/${generatedWebhook.id}`)
+      const resJson2 = await res2.json()
 
-    //   expect(res2.status).toBe(404)
-    // })
+      expect(res2.status).toBe(404)
+    })
   })
 
-  // describe('webhook trigger', () => {
-  //   let client,
-  //     adminUser,
-  //     adminToken,
-  //     nonAdminUser,
-  //     nonAdminToken,
-  //     generatedWebhook
+  describe('webhook trigger', () => {
+    let client,
+      adminUser,
+      adminToken,
+      nonAdminUser,
+      nonAdminToken,
+      generatedWebhook
 
-  //   beforeAll(async () => {
-  //     ;({
-  //       client,
-  //       adminUser,
-  //       adminToken,
-  //       nonAdminUser,
-  //       nonAdminToken,
-  //     } = await setupUsers(server))
-  //   })
+    beforeAll(async () => {
+      ;({
+        client,
+        adminUser,
+        adminToken,
+        nonAdminUser,
+        nonAdminToken,
+      } = await setupUsers(server))
+    })
 
-  //   afterAll(async () => {
-  //     await clearDatabase(server)
-  //   })
+    afterAll(async () => {
+      await clearDatabase(server)
+    })
 
-  //   it('trigger webhook', async () => {
-  //     // create webhook
-  //     const webhookRes = await client.post('/webhook', { ...mockWebhook })
-  //     let webhookResJson = await webhookRes.json()
-  //     expect(webhookRes.status).toBe(201)
-  //     generatedWebhook = webhookResJson
+    it('trigger webhook', async () => {
+      // create webhook
+      const webhookRes = await client.post('/webhook', { ...mockWebhook })
+      let webhookResJson = await webhookRes.json()
+      expect(webhookRes.status).toBe(201)
+      generatedWebhook = webhookResJson
 
-  //     const webhookRes2 = await client.post('/webhook', { ...mockWebhook })
-  //     let webhookResJson2 = await webhookRes2.json()
-  //     expect(webhookRes2.status).toBe(201)
-  //     // generatedWebhook = webhookResJson
+      const webhookRes2 = await client.post('/webhook', { ...mockWebhook })
+      let webhookResJson2 = await webhookRes2.json()
+      expect(webhookRes2.status).toBe(201)
+      // generatedWebhook = webhookResJson
 
-  //     // create a stream object
-  //     const now = Date.now()
-  //     postMockStream.name = 'eli_is_cool' // :D
-  //     const res = await client.post('/stream', { ...postMockStream })
-  //     expect(res.status).toBe(201)
-  //     const stream = await res.json()
-  //     expect(stream.id).toBeDefined()
-  //     expect(stream.kind).toBe('stream')
-  //     expect(stream.name).toBe('eli_is_cool')
-  //     expect(stream.createdAt).toBeGreaterThanOrEqual(now)
-  //     const document = await server.store.get(`stream/${stream.id}`)
-  //     expect(document).toEqual(stream)
+      // create a stream object
+      const now = Date.now()
+      postMockStream.name = 'eli_is_cool' // :D
+      const res = await client.post('/stream', { ...postMockStream })
+      expect(res.status).toBe(201)
+      const stream = await res.json()
+      expect(stream.id).toBeDefined()
+      expect(stream.kind).toBe('stream')
+      expect(stream.name).toBe('eli_is_cool')
+      expect(stream.createdAt).toBeGreaterThanOrEqual(now)
+      const document = await server.store.get(`stream/${stream.id}`)
+      expect(document).toEqual(stream)
 
-  //     // trigger
-  //     const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
-  //       active: true,
-  //     })
-  //     expect(setActiveRes).toBeDefined()
-  //     expect(setActiveRes.status).toBe(204)
-  //     // const setActiveResJson = await setActiveRes.json()
-  //     // expect(setActiveResJson).toBeDefined()
-  //   }, 20000)
+      // trigger
+      const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {
+        active: true,
+      })
+      expect(setActiveRes).toBeDefined()
+      expect(setActiveRes.status).toBe(204)
+      // const setActiveResJson = await setActiveRes.json()
+      // expect(setActiveResJson).toBeDefined()
+    }, 20000)
 
-  //   it('trigger webhook with localIP', async () => {
-  //     await clearDatabase(server)
-  //     ;({
-  //       client,
-  //       adminUser,
-  //       adminToken,
-  //       nonAdminUser,
-  //       nonAdminToken,
-  //     } = await setupUsers(server))
+    it('trigger webhook with localIP', async () => {
+      await clearDatabase(server)
+      ;({
+        client,
+        adminUser,
+        adminToken,
+        nonAdminUser,
+        nonAdminToken,
+      } = await setupUsers(server))
 
-  //     let localWebhook = { ...mockWebhook }
-  //     localWebhook.url = '192.168.1.1'
-  //     console.log('localwebhook: ', localWebhook)
-  //     // create webhook
-  //     const webhookRes = await client.post('/webhook', { ...localWebhook })
-  //     let webhookResJson = await webhookRes.json()
-  //     console.log('webhook created: ', webhookResJson)
-  //     expect(webhookRes.status).toBe(406)
-  //   })
-  // })
+      let localWebhook = { ...mockWebhook }
+      localWebhook.url = '192.168.1.1'
+      console.log('localwebhook: ', localWebhook)
+      // create webhook
+      const webhookRes = await client.post('/webhook', { ...localWebhook })
+      let webhookResJson = await webhookRes.json()
+      console.log('webhook created: ', webhookResJson)
+      expect(webhookRes.status).toBe(406)
+    })
+  })
 })

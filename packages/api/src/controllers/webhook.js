@@ -6,6 +6,7 @@ import logger from '../logger'
 import uuid from 'uuid/v4'
 import { makeNextHREF, trackAction, getWebhooks } from './helpers'
 import { db } from '../store'
+import sql from 'sql-template-strings'
 
 const app = Router()
 

@@ -23,7 +23,7 @@ beforeAll(async () => {
     random_prefix_bbb_160p:
       '/stream/305b9fa7-c6b3-4690-8b2e-5652a2556524/P144p30fps16x9.m3u8',
   }
-  postMockStream.objectStoreId = 'mock_store_stream'
+  postMockStream.objectStoreId = 'mock_store'
   postMockStream.wowza.streamNameGroups = [
     {
       name: 'bbb_all',
@@ -186,7 +186,13 @@ describe('controllers/stream', () => {
       expect(streams.length).toEqual(11)
     })
 
+    it('should reject streams with object stores that don not exist', async () => {
+      const res = await client.post('/stream', { ...postMockStream })
+      expect(res.status).toBe(400)
+    })
+
     it('should create a stream', async () => {
+      await server.store.create(mockStore)
       const now = Date.now()
       const res = await client.post('/stream', { ...postMockStream })
       expect(res.status).toBe(201)
@@ -200,6 +206,7 @@ describe('controllers/stream', () => {
     })
 
     it('should create a stream, delete it, and error when attempting additional detele or replace', async () => {
+      await server.store.create(mockStore)
       const res = await client.post('/stream', { ...postMockStream })
       expect(res.status).toBe(201)
       const stream = await res.json()
