@@ -133,7 +133,7 @@ const Post = ({
       </Box>
       <Container
         className="markdown-body"
-        sx={{ pb: 6, maxWidth: 960, margin: "0 auto" }}
+        sx={{ pb: 6, maxWidth: 768, margin: "0 auto" }}
       >
         <ReactMarkdown>{body}</ReactMarkdown>
       </Container>
