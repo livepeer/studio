@@ -2,7 +2,7 @@
   "version": 2,
   "public": true,
   "functions": {
-    "packages/www/package.json": {
+    "packages/www/next.config.json": {
       "runtime": "@vercel/next@2.6.23"
     },
     "packages/admin/package.json": {
