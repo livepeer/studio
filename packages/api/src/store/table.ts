@@ -48,9 +48,9 @@ export default class Table<T extends DBObject> {
   // returns [docs, cursor]
   async find(
     query: FindQuery | Array<SQLStatement> = {},
-    opts: FindOptions,
+    opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
-    const { cursor, limit = 100 } = opts
+    const { cursor = '', limit = 100 } = opts
 
     const q = sql`SELECT * FROM `.append(this.name)
     let filters = []

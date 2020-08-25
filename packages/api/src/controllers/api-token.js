@@ -61,7 +61,6 @@ app.get('/', authMiddleware({}), async (req, res) => {
     if (output.length > 0) {
       res.links({ next: makeNextHREF(req, resp.cursor) })
     }
-    output = output.map((o) => o[Object.keys(o)[0]])
     res.json(output)
     return
   }
