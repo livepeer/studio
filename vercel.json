@@ -1,13 +1,14 @@
 {
   "version": 2,
   "public": true,
-  "builds": [
-    { "src": "packages/www/package.json", "use": "@now/next" },
-    {
-      "src": "packages/admin/package.json",
-      "use": "@now/static-build"
+  "functions": {
+    "packages/www/package.json": {
+      "runtime": "@now/next"
+    },
+    "packages/admin/package.json": {
+      "runtime": "@now/static-build"
     }
-  ],
+  },
   "rewrites": [
     {
       "source": "/admin/static/(.*)",
