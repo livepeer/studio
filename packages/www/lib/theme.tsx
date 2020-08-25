@@ -33,6 +33,7 @@ export const theme = {
     muted: "#eaeaea",
     gray: "#525252",
     lightGray: "#919191",
+    ultraLightGray: "#E6E6E6",
     listText: "#666666",
     extremelyBlue: "#3F3FE2"
   },

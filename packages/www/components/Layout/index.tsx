@@ -80,6 +80,7 @@ const Layout = ({
             id="layout"
             gradient="violet"
             sx={{ height: "1000px" }}
+            slide
           />
         </div>
       )}

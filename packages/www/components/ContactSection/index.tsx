@@ -7,7 +7,7 @@ import Button from "../Button";
 import SimpleBlockContent from "../SimpleBlockContent";
 import Fade from "react-reveal/Fade";
 
-export default ({ heading, body }) => {
+const ContactSection = ({ heading, body }) => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -92,6 +92,7 @@ export default ({ heading, body }) => {
           htmlFor="message"
           id="message"
           sx={{ width: "100%" }}
+          rows={5}
           as="textarea"
           name="message"
           type="text"
@@ -111,3 +112,5 @@ export default ({ heading, body }) => {
     </Container>
   );
 };
+
+export default ContactSection;

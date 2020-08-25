@@ -18,6 +18,7 @@ import {
   FiGlobe
 } from "react-icons/fi";
 
+// TODO this data should come from Sanity
 const benefitsListItems: IconListItemProps[] = [
   {
     icon: <FiUserCheck />,
@@ -45,6 +46,7 @@ const benefitsListItems: IconListItemProps[] = [
   }
 ];
 
+// TODO this data should come from Sanity
 const featuresListItems: IconListItemProps[] = [
   {
     icon: <FiCode />,
@@ -73,6 +75,7 @@ const featuresListItems: IconListItemProps[] = [
 ];
 
 const HomePage = ({ content, preview }) => {
+  console.log(content);
   return (
     <Layout
       title={`Home - Livepeer`}
@@ -84,6 +87,7 @@ const HomePage = ({ content, preview }) => {
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}
+      {/* TODO this data should come from Sanity */}
       <SectionLayout
         heading={{
           title:
