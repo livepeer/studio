@@ -35,7 +35,7 @@ const Post = ({
     <Layout
       title={`${title} - Livepeer`}
       description={excerpt}
-      image={{ url: builder.image(mainImage).url(), alt: mainImage.alt }}
+      image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
       url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
@@ -68,7 +68,7 @@ const Post = ({
             }}
           >
             <img
-              alt={mainImage.alt}
+              alt={mainImage?.alt}
               width={700}
               height={400}
               sx={{
@@ -104,7 +104,7 @@ const Post = ({
             <Flex sx={{ alignItems: "center" }}>
               <Flex sx={{ alignItems: "center" }}>
                 <img
-                  alt={author.image.alt}
+                  alt={author.image?.alt}
                   width={40}
                   height={40}
                   sx={{
