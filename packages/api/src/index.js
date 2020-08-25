@@ -3,6 +3,7 @@ import 'express-async-errors' // it monkeypatches, i guess
 import morgan from 'morgan'
 import logger from './logger'
 import appRouter from './app-router'
+import 'source-map-support/register'
 
 export default async function makeApp(params) {
   const {
@@ -34,43 +35,8 @@ export default async function makeApp(params) {
   } = params
   // Storage init
 
-  const { router, store } = await appRouter(params)
-  const app = express()
-  app.use(
-    morgan('dev', {
-      skip: (req, res) => {
-        if (req.path.startsWith('/_next')) {
-          return true
-        }
-        if (insecureTestToken) {
-          if (req.originalUrl.includes(insecureTestToken)) {
-            return true
-          }
-        }
-        return false
-      },
-    }),
-  )
-  app.use(router)
-
   let listener
   let listenPort
-
-  if (listen) {
-    await new Promise((resolve, reject) => {
-      listener = app.listen(port, (err) => {
-        if (err) {
-          logger.error('Error starting server', err)
-          return reject(err)
-        }
-        listenPort = listener.address().port
-        logger.info(
-          `API server listening on http://0.0.0.0:${listenPort}${httpPrefix}`,
-        )
-        resolve()
-      })
-    })
-  }
 
   const close = async () => {
     process.off('SIGTERM', sigterm)
@@ -91,6 +57,54 @@ export default async function makeApp(params) {
   }
   process.on('unhandledRejection', unhandledRejection)
 
+  let router
+  let store
+  let db
+  try {
+    const appRoute = await appRouter(params)
+    router = appRoute.router
+    store = appRoute.store
+    db = appRoute.db
+  } catch (e) {
+    console.error('Error on startup')
+    console.error(e)
+    throw e
+    // process.exit(1)
+  }
+  const app = express()
+  app.use(
+    morgan('dev', {
+      skip: (req, res) => {
+        if (req.path.startsWith('/_next')) {
+          return true
+        }
+        if (insecureTestToken) {
+          if (req.originalUrl.includes(insecureTestToken)) {
+            return true
+          }
+        }
+        return false
+      },
+    }),
+  )
+  app.use(router)
+
+  if (listen) {
+    await new Promise((resolve, reject) => {
+      listener = app.listen(port, (err) => {
+        if (err) {
+          logger.error('Error starting server', err)
+          return reject(err)
+        }
+        listenPort = listener.address().port
+        logger.info(
+          `API server listening on http://0.0.0.0:${listenPort}${httpPrefix}`,
+        )
+        resolve()
+      })
+    })
+  }
+
   return {
     ...params,
     app,
@@ -98,6 +112,7 @@ export default async function makeApp(params) {
     port: listenPort,
     close,
     store,
+    db,
   }
 }
 

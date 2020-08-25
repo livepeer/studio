@@ -5,6 +5,8 @@ import Router from 'express/lib/router'
 import logger from '../logger'
 import uuid from 'uuid/v4'
 import { makeNextHREF, trackAction, getWebhooks } from './helpers'
+import { db } from '../store'
+import sql from 'sql-template-strings'
 
 const app = Router()
 
@@ -12,24 +14,27 @@ app.get('/', authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers } = req.query
 
   if (req.user.admin && allUsers) {
-    const filter = all ? (o) => o : (o) => !o[Object.keys(o)[0]].deleted
-    const resp = await req.store.list({
-      prefix: `webhook/`,
-      cursor,
-      limit,
-      filter,
-    })
-    let output = resp.data
+    const query = []
+    if (!all) {
+      query.push(sql`data->>'deleted' IS NULL`)
+    }
+    const [output, newCursor] = await db.webhook.find(query, { cursor })
     res.status(200)
 
     if (output.length > 0) {
-      res.links({ next: makeNextHREF(req, resp.cursor) })
+      res.links({ next: makeNextHREF(req, newCursor) })
     }
-    output = output.map((o) => o[Object.keys(o)[0]])
     return res.json(output)
   }
-  
-  let output = await getWebhooks(req.store, req.user.id, event, limit, cursor, all)
+
+  let output = await getWebhooks(
+    req.store,
+    req.user.id,
+    event,
+    limit,
+    cursor,
+    all,
+  )
   res.status(200)
 
   if (output.data.length > 0) {
@@ -51,9 +56,12 @@ app.post('/', authMiddleware({}), validatePost('webhook'), async (req, res) => {
     return res.end()
   }
 
-  if (!urlObj.protocol || (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:')) {
+  if (
+    !urlObj.protocol ||
+    (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:')
+  ) {
     res.status(406)
-    return res.json({ errors: [ 'url provided should be http or https only']})
+    return res.json({ errors: ['url provided should be http or https only'] })
   }
 
   const doc = {
@@ -88,9 +96,10 @@ app.get('/:id', authMiddleware({}), async (req, res) => {
   logger.info(`webhook params ${req.params.id}`)
 
   const webhook = await req.store.get(`webhook/${req.params.id}`)
-  if ( !webhook || (webhook.deleted ||
-    webhook.userId !== req.user.id) && !req.user.admin)
-  {
+  if (
+    !webhook ||
+    ((webhook.deleted || webhook.userId !== req.user.id) && !req.user.admin)
+  ) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
@@ -99,47 +108,58 @@ app.get('/:id', authMiddleware({}), async (req, res) => {
   res.json(webhook)
 })
 
-app.put('/:id', authMiddleware({}), validatePost('webhook'), async (req, res) => {
-  // modify a specific webhook
-  const webhook = await req.store.get(`webhook/${req.body.id}`)
-  if ((webhook.userId !== req.user.id || webhook.deleted) && 
-    !req.user.admin) {
-    // do not reveal that webhooks exists
-    res.status(404)
-    return res.json({ errors: ['not found'] })
-  }
+app.put(
+  '/:id',
+  authMiddleware({}),
+  validatePost('webhook'),
+  async (req, res) => {
+    // modify a specific webhook
+    const webhook = await req.store.get(`webhook/${req.body.id}`)
+    if (
+      (webhook.userId !== req.user.id || webhook.deleted) &&
+      !req.user.admin
+    ) {
+      // do not reveal that webhooks exists
+      res.status(404)
+      return res.json({ errors: ['not found'] })
+    }
 
-  let urlObj
-  try {
-    urlObj = parseUrl(req.body.url)
-  } catch (e) {
-    console.error(`couldn't parse the url provided ${req.body.url}`)
-    res.status(400)
-    return res.end()
-  }
+    let urlObj
+    try {
+      urlObj = parseUrl(req.body.url)
+    } catch (e) {
+      console.error(`couldn't parse the url provided ${req.body.url}`)
+      res.status(400)
+      return res.end()
+    }
 
-  if (!urlObj.protocol || (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:')) {
-    res.status(406)
-    return res.json({ errors: [ 'url provided should be http or https only']})
-  }
+    if (
+      !urlObj.protocol ||
+      (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:')
+    ) {
+      res.status(406)
+      return res.json({ errors: ['url provided should be http or https only'] })
+    }
 
-  try {
-    await req.store.replace(req.body)
-  } catch (e) {
-    console.error(e)
-    throw e
-  }
-  res.status(200)
-  res.json({id: req.body.id})
-})
+    try {
+      await req.store.replace(req.body)
+    } catch (e) {
+      console.error(e)
+      throw e
+    }
+    res.status(200)
+    res.json({ id: req.body.id })
+  },
+)
 
 app.delete('/:id', authMiddleware({}), async (req, res) => {
   // delete a specific webhook
   const webhook = await req.store.get(`webhook/${req.params.id}`)
-  
-  if ( !webhook || (webhook.deleted ||
-    webhook.userId !== req.user.id) && !req.isUIAdmin
-  ){
+
+  if (
+    !webhook ||
+    ((webhook.deleted || webhook.userId !== req.user.id) && !req.isUIAdmin)
+  ) {
     // do not reveal that webhooks exists
     res.status(404)
     return res.json({ errors: ['not found'] })

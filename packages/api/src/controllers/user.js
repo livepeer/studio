@@ -129,6 +129,7 @@ app.post('/token', validatePost('user'), async (req, res) => {
     kind: 'user',
     query: { email: req.body.email },
   })
+  console.log(userIds)
   if (userIds.length < 1) {
     res.status(404)
     return res.json({ errors: ['user not found'] })

@@ -23,25 +23,46 @@ export const shuffle = (arr) => {
     .map((idx) => arr[idx])
 }
 
-export const fetchWithTimeout = (url, options) => new Promise((resolve, reject) => {
-  let timeout = setTimeout(() => {
-    timeout = null;
-    reject('timeout');
-  }, options.timeout || 10 * 1000);
-  return fetch(url, options)
-    .then(response => {
-      if (timeout === null) {
-        // already timed out
-        return;
-      }
-      clearTimeout(timeout);
-      return resolve(response)
-    }, rejectReason => {
-      if (timeout === null) {
-        // already timed out
-        return;
-      }
-      clearTimeout(timeout);
-      return reject(rejectReason);
-    });
-});
+export const fetchWithTimeout = (url, options) =>
+  new Promise((resolve, reject) => {
+    let timeout = setTimeout(() => {
+      timeout = null
+      reject('timeout')
+    }, options.timeout || 10 * 1000)
+    return fetch(url, options).then(
+      (response) => {
+        if (timeout === null) {
+          // already timed out
+          return
+        }
+        clearTimeout(timeout)
+        return resolve(response)
+      },
+      (rejectReason) => {
+        if (timeout === null) {
+          // already timed out
+          return
+        }
+        clearTimeout(timeout)
+        return reject(rejectReason)
+      },
+    )
+  })
+
+// turns foo-bar-baz into fooBarBaz
+export const kebabToCamel = (str) => {
+  let out = ''
+  let upper = false
+  for (let i = 0; i < str.length; i += 1) {
+    const char = str[i]
+    if (char === '-') {
+      upper = true
+    } else if (upper === true) {
+      out += char.toUpperCase()
+      upper = false
+    } else {
+      out += char
+    }
+  }
+  return out
+}

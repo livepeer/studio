@@ -35,6 +35,7 @@ params.jwtSecret = jwtSecret
 params.supportAddr = supportAddr
 params.sendgridTemplateId = sendgridTemplateId
 params.sendgridApiKey = sendgridApiKey
+params.postgresUrl = `postgresql://postgres@127.0.0.1/test_${Date.now()}`
 
 if (!params.insecureTestToken) {
   params.insecureTestToken = uuid()
@@ -83,27 +84,17 @@ export default Promise.resolve().then(async () => {
   return {
     ...params,
     host: server.host,
-    store: {
-      create: doStore('create'),
-      delete: doStore('delete'),
-      get: doStore('get'),
-      query: doStore('query'),
-      list: doStore('list'),
-      listKeys: doStore('listKeys'),
-      replace: doStore('replace'),
-      delete: doStore('delete'),
-      deleteKey: doStore('deleteKey'),
-      close: () => {},
-    },
+    store: server.store,
     async close() {
       await server.close()
     },
+    db: server.db,
   }
 })
 
-afterAll(() => {
+afterAll(async () => {
   if (server) {
-    server.close()
+    await server.close()
   }
   fs.removeSync(dbPath)
 })

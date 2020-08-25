@@ -3,7 +3,14 @@ import { generateJWT, prepareConfig } from './firestore-helpers'
 import * as qs from 'query-string'
 
 const DEFAULT_LIMIT = 100
-
+const COLLECTIONS = [
+  'api-token',
+  'object-store',
+  'password-reset-token',
+  'stream',
+  'user',
+  'webhook',
+]
 export default class FirestoreStore {
   constructor({ firestoreCredentials, firestoreCollection }) {
     if (!firestoreCredentials) {
@@ -69,26 +76,26 @@ export default class FirestoreStore {
     return JSON.parse(doc.fields.data.stringValue)
   }
 
-  async replace(key, data) {
-    const fields = {
-      id: {
-        stringValue: key,
-      },
-      data: {
-        stringValue: JSON.stringify(data),
-      },
-    }
-    const url = `${this.url}/${this.getPath(key)}`
-    const res = await this.fetch(url, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        fields,
-      }),
-    })
-    if (res.status !== 200) {
-      throw new Error(await res.text())
-    }
-  }
+  // async replace(key, data) {
+  //   const fields = {
+  //     id: {
+  //       stringValue: key,
+  //     },
+  //     data: {
+  //       stringValue: JSON.stringify(data),
+  //     },
+  //   }
+  //   const url = `${this.url}/${this.getPath(key)}`
+  //   const res = await this.fetch(url, {
+  //     method: 'PATCH',
+  //     body: JSON.stringify({
+  //       fields,
+  //     }),
+  //   })
+  //   if (res.status !== 200) {
+  //     throw new Error(await res.text())
+  //   }
+  // }
 
   async create(key, data) {
     const fields = {
@@ -117,18 +124,21 @@ export default class FirestoreStore {
   }
 
   // Only needed for the test harness so it's a little hacky
-  async listWholeDatabase() {
-    const path = this.getPath('')
-    const url = `${this.url}/${path}:listCollectionIds`
-    const res = await this.fetch(url, { method: 'POST' })
-    const data = await res.json()
-    const output = []
-    const collectionIds = data.collectionIds || []
-    for (const record of collectionIds) {
-      const [docs] = await this.doList(record.replace('_', '/'))
-      output.push(...docs)
+  async *listWholeDatabase() {
+    for (const record of COLLECTIONS) {
+      console.log(record)
+      const rec = record.replace('_', '/')
+      let [docs, next] = await this.doList(rec, null, 1000)
+      for (const doc of docs) {
+        yield doc
+      }
+      while (next) {
+        ;[docs, next] = await this.doList(rec, next, 1000)
+        for (const doc of docs) {
+          yield doc
+        }
+      }
     }
-    return [output, null]
   }
 
   // Helper for list() and listKeys()
@@ -184,15 +194,15 @@ export default class FirestoreStore {
     return [data, nextPageToken]
   }
 
-  async delete(key) {
-    const path = this.getPath(key)
-    const res = await this.fetch(`${this.url}/${path}`, {
-      method: 'DELETE',
-    })
-    if (res.status !== 200) {
-      throw new Error(await res.text())
-    }
-  }
+  // async delete(key) {
+  //   const path = this.getPath(key)
+  //   const res = await this.fetch(`${this.url}/${path}`, {
+  //     method: 'DELETE',
+  //   })
+  //   if (res.status !== 200) {
+  //     throw new Error(await res.text())
+  //   }
+  // }
 
   async close() {}
 }
