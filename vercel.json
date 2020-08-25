@@ -3,10 +3,10 @@
   "public": true,
   "functions": {
     "packages/www/package.json": {
-      "runtime": "@now/next"
+      "runtime": "@vercel/next@2.6.23"
     },
     "packages/admin/package.json": {
-      "runtime": "@now/static-build"
+      "runtime": "@vercel/static-build@0.17.7"
     }
   },
   "rewrites": [
