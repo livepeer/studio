@@ -1,4 +1,11 @@
-const VioletGradient = ({ id }: { id: string }) => (
+import { SxStyleProp } from "theme-ui";
+
+type Props = {
+  id: string;
+  pushSx?: SxStyleProp;
+};
+
+const VioletGradient = ({ id }: Props) => (
   <svg
     width="2766"
     viewBox="0 0 2766 720"

@@ -1,9 +1,17 @@
-const ColorfulGradient = ({ id }: { id: string }) => (
+import { SxStyleProp } from "theme-ui";
+
+type Props = {
+  id: string;
+  pushSx?: SxStyleProp;
+};
+
+const ColorfulGradient = ({ id, pushSx }: Props) => (
   <svg
     width="1919"
     viewBox="0 0 1919 720"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    sx={pushSx}
   >
     <g clipPath={`url(#${id}-colorful-gradient-clip0)`}>
       <g filter={`url(#${id}-colorful-gradient-filter0_f)`}>

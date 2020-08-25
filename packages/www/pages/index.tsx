@@ -72,7 +72,7 @@ const featuresListItems: IconListItemProps[] = [
   }
 ];
 
-const Page = ({ content, preview }) => {
+const HomePage = ({ content, preview }) => {
   return (
     <Layout
       title={`Home - Livepeer`}
@@ -155,4 +155,4 @@ export async function getStaticProps({ preview = false }) {
   };
 }
 
-export default Page;
+export default HomePage;
