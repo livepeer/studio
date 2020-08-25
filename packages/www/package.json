@@ -31,7 +31,7 @@
     "isomorphic-unfetch": "^3.0.0",
     "lazysizes": "^5.2.0",
     "moment": "^2.24.0",
-    "next": "^9.5.1",
+    "next": "^9.5.3-canary.23",
     "next-seo": "^4.4.0",
     "pascal-case": "^3.1.1",
     "prism-react-renderer": "^1.1.0",
