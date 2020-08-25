@@ -3,7 +3,7 @@ import { request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
-import { Container, Flex, Box, Link as A } from "@theme-ui/components";
+import { Container, Flex, Box, Link as A, Spinner } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import readingTime from "reading-time";
@@ -15,11 +15,19 @@ const BlogIndex = ({ categories, posts }) => {
   const { slug } = router.query;
   const builder = imageUrlBuilder(client as any);
 
+  if (router.isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
+
   return (
     <Layout
-      title={`Blog - Liveper`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com`}
+      title={`Blog - Livepeer`}
+      description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
+      url={`https://livepeer.com/blog`}
     >
       <Container
         sx={{
@@ -113,6 +121,7 @@ const BlogIndex = ({ categories, posts }) => {
                           mt: [2, 0],
                           height: [260, 260, 180],
                           width: ["100%", "100%", 240],
+                          minWidth: 240,
                           objectFit: "cover",
                           mr: 4,
                         }}
@@ -121,7 +130,7 @@ const BlogIndex = ({ categories, posts }) => {
                       />
                     )}
                     <Box>
-                      <Box sx={{ fontSize: 1, color: "grey", mb: 1 }}>
+                      <Box sx={{ fontSize: 1, color: "grey", mb: 2 }}>
                         {new Date(p._createdAt).toLocaleDateString("en-US", {
                           weekday: "long",
                           year: "numeric",

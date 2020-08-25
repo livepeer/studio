@@ -1,12 +1,14 @@
 import { Container, Flex, Box, Link as A } from "@theme-ui/components";
 import Layout from "../../components/Layout";
-import { GraphQLClient, request } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../queries/allPosts.gql";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import readingTime from "reading-time";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "next/router";
+import { Spinner } from "@theme-ui/components";
 
 const Post = ({
   title,
@@ -14,16 +16,27 @@ const Post = ({
   author,
   category,
   _createdAt,
+  excerpt,
   body,
   preview,
 }) => {
+  const { isFallback, asPath } = useRouter();
+  if (isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
+
   const stats = readingTime(body);
   const builder = imageUrlBuilder(client as any);
   return (
     <Layout
-      title={`${title} - Liveper`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com`}
+      title={`${title} - Livepeer`}
+      description={excerpt}
+      image={{ url: builder.image(mainImage).url(), alt: mainImage.alt }}
+      url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
       <Box
@@ -33,7 +46,7 @@ const Post = ({
             "none",
             "none",
             "none",
-            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(250,245,239, 1) 45%, rgba(250,245,239, 1) 45%)",
+            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(148, 60, 255,.08) 45%, rgba(255,255,255,.3) 100%);",
           ],
         }}
       >
@@ -45,15 +58,23 @@ const Post = ({
             alignItems: "center",
           }}
         >
-          <Box sx={{ py: [40, 40, 40, 100], mr: [0, 0, 0, 5] }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              width: "100%",
+              maxWidth: 800,
+              py: [40, 40, 40, 100],
+              mr: [0, 0, 0, 5],
+            }}
+          >
             <img
               alt={mainImage.alt}
               width={700}
-              height={550}
+              height={400}
               sx={{
                 mt: [2, 0],
-                maxHeight: "550",
-                maxWidth: 700,
+                height: [300, 300, 400],
+                maxHeight: [300, 300, 400],
                 width: "100%",
                 objectFit: "cover",
               }}
@@ -61,9 +82,14 @@ const Post = ({
               data-src={builder.image(mainImage).url()}
             />
           </Box>
-          <Box>
+          <Box
+            sx={{
+              flexGrow: 0,
+              flexBasis: ["initial", "initial", "initial", 950],
+            }}
+          >
             <Flex sx={{ mb: 2, alignItems: "center", fontSize: 1 }}>
-              <Box sx={{ color: "grey" }}>
+              <Box>
                 {new Date(_createdAt).toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
@@ -74,7 +100,7 @@ const Post = ({
               <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
               <Box>{category.title}</Box>
             </Flex>
-            <h1 sx={{ fontSize: 56, mb: 2 }}>{title}</h1>
+            <h1 sx={{ fontSize: 48, my: 3 }}>{title}</h1>
             <Flex sx={{ alignItems: "center" }}>
               <Flex sx={{ alignItems: "center" }}>
                 <img
@@ -97,7 +123,7 @@ const Post = ({
                   <Flex sx={{ alignItems: "center", fontSize: 1 }}>
                     <Box>By {author.name}</Box>
                     <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-                    <Box sx={{ color: "grey" }}>{stats.text}</Box>
+                    <Box>{stats.text}</Box>
                   </Flex>
                 </Box>
               </Flex>
@@ -107,7 +133,7 @@ const Post = ({
       </Box>
       <Container
         className="markdown-body"
-        sx={{ pb: 6, maxWidth: 960, margin: "0 auto" }}
+        sx={{ pb: 6, maxWidth: 768, margin: "0 auto" }}
       >
         <ReactMarkdown>{body}</ReactMarkdown>
       </Container>
@@ -126,9 +152,11 @@ export async function getStaticPaths() {
   });
 
   let paths = [];
-  allPost.map((post) => paths.push({ params: { slug: post.slug.current } }));
+  for (const post of allPost) {
+    paths.push({ params: { slug: post.slug.current } });
+  }
   return {
-    fallback: false,
+    fallback: true,
     paths,
   };
 }
@@ -153,7 +181,7 @@ export async function getStaticProps({ params, preview = false }) {
   });
 
   // if in preview mode but no draft exists, then return published post
-  if (preview && !data.allPost.length) {
+  if (preview && !data?.allPost?.length) {
     data = await graphQLClient.request(print(allPosts), {
       where: {
         _: { is_draft: false },
