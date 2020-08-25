@@ -10,9 +10,11 @@ export async function getStaticPaths() {
     print(allCategories)
   );
   let paths = [];
-  allCategory.map((c) => paths.push({ params: { slug: c.slug.current } }));
+  for (const category of allCategory) {
+    paths.push({ params: { slug: category.slug.current } });
+  }
   return {
-    fallback: false,
+    fallback: true,
     paths,
   };
 }

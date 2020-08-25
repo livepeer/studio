@@ -3,7 +3,7 @@ import { request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
-import { Container, Flex, Box, Link as A } from "@theme-ui/components";
+import { Container, Flex, Box, Link as A, Spinner } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import readingTime from "reading-time";
@@ -14,6 +14,14 @@ const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
   const { slug } = router.query;
   const builder = imageUrlBuilder(client as any);
+
+  if (router.isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
 
   return (
     <Layout
@@ -113,6 +121,7 @@ const BlogIndex = ({ categories, posts }) => {
                           mt: [2, 0],
                           height: [260, 260, 180],
                           width: ["100%", "100%", 240],
+                          minWidth: 240,
                           objectFit: "cover",
                           mr: 4,
                         }}
