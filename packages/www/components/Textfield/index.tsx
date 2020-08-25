@@ -97,7 +97,7 @@ const Textfield = ({
           ref={inputRef}
           name={name}
           sx={{
-            padding: "28px 20px 12px",
+            padding: "22px 20px 12px",
             fontSize: 16,
             color: "currentColor",
             width: "100%",
@@ -117,7 +117,8 @@ const Textfield = ({
             },
             "&:focus": {
               outline: "none",
-              borderColor: "gray"
+              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+              borderColor: "primary"
             }
           }}
           id={id}

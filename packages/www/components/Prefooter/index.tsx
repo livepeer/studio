@@ -40,8 +40,14 @@ const Prefooter = () => (
         Create a free account instantly and start creating streams. You can also
         contact us to design a custom package for your business.
       </Text>
-      <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
-        <Button sx={{ mr: 2 }}>Sign up for free</Button>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: ["column", "row"]
+        }}
+      >
+        <Button sx={{ mr: [0, 2], mb: [2, 0] }}>Sign up for free</Button>
         <Button variant="buttons.text" sx={{ color: "background" }}>
           Contact sales
         </Button>
