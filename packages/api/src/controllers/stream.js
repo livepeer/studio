@@ -58,7 +58,7 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
 
   res.status(200)
 
-  if (newCursor.length > 0) {
+  if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) })
   }
   res.json(output)
@@ -270,7 +270,13 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 
   let objectStoreId
   if (req.body.objectStoreId) {
-    await req.store.get(`object-store/${req.body.objectStoreId}`)
+    const store = await req.store.get(`object-store/${req.body.objectStoreId}`)
+    if (!store) {
+      res.status(400)
+      return res.json({
+        errors: [`object-store ${req.body.objectStoreId} does not exist`],
+      })
+    }
   }
 
   const doc = wowzaHydrate({
@@ -321,7 +327,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
 
     const { data: webhooksList } = await getWebhooks(
       req.store,
-      req.user.id,
+      stream.userId,
       'streamStarted',
     )
     try {

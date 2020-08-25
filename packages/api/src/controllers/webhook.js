@@ -17,7 +17,7 @@ app.get('/', authMiddleware({}), async (req, res) => {
     if (!all) {
       query.push(sql`data->>'deleted' IS NULL`)
     }
-    const [output, newCursor] = await db.webhook.find(query, {cursor})
+    const [output, newCursor] = await db.webhook.find(query, { cursor })
     res.status(200)
 
     if (output.length > 0) {

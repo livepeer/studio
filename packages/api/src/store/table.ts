@@ -1,5 +1,5 @@
 import sql, { SQLStatement } from 'sql-template-strings'
-import DB from './db'
+import { DB } from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
 
