@@ -1,13 +1,14 @@
-import { Flex, Container, Box, Link as A } from "@theme-ui/components";
-import Logo from "../../public/img/logo.svg";
+import { Flex, Container, Box } from "@theme-ui/components";
 import Link from "next/link";
+import Logo from "../Logo";
 
-export default () => {
+const Footer = () => {
   return (
     <Box
       sx={{
         py: 4,
-        bg: "primary",
+        bg: "text",
+        color: "background",
         boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)"
       }}
     >
@@ -20,31 +21,7 @@ export default () => {
             justifyContent: "space-between"
           }}
         >
-          <Link href="/" passHref>
-            <A
-              sx={{
-                width: ["100%", "100%", "100%", "33.33%"],
-                textDecoration: "none",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: ["center", "center", "center", "flex-start"],
-                cursor: "pointer"
-              }}
-            >
-              <Logo />
-              <Box
-                sx={{
-                  ml: "12px",
-                  fontWeight: 500,
-                  fontSize: "18px",
-                  color: "white"
-                }}
-              >
-                livepeer.com
-              </Box>
-            </A>
-          </Link>
+          <Logo isDark />
           <Flex
             sx={{
               justifyContent: "center",
@@ -103,3 +80,5 @@ export default () => {
     </Box>
   );
 };
+
+export default Footer;
