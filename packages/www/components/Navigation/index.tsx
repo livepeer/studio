@@ -6,12 +6,12 @@ import {
   IconButton
 } from "@theme-ui/components";
 import Link from "next/link";
-import Logo from "../../public/img/logo.svg";
 import { useApi } from "../../hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Menu from "./menu";
 import { useRouter } from "next/router";
+import Logo from "../Logo";
 
 const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -67,30 +67,7 @@ const Navigation = () => {
           <div
             sx={{ minWidth: sidesWidth, display: "flex", alignItems: "center" }}
           >
-            <Link href="/" passHref>
-              <A
-                sx={{
-                  textDecoration: "none",
-                  color: "text",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  cursor: "pointer"
-                }}
-              >
-                <Logo sx={{ color: "text" }} />
-                {!isDashboard && (
-                  <Box
-                    sx={{
-                      ml: "12px",
-                      fontWeight: 800,
-                      fontSize: "22px"
-                    }}
-                  >
-                    Livepeer.com
-                  </Box>
-                )}
-              </A>
-            </Link>
+            <Logo logoType={!isDashboard} />
           </div>
           <Flex
             sx={{

@@ -76,7 +76,6 @@ const featuresListItems: IconListItemProps[] = [
 ];
 
 const HomePage = ({ content, preview }) => {
-  console.log(content);
   return (
     <Layout
       title={`Home - Livepeer`}

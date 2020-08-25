@@ -7,7 +7,7 @@ import {
 } from "@theme-ui/components";
 import Button from "../Button";
 import Link from "next/link";
-import Logo from "../../public/img/logo.svg";
+import Logo from "../Logo";
 import { FiX } from "react-icons/fi";
 
 const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
@@ -32,30 +32,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
         py: 3
       }}
     >
-      <Link href="/" passHref>
-        <A
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            textDecoration: "none",
-            color: "text"
-          }}
-        >
-          <Logo sx={{ color: "primary" }} />
-          {!token && (
-            <Box
-              sx={{
-                ml: "12px",
-                fontWeight: 500,
-                fontSize: "18px"
-              }}
-            >
-              livepeer.com
-            </Box>
-          )}
-        </A>
-      </Link>
+      <Logo logoType={!token} />
       <IconButton
         sx={{ fontSize: 6 }}
         onClick={() => setMobileMenuIsOpen(false)}
