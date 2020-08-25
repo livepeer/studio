@@ -4,8 +4,18 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 import { getComponent } from "../lib/utils";
+import { useRouter } from "next/router";
+import { Spinner } from "@theme-ui/components";
 
 const Page = ({ title, content, preview }) => {
+  const router = useRouter();
+  if (router.isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
   return (
     <Layout
       title={`${title} - Livepeer`}
@@ -29,9 +39,11 @@ export async function getStaticPaths() {
     }
   );
   let paths = [];
-  allPage.map((page) => paths.push({ params: { slug: page.slug.current } }));
+  for (const page of allPage) {
+    paths.push({ params: { slug: page.slug.current } });
+  }
   return {
-    fallback: false,
+    fallback: true,
     paths,
   };
 }
