@@ -71,6 +71,10 @@ export const theme = {
       color: "white",
       bg: "primary",
       py: "10px",
+      transition: "background-color .15s",
+      "&:hover": {
+        bg: "#761EE1"
+      },
       ":focus": {
         outline: "none",
         boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
@@ -83,6 +87,10 @@ export const theme = {
       borderWidth: "1px",
       borderColor: "primary",
       borderStyle: "solid",
+      transition: "background-color .15s",
+      "&:hover": {
+        bg: "#761EE1"
+      },
       ":focus": {
         outline: "none",
         boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
@@ -143,16 +151,22 @@ export const theme = {
       fontSize: 1,
       fontWeight: 600,
       "&:last-of-type": { mr: 0 }
+    },
+    footer: {
+      color: "background",
+      "&:hover": {
+        textDecoration: "underline"
+      }
     }
   },
   layout: {
     container: {
       maxWidth: 1328,
-      px: [3, null, 5]
+      px: [4, null, 5]
     },
     content: {
       maxWidth: 1122,
-      px: [3, null, 5],
+      px: [4, null, 5],
       py: [5, 6],
       mx: "auto"
     }
@@ -229,7 +243,10 @@ export const theme = {
       lineHeight: "body"
     },
     a: {
-      color: "extremelyBlue"
+      color: "primary",
+      "&:hover": {
+        textDecoration: "underline"
+      }
     },
     pre: {
       borderRadius: 12,

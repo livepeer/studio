@@ -5,13 +5,14 @@ import {
   Link as A,
   IconButton
 } from "@theme-ui/components";
-import Link from "next/link";
+import Link from "../Link";
 import { useApi } from "../../hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Menu from "./menu";
 import { useRouter } from "next/router";
 import Logo from "../Logo";
+import Button from "../Button";
 
 const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -77,11 +78,11 @@ const Navigation = () => {
               alignItems: "center"
             }}
           >
-            <Link href="/docs" passHref>
-              <A variant="nav">Docs</A>
+            <Link href="/docs" variant="nav">
+              Docs
             </Link>
-            <Link href="/#contactSection" passHref>
-              <A variant="nav">Contact Us</A>
+            <Link href="/#contactSection" variant="nav">
+              Contact Us
             </Link>
           </Flex>
           <Flex
@@ -94,32 +95,39 @@ const Navigation = () => {
           >
             {!loggedIn && (
               <>
-                <Link href="/login" passHref>
-                  <A variant="nav" sx={{ fontWeight: 600, mr: 3 }}>
-                    Log in
-                  </A>
+                <Link
+                  href="/login"
+                  variant="nav"
+                  sx={{ fontWeight: 600, mr: 3 }}
+                >
+                  Log in
                 </Link>
-                <Link href="/register" passHref>
-                  <A variant="buttons.secondarySmall">Sign up</A>
-                </Link>
+                <Button
+                  variant="buttons.secondarySmall"
+                  href="/register"
+                  isLink
+                >
+                  Sign up
+                </Button>
               </>
             )}
             {loggedIn && (
               <>
                 {user && user.admin && !isDashboard && (
-                  <Link href="/app/admin" passHref>
-                    <A variant="nav">Admin</A>
+                  <Link href="/app/admin" variant="nav">
+                    Admin
                   </Link>
                 )}
-
                 <A variant="nav" onClick={() => logout()}>
                   Log Out
                 </A>
                 {!isDashboard && (
-                  <Link href="/app/user" passHref>
-                    <A variant="buttons.outlineSmall" sx={{ ml: 2 }}>
-                      Dashboard
-                    </A>
+                  <Link
+                    href="/app/user"
+                    variant="buttons.outlineSmall"
+                    sx={{ ml: 2 }}
+                  >
+                    Dashboard
                   </Link>
                 )}
               </>

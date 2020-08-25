@@ -42,7 +42,8 @@ const Hero = ({
           minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center"
+          justifyContent: "center",
+          px: [3, null, null, 0]
         }}
       >
         <Box
@@ -53,11 +54,7 @@ const Hero = ({
             textAlign: "center"
           }}
         >
-          <Styled.h1
-            sx={{
-              fontSize: [48, 56, 64, 72]
-            }}
-          >
+          <Styled.h1 sx={{ fontSize: [40, 56, 64, 72] }}>
             <span sx={{ fontWeight: 400 }}>The platform built to power</span>
             <br />
             video-centric UGC applications at scale.
