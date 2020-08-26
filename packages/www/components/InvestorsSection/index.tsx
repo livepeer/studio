@@ -3,8 +3,15 @@ import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import { Text } from "@theme-ui/components";
 
-const InvestorsSection = ({ heading, investors }) => {
-  const builder = imageUrlBuilder(client as any);
+const investorIds = [
+  "northzone",
+  "compound",
+  "dgc",
+  "collaborative-fund",
+  "notation"
+];
+
+const InvestorsSection = () => {
   return (
     <Box
       sx={{
@@ -14,18 +21,16 @@ const InvestorsSection = ({ heading, investors }) => {
       }}
     >
       <Container>
-        {heading && (
-          <Text
-            sx={{
-              fontSize: [2, 3],
-              textAlign: "center",
-              color: "lightGray",
-              mb: 4
-            }}
-          >
-            {heading}
-          </Text>
-        )}
+        <Text
+          sx={{
+            fontSize: [2, 3],
+            textAlign: "center",
+            color: "lightGray",
+            mb: 4
+          }}
+        >
+          Backed by these amazing organizations and trusted by the best
+        </Text>
       </Container>
       <Container>
         <Grid
@@ -33,7 +38,16 @@ const InvestorsSection = ({ heading, investors }) => {
           gap={[5]}
           columns={[1, 3, 5]}
         >
-          {investors.map((investor, i) => (
+          {investorIds.map((id) => (
+            <img
+              key={id}
+              src={`/img/investors/${id}.svg`}
+              alt={`${id} logo`}
+              className="lazyload"
+              sx={{ justifySelf: "center" }}
+            />
+          ))}
+          {/* {investors.map((investor, i) => (
             <img
               key={i}
               width={investor.asset.metadata.dimensions.width}
@@ -43,7 +57,7 @@ const InvestorsSection = ({ heading, investors }) => {
               className="lazyload"
               data-src={builder.image(investor).url()}
             />
-          ))}
+          ))} */}
         </Grid>
       </Container>
     </Box>

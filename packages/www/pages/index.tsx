@@ -18,6 +18,10 @@ import {
   FiGlobe
 } from "react-icons/fi";
 import Prefooter from "../components/Prefooter";
+import Hero from "../components/Hero";
+import InvestorsSection from "../components/InvestorsSection";
+import TestimonialsSection from "../components/TestimonialsSection";
+import ContactSection from "../components/ContactSection";
 
 // TODO this data should come from Sanity
 const benefitsListItems: IconListItemProps[] = [
@@ -84,40 +88,60 @@ const HomePage = ({ content, preview }) => {
       preview={preview}
       withGradientBackground
     >
-      {content.map((component, i) => (
-        <Fade key={i}>{getComponent(component)}</Fade>
-      ))}
-      {/* TODO this data should come from Sanity */}
-      <SectionLayout
-        heading={{
-          title:
-            "A platform uniquely tailored to address the needs of today’s video-centric UGC platforms",
-          tag: "Benefits",
-          cta: { children: "Sign up for free" }
-        }}
-        gradient="colorful"
-      >
-        <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-          {benefitsListItems.map((item) => (
-            <IconListItem key={`benefits-list-item-${item.title}`} {...item} />
-          ))}
-        </Grid>
-      </SectionLayout>
-      <SectionLayout
-        heading={{
-          title:
-            "Feature-rich, high quality streaming and on-demand video for your project",
-          tag: "Features",
-          cta: { children: "Sign up for free" }
-        }}
-      >
-        <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-          {featuresListItems.map((item) => (
-            <IconListItem key={`features-list-item-${item.title}`} {...item} />
-          ))}
-        </Grid>
-      </SectionLayout>
-      <Prefooter />
+      <Fade key={0}>
+        <Hero />
+      </Fade>
+      <Fade key={1}>
+        <SectionLayout
+          heading={{
+            title:
+              "A platform uniquely tailored to address the needs of today’s video-centric UGC platforms",
+            tag: "Benefits",
+            cta: { children: "Sign up for free" }
+          }}
+          gradient="colorful"
+        >
+          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
+            {benefitsListItems.map((item) => (
+              <IconListItem
+                key={`benefits-list-item-${item.title}`}
+                {...item}
+              />
+            ))}
+          </Grid>
+        </SectionLayout>
+      </Fade>
+      <Fade key={2}>
+        <SectionLayout
+          heading={{
+            title:
+              "Feature-rich, high quality streaming and on-demand video for your project",
+            tag: "Features",
+            cta: { children: "Sign up for free" }
+          }}
+        >
+          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
+            {featuresListItems.map((item) => (
+              <IconListItem
+                key={`features-list-item-${item.title}`}
+                {...item}
+              />
+            ))}
+          </Grid>
+        </SectionLayout>
+      </Fade>
+      <Fade key={3}>
+        <InvestorsSection />
+      </Fade>
+      <Fade key={4}>
+        <TestimonialsSection />
+      </Fade>
+      <Fade key={4}>
+        <ContactSection />
+      </Fade>
+      <Fade key={5}>
+        <Prefooter />
+      </Fade>
     </Layout>
   );
 };
