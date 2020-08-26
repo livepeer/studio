@@ -15,7 +15,7 @@ export default ({ children }) => {
           bg: "white",
           borderBottom: "1px solid",
           borderColor: "muted",
-          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)",
+          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)"
         }}
       >
         <Container>
@@ -26,14 +26,14 @@ export default ({ children }) => {
               cursor: "pointer",
               pb: 3,
               pt: 3,
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <svg
               sx={{
                 mr: 3,
                 ml: "1px",
-                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)"
               }}
               width="6"
               height="10"
@@ -65,12 +65,12 @@ export default ({ children }) => {
               display: [
                 isOpen ? "block" : "none",
                 isOpen ? "block" : "none",
-                "block",
+                "block"
               ],
               left: 0,
               zIndex: 10,
               pt: 2,
-              px: 3,
+              px: 3
             }}
           >
             <Box sx={{ mb: 3 }}>
@@ -79,7 +79,7 @@ export default ({ children }) => {
           </Box>
           <Box
             className="markdown-body"
-            sx={{ pt: [2, 2, 0], a: { color: "extremelyBlue" }, pl: [0, 0, 4] }}
+            sx={{ pt: [2, 2, 0], a: { color: "primary" }, pl: [0, 0, 4] }}
           >
             {children}
           </Box>

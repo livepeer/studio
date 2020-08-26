@@ -92,7 +92,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
             <A variant="buttons.outline">Admin</A>
           </Link>
         )}
-        <Link href="/#contactSection" passHref>
+        <Link href="/docs" passHref>
           <A
             sx={{
               color: "text",
@@ -100,10 +100,21 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
               py: 3
             }}
           >
-            Contact
+            Docs
           </A>
         </Link>
-        <Link href="/docs" passHref>
+        <Link href="/contact" passHref>
+          <A
+            sx={{
+              color: "text",
+              textDecoration: "none",
+              py: 3
+            }}
+          >
+            Blog
+          </A>
+        </Link>
+        <Link href="/contact" passHref>
           <A
             sx={{
               color: "text",
@@ -112,7 +123,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
               mb: 0
             }}
           >
-            Docs
+            Contact
           </A>
         </Link>
       </Flex>

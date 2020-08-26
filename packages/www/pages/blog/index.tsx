@@ -34,7 +34,7 @@ const BlogIndex = ({ categories, posts }) => {
           pb: 5,
           ul: { mb: 4 },
           p: { mb: 4 },
-          margin: "0 auto",
+          margin: "0 auto"
         }}
       >
         <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>Blog</h1>
@@ -47,7 +47,7 @@ const BlogIndex = ({ categories, posts }) => {
           sx={{
             borderBottom: "1px solid rgba(55,54,77,.1)",
             alignItems: "center",
-            mb: 4,
+            mb: 4
           }}
         >
           {categories.map((c, i) => (
@@ -64,6 +64,9 @@ const BlogIndex = ({ categories, posts }) => {
                   display: "block",
                   color: "black",
                   textDecoration: "none",
+                  ":hover": {
+                    textDecoration: "none"
+                  }
                 }}
               >
                 <Box
@@ -75,7 +78,7 @@ const BlogIndex = ({ categories, posts }) => {
                         : "transparent"
                     }`,
                     pb: 3,
-                    mr: 4,
+                    mr: 4
                   }}
                 >
                   {c.title}
@@ -106,8 +109,11 @@ const BlogIndex = ({ categories, posts }) => {
                     marginRight: "auto",
                     cursor: "pointer",
                     ":last-of-type": {
-                      borderBottom: 0,
+                      borderBottom: 0
                     },
+                    ":hover": {
+                      textDecoration: "none"
+                    }
                   }}
                 >
                   <Flex sx={{ flexDirection: ["column", "column", "row"] }}>
@@ -123,7 +129,7 @@ const BlogIndex = ({ categories, posts }) => {
                           width: ["100%", "100%", 240],
                           minWidth: 240,
                           objectFit: "cover",
-                          mr: 4,
+                          mr: 4
                         }}
                         className="lazyload"
                         data-src={builder.image(p.mainImage).url()}
@@ -135,14 +141,14 @@ const BlogIndex = ({ categories, posts }) => {
                           alignItems: "center",
                           fontSize: 1,
                           color: "grey",
-                          mb: 3,
+                          mb: 3
                         }}
                       >
                         {new Date(p._createdAt).toLocaleDateString("en-US", {
                           weekday: "long",
                           year: "numeric",
                           month: "long",
-                          day: "numeric",
+                          day: "numeric"
                         })}
                         <Box
                           sx={{
@@ -150,13 +156,13 @@ const BlogIndex = ({ categories, posts }) => {
                             mx: 3,
                             width: "1px",
                             height: 16,
-                            bg: "grey",
+                            bg: "grey"
                           }}
                         />
                         <Box
                           sx={{
                             display: ["block", "block", "none"],
-                            color: "grey",
+                            color: "grey"
                           }}
                         >
                           {p.category.title}
@@ -177,7 +183,7 @@ const BlogIndex = ({ categories, posts }) => {
                             width: 30,
                             borderRadius: 1000,
                             objectFit: "cover",
-                            mr: 3,
+                            mr: 3
                           }}
                           className="lazyload"
                           data-src={builder.image(p.author.image).url()}
@@ -189,7 +195,7 @@ const BlogIndex = ({ categories, posts }) => {
                         <Box
                           sx={{
                             display: ["none", "none", "block"],
-                            color: "grey",
+                            color: "grey"
                           }}
                         >
                           {p.category.title}
@@ -200,7 +206,7 @@ const BlogIndex = ({ categories, posts }) => {
                             mx: 3,
                             width: "1px",
                             height: 16,
-                            bg: "grey",
+                            bg: "grey"
                           }}
                         />
                         <Box sx={{ color: "grey" }}>{stats.text}</Box>
@@ -224,7 +230,7 @@ export async function getStaticProps({ params }) {
   );
   categories.push({ title: "All", slug: { current: "" } });
   const {
-    allPost: posts,
+    allPost: posts
   } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
@@ -234,9 +240,9 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       categories: categories.reverse(),
-      posts,
+      posts
     },
-    revalidate: 1,
+    revalidate: 1
   };
 }
 

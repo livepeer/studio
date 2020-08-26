@@ -1,5 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
   try {

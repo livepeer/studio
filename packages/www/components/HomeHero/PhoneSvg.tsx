@@ -216,7 +216,7 @@ const Frame = () => (
       rx="48.75"
       fill="white"
       stroke="#C4C4C4"
-      stroke-width="0.5"
+      strokeWidth="0.5"
     />
     <rect x="24" y="26" width="740" height="343" rx="37" fill="#127C9D" />
     <defs>
@@ -228,8 +228,8 @@ const Frame = () => (
         y2="393.5"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="white" stop-opacity="0" />
-        <stop offset="1" stop-color="#F2F2F2" />
+        <stop stopColor="white" stopOpacity="0" />
+        <stop offset="1" stopColor="#F2F2F2" />
       </linearGradient>
       <linearGradient
         id="paint1_linear"
@@ -239,8 +239,8 @@ const Frame = () => (
         y2="197.5"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="#F2F2F2" />
-        <stop offset="1" stop-color="white" stop-opacity="0" />
+        <stop stopColor="#F2F2F2" />
+        <stop offset="1" stopColor="white" stopOpacity="0" />
       </linearGradient>
     </defs>
   </svg>

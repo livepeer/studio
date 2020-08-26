@@ -48,8 +48,8 @@ const RegisterPage = () => {
             mx: "auto"
           }}
         >
-          Sign up to try Livepeer’s transcoding platform, and qualify for 1,000
-          free transcoding input minutes per month forever.
+          Sign up to try Livepeer.com's video-centric UGC platform, and qualify
+          for 1,000 free transcoding input minutes per month.
         </Box>
         <Login
           id="register"

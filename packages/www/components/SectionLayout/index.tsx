@@ -8,6 +8,7 @@ import {
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
 import slugify from "@sindresorhus/slugify";
+import Link from "next/link";
 
 type Props = {
   heading: {
