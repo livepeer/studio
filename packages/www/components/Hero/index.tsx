@@ -1,45 +1,24 @@
 import { Styled } from "theme-ui";
-import { Grid, Flex, Container, Box, Link as A } from "@theme-ui/components";
-import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
-import { Link as ScrollLink } from "react-scroll";
-import ArrowRight from "../../public/img/arrow-right.svg";
-import Link from "next/link";
+import { Flex, Container, Box } from "@theme-ui/components";
+import Textfield from "../Textfield";
+import Button from "../Button";
+import HeroVideo from "./Video";
+import { Text } from "@theme-ui/components";
+import PhoneSvg from "./PhoneSvg";
 
-type Props = {
-  heading?: string;
-  tagline?: string;
-  centered?: boolean;
-  skinny?: boolean;
-  image?: any;
-  ctas?: [];
-};
-
-const Hero = ({
-  heading,
-  tagline,
-  centered = false,
-  skinny = false,
-  image,
-  ctas,
-  ...props
-}: Props) => {
-  const builder = imageUrlBuilder(client as any);
+const Hero = () => {
   return (
     <Box
       sx={{
         mt: [5, 5, 5, 0],
         overflow: "hidden",
-        borderBottom: skinny ? "0" : "1px solid",
-        borderColor: "muted",
-        pt: skinny ? 4 : 0,
-        pb: skinny ? 4 : "65px"
+        pt: 6,
+        pb: "65px"
       }}
-      {...props}
     >
       <Container
         sx={{
-          minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
+          minHeight: ["auto", "auto", "calc(100vh - 130px)"],
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -59,59 +38,61 @@ const Hero = ({
             <br />
             video-centric UGC applications at scale.
           </Styled.h1>
-          {ctas && (
-            <Flex
+          <Flex
+            sx={{
+              mt: 5,
+              flexDirection: ["column", "row"],
+              justifyContent: "center",
+              width: "100%",
+              alignItems: "center"
+            }}
+          >
+            <Textfield
+              label="Enter your email"
+              sx={{ width: ["188px", "320px"] }}
+            />
+            <Button
               sx={{
-                mt: "44px",
-                flexDirection: ["column", "row"],
-                justifyContent: "center",
-                width: "100%",
-                alignItems: "center"
+                height: "55px",
+                ml: [0, 3],
+                mt: [3, 0],
+                width: ["184px", "unset"]
               }}
             >
-              {ctas.map((cta, i) => (
-                <Box key={i}>{renderSwitch(cta)}</Box>
-              ))}
-            </Flex>
-          )}
+              Get Started
+            </Button>
+          </Flex>
+          <div
+            sx={{
+              my: 6,
+              position: "relative",
+              height: 700,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "flex-end"
+            }}
+          >
+            <HeroVideo />
+            <PhoneSvg />
+          </div>
+          <div sx={{ my: 6 }}>
+            <Styled.h2 sx={{ mb: 4, lineHeight: 1.3 }}>
+              Reliable, affordable, high-quality streaming for all of your video
+              content.
+            </Styled.h2>
+            <Text sx={{ fontSize: "18px", lineHeight: 1.7 }}>
+              By leveraging decentralized infrastructure, Livepeer delivers a
+              video platform that focuses on what user-generated content (UGC)
+              applications need. Affordable, scalable and reliable, the Livepeer
+              platform combines high-quality transcoding with powerful APIs and
+              features that are essential for a seamless creator experience.
+            </Text>
+          </div>
         </Box>
       </Container>
     </Box>
   );
 };
-
-function renderSwitch(cta) {
-  switch (true) {
-    case !!cta.internalLink?.slug?.current:
-      return (
-        <Link href={cta.internalLink?.slug?.current} passHref>
-          <A variant="buttons.secondary">{cta.title}</A>
-        </Link>
-      );
-    case !!cta.externalLink:
-      return (
-        <A
-          sx={{ display: "flex", alignItems: "center" }}
-          variant={cta.variant}
-          target="__blank"
-          href={cta.externalLink}
-        >
-          {cta.title}
-          <ArrowRight sx={{ ml: 2 }} />
-        </A>
-      );
-    default:
-      return (
-        <ScrollLink offset={-40} to={cta.anchorLink} spy smooth>
-          <Box
-            variant="buttons.secondary"
-            sx={{ mr: [0, 0, 4], mb: [3, 3, 0] }}
-          >
-            {cta.title}
-          </Box>
-        </ScrollLink>
-      );
-  }
-}
 
 export default Hero;
