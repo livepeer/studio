@@ -101,7 +101,7 @@ export default () => {
             <Link href="/blog" passHref>
               <A variant="nav">Blog</A>
             </Link>
-            <Link href="/#contactSection" passHref>
+            <Link href="/contact" passHref>
               <A variant="nav">Contact Us</A>
             </Link>
             {!loggedIn && (
