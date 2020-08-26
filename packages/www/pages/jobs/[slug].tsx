@@ -47,37 +47,19 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params, preview = false }) {
   const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    {
-      ...(preview && {
-        headers: {
-          authorization: `Bearer ${process.env.SANITY_API_TOKEN}`,
-        },
-      }),
-    }
+    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
   let data: any = await graphQLClient.request(print(allJobs), {
     where: {
-      _: { is_draft: preview },
       slug: { current: { eq: params.slug } },
     },
   });
 
-  // if in preview mode but no draft exists, then return published post
-  if (preview && !data.allJob.length) {
-    data = await graphQLClient.request(print(allJobs), {
-      where: {
-        _: { is_draft: false },
-        slug: { current: { eq: params.slug } },
-      },
-    });
-  }
-
   return {
     props: {
       ...data.allJob[0],
-      preview,
+      preview: false,
     },
     revalidate: 1,
   };
