@@ -75,6 +75,7 @@ const Footer = () => {
             <Textfield
               label="Enter your email"
               name="email"
+              id="email-footer"
               sx={{ width: "100%", maxWidth: "276px" }}
             />
           </form>

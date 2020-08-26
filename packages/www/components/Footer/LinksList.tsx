@@ -8,8 +8,11 @@ export type LinksListProps = {
 const LinksList = ({ heading, links }: LinksListProps) => (
   <ul>
     <li sx={{ fontWeight: 600, mb: 3 }}>{heading}</li>
-    {links.map((link) => (
-      <li key={`link-${link.href}`} sx={{ "&:not(:last-of-type)": { mb: 3 } }}>
+    {links.map((link, i) => (
+      <li
+        key={`link-${link.href}-${i}`}
+        sx={{ "&:not(:last-of-type)": { mb: 3 } }}
+      >
         <Link {...link} variant="footer" />
       </li>
     ))}

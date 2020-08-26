@@ -23,7 +23,6 @@ import InvestorsSection from "../components/InvestorsSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import ContactSection from "../components/ContactSection";
 
-// TODO this data should come from Sanity
 const benefitsListItems: IconListItemProps[] = [
   {
     icon: <FiUserCheck />,
@@ -51,7 +50,6 @@ const benefitsListItems: IconListItemProps[] = [
   }
 ];
 
-// TODO this data should come from Sanity
 const featuresListItems: IconListItemProps[] = [
   {
     icon: <FiCode />,
@@ -79,13 +77,12 @@ const featuresListItems: IconListItemProps[] = [
   }
 ];
 
-const HomePage = ({ content, preview }) => {
+const HomePage = () => {
   return (
     <Layout
       title={`Home - Livepeer`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com`}
-      preview={preview}
       withGradientBackground
     >
       <Fade key={0}>
@@ -136,52 +133,14 @@ const HomePage = ({ content, preview }) => {
       <Fade key={4}>
         <TestimonialsSection />
       </Fade>
-      <Fade key={4}>
+      <Fade key={5}>
         <ContactSection />
       </Fade>
-      <Fade key={5}>
+      <Fade key={6}>
         <Prefooter />
       </Fade>
     </Layout>
   );
 };
-
-export async function getStaticProps({ preview = false }) {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    {
-      ...(preview && {
-        headers: {
-          authorization: `Bearer ${process.env.SANITY_API_TOKEN}`
-        }
-      })
-    }
-  );
-
-  let data: any = await graphQLClient.request(print(allPages), {
-    where: {
-      _: { is_draft: preview },
-      slug: { current: { eq: "home" } }
-    }
-  });
-
-  // if in preview mode but no draft exists, then return published post
-  if (preview && !data.allPage.length) {
-    data = await graphQLClient.request(print(allPages), {
-      where: {
-        _: { is_draft: false },
-        slug: { current: { eq: "home" } }
-      }
-    });
-  }
-
-  return {
-    props: {
-      ...data.allPage[0],
-      preview
-    },
-    revalidate: 1
-  };
-}
 
 export default HomePage;

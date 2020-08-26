@@ -132,6 +132,12 @@ export const theme = {
       fontSize: 14,
       px: 3,
       py: "6px"
+    },
+    icon: {
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
     }
   },
   forms: {
