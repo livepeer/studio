@@ -4,10 +4,10 @@ import { Box, Flex, Container } from "@theme-ui/components";
 import Textfield from "../Textfield";
 import { useForm } from "react-hubspot";
 import Button from "../Button";
-import SimpleBlockContent from "../SimpleBlockContent";
 import Fade from "react-reveal/Fade";
+import Link from "../Link";
 
-const ContactSection = ({ heading, body }) => {
+const ContactSection = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -35,11 +35,19 @@ const ContactSection = ({ heading, body }) => {
       }}
     >
       <Box sx={{ mb: 48, textAlign: "center" }}>
-        {heading && (
-          <Styled.h2 sx={{ fontSize: [5, 5, 6], mb: 3 }}>{heading}</Styled.h2>
-        )}
+        <Styled.h2 sx={{ fontSize: [5, 5, 6], mb: 3 }}>
+          Get in touch with us
+        </Styled.h2>
         <Box sx={{ maxWidth: 512, margin: "0 auto" }}>
-          {body && <SimpleBlockContent blocks={body} />}
+          If you’d like to learn more about Livepeer’s innovative UGC focused
+          video platform drop us a note and we’ll get right back to you!
+          <br />
+          <br />
+          or email us at{" "}
+          <Link href="mailto:hello@livepeer.com" isExternal>
+            hello@livepeer.com
+          </Link>
+          .
         </Box>
       </Box>
       <form

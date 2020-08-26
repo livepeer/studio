@@ -1,19 +1,24 @@
 import { Box, Flex } from "@theme-ui/components";
-import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
 import { Text } from "@theme-ui/components";
+import { SxStyleProp } from "theme-ui";
 
-const builder = imageUrlBuilder(client as any);
+export type TestimonialCardProps = {
+  id: string;
+  quote: string;
+  author: {
+    name: string;
+    role: string;
+    company: string;
+  };
+  pushSx?: SxStyleProp;
+};
 
 const TestimonialCard = ({
-  companyLogo,
+  id,
   quote,
-  image,
-  name,
-  role,
-  company,
-  ...props
-}) => (
+  author,
+  pushSx
+}: TestimonialCardProps) => (
   <Box
     sx={{
       position: "relative",
@@ -21,7 +26,7 @@ const TestimonialCard = ({
       py: 32,
       px: 24,
       borderRadius: 24,
-      height: [356, 407],
+      minHeight: [360, null, null, 432],
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
@@ -30,52 +35,48 @@ const TestimonialCard = ({
       "&:hover": {
         boxShadow:
           "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-      }
+      },
+      ...pushSx
     }}
-    {...props}
   >
-    {companyLogo && (
-      <img
-        alt={companyLogo.alt}
-        className="lazyload"
-        data-src={builder.image(companyLogo).url()}
-        width={companyLogo.asset.metadata.dimensions.width}
-        height={companyLogo.asset.metadata.dimensions.height}
-      />
-    )}
-    <Box sx={{ fontWeight: 400, mb: 4, fontSize: [3, 4] }}>"{quote}"</Box>
-    <Flex
-      sx={{
-        fontWeight: 500,
-        alignItems: "center",
-        justifyContent: "flex-start",
-        height: [75, 90]
-      }}
-    >
-      <img
-        alt={image.alt}
-        className="lazyload"
-        data-src={builder.image(image).url()}
-        width={image.asset.metadata.dimensions.width}
-        height={image.asset.metadata.dimensions.height}
+    <img
+      alt={`${id} logo`}
+      className="lazyload"
+      src={`/img/testimonials/${id}/logo.svg`}
+    />
+    <div sx={{ mt: 3 }}>
+      <Box sx={{ fontWeight: 400, mb: 4, fontSize: [3, 4] }}>"{quote}"</Box>
+      <Flex
         sx={{
-          width: [56, 72],
-          height: [56, 72],
-          minWidth: [56, 72],
-          minHeight: [56, 72],
-          objectFit: "cover",
-          objectPosition: "center",
-          borderRadius: 1000,
-          mr: 2
+          fontWeight: 500,
+          alignItems: "center",
+          justifyContent: "flex-start",
+          height: [75, 90]
         }}
-      />
-      <Box>
-        <Text sx={{ fontWeight: 600 }}>{name}</Text>
-        <Text sx={{ fontWeight: 400 }}>
-          {role}, {company}
-        </Text>
-      </Box>
-    </Flex>
+      >
+        <img
+          alt={`${author.name} avatar`}
+          src={`/img/testimonials/${id}/avatar.png`}
+          className="lazyload"
+          sx={{
+            width: [56, 72],
+            height: [56, 72],
+            minWidth: [56, 72],
+            minHeight: [56, 72],
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: 1000,
+            mr: 2
+          }}
+        />
+        <Box>
+          <Text sx={{ fontWeight: 600 }}>{author.name}</Text>
+          <Text sx={{ fontWeight: 400 }}>
+            {author.role}, {author.company}
+          </Text>
+        </Box>
+      </Flex>
+    </div>
   </Box>
 );
 
