@@ -143,25 +143,8 @@ const Post = ({
 
 export default Post;
 
-export async function getStaticPaths() {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
-  const { allPost } = await graphQLClient.request(print(allPosts), {
-    where: {},
-  });
-
-  let paths = [];
-  for (const post of allPost) {
-    paths.push({ params: { slug: post.slug.current } });
-  }
-  return {
-    fallback: true,
-    paths,
-  };
-}
-
-export async function getStaticProps({ params, preview = false }) {
+export async function getServerSideProps({ params }) {
+  const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
@@ -175,8 +158,43 @@ export async function getStaticProps({ params, preview = false }) {
   return {
     props: {
       ...data.allPost[0],
-      preview: false,
     },
-    revalidate: 1,
   };
 }
+// export async function getStaticPaths() {
+//   const graphQLClient = new GraphQLClient(
+//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+//   );
+//   const { allPost } = await graphQLClient.request(print(allPosts), {
+//     where: {},
+//   });
+
+//   let paths = [];
+//   for (const post of allPost) {
+//     paths.push({ params: { slug: post.slug.current } });
+//   }
+//   return {
+//     fallback: true,
+//     paths,
+//   };
+// }
+
+// export async function getStaticProps({ params, preview = false }) {
+//   const graphQLClient = new GraphQLClient(
+//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+//   );
+
+//   let data: any = await graphQLClient.request(print(allPosts), {
+//     where: {
+//       slug: { current: { eq: params.slug } },
+//     },
+//   });
+
+//   return {
+//     props: {
+//       ...data.allPost[0],
+//       preview: false,
+//     },
+//     revalidate: 1,
+//   };
+// }
