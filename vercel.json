@@ -1,14 +1,13 @@
 {
   "version": 2,
   "public": true,
-  "functions": {
-    "packages/www/next.config.json": {
-      "runtime": "@vercel/next@2.6.23"
-    },
-    "packages/admin/package.json": {
-      "runtime": "@vercel/static-build@0.17.7"
+  "builds": [
+    { "src": "packages/www/package.json", "use": "@now/next" },
+    {
+      "src": "packages/admin/package.json",
+      "use": "@now/static-build"
     }
-  },
+  ],
   "rewrites": [
     {
       "source": "/admin/static/(.*)",
