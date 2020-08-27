@@ -127,6 +127,13 @@ export default async function makeApp(params) {
   // Special case: handle /stream proxies off that endpoint
   app.use('/stream', streamProxy)
 
+  // fix for bad links
+  app.get('/app/user/verify', (req, res) => {
+    const url = new URL(req.url)
+    url.host = req.frontendDomain
+    res.redirect(url.toString())
+  })
+
   // This far down, this would otherwise be a 404... hit up the fallback proxy if we have it.
   // Mostly this is used for proxying to the Next.js server in development.
   if (fallbackProxy) {
