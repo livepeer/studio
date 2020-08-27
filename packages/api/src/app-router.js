@@ -129,7 +129,7 @@ export default async function makeApp(params) {
 
   // fix for bad links
   app.get('/app/user/verify', (req, res) => {
-    res.redirect(`${req.frontendDomain}${req.url}`)
+    res.redirect(301, `${req.protocol}://${req.frontendDomain}${req.url}`)
   })
 
   // This far down, this would otherwise be a 404... hit up the fallback proxy if we have it.
