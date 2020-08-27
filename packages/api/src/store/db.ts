@@ -13,6 +13,7 @@ import {
   PasswordResetToken,
 } from '../schema/types'
 import Table from './table'
+import StreamTable from './stream-table'
 import { kebabToCamel } from '../util'
 
 // Should be configurable, perhaps?
@@ -20,7 +21,7 @@ const CONNECT_TIMEOUT = 5000
 
 export class DB {
   // Table objects
-  stream: Table<Stream>
+  stream: StreamTable
   objectStore: Table<ObjectStore>
   apiToken: Table<ApiToken>
   user: Table<User>
@@ -63,13 +64,29 @@ export class DB {
   }
 
   async makeTables() {
+    const schemas = schema.components.schemas
+    this.stream = new StreamTable({ db: this, schema: schemas['stream'] })
+    this.objectStore = new Table<ObjectStore>({
+      db: this,
+      schema: schemas['object-store'],
+    })
+    this.apiToken = new Table<ApiToken>({
+      db: this,
+      schema: schemas['api-token'],
+    })
+    this.user = new Table<User>({ db: this, schema: schemas['user'] })
+    this.webhook = new Table<Webhook>({ db: this, schema: schemas['webhook'] })
+    this.passwordResetToken = new Table<PasswordResetToken>({
+      db: this,
+      schema: schemas['password-reset-token'],
+    })
+
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => !!schema.table,
     )
     await Promise.all(
       tables.map(([name, schema]) => {
         const camelName = kebabToCamel(name)
-        this[camelName] = new Table({ db: this, schema })
         return this[camelName].ensureTable()
       }),
     )
