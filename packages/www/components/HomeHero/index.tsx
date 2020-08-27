@@ -18,6 +18,7 @@ import {
   getDynamicBreakpoints
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
+import { Heading } from "@theme-ui/components";
 
 const HomeHero = () => {
   const router = useRouter();
@@ -181,10 +182,10 @@ const HomeHero = () => {
             <PhoneSvg ref={phoneRef} />
           </div>
           <div sx={{ my: 6 }}>
-            <Styled.h2 sx={{ mb: 4, lineHeight: 1.3 }}>
+            <Heading variant="heading.section" sx={{ mb: 4, lineHeight: 1.3 }}>
               Reliable, affordable, high-quality streaming for all of your video
               content.
-            </Styled.h2>
+            </Heading>
             <Text sx={{ fontSize: "18px", lineHeight: 1.7 }}>
               By leveraging decentralized infrastructure, Livepeer delivers a
               video platform that focuses on what user-generated content (UGC)

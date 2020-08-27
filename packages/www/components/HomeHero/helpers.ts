@@ -58,7 +58,7 @@ function getProportionalValue(
   // 3. We calculate what we'll substract from the total
   const toSubstract = scope * currentScrollFraction;
   // 4. Substract and format
-  const value = breakpoint.initial - toSubstract;
+  const value = Math.round((breakpoint.initial - toSubstract) * 100) / 100;
   return breakpoint.formatter(value);
 }
 
