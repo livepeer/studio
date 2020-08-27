@@ -31,6 +31,7 @@ export default async function makeApp(params) {
     httpPrefix = '/api',
     port,
     postgresUrl,
+    postgresReplicaUrl,
     cloudflareNamespace,
     cloudflareAccount,
     cloudflareAuth,
@@ -67,7 +68,11 @@ export default async function makeApp(params) {
 
   // Storage init
   const bodyParser = require('body-parser')
-  const [db, store] = await makeStore({ postgresUrl, schema })
+  const [db, store] = await makeStore({
+    postgresUrl,
+    postgresReplicaUrl,
+    schema,
+  })
 
   // Logging, JSON parsing, store injection
 
