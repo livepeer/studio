@@ -36,7 +36,7 @@ export default async function makeApp(params) {
     cloudflareAuth,
     listen = true,
     clientId,
-    trustedDomain,
+    frontendDomain = 'livepeer.com',
     jwtSecret,
     jwtAudience,
     supportAddr,
@@ -77,6 +77,7 @@ export default async function makeApp(params) {
   app.use((req, res, next) => {
     req.store = store
     req.config = params
+    req.frontendDomain = frontendDomain // defaults to livepeer.com
     next()
   })
   if (insecureTestToken) {
