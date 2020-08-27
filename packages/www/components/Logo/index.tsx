@@ -17,6 +17,7 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         display: "inline-flex",
         alignItems: "center",
         cursor: "pointer",
+        letterSpacing: "-.5px",
         ":hover": {
           textDecoration: "none"
         }
