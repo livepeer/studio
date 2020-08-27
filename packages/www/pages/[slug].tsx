@@ -35,7 +35,7 @@ export async function getStaticPaths() {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPages),
     {
-      where: {},
+      where: {}
     }
   );
   let paths = [];
@@ -44,7 +44,7 @@ export async function getStaticPaths() {
   }
   return {
     fallback: true,
-    paths,
+    paths
   };
 }
 
@@ -55,16 +55,16 @@ export async function getStaticProps({ params, preview = false }) {
 
   let data: any = await graphQLClient.request(print(allPages), {
     where: {
-      slug: { current: { eq: params.slug } },
-    },
+      slug: { current: { eq: params.slug } }
+    }
   });
 
   return {
     props: {
       ...data.allPage[0],
-      preview: false,
+      preview: false
     },
-    revalidate: 1,
+    revalidate: 1
   };
 }
 
