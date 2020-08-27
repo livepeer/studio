@@ -15,6 +15,7 @@ import {
   toPx,
   getTransform,
   toPercent,
+  scrollToEnterPhone,
   maxScroll
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
@@ -32,13 +33,26 @@ const HomeHero = () => {
       "#background-gradient"
     ) as HTMLDivElement;
 
-    // Animate bottom
-    videoRef.current.style.bottom = getProportionalValue(
-      scrollTop,
-      breakpoints.bottom,
-      toPx,
-      maxScroll
-    );
+    // We have two 'phases' for the bottom:
+    if (scrollTop < scrollToEnterPhone) {
+      // Animate bottom first phase
+      videoRef.current.style.bottom = getProportionalValue(
+        scrollTop,
+        breakpoints.bottom,
+        toPx
+      );
+    } else {
+      // Animate bottom second phase
+      videoRef.current.style.bottom = getProportionalValue(
+        scrollTop,
+        breakpoints.bottomSecondPhase,
+        toPx,
+        scrollToEnterPhone,
+        maxScroll
+      );
+    }
+    // Animation continues...
+
     // Animate transform
     videoRef.current.style.transform = getProportionalValue(
       scrollTop,
@@ -152,7 +166,7 @@ const HomeHero = () => {
             sx={{
               my: 6,
               position: "relative",
-              height: 700,
+              height: maxScroll,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",

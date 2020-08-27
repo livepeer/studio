@@ -18,9 +18,11 @@ const Notch = () => (
     sx={{
       position: "absolute",
       top: "50%",
-      left: 23,
       zIndex: notchZIndex,
-      transform: "translateY(-50%)"
+      transform: "translateY(-50%)",
+      width: "4%",
+      left: "3%",
+      maxWidth: "27px"
     }}
   >
     <path
@@ -198,7 +200,14 @@ const Frame = () => (
     viewBox={`0 0 ${phoneFrameMaxWidth} ${phoneFrameMaxHeight}`}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    sx={{ position: "absolute", top: 0, bottom: 0, right: 0, left: 0 }}
+    sx={{
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      maxWidth: "100%"
+    }}
   >
     <path
       d="M57 392.5H109.5C109.5 393.052 109.948 393.5 110.5 393.5H139.5C140.052 393.5 140.5 393.052 140.5 392.5H174C174 393.052 174.448 393.5 175 393.5H234C234.552 393.5 235 393.052 235 392.5H252C252.276 392.5 252.5 392.724 252.5 393C252.5 393.276 252.724 393.5 253 393.5H312.5C312.776 393.5 313 393.276 313 393C313 392.724 313.224 392.5 313.5 392.5H731C762.48 392.5 788 366.98 788 335.5V254.5C788 223.02 762.48 197.5 731 197.5H57C25.5198 197.5 0 223.02 0 254.5V335.5C0 366.98 25.5198 392.5 57 392.5Z"
@@ -218,7 +227,7 @@ const Frame = () => (
       stroke="#C4C4C4"
       strokeWidth="0.5"
     />
-    <rect x="24" y="26" width="740" height="343" rx="37" fill="#127C9D" />
+    <rect x="24" y="26" width="740" height="343" rx="37" fill="#efefef" />
     <defs>
       <linearGradient
         id="paint0_linear"
