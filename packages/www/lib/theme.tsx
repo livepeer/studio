@@ -260,7 +260,6 @@ export const theme = {
       overflowX: "auto",
       padding: 4,
       cursor: "text",
-      backgroundColor: (t) => `${t.colors.primary} !important`,
       code: {
         color: "inherit",
         WebkitFontSmoothing: "antialiased"
