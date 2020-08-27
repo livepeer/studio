@@ -8,11 +8,12 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
   <div
     ref={ref}
     sx={{
-      width: "100%",
+      width: "83.69vw",
       mx: "auto",
       position: "absolute",
       zIndex: notchZIndex - 1,
-      overflow: "hidden"
+      overflow: "hidden",
+      borderRadius: ["4vw", null, null, "36px"]
     }}
   >
     <figure sx={{ width: "100%", position: "relative" }}>

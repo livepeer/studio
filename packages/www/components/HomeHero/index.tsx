@@ -12,9 +12,6 @@ import { useCallback } from "react";
 import {
   getProportionalValue,
   breakpoints,
-  toPx,
-  getTransform,
-  toPercent,
   scrollToEnterPhone,
   maxScroll
 } from "./helpers";
@@ -38,15 +35,13 @@ const HomeHero = () => {
       // Animate bottom first phase
       videoRef.current.style.bottom = getProportionalValue(
         scrollTop,
-        breakpoints.bottom,
-        toPx
+        breakpoints.bottom
       );
     } else {
       // Animate bottom second phase
       videoRef.current.style.bottom = getProportionalValue(
         scrollTop,
         breakpoints.bottomSecondPhase,
-        toPx,
         scrollToEnterPhone,
         maxScroll
       );
@@ -56,20 +51,12 @@ const HomeHero = () => {
     // Animate transform
     videoRef.current.style.transform = getProportionalValue(
       scrollTop,
-      breakpoints.rotateX,
-      getTransform
+      breakpoints.rotateX
     );
     // Animate maxWidth
     videoRef.current.style.maxWidth = getProportionalValue(
       scrollTop,
-      breakpoints.maxWidth,
-      toPx
-    );
-    // Animate borderRadius
-    videoRef.current.style.borderRadius = getProportionalValue(
-      scrollTop,
-      breakpoints.borderRadius,
-      toPx
+      breakpoints.maxWidth
     );
     // Animate linear gradient background's opacity
     gradient.style.opacity = getProportionalValue(
@@ -79,8 +66,7 @@ const HomeHero = () => {
     // Animate figure's aspect ratio
     figure.style.paddingBottom = getProportionalValue(
       scrollTop,
-      breakpoints.aspectRatio,
-      toPercent
+      breakpoints.aspectRatio
     );
   }, [videoRef.current]);
 
