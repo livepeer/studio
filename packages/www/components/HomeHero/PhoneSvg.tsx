@@ -1,4 +1,5 @@
 import { getAspectRatio } from "../../lib/utils";
+import { forwardRef } from "react";
 
 export const phoneFrameMaxWidth = 788;
 export const phoneFrameMaxHeight = 394;
@@ -32,7 +33,7 @@ const Notch = () => (
       fill="white"
     />
     <mask
-      id="mask0"
+      id="phone-notch-mask0"
       mask-type="alpha"
       maskUnits="userSpaceOnUse"
       x="2"
@@ -42,7 +43,7 @@ const Notch = () => (
     >
       <rect x="2" y="77" width="8" height="48" rx="4" fill="#F5F5F5" />
     </mask>
-    <g mask="url(#mask0)">
+    <g mask="url(#phone-notch-mask0)">
       <rect x="2" y="77" width="8" height="48" rx="4" fill="#F5F5F5" />
       <g opacity="0.5">
         <path
@@ -200,6 +201,7 @@ const Frame = () => (
     viewBox={`0 0 ${phoneFrameMaxWidth} ${phoneFrameMaxHeight}`}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    id="phone-frame"
     sx={{
       position: "absolute",
       top: 0,
@@ -211,11 +213,11 @@ const Frame = () => (
   >
     <path
       d="M57 392.5H109.5C109.5 393.052 109.948 393.5 110.5 393.5H139.5C140.052 393.5 140.5 393.052 140.5 392.5H174C174 393.052 174.448 393.5 175 393.5H234C234.552 393.5 235 393.052 235 392.5H252C252.276 392.5 252.5 392.724 252.5 393C252.5 393.276 252.724 393.5 253 393.5H312.5C312.776 393.5 313 393.276 313 393C313 392.724 313.224 392.5 313.5 392.5H731C762.48 392.5 788 366.98 788 335.5V254.5C788 223.02 762.48 197.5 731 197.5H57C25.5198 197.5 0 223.02 0 254.5V335.5C0 366.98 25.5198 392.5 57 392.5Z"
-      fill="url(#paint0_linear)"
+      fill="url(#phone-frame-paint0_linear)"
     />
     <path
       d="M184.5 2.5H57C25.5198 2.5 0 28.0198 0 59.5V140.5C0 171.98 25.5198 197.5 57 197.5H731C762.48 197.5 788 171.98 788 140.5V59.5C788 28.0198 762.48 2.5 731 2.5H278.5V1C278.5 0.447715 278.052 0 277.5 0H185.5C184.948 0 184.5 0.447715 184.5 1V2.5Z"
-      fill="url(#paint1_linear)"
+      fill="url(#phone-frame-paint1_linear)"
     />
     <rect
       x="10.25"
@@ -230,7 +232,7 @@ const Frame = () => (
     <rect x="24" y="26" width="740" height="343" rx="37" fill="#efefef" />
     <defs>
       <linearGradient
-        id="paint0_linear"
+        id="phone-frame-paint0_linear"
         x1="394"
         y1="197.5"
         x2="394"
@@ -241,7 +243,7 @@ const Frame = () => (
         <stop offset="1" stopColor="#F2F2F2" />
       </linearGradient>
       <linearGradient
-        id="paint1_linear"
+        id="phone-frame-paint1_linear"
         x1="394"
         y1="0"
         x2="394"
@@ -255,8 +257,9 @@ const Frame = () => (
   </svg>
 );
 
-const PhoneSvg = () => (
+const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
   <div
+    ref={ref}
     sx={{
       width: "100%",
       maxWidth: phoneFrameMaxWidth,
@@ -276,7 +279,6 @@ const PhoneSvg = () => (
       <Frame />
     </div>
   </div>
-);
-
+));
 export default PhoneSvg;
 export { Notch, Frame };

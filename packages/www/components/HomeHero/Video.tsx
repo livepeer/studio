@@ -8,7 +8,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
   <div
     ref={ref}
     sx={{
-      width: "83.69vw",
+      width: "100%",
       mx: "auto",
       position: "absolute",
       zIndex: notchZIndex - 1,

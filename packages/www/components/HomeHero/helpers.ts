@@ -5,7 +5,7 @@ const phonePadding = 48;
 const maxScroll = 1082;
 const scrollToEnterPhone = maxScroll - phoneFrameMaxHeight;
 
-type Breakpoint = {
+export type Breakpoint = {
   initial: number;
   target: number;
   formatter: (value: number) => string;
@@ -40,12 +40,6 @@ const breakpoints: { [key: string]: Breakpoint } = {
   }
 };
 
-breakpoints.bottomSecondPhase = {
-  initial: breakpoints.bottom.target,
-  target: 24,
-  formatter: (v: number) => `${v}px`
-};
-
 /**
  * To calculate value in proportion of the scrollTop
  */
@@ -68,4 +62,44 @@ function getProportionalValue(
   return breakpoint.formatter(value);
 }
 
-export { maxScroll, scrollToEnterPhone, breakpoints, getProportionalValue };
+export type DynamicBreakpoints = {
+  bottomSecondPhase: Breakpoint;
+  maxWidth: Breakpoint;
+};
+
+/**
+ * Some breakpoints depend on the frame's width, which is retrieved on render
+ */
+function getDynamicBreakpoints(): DynamicBreakpoints {
+  const { clientWidth } = document.querySelector("#phone-frame") as SVGElement;
+  const paddingFraction = 25 / 788;
+
+  const phonePadding = Math.round(clientWidth * paddingFraction * 100) / 100;
+
+  const maxMaxWidth = window.innerWidth * 0.8;
+  const initialMaxWidthCandidate = clientWidth * 1.2;
+
+  return {
+    bottomSecondPhase: {
+      initial: breakpoints.bottom.target,
+      target: phonePadding,
+      formatter: (v: number) => `${v}px`
+    },
+    maxWidth: {
+      initial:
+        initialMaxWidthCandidate < maxMaxWidth
+          ? initialMaxWidthCandidate
+          : maxMaxWidth,
+      target: clientWidth - phonePadding * 2,
+      formatter: (v: number) => `${v}px`
+    }
+  };
+}
+
+export {
+  maxScroll,
+  scrollToEnterPhone,
+  breakpoints,
+  getProportionalValue,
+  getDynamicBreakpoints
+};

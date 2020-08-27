@@ -13,7 +13,9 @@ import {
   getProportionalValue,
   breakpoints,
   scrollToEnterPhone,
-  maxScroll
+  maxScroll,
+  DynamicBreakpoints,
+  getDynamicBreakpoints
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 
@@ -21,9 +23,24 @@ const HomeHero = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const videoRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const [dynamicBreakpoints, setDynamicBreakpoints] = useState<
+    DynamicBreakpoints
+  >();
+
+  const onResize = useCallback(() => {
+    setDynamicBreakpoints(getDynamicBreakpoints());
+  }, []);
+
+  useEffect(() => {
+    onResize();
+    window.addEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
+  }, [onResize]);
 
   const handleScroll = useCallback(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !dynamicBreakpoints) return;
     const { scrollTop } = document.documentElement;
     const figure = videoRef.current.querySelector("figure") as HTMLElement;
     const gradient = videoRef.current.querySelector(
@@ -41,7 +58,7 @@ const HomeHero = () => {
       // Animate bottom second phase
       videoRef.current.style.bottom = getProportionalValue(
         scrollTop,
-        breakpoints.bottomSecondPhase,
+        dynamicBreakpoints.bottomSecondPhase,
         scrollToEnterPhone,
         maxScroll
       );
@@ -56,7 +73,7 @@ const HomeHero = () => {
     // Animate maxWidth
     videoRef.current.style.maxWidth = getProportionalValue(
       scrollTop,
-      breakpoints.maxWidth
+      dynamicBreakpoints.maxWidth
     );
     // Animate linear gradient background's opacity
     gradient.style.opacity = getProportionalValue(
@@ -68,19 +85,19 @@ const HomeHero = () => {
       scrollTop,
       breakpoints.aspectRatio
     );
-  }, [videoRef.current]);
+  }, [videoRef.current, dynamicBreakpoints]);
 
   useEffect(() => {
     handleScroll();
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [handleScroll]);
 
   return (
     <Box
       sx={{
-        mt: [5, 5, 5, 0],
+        mt: [3, 3, 4, 0],
         overflow: "hidden",
         pt: 6,
         pb: "65px"
@@ -92,7 +109,7 @@ const HomeHero = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          px: [3, null, null, 0]
+          px: [3, null, 0]
         }}
       >
         <Box
@@ -114,10 +131,10 @@ const HomeHero = () => {
                 e.preventDefault();
                 router.push(`/register?email=${email}`);
               }}
+              sx={{ mt: 5 }}
             >
               <Flex
                 sx={{
-                  mt: 5,
                   flexDirection: ["column", "row"],
                   justifyContent: "center",
                   width: "100%",
@@ -150,7 +167,8 @@ const HomeHero = () => {
           </div>
           <div
             sx={{
-              my: 6,
+              mb: 6,
+              mt: [-6, 4, null, 6],
               position: "relative",
               height: maxScroll,
               display: "flex",
@@ -160,7 +178,7 @@ const HomeHero = () => {
             }}
           >
             <HeroVideo ref={videoRef} />
-            <PhoneSvg />
+            <PhoneSvg ref={phoneRef} />
           </div>
           <div sx={{ my: 6 }}>
             <Styled.h2 sx={{ mb: 4, lineHeight: 1.3 }}>
