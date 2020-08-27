@@ -62,6 +62,7 @@ export class DB {
     }
 
     await this.query('SELECT NOW()')
+    await this.replicaQuery('SELECT NOW()')
     await this.makeTables()
   }
 
@@ -92,6 +93,9 @@ export class DB {
 
   async replicaQuery(query, ...params) {
     console.log(query)
+    if (params && !params.useReplica) {
+      return this.pool.query(query, ...params)
+    }
     return (this.replicaPool)? this.replicaPool.query(query, ...params) : this.pool.query(query, ...params)
   }
 }
