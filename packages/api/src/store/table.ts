@@ -2,6 +2,7 @@ import sql, { SQLStatement } from 'sql-template-strings'
 import { DB } from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
+import { QueryArrayResult } from 'pg'
 
 interface TableSchema {
   table: string
@@ -42,12 +43,13 @@ export default class Table<T extends DBObject> {
     if (!id) {
       throw new Error('missing id')
     }
+    let res: QueryArrayResult<any[]>
     if (!opts.useReplica) {
-      const res = await this.db.query(
+      res = await this.db.query(
         sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
       )
     } else {
-      const res = await this.db.replicaQuery(
+      res = await this.db.replicaQuery(
         sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
       )
     }
