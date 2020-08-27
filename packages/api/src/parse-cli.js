@@ -45,8 +45,8 @@ export default function parseCli(argv) {
           describe: 'google auth ID',
           type: 'string',
         },
-        'trusted-domain': {
-          describe: 'trusted google domain, example: livepeer.org',
+        'frontend-domain': {
+          describe: 'the domain used in templating urls, example: livepeer.org',
           type: 'string',
         },
         'kube-namespace': {

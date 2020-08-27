@@ -36,7 +36,7 @@ export default async function makeApp(params) {
     cloudflareAuth,
     listen = true,
     clientId,
-    trustedDomain,
+    frontendDomain = 'livepeer.com',
     jwtSecret,
     jwtAudience,
     supportAddr,
@@ -77,6 +77,7 @@ export default async function makeApp(params) {
   app.use((req, res, next) => {
     req.store = store
     req.config = params
+    req.frontendDomain = frontendDomain // defaults to livepeer.com
     next()
   })
   if (insecureTestToken) {
@@ -125,6 +126,11 @@ export default async function makeApp(params) {
   app.use(httpPrefix, prefixRouter)
   // Special case: handle /stream proxies off that endpoint
   app.use('/stream', streamProxy)
+
+  // fix for bad links
+  app.get('/app/user/verify', (req, res) => {
+    res.redirect(301, `${req.protocol}://${req.frontendDomain}${req.url}`)
+  })
 
   // This far down, this would otherwise be a 404... hit up the fallback proxy if we have it.
   // Mostly this is used for proxying to the Next.js server in development.

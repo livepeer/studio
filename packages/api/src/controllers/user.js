@@ -82,7 +82,7 @@ app.post('/', validatePost('user'), async (req, res) => {
     req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'
 
   const verificationUrl = `${protocol}://${
-    req.headers.host
+    req.frontendDomain
   }/app/user/verify?${qs.stringify({ email, emailValidToken })}`
   const unsubscribeUrl = `${protocol}://${req.headers.host}/#contactSection`
 
