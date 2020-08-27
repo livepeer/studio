@@ -47,8 +47,15 @@ const Prefooter = () => (
           flexDirection: ["column", "row"]
         }}
       >
-        <Button sx={{ mr: [0, 2], mb: [2, 0] }}>Sign up for free</Button>
-        <Button variant="buttons.text" sx={{ color: "background" }}>
+        <Button isLink={true} href="/register" sx={{ mr: [0, 2], mb: [2, 0] }}>
+          Sign up for free
+        </Button>
+        <Button
+          isLink={true}
+          href="/contact"
+          variant="buttons.text"
+          sx={{ color: "background" }}
+        >
           Contact sales
         </Button>
       </Flex>

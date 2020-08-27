@@ -1,4 +1,4 @@
-import { Container, Box } from "@theme-ui/components";
+import { Container, Box, Link as A } from "@theme-ui/components";
 import Logo from "../Logo";
 import { Text } from "@theme-ui/components";
 import { Grid } from "@theme-ui/components";
@@ -95,10 +95,10 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link
-                href="mailto:hello@livepeer.com"
-                variant="footer"
-                isExternal
+              <A
+                href="https://www.linkedin.com/company/livepeer"
+                rel="noopener noreferrer"
+                target="__blank"
               >
                 <svg
                   width="32"
@@ -115,8 +115,12 @@ const Footer = () => {
                     fill="#fff"
                   />
                 </svg>
-              </Link>
-              <Link href="mailto:hello@livepeer.com" isExternal>
+              </A>
+              <A
+                href="https://twitter.com/livepeerorg"
+                rel="noopener noreferrer"
+                target="__blank"
+              >
                 <svg
                   width="32"
                   height="32"
@@ -132,7 +136,7 @@ const Footer = () => {
                     fill="#fff"
                   />
                 </svg>
-              </Link>
+              </A>
             </li>
           </ul>
         </Grid>
