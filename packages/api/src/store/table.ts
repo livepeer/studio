@@ -20,6 +20,10 @@ interface FindOptions {
   limit?: number
 }
 
+interface GetOptions {
+  useReplica: boolean
+}
+
 export default class Table<T extends DBObject> {
   db: DB
   schema: TableSchema
@@ -31,14 +35,23 @@ export default class Table<T extends DBObject> {
   }
 
   // get a single document by id
-  async get(id: string): Promise<T> {
+  async get(
+    id: string,
+    opts: GetOptions = {useReplica: true}
+  ): Promise<T> {
     if (!id) {
       throw new Error('missing id')
     }
-    const res = await this.db.query(
-      sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
-    )
-
+    if (!opts.useReplica) {
+      const res = await this.db.query(
+        sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
+      )
+    } else {
+      const res = await this.db.replicaQuery(
+        sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
+      )
+    }
+    
     if (res.rowCount < 1) {
       return null
     }
@@ -84,8 +97,8 @@ export default class Table<T extends DBObject> {
 
     q.append(' ORDER BY id ASC')
     q.append(sql` LIMIT ${limit}`)
-
-    const res = await this.db.query(q)
+    
+    const res = await this.db.replicaQuery(q)
 
     const docs = res.rows.map(({ data }) => data)
 
