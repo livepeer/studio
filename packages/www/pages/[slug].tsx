@@ -4,8 +4,18 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 import { getComponent } from "../lib/utils";
+import { useRouter } from "next/router";
+import { Spinner } from "@theme-ui/components";
 
 const Page = ({ title, content, preview }) => {
+  const router = useRouter();
+  if (router.isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
   return (
     <Layout
       title={`${title} - Livepeer`}
@@ -29,46 +39,30 @@ export async function getStaticPaths() {
     }
   );
   let paths = [];
-  allPage.map((page) => paths.push({ params: { slug: page.slug.current } }));
+  for (const page of allPage) {
+    paths.push({ params: { slug: page.slug.current } });
+  }
   return {
-    fallback: false,
+    fallback: true,
     paths,
   };
 }
 
 export async function getStaticProps({ params, preview = false }) {
   const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    {
-      ...(preview && {
-        headers: {
-          authorization: `Bearer ${process.env.SANITY_API_TOKEN}`,
-        },
-      }),
-    }
+    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
   let data: any = await graphQLClient.request(print(allPages), {
     where: {
-      _: { is_draft: preview },
       slug: { current: { eq: params.slug } },
     },
   });
 
-  // if in preview mode but no draft exists, then return published post
-  if (preview && !data.allPage.length) {
-    data = await graphQLClient.request(print(allPages), {
-      where: {
-        _: { is_draft: false },
-        slug: { current: { eq: params.slug } },
-      },
-    });
-  }
-
   return {
     props: {
       ...data.allPage[0],
-      preview,
+      preview: false,
     },
     revalidate: 1,
   };

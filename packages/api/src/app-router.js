@@ -1,13 +1,7 @@
 // import 'express-async-errors' // it monkeypatches, i guess
 import Router from 'express/lib/router'
 import bearerToken from 'express-bearer-token'
-import {
-  LevelStore,
-  PostgresStore,
-  CloudflareStore,
-  CloudflareClusterStore,
-  FirestoreStore,
-} from './store'
+import makeStore from './store'
 import {
   healthCheck,
   kubernetes,
@@ -20,6 +14,7 @@ import streamProxy from './controllers/stream-proxy'
 import apiProxy from './controllers/api-proxy'
 import proxy from 'http-proxy-middleware'
 import { getBroadcasterHandler } from './controllers/broadcaster'
+import schema from './schema/schema.json'
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -27,7 +22,6 @@ const GEOLOCATION_ENDPOINTS = [
   'orchestrator',
   'ingest',
   'geolocate',
-  'user',
 ]
 
 export default async function makeApp(params) {
@@ -73,27 +67,7 @@ export default async function makeApp(params) {
 
   // Storage init
   const bodyParser = require('body-parser')
-  let store
-  if (storage === 'level') {
-    store = LevelStore({ dbPath })
-  } else if (storage === 'postgres') {
-    store = PostgresStore({ postgresUrl })
-  } else if (storage === 'cloudflare') {
-    store = CloudflareStore({
-      cloudflareNamespace,
-      cloudflareAccount,
-      cloudflareAuth,
-    })
-  } else if (storage === 'cloudflare-cluster') {
-    store = CloudflareClusterStore({
-      cloudflareNamespace,
-    })
-  } else if (storage === 'firestore') {
-    store = FirestoreStore({ firestoreCredentials, firestoreCollection })
-  } else {
-    throw new Error('Missing storage information')
-  }
-  await store.ready
+  const [db, store] = await makeStore({ postgresUrl, schema })
 
   // Logging, JSON parsing, store injection
 
@@ -164,12 +138,14 @@ export default async function makeApp(params) {
       res.status(err.status)
       return res.json({ errors: [err.message] })
     }
-
-    next(err)
+    res.status(500)
+    console.error(err)
+    return res.json({ errors: [err.stack] })
   })
 
   return {
     router: app,
     store,
+    db,
   }
 }

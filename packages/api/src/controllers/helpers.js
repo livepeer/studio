@@ -2,6 +2,8 @@ import crypto from 'isomorphic-webcrypto'
 import util from 'util'
 import fetch from 'isomorphic-fetch'
 import SendgridMail from '@sendgrid/mail'
+import { db } from '../store'
+import sql from 'sql-template-strings'
 
 let Encoder
 if (typeof TextEncoder === 'undefined') {
@@ -190,14 +192,22 @@ export async function fetchSegmentApi(body, endpoint, apiKey) {
   })
 }
 
-export async function getWebhooks(store, userId, event, limit = 100, cursor = undefined, includeDeleted = false) {
-  let filter = (o) => (!o.deleted || includeDeleted) && (!event || o.event === event)
-  const resp = await store.queryObjects({
-    kind: 'webhook',
-    query: { userId },
-    limit,
-    cursor,
-    filter
-  })
-  return resp
+export async function getWebhooks(
+  store,
+  userId,
+  event,
+  limit = 100,
+  cursor = undefined,
+  includeDeleted = false,
+) {
+  const query = [sql`data->>'userId' = ${userId}`]
+  if (event) {
+    query.push(sql`data->>'event' = ${event}`)
+  }
+  if (!includeDeleted) {
+    query.push(sql`data->>'deleted' IS NULL`)
+  }
+  const [webhooks, nextCursor] = await db.webhook.find(query, { limit, cursor })
+
+  return { data: webhooks, cursor: nextCursor }
 }

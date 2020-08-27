@@ -81,7 +81,10 @@ const Navigation = () => {
             <Link href="/docs" variant="nav">
               Docs
             </Link>
-            <Link href="/#contactSection" variant="nav">
+            <Link href="/blog" variant="nav">
+              Blog
+            </Link>
+            <Link href="/contact" variant="nav">
               Contact Us
             </Link>
           </Flex>

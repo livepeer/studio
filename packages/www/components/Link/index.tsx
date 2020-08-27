@@ -14,7 +14,11 @@ export type LinkProps = {
 
 const Link = ({ isExternal, children, ...moreProps }: LinkProps) => {
   if (isExternal) {
-    return <A {...moreProps}>{children}</A>;
+    return (
+      <A target="_blank" rel="noopener" {...moreProps}>
+        {children}
+      </A>
+    );
   }
   const { asPath, href, ...anchorProps } = moreProps;
   return (

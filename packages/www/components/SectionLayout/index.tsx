@@ -1,10 +1,4 @@
-import {
-  Heading,
-  Text,
-  Flex,
-  Link as A,
-  Container
-} from "@theme-ui/components";
+import { Heading, Text, Flex, Container } from "@theme-ui/components";
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
 import slugify from "@sindresorhus/slugify";

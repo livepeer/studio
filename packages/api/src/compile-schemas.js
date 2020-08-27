@@ -8,23 +8,33 @@ import { compile as generateTypes } from 'json-schema-to-typescript'
 // This takes schema.yaml as its input and produces a few outputs.
 // 1. types.d.ts, TypeScript definitions of the JSON-schema objects
 // 2. the `validators` directory containing precompiled Ajv schemas for those objects
-// 3. schema.json
+// 3. src/schema/schema.json and dist/schema/schema.json
 
 const write = (dir, data) => {
+  if (fs.existsSync(dir)) {
+    const existing = fs.readFileSync(dir, 'utf8')
+    if (existing === data) {
+      return
+    }
+  }
   fs.writeFileSync(dir, data, 'utf8')
   console.log(`wrote ${dir}`)
 }
 
 const schemaDir = path.resolve(__dirname, 'schema')
 const validatorDir = path.resolve(schemaDir, 'validators')
+const schemaDistDir = path.resolve(__dirname, '..', 'dist', 'schema')
 fs.ensureDirSync(validatorDir)
+fs.ensureDirSync(schemaDistDir)
 
 const schemaStr = fs.readFileSync(
   path.resolve(schemaDir, 'schema.yaml'),
   'utf8',
 )
 const data = parseYaml(schemaStr)
-write(path.resolve(schemaDir, 'schema.json'), JSON.stringify(data, null, 2))
+const str = JSON.stringify(data, null, 2)
+write(path.resolve(schemaDir, 'schema.json'), str)
+write(path.resolve(schemaDistDir, 'schema.json'), str)
 const ajv = new Ajv({ sourceCode: true })
 
 const index = []

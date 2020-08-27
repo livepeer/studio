@@ -179,7 +179,6 @@ const makeContext = (state: ApiState, setState) => {
 
     async getUsers(opts = {}): Promise<[Response, Array<User> | ApiError]> {
       let [res, users] = await context.fetch(`/user`, opts);
-      users = users.map((o) => o[Object.keys(o)[0]]);
 
       if (res.status === 200) {
         return users;

@@ -1,14 +1,32 @@
+/**
+ * DEPRECATED. Use `db` for stuff instead of  `req.store`.
+ */
+
 import schema from '../schema/schema.json'
 import { NotFoundError, ForbiddenError, InternalServerError } from './errors'
+import { kebabToCamel } from '../util'
 
 export default class Model {
-  constructor(backend) {
-    this.backend = backend
-    this.ready = backend.ready
+  constructor(db) {
+    this.db = db
+    this.ready = db.ready
+  }
+
+  getTable(id) {
+    let [table, uuid] = id.split('/')
+    table = kebabToCamel(table)
+    if (!this.db[table]) {
+      throw new Error(`table not found: ${table}`)
+    }
+    return [table, uuid]
   }
 
   async get(id, cleanWriteOnly = true) {
-    const responses = await this.backend.get(id)
+    const [table, uuid] = this.getTable(id)
+    if (!this.db[table]) {
+      throw new Error(`table not found for ${id}`)
+    }
+    const responses = await this.db[table].get(uuid)
     if (responses && cleanWriteOnly) {
       return this.cleanWriteOnlyResponses(id, responses)
     }
@@ -26,66 +44,55 @@ export default class Model {
     }
 
     const key = `${kind}/${id}`
-    const record = await this.backend.get(key)
+    const record = await this.get(key)
 
     if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
 
-    return await this.backend.replace(key, data)
-
-    // NOTE: uncomment code below when replacing objects saved from indexes becomes relevant
-    // const operations = await this.getOperations(key, data)
-    // if (!operations) {
-    // return await this.backend.replace(key, data)
-    // }
-
-    // await Promise.all(
-    //   operations.map(([key, value]) => {
-    //     return this.backend.replace(key, value)
-    //   }),
-    // )
+    const [table] = this.getTable(kind)
+    return await this.db[table].replace(data)
   }
 
   async list({ prefix, cursor, limit, filter, cleanWriteOnly = true }) {
-    while (true) {
-      const responses = await this.backend.list(prefix, cursor, limit)
-      if (typeof filter == 'function') {
-        responses.data = responses.data.filter(filter)
-        if (!responses.data.length && responses.cursor) {
-          // filtered set are empty, but there is more in database,
-          // so let's try next page
-          cursor = responses.cursor
-          continue
-        }
-      }
-      if (responses.data.length > 0 && cleanWriteOnly) {
-        return this.cleanWriteOnlyResponses(prefix, responses)
-      }
-      return responses
+    if (filter) {
+      throw new Error('filter no longer supported, use `db.find` instead')
+    }
+    const [kind] = prefix.split('/')
+    const [table] = this.getTable(prefix)
+    let [docs, nextCursor] = await this.db[table].find({}, { limit, cursor })
+    if (docs.length > 0 && cleanWriteOnly) {
+      docs = docs.map((doc) => this.cleanWriteOnlyResponses(kind, doc))
+    }
+    return {
+      data: docs,
+      cursor: nextCursor,
     }
   }
 
   async listKeys(prefix, cursor, limit) {
-    return this.backend.listKeys(prefix, cursor, limit)
+    const [table] = this.getTable(prefix)
+    const [response, nextCursor] = await this.db[table].find(
+      {},
+      { limit, cursor },
+    )
+    const keys = response.map((x) => x.id)
+    return [keys, nextCursor]
   }
 
   async query({ kind, query, cursor, limit }) {
-    const [queryKey, ...others] = Object.keys(query)
+    const [_, ...others] = Object.keys(query)
     if (others.length > 0) {
       throw new Error('you may only query() by one key')
     }
-    const queryValue = query[queryKey]
-    const prefix = `${kind}+${queryKey}/${queryValue}/`
+    const [table] = this.getTable(kind)
+    const [docs, cursorOut] = await this.db[table].find(query, {
+      cursor,
+      limit,
+    })
+    const keys = docs.map((x) => x.id)
 
-    const [keys, cursorOut] = await this.backend.listKeys(prefix, cursor, limit)
-
-    const ids = []
-    for (let i = 0; i < keys.length; i++) {
-      ids.push(keys[i].split('/').pop())
-    }
-
-    return { data: ids, cursor: cursorOut }
+    return { data: keys, cursor: cursorOut }
   }
 
   async queryObjects({
@@ -96,63 +103,35 @@ export default class Model {
     filter,
     cleanWriteOnly = true,
   }) {
+    if (filter) {
+      throw new Error('filter no longer supported, use db[table].find')
+    }
     const [queryKey, ...others] = Object.keys(query)
     if (others.length > 0) {
       throw new Error('you may only query() by one key')
     }
-    const queryValue = query[queryKey]
-    const prefix = `${kind}+${queryKey}/${queryValue}/`
+    const [table] = this.getTable(kind)
 
-    while (true) {
-      const [keys, cursorOut] = await this.backend.listKeys(
-        prefix,
-        cursor,
-        limit,
-      )
-
-      const documents = []
-      for (let i = 0; i < keys.length; i++) {
-        const id = keys[i].split('/').pop()
-        const doc = await this.backend.get(`${kind}/${id}`)
-        if (doc && (typeof filter !== 'function' || filter(doc))) {
-          documents.push(
-            cleanWriteOnly ? this.cleanWriteOnlyResponses(kind, doc) : doc,
-          )
-        }
-      }
-      if (!documents.length && keys.length && cursorOut) {
-        cursor = cursorOut
-        continue
-      }
-      return { data: documents, cursor: cursorOut }
+    let [docs, cursorOut] = await this.db[table].find(query, { cursor, limit })
+    if (cleanWriteOnly) {
+      docs = docs.map((doc) => this.cleanWriteOnlyResponses(kind, doc))
     }
+    return { data: docs, cursor: cursorOut }
   }
 
   async deleteKey(key) {
-    const record = await this.get(key)
-    if (!record) {
-      throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
-    }
-    return await this.backend.delete(key)
+    return this.delete(key)
   }
 
   async delete(key) {
-    const [properties, kind] = this.getSchema(key)
-    const doc = await this.get(`${key}`)
-    if (!doc) {
+    const [table, id] = this.getTable(key)
+    const record = await this.db[table].get(id)
+    if (!record) {
       throw new NotFoundError(`key not found: ${JSON.stringify(key)}`)
     }
-
-    const operations = await this.getOperations(key, doc)
-
-    await Promise.all(
-      operations.map(([key, value]) => {
-        return this.backend.delete(key)
-      }),
-    )
+    return await this.db[table].delete(id)
   }
 
-  // before sending object back to user, pipe it through function. Write-only.
   async create(doc) {
     if (typeof doc !== 'object' || typeof doc.id !== 'string') {
       throw new Error(`invalid values: ${JSON.stringify(doc)}`)
@@ -162,57 +141,8 @@ export default class Model {
       throw new Error(`Missing required values: id, kind`)
     }
 
-    const item = await this.get(`${kind}/${id}`)
-    if (item) {
-      throw new Error(`${id} already exists`)
-    }
-
-    const [properties] = this.getSchema(kind)
-    if (properties) {
-      for (const [fieldName, fieldArray] of Object.entries(properties)) {
-        const value = doc[fieldName]
-        if (fieldArray.unique && value) {
-          const [keys] = await this.backend.listKeys(
-            `${kind}+${fieldName}/${value}`,
-          )
-          if (keys.length > 0) {
-            throw new ForbiddenError(
-              `there is already a ${kind} with ${fieldName}=${value}`,
-            )
-          }
-        }
-      }
-    }
-
-    const operations = await this.getOperations(`${kind}/${id}`, doc)
-
-    await Promise.all(
-      operations.map(([key, value]) => {
-        return this.backend.create(key, value)
-      }),
-    )
-  }
-
-  async getOperations(key, data) {
-    const [properties, kind] = this.getSchema(key)
-    if (!properties || properties.length) {
-      return null
-    }
-
-    const operations = [[key, data]]
-
-    if (properties) {
-      for (const [fieldName, fieldArray] of Object.entries(properties)) {
-        if (fieldArray.unique || fieldArray.index) {
-          operations.push(
-            // ex. user-emails/eli@iame.li/abc123
-            [`${kind}+${fieldName}/${data[fieldName]}/${data['id']}`, {}],
-          )
-        }
-      }
-    }
-
-    return operations
+    const [table] = this.getTable(kind)
+    return await this.db[table].create(doc)
   }
 
   getSchema(kind) {
@@ -259,6 +189,6 @@ export default class Model {
   }
 
   close() {
-    this.backend.close()
+    this.db.close()
   }
 }

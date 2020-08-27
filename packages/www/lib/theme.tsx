@@ -260,7 +260,6 @@ export const theme = {
       overflowX: "auto",
       padding: 4,
       cursor: "text",
-      backgroundColor: (t) => `${t.colors.primary} !important`,
       code: {
         color: "inherit",
         WebkitFontSmoothing: "antialiased"
@@ -360,6 +359,19 @@ const Reset = () => (
       },
       "table tr td :last-of-type": {
         marginBottom: "0"
+      },
+      "img.lazyload:not([src])": {
+        visibility: "hidden"
+      },
+      ".lazyload": {
+        opacity: 0
+      },
+      ".lazyloading": {
+        opacity: 0
+      },
+      ".lazyloaded": {
+        opacity: 1,
+        transition: "opacity .3s"
       }
     }}
   />

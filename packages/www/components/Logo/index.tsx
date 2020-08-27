@@ -16,7 +16,11 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         color: isDark ? "background" : "text",
         display: "inline-flex",
         alignItems: "center",
-        cursor: "pointer"
+        cursor: "pointer",
+        letterSpacing: "-.5px",
+        ":hover": {
+          textDecoration: "none"
+        }
       }}
     >
       <LogoSvg sx={{ color: isDark ? "background" : "text" }} />

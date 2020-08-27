@@ -18,7 +18,6 @@
     "@sanity/production-preview",
     "dashboard-widget-structure-menu",
     "dashboard-widget-document-list",
-    "dashboard-widget-netlify",
     "media",
     "markdown"
   ],

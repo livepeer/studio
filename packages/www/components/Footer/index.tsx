@@ -11,10 +11,8 @@ const linksLists: LinksListProps[] = [
     heading: "Company",
     links: [
       { children: "Home", href: "/" },
-      { children: "Product", href: "/" },
-      { children: "About", href: "/" },
-      { children: "Jobs", href: "/" },
-      { children: "Pricing", href: "/" }
+      { children: "About", href: "/team" },
+      { children: "Jobs", href: "/jobs" }
     ]
   },
   {
@@ -22,10 +20,8 @@ const linksLists: LinksListProps[] = [
     links: [
       { children: "Documentation", href: "/docs" },
       { children: "Blog", href: "/blog" },
-      { children: "Case Studies", href: "/blog" },
-      { children: "Contact", href: "/" },
-      { children: "Privacy Policy", href: "/" },
-      { children: "Terms of Service", href: "/" }
+      { children: "Contact", href: "/contact" },
+      { children: "Privacy Policy", href: "/privacy-policy" }
     ]
   }
 ];
@@ -99,11 +95,7 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link
-                href="mailto:hello@livepeer.com"
-                variant="footer"
-                isExternal
-              >
+              <Link href="https://www.linkedin.com/company/livepeer" isExternal>
                 <svg
                   width="32"
                   height="32"
@@ -120,7 +112,7 @@ const Footer = () => {
                   />
                 </svg>
               </Link>
-              <Link href="mailto:hello@livepeer.com" isExternal>
+              <Link href="https://twitter.com/livepeerorg" isExternal>
                 <svg
                   width="32"
                   height="32"

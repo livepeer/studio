@@ -1,13 +1,14 @@
 import isoFetch from 'isomorphic-fetch'
+import schema from './schema/schema.json'
 
 /**
  * Clear the entire database! Not to be used outside of tests
  */
 export async function clearDatabase(server) {
-  let [keys] = await server.store.listKeys('', undefined, undefined, false)
-  for (const key of keys) {
-    await server.store.deleteKey(key)
-  }
+  const tables = Object.values(schema.components.schemas)
+    .filter((x) => x.table)
+    .map((x) => x.table)
+  await Promise.all(tables.map((t) => server.db.query(`TRUNCATE TABLE ${t}`)))
 }
 
 export class TestClient {

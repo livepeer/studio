@@ -18,7 +18,7 @@ import {
   FiGlobe
 } from "react-icons/fi";
 import Prefooter from "../components/Prefooter";
-import Hero from "../components/Hero";
+import Hero from "../components/HomeHero";
 import InvestorsSection from "../components/InvestorsSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import ContactSection from "../components/ContactSection";
@@ -94,7 +94,11 @@ const HomePage = () => {
             title:
               "A platform uniquely tailored to address the needs of today’s video-centric UGC platforms",
             tag: "Benefits",
-            cta: { children: "Sign up for free" }
+            cta: {
+              isLink: true,
+              href: "/register",
+              children: "Sign up for free"
+            }
           }}
           gradient="colorful"
         >
@@ -114,7 +118,11 @@ const HomePage = () => {
             title:
               "Feature-rich, high quality streaming and on-demand video for your project",
             tag: "Features",
-            cta: { children: "Sign up for free" }
+            cta: {
+              isLink: true,
+              href: "/register",
+              children: "Sign up for free"
+            }
           }}
         >
           <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>

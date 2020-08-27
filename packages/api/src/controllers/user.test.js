@@ -130,7 +130,7 @@ describe('controllers/user', () => {
       res = await client.post('/user', {
         ...mockUser,
       })
-      expect(res.status).toBe(403)
+      expect(res.status).toBe(400)
     })
 
     it('should make a user an admin with admin email', async () => {

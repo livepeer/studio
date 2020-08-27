@@ -1,12 +1,34 @@
 import { Container, Flex, Box, Link as A } from "@theme-ui/components";
 import Layout from "../../components/Layout";
-import { GraphQLClient, request } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../queries/allPosts.gql";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import readingTime from "reading-time";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "next/router";
+import { Spinner } from "@theme-ui/components";
+import React from "react";
+import PropTypes from "prop-types";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+
+class CodeBlock extends React.PureComponent {
+  static propTypes = {
+    value: PropTypes.string.isRequired,
+    language: PropTypes.string
+  };
+
+  static defaultProps = {
+    language: null
+  };
+
+  render() {
+    const { language, value }: any = this.props;
+
+    return <SyntaxHighlighter language={language}>{value}</SyntaxHighlighter>;
+  }
+}
 
 const Post = ({
   title,
@@ -14,16 +36,27 @@ const Post = ({
   author,
   category,
   _createdAt,
+  excerpt,
   body,
-  preview,
+  preview
 }) => {
+  const { isFallback, asPath } = useRouter();
+  if (isFallback) {
+    return (
+      <Layout>
+        <Spinner />
+      </Layout>
+    );
+  }
+
   const stats = readingTime(body);
   const builder = imageUrlBuilder(client as any);
   return (
     <Layout
-      title={`${title} - Liveper`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com`}
+      title={`${title} - Livepeer`}
+      description={excerpt}
+      image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
+      url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
       <Box
@@ -33,8 +66,8 @@ const Post = ({
             "none",
             "none",
             "none",
-            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(250,245,239, 1) 45%, rgba(250,245,239, 1) 45%)",
-          ],
+            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(148, 60, 255,.08) 45%, rgba(255,255,255,.3) 100%);"
+          ]
         }}
       >
         <Container
@@ -42,43 +75,56 @@ const Post = ({
             flexDirection: ["column", "column", "column", "row"],
             display: "flex",
             gap: "12px",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
-          <Box sx={{ py: [40, 40, 40, 100], mr: [0, 0, 0, 5] }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              width: "100%",
+              maxWidth: 800,
+              py: [40, 40, 40, 100],
+              mr: [0, 0, 0, 5]
+            }}
+          >
             <img
-              alt={mainImage.alt}
+              alt={mainImage?.alt}
               width={700}
-              height={550}
+              height={400}
               sx={{
                 mt: [2, 0],
-                maxHeight: "550",
-                maxWidth: 700,
+                height: [300, 300, 400],
+                maxHeight: [300, 300, 400],
                 width: "100%",
-                objectFit: "cover",
+                objectFit: "cover"
               }}
               className="lazyload"
               data-src={builder.image(mainImage).url()}
             />
           </Box>
-          <Box>
+          <Box
+            sx={{
+              flexGrow: 0,
+              flexBasis: ["initial", "initial", "initial", 950]
+            }}
+          >
             <Flex sx={{ mb: 2, alignItems: "center", fontSize: 1 }}>
-              <Box sx={{ color: "grey" }}>
+              <Box>
                 {new Date(_createdAt).toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
-                  day: "numeric",
+                  day: "numeric"
                 })}
               </Box>
               <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
               <Box>{category.title}</Box>
             </Flex>
-            <h1 sx={{ fontSize: 56, mb: 2 }}>{title}</h1>
+            <h1 sx={{ fontSize: [32, 32, 48], my: 3 }}>{title}</h1>
             <Flex sx={{ alignItems: "center" }}>
               <Flex sx={{ alignItems: "center" }}>
                 <img
-                  alt={author.image.alt}
+                  alt={author.image?.alt}
                   width={40}
                   height={40}
                   sx={{
@@ -87,7 +133,7 @@ const Post = ({
                     width: 40,
                     borderRadius: 1000,
                     objectFit: "cover",
-                    mr: 3,
+                    mr: 3
                   }}
                   className="lazyload"
                   data-src={builder.image(author.image).url()}
@@ -97,7 +143,7 @@ const Post = ({
                   <Flex sx={{ alignItems: "center", fontSize: 1 }}>
                     <Box>By {author.name}</Box>
                     <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-                    <Box sx={{ color: "grey" }}>{stats.text}</Box>
+                    <Box>{stats.text}</Box>
                   </Flex>
                 </Box>
               </Flex>
@@ -107,9 +153,14 @@ const Post = ({
       </Box>
       <Container
         className="markdown-body"
-        sx={{ pb: 6, maxWidth: 960, margin: "0 auto" }}
+        sx={{ pb: 6, maxWidth: 768, margin: "0 auto" }}
       >
-        <ReactMarkdown>{body}</ReactMarkdown>
+        <ReactMarkdown
+          source={body}
+          renderers={{
+            code: CodeBlock
+          }}
+        />
       </Container>
     </Layout>
   );
@@ -117,56 +168,58 @@ const Post = ({
 
 export default Post;
 
-export async function getStaticPaths() {
+export async function getServerSideProps({ params }) {
+  const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
-  const { allPost } = await graphQLClient.request(print(allPosts), {
-    where: {},
-  });
-
-  let paths = [];
-  allPost.map((post) => paths.push({ params: { slug: post.slug.current } }));
-  return {
-    fallback: false,
-    paths,
-  };
-}
-
-export async function getStaticProps({ params, preview = false }) {
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    {
-      ...(preview && {
-        headers: {
-          authorization: `Bearer ${process.env.SANITY_API_TOKEN}`,
-        },
-      }),
-    }
   );
 
   let data: any = await graphQLClient.request(print(allPosts), {
     where: {
-      _: { is_draft: preview },
-      slug: { current: { eq: params.slug } },
-    },
+      slug: { current: { eq: params.slug } }
+    }
   });
-
-  // if in preview mode but no draft exists, then return published post
-  if (preview && !data.allPost.length) {
-    data = await graphQLClient.request(print(allPosts), {
-      where: {
-        _: { is_draft: false },
-        slug: { current: { eq: params.slug } },
-      },
-    });
-  }
 
   return {
     props: {
-      ...data.allPost[0],
-      preview,
-    },
-    revalidate: 1,
+      ...data.allPost[0]
+    }
   };
 }
+// export async function getStaticPaths() {
+//   const graphQLClient = new GraphQLClient(
+//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+//   );
+//   const { allPost } = await graphQLClient.request(print(allPosts), {
+//     where: {},
+//   });
+
+//   let paths = [];
+//   for (const post of allPost) {
+//     paths.push({ params: { slug: post.slug.current } });
+//   }
+//   return {
+//     fallback: true,
+//     paths,
+//   };
+// }
+
+// export async function getStaticProps({ params, preview = false }) {
+//   const graphQLClient = new GraphQLClient(
+//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+//   );
+
+//   let data: any = await graphQLClient.request(print(allPosts), {
+//     where: {
+//       slug: { current: { eq: params.slug } },
+//     },
+//   });
+
+//   return {
+//     props: {
+//       ...data.allPost[0],
+//       preview: false,
+//     },
+//     revalidate: 1,
+//   };
+// }

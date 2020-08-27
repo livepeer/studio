@@ -10,16 +10,14 @@ import { makeNextHREF, trackAction, getWebhooks } from './helpers'
 import { generateStreamKey } from './generate-stream-key'
 import { geolocateMiddleware } from '../middleware'
 import { getBroadcasterHandler } from './broadcaster'
+import { db } from '../store'
+import sql from 'sql-template-strings'
 
 const WEBHOOK_TIMEOUT = 5 * 1000
 
 const isLocalIP = require('is-local-ip')
-let resolver
-const dns = require('dns')
-if (dns && dns.promises && dns.promises.Resolver) {
-  const Resolver = dns.promises.Resolver
-  resolver = new Resolver()
-}
+const { Resolver } = require('dns').promises
+const resolver = new Resolver()
 
 const app = Router()
 const hackMistSettings = (req, profiles) => {
@@ -46,27 +44,23 @@ const hackMistSettings = (req, profiles) => {
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   let { limit, cursor, streamsonly, sessionsonly, all } = req.query
 
-  const filter1 = all ? (o) => o : (o) => !o[Object.keys(o)[0]].deleted
-  let filter2 = (o) => o
+  const query = []
+  if (!all) {
+    query.push(sql`data->>'deleted' IS NULL`)
+  }
   if (streamsonly) {
-    filter2 = (o) => !o[Object.keys(o)[0]].parentId
+    query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
-    filter2 = (o) => o[Object.keys(o)[0]].parentId
+    query.push(sql`data->>'parentId' IS NOT NULL`)
   }
 
-  const resp = await req.store.list({
-    prefix: `stream/`,
-    cursor,
-    limit,
-    filter: (o) => filter1(o) && filter2(o),
-  })
-  let output = resp.data
+  const [output, newCursor] = await db.stream.find(query, { cursor, limit })
+
   res.status(200)
 
-  if (output.length > 0) {
-    res.links({ next: makeNextHREF(req, resp.cursor) })
-  } // CF doesn't know what this means
-  output = output.map((o) => o[Object.keys(o)[0]])
+  if (newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) })
+  }
   res.json(output)
 })
 
@@ -98,8 +92,8 @@ app.get('/sessions/:parentId', authMiddleware({}), async (req, res) => {
 })
 
 app.get('/user/:userId', authMiddleware({}), async (req, res) => {
+  const { userId } = req.params
   let { limit, cursor, streamsonly, sessionsonly } = req.query
-  logger.info(`cursor params ${req.query.cursor}, limit ${limit}`)
 
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403)
@@ -108,23 +102,22 @@ app.get('/user/:userId', authMiddleware({}), async (req, res) => {
     })
   }
 
-  let filter = (o) => !o.deleted
+  const query = [
+    sql`data->>'deleted' IS NULL`,
+    sql`data->>'userId' = ${userId}`,
+  ]
   if (streamsonly) {
-    filter = (o) => !o.deleted && !o.parentId
+    query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
-    filter = (o) => !o.deleted && o.parentId
+    query.push(sql`data->>'parentId' IS NOT NULL`)
   }
 
-  const { data: streams, cursor: cursorOut } = await req.store.queryObjects({
-    kind: 'stream',
-    query: { userId: req.params.userId },
-    cursor,
-    limit,
-    filter,
-  })
+  const [streams, newCursor] = await db.stream.find(query, { cursor, limit })
+
   res.status(200)
-  if (streams.length > 0 && cursorOut) {
-    res.links({ next: makeNextHREF(req, cursorOut) })
+
+  if (newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) })
   }
   res.json(streams)
 })
@@ -277,8 +270,13 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 
   let objectStoreId
   if (req.body.objectStoreId) {
-    await req.store.get(`objectstores/${req.user.id}/${req.body.objectStoreId}`)
-    objectStoreId = req.body.objectStoreId
+    const store = await req.store.get(`object-store/${req.body.objectStoreId}`)
+    if (!store) {
+      res.status(400)
+      return res.json({
+        errors: [`object-store ${req.body.objectStoreId} does not exist`],
+      })
+    }
   }
 
   const doc = wowzaHydrate({
@@ -332,7 +330,6 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
       stream.userId,
       'streamStarted',
     )
-    console.log('webhooksList: ', webhooksList)
     try {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {

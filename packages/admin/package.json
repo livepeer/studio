@@ -15,23 +15,22 @@
     "dev": "sanity start"
   },
   "dependencies": {
-    "@sanity/base": "^1.149.19",
-    "@sanity/cli": "^1.149.19",
-    "@sanity/components": "^1.149.19",
-    "@sanity/core": "^1.149.19",
-    "@sanity/dashboard": "^1.149.19",
-    "@sanity/default-layout": "^1.149.19",
-    "@sanity/default-login": "^1.149.18",
-    "@sanity/desk-tool": "^1.149.19",
-    "@sanity/production-preview": "^1.149.0",
+    "@sanity/base": "^1.150.3",
+    "@sanity/cli": "^1.150.1",
+    "@sanity/components": "^1.150.3",
+    "@sanity/core": "^1.150.3",
+    "@sanity/dashboard": "^1.150.4",
+    "@sanity/default-layout": "^1.150.3",
+    "@sanity/default-login": "^1.150.1",
+    "@sanity/desk-tool": "^1.150.3",
+    "@sanity/production-preview": "^1.150.1",
     "bcp47": "^1.1.2",
     "prop-types": "^15.7.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-icons": "^3.10.0",
-    "sanity-plugin-dashboard-widget-document-list": "^0.0.10",
-    "sanity-plugin-dashboard-widget-netlify": "^1.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-icons": "^3.11.0",
+    "sanity-plugin-dashboard-widget-document-list": "^0.0.11",
     "sanity-plugin-markdown": "^1.0.1",
-    "sanity-plugin-media": "^0.2.10"
+    "sanity-plugin-media": "^0.2.13"
   }
 }
