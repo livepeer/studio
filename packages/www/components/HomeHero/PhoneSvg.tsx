@@ -1,12 +1,12 @@
 import { getAspectRatio } from "../../lib/utils";
 
-const phoneFrameMaxWidth = 788;
-const phoneFrameMaxHeight = 394;
+export const phoneFrameMaxWidth = 788;
+export const phoneFrameMaxHeight = 394;
 export const phoneAspectRatio = getAspectRatio(
   phoneFrameMaxHeight,
   phoneFrameMaxWidth,
   true
-);
+) as string;
 export const notchZIndex = 10;
 
 const Notch = () => (

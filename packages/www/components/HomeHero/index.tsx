@@ -5,12 +5,77 @@ import Button from "../Button";
 import HeroVideo from "./Video";
 import { Text } from "@theme-ui/components";
 import PhoneSvg from "./PhoneSvg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useRef } from "react";
+import { useCallback } from "react";
+import {
+  getProportionalValue,
+  breakpoints,
+  toPx,
+  getTransform,
+  toPercent,
+  maxScroll
+} from "./helpers";
+import { notchZIndex } from "./PhoneSvg";
 
 const HomeHero = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const videoRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    if (!videoRef.current) return;
+    const { scrollTop } = document.documentElement;
+    const figure = videoRef.current.querySelector("figure") as HTMLElement;
+    const gradient = videoRef.current.querySelector(
+      "#background-gradient"
+    ) as HTMLDivElement;
+
+    // Animate bottom
+    videoRef.current.style.bottom = getProportionalValue(
+      scrollTop,
+      breakpoints.bottom,
+      toPx,
+      maxScroll
+    );
+    // Animate transform
+    videoRef.current.style.transform = getProportionalValue(
+      scrollTop,
+      breakpoints.rotateX,
+      getTransform
+    );
+    // Animate maxWidth
+    videoRef.current.style.maxWidth = getProportionalValue(
+      scrollTop,
+      breakpoints.maxWidth,
+      toPx
+    );
+    // Animate borderRadius
+    videoRef.current.style.borderRadius = getProportionalValue(
+      scrollTop,
+      breakpoints.borderRadius,
+      toPx
+    );
+    // Animate linear gradient background's opacity
+    gradient.style.opacity = getProportionalValue(
+      scrollTop,
+      breakpoints.opacity
+    );
+    // Animate figure's aspect ratio
+    figure.style.paddingBottom = getProportionalValue(
+      scrollTop,
+      breakpoints.aspectRatio,
+      toPercent
+    );
+  }, [videoRef.current]);
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <Box
@@ -38,49 +103,51 @@ const HomeHero = () => {
             textAlign: "center"
           }}
         >
-          <Styled.h1 sx={{ fontSize: [40, 56, 64, 72] }}>
-            <span sx={{ fontWeight: 400 }}>The platform built to power</span>
-            <br />
-            video-centric UGC applications at scale.
-          </Styled.h1>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              router.push(`/register?email=${email}`);
-            }}
-          >
-            <Flex
-              sx={{
-                mt: 5,
-                flexDirection: ["column", "row"],
-                justifyContent: "center",
-                width: "100%",
-                alignItems: "center"
+          <div sx={{ zIndex: notchZIndex + 1, position: "relative" }}>
+            <Styled.h1 sx={{ fontSize: [40, 56, 64, 72] }}>
+              <span sx={{ fontWeight: 400 }}>The platform built to power</span>
+              <br />
+              video-centric UGC applications at scale.
+            </Styled.h1>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                router.push(`/register?email=${email}`);
               }}
             >
-              <Textfield
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                label="Enter your email"
-                sx={{ width: ["188px", "320px"] }}
-              />
-              <Button
-                type="submit"
+              <Flex
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "55px",
-                  ml: [0, 3],
-                  mt: [3, 0],
-                  width: ["184px", "unset"]
+                  mt: 5,
+                  flexDirection: ["column", "row"],
+                  justifyContent: "center",
+                  width: "100%",
+                  alignItems: "center"
                 }}
               >
-                Get Started
-              </Button>
-            </Flex>
-          </form>
+                <Textfield
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  label="Enter your email"
+                  sx={{ width: ["188px", "320px"] }}
+                />
+                <Button
+                  type="submit"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    height: "55px",
+                    ml: [0, 3],
+                    mt: [3, 0],
+                    width: ["184px", "unset"]
+                  }}
+                >
+                  Get Started
+                </Button>
+              </Flex>
+            </form>
+          </div>
           <div
             sx={{
               my: 6,
@@ -92,7 +159,7 @@ const HomeHero = () => {
               justifyContent: "flex-end"
             }}
           >
-            <HeroVideo />
+            <HeroVideo ref={videoRef} />
             <PhoneSvg />
           </div>
           <div sx={{ my: 6 }}>

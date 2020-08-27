@@ -1,9 +1,5 @@
 import Fade from "react-reveal/Fade";
 import Layout from "../components/Layout";
-import { GraphQLClient } from "graphql-request";
-import { print } from "graphql/language/printer";
-import allPages from "../queries/allPages.gql";
-import { getComponent } from "../lib/utils";
 import SectionLayout from "../components/SectionLayout";
 import IconListItem, { IconListItemProps } from "../components/IconListItem";
 import { Grid } from "@theme-ui/components";
