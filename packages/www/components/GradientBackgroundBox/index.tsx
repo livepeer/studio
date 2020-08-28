@@ -42,9 +42,10 @@ const GradientBackgroundBox = ({
       sx={{ position: "relative", overflow: "hidden", ...sx }}
       {...moreProps}
     >
-      {gradient && !isFirefox && (
+      {/* Safari and Firefox really struggle with these gradients */}
+      {gradient && !isFirefox && !isSafari && (
         <>
-          {slide && !isSafari ? (
+          {slide ? (
             <div
               sx={{
                 position: "absolute",
