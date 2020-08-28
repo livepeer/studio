@@ -1,15 +1,23 @@
 import { Text } from "@theme-ui/components";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";
-import { forwardRef, useRef, useCallback } from "react";
+import { forwardRef, useRef } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
-  const figureRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isReady, setIsReady] = useState(false);
 
-  const fadeIn = useCallback(() => {
-    if (!figureRef.current) return;
-    figureRef.current.style.opacity = "1";
-  }, [figureRef]);
+  useEffect(() => {
+    if (!videoRef.current || isReady) return;
+    const interval = setInterval(() => {
+      const isReady = videoRef.current.readyState === 4;
+      setIsReady(isReady);
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, [videoRef, isReady]);
 
   return (
     <div
@@ -25,12 +33,12 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
         sx={{
           width: "100%",
           position: "relative",
-          opacity: 0,
+          opacity: isReady ? 1 : 0,
           transition: "opacity .5s"
         }}
-        ref={figureRef}
       >
         <video
+          ref={videoRef}
           src="/img/video-placeholder.mp4"
           sx={{
             position: "absolute",
@@ -39,7 +47,6 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             bottom: 0,
             right: 0
           }}
-          onPlay={fadeIn}
           autoPlay
           loop
           muted
