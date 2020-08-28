@@ -1,5 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
   try {
@@ -33,7 +34,7 @@ export function pathJoin2(p1: string, p2: string): string {
 }
 
 export function pathJoin(...items: Array<string>): string {
-  return items.reduce(pathJoin2, '')
+  return items.reduce(pathJoin2, "");
 }
 
 export function breakablePath(path: string): string {
@@ -41,4 +42,9 @@ export function breakablePath(path: string): string {
     return path;
   }
   return path.split("/").join("/\u{200B}");
+}
+
+export function getAspectRatio(height: number, width: number, forCss = false) {
+  const percentage = (height / width) * 100;
+  return forCss ? percentage + "%" : percentage;
 }

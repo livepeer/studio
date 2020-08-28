@@ -1,69 +1,83 @@
 import { Box, Flex } from "@theme-ui/components";
-import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
+import { Text } from "@theme-ui/components";
+import { SxStyleProp } from "theme-ui";
 
-const builder = imageUrlBuilder(client as any);
-
-export default ({ quote, image, name, role, company, ...props }) => {
-  return (
-    <Box
-      sx={{
-        position: "relative",
-        bg: "background",
-        py: 50,
-        px: 4,
-        borderRadius: 8,
-        width: "100%",
-        border: "1px solid",
-        borderColor: "muted",
-        boxShadow:
-          "0px 14px 40px rgba(224, 224, 224, 0.18), 0px 4px 7px rgba(0, 0, 0, 0.05)",
-        ":before": {
-          content: '"“"',
-          position: "absolute",
-          left: 20,
-          fontWeight: "500",
-          top: -10,
-          fontSize: 150,
-          color: "#E5FDF3",
-          zIndex: 0,
-        },
-      }}
-      {...props}
-    >
-      <Box sx={{ position: "relative", pt: 3, pb: 3, px: 3 }}>
-        <Box sx={{ fontWeight: 500, mb: 4, fontSize: 4 }}>{quote}</Box>
-        <Flex
-          sx={{
-            fontWeight: 500,
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box sx={{ mr: 2 }}>
-            <Box>{name}</Box>
-            <Box>
-              {role}, {company}
-            </Box>
-          </Box>
-          <img
-            alt={image.alt}
-            className="lazyload"
-            data-src={builder.image(image).url()}
-            width={image.asset.metadata.dimensions.width}
-            height={image.asset.metadata.dimensions.height}
-            sx={{
-              width: 118,
-              height: 118,
-              minWidth: 118,
-              minHeight: 118,
-              objectFit: "cover",
-              objectPosition: "center",
-              borderRadius: 1000,
-            }}
-          />
-        </Flex>
-      </Box>
-    </Box>
-  );
+export type TestimonialCardProps = {
+  id: string;
+  quote: string;
+  author: {
+    name: string;
+    role: string;
+    company: string;
+  };
+  pushSx?: SxStyleProp;
 };
+
+const TestimonialCard = ({
+  id,
+  quote,
+  author,
+  pushSx
+}: TestimonialCardProps) => (
+  <Box
+    sx={{
+      position: "relative",
+      bg: "background",
+      py: 32,
+      px: 24,
+      borderRadius: 24,
+      minHeight: [360, null, null, 432],
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      transition: "box-shadow .3s",
+      "&:hover": {
+        boxShadow:
+          "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
+      },
+      ...pushSx
+    }}
+  >
+    <img
+      alt={`${id} logo`}
+      className="lazyload"
+      src={`/img/testimonials/${id}/logo.svg`}
+    />
+    <div sx={{ mt: 3 }}>
+      <Box sx={{ fontWeight: 400, mb: 4, fontSize: [3, 4] }}>"{quote}"</Box>
+      <Flex
+        sx={{
+          fontWeight: 500,
+          alignItems: "center",
+          justifyContent: "flex-start",
+          height: [75, 90]
+        }}
+      >
+        <img
+          alt={`${author.name} avatar`}
+          src={`/img/testimonials/${id}/avatar.png`}
+          className="lazyload"
+          sx={{
+            width: [56, 72],
+            height: [56, 72],
+            minWidth: [56, 72],
+            minHeight: [56, 72],
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: 1000,
+            mr: 2
+          }}
+        />
+        <Box>
+          <Text sx={{ fontWeight: 600 }}>{author.name}</Text>
+          <Text sx={{ fontWeight: 400 }}>
+            {author.role}, {author.company}
+          </Text>
+        </Box>
+      </Flex>
+    </div>
+  </Box>
+);
+
+export default TestimonialCard;

@@ -2,7 +2,6 @@ import { Styled } from "theme-ui";
 import { Grid, Flex, Container, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
-import Button from "../Button";
 import { Link as ScrollLink } from "react-scroll";
 import ArrowRight from "../../public/img/arrow-right.svg";
 import Link from "next/link";
@@ -16,7 +15,7 @@ type Props = {
   ctas?: [];
 };
 
-export default ({
+const Hero = ({
   heading,
   tagline,
   centered = false,
@@ -34,7 +33,7 @@ export default ({
         borderBottom: skinny ? "0" : "1px solid",
         borderColor: "muted",
         pt: skinny ? 4 : 0,
-        pb: skinny ? 4 : "65px",
+        pb: skinny ? 4 : "65px"
       }}
       {...props}
     >
@@ -43,7 +42,7 @@ export default ({
           columns={[1, 1, 1, centered ? 1 : 2]}
           sx={{
             alignItems: "center",
-            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
+            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"]
           }}
         >
           <Box
@@ -55,14 +54,14 @@ export default ({
                 "center",
                 "center",
                 "center",
-                centered ? "center" : "left",
-              ],
+                centered ? "center" : "left"
+              ]
             }}
           >
             {heading && (
               <Styled.h1
                 sx={{
-                  fontSize: [48, 56, 7],
+                  fontSize: [48, 56, 7]
                 }}
               >
                 {heading}
@@ -72,7 +71,7 @@ export default ({
               <Box
                 sx={{
                   mt: 4,
-                  fontSize: "18px",
+                  fontSize: "18px"
                 }}
               >
                 {tagline}
@@ -87,10 +86,10 @@ export default ({
                     "center",
                     "center",
                     "center",
-                    centered ? "center" : "flex-start",
+                    centered ? "center" : "flex-start"
                   ],
                   width: "100%",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 {ctas.map((cta, i) => (
@@ -110,7 +109,7 @@ export default ({
                 width: ["100%", "100%", "100%", centered ? "'100%'" : "auto"],
                 mr: [0, 0, -260],
                 position: "relative",
-                right: [0, 0, 0, -100],
+                right: [0, 0, 0, -100]
               }}
               className="lazyload"
               data-src={builder.image(image).url()}
@@ -155,3 +154,5 @@ function renderSwitch(cta) {
       );
   }
 }
+
+export default Hero;

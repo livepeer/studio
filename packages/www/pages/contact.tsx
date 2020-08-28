@@ -11,7 +11,7 @@ const ContactPage = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -36,7 +36,7 @@ const ContactPage = () => {
     >
       <Container
         sx={{
-          py: 88,
+          py: 88
         }}
       >
         <Box sx={{ mb: 48, textAlign: "center" }}>
@@ -45,9 +45,8 @@ const ContactPage = () => {
           </Styled.h2>
 
           <Box sx={{ maxWidth: 512, margin: "0 auto" }}>
-            If you’d like to learn more about Livepeer.com and our game changing
-            transcoding infrastructure drop us a note, and we’ll get right back
-            you.
+            If you’d like to learn more about Livepeer’s innovative UGC focused
+            video platform drop us a note and we’ll get right back to you!
             <br />
             <br /> or email us at{" "}
             <a

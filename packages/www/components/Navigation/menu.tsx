@@ -3,11 +3,11 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton,
+  IconButton
 } from "@theme-ui/components";
 import Button from "../Button";
 import Link from "next/link";
-import Logo from "../../public/img/logo.svg";
+import Logo from "../Logo";
 import { FiX } from "react-icons/fi";
 
 const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
@@ -21,7 +21,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
       overflow: "hidden",
       width: "100%",
       zIndex: "dropdown",
-      visibility: mobileMenuIsOpen ? "visible" : "hidden",
+      visibility: mobileMenuIsOpen ? "visible" : "hidden"
     }}
   >
     <Container
@@ -29,33 +29,10 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        py: 3,
+        py: 3
       }}
     >
-      <Link href="/" passHref>
-        <A
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            textDecoration: "none",
-            color: "text",
-          }}
-        >
-          <Logo sx={{ color: "primary" }} />
-          {!token && (
-            <Box
-              sx={{
-                ml: "12px",
-                fontWeight: 500,
-                fontSize: "18px",
-              }}
-            >
-              livepeer.com
-            </Box>
-          )}
-        </A>
-      </Link>
+      <Logo logoType={!token} />
       <IconButton
         sx={{ fontSize: 6 }}
         onClick={() => setMobileMenuIsOpen(false)}
@@ -69,20 +46,21 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
         pb: 4,
         display: "flex",
         flexDirection: "column",
-        height: `calc(100vh -70px)`,
+        height: `calc(100vh -70px)`
       }}
     >
       <Flex sx={{ flexDirection: "column" }}>
         {!token && (
           <>
-            <Link href="/login" passHref>
-              <Button as={A} variant="outline" sx={{ mb: 3 }}>
-                Login
-              </Button>
-            </Link>
-            <Link href="/register" passHref>
-              <Button as={A}>Sign up</Button>
-            </Link>
+            <Button
+              href="/login"
+              variant="buttons.outline"
+              sx={{ mb: 3 }}
+              isLink
+            >
+              Login
+            </Button>
+            <Button href="/register">Sign up</Button>
           </>
         )}
       </Flex>
@@ -90,7 +68,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
       <Flex
         sx={{
           py: 3,
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
         {!!token && (
@@ -101,7 +79,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
                   py: 3,
                   mb: 0,
                   color: "text",
-                  textDecoration: "none",
+                  textDecoration: "none"
                 }}
               >
                 Dashboard
@@ -119,30 +97,30 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
             sx={{
               color: "text",
               textDecoration: "none",
-              py: 3,
+              py: 3
             }}
           >
             Docs
           </A>
         </Link>
-        <Link href="/blog" passHref>
+        <Link href="/contact" passHref>
           <A
             sx={{
               color: "text",
               textDecoration: "none",
-              py: 3,
+              py: 3
             }}
           >
             Blog
           </A>
         </Link>
-        <Link href="/#contactSection" passHref>
+        <Link href="/contact" passHref>
           <A
             sx={{
               color: "text",
               textDecoration: "none",
               py: 3,
-              mb: 0,
+              mb: 0
             }}
           >
             Contact
