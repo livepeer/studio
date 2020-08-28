@@ -2,8 +2,8 @@ const emoji = require("remark-emoji");
 
 const withMDX = require("@next/mdx")({
   options: {
-    remarkPlugins: [emoji],
-  },
+    remarkPlugins: [emoji]
+  }
 });
 
 module.exports = withMDX({
@@ -12,12 +12,12 @@ module.exports = withMDX({
     config.module.rules.push({
       test: /\.(graphql|gql)$/,
       exclude: /node_modules/,
-      loader: "graphql-tag/loader",
+      loader: "graphql-tag/loader"
     });
     config.module.rules.push({
       test: /\.md$/,
-      use: "raw-loader",
+      use: "raw-loader"
     });
     return config;
-  },
+  }
 });

@@ -3,17 +3,20 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton,
+  IconButton
 } from "@theme-ui/components";
-import Link from "next/link";
-import Logo from "../../public/img/logo.svg";
+import Link from "../Link";
 import { useApi } from "../../hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Menu from "./menu";
 import { useRouter } from "next/router";
+import Logo from "../Logo";
+import Button from "../Button";
 
-export default () => {
+const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
+
+const Navigation = () => {
   const { pathname } = useRouter();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
@@ -47,10 +50,11 @@ export default () => {
   return (
     <Box
       sx={{
-        transition: "box-shadow .3s, top .3s",
+        transition: "box-shadow .3s, top .3s, background-color .3s",
+        bg: hasScrolled ? "background" : "transparent",
         boxShadow: hasScrolled
           ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
-          : "none",
+          : "none"
       }}
     >
       <Container>
@@ -58,82 +62,75 @@ export default () => {
           sx={{
             py: 3,
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
-          <Link href="/" passHref>
-            <A
-              sx={{
-                textDecoration: "none",
-                color: "primary",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-            >
-              <Logo sx={{ color: "primary" }} />
-              {!isDashboard && (
-                <Box
-                  sx={{
-                    ml: "12px",
-                    fontWeight: 500,
-                    fontSize: "18px",
-                  }}
-                >
-                  livepeer.com
-                </Box>
-              )}
-            </A>
-          </Link>
+          <div
+            sx={{ minWidth: sidesWidth, display: "flex", alignItems: "center" }}
+          >
+            <Logo logoType={!isDashboard} />
+          </div>
           <Flex
             sx={{
               display: ["none", "none", "flex"],
               width: "100%",
-              justifyContent: "flex-end",
-              alignItems: "center",
+              justifyContent: "center",
+              alignItems: "center"
             }}
           >
-            <Link href="/docs" passHref>
-              <A variant="nav" sx={{ ml: 0 }}>
-                Docs
-              </A>
+            <Link href="/docs" variant="nav">
+              Docs
             </Link>
-            <Link href="/blog" passHref>
-              <A variant="nav">Blog</A>
+            <Link href="/blog" variant="nav">
+              Blog
             </Link>
-            <Link href="/contact" passHref>
-              <A variant="nav">Contact Us</A>
+            <Link href="/contact" variant="nav">
+              Contact Us
             </Link>
+          </Flex>
+          <Flex
+            sx={{
+              display: ["none", "none", "flex"],
+              alignItems: "center",
+              justifyContent: "flex-end",
+              minWidth: sidesWidth
+            }}
+          >
             {!loggedIn && (
               <>
-                <Link href="/login" passHref>
-                  <A variant="nav" sx={{ fontWeight: 600, ml: 3, mr: 3 }}>
-                    Log in
-                  </A>
+                <Link
+                  href="/login"
+                  variant="nav"
+                  sx={{ fontWeight: 600, mr: 3 }}
+                >
+                  Log in
                 </Link>
-                <Link href="/register" passHref>
-                  <A variant="buttons.secondarySmall" sx={{ m: 0 }}>
-                    Sign up
-                  </A>
-                </Link>
+                <Button
+                  variant="buttons.secondarySmall"
+                  href="/register"
+                  isLink
+                >
+                  Sign up
+                </Button>
               </>
             )}
             {loggedIn && (
               <>
                 {user && user.admin && !isDashboard && (
-                  <Link href="/app/admin" passHref>
-                    <A variant="nav">Admin</A>
+                  <Link href="/app/admin" variant="nav">
+                    Admin
                   </Link>
                 )}
-
                 <A variant="nav" onClick={() => logout()}>
                   Log Out
                 </A>
                 {!isDashboard && (
-                  <Link href="/app/user" passHref>
-                    <A variant="buttons.outlineSmall" sx={{ ml: 2 }}>
-                      Dashboard
-                    </A>
+                  <Link
+                    href="/app/user"
+                    variant="buttons.outlineSmall"
+                    sx={{ ml: 2 }}
+                  >
+                    Dashboard
                   </Link>
                 )}
               </>
@@ -143,7 +140,7 @@ export default () => {
             sx={{
               color: "black",
               display: ["flex", "flex", "none"],
-              fontSize: 6,
+              fontSize: 6
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >
@@ -160,3 +157,5 @@ export default () => {
     </Box>
   );
 };
+
+export default Navigation;

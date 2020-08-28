@@ -17,7 +17,7 @@ const ignoreList = [
   "password-reset-token",
   "make-admin",
   "user-verification",
-  "user",
+  "user"
 ];
 
 export default ({ children, tree = guides }) => {
@@ -37,7 +37,7 @@ export default ({ children, tree = guides }) => {
           bg: "white",
           borderBottom: "1px solid",
           borderColor: "muted",
-          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)",
+          boxShadow: isOpen ? "none" : "0 10px 20px rgba(0,0,0,0.1)"
         }}
       >
         <Container>
@@ -49,7 +49,7 @@ export default ({ children, tree = guides }) => {
               pb: 3,
               pt: 3,
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "space-between"
             }}
           >
             <Flex sx={{ alignItems: "center" }}>
@@ -57,7 +57,7 @@ export default ({ children, tree = guides }) => {
                 sx={{
                   mr: 3,
                   ml: "1px",
-                  transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                  transform: isOpen ? "rotate(90deg)" : "rotate(0deg)"
                 }}
                 width="6"
                 height="10"
@@ -76,7 +76,7 @@ export default ({ children, tree = guides }) => {
             <Flex
               sx={{
                 display: "flex",
-                alignItems: "centered",
+                alignItems: "centered"
               }}
             >
               <Link href="/docs" passHref>
@@ -88,7 +88,7 @@ export default ({ children, tree = guides }) => {
                   }
                   sx={{
                     borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
+                    borderBottomRightRadius: 0
                   }}
                 >
                   Guides
@@ -113,7 +113,7 @@ export default ({ children, tree = guides }) => {
       <Container
         sx={{
           pb: 4,
-          mt: [20, 20, 40],
+          mt: [20, 20, 40]
         }}
       >
         <Flex sx={{ flexDirection: ["column", "column", "row"] }}>
@@ -125,7 +125,7 @@ export default ({ children, tree = guides }) => {
               height: [
                 "calc(100vh - 130)",
                 "calc(100vh - 130)",
-                "calc(100vh - 105px)",
+                "calc(100vh - 105px)"
               ],
               overflow: "scroll",
               minWidth: ["100%", "100%", 350],
@@ -133,12 +133,12 @@ export default ({ children, tree = guides }) => {
               display: [
                 isOpen ? "block" : "none",
                 isOpen ? "block" : "none",
-                "block",
+                "block"
               ],
               left: 0,
               zIndex: 10,
               pt: 2,
-              pl: [19, 19, 1],
+              pl: [19, 19, 1]
             }}
           >
             <Flex
@@ -147,7 +147,7 @@ export default ({ children, tree = guides }) => {
                 alignItems: "centered",
                 mb: 3,
                 left: -1,
-                position: "relative",
+                position: "relative"
               }}
             >
               <Link href="/docs" passHref>
@@ -159,7 +159,7 @@ export default ({ children, tree = guides }) => {
                   }
                   sx={{
                     borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
+                    borderBottomRightRadius: 0
                   }}
                 >
                   Guides
@@ -190,8 +190,8 @@ export default ({ children, tree = guides }) => {
             sx={{
               "> div :last-child": { mb: 0 },
               pt: [2, 2, 1],
-              a: { color: "extremelyBlue" },
-              pl: [0, 0, 4],
+              a: { color: "primary" },
+              pl: [0, 0, 4]
             }}
           >
             {children}

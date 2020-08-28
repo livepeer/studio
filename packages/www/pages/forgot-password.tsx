@@ -1,11 +1,11 @@
 import Layout from "../components/Layout";
 import Login from "../components/Login";
-import Link from "next/link";
+import Link from "../components/Link";
 import { Flex, Box } from "@theme-ui/components";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 
-export default () => {
+const ForgotPasswordPage = () => {
   useLoggedIn(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,8 @@ export default () => {
           alignItems: "center",
           justifyContent: "center",
           flexGrow: 1,
-          flexDirection: "column"
+          flexDirection: "column",
+          py: 6
         }}
       >
         <h3 sx={{ mb: 4 }}>Reset your password</h3>
@@ -60,11 +61,11 @@ export default () => {
         />
         <Box>
           Nevermind!&nbsp;
-          <Link href="/login">
-            <a>Take me back to log in</a>
-          </Link>
+          <Link href="/login">Take me back to log in</Link>
         </Box>
       </Flex>
     </Layout>
   );
 };
+
+export default ForgotPasswordPage;

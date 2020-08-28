@@ -1,5 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
   try {
@@ -86,4 +87,9 @@ export function buildTree(toc) {
 
   // Return the tree
   return tree;
+}
+
+export function getAspectRatio(height: number, width: number, forCss = false) {
+  const percentage = (height / width) * 100;
+  return forCss ? percentage + "%" : percentage;
 }

@@ -1,12 +1,13 @@
 import Textfield from "../../components/Textfield";
 import { Button, Box, Container } from "@theme-ui/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
+import { useRouter } from "next/router";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
 
-export default ({
+const Login = ({
   id,
   showEmail,
   showPassword,
@@ -15,13 +16,20 @@ export default ({
   loading,
   errors
 }) => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (router?.query?.email) {
+      setEmail(router.query.email as string);
+    }
+  }, [router?.query?.email]);
 
   return (
     <Container>
       <form
-        onSubmit={async e => {
+        onSubmit={async (e) => {
           e.preventDefault();
           if (!showPassword) {
             return onSubmit({ email });
@@ -50,7 +58,7 @@ export default ({
             label="Email"
             required
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         )}
         {showPassword && (
@@ -63,7 +71,7 @@ export default ({
             label="Password"
             required
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         )}
 
@@ -76,3 +84,5 @@ export default ({
     </Container>
   );
 };
+
+export default Login;

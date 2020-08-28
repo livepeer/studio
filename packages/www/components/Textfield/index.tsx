@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box } from "@theme-ui/components";
 
-export default ({
+const Textfield = ({
   disabled = false,
   onFocus = null,
   onBlur = null,
@@ -30,10 +30,9 @@ export default ({
   return (
     <Box
       sx={{
-        bg: "#F4F4F4",
+        bg: "background",
+        borderRadius: 8,
         border: "0",
-        borderTopRightRadius: 8,
-        borderTopLeftRadius: 8,
         margin: "0",
         display: "inline-flex",
         padding: "0",
@@ -74,8 +73,6 @@ export default ({
         sx={{
           transition: "background-color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
           backgroundColor: "rgba(255, 255, 255, 0.09)",
-          borderTopLeftRadius: "4px",
-          borderTopRightRadius: "4px",
           color: "text",
           cursor: "text",
           display: "inline-flex",
@@ -83,31 +80,7 @@ export default ({
           fontSize: "1rem",
           boxSizing: "border-box",
           alignItems: "center",
-          lineHeight: "1.1875em",
-          "&:before": {
-            left: "0",
-            right: "0",
-            bottom: "0",
-            content: '"\\00a0"',
-            position: "absolute",
-            transition:
-              "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-            borderBottom: "1px solid",
-            borderColor: error ? "red" : "text",
-            pointerEvents: "none"
-          },
-          "&:after": {
-            left: "0",
-            right: "0",
-            bottom: "0",
-            content: '""',
-            position: "absolute",
-            transform: "scaleX(0)",
-            transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
-            borderBottom: "2px solid",
-            borderColor: error ? "red" : "text",
-            pointerEvents: "none"
-          }
+          lineHeight: "1.1875em"
         }}
       >
         <Box
@@ -120,22 +93,33 @@ export default ({
           required={required}
           defaultValue={defaultValue}
           value={value}
-          onChange={onChange ? onChange : e => setScopedValue(e.target.value)}
+          onChange={onChange ? onChange : (e) => setScopedValue(e.target.value)}
           ref={inputRef}
           name={name}
           sx={{
-            padding: "28px 20px 12px",
+            padding: "22px 20px 12px",
             fontSize: 16,
             color: "currentColor",
             width: "100%",
-            border: "0",
             margin: "0",
             display: "block",
             minWidth: "0",
             background: "none",
             boxSizing: "content-box",
             animationName: "MuiInputBase-keyframes-auto-fill-cancel",
-            WebkitTapHighlightColor: "transparent"
+            WebkitTapHighlightColor: "transparent",
+            borderRadius: 8,
+            border: "1px solid",
+            borderColor: "ultraLightGray",
+            transition: "border-color .2s",
+            "&:hover": {
+              borderColor: "lightGray"
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+              borderColor: "primary"
+            }
           }}
           id={id}
           type={type}
@@ -157,3 +141,5 @@ export default ({
     </Box>
   );
 };
+
+export default Textfield;
