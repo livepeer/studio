@@ -12,10 +12,10 @@ import { useCallback } from "react";
 import {
   getProportionalValue,
   breakpoints,
-  scrollToEnterPhone,
   maxScroll,
   DynamicBreakpoints,
-  getDynamicBreakpoints
+  getDynamicBreakpoints,
+  getPhonePadding
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 import { Heading } from "@theme-ui/components";
@@ -23,6 +23,7 @@ import { Heading } from "@theme-ui/components";
 const HomeHero = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const [dynamicBreakpoints, setDynamicBreakpoints] = useState<
@@ -41,30 +42,37 @@ const HomeHero = () => {
   }, [onResize]);
 
   const handleScroll = useCallback(() => {
-    if (!videoRef.current || !dynamicBreakpoints) return;
+    if (
+      !videoRef.current ||
+      !dynamicBreakpoints ||
+      !phoneRef.current ||
+      !videoContainerRef.current
+    ) {
+      return;
+    }
     const { scrollTop } = document.documentElement;
     const figure = videoRef.current.querySelector("figure") as HTMLElement;
     const gradient = videoRef.current.querySelector(
       "#background-gradient"
     ) as HTMLDivElement;
 
-    // We have two 'phases' for the bottom:
-    if (scrollTop < scrollToEnterPhone) {
+    // Some calculations to know when to remove `position: fixed` on the video
+    const { offsetHeight } = phoneRef.current;
+    const { top } = phoneRef.current.getBoundingClientRect();
+    const isPlacedOnPhone = top + offsetHeight / 2 <= window.innerHeight / 2;
+    if (isPlacedOnPhone) {
       // Animate bottom first phase
-      videoRef.current.style.bottom = getProportionalValue(
-        scrollTop,
-        breakpoints.bottom
-      );
+      videoContainerRef.current.style.position = "absolute";
+      videoContainerRef.current.style.transform = "none";
+      videoContainerRef.current.style.left = "unset";
+      videoContainerRef.current.style.top = "unset";
+      videoContainerRef.current.style.bottom = `${getPhonePadding()}px`;
     } else {
-      // Animate bottom second phase
-      videoRef.current.style.bottom = getProportionalValue(
-        scrollTop,
-        dynamicBreakpoints.bottomSecondPhase,
-        scrollToEnterPhone,
-        maxScroll
-      );
+      videoContainerRef.current.style.position = "fixed";
+      videoContainerRef.current.style.transform = "translate(-50%, -50%)";
+      videoContainerRef.current.style.left = "50%";
+      videoContainerRef.current.style.top = "50%";
     }
-    // Animation continues...
 
     // Animate transform
     videoRef.current.style.transform = getProportionalValue(
@@ -86,7 +94,12 @@ const HomeHero = () => {
       scrollTop,
       breakpoints.aspectRatio
     );
-  }, [videoRef.current, dynamicBreakpoints]);
+  }, [
+    videoRef.current,
+    phoneRef.current,
+    videoContainerRef.current,
+    dynamicBreakpoints
+  ]);
 
   useEffect(() => {
     handleScroll();
@@ -178,7 +191,18 @@ const HomeHero = () => {
               justifyContent: "flex-end"
             }}
           >
-            <HeroVideo ref={videoRef} />
+            <div
+              ref={videoContainerRef}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100vw",
+                zIndex: notchZIndex - 1
+              }}
+            >
+              <HeroVideo ref={videoRef} />
+            </div>
             <PhoneSvg ref={phoneRef} />
           </div>
           <div sx={{ my: 6 }}>

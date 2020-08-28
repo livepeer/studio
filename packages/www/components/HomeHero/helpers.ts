@@ -12,11 +12,6 @@ export type Breakpoint = {
 };
 
 const breakpoints: { [key: string]: Breakpoint } = {
-  bottom: {
-    initial: maxScroll,
-    target: phoneFrameMaxHeight,
-    formatter: (v: number) => `${v}px`
-  },
   rotateX: {
     initial: 45,
     target: 0,
@@ -63,28 +58,27 @@ function getProportionalValue(
 }
 
 export type DynamicBreakpoints = {
-  bottomSecondPhase: Breakpoint;
   maxWidth: Breakpoint;
 };
+
+function getPhonePadding() {
+  const { clientWidth } = document.querySelector("#phone-frame") as SVGElement;
+  const paddingFraction = 25 / 788;
+  return Math.round(clientWidth * paddingFraction * 100) / 100;
+}
 
 /**
  * Some breakpoints depend on the frame's width, which is retrieved on render
  */
 function getDynamicBreakpoints(): DynamicBreakpoints {
   const { clientWidth } = document.querySelector("#phone-frame") as SVGElement;
-  const paddingFraction = 25 / 788;
-
-  const phonePadding = Math.round(clientWidth * paddingFraction * 100) / 100;
 
   const maxMaxWidth = window.innerWidth * 0.8;
   const initialMaxWidthCandidate = clientWidth * 1.2;
 
+  const phonePadding = getPhonePadding();
+
   return {
-    bottomSecondPhase: {
-      initial: breakpoints.bottom.target,
-      target: phonePadding,
-      formatter: (v: number) => `${v}px`
-    },
     maxWidth: {
       initial:
         initialMaxWidthCandidate < maxMaxWidth
@@ -101,5 +95,6 @@ export {
   scrollToEnterPhone,
   breakpoints,
   getProportionalValue,
+  getPhonePadding,
   getDynamicBreakpoints
 };

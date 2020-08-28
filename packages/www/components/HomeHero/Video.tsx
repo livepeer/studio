@@ -2,7 +2,6 @@ import { Text } from "@theme-ui/components";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";
 import { forwardRef } from "react";
-import { notchZIndex } from "./PhoneSvg";
 
 const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
   <div
@@ -10,8 +9,6 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
     sx={{
       width: "100%",
       mx: "auto",
-      position: "absolute",
-      zIndex: notchZIndex - 1,
       overflow: "hidden",
       borderRadius: ["4vw", null, null, "36px"]
     }}
@@ -27,6 +24,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
           right: 0
         }}
         autoPlay
+        muted
       />
       <div
         sx={{
