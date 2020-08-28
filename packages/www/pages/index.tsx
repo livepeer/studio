@@ -81,9 +81,8 @@ const HomePage = () => {
       url={`https://livepeer.com`}
       withGradientBackground
     >
-      <Fade key={0}>
-        <Hero />
-      </Fade>
+      {/* Do not wrap the <Hero /> in <Fade />. It completely breaks in Safari */}
+      <Hero />
       <Fade key={1}>
         <SectionLayout
           heading={{

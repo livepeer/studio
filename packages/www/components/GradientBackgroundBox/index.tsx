@@ -41,7 +41,7 @@ const GradientBackgroundBox = ({
       sx={{ position: "relative", overflow: "hidden", ...sx }}
       {...moreProps}
     >
-      {gradient && (
+      {false && (
         <>
           {slide ? (
             <div
