@@ -24,6 +24,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
           right: 0
         }}
         autoPlay
+        loop
         muted
       />
       <div
@@ -124,7 +125,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => (
         background:
           "linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
         height: "100%",
-        top: 0
+        top: 0,
+        pointerEvents: "none"
       }}
     />
   </div>
