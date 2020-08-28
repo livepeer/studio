@@ -19,6 +19,11 @@ const breakpoints: { [key: string]: Breakpoint } = {
       `perspective(800px) rotateX(${rotateX}deg) rotateY(0deg) scale(1)`
   },
   opacity: {
+    initial: 0.7,
+    target: 1,
+    formatter: (v: number) => `${v}`
+  },
+  gradientOpacity: {
     initial: 1,
     target: 0,
     formatter: (v: number) => `${v}`

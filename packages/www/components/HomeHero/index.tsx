@@ -84,10 +84,15 @@ const HomeHero = () => {
       scrollTop,
       dynamicBreakpoints.maxWidth
     );
+    // Animate opacity
+    videoRef.current.style.opacity = getProportionalValue(
+      scrollTop,
+      breakpoints.opacity
+    );
     // Animate linear gradient background's opacity
     gradient.style.opacity = getProportionalValue(
       scrollTop,
-      breakpoints.opacity
+      breakpoints.gradientOpacity
     );
     // Animate figure's aspect ratio
     figure.style.paddingBottom = getProportionalValue(
