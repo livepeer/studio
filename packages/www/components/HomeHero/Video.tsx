@@ -4,12 +4,12 @@ import { IconButton } from "@theme-ui/components";
 import { forwardRef, useRef, useCallback } from "react";
 
 const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const figureRef = useRef<HTMLElement>(null);
 
   const fadeIn = useCallback(() => {
-    if (!videoRef.current) return;
-    videoRef.current.style.opacity = "1";
-  }, [videoRef]);
+    if (!figureRef.current) return;
+    figureRef.current.style.opacity = "1";
+  }, [figureRef]);
 
   return (
     <div
@@ -21,7 +21,15 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
         borderRadius: ["4vw", null, null, "36px"]
       }}
     >
-      <figure sx={{ width: "100%", position: "relative" }}>
+      <figure
+        sx={{
+          width: "100%",
+          position: "relative",
+          opacity: 0,
+          transition: "opacity .5s"
+        }}
+        ref={figureRef}
+      >
         <video
           src="/img/video-placeholder.mp4"
           sx={{
@@ -29,12 +37,9 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             top: 0,
             left: 0,
             bottom: 0,
-            right: 0,
-            opacity: 0,
-            transition: "opacity .5s"
+            right: 0
           }}
           onPlay={fadeIn}
-          ref={videoRef}
           autoPlay
           loop
           muted
