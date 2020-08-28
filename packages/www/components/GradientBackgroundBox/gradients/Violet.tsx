@@ -5,12 +5,13 @@ type Props = {
   pushSx?: SxStyleProp;
 };
 
-const VioletGradient = ({ id }: Props) => (
+const VioletGradient = ({ id, pushSx }: Props) => (
   <svg
     width="2766"
     viewBox="0 0 2766 720"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    sx={{ height: "100%", ...pushSx }}
   >
     <g clipPath={`url(#${id}-violet-gradient-clip0)`}>
       <g opacity="0.25" filter={`url(#${id}-violet-gradient-filter0_f)`}>

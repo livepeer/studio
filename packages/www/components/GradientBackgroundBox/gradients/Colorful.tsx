@@ -11,7 +11,7 @@ const ColorfulGradient = ({ id, pushSx }: Props) => (
     viewBox="0 0 1919 720"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    sx={pushSx}
+    sx={{ height: "100%", ...pushSx }}
   >
     <g clipPath={`url(#${id}-colorful-gradient-clip0)`}>
       <g filter={`url(#${id}-colorful-gradient-filter0_f)`}>
