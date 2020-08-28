@@ -38,6 +38,7 @@
     "prism-react-renderer": "^1.1.0",
     "react": "^16.12.0",
     "react-copy-to-clipboard": "^5.0.2",
+    "react-device-detect": "^1.13.1",
     "react-dom": "^16.12.0",
     "react-ga": "^2.7.0",
     "react-hubspot": "^1.0.4",

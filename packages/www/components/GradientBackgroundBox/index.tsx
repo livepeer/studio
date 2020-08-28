@@ -4,6 +4,7 @@ import Slider from "../Slider";
 import { SxStyleProp } from "theme-ui";
 import { useMemo } from "react";
 import ColorfulGradient from "./gradients/Colorful";
+import { isSafari } from "react-device-detect";
 
 export type Gradient = "violet" | "colorful" | null;
 
@@ -41,9 +42,9 @@ const GradientBackgroundBox = ({
       sx={{ position: "relative", overflow: "hidden", ...sx }}
       {...moreProps}
     >
-      {false && (
+      {gradient && (
         <>
-          {slide ? (
+          {slide && !isSafari ? (
             <div
               sx={{
                 position: "absolute",
