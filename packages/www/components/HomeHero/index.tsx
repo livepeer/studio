@@ -13,7 +13,6 @@ import {
   getProportionalValue,
   breakpoints,
   maxScroll,
-  DynamicBreakpoints,
   getDynamicBreakpoints,
   getPhonePadding
 } from "./helpers";
@@ -26,30 +25,12 @@ const HomeHero = () => {
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
-  const [dynamicBreakpoints, setDynamicBreakpoints] = useState<
-    DynamicBreakpoints
-  >();
-
-  const onResize = useCallback(() => {
-    setDynamicBreakpoints(getDynamicBreakpoints());
-  }, []);
-
-  useEffect(() => {
-    onResize();
-    window.addEventListener("resize", onResize);
-
-    return () => window.removeEventListener("resize", onResize);
-  }, [onResize]);
 
   const handleScroll = useCallback(() => {
-    if (
-      !videoRef.current ||
-      !dynamicBreakpoints ||
-      !phoneRef.current ||
-      !videoContainerRef.current
-    ) {
+    if (!videoRef.current || !phoneRef.current || !videoContainerRef.current) {
       return;
     }
+    const dynamicBreakpoints = getDynamicBreakpoints();
     const { scrollTop } = document.documentElement;
     const figure = videoRef.current.querySelector("figure") as HTMLElement;
     const gradient = videoRef.current.querySelector(
@@ -99,18 +80,17 @@ const HomeHero = () => {
       scrollTop,
       breakpoints.aspectRatio
     );
-  }, [
-    videoRef.current,
-    phoneRef.current,
-    videoContainerRef.current,
-    dynamicBreakpoints
-  ]);
+  }, [videoRef.current, phoneRef.current, videoContainerRef.current]);
 
   useEffect(() => {
     handleScroll();
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, [handleScroll]);
 
   return (

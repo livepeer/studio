@@ -2,7 +2,6 @@ import { Heading, Text, Flex, Container } from "@theme-ui/components";
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
 import slugify from "@sindresorhus/slugify";
-import { isFirefox, isSafari } from "react-device-detect";
 
 type Props = {
   heading: {
@@ -20,10 +19,7 @@ const SectionLayout = ({ children, heading, gradient }: Props) => (
     gradient={gradient ?? null}
     slide
   >
-    <Container
-      variant="content"
-      sx={{ pt: gradient && !isFirefox && !isSafari ? [6, 7] : undefined }}
-    >
+    <Container variant="content" sx={{ pt: gradient ? [6, 7] : undefined }}>
       <div>
         <Text
           sx={{

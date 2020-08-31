@@ -1,10 +1,6 @@
 import { Box } from "@theme-ui/components";
-import VioletGradient from "./gradients/Violet";
 import Slider from "../Slider";
 import { SxStyleProp } from "theme-ui";
-import { useMemo } from "react";
-import ColorfulGradient from "./gradients/Colorful";
-import { isSafari, isFirefox } from "react-device-detect";
 
 export type Gradient = "violet" | "colorful" | null;
 
@@ -26,24 +22,18 @@ const GradientBackgroundBox = ({
   gradientSx,
   ...moreProps
 }: Props) => {
-  const Gradient = useMemo(() => {
-    switch (gradient) {
-      case "violet":
-        return VioletGradient;
-      case "colorful":
-        return ColorfulGradient;
-      default:
-        return null;
-    }
-  }, [gradient]);
+  const gradientMarkup = (
+    <div sx={{ width: 2766, minWidth: "100vw", ...gradientSx }}>
+      <img src={`/img/gradient-${gradient}.svg`} sx={{ width: "100%" }} />
+    </div>
+  );
 
   return (
     <Box
       sx={{ position: "relative", overflow: "hidden", ...sx }}
       {...moreProps}
     >
-      {/* Safari and Firefox really struggle with these gradients */}
-      {gradient && !isFirefox && !isSafari && (
+      {gradient && (
         <>
           {slide ? (
             <div
@@ -55,9 +45,7 @@ const GradientBackgroundBox = ({
                 top: 0
               }}
             >
-              <Slider duration={3}>
-                <Gradient id={id} pushSx={gradientSx} />
-              </Slider>
+              <Slider duration={3}>{gradientMarkup}</Slider>
             </div>
           ) : (
             <div
@@ -69,7 +57,7 @@ const GradientBackgroundBox = ({
                 top: 0
               }}
             >
-              <Gradient id={id} pushSx={gradientSx} />
+              {gradientMarkup}
             </div>
           )}
         </>
