@@ -38,7 +38,7 @@ export class DB {
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl, replicaUrl }) {
+  async start({ postgresUrl, postgresReplicaUrl }) {
     this.postgresUrl = postgresUrl
     if (!postgresUrl) {
       throw new Error('no postgres url provided')
@@ -54,11 +54,14 @@ export class DB {
       connectionString: postgresUrl,
     })
 
-    if (replicaUrl) {
+    if (postgresReplicaUrl) {
+      console.log('replica url found, using read replica')
       this.replicaPool = new Pool({
         connectionTimeoutMillis: CONNECT_TIMEOUT,
-        connectionString: replicaUrl,
+        connectionString: postgresReplicaUrl,
       })
+    } else {
+      console.log('no replica url found, not using read replica')
     }
 
     await this.query('SELECT NOW()')
