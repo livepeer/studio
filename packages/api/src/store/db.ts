@@ -29,15 +29,17 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>
 
   postgresUrl: String
+  replicaUrl: String
   ready: Promise<void>
   pool: Pool
+  replicaPool: Pool
 
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl }) {
+  async start({ postgresUrl, postgresReplicaUrl }) {
     this.postgresUrl = postgresUrl
     if (!postgresUrl) {
       throw new Error('no postgres url provided')
@@ -52,7 +54,19 @@ export class DB {
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
     })
+
+    if (postgresReplicaUrl) {
+      console.log('replica url found, using read replica')
+      this.replicaPool = new Pool({
+        connectionTimeoutMillis: CONNECT_TIMEOUT,
+        connectionString: postgresReplicaUrl,
+      })
+    } else {
+      console.log('no replica url found, not using read replica')
+    }
+
     await this.query('SELECT NOW()')
+    await this.replicaQuery('SELECT NOW()')
     await this.makeTables()
   }
 
@@ -95,6 +109,13 @@ export class DB {
   async query(query, ...params) {
     console.log(query)
     return this.pool.query(query, ...params)
+  }
+
+  async replicaQuery(query, ...params) {
+    console.log(query)
+    return this.replicaPool
+      ? this.replicaPool.query(query, ...params)
+      : this.pool.query(query, ...params)
   }
 }
 

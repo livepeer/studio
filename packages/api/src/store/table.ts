@@ -2,6 +2,7 @@ import sql, { SQLStatement } from 'sql-template-strings'
 import { DB } from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
+import { QueryArrayResult } from 'pg'
 
 interface TableSchema {
   table: string
@@ -18,6 +19,11 @@ interface FindQuery {
 interface FindOptions {
   cursor?: string
   limit?: number
+  useReplica?: boolean
+}
+
+interface GetOptions {
+  useReplica?: boolean
 }
 
 export default class Table<T extends DBObject> {
@@ -31,13 +37,24 @@ export default class Table<T extends DBObject> {
   }
 
   // get a single document by id
-  async get(id: string): Promise<T> {
+  async get(id: string, opts: GetOptions = { useReplica: true }): Promise<T> {
     if (!id) {
       throw new Error('missing id')
     }
-    const res = await this.db.query(
-      sql`SELECT data FROM `.append(this.name).append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
-    )
+    let res: QueryArrayResult<any[]>
+    if (!opts.useReplica) {
+      res = await this.db.query(
+        sql`SELECT data FROM `
+          .append(this.name)
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
+      )
+    } else {
+      res = await this.db.replicaQuery(
+        sql`SELECT data FROM `
+          .append(this.name)
+          .append(sql` WHERE id=${id}`.setName(`${this.name}_by_id`)),
+      )
+    }
 
     if (res.rowCount < 1) {
       return null
@@ -50,7 +67,7 @@ export default class Table<T extends DBObject> {
     query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
-    const { cursor = '', limit = 100 } = opts
+    const { cursor = '', limit = 100, useReplica = true } = opts
 
     const q = sql`SELECT * FROM `.append(this.name)
     let filters = []
@@ -67,7 +84,6 @@ export default class Table<T extends DBObject> {
       }
     }
     if (cursor) {
-      console.log(`CURSORRR: ${cursor}`)
       filters.push(sql`data->>'id' > ${cursor}`)
     }
     let first = true
@@ -85,7 +101,12 @@ export default class Table<T extends DBObject> {
     q.append(' ORDER BY id ASC')
     q.append(sql` LIMIT ${limit}`)
 
-    const res = await this.db.query(q)
+    let res
+    if (useReplica) {
+      res = await this.db.replicaQuery(q)
+    } else {
+      res = this.db.query(q)
+    }
 
     const docs = res.rows.map(({ data }) => data)
 

@@ -41,6 +41,10 @@ export default function parseCli(argv) {
           demandOption: true,
           default: 'postgresql://postgres@localhost/livepeer',
         },
+        'postgres-replica-url': {
+          describe: 'url of a postgres read replica database',
+          type: 'string',
+        },
         'client-id': {
           describe: 'google auth ID',
           type: 'string',
