@@ -50,7 +50,7 @@ export default ({
     title: title,
     description: description,
     openGraph: {
-      title: title ? title : "Live Video Transcoding - Livepeer",
+      title: title ? title : "Live Video Transcoding - Livepeer.com",
       description: description
         ? description
         : "Scalable, secure live transcoding at a fraction of the cost",
@@ -58,7 +58,7 @@ export default ({
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/share-icon.png",
-          alt: image ? image.alt : "Live Video Transcoding - Livepeer",
+          alt: image ? image.alt : "Live Video Transcoding - Livepeer.com",
         },
       ],
     },

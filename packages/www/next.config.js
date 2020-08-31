@@ -1,17 +1,23 @@
+const emoji = require("remark-emoji");
+
 const withMDX = require("@next/mdx")({
-  extension: /\.mdx?$/,
-});
-module.exports = withMDX({
-  experimental: {
-    trailingSlash: false,
+  options: {
+    remarkPlugins: [emoji],
   },
-  webpack(config, options) {
+});
+
+module.exports = withMDX({
+  pageExtensions: ["js", "jsx", "mdx", "ts", "tsx", "svg"],
+  webpack(config, _options) {
     config.module.rules.push({
       test: /\.(graphql|gql)$/,
       exclude: /node_modules/,
       loader: "graphql-tag/loader",
     });
+    config.module.rules.push({
+      test: /\.md$/,
+      use: "raw-loader",
+    });
     return config;
   },
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx", "svg"],
 });

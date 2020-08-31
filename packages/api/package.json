@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@cloudflare/json-schema-walker": "^0.1.1",
-    "@cloudflare/kv-asset-handler": "^0.0.5",
+    "@cloudflare/kv-asset-handler": "^0.0.11",
     "@cloudflare/wrangler": "^1.8.4",
     "@kubernetes/client-node": "^0.10.2",
     "@livepeer/axios": "^0.19.2",
@@ -85,6 +85,7 @@
     "sql-template-strings": "^2.2.2",
     "string-template": "^1.0.0",
     "uuid": "^3.3.2",
+    "whatwg-fetch": "^3.4.0",
     "winston": "^3.2.1",
     "wolfy87-eventemitter": "^5.2.9",
     "yargs": "^13.2.2"
