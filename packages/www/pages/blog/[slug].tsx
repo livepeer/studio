@@ -17,6 +17,7 @@ import BlogPostImage from "../../components/renderers/BlogPostImage";
 import { Grid } from "@theme-ui/components";
 import BlogPostCard from "../../components/cards/BlogPost";
 import Prefooter from "../../components/Prefooter";
+import Link from "next/link";
 
 class CodeBlock extends React.PureComponent {
   static propTypes = {
@@ -89,19 +90,30 @@ const Post = ({
               day: "numeric"
             })}
           </Box>
-          <Box
-            sx={{
-              color: "text",
-              textTransform: "uppercase",
-              textDecoration: "underline",
-              lineHeight: "15px",
-              fontSize: "12px",
-              letterSpacing: "-0.02em",
-              fontWeight: 600
-            }}
+          <Link
+            href={category.title === "All" ? "/blog" : `/blog/category/[slug]`}
+            as={
+              category.title === "All"
+                ? "/blog"
+                : `/blog/category/${category.slug.current}`
+            }
+            passHref
           >
-            {category.title}
-          </Box>
+            <Box
+              as="a"
+              sx={{
+                color: "text",
+                textTransform: "uppercase",
+                textDecoration: "underline",
+                lineHeight: "15px",
+                fontSize: "12px",
+                letterSpacing: "-0.02em",
+                fontWeight: 600
+              }}
+            >
+              {category.title}
+            </Box>
+          </Link>
         </Flex>
         <h1 sx={{ fontSize: [32, null, 40], my: 3 }}>{title}</h1>
         <Flex sx={{ alignItems: "center" }}>
