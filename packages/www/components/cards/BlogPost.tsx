@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Flex, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
+import { SxStyleProp } from "theme-ui";
 
 // Super hardcoded values to calculate the excerpt height. Yep.
 const cardHeight = 555;
@@ -17,10 +18,10 @@ const cardPadding = 24;
 
 const BlogPostCard = ({
   post,
-  className
+  pushSx
 }: {
   post: any;
-  className?: string;
+  pushSx?: SxStyleProp;
 }) => {
   const stats = readingTime(post.body);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -51,7 +52,7 @@ const BlogPostCard = ({
   }, [getExcerptMaxLines]);
 
   return (
-    <div className={className}>
+    <div sx={pushSx}>
       <Link href="/blog/[slug]" as={`/blog/${post.slug.current}`} passHref>
         <A
           sx={{
