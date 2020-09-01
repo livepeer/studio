@@ -30,7 +30,7 @@ const ContactPage = () => {
   }, [data]);
   return (
     <Layout
-      title={`Contact - Livepeer`}
+      title={`Contact - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com/contact`}
     >

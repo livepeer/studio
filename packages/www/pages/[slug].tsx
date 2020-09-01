@@ -18,7 +18,7 @@ const Page = ({ title, content, preview }) => {
   }
   return (
     <Layout
-      title={`${title} - Livepeer`}
+      title={`${title} - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com`}
       preview={preview}

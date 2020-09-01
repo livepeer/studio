@@ -76,7 +76,7 @@ const featuresListItems: IconListItemProps[] = [
 const HomePage = () => {
   return (
     <Layout
-      title={`Home - Livepeer`}
+      title={`Home - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com`}
       withGradientBackground

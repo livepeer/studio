@@ -1,11 +1,11 @@
 export default {
-  title: "Live Video Transcoding - Livepeer",
+  title: "Live Video Transcoding - Livepeer.com",
   description: "Scalable, secure live transcoding at a fraction of the cost",
   openGraph: {
     type: "website",
     locale: "en_IE",
     url: "https://livepeer.com",
-    title: "Live Video Transcoding - Livepeer",
+    title: "Live Video Transcoding - Livepeer.com",
     description: "Scalable, secure live transcoding at a fraction of the cost",
     defaultImageWidth: 1200,
     defaultImageHeight: 630,
@@ -15,14 +15,14 @@ export default {
         url: "https://livepeer.com/img/share-icon.png",
         width: 325,
         height: 325,
-        alt: "Livepeer",
-      },
+        alt: "Livepeer"
+      }
     ],
-    site_name: "Livepeer",
+    site_name: "Livepeer"
   },
   twitter: {
     handle: "@livepeerorg",
     site: "@site",
-    cardType: "summary_large_image",
-  },
+    cardType: "summary_large_image"
+  }
 };
