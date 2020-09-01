@@ -31,10 +31,8 @@ const BlogIndex = ({ categories, posts }) => {
       withGradientBackground
     >
       <Container sx={{ textAlign: "center", maxWidth: 900, mb: 6 }}>
-        <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>
-          Livepeer Blog
-        </h1>
-        <p sx={{ lineHeight: "32px", fontSize: 3, color: "text" }}>
+        <h1 sx={{ variant: "text.heading.hero" }}>Livepeer Blog</h1>
+        <p sx={{ variant: "text.heroDescription" }}>
           Read the latest updates of Livepeer.
         </p>
       </Container>
