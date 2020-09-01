@@ -4,16 +4,14 @@ import { print } from "graphql/language/printer";
 import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
 import { Container, Flex, Box, Link as A, Spinner } from "@theme-ui/components";
-import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
-import readingTime from "reading-time";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import BlogPostCard from "../../components/cards/BlogPost";
+import { Grid } from "@theme-ui/components";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
   const { slug } = router.query;
-  const builder = imageUrlBuilder(client as any);
 
   if (router.isFallback) {
     return (
@@ -28,7 +26,16 @@ const BlogIndex = ({ categories, posts }) => {
       title={`Blog - Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
       url={`https://livepeer.com/blog`}
+      withGradientBackground
     >
+      <Container sx={{ textAlign: "center", maxWidth: 900, mb: 6 }}>
+        <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>
+          Livepeer Blog
+        </h1>
+        <p sx={{ lineHeight: "32px", fontSize: 3, color: "text" }}>
+          Read the latest updates of Livepeer.
+        </p>
+      </Container>
       <Container
         sx={{
           pb: 5,
@@ -37,12 +44,6 @@ const BlogIndex = ({ categories, posts }) => {
           margin: "0 auto"
         }}
       >
-        <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>Blog</h1>
-        <p
-          sx={{ maxWidth: 900, lineHeight: "32px", fontSize: 3, color: "grey" }}
-        >
-          Welcome to the Livepeer.com blog.
-        </p>
         <Flex
           sx={{
             borderBottom: "1px solid rgba(55,54,77,.1)",
@@ -87,137 +88,11 @@ const BlogIndex = ({ categories, posts }) => {
             </Link>
           ))}
         </Flex>
-        <Box>
-          {posts.map((p, i) => {
-            const stats = readingTime(p.body);
-            return (
-              <Link
-                key={i}
-                href="/blog/[slug]"
-                as={`/blog/${p.slug.current}`}
-                passHref
-              >
-                <A
-                  sx={{
-                    pb: 4,
-                    mb: 4,
-                    borderBottom: "1px solid rgba(55,54,77,.1)",
-                    width: "100%",
-                    display: "block",
-                    textDecoration: "none",
-                    color: "initial",
-                    marginRight: "auto",
-                    cursor: "pointer",
-                    ":last-of-type": {
-                      borderBottom: 0
-                    },
-                    ":hover": {
-                      textDecoration: "none"
-                    }
-                  }}
-                >
-                  <Flex sx={{ flexDirection: ["column", "column", "row"] }}>
-                    {p.mainImage && (
-                      <img
-                        alt={p.mainImage?.alt}
-                        width={150}
-                        height={200}
-                        sx={{
-                          mb: [3, 3, 0],
-                          mt: [2, 0],
-                          height: [260, 260, 180],
-                          width: ["100%", "100%", 240],
-                          minWidth: 240,
-                          objectFit: "cover",
-                          mr: 4
-                        }}
-                        className="lazyload"
-                        data-src={builder.image(p.mainImage).url()}
-                      />
-                    )}
-                    <Box>
-                      <Flex
-                        sx={{
-                          alignItems: "center",
-                          fontSize: 1,
-                          color: "grey",
-                          mb: 3
-                        }}
-                      >
-                        {new Date(p._createdAt).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric"
-                        })}
-                        <Box
-                          sx={{
-                            display: ["block", "block", "none"],
-                            mx: 3,
-                            width: "1px",
-                            height: 16,
-                            bg: "grey"
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            display: ["block", "block", "none"],
-                            color: "grey"
-                          }}
-                        >
-                          {p.category.title}
-                        </Box>
-                      </Flex>
-                      <h2 sx={{ fontSize: 5, mb: 3, transition: "color .3s" }}>
-                        {p.title}
-                      </h2>
-                      <Box sx={{ mb: 3, color: "grey" }}>{p.excerpt}</Box>
-                      <Flex sx={{ alignItems: "center" }}>
-                        <img
-                          alt={p.author.image?.alt}
-                          width={30}
-                          height={30}
-                          sx={{
-                            mt: [2, 0],
-                            height: 30,
-                            width: 30,
-                            borderRadius: 1000,
-                            objectFit: "cover",
-                            mr: 3
-                          }}
-                          className="lazyload"
-                          data-src={builder.image(p.author.image).url()}
-                        />
-                        <Box>By {p.author.name}</Box>
-                        <Box
-                          sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }}
-                        />
-                        <Box
-                          sx={{
-                            display: ["none", "none", "block"],
-                            color: "grey"
-                          }}
-                        >
-                          {p.category.title}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: ["none", "none", "block"],
-                            mx: 3,
-                            width: "1px",
-                            height: 16,
-                            bg: "grey"
-                          }}
-                        />
-                        <Box sx={{ color: "grey" }}>{stats.text}</Box>
-                      </Flex>
-                    </Box>
-                  </Flex>
-                </A>
-              </Link>
-            );
-          })}
-        </Box>
+        <Grid columns={[1, 2, 3]}>
+          {posts.map((p, i) => (
+            <BlogPostCard post={p} key={`post-${i}`} />
+          ))}
+        </Grid>
       </Container>
     </Layout>
   );

@@ -93,3 +93,29 @@ export function getAspectRatio(height: number, width: number, forCss = false) {
   const percentage = (height / width) * 100;
   return forCss ? percentage + "%" : percentage;
 }
+
+/**
+ * Gets line height of element
+ * Credits: https://stackoverflow.com/a/4515470
+ */
+function getLineHeight(el: HTMLElement) {
+  const temp = document.createElement(el.nodeName);
+  temp.setAttribute(
+    "style",
+    `margin:0; padding:0;font-family:${
+      el.style.fontFamily || "inherit"
+    };font-size:${el.style.fontSize || "inherit"};`
+  );
+  temp.innerHTML = "A";
+
+  el.parentNode.appendChild(temp);
+  const { clientHeight: lineHeight } = temp;
+  temp.parentNode.removeChild(temp);
+
+  return lineHeight;
+}
+
+export default function getMaxLines(element: HTMLElement, height: number) {
+  const lineHeight = getLineHeight(element);
+  return Math.floor(height / lineHeight);
+}

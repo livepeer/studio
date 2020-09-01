@@ -89,7 +89,8 @@ const Layout = ({
         sx={{
           flexGrow: 1,
           flexDirection: "column",
-          justifyContent: "flex-start"
+          justifyContent: "flex-start",
+          zIndex: 1
         }}
       >
         <Box
