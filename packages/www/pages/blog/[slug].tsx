@@ -12,6 +12,7 @@ import { Spinner } from "@theme-ui/components";
 import React from "react";
 import PropTypes from "prop-types";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import BlogPostImage from "../../components/renderers/BlogPostImage";
 
 class CodeBlock extends React.PureComponent {
   static propTypes = {
@@ -59,108 +60,105 @@ const Post = ({
       url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
-      <Box
-        sx={{
-          mb: 5,
-          background: [
-            "none",
-            "none",
-            "none",
-            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(148, 60, 255,.08) 45%, rgba(255,255,255,.3) 100%);"
-          ]
-        }}
-      >
-        <Container
+      <Container variant="blogPost">
+        <BlogPostImage
+          alt={mainImage?.alt}
+          width={700}
+          height={400}
+          className="lazyload"
+          data-src={builder.image(mainImage).url()}
+        />
+        <Flex
           sx={{
-            flexDirection: ["column", "column", "column", "row"],
-            display: "flex",
-            gap: "12px",
-            alignItems: "center"
+            mb: 2,
+            alignItems: "center",
+            fontSize: 1,
+            justifyContent: "space-between"
           }}
         >
           <Box
             sx={{
-              flexGrow: 1,
-              width: "100%",
-              maxWidth: 800,
-              py: [40, 40, 40, 100],
-              mr: [0, 0, 0, 5]
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              mr: 2
             }}
           >
-            <img
-              alt={mainImage?.alt}
-              width={700}
-              height={400}
-              sx={{
-                mt: [2, 0],
-                height: [300, 300, 400],
-                maxHeight: [300, 300, 400],
-                width: "100%",
-                objectFit: "cover"
-              }}
-              className="lazyload"
-              data-src={builder.image(mainImage).url()}
-            />
+            {new Date(_createdAt).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            })}
           </Box>
           <Box
             sx={{
-              flexGrow: 0,
-              flexBasis: ["initial", "initial", "initial", 950]
+              color: "text",
+              textTransform: "uppercase",
+              textDecoration: "underline",
+              lineHeight: "15px",
+              fontSize: "12px",
+              letterSpacing: "-0.02em",
+              fontWeight: 600
             }}
           >
-            <Flex sx={{ mb: 2, alignItems: "center", fontSize: 1 }}>
-              <Box>
-                {new Date(_createdAt).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric"
-                })}
-              </Box>
-              <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-              <Box>{category.title}</Box>
-            </Flex>
-            <h1 sx={{ fontSize: [32, 32, 48], my: 3 }}>{title}</h1>
-            <Flex sx={{ alignItems: "center" }}>
-              <Flex sx={{ alignItems: "center" }}>
+            {category.title}
+          </Box>
+        </Flex>
+        <h1 sx={{ fontSize: [32, null, 40], my: 3 }}>{title}</h1>
+        <Flex sx={{ alignItems: "center", mb: 4 }}>
+          <Box>
+            <Flex sx={{ alignItems: "center", fontSize: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                By{" "}
                 <img
                   alt={author.image?.alt}
                   width={40}
                   height={40}
                   sx={{
-                    mt: [2, 0],
-                    height: 40,
-                    width: 40,
+                    height: 32,
+                    width: 32,
                     borderRadius: 1000,
                     objectFit: "cover",
-                    mr: 3
+                    ml: 3,
+                    mr: 2
                   }}
                   className="lazyload"
                   data-src={builder.image(author.image).url()}
                 />
-
-                <Box>
-                  <Flex sx={{ alignItems: "center", fontSize: 1 }}>
-                    <Box>By {author.name}</Box>
-                    <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-                    <Box>{stats.text}</Box>
-                  </Flex>
-                </Box>
-              </Flex>
+                <span
+                  sx={{
+                    fontWeight: 600,
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {author.name}
+                </span>
+              </Box>
+              <Box sx={{ mx: 2, width: "1px", height: 16, bg: "grey" }} />
+              <Box
+                sx={{
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                {stats.text}
+              </Box>
             </Flex>
           </Box>
-        </Container>
-      </Box>
-      <Container
-        className="markdown-body"
-        sx={{ pb: 6, maxWidth: 768, margin: "0 auto" }}
-      >
-        <ReactMarkdown
-          source={body}
-          renderers={{
-            code: CodeBlock
-          }}
-        />
+        </Flex>
+        <div className="markdown-body">
+          <ReactMarkdown
+            source={body}
+            renderers={{
+              code: CodeBlock,
+              image: BlogPostImage
+            }}
+          />
+        </div>
       </Container>
     </Layout>
   );

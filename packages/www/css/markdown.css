@@ -94,10 +94,6 @@
   margin: 0.67em 0;
 }
 
-.markdown-body img {
-  border-style: none;
-}
-
 .markdown-body code,
 .markdown-body kbd,
 .markdown-body pre {
@@ -775,20 +771,6 @@
 
 .markdown-body table tr:nth-child(2n) {
   background-color: #f6f8fa;
-}
-
-.markdown-body img {
-  max-width: 100%;
-  box-sizing: initial;
-  background-color: #fff;
-}
-
-.markdown-body img[align="right"] {
-  padding-left: 20px;
-}
-
-.markdown-body img[align="left"] {
-  padding-right: 20px;
 }
 
 .markdown-body code {
