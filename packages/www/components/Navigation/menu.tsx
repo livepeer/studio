@@ -103,7 +103,7 @@ const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
             Docs
           </A>
         </Link>
-        <Link href="/contact" passHref>
+        <Link href="/blog" passHref>
           <A
             sx={{
               color: "text",

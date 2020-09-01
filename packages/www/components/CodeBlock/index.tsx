@@ -4,7 +4,7 @@ import Highlight, { defaultProps } from "prism-react-renderer";
 import theme from "prism-react-renderer/themes/vsDark";
 import { Box } from "@theme-ui/components";
 
-export default ({ children, className }) => {
+const CodeBlock = ({ children, className }) => {
   let language = null;
   if (className && className.startsWith("language-")) {
     language = className.replace("language-", "");
@@ -37,3 +37,5 @@ export default ({ children, className }) => {
     </Highlight>
   );
 };
+
+export default CodeBlock;

@@ -1,4 +1,5 @@
-import { Container, Flex, Box, Link as A } from "@theme-ui/components";
+import Fade from "react-reveal/Fade";
+import { Container, Flex, Box } from "@theme-ui/components";
 import Layout from "../../components/Layout";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
@@ -13,6 +14,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import BlogPostImage from "../../components/renderers/BlogPostImage";
+import { Grid } from "@theme-ui/components";
+import BlogPostCard from "../../components/cards/BlogPost";
+import Prefooter from "../../components/Prefooter";
 
 class CodeBlock extends React.PureComponent {
   static propTypes = {
@@ -39,7 +43,8 @@ const Post = ({
   _createdAt,
   excerpt,
   body,
-  preview
+  preview,
+  furtherReading
 }) => {
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
@@ -60,14 +65,7 @@ const Post = ({
       url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
-      <Container variant="blogPost">
-        <BlogPostImage
-          alt={mainImage?.alt}
-          width={700}
-          height={400}
-          className="lazyload"
-          data-src={builder.image(mainImage).url()}
-        />
+      <Container variant="blogPost" sx={{ my: 5 }}>
         <Flex
           sx={{
             mb: 2,
@@ -106,7 +104,7 @@ const Post = ({
           </Box>
         </Flex>
         <h1 sx={{ fontSize: [32, null, 40], my: 3 }}>{title}</h1>
-        <Flex sx={{ alignItems: "center", mb: 4 }}>
+        <Flex sx={{ alignItems: "center" }}>
           <Box>
             <Flex sx={{ alignItems: "center", fontSize: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -150,6 +148,13 @@ const Post = ({
             </Flex>
           </Box>
         </Flex>
+        <BlogPostImage
+          alt={mainImage?.alt}
+          width={700}
+          height={400}
+          className="lazyload"
+          data-src={builder.image(mainImage).url()}
+        />
         <div className="markdown-body">
           <ReactMarkdown
             source={body}
@@ -159,7 +164,17 @@ const Post = ({
             }}
           />
         </div>
+        <hr sx={{ my: [5, 6] }} />
+        <h3 sx={{ mb: 40 }}>Articles you may be interested in</h3>
+        <Grid columns={[1, null, 2]} mb={5} gap={4}>
+          {furtherReading.map((p, i) => (
+            <BlogPostCard post={p} key={`post-${i}`} />
+          ))}
+        </Grid>
       </Container>
+      <Fade key={0}>
+        <Prefooter />
+      </Fade>
     </Layout>
   );
 };
@@ -172,15 +187,22 @@ export async function getServerSideProps({ params }) {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
-  let data: any = await graphQLClient.request(print(allPosts), {
-    where: {
-      slug: { current: { eq: params.slug } }
-    }
+  let { allPost: posts }: any = await graphQLClient.request(print(allPosts), {
+    where: {}
   });
+
+  const post = posts.find((p) => p.slug.current === slug);
+
+  // TODO. should this be random?
+  const furtherReading = posts
+    .filter((p) => p.slug.current !== slug)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 2);
 
   return {
     props: {
-      ...data.allPost[0]
+      ...post,
+      furtherReading
     }
   };
 }
