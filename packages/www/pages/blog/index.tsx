@@ -1,3 +1,4 @@
+import Fade from "react-reveal/Fade";
 import Layout from "../../components/Layout";
 import { request } from "graphql-request";
 import { print } from "graphql/language/printer";
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import BlogPostCard from "../../components/cards/BlogPost";
 import { Grid } from "@theme-ui/components";
+import Prefooter from "../../components/Prefooter";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -36,14 +38,7 @@ const BlogIndex = ({ categories, posts }) => {
           Read the latest updates of Livepeer.
         </p>
       </Container>
-      <Container
-        sx={{
-          pb: 5,
-          ul: { mb: 4 },
-          p: { mb: 4 },
-          margin: "0 auto"
-        }}
-      >
+      <Container>
         <Flex
           sx={{
             borderBottom: "1px solid rgba(55,54,77,.1)",
@@ -51,49 +46,57 @@ const BlogIndex = ({ categories, posts }) => {
             mb: 4
           }}
         >
-          {categories.map((c, i) => (
-            <Link
-              key={i}
-              href={c.title === "All" ? "/blog" : `/blog/category/[slug]`}
-              as={
-                c.title === "All" ? "/blog" : `/blog/category/${c.slug.current}`
-              }
-              passHref
-            >
-              <A
-                sx={{
-                  display: "block",
-                  color: "black",
-                  textDecoration: "none",
-                  ":hover": {
-                    textDecoration: "none"
-                  }
-                }}
+          {categories.map((c, i) => {
+            const isSelected =
+              slug === c.slug.current || (!slug && c.title === "All");
+            return (
+              <Link
+                key={i}
+                href={c.title === "All" ? "/blog" : `/blog/category/[slug]`}
+                as={
+                  c.title === "All"
+                    ? "/blog"
+                    : `/blog/category/${c.slug.current}`
+                }
+                passHref
               >
-                <Box
-                  key={i + 1}
+                <A
                   sx={{
-                    borderBottom: `2px solid  ${
-                      slug === c.slug.current || (!slug && c.title === "All")
-                        ? "black"
-                        : "transparent"
-                    }`,
-                    pb: 3,
-                    mr: 4
+                    display: "block",
+                    color: "black",
+                    textDecoration: "none",
+                    ":hover": {
+                      textDecoration: "none"
+                    }
                   }}
                 >
-                  {c.title}
-                </Box>
-              </A>
-            </Link>
-          ))}
+                  <Box
+                    key={i + 1}
+                    sx={{
+                      borderBottom: "2px solid",
+                      borderColor: isSelected ? "primary" : "transparent",
+                      color: isSelected ? "primary" : "text",
+                      fontWeight: isSelected ? 600 : 500,
+                      pb: 3,
+                      mr: 4
+                    }}
+                  >
+                    {c.title}
+                  </Box>
+                </A>
+              </Link>
+            );
+          })}
         </Flex>
-        <Grid columns={[1, 2, 3]}>
+        <Grid columns={[1, null, 2, null, 3]} mb={5} gap={4}>
           {posts.map((p, i) => (
             <BlogPostCard post={p} key={`post-${i}`} />
           ))}
         </Grid>
       </Container>
+      <Fade key={0}>
+        <Prefooter />
+      </Fade>
     </Layout>
   );
 };

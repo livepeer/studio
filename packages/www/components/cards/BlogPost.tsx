@@ -66,8 +66,11 @@ const BlogPostCard = ({
             borderColor: "#F0F0F0",
             overflow: "hidden",
             height: cardHeight,
+            transition: "box-shadow .2s",
             ":hover": {
-              textDecoration: "none"
+              textDecoration: "none",
+              boxShadow:
+                "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
             }
           }}
         >
@@ -131,9 +134,26 @@ const BlogPostCard = ({
                   className="lazyload"
                   data-src={builder.image(post.author.image).url()}
                 />
-                <Box sx={{ fontWeight: 600 }}>{post.author.name}</Box>
+                <Box
+                  sx={{
+                    fontWeight: 600,
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {post.author.name}
+                </Box>
                 <Box sx={{ mx: 2, width: "2px", height: 16, bg: "grey" }} />
-                <Box>{stats.text}</Box>
+                <Box
+                  sx={{
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {stats.text}
+                </Box>
               </Flex>
               <h2
                 ref={titleRef}
@@ -156,14 +176,16 @@ const BlogPostCard = ({
                   WebkitLineClamp: excerptMaxLines,
                   WebkitBoxOrient: "vertical",
                   overflow: "hidden",
-                  display: "-webkit-box"
+                  display: excerptMaxLines === 0 ? "none" : "-webkit-box"
                 }}
                 ref={excerptRef}
               >
                 {post.excerpt}
               </Box>
             </div>
-            <A sx={{ fontWeight: 600 }}>Read more</A>
+            <A as="p" sx={{ fontWeight: 600, margin: 0 }}>
+              Read more
+            </A>
           </Flex>
         </A>
       </Link>

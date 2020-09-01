@@ -37,6 +37,7 @@ export const theme = {
     listText: "#666666",
     extremelyBlue: "#3F3FE2"
   },
+  breakpoints: ["640px", "832px", "1024px", "1280px"],
   buttons: {
     default: {
       color: "text",
