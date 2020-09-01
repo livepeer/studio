@@ -39,7 +39,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
       >
         <video
           ref={videoRef}
-          src="/img/video-placeholder.mp4"
+          src="/dj.mp4"
           sx={{
             position: "absolute",
             top: 0,
