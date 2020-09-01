@@ -179,6 +179,7 @@ const BlogPostCard = ({
                   display: excerptMaxLines === 0 ? "none" : "-webkit-box"
                 }}
                 ref={excerptRef}
+                as="p"
               >
                 {post.excerpt}
               </Box>

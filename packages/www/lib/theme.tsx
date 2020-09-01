@@ -188,7 +188,19 @@ export const theme = {
         fontSize: [5, 6],
         color: "text",
         fontWeight: "bold"
+      },
+      hero: {
+        lineHeight: ["48px", "72px"],
+        mt: [4, 5],
+        mb: [2, 3],
+        fontSize: ["40px", "8"],
+        letterSpacing: "-0.05em"
       }
+    },
+    heroDescription: {
+      lineHeight: "32px",
+      fontSize: 3,
+      color: "text"
     }
   },
   styles: {
