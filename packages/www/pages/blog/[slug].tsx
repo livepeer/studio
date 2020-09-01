@@ -104,11 +104,13 @@ const Post = ({
               sx={{
                 color: "text",
                 textTransform: "uppercase",
-                textDecoration: "underline",
                 lineHeight: "15px",
                 fontSize: "12px",
                 letterSpacing: "-0.02em",
-                fontWeight: 600
+                fontWeight: 600,
+                "&:hover": {
+                  textDecoration: "underline"
+                }
               }}
             >
               {category.title}

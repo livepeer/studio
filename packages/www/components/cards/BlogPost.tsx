@@ -102,7 +102,6 @@ const BlogPostCard = ({
                 sx={{
                   color: "text",
                   textTransform: "uppercase",
-                  textDecoration: "underline",
                   lineHeight: "15px",
                   fontSize: "12px",
                   letterSpacing: "-0.02em",
