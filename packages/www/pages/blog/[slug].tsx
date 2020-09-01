@@ -1,4 +1,5 @@
-import { Container, Flex, Box, Link as A } from "@theme-ui/components";
+import Fade from "react-reveal/Fade";
+import { Container, Flex, Box } from "@theme-ui/components";
 import Layout from "../../components/Layout";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
@@ -12,6 +13,11 @@ import { Spinner } from "@theme-ui/components";
 import React from "react";
 import PropTypes from "prop-types";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import BlogPostImage from "../../components/renderers/BlogPostImage";
+import { Grid } from "@theme-ui/components";
+import BlogPostCard from "../../components/cards/BlogPost";
+import Prefooter from "../../components/Prefooter";
+import Link from "next/link";
 
 class CodeBlock extends React.PureComponent {
   static propTypes = {
@@ -38,7 +44,8 @@ const Post = ({
   _createdAt,
   excerpt,
   body,
-  preview
+  preview,
+  furtherReading
 }) => {
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
@@ -59,109 +66,129 @@ const Post = ({
       url={`https://livepeer.com${asPath}`}
       preview={preview}
     >
-      <Box
-        sx={{
-          mb: 5,
-          background: [
-            "none",
-            "none",
-            "none",
-            "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(148, 60, 255,.08) 45%, rgba(255,255,255,.3) 100%);"
-          ]
-        }}
-      >
-        <Container
+      <Container variant="blogPost" sx={{ my: 5 }}>
+        <Flex
           sx={{
-            flexDirection: ["column", "column", "column", "row"],
-            display: "flex",
-            gap: "12px",
-            alignItems: "center"
+            mb: 2,
+            alignItems: "center",
+            fontSize: 1,
+            justifyContent: "space-between"
           }}
         >
           <Box
             sx={{
-              flexGrow: 1,
-              width: "100%",
-              maxWidth: 800,
-              py: [40, 40, 40, 100],
-              mr: [0, 0, 0, 5]
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              mr: 2
             }}
           >
-            <img
-              alt={mainImage?.alt}
-              width={700}
-              height={400}
-              sx={{
-                mt: [2, 0],
-                height: [300, 300, 400],
-                maxHeight: [300, 300, 400],
-                width: "100%",
-                objectFit: "cover"
-              }}
-              className="lazyload"
-              data-src={builder.image(mainImage).url()}
-            />
+            {new Date(_createdAt).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            })}
           </Box>
-          <Box
-            sx={{
-              flexGrow: 0,
-              flexBasis: ["initial", "initial", "initial", 950]
-            }}
+          <Link
+            href={category.title === "All" ? "/blog" : `/blog/category/[slug]`}
+            as={
+              category.title === "All"
+                ? "/blog"
+                : `/blog/category/${category.slug.current}`
+            }
+            passHref
           >
-            <Flex sx={{ mb: 2, alignItems: "center", fontSize: 1 }}>
-              <Box>
-                {new Date(_createdAt).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric"
-                })}
-              </Box>
-              <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-              <Box>{category.title}</Box>
-            </Flex>
-            <h1 sx={{ fontSize: [32, 32, 48], my: 3 }}>{title}</h1>
-            <Flex sx={{ alignItems: "center" }}>
-              <Flex sx={{ alignItems: "center" }}>
+            <Box
+              as="a"
+              sx={{
+                color: "text",
+                textTransform: "uppercase",
+                lineHeight: "15px",
+                fontSize: "12px",
+                letterSpacing: "-0.02em",
+                fontWeight: 600,
+                "&:hover": {
+                  textDecoration: "underline"
+                }
+              }}
+            >
+              {category.title}
+            </Box>
+          </Link>
+        </Flex>
+        <h1 sx={{ fontSize: [32, null, 40], my: 3 }}>{title}</h1>
+        <Flex sx={{ alignItems: "center" }}>
+          <Box>
+            <Flex sx={{ alignItems: "center", fontSize: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                By{" "}
                 <img
                   alt={author.image?.alt}
                   width={40}
                   height={40}
                   sx={{
-                    mt: [2, 0],
-                    height: 40,
-                    width: 40,
+                    height: 32,
+                    width: 32,
                     borderRadius: 1000,
                     objectFit: "cover",
-                    mr: 3
+                    ml: 3,
+                    mr: 2
                   }}
                   className="lazyload"
                   data-src={builder.image(author.image).url()}
                 />
-
-                <Box>
-                  <Flex sx={{ alignItems: "center", fontSize: 1 }}>
-                    <Box>By {author.name}</Box>
-                    <Box sx={{ mx: 3, width: "1px", height: 16, bg: "grey" }} />
-                    <Box>{stats.text}</Box>
-                  </Flex>
-                </Box>
-              </Flex>
+                <span
+                  sx={{
+                    fontWeight: 600,
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {author.name}
+                </span>
+              </Box>
+              <Box sx={{ mx: 2, width: "1px", height: 16, bg: "grey" }} />
+              <Box
+                sx={{
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                {stats.text}
+              </Box>
             </Flex>
           </Box>
-        </Container>
-      </Box>
-      <Container
-        className="markdown-body"
-        sx={{ pb: 6, maxWidth: 768, margin: "0 auto" }}
-      >
-        <ReactMarkdown
-          source={body}
-          renderers={{
-            code: CodeBlock
-          }}
+        </Flex>
+        <BlogPostImage
+          alt={mainImage?.alt}
+          width={700}
+          height={400}
+          className="lazyload"
+          data-src={builder.image(mainImage).url()}
         />
+        <div className="markdown-body">
+          <ReactMarkdown
+            source={body}
+            renderers={{
+              code: CodeBlock,
+              image: BlogPostImage
+            }}
+          />
+        </div>
+        <hr sx={{ my: [5, 6] }} />
+        <h3 sx={{ mb: 40 }}>Articles you may be interested in</h3>
+        <Grid columns={[1, null, 2]} mb={5} gap={4}>
+          {furtherReading.map((p, i) => (
+            <BlogPostCard post={p} key={`post-${i}`} />
+          ))}
+        </Grid>
       </Container>
+      <Fade key={0}>
+        <Prefooter />
+      </Fade>
     </Layout>
   );
 };
@@ -174,15 +201,22 @@ export async function getServerSideProps({ params }) {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
-  let data: any = await graphQLClient.request(print(allPosts), {
-    where: {
-      slug: { current: { eq: params.slug } }
-    }
+  let { allPost: posts }: any = await graphQLClient.request(print(allPosts), {
+    where: {}
   });
+
+  const post = posts.find((p) => p.slug.current === slug);
+
+  // TODO. should this be random?
+  const furtherReading = posts
+    .filter((p) => p.slug.current !== slug)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 2);
 
   return {
     props: {
-      ...data.allPost[0]
+      ...post,
+      furtherReading
     }
   };
 }

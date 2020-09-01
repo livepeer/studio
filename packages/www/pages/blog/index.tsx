@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import BlogPostCard from "../../components/cards/BlogPost";
 import { Grid } from "@theme-ui/components";
 import Prefooter from "../../components/Prefooter";
+import FeaturedBlogPostCard from "../../components/cards/FeaturedBlogPost";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -23,6 +24,9 @@ const BlogIndex = ({ categories, posts }) => {
     );
   }
 
+  // TODO featured post should be defined somewhere in sanity?
+  const featuredPost = posts.find((p) => p);
+
   return (
     <Layout
       title={`Blog - Livepeer.com`}
@@ -30,15 +34,18 @@ const BlogIndex = ({ categories, posts }) => {
       url={`https://livepeer.com/blog`}
       withGradientBackground
     >
-      <Container sx={{ textAlign: "center", maxWidth: 900, mb: 6 }}>
-        <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>
-          Livepeer Blog
-        </h1>
+      <Container sx={{ textAlign: "center", maxWidth: 900, mb: 112 }}>
+        <h1 sx={{ lineHeight: "72px", mt: 5, mb: 3, fontSize: 8 }}>Blog</h1>
         <p sx={{ lineHeight: "32px", fontSize: 3, color: "text" }}>
-          Read the latest updates of Livepeer.
+          Welcome to the Livepeer.com blog.
         </p>
       </Container>
       <Container>
+        {featuredPost && (
+          <div sx={{ mb: "80px", display: ["none", null, "block"] }}>
+            <FeaturedBlogPostCard post={featuredPost} />
+          </div>
+        )}
         <Flex
           sx={{
             borderBottom: "1px solid rgba(55,54,77,.1)",
@@ -90,7 +97,16 @@ const BlogIndex = ({ categories, posts }) => {
         </Flex>
         <Grid columns={[1, null, 2, null, 3]} mb={5} gap={4}>
           {posts.map((p, i) => (
-            <BlogPostCard post={p} key={`post-${i}`} />
+            <BlogPostCard
+              post={p}
+              pushSx={{
+                display:
+                  p._id === featuredPost._id
+                    ? ["block", null, "none"]
+                    : undefined
+              }}
+              key={`post-${i}`}
+            />
           ))}
         </Grid>
       </Container>

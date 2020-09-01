@@ -176,6 +176,10 @@ export const theme = {
       px: [4, null, 5],
       py: [5, 6],
       mx: "auto"
+    },
+    blogPost: {
+      maxWidth: 918,
+      px: [4, null, 5]
     }
   },
   text: {
