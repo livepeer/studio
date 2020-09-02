@@ -1,5 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+import { Tree } from "../components/TableOfContents";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
@@ -44,7 +45,7 @@ export function breakablePath(path: string): string {
   return path.split("/").join("/\u{200B}");
 }
 
-export function buildTree(toc) {
+export function buildTree(toc): Tree {
   // [h1, children]
   const tree = [undefined, []];
 
@@ -86,7 +87,7 @@ export function buildTree(toc) {
   }
 
   // Return the tree
-  return tree;
+  return tree as Tree; // TODO type this [hard function to type].
 }
 
 export function getAspectRatio(height: number, width: number, forCss = false) {

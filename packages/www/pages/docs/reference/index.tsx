@@ -16,7 +16,7 @@ const markdownItAnchorOptions = {
   permalinkClass: "header-anchor",
   permalinkSymbol: "#",
   permalinkBefore: true,
-  slugify: uslugify,
+  slugify: uslugify
 };
 
 md.use(markdownItAnchor, markdownItAnchorOptions);
@@ -56,12 +56,12 @@ const ReferencePage = () => {
           ".header-anchor": {
             ml: "-16px",
             pr: 1,
-            visibility: "hidden",
+            visibility: "hidden"
           },
           "h3:hover .header-anchor, h4:hover .header-anchor, h5:hover .header-anchor, h6:hover .header-anchor": {
-            visibility: "visible",
+            visibility: "visible"
           },
-          h1: { mt: 0 },
+          h1: { mt: 0 }
         }}
         dangerouslySetInnerHTML={{ __html: md.render(reference) }}
       />

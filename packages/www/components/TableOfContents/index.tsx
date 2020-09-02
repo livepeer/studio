@@ -3,7 +3,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
+export type Tree = [{ content: string; slug?: string }, Tree[]] | [];
+
+type Props = {
+  tree: Tree;
+  onClose?: (() => void) | null;
+  ignoreList?: string[];
+};
+
+const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
   function renderHeading(heading, hasChildren = false) {
     const { pathname } = useRouter();
     const isActive = pathname === heading.slug;
@@ -18,7 +26,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
           sx={{
             color: "black",
             alignItems: "center",
-            display: "flex",
+            display: "flex"
           }}
         >
           {heading.content}
@@ -31,7 +39,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
       fontWeight: 600,
       px: 2,
       py: "2px",
-      borderRadius: 4,
+      borderRadius: 4
     };
     return (
       <Link href={heading.slug} passHref>
@@ -43,7 +51,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
             alignItems: "center",
             display: "flex",
             ":hover": {
-              color: "black",
+              color: "black"
             },
             ":before": {
               content: '""',
@@ -54,28 +62,28 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
               height: 4,
               mr: 3,
               borderRadius: "50%",
-              background: "rgb(102, 102, 102)",
-            },
+              background: "rgb(102, 102, 102)"
+            }
           }}
         >
           <Box
             sx={{
               ...(heading.content === "POST" && {
                 bg: "green",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "GET" && {
                 bg: "blue",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "DELETE" && {
                 bg: "red",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "PUT" && {
                 bg: "orange",
-                ...labelStyles,
-              }),
+                ...labelStyles
+              })
             }}
           >
             {heading.content}
@@ -85,15 +93,21 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
     );
   }
 
-  function renderChildren(children) {
+  function renderChildren(children: Tree[]) {
     if (children.length === 0) {
       return null;
     }
 
-    return children.map((child, i) => <Box key={i}>{renderPair(child)}</Box>);
+    return (
+      <>
+        {children.map((child, i) => (
+          <Box key={i}>{renderPair(child)}</Box>
+        ))}
+      </>
+    );
   }
 
-  function renderPair(pair) {
+  function renderPair(pair: Tree) {
     const [isOpen, setIsOpen] = useState(true);
     const [heading, children] = pair;
     const hasChildren = children?.length > 0;
@@ -110,7 +124,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
                 minWidth: 6,
                 mr: 3,
                 ml: "-2px",
-                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)"
               }}
               width="6"
               height="10"
@@ -137,7 +151,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
               my: 0,
               borderLeft: "1px solid",
               borderColor: "#eaeaea",
-              pl: 3,
+              pl: 3
             }}
           >
             <Box>{renderChildren(children)}</Box>
@@ -147,7 +161,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
     );
   }
 
-  function render(tree) {
+  function render(tree: Tree) {
     const [heading, children] = tree;
 
     let Toc = renderPair(tree);
