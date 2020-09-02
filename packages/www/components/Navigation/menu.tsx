@@ -1,18 +1,13 @@
-import {
-  Box,
-  Flex,
-  Container,
-  Link as A,
-  IconButton
-} from "@theme-ui/components";
+import { Box, Flex, Container, IconButton } from "@theme-ui/components";
 import Button from "../Button";
-import Logo from "../Logo";
 import { FiX } from "react-icons/fi";
 import { User } from "@livepeer.com/api";
 import Link from "../Link";
+import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
+  breadcrumb?: BreadcrumbItem[];
   mobileMenuIsOpen: boolean;
   setMobileMenuIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   token: string | undefined;
@@ -24,7 +19,8 @@ const Menu = ({
   setMobileMenuIsOpen,
   token,
   user,
-  links
+  links,
+  breadcrumb
 }: Props) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) setMobileMenuIsOpen(false);
@@ -54,7 +50,9 @@ const Menu = ({
           bg: "background"
         }}
       >
-        <Logo logoType={!token} />
+        <div>
+          <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType={!token} />
+        </div>
         <IconButton
           sx={{ fontSize: 6 }}
           onClick={() => setMobileMenuIsOpen(false)}

@@ -11,14 +11,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Menu from "./menu";
 import { useRouter } from "next/router";
-import Logo from "../Logo";
 import Button from "../Button";
+import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 
 const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
-  breadcrumb?: React.ComponentProps<typeof Link>[];
+  breadcrumb?: BreadcrumbItem[];
 };
 
 const NavigationBase = ({ links, breadcrumb }: Props) => {
@@ -73,37 +73,10 @@ const NavigationBase = ({ links, breadcrumb }: Props) => {
           <div
             sx={{ minWidth: sidesWidth, display: "flex", alignItems: "center" }}
           >
-            {breadcrumb ? (
-              <>
-                <Logo logoType={false} />
-                {breadcrumb.map((link) => (
-                  <span key={`breadcrumb-${link.href}`}>
-                    <span
-                      sx={{
-                        ml: "12px",
-                        mr: "6px",
-                        fontWeight: 800,
-                        fontSize: "22px",
-                        color: "text"
-                      }}
-                    >
-                      /
-                    </span>
-                    <Link
-                      {...link}
-                      sx={{
-                        ml: "px",
-                        fontWeight: 800,
-                        fontSize: "22px",
-                        color: "text"
-                      }}
-                    />
-                  </span>
-                ))}
-              </>
-            ) : (
-              <Logo logoType={!isDashboard} />
-            )}
+            <NavigationBreadcrumb
+              breadcrumb={breadcrumb}
+              withLogoType={!isDashboard}
+            />
           </div>
           <Flex
             sx={{
@@ -183,6 +156,7 @@ const NavigationBase = ({ links, breadcrumb }: Props) => {
         user={user}
         token={token}
         links={links}
+        breadcrumb={breadcrumb}
       />
     </Box>
   );

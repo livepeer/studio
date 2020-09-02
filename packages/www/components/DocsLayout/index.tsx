@@ -5,6 +5,7 @@ import TableOfContents from "../TableOfContents";
 import guides from "./guides";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { DocsNav } from "../Navigation";
 
 const ignoreList = [
   "/password-reset",
@@ -29,6 +30,7 @@ export default ({ children, tree = guides }) => {
       title={`Docs - Livepeer.com`}
       description={`An introduction to the Livepeer.com platform and how to get started creating streams.`}
       url={`https://livepeer.com/docs`}
+      customNav={<DocsNav />}
     >
       <Box
         sx={{

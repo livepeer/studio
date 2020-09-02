@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import NavigationBase from "./base";
+import { useRouter } from "next/router";
 
 type NavProps = React.ComponentProps<typeof NavigationBase>;
 
@@ -35,10 +36,80 @@ const docsNavProps: NavProps = {
       children: "API Reference"
     }
   ],
-  breadcrumb: [{ children: "Docs", href: "/docs" }]
+  breadcrumb: [
+    {
+      children: "docs",
+      href: "/docs",
+      mobileDropdownLinks: [
+        {
+          children: "Overview",
+          href: "/docs",
+          isSelected: true
+        },
+        {
+          children: "Guides",
+          href: "/guides",
+          isSelected: false
+        },
+        {
+          children: "API Reference",
+          href: "/reference",
+          isSelected: false
+        }
+      ]
+    }
+  ]
 };
 
 const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
-const DocsNav = () => <NavigationBase {...docsNavProps} />;
+const DocsNav = () => {
+  const router = useRouter();
+  const { pathname } = router;
+
+  const docsNavProps: NavProps = useMemo(
+    () => ({
+      links: [
+        {
+          href: "/docs",
+          children: "Overview"
+        },
+        {
+          href: "/docs/guides",
+          children: "Guides"
+        },
+        {
+          href: "/docs/reference",
+          children: "API Reference"
+        }
+      ],
+      breadcrumb: [
+        {
+          children: "Docs",
+          href: "/docs",
+          mobileDropdownLinks: [
+            {
+              children: "Overview",
+              href: "/docs",
+              isSelected: pathname === "/docs"
+            },
+            {
+              children: "Guides",
+              href: "/docs/guides",
+              isSelected: pathname === "/docs/guides"
+            },
+            {
+              children: "API Reference",
+              href: "/docs/reference",
+              isSelected: pathname === "/docs/reference"
+            }
+          ]
+        }
+      ]
+    }),
+    [pathname]
+  );
+
+  return <NavigationBase {...docsNavProps} />;
+};
 
 export { DefaultNav, DocsNav };
