@@ -45,7 +45,7 @@ export function breakablePath(path: string): string {
   return path.split("/").join("/\u{200B}");
 }
 
-export function buildTree(toc): Tree {
+export function buildTree(toc): Tree[] {
   // [h1, children]
   const tree = [undefined, []];
 
@@ -86,8 +86,8 @@ export function buildTree(toc): Tree {
     references.splice(h + 1); // 3. remove deeper references
   }
 
-  // Return the tree
-  return tree as Tree; // TODO type this [hard function to type].
+  // Return the tree. We don't care about the heading though.
+  return tree[1] as Tree[]; // TODO type this [hard function to type].
 }
 
 export function getAspectRatio(height: number, width: number, forCss = false) {

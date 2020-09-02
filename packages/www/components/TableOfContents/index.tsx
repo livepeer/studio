@@ -6,7 +6,7 @@ import { useState } from "react";
 export type Tree = [{ content: string; slug?: string }, Tree[]] | [];
 
 type Props = {
-  tree: Tree;
+  tree: Tree[];
   onClose?: (() => void) | null;
   ignoreList?: string[];
 };
@@ -174,7 +174,13 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
     return Toc;
   }
 
-  return render(tree);
+  return (
+    <>
+      {tree.map((t, i) => (
+        <div key={`tree-${i}`}>{render(t)}</div>
+      ))}
+    </>
+  );
 };
 
 export default TableOfContents;

@@ -143,43 +143,11 @@ export default ({ children, tree = guides }) => {
               pl: [19, 19, 1]
             }}
           >
-            <Flex
-              sx={{
-                display: ["none", "none", "flex"],
-                alignItems: "centered",
-                mb: 3,
-                left: -1,
-                position: "relative"
-              }}
-            >
-              <Link href="/docs" passHref>
-                <A
-                  variant={
-                    pathname === "/docs/reference"
-                      ? "buttons.outlineSmall"
-                      : "buttons.primarySmall"
-                  }
-                  sx={{
-                    borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0
-                  }}
-                >
-                  Guides
-                </A>
-              </Link>
-              <Link href="/docs/reference" passHref>
-                <A
-                  variant={
-                    pathname === "/docs/reference"
-                      ? "buttons.primarySmall"
-                      : "buttons.outlineSmall"
-                  }
-                  sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-                >
-                  API Reference
-                </A>
-              </Link>
-            </Flex>
+            {pathname === "/docs/reference" ? (
+              <h4 sx={{ mb: 3 }}>API Reference</h4>
+            ) : (
+              <h4 sx={{ mb: 3 }}>Guides</h4>
+            )}
             <TableOfContents
               onClose={() => setIsOpen(false)}
               tree={tree}
