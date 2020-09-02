@@ -117,5 +117,6 @@ function getLineHeight(el: HTMLElement) {
 
 export default function getMaxLines(element: HTMLElement, height: number) {
   const lineHeight = getLineHeight(element);
+  if (lineHeight <= 0) return 0;
   return Math.floor(height / lineHeight);
 }

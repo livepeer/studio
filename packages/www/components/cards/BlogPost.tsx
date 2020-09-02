@@ -176,7 +176,7 @@ const BlogPostCard = ({
                   WebkitLineClamp: excerptMaxLines,
                   WebkitBoxOrient: "vertical",
                   overflow: "hidden",
-                  display: excerptMaxLines === 0 ? "none" : "-webkit-box"
+                  display: excerptMaxLines <= 0 ? "none" : "-webkit-box"
                 }}
                 ref={excerptRef}
                 as="p"
