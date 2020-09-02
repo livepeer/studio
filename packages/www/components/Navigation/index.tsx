@@ -21,46 +21,6 @@ const defaultNavProps: NavProps = {
   ]
 };
 
-const docsNavProps: NavProps = {
-  links: [
-    {
-      href: "/docs",
-      children: "Overview"
-    },
-    {
-      href: "/guides",
-      children: "Guides"
-    },
-    {
-      href: "/reference",
-      children: "API Reference"
-    }
-  ],
-  breadcrumb: [
-    {
-      children: "docs",
-      href: "/docs",
-      mobileDropdownLinks: [
-        {
-          children: "Overview",
-          href: "/docs",
-          isSelected: true
-        },
-        {
-          children: "Guides",
-          href: "/guides",
-          isSelected: false
-        },
-        {
-          children: "API Reference",
-          href: "/reference",
-          isSelected: false
-        }
-      ]
-    }
-  ]
-};
-
 const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
 const DocsNav = () => {
   const router = useRouter();

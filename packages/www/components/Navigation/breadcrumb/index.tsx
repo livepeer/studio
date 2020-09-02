@@ -48,9 +48,9 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
             <span
               sx={{
                 position: "relative",
-                display: ["inline-flex", null, "none"],
+                display: "inline-flex",
                 alignItems: "center",
-                height: "34px"
+                height: "33px"
               }}
             >
               <Divider />
@@ -71,16 +71,15 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                   position: "relative",
                   display: ["inline-flex", null, "none"],
                   alignItems: "center",
-                  height: "34px",
+                  height: "33px",
                   ml: "-6px"
                 }}
               >
                 <Divider />
                 {(() => {
-                  const {
-                    children,
-                    ...selectedProps
-                  } = item.mobileDropdownLinks.find((l) => l.isSelected);
+                  const { children, ...selectedProps } =
+                    item.mobileDropdownLinks.find((l) => l.isSelected) ??
+                    item.mobileDropdownLinks.find((l) => l.href === "/docs");
                   return (
                     <Link
                       {...selectedProps}
