@@ -25,7 +25,7 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
     const maxExcerptHeight =
       cardHeight - cardPadding * 2 - titleRef.current.clientHeight;
     const maxLines = getMaxLines(excerptRef.current, maxExcerptHeight);
-    setExcerptMaxLines(maxLines - 1);
+    setExcerptMaxLines(maxLines);
   }, [titleRef, excerptRef]);
 
   useEffect(() => {
@@ -36,19 +36,48 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
   }, [getExcerptMaxLines]);
 
   return (
-    <Link href={href} as={asPath}>
-      <A>
-        <h4 ref={titleRef}>{title}</h4>
+    <Link href={href} as={asPath} passHref>
+      <A
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          bg: "#fafafa",
+          textAlign: "left",
+          borderRadius: 24,
+          p: 24,
+          height: cardHeight,
+          transition: "background-color .2s",
+          "&:hover": {
+            bg: "#F0F0F0",
+            textDecoration: "none"
+          }
+        }}
+      >
+        <h4
+          ref={titleRef}
+          sx={{
+            color: "text",
+            fontWeight: 600,
+            fontSize: "20px",
+            lineHeight: "23px",
+            letterSpacing: "-0.03em",
+            pb: 2
+          }}
+        >
+          {title}
+        </h4>
         <Box
           as="p"
           sx={{
-            mb: "3",
             color: "gray",
             textOverflow: "ellipsis",
             WebkitLineClamp: excerptMaxLines,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            display: excerptMaxLines <= 0 ? "none" : "-webkit-box"
+            display: excerptMaxLines <= 0 ? "none" : "-webkit-box",
+            fontSize: "18px",
+            lineHeight: 1.6
           }}
           ref={excerptRef}
         >

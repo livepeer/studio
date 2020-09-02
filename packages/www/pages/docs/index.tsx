@@ -60,58 +60,72 @@ const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
     excerpt:
       "Before live streaming via the Livepeer API, you will need to create a Livepeer account and be...",
     href: "/docs/introduction"
+  },
+  {
+    title: "How to create a stream 3",
+    excerpt:
+      "Before live streaming via the Livepeer API, you will need to create a Livepeer account and be...",
+    href: "/docs/introduction"
   }
 ];
 
-const DocsIndex = () => {
-  return (
-    <Layout
-      title={`Docs - Livepeer.com`}
-      description={`TODO`}
-      url={`https://livepeer.com/docs`}
-      withGradientBackground
-    >
-      <div sx={{ overflowX: "hidden" }}>
-        <Container sx={{ textAlign: "center", maxWidth: "1056px", mb: 6 }}>
-          <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
-          <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
-            Here you could find all the information needed in order to take your
-            product to a whole new level.
-          </p>
-          <KeenSliderGrid
-            breakpoints={[
-              { value: "320px", slidesPerView: 1 },
-              { value: "604px", slidesPerView: 2 },
-              { value: "832px", slidesPerView: 3 },
-              { value: "1440px", slidesPerView: 4 }
-            ]}
-          >
-            {categories.map((category) => (
-              <DocsCategoryCard {...category} key={category.title} />
-            ))}
-          </KeenSliderGrid>
-          <Flex
+const DocsIndex = () => (
+  <Layout
+    title={`Docs - Livepeer.com`}
+    description={`TODO`}
+    url={`https://livepeer.com/docs`}
+    withGradientBackground
+  >
+    <div sx={{ overflowX: "hidden" }}>
+      <Container sx={{ textAlign: "center", maxWidth: "1056px", mb: 6 }}>
+        <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
+        <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
+          Here you could find all the information needed in order to take your
+          product to a whole new level.
+        </p>
+        <KeenSliderGrid
+          breakpoints={[
+            { value: "320px", slidesPerView: 1 },
+            { value: "604px", slidesPerView: 2 },
+            { value: "832px", slidesPerView: 3 },
+            { value: "1440px", slidesPerView: 4 }
+          ]}
+        >
+          {categories.map((category) => (
+            <DocsCategoryCard {...category} key={category.title} />
+          ))}
+        </KeenSliderGrid>
+        <Flex
+          sx={{
+            alignItems: ["flex-start", "center"],
+            justifyContent: "space-between",
+            mt: ["80px", "160px"],
+            mb: 4,
+            flexDirection: ["column", "row"]
+          }}
+        >
+          <h2
             sx={{
-              alignItems: "center",
-              justifyContent: "space-between",
-              mt: "160px"
+              mb: [3, 0],
+              fontSize: ["32px", "48px"],
+              lineHeight: ["40px", "56px"]
             }}
           >
-            <h2>Popular topics</h2>
-            <Button>Go to guides</Button>
-          </Flex>
-          <Grid>
-            {popularTopics.map((topic) => (
-              <DocsPopularTopicCard {...topic} key={`topic-${topic.title}`} />
-            ))}
-          </Grid>
-        </Container>
-      </div>
-      <Fade key={0}>
-        <Prefooter />
-      </Fade>
-    </Layout>
-  );
-};
+            Popular topics
+          </h2>
+          <Button>Go to guides</Button>
+        </Flex>
+        <Grid columns={[1, 2]} gap={3}>
+          {popularTopics.map((topic) => (
+            <DocsPopularTopicCard {...topic} key={`topic-${topic.title}`} />
+          ))}
+        </Grid>
+      </Container>
+    </div>
+    <Fade key={0}>
+      <Prefooter />
+    </Fade>
+  </Layout>
+);
 
 export default DocsIndex;
