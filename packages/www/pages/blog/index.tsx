@@ -34,7 +34,7 @@ const BlogIndex = ({ categories, posts }) => {
       url={`https://livepeer.com/blog`}
       withGradientBackground
     >
-      <Container sx={{ textAlign: "center", maxWidth: 900, mb: 112 }}>
+      <Container variant="hero">
         <h1 sx={{ variant: "text.heading.hero" }}>Blog</h1>
         <p sx={{ variant: "text.heroDescription" }}>
           Welcome to the Livepeer.com blog.

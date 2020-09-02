@@ -79,7 +79,7 @@ const DocsIndex = () => (
     withGradientBackground
   >
     <div sx={{ overflowX: "hidden" }}>
-      <Container sx={{ textAlign: "center", maxWidth: "1056px", mb: 6 }}>
+      <Container variant="hero" sx={{ maxWidth: "1056px" }}>
         <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
         <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
           Here you could find all the information needed in order to take your

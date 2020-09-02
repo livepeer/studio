@@ -190,6 +190,12 @@ export const theme = {
     blogPost: {
       maxWidth: 918,
       px: [4, null, 5]
+    },
+    hero: {
+      textAlign: "center",
+      maxWidth: 900,
+      mb: 112,
+      px: 4
     }
   },
   text: {
@@ -204,13 +210,15 @@ export const theme = {
         mt: [4, 5],
         mb: [2, 3],
         fontSize: ["40px", "8"],
-        letterSpacing: "-0.05em"
+        letterSpacing: "-0.05em",
+        mx: "auto"
       }
     },
     heroDescription: {
       lineHeight: "32px",
       fontSize: 3,
-      color: "text"
+      color: "text",
+      mx: "auto"
     }
   },
   styles: {
