@@ -6,129 +6,116 @@ import {
   IconButton
 } from "@theme-ui/components";
 import Button from "../Button";
-import Link from "next/link";
 import Logo from "../Logo";
 import { FiX } from "react-icons/fi";
+import { User } from "@livepeer.com/api";
+import Link from "../Link";
 
-const Menu = ({ mobileMenuIsOpen, setMobileMenuIsOpen, token, user }) => (
-  <Box
-    sx={{
-      bg: "white",
-      position: "fixed",
-      top: 0,
-      height: mobileMenuIsOpen ? "100vh" : 0,
-      transition: "height .2s",
-      overflow: "hidden",
-      width: "100%",
-      zIndex: "dropdown",
-      visibility: mobileMenuIsOpen ? "visible" : "hidden"
-    }}
-  >
-    <Container
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        py: 3
-      }}
-    >
-      <Logo logoType={!token} />
-      <IconButton
-        sx={{ fontSize: 6 }}
-        onClick={() => setMobileMenuIsOpen(false)}
-      >
-        <FiX size="24px" />
-      </IconButton>
-    </Container>
-    <Container
-      sx={{
-        pt: 4,
-        pb: 4,
-        display: "flex",
-        flexDirection: "column",
-        height: `calc(100vh -70px)`
-      }}
-    >
-      <Flex sx={{ flexDirection: "column" }}>
-        {!token && (
-          <>
-            <Button
-              href="/login"
-              variant="buttons.outline"
-              sx={{ mb: 3 }}
-              isLink
-            >
-              Login
-            </Button>
-            <Button href="/register">Sign up</Button>
-          </>
-        )}
-      </Flex>
+type Props = {
+  links: React.ComponentProps<typeof Link>[];
+  mobileMenuIsOpen: boolean;
+  setMobileMenuIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  token: string | undefined;
+  user: User | undefined;
+};
 
-      <Flex
+const Menu = ({
+  mobileMenuIsOpen,
+  setMobileMenuIsOpen,
+  token,
+  user,
+  links
+}: Props) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) setMobileMenuIsOpen(false);
+  };
+
+  return (
+    <Box
+      sx={{
+        bg: "rgba(0,0,0,.35)",
+        position: "fixed",
+        top: 0,
+        height: mobileMenuIsOpen ? "100vh" : 0,
+        transition: "height .2s",
+        overflow: "hidden",
+        width: "100%",
+        zIndex: "dropdown",
+        visibility: mobileMenuIsOpen ? "visible" : "hidden"
+      }}
+      onClick={handleClick}
+    >
+      <Container
         sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           py: 3,
-          flexDirection: "column"
+          bg: "background"
         }}
       >
-        {!!token && (
-          <>
-            <Link href="/app/user" passHref>
-              <A
-                sx={{
-                  py: 3,
-                  mb: 0,
-                  color: "text",
-                  textDecoration: "none"
-                }}
-              >
+        <Logo logoType={!token} />
+        <IconButton
+          sx={{ fontSize: 6 }}
+          onClick={() => setMobileMenuIsOpen(false)}
+        >
+          <FiX size="24px" />
+        </IconButton>
+      </Container>
+      <Container
+        sx={{
+          pt: 4,
+          pb: 4,
+          display: "flex",
+          flexDirection: "column",
+          height: `calc(100vh -70px)`,
+          bg: "background"
+        }}
+      >
+        <Flex sx={{ flexDirection: "column" }}>
+          {links.map((link) => (
+            <Link
+              {...link}
+              key={`menu-link-${link.href}`}
+              variant="mobileNav"
+            />
+          ))}
+          <hr sx={{ my: 3, visibility: "hidden" }} />
+          {!!token ? (
+            <>
+              <Button href="/app/user" isLink>
                 Dashboard
-              </A>
-            </Link>
-          </>
-        )}
-        {user && user.admin && (
-          <Link href="/app/admin" passHref>
-            <A variant="buttons.outline">Admin</A>
-          </Link>
-        )}
-        <Link href="/docs" passHref>
-          <A
-            sx={{
-              color: "text",
-              textDecoration: "none",
-              py: 3
-            }}
-          >
-            Docs
-          </A>
-        </Link>
-        <Link href="/blog" passHref>
-          <A
-            sx={{
-              color: "text",
-              textDecoration: "none",
-              py: 3
-            }}
-          >
-            Blog
-          </A>
-        </Link>
-        <Link href="/contact" passHref>
-          <A
-            sx={{
-              color: "text",
-              textDecoration: "none",
-              py: 3,
-              mb: 0
-            }}
-          >
-            Contact
-          </A>
-        </Link>
-      </Flex>
-    </Container>
-  </Box>
-);
+              </Button>
+              {user && user.admin && (
+                <Button
+                  href="/app/admin"
+                  variant="buttons.outline"
+                  sx={{ mt: 3 }}
+                  isLink
+                >
+                  Admin
+                </Button>
+              )}
+            </>
+          ) : (
+            <>
+              <Button href="/register" isLink>
+                Sign up
+              </Button>
+              <Button
+                href="/login"
+                variant="buttons.outline"
+                sx={{ mt: 3 }}
+                isLink
+              >
+                Login
+              </Button>
+            </>
+          )}
+        </Flex>
+      </Container>
+    </Box>
+  );
+};
 
 export default Menu;

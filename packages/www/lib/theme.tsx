@@ -100,8 +100,9 @@ export const theme = {
     outline: {
       variant: "buttons.default",
       bg: "transparent",
-      borderColor: "text",
-      color: "text"
+      color: "text",
+      transition: "background-color .15s",
+      "&:hover": { bg: "muted" }
     },
     text: {
       variant: "buttons.default",
@@ -151,13 +152,22 @@ export const theme = {
   },
   links: {
     nav: {
-      cursor: "pointer",
       color: "body",
       textDecoration: "none",
       mr: 4,
       fontSize: 1,
       fontWeight: 600,
       "&:last-of-type": { mr: 0 }
+    },
+    mobileNav: {
+      textAlign: "center",
+      color: "body",
+      textDecoration: "none",
+      mb: 42,
+      fontSize: "32px",
+      lineHeight: "26px",
+      fontWeight: 600,
+      letterSpacing: "-0.02em"
     },
     footer: {
       color: "background",

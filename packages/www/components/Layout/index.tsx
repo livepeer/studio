@@ -1,5 +1,5 @@
 import { DefaultSeo } from "next-seo";
-import Navigation from "../Navigation";
+import { DefaultNav } from "../Navigation";
 import Footer from "../Footer";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
@@ -17,6 +17,7 @@ interface Props {
   url?: string;
   preview?: boolean;
   withGradientBackground?: boolean;
+  customNav?: React.ReactNode;
 }
 
 if (process.env.NODE_ENV === "production") {
@@ -42,7 +43,8 @@ const Layout = ({
   image,
   url,
   preview,
-  withGradientBackground
+  withGradientBackground,
+  customNav
 }: Props) => {
   const { asPath } = useRouter();
   useEffect(() => {
@@ -121,7 +123,7 @@ const Layout = ({
               Preview Mode — Click to Exit
             </a>
           )}
-          <Navigation />
+          {customNav ? customNav : <DefaultNav />}
         </Box>
         {children}
       </Flex>

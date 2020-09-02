@@ -8,6 +8,7 @@ import Button from "../../components/Button";
 import Prefooter from "../../components/Prefooter";
 import { Grid } from "@theme-ui/components";
 import DocsPopularTopicCard from "../../components/cards/cards/popular-topic";
+import { DocsNav } from "../../components/Navigation";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
@@ -74,6 +75,7 @@ const DocsIndex = () => (
     title={`Docs - Livepeer.com`}
     description={`TODO`}
     url={`https://livepeer.com/docs`}
+    customNav={<DocsNav />}
     withGradientBackground
   >
     <div sx={{ overflowX: "hidden" }}>
