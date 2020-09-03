@@ -146,17 +146,18 @@ const HomeHero = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   label="Enter your email"
-                  sx={{ width: ["188px", "320px"] }}
+                  sx={{ width: ["100%", "320px"] }}
                 />
                 <Button
                   type="submit"
                   sx={{
                     display: "flex",
+                    justifyContent: "center",
                     alignItems: "center",
                     height: "55px",
                     ml: [0, 3],
                     mt: [3, 0],
-                    width: ["184px", "unset"]
+                    width: ["100%", "unset"]
                   }}
                 >
                   Get Started
