@@ -3,6 +3,7 @@ import NavigationBase from "./base";
 import { useRouter } from "next/router";
 import DocsMobileSubMenu from "./mobile/docs-submenu";
 import { Tree } from "../TableOfContents";
+import { isMobile } from "react-device-detect";
 
 type NavProps = React.ComponentProps<typeof NavigationBase>;
 
@@ -98,7 +99,7 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
     <>
       <NavigationBase
         {...docsNavProps}
-        withShadow={!mobileSubmenuVisible}
+        withShadow={!mobileSubmenuVisible || !tree || !isMobile}
         pushSx={tree ? { bg: "background" } : undefined}
       />
       {tree && (
