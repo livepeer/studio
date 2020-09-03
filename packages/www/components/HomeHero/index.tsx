@@ -186,7 +186,7 @@ const HomeHero = () => {
                 zIndex: notchZIndex - 1
               }}
             >
-              <HeroVideo ref={videoRef} />
+              <HeroVideo ref={videoRef} sources={["/dj.mp4"]} />
             </div>
             <PhoneSvg ref={phoneRef} />
           </div>
