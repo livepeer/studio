@@ -1,9 +1,9 @@
 import { Box, Flex, Container, IconButton } from "@theme-ui/components";
-import Button from "../Button";
+import Button from "../../Button";
 import { FiX } from "react-icons/fi";
 import { User } from "@livepeer.com/api";
-import Link from "../Link";
-import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
+import Link from "../../Link";
+import NavigationBreadcrumb, { BreadcrumbItem } from "../breadcrumb";
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
@@ -50,7 +50,7 @@ const Menu = ({
           bg: "background"
         }}
       >
-        <div>
+        <div sx={{ display: "flex", alignItems: "center" }}>
           <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType={!token} />
         </div>
         <IconButton

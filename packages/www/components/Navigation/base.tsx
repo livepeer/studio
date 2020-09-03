@@ -9,19 +9,27 @@ import Link from "../Link";
 import { useApi } from "../../hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
-import Menu from "./menu";
+import Menu from "./mobile/menu";
 import { useRouter } from "next/router";
 import Button from "../Button";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
+import { SxStyleProp } from "theme-ui";
 
 const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
   breadcrumb?: BreadcrumbItem[];
+  withShadow?: boolean;
+  pushSx?: SxStyleProp;
 };
 
-const NavigationBase = ({ links, breadcrumb }: Props) => {
+const NavigationBase = ({
+  links,
+  breadcrumb,
+  withShadow = true,
+  pushSx
+}: Props) => {
   const { pathname } = useRouter();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
@@ -57,9 +65,14 @@ const NavigationBase = ({ links, breadcrumb }: Props) => {
       sx={{
         transition: "box-shadow .3s, top .3s, background-color .3s",
         bg: hasScrolled ? "background" : "transparent",
-        boxShadow: hasScrolled
-          ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
-          : "none"
+        boxShadow:
+          hasScrolled && withShadow
+            ? "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px"
+            : "none",
+        position: "sticky",
+        top: 0,
+        zIndex: mobileMenuIsOpen ? 22 : 22,
+        ...pushSx
       }}
     >
       <Container>

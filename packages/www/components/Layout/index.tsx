@@ -95,36 +95,26 @@ const Layout = ({
           zIndex: 1
         }}
       >
-        <Box
-          sx={{
-            bg: "transparent",
-            zIndex: 20,
-            position: "sticky",
-            top: 0,
-            width: "100%"
-          }}
-        >
-          {preview && (
-            <a
-              href={`/api/exit-preview?path=${asPath}`}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                textDecoration: "none",
-                justifyContent: "center",
-                height: 24,
-                fontSize: 12,
-                fontWeight: "500",
-                bg: "extremelyBlue",
-                color: "white",
-                lineHeight: "32px"
-              }}
-            >
-              Preview Mode — Click to Exit
-            </a>
-          )}
-          {customNav ? customNav : <DefaultNav />}
-        </Box>
+        {preview && (
+          <a
+            href={`/api/exit-preview?path=${asPath}`}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              justifyContent: "center",
+              height: 24,
+              fontSize: 12,
+              fontWeight: "500",
+              bg: "extremelyBlue",
+              color: "white",
+              lineHeight: "32px"
+            }}
+          >
+            Preview Mode — Click to Exit
+          </a>
+        )}
+        {customNav ? customNav : <DefaultNav />}
         {children}
       </Flex>
       <Footer />

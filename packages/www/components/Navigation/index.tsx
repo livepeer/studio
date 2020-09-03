@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import NavigationBase from "./base";
 import { useRouter } from "next/router";
+import DocsMobileSubMenu from "./mobile/docs-submenu";
 
 type NavProps = React.ComponentProps<typeof NavigationBase>;
 
@@ -22,9 +23,26 @@ const defaultNavProps: NavProps = {
 };
 
 const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
-const DocsNav = () => {
+const DocsNav = ({ tree, ignoreList }) => {
   const router = useRouter();
   const { pathname } = router;
+  const [mobileSubmenuVisible, setMobileSubmenuVisible] = useState(true);
+  const [lastScrollTop, setLastScrollTop] = useState<number>();
+
+  const handleScroll = useCallback(() => {
+    const { scrollTop: currentScrollTop } = document.documentElement;
+    setLastScrollTop(currentScrollTop);
+    if (currentScrollTop > lastScrollTop) {
+      setMobileSubmenuVisible(false);
+    } else if (currentScrollTop < lastScrollTop) {
+      setMobileSubmenuVisible(true);
+    }
+  }, [lastScrollTop]);
+
+  useEffect(() => {
+    document.addEventListener("scroll", handleScroll);
+    return () => document.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   const docsNavProps: NavProps = useMemo(
     () => ({
@@ -69,7 +87,22 @@ const DocsNav = () => {
     [pathname]
   );
 
-  return <NavigationBase {...docsNavProps} />;
+  return (
+    <>
+      <NavigationBase
+        {...docsNavProps}
+        withShadow={!mobileSubmenuVisible}
+        pushSx={tree ? { bg: "background" } : undefined}
+      />
+      {tree && (
+        <DocsMobileSubMenu
+          tree={tree}
+          ignoreList={ignoreList}
+          mobileSubmenuVisible={mobileSubmenuVisible}
+        />
+      )}
+    </>
+  );
 };
 
 export { DefaultNav, DocsNav };
