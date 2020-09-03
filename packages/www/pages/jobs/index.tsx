@@ -1,13 +1,12 @@
-import { Box, Container, Grid, Link as A } from '@theme-ui/components';
-import { GraphQLClient, request } from 'graphql-request';
-import { print } from 'graphql/language/printer';
-import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Fade from 'react-reveal/Fade';
+import { Box, Container, Grid, Link as A } from "@theme-ui/components";
+import { GraphQLClient } from "graphql-request";
+import { print } from "graphql/language/printer";
+import Link from "next/link";
+import Fade from "react-reveal/Fade";
 
-import Layout from '../../components/Layout';
-import Prefooter from '../../components/Prefooter';
-import allJobs from '../../queries/allJobs.gql';
+import Layout from "../../components/Layout";
+import Prefooter from "../../components/Prefooter";
+import allJobs from "../../queries/allJobs.gql";
 
 const Page = ({ positions, preview }) => {
   const getFirstParagraph = (content) => content.split("\n")[1];
@@ -29,6 +28,7 @@ const Page = ({ positions, preview }) => {
           margin: "0 auto"
         }}
       >
+        {/* TODO update this with variant: 'text.heading.hero' */}
         <h1 sx={{ lineHeight: "72px", my: 5, textAlign: "center" }}>
           Join Livepeer, Inc.
         </h1>
@@ -64,7 +64,7 @@ const Page = ({ positions, preview }) => {
                 >
                   <p
                     sx={{
-                      fontSize: 32,
+                      fontSize: [24, 32],
                       fontWeight: 600,
                       px: 4,
                       pt: 4,
@@ -118,22 +118,6 @@ const Page = ({ positions, preview }) => {
     </Layout>
   );
 };
-
-export async function getStaticPaths() {
-  const { allJob } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allJobs),
-    {
-      where: {}
-    }
-  );
-  let paths = [];
-  allJob.map((page) => paths.push({ params: { slug: page.slug.current } }));
-  return {
-    fallback: true,
-    paths
-  };
-}
 
 export async function getStaticProps({ params, preview = false }) {
   const graphQLClient = new GraphQLClient(

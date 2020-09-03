@@ -1,13 +1,13 @@
-import { Box, Container, Grid } from '@theme-ui/components';
-import { GraphQLClient, request } from 'graphql-request';
-import { print } from 'graphql/language/printer';
-import ReactMarkdown from 'react-markdown';
-import Fade from 'react-reveal/Fade';
+import { Box, Container, Grid } from "@theme-ui/components";
+import { GraphQLClient, request } from "graphql-request";
+import { print } from "graphql/language/printer";
+import ReactMarkdown from "react-markdown";
+import Fade from "react-reveal/Fade";
 
-import Button from '../../components/Button';
-import Layout from '../../components/Layout';
-import Prefooter from '../../components/Prefooter';
-import allJobs from '../../queries/allJobs.gql';
+import Button from "../../components/Button";
+import Layout from "../../components/Layout";
+import Prefooter from "../../components/Prefooter";
+import allJobs from "../../queries/allJobs.gql";
 
 const Page = ({ title, body, preview }) => {
   return (
@@ -24,7 +24,15 @@ const Page = ({ title, body, preview }) => {
           p: { mb: 4 }
         }}
       >
-        <h1 sx={{ lineHeight: "72px", my: 5 }}>{title}</h1>
+        <h1
+          sx={{
+            lineHeight: ["42px", "72px"],
+            my: 5,
+            fontSize: ["32px", "56px"]
+          }}
+        >
+          {title}
+        </h1>
         <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
           <ReactMarkdown className="markdown-body">{body}</ReactMarkdown>
           <Box
@@ -33,13 +41,12 @@ const Page = ({ title, body, preview }) => {
               top: "100px",
               display: "block",
               alignSelf: "start",
-              width: "380px",
+              width: ["100%", null, "380px"],
               ml: "auto",
               p: 4,
               textDecoration: "none",
               color: "initial",
               marginRight: "auto",
-              cursor: "pointer",
               borderRadius: 24,
               border: "1px solid",
               borderColor: "#F0F0F0",
@@ -60,6 +67,7 @@ const Page = ({ title, body, preview }) => {
             </p>
             <Button
               isExternal
+              isLink
               href="mailto:jobs@livepeer.com"
               sx={{ width: "100%" }}
             >
