@@ -167,7 +167,7 @@ export default () => {
     setStream(null); // make sure that we will load updated stream
   };
 
-  const tabs = query.admin ? getTabsAdmin(2) : getTabs(0);
+  const tabs = !query.admin ? getTabs(0) : getTabsAdmin(2);
   const backLink = query.admin ? "/app/admin/streams" : "/app/user";
 
   return (
