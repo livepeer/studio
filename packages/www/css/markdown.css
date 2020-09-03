@@ -65,6 +65,7 @@
     Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   word-wrap: break-word;
+  overflow: hidden;
 }
 
 .markdown-body details {

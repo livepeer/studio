@@ -1,4 +1,4 @@
-import { Container, Flex, Link as A } from '@theme-ui/components';
+import { Box, Container, Grid } from '@theme-ui/components';
 import { GraphQLClient, request } from 'graphql-request';
 import { print } from 'graphql/language/printer';
 import ReactMarkdown from 'react-markdown';
@@ -25,17 +25,16 @@ const Page = ({ title, body, preview }) => {
         }}
       >
         <h1 sx={{ lineHeight: "72px", my: 5 }}>{title}</h1>
-        <Flex sx={{ maxWidth: 1200, margin: "0 auto" }}>
-          <ReactMarkdown className="markdown-body" sx={{ flex: "1 1 auto" }}>
-            {body}
-          </ReactMarkdown>
-          <A
+        <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
+          <ReactMarkdown className="markdown-body">{body}</ReactMarkdown>
+          <Box
             sx={{
+              position: "sticky",
+              top: "100px",
               display: "block",
-              flex: "1 0 auto",
-              alignSelf: "flex-start",
+              alignSelf: "start",
               width: "380px",
-              ml: 4,
+              ml: "auto",
               p: 4,
               textDecoration: "none",
               color: "initial",
@@ -66,8 +65,8 @@ const Page = ({ title, body, preview }) => {
             >
               Send email
             </Button>
-          </A>
-        </Flex>
+          </Box>
+        </Grid>
       </Container>
       <Fade key={0}>
         <Prefooter />
