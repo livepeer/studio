@@ -1,15 +1,19 @@
-import { Box, Container, Grid, Link as A } from "@theme-ui/components";
-import { GraphQLClient } from "graphql-request";
-import { print } from "graphql/language/printer";
-import Link from "next/link";
-import Fade from "react-reveal/Fade";
+import { Box, Container, Grid, Link as A } from '@theme-ui/components';
+import { GraphQLClient } from 'graphql-request';
+import { print } from 'graphql/language/printer';
+import Link from 'next/link';
+import Fade from 'react-reveal/Fade';
 
-import Layout from "../../components/Layout";
-import Prefooter from "../../components/Prefooter";
-import allJobs from "../../queries/allJobs.gql";
+import Layout from '../../components/Layout';
+import Prefooter from '../../components/Prefooter';
+import allJobs from '../../queries/allJobs.gql';
 
 const Page = ({ positions, preview }) => {
-  const getFirstParagraph = (content) => content.split("\n")[1];
+  const getFirstParagraph = (content) => {
+    return !!content.split("\n")[1]
+      ? content.split("\n")[1]
+      : content.split("\n")[2];
+  };
 
   return (
     <Layout
