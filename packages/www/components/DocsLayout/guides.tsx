@@ -1,10 +1,18 @@
 import { Tree } from "../TableOfContents";
 
 const guidesTree: Tree[] = [
-  [{ content: "Using Livepeer.com for live streaming", slug: "/docs" }, []],
   [
     {
-      content: "How to live stream with the Livepeer.com dashboard"
+      content: "Using Livepeer.com for live streaming",
+      slug: "/docs",
+      iconComponentName: "FiGlobe"
+    },
+    []
+  ],
+  [
+    {
+      content: "How to live stream with the Livepeer.com dashboard",
+      iconComponentName: "FiSettings"
     },
     [
       [
@@ -53,7 +61,8 @@ const guidesTree: Tree[] = [
   ],
   [
     {
-      content: "How to live stream with the Livepeer.com API"
+      content: "How to live stream with the Livepeer.com API",
+      iconComponentName: "FiSliders"
     },
     [
       [
@@ -109,7 +118,8 @@ const guidesTree: Tree[] = [
   ],
   [
     {
-      content: "How do you manage API keys"
+      content: "How do you manage API keys",
+      iconComponentName: "FiKey"
     },
     [
       [
@@ -138,7 +148,8 @@ const guidesTree: Tree[] = [
   [
     {
       content: "Feature Support Matrix",
-      slug: "/docs/support-matrix"
+      slug: "/docs/support-matrix",
+      iconComponentName: "FiInfo"
     },
     []
   ]
