@@ -2,6 +2,7 @@ import React, { useMemo, useState, useCallback, useEffect } from "react";
 import NavigationBase from "./base";
 import { useRouter } from "next/router";
 import DocsMobileSubMenu from "./mobile/docs-submenu";
+import { Tree } from "../TableOfContents";
 
 type NavProps = React.ComponentProps<typeof NavigationBase>;
 
@@ -23,7 +24,13 @@ const defaultNavProps: NavProps = {
 };
 
 const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
-const DocsNav = ({ tree, ignoreList }) => {
+
+type DocsNavProps = {
+  tree?: Tree[];
+  ignoreList?: string[];
+};
+
+const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
   const router = useRouter();
   const { pathname } = router;
   const [mobileSubmenuVisible, setMobileSubmenuVisible] = useState(true);

@@ -15,7 +15,7 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
     img: { src: "/img/docs/key.png", alt: "key image", sx: { width: "130px" } },
     title: "API Keys",
     description: "Learn how to use our API key to live transcode.",
-    link: { href: "/docs/introduction" }
+    link: { href: "/docs/guides/api/create-api-key" }
   },
   {
     img: {
@@ -25,7 +25,7 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
     },
     title: "Broadcasting",
     description: "Learn how to broadcast a stream session.",
-    link: { href: "/docs/introduction" }
+    link: { href: "/docs/guides/dashboard/broadcast-a-stream-session" }
   },
   {
     img: {
@@ -35,7 +35,7 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
     },
     title: "ETH esentials",
     description: "Learn how we use the Blockchain.",
-    link: { href: "/docs/introduction" }
+    link: { href: "/docs/guides" }
   },
   {
     img: {
@@ -45,7 +45,7 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
     },
     title: "Specifications",
     description: "Understanding the stream page specifications.",
-    link: { href: "/docs/introduction" }
+    link: { href: "/docs/guides" }
   }
 ];
 
@@ -53,20 +53,37 @@ const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
   {
     title: "How to create a stream",
     excerpt:
-      "Before live streaming via the Livepeer API, you will need to create a Livepeer account and be...",
-    href: "/docs/introduction"
+      "Before live streaming via the Livepeer.com API, you will need to create a Livepeer.com account and be able to create a RTMP stream. You do not need to create an API key.",
+    href: "/docs/guides/dashboard/create-a-stream"
   },
   {
-    title: "How to create a stream 2",
+    title: "How to broadcast a stream session",
     excerpt:
-      "Before live streaming via the Livepeer API, you will need to create a Livepeer account and be...",
-    href: "/docs/introduction"
+      "Your users or your application will need to be able to push an RTMP stream. When configuring the software to push streams, use the secret stream key and RTMP ingest URL from the stream page.",
+    href: "/docs/guides/dashboard/broadcast-a-stream-session"
   },
   {
-    title: "How to create a stream 3",
+    title: "How to get base URLs",
     excerpt:
-      "Before live streaming via the Livepeer API, you will need to create a Livepeer account and be...",
-    href: "/docs/introduction"
+      "There are 2 types of base URLs: The ingest base URL is a part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream. The playback base URL is a part of the playback URL, used for the viewers to watch the stream.",
+    href: "/docs/guides/api/base-urls"
+  },
+  {
+    title: "How to create a stream",
+    excerpt:
+      "To create a stream, We'll send a POST requst to https://livepeer.com/api/stream.",
+    href: "/docs/guides/api/create-a-stream"
+  },
+  {
+    title: "How to delete a stream",
+    excerpt: `You can delete a stream by sending the DELETE request with a specific "streamId".`,
+    href: "/docs/guides/api/delete-a-stream"
+  },
+  {
+    title: "How to create an API key",
+    excerpt:
+      "Open your Livepeer.com account and navigate to the API key list page, https://livepeer.com/app/user/keys.",
+    href: "/docs/guides/api-keys/create-an-api-key"
   }
 ];
 
@@ -115,7 +132,9 @@ const DocsIndex = () => (
           >
             Popular topics
           </h2>
-          <Button>Go to guides</Button>
+          <Button href="/docs/guides" isLink>
+            Go to guides
+          </Button>
         </Flex>
         <Grid columns={[1, 2]} gap={3}>
           {popularTopics.map((topic) => (

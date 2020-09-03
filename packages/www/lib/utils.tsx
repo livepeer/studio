@@ -58,7 +58,7 @@ export function buildTree(toc): Tree[] {
 
     // h1
     if (h === 1) {
-      tree[0] = heading;
+      tree[0] = { ...heading, iconComponentName: "FiCloud" };
       continue;
     }
 
@@ -87,7 +87,7 @@ export function buildTree(toc): Tree[] {
   }
 
   // Return the tree. We don't care about the heading though.
-  return tree[1] as Tree[]; // TODO type this [hard function to type].
+  return [tree] as Tree[]; // TODO type this [hard function to type].
 }
 
 export function getAspectRatio(height: number, width: number, forCss = false) {
