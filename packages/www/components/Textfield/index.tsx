@@ -22,6 +22,7 @@ const Textfield = ({
   htmlFor = "",
   id = "",
   label,
+  pushInputSx = {},
   ...props
 }) => {
   const [focused, setFocused] = useState(false);
@@ -119,7 +120,8 @@ const Textfield = ({
               outline: "none",
               boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
               borderColor: "primary"
-            }
+            },
+            ...pushInputSx
           }}
           id={id}
           type={type}

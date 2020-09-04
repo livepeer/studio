@@ -7,6 +7,8 @@ import Link from "../Link";
 import Textfield from "../Textfield";
 import { useMailchimp } from "react-use-mailchimp";
 import { useState } from "react";
+import { FiArrowRight } from "react-icons/fi";
+import { IconButton } from "@theme-ui/components";
 
 const linksLists: LinksListProps[] = [
   {
@@ -113,18 +115,41 @@ const Footer = () => {
               Join our newsletter to stay up to date on features and new
               releases.
             </Text>
-            <Textfield
-              label="Enter your email"
-              name="email"
-              id="email-footer"
-              sx={{ width: "100%", maxWidth: "276px" }}
-              type="email"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              value={email}
-              required
-            />
+            <div
+              sx={{
+                position: "relative",
+                width: "fit-content",
+                mx: ["auto", null, null, "unset"]
+              }}
+            >
+              <Textfield
+                label="Enter your email"
+                name="email"
+                id="email-footer"
+                sx={{ width: ["300px", "346px"], maxWidth: "100%" }}
+                pushInputSx={{ pr: 60 }}
+                type="email"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
+                value={email}
+                required
+              />
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  right: "0",
+                  height: "55px",
+                  width: "55px",
+                  color: "text"
+                }}
+                type="submit"
+              >
+                <FiArrowRight />
+              </IconButton>
+            </div>
             {mailchimpResponseData && (
               <MailchimpResponse {...mailchimpResponseData} />
             )}
