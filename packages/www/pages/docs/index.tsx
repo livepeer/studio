@@ -106,7 +106,7 @@ const DocsIndex = () => (
             { value: "320px", slidesPerView: 1 },
             { value: "604px", slidesPerView: 2 },
             { value: "832px", slidesPerView: 3 },
-            { value: "1440px", slidesPerView: 4 }
+            { value: "1280px", slidesPerView: 4 }
           ]}
         >
           {categories.map((category) => (
