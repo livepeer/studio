@@ -128,7 +128,7 @@ const HomeHero = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                router.push(`/register?email=${email}`);
+                router.push(`/register?email=${encodeURIComponent(email)}`);
               }}
               sx={{ mt: 5 }}
             >
