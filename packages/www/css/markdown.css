@@ -648,6 +648,10 @@
   margin-bottom: 16px;
 }
 
+.markdown-body pre > .codeblock-pre-container {
+  margin-bottom: 0;
+}
+
 .markdown-body hr {
   height: 0.25em;
   padding: 0;

@@ -1,9 +1,9 @@
 // Wrapper around <MDXProvider> that injects all of our custom rendering.
 
 import { MDXProvider } from "@mdx-js/react";
-import CodeBlock from "../components/CodeBlock";
 import { Styled } from "theme-ui";
 import Link from "next/link";
+import Code from "../components/renderers/Code";
 
 const StyledA = ({ href, children }) => {
   const isInternal = href.startsWith("/");
@@ -19,8 +19,8 @@ const StyledA = ({ href, children }) => {
         "&:hover": {
           textDecoration: "none",
           transition: ".3s opacity",
-          opacity: 0.75,
-        },
+          opacity: 0.75
+        }
       }}
     >
       {children}
@@ -35,7 +35,7 @@ const StyledA = ({ href, children }) => {
 };
 
 const components = {
-  code: CodeBlock,
+  code: Code,
   inlineCode: Styled.code,
   h1: Styled.h1,
   h2: Styled.h2,
@@ -45,9 +45,11 @@ const components = {
   a: StyledA,
   ul: Styled.ul,
   ol: Styled.ol,
-  li: Styled.li,
+  li: Styled.li
 };
 
-export default ({ children }) => (
+const MarkdownProvider = ({ children }) => (
   <MDXProvider components={components}>{children}</MDXProvider>
 );
+
+export default MarkdownProvider;

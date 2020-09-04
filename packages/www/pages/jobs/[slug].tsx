@@ -8,6 +8,7 @@ import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import Prefooter from "../../components/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
+import Code from "../../components/renderers/Code";
 
 const Page = ({ title, body, preview }) => {
   return (
@@ -34,7 +35,9 @@ const Page = ({ title, body, preview }) => {
           {title}
         </h1>
         <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
-          <ReactMarkdown className="markdown-body">{body}</ReactMarkdown>
+          <ReactMarkdown className="markdown-body" renderers={{ code: Code }}>
+            {body}
+          </ReactMarkdown>
           <Box
             sx={{
               position: "sticky",
