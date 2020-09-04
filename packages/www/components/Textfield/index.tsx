@@ -46,7 +46,7 @@ const Textfield = ({
       <Box
         as="label"
         sx={{
-          zIndex: "1",
+          zIndex: 0,
           transform:
             defaultValue || value || scopedValue || focused
               ? "translate(20px, 10px) scale(0.75)"

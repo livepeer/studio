@@ -1,5 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
+import { Tree } from "../components/TableOfContents";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
@@ -44,7 +45,7 @@ export function breakablePath(path: string): string {
   return path.split("/").join("/\u{200B}");
 }
 
-export function buildTree(toc) {
+export function buildTree(toc): Tree[] {
   // [h1, children]
   const tree = [undefined, []];
 
@@ -57,7 +58,7 @@ export function buildTree(toc) {
 
     // h1
     if (h === 1) {
-      tree[0] = heading;
+      tree[0] = { ...heading, iconComponentName: "FiCloud" };
       continue;
     }
 
@@ -85,8 +86,8 @@ export function buildTree(toc) {
     references.splice(h + 1); // 3. remove deeper references
   }
 
-  // Return the tree
-  return tree;
+  // Return the tree. We don't care about the heading though.
+  return [tree] as Tree[]; // TODO type this [hard function to type].
 }
 
 export function getAspectRatio(height: number, width: number, forCss = false) {
@@ -117,5 +118,6 @@ function getLineHeight(el: HTMLElement) {
 
 export default function getMaxLines(element: HTMLElement, height: number) {
   const lineHeight = getLineHeight(element);
+  if (lineHeight <= 0) return 0;
   return Math.floor(height / lineHeight);
 }

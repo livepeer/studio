@@ -100,8 +100,9 @@ export const theme = {
     outline: {
       variant: "buttons.default",
       bg: "transparent",
-      borderColor: "text",
-      color: "text"
+      color: "text",
+      transition: "background-color .15s",
+      "&:hover": { bg: "muted" }
     },
     text: {
       variant: "buttons.default",
@@ -151,13 +152,22 @@ export const theme = {
   },
   links: {
     nav: {
-      cursor: "pointer",
       color: "body",
       textDecoration: "none",
       mr: 4,
       fontSize: 1,
       fontWeight: 600,
       "&:last-of-type": { mr: 0 }
+    },
+    mobileNav: {
+      textAlign: "center",
+      color: "body",
+      textDecoration: "none",
+      mb: 42,
+      fontSize: "32px",
+      lineHeight: "26px",
+      fontWeight: 600,
+      letterSpacing: "-0.02em"
     },
     footer: {
       color: "background",
@@ -180,6 +190,12 @@ export const theme = {
     blogPost: {
       maxWidth: 918,
       px: [4, null, 5]
+    },
+    hero: {
+      textAlign: "center",
+      maxWidth: 900,
+      mb: 112,
+      px: 4
     }
   },
   text: {
@@ -188,7 +204,21 @@ export const theme = {
         fontSize: [5, 6],
         color: "text",
         fontWeight: "bold"
+      },
+      hero: {
+        lineHeight: ["48px", "72px"],
+        mt: [4, 5],
+        mb: [2, 3],
+        fontSize: ["40px", "8"],
+        letterSpacing: "-0.05em",
+        mx: "auto"
       }
+    },
+    heroDescription: {
+      lineHeight: "32px",
+      fontSize: 3,
+      color: "text",
+      mx: "auto"
     }
   },
   styles: {

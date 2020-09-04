@@ -1,5 +1,5 @@
 import { DefaultSeo } from "next-seo";
-import Navigation from "../Navigation";
+import { DefaultNav } from "../Navigation";
 import Footer from "../Footer";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
@@ -17,6 +17,7 @@ interface Props {
   url?: string;
   preview?: boolean;
   withGradientBackground?: boolean;
+  customNav?: React.ReactNode;
 }
 
 if (process.env.NODE_ENV === "production") {
@@ -42,7 +43,8 @@ const Layout = ({
   image,
   url,
   preview,
-  withGradientBackground
+  withGradientBackground,
+  customNav
 }: Props) => {
   const { asPath } = useRouter();
   useEffect(() => {
@@ -93,36 +95,26 @@ const Layout = ({
           zIndex: 1
         }}
       >
-        <Box
-          sx={{
-            bg: "transparent",
-            zIndex: 20,
-            position: "sticky",
-            top: 0,
-            width: "100%"
-          }}
-        >
-          {preview && (
-            <a
-              href={`/api/exit-preview?path=${asPath}`}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                textDecoration: "none",
-                justifyContent: "center",
-                height: 24,
-                fontSize: 12,
-                fontWeight: "500",
-                bg: "extremelyBlue",
-                color: "white",
-                lineHeight: "32px"
-              }}
-            >
-              Preview Mode — Click to Exit
-            </a>
-          )}
-          <Navigation />
-        </Box>
+        {preview && (
+          <a
+            href={`/api/exit-preview?path=${asPath}`}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              justifyContent: "center",
+              height: 24,
+              fontSize: 12,
+              fontWeight: "500",
+              bg: "extremelyBlue",
+              color: "white",
+              lineHeight: "32px"
+            }}
+          >
+            Preview Mode — Click to Exit
+          </a>
+        )}
+        {customNav ? customNav : <DefaultNav />}
         {children}
       </Flex>
       <Footer />

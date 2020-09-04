@@ -53,7 +53,15 @@ const Prefooter = () => (
         <Button
           href="/contact"
           variant="buttons.text"
-          sx={{ color: "background" }}
+          sx={{
+            height: 44, // Match sibling button
+            color: "background",
+            bg: "rgba(255,255,255,0)",
+            transition: "background-color .15s",
+            "&:hover": {
+              bg: "rgba(255,255,255,0.08)"
+            }
+          }}
           isLink
         >
           Contact sales
