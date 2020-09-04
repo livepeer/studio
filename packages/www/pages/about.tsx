@@ -23,9 +23,9 @@ const AboutPage = ({ content }) => {
           We’re building the future of video infrastructure services.
         </h1>
         <p sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ornare
-          quam ac maximus aliquet. Pellentesque semper lobortis nunc vitae
-          porta. Sed faucibus turpis.
+          We're comprised of team members dedicated to building an affordable,
+          scalable and reliable video platform that focuses on what
+          user-generated content applications need.
         </p>
       </Container>
       <TeamSection teamMembers={teamMembers} />
