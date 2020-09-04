@@ -5,6 +5,8 @@ import { Grid } from "@theme-ui/components";
 import LinksList, { LinksListProps } from "./LinksList";
 import Link from "../Link";
 import Textfield from "../Textfield";
+import { useMailchimp } from "react-use-mailchimp";
+import { useState } from "react";
 
 const linksLists: LinksListProps[] = [
   {
@@ -26,11 +28,54 @@ const linksLists: LinksListProps[] = [
   }
 ];
 
+const MailchimpResponse = ({
+  result,
+  msg
+}: {
+  result?: string;
+  msg?: string;
+}) => {
+  if (!result || !msg) return null;
+
+  const message = msg.includes("is already subscribed to list")
+    ? msg.split(" <a href=")[0]
+    : msg;
+
+  return (
+    <Text
+      sx={{
+        fontWeight: 500,
+        fontSize: 1,
+        ml: 2,
+        mr: "auto",
+        color: "background",
+        position: "absolute",
+        transform: ["translateX(-50%)", null, null, "none"],
+        left: ["50%", null, null, "0"],
+        bottom: "-32px",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        width: "90%"
+      }}
+    >
+      {message}
+    </Text>
+  );
+};
+
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [mailchimp, subscribe] = useMailchimp({
+    url:
+      "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158"
+  });
+
+  const { data: mailchimpResponseData } = mailchimp;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO handle submit
-    console.log("Submitting");
+    subscribe({ EMAIL: email });
   };
 
   return (
@@ -52,7 +97,7 @@ const Footer = () => {
             textAlign: ["center", null, null, "left"]
           }}
         >
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} sx={{ position: "relative" }}>
             <Logo isDark />
             <Text
               as="label"
@@ -73,7 +118,16 @@ const Footer = () => {
               name="email"
               id="email-footer"
               sx={{ width: "100%", maxWidth: "276px" }}
+              type="email"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
+              value={email}
+              required
             />
+            {mailchimpResponseData && (
+              <MailchimpResponse {...mailchimpResponseData} />
+            )}
           </form>
           {linksLists.map((list) => (
             <LinksList key={`links-list-${list.heading}`} {...list} />
