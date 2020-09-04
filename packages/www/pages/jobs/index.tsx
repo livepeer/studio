@@ -1,12 +1,12 @@
-import { Box, Container, Grid, Link as A } from '@theme-ui/components';
-import { GraphQLClient } from 'graphql-request';
-import { print } from 'graphql/language/printer';
-import Link from 'next/link';
-import Fade from 'react-reveal/Fade';
+import { Box, Container, Grid, Link as A } from "@theme-ui/components";
+import { GraphQLClient } from "graphql-request";
+import { print } from "graphql/language/printer";
+import Link from "next/link";
+import Fade from "react-reveal/Fade";
 
-import Layout from '../../components/Layout';
-import Prefooter from '../../components/Prefooter';
-import allJobs from '../../queries/allJobs.gql';
+import Layout from "../../components/Layout";
+import Prefooter from "../../components/Prefooter";
+import allJobs from "../../queries/allJobs.gql";
 
 const Page = ({ positions, preview }) => {
   const getFirstParagraph = (content) => {
@@ -32,8 +32,15 @@ const Page = ({ positions, preview }) => {
           margin: "0 auto"
         }}
       >
-        {/* TODO update this with variant: 'text.heading.hero' */}
-        <h1 sx={{ lineHeight: "72px", my: 5, textAlign: "center" }}>
+        <h1
+          sx={{
+            lineHeight: ["48px", "72px"],
+            my: [4, 5],
+            fontSize: ["40px", "8"],
+            letterSpacing: "-0.05em",
+            textAlign: "center"
+          }}
+        >
           Join Livepeer, Inc.
         </h1>
         <Grid columns={1} mb={5} gap={4}>
