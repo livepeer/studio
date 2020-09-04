@@ -39,8 +39,8 @@ const ContactSection = () => {
           Get in touch with us
         </Styled.h2>
         <Box sx={{ maxWidth: 512, margin: "0 auto" }}>
-          If you’d like to learn more about Livepeer’s innovative UGC focused
-          video platform drop us a note and we’ll get right back to you!
+          If you’d like to learn more about Livepeer.com's innovative UGC
+          focused video platform drop us a note and we’ll get right back to you!
           <br />
           <br />
           or email us at{" "}
