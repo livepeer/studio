@@ -41,8 +41,9 @@ const ContactPage = () => {
         <Box sx={{ mb: 80 }}>
           <h1 sx={{ variant: "text.heading.hero" }}>Get in touch with us</h1>
           <Box sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
-            If you’d like to learn more about Livepeer’s innovative UGC focused
-            video platform drop us a note and we’ll get right back to you!
+            If you’d like to learn more about Livepeer.com’s innovative UGC
+            focused video platform drop us a note and we’ll get right back to
+            you!
             <br />
             <br />
             or email us at{" "}

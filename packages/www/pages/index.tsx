@@ -24,7 +24,7 @@ const benefitsListItems: IconListItemProps[] = [
     icon: <FiUserCheck />,
     title: "Easy to use",
     description:
-      "Our straight forward API’s make integrating Livepeer into your UGC platform a quick and easy task."
+      "Our straight forward API’s make integrating Livepeer.com into your UGC platform a quick and easy task."
   },
   {
     icon: <FiPlay />,
