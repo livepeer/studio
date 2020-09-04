@@ -99,8 +99,7 @@ const DocsIndex = () => (
       <Container variant="hero" sx={{ maxWidth: "1056px" }}>
         <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
         <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
-          Here you could find all the information needed in order to take your
-          product to a whole new level.
+          Welcome to the Livepeer.com documentation!
         </p>
         <KeenSliderGrid
           breakpoints={[
