@@ -65,6 +65,7 @@
     Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   word-wrap: break-word;
+  overflow: hidden;
 }
 
 .markdown-body details {
@@ -645,6 +646,10 @@
 .markdown-body ul {
   margin-top: 0;
   margin-bottom: 16px;
+}
+
+.markdown-body pre > .codeblock-pre-container {
+  margin-bottom: 0;
 }
 
 .markdown-body hr {

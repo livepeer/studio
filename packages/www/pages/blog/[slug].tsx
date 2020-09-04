@@ -11,30 +11,12 @@ import ReactMarkdown from "react-markdown";
 import { useRouter } from "next/router";
 import { Spinner } from "@theme-ui/components";
 import React from "react";
-import PropTypes from "prop-types";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import BlogPostImage from "../../components/renderers/BlogPostImage";
 import { Grid } from "@theme-ui/components";
 import BlogPostCard from "../../components/cards/BlogPost";
 import Prefooter from "../../components/Prefooter";
 import Link from "next/link";
-
-class CodeBlock extends React.PureComponent {
-  static propTypes = {
-    value: PropTypes.string.isRequired,
-    language: PropTypes.string
-  };
-
-  static defaultProps = {
-    language: null
-  };
-
-  render() {
-    const { language, value }: any = this.props;
-
-    return <SyntaxHighlighter language={language}>{value}</SyntaxHighlighter>;
-  }
-}
+import Code from "../../components/renderers/Code";
 
 const Post = ({
   title,
@@ -173,7 +155,7 @@ const Post = ({
           <ReactMarkdown
             source={body}
             renderers={{
-              code: CodeBlock,
+              code: Code,
               image: BlogPostImage
             }}
           />

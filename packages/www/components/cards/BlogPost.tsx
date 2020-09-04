@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import readingTime from "reading-time";
-import getMaxLines from "../../lib/utils";
-import Link from "next/link";
-import { Flex, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
+import { Box, Flex, Link as A } from "@theme-ui/components";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import readingTime from "reading-time";
 import { SxStyleProp } from "theme-ui";
+
+import client from "../../lib/client";
+import getMaxLines from "../../lib/utils";
 
 // Super hardcoded values to calculate the excerpt height. Yep.
 const cardHeight = 555;
