@@ -85,9 +85,10 @@ export default () => {
             })
               .then(newStream => {
                 setCreating(false);
+                const query = router.query.admin === "true" ? { admin: true } : {};
                 router.replace({
                   pathname: `/app/stream/${newStream.id}`,
-                  query: { admin: router.query.admin }
+                  query
                 });
               })
               .catch(e => {
