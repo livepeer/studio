@@ -301,49 +301,6 @@ export default () => {
                 <Cell>
                   <ShowURL text="" url={getPlaybackURL(stream)} anchor={true} />
                 </Cell>
-                <Cell>Record stream</Cell>
-                <Box
-                  sx={{
-                    m: "0.4em",
-                    justifySelf: "flex-start",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    if (stream.record) {
-                      setRecordOffModal(true);
-                    } else {
-                      doSetRecord(stream, true);
-                    }
-                  }}
-                >
-                  <Flex>
-                    <Checkbox value={stream.record} />
-                    <ReactTooltip
-                      id={`tooltip-record-${stream.id}`}
-                      className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid"
-                    >
-                      <p>
-                        When checked, transcoded streaming sessions will be
-                        recorded and stored by Livepeer.
-                        <br /> Each recorded session will have a recording .m3u8
-                        URL for playback. <br />
-                        This feature is currently in beta and free.
-                      </p>
-                    </ReactTooltip>
-                    <Help
-                      data-tip
-                      data-for={`tooltip-record-${stream.id}`}
-                      sx={{
-                        color: "muted",
-                        cursor: "pointer",
-                        ml: 1,
-                      }}
-                    />
-                  </Flex>
-                </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
@@ -374,6 +331,49 @@ export default () => {
                     <Cell>
                       <strong>Admin only fields:</strong>
                     </Cell>
+                    <Cell>Record stream</Cell>
+                    <Box
+                      sx={{
+                        m: "0.4em",
+                        justifySelf: "flex-start",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        if (stream.record) {
+                          setRecordOffModal(true);
+                        } else {
+                          doSetRecord(stream, true);
+                        }
+                      }}
+                    >
+                      <Flex>
+                        <Checkbox value={stream.record} />
+                        <ReactTooltip
+                          id={`tooltip-record-${stream.id}`}
+                          className="tooltip"
+                          place="top"
+                          type="dark"
+                          effect="solid"
+                        >
+                          <p>
+                            When checked, transcoded streaming sessions will be
+                            recorded and stored by Livepeer.
+                            <br /> Each recorded session will have a recording
+                            .m3u8 URL for playback. <br />
+                            This feature is currently in beta and free.
+                          </p>
+                        </ReactTooltip>
+                        <Help
+                          data-tip
+                          data-for={`tooltip-record-${stream.id}`}
+                          sx={{
+                            color: "muted",
+                            cursor: "pointer",
+                            ml: 1,
+                          }}
+                        />
+                      </Flex>
+                    </Box>
                     <Cell>Deleted</Cell>
                     <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
                     <Cell>Source segments</Cell>
