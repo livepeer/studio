@@ -167,8 +167,9 @@ export default () => {
     setStream(null); // make sure that we will load updated stream
   };
 
-  const tabs = query.admin === "true" ? getTabsAdmin(2) : getTabs(0);
-  const backLink = query.admin ? "/app/admin/streams" : "/app/user";
+  const isAdmin = query.admin === "true"
+  const tabs =  isAdmin ? getTabsAdmin(2) : getTabs(0);
+  const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
