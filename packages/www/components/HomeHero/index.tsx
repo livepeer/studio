@@ -18,6 +18,22 @@ import {
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 import { Heading } from "@theme-ui/components";
+import { shuffleArray } from "../../lib/utils";
+
+const videos = [
+  {
+    src: "/hero-videos/dj.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  },
+  {
+    src: "/hero-videos/makeup_tutorial.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  },
+  {
+    src: "/hero-videos/singer.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  }
+];
 
 const HomeHero = () => {
   const router = useRouter();
@@ -146,17 +162,18 @@ const HomeHero = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   label="Enter your email"
-                  sx={{ width: ["188px", "320px"] }}
+                  sx={{ width: ["100%", "320px"] }}
                 />
                 <Button
                   type="submit"
                   sx={{
                     display: "flex",
+                    justifyContent: "center",
                     alignItems: "center",
                     height: "55px",
                     ml: [0, 3],
                     mt: [3, 0],
-                    width: ["184px", "unset"]
+                    width: ["100%", "unset"]
                   }}
                 >
                   Get Started
@@ -186,7 +203,7 @@ const HomeHero = () => {
                 zIndex: notchZIndex - 1
               }}
             >
-              <HeroVideo ref={videoRef} />
+              <HeroVideo ref={videoRef} videos={shuffleArray(videos)} />
             </div>
             <PhoneSvg ref={phoneRef} />
           </div>

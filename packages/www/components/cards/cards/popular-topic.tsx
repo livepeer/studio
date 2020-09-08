@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Link as A } from "@theme-ui/components";
 import { useRef, useState, useCallback, useEffect } from "react";
-import getMaxLines from "../../../lib/utils";
+import { getMaxLines } from "../../../lib/utils";
 import { Box } from "@theme-ui/components";
 
 const cardHeight = 142;

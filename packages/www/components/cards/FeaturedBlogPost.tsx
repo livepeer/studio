@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import readingTime from "reading-time";
-import getMaxLines from "../../lib/utils";
+import { getMaxLines } from "../../lib/utils";
 import Link from "next/link";
 import { Flex, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";

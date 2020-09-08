@@ -69,13 +69,7 @@ const Layout = ({
     }
   };
   return (
-    <Flex
-      sx={{
-        minHeight: "100vh",
-        flexDirection: "column",
-        justifyContent: "space-between"
-      }}
-    >
+    <div sx={{ minHeight: "100vh" }}>
       <DefaultSeo {...seo} />
       {withGradientBackground && (
         <div sx={{ position: "absolute", top: 0, width: "100%" }}>
@@ -118,7 +112,7 @@ const Layout = ({
         {children}
       </Flex>
       <Footer />
-    </Flex>
+    </div>
   );
 };
 
