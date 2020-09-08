@@ -9,6 +9,8 @@ type Props = {
   sources: string[];
 };
 
+const randomViews = Math.round(100 + Math.random() * 500);
+
 const HeroVideo = forwardRef(
   ({ sources }: Props, ref: React.Ref<HTMLDivElement>) => {
     const videosRef = useRef<HTMLVideoElement[]>([]);
@@ -104,7 +106,7 @@ const HeroVideo = forwardRef(
               <i sx={{ display: "flex", alignItems: "center", mr: 1 }}>
                 <FiEye />
               </i>
-              16
+              {randomViews}
             </Text>
           </div>
           <div

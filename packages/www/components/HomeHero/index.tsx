@@ -18,6 +18,13 @@ import {
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 import { Heading } from "@theme-ui/components";
+import { shuffleArray } from "../../lib/utils";
+
+const videoSources = [
+  "/hero-videos/dj.mp4",
+  "/hero-videos/makeup_tutorial.mp4",
+  "/hero-videos/singer.mp4"
+];
 
 const HomeHero = () => {
   const router = useRouter();
@@ -187,7 +194,7 @@ const HomeHero = () => {
                 zIndex: notchZIndex - 1
               }}
             >
-              <HeroVideo ref={videoRef} sources={["/dj.mp4"]} />
+              <HeroVideo ref={videoRef} sources={shuffleArray(videoSources)} />
             </div>
             <PhoneSvg ref={phoneRef} />
           </div>
