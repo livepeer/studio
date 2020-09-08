@@ -54,17 +54,56 @@ const Prefooter = () => (
           href="/contact"
           variant="buttons.text"
           sx={{
+            display: "flex",
+            alignItems: "center",
             height: 44, // Match sibling button
             color: "background",
             bg: "rgba(255,255,255,0)",
-            transition: "background-color .15s",
+            transition: "background-color .1s",
             "&:hover": {
               bg: "rgba(255,255,255,0.08)"
+            },
+            ".HoverArrow": {
+              position: "relative",
+              top: "1px",
+              marginLeft: "8px",
+              strokeWidth: "2",
+              fill: "none",
+              stroke: "currentColor"
+            },
+            ".HoverArrow__linePath": {
+              opacity: "0",
+              transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s"
+            },
+            ".HoverArrow__tipPath": {
+              transition:
+                "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s"
+            },
+            ":hover .HoverArrow": {
+              transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
+              ".HoverArrow__linePath": {
+                opacity: 1
+              },
+              ".HoverArrow__tipPath": {
+                transform: "translateX(3px)"
+              }
             }
           }}
           isLink
         >
           Contact sales
+          <svg
+            className="HoverArrow"
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            aria-hidden="true"
+          >
+            <g fill-rule="evenodd">
+              <path className="HoverArrow__linePath" d="M0 5h7" />
+              <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
+            </g>
+          </svg>
         </Button>
       </Flex>
     </Box>
