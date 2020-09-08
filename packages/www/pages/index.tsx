@@ -147,10 +147,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-export function getStaticProps() {
-  return {
-    props: {},
-    revalidate: 1
-  };
-}
