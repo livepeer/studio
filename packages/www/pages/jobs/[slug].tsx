@@ -71,7 +71,7 @@ const Page = ({ title, body, preview }) => {
             <Button
               isExternal
               isLink
-              href="mailto:jobs@livepeer.com"
+              href="mailto:work@livepeer.com"
               sx={{ width: "100%" }}
             >
               Send email
