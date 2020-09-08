@@ -72,7 +72,15 @@ const Layout = ({
     <div sx={{ minHeight: "100vh" }}>
       <DefaultSeo {...seo} />
       {withGradientBackground && (
-        <div sx={{ position: "absolute", top: 0, width: "100%" }}>
+        <div
+          sx={{
+            position: "absolute",
+            top: 0,
+            width: "100%",
+            pointerEvents: "none",
+            zIndex: 0
+          }}
+        >
           <GradientBackgroundBox
             id="layout"
             gradient="violet"
@@ -86,7 +94,8 @@ const Layout = ({
           flexGrow: 1,
           flexDirection: "column",
           justifyContent: "flex-start",
-          zIndex: 1
+          zIndex: 1,
+          position: "relative"
         }}
       >
         {preview && (
