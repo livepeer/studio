@@ -20,10 +20,19 @@ import { notchZIndex } from "./PhoneSvg";
 import { Heading } from "@theme-ui/components";
 import { shuffleArray } from "../../lib/utils";
 
-const videoSources = [
-  "/hero-videos/dj.mp4",
-  "/hero-videos/makeup_tutorial.mp4",
-  "/hero-videos/singer.mp4"
+const videos = [
+  {
+    src: "/hero-videos/dj.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  },
+  {
+    src: "/hero-videos/makeup_tutorial.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  },
+  {
+    src: "/hero-videos/singer.mp4",
+    views: Math.round(100 + Math.random() * 500)
+  }
 ];
 
 const HomeHero = () => {
@@ -194,7 +203,7 @@ const HomeHero = () => {
                 zIndex: notchZIndex - 1
               }}
             >
-              <HeroVideo ref={videoRef} sources={shuffleArray(videoSources)} />
+              <HeroVideo ref={videoRef} videos={shuffleArray(videos)} />
             </div>
             <PhoneSvg ref={phoneRef} />
           </div>

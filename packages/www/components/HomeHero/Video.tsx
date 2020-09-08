@@ -6,13 +6,11 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 type Props = {
-  sources: string[];
+  videos: { src: string; views: number }[];
 };
 
-const randomViews = Math.round(100 + Math.random() * 500);
-
 const HeroVideo = forwardRef(
-  ({ sources }: Props, ref: React.Ref<HTMLDivElement>) => {
+  ({ videos }: Props, ref: React.Ref<HTMLDivElement>) => {
     const videosRef = useRef<HTMLVideoElement[]>([]);
 
     const [currentVideo, setCurrentVideo] = useState(0);
@@ -45,7 +43,7 @@ const HeroVideo = forwardRef(
         }}
       >
         <figure sx={{ width: "100%", position: "relative" }}>
-          {sources.map((source, i) => (
+          {videos.map(({ src }, i) => (
             <video
               onEnded={() => onVideoEnded(i)}
               key={`video-swapper-item-${i}`}
@@ -62,7 +60,7 @@ const HeroVideo = forwardRef(
                 opacity: i === currentVideo ? 1 : 0,
                 transition: "opacity 1s ease-out"
               }}
-              src={source}
+              src={src}
               muted
               playsInline
             />
@@ -106,7 +104,7 @@ const HeroVideo = forwardRef(
               <i sx={{ display: "flex", alignItems: "center", mr: 1 }}>
                 <FiEye />
               </i>
-              {randomViews}
+              {videos[currentVideo].views}
             </Text>
           </div>
           <div
