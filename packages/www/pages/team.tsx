@@ -13,9 +13,9 @@ const AboutPage = ({ content }) => {
   const [, { teamMembers }] = content;
   return (
     <Layout
-      title={`About - Livepeer.com`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com/about`}
+      title={`Team - Livepeer.com`}
+      description={`We’re building the future of video infrastructure services.`}
+      url={`https://livepeer.com/team`}
       withGradientBackground
     >
       <Container variant="hero">

@@ -15,7 +15,7 @@ const linksLists: LinksListProps[] = [
     heading: "Company",
     links: [
       { children: "Home", href: "/" },
-      { children: "About Us", href: "/about" },
+      { children: "Team", href: "/team" },
       { children: "Jobs", href: "/jobs" }
     ]
   },
