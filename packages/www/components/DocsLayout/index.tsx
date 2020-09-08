@@ -4,7 +4,7 @@ import { useState } from "react";
 import TableOfContents from "../TableOfContents";
 import guides from "./guides";
 import { useRouter } from "next/router";
-import { DocsNav } from "../Navigation";
+import { DocsNav, DefaultNav } from "../Navigation";
 
 const ignoreList = [
   "/password-reset",
@@ -29,7 +29,6 @@ const DocsLayout = ({ children, tree = guides }) => {
       title={`Docs - Livepeer.com`}
       description={`An introduction to the Livepeer.com platform and how to get started creating streams.`}
       url={`https://livepeer.com/docs`}
-      customNav={<DocsNav tree={tree} ignoreList={ignoreList} />}
     >
       <Container
         sx={{
