@@ -42,9 +42,11 @@ export async function getStaticPaths() {
   for (const page of allPage) {
     paths.push({ params: { slug: page.slug.current } });
   }
-  // TODO, next errors when it tries to build /jobs, a page that's already here.
+  // TODO, next errors when it tries to build and /team and /jobs, a page that's already here.
   // Remove from sanity maybe?
-  paths = paths.filter((p) => p.params.slug !== "jobs");
+  paths = paths.filter(
+    (p) => p.params.slug !== "jobs" && p.params.slug !== "team"
+  );
   return {
     fallback: true,
     paths

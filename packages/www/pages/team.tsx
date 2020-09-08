@@ -1,6 +1,6 @@
 import Fade from "react-reveal/Fade";
 import Layout from "../components/Layout";
-import { Box, Container } from "@theme-ui/components";
+import { Container } from "@theme-ui/components";
 import Prefooter from "../components/Prefooter";
 import TeamSection from "../components/TeamSection";
 import { GraphQLClient } from "graphql-request";
@@ -9,7 +9,7 @@ import allPages from "../queries/allPages.gql";
 
 // TODO this page is sort of a hybrid between sanity and hardcoded
 // Maybe we should update the sanity structure a bit and use it fully
-const AboutPage = ({ content }) => {
+const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
   return (
     <Layout
@@ -57,4 +57,4 @@ export async function getStaticProps() {
   };
 }
 
-export default AboutPage;
+export default TeamPage;
