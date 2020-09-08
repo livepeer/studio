@@ -91,7 +91,7 @@ const Prefooter = () => (
           }}
           isLink
         >
-          Contact sales
+          Contact us
           <svg
             className="HoverArrow"
             width="10"
