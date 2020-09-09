@@ -77,7 +77,7 @@ const HomePage = () => {
   return (
     <Layout
       title={`Home - Livepeer.com`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
+      description={`The platform built to power video-centric UGC applications at scale.`}
       url={`https://livepeer.com`}
       withGradientBackground
     >
