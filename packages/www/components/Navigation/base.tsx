@@ -133,7 +133,7 @@ const NavigationBase = ({
             )}
             {loggedIn && (
               <>
-                {!isDashboard && (
+                {user && user.admin && !isDashboard && (
                   <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin
                   </Link>
