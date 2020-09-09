@@ -17,7 +17,7 @@ type RecordingURLProps = {
 export const RecordingURL = ({
   manifestId,
   baseUrl,
-  hasRecording,
+  hasRecording
 }: RecordingURLProps) => {
   const [isCopied, setCopied] = useState(0);
   useEffect(() => {
@@ -38,7 +38,7 @@ export const RecordingURL = ({
       sx={{
         justifyContent: "flex-start",
         alignItems: "center",
-        wordBreak: "break-all",
+        wordBreak: "break-all"
       }}
     >
       {fullUrl ? (
@@ -50,7 +50,7 @@ export const RecordingURL = ({
                   fontSize: 12,
                   fontFamily: "monospace",
                   mr: 1,
-                  wordBreak: "break-all",
+                  wordBreak: "break-all"
                 }}
                 href={fullUrl}
                 target="_blank"
@@ -68,7 +68,7 @@ export const RecordingURL = ({
                 cursor: "pointer",
                 width: 14,
                 height: 14,
-                color: "listText",
+                color: "listText"
               }}
             />
           </Flex>
@@ -81,7 +81,7 @@ export const RecordingURL = ({
 
 export default ({
   streamId,
-  mt = null,
+  mt = null
 }: {
   streamId: string;
   mt?: string | number;
@@ -117,7 +117,7 @@ export default ({
   }, [streamId, isVisible]);
 
   return streamsSessions.length ? (
-    <Container sx={{ mt: 2 }}>
+    <Container sx={{ mb: 5, mt: 2 }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
       <Table sx={{ gridTemplateColumns: "auto auto auto " }}>
         <TableRow variant={TableRowVariant.Header}>
@@ -131,7 +131,7 @@ export default ({
             lastSeen,
             createdAt,
             sourceSegments,
-            transcodedSegments,
+            transcodedSegments
           } = stream;
           return (
             <TableRow key={id}>

@@ -1,5 +1,5 @@
 import Modal from "../Modal";
-import { Button, Flex } from "@theme-ui/components";
+import { Box, Button, Flex } from "@theme-ui/components";
 
 type DeleteStreamModalProps = {
   streamName: string;
@@ -11,8 +11,10 @@ export default ({ streamName, onClose, onDelete }: DeleteStreamModalProps) => {
   return (
     <Modal onClose={onClose}>
       <h3>Are you sure?</h3>
-      <p>Are you sure you want to delete stream "{streamName}"?</p>
-      <p>Deleting a stream cannot be undone.</p>
+      <Box sx={{ my: 3 }}>
+        Are you sure you want to delete stream "{streamName}"? Deleting a stream
+        cannot be undone.
+      </Box>
       <Flex sx={{ justifyContent: "flex-end" }}>
         <Button
           type="button"

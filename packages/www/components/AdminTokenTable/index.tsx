@@ -15,7 +15,7 @@ import { User } from "@livepeer.com/api";
 import ReactTooltip from "react-tooltip";
 
 export const UserName = ({ id, users }: { id: string; users: Array<User> }) => {
-  const user = users.find(o => o.id === id);
+  const user = users.find((o) => o.id === id);
   const tid = `tooltip-name-${id}`;
   return (
     <Box
@@ -69,18 +69,18 @@ export default ({ id }: TokenTableProps) => {
   } = useApi();
   useEffect(() => {
     getApiTokens(null)
-      .then(tokens => {
+      .then((tokens) => {
         if (tokens) {
           tokens.sort((a, b) => a.userId.localeCompare(b.userId));
         }
         setTokens(tokens);
       })
-      .catch(err => console.error(err)); // todo: surface this
+      .catch((err) => console.error(err)); // todo: surface this
   }, [newToken, deleteModal]);
   useEffect(() => {
     getUsers()
-      .then(users => setUsers(users))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((users) => setUsers(users))
+      .catch((err) => console.error(err)); // todo: surface this
   }, []);
   const close = () => {
     setCreateModal(false);
@@ -94,8 +94,8 @@ export default ({ id }: TokenTableProps) => {
     if (tokens && users) {
       if (users) {
         tokens.sort((a, b) => {
-          const userA = users.find(u => u.id === a.userId);
-          const userB = users.find(u => u.id === b.userId);
+          const userA = users.find((u) => u.id === a.userId);
+          const userB = users.find((u) => u.id === b.userId);
           if (userA && userB) {
             return userA.email.localeCompare(userB.email);
           }
@@ -127,6 +127,7 @@ export default ({ id }: TokenTableProps) => {
   return (
     <Container
       sx={{
+        mb: 5,
         mt: 2
       }}
     >
@@ -135,18 +136,18 @@ export default ({ id }: TokenTableProps) => {
           {!newToken && (
             <form
               id={id}
-              onSubmit={e => {
+              onSubmit={(e) => {
                 e.preventDefault();
                 if (creating) {
                   return;
                 }
                 setCreating(true);
                 createApiToken({ name: tokenName, userId: newTokenUserId })
-                  .then(newToken => {
+                  .then((newToken) => {
                     setNewToken(newToken);
                     setCreating(false);
                   })
-                  .catch(e => {
+                  .catch((e) => {
                     setCreating(false);
                   });
               }}
@@ -159,14 +160,14 @@ export default ({ id }: TokenTableProps) => {
               <Input
                 label="Name"
                 value={tokenName}
-                onChange={e => setTokenName(e.target.value)}
+                onChange={(e) => setTokenName(e.target.value)}
                 placeholder="New Token"
               ></Input>
               <Select
                 sx={{ mt: "1em" }}
-                onChange={e => setNewTokenUserId(e.target.value)}
+                onChange={(e) => setNewTokenUserId(e.target.value)}
               >
-                {users.map(user => (
+                {users.map((user) => (
                   <option value={user.id}>{user.email}</option>
                 ))}
               </Select>
@@ -289,7 +290,7 @@ export default ({ id }: TokenTableProps) => {
             Last Active ⭥
           </Box>
         </TableRow>
-        {tokens.map(token => {
+        {tokens.map((token) => {
           const { id, name, lastSeen } = token;
           let formattedLastSeen = <em>unused</em>;
           if (lastSeen) {

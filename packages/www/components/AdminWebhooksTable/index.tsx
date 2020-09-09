@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, Flex, Grid, Input } from "@theme-ui/components";
+import {
+  Container,
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Input
+} from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import { RelativeTime } from "../StreamsTable";
@@ -47,8 +54,8 @@ const sortUrlF = (a: Webhook, b: Webhook) =>
   ((a && a.url) || "").localeCompare((b && b.url) || "");
 
 const sortUserName = (users: Array<User>, a: Webhook, b: Webhook) => {
-  const userA = users.find(u => u.id === a.userId);
-  const userB = users.find(u => u.id === b.userId);
+  const userA = users.find((u) => u.id === a.userId);
+  const userB = users.find((u) => u.id === b.userId);
   if (userA && userB) {
     return userA.email.localeCompare(userB.email);
   }
@@ -79,18 +86,18 @@ export default ({ id }: { id: string }) => {
   const [sortFunc, setSortFunc] = useState(null);
   useEffect(() => {
     getUsers()
-      .then(users => setUsers(users))
-      .catch(err => console.error(err)); // todo: surface this
+      .then((users) => setUsers(users))
+      .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
     getWebhooks(true, true)
-      .then(webhooks => {
+      .then((webhooks) => {
         if (sortFunc) {
           webhooks.sort(sortFunc);
         }
         setWebhooks(webhooks);
       })
-      .catch(err => console.error(err)); // todo: surface this
+      .catch((err) => console.error(err)); // todo: surface this
   }, [deleteModal]);
   const close = () => {
     setDeleteModal(false);
@@ -118,7 +125,7 @@ export default ({ id }: { id: string }) => {
       blocking
     })
       .then(() => setMessage("Webhook created"))
-      .catch(e => setMessage(`Error: ${e}`));
+      .catch((e) => setMessage(`Error: ${e}`));
   };
   const isVisible = usePageVisibility();
   useEffect(() => {
@@ -127,13 +134,13 @@ export default ({ id }: { id: string }) => {
     }
     const interval = setInterval(() => {
       getWebhooks(true, true)
-        .then(webhooks => {
+        .then((webhooks) => {
           if (sortFunc) {
             webhooks.sort(sortFunc);
           }
           setWebhooks(webhooks);
         })
-        .catch(err => console.error(err)); // todo: surface this
+        .catch((err) => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
   }, [isVisible, sortFunc]);
@@ -179,13 +186,11 @@ export default ({ id }: { id: string }) => {
     }
   };
   return (
-    <Box
+    <Container
       id={id}
       sx={{
-        width: "100%",
-        maxWidth: 958,
-        mb: [3, 3],
-        mx: "auto"
+        mb: 5,
+        mt: 2
       }}
     >
       {createModal && (
@@ -209,7 +214,7 @@ export default ({ id }: { id: string }) => {
                   borderBottom: "2px solid black",
                   borderRadius: "0px"
                 }}
-                onChange={e => setWebhookName(e.target.value)}
+                onChange={(e) => setWebhookName(e.target.value)}
                 placeholder="new-wehbook-name-123"
               ></Input>
             </Box>
@@ -225,7 +230,7 @@ export default ({ id }: { id: string }) => {
                   borderBottom: "2px solid black",
                   borderRadius: "0px"
                 }}
-                onChange={e => setWebhookUrl(e.target.value)}
+                onChange={(e) => setWebhookUrl(e.target.value)}
                 placeholder="https://own.site/hook1"
               ></Input>
             </Box>
@@ -267,7 +272,7 @@ export default ({ id }: { id: string }) => {
               .then(() => {
                 setMessage("Webhook deleted");
               })
-              .catch(e => setMessage(`Error: ${e}`));
+              .catch((e) => setMessage(`Error: ${e}`));
           }}
         />
       )}
@@ -320,9 +325,7 @@ export default ({ id }: { id: string }) => {
           >
             URL ⭥
           </Box>
-          <Box >
-            Blocking
-          </Box>
+          <Box>Blocking</Box>
           <Box
             sx={{
               cursor: "pointer"
@@ -374,6 +377,6 @@ export default ({ id }: { id: string }) => {
           );
         })}
       </Table>
-    </Box>
+    </Container>
   );
 };

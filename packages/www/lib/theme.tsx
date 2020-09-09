@@ -64,7 +64,10 @@ export const theme = {
         borderWidth: "1px",
         borderColor: "listText",
         borderStyle: "solid",
-        opacity: 0.6
+        opacity: 0.6,
+        ":hover": {
+          backgroundColor: "muted"
+        }
       }
     },
     primary: {
@@ -99,6 +102,8 @@ export const theme = {
     },
     outline: {
       variant: "buttons.default",
+      borderWidth: "1px",
+      borderColor: "black",
       bg: "transparent",
       color: "text",
       transition: "background-color .15s",

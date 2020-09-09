@@ -6,7 +6,7 @@ import {
   Flex,
   Input,
   Container,
-  Heading,
+  Heading
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
@@ -40,7 +40,7 @@ export default ({ userId, id }: TokenTableProps) => {
     setCopyTime(null);
   };
   return (
-    <Container>
+    <Container sx={{ mb: 5 }}>
       {createModal && (
         <Modal onClose={close}>
           {!newToken && (
@@ -110,7 +110,7 @@ export default ({ userId, id }: TokenTableProps) => {
                 sx={{
                   justifyContent: "space-between",
                   alignItems: "center",
-                  py: 3,
+                  py: 3
                 }}
               >
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>

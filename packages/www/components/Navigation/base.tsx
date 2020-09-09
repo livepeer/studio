@@ -15,7 +15,7 @@ import Button from "../Button";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import { SxStyleProp } from "theme-ui";
 
-const sidesWidth = "210px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
+const sidesWidth = "280px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
@@ -91,18 +91,20 @@ const NavigationBase = ({
               withLogoType={!isDashboard}
             />
           </div>
-          <Flex
-            sx={{
-              display: ["none", "none", "flex"],
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            {links.map((link) => (
-              <Link {...link} key={`nav-link-${link.href}`} variant="nav" />
-            ))}
-          </Flex>
+          {!isDashboard && (
+            <Flex
+              sx={{
+                display: ["none", "none", "flex"],
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              {links.map((link) => (
+                <Link {...link} key={`nav-link-${link.href}`} variant="nav" />
+              ))}
+            </Flex>
+          )}
           <Flex
             sx={{
               display: ["none", "none", "flex"],
@@ -131,22 +133,36 @@ const NavigationBase = ({
             )}
             {loggedIn && (
               <>
-                {user && user.admin && !isDashboard && (
-                  <Link href="/app/admin" variant="nav">
+                {!isDashboard && (
+                  <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin
                   </Link>
                 )}
-                <A variant="nav" onClick={() => logout()}>
+                {isDashboard && (
+                  <Link href="/docs/guides" variant="nav">
+                    Docs
+                  </Link>
+                )}
+                {isDashboard && (
+                  <Link href="/contact" variant="nav">
+                    Contact
+                  </Link>
+                )}
+                <A
+                  variant="nav"
+                  sx={{ mr: 3, cursor: "pointer" }}
+                  onClick={() => logout()}
+                >
                   Log Out
                 </A>
                 {!isDashboard && (
-                  <Link
+                  <Button
+                    isLink
                     href="/app/user"
-                    variant="buttons.outlineSmall"
-                    sx={{ ml: 2 }}
+                    variant="buttons.secondarySmall"
                   >
                     Dashboard
-                  </Link>
+                  </Button>
                 )}
               </>
             )}
