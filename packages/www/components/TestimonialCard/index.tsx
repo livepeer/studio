@@ -26,16 +26,13 @@ const TestimonialCard = ({
       py: 32,
       px: 24,
       borderRadius: 24,
-      minHeight: [360, null, null, 432],
+      minHeight: [360, null, null, 380],
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      justifyContent: "space-between",
       transition: "box-shadow .3s",
-      "&:hover": {
-        boxShadow:
-          "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-      },
+      boxShadow:
+        "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
       ...pushSx
     }}
   >
@@ -44,39 +41,38 @@ const TestimonialCard = ({
       className="lazyload"
       src={`/img/testimonials/${id}/logo.svg`}
     />
-    <div sx={{ mt: 3 }}>
-      <Box sx={{ fontWeight: 400, mb: 4, fontSize: [3, 4] }}>"{quote}"</Box>
-      <Flex
+    <Box sx={{ fontWeight: 400, mt: 4, fontSize: 3 }}>"{quote}"</Box>
+    <Flex
+      sx={{
+        fontWeight: 500,
+        alignItems: "center",
+        justifyContent: "flex-start",
+        marginTop: "auto",
+        height: [75, 90]
+      }}
+    >
+      <img
+        alt={`${author.name} avatar`}
+        src={`/img/testimonials/${id}/avatar.png`}
+        className="lazyload"
         sx={{
-          fontWeight: 500,
-          alignItems: "center",
-          justifyContent: "flex-start",
-          height: [75, 90]
+          width: [56, 72],
+          height: [56, 72],
+          minWidth: [56, 72],
+          minHeight: [56, 72],
+          objectFit: "cover",
+          objectPosition: "center",
+          borderRadius: 1000,
+          mr: 2
         }}
-      >
-        <img
-          alt={`${author.name} avatar`}
-          src={`/img/testimonials/${id}/avatar.png`}
-          className="lazyload"
-          sx={{
-            width: [56, 72],
-            height: [56, 72],
-            minWidth: [56, 72],
-            minHeight: [56, 72],
-            objectFit: "cover",
-            objectPosition: "center",
-            borderRadius: 1000,
-            mr: 2
-          }}
-        />
-        <Box>
-          <Text sx={{ fontWeight: 600 }}>{author.name}</Text>
-          <Text sx={{ fontWeight: 400 }}>
-            {author.role}, {author.company}
-          </Text>
-        </Box>
-      </Flex>
-    </div>
+      />
+      <Box>
+        <Text sx={{ fontWeight: 600 }}>{author.name}</Text>
+        <Text sx={{ fontWeight: 400 }}>
+          {author.role}, {author.company}
+        </Text>
+      </Box>
+    </Flex>
   </Box>
 );
 

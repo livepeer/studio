@@ -25,11 +25,11 @@ const testimonials: TestimonialCardProps[] = [
   },
   {
     quote:
-      "Livepeer.com is an incredible team building the future of video infrastructure services.",
+      "Partnering with Livepeer.com has allowed PlayDJ.tv to get ahead of our competitors through innovation and new technology.",
     id: "playdj-tv",
     author: {
-      name: "Ben Rubin",
-      role: "CEO",
+      name: "Tom Burman",
+      role: "Co-founder",
       company: "PlayDJ.TV"
     }
   }
