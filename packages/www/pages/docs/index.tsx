@@ -9,6 +9,7 @@ import Prefooter from "../../components/Prefooter";
 import { Grid } from "@theme-ui/components";
 import DocsPopularTopicCard from "../../components/cards/cards/popular-topic";
 import { DocsNav } from "../../components/Navigation";
+import { useRouter } from "next/router";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
@@ -87,65 +88,81 @@ const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
   }
 ];
 
-const DocsIndex = () => (
-  <Layout
-    title={`Docs - Livepeer.com`}
-    description={`TODO`}
-    url={`https://livepeer.com/docs`}
-    customNav={<DocsNav />}
-    withGradientBackground
-  >
-    <div sx={{ overflowX: "hidden" }}>
-      <Container variant="hero" sx={{ maxWidth: "1056px" }}>
-        <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
-        <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
-          Welcome to the Livepeer.com documentation!
-        </p>
-        <KeenSliderGrid
-          breakpoints={[
-            { value: "320px", slidesPerView: 1 },
-            { value: "604px", slidesPerView: 2 },
-            { value: "832px", slidesPerView: 3 },
-            { value: "1280px", slidesPerView: 4 }
-          ]}
-        >
-          {categories.map((category) => (
-            <DocsCategoryCard {...category} key={category.title} />
-          ))}
-        </KeenSliderGrid>
-        <Flex
-          sx={{
-            alignItems: ["flex-start", "center"],
-            justifyContent: "space-between",
-            mt: ["80px", "160px"],
-            mb: 4,
-            flexDirection: ["column", "row"]
-          }}
-        >
-          <h2
+const DocsIndex = () => {
+  const router = useRouter();
+  if (typeof window !== "undefined") {
+    router.push("/docs/guides");
+    return;
+  }
+  return (
+    <Layout
+      title={`Docs - Livepeer.com`}
+      description={`TODO`}
+      url={`https://livepeer.com/docs`}
+      customNav={<DocsNav />}
+      withGradientBackground
+    >
+      <div sx={{ overflowX: "hidden" }}>
+        <Container variant="hero" sx={{ maxWidth: "1056px" }}>
+          <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
+          <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
+            Welcome to the Livepeer.com documentation!
+          </p>
+          <KeenSliderGrid
+            breakpoints={[
+              { value: "320px", slidesPerView: 1 },
+              { value: "604px", slidesPerView: 2 },
+              { value: "832px", slidesPerView: 3 },
+              { value: "1280px", slidesPerView: 4 }
+            ]}
+          >
+            {categories.map((category) => (
+              <DocsCategoryCard {...category} key={category.title} />
+            ))}
+          </KeenSliderGrid>
+          <Flex
             sx={{
-              mb: [3, 0],
-              fontSize: ["32px", "48px"],
-              lineHeight: ["40px", "56px"]
+              alignItems: ["flex-start", "center"],
+              justifyContent: "space-between",
+              mt: ["80px", "160px"],
+              mb: 4,
+              flexDirection: ["column", "row"]
             }}
           >
-            Popular topics
-          </h2>
-          <Button href="/docs/guides" isLink>
-            Go to guides
-          </Button>
-        </Flex>
-        <Grid columns={[1, 2]} gap={3}>
-          {popularTopics.map((topic) => (
-            <DocsPopularTopicCard {...topic} key={`topic-${topic.title}`} />
-          ))}
-        </Grid>
-      </Container>
-    </div>
-    <Fade key={0}>
-      <Prefooter />
-    </Fade>
-  </Layout>
-);
+            <h2
+              sx={{
+                mb: [3, 0],
+                fontSize: ["32px", "48px"],
+                lineHeight: ["40px", "56px"]
+              }}
+            >
+              Popular topics
+            </h2>
+            <Button href="/docs/guides" isLink>
+              Go to guides
+            </Button>
+          </Flex>
+          <Grid columns={[1, 2]} gap={3}>
+            {popularTopics.map((topic) => (
+              <DocsPopularTopicCard {...topic} key={`topic-${topic.title}`} />
+            ))}
+          </Grid>
+        </Container>
+      </div>
+      <Fade key={0}>
+        <Prefooter />
+      </Fade>
+    </Layout>
+  );
+};
+
+// Temporarily redirect to guides
+export async function getServerSideProps(ctx) {
+  if (ctx.res) {
+    ctx.res.writeHead(302, { Location: "/docs/guides" });
+    ctx.res.end();
+  }
+  return { props: {} };
+}
 
 export default DocsIndex;
