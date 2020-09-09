@@ -2,11 +2,50 @@ import { Box, Flex } from "@theme-ui/components";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { SxStyleProp } from "theme-ui";
+import BulletSvg from "./bullet-svg";
 
-const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
-  function renderHeading(heading, hasChildren = false) {
+type Heading = { content: string; slug?: string; iconComponentName?: string };
+export type Tree = [Heading, Tree[]] | [];
+
+type Props = {
+  tree: Tree[];
+  onClose?: (() => void) | null;
+  ignoreList?: string[];
+};
+
+const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
+  children,
+  pushSx
+}) => (
+  <i
+    sx={{
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      mr: "12px",
+      width: "16px",
+      height: "16px",
+      color: "text",
+      ...pushSx
+    }}
+  >
+    {children}
+  </i>
+);
+
+const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
+  function renderHeading(
+    heading: Heading,
+    hasChildren = false,
+    isChildren = false
+  ) {
     const { pathname } = useRouter();
     const isActive = pathname === heading.slug;
+
+    const Icon =
+      require(`react-icons/fi`)[heading.iconComponentName] ?? BulletSvg;
 
     if (heading === undefined || ignoreList.includes(heading.content)) {
       return null;
@@ -19,8 +58,13 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
             color: "black",
             alignItems: "center",
             display: "flex",
+            pl: "0",
+            py: "12px"
           }}
         >
+          <IconContainer>
+            <Icon />
+          </IconContainer>
           {heading.content}
         </Box>
       );
@@ -31,51 +75,52 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
       fontWeight: 600,
       px: 2,
       py: "2px",
-      borderRadius: 4,
+      borderRadius: 4
     };
     return (
       <Link href={heading.slug} passHref>
         <a
           onClick={onClose}
           sx={{
-            color: isActive ? "black" : "listText",
+            fontSize: "16px",
+            color: isActive ? "primary" : "black",
             fontWeight: isActive ? 600 : 400,
+            borderLeft: "1px solid",
+            borderColor: isChildren
+              ? isActive
+                ? "primary"
+                : "#eaeaea"
+              : "transparent",
             alignItems: "center",
+            py: isChildren ? "8px" : "12px",
+            pl: isChildren ? "12px" : "0",
             display: "flex",
             ":hover": {
-              color: "black",
-            },
-            ":before": {
-              content: '""',
-              flexBasis: 4,
-              flexShrink: 0,
-              display: "block",
-              width: 4,
-              height: 4,
-              mr: 3,
-              borderRadius: "50%",
-              background: "rgb(102, 102, 102)",
-            },
+              color: "primary"
+            }
           }}
         >
+          <IconContainer>
+            <Icon />
+          </IconContainer>
           <Box
             sx={{
               ...(heading.content === "POST" && {
                 bg: "green",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "GET" && {
                 bg: "blue",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "DELETE" && {
                 bg: "red",
-                ...labelStyles,
+                ...labelStyles
               }),
               ...(heading.content === "PUT" && {
                 bg: "orange",
-                ...labelStyles,
-              }),
+                ...labelStyles
+              })
             }}
           >
             {heading.content}
@@ -85,69 +130,67 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
     );
   }
 
-  function renderChildren(children) {
+  function renderChildren(children: Tree[]) {
     if (children.length === 0) {
       return null;
     }
 
-    return children.map((child, i) => <Box key={i}>{renderPair(child)}</Box>);
+    return (
+      <>
+        {children.map((child, i) => (
+          <Box key={i}>{renderPair(child, true)}</Box>
+        ))}
+      </>
+    );
   }
 
-  function renderPair(pair) {
+  function renderPair(pair: Tree, isChildren = false) {
     const [isOpen, setIsOpen] = useState(true);
     const [heading, children] = pair;
     const hasChildren = children?.length > 0;
+
     if (ignoreList.includes(heading.content)) return <></>;
     return (
       <>
         <Flex
           onClick={() => setIsOpen(isOpen ? false : true)}
-          sx={{ cursor: "pointer", alignItems: "center" }}
+          sx={{
+            cursor: "pointer",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
         >
+          <Box>{renderHeading(heading, hasChildren, isChildren)}</Box>
           {hasChildren && (
-            <svg
-              sx={{
-                minWidth: 6,
-                mr: 3,
-                ml: "-2px",
-                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-              }}
-              width="6"
-              height="10"
-              viewBox="0 0 6 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1.4 8.56L4.67 5M1.4 1.23L4.66 4.7"
-                stroke="#999"
-                strokeLinecap="square"
-              ></path>
-            </svg>
+            <>
+              {isOpen ? (
+                <IconContainer pushSx={{ m: 0 }}>
+                  <FiChevronUp />
+                </IconContainer>
+              ) : (
+                <IconContainer pushSx={{ m: 0 }}>
+                  <FiChevronDown />
+                </IconContainer>
+              )}
+            </>
           )}
-
-          <Box sx={{ py: 2, fontWeight: "body" }}>
-            {renderHeading(heading, hasChildren)}
-          </Box>
         </Flex>
         {hasChildren && (
           <Box
             sx={{
               display: isOpen ? "block" : "none",
               my: 0,
-              borderLeft: "1px solid",
-              borderColor: "#eaeaea",
-              pl: 3,
+              pl: "8px"
             }}
           >
-            <Box>{renderChildren(children)}</Box>
+            {renderChildren(children)}
           </Box>
         )}
       </>
     );
   }
 
-  function render(tree) {
+  function render(tree: Tree) {
     const [heading, children] = tree;
 
     let Toc = renderPair(tree);
@@ -160,7 +203,13 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }) => {
     return Toc;
   }
 
-  return render(tree);
+  return (
+    <>
+      {tree.map((t, i) => (
+        <div key={`tree-${i}`}>{render(t)}</div>
+      ))}
+    </>
+  );
 };
 
 export default TableOfContents;

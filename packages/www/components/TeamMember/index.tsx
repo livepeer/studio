@@ -3,7 +3,7 @@ import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import { FaTwitter, FaMedium, FaGithub, FaLinkedin } from "react-icons/fa";
 
-export default ({
+const TeamMember = ({
   fullname,
   image,
   role,
@@ -16,26 +16,53 @@ export default ({
   const builder = imageUrlBuilder(client as any);
 
   return (
-    <Box sx={{ textAlign: "center", mb: 6 }} {...props}>
-      <Image
-        sx={{
-          borderRadius: 1000,
-          width: 130,
-          height: 130,
-          objectFit: "cover",
-          m: "0 auto 8px"
-        }}
-        width={130}
-        height={130}
-        className="lazyload"
-        data-src={builder.image(image).url()}
-      />
-      <Box sx={{ mb: 2 }}>
-        <Heading as="h3" sx={{ mb: 2, fontSize: 3, fontWeight: 600 }}>
-          {fullname}
-        </Heading>
-        <Box sx={{ fontSize: 1, color: "rgba(0,0,0,.6)" }}>{role}</Box>
-      </Box>
+    <Box
+      sx={{
+        textAlign: "center",
+        borderRadius: 24,
+        border: "1px solid #F5F5F5",
+        p: 40,
+        bg: "background",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        transition: "box-shadow .15s",
+        "&:hover": {
+          boxShadow:
+            "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
+        }
+      }}
+      {...props}
+    >
+      <div>
+        <Image
+          sx={{
+            borderRadius: 1000,
+            width: 130,
+            height: 130,
+            objectFit: "cover",
+            m: "0 auto 8px"
+          }}
+          width={130}
+          height={130}
+          className="lazyload"
+          data-src={builder.image(image).url()}
+        />
+        <Box sx={{ mb: 3 }}>
+          <Heading
+            as="h3"
+            sx={{
+              mb: 2,
+              mt: 3,
+              fontWeight: 500,
+              fontSize: "20px"
+            }}
+          >
+            {fullname}
+          </Heading>
+          <Box sx={{ fontSize: 2, color: "gray" }}>{role}</Box>
+        </Box>
+      </div>
       <Flex
         sx={{
           maxWidth: 120,
@@ -46,7 +73,13 @@ export default ({
       >
         {twitter && (
           <Link
-            sx={{ mx: 2, color: "black" }}
+            sx={{
+              "&:not(:last-of-type)": { mr: 3 },
+              color: "black",
+              fontSize: 3,
+              transition: "color .15s",
+              "&:hover": { color: "primary" }
+            }}
             href={twitter}
             target="_blank"
             rel="noopener noreferrer"
@@ -56,7 +89,13 @@ export default ({
         )}
         {linkedin && (
           <Link
-            sx={{ mx: 2, color: "black" }}
+            sx={{
+              "&:not(:last-of-type)": { mr: 3 },
+              color: "black",
+              fontSize: 3,
+              transition: "color .15s",
+              "&:hover": { color: "primary" }
+            }}
             href={linkedin}
             target="_blank"
             rel="noopener noreferrer"
@@ -66,7 +105,13 @@ export default ({
         )}
         {medium && (
           <Link
-            sx={{ mx: 2, color: "black" }}
+            sx={{
+              "&:not(:last-of-type)": { mr: 3 },
+              color: "black",
+              fontSize: 3,
+              transition: "color .15s",
+              "&:hover": { color: "primary" }
+            }}
             href={medium}
             target="_blank"
             rel="noopener noreferrer"
@@ -76,7 +121,13 @@ export default ({
         )}
         {github && (
           <Link
-            sx={{ mx: 2, color: "black" }}
+            sx={{
+              "&:not(:last-of-type)": { mr: 3 },
+              color: "black",
+              fontSize: 3,
+              transition: "color .15s",
+              "&:hover": { color: "primary" }
+            }}
             href={github}
             target="_blank"
             rel="noopener noreferrer"
@@ -88,3 +139,5 @@ export default ({
     </Box>
   );
 };
+
+export default TeamMember;

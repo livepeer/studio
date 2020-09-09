@@ -1,12 +1,12 @@
 import Layout from "../components/Layout";
 import Login from "../components/Login";
-import Link from "next/link";
+import Link from "../components/Link";
 import { Flex, Box, Heading } from "@theme-ui/components";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import useApi from "../hooks/use-api";
 
-export default () => {
+const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,21 +36,20 @@ export default () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
+          py: 6
         }}
       >
-        <Heading as="h3" sx={{ mb: 4 }}>
-          Create an Account
-        </Heading>
+        <h3 sx={{ mb: 4 }}>Create an Account</h3>
         <Box
           sx={{
             mb: 4,
             textAlign: "center",
             maxWidth: 630,
-            mx: "auto",
+            mx: "auto"
           }}
         >
-          Sign up to try Livepeer’s transcoding platform, and qualify for 1,000
-          free transcoding input minutes per month forever.
+          Sign up to try Livepeer.com's video-centric UGC platform, and qualify
+          for 1,000 free transcoding input minutes per month.
         </Box>
         <Login
           id="register"
@@ -63,11 +62,11 @@ export default () => {
         />
         <Box>
           Already have an account?&nbsp;
-          <Link href="/login">
-            <a>Log in</a>
-          </Link>
+          <Link href="/login">Log in</Link>
         </Box>
       </Flex>
     </Layout>
   );
 };
+
+export default RegisterPage;

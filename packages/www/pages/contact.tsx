@@ -1,17 +1,18 @@
+import Fade from "react-reveal/Fade";
 import Layout from "../components/Layout";
 import { useRef, useState, useEffect } from "react";
-import { Styled } from "theme-ui";
 import { Box, Flex, Container } from "@theme-ui/components";
 import Textfield from "../components/Textfield";
 import { useForm } from "react-hubspot";
 import Button from "../components/Button";
-import Fade from "react-reveal/Fade";
+import Link from "../components/Link";
+import Prefooter from "../components/Prefooter";
 
 const ContactPage = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -28,34 +29,27 @@ const ContactPage = () => {
       };
     }
   }, [data]);
+
   return (
     <Layout
       title={`Contact - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com/contact`}
+      withGradientBackground
     >
-      <Container
-        sx={{
-          py: 88,
-        }}
-      >
-        <Box sx={{ mb: 48, textAlign: "center" }}>
-          <Styled.h2 sx={{ fontSize: [5, 5, 6], mb: 3 }}>
-            Get in touch with us
-          </Styled.h2>
-
-          <Box sx={{ maxWidth: 512, margin: "0 auto" }}>
-            If you’d like to learn more about Livepeer.com and our game changing
-            transcoding infrastructure drop us a note, and we’ll get right back
-            you.
+      <Container variant="hero">
+        <Box sx={{ mb: 80 }}>
+          <h1 sx={{ variant: "text.heading.hero" }}>Get in touch with us</h1>
+          <Box sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
+            If you’d like to learn more about Livepeer.com’s innovative UGC
+            focused video platform drop us a note and we’ll get right back to
+            you!
             <br />
-            <br /> or email us at{" "}
-            <a
-              sx={{ color: "primary", fontWeight: "600" }}
-              href="mailto:hello@livepeer.com"
-            >
-              hello@livepeer.com
-            </a>
+            <br />
+            or email us at{" "}
+            <Link href="mailto:hello@livepeer.com" isExternal>
+              <b>hello@livepeer.com</b>
+            </Link>
             .
           </Box>
         </Box>
@@ -126,6 +120,9 @@ const ContactPage = () => {
           </Fade>
         </form>
       </Container>
+      <Fade key={0}>
+        <Prefooter />
+      </Fade>
     </Layout>
   );
 };

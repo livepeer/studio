@@ -1,47 +1,59 @@
-import { Styled } from "theme-ui";
-import { Box, Grid, Container } from "@theme-ui/components";
-import TestimonialCard from "../TestimonialCard";
+import { Grid, Container } from "@theme-ui/components";
+import TestimonialCard, { TestimonialCardProps } from "../TestimonialCard";
+import GradientBackgroundBox from "../GradientBackgroundBox";
 
-export default ({ heading, testimonials }) => (
-  <Box
-    sx={{
-      position: "relative",
-      py: 88,
-      overflow: "hidden",
-      backgroundImage: "url(/img/triangle-bg.svg)",
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "bottom",
-    }}
+const testimonials: TestimonialCardProps[] = [
+  {
+    quote:
+      "Livepeer.com is an exciting video infrastructure solution that’s highly reliable and price disruptive.",
+    id: "cbs-interactive",
+    author: {
+      name: "Flávio Ribeiro",
+      role: "Director of Engineering",
+      company: "CBS Interactive"
+    }
+  },
+  {
+    quote:
+      "Livepeer.com is an incredible team building the future of video infrastructure services.",
+    id: "houseparty",
+    author: {
+      name: "Ben Rubin",
+      role: "CEO",
+      company: "Houseparty (Acquired by Epic Games)"
+    }
+  },
+  {
+    quote:
+      "Partnering with Livepeer.com has allowed PlayDJ.tv to get ahead of our competitors through innovation and new technology.",
+    id: "playdj-tv",
+    author: {
+      name: "Tom Burman",
+      role: "Co-founder",
+      company: "PlayDJ.TV"
+    }
+  }
+];
+
+const TestimonialsSection = () => (
+  <GradientBackgroundBox
+    id="testimonials"
+    gradient="colorful"
+    gradientSx={{ minWidth: ["5000px", null, null, "unset"] }}
+    slide
   >
-    {heading && (
-      <Styled.h2
-        sx={{
-          fontSize: [5, 5, 6],
-          textAlign: "center",
-          width: "100%",
-          mb: 48,
-        }}
-      >
-        {heading}
-      </Styled.h2>
-    )}
-    <Container>
+    <Container sx={{ py: [5, 6] }}>
       <Grid
         sx={{ justifyContent: "center", alignItems: "center" }}
         gap={[3, 3, 3, 4]}
-        columns={[1, 1, 2]}
+        columns={[1, null, null, testimonials.length]}
       >
         {testimonials.map((testimonial, i) => (
-          <TestimonialCard
-            key={i}
-            quote={testimonial.quote}
-            name={testimonial.name}
-            role={testimonial.role}
-            company={testimonial.company}
-            image={testimonial.image}
-          />
+          <TestimonialCard key={i} {...testimonial} />
         ))}
       </Grid>
     </Container>
-  </Box>
+  </GradientBackgroundBox>
 );
+
+export default TestimonialsSection;

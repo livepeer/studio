@@ -8,6 +8,7 @@ import { ApiProvider } from "../hooks/use-api";
 import MarkdownProvider from "../lib/markdown-provider";
 import "../css/reset.css";
 import "../css/markdown.css";
+import "keen-slider/keen-slider.min.css";
 
 export default class MyApp extends App {
   render() {

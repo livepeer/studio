@@ -1,17 +1,14 @@
-import { Flex, Container } from "@theme-ui/components";
+import { Container } from "@theme-ui/components";
 import TeamMember from "../TeamMember";
+import { Grid } from "@theme-ui/components";
 
-export default ({ teamMembers }) => {
+const TeamSection = ({ teamMembers }) => {
   return (
     <Container>
-      <Flex
-        sx={{
-          flex: 1,
-          justifyContent: "flex-start",
-          flexWrap: "wrap",
-          maxWidth: 960,
-          margin: "0 auto",
-        }}
+      <Grid
+        columns={[1, 2, 3, null, 4]}
+        gap={3}
+        sx={{ maxWidth: 1200, margin: "0 auto" }}
       >
         {teamMembers.map((t, i) => (
           <TeamMember
@@ -26,7 +23,9 @@ export default ({ teamMembers }) => {
             sx={{ flex: ["1 1 100%", "1 1 50%", "1 1 25%"] }}
           />
         ))}
-      </Flex>
+      </Grid>
     </Container>
   );
 };
+
+export default TeamSection;

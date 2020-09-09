@@ -35,16 +35,21 @@ export async function getStaticPaths() {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPages),
     {
-      where: {},
+      where: {}
     }
   );
   let paths = [];
   for (const page of allPage) {
     paths.push({ params: { slug: page.slug.current } });
   }
+  // TODO, next errors when it tries to build and /team and /jobs, a page that's already here.
+  // Remove from sanity maybe?
+  paths = paths.filter(
+    (p) => p.params.slug !== "jobs" && p.params.slug !== "team"
+  );
   return {
     fallback: true,
-    paths,
+    paths
   };
 }
 
@@ -55,16 +60,16 @@ export async function getStaticProps({ params, preview = false }) {
 
   let data: any = await graphQLClient.request(print(allPages), {
     where: {
-      slug: { current: { eq: params.slug } },
-    },
+      slug: { current: { eq: params.slug } }
+    }
   });
 
   return {
     props: {
       ...data.allPage[0],
-      preview: false,
+      preview: false
     },
-    revalidate: 1,
+    revalidate: 1
   };
 }
 

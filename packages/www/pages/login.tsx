@@ -1,11 +1,11 @@
 import Layout from "../components/Layout";
 import Login from "../components/Login";
-import Link from "next/link";
+import Link from "../components/Link";
 import { Flex, Box, Heading } from "@theme-ui/components";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 
-export default () => {
+const LoginPage = () => {
   useLoggedIn(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,11 +30,10 @@ export default () => {
           flexGrow: 1,
           flexDirection: "column",
           mx: [3, 0],
+          py: 6
         }}
       >
-        <Heading as="h3" sx={{ mb: 4 }}>
-          Log in
-        </Heading>
+        <h3 sx={{ mb: 4 }}>Log in</h3>
         <Login
           id="login"
           onSubmit={onSubmit}
@@ -45,11 +44,11 @@ export default () => {
           loading={loading}
         />
         <Box>
-          <Link href="/forgot-password">
-            <a>Forgot your password?</a>
-          </Link>
+          <Link href="/forgot-password">Forgot your password?</Link>
         </Box>
       </Flex>
     </Layout>
   );
 };
+
+export default LoginPage;

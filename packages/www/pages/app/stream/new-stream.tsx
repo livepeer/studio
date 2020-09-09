@@ -30,6 +30,7 @@ export default () => {
     <Layout>
       <Container
         sx={{
+          mb: 5,
           mt: 3
         }}
       >
@@ -44,7 +45,7 @@ export default () => {
         </Heading>
         <form
           id={"New Stream"}
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault();
             if (creating) {
               return;
@@ -83,7 +84,7 @@ export default () => {
                 }
               ]
             })
-              .then(newStream => {
+              .then((newStream) => {
                 setCreating(false);
                 const query = router.query.admin === "true" ? { admin: true } : {};
                 router.replace({
@@ -91,7 +92,7 @@ export default () => {
                   query
                 });
               })
-              .catch(e => {
+              .catch((e) => {
                 setCreating(false);
               });
           }}
@@ -102,7 +103,7 @@ export default () => {
             autoFocus={true}
             label="Stream name"
             value={streamName}
-            onChange={e => setStreamName(e.target.value)}
+            onChange={(e) => setStreamName(e.target.value)}
             placeholder="new-stream-name-123"
           />
           <Box sx={{ fontSize: 1, color: "listText" }}>

@@ -1,58 +1,67 @@
-import { Styled } from "theme-ui";
 import { Box, Grid, Container } from "@theme-ui/components";
-import Star from "../../public/img/star.svg";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
+import { Text } from "@theme-ui/components";
 
-export default ({ heading, investors }) => {
-  const builder = imageUrlBuilder(client as any);
+const investorIds = [
+  "northzone",
+  "compound",
+  "dgc",
+  "collaborative-fund",
+  "notation"
+];
+
+const InvestorsSection = () => {
   return (
-    <Box sx={{ position: "relative", py: [40, 40, 120], bg: "secondary" }}>
+    <Box
+      sx={{
+        position: "relative",
+        py: [64, 64, 128],
+        bg: "text"
+      }}
+    >
       <Container>
-        {heading && (
-          <Styled.h2
-            sx={{
-              fontSize: [5, 5, 6],
-              mb: [5, 5, 0],
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              left: 0,
-              position: ["relative", "relative", "absolute"],
-              textAlign: "center",
-              top: [0, 0, -4],
-              width: "100%",
-            }}
-          >
-            <Star sx={{ display: ["none", "block"] }} />
-            <Box sx={{ mx: 4 }}>{heading}</Box>
-            <Star sx={{ display: ["none", "block"] }} />
-          </Styled.h2>
-        )}
+        <Text
+          sx={{
+            fontSize: [2, 3],
+            textAlign: "center",
+            color: "lightGray",
+            mb: 4
+          }}
+        >
+          Backed by these amazing organizations and trusted by the best
+        </Text>
       </Container>
       <Container>
         <Grid
           sx={{ justifyContent: "center", alignItems: "center" }}
-          gap={[4, 4, 5]}
-          columns={[3, 3, 5]}
+          gap={[5]}
+          columns={[1, 3, 5]}
         >
-          {investors.map((investor, i) => (
+          {investorIds.map((id) => (
+            <img
+              key={id}
+              src={`/img/investors/${id}.svg`}
+              alt={`${id} logo`}
+              className="lazyload"
+              sx={{ justifySelf: "center" }}
+            />
+          ))}
+          {/* {investors.map((investor, i) => (
             <img
               key={i}
               width={investor.asset.metadata.dimensions.width}
               height={investor.asset.metadata.dimensions.height}
               alt={investor.alt}
-              sx={{
-                width: [90, 90, "auto"],
-                mb: [3, 3, 0],
-                justifySelf: "center",
-              }}
+              sx={{ justifySelf: "center", filter: "invert(1)" }}
               className="lazyload"
               data-src={builder.image(investor).url()}
             />
-          ))}
+          ))} */}
         </Grid>
       </Container>
     </Box>
   );
 };
+
+export default InvestorsSection;

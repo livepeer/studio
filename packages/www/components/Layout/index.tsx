@@ -1,5 +1,5 @@
 import { DefaultSeo } from "next-seo";
-import Navigation from "../Navigation";
+import { DefaultNav } from "../Navigation";
 import Footer from "../Footer";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
@@ -7,6 +7,7 @@ import ReactGA from "react-ga";
 import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router, { useRouter } from "next/router";
+import GradientBackgroundBox from "../GradientBackgroundBox";
 
 interface Props {
   title?: string;
@@ -15,6 +16,8 @@ interface Props {
   image?: any;
   url?: string;
   preview?: boolean;
+  withGradientBackground?: boolean;
+  customNav?: React.ReactNode;
 }
 
 if (process.env.NODE_ENV === "production") {
@@ -33,13 +36,15 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-export default ({
+const Layout = ({
   title,
   description,
   children,
   image,
   url,
   preview,
+  withGradientBackground,
+  customNav
 }: Props) => {
   const { asPath } = useRouter();
   useEffect(() => {
@@ -58,61 +63,66 @@ export default ({
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/share-icon.png",
-          alt: image ? image.alt : "Live Video Transcoding - Livepeer.com",
-        },
-      ],
-    },
+          alt: image ? image.alt : "Live Video Transcoding - Livepeer.com"
+        }
+      ]
+    }
   };
   return (
-    <Flex
-      sx={{
-        minHeight: "100vh",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}
-    >
+    <div sx={{ minHeight: "100vh" }}>
       <DefaultSeo {...seo} />
-
+      {withGradientBackground && (
+        <div
+          sx={{
+            position: "absolute",
+            top: 0,
+            width: "100%",
+            pointerEvents: "none",
+            zIndex: 0
+          }}
+        >
+          <GradientBackgroundBox
+            id="layout"
+            gradient="violet"
+            sx={{ height: "1000px" }}
+            slide
+          />
+        </div>
+      )}
       <Flex
         sx={{
           flexGrow: 1,
           flexDirection: "column",
           justifyContent: "flex-start",
+          zIndex: 1,
+          position: "relative"
         }}
       >
-        <Box
-          sx={{
-            bg: "background",
-            zIndex: 20,
-            position: "sticky",
-            top: 0,
-            width: "100%",
-          }}
-        >
-          {preview && (
-            <a
-              href={`/api/exit-preview?path=${asPath}`}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                textDecoration: "none",
-                justifyContent: "center",
-                height: 24,
-                fontSize: 12,
-                fontWeight: "500",
-                bg: "extremelyBlue",
-                color: "white",
-                lineHeight: "32px",
-              }}
-            >
-              Preview Mode — Click to Exit
-            </a>
-          )}
-          <Navigation />
-        </Box>
+        {preview && (
+          <a
+            href={`/api/exit-preview?path=${asPath}`}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              justifyContent: "center",
+              height: 24,
+              fontSize: 12,
+              fontWeight: "500",
+              bg: "extremelyBlue",
+              color: "white",
+              lineHeight: "32px"
+            }}
+          >
+            Preview Mode — Click to Exit
+          </a>
+        )}
+        {customNav ? customNav : <DefaultNav />}
         {children}
       </Flex>
       <Footer />
-    </Flex>
+    </div>
   );
 };
+
+export default Layout;

@@ -8,33 +8,36 @@ export const theme = {
     body:
       'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
     heading: "inherit",
-    monospace: "'Fira Code', Menlo, monospace",
+    monospace: "'Fira Code', Menlo, monospace"
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 56, 64, 96],
   fontWeights: {
     body: 400,
     heading: 600,
-    bold: 700,
+    bold: 700
   },
   letterSpacings: {
     body: 0,
-    heading: 0,
+    heading: 0
   },
   lineHeights: {
     body: 1.5,
-    heading: 1.125,
+    heading: 1.125
   },
   colors: {
-    text: "#292929",
+    text: "#000",
     background: "#fff",
-    primary: "#131418",
+    primary: "#943CFF",
     secondary: "#FAF5EF",
     accent: "#00EB88",
     muted: "#eaeaea",
-    gray: "#fafafa",
+    gray: "#525252",
+    lightGray: "#919191",
+    ultraLightGray: "#E6E6E6",
     listText: "#666666",
-    extremelyBlue: "#3F3FE2",
+    extremelyBlue: "#3F3FE2"
   },
+  breakpoints: ["640px", "832px", "1024px", "1280px"],
   buttons: {
     default: {
       color: "text",
@@ -46,13 +49,13 @@ export const theme = {
       borderRadius: 4,
       lineHeight: 1.4,
       letterSpacing: ".5px",
-      fontWeight: 500,
+      fontWeight: 600,
       px: 4,
       py: "10px",
       cursor: "pointer",
       textDecoration: "none",
       ":focus": {
-        outline: "none",
+        outline: "none"
       },
       ":disabled": {
         cursor: "not-allowed",
@@ -62,13 +65,24 @@ export const theme = {
         borderColor: "listText",
         borderStyle: "solid",
         opacity: 0.6,
-      },
+        ":hover": {
+          backgroundColor: "muted"
+        }
+      }
     },
     primary: {
       variant: "buttons.default",
       color: "white",
       bg: "primary",
       py: "10px",
+      transition: "background-color .15s",
+      "&:hover": {
+        bg: "#761EE1"
+      },
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
     },
     secondary: {
       variant: "buttons.default",
@@ -77,67 +91,140 @@ export const theme = {
       borderWidth: "1px",
       borderColor: "primary",
       borderStyle: "solid",
+      transition: "background-color .15s",
+      "&:hover": {
+        bg: "#761EE1"
+      },
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
     },
     outline: {
       variant: "buttons.default",
+      borderWidth: "1px",
+      borderColor: "black",
       bg: "transparent",
-      borderColor: "text",
       color: "text",
+      transition: "background-color .15s",
+      "&:hover": { bg: "muted" }
     },
     text: {
       variant: "buttons.default",
       border: 0,
-      fontWeight: 300,
+      fontWeight: 300
     },
     large: {
       variant: "buttons.default",
-      fontSize: 16,
+      fontSize: 16
     },
     primaryLarge: {
       variant: "buttons.primary",
-      fontSize: 16,
+      fontSize: 16
     },
     outlineSmall: {
       variant: "buttons.outline",
       fontSize: 14,
       px: 3,
-      py: "6px",
+      py: "6px"
     },
     primarySmall: {
       variant: "buttons.primary",
       fontSize: 14,
       px: 3,
-      py: "6px",
+      py: "6px"
     },
     secondarySmall: {
       variant: "buttons.secondary",
       fontSize: 14,
       px: 3,
-      py: "6px",
+      py: "6px"
     },
+    icon: {
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+      }
+    }
   },
   forms: {
     input: {
       py: 2,
       px: 3,
       borderColor: "listText",
-      borderRadius: 4,
-    },
+      borderRadius: 4
+    }
   },
   links: {
     nav: {
-      cursor: "pointer",
       color: "body",
       textDecoration: "none",
-      mx: 3,
+      mr: 4,
       fontSize: 1,
+      fontWeight: 600,
+      "&:last-of-type": { mr: 0 }
     },
+    mobileNav: {
+      textAlign: "center",
+      color: "body",
+      textDecoration: "none",
+      mb: 42,
+      fontSize: "32px",
+      lineHeight: "26px",
+      fontWeight: 600,
+      letterSpacing: "-0.02em"
+    },
+    footer: {
+      color: "background",
+      "&:hover": {
+        textDecoration: "underline"
+      }
+    }
   },
   layout: {
     container: {
-      maxWidth: 1200,
-      px: [3, 3, 3, 3, 0],
+      maxWidth: 1328,
+      px: [4, null, 5]
     },
+    content: {
+      maxWidth: 1122,
+      px: [4, null, 5],
+      py: [5, 6],
+      mx: "auto"
+    },
+    blogPost: {
+      maxWidth: 918,
+      px: [4, null, 5]
+    },
+    hero: {
+      textAlign: "center",
+      maxWidth: 900,
+      mb: 112,
+      px: 4
+    }
+  },
+  text: {
+    heading: {
+      section: {
+        fontSize: [5, 6],
+        color: "text",
+        fontWeight: "bold"
+      },
+      hero: {
+        lineHeight: ["48px", "72px"],
+        mt: [4, 5],
+        mb: [2, 3],
+        fontSize: ["40px", "8"],
+        letterSpacing: "-0.05em",
+        mx: "auto"
+      }
+    },
+    heroDescription: {
+      lineHeight: "32px",
+      fontSize: 3,
+      color: "text",
+      mx: "auto"
+    }
   },
   styles: {
     root: {
@@ -145,7 +232,7 @@ export const theme = {
       lineHeight: "body",
       fontWeight: "body",
       letterSpacing: "body",
-      height: "100%",
+      height: "100%"
     },
     h1: {
       color: "text",
@@ -153,7 +240,7 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "bold",
       letterSpacing: "heading",
-      fontSize: 7,
+      fontSize: 7
     },
     h2: {
       color: "text",
@@ -161,7 +248,7 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "bold",
       letterSpacing: "heading",
-      fontSize: 6,
+      fontSize: 6
     },
     h3: {
       color: "text",
@@ -169,7 +256,7 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "heading",
       letterSpacing: "heading",
-      fontSize: 5,
+      fontSize: 5
     },
     h4: {
       color: "text",
@@ -177,7 +264,7 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "heading",
       letterSpacing: "heading",
-      fontSize: 4,
+      fontSize: 4
     },
     h5: {
       color: "text",
@@ -185,7 +272,7 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "heading",
       letterSpacing: "heading",
-      fontSize: 3,
+      fontSize: 3
     },
     h6: {
       color: "text",
@@ -193,16 +280,19 @@ export const theme = {
       lineHeight: "heading",
       fontWeight: "heading",
       letterSpacing: "heading",
-      fontSize: 2,
+      fontSize: 2
     },
     p: {
       color: "text",
       fontFamily: "body",
       fontWeight: "body",
-      lineHeight: "body",
+      lineHeight: "body"
     },
     a: {
-      color: "extremelyBlue",
+      color: "primary",
+      "&:hover": {
+        textDecoration: "underline"
+      }
     },
     pre: {
       borderRadius: 12,
@@ -210,20 +300,19 @@ export const theme = {
       overflowX: "auto",
       padding: 4,
       cursor: "text",
-      backgroundColor: (t) => `${t.colors.primary} !important`,
       code: {
         color: "inherit",
-        WebkitFontSmoothing: "antialiased",
-      },
+        WebkitFontSmoothing: "antialiased"
+      }
     },
     code: {
       fontFamily: "monospace",
-      fontSize: "inherit",
+      fontSize: "inherit"
     },
     img: {
-      maxWidth: "100%",
-    },
-  },
+      maxWidth: "100%"
+    }
+  }
 };
 
 const ThemeProvider = memo(({ children, ...props }) => (
@@ -236,94 +325,94 @@ const Reset = () => (
   <Global
     styles={{
       body: {
-        margin: "0",
+        margin: "0"
       },
       "h1, h2, h3, h4, h5, h6": {
         margin: 0,
-        fontWeight: 700,
+        fontWeight: 700
       },
       h1: {
         fontSize: 56,
-        lineHeight: 1.1,
+        lineHeight: 1.1
       },
       h2: {
         fontSize: 48,
-        lineHeight: 1.1,
+        lineHeight: 1.1
       },
       h3: {
         fontSize: 32,
-        lineHeight: 1.1,
+        lineHeight: 1.1
       },
       h4: {
         fontSize: 24,
-        lineHeight: 1.1,
+        lineHeight: 1.1
       },
       h5: {
         fontSize: 16,
-        lineHeight: 1.1,
+        lineHeight: 1.1
       },
       small: {
-        fontSize: "100%",
+        fontSize: "100%"
       },
       a: {
-        color: "#131418",
+        color: "#000"
       },
       ".react-reveal": {
-        opacity: 0,
+        opacity: 0
       },
       li: {
-        marginBottom: "6px",
+        marginBottom: "6px"
       },
       table: {
-        padding: "0",
+        padding: "0"
       },
       "table tr": {
         borderTop: "1px solid #cccccc",
         backgroundColor: "white",
         margin: "0",
-        padding: "0",
+        padding: "0"
       },
       "table tr:nth-of-type(2n)": {
-        backgroundColor: "#f8f8f8",
+        backgroundColor: "#f8f8f8"
       },
       "table tr th": {
         fontWeight: "bold",
         border: "1px solid #cccccc",
         textAlign: "left",
         margin: "0",
-        padding: "6px 13px",
+        padding: "6px 13px"
       },
       "table tr td": {
         border: "1px solid #cccccc",
         textAlign: "left",
         margin: "0",
-        padding: "6px 13px",
+        padding: "6px 13px"
       },
       "table tr th :first-of-type": {
-        marginTop: 0,
+        marginTop: 0
       },
       "table tr td :first-of-type": {
-        marginTop: "0",
+        marginTop: "0"
       },
       "table tr th :last-of-type": {
-        marginBottom: "0",
+        marginBottom: "0"
       },
       "table tr td :last-of-type": {
-        marginBottom: "0",
+        marginBottom: "0"
       },
       "img.lazyload:not([src])": {
-        visibility: "hidden",
+        visibility: "hidden"
       },
       ".lazyload": {
-        opacity: 0,
+        opacity: 0
       },
       ".lazyloading": {
-        opacity: 0,
+        opacity: 0
       },
       ".lazyloaded": {
         opacity: 1,
-        transition: "opacity .3s",
-      },
+        transition: "opacity .3s"
+      }
     }}
   />
 );
