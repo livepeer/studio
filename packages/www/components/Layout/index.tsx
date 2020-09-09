@@ -55,15 +55,15 @@ const Layout = ({
     title: title,
     description: description,
     openGraph: {
-      title: title ? title : "Live Video Transcoding - Livepeer.com",
+      title: title ? title : "Livepeer.com",
       description: description
         ? description
-        : "Scalable, secure live transcoding at a fraction of the cost",
+        : "The platform built to power video-centric UGC applications at scale.",
       url: url ? url : "https://livepeer.com",
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/share-icon.png",
-          alt: image ? image.alt : "Live Video Transcoding - Livepeer.com"
+          alt: image ? image.alt : "Livepeer.com"
         }
       ]
     }
