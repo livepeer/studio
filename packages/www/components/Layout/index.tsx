@@ -1,7 +1,7 @@
 import { DefaultSeo } from "next-seo";
 import { DefaultNav } from "../Navigation";
 import Footer from "../Footer";
-import { Flex, Box } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
 import "lazysizes";

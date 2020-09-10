@@ -83,7 +83,7 @@ const HomePage = () => {
     >
       {/* Do not wrap the <Hero /> in <Fade />. It completely breaks in Safari */}
       <Hero />
-      <Fade key={1}>
+      <Fade key={1} fraction={0.05}>
         <SectionLayout
           heading={{
             title:
@@ -107,7 +107,7 @@ const HomePage = () => {
           </Grid>
         </SectionLayout>
       </Fade>
-      <Fade key={2}>
+      <Fade key={2} fraction={0.05}>
         <SectionLayout
           heading={{
             title:
@@ -130,16 +130,16 @@ const HomePage = () => {
           </Grid>
         </SectionLayout>
       </Fade>
-      <Fade key={3}>
+      <Fade key={3} fraction={0.05}>
         <InvestorsSection />
       </Fade>
-      <Fade key={4}>
+      <Fade key={4} fraction={0.05}>
         <TestimonialsSection />
       </Fade>
-      <Fade key={5}>
+      <Fade key={5} fraction={0.05}>
         <ContactSection />
       </Fade>
-      <Fade key={6}>
+      <Fade key={6} fraction={0.05}>
         <Prefooter />
       </Fade>
     </Layout>

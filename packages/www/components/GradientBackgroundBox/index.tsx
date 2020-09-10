@@ -57,7 +57,14 @@ const GradientBackgroundBox = ({
                 top: 0
               }}
             >
-              {gradientMarkup}
+              <div
+                sx={{
+                  position: "relative",
+                  width: "100vw"
+                }}
+              >
+                {gradientMarkup}
+              </div>
             </div>
           )}
         </>
