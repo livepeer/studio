@@ -17,6 +17,18 @@ import BlogPostCard from "../../components/cards/BlogPost";
 import Prefooter from "../../components/Prefooter";
 import Link from "next/link";
 import Code from "../../components/renderers/Code";
+import BlockContent from "@sanity/block-content-to-react";
+import SyntaxHighlighter from "react-syntax-highlighter";
+
+const serializers = {
+  types: {
+    code: (props) => (
+      <SyntaxHighlighter language={props.node.language || "text"}>
+        {props.node.code}
+      </SyntaxHighlighter>
+    )
+  }
+};
 
 const Post = ({
   title,
@@ -26,9 +38,11 @@ const Post = ({
   _createdAt,
   excerpt,
   body,
+  contentRaw,
   preview,
   furtherReading
 }) => {
+  console.log(contentRaw);
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
     return (
@@ -152,12 +166,10 @@ const Post = ({
           data-src={builder.image(mainImage).url()}
         />
         <div className="markdown-body">
-          <ReactMarkdown
-            source={body}
-            renderers={{
-              code: Code,
-              image: BlogPostImage
-            }}
+          <BlockContent
+            blocks={contentRaw}
+            serializers={serializers}
+            {...client.config()}
           />
         </div>
         <hr sx={{ my: [5, 6] }} />

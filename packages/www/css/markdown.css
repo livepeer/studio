@@ -818,9 +818,10 @@
 .markdown-body pre {
   padding: 16px;
   overflow: auto;
-  font-size: 85%;
+  font-size: 16px;
   line-height: 1.45;
   background-color: #000;
+  color: #fff;
   border-radius: 4px;
 }
 

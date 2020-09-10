@@ -47,6 +47,23 @@ export default {
       name: 'body',
       type: 'markdown',
       title: 'Body',
+      hidden: true, // deprecated markdown field
+    },
+    {
+      name: 'content',
+      type: 'array',
+      title: 'Content',
+      of: [
+        {
+          type: 'block',
+        },
+        {
+          type: 'image',
+        },
+        {
+          type: 'code',
+        },
+      ],
     },
   ],
 
