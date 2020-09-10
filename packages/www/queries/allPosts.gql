@@ -40,5 +40,6 @@ query allPost($where: PostFilter) {
     }
     excerpt
     body
+    contentRaw
   }
 }
