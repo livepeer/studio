@@ -113,6 +113,7 @@ const HomeHero = () => {
       >
         <Box
           sx={{
+            width: "100%",
             mb: [4, 4, 4, 0],
             maxWidth: 1000,
             mx: "auto",
