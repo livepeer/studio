@@ -41,7 +41,7 @@ const TestimonialCard = ({
       className="lazyload"
       src={`/img/testimonials/${id}/logo.svg`}
     />
-    <Box sx={{ fontWeight: 400, mt: 4, fontSize: 3 }}>"{quote}"</Box>
+    <Box sx={{ fontWeight: 400, my: 4, fontSize: 3 }}>"{quote}"</Box>
     <Flex
       sx={{
         fontWeight: 500,
