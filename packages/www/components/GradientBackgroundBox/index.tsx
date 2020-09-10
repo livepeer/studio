@@ -1,6 +1,7 @@
 import { Box } from "@theme-ui/components";
 import Slider from "../Slider";
 import { SxStyleProp } from "theme-ui";
+import { isMobile, isSafari } from "react-device-detect";
 
 export type Gradient = "violet" | "colorful" | null;
 
@@ -35,7 +36,7 @@ const GradientBackgroundBox = ({
     >
       {gradient && (
         <>
-          {slide ? (
+          {slide && !isMobile && !isSafari ? (
             <div
               sx={{
                 position: "absolute",
@@ -45,7 +46,7 @@ const GradientBackgroundBox = ({
                 top: 0
               }}
             >
-              <Slider duration={3}>{gradientMarkup}</Slider>
+              <Slider duration={4}>{gradientMarkup}</Slider>
             </div>
           ) : (
             <div
