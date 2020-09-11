@@ -1,12 +1,12 @@
-import { DefaultSeo } from "next-seo";
+import { NextSeo } from "next-seo";
 import { DefaultNav } from "../Navigation";
 import Footer from "../Footer";
-import { Flex } from "@theme-ui/components";
+import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
 import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
-import Router, { useRouter } from "next/router";
+import Router from "next/router";
 import GradientBackgroundBox from "../GradientBackgroundBox";
 
 interface Props {
@@ -15,6 +15,7 @@ interface Props {
   description?: string;
   image?: any;
   url?: string;
+  noindex?: boolean;
   preview?: boolean;
   withGradientBackground?: boolean;
   customNav?: React.ReactNode;
@@ -42,18 +43,18 @@ const Layout = ({
   children,
   image,
   url,
-  preview,
+  noindex = false,
+  preview = false,
   withGradientBackground,
   customNav
 }: Props) => {
-  const { asPath } = useRouter();
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
-
   const seo = {
     title: title,
     description: description,
+    noindex: noindex,
     openGraph: {
       title: title ? title : "Livepeer.com",
       description: description
@@ -70,7 +71,7 @@ const Layout = ({
   };
   return (
     <div sx={{ minHeight: "100vh" }}>
-      <DefaultSeo {...seo} />
+      <NextSeo {...seo} />
       {withGradientBackground && (
         <div
           sx={{
@@ -99,8 +100,7 @@ const Layout = ({
         }}
       >
         {preview && (
-          <a
-            href={`/api/exit-preview?path=${asPath}`}
+          <Box
             sx={{
               display: "flex",
               alignItems: "center",
@@ -109,13 +109,13 @@ const Layout = ({
               height: 24,
               fontSize: 12,
               fontWeight: "500",
-              bg: "extremelyBlue",
+              bg: "primary",
               color: "white",
               lineHeight: "32px"
             }}
           >
-            Preview Mode — Click to Exit
-          </a>
+            Preview Mode
+          </Box>
         )}
         {customNav ? customNav : <DefaultNav />}
         {children}
