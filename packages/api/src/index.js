@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import logger from './logger'
 import appRouter from './app-router'
 import 'source-map-support/register'
+import cors from 'cors'
 
 export default async function makeApp(params) {
   const {
@@ -72,6 +73,18 @@ export default async function makeApp(params) {
     // process.exit(1)
   }
   const app = express()
+  const whitelist = [
+    'https://livepeer.com',
+    'https://livepeer.monster',
+    /\.livepeerorg.vercel\.app$/,
+    /\.livepeerorg.now\.sh$/,
+  ]
+  app.use(
+    cors({
+      origin: whitelist,
+      credentials: true,
+    }),
+  )
   app.use(
     morgan('dev', {
       skip: (req, res) => {
