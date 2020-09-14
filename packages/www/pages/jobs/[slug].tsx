@@ -3,19 +3,19 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
-
 import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import Prefooter from "../../components/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
 import Code from "../../components/renderers/Code";
 
-const Page = ({ title, body, preview }) => {
+const Page = ({ title, body, noindex = false, preview }) => {
   return (
     <Layout
       title={`${title} - Livepeer.com`}
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs`}
+      noindex={noindex}
       preview={preview}
     >
       <Container
@@ -103,20 +103,24 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params, preview = false }) {
+  const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
   let data: any = await graphQLClient.request(print(allJobs), {
     where: {
-      slug: { current: { eq: params.slug } }
+      slug: { current: { eq: slug } }
     }
   });
 
+  let job = data.allJob.find((j) => j.slug.current === slug);
+
   return {
     props: {
-      ...data.allJob[0],
-      preview: false
+      ...job,
+      noindex: true,
+      preview
     },
     revalidate: 1
   };

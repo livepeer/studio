@@ -7,7 +7,6 @@ import allPosts from "../../queries/allPosts.gql";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";
 import readingTime from "reading-time";
-import ReactMarkdown from "react-markdown";
 import { useRouter } from "next/router";
 import { Spinner } from "@theme-ui/components";
 import React from "react";
@@ -16,7 +15,6 @@ import { Grid } from "@theme-ui/components";
 import BlogPostCard from "../../components/cards/BlogPost";
 import Prefooter from "../../components/Prefooter";
 import Link from "next/link";
-import Code from "../../components/renderers/Code";
 import BlockContent from "@sanity/block-content-to-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 
@@ -38,11 +36,11 @@ const Post = ({
   _createdAt,
   excerpt,
   body,
-  contentRaw,
+  noindex = false,
   preview,
+  contentRaw,
   furtherReading
 }) => {
-  console.log(contentRaw);
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
     return (
@@ -58,6 +56,7 @@ const Post = ({
     <Layout
       title={`${title} - Livepeer.com`}
       description={excerpt}
+      noindex={noindex}
       image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
       url={`https://livepeer.com${asPath}`}
       preview={preview}
@@ -172,13 +171,17 @@ const Post = ({
             {...client.config()}
           />
         </div>
-        <hr sx={{ my: [5, 6] }} />
-        <h3 sx={{ mb: 40 }}>Articles you may be interested in</h3>
-        <Grid columns={[1, null, 2]} mb={5} gap={4}>
-          {furtherReading.map((p, i) => (
-            <BlogPostCard post={p} key={`post-${i}`} />
-          ))}
-        </Grid>
+        {!!furtherReading && (
+          <>
+            <hr sx={{ my: [5, 6] }} />
+            <h3 sx={{ mb: 40 }}>Articles you may be interested in</h3>
+            <Grid columns={[1, null, 2]} mb={5} gap={4}>
+              {furtherReading.map((p, i) => (
+                <BlogPostCard post={p} key={`post-${i}`} />
+              ))}
+            </Grid>
+          </>
+        )}
       </Container>
       <Fade key={0}>
         <Prefooter />
@@ -189,20 +192,38 @@ const Post = ({
 
 export default Post;
 
-export async function getServerSideProps({ params }) {
+export async function getStaticPaths() {
+  const graphQLClient = new GraphQLClient(
+    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
+  );
+  const { allPost } = await graphQLClient.request(print(allPosts), {
+    where: {}
+  });
+
+  let paths = [];
+  for (const post of allPost) {
+    paths.push({ params: { slug: post.slug.current } });
+  }
+  return {
+    fallback: true,
+    paths
+  };
+}
+
+export async function getStaticProps({ params }) {
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
-  let { allPost: posts }: any = await graphQLClient.request(print(allPosts), {
+  let data: any = await graphQLClient.request(print(allPosts), {
     where: {}
   });
 
-  const post = posts.find((p) => p.slug.current === slug);
+  let post = data.allPost.find((p) => p.slug.current === slug);
 
-  // TODO. should this be random?
-  const furtherReading = posts
+  // TODO: fetch related posts from sanity
+  const furtherReading = data.allPost
     .filter((p) => p.slug.current !== slug)
     .sort(() => 0.5 - Math.random())
     .slice(0, 2);
@@ -211,43 +232,7 @@ export async function getServerSideProps({ params }) {
     props: {
       ...post,
       furtherReading
-    }
+    },
+    revalidate: 1
   };
 }
-// export async function getStaticPaths() {
-//   const graphQLClient = new GraphQLClient(
-//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-//   );
-//   const { allPost } = await graphQLClient.request(print(allPosts), {
-//     where: {},
-//   });
-
-//   let paths = [];
-//   for (const post of allPost) {
-//     paths.push({ params: { slug: post.slug.current } });
-//   }
-//   return {
-//     fallback: true,
-//     paths,
-//   };
-// }
-
-// export async function getStaticProps({ params, preview = false }) {
-//   const graphQLClient = new GraphQLClient(
-//     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-//   );
-
-//   let data: any = await graphQLClient.request(print(allPosts), {
-//     where: {
-//       slug: { current: { eq: params.slug } },
-//     },
-//   });
-
-//   return {
-//     props: {
-//       ...data.allPost[0],
-//       preview: false,
-//     },
-//     revalidate: 1,
-//   };
-// }

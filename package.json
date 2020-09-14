@@ -12,7 +12,8 @@
   "bugs": "https://github.com/livepeer/livepeer.com/issues",
   "homepage": "https://livepeer.com",
   "scripts": {
-    "build": "lerna run build --stream --concurrency=1",
+    "build": "lerna run --stream --no-sort --concurrency=999 build",
+    "start": "lerna run --stream --no-sort --concurrency=999 start",
     "clean": "lerna clean --yes && rm -rf node_modules",
     "cz": "git-cz",
     "coverage": "lerna run coverage --ignore @livepeer.com/www --ignore @livepeer.com/admin && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
@@ -23,7 +24,7 @@
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
     "test": "lerna run --stream test --no-sort --concurrency=999 --ignore @livepeer.com/www --ignore @livepeer.com/admin",
-    "dev": "lerna run --stream --no-sort --concurrency=999 --ignore @livepeer/admin dev",
+    "dev": "cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
     "deploy:staging": "run-p wrangler:staging now:staging",
     "deploy:production": "run-p wrangler:production now:production",

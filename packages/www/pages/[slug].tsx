@@ -7,7 +7,7 @@ import { getComponent } from "../lib/utils";
 import { useRouter } from "next/router";
 import { Spinner } from "@theme-ui/components";
 
-const Page = ({ title, content, preview }) => {
+const Page = ({ title, content, noindex = false, preview }) => {
   const router = useRouter();
   if (router.isFallback) {
     return (
@@ -21,6 +21,7 @@ const Page = ({ title, content, preview }) => {
       title={`${title} - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com`}
+      noindex={noindex}
       preview={preview}
     >
       {content.map((component, i) => (
@@ -53,21 +54,23 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params, preview = false }) {
+export async function getStaticProps({ params }) {
+  const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
   let data: any = await graphQLClient.request(print(allPages), {
     where: {
-      slug: { current: { eq: params.slug } }
+      slug: { current: { eq: slug } }
     }
   });
 
+  let page = data.allPage.find((p) => p.slug.current === slug);
+
   return {
     props: {
-      ...data.allPage[0],
-      preview: false
+      ...page
     },
     revalidate: 1
   };

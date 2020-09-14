@@ -1,41 +1,10 @@
 {
   "version": 2,
   "public": true,
-  "builds": [
-    { "src": "packages/www/package.json", "use": "@now/next" },
-    {
-      "src": "packages/admin/package.json",
-      "use": "@now/static-build"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/admin/static/(.*)",
-      "destination": "/packages/admin/static/$1"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "/packages/admin/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/packages/www/$1"
-    }
-  ],
   "redirects": [
     {
       "source": "/tv",
       "destination": "https://media.livepeer.org/play?url=https%3A%2F%2Fd21gyr0uv5jqnv.cloudfront.net%2F4br7%252Badam_obs%2Findex.m3u8"
     }
-  ],
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_HUBSPOT_PORTAL_ID": "@hubspot_portal_id",
-      "NEXT_PUBLIC_HUBSPOT_FORM_ID": "@hubspot_form_id",
-      "NEXT_PUBLIC_GA_TRACKING_ID": "@ga_tracking_id_dot_com",
-      "NEXT_PUBLIC_SEGMENT_WRITE_KEY": "@segment_write_key_dot_com",
-      "SANITY_API_TOKEN": "@sanity_api_token",
-      "SANITY_PREVIEW_SECRET": "@sanity_preview_secret"
-    }
-  }
+  ]
 }

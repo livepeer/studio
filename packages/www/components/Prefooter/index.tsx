@@ -99,7 +99,7 @@ const Prefooter = () => (
             viewBox="0 0 10 10"
             aria-hidden="true"
           >
-            <g fill-rule="evenodd">
+            <g fillRule="evenodd">
               <path className="HoverArrow__linePath" d="M0 5h7" />
               <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
             </g>

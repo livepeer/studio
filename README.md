@@ -15,23 +15,30 @@ This project requires `node >=10.0.0` and `yarn >=1.0.0`. A unix shell is also r
 - [Installing Yarn](https://yarnpkg.com/lang/en/docs/install/)
 - [UNIX Shell (Windows users)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 
-## Getting Started
+## Local Development
 
-To get started, clone the repo and install its dependencies:
+### Step 1
+
+If you're a member of the `livepeer-com` vercel team run `vercel env pull .env.local` to fetch the development environment vars. If not, copy the .env.local.example file in this directory, rename it to .env.local (which will be ignored by Git) and add your local env vars
+
+`cp .env.local.example .env.local`
+
+### Step 2
+
+Install it and run:
 
 ```bash
-git clone https://github.com/livepeer/livepeer.com.git
-cd livepeer.com
 yarn
-```
-
-For development purposes there's a top-level `dev` script that will watch and continuously compile all packages concurrently:
-
-```bash
 yarn dev
 ```
 
-For next steps, take a look at documentation for the individual package(s) you want to run and/or develop.
+## Sanity CMS
+
+The Sanity CMS can be accessed locally by visiting `http://localhost:3333/admin`. If you've made changes to the Sanity schema and would like to deploy theem to production run `yarn deploy` inside the `packags/admin` (you'll need to be authenticated with Sanity to deploy changes to prod).
+
+## Deploying
+
+Deployments are run automatically via [Vercel's github integration](https://vercel.com/docs/git-integrations/vercel-for-github).
 
 ## Contributing
 
@@ -45,8 +52,8 @@ We happily await your pull requests and/or involvement in our [issues page](http
 
 ### Private
 
-| Name                                                                                          | Description                               |
-| --------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [`@livepeer.com/api`](https://github.com/livepeer/livepeer.com/tree/master/packages/api)      | Livepeer API node for controlling streams |
-| [`@livepeer.com/www`](https://github.com/livepeer/livepeer.com/tree/master/packages/subgraph) | The livepeer.com frontend                 |
-| [`@livepeer.com/admin`](https://github.com/livepeer/livepeer.com/tree/master/packages/admin)  | The livepeer.com Sanity CMS               |
+| Name                                                                                          | Description                              |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [`@livepeer.com/api`](https://github.com/livepeer/livepeer.com/tree/master/packages/api)      | Livepeer.com API for controlling streams |
+| [`@livepeer.com/www`](https://github.com/livepeer/livepeer.com/tree/master/packages/subgraph) | The livepeer.com frontend                |
+| [`@livepeer.com/admin`](https://github.com/livepeer/livepeer.com/tree/master/packages/admin)  | The livepeer.com Sanity CMS              |
