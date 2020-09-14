@@ -4,27 +4,7 @@ import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
 import { QueryArrayResult } from 'pg'
 
-interface TableSchema {
-  table: string
-}
-
-interface DBObject {
-  id: string
-}
-
-interface FindQuery {
-  [key: string]: any
-}
-
-interface FindOptions {
-  cursor?: string
-  limit?: number
-  useReplica?: boolean
-}
-
-interface GetOptions {
-  useReplica?: boolean
-}
+import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions } from './types'
 
 export default class Table<T extends DBObject> {
   db: DB

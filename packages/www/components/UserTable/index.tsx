@@ -17,7 +17,13 @@ export default ({ userId, id }: UserTableProps) => {
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
     getUsers()
-      .then(users => setUsers(users))
+      .then((users) => {
+        if (Array.isArray(users)) {
+          setUsers(users);
+        } else {
+          console.log(users);
+        }
+      })
       .catch(err => console.error(err)); // todo: surface this
   }, [userId, adminModal, removeAdminModal, selectedUser]);
   const close = () => {

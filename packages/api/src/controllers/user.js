@@ -8,8 +8,26 @@ import validator from 'email-validator'
 import { makeNextHREF, sendgridEmail, trackAction } from './helpers'
 import hash from '../hash'
 import qs from 'qs'
+import { db } from '../store'
 
 const app = Router()
+
+app.get('/usage', authMiddleware({}), async (req, res) => {
+  let { userId, fromTime, toTime } = req.query
+  if (!fromTime || !toTime) {
+    res.status(400)
+    return res.json({ errors: ['should specify time range'] })
+  }
+  if (!userId || (req.user.admin !== true && req.user.id !== userId)) {
+    userId = req.user.id
+  }
+
+  const usageRes = await db.stream.usage(userId, fromTime, toTime, {
+    useReplica: true,
+  })
+  res.status(200)
+  res.json(usageRes)
+})
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   const resp = await req.store.list({

@@ -79,7 +79,13 @@ export default ({ id }: TokenTableProps) => {
   }, [newToken, deleteModal]);
   useEffect(() => {
     getUsers()
-      .then((users) => setUsers(users))
+      .then((users) => {
+        if (Array.isArray(users)) {
+          setUsers(users);
+        } else {
+          console.log(users);
+        }
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, []);
   const close = () => {
