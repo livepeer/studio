@@ -27,6 +27,14 @@ type ApiState = {
   userRefresh?: number;
 };
 
+export interface UsageData {
+  sourceSegments: number
+  transcodedSegments: number
+  sourceSegmentsDuration: number
+  transcodedSegmentsDuration: number
+}
+
+
 const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
 const storeToken = (token) => {
   try {
@@ -177,13 +185,19 @@ const makeContext = (state: ApiState, setState) => {
       return [res, user as User | ApiError];
     },
 
-    async getUsers(opts = {}): Promise<[Response, Array<User> | ApiError]> {
-      let [res, users] = await context.fetch(`/user`, opts);
+    async getUsers(limit = 100, opts = {}): Promise<Array<User> | ApiError> {
+      let [res, users] = await context.fetch(`/user?limit=${limit}`, opts);
 
       if (res.status === 200) {
         return users;
       }
       return res;
+    },
+
+    async getUsage(fromTime: number, toTime: number, userId?: number): Promise<[Response, UsageData | ApiError]> {
+      let [res, usage] = await context.fetch(`/user/usage?${qs.stringify({ fromTime, toTime, userId })}`, {});
+
+      return [res, usage as UsageData | ApiError];
     },
 
     async makeUserAdmin(email, admin): Promise<[Response, User | ApiError]> {

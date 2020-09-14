@@ -64,6 +64,12 @@ function authFactory(params) {
         throw new ForbiddenError(`user does not have admin priviledges`)
       }
     }
+
+    if (params.anyAdmin) {
+      if (user.admin !== true) {
+        throw new ForbiddenError(`user does not have admin priviledges`)
+      }
+    }
     return next()
   }
 }

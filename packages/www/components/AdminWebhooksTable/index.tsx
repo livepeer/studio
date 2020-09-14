@@ -86,7 +86,13 @@ export default ({ id }: { id: string }) => {
   const [sortFunc, setSortFunc] = useState(null);
   useEffect(() => {
     getUsers()
-      .then((users) => setUsers(users))
+      .then((users) => {
+        if (Array.isArray(users)) {
+          setUsers(users);
+        } else {
+          console.log(users);
+        }
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {

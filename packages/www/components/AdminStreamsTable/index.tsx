@@ -62,8 +62,14 @@ export default ({ id }: { id: string }) => {
   const { getAdminStreams, deleteStream, getBroadcasters, getUsers } = useApi();
   const [sortFunc, setSortFunc] = useState(null);
   useEffect(() => {
-    getUsers()
-      .then((users) => setUsers(users))
+    getUsers(1000)
+      .then((users) => {
+        if (Array.isArray(users)) {
+          setUsers(users);
+        } else {
+          console.log(users);
+        }
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
