@@ -4,6 +4,7 @@ import { timeout } from '../util'
 import { parse as parseUrl, format as stringifyUrl } from 'url'
 import { IStore } from '../types/common'
 import schema from '../schema/schema.json'
+import { QueryArrayResult, QueryResult, QueryConfig } from 'pg'
 import {
   Stream,
   ObjectStore,
@@ -15,6 +16,7 @@ import {
 import Table from './table'
 import StreamTable from './stream-table'
 import { kebabToCamel } from '../util'
+import { QueryOptions } from './types'
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000
@@ -106,16 +108,32 @@ export class DB {
     )
   }
 
-  async query(query, ...params) {
-    console.log(query)
-    return this.pool.query(query, ...params)
+  queryWithOpts<T, I extends any[] = any[]>(
+    query: QueryConfig<I>,
+    opts: QueryOptions = {},
+  ): Promise<QueryResult<T>> {
+    if (opts.useReplica && this.replicaPool) {
+      return this.replicaPool.query(query)
+    }
+    return this.pool.query(query)
   }
 
-  async replicaQuery(query, ...params) {
+  query<T, I extends any[] = any[]>(
+    query: string | QueryConfig<I>,
+    values?: I,
+  ): Promise<QueryResult<T>> {
+    console.log(query)
+    return this.pool.query(query, values)
+  }
+
+  replicaQuery<T, I extends any[] = any[]>(
+    query: string | QueryConfig<I>,
+    values?: I,
+  ): Promise<QueryResult<T>> {
     console.log(query)
     return this.replicaPool
-      ? this.replicaPool.query(query, ...params)
-      : this.pool.query(query, ...params)
+      ? this.replicaPool.query(query, values)
+      : this.pool.query(query, values)
   }
 }
 

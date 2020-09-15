@@ -475,6 +475,49 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
   res.end()
 })
 
+app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
+  let { id } = req.params
+  let stream = await db.stream.getByStreamKey(id, { useReplica: true })
+  let session,
+    isPlaybackid = false,
+    isStreamKey = !!stream,
+    isSession = false
+  if (!stream) {
+    stream = await db.stream.getByPlaybackId(id, { useReplica: true })
+    isPlaybackid = !!stream
+  }
+  if (!stream) {
+    stream = await db.stream.get(id, { useReplica: true })
+  }
+  if (stream && stream.parentId) {
+    session = stream
+    isSession = true
+    stream = await db.stream.get(stream.parentId, { useReplica: true })
+  }
+  if (!stream) {
+    res.staus(404)
+    return res.json({
+      errors: ['not found'],
+    })
+  }
+  if (!session) {
+    // find last session
+    session = await db.stream.getLastSession(stream.id, { useReplica: true })
+  }
+  const user = await req.store.get(`user/${stream.userId}`)
+  const resp = {
+    stream,
+    session,
+    isPlaybackid,
+    isSession,
+    isStreamKey,
+    user
+  }
+
+  res.status(200)
+  res.json(resp)
+})
+
 app.post('/hook', async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422)

@@ -2,9 +2,9 @@ import sql, { SQLStatement } from 'sql-template-strings'
 import { DB } from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
-import { QueryArrayResult } from 'pg'
+import { QueryArrayResult, QueryResult } from 'pg'
 
-import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions } from './types'
+import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions, DBLegacyObject } from './types'
 
 export default class Table<T extends DBObject> {
   db: DB
@@ -21,7 +21,7 @@ export default class Table<T extends DBObject> {
     if (!id) {
       throw new Error('missing id')
     }
-    let res: QueryArrayResult<any[]>
+    let res: QueryResult<DBLegacyObject>
     if (!opts.useReplica) {
       res = await this.db.query(
         sql`SELECT data FROM `
@@ -39,7 +39,7 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       return null
     }
-    return res.rows[0].data
+    return res.rows[0].data as T
   }
 
   // returns [docs, cursor]

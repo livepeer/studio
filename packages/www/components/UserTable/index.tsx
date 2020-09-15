@@ -9,7 +9,7 @@ type UserTableProps = {
   id: string;
 };
 
-export default ({ userId, id }: UserTableProps) => {
+const UserTable = ({ userId, id }: UserTableProps) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [adminModal, setAdminModal] = useState(false);
@@ -148,3 +148,4 @@ export default ({ userId, id }: UserTableProps) => {
     </Container>
   );
 };
+export default UserTable;
