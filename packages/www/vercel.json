@@ -1,0 +1,79 @@
+{
+  "version": 2,
+  "public": true,
+  "redirects": [
+    {
+      "source": "/tv",
+      "destination": "https://media.livepeer.org/play?url=https%3A%2F%2Fd21gyr0uv5jqnv.cloudfront.net%2F4br7%252Badam_obs%2Findex.m3u8",
+      "permanent": false
+    },
+    {
+      "source": "/docs/support-matrix",
+      "destination": "/docs/guides/support-matrix"
+    },
+    {
+      "source": "/docs/dashboard/create-a-stream",
+      "destination": "/docs/guides/dashboard/create-a-stream"
+    },
+    {
+      "source": "/docs/dashboard/stream-page-specifications",
+      "destination": "/docs/guides/dashboard/stream-page-specifications"
+    },
+    {
+      "source": "/docs/dashboard/broadcast-a-stream-session",
+      "destination": "/docs/guides/dashboard/broadcast-a-stream-session"
+    },
+    {
+      "source": "/docs/dashboard/stream-rendition-properties",
+      "destination": "/docs/guides/dashboard/stream-rendition-properties"
+    },
+    {
+      "source": "/docs/dashboard/playback-a-stream",
+      "destination": "/docs/guides/dashboard/playback-a-stream"
+    },
+    {
+      "source": "/docs/dashboard/delete-a-stream",
+      "destination": "/docs/guides/dashboard/delete-a-stream"
+    },
+    {
+      "source": "/docs/api/create-api-key",
+      "destination": "/docs/guides/api/create-api-key"
+    },
+    {
+      "source": "/docs/api/base-urls",
+      "destination": "/docs/guides/api/base-urls"
+    },
+    {
+      "source": "/docs/api/create-a-stream",
+      "destination": "/docs/guides/api/create-a-stream"
+    },
+    {
+      "source": "/docs/api/broadcast-a-live-stream",
+      "destination": "/docs/guides/api/broadcast-a-live-stream"
+    },
+    {
+      "source": "/docs/api/playback-a-live-stream",
+      "destination": "/docs/guides/api/playback-a-live-stream"
+    },
+    {
+      "source": "/docs/api/list-all-streams",
+      "destination": "/docs/guides/api/list-all-streamsm"
+    },
+    {
+      "source": "/docs/api/delete-a-stream",
+      "destination": "/docs/guides/api/delete-a-stream"
+    },
+    {
+      "source": "/docs/api-keys/when-do-you-need-an-API-key",
+      "destination": "/docs/guides/api-keys/when-do-you-need-an-API-key"
+    },
+    {
+      "source": "/docs/api-keys/create-an-api-key",
+      "destination": "/docs/guides/api-keys/create-an-api-key"
+    },
+    {
+      "source": "/docs/api-keys/delete-an-api-key",
+      "destination": "/docs/guides/api-keys/delete-an-api-key"
+    }
+  ]
+}
