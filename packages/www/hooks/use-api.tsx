@@ -77,9 +77,8 @@ const makeContext = (state: ApiState, setState) => {
         headers.set("authorization", `JWT ${state.token}`);
       }
       const endpoint =
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "livepeer.monster" &&
-        window.location.hostname !== "livepeer.com"
+        window.location.hostname.includes("livepeerorg.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.now.sh")
           ? `https://livepeer.monster/api${url}`
           : `/api${url}`;
       const res = await fetch(endpoint, {
