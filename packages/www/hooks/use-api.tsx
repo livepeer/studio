@@ -279,8 +279,12 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getAdminStreams(): Promise<Array<Stream>> {
-      const [res, streams] = await context.fetch(`/stream?streamsonly=1`);
+    async getAdminStreams(active = false): Promise<Array<Stream>> {
+      let url = `/stream?streamsonly=1`;
+      if (active) {
+        url += `&active=1`;
+      }
+      const [res, streams] = await context.fetch(url);
       if (res.status !== 200) {
         throw new Error(streams);
       }

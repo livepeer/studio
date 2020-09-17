@@ -42,7 +42,7 @@ const hackMistSettings = (req, profiles) => {
 }
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, streamsonly, sessionsonly, all } = req.query
+  let { limit, cursor, streamsonly, sessionsonly, all, active } = req.query
 
   const query = []
   if (!all) {
@@ -52,6 +52,9 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
     query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
     query.push(sql`data->>'parentId' IS NOT NULL`)
+  }
+  if (active) {
+    query.push(sql`data->>'isActive' = 'true'`)
   }
 
   const [output, newCursor] = await db.stream.find(query, { cursor, limit })
