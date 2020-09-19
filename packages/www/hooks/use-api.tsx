@@ -6,7 +6,7 @@ import {
   Error as ApiError,
   ApiToken,
   Stream,
-  Webhook,
+  Webhook
 } from "@livepeer.com/api";
 import qs from "qs";
 
@@ -84,9 +84,14 @@ const makeContext = (state: ApiState, setState) => {
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
-      const res = await fetch(`/api${url}`, {
+      const endpoint =
+        window.location.hostname.includes("livepeerorg.vercel.app") ||
+        window.location.hostname.includes("livepeerorg.now.sh")
+          ? `https://livepeer.monster/api${url}`
+          : `/api${url}`;
+      const res = await fetch(endpoint, {
         ...opts,
-        headers,
+        headers
       });
       if (res.status === 204) {
         return [res];
@@ -106,8 +111,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       if (res.status !== 201) {
         return body;
@@ -118,7 +123,7 @@ const makeContext = (state: ApiState, setState) => {
       if (process.env.NODE_ENV === "production") {
         const data = jwt.decode(token);
         window.analytics.identify(data.sub, {
-          email: email,
+          email: email
         });
       }
 
@@ -132,8 +137,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       if (res.status !== 201) {
         return body;
@@ -147,8 +152,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email, emailValidToken }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       setState({ ...state, userRefresh: Date.now() });
     },
@@ -159,8 +164,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       return body;
     },
@@ -171,8 +176,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email, resetToken, password }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       if (res.status !== 201) {
         return body;
@@ -205,8 +210,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify({ email: email, admin: admin }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
 
       if (res.status !== 201) {
@@ -272,8 +277,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify(params),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
 
       if (res.status !== 201) {
@@ -292,7 +297,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async deleteStream(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/stream/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
       if (res.status !== 204) {
         throw new Error(body);
@@ -307,8 +312,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "PATCH",
         body: JSON.stringify({ record }),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
 
       if (res.status !== 204) {
@@ -338,8 +343,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify(params),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
 
       if (res.status !== 201) {
@@ -350,7 +355,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async deleteWebhook(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/webhook/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
       if (res.status !== 204) {
         throw new Error(body.errors.join(", "));
@@ -373,8 +378,8 @@ const makeContext = (state: ApiState, setState) => {
         method: "POST",
         body: JSON.stringify(params),
         headers: {
-          "content-type": "application/json",
-        },
+          "content-type": "application/json"
+        }
       });
       if (res.status !== 201) {
         throw new Error(JSON.stringify(res.errors));
@@ -384,12 +389,12 @@ const makeContext = (state: ApiState, setState) => {
 
     async deleteApiToken(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/api-token/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
       if (res.status !== 204) {
         throw new Error(body);
       }
-    },
+    }
   };
   return context;
 };
@@ -398,7 +403,7 @@ export const ApiContext = createContext(makeContext({} as ApiState, () => {}));
 
 export const ApiProvider = ({ children }) => {
   const [state, setState] = useState<ApiState>({
-    token: getStoredToken(),
+    token: getStoredToken()
   });
 
   const context = makeContext(state, setState);
