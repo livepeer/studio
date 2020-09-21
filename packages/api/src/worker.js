@@ -262,6 +262,12 @@ class ExpressResponse {
   header(key, value) {
     return this.set(key, value)
   }
+
+  headers(obj) {
+    for (const [key, value] of Object.entries(obj)) {
+      this.set(key, value)
+    }
+  }
 }
 
 /**
@@ -273,6 +279,8 @@ async function expressRequest(cfReq, router) {
   const buf = Buffer.from(await cfReq.arrayBuffer())
   return new Promise((resolve, reject) => {
     let status = 200
+    let resText = null
+    let ended = false
     const { pathname, searchParams } = new URL(cfReq.url)
     const req = new ExpressRequest({
       url: pathname,
@@ -287,6 +295,9 @@ async function expressRequest(cfReq, router) {
     const res = new ExpressResponse({
       status: (stat) => {
         status = stat
+      },
+      send: (text) => {
+        res.end(text)
       },
       end: (text) => {
         resolve(
