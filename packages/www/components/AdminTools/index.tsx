@@ -91,7 +91,22 @@ const AdminTools = ({ id }: { id: string }) => {
       }}
     >
       <Box sx={{ mt: "2em" }}>{message}</Box>
-      <Flex sx={{ justifyContent: "flex-start", mt: "2em", mb: "1em" }}>
+      <form
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          mt: "2em",
+          mb: "1em"
+        }}
+        id={id}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (loading || !idInput) {
+            return;
+          }
+          doGetInfo(idInput);
+        }}
+      >
         <Input
           sx={{ width: "30em" }}
           label="idInput"
@@ -104,11 +119,10 @@ const AdminTools = ({ id }: { id: string }) => {
           aria-label="Get info button"
           disabled={loading || !idInput}
           sx={{ ml: "1em" }}
-          onClick={() => doGetInfo(idInput)}
         >
           Get info
         </Button>
-      </Flex>
+      </form>
       <Box>{desc}</Box>
       {ginfo && ginfo.stream && (
         <>
@@ -168,7 +182,8 @@ const AdminTools = ({ id }: { id: string }) => {
                     href={`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`}
                   >
                     Playback link (
-                    {`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`})
+                    {`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`}
+                    )
                   </a>
                 </Box>
               </>
