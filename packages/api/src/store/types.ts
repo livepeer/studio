@@ -7,14 +7,21 @@ export interface DBObject {
   id: string
 }
 
+export interface DBLegacyObject extends DBObject {
+  data: Object
+}
+
 export interface FindQuery {
   [key: string]: any
 }
 
-export interface FindOptions {
+export interface QueryOptions {
+  useReplica?: boolean
+}
+
+export interface FindOptions extends QueryOptions {
   cursor?: string
   limit?: number
-  useReplica?: boolean
 }
 
 export interface GetOptions {

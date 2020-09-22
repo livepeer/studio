@@ -42,7 +42,7 @@ const hackMistSettings = (req, profiles) => {
 }
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, streamsonly, sessionsonly, all } = req.query
+  let { limit, cursor, streamsonly, sessionsonly, all, active } = req.query
 
   const query = []
   if (!all) {
@@ -52,6 +52,9 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
     query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
     query.push(sql`data->>'parentId' IS NOT NULL`)
+  }
+  if (active) {
+    query.push(sql`data->>'isActive' = 'true'`)
   }
 
   const [output, newCursor] = await db.stream.find(query, { cursor, limit })
@@ -473,6 +476,49 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
 
   res.status(204)
   res.end()
+})
+
+app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
+  let { id } = req.params
+  let stream = await db.stream.getByStreamKey(id)
+  let session,
+    isPlaybackid = false,
+    isStreamKey = !!stream,
+    isSession = false
+  if (!stream) {
+    stream = await db.stream.getByPlaybackId(id)
+    isPlaybackid = !!stream
+  }
+  if (!stream) {
+    stream = await db.stream.get(id)
+  }
+  if (stream && stream.parentId) {
+    session = stream
+    isSession = true
+    stream = await db.stream.get(stream.parentId)
+  }
+  if (!stream) {
+    res.staus(404)
+    return res.json({
+      errors: ['not found'],
+    })
+  }
+  if (!session) {
+    // find last session
+    session = await db.stream.getLastSession(stream.id)
+  }
+  const user = await req.store.get(`user/${stream.userId}`)
+  const resp = {
+    stream,
+    session,
+    isPlaybackid,
+    isSession,
+    isStreamKey,
+    user
+  }
+
+  res.status(200)
+  res.json(resp)
 })
 
 app.post('/hook', async (req, res) => {

@@ -28,12 +28,26 @@ type ApiState = {
 };
 
 export interface UsageData {
-  sourceSegments: number
-  transcodedSegments: number
-  sourceSegmentsDuration: number
-  transcodedSegmentsDuration: number
+  sourceSegments: number;
+  transcodedSegments: number;
+  sourceSegmentsDuration: number;
+  transcodedSegmentsDuration: number;
 }
 
+export interface StreamInfo {
+  stream: Stream;
+  session?: Stream;
+  isPlaybackid: boolean;
+  isSession: boolean;
+  isStreamKey: boolean;
+  user: User;
+}
+
+export interface Ingest {
+  ingest: string;
+  playback: string;
+  base: string;
+}
 
 const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
 const storeToken = (token) => {
@@ -199,8 +213,15 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async getUsage(fromTime: number, toTime: number, userId?: number): Promise<[Response, UsageData | ApiError]> {
-      let [res, usage] = await context.fetch(`/user/usage?${qs.stringify({ fromTime, toTime, userId })}`, {});
+    async getUsage(
+      fromTime: number,
+      toTime: number,
+      userId?: number
+    ): Promise<[Response, UsageData | ApiError]> {
+      let [res, usage] = await context.fetch(
+        `/user/usage?${qs.stringify({ fromTime, toTime, userId })}`,
+        {}
+      );
 
       return [res, usage as UsageData | ApiError];
     },
@@ -234,14 +255,23 @@ const makeContext = (state: ApiState, setState) => {
       return broadcasters;
     },
 
-    async getIngest(): Promise<
-      Array<{ ingest: string; playback: string; base: string }>
-    > {
-      const [res, ingest] = await context.fetch(`/ingest`);
+    async getIngest(
+      all = false
+    ): Promise<Array<Ingest>> {
+      const q = all ? "?first=false" : "";
+      const [res, ingest] = await context.fetch(`/ingest${q}`);
       if (res.status !== 200) {
         throw new Error(ingest);
       }
       return ingest;
+    },
+
+    async getStreamInfo(
+      id: string
+    ): Promise<[Response, StreamInfo | ApiError]> {
+      let [res, info] = await context.fetch(`/stream/${id}/info`);
+
+      return [res, info as StreamInfo | ApiError];
     },
 
     async getStream(streamId): Promise<Stream> {
@@ -254,8 +284,12 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getAdminStreams(): Promise<Array<Stream>> {
-      const [res, streams] = await context.fetch(`/stream?streamsonly=1`);
+    async getAdminStreams(active = false): Promise<Array<Stream>> {
+      let url = `/stream?streamsonly=1`;
+      if (active) {
+        url += `&active=1`;
+      }
+      const [res, streams] = await context.fetch(url);
       if (res.status !== 200) {
         throw new Error(streams);
       }
