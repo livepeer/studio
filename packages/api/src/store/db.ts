@@ -110,7 +110,7 @@ export class DB {
 
   queryWithOpts<T, I extends any[] = any[]>(
     query: QueryConfig<I>,
-    opts: QueryOptions = {},
+    opts: QueryOptions = { useReplica: true },
   ): Promise<QueryResult<T>> {
     if (opts.useReplica && this.replicaPool) {
       return this.replicaPool.query(query)

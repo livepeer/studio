@@ -23,7 +23,7 @@ export default class StreamTable extends Table<Stream> {
 
 
   async usage(userId: string, fromTime: number, toTime: number,
-    opts: QueryOptions = {},
+    opts?: QueryOptions
   ): Promise<UsageData> {
     const q1 = sql`SELECT 
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
@@ -78,7 +78,7 @@ export default class StreamTable extends Table<Stream> {
     return usage
   }
 
-  async getByStreamKey(streamKey: string, opts: QueryOptions = {}): Promise<Stream> {
+  async getByStreamKey(streamKey: string, opts?: QueryOptions): Promise<Stream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'streamKey'=${streamKey}`.setName(`${this.name}_by_streamKey`),
       opts
@@ -86,7 +86,7 @@ export default class StreamTable extends Table<Stream> {
     return res.rowCount < 1 ? null : res.rows[0].data as Stream
   }
 
-  async getByPlaybackId(playbackId: string, opts: QueryOptions = {}): Promise<Stream> {
+  async getByPlaybackId(playbackId: string, opts?: QueryOptions): Promise<Stream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'playbackId'=${playbackId}`.setName(`${this.name}_by_playbackid`),
       opts
@@ -94,7 +94,7 @@ export default class StreamTable extends Table<Stream> {
     return res.rowCount < 1 ? null : res.rows[0].data as Stream
   }
 
-  async getLastSession(id: string, opts: QueryOptions = {}): Promise<Stream> {
+  async getLastSession(id: string, opts?: QueryOptions): Promise<Stream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->>'createdAt' DESC LIMIT 1`
         .setName(`${this.name}_by_parentid_last_session`),

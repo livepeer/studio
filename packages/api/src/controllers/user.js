@@ -22,9 +22,7 @@ app.get('/usage', authMiddleware({}), async (req, res) => {
     userId = req.user.id
   }
 
-  const usageRes = await db.stream.usage(userId, fromTime, toTime, {
-    useReplica: true,
-  })
+  const usageRes = await db.stream.usage(userId, fromTime, toTime)
   res.status(200)
   res.json(usageRes)
 })

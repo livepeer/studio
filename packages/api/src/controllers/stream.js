@@ -480,22 +480,22 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
 
 app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
   let { id } = req.params
-  let stream = await db.stream.getByStreamKey(id, { useReplica: true })
+  let stream = await db.stream.getByStreamKey(id)
   let session,
     isPlaybackid = false,
     isStreamKey = !!stream,
     isSession = false
   if (!stream) {
-    stream = await db.stream.getByPlaybackId(id, { useReplica: true })
+    stream = await db.stream.getByPlaybackId(id)
     isPlaybackid = !!stream
   }
   if (!stream) {
-    stream = await db.stream.get(id, { useReplica: true })
+    stream = await db.stream.get(id)
   }
   if (stream && stream.parentId) {
     session = stream
     isSession = true
-    stream = await db.stream.get(stream.parentId, { useReplica: true })
+    stream = await db.stream.get(stream.parentId)
   }
   if (!stream) {
     res.staus(404)
@@ -505,7 +505,7 @@ app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
   }
   if (!session) {
     // find last session
-    session = await db.stream.getLastSession(stream.id, { useReplica: true })
+    session = await db.stream.getLastSession(stream.id)
   }
   const user = await req.store.get(`user/${stream.userId}`)
   const resp = {
