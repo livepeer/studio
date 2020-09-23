@@ -106,6 +106,7 @@ type TableRowProps = {
   variant?: TableRowVariant;
   selected?: boolean;
   selectable?: boolean;
+  textSelectable?: boolean;
   sx?: SxStyleProp;
   onClick?: Function;
 };
@@ -115,6 +116,7 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
   variant = TableRowVariant.Normal,
   selected = false,
   selectable = true,
+  textSelectable = false,
   sx = null,
   onClick = () => {},
 }) => {
@@ -127,7 +129,7 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
           variant === TableRowVariant.Header || !selectable
             ? "normal"
             : "pointer",
-        userSelect: "none",
+        userSelect: textSelectable ? "auto" : "none",
         "&:last-of-type": {
           ">div": {
             borderBottomStyle: "none",
