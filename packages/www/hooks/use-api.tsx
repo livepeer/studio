@@ -43,6 +43,11 @@ export interface StreamInfo {
   user: User;
 }
 
+export interface Version {
+  tag: string;
+  commit: string;
+}
+
 export interface Ingest {
   ingest: string;
   playback: string;
@@ -603,6 +608,14 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 204) {
         throw new Error(body);
       }
+    },
+
+    async getVersion(): Promise<Version> {
+      let [res, info] = await context.fetch(`/version`);
+      if (res.status === 200) {
+        return info as Version;
+      }
+      return { tag: "unknown", commit: "unknowm" };
     }
   };
   return context;

@@ -5612,6 +5612,11 @@ babel-plugin-extract-import-names@1.6.16:
   dependencies:
     "@babel/helper-plugin-utils" "7.10.4"
 
+babel-plugin-git-version@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-git-version/-/babel-plugin-git-version-0.2.0.tgz#613afd28ae1da8e5ef98249be1b5aca74a13f8f5"
+  integrity sha1-YTr9KK4dqOXvmCSb4bWsp0oT+PU=
+
 babel-plugin-import-graphql@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-import-graphql/-/babel-plugin-import-graphql-2.7.0.tgz#984b2330afa05cce5ff81e577f7d82cdb86aea6d"
