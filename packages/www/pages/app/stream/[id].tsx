@@ -7,7 +7,7 @@ import {
   Flex,
   Heading,
   Container,
-  Link as A,
+  Link as A
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -27,7 +27,7 @@ import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
 import {
   RelativeTime,
-  RenditionsDetails,
+  RenditionsDetails
 } from "../../../components/StreamsTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
@@ -78,7 +78,7 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               cursor: "pointer",
               width: 14,
               height: 14,
-              color: "listText",
+              color: "listText"
             }}
           />
         </Flex>
@@ -100,7 +100,7 @@ export default () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord,
+    setRecord
   } = useApi();
   const router = useRouter();
   const { query, asPath } = router;
@@ -167,8 +167,8 @@ export default () => {
     setStream(null); // make sure that we will load updated stream
   };
 
-  const isAdmin = query.admin === "true"
-  const tabs =  isAdmin ? getTabsAdmin(2) : getTabs(0);
+  const isAdmin = query.admin === "true";
+  const tabs = isAdmin ? getTabsAdmin(2) : getTabs(0);
   const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
 
   return (
@@ -220,7 +220,7 @@ export default () => {
               fontWeight: 500,
               mb: 3,
               color: "text",
-              display: "block",
+              display: "block"
             }}
           >
             {"← stream list"}
@@ -232,7 +232,7 @@ export default () => {
               sx={{
                 justifyContent: "flex-start",
                 alignItems: "baseline",
-                flexDirection: "column",
+                flexDirection: "column"
               }}
             >
               <Heading as="h3" sx={{ mb: "0.5em" }}>
@@ -244,7 +244,7 @@ export default () => {
                   alignItems: "center",
                   gridTemplateColumns: "10em auto",
                   width: "100%",
-                  fontSize: 0,
+                  fontSize: 0
                 }}
               >
                 <Cell>Stream name</Cell>
@@ -277,14 +277,14 @@ export default () => {
                     <Flex
                       sx={{
                         justifyContent: "flex-start",
-                        alignItems: "center",
+                        alignItems: "center"
                       }}
                     >
                       <Box
                         sx={{
                           minWidth: 125,
                           fontSize: 12,
-                          paddingRight: "1em",
+                          paddingRight: "1em"
                         }}
                       >
                         {getIngestURL(stream, false)}
@@ -384,13 +384,43 @@ export default () => {
                     <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
                     <Cell>Transcoded duration</Cell>
                     <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
+                    <Cell>Papertrail to stream key</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.streamKey}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.streamKey}
+                      </a>
+                    </Cell>
+                    <Cell>Papertrail to playback id</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.playbackId}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.playbackId}
+                      </a>
+                    </Cell>
+                    <Cell>Papertrail to stream id</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.id}
+                      </a>
+                    </Cell>
                   </>
                 ) : null}
               </Box>
             </Flex>
             <Flex
               sx={{
-                justifyContent: "flex-end",
+                justifyContent: "flex-end"
               }}
             >
               <Button

@@ -79,7 +79,7 @@ export const RecordingURL = ({
   );
 };
 
-export default ({
+const StreamSessionsTable = ({
   streamId,
   mt = null
 }: {
@@ -88,7 +88,7 @@ export default ({
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
   const [baseUrl, setBaseUrl] = useState(null);
-  const { getStreamSessions, getIngest } = useApi();
+  const { user, getStreamSessions, getIngest } = useApi();
   useEffect(() => {
     getIngest()
       .then((ingest) => {
@@ -119,11 +119,18 @@ export default ({
   return streamsSessions.length ? (
     <Container sx={{ mb: 5, mt: 2 }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
-      <Table sx={{ gridTemplateColumns: "auto auto auto " }}>
+      <Table
+        sx={{
+          gridTemplateColumns: user.admin
+            ? "auto auto auto auto"
+            : "auto auto auto "
+        }}
+      >
         <TableRow variant={TableRowVariant.Header}>
           <Box>Created</Box>
           <Box>Last Active</Box>
           <Box>Recording URL</Box>
+          {user.admin ? <Box>Papertrail</Box> : null}
         </TableRow>
         {streamsSessions.map((stream) => {
           const {
@@ -134,7 +141,7 @@ export default ({
             transcodedSegments
           } = stream;
           return (
-            <TableRow key={id}>
+            <TableRow key={id} selectable={false} textSelectable={true}>
               <RelativeTime
                 id={id}
                 prefix="createdat"
@@ -152,6 +159,17 @@ export default ({
                 hasRecording={!!stream.recordObjectStoreId}
                 baseUrl={baseUrl}
               />
+              {user.admin ? (
+                <Box>
+                  <a
+                    target="_blank"
+                    href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                    sx={{ userSelect: "all" }}
+                  >
+                    {stream.id}
+                  </a>
+                </Box>
+              ) : null}
             </TableRow>
           );
         })}
@@ -159,3 +177,5 @@ export default ({
     </Container>
   ) : null;
 };
+
+export default StreamSessionsTable;
