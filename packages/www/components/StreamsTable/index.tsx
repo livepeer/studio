@@ -190,12 +190,12 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
   );
 };
 
-export default ({ userId, id }: { userId: string; id: string }) => {
+const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
   const [broadcasters, setBroadcasters] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedStream, setSelectedStream] = useState(null);
+  const [selectedStream, setSelectedStream] = useState([]);
   const [streams, setStreams] = useState([]);
-  const { getStreams, deleteStream, getBroadcasters } = useApi();
+  const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
   useEffect(() => {
     getBroadcasters()
       .then((broadcasters) => setBroadcasters(broadcasters))
@@ -208,7 +208,7 @@ export default ({ userId, id }: { userId: string; id: string }) => {
   }, [userId, deleteModal]);
   const close = () => {
     setDeleteModal(false);
-    setSelectedStream(null);
+    setSelectedStream([]);
   };
   const isVisible = usePageVisibility();
   useEffect(() => {
@@ -224,12 +224,17 @@ export default ({ userId, id }: { userId: string; id: string }) => {
   }, [userId, isVisible]);
   return (
     <Container sx={{ mb: 5 }} id={id}>
-      {deleteModal && selectedStream && (
+      {deleteModal && selectedStream.length && (
         <DeleteStreamModal
-          streamName={selectedStream.name}
+          numStreamsToDelete={selectedStream.length}
+          streamName={selectedStream[0].name}
           onClose={close}
           onDelete={() => {
-            deleteStream(selectedStream.id).then(close);
+            if (selectedStream.length === 1) {
+              deleteStream(selectedStream[0].id).then(close);
+            } else if (selectedStream.length > 1) {
+              deleteStreams(selectedStream.map(s => s.id)).then(close);
+            }
           }}
         />
       )}
@@ -242,15 +247,28 @@ export default ({ userId, id }: { userId: string; id: string }) => {
         <Button
           variant="primarySmall"
           aria-label="Delete Stream button"
-          disabled={!selectedStream}
-          onClick={() => selectedStream && setDeleteModal(true)}
+          disabled={!selectedStream.length}
+          onClick={() => selectedStream.length && setDeleteModal(true)}
         >
           Delete
         </Button>
       </Box>
       <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>
-          <Box></Box>
+          <Flex
+            sx={{ alignItems: "end" }}
+            onClick={() => {
+              if (streams.length && streams.length === selectedStream.length) {
+                setSelectedStream([]);
+              } else {
+                setSelectedStream([...streams]);
+              }
+            }}
+          >
+            <Checkbox
+              value={streams.length && streams.length === selectedStream.length}
+            />
+          </Flex>
           <Box>Name</Box>
           <Box>Details</Box>
           <Box>Created</Box>
@@ -267,7 +285,8 @@ export default ({ userId, id }: { userId: string; id: string }) => {
             createdAt,
             isActive
           } = stream;
-          const selected = selectedStream && selectedStream.id === id;
+          const selected =
+            selectedStream && selectedStream.some((stream) => stream.id === id);
           return (
             <>
               <TableRow
@@ -276,9 +295,12 @@ export default ({ userId, id }: { userId: string; id: string }) => {
                 selected={selected}
                 onClick={() => {
                   if (selected) {
-                    setSelectedStream(null);
+                    setSelectedStream(
+                      selectedStream.filter((s) => s.id !== id)
+                    );
                   } else {
-                    setSelectedStream(stream);
+                    selectedStream.push(stream);
+                    setSelectedStream([...selectedStream]);
                   }
                 }}
               >
@@ -306,3 +328,5 @@ export default ({ userId, id }: { userId: string; id: string }) => {
     </Container>
   );
 };
+
+export default StreamsTable;

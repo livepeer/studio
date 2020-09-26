@@ -480,6 +480,30 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
   await db.stream.update(stream.id, {
     deleted: true,
   })
+  res.status(204)
+  res.end()
+})
+
+app.delete('/', authMiddleware({}), async (req, res) => {
+  if (!req.body || !req.body.ids || !req.body.ids.length) {
+    res.status(422)
+    return res.json({
+      errors: ['missing ids'],
+    })
+  }
+  const ids = req.body.ids
+
+  if (!req.user.admin) {
+    const streams = await db.stream.getMany(ids)
+    if (
+      streams.length !== ids.length ||
+      streams.some((s) => s.userId !== req.user.id)
+    ) {
+      res.status(404)
+      return res.json({ errors: ['not found'] })
+    }
+  }
+  await db.stream.markDeletedMany(ids)
 
   res.status(204)
   res.end()
