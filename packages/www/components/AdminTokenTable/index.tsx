@@ -78,10 +78,10 @@ export default ({ id }: TokenTableProps) => {
       .catch((err) => console.error(err)); // todo: surface this
   }, [newToken, deleteModal]);
   useEffect(() => {
-    getUsers()
+    getUsers(10000)
       .then((users) => {
         if (Array.isArray(users)) {
-          setUsers(users);
+          setUsers(users[0]);
         } else {
           console.log(users);
         }

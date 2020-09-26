@@ -95,6 +95,19 @@ const clearToken = () => {
   }
 };
 
+const linkRE = new RegExp('<.[^?]?([^>]*)>');
+
+const getCursor = (link?: string): string => {
+  if (!link) {
+    return "";
+  }
+  const match = link.match(linkRE);
+  if (!match) {
+    return "";
+  }
+  return qs.parse(match[1]).cursor;
+}
+
 const makeContext = (state: ApiState, setState) => {
   const context = {
     ...state,
@@ -246,11 +259,13 @@ const makeContext = (state: ApiState, setState) => {
       return [res, user as User | ApiError];
     },
 
-    async getUsers(limit = 100, opts = {}): Promise<Array<User> | ApiError> {
-      let [res, users] = await context.fetch(`/user?limit=${limit}`, opts);
+    async getUsers(limit = 100, cursor?: string, livepeer?: boolean, filter?: string): Promise<[Array<User>, string] | ApiError> {
+      let [res, users] = await context.fetch(`/user?limit=${limit}&cursor=${cursor}&livepeer=${livepeer}&filter=${filter}`);
+      console.log(res)
 
       if (res.status === 200) {
-        return users;
+        const nextCursor = getCursor(res.headers.get("link"));
+        return [users, nextCursor];
       }
       return res;
     },

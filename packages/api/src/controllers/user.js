@@ -10,6 +10,7 @@ import hash from '../hash'
 import qs from 'qs'
 import { db } from '../store'
 import { products } from '../config'
+import sql from 'sql-template-strings'
 
 const stripe = require('stripe')(process.env.LP_STRIPE_SECRET_KEY)
 const app = Router()
@@ -32,17 +33,24 @@ app.get('/usage', authMiddleware({}), async (req, res) => {
 })
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
-  const resp = await req.store.list({
-    prefix: `user/`,
-    cursor: req.query.cursor,
-    limit: req.query.limit,
-  })
+  let { limit, cursor, livepeer, filter } = req.query
+  const query = []
+  if (livepeer && livepeer !== 'false' && livepeer !== '0') {
+    query.push(sql`data->>'email' LIKE '%livepeer%'`)
+  } else if (filter) {
+    query.push(sql`data->>'email' LIKE ${'%' + filter + '%'}`)
+  }
+  if (isNaN(parseInt(limit))) {
+    limit = undefined
+  }
+  const [output, newCursor] = await db.user.find(query, { limit, cursor })
+
   res.status(200)
 
-  if (resp.data.length > 0) {
-    res.links({ next: makeNextHREF(req, resp.cursor) })
+  if (output.length > 0 && newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) })
   }
-  res.json(resp.data)
+  res.json(db.user.cleanWriteOnlyResponses(output))
 })
 
 app.get('/:id', authMiddleware({ allowUnverified: true }), async (req, res) => {
