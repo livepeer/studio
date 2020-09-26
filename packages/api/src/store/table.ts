@@ -72,7 +72,10 @@ export default class Table<T extends DBObject> {
     opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
     const { cursor = '', useReplica = true, order = 'id ASC' } = opts
-    const limit = opts.hasOwnProperty('limit') ? opts.limit : 100
+    let limit = opts.hasOwnProperty('limit') ? opts.limit : 100
+    if (typeof limit === "string") {
+      limit = parseInt(limit)
+    }
 
     const q = sql`SELECT * FROM `.append(this.name)
     let filters = []
@@ -117,11 +120,7 @@ export default class Table<T extends DBObject> {
 
     const docs = res.rows.map(({ data }) => data)
 
-    if (docs.length < 1) {
-      return [docs, null]
-    }
-
-    return [docs, docs[docs.length - 1].id]
+    return [docs, (docs.length > 0 && docs.length === limit) ? docs[docs.length - 1].id : null]
   }
 
   async create(doc: T): Promise<T> {
@@ -221,6 +220,23 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       throw new NotFoundError(`couldn't find ${this.name} ids=${ids}`)
     }
+  }
+
+  cleanWriteOnlyResponses(docs: Array<T>): Array<T> {
+    // obfuscate writeOnly fields in objects returned
+    const writeOnlyFields = {}
+    if (this.schema.properties) {
+      for (const [fieldName, fieldArray] of Object.entries(this.schema.properties)) {
+        if (fieldArray.writeOnly) {
+          writeOnlyFields[fieldName] = null
+        }
+      }
+    }
+
+    return docs.map((x) => ({
+      ...x,
+      ...writeOnlyFields,
+    }))
   }
 
   // on startup: auto-create table if it doesn't exist

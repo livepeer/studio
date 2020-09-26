@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useApi } from "../../hooks";
-import { Box, Button, Flex, Container } from "@theme-ui/components";
+import { useApi, useDebounce } from "../../hooks";
+import { Box, Button, Flex, Container, Input } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
 
@@ -14,18 +14,39 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [adminModal, setAdminModal] = useState(false);
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
+  const [livepeerOnly, setLivepeerOnly] = useState(false);
+  const [cursor, setCursor] = useState("");
+  const [prevCursor, setPrevCursor] = useState([]);
+  const [nextCursor, setNextCursor] = useState("");
+  const [filterInput, setFilterInput] = useState("");
+  const filter = useDebounce(filterInput, 500, (v) => {
+    setPrevCursor([]);
+    setNextCursor("");
+    setCursor("");
+  });
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
-    getUsers()
-      .then((users) => {
-        if (Array.isArray(users)) {
+    setUsers([]);
+    getUsers(100, cursor, livepeerOnly, filter)
+      .then((result) => {
+        if (Array.isArray(result)) {
+          const [users, nextCursor] = result;
+          setNextCursor(nextCursor);
           setUsers(users);
         } else {
           console.log(users);
         }
       })
-      .catch(err => console.error(err)); // todo: surface this
-  }, [userId, adminModal, removeAdminModal, selectedUser]);
+      .catch((err) => console.error(err)); // todo: surface this
+  }, [
+    userId,
+    adminModal,
+    removeAdminModal,
+    selectedUser,
+    livepeerOnly,
+    cursor,
+    filter
+  ]);
   const close = () => {
     setAdminModal(false);
     setRemoveAdminModal(false);
@@ -93,22 +114,66 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           </Flex>
         </Modal>
       )}
-      <Button
-        variant="secondarySmall"
-        disabled={!selectedUser || selectedUser.admin}
-        sx={{ margin: 2, mb: 4 }}
-        onClick={() => selectedUser && setAdminModal(true)}
-      >
-        Make User Admin
-      </Button>
-      <Button
-        variant="secondarySmall"
-        disabled={!selectedUser || !selectedUser.admin}
-        sx={{ margin: 2, mb: 4 }}
-        onClick={() => selectedUser && setRemoveAdminModal(true)}
-      >
-        Remove Admin Rights
-      </Button>
+      <Flex sx={{ justifyContent: "flex-start", alignItems: "baseline" }}>
+        <Button
+          variant="secondarySmall"
+          disabled={!selectedUser || selectedUser.admin}
+          sx={{ margin: 2, mb: 4 }}
+          onClick={() => selectedUser && setAdminModal(true)}
+        >
+          Make User Admin
+        </Button>
+        <Button
+          variant="secondarySmall"
+          disabled={!selectedUser || !selectedUser.admin}
+          sx={{ margin: 2, mb: 4 }}
+          onClick={() => selectedUser && setRemoveAdminModal(true)}
+        >
+          Remove Admin Rights
+        </Button>
+        <Flex
+          sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
+          onClick={() => {
+            setUsers([]);
+            setLivepeerOnly(!livepeerOnly);
+          }}
+        >
+          <Checkbox value={livepeerOnly} />
+          <Box sx={{ ml: "0.5em" }}> Show Livepeer's users only</Box>
+        </Flex>
+        <Button
+          variant="secondarySmall"
+          disabled={prevCursor.length === 0}
+          sx={{ margin: 2, mb: 4 }}
+          onClick={() => {
+            setNextCursor(cursor);
+            setCursor(prevCursor.pop());
+            setPrevCursor([...prevCursor]);
+          }}
+        >
+          Previouse page
+        </Button>
+        <Button
+          variant="secondarySmall"
+          disabled={users.length < 100 || nextCursor === ""}
+          sx={{ margin: 2, mb: 4 }}
+          onClick={() => {
+            prevCursor.push(cursor);
+            setPrevCursor([...prevCursor]);
+            setCursor(nextCursor);
+            setNextCursor("");
+          }}
+        >
+          Next page
+        </Button>
+        <Input
+          sx={{ width: "10em" }}
+          label="filterInput"
+          value={filterInput}
+          onChange={(e) => setFilterInput(e.target.value)}
+          placeholder="email"
+        ></Input>
+      </Flex>
       {users.length === 0 ? (
         <p>No users created yet</p>
       ) : (
@@ -120,7 +185,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             <Box>EmailValid</Box>
             <Box>Admin</Box>
           </TableRow>
-          {users.map(user => {
+          {users.map((user) => {
             const { id, email, emailValid, admin } = user;
             const selected = selectedUser && selectedUser.id === id;
             return (

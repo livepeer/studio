@@ -38,13 +38,14 @@ const AdminTools = ({ id }: { id: string }) => {
   }, [id]);
   useEffect(() => {
     getUsers(10000)
-      .then((users) => {
-        if (Array.isArray(users)) {
+      .then((result) => {
+        if (Array.isArray(result)) {
+          const [users] = result;
           users.sort((a, b) => a.email.localeCompare(b.email));
           setUsers(users);
           setUsersMap(users.reduce((a, cv) => (a[cv.email] = cv), {}));
         } else {
-          setMessage(`${users}`);
+          setMessage(`${result}`);
         }
       })
       .catch((err) => {
