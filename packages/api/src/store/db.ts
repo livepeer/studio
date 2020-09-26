@@ -112,7 +112,8 @@ export class DB {
     query: QueryConfig<I>,
     opts: QueryOptions = { useReplica: true },
   ): Promise<QueryResult<T>> {
-    if (opts.useReplica && this.replicaPool) {
+    const { useReplica = true } = opts
+    if (useReplica && this.replicaPool) {
       return this.replicaPool.query(query)
     }
     return this.pool.query(query)
