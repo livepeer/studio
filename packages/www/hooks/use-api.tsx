@@ -518,6 +518,19 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async deleteStreams(ids: Array<string>): Promise<void> {
+      const [res, body] = await context.fetch(`/stream`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
+    },
+
     async setRecord(
       streamId: string,
       record: boolean

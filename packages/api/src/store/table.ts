@@ -49,6 +49,22 @@ export default class Table<T extends DBObject> {
     return res.rows[0].data as T
   }
 
+  async getMany(ids: Array<string>, opts: GetOptions = { useReplica: true }): Promise<Array<T>> {
+    if (!ids || !ids.length) {
+      throw new Error('missing ids')
+    }
+    let res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts({
+      name: `${this.name}_by_ids`,
+      text: `SELECT data FROM ${this.name}  WHERE id IN (${ids.map((_, i) => '$' + (i + 1)).join(',')})`,
+      values: ids
+    }, opts)
+
+    if (res.rowCount < 1) {
+      return null
+    }
+    return res.rows.map(o => o.data as T)
+  }
+
   // returns [docs, cursor]
   async find(
     query: FindQuery | Array<SQLStatement> = {},
@@ -170,6 +186,24 @@ export default class Table<T extends DBObject> {
 
     if (res.rowCount < 1) {
       throw new NotFoundError(`couldn't find ${this.name} id=${id}`)
+    }
+  }
+
+  async markDeleted(id: string) {
+    const res = await this.db.query(`UPDATE ${this.name} SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id = $1`, [
+      id,
+    ])
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`couldn't find ${this.name} id=${id}`)
+    }
+  }
+
+  async markDeletedMany(ids: Array<string>) {
+    const res = await this.db.query(`UPDATE ${this.name} SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id IN (${ids.map((_, i) => '$' + (i + 1)).join(',')})`, ids)
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`couldn't find ${this.name} ids=${ids}`)
     }
   }
 

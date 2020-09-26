@@ -5,15 +5,24 @@ type DeleteStreamModalProps = {
   streamName: string;
   onClose: Function;
   onDelete: Function;
+  numStreamsToDelete?: number;
 };
 
-export default ({ streamName, onClose, onDelete }: DeleteStreamModalProps) => {
+export default ({
+  streamName,
+  onClose,
+  onDelete,
+  numStreamsToDelete
+}: DeleteStreamModalProps) => {
   return (
     <Modal onClose={onClose}>
       <h3>Are you sure?</h3>
       <Box sx={{ my: 3 }}>
-        Are you sure you want to delete stream "{streamName}"? Deleting a stream
-        cannot be undone.
+        {numStreamsToDelete > 1
+          ? `Are you sure you want to delete ${numStreamsToDelete} streams? Deleting streams
+        cannot be undone.`
+          : `Are you sure you want to delete stream "${streamName}"? Deleting a stream
+        cannot be undone.`}
       </Box>
       <Flex sx={{ justifyContent: "flex-end" }}>
         <Button
