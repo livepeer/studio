@@ -34,8 +34,7 @@ const NavigationBase = ({
   const [hasScrolled, setHasScrolled] = useState(false);
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [version, setVersion] = useState({ tag: "", commit: "" });
-  const { token, user, logout, getVersion } = useApi();
+  const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
 
   const handleScroll = useCallback(() => {
@@ -60,10 +59,6 @@ const NavigationBase = ({
       setLoggedIn(false);
     }
   }, [token]);
-
-  useEffect(() => {
-    getVersion().then((v) => setVersion(v));
-  }, []);
 
   return (
     <Box
@@ -154,16 +149,6 @@ const NavigationBase = ({
                 {user && user.admin && !isDashboard && (
                   <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin
-                  </Link>
-                )}
-                {user && user.admin && isDashboard && version && version.commit && (
-                  <Link
-                    sx={{ mr: 3 }}
-                    isExternal={true}
-                    href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}
-                    variant="nav"
-                  >
-                    Version {version.commit.substring(0, 8)}
                   </Link>
                 )}
                 {isDashboard && (
