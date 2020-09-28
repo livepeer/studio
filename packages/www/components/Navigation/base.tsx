@@ -134,16 +134,18 @@ const NavigationBase = ({
             )}
             {loggedIn && (
               <>
-                {isDashboard && user?.stripeProductId === "prod_0" && (
-                  <Button
-                    sx={{ mr: 4, py: "6px" }}
-                    isLink
-                    href="/app/user/plans"
-                    variant="buttons.primarySmall"
-                  >
-                    Upgrade
-                  </Button>
-                )}
+                {isDashboard &&
+                  user?.stripeProductId === "prod_0" &&
+                  user?.emailValid !== false && (
+                    <Button
+                      sx={{ mr: 4, py: "6px" }}
+                      isLink
+                      href="/app/user/plans"
+                      variant="buttons.primarySmall"
+                    >
+                      Upgrade
+                    </Button>
+                  )}
                 {user && user.admin && !isDashboard && (
                   <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin

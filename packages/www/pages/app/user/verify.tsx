@@ -36,7 +36,22 @@ export default () => {
   }, [user]);
 
   if (email && emailValidToken) {
-    return <Container>Verifying...</Container>;
+    return (
+      <Container>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            height: "calc(100vh - 280px)",
+            mb: 65
+          }}
+        >
+          Verifying...
+        </Flex>
+      </Container>
+    );
   }
   return (
     <Container>

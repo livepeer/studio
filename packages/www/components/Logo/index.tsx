@@ -23,7 +23,11 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         }
       }}
     >
-      <LogoSvg sx={{ color: isDark ? "background" : "text" }} />
+      <LogoSvg
+        sx={{
+          color: isDark ? "background" : "text"
+        }}
+      />
       {logoType && (
         <Box
           sx={{
