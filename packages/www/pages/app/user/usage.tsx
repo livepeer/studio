@@ -209,7 +209,8 @@ const Usage = () => {
             )
           )}
         </Box>
-        {invoices && (
+        {invoices?.data.filter((invoice) => invoice.lines.total_count > 1)
+          .length > 0 && (
           <Box sx={{ mb: 6 }}>
             <Box sx={{ fontWeight: 600, textAlign: "center", mb: 4 }}>
               Past Invoices
