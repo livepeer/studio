@@ -99,9 +99,10 @@ const makeContext = (state: ApiState, setState) => {
         headers.set("authorization", `JWT ${state.token}`);
       }
       const endpoint =
+        window.location.hostname.includes("livepeer.monster") ||
         window.location.hostname.includes("livepeerorg.vercel.app") ||
         window.location.hostname.includes("livepeerorg.now.sh")
-          ? `https://livepeer.monster/api${url}`
+          ? `https://mdw.livepeer.monster/api${url}`
           : `/api${url}`;
       const res = await fetch(endpoint, {
         ...opts,
@@ -157,6 +158,15 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 201) {
         return body;
       }
+      // Create stripe customer
+      const customer: any = await context.createCustomer(email);
+
+      // Subscribe customer to free plan upon registation
+      await context.createSubscription({
+        stripeCustomerId: customer.id,
+        stripeProductId: "prod_0"
+      });
+
       return context.login(email, password);
     },
 
@@ -235,6 +245,135 @@ const makeContext = (state: ApiState, setState) => {
         }
       });
 
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async createCustomer(email): Promise<[Response, User | ApiError]> {
+      const [, body] = await context.fetch("/user/create-customer", {
+        method: "POST",
+        body: JSON.stringify({ email: email }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      return body;
+    },
+
+    async updateUser(id, fields): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch(`/user/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ ...fields }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async createSubscription({
+      stripeCustomerId,
+      stripeProductId
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch("/user/create-subscription", {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId,
+          stripeProductId
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async updateSubscription({
+      stripeCustomerId,
+      stripeCustomerSubscriptionId,
+      stripeProductId,
+      stripeCustomerPaymentMethodId = null
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch("/user/update-subscription", {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId,
+          stripeCustomerSubscriptionId,
+          stripeProductId,
+          ...(stripeCustomerPaymentMethodId && {
+            stripeCustomerPaymentMethodId
+          })
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async getSubscription(
+      stripeCustomerSubscriptionId: string
+    ): Promise<[Response, ApiError]> {
+      let [res, subscription] = await context.fetch(
+        `/stripe/retrieve-subscription?${qs.stringify({
+          stripeCustomerSubscriptionId
+        })}`,
+        {}
+      );
+
+      return [res, subscription];
+    },
+
+    async getInvoices(stripeCustomerId: string): Promise<[Response, ApiError]> {
+      let [res, invoices] = await context.fetch(
+        `/stripe/retrieve-invoices?${qs.stringify({ stripeCustomerId })}`,
+        {}
+      );
+
+      return [res, invoices];
+    },
+
+    async updateCustomerPaymentMethod({
+      stripeCustomerId,
+      stripeCustomerPaymentMethodId
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch(
+        "/user/update-customer-payment-method",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripeCustomerId,
+            stripeCustomerPaymentMethodId
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        }
+      );
+
       if (res.status !== 201) {
         return body;
       }
@@ -255,9 +394,7 @@ const makeContext = (state: ApiState, setState) => {
       return broadcasters;
     },
 
-    async getIngest(
-      all = false
-    ): Promise<Array<Ingest>> {
+    async getIngest(all = false): Promise<Array<Ingest>> {
       const q = all ? "?first=false" : "";
       const [res, ingest] = await context.fetch(`/ingest${q}`);
       if (res.status !== 200) {

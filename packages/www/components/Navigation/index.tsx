@@ -18,8 +18,12 @@ const defaultNavProps: NavProps = {
       children: "Blog"
     },
     {
+      href: "/pricing",
+      children: "Pricing"
+    },
+    {
       href: "/contact",
-      children: "Contact us"
+      children: "Contact"
     }
   ]
 };

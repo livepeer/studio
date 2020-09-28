@@ -200,9 +200,10 @@ const HomeHero = () => {
             <Text sx={{ fontSize: "18px", lineHeight: 1.7 }}>
               By leveraging decentralized infrastructure, Livepeer.com delivers
               a video platform that focuses on what user-generated content (UGC)
-              applications need. Affordable, scalable and reliable, the Livepeer
-              platform combines high-quality transcoding with powerful APIs and
-              features that are essential for a seamless creator experience.
+              applications need. Affordable, scalable and reliable, the
+              Livepeer.com platform combines high-quality transcoding with
+              powerful APIs and features that are essential for a seamless
+              creator experience.
             </Text>
           </div>
         </Box>

@@ -1,6 +1,7 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
 import { Tree } from "../components/TableOfContents";
+import { Stripe, loadStripe } from "@stripe/stripe-js";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
@@ -136,3 +137,100 @@ export function blocksToText(blocks, opts = {}) {
     })
     .join("\n\n");
 }
+
+/**
+ * This is a singleton to ensure we only instantiate Stripe once.
+ */
+let stripePromise: Promise<Stripe | null>;
+export const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  }
+  return stripePromise;
+};
+
+export function formatAmountForDisplay(
+  amount: number,
+  currency: string
+): string {
+  let numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol"
+  });
+  return numberFormat.format(amount);
+}
+
+export function formatAmountForStripe(
+  amount: number,
+  currency: string
+): number {
+  let numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol"
+  });
+  const parts = numberFormat.formatToParts(amount);
+  let zeroDecimalCurrency: boolean = true;
+  for (let part of parts) {
+    if (part.type === "decimal") {
+      zeroDecimalCurrency = false;
+    }
+  }
+  return zeroDecimalCurrency ? amount : Math.round(amount * 100);
+}
+
+export async function fetchGetJSON(url: string) {
+  try {
+    const data = await fetch(url).then((res) => res.json());
+    return data;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export async function fetchPostJSON(url: string, data?: {}) {
+  try {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json"
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *client
+      body: JSON.stringify(data || {}) // body data type must match "Content-Type" header
+    });
+    return await response.json(); // parses JSON response into native JavaScript objects
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export const CARD_OPTIONS = {
+  iconStyle: "solid" as const,
+  style: {
+    base: {
+      iconColor: "#943CFF",
+      color: "#943CFF",
+      fontWeight: "500",
+      fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+      fontSize: "16px",
+      fontSmoothing: "antialiased",
+      "::placeholder": {
+        color: "#a0aec0"
+      },
+      ":-webkit-autofill": {
+        color: "#fce883"
+      }
+    },
+    invalid: {
+      iconColor: "#ef2961",
+      color: "#ef2961"
+    }
+  }
+};

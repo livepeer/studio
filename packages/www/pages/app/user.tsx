@@ -10,12 +10,20 @@ export function getTabs(i: number): Array<TabType> {
   const tabs: Array<TabType> = [
     {
       name: "Streams",
-      href: "/app/user",
+      href: "/app/user"
     },
     {
       name: "API Keys",
-      href: "/app/user/keys",
+      href: "/app/user/keys"
     },
+    {
+      name: "Usage",
+      href: "/app/user/usage"
+    },
+    {
+      name: "Plans",
+      href: "/app/user/plans"
+    }
   ];
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }

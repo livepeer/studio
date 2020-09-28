@@ -24,7 +24,7 @@ export default ({ streamName, onClose, onDelete }: DeleteStreamModalProps) => {
         >
           Cancel
         </Button>
-        <Button type="button" variant="secondarySmall" onClick={onDelete}>
+        <Button type="button" variant="primarySmall" onClick={onDelete}>
           Delete
         </Button>
       </Flex>

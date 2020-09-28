@@ -28,7 +28,7 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         <Box
           sx={{
             ml: "12px",
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: "22px"
           }}
         >
