@@ -7,16 +7,18 @@ import stream from './stream'
 import user from './user'
 import geolocate from './geolocate'
 import webhook from './webhook'
+import stripe from './stripe'
 
 // Annoying but necessary to get the routing correct
 export default {
   'api-token': apiToken,
-  broadcaster: broadcaster,
+  broadcaster,
   'object-store': objectStore,
-  orchestrator: orchestrator,
-  stream: stream,
-  user: user,
-  geolocate: geolocate,
+  orchestrator,
+  stream,
+  user,
+  geolocate,
   ingest,
   webhook,
+  stripe,
 }

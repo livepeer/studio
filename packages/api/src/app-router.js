@@ -78,6 +78,11 @@ export default async function makeApp(params) {
 
   const app = Router()
   app.use(healthCheck)
+
+  // stripe webhook requires raw body
+  // https://github.com/stripe/stripe-node/issues/331
+  app.use('/api/stripe/webhook', bodyParser.raw({ type: '*/*' }))
+
   app.use(bodyParser.json())
   app.use((req, res, next) => {
     req.store = store
@@ -125,6 +130,7 @@ export default async function makeApp(params) {
     ) {
       prefixRouter.use(`/${name}`, apiProxy)
     } else {
+      console.log(`/${name}`)
       prefixRouter.use(`/${name}`, controller)
     }
   }

@@ -356,6 +356,88 @@ components:
           type: boolean
           example: true
 
+    create-customer:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+
+    create-subscription:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeProductId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: src_xxxxxxxxxxxxxxxxxxxxxxxx
+        stripeProductId:
+          type: string
+          description: stripe product id
+          example: prod_0
+
+    update-subscription:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeProductId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerSubscriptionId:
+          type: string
+          description: stripe subscription id
+          example: sub_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: pm_xxxxxxxxxxxxxxxxxxxxxxxx
+        stripeProductId:
+          type: string
+          description: stripe product id
+          example: prod_0
+
+    update-customer-payment-method:
+      type: object
+      required:
+        - stripeCustomerId
+        - stripeCustomerPaymentMethodId
+      additionalProperties: false
+      properties:
+        stripeCustomerId:
+          type: string
+          description: stripe customer id
+          example: cus_xxxxxxxxxxxxxx
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: pm_xxxxxxxxxxxxxxxxxxxxxxxx
+
+    retrieve-customer-payment-method:
+      type: object
+      required:
+        - stripeCustomerPaymentMethodId
+      additionalProperties: false
+      properties:
+        stripeCustomerPaymentMethodId:
+          type: string
+          description: stripe payment method id
+          example: src_xxxxxxxxxxxxxxxxxxxxxxxx
+
     password-reset:
       type: object
       required:
@@ -425,6 +507,24 @@ components:
           type: string
           readOnly: true
           example: abc123
+        stripeProductId:
+          type: string
+          example: prod_0
+        stripeCustomerId:
+          type: string
+          example: cus_Jv6KvgT0DCH8HU
+        stripeCustomerPaymentMethodId:
+          type: string
+          example: pm_2FSSNNJfrKDAwlJ9n4EN15Du
+        stripeCustomerSubscriptionId:
+          type: string
+          example: sub_I29pdyfOTPBkjb
+        ccLast4:
+          type: string
+          example: 1234
+        ccBrand:
+          type: string
+          example: 1234
 
 paths:
   /stream:
@@ -694,7 +794,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-
+    patch:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      description: updates a user
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
     get:
       description: Lists users
       responses:
