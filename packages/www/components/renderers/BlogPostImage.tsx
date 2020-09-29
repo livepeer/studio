@@ -4,6 +4,7 @@ const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
       position: "relative",
       width: "100vw",
       left: "50%",
+      maxHeight: [200, 300, "initial"],
       transform: "translateX(-50%)",
       display: "flex",
       justifyContent: "center",
