@@ -70,7 +70,7 @@ const Layout = ({
     }
   };
   return (
-    <div sx={{ minHeight: "100vh" }}>
+    <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
       <NextSeo {...seo} />
       {withGradientBackground && (
         <div
@@ -121,7 +121,7 @@ const Layout = ({
         {children}
       </Flex>
       <Footer />
-    </div>
+    </Flex>
   );
 };
 
