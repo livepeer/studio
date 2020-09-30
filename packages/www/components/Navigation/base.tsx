@@ -141,7 +141,7 @@ const NavigationBase = ({
                       sx={{ mr: 4, py: "6px" }}
                       isLink
                       href="/app/user/plans"
-                      variant="buttons.primarySmall"
+                      variant="buttons.gradientOutlineSmall"
                     >
                       Upgrade
                     </Button>

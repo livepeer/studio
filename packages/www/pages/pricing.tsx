@@ -11,22 +11,25 @@ const Pricing = () => {
       withGradientBackground
     >
       <Container>
-        <Box sx={{ py: 5, textAlign: "center" }}>
+        <Box sx={{ pt: 5, pb: [0, 0, 0, 5], textAlign: "center" }}>
           <Heading
             as="h1"
             sx={{
-              letterSpacing: "-5px",
-              mb: 5,
-              fontSize: 9,
+              letterSpacing: [0, 0, 0, "-5px"],
+              mb: [4, 4, 4, 5],
+              fontSize: [6, 6, 6, 9],
               fontWeight: 800,
-              lineHeight: "88px"
+              lineHeight: ["50px", "50px", "50px", "88px"]
             }}
           >
             <span sx={{ fontWeight: "normal" }}>Start free.</span>
             <br />
             Then pay as you grow.
           </Heading>
-          <Heading as="h2" sx={{ fontSize: 4, fontWeight: "normal" }}>
+          <Heading
+            as="h2"
+            sx={{ fontSize: [3, 3, 3, 4], fontWeight: "normal" }}
+          >
             Flexible pricing for projects of all sizes.
           </Heading>
         </Box>

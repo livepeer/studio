@@ -10,14 +10,20 @@ import { MdCreditCard } from "react-icons/md";
 import ChangePaymentForm from "../ChangePaymentForm";
 import { useRouter } from "next/router";
 
-const Item = ({ title, displayCheck = true, color = "black" }) => (
+const Item = ({
+  title,
+  displayCheck = true,
+  color = "black",
+  styles = null
+}) => (
   <Flex
     sx={{
       fontSize: 1,
       height: 50,
       alignItems: "center",
       borderBottom: "1px solid",
-      borderColor: "rgba(255, 255, 255, .3)"
+      borderColor: "rgba(0, 0, 0, .1)",
+      ...styles
     }}
   >
     {displayCheck && <MdCheck sx={{ mr: 2, color: color }} />}
@@ -175,17 +181,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
           borderRadius: 16,
           position: "relative",
           py: 5,
-          px: 4,
           mb: 100
         }}
       >
         <Flex
           sx={{
+            flexDirection: ["column", "column", "column", "row"],
             alignItems: "center",
             justifyContent: "space-between"
           }}
         >
-          <Box sx={{ pl: 4, width: "25%", maxWidth: 174 }}>
+          <Box
+            sx={{
+              display: ["none", "none", "none", "block"],
+              pl: 4,
+              width: ["100%", "100%", "100%", "25%"],
+              maxWidth: 174
+            }}
+          >
             <Flex
               sx={{
                 mb: 3,
@@ -209,7 +222,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 "linear-gradient(180deg, #FAFAFA 0%, rgba(255, 255, 255, 0) 100%)",
               p: 4,
               borderRadius: 16,
-              width: "25%"
+              width: ["100%", "100%", "100%", "25%"]
             }}
           >
             <Header
@@ -235,14 +248,32 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               }}
             />
             <List>
-              <Item title="Up to 120 minutes / month" />
-              <Item title="" displayCheck={false} />
-              <Item title="" displayCheck={false} />
+              <Item
+                styles={{
+                  borderColor: [
+                    "transparent",
+                    "transparent",
+                    "transparent",
+                    "rgba(0, 0, 0, .1)"
+                  ]
+                }}
+                title="Up to 120 minutes / month"
+              />
+              <Item
+                title=""
+                styles={{ display: ["none", "none", "none", "block"] }}
+                displayCheck={false}
+              />
+              <Item
+                title=""
+                styles={{ display: ["none", "none", "none", "block"] }}
+                displayCheck={false}
+              />
             </List>
           </Box>
           <Box
             sx={{
-              width: "25%",
+              width: ["100%", "100%", "100%", "25%"],
               bg: "primary",
               color: "white",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.08)",
@@ -276,9 +307,21 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             />
 
             <List>
-              <Item title="$0.01 / min video ingested" color="pink" />
-              <Item title="$0.002 / gb video stored" color="pink" />
-              <Item title="$0.003 / gb video streamed" color="pink" />
+              <Item
+                styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
+                title="$0.01 / min video ingested"
+                color="pink"
+              />
+              <Item
+                styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
+                title="$0.002 / gb video stored"
+                color="pink"
+              />
+              <Item
+                styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
+                title="$0.003 / gb video streamed"
+                color="pink"
+              />
             </List>
           </Box>
           <Box
@@ -287,7 +330,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 "linear-gradient(180deg, #FAFAFA 0%, rgba(255, 255, 255, 0) 100%)",
               borderRadius: 16,
               p: 4,
-              width: "25%"
+              width: ["100%", "100%", "100%", "25%"]
             }}
           >
             <Header

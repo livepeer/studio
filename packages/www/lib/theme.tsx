@@ -35,6 +35,7 @@ export const theme = {
     offBlack: "#666666",
     extremelyBlue: "#3F3FE2"
   },
+
   breakpoints: ["640px", "832px", "1024px", "1280px"],
   buttons: {
     default: {
@@ -44,7 +45,7 @@ export const theme = {
       borderStyle: "solid",
       bg: "initial",
       display: "inline-block",
-      borderRadius: 4,
+      borderRadius: 6,
       lineHeight: 1.4,
       letterSpacing: ".5px",
       fontWeight: 600,
@@ -158,6 +159,18 @@ export const theme = {
       fontSize: 14,
       px: 3,
       py: "8px"
+    },
+    gradientOutlineSmall: {
+      variant: "buttons.outlineSmall",
+      color: "#fff",
+      border: "2px solid #943CFF",
+      letterSpacing: "0",
+      display: "flex",
+      alignItems: "center",
+      background: "linear-gradient(-131deg, #ef00ff 0%, #7300ff 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      marginRight: "30px"
     },
     icon: {
       ":focus": {
