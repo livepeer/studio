@@ -9,7 +9,6 @@ import Prefooter from "../../components/Prefooter";
 import { Grid } from "@theme-ui/components";
 import DocsPopularTopicCard from "../../components/cards/cards/popular-topic";
 import { DocsNav } from "../../components/Navigation";
-import { useRouter } from "next/router";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
