@@ -23,7 +23,7 @@ const DocsCategoryCard = ({
       sx={{
         background: "linear-gradient(212.62deg, #1C1C1C 0%, #292935 100%)",
         borderRadius: 16,
-        width: "276px",
+        width: 276,
         height: "345px",
         padding: 24,
         display: "block",

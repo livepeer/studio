@@ -37,8 +37,8 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       alt: "shield image",
       sx: { width: "100px" }
     },
-    title: "Your 1st stream in under 5 minutes",
-    description: "Read the Livepeer.com blog post",
+    title: "Your first stream in under 5 minutes",
+    description: "Read the Livepeer.com blog post.",
     link: { href: "/blog/first-livepeer-stream-in-five-minutes" }
   }
 ];

@@ -1,5 +1,5 @@
 import Layout from "../Layout";
-import { Flex, Box, Container, Link as A } from "@theme-ui/components";
+import { Flex, Box, Container } from "@theme-ui/components";
 import { useState } from "react";
 import TableOfContents from "../TableOfContents";
 import guides from "./guides";
