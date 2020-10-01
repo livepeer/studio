@@ -170,7 +170,7 @@ const guidesTree: Tree[] = [
   [
     {
       content: "Your Livepeer.com account",
-      iconComponentName: ""
+      iconComponentName: "FiUser"
     },
     [
       [
