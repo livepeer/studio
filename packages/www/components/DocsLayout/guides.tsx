@@ -11,18 +11,11 @@ const guidesTree: Tree[] = [
   ],
   [
     {
-      content: "Your Livepeer.com account",
-      iconComponentName: ""
+      content: "Feature Support Matrix",
+      slug: "/docs/guides/support-matrix",
+      iconComponentName: "FiInfo"
     },
-    [
-      [
-        {
-          content: "Create a Livepeer.com account",
-          slug: "/docs/guides/account/create-an-account"
-        },
-        []
-      ]
-    ]
+    []
   ],
   [
     {
@@ -176,11 +169,18 @@ const guidesTree: Tree[] = [
   ],
   [
     {
-      content: "Feature Support Matrix",
-      slug: "/docs/guides/support-matrix",
-      iconComponentName: "FiInfo"
+      content: "Your Livepeer.com account",
+      iconComponentName: ""
     },
-    []
+    [
+      [
+        {
+          content: "Create a Livepeer.com account",
+          slug: "/docs/guides/account/create-an-account"
+        },
+        []
+      ]
+    ]
   ]
 ];
 
