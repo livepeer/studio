@@ -9,7 +9,6 @@ import Prefooter from "../../components/Prefooter";
 import { Grid } from "@theme-ui/components";
 import DocsPopularTopicCard from "../../components/cards/cards/popular-topic";
 import { DocsNav } from "../../components/Navigation";
-import { useRouter } from "next/router";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
@@ -127,7 +126,7 @@ const DocsIndex = () => {
                 lineHeight: ["40px", "56px"]
               }}
             >
-              Popular topics
+              Popular guides
             </h2>
             <Button href="/docs/guides" isLink>
               Go to guides
