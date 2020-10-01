@@ -10,7 +10,7 @@ type NavProps = React.ComponentProps<typeof NavigationBase>;
 const defaultNavProps: NavProps = {
   links: [
     {
-      href: "/docs/guides",
+      href: "/docs",
       children: "Docs"
     },
     {

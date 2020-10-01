@@ -91,15 +91,10 @@ const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
 ];
 
 const DocsIndex = () => {
-  const router = useRouter();
-  if (typeof window !== "undefined") {
-    router.push("/docs/guides");
-    return;
-  }
   return (
     <Layout
       title={`Docs - Livepeer.com`}
-      description={`TODO`}
+      description={`Everything you need to build powerful video applications with Livepeer.com`}
       url={`https://livepeer.com/docs`}
       customNav={<DocsNav />}
       withGradientBackground
@@ -157,14 +152,5 @@ const DocsIndex = () => {
     </Layout>
   );
 };
-
-// Temporarily redirect to guides
-export async function getServerSideProps(ctx) {
-  if (ctx.res) {
-    ctx.res.writeHead(302, { Location: "/docs/guides" });
-    ctx.res.end();
-  }
-  return { props: {} };
-}
 
 export default DocsIndex;

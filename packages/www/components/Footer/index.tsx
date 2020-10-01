@@ -22,7 +22,7 @@ const linksLists: LinksListProps[] = [
   {
     heading: "Resources",
     links: [
-      { children: "Documentation", href: "/docs/guides" },
+      { children: "Documentation", href: "/docs" },
       { children: "Blog", href: "/blog" },
       { children: "Contact", href: "/contact" },
       { children: "Privacy Policy", href: "/privacy-policy" }
