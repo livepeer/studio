@@ -13,7 +13,11 @@ import { useRouter } from "next/router";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
-    img: { src: "/img/docs/key.png", alt: "key image", sx: { width: "130px" } },
+    img: {
+      src: "/img/docs/equalizer.png",
+      alt: "equalizer image",
+      sx: { width: "90px" }
+    },
     title: "Getting started",
     description: "Start live streaming now!",
     link: { href: "/docs/guides" }
@@ -34,46 +38,24 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       alt: "shield image",
       sx: { width: "100px" }
     },
-    title: "User generated content platform tutorial",
-    description: "Integrate Livepeer into your streaming platform.",
-    link: { href: "/docs/guides" }
-  },
-  {
-    img: {
-      src: "/img/docs/equalizer.png",
-      alt: "equalizer image",
-      sx: { width: "90px" }
-    },
-    title: "Special live event stream tutorial",
-    description: "Live stream your next event with Livepeer.com.",
-    link: { href: "/docs/guides" }
+    title: "Workflow tutorials",
+    description: "Coming soon!",
+    link: { href: "" }
   }
 ];
 
 const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
   {
-    title: "How to create a Livepeer.com account",
+    title: "How to create a stream with the Livepeer.com API",
     excerpt:
-      "Whether you are integrating your streaming application directly with the Livepeer.com API or creating individual streams in the Livepeer.com dashboard, you’ll need to create a Livepeer.com account.",
-    href: "/docs/guides/account/create-an-account"
-  },
-  {
-    title: "When do you need an Livepeer.com API key?",
-    excerpt:
-      "You need an API key to live stream with the Livepeer.com API. You do not need to create an API key for the Livepeer.com dashboard-only workflow.",
-    href: "/docs/guides/api-keys/when-do-you-need-an-api-key"
+      "To create a stream, send a POST request to https://livepeer.com/api/stream.",
+    href: "/docs/guides/api/create-a-stream"
   },
   {
     title: "How to verify stream status with the Livepeer.com API",
     excerpt:
       "To verify a stream is running, you can fetch the stream status by sending a `GET` request to `https://livepeer.com/api/stream/` with the stream object `id` appended.",
     href: "/docs/guides/api/verify-stream-status"
-  },
-  {
-    title: "How to create a stream with the Livepeer.com API",
-    excerpt:
-      "To create a stream, send a POST request to https://livepeer.com/api/stream.",
-    href: "/docs/guides/api/create-a-stream"
   },
   {
     title: "How to create a stream in the Livepeer.com dashboard",
@@ -87,6 +69,18 @@ const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
     excerpt:
       "To list all the streams created by a user, you will need the `userId` from the API key object.",
     href: "/docs/guides/api/list-all-streams"
+  },
+  {
+    title: "How to create a Livepeer.com account",
+    excerpt:
+      "Whether you are integrating your streaming application directly with the Livepeer.com API or creating individual streams in the Livepeer.com dashboard, you’ll need to create a Livepeer.com account.",
+    href: "/docs/guides/account/create-an-account"
+  },
+  {
+    title: "When do you need an Livepeer.com API key?",
+    excerpt:
+      "You need an API key to live stream with the Livepeer.com API. You do not need to create an API key for the Livepeer.com dashboard-only workflow.",
+    href: "/docs/guides/api-keys/when-do-you-need-an-api-key"
   }
 ];
 

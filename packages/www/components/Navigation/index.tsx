@@ -57,16 +57,16 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
       links: [
         {
           href: "/docs",
-          children: "Overview"
+          children: "Docs Overview"
         },
         {
           href: "/docs/guides",
           children: "Guides"
-        },
-        {
+        }
+        /*{
           href: "/docs/reference",
           children: "API Reference"
-        }
+        }*/
       ],
       breadcrumb: [
         {
