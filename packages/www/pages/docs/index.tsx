@@ -126,7 +126,7 @@ const DocsIndex = () => {
                 lineHeight: ["40px", "56px"]
               }}
             >
-              Popular topics
+              Popular guides
             </h2>
             <Button href="/docs/guides" isLink>
               Go to guides
