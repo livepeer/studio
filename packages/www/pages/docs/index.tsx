@@ -14,9 +14,9 @@ import { useRouter } from "next/router";
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
     img: { src: "/img/docs/key.png", alt: "key image", sx: { width: "130px" } },
-    title: "API Keys",
-    description: "Learn how to use our API key to live transcode.",
-    link: { href: "/docs/guides/api/create-api-key" }
+    title: "Getting started",
+    description: "Start live streaming now!",
+    link: { href: "/docs/guides" }
   },
   {
     img: {
@@ -24,9 +24,9 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       alt: "globe image",
       sx: { width: "120px" }
     },
-    title: "Broadcasting",
-    description: "Learn how to broadcast a stream session.",
-    link: { href: "/docs/guides/dashboard/broadcast-a-stream-session" }
+    title: "Feature support matrix",
+    description: "Learn about compatible video formats and workflows.",
+    link: { href: "/docs/guides/support-matrix" }
   },
   {
     img: {
@@ -34,8 +34,8 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       alt: "shield image",
       sx: { width: "100px" }
     },
-    title: "ETH esentials",
-    description: "Learn how we use the Blockchain.",
+    title: "User generated content platform tutorial",
+    description: "Integrate Livepeer into your streaming platform.",
     link: { href: "/docs/guides" }
   },
   {
@@ -44,47 +44,49 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       alt: "equalizer image",
       sx: { width: "90px" }
     },
-    title: "Specifications",
-    description: "Understanding the stream page specifications.",
+    title: "Special live event stream tutorial",
+    description: "Live stream your next event with Livepeer.com.",
     link: { href: "/docs/guides" }
   }
 ];
 
 const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
   {
-    title: "How to create a stream",
+    title: "How to create a Livepeer.com account",
     excerpt:
-      "Before live streaming via the Livepeer.com API, you will need to create a Livepeer.com account and be able to create a RTMP stream. You do not need to create an API key.",
-    href: "/docs/guides/dashboard/create-a-stream"
+      "Whether you are integrating your streaming application directly with the Livepeer.com API or creating individual streams in the Livepeer.com dashboard, you’ll need to create a Livepeer.com account.",
+    href: "/docs/guides/account/create-an-account"
   },
   {
-    title: "How to broadcast a stream session",
+    title: "When do you need an Livepeer.com API key?",
     excerpt:
-      "Your users or your application will need to be able to push an RTMP stream. When configuring the software to push streams, use the secret stream key and RTMP ingest URL from the stream page.",
-    href: "/docs/guides/dashboard/broadcast-a-stream-session"
+      "You need an API key to live stream with the Livepeer.com API. You do not need to create an API key for the Livepeer.com dashboard-only workflow.",
+    href: "/docs/guides/api-keys/when-do-you-need-an-api-key"
   },
   {
-    title: "How to get base URLs",
+    title: "How to verify stream status with the Livepeer.com API",
     excerpt:
-      "There are 2 types of base URLs: The ingest base URL is a part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream. The playback base URL is a part of the playback URL, used for the viewers to watch the stream.",
-    href: "/docs/guides/api/base-urls"
+      "To verify a stream is running, you can fetch the stream status by sending a `GET` request to `https://livepeer.com/api/stream/` with the stream object `id` appended.",
+    href: "/docs/guides/api/verify-stream-status"
   },
   {
-    title: "How to create a stream",
+    title: "How to create a stream with the Livepeer.com API",
     excerpt:
-      "To create a stream, We'll send a POST requst to https://livepeer.com/api/stream.",
+      "To create a stream, send a POST request to https://livepeer.com/api/stream.",
     href: "/docs/guides/api/create-a-stream"
   },
   {
-    title: "How to delete a stream",
-    excerpt: `You can delete a stream by sending the DELETE request with a specific "streamId".`,
-    href: "/docs/guides/api/delete-a-stream"
+    title: "How to create a stream in the Livepeer.com dashboard",
+    excerpt:
+      "Open your Livepeer.com account and navigate to the streams list page, https://livepeer.com/app/user.",
+    href: "/docs/guides/dashboard/create-a-stream"
   },
   {
-    title: "How to create an API key",
+    title:
+      "How to use the Livepeer.com API to list all streams created by a Livepeer.com user",
     excerpt:
-      "Open your Livepeer.com account and navigate to the API key list page, https://livepeer.com/app/user/keys.",
-    href: "/docs/guides/api-keys/create-an-api-key"
+      "To list all the streams created by a user, you will need the `userId` from the API key object.",
+    href: "/docs/guides/api/list-all-streams"
   }
 ];
 

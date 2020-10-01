@@ -3,13 +3,15 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## How to Create a Stream
+# How to create a stream with the Livepeer.com API
 
-To create a stream, We'll send a POST requst to
-`https://livepeer.com/api/stream`.
+To create a stream, send a `POST` request to `https://livepeer.com/api/stream`.
 
-We will use the API key as a part of the authorization header, and use a JSON
-body to specify the configuration for the stream. For example:
+Use the API key as a part of the authorization header, and use a JSON body to specify the configuration for the stream. The only parameter you are required to set is the `name` of your stream, but we also highly recommend that you define the `profiles` parameter with 720p, 480p and 360p renditions. 
+
+If you do not define transcoding rendition profiles when creating the stream, no transcoding will happen. Your playback video will have the attributes of the source stream only, will not take advantage of adaptive bitrate streaming and will likely buffer.
+
+Here is an example request: 
 
 ```bash
 curl -X POST \
@@ -44,24 +46,25 @@ curl -X POST \
 https://livepeer.com/api/stream
 ```
 
-We'll get a stream object as a result. For example:
+This is an example stream object response to the request above:
 
-```jsx
+```bash
 {
-	"name":"test_stream",
-	"profiles":[
-		{"name":"720p","bitrate":2000000,"fps":30,"width":1280,"height":720},
-		{"name":"480p","bitrate":1000000,"fps":30,"width":854,"height":480}],
-		{"name":"360p","bitrate":500000,"fps":30,"width":640,"height":360}],
-	"id":"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
-	"createdAt":1596081229373,
-	"streamKey":"rlmn-uimq-jtgy-x98v",
-	"playbackId":"emh3b2mxupongp5k"
+    "name":"test_stream",
+    "profiles":[
+        {"name":"720p","bitrate":2000000,"fps":30,"width":1280,"height":720},
+        {"name":"480p","bitrate":1000000,"fps":30,"width":854,"height":480}],
+        {"name":"360p","bitrate":500000,"fps":30,"width":640,"height":360}],
+    "id":"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "createdAt":1596081229373,
+    "streamKey":"rlmn-uimq-jtgy-x98v",
+    "playbackId":"emh3b2mxupongp5k"
 }
 ```
 
-"streamKey", "playbackId", and "id" (aka "streamId") will be important to
-remember.
+`streamKey`, `playbackId`, and `id` (a.k.a. the stream ID) are unique to the stream object and important to remember.
+
+Next, learn [how to find your ingest and playback base URLs](/docs/guides/api/base-urls).
 
 </DocsLayout>
 

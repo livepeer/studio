@@ -3,24 +3,25 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## Understanding the stream page specifications
+# Understand the stream page specifications
 
-Navigate to a stream page by clicking on a stream name on the **stream list
-page**, [https://livepeer.com/app/user](/app/user).
+Navigate to a stream page by clicking on a stream name on the **stream list page**, [https://livepeer.com/app/user](/app/user).
 
-The stream name is at the top of the stream page.
+The **stream name** is at the top of the **stream page**.
 
-These are the other fields on the stream page.
+These are the other fields on the **stream page**.
 
 | Field               | Notes                                                                                                                                                                                                                                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stream key**      | Your stream key is a secret. Protect this key. The stream key is used to authenticate while ingesting RTMP streams.                                                                                                                                                                         |
-| **RTMP ingest URL** | Your RTMP ingest URL is based on the region your stream originates in. The regional ingest URLs are the following: <ul><li>North America: rtmp://mdw-rtmp.livepeer.com/live/<strong>stream-key</strong></li><li>EU: rtmp://fra-rtmp.livepeer.com/live/<strong>stream-key</strong></li></ul> |
-| **Playback URL**    | The playback URL is based on the region your stream originates in. https://<strong>region</strong>-cdn.livepeer.com/hls/<strong>playbackId</strong>/index.m3u8. The playback URL is listed on the <strong>stream page</strong>.                                                             |
-| **Renditions**      | The width (pixels), height (pixels) and frame rate (frames per second) for each rendition are listed.                                                                                                                                                                                       |
-| **Created at**      | This is the local date (MM/DD/YYYY) and time the stream was created.                                                                                                                                                                                                                        |
-| **Last seen at**    | This is the most recent date and time a video segment for this stream was transcoded.                                                                                                                                                                                                       |
-| **Status**          | Either active or idle. <ul><li>active: there is an active stream session</li><li>idle: there is not an active stream session</li></ul>                                                                                                                                                      |
+| Stream key          | Your stream key is a secret. Protect this key. The stream key is used to authenticate while ingesting RTMP streams.                                                                                                                                                                         |
+| RTMP ingest URL     | Your RTMP ingest URL is based on the region your stream originates in. The RTMP ingest point should be close to where the stream is broadcasted. This is an example of how the RTMP ingest URL is formatted: <ul><li>rtmp://{region}-rtmp.livepeer.com/live/<strong>stream-key</strong></li></ul> |
+| Playback URL        | The playback URL is based on the region your stream originates in. Even though the playback URL references the ingest location, playback will work for your viewers everywhere. This is an example of how the playback URL is formatted: <ul><li>https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8</li></ul>|
+| Renditions          | The width (pixels), height (pixels) and frame rate (frames per second) for each transcoded rendition of your source stream are listed.                                                                                                                                                                                       |
+| Created at          | This is the local date (MM/DD/YYYY) and time the stream was created.                                                                                                                                                                                                                       |
+| Last seen at        | This is the most recent date and time a video segment for this stream was transcoded.                                                                                                                                                                                                       |
+| Status              | Either active or idle. <ul><li>active: there is an active stream session</li><li>idle: there is not an active stream session</li></ul>                                                                                                                                                      |
+
+Next, learn [how to broadcast a stream configured in the Livepeer.com dashboard](/docs/guides/dashboard/broadcast-a-stream-session).
 
 </DocsLayout>
 
