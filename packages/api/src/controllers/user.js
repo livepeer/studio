@@ -60,13 +60,13 @@ app.get('/:id', authMiddleware({ allowUnverified: true }), async (req, res) => {
 
 app.post('/', validatePost('user'), async (req, res) => {
   const { email, password } = req.body
+  const { selectedPlan } = req.query
   const emailValid = validator.validate(email)
   if (!emailValid) {
     res.status(422)
     res.json({ errors: ['invalid email'] })
     return
   }
-
   const [hashedPassword, salt] = await hash(password)
   const id = uuid()
   const emailValidToken = uuid()
@@ -103,7 +103,7 @@ app.post('/', validatePost('user'), async (req, res) => {
 
   const verificationUrl = `${protocol}://${
     req.frontendDomain
-  }/app/user/verify?${qs.stringify({ email, emailValidToken })}`
+  }/app/user/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`
 
   if (!validUser && user) {

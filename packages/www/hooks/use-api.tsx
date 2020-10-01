@@ -146,15 +146,18 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async register(email, password) {
+    async register(email, password, selectedPlan = 0) {
       trackPageView(email);
-      const [res, body] = await context.fetch("/user", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: {
-          "content-type": "application/json"
+      const [res, body] = await context.fetch(
+        `/user?selectedPlan=${selectedPlan}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+          headers: {
+            "content-type": "application/json"
+          }
         }
-      });
+      );
       if (res.status !== 201) {
         return body;
       }

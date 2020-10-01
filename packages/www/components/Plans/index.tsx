@@ -1,5 +1,4 @@
 import { Container, Box, Flex, Heading } from "@theme-ui/components";
-import { useState } from "react";
 import { MdCheck } from "react-icons/md";
 import Button from "../Button";
 import Modal from "../Modal";
@@ -9,6 +8,17 @@ import useApi from "../../hooks/use-api";
 import { MdCreditCard } from "react-icons/md";
 import ChangePaymentForm from "../ChangePaymentForm";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+
+const Tour: any = dynamic(() => import("reactour"), { ssr: false });
+const steps = [
+  {
+    selector: ".upgrade-card",
+    content: `Welcome to Livepeer.com! You're currently subscribed to the free plan. Click "Upgrade" to enter your credit card information and switch over to the pay-as-you-go plan for unlimited transcoding minutes.`
+  }
+  // ...
+];
 
 const Item = ({
   title,
@@ -72,9 +82,34 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
   const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const [updatePaymentModal, setUpdatePaymentModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState("prod_0");
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const promptUpgrade = router.query?.promptUpgrade;
+
+  useEffect(() => {
+    if (promptUpgrade) {
+      setIsTourOpen(true);
+    }
+  }, [promptUpgrade]);
 
   return (
     <>
+      <Tour
+        steps={steps}
+        disableDotsNavigation={false}
+        showButtons={false}
+        rounded={6}
+        showNumber={false}
+        showNavigation={false}
+        isOpen={isTourOpen}
+        onAfterOpen={() => (document.body.style.overflowY = "hidden")}
+        onBeforeClose={() => {
+          document.body.style.overflowY = "auto";
+          if (location.href.includes("?")) {
+            history.pushState({}, null, location.href.split("?")[0]);
+          }
+        }}
+        onRequestClose={() => setIsTourOpen(false)}
+      />
       {subscriptionModalOpen && (
         <Modal onClose={() => {}}>
           <Box>
@@ -272,6 +307,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </List>
           </Box>
           <Box
+            className="upgrade-card"
             sx={{
               width: ["100%", "100%", "100%", "25%"],
               bg: "primary",
@@ -298,10 +334,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               }}
               onClick={() => {
                 if (dashboard) {
+                  setIsTourOpen(false);
                   setSelectedProduct("prod_1");
                   setSubscriptionModalOpen(true);
                 } else {
-                  router.push("/register");
+                  router.push("/register?selectedPlan=1");
                 }
               }}
             />

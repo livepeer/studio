@@ -62,6 +62,7 @@
     "react-syntax-highlighter": "^13.5.1",
     "react-tooltip": "^4.2.7",
     "react-use-mailchimp": "^0.4.0",
+    "reactour": "^1.18.0",
     "reading-time": "^1.2.0",
     "remark-emoji": "^2.1.0",
     "swr": "^0.3.2",

@@ -15,6 +15,7 @@ const PlansPage = () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
+
   const tabs = getTabs(3);
 
   return (

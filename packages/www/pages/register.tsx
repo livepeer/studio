@@ -20,9 +20,14 @@ const RegisterPage = () => {
   }, [user]);
 
   const onSubmit = async ({ email, password }) => {
+    const selectedPlan = router.query?.selectedPlan;
     setLoading(true);
     setErrors([]);
-    const res = await register(email, password);
+    const res = await register(
+      email,
+      password,
+      selectedPlan ? +selectedPlan : 0
+    );
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
       setErrors(res.errors);

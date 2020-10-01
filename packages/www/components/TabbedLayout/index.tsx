@@ -1,6 +1,4 @@
-import { Box } from "@theme-ui/components";
 import Layout from "../../components/Layout";
-import { Button } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
 import Tabs, { TabType } from "../../components/Tabs";
 import { FunctionComponent } from "react";
@@ -12,7 +10,6 @@ type TabbedLayoutProps = {
 
 const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   tabs,
-  logout,
   children
 }) => {
   return (

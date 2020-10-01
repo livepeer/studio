@@ -130,7 +130,6 @@ export default async function makeApp(params) {
     ) {
       prefixRouter.use(`/${name}`, apiProxy)
     } else {
-      console.log(`/${name}`)
       prefixRouter.use(`/${name}`, controller)
     }
   }
