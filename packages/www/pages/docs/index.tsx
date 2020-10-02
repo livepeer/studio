@@ -13,9 +13,9 @@ import { DocsNav } from "../../components/Navigation";
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
     img: {
-      src: "/img/docs/equalizer.png",
-      alt: "equalizer image",
-      sx: { width: "90px" }
+      src: "/img/docs/flag.png",
+      alt: "flag",
+      sx: { width: "140px" }
     },
     title: "Getting started",
     description: "Start live streaming now!",
@@ -23,9 +23,9 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   },
   {
     img: {
-      src: "/img/docs/globe.png",
-      alt: "globe image",
-      sx: { width: "120px" }
+      src: "/img/docs/puzzle.png",
+      alt: "puzzle",
+      sx: { width: "140px" }
     },
     title: "Feature support matrix",
     description: "Learn about compatible video formats and workflows.",
@@ -33,9 +33,9 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   },
   {
     img: {
-      src: "/img/docs/shield.png",
-      alt: "shield image",
-      sx: { width: "100px" }
+      src: "/img/docs/stopwatch.png",
+      alt: "stopwatch",
+      sx: { width: "120px" }
     },
     title: "Your first stream in under 5 minutes",
     description: "Read the Livepeer.com blog post.",
