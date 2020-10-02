@@ -1,6 +1,7 @@
 import { Box, Link as A } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
 import { products } from "@livepeer.com/api/src/config";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const PastInvoicesTable = ({ invoices }) => {
   return (
@@ -36,9 +37,13 @@ const PastInvoicesTable = ({ invoices }) => {
               <A
                 variant="buttons.outlineSmall"
                 download
-                href={invoice.invoice_pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                href={invoice.hosted_invoice_url}
+                sx={{ display: "flex", alignItems: "center" }}
               >
-                Invoice (PDF)
+                Invoice
+                <FiArrowUpRight sx={{ ml: 1 }} />
               </A>
             </Box>
           </TableRow>
