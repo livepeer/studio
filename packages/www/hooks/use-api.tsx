@@ -146,13 +146,28 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async register(email, password, selectedPlan = 0) {
+    async register({
+      email,
+      password,
+      selectedPlan = 0,
+      firstName = null,
+      lastName = null,
+      phone = null,
+      organization = null
+    }) {
       trackPageView(email);
       const [res, body] = await context.fetch(
         `/user?selectedPlan=${selectedPlan}`,
         {
           method: "POST",
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({
+            email,
+            password,
+            ...(firstName && { firstName }),
+            ...(lastName && { lastName }),
+            ...(organization && { organization }),
+            ...(phone && { phone })
+          }),
           headers: {
             "content-type": "application/json"
           }

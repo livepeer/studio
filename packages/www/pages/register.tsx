@@ -1,7 +1,7 @@
 import Layout from "../components/Layout";
 import Login from "../components/Login";
 import Link from "../components/Link";
-import { Flex, Box, Heading } from "@theme-ui/components";
+import { Flex, Box } from "@theme-ui/components";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import useApi from "../hooks/use-api";
@@ -19,15 +19,26 @@ const RegisterPage = () => {
     }
   }, [user]);
 
-  const onSubmit = async ({ email, password }) => {
+  const onSubmit = async ({
+    email,
+    password,
+    firstName,
+    lastName,
+    organization,
+    phone
+  }) => {
     const selectedPlan = router.query?.selectedPlan;
     setLoading(true);
     setErrors([]);
-    const res = await register(
+    const res = await register({
       email,
       password,
-      selectedPlan ? +selectedPlan : 0
-    );
+      selectedPlan: selectedPlan ? +selectedPlan : 0,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(organization && { organization }),
+      ...(phone && { phone })
+    });
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
       setErrors(res.errors);
@@ -59,6 +70,9 @@ const RegisterPage = () => {
         <Login
           id="register"
           onSubmit={onSubmit}
+          showName={true}
+          showOrganization={true}
+          showPhone={true}
           showEmail={true}
           showPassword={true}
           buttonText="Continue"

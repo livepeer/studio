@@ -9,6 +9,9 @@ export const FRONTEND_SALT = "69195A9476F08546";
 
 const Login = ({
   id,
+  showName = false,
+  showOrganization = false,
+  showPhone = false,
   showEmail,
   showPassword,
   buttonText,
@@ -17,6 +20,10 @@ const Login = ({
   errors
 }) => {
   const router = useRouter();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,7 +43,14 @@ const Login = ({
           }
           const [hashedPassword] = await hash(password, FRONTEND_SALT);
           // hash password, then
-          onSubmit({ email, password: hashedPassword });
+          onSubmit({
+            email,
+            password: hashedPassword,
+            ...(firstName && { firstName }),
+            ...(lastName && { lastName }),
+            ...(organization && { organization }),
+            ...(phone && { phone })
+          });
         }}
         sx={{
           textAlign: "center",
@@ -51,60 +65,68 @@ const Login = ({
         }}
         id={id}
       >
-        {/* <Grid
-          sx={{
-            gridTemplateColumns: "1fr 1fr",
-            width: "100%",
-            alignItems: "center"
-          }}
-        >
-          <Textfield
-            htmlFor="firstName"
-            id="firstName"
-            sx={{ width: ["100%"], mb: [3, 3] }}
-            name="firstName"
-            type="text"
-            label="First name"
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Textfield
-            htmlFor="lastName"
-            id="lastName"
-            sx={{ width: ["100%"], mb: [3, 3] }}
-            name="lastName"
-            type="text"
-            label="Last name"
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Grid>
-        <Grid
-          sx={{
-            gridTemplateColumns: "1fr 1fr",
-            width: "100%",
-            alignItems: "center"
-          }}
-        >
-          <Textfield
-            htmlFor="company"
-            id="company"
-            sx={{ width: ["100%"], mb: [3, 3] }}
-            name="company"
-            type="company"
-            label="Company"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Textfield
-            htmlFor="phone"
-            id="phone"
-            sx={{ width: ["100%"], mb: [3, 3] }}
-            name="phone"
-            type="phone"
-            label="Phone"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Grid> */}
+        {showName && (
+          <Grid
+            sx={{
+              gridTemplateColumns: "1fr 1fr",
+              width: "100%",
+              alignItems: "center"
+            }}
+          >
+            <Textfield
+              htmlFor="firstName"
+              id="firstName"
+              sx={{ width: ["100%"], mb: [3, 3] }}
+              name="firstName"
+              type="text"
+              label="First name"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <Textfield
+              htmlFor="lastName"
+              id="lastName"
+              sx={{ width: ["100%"], mb: [3, 3] }}
+              name="lastName"
+              type="text"
+              label="Last name"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </Grid>
+        )}
+        {showOrganization && showPhone && (
+          <Grid
+            sx={{
+              gridTemplateColumns: "1fr 1fr",
+              width: "100%",
+              alignItems: "center"
+            }}
+          >
+            <Textfield
+              htmlFor="organization"
+              id="organization"
+              sx={{ width: ["100%"], mb: [3, 3] }}
+              name="organization"
+              type="organization"
+              label="Organization (optional)"
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
+            />
+            <Textfield
+              htmlFor="phone"
+              id="phone"
+              sx={{ width: ["100%"], mb: [3, 3] }}
+              name="phone"
+              type="phone"
+              label="Phone (optional)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </Grid>
+        )}
         {showEmail && (
           <Textfield
             htmlFor="email"

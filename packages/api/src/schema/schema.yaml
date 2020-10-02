@@ -507,6 +507,18 @@ components:
           type: string
           readOnly: true
           example: abc123
+        firstName:
+          type: string
+          example: Joe
+        lastName:
+          type: string
+          example: Smith
+        organization:
+          type: string
+          example: Livepeer
+        phone:
+          type: string
+          example: 2034212122
         stripeProductId:
           type: string
           example: prod_0

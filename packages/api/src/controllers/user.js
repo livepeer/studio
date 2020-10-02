@@ -59,7 +59,7 @@ app.get('/:id', authMiddleware({ allowUnverified: true }), async (req, res) => {
 })
 
 app.post('/', validatePost('user'), async (req, res) => {
-  const { email, password } = req.body
+  const { email, password, firstName, lastName, organization, phone } = req.body
   const { selectedPlan } = req.query
   const emailValid = validator.validate(email)
   if (!emailValid) {
@@ -87,6 +87,10 @@ app.post('/', validatePost('user'), async (req, res) => {
       admin: false,
       emailValidToken: emailValidToken,
       emailValid: validUser,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(organization && { organization }),
+      ...(phone && { phone }),
     }),
     trackAction(
       id,
