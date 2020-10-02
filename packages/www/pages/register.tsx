@@ -41,7 +41,7 @@ const RegisterPage = () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
-          py: 6
+          py: 5
         }}
       >
         <h3 sx={{ mb: 4 }}>Create an Account</h3>

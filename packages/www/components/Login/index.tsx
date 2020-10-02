@@ -1,5 +1,5 @@
 import Textfield from "../../components/Textfield";
-import { Button, Box, Container } from "@theme-ui/components";
+import { Button, Grid, Box, Container } from "@theme-ui/components";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
 import { useRouter } from "next/router";
@@ -44,15 +44,72 @@ const Login = ({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mb: 3
+          mb: 3,
+          maxWidth: 600,
+          ml: "auto",
+          mr: "auto"
         }}
         id={id}
       >
+        {/* <Grid
+          sx={{
+            gridTemplateColumns: "1fr 1fr",
+            width: "100%",
+            alignItems: "center"
+          }}
+        >
+          <Textfield
+            htmlFor="firstName"
+            id="firstName"
+            sx={{ width: ["100%"], mb: [3, 3] }}
+            name="firstName"
+            type="text"
+            label="First name"
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Textfield
+            htmlFor="lastName"
+            id="lastName"
+            sx={{ width: ["100%"], mb: [3, 3] }}
+            name="lastName"
+            type="text"
+            label="Last name"
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Grid>
+        <Grid
+          sx={{
+            gridTemplateColumns: "1fr 1fr",
+            width: "100%",
+            alignItems: "center"
+          }}
+        >
+          <Textfield
+            htmlFor="company"
+            id="company"
+            sx={{ width: ["100%"], mb: [3, 3] }}
+            name="company"
+            type="company"
+            label="Company"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Textfield
+            htmlFor="phone"
+            id="phone"
+            sx={{ width: ["100%"], mb: [3, 3] }}
+            name="phone"
+            type="phone"
+            label="Phone"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Grid> */}
         {showEmail && (
           <Textfield
             htmlFor="email"
             id="email"
-            sx={{ width: ["100%", "50%"], mb: [3, 3], mx: [1, 3] }}
+            sx={{ width: ["100%"], mb: [3, 3], mx: [1, 3] }}
             name="email"
             type="email"
             label="Email"
@@ -65,7 +122,7 @@ const Login = ({
           <Textfield
             htmlFor="password"
             id="password"
-            sx={{ width: ["100%", "50%"], mb: [3, 3], mx: [1, 3] }}
+            sx={{ width: ["100%"], mb: [3, 3], mx: [1, 3] }}
             name="password"
             type="password"
             label="Password"
@@ -77,7 +134,7 @@ const Login = ({
 
         <Box>{errors.join(", ")}&nbsp;</Box>
 
-        <Button sx={{ mt: 4, px: 5 }} variant="primary">
+        <Button sx={{ mt: 3, px: 5 }} variant="primary">
           {loading ? "Loading..." : buttonText}
         </Button>
       </form>
