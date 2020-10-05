@@ -23,6 +23,9 @@ const Textfield = ({
   id = "",
   label,
   pushInputSx = {},
+  variant = "outlined",
+  fixedLabel = false,
+  placeholder = "",
   ...props
 }) => {
   const [focused, setFocused] = useState(false);
@@ -49,9 +52,13 @@ const Textfield = ({
         sx={{
           zIndex: 0,
           transform:
-            defaultValue || value || scopedValue || focused
-              ? "translate(20px, 10px) scale(0.75)"
-              : "translate(20px, 20px) scale(1)",
+            fixedLabel || defaultValue || value || scopedValue || focused
+              ? `translate(${
+                  variant === "outlined" ? "16px, 8px" : "0, 4px"
+                }) scale(0.75)`
+              : `translate(${
+                  variant === "outlined" ? "16px" : "0"
+                }, 20px) scale(1)`,
           pointerEvents: "none",
           top: "0",
           left: "0",
@@ -60,7 +67,8 @@ const Textfield = ({
             "color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
           display: "block",
           transformOrigin: "top left",
-          color: "#6f6f6f",
+          color: "offBlack",
+          fontWeight: 600,
           padding: 0,
           fontSize: 16,
           lineHeight: 1
@@ -92,13 +100,14 @@ const Textfield = ({
           disabled={disabled}
           autoFocus={autoFocus}
           required={required}
+          placeholder={placeholder}
           defaultValue={defaultValue}
           value={value}
           onChange={onChange ? onChange : (e) => setScopedValue(e.target.value)}
           ref={inputRef}
           name={name}
           sx={{
-            padding: "22px 20px 12px",
+            padding: variant === "outlined" ? "22px 16px 12px" : "22px 0 5px",
             fontSize: 16,
             color: "currentColor",
             width: "100%",
@@ -107,18 +116,23 @@ const Textfield = ({
             minWidth: "0",
             background: "none",
             boxSizing: "content-box",
-            animationName: "MuiInputBase-keyframes-auto-fill-cancel",
             WebkitTapHighlightColor: "transparent",
-            borderRadius: 8,
-            border: "1px solid",
+            borderRadius: variant === "outlined" ? 8 : 0,
+            borderTop: variant === "outlined" ? "1px solid" : 0,
+            borderBottom: "1px solid",
+            borderLeft: variant === "outlined" ? "1px solid" : 0,
+            borderRight: variant === "outlined" ? "1px solid" : 0,
             borderColor: "ultraLightGray",
             transition: "border-color .2s",
             "&:hover": {
-              borderColor: "lightGray"
+              borderColor: "primary"
             },
             "&:focus": {
               outline: "none",
-              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+              boxShadow:
+                variant === "outlined"
+                  ? "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+                  : "none",
               borderColor: "primary"
             },
             ...pushInputSx

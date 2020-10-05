@@ -424,6 +424,10 @@ deletes a specific webhook details
 | admin | boolean | _Example:_ `true` | No |
 | kind | string | _Example:_ `"user"` | No |
 | id | string | _Example:_ `"abc123"` | No |
+| firstName | string | _Example:_ `"Joe"` | No |
+| lastName | string | _Example:_ `"Smith"` | No |
+| organization | string | _Example:_ `"Livepeer"` | No |
+| phone | string | _Example:_ `2034212122` | No |
 | stripeProductId | string | _Example:_ `"prod_0"` | No |
 | stripeCustomerId | string | _Example:_ `"cus_Jv6KvgT0DCH8HU"` | No |
 | stripeCustomerPaymentMethodId | string | _Example:_ `"pm_2FSSNNJfrKDAwlJ9n4EN15Du"` | No |

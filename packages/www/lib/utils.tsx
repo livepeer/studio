@@ -2,6 +2,7 @@ import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
 import { Tree } from "../components/TableOfContents";
 import { Stripe, loadStripe } from "@stripe/stripe-js";
+import { theme } from "./theme";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
@@ -215,8 +216,9 @@ export const CARD_OPTIONS = {
   iconStyle: "solid" as const,
   style: {
     base: {
-      iconColor: "#943CFF",
-      color: "#943CFF",
+      width: "100%",
+      iconColor: theme.colors.primary,
+      color: theme.colors.text,
       fontWeight: "500",
       fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
       fontSize: "16px",
@@ -225,12 +227,12 @@ export const CARD_OPTIONS = {
         color: "#a0aec0"
       },
       ":-webkit-autofill": {
-        color: "#fce883"
+        color: "transparent"
       }
     },
     invalid: {
-      iconColor: "#ef2961",
-      color: "#ef2961"
+      iconColor: theme.colors.red,
+      color: theme.colors.red
     }
   }
 };

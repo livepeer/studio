@@ -1,27 +1,29 @@
-import {
-  ChangeEventHandler,
-  FormEventHandler,
-  useEffect,
-  useState
-} from "react";
-import { Flex, Box, Heading } from "@theme-ui/components";
+import { useState } from "react";
+import { Flex, Box, Grid, Heading } from "@theme-ui/components";
 import Button from "../Button";
+import Textfield from "../Textfield";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi } from "../../hooks";
-import { products } from "@livepeer.com/api/src/config";
 import { CARD_OPTIONS } from "../../lib/utils";
+import { useForm } from "react-hook-form";
 
 const ChangePaymentForm = ({ onAbort, onSuccess }) => {
   const { user, updateCustomerPaymentMethod } = useApi();
   const [status, setStatus] = useState("initial");
   const stripe = useStripe();
+  const { register, handleSubmit } = useForm();
   const elements = useElements();
 
-  function createPaymentMethod({ cardElement, stripeCustomerId }) {
+  function createPaymentMethod({
+    cardElement,
+    stripeCustomerId,
+    billingDetails
+  }) {
     return stripe
       .createPaymentMethod({
         type: "card",
-        card: cardElement
+        card: cardElement,
+        billing_details: billingDetails
       })
       .then(async (result) => {
         const paymentMethod = result.paymentMethod;
@@ -100,18 +102,27 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
     }
   }
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const onSubmit = async (data, e) => {
     e.preventDefault();
 
     // Abort if form isn't valid
-    if (!e.currentTarget.reportValidity()) return;
+    if (!e.target.reportValidity()) return;
 
     setStatus("processing");
 
     const cardElement = elements!.getElement(CardElement);
     createPaymentMethod({
       cardElement,
-      stripeCustomerId: user.stripeCustomerId
+      stripeCustomerId: user.stripeCustomerId,
+      billingDetails: {
+        name: data.name,
+        address: {
+          line1: data.address,
+          city: data.city,
+          state: data.state,
+          postal_code: data.postalCode
+        }
+      }
     });
   };
 
@@ -120,15 +131,110 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
       <Heading as="h4" sx={{ mb: 3 }}>
         Change Payment Details
       </Heading>
-      <form onSubmit={handleSubmit}>
-        <fieldset className="elements-style">
-          <Box
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <fieldset>
+          <Textfield
+            inputRef={register({ required: true })}
+            htmlFor="name"
+            variant="standard"
+            fixedLabel
+            placeholder="Jane Doe"
+            id="name"
+            name="name"
+            type="text"
+            sx={{ width: "100%", mb: 3 }}
+            label="Name"
+            required
+          />
+          <Textfield
+            inputRef={register({ required: true })}
+            htmlFor="address"
+            variant="standard"
+            fixedLabel
+            placeholder="185 Berry St"
+            id="address"
+            name="address"
+            type="text"
+            sx={{ width: "100%", mb: 3 }}
+            label="Address"
+            required
+          />
+          <Grid
+            gap={2}
             sx={{
-              borderRadius: 8,
-              padding: 16,
-              backgroundColor: "rgba(237, 242, 247, .6)"
+              gridTemplateColumns: "1fr 1fr 1fr",
+              width: "100%",
+              alignItems: "center",
+              mb: 3
             }}
           >
+            <Textfield
+              inputRef={register({ required: true })}
+              htmlFor="city"
+              variant="standard"
+              fixedLabel
+              placeholder="Brooklyn"
+              id="city"
+              sx={{ width: ["100%"] }}
+              name="city"
+              type="text"
+              label="City"
+              required
+            />
+            <Textfield
+              inputRef={register({ required: true })}
+              htmlFor="state"
+              variant="standard"
+              fixedLabel
+              placeholder="NY"
+              id="lastName"
+              sx={{ width: ["100%"] }}
+              name="state"
+              type="text"
+              label="State"
+              required
+            />
+            <Textfield
+              inputRef={register({ required: true })}
+              htmlFor="postalCode"
+              variant="standard"
+              fixedLabel
+              placeholder="11211"
+              id="postalCode"
+              sx={{ width: ["100%"] }}
+              name="postalCode"
+              type="text"
+              label="ZIP"
+              required
+            />
+          </Grid>
+          <Box
+            sx={{
+              borderBottom: "1px solid",
+              borderColor: "ultraLightGray",
+              transition: "border-color .2s",
+              borderRadius: 0,
+              pb: "5px",
+              mb: 3,
+              "&:hover": {
+                borderColor: "primary"
+              },
+              "&:focus": {
+                outline: "none",
+                borderColor: "primary"
+              }
+            }}
+          >
+            <Box
+              sx={{
+                fontSize: 0,
+                color: "offBlack",
+                fontWeight: 600,
+                mb: 1
+              }}
+            >
+              Card
+            </Box>
             <CardElement
               options={CARD_OPTIONS}
               onChange={(e) => {

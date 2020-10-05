@@ -33,7 +33,8 @@ export const theme = {
     lightGray: "#919191",
     ultraLightGray: "#E6E6E6",
     offBlack: "#666666",
-    extremelyBlue: "#3F3FE2"
+    extremelyBlue: "#3F3FE2",
+    red: "#ef2961"
   },
 
   breakpoints: ["640px", "832px", "1024px", "1280px"],

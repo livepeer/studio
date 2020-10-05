@@ -1,7 +1,7 @@
 exports.products = {
   prod_0: {
     order: 0,
-    name: 'Hobby',
+    name: 'Personal',
     lookupKeys: ['price_0'],
     usage: [
       {
@@ -25,7 +25,7 @@ exports.products = {
   },
   prod_2: {
     order: 2,
-    name: 'Enterprise',
+    name: 'Business',
     lookupKeys: ['price_2'],
   },
 }
