@@ -116,6 +116,8 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
       stripeCustomerId: user.stripeCustomerId,
       billingDetails: {
         name: data.name,
+        email: data.email,
+        phone: data.phone,
         address: {
           line1: data.address,
           city: data.city,
@@ -146,6 +148,42 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
             label="Name"
             required
           />
+          <Grid
+            gap={2}
+            sx={{
+              gridTemplateColumns: "1fr 1fr",
+              width: "100%",
+              alignItems: "center",
+              mb: 3
+            }}
+          >
+            <Textfield
+              inputRef={register({ required: true })}
+              htmlFor="email"
+              variant="standard"
+              fixedLabel
+              placeholder="jane.doe@gmail.com"
+              id="email"
+              sx={{ width: ["100%"] }}
+              name="email"
+              type="email"
+              label="Email"
+              required
+            />
+            <Textfield
+              inputRef={register({ required: true })}
+              htmlFor="phone"
+              variant="standard"
+              fixedLabel
+              placeholder="(941) 555-0123"
+              id="phone"
+              sx={{ width: ["100%"] }}
+              name="phone"
+              type="tel"
+              label="Phone"
+              required
+            />
+          </Grid>
           <Textfield
             inputRef={register({ required: true })}
             htmlFor="address"
@@ -229,7 +267,7 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               sx={{
                 fontSize: 0,
                 color: "offBlack",
-                fontWeight: 600,
+                fontWeight: 500,
                 mb: 1
               }}
             >

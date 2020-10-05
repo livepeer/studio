@@ -20,6 +20,7 @@ const Textfield = ({
   rows = 2,
   name = "",
   htmlFor = "",
+  pattern = null,
   id = "",
   label,
   pushInputSx = {},
@@ -54,11 +55,11 @@ const Textfield = ({
           transform:
             fixedLabel || defaultValue || value || scopedValue || focused
               ? `translate(${
-                  variant === "outlined" ? "16px, 8px" : "0, 4px"
+                  variant === "outlined" ? "16px, 10px" : "0, 4px"
                 }) scale(0.75)`
               : `translate(${
                   variant === "outlined" ? "16px" : "0"
-                }, 20px) scale(1)`,
+                }, 18px) scale(1)`,
           pointerEvents: "none",
           top: "0",
           left: "0",
@@ -68,10 +69,10 @@ const Textfield = ({
           display: "block",
           transformOrigin: "top left",
           color: "offBlack",
-          fontWeight: 600,
           padding: 0,
           fontSize: 16,
-          lineHeight: 1
+          lineHeight: 1,
+          fontWeight: fixedLabel ? 500 : 400
         }}
         htmlFor={htmlFor}
         id={id}
@@ -103,11 +104,12 @@ const Textfield = ({
           placeholder={placeholder}
           defaultValue={defaultValue}
           value={value}
+          pattern={pattern}
           onChange={onChange ? onChange : (e) => setScopedValue(e.target.value)}
           ref={inputRef}
           name={name}
           sx={{
-            padding: variant === "outlined" ? "22px 16px 12px" : "22px 0 5px",
+            padding: variant === "outlined" ? "24px 16px 8px" : "22px 0 6px",
             fontSize: 16,
             color: "currentColor",
             width: "100%",

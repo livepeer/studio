@@ -19,7 +19,7 @@ exports.products = {
       {
         name: 'Transcoding',
         description: 'Transcoding (minutes)',
-        price: 0.01,
+        price: 0.005,
       },
     ],
   },

@@ -120,7 +120,7 @@ const Usage = () => {
                   (usage.sourceSegmentsDuration / 60)
                     .toFixed(2)
                     .toLocaleString()}{" "}
-                min
+                {products[user.stripeProductId].order > 0 && <span>min</span>}
               </Box>
               <Flex
                 sx={{
@@ -130,7 +130,11 @@ const Usage = () => {
                 }}
               >
                 /
-                <MdAllInclusive sx={{ mt: "3px", ml: 2 }} />
+                {!products[user.stripeProductId].order ? (
+                  <span sx={{ mt: "3px", ml: 2 }}>1,000 min</span>
+                ) : (
+                  <MdAllInclusive sx={{ mt: "3px", ml: 2 }} />
+                )}
               </Flex>
             </Flex>
             <Box sx={{ fontSize: 1, color: "gray" }}>Transcoding</Box>
@@ -196,8 +200,16 @@ const Usage = () => {
             Upcoming Invoice
           </Box>
           {!products[user.stripeProductId].order ? (
-            <Box sx={{ textAlign: "center", color: "gray" }}>
-              The Hobby plan is free of charge.
+            <Box
+              sx={{
+                maxWidth: 600,
+                mx: "auto",
+                textAlign: "center",
+                color: "offBlack"
+              }}
+            >
+              The Personal plan is free of charge up to 1000 minutes per month
+              and limited to 10 concurrent viewers per account
             </Box>
           ) : (
             subscription && (

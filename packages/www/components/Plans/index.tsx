@@ -1,5 +1,5 @@
 import { Container, Box, Flex, Heading } from "@theme-ui/components";
-import { MdCheck } from "react-icons/md";
+import { MdCheck, MdClose } from "react-icons/md";
 import Button from "../Button";
 import Modal from "../Modal";
 import PlanForm from "../PlanForm";
@@ -23,6 +23,7 @@ const steps = [
 const Item = ({
   title,
   displayCheck = true,
+  displayX = false,
   color = "black",
   styles = null
 }) => (
@@ -32,11 +33,13 @@ const Item = ({
       height: 50,
       alignItems: "center",
       borderBottom: "1px solid",
+      letterSpacing: -0.3,
       borderColor: "rgba(0, 0, 0, .1)",
       ...styles
     }}
   >
     {displayCheck && <MdCheck sx={{ mr: 2, color: color }} />}
+    {displayX && <MdClose sx={{ mr: 2, color: color }} />}
     {title}
   </Flex>
 );
@@ -175,7 +178,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   px: 3,
                   py: "12px",
                   borderRadius: 6,
-                  bg: "rgba(0,0,0,.03)",
+                  bg: "rgba(0,0,0,.02)",
                   border: "1px solid",
                   borderColor: "muted"
                 }}
@@ -187,7 +190,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     justifyContent: "space-between"
                   }}
                 >
-                  <Flex sx={{ color: "offBlack", alignItems: "center", mr: 4 }}>
+                  <Flex sx={{ color: "text", alignItems: "center", mr: 4 }}>
                     <MdCreditCard sx={{ mr: 2, fontSize: 4 }} />{" "}
                     <Box sx={{ fontSize: 1, mr: 2 }}>Credit Card: </Box>
                     <Box
@@ -228,10 +231,12 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
         >
           <Box
             sx={{
-              display: ["none", "none", "none", "block"],
               pl: 4,
               width: ["100%", "100%", "100%", "25%"],
-              maxWidth: 174
+              maxWidth: 174,
+              "@media screen and (max-width: 1200px)": {
+                display: "none"
+              }
             }}
           >
             <Flex
@@ -247,8 +252,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </Flex>
             <List>
               <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Storage" />
-              <Item displayCheck={false} title="Streaming" />
+              <Item displayCheck={false} title="Recording storage" />
+              <Item displayCheck={false} title="Streaming*" />
             </List>
           </Box>
           <Box
@@ -257,7 +262,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 "linear-gradient(180deg, #FAFAFA 0%, rgba(255, 255, 255, 0) 100%)",
               p: 4,
               borderRadius: 16,
-              width: ["100%", "100%", "100%", "25%"]
+              width: ["100%", "100%", "100%", "25%"],
+              minWidth: 300
             }}
           >
             <Header
@@ -292,17 +298,21 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     "rgba(0, 0, 0, .1)"
                   ]
                 }}
-                title="Up to 120 minutes / month"
+                title="1000 minutes / month"
               />
+              <Item title="None" displayX={true} displayCheck={false} />
               <Item
-                title=""
-                styles={{ display: ["none", "none", "none", "block"] }}
-                displayCheck={false}
-              />
-              <Item
-                title=""
-                styles={{ display: ["none", "none", "none", "block"] }}
-                displayCheck={false}
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Streaming:
+                    </span>
+                    10 concurrent viewers / account
+                  </span>
+                }
+                displayCheck={true}
               />
             </List>
           </Box>
@@ -314,7 +324,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               color: "white",
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.08)",
               borderRadius: "16px",
-              p: 4
+              p: 4,
+              minWidth: 300
             }}
           >
             <Header
@@ -346,17 +357,17 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             <List>
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="$0.01 / min video ingested"
+                title="$0.005 USD / min video ingested"
                 color="pink"
               />
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="$0.002 / gb video stored"
+                title="Coming soon"
                 color="pink"
               />
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="$0.003 / gb video streamed"
+                title="$0.01 USD / gb video streamed"
                 color="pink"
               />
             </List>
@@ -367,7 +378,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 "linear-gradient(180deg, #FAFAFA 0%, rgba(255, 255, 255, 0) 100%)",
               borderRadius: 16,
               p: 4,
-              width: ["100%", "100%", "100%", "25%"]
+              width: ["100%", "100%", "100%", "25%"],
+              minWidth: 300
             }}
           >
             <Header
@@ -389,12 +401,26 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             />
 
             <List>
-              <Item title="Custom pricing" color="purple" />
-              <Item title="Custom pricing" color="purple" />
-              <Item title="Custom pricing" color="purple" />
+              <Item title="Custom pricing available" color="purple" />
+              <Item title="Coming soon" color="purple" />
+              <Item title="Custom pricing available" color="purple" />
             </List>
           </Box>
         </Flex>
+        <Container
+          sx={{
+            fontSize: 1,
+            textAlign: "center",
+            maxWidth: 800,
+            mt: 5,
+            mx: "auto",
+            fontStyle: "italic",
+            color: "offBlack"
+          }}
+        >
+          *Currently, we are not charging for Streaming. We’ll be sure to reach
+          out before we start to do so. Thanks for streaming with Livepeer.com.
+        </Container>
       </Box>
     </>
   );
