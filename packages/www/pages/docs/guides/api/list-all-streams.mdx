@@ -3,36 +3,37 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## List All Streams
+# How to use the Livepeer.com API to list all streams created by a Livepeer.com user
 
-You can list all of the streams created by an user. To do so, you will need the
-"userId".
+To list all the streams created by a user, you will need the `userId` from the API key object.
 
-You can find your userId by fetching the API key information:
+The simplest way to find your userId is by fetching the API key information. For example:
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
-"https://livepeer.com/api/api-token/{api_key}"
+"https://livepeer.com/api/api-token/{api_key}”
 ```
+ 
+You will get the API key object in the response. For example:
 
-You will get the API key object. For example:
-
-```jsx
+```bash
 {
-	"id":"d210eded-46a9-4119-86f9-64c33e003f1b",
-	"userId":"4ecd4b74-9908-4d23-be05-58e2480e752a",
-	"name":"test-7-29-2020",
-	"createdAt":1596047053660
+    "id":"{api_key}",
+    "userId":"1234abcd-1234-abcd-1234-abcd1234abcd",
+    "name":"example-api-key",
+    "createdAt":1596047053660
 }
 ```
 
-Now, you can use the "userId" to fetch all the streams created by the user. For
-example:
+Use the `userId` to fetch all the streams created by the user. For example:
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
 "https://livepeer.com/api/stream/user/{user_id}"
 ```
+
+Next learn [how to delete a stream with the Livepeer.com API](/docs/guides/api/delete-a-stream).
+
 
 </DocsLayout>
 

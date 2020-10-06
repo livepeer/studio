@@ -336,7 +336,7 @@ export default () => {
                       sx={{
                         m: "0.4em",
                         justifySelf: "flex-start",
-                        cursor: "pointer",
+                        cursor: "pointer"
                       }}
                       onClick={() => {
                         if (stream.record) {
@@ -369,7 +369,7 @@ export default () => {
                           sx={{
                             color: "muted",
                             cursor: "pointer",
-                            ml: 1,
+                            ml: 1
                           }}
                         />
                       </Flex>
@@ -420,7 +420,8 @@ export default () => {
             </Flex>
             <Flex
               sx={{
-                justifyContent: "flex-end"
+                justifyContent: "flex-end",
+                mb: 3
               }}
             >
               <Button
@@ -431,7 +432,7 @@ export default () => {
                 Delete
               </Button>
             </Flex>
-            <StreamSessionsTable streamId={stream.id} />
+            {/* <StreamSessionsTable streamId={stream.id} /> */}
           </>
         ) : notFound ? (
           <Box>Not found</Box>

@@ -10,7 +10,7 @@ type NavProps = React.ComponentProps<typeof NavigationBase>;
 const defaultNavProps: NavProps = {
   links: [
     {
-      href: "/docs/guides",
+      href: "/docs",
       children: "Docs"
     },
     {
@@ -62,11 +62,11 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
         {
           href: "/docs/guides",
           children: "Guides"
-        },
-        {
+        }
+        /*{
           href: "/docs/reference",
           children: "API Reference"
-        }
+        }*/
       ],
       breadcrumb: [
         {

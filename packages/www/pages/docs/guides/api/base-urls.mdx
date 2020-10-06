@@ -3,17 +3,16 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## How to Get Base URLs
+# How to find ingest and playback base URLs
 
-There are 2 types of base URLs:
+There are two types of base URLs: ingest and playback.
 
-- The ingest base URL is a part of the (rtmp) ingest URL, used for the
-  broadcaster to ingest the video stream.
-- The playback base URL is a part of the playback URL, used for the viewers to
-  watch the stream.
+1. The **ingest base URL** is the first part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream.
+1. The **playback base URL** is the first part of the playback URL, used for the viewers to watch the stream.
 
-You can get the base URLs by calling `https://livepeer.com/api/ingest`. For
-example:
+Your base URLs are dependent on the location you issue the request from. This is important, because the ingest point should be as close to the broadcaster as possible. Even though the playback base URL references the ingest location, playback will work for your viewers everywhere.
+
+You can get the base URLs by calling `https://livepeer.com/api/ingest`. For example:
 
 ```bash
 curl "https://livepeer.com/api/ingest"
@@ -21,18 +20,17 @@ curl "https://livepeer.com/api/ingest"
 
 And you should get results like
 
-```jsx
+```bash
 [
   {
-    ingest: "rtmp://mdw-rtmp.livepeer.com/live",
-    playback: "https://mdw-cdn.livepeer.com/hls"
+    ingest: "rtmp://{region}-rtmp.livepeer.com/live",
+    playback: "https://{region}-cdn.livepeer.com/hls"
   }
 ];
 ```
 
-_Note: the results will depend on the location you issue the request from._ This
-is important, because the ingest point should be as close to the broadcaster as
-possible.
+Next, learn [how to broadcast a live stream with the Livepeer.com API](/docs/guides/api/broadcast-a-live-stream).
+
 
 </DocsLayout>
 

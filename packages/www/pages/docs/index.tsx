@@ -9,117 +9,108 @@ import Prefooter from "../../components/Prefooter";
 import { Grid } from "@theme-ui/components";
 import DocsPopularTopicCard from "../../components/cards/cards/popular-topic";
 import { DocsNav } from "../../components/Navigation";
-import { useRouter } from "next/router";
 
 const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
   {
-    img: { src: "/img/docs/key.png", alt: "key image", sx: { width: "130px" } },
-    title: "API Keys",
-    description: "Learn how to use our API key to live transcode.",
-    link: { href: "/docs/guides/api/create-api-key" }
+    img: {
+      src: "/img/docs/flag.png",
+      alt: "flag",
+      sx: { width: "140px" }
+    },
+    title: "Getting started",
+    description: "Start live streaming now!",
+    link: { href: "/docs/guides" }
   },
   {
     img: {
-      src: "/img/docs/globe.png",
-      alt: "globe image",
+      src: "/img/docs/puzzle.png",
+      alt: "puzzle",
+      sx: { width: "140px" }
+    },
+    title: "Feature support matrix",
+    description: "Learn about compatible video formats and workflows.",
+    link: { href: "/docs/guides/support-matrix" }
+  },
+  {
+    img: {
+      src: "/img/docs/stopwatch.png",
+      alt: "stopwatch",
       sx: { width: "120px" }
     },
-    title: "Broadcasting",
-    description: "Learn how to broadcast a stream session.",
-    link: { href: "/docs/guides/dashboard/broadcast-a-stream-session" }
-  },
-  {
-    img: {
-      src: "/img/docs/shield.png",
-      alt: "shield image",
-      sx: { width: "100px" }
-    },
-    title: "ETH esentials",
-    description: "Learn how we use the Blockchain.",
-    link: { href: "/docs/guides" }
-  },
-  {
-    img: {
-      src: "/img/docs/equalizer.png",
-      alt: "equalizer image",
-      sx: { width: "90px" }
-    },
-    title: "Specifications",
-    description: "Understanding the stream page specifications.",
-    link: { href: "/docs/guides" }
+    title: "Your first stream in under 5 minutes",
+    description: "Read the Livepeer.com blog post.",
+    link: { href: "/blog/first-livepeer-stream-in-five-minutes" }
   }
 ];
 
 const popularTopics: React.ComponentProps<typeof DocsPopularTopicCard>[] = [
   {
-    title: "How to create a stream",
+    title: "How to create a stream with the Livepeer.com API",
     excerpt:
-      "Before live streaming via the Livepeer.com API, you will need to create a Livepeer.com account and be able to create a RTMP stream. You do not need to create an API key.",
-    href: "/docs/guides/dashboard/create-a-stream"
-  },
-  {
-    title: "How to broadcast a stream session",
-    excerpt:
-      "Your users or your application will need to be able to push an RTMP stream. When configuring the software to push streams, use the secret stream key and RTMP ingest URL from the stream page.",
-    href: "/docs/guides/dashboard/broadcast-a-stream-session"
-  },
-  {
-    title: "How to get base URLs",
-    excerpt:
-      "There are 2 types of base URLs: The ingest base URL is a part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream. The playback base URL is a part of the playback URL, used for the viewers to watch the stream.",
-    href: "/docs/guides/api/base-urls"
-  },
-  {
-    title: "How to create a stream",
-    excerpt:
-      "To create a stream, We'll send a POST requst to https://livepeer.com/api/stream.",
+      "To create a stream, send a POST request to https://livepeer.com/api/stream.",
     href: "/docs/guides/api/create-a-stream"
   },
   {
-    title: "How to delete a stream",
-    excerpt: `You can delete a stream by sending the DELETE request with a specific "streamId".`,
-    href: "/docs/guides/api/delete-a-stream"
+    title: "How to verify stream status with the Livepeer.com API",
+    excerpt:
+      "To verify a stream is running, you can fetch the stream status by sending a `GET` request to `https://livepeer.com/api/stream/` with the stream object `id` appended.",
+    href: "/docs/guides/api/verify-stream-status"
   },
   {
-    title: "How to create an API key",
+    title: "How to create a stream in the Livepeer.com dashboard",
     excerpt:
-      "Open your Livepeer.com account and navigate to the API key list page, https://livepeer.com/app/user/keys.",
-    href: "/docs/guides/api-keys/create-an-api-key"
+      "Open your Livepeer.com account and navigate to the streams list page, https://livepeer.com/app/user.",
+    href: "/docs/guides/dashboard/create-a-stream"
+  },
+  {
+    title:
+      "How to use the Livepeer.com API to list all streams created by a Livepeer.com user",
+    excerpt:
+      "To list all the streams created by a user, you will need the `userId` from the API key object.",
+    href: "/docs/guides/api/list-all-streams"
+  },
+  {
+    title: "How to create a Livepeer.com account",
+    excerpt:
+      "Whether you are integrating your streaming application directly with the Livepeer.com API or creating individual streams in the Livepeer.com dashboard, you’ll need to create a Livepeer.com account.",
+    href: "/docs/guides/account/create-an-account"
+  },
+  {
+    title: "When do you need an Livepeer.com API key?",
+    excerpt:
+      "You need an API key to live stream with the Livepeer.com API. You do not need to create an API key for the Livepeer.com dashboard-only workflow.",
+    href: "/docs/guides/api-keys/when-do-you-need-an-api-key"
   }
 ];
 
 const DocsIndex = () => {
-  const router = useRouter();
-  if (typeof window !== "undefined") {
-    router.push("/docs/guides");
-    return;
-  }
   return (
     <Layout
       title={`Docs - Livepeer.com`}
-      description={`TODO`}
+      description={`Everything you need to build powerful video applications with Livepeer.com`}
       url={`https://livepeer.com/docs`}
       customNav={<DocsNav />}
       withGradientBackground
     >
       <div sx={{ overflowX: "hidden" }}>
-        <Container variant="hero" sx={{ maxWidth: "1056px" }}>
+        <Container variant="hero" sx={{ maxWidth: "1220px" }}>
           <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
           <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
             Welcome to the Livepeer.com documentation!
           </p>
-          <KeenSliderGrid
-            breakpoints={[
-              { value: "320px", slidesPerView: 1 },
-              { value: "604px", slidesPerView: 2 },
-              { value: "832px", slidesPerView: 3 },
-              { value: "1280px", slidesPerView: 4 }
-            ]}
-          >
-            {categories.map((category) => (
-              <DocsCategoryCard {...category} key={category.title} />
-            ))}
-          </KeenSliderGrid>
+          <Fade fraction={0.02} duration={400}>
+            <KeenSliderGrid
+              breakpoints={[
+                { value: "320px", slidesPerView: 1 },
+                { value: "604px", slidesPerView: 2 },
+                { value: "832px", slidesPerView: 3 }
+              ]}
+            >
+              {categories.map((category) => (
+                <DocsCategoryCard {...category} key={category.title} />
+              ))}
+            </KeenSliderGrid>
+          </Fade>
           <Flex
             sx={{
               alignItems: ["flex-start", "center"],
@@ -136,7 +127,7 @@ const DocsIndex = () => {
                 lineHeight: ["40px", "56px"]
               }}
             >
-              Popular topics
+              Popular guides
             </h2>
             <Button href="/docs/guides" isLink>
               Go to guides
@@ -149,20 +140,11 @@ const DocsIndex = () => {
           </Grid>
         </Container>
       </div>
-      <Fade key={0}>
+      <Fade>
         <Prefooter />
       </Fade>
     </Layout>
   );
 };
-
-// Temporarily redirect to guides
-export async function getServerSideProps(ctx) {
-  if (ctx.res) {
-    ctx.res.writeHead(302, { Location: "/docs/guides" });
-    ctx.res.end();
-  }
-  return { props: {} };
-}
 
 export default DocsIndex;
