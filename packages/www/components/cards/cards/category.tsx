@@ -21,7 +21,6 @@ const DocsCategoryCard = ({
     <A
       className={className}
       sx={{
-        zIndex: 100,
         background: "linear-gradient(212.62deg, #1C1C1C 0%, #292935 100%)",
         borderRadius: 16,
         width: 276,
