@@ -98,18 +98,20 @@ const DocsIndex = () => {
           <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
             Welcome to the Livepeer.com documentation!
           </p>
-          <KeenSliderGrid
-            breakpoints={[
-              { value: "320px", slidesPerView: 1 },
-              { value: "604px", slidesPerView: 2 },
-              { value: "832px", slidesPerView: 3 },
-              { value: "1280px", slidesPerView: 4 }
-            ]}
-          >
-            {categories.map((category) => (
-              <DocsCategoryCard {...category} key={category.title} />
-            ))}
-          </KeenSliderGrid>
+          <Fade fraction={0.05}>
+            <KeenSliderGrid
+              breakpoints={[
+                { value: "320px", slidesPerView: 1 },
+                { value: "604px", slidesPerView: 2 },
+                { value: "832px", slidesPerView: 3 },
+                { value: "1280px", slidesPerView: 4 }
+              ]}
+            >
+              {categories.map((category) => (
+                <DocsCategoryCard {...category} key={category.title} />
+              ))}
+            </KeenSliderGrid>
+          </Fade>
           <Flex
             sx={{
               alignItems: ["flex-start", "center"],
@@ -139,7 +141,7 @@ const DocsIndex = () => {
           </Grid>
         </Container>
       </div>
-      <Fade key={0}>
+      <Fade>
         <Prefooter />
       </Fade>
     </Layout>
