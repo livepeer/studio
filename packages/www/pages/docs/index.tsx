@@ -98,7 +98,7 @@ const DocsIndex = () => {
           <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
             Welcome to the Livepeer.com documentation!
           </p>
-          <Fade fraction={0.05}>
+          <Fade fraction={0.02} duration={400}>
             <KeenSliderGrid
               breakpoints={[
                 { value: "320px", slidesPerView: 1 },
