@@ -93,7 +93,7 @@ const DocsIndex = () => {
       withGradientBackground
     >
       <div sx={{ overflowX: "hidden" }}>
-        <Container variant="hero" sx={{ maxWidth: "1056px" }}>
+        <Container variant="hero" sx={{ maxWidth: "1220px" }}>
           <h1 sx={{ variant: "text.heading.hero" }}>Documentation</h1>
           <p sx={{ variant: "text.heroDescription", mb: [4, 5] }}>
             Welcome to the Livepeer.com documentation!
@@ -103,8 +103,7 @@ const DocsIndex = () => {
               breakpoints={[
                 { value: "320px", slidesPerView: 1 },
                 { value: "604px", slidesPerView: 2 },
-                { value: "832px", slidesPerView: 3 },
-                { value: "1280px", slidesPerView: 4 }
+                { value: "832px", slidesPerView: 3 }
               ]}
             >
               {categories.map((category) => (
