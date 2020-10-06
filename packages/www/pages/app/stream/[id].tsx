@@ -113,7 +113,12 @@ export default () => {
 
   useEffect(() => {
     getIngest(true)
-      .then((ingest) => setIngest(ingest))
+      .then((ingest) => {
+        if (Array.isArray(ingest)) {
+          ingest.sort((a, b) => a.base.localeCompare(b.base));
+        }
+        setIngest(ingest);
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
   useEffect(() => {
@@ -319,6 +324,9 @@ export default () => {
                     </>
                   );
                 })}
+                <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
+                  <hr />
+                </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
