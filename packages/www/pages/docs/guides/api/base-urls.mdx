@@ -10,23 +10,56 @@ There are two types of base URLs: ingest and playback.
 1. The **ingest base URL** is the first part of the (rtmp) ingest URL, used for the broadcaster to ingest the video stream.
 1. The **playback base URL** is the first part of the playback URL, used for the viewers to watch the stream.
 
-Your base URLs are dependent on the location you issue the request from. This is important, because the ingest point should be as close to the broadcaster as possible. Even though the playback base URL references the ingest location, playback will work for your viewers everywhere.
+A base URL pair references hardware in different parts of the world. This is important because the ingest point should be as physically close to the broadcaster as possible. 
 
-You can get the base URLs by calling `https://livepeer.com/api/ingest`. For example:
+For any stream session, you must use the ingest base URL and playback base URL pair from the same region. Even though the playback base URL references the ingest location, playback will work for your viewers everywhere.
+
+### Find the closest ingest point
+
+You can get the base URL pair for the ingest point nearest to you by calling `https://livepeer.com/api/ingest`. For example:
 
 ```bash
 curl "https://livepeer.com/api/ingest"
 ```
 
-And you should get results like
+And you should get results like this:
 
 ```bash
 [
   {
-    ingest: "rtmp://{region}-rtmp.livepeer.com/live",
-    playback: "https://{region}-cdn.livepeer.com/hls"
+    ingest: "rtmp://{nearbyRegion}-rtmp.livepeer.com/live",
+    playback: "https://{nearbyRegion}-cdn.livepeer.com/hls"
   }
 ];
+```
+### Return a list of all base URL pairs
+
+At times, you will want to use a base URL pair of a region different from the one closest to you. You can get a list of all base URL pairs by calling `https://livepeer.com/api/ingest?first=false`. For example:
+
+```bash
+curl "https://livepeer.com/api/ingest?first=false"
+```
+
+And you should get a result similar to this:
+
+```bash
+[
+   {
+      "ingest":"rtmp://{region-1}-rtmp.livepeer.com/live",
+      "playback":"https://{region-1}-cdn.livepeer.com/hls",
+      "base":"https://{region-1}-cdn.livepeer.com"
+   },
+   {
+      "ingest":"rtmp://{region-2}-rtmp.livepeer.com/live",
+      "playback":"https://{region-2}-cdn.livepeer.com/hls",
+      "base":"https://{region-2}-cdn.livepeer.com"
+   },
+   {
+      "ingest":"rtmp://{region-3}-rtmp.livepeer.com/live",
+      "playback":"https://{region-3}-cdn.livepeer.com/hls",
+      "base":"https://{region-3}-cdn.livepeer.com"
+   }
+]
 ```
 
 Next, learn [how to broadcast a live stream with the Livepeer.com API](/docs/guides/api/broadcast-a-live-stream).
