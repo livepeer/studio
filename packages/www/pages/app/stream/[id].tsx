@@ -112,8 +112,13 @@ export default () => {
   const [recordOffModal, setRecordOffModal] = useState(false);
 
   useEffect(() => {
-    getIngest()
-      .then((ingest) => setIngest(ingest))
+    getIngest(true)
+      .then((ingest) => {
+        if (Array.isArray(ingest)) {
+          ingest.sort((a, b) => a.base.localeCompare(b.base));
+        }
+        setIngest(ingest);
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
   useEffect(() => {
@@ -151,13 +156,17 @@ export default () => {
     return <Layout />;
   }
 
-  const getIngestURL = (stream: Stream, showKey: boolean): string => {
+  const getIngestURL = (
+    stream: Stream,
+    showKey: boolean,
+    i: number
+  ): string => {
     const key = showKey ? stream.streamKey : "";
-    return ingest.length ? pathJoin(ingest[0].ingest, key) : key || "";
+    return i < ingest.length ? pathJoin(ingest[i].ingest, key) : key || "";
   };
-  const getPlaybackURL = (stream: Stream): string => {
-    return ingest.length
-      ? pathJoin(ingest[0].base, "hls", `${stream.playbackId}/index.m3u8`)
+  const getPlaybackURL = (stream: Stream, i: number): string => {
+    return i < ingest.length
+      ? pathJoin(ingest[i].base, "hls", `${stream.playbackId}/index.m3u8`)
       : stream.playbackId || "";
   };
   const doSetRecord = async (stream: Stream, record: boolean) => {
@@ -264,43 +273,60 @@ export default () => {
                     </Button>
                   )}
                 </Cell>
-                <Cell>RTMP ingest URL</Cell>
+                <Box></Box>
                 <Cell>
-                  {keyRevealed ? (
-                    <ShowURL
-                      text=""
-                      url={getIngestURL(stream, keyRevealed)}
-                      urlToCopy={getIngestURL(stream, true)}
-                      anchor={false}
-                    />
-                  ) : (
-                    <Flex
-                      sx={{
-                        justifyContent: "flex-start",
-                        alignItems: "center"
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          minWidth: 125,
-                          fontSize: 12,
-                          paddingRight: "1em"
-                        }}
-                      >
-                        {getIngestURL(stream, false)}
-                        <b>stream-key</b>
-                        <i sx={{ ml: "2em" }}>
-                          Reveal your stream key and the full URL via the button
-                          above.
-                        </i>
-                      </Box>
-                    </Flex>
-                  )}
+                  <strong>Ingest and playback URL pairs:</strong>
                 </Cell>
-                <Cell>Playback URL</Cell>
-                <Cell>
-                  <ShowURL text="" url={getPlaybackURL(stream)} anchor={true} />
-                </Cell>
+                {ingest.map((_, i) => {
+                  return (
+                    <>
+                      <Cell>RTMP ingest URL</Cell>
+                      <Cell>
+                        {keyRevealed ? (
+                          <ShowURL
+                            text=""
+                            url={getIngestURL(stream, keyRevealed, i)}
+                            urlToCopy={getIngestURL(stream, true, i)}
+                            anchor={false}
+                          />
+                        ) : (
+                          <Flex
+                            sx={{
+                              justifyContent: "flex-start",
+                              alignItems: "center"
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                minWidth: 125,
+                                fontSize: 12,
+                                paddingRight: "1em"
+                              }}
+                            >
+                              {getIngestURL(stream, false, i)}
+                              <b>stream-key</b>
+                              <i sx={{ ml: "2em" }}>
+                                Reveal your stream key and the full URL via the
+                                button above.
+                              </i>
+                            </Box>
+                          </Flex>
+                        )}
+                      </Cell>
+                      <Cell>Playback URL</Cell>
+                      <Cell>
+                        <ShowURL
+                          text=""
+                          url={getPlaybackURL(stream, i)}
+                          anchor={true}
+                        />
+                      </Cell>
+                    </>
+                  );
+                })}
+                <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
+                  <hr />
+                </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
