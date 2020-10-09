@@ -5,11 +5,13 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to playback a stream configured in the Livepeer.com dashboard
 
-The **playback URL** is listed on the **stream page**, and it is based on the region your stream originates in. For example: https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8. 
+The possible **playback URLs** are listed on the **stream page**. For any stream session, you must use an **RTMP ingest URL** and **playback URL** pair from the same region.
 
-Users can view the live stream with any HLS video player (for example [video.js](https://videojs.github.io/videojs-contrib-hls/)).
+This is how a Livepeer.com playback URL is formatted: `https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`. 
 
 All sessions for a stream have the same **playback URL**.
+
+Users can view the live stream with any HLS video player (for example [video.js](https://videojs.github.io/videojs-contrib-hls/)).
 
 The **playback URL** for RTMP streams is delivered via a content delivery network (CDN). The transcoded video stream automatically switches between the transcoded renditions based on the viewers’ available bandwidth, device performance, and network conditions.
 

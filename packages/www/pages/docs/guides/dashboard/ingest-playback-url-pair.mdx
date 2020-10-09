@@ -1,0 +1,26 @@
+import DocsLayout from "../../../../components/DocsLayout";
+
+<DocsLayout>
+
+
+# How to pick an RTMP ingest and playback URL pair
+
+Your users or your application will need to use two Livepeer.com URLs, an RTMP ingest URL and a playback URL.
+
+1. The RTMP ingest URL is for the broadcaster to ingest the video stream, for example `rtmp://{region}-rtmp.livepeer.com/live/{stream-key}`.
+1. The playback URL is for the viewers to watch the stream, for example `https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+
+An RTMP ingest and playback URL pair references hardware in different parts of the world. This is important because the ingest point should be as physically close to the broadcaster as possible. Each region is three letters, the airport code of the server location. 
+**Use the ingest and playback URL pair in the region closest to your broadcaster.**
+
+For any stream session, **you must use the RTMP ingest URL and playback URL pair from the same region.** Even though the playback URL references the ingest location, playback will work for your viewers everywhere.
+
+### Examples
+FRA is the airport code for Frankfurt International Airport in Germany. Frankfurt is the location of Livepeer.com's ingest server in the EU. Anyone broadcasting from Europe will want to select this RTMP ingest URL and playback URL pair: `rtmp://fra-rtmp.livepeer.com/live/{stream-key}` and `https://fra-cdn.livepeer.com/hls/{playbackId}/index.m3u8`
+
+MDW is the airport code for Chicago Midway International Airport, an airport in the middle of the United States of America. Anyone broadcasting from the Americas would see better performance selecting this RTMP ingest URL and playback URL pair: `rtmp://mdw-rtmp.livepeer.com/live/{stream-key}` and `https://mdw-cdn.livepeer.com/hls/{playbackId}/index.m3u8`
+
+Next, learn about the [specifications on the stream page](/docs/guides/dashboard/stream-page-specifications).
+
+
+</DocsLayout>

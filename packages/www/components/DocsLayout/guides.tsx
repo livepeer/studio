@@ -103,6 +103,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Ingest and playback URL pairs",
+          slug: "/docs/guides/dashboard/ingest-playback-url-pair"
+        },
+        []
+      ],
+      [
+        {
           content: "Stream page specifications",
           slug: "/docs/guides/dashboard/stream-page-specifications"
         },
