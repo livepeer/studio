@@ -273,14 +273,32 @@ export default () => {
                     </Button>
                   )}
                 </Cell>
-                <Box></Box>
-                <Cell>
-                  <strong>Ingest and playback URL pairs:</strong>
-                </Cell>
+                <Box
+                  sx={{ mx: "0.4em", mt: "2em", mb: "0", gridColumn: "1/-1" }}
+                >
+                  <h5>Ingest and playback URL pairs:</h5>
+                </Box>
+                <Box
+                  sx={{
+                    mx: "0.4em",
+                    mt: "0.4em",
+                    mb: "1.5em",
+                    gridColumn: "1/-1"
+                  }}
+                >
+                  <Link
+                    href="/docs/guides/dashboard/ingest-playback-url-pair"
+                    passHref
+                  >
+                    <A target="_blank">
+                      <i>Learn how to pick an ingest and playback URL pair.</i>
+                    </A>
+                  </Link>
+                </Box>
                 {ingest.map((_, i) => {
                   return (
                     <>
-                      <Cell>RTMP ingest URL</Cell>
+                      <Cell>RTMP ingest URL {i + 1}</Cell>
                       <Cell>
                         {keyRevealed ? (
                           <ShowURL
@@ -305,22 +323,30 @@ export default () => {
                             >
                               {getIngestURL(stream, false, i)}
                               <b>stream-key</b>
-                              <i sx={{ ml: "2em" }}>
-                                Reveal your stream key and the full URL via the
-                                button above.
-                              </i>
                             </Box>
                           </Flex>
                         )}
                       </Cell>
-                      <Cell>Playback URL</Cell>
-                      <Cell>
+                      <Box
+                        sx={{
+                          m: "0.4em",
+                          mb: "1.4em"
+                        }}
+                      >
+                        Playback URL {i + 1}
+                      </Box>
+                      <Box
+                        sx={{
+                          m: "0.4em",
+                          mb: "1.4em"
+                        }}
+                      >
                         <ShowURL
                           text=""
                           url={getPlaybackURL(stream, i)}
                           anchor={true}
                         />
-                      </Cell>
+                      </Box>
                     </>
                   );
                 })}
