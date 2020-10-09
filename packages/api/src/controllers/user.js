@@ -601,16 +601,22 @@ app.post(
       })
     }
 
+    // Get all the prices associated with this plan (just transcoding price as of now)
     const items = await stripe.prices.list({
       lookup_keys: products[req.body.stripeProductId].lookupKeys,
     })
-    const subscriptionItems = await stripe.subscriptionItems.list({
-      subscription: req.body.stripeCustomerSubscriptionId,
-    })
+
+    // Get the subscription
     const subscription = await stripe.subscriptions.retrieve(
       req.body.stripeCustomerSubscriptionId,
     )
 
+    // Get the prices associated with the subscription
+    const subscriptionItems = await stripe.subscriptionItems.list({
+      subscription: req.body.stripeCustomerSubscriptionId,
+    })
+
+    // Get the customer's usage
     const usageRes = await db.stream.usage(
       user.id,
       subscription.current_period_start,
@@ -620,29 +626,31 @@ app.post(
       },
     )
 
+    // Update the customer's invoice items based on its usage
     await Promise.all(
       products[user.stripeProductId].usage.map(async (product) => {
         if (product.name === 'Transcoding') {
           let quantity = Math.round(
             (usageRes.sourceSegmentsDuration / 60).toFixed(2),
           )
-
-          const invoice = await stripe.invoiceItems.create({
-            customer: user.stripeCustomerId,
+          await stripe.invoiceItems.create({
+            customer: req.body.stripeCustomerId,
             currency: 'usd',
             unit_amount_decimal: product.price * 100,
+            subscription: req.body.stripeCustomerSubscriptionId,
             quantity,
             description: product.description,
           })
-          return invoice
         }
       }),
     )
 
+    // Update the customer's subscription plan.
+    // Stripe will automatically invoice the customer based on its usage up until this point
     const updatedSubscription = await stripe.subscriptions.update(
       req.body.stripeCustomerSubscriptionId,
       {
-        billing_cycle_anchor: 'now',
+        billing_cycle_anchor: 'now', // reset billing anchor when updating subscription
         items: [
           ...subscriptionItems.data.map((item) => ({
             id: item.id,
@@ -654,7 +662,6 @@ app.post(
             price: item.id,
           })),
         ],
-        expand: ['latest_invoice.payment_intent'],
       },
     )
 
