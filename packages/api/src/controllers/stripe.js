@@ -44,6 +44,10 @@ app.post('/webhook', async (req, res) => {
               customer: user.stripeCustomerId,
               invoice: invoice.id,
               currency: 'usd',
+              period: {
+                start: invoice.period_start,
+                end: invoice.period_end,
+              },
               subscription: user.stripeCustomerSubscriptionId,
               unit_amount_decimal: product.price * 100,
               quantity,

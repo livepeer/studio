@@ -636,6 +636,10 @@ app.post(
           await stripe.invoiceItems.create({
             customer: req.body.stripeCustomerId,
             currency: 'usd',
+            period: {
+              start: subscription.current_period_start,
+              end: subscription.current_period_end,
+            },
             unit_amount_decimal: product.price * 100,
             subscription: req.body.stripeCustomerSubscriptionId,
             quantity,
