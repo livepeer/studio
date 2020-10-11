@@ -102,7 +102,7 @@ const makeContext = (state: ApiState, setState) => {
         window.location.hostname.includes("livepeer.monster") ||
         window.location.hostname.includes("livepeerorg.vercel.app") ||
         window.location.hostname.includes("livepeerorg.now.sh")
-          ? `https://mdw.livepeer.monster/api${url}`
+          ? `https://livepeer.monster/api${url}`
           : `/api${url}`;
       const res = await fetch(endpoint, {
         ...opts,
