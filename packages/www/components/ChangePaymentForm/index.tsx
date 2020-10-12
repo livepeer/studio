@@ -43,21 +43,9 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               }
               return result;
             })
-            // Normalize the result to contain the object returned by Stripe.
-            // Add the additional details we need.
-            .then((result) => {
-              return {
-                paymentMethodId: paymentMethod.id,
-                setupIntent: result.subscriptions.data[0].pending_setup_intent
-              };
-            })
-            // Some payment methods require a customer to be on session
-            // to complete the payment process. Check the status of the
-            // payment intent to handle these actions.
-            .then(handlePaymentThatRequiresCustomerAction)
-            // No more actions required. Provision your service for the user.
             .then(onPaymentChangeComplete)
             .catch((error) => {
+              console.log(error);
               setStatus("error");
             });
         }
@@ -67,39 +55,6 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
   async function onPaymentChangeComplete() {
     setStatus("succeeded");
     onSuccess();
-  }
-
-  function handlePaymentThatRequiresCustomerAction({
-    setupIntent,
-    paymentMethodId
-  }) {
-    if (setupIntent && setupIntent.status === "requires_action") {
-      return stripe
-        .confirmCardSetup(setupIntent.client_secret, {
-          payment_method: paymentMethodId
-        })
-        .then((result) => {
-          if (result.error) {
-            setStatus("error");
-            // start code flow to handle updating the payment details
-            // Display error message in your UI.
-            // The card was declined (i.e. insufficient funds, card has expired, etc)
-            throw result;
-          } else {
-            if (result.setupIntent.status === "succeeded") {
-              // There's a risk of the customer closing the window before callback
-              // execution. To handle this case, set up a webhook endpoint and
-              // listen to setup_intent.succeeded.
-              return {
-                paymentMethodId
-              };
-            }
-          }
-        });
-    } else {
-      // No customer action needed
-      return { paymentMethodId };
-    }
   }
 
   const onSubmit = async (data, e) => {
