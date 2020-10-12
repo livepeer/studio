@@ -396,7 +396,9 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 variant: "primarySmall"
               }}
               onClick={() => {
-                router.push("/contact");
+                router.push(
+                  "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
+                );
               }}
             />
 

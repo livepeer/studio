@@ -7,8 +7,11 @@ import { useForm } from "react-hubspot";
 import Button from "../components/Button";
 import Link from "../components/Link";
 import Prefooter from "../components/Prefooter";
+import { useRouter } from "next/router";
 
 const ContactPage = () => {
+  const { query } = useRouter();
+  console.log(query);
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -99,6 +102,13 @@ const ContactPage = () => {
               label="Organization"
             />
           </Flex>
+          <input name="utm_source" type="hidden" value={query?.utm_source} />
+          <input name="utm_medium" type="hidden" value={query?.utm_medium} />
+          <input
+            name="utm_campaign"
+            type="hidden"
+            value={query?.utm_campaign}
+          />
           <Textfield
             htmlFor="message"
             id="message"
