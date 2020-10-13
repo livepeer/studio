@@ -124,7 +124,7 @@ app.post('/migrate-users', async (req, res) => {
       })
 
       // sleep for a 200 ms to get around stripe rate limits
-      await sleep(500)
+      await sleep(200)
     }
   }
   res.json(users)
