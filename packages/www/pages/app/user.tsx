@@ -29,7 +29,6 @@ export function getTabs(i: number): Array<TabType> {
   ];
 
   // hide tabs that interact with stripe if it's not enabled in dev mode
-  console.log(process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE);
   if (
     PHASE_DEVELOPMENT_SERVER &&
     !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
