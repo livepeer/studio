@@ -451,8 +451,9 @@ app.post(
     const customer = await stripe.customers.create({
       email: req.body.email,
     })
-    user = { ...user, stripeCustomerId: customer.id }
-    await req.store.replace(user)
+    await db.user.update(user.id, {
+      stripeCustomerId: customer.id,
+    })
     res.status(201)
     res.json(customer)
   },
@@ -487,13 +488,11 @@ app.post(
     })
 
     // Update user's payment method
-    user = {
-      ...user,
+    await db.user.update(user.id, {
       stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
       ccLast4: paymentMethod.card.last4,
       ccBrand: paymentMethod.card.brand,
-    }
-    await req.store.replace(user)
+    })
     res.json(customer)
   },
 )
@@ -523,12 +522,11 @@ app.post(
           },
         )
         // Update user's payment method
-        user = {
-          ...user,
+        await db.user.update(user.id, {
           stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
-        }
+        })
       } catch (error) {
         return res.status('402').send({ error: { message: error.message } })
       }
@@ -555,13 +553,10 @@ app.post(
     })
 
     // Update user's product and subscription id in our db
-    user = {
-      ...user,
+    await db.user.update(user.id, {
       stripeProductId: req.body.stripeProductId,
       stripeCustomerSubscriptionId: subscription.id,
-    }
-    await req.store.replace(user)
-
+    })
     res.send(subscription)
   },
 )
@@ -591,12 +586,11 @@ app.post(
           },
         )
         // Update user's payment method in our db
-        user = {
-          ...user,
+        await db.user.update(user.id, {
           stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
-        }
+        })
       } catch (error) {
         return res.status('402').send({ error: { message: error.message } })
       }
@@ -678,9 +672,9 @@ app.post(
     )
 
     // Update user's product subscription in our db
-    user = { ...user, stripeProductId: req.body.stripeProductId }
-    await req.store.replace(user)
-
+    await db.user.update(user.id, {
+      stripeProductId: req.body.stripeProductId,
+    })
     res.send(updatedSubscription)
   },
 )

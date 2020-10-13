@@ -116,14 +116,12 @@ app.post('/migrate-users', async (req, res) => {
       })
 
       // Update user's customer, product, subscription, and payment id in our db
-      user = {
-        ...user,
+      await db.user.update(user.id, {
         stripeCustomerId: customer.id,
         stripeProductId: 'prod_0',
         stripeCustomerSubscriptionId: subscription.id,
         stripeCustomerPaymentMethodId: null,
-      }
-      await req.store.replace(user)
+      })
 
       // sleep for a half a second to get around stripe rate limits
       await sleep(500)
