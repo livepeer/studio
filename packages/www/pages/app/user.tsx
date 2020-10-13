@@ -5,7 +5,6 @@ import StreamsTable from "../../components/StreamsTable";
 import TabbedLayout from "../../components/TabbedLayout";
 import { TabType } from "../../components/Tabs";
 import { Box, Container, Heading } from "@theme-ui/components";
-import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 export function getTabs(i: number): Array<TabType> {
   let tabs: Array<TabType> = [
@@ -29,7 +28,7 @@ export function getTabs(i: number): Array<TabType> {
 
   // hide tabs that interact with stripe if it's not enabled in dev mode
   if (
-    PHASE_DEVELOPMENT_SERVER === "phase-development-server" &&
+    process.env.NODE_ENV === "development" &&
     !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
   ) {
     tabs = [
