@@ -10,18 +10,18 @@ import { UserName } from "../AdminTokenTable";
 import { Stream, User } from "@livepeer.com/api";
 
 function dur2str(dur?: number) {
-    if (!dur) {
-        return ''
-    }
-    if (dur < 120) {
-      return `${dur.toFixed(2)} sec`
-    }
-    const min = dur/60;
-    if (min < 12) {
-      return `${min.toFixed(2)} min`
-    }
-    const hour = min/60;
-    return `${hour.toFixed(2)} hours`
+  if (!dur) {
+    return "";
+  }
+  if (dur < 120) {
+    return `${dur.toFixed(2)} sec`;
+  }
+  const min = dur / 60;
+  if (min < 12) {
+    return `${min.toFixed(2)} min`;
+  }
+  const hour = min / 60;
+  return `${hour.toFixed(2)} hours`;
 }
 
 const Segments = ({ stream }: { stream: Stream }) => {
@@ -40,9 +40,10 @@ const Segments = ({ stream }: { stream: Stream }) => {
       <span data-tip data-for={`tooltip-${idpref}`}>
         {stream.sourceSegments || 0}/{stream.transcodedSegments || 0}
       </span>
-      <br/>
-      <span >
-        {dur2str(stream.sourceSegmentsDuration || 0)}/{dur2str(stream.transcodedSegmentsDuration || 0)}
+      <br />
+      <span>
+        {dur2str(stream.sourceSegmentsDuration || 0)}/
+        {dur2str(stream.transcodedSegmentsDuration || 0)}
       </span>
     </Box>
   );
@@ -198,7 +199,7 @@ export default ({ id }: { id: string }) => {
           </a>
         </Link>
         <Button
-          variant="secondarySmall"
+          variant="primarySmall"
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}

@@ -85,6 +85,7 @@
     "source-map-support": "^0.5.19",
     "sql-template-strings": "^2.2.2",
     "string-template": "^1.0.0",
+    "stripe": "^8.93.0",
     "uuid": "^3.3.2",
     "whatwg-fetch": "^3.4.0",
     "winston": "^3.2.1",

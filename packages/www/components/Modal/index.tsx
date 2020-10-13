@@ -34,9 +34,10 @@ export default ({ children, onClose, maxWidth = "500px" }) => {
           borderRadius: 6,
           backgroundColor: "white",
           padding: [4, 4],
-          maxWidth,
+          width: "100%",
+          maxWidth
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </Box>

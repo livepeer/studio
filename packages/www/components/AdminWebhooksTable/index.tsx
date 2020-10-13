@@ -39,7 +39,7 @@ const DeleteWebhookModal = ({
         >
           Cancel
         </Button>
-        <Button type="button" variant="secondarySmall" onClick={onDelete}>
+        <Button type="button" variant="primarySmall" onClick={onDelete}>
           Delete
         </Button>
       </Flex>
@@ -259,7 +259,7 @@ export default ({ id }: { id: string }) => {
             </Button>
             <Button
               type="button"
-              variant="secondarySmall"
+              variant="primarySmall"
               onClick={doCreateWebhook}
             >
               Create
@@ -295,7 +295,7 @@ export default ({ id }: { id: string }) => {
           Create
         </Button>
         <Button
-          variant="secondarySmall"
+          variant="primarySmall"
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}

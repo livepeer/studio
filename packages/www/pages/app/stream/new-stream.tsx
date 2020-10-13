@@ -86,7 +86,8 @@ export default () => {
             })
               .then((newStream) => {
                 setCreating(false);
-                const query = router.query.admin === "true" ? { admin: true } : {};
+                const query =
+                  router.query.admin === "true" ? { admin: true } : {};
                 router.replace({
                   pathname: `/app/stream/${newStream.id}`,
                   query
@@ -106,7 +107,7 @@ export default () => {
             onChange={(e) => setStreamName(e.target.value)}
             placeholder="new-stream-name-123"
           />
-          <Box sx={{ fontSize: 1, color: "listText" }}>
+          <Box sx={{ fontSize: 1, color: "offBlack" }}>
             (a-z, A-Z, 0-9, -, _, ~ only)
           </Box>
 

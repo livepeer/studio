@@ -7,16 +7,42 @@ import { TabType } from "../../components/Tabs";
 import { Box, Container, Heading } from "@theme-ui/components";
 
 export function getTabs(i: number): Array<TabType> {
-  const tabs: Array<TabType> = [
+  let tabs: Array<TabType> = [
     {
       name: "Streams",
-      href: "/app/user",
+      href: "/app/user"
     },
     {
       name: "API Keys",
-      href: "/app/user/keys",
+      href: "/app/user/keys"
     },
+    {
+      name: "Usage",
+      href: "/app/user/usage"
+    },
+    {
+      name: "Plans",
+      href: "/app/user/plans"
+    }
   ];
+
+  // hide tabs that interact with stripe if it's not enabled in dev mode
+  if (
+    process.env.NODE_ENV === "development" &&
+    !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+  ) {
+    tabs = [
+      {
+        name: "Streams",
+        href: "/app/user"
+      },
+      {
+        name: "API Keys",
+        href: "/app/user/keys"
+      }
+    ];
+  }
+
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }
 
@@ -26,6 +52,7 @@ export default () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
+  console.log(user);
   const tabs = getTabs(0);
 
   return (

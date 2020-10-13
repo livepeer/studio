@@ -240,7 +240,7 @@ export default ({ userId, id }: { userId: string; id: string }) => {
           </A>
         </Link>
         <Button
-          variant="secondarySmall"
+          variant="primarySmall"
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           onClick={() => selectedStream && setDeleteModal(true)}

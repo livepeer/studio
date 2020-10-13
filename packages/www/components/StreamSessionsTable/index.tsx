@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Container, Flex } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
-import { Stream } from "@livepeer.com/api";
-import { RelativeTime, RenditionsDetails } from "../StreamsTable";
+import { RelativeTime } from "../StreamsTable";
 import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
@@ -68,13 +67,13 @@ export const RecordingURL = ({
                 cursor: "pointer",
                 width: 14,
                 height: 14,
-                color: "listText"
+                color: "offBlack"
               }}
             />
           </Flex>
         </CopyToClipboard>
       ) : null}
-      {!!isCopied && <Box sx={{ fontSize: 12, color: "listText" }}>Copied</Box>}
+      {!!isCopied && <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>}
     </Flex>
   );
 };
@@ -133,13 +132,7 @@ const StreamSessionsTable = ({
           {user.admin ? <Box>Papertrail</Box> : null}
         </TableRow>
         {streamsSessions.map((stream) => {
-          const {
-            id,
-            lastSeen,
-            createdAt,
-            sourceSegments,
-            transcodedSegments
-          } = stream;
+          const { id, lastSeen, createdAt } = stream;
           return (
             <TableRow key={id} selectable={false} textSelectable={true}>
               <RelativeTime

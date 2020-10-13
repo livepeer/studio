@@ -17,13 +17,17 @@ const Container = ({ children }) => (
 export default () => {
   useLoggedIn();
   const router = useRouter();
-  const { verify, user, logout } = useApi();
-  const { email, emailValidToken } = router.query;
+  const { verify, user } = useApi();
+  const { email, emailValidToken, selectedPlan } = router.query;
 
   useEffect(() => {
     if (email && emailValidToken) {
       verify(email, emailValidToken).then(() => {
-        router.replace("/app/user");
+        if (selectedPlan === "1") {
+          router.replace("/app/user/plans?promptUpgrade=true");
+        } else {
+          router.replace("/app/user");
+        }
       });
     }
   }, [email, emailValidToken]);
@@ -36,7 +40,22 @@ export default () => {
   }, [user]);
 
   if (email && emailValidToken) {
-    return <Container>Verifying...</Container>;
+    return (
+      <Container>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            height: "calc(100vh - 280px)",
+            mb: 65
+          }}
+        >
+          Verifying...
+        </Flex>
+      </Container>
+    );
   }
   return (
     <Container>

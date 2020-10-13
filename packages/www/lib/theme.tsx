@@ -25,18 +25,18 @@ export const theme = {
     heading: 1.125
   },
   colors: {
-    text: "#000",
-    background: "#fff",
+    text: "#000000",
+    background: "#ffffff",
     primary: "#943CFF",
-    secondary: "#FAF5EF",
-    accent: "#00EB88",
     muted: "#eaeaea",
     gray: "#525252",
     lightGray: "#919191",
     ultraLightGray: "#E6E6E6",
-    listText: "#666666",
-    extremelyBlue: "#3F3FE2"
+    offBlack: "#666666",
+    extremelyBlue: "#3F3FE2",
+    red: "#ef2961"
   },
+
   breakpoints: ["640px", "832px", "1024px", "1280px"],
   buttons: {
     default: {
@@ -46,7 +46,7 @@ export const theme = {
       borderStyle: "solid",
       bg: "initial",
       display: "inline-block",
-      borderRadius: 4,
+      borderRadius: 6,
       lineHeight: 1.4,
       letterSpacing: ".5px",
       fontWeight: 600,
@@ -60,10 +60,7 @@ export const theme = {
       ":disabled": {
         cursor: "not-allowed",
         backgroundColor: "muted",
-        color: "listText",
-        borderWidth: "1px",
-        borderColor: "listText",
-        borderStyle: "solid",
+        color: "offBlack",
         opacity: 0.6,
         ":hover": {
           backgroundColor: "muted"
@@ -86,18 +83,36 @@ export const theme = {
     },
     secondary: {
       variant: "buttons.default",
-      color: "background",
-      bg: "primary",
+      color: "text",
+      bg: "background",
       borderWidth: "1px",
-      borderColor: "primary",
+      borderColor: "transparent",
       borderStyle: "solid",
       transition: "background-color .15s",
       "&:hover": {
-        bg: "#761EE1"
+        bg: "rgba(255, 255, 255, .8)"
       },
       ":focus": {
         outline: "none",
-        boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
+        boxShadow: "0px 0px 0px 3px rgba(0, 0, 0, 0.3)"
+      }
+    },
+    tertiary: {
+      variant: "buttons.default",
+      color: "background",
+      bg: "text",
+      borderWidth: "1px",
+      borderColor: "transparent",
+      borderStyle: "solid",
+      transition: "background-color .15s",
+      "&:hover": {
+        bg: "transparent",
+        borderColor: "text",
+        color: "text"
+      },
+      ":focus": {
+        outline: "none",
+        boxShadow: "0px 0px 0px 3px rgba(0, 0, 0, 0.3)"
       }
     },
     outline: {
@@ -126,19 +141,37 @@ export const theme = {
       variant: "buttons.outline",
       fontSize: 14,
       px: 3,
-      py: "6px"
+      py: "8px"
     },
     primarySmall: {
       variant: "buttons.primary",
       fontSize: 14,
       px: 3,
-      py: "6px"
+      py: "8px"
     },
     secondarySmall: {
       variant: "buttons.secondary",
       fontSize: 14,
       px: 3,
-      py: "6px"
+      py: "8px"
+    },
+    tertiarySmall: {
+      variant: "buttons.tertiary",
+      fontSize: 14,
+      px: 3,
+      py: "8px"
+    },
+    gradientOutlineSmall: {
+      variant: "buttons.outlineSmall",
+      color: "#fff",
+      border: "2px solid #943CFF",
+      letterSpacing: "0",
+      display: "flex",
+      alignItems: "center",
+      background: "linear-gradient(-131deg, #ef00ff 0%, #7300ff 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      marginRight: "30px"
     },
     icon: {
       ":focus": {
@@ -151,7 +184,7 @@ export const theme = {
     input: {
       py: 2,
       px: 3,
-      borderColor: "listText",
+      borderColor: "offBlack",
       borderRadius: 4
     }
   },

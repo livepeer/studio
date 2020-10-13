@@ -186,7 +186,7 @@ export default ({ id }: TokenTableProps) => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" variant="secondarySmall">
+                <Button type="submit" variant="primarySmall">
                   Create Token
                 </Button>
               </Flex>
@@ -215,7 +215,7 @@ export default ({ id }: TokenTableProps) => {
                 }}
               >
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>
-                <Button type="button" variant="secondarySmall" onClick={close}>
+                <Button type="button" variant="primarySmall" onClick={close}>
                   Close
                 </Button>
               </Flex>
@@ -238,7 +238,7 @@ export default ({ id }: TokenTableProps) => {
             </Button>
             <Button
               type="button"
-              variant="secondarySmall"
+              variant="primarySmall"
               onClick={() => {
                 deleteApiToken(selectedToken.id).then(close);
               }}
@@ -259,7 +259,7 @@ export default ({ id }: TokenTableProps) => {
           Create
         </Button>
         <Button
-          variant="secondarySmall"
+          variant="primarySmall"
           disabled={!selectedToken}
           sx={{ margin: 2, mb: 4 }}
           onClick={() => selectedToken && setDeleteModal(true)}

@@ -1,26 +1,14 @@
 import { useEffect, useState } from "react";
-import { useApi, usePageVisibility } from "../../hooks";
-import {
-  Select,
-  Container,
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Input
-} from "@theme-ui/components";
-import Modal from "../Modal";
-import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
-import { RelativeTime } from "../StreamsTable";
-import { UserName } from "../AdminTokenTable";
-import { User, Webhook } from "@livepeer.com/api";
+import { useApi } from "../../hooks";
+import { Select, Container, Box, Button, Input } from "@theme-ui/components";
+import { Table, TableRow, TableRowVariant } from "../Table";
 
 function dur2str(dur?: number) {
-    if (!dur) {
-        return ''
-    }
-    const min = dur/60;
-    return `${dur} sec (${min} min)`
+  if (!dur) {
+    return "";
+  }
+  const min = dur / 60;
+  return `${dur} sec (${min} min)`;
 }
 
 export default ({ id }: { id: string }) => {
@@ -115,10 +103,7 @@ export default ({ id }: { id: string }) => {
           <Box>Source segments</Box>
           <Box>Transcoded segments</Box>
         </TableRow>
-        <TableRow
-          key="just one row for now"
-          variant={TableRowVariant.Normal}
-        >
+        <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
           <Box></Box>
           <Box>{dur2str(usage && usage.sourceSegmentsDuration)}</Box>
           <Box>{dur2str(usage && usage.transcodedSegmentsDuration)}</Box>

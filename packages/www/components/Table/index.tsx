@@ -8,13 +8,13 @@ type TableProps = {
 
 export const Table: FunctionComponent<TableProps> = ({
   className = null,
-  children,
+  children
 }) => {
   return (
     <Box
       sx={{
         display: "grid",
-        alignItems: "space-around",
+        alignItems: "space-around"
       }}
       className={className}
     >
@@ -35,52 +35,58 @@ export const TableCell: FunctionComponent<TableCellProps> = (props) => {
     ...props.sx,
     backgroundColor: "transparent",
     py: 3,
-    px: 3,
-    color: "listText",
+    px: 4,
+    display: "flex",
+    alignItems: "center",
+    fontSize: 1
   } as SxStyleProp;
   if (selected) {
     // @ts-ignore
     sx = {
-      ...sx,
-      // backgroundColor: "muted"
+      ...sx
     };
   }
   if (variant === TableRowVariant.Header) {
     sx = {
       ...sx,
-      fontVariant: "all-small-caps",
-      backgroundColor: "muted",
-      borderBottom: "1px solid muted",
-      borderTop: "1px solid muted",
+      textTransform: "uppercase",
+      bg: "rgba(0,0,0,.03)",
+      borderBottom: "1px solid",
+      borderTop: "1px solid",
+      borderColor: "muted",
+      fontSize: 0,
+      color: "gray",
       py: 2,
       "&:first-of-type": {
-        borderLeft: "1px solid muted",
+        borderLeft: "1px solid",
+        borderColor: "muted",
         borderTopLeftRadius: 6,
-        borderBottomLeftRadius: 6,
+        borderBottomLeftRadius: 6
       },
       "&:last-of-type": {
-        borderRight: "1px solid muted",
+        borderRight: "1px solid",
+        borderColor: "muted",
         borderTopRightRadius: 6,
-        borderBottomRightRadius: 6,
-      },
+        borderBottomRightRadius: 6
+      }
     };
   } else if (variant === TableRowVariant.Normal) {
     sx = {
       ...sx,
       borderBottomColor: "muted",
       borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
+      borderBottomStyle: "solid"
     };
   } else if (variant === TableRowVariant.ComplexTop) {
     sx = {
       ...sx,
-      paddingBottom: 0,
+      paddingBottom: 0
     };
   } else if (variant === TableRowVariant.ComplexMiddle) {
     sx = {
       ...sx,
       paddingBottom: 0,
-      paddingTop: 0,
+      paddingTop: 0
     };
   } else if (variant === TableRowVariant.ComplexBottom) {
     sx = {
@@ -88,7 +94,7 @@ export const TableCell: FunctionComponent<TableCellProps> = (props) => {
       paddingTop: 0,
       borderBottomColor: "muted",
       borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
+      borderBottomStyle: "solid"
     };
   }
   return <Box sx={sx}>{children}</Box>;
@@ -99,7 +105,7 @@ export enum TableRowVariant {
   Normal = "normal",
   ComplexTop = "complexTop",
   ComplexMiddle = "complexMiddle",
-  ComplexBottom = "complexBottom",
+  ComplexBottom = "complexBottom"
 }
 
 type TableRowProps = {
@@ -118,7 +124,7 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
   selectable = true,
   textSelectable = false,
   sx = null,
-  onClick = () => {},
+  onClick = () => {}
 }) => {
   return (
     <Box
@@ -132,9 +138,9 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
         userSelect: textSelectable ? "auto" : "none",
         "&:last-of-type": {
           ">div": {
-            borderBottomStyle: "none",
-          },
-        },
+            borderBottomStyle: "none"
+          }
+        }
       }}
     >
       {Array.isArray(children) ? (
@@ -166,7 +172,7 @@ export const Checkbox = ({ value }: { value: boolean }) => {
           borderWidth: "1px",
           borderRadius: "3px",
           borderStyle: "solid",
-          borderColor: "primary",
+          borderColor: "primary"
         }}
       ></Box>
     </Flex>

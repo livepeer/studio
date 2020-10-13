@@ -78,12 +78,12 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               cursor: "pointer",
               width: 14,
               height: 14,
-              color: "listText"
+              color: "offBlack"
             }}
           />
         </Flex>
       </CopyToClipboard>
-      {!!isCopied && <Box sx={{ fontSize: 12, color: "listText" }}>Copied</Box>}
+      {!!isCopied && <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>}
     </Flex>
   );
 };
@@ -409,7 +409,7 @@ export default () => {
                         >
                           <p>
                             When checked, transcoded streaming sessions will be
-                            recorded and stored by Livepeer.
+                            recorded and stored by Livepeer.com.
                             <br /> Each recorded session will have a recording
                             .m3u8 URL for playback. <br />
                             This feature is currently in beta and free.

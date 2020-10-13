@@ -4,7 +4,14 @@ import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
 import { QueryArrayResult, QueryResult } from 'pg'
 
-import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions, DBLegacyObject } from './types'
+import {
+  TableSchema,
+  GetOptions,
+  DBObject,
+  FindQuery,
+  FindOptions,
+  DBLegacyObject,
+} from './types'
 
 export default class Table<T extends DBObject> {
   db: DB
@@ -85,7 +92,7 @@ export default class Table<T extends DBObject> {
     if (useReplica) {
       res = await this.db.replicaQuery(q)
     } else {
-      res = this.db.query(q)
+      res = await this.db.query(q)
     }
 
     const docs = res.rows.map(({ data }) => data)
@@ -117,6 +124,19 @@ export default class Table<T extends DBObject> {
       `UPDATE ${this.name} SET data = $1 WHERE id = $2`,
       [JSON.stringify(doc), doc.id],
     )
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`${this.name} id=${doc.id} not found`)
+    }
+  }
+
+  async update(id: string, doc: T) {
+    const q = sql`UPDATE `.append(this.name).append(sql`
+      SET data = data || ${JSON.stringify(doc)}
+      WHERE id = ${id}
+    `)
+
+    const res = await this.db.query(q)
 
     if (res.rowCount < 1) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`)
