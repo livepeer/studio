@@ -123,7 +123,7 @@ app.post('/migrate-users', async (req, res) => {
         stripeCustomerPaymentMethodId: null,
       })
 
-      // sleep for a half a second to get around stripe rate limits
+      // sleep for a 200 ms to get around stripe rate limits
       await sleep(500)
     }
   }
