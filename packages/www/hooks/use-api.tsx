@@ -180,7 +180,7 @@ const makeContext = (state: ApiState, setState) => {
 
       // Only create stripe customer if developer explicitly enables stripe in dev mode
       if (
-        PHASE_DEVELOPMENT_SERVER &&
+        PHASE_DEVELOPMENT_SERVER === "phase-development-server" &&
         !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
       ) {
         return context.login(email, password);
