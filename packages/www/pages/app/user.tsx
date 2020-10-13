@@ -5,9 +5,11 @@ import StreamsTable from "../../components/StreamsTable";
 import TabbedLayout from "../../components/TabbedLayout";
 import { TabType } from "../../components/Tabs";
 import { Box, Container, Heading } from "@theme-ui/components";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
+PHASE_DEVELOPMENT_SERVER && !process.env.STRIPE_ENABLED_IN_DEV_MODE;
 export function getTabs(i: number): Array<TabType> {
-  const tabs: Array<TabType> = [
+  let tabs: Array<TabType> = [
     {
       name: "Streams",
       href: "/app/user"
@@ -25,6 +27,25 @@ export function getTabs(i: number): Array<TabType> {
       href: "/app/user/plans"
     }
   ];
+
+  // hide tabs that interact with stripe if it's not enabled in dev mode
+  console.log(process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE);
+  if (
+    PHASE_DEVELOPMENT_SERVER &&
+    !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+  ) {
+    tabs = [
+      {
+        name: "Streams",
+        href: "/app/user"
+      },
+      {
+        name: "API Keys",
+        href: "/app/user/keys"
+      }
+    ];
+  }
+
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }
 

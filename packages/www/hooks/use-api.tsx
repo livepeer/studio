@@ -9,6 +9,7 @@ import {
   Webhook
 } from "@livepeer.com/api";
 import qs from "qs";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -176,6 +177,15 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 201) {
         return body;
       }
+
+      // Only create stripe customer if developer explicitly enables stripe in dev mode
+      if (
+        PHASE_DEVELOPMENT_SERVER &&
+        !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+      ) {
+        return context.login(email, password);
+      }
+
       // Create stripe customer
       const customer: any = await context.createCustomer(email);
 
