@@ -453,7 +453,7 @@ app.patch('/:id/record', authMiddleware({}), async (req, res) => {
   console.log(`set stream ${id} record ${req.body.record}`)
 
   stream.record = !!req.body.record
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, { record: !!req.body.record })
 
   res.status(204)
   res.end()
@@ -514,7 +514,7 @@ app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
     isPlaybackid,
     isSession,
     isStreamKey,
-    user
+    user,
   }
 
   res.status(200)
