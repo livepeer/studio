@@ -138,8 +138,6 @@ export default class Table<T extends DBObject> {
 
     const res = await this.db.query(q)
 
-    console.log(res)
-
     if (res.rowCount < 1) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`)
     }
