@@ -524,6 +524,7 @@ components:
           example: prod_0
         stripeCustomerId:
           type: string
+          unique: true
           example: cus_Jv6KvgT0DCH8HU
         stripeCustomerPaymentMethodId:
           type: string

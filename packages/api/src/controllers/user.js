@@ -87,10 +87,10 @@ app.post('/', validatePost('user'), async (req, res) => {
       admin: false,
       emailValidToken: emailValidToken,
       emailValid: validUser,
-      ...(firstName && { firstName }),
-      ...(lastName && { lastName }),
-      ...(organization && { organization }),
-      ...(phone && { phone }),
+      firstName,
+      lastName,
+      organization,
+      phone,
     }),
     trackAction(
       id,
@@ -438,28 +438,23 @@ app.post(
   '/create-customer',
   validatePost('create-customer'),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: 'user',
-      query: { email: req.body.email },
-    })
-    if (userIds.length < 1) {
+    const [users] = await db.user.find(
+      { email: req.body.email },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
       res.status(404)
       return res.json({ errors: ['user not found'] })
     }
 
-    let user = await req.store.get(`user/${userIds[0]}`, false)
-    if (user) {
-      const customer = await stripe.customers.create({
-        email: req.body.email,
-      })
-      user = { ...user, stripeCustomerId: customer.id }
-      await req.store.replace(user)
-      res.status(201)
-      res.json(customer)
-    } else {
-      res.status(403)
-      res.json({ errors: ['customer not created'] })
-    }
+    let user = users[0]
+    const customer = await stripe.customers.create({
+      email: req.body.email,
+    })
+    user = { ...user, stripeCustomerId: customer.id }
+    await req.store.replace(user)
+    res.status(201)
+    res.json(customer)
   },
 )
 
@@ -467,12 +462,16 @@ app.post(
   '/update-customer-payment-method',
   validatePost('update-customer-payment-method'),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: 'user',
-      query: { stripeCustomerId: req.body.stripeCustomerId },
-    })
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
 
-    let user = await req.store.get(`user/${userIds[0]}`, false)
+    let user = users[0]
 
     const paymentMethod = await stripe.paymentMethods.attach(
       req.body.stripeCustomerPaymentMethodId,
@@ -503,12 +502,16 @@ app.post(
   '/create-subscription',
   validatePost('create-subscription'),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: 'user',
-      query: { stripeCustomerId: req.body.stripeCustomerId },
-    })
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
 
-    let user = await req.store.get(`user/${userIds[0]}`, false)
+    let user = users[0]
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (req.body.stripeCustomerPaymentMethodId) {
@@ -567,11 +570,16 @@ app.post(
   '/update-subscription',
   validatePost('update-subscription'),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: 'user',
-      query: { stripeCustomerId: req.body.stripeCustomerId },
-    })
-    let user = await req.store.get(`user/${userIds[0]}`, false)
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
+
+    let user = users[0]
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (req.body.stripeCustomerPaymentMethodId) {
@@ -676,5 +684,23 @@ app.post(
     res.send(updatedSubscription)
   },
 )
+
+app.post('/retrieve-subscription', async (req, res) => {
+  let { stripeCustomerSubscriptionId } = req.body
+  const subscription = await stripe.subscriptions.retrieve(
+    stripeCustomerSubscriptionId,
+  )
+  res.status(200)
+  res.json(subscription)
+})
+
+app.post('/retrieve-invoices', async (req, res) => {
+  let { stripeCustomerId } = req.body
+  const invoices = await stripe.invoices.list({
+    customer: stripeCustomerId,
+  })
+  res.status(200)
+  res.json(invoices)
+})
 
 export default app

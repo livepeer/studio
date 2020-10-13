@@ -46,10 +46,10 @@ const Login = ({
           onSubmit({
             email,
             password: hashedPassword,
-            ...(firstName && { firstName }),
-            ...(lastName && { lastName }),
-            ...(organization && { organization }),
-            ...(phone && { phone })
+            firstName,
+            lastName,
+            organization,
+            phone
           });
         }}
         sx={{

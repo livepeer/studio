@@ -356,22 +356,33 @@ const makeContext = (state: ApiState, setState) => {
       stripeCustomerSubscriptionId: string
     ): Promise<[Response, ApiError]> {
       let [res, subscription] = await context.fetch(
-        `/stripe/retrieve-subscription?${qs.stringify({
-          stripeCustomerSubscriptionId
-        })}`,
-        {}
+        `/user/retrieve-subscription`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripeCustomerSubscriptionId
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        }
       );
 
       return [res, subscription];
     },
 
     async getInvoices(stripeCustomerId: string): Promise<[Response, ApiError]> {
-      let [res, invoices] = await context.fetch(
-        `/stripe/retrieve-invoices?${qs.stringify({ stripeCustomerId })}`,
-        {}
-      );
+      let [res, invoice] = await context.fetch(`/user/retrieve-invoices`, {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
 
-      return [res, invoices];
+      return [res, invoice];
     },
 
     async updateCustomerPaymentMethod({

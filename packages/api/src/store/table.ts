@@ -4,7 +4,14 @@ import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
 import { QueryArrayResult, QueryResult } from 'pg'
 
-import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions, DBLegacyObject } from './types'
+import {
+  TableSchema,
+  GetOptions,
+  DBObject,
+  FindQuery,
+  FindOptions,
+  DBLegacyObject,
+} from './types'
 
 export default class Table<T extends DBObject> {
   db: DB
@@ -85,7 +92,7 @@ export default class Table<T extends DBObject> {
     if (useReplica) {
       res = await this.db.replicaQuery(q)
     } else {
-      res = this.db.query(q)
+      res = await this.db.query(q)
     }
 
     const docs = res.rows.map(({ data }) => data)
