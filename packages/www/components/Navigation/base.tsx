@@ -185,7 +185,8 @@ const NavigationBase = ({
             sx={{
               color: "black",
               display: ["flex", "flex", "none"],
-              fontSize: 6
+              fontSize: 6,
+              flexShrink: 0
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >
