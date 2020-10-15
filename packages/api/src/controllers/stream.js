@@ -630,8 +630,15 @@ app.post('/hook', async (req, res) => {
     recordObjectStore = ros.url
   }
 
+  // Use our parents' playbackId for sharded playback
+  let manifestID = streamId
+  if (stream.parentId) {
+    const parent = await db.stream.get(stream.parentId)
+    manifestID = parent.playbackId
+  }
+
   res.json({
-    manifestID: streamId,
+    manifestID: manifestID,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
