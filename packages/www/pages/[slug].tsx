@@ -1,21 +1,36 @@
 import Fade from "react-reveal/Fade";
 import Layout from "../components/Layout";
+import DefaultError from "../components/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 import { getComponent } from "../lib/utils";
 import { useRouter } from "next/router";
-import { Spinner } from "@theme-ui/components";
+import { Spinner, Box } from "@theme-ui/components";
 
 const Page = ({ title, content, noindex = false, preview }) => {
   const router = useRouter();
   if (router.isFallback) {
     return (
       <Layout>
-        <Spinner />
+        <Box
+          sx={{
+            py: 5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Spinner />
+        </Box>
       </Layout>
     );
   }
+
+  if (!content || !title) {
+    return <DefaultError />;
+  }
+
   return (
     <Layout
       title={`${title} - Livepeer.com`}
