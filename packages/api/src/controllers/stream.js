@@ -631,7 +631,7 @@ app.post('/hook', async (req, res) => {
   }
 
   res.json({
-    manifestId: streamId,
+    manifestID: streamId,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
