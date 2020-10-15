@@ -221,7 +221,8 @@ app.post(
       return res.json({ errors: ['not found'] })
     }
 
-    const id = uuid()
+    // The first four letters of our playback id are the shard key.
+    const id = stream.playbackId.slice(0, 4) + uuid().slice(4)
     const createdAt = Date.now()
 
     const doc = wowzaHydrate({
@@ -265,11 +266,16 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
   }
   const id = uuid()
   const createdAt = Date.now()
-  const streamKey = await generateUniqueStreamKey(req.store, [])
+  let streamKey = await generateUniqueStreamKey(req.store, [])
   // Mist doesn't allow dashes in the URLs
-  const playbackId = (
+  let playbackId = (
     await generateUniqueStreamKey(req.store, [streamKey])
   ).replace(/-/g, '')
+
+  // use the first four characters of the id as the "shard key" across all identifiers
+  const shardKey = id.slice(0, 4)
+  streamKey = shardKey + streamKey.slice(4)
+  playbackId = shardKey + playbackId.slice(4)
 
   let objectStoreId
   if (req.body.objectStoreId) {
