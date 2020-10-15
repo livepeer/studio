@@ -418,16 +418,20 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     }
   }
 
-  stream.isActive = req.body.active
+  stream.isActive = !!req.body.active
   stream.lastSeen = +new Date()
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, {
+    isActive: stream.isActive,
+    lastSeen: stream.lastSeen,
+  })
 
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false)
     if (pStream && !pStream.deleted) {
-      pStream.isActive = req.body.active
-      pStream.lastSeen = stream.lastSeen
-      await req.store.replace(pStream)
+      await db.stream.update(pStream.id, {
+        isActive: stream.isActive,
+        lastSeen: stream.lastSeen,
+      })
     }
   }
 
@@ -452,7 +456,6 @@ app.patch('/:id/record', authMiddleware({}), async (req, res) => {
   }
   console.log(`set stream ${id} record ${req.body.record}`)
 
-  stream.record = !!req.body.record
   await db.stream.update(stream.id, { record: !!req.body.record })
 
   res.status(204)
@@ -471,8 +474,9 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
     return res.json({ errors: ['not found'] })
   }
 
-  stream.deleted = true
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, {
+    deleted: true,
+  })
 
   res.status(204)
   res.end()
@@ -602,8 +606,9 @@ app.post('/hook', async (req, res) => {
     req.config.recordObjectStoreId &&
     !stream.recordObjectStoreId
   ) {
-    stream.recordObjectStoreId = req.config.recordObjectStoreId
-    await req.store.replace(stream)
+    await db.stream.update(stream.id, {
+      recordObjectStoreId: req.config.recordObjectStoreId,
+    })
   }
   if (
     (live === 'live' && stream.record && stream.recordObjectStoreId) ||
