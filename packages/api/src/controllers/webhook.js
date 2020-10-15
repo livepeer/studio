@@ -165,9 +165,10 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
     return res.json({ errors: ['not found'] })
   }
 
-  webhook.deleted = true
   try {
-    await req.store.replace(webhook)
+    await db.webhook.update(webhook.id, {
+      deleted: true,
+    })
   } catch (e) {
     console.error(e)
     throw e
