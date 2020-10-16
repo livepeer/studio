@@ -6,11 +6,11 @@ import DocsLayout from "../../../../components/DocsLayout";
 ## How to transcode .ts segments
 
 Before transcoding your stream of .ts segments, be sure to
-[create a stream with defined rendition profiles](/docs/segment-based-ingest/create-a-stream-and-define-renditions)
+[create a stream with defined rendition profiles](/docs/guides/segment-based-ingest/create-a-stream-and-define-renditions)
 and
-[gather a list of broadcasters](/docs/segment-based-ingest/get-a-list-of-broadcasters).
+[gather a list of broadcasters](/docs/guides/segment-based-ingest/get-a-list-of-broadcasters).
 It may also be helpful to review how to
-[authenticate](/docs/segment-based-ingest/authentication).
+[authenticate](/docs/guides/segment-based-ingest/authentication).
 
 `POST` your .ts segment. to
 `{broadcaster_address}/live/{stream_id}/{media_number}.ts`
@@ -28,6 +28,16 @@ Mixed within the data about your transcoded video, the content of the API
 response will include something like:
 
 ```
+>>> Example Request
+curl -X POST https://example-broadcaster-url-1.livepeer.live/live/stream_id/100.ts \
+-H "Accept: multipart/mixed" \
+-H "content-duration: 2050" \
+-H "content-resolution: 1920x1080" \
+--data-binary "@100.ts" > out.ts
+
+
+>>> Example Response
+
 HTTP/1.1 100 Continue
 
 HTTP/1.1 200 OK
