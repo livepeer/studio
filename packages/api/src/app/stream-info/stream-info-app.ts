@@ -1,13 +1,12 @@
 import express, { Router } from 'express'
 import 'express-async-errors' // it monkeypatches, i guess
 import morgan from 'morgan'
-import createStore from '../../store'
+import { db } from '../../store'
+import { DB } from '../../store/db'
 import { healthCheck } from '../../middleware'
 import logger from '../../logger'
 import { Stream } from '../../schema/types'
 import fetch from 'isomorphic-fetch'
-
-import { IStore } from '../../types/common'
 
 import { StatusResponse, MasterPlaylist } from './livepeer-types'
 
@@ -17,9 +16,7 @@ const deleteTimeout = 5 * 60 * 1000
 const seenSegmentsTimeout = 60 * 1000
 
 async function makeRouter(params) {
-  // Storage init
   const bodyParser = require('body-parser')
-  let [db, store] = await createStore(params)
 
   // Logging, JSON parsing, store injection
 
@@ -27,7 +24,6 @@ async function makeRouter(params) {
   app.use(healthCheck)
   app.use(bodyParser.json())
   app.use((req, res, next) => {
-    req.store = store
     req.config = params
     next()
   })
@@ -44,7 +40,6 @@ async function makeRouter(params) {
 
   return {
     router: app,
-    store,
   }
 }
 
@@ -119,13 +114,11 @@ function newStreamInfo(): streamInfo {
 
 class statusPoller {
   broadcaster: string
-  store: IStore
 
   private seenStreams: Map<string, streamInfo>
 
-  constructor(broadcaster: string, store: IStore) {
+  constructor(broadcaster: string) {
     this.broadcaster = broadcaster
-    this.store = store
     this.seenStreams = new Map<string, streamInfo>()
   }
 
@@ -158,52 +151,25 @@ class statusPoller {
       const manifest = status.Manifests[mid]
       countSegments(si, manifest)
       if (needUpdate) {
-        const streamKey = `stream/${mid}`
-        const storedInfo: Stream = await this.store.get(streamKey, false)
+        let storedInfo: Stream = await db.stream.get(mid)
+        if (!storedInfo) {
+          const [objs, _] = await db.stream.find({ playbackId: mid })
+          if (objs && Array.isArray(objs) && objs.length) {
+            storedInfo = objs[0]
+          }
+        }
         // console.log(`got stream info from store: `, storedInfo)
         if (storedInfo) {
-          storedInfo.lastSeen = si.lastSeen.valueOf()
-          storedInfo.sourceSegments =
-            (storedInfo.sourceSegments || 0) +
-            si.sourceSegments -
-            si.sourceSegmentsLastUpdated
-          storedInfo.transcodedSegments =
-            (storedInfo.transcodedSegments || 0) +
-            si.transcodedSegments -
-            si.transcodedSegmentsLastUpdated
-          storedInfo.sourceSegmentsDuration =
-            (storedInfo.sourceSegmentsDuration || 0) +
-            si.sourceSegmentsDuration -
-            si.sourceSegmentsDurationLastUpdated
-          storedInfo.transcodedSegmentsDuration =
-            (storedInfo.transcodedSegmentsDuration || 0) +
-            si.transcodedSegmentsDuration -
-            si.transcodedSegmentsDurationLastUpdated
-          await this.store.replace(storedInfo)
+          await db.stream.update(storedInfo.id, { lastSeen: si.lastSeen.valueOf() } as Stream)
+          const incObj = {
+            sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
+            transcodedSegments: si.transcodedSegments - si.transcodedSegmentsLastUpdated,
+            sourceSegmentsDuration: si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated,
+            transcodedSegmentsDuration: si.transcodedSegmentsDuration - si.transcodedSegmentsDurationLastUpdated,
+          }
+          await db.stream.add(storedInfo.id, incObj as Stream)
           if (storedInfo.parentId) {
-            const parentStream: Stream = await this.store.get(
-              `stream/${storedInfo.parentId}`,
-              false,
-            )
-            // console.log(`got parent stream store: `, storedInfo)
-            parentStream.lastSeen = si.lastSeen.valueOf()
-            parentStream.sourceSegments =
-              (parentStream.sourceSegments || 0) +
-              si.sourceSegments -
-              si.sourceSegmentsLastUpdated
-            parentStream.transcodedSegments =
-              (parentStream.transcodedSegments || 0) +
-              si.transcodedSegments -
-              si.transcodedSegmentsLastUpdated
-            parentStream.sourceSegmentsDuration =
-              (parentStream.sourceSegmentsDuration || 0) +
-              si.sourceSegmentsDuration -
-              si.sourceSegmentsDurationLastUpdated
-            parentStream.transcodedSegmentsDuration =
-              (parentStream.transcodedSegmentsDuration || 0) +
-              si.transcodedSegmentsDuration -
-              si.transcodedSegmentsDurationLastUpdated
-            await this.store.replace(parentStream)
+            await db.stream.add(storedInfo.parentId, incObj as Stream)
           }
           si.lastUpdated = new Date()
           si.sourceSegmentsLastUpdated = si.sourceSegments
@@ -253,8 +219,9 @@ export default async function makeApp(params) {
     broadcaster,
   } = params
   // Storage init
+  await db.start({ postgresUrl, postgresReplicaUrl: undefined })
 
-  const { router, store } = await makeRouter(params)
+  const { router } = await makeRouter(params)
   const app = express()
   app.use(morgan('dev'))
   app.use(router)
@@ -276,7 +243,7 @@ export default async function makeApp(params) {
     })
   }
 
-  const poller = new statusPoller(broadcaster, store)
+  const poller = new statusPoller(broadcaster)
   const pid = poller.startPoller()
 
   const close = async () => {
@@ -284,7 +251,7 @@ export default async function makeApp(params) {
     process.off('SIGTERM', sigterm)
     process.off('unhandledRejection', unhandledRejection)
     listener.close()
-    await store.close()
+    await db.close()
   }
 
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
@@ -305,7 +272,6 @@ export default async function makeApp(params) {
     listener,
     port: listenPort,
     close,
-    store,
   }
 }
 
@@ -319,7 +285,7 @@ const handleSigterm = (close) => async () => {
   try {
     await close()
   } catch (err) {
-    logger.error('Error closing store', err)
+    logger.error('Error closing database', err)
     process.exit(1)
   }
   clearTimeout(timeout)
