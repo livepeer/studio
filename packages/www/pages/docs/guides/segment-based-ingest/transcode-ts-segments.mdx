@@ -2,6 +2,7 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
+[Back to Video Segment Based Transcoding Guide](/docs/guides/segment-based-ingest/segment-based-ingest)
 
 ## How to transcode .ts segments
 
@@ -12,31 +13,32 @@ and
 It may also be helpful to review how to
 [authenticate](/docs/guides/segment-based-ingest/authentication).
 
-`POST` your .ts segment. to
+To transcode a video segment, `POST` your .ts segment to
 `{broadcaster_address}/live/{stream_id}/{media_number}.ts`
 
 In the header be sure to `Accept: multipart/mixed`.
 
 A continuous livestream should start with the media_number set to 1.ts and count
-upward to 2.ts, 3.ts and so on for each segment.
+upward to 2.ts, 3.ts and so on for each segment. 
 
-If you encounter a problem uploading a segment, try making a new request for a
-list of broadcasters and `POST` to a different broadcaster address. You can
-still expect the stream to be at the same URL.
+There is currently a limit of 1 segment at a time per stream. If you encounter 
+a problem uploading a segment, try making a new request for a list of broadcasters 
+and `POST` to a different broadcaster address. You can still expect the stream to be 
+at the same URL.
 
-Mixed within the data about your transcoded video, the content of the API
-response will include something like:
+Here is an example request:
 
 ```
->>> Example Request
 curl -X POST https://example-broadcaster-url-1.livepeer.live/live/stream_id/100.ts \
 -H "Accept: multipart/mixed" \
 -H "content-duration: 2050" \
 -H "content-resolution: 1920x1080" \
 --data-binary "@100.ts" > out.ts
+```
 
 
->>> Example Response
+Here is an example response
+```
 
 HTTP/1.1 100 Continue
 

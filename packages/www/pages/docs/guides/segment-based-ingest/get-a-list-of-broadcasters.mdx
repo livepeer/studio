@@ -2,6 +2,7 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
+[Back to Video Segment Based Transcoding Guide](/docs/guides/segment-based-ingest/segment-based-ingest)
 
 ## How to get a list of broadcasters
 
@@ -10,15 +11,16 @@ broadcasters.
 
 `GET` a list of broadcasters via `https://livepeer.com/api/broadcaster`.
 
-Here is an example response:
+Here is an example request:
 
 ```
->>> Example Command
 curl https://livepeer.live/api/broadcaster \
 -H "Authorization: Bearer <api-key>" \
 -H "content-type: application/json" 
+```
 
->>> Example Response
+Here is an example response:
+```
 [
   {
     "address":"https://example-broadcaster-url-1.livepeer.live"
