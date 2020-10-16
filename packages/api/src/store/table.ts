@@ -143,6 +143,25 @@ export default class Table<T extends DBObject> {
     }
   }
 
+  async add(id: string, doc: T) {
+    const q = sql`UPDATE `.append(this.name).append(sql`
+      SET data = data || jsonb_build_object(`)
+    Object.keys(doc).forEach((k, i) => {
+      if (i) {
+        q.append(`, `)
+      }
+      q.append(`'${k}', COALESCE((data->>'${k}')::numeric, 0) + `)
+      q.append(sql` ${doc[k]}`)
+    })
+    q.append(sql`) WHERE id = ${id}`)
+
+    const res = await this.db.query(q)
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`${this.name} id=${doc.id} not found`)
+    }
+  }
+
   async delete(id) {
     const res = await this.db.query(`DELETE FROM ${this.name} WHERE id = $1`, [
       id,
