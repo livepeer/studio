@@ -2,6 +2,7 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
+[Back to Video Segment Based Transcoding Guide](/docs/guides/segment-based-ingest/segment-based-ingest)
 
 ## How to create a stream and define renditions
 
@@ -17,25 +18,28 @@ Each **rendition profile** includes `name`, `bitrate`, `fps`, `width` and
 [Apple's recommended settings for HLS ladders](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices)
 is a good starting point.
 
-Here is an request example:
+Here is an example request:
 
 ```
-{
-  "name": "my-stream",
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_stream",
   "profiles": [
-    {
-      "name": "1080p",
-      "bitrate": 6000000,
-      "fps": 30,
-      "width": 1920,
-      "height": 1080
-    },
     {
       "name": "720p",
       "bitrate": 2000000,
       "fps": 30,
       "width": 1280,
       "height": 720
+    },
+    {
+      "name": "480p",
+      "bitrate": 1000000,
+      "fps": 30,
+      "width": 854,
+      "height": 480
     },
     {
       "name": "360p",
@@ -45,7 +49,9 @@ Here is an request example:
       "height": 360
     }
   ]
-}
+}' \
+https://livepeer.com/api/stream
+
 ```
 
 The `json` response includes the stream `id` parameter. You'll need that later.
