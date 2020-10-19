@@ -154,7 +154,7 @@ class statusPoller {
         let storedInfo: Stream = await db.stream.get(mid)
         if (!storedInfo) {
           const [objs, _] = await db.stream.find({ playbackId: mid })
-          if (objs && Array.isArray(objs) && objs.length) {
+          if (objs?.length) {
             storedInfo = objs[0]
           }
         }
