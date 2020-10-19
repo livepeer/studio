@@ -143,6 +143,7 @@ export default class Table<T extends DBObject> {
     }
   }
 
+  // Takes in an object of {"field": number} and increases all the fields by the specified amounts
   async add(id: string, doc: T) {
     const q = sql`UPDATE `.append(this.name).append(sql`
       SET data = data || jsonb_build_object(`)
