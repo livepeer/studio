@@ -15,6 +15,7 @@ const linksLists: LinksListProps[] = [
     heading: "Company",
     links: [
       { children: "Home", href: "/" },
+      { children: "Contact", href: "/contact" },
       { children: "Team", href: "/team" },
       { children: "Jobs", href: "/jobs" }
     ]
@@ -23,8 +24,8 @@ const linksLists: LinksListProps[] = [
     heading: "Resources",
     links: [
       { children: "Documentation", href: "/docs" },
+      { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
-      { children: "Contact", href: "/contact" },
       { children: "Privacy Policy", href: "/privacy-policy" }
     ]
   }
