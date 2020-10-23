@@ -1,5 +1,6 @@
 import Layout from "../Layout";
-import { Container, Heading, Box, Text, Button } from "@theme-ui/components";
+import Button from "../Button";
+import { Container, Heading, Box, Text } from "@theme-ui/components";
 
 const DefaultError = () => {
   return (
