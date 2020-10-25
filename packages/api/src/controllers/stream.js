@@ -21,7 +21,6 @@ const resolver = new Resolver()
 
 const app = Router()
 const hackMistSettings = (req, profiles) => {
-  // FIXME: tempoarily, Mist can only make passthrough FPS streams with 2-second gop sizes
   if (
     !req.headers['user-agent'] ||
     !req.headers['user-agent'].toLowerCase().includes('mistserver')
@@ -32,10 +31,12 @@ const hackMistSettings = (req, profiles) => {
   return profiles.map((profile) => {
     profile = {
       ...profile,
-      fps: 0,
     }
     if (typeof profile.gop === 'undefined') {
       profile.gop = '2.0'
+    }
+    if (typeof profile.fps === 'undefined') {
+      profile.fps = 0
     }
     return profile
   })
