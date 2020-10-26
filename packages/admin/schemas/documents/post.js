@@ -37,6 +37,11 @@ export default {
       title: 'Main image',
     },
     {
+      name: 'featured',
+      type: 'boolean',
+      title: 'Featured',
+    },
+    {
       name: 'excerpt',
       type: 'text',
       title: 'Excerpt',
