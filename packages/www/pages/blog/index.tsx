@@ -24,8 +24,17 @@ const BlogIndex = ({ categories, posts }) => {
     );
   }
 
-  // TODO featured post should be defined somewhere in sanity?
-  const featuredPost = posts.find((p) => p);
+  let featuredPost = posts
+    .sort(
+      (x, y) =>
+        new Date(y._updatedAt).getTime() - new Date(x._updatedAt).getTime()
+    )
+    .find((p) => p.featured);
+
+  // If no post is set as featured, default to the most recent post
+  if (!featuredPost) {
+    featuredPost = posts[0];
+  }
 
   return (
     <Layout
