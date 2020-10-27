@@ -1,5 +1,7 @@
 'use strict'
 
+import { fetchWithTimeout } from '../util'
+
 // This is a spec but it doesn't look like it's very well supported, so
 import promiseAny from 'promise.any'
 
@@ -10,7 +12,7 @@ export function addProtocol(url, protocol = 'https') {
   return protocol + '://' + url
 }
 
-function geoLocateFactory({ first = true, region = 'region' }) {
+export function geoLocateFactory({ first = true, region = 'region' }) {
   return async (req, res, next) => {
     if (req.query.first === 'false') {
       first = false
@@ -29,20 +31,29 @@ function geoLocateFactory({ first = true, region = 'region' }) {
       return next()
     }
 
-    let smallestServer
+    let smallestServer = ''
     let smallestDuration = Infinity
     console.log('servers: ', typeof servers, servers)
     const errors = []
     const promises = servers.map(async (server) => {
       const start = Date.now()
       const upstreamUrl = `${server}/api/geolocate`
-      const res = await fetch(upstreamUrl)
+      let res
+      try {
+        res = await fetchWithTimeout(upstreamUrl, { timeout: 2 * 1000 })
+      } catch (e) {
+        console.log(e)
+        const err = new Error(`${upstreamUrl} HTTP ${e}`)
+        errors.push(err)
+        // Promise.all will throw at first rejected promise, we don't want that
+        return null
+      }
       if (res.status !== 200) {
         const err = new Error(
           `${upstreamUrl} HTTP ${res.status}: ${await res.text()}`,
         )
         errors.push(err)
-        throw err
+        return null
       }
       const duration = Date.now() - start
       if (duration < smallestDuration) {
@@ -60,7 +71,7 @@ function geoLocateFactory({ first = true, region = 'region' }) {
         data = await promiseAny(promises)
         data = [data]
       } else {
-        data = await Promise.all(promises)
+        data = (await Promise.all(promises)).filter((v) => !!v)
       }
     } catch (e) {
       const allErrors = errors.map((err) => err.message).join(', ')
