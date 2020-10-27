@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 import anyBase from 'any-base'
 
-const BASE_36 = 'abcdefghijklmnopqrstuvwxyz0123456789'
+const BASE_36 = '0123456789abcdefghijklmnopqrstuvwxyz'
 const SEGMENT_COUNT = 4
 const SEGMENT_LENGTH = 4
 const hexToBase36 = anyBase(anyBase.HEX, BASE_36)
@@ -34,6 +34,21 @@ export async function generateStreamKey() {
   })
 }
 
+// Hidden functionality - run this file directly with `node -r esm generate-stream-key.js` to generate shard keys!
 if (!module.parent) {
-  generateStreamKey().then((x) => console.log(x))
+  if (process.argv[2]) {
+    const shardCount = parseInt(process.argv[2])
+    const shards = [...new Array(shardCount)].map(() => '')
+    let remainingLetters = BASE_36.split('')
+    let shardIdx = 0
+    while (remainingLetters.length > 0) {
+      shards[shardIdx] += remainingLetters.shift()
+      shardIdx = (shardIdx + 1) % shardCount
+    }
+    for (const shard of shards) {
+      console.log(shard)
+    }
+  } else {
+    generateStreamKey().then((x) => console.log(x))
+  }
 }
