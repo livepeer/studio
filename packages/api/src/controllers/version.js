@@ -4,7 +4,7 @@ const app = Router()
 
 app.get('/',  async (req, res) => {
   res.status(200)
-  res.json({ tag: `${GIT_TAG}`, commit: `${GIT_COMMIT}`})
+  res.json({ tag: `${process.env.DOCKER_TAG || 'local'}`, commit: `${process.env.GITHUB_SHA || 'local'}`})
 })
 
 export default app
