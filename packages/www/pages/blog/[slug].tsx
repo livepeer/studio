@@ -17,6 +17,7 @@ import Prefooter from "../../components/Prefooter";
 import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import { blocksToText } from "../../lib/utils";
 
 const serializers = {
   types: {
@@ -35,7 +36,6 @@ const Post = ({
   category,
   _createdAt,
   excerpt,
-  body,
   noindex = false,
   preview,
   contentRaw,
@@ -49,8 +49,8 @@ const Post = ({
       </Layout>
     );
   }
-
-  const stats = readingTime(body);
+  const text = blocksToText(contentRaw);
+  const stats = readingTime(text);
   const builder = imageUrlBuilder(client as any);
   return (
     <Layout

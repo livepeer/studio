@@ -6,15 +6,17 @@ import LinksList, { LinksListProps } from "./LinksList";
 import Link from "../Link";
 import Textfield from "../Textfield";
 import { useMailchimp } from "react-use-mailchimp";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";
+import { useApi } from "../../hooks";
 
 const linksLists: LinksListProps[] = [
   {
     heading: "Company",
     links: [
       { children: "Home", href: "/" },
+      { children: "Contact", href: "/contact" },
       { children: "Team", href: "/team" },
       { children: "Jobs", href: "/jobs" }
     ]
@@ -22,9 +24,9 @@ const linksLists: LinksListProps[] = [
   {
     heading: "Resources",
     links: [
-      { children: "Documentation", href: "/docs/guides" },
+      { children: "Documentation", href: "/docs" },
+      { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
-      { children: "Contact", href: "/contact" },
       { children: "Privacy Policy", href: "/privacy-policy" }
     ]
   }
@@ -67,6 +69,8 @@ const MailchimpResponse = ({
 };
 
 const Footer = () => {
+  const [version, setVersion] = useState({ tag: "", commit: "" });
+  const { user, getVersion } = useApi();
   const [email, setEmail] = useState("");
   const [mailchimp, subscribe] = useMailchimp({
     url:
@@ -74,6 +78,10 @@ const Footer = () => {
   });
 
   const { data: mailchimpResponseData } = mailchimp;
+
+  useEffect(() => {
+    getVersion().then((v) => setVersion(v));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,6 +216,18 @@ const Footer = () => {
                   />
                 </svg>
               </Link>
+            </li>
+            <li>
+              {user && user.admin && version && version.commit && (
+                <Link
+                  isExternal
+                  variant="footer"
+                  sx={{ textDecoration: "underline" }}
+                  href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}
+                >
+                  version {version.commit.substring(0, 8)}
+                </Link>
+              )}
             </li>
           </ul>
         </Grid>

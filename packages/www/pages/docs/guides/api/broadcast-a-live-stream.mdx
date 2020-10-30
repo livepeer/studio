@@ -3,58 +3,24 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## How to Broadcast a Live Stream
+# How to broadcast a live stream with the Livepeer.com API 
 
-**Start the Stream**
+Your users or your application will need to be able to push an RTMP stream. To broadcast a live stream, you’ll need to have [created a stream object](/docs/guides/api/create-a-stream) with a `streamKey`. You also need to know your [ingest base URL](/docs/guides/api/base-urls).
 
-We'll use [OBS](https://obsproject.com/download) for broadcasting the video.
+Depending on the software used to push your RTMP stream, you’ll be prompted for the following:
 
-Go to "Settings" → "Stream", and click on the "Service" dropdown to select
-"Custom".
+1. Stream Key: In some cases, this is called a "Stream Name." Input your Livepeer.com `streamKey` not your stream object `name`.
+1. Server URL: Input the RTMP ingest base URL.
+1. Location or URL: Input the ingest url with the `streamKey` appended. For example, if your base URL is `rtmp://{region}-rtmp.livepeer.com/live`, use `rtmp:/{region}-rtmp.livepeer.com/live/streamKey`.
 
-Fill in the empty fields. For "URL", use the ingest base URL. For "Stream key",
-use "streamKey" from the newly created stream object. Click "OK" to save the
-configuration.
+### Optimization: Set keyframe intervals
 
-Now go to "Settings" -> "Output", and put "2" as the "Keyframe Interval". Click
-"OK" to save the configuration. This makes sure the ingest keyframe is
-consistently 2 seconds. \*\*If you are building a live streaming application, we
-strongly suggest that you help your users to set their keyframe interval to 2
-seconds"
+Livepeer works best with consistent, short keyframe intervals, ideally 2 seconds. 
 
-When you click "Start Streaming", the RTMP stream will be pushed into the ingest
-point.
+You should set or encourage your users to set this in their broadcasting software. In [OBS](https://obsproject.com/), you can set this by going to "Settings" --> "Output", change the "Output Mode" from "Simple" to "Advanced" and set the "Keyframe interval" to 2.
 
-**Verify stream status**
+Next, learn [how to verify stream status with the Livepeer.com API](/docs/guides/api/verify-stream-status).
 
-To verify the stream is running, you can fetch the stream status using the "id"
-of the stream object by sending a GET request to
-`https://livepeer.com/api/stream/`.
-
-For example:
-
-```bash
-curl -H 'authorization: Bearer {api_key}' \
-"https://livepeer.com/api/stream/{streamId}"
-```
-
-You will get a result like:
-
-```jsx
-{
-  "name":"test_stream",
-  "profiles":[
-    {"bitrate":2000000,"fps":30,"height":720,"name":"720p","width":1280},
-    {"bitrate":1000000,"fps":30,"height":480,"name":"480p","width":854},
-    {"bitrate":500000,"fps":30,"height":360,"name":"360p","width":640}],
-  "id":"2d10f1fd-dbf7-495b-8aef-08916507fcce",
-  "createdAt":1596118509635,
-  "lastSeen":1596119750455
-}
-```
-
-The "lastSeen" field represents when the stream was last observed by the
-monitoring system. It should contain an epoch that's close to the current time.
 
 </DocsLayout>
 

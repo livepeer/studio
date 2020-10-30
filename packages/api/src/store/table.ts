@@ -2,9 +2,16 @@ import sql, { SQLStatement } from 'sql-template-strings'
 import { DB } from './db'
 import logger from '../logger'
 import { BadRequestError, NotFoundError } from './errors'
-import { QueryArrayResult } from 'pg'
+import { QueryArrayResult, QueryResult } from 'pg'
 
-import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions } from './types'
+import {
+  TableSchema,
+  GetOptions,
+  DBObject,
+  FindQuery,
+  FindOptions,
+  DBLegacyObject,
+} from './types'
 
 export default class Table<T extends DBObject> {
   db: DB
@@ -21,7 +28,7 @@ export default class Table<T extends DBObject> {
     if (!id) {
       throw new Error('missing id')
     }
-    let res: QueryArrayResult<any[]>
+    let res: QueryResult<DBLegacyObject>
     if (!opts.useReplica) {
       res = await this.db.query(
         sql`SELECT data FROM `
@@ -39,7 +46,7 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       return null
     }
-    return res.rows[0].data
+    return res.rows[0].data as T
   }
 
   // returns [docs, cursor]
@@ -85,7 +92,7 @@ export default class Table<T extends DBObject> {
     if (useReplica) {
       res = await this.db.replicaQuery(q)
     } else {
-      res = this.db.query(q)
+      res = await this.db.query(q)
     }
 
     const docs = res.rows.map(({ data }) => data)
@@ -117,6 +124,39 @@ export default class Table<T extends DBObject> {
       `UPDATE ${this.name} SET data = $1 WHERE id = $2`,
       [JSON.stringify(doc), doc.id],
     )
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`${this.name} id=${doc.id} not found`)
+    }
+  }
+
+  async update(id: string, doc: T) {
+    const q = sql`UPDATE `.append(this.name).append(sql`
+      SET data = data || ${JSON.stringify(doc)}
+      WHERE id = ${id}
+    `)
+
+    const res = await this.db.query(q)
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`${this.name} id=${doc.id} not found`)
+    }
+  }
+
+  // Takes in an object of {"field": number} and increases all the fields by the specified amounts
+  async add(id: string, doc: T) {
+    const q = sql`UPDATE `.append(this.name).append(sql`
+      SET data = data || jsonb_build_object(`)
+    Object.keys(doc).forEach((k, i) => {
+      if (i) {
+        q.append(`, `)
+      }
+      q.append(`'${k}', COALESCE((data->>'${k}')::numeric, 0) + `)
+      q.append(sql` ${doc[k]}`)
+    })
+    q.append(sql`) WHERE id = ${id}`)
+
+    const res = await this.db.query(q)
 
     if (res.rowCount < 1) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`)

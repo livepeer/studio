@@ -65,7 +65,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 }}
               />
             </span>
-            {item.mobileDropdownLinks && (
+            {/* {item.mobileDropdownLinks && (
               <span
                 sx={{
                   position: "relative",
@@ -131,7 +131,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                     ))}
                 </BreadcrumbDropdown>
               </span>
-            )}
+            )} */}
           </span>
         ))}
       </>

@@ -3,7 +3,7 @@ import Table from './table'
 import { Stream } from '../schema/types'
 import { QueryArrayResult, QueryResult, QueryResultRow } from 'pg'
 
-import { TableSchema, GetOptions, DBObject, FindQuery, FindOptions } from './types'
+import { DBLegacyObject, FindOptions, QueryOptions } from './types'
 
 interface UsageData {
   sourceSegments: number
@@ -23,9 +23,8 @@ export default class StreamTable extends Table<Stream> {
 
 
   async usage(userId: string, fromTime: number, toTime: number,
-    opts: FindOptions = {},
+    opts?: QueryOptions
   ): Promise<UsageData> {
-    const { cursor = '', limit = 100, useReplica = true } = opts
     const q1 = sql`SELECT 
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
@@ -47,11 +46,7 @@ export default class StreamTable extends Table<Stream> {
     }
 
     let res: QueryResult<dbUsageData>
-    if (!opts.useReplica) {
-      res = await this.db.query(q1)
-    } else {
-      res = await this.db.replicaQuery(q1)
-    }
+    res = await this.db.queryWithOpts(q1, opts)
     if (res.rowCount > 0) {
       const dbUsage = res.rows[0]
       usage.sourceSegments += parseInt(dbUsage.sourcesegments)
@@ -72,11 +67,7 @@ export default class StreamTable extends Table<Stream> {
       AND data->>'createdAt' >= ${fromTime}
       AND data->>'createdAt' < ${toTime}
     `
-    if (!opts.useReplica) {
-      res = await this.db.query(q2)
-    } else {
-      res = await this.db.replicaQuery(q2)
-    }
+    res = await this.db.queryWithOpts(q2, opts)
     if (res.rowCount > 0) {
       const dbUsage = res.rows[0]
       usage.sourceSegments += parseInt(dbUsage.sourcesegments)
@@ -85,5 +76,30 @@ export default class StreamTable extends Table<Stream> {
       usage.transcodedSegmentsDuration += dbUsage.transcodedsegmentsduration
     }
     return usage
+  }
+
+  async getByStreamKey(streamKey: string, opts?: QueryOptions): Promise<Stream> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT data FROM stream  WHERE data->>'streamKey'=${streamKey}`.setName(`${this.name}_by_streamKey`),
+      opts
+    )
+    return res.rowCount < 1 ? null : res.rows[0].data as Stream
+  }
+
+  async getByPlaybackId(playbackId: string, opts?: QueryOptions): Promise<Stream> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT data FROM stream  WHERE data->>'playbackId'=${playbackId}`.setName(`${this.name}_by_playbackid`),
+      opts
+    )
+    return res.rowCount < 1 ? null : res.rows[0].data as Stream
+  }
+
+  async getLastSession(id: string, opts?: QueryOptions): Promise<Stream> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->>'createdAt' DESC LIMIT 1`
+        .setName(`${this.name}_by_parentid_last_session`),
+      opts
+    )
+    return res.rowCount < 1 ? null : res.rows[0].data as Stream
   }
 }

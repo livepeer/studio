@@ -9,7 +9,9 @@ import { makeNextHREF, sendgridEmail, trackAction } from './helpers'
 import hash from '../hash'
 import qs from 'qs'
 import { db } from '../store'
+import { products } from '../config'
 
+const stripe = require('stripe')(process.env.LP_STRIPE_SECRET_KEY)
 const app = Router()
 
 app.get('/usage', authMiddleware({}), async (req, res) => {
@@ -23,7 +25,7 @@ app.get('/usage', authMiddleware({}), async (req, res) => {
   }
 
   const usageRes = await db.stream.usage(userId, fromTime, toTime, {
-    useReplica: true,
+    useReplica: false,
   })
   res.status(200)
   res.json(usageRes)
@@ -57,14 +59,14 @@ app.get('/:id', authMiddleware({ allowUnverified: true }), async (req, res) => {
 })
 
 app.post('/', validatePost('user'), async (req, res) => {
-  const { email, password } = req.body
+  const { email, password, firstName, lastName, organization, phone } = req.body
+  const { selectedPlan } = req.query
   const emailValid = validator.validate(email)
   if (!emailValid) {
     res.status(422)
     res.json({ errors: ['invalid email'] })
     return
   }
-
   const [hashedPassword, salt] = await hash(password)
   const id = uuid()
   const emailValidToken = uuid()
@@ -85,6 +87,10 @@ app.post('/', validatePost('user'), async (req, res) => {
       admin: false,
       emailValidToken: emailValidToken,
       emailValid: validUser,
+      firstName,
+      lastName,
+      organization,
+      phone,
     }),
     trackAction(
       id,
@@ -101,7 +107,7 @@ app.post('/', validatePost('user'), async (req, res) => {
 
   const verificationUrl = `${protocol}://${
     req.frontendDomain
-  }/app/user/verify?${qs.stringify({ email, emailValidToken })}`
+  }/app/user/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`
 
   if (!validUser && user) {
@@ -142,12 +148,35 @@ app.post('/', validatePost('user'), async (req, res) => {
   res.json(user)
 })
 
+app.patch('/:id', async (req, res) => {
+  let user = await req.store.get(`user/${req.params.id}`, false)
+  if (!user) {
+    res.status(404)
+    return res.json({ errors: ['user not found'] })
+  }
+  const fullUser = {
+    ...user,
+    ...req.body,
+  }
+  const validators = require('../schema/validators').default
+  const validate = validators['user']
+  if (!validate(fullUser)) {
+    res.status(422)
+    return res.json({
+      errors: validate.errors.map((err) => JSON.stringify(err)),
+    })
+  }
+  await req.store.replace(fullUser)
+  res.status(200)
+  res.json(fullUser)
+})
+
 app.post('/token', validatePost('user'), async (req, res) => {
   const { data: userIds } = await req.store.query({
     kind: 'user',
     query: { email: req.body.email },
   })
-  console.log(userIds)
+
   if (userIds.length < 1) {
     res.status(404)
     return res.json({ errors: ['user not found'] })
@@ -404,5 +433,268 @@ app.post(
     }
   },
 )
+
+app.post(
+  '/create-customer',
+  validatePost('create-customer'),
+  async (req, res) => {
+    const [users] = await db.user.find(
+      { email: req.body.email },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
+
+    let user = users[0]
+    const customer = await stripe.customers.create({
+      email: req.body.email,
+    })
+    await db.user.update(user.id, {
+      stripeCustomerId: customer.id,
+    })
+    res.status(201)
+    res.json(customer)
+  },
+)
+
+app.post(
+  '/update-customer-payment-method',
+  validatePost('update-customer-payment-method'),
+  async (req, res) => {
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
+
+    let user = users[0]
+
+    const paymentMethod = await stripe.paymentMethods.attach(
+      req.body.stripeCustomerPaymentMethodId,
+      {
+        customer: req.body.stripeCustomerId,
+      },
+    )
+
+    const customer = await stripe.customers.update(req.body.stripeCustomerId, {
+      invoice_settings: {
+        default_payment_method: req.body.stripeCustomerPaymentMethodId,
+      },
+    })
+
+    // Update user's payment method
+    await db.user.update(user.id, {
+      stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
+      ccLast4: paymentMethod.card.last4,
+      ccBrand: paymentMethod.card.brand,
+    })
+    res.json(customer)
+  },
+)
+
+app.post(
+  '/create-subscription',
+  validatePost('create-subscription'),
+  async (req, res) => {
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
+
+    let user = users[0]
+
+    // Attach the payment method to the customer if it exists (free plan doesn't require payment)
+    if (req.body.stripeCustomerPaymentMethodId) {
+      try {
+        const paymentMethod = await stripe.paymentMethods.attach(
+          req.body.stripeCustomerPaymentMethodId,
+          {
+            customer: req.body.stripeCustomerId,
+          },
+        )
+        // Update user's payment method
+        await db.user.update(user.id, {
+          stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
+          ccLast4: paymentMethod.card.last4,
+          ccBrand: paymentMethod.card.brand,
+        })
+      } catch (error) {
+        return res.status('402').send({ error: { message: error.message } })
+      }
+
+      // Change the default invoice settings on the customer to the new payment method
+      await stripe.customers.update(req.body.stripeCustomerId, {
+        invoice_settings: {
+          default_payment_method: req.body.stripeCustomerPaymentMethodId,
+        },
+      })
+    }
+
+    // fetch prices associated with plan
+    const items = await stripe.prices.list({
+      lookup_keys: products[req.body.stripeProductId].lookupKeys,
+    })
+
+    // Create the subscription
+    const subscription = await stripe.subscriptions.create({
+      cancel_at_period_end: false,
+      customer: req.body.stripeCustomerId,
+      items: items.data.map((item) => ({ price: item.id })),
+      expand: ['latest_invoice.payment_intent'],
+    })
+
+    // Update user's product and subscription id in our db
+    await db.user.update(user.id, {
+      stripeProductId: req.body.stripeProductId,
+      stripeCustomerSubscriptionId: subscription.id,
+    })
+    res.send(subscription)
+  },
+)
+
+app.post(
+  '/update-subscription',
+  validatePost('update-subscription'),
+  async (req, res) => {
+    const [users] = await db.user.find(
+      { stripeCustomerId: req.body.stripeCustomerId },
+      { useReplica: false },
+    )
+    if (users.length < 1) {
+      res.status(404)
+      return res.json({ errors: ['user not found'] })
+    }
+
+    let user = users[0]
+
+    // Attach the payment method to the customer if it exists (free plan doesn't require payment)
+    if (req.body.stripeCustomerPaymentMethodId) {
+      try {
+        const paymentMethod = await stripe.paymentMethods.attach(
+          req.body.stripeCustomerPaymentMethodId,
+          {
+            customer: req.body.stripeCustomerId,
+          },
+        )
+        // Update user's payment method in our db
+        await db.user.update(user.id, {
+          stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
+          ccLast4: paymentMethod.card.last4,
+          ccBrand: paymentMethod.card.brand,
+        })
+      } catch (error) {
+        return res.status('402').send({ error: { message: error.message } })
+      }
+
+      // Change the default invoice settings on the customer to the new payment method
+      await stripe.customers.update(req.body.stripeCustomerId, {
+        invoice_settings: {
+          default_payment_method: req.body.stripeCustomerPaymentMethodId,
+        },
+      })
+    }
+
+    // Get all the prices associated with this plan (just transcoding price as of now)
+    const items = await stripe.prices.list({
+      lookup_keys: products[req.body.stripeProductId].lookupKeys,
+    })
+
+    // Get the subscription
+    const subscription = await stripe.subscriptions.retrieve(
+      req.body.stripeCustomerSubscriptionId,
+    )
+
+    // Get the prices associated with the subscription
+    const subscriptionItems = await stripe.subscriptionItems.list({
+      subscription: req.body.stripeCustomerSubscriptionId,
+    })
+
+    // Get the customer's usage
+    const usageRes = await db.stream.usage(
+      user.id,
+      subscription.current_period_start,
+      subscription.current_period_end,
+      {
+        useReplica: false,
+      },
+    )
+
+    // Update the customer's invoice items based on its usage
+    await Promise.all(
+      products[user.stripeProductId].usage.map(async (product) => {
+        if (product.name === 'Transcoding') {
+          let quantity = Math.round(
+            (usageRes.sourceSegmentsDuration / 60).toFixed(2),
+          )
+          await stripe.invoiceItems.create({
+            customer: req.body.stripeCustomerId,
+            currency: 'usd',
+            period: {
+              start: subscription.current_period_start,
+              end: subscription.current_period_end,
+            },
+            unit_amount_decimal: product.price * 100,
+            subscription: req.body.stripeCustomerSubscriptionId,
+            quantity,
+            description: product.description,
+          })
+        }
+      }),
+    )
+
+    // Update the customer's subscription plan.
+    // Stripe will automatically invoice the customer based on its usage up until this point
+    const updatedSubscription = await stripe.subscriptions.update(
+      req.body.stripeCustomerSubscriptionId,
+      {
+        billing_cycle_anchor: 'now', // reset billing anchor when updating subscription
+        items: [
+          ...subscriptionItems.data.map((item) => ({
+            id: item.id,
+            deleted: true,
+            clear_usage: true,
+            price: item.price.id,
+          })),
+          ...items.data.map((item) => ({
+            price: item.id,
+          })),
+        ],
+      },
+    )
+
+    // Update user's product subscription in our db
+    await db.user.update(user.id, {
+      stripeProductId: req.body.stripeProductId,
+    })
+    res.send(updatedSubscription)
+  },
+)
+
+app.post('/retrieve-subscription', async (req, res) => {
+  let { stripeCustomerSubscriptionId } = req.body
+  const subscription = await stripe.subscriptions.retrieve(
+    stripeCustomerSubscriptionId,
+  )
+  res.status(200)
+  res.json(subscription)
+})
+
+app.post('/retrieve-invoices', async (req, res) => {
+  let { stripeCustomerId } = req.body
+  const invoices = await stripe.invoices.list({
+    customer: stripeCustomerId,
+  })
+  res.status(200)
+  res.json(invoices)
+})
 
 export default app

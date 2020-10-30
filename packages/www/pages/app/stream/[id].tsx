@@ -7,7 +7,7 @@ import {
   Flex,
   Heading,
   Container,
-  Link as A,
+  Link as A
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -27,7 +27,7 @@ import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
 import {
   RelativeTime,
-  RenditionsDetails,
+  RenditionsDetails
 } from "../../../components/StreamsTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
@@ -78,12 +78,12 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               cursor: "pointer",
               width: 14,
               height: 14,
-              color: "listText",
+              color: "offBlack"
             }}
           />
         </Flex>
       </CopyToClipboard>
-      {!!isCopied && <Box sx={{ fontSize: 12, color: "listText" }}>Copied</Box>}
+      {!!isCopied && <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>}
     </Flex>
   );
 };
@@ -100,7 +100,7 @@ export default () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord,
+    setRecord
   } = useApi();
   const router = useRouter();
   const { query, asPath } = router;
@@ -112,8 +112,13 @@ export default () => {
   const [recordOffModal, setRecordOffModal] = useState(false);
 
   useEffect(() => {
-    getIngest()
-      .then((ingest) => setIngest(ingest))
+    getIngest(true)
+      .then((ingest) => {
+        if (Array.isArray(ingest)) {
+          ingest.sort((a, b) => a.base.localeCompare(b.base));
+        }
+        setIngest(ingest);
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
   useEffect(() => {
@@ -151,13 +156,17 @@ export default () => {
     return <Layout />;
   }
 
-  const getIngestURL = (stream: Stream, showKey: boolean): string => {
+  const getIngestURL = (
+    stream: Stream,
+    showKey: boolean,
+    i: number
+  ): string => {
     const key = showKey ? stream.streamKey : "";
-    return ingest.length ? pathJoin(ingest[0].ingest, key) : key || "";
+    return i < ingest.length ? pathJoin(ingest[i].ingest, key) : key || "";
   };
-  const getPlaybackURL = (stream: Stream): string => {
-    return ingest.length
-      ? pathJoin(ingest[0].base, "hls", `${stream.playbackId}/index.m3u8`)
+  const getPlaybackURL = (stream: Stream, i: number): string => {
+    return i < ingest.length
+      ? pathJoin(ingest[i].base, "hls", `${stream.playbackId}/index.m3u8`)
       : stream.playbackId || "";
   };
   const doSetRecord = async (stream: Stream, record: boolean) => {
@@ -167,8 +176,8 @@ export default () => {
     setStream(null); // make sure that we will load updated stream
   };
 
-  const isAdmin = query.admin === "true"
-  const tabs =  isAdmin ? getTabsAdmin(2) : getTabs(0);
+  const isAdmin = query.admin === "true";
+  const tabs = isAdmin ? getTabsAdmin(2) : getTabs(0);
   const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
 
   return (
@@ -220,7 +229,7 @@ export default () => {
               fontWeight: 500,
               mb: 3,
               color: "text",
-              display: "block",
+              display: "block"
             }}
           >
             {"← stream list"}
@@ -232,7 +241,7 @@ export default () => {
               sx={{
                 justifyContent: "flex-start",
                 alignItems: "baseline",
-                flexDirection: "column",
+                flexDirection: "column"
               }}
             >
               <Heading as="h3" sx={{ mb: "0.5em" }}>
@@ -244,7 +253,7 @@ export default () => {
                   alignItems: "center",
                   gridTemplateColumns: "10em auto",
                   width: "100%",
-                  fontSize: 0,
+                  fontSize: 0
                 }}
               >
                 <Cell>Stream name</Cell>
@@ -264,85 +273,85 @@ export default () => {
                     </Button>
                   )}
                 </Cell>
-                <Cell>RTMP ingest URL</Cell>
-                <Cell>
-                  {keyRevealed ? (
-                    <ShowURL
-                      text=""
-                      url={getIngestURL(stream, keyRevealed)}
-                      urlToCopy={getIngestURL(stream, true)}
-                      anchor={false}
-                    />
-                  ) : (
-                    <Flex
-                      sx={{
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          minWidth: 125,
-                          fontSize: 12,
-                          paddingRight: "1em",
-                        }}
-                      >
-                        {getIngestURL(stream, false)}
-                        <b>stream-key</b>
-                        <i sx={{ ml: "2em" }}>
-                          Reveal your stream key and the full URL via the button
-                          above.
-                        </i>
-                      </Box>
-                    </Flex>
-                  )}
-                </Cell>
-                <Cell>Playback URL</Cell>
-                <Cell>
-                  <ShowURL text="" url={getPlaybackURL(stream)} anchor={true} />
-                </Cell>
-                <Cell>Record stream</Cell>
+                <Box
+                  sx={{ mx: "0.4em", mt: "2em", mb: "0", gridColumn: "1/-1" }}
+                >
+                  <h5>Ingest and playback URL pairs:</h5>
+                </Box>
                 <Box
                   sx={{
-                    m: "0.4em",
-                    justifySelf: "flex-start",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    if (stream.record) {
-                      setRecordOffModal(true);
-                    } else {
-                      doSetRecord(stream, true);
-                    }
+                    mx: "0.4em",
+                    mt: "0.4em",
+                    mb: "1.5em",
+                    gridColumn: "1/-1"
                   }}
                 >
-                  <Flex>
-                    <Checkbox value={stream.record} />
-                    <ReactTooltip
-                      id={`tooltip-record-${stream.id}`}
-                      className="tooltip"
-                      place="top"
-                      type="dark"
-                      effect="solid"
-                    >
-                      <p>
-                        When checked, transcoded streaming sessions will be
-                        recorded and stored by Livepeer.
-                        <br /> Each recorded session will have a recording .m3u8
-                        URL for playback. <br />
-                        This feature is currently in beta and free.
-                      </p>
-                    </ReactTooltip>
-                    <Help
-                      data-tip
-                      data-for={`tooltip-record-${stream.id}`}
-                      sx={{
-                        color: "muted",
-                        cursor: "pointer",
-                        ml: 1,
-                      }}
-                    />
-                  </Flex>
+                  <Link
+                    href="/docs/guides/dashboard/ingest-playback-url-pair"
+                    passHref
+                  >
+                    <A target="_blank">
+                      <i>Learn how to pick an ingest and playback URL pair.</i>
+                    </A>
+                  </Link>
+                </Box>
+                {ingest.map((_, i) => {
+                  return (
+                    <>
+                      <Cell>RTMP ingest URL {i + 1}</Cell>
+                      <Cell>
+                        {keyRevealed ? (
+                          <ShowURL
+                            text=""
+                            url={getIngestURL(stream, keyRevealed, i)}
+                            urlToCopy={getIngestURL(stream, true, i)}
+                            anchor={false}
+                          />
+                        ) : (
+                          <Flex
+                            sx={{
+                              justifyContent: "flex-start",
+                              alignItems: "center"
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                minWidth: 125,
+                                fontSize: 12,
+                                paddingRight: "1em"
+                              }}
+                            >
+                              {getIngestURL(stream, false, i)}
+                              <b>stream-key</b>
+                            </Box>
+                          </Flex>
+                        )}
+                      </Cell>
+                      <Box
+                        sx={{
+                          m: "0.4em",
+                          mb: "1.4em"
+                        }}
+                      >
+                        Playback URL {i + 1}
+                      </Box>
+                      <Box
+                        sx={{
+                          m: "0.4em",
+                          mb: "1.4em"
+                        }}
+                      >
+                        <ShowURL
+                          text=""
+                          url={getPlaybackURL(stream, i)}
+                          anchor={true}
+                        />
+                      </Box>
+                    </>
+                  );
+                })}
+                <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
+                  <hr />
                 </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
@@ -374,6 +383,49 @@ export default () => {
                     <Cell>
                       <strong>Admin only fields:</strong>
                     </Cell>
+                    <Cell>Record stream</Cell>
+                    <Box
+                      sx={{
+                        m: "0.4em",
+                        justifySelf: "flex-start",
+                        cursor: "pointer"
+                      }}
+                      onClick={() => {
+                        if (stream.record) {
+                          setRecordOffModal(true);
+                        } else {
+                          doSetRecord(stream, true);
+                        }
+                      }}
+                    >
+                      <Flex>
+                        <Checkbox value={stream.record} />
+                        <ReactTooltip
+                          id={`tooltip-record-${stream.id}`}
+                          className="tooltip"
+                          place="top"
+                          type="dark"
+                          effect="solid"
+                        >
+                          <p>
+                            When checked, transcoded streaming sessions will be
+                            recorded and stored by Livepeer.com.
+                            <br /> Each recorded session will have a recording
+                            .m3u8 URL for playback. <br />
+                            This feature is currently in beta and free.
+                          </p>
+                        </ReactTooltip>
+                        <Help
+                          data-tip
+                          data-for={`tooltip-record-${stream.id}`}
+                          sx={{
+                            color: "muted",
+                            cursor: "pointer",
+                            ml: 1
+                          }}
+                        />
+                      </Flex>
+                    </Box>
                     <Cell>Deleted</Cell>
                     <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
                     <Cell>Source segments</Cell>
@@ -384,6 +436,36 @@ export default () => {
                     <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
                     <Cell>Transcoded duration</Cell>
                     <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
+                    <Cell>Papertrail to stream key</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.streamKey}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.streamKey}
+                      </a>
+                    </Cell>
+                    <Cell>Papertrail to playback id</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.playbackId}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.playbackId}
+                      </a>
+                    </Cell>
+                    <Cell>Papertrail to stream id</Cell>
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                        sx={{ userSelect: "all" }}
+                      >
+                        {stream.id}
+                      </a>
+                    </Cell>
                   </>
                 ) : null}
               </Box>
@@ -391,6 +473,7 @@ export default () => {
             <Flex
               sx={{
                 justifyContent: "flex-end",
+                mb: 3
               }}
             >
               <Button
@@ -401,7 +484,7 @@ export default () => {
                 Delete
               </Button>
             </Flex>
-            <StreamSessionsTable streamId={stream.id} />
+            {/* <StreamSessionsTable streamId={stream.id} /> */}
           </>
         ) : notFound ? (
           <Box>Not found</Box>

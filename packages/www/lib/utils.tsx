@@ -1,6 +1,8 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
 import { Tree } from "../components/TableOfContents";
+import { Stripe, loadStripe } from "@stripe/stripe-js";
+import { theme } from "./theme";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
@@ -121,3 +123,116 @@ export function getMaxLines(element: HTMLElement, height: number) {
   if (lineHeight <= 0) return 0;
   return Math.floor(height / lineHeight);
 }
+
+export function blocksToText(blocks, opts = {}) {
+  const options = Object.assign({}, { nonTextBehavior: "remove" }, opts);
+  return blocks
+    .map((block) => {
+      if (block._type !== "block" || !block.children) {
+        return options.nonTextBehavior === "remove"
+          ? ""
+          : `[${block._type} block]`;
+      }
+
+      return block.children.map((child) => child.text).join("");
+    })
+    .join("\n\n");
+}
+
+/**
+ * This is a singleton to ensure we only instantiate Stripe once.
+ */
+let stripePromise: Promise<Stripe | null>;
+export const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  }
+  return stripePromise;
+};
+
+export function formatAmountForDisplay(
+  amount: number,
+  currency: string
+): string {
+  let numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol"
+  });
+  return numberFormat.format(amount);
+}
+
+export function formatAmountForStripe(
+  amount: number,
+  currency: string
+): number {
+  let numberFormat = new Intl.NumberFormat(["en-US"], {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "symbol"
+  });
+  const parts = numberFormat.formatToParts(amount);
+  let zeroDecimalCurrency: boolean = true;
+  for (let part of parts) {
+    if (part.type === "decimal") {
+      zeroDecimalCurrency = false;
+    }
+  }
+  return zeroDecimalCurrency ? amount : Math.round(amount * 100);
+}
+
+export async function fetchGetJSON(url: string) {
+  try {
+    const data = await fetch(url).then((res) => res.json());
+    return data;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export async function fetchPostJSON(url: string, data?: {}) {
+  try {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json"
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *client
+      body: JSON.stringify(data || {}) // body data type must match "Content-Type" header
+    });
+    return await response.json(); // parses JSON response into native JavaScript objects
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export const CARD_OPTIONS = {
+  iconStyle: "solid" as const,
+  style: {
+    base: {
+      width: "100%",
+      iconColor: theme.colors.primary,
+      color: theme.colors.text,
+      fontWeight: "500",
+      fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+      fontSize: "16px",
+      fontSmoothing: "antialiased",
+      "::placeholder": {
+        color: "#a0aec0"
+      },
+      ":-webkit-autofill": {
+        color: "transparent"
+      }
+    },
+    invalid: {
+      iconColor: theme.colors.red,
+      color: theme.colors.red
+    }
+  }
+};

@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Container, Flex } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
-import { Stream } from "@livepeer.com/api";
-import { RelativeTime, RenditionsDetails } from "../StreamsTable";
+import { RelativeTime } from "../StreamsTable";
 import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
@@ -68,18 +67,18 @@ export const RecordingURL = ({
                 cursor: "pointer",
                 width: 14,
                 height: 14,
-                color: "listText"
+                color: "offBlack"
               }}
             />
           </Flex>
         </CopyToClipboard>
       ) : null}
-      {!!isCopied && <Box sx={{ fontSize: 12, color: "listText" }}>Copied</Box>}
+      {!!isCopied && <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>}
     </Flex>
   );
 };
 
-export default ({
+const StreamSessionsTable = ({
   streamId,
   mt = null
 }: {
@@ -88,7 +87,7 @@ export default ({
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
   const [baseUrl, setBaseUrl] = useState(null);
-  const { getStreamSessions, getIngest } = useApi();
+  const { user, getStreamSessions, getIngest } = useApi();
   useEffect(() => {
     getIngest()
       .then((ingest) => {
@@ -119,22 +118,23 @@ export default ({
   return streamsSessions.length ? (
     <Container sx={{ mb: 5, mt: 2 }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
-      <Table sx={{ gridTemplateColumns: "auto auto auto " }}>
+      <Table
+        sx={{
+          gridTemplateColumns: user.admin
+            ? "auto auto auto auto"
+            : "auto auto auto "
+        }}
+      >
         <TableRow variant={TableRowVariant.Header}>
           <Box>Created</Box>
           <Box>Last Active</Box>
           <Box>Recording URL</Box>
+          {user.admin ? <Box>Papertrail</Box> : null}
         </TableRow>
         {streamsSessions.map((stream) => {
-          const {
-            id,
-            lastSeen,
-            createdAt,
-            sourceSegments,
-            transcodedSegments
-          } = stream;
+          const { id, lastSeen, createdAt } = stream;
           return (
-            <TableRow key={id}>
+            <TableRow key={id} selectable={false} textSelectable={true}>
               <RelativeTime
                 id={id}
                 prefix="createdat"
@@ -152,6 +152,17 @@ export default ({
                 hasRecording={!!stream.recordObjectStoreId}
                 baseUrl={baseUrl}
               />
+              {user.admin ? (
+                <Box>
+                  <a
+                    target="_blank"
+                    href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                    sx={{ userSelect: "all" }}
+                  >
+                    {stream.id}
+                  </a>
+                </Box>
+              ) : null}
             </TableRow>
           );
         })}
@@ -159,3 +170,5 @@ export default ({
     </Container>
   ) : null;
 };
+
+export default StreamSessionsTable;

@@ -21,7 +21,6 @@ const resolver = new Resolver()
 
 const app = Router()
 const hackMistSettings = (req, profiles) => {
-  // FIXME: tempoarily, Mist can only make passthrough FPS streams with 2-second gop sizes
   if (
     !req.headers['user-agent'] ||
     !req.headers['user-agent'].toLowerCase().includes('mistserver')
@@ -32,17 +31,19 @@ const hackMistSettings = (req, profiles) => {
   return profiles.map((profile) => {
     profile = {
       ...profile,
-      fps: 0,
     }
     if (typeof profile.gop === 'undefined') {
       profile.gop = '2.0'
+    }
+    if (typeof profile.fps === 'undefined') {
+      profile.fps = 0
     }
     return profile
   })
 }
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, streamsonly, sessionsonly, all } = req.query
+  let { limit, cursor, streamsonly, sessionsonly, all, active } = req.query
 
   const query = []
   if (!all) {
@@ -52,6 +53,9 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
     query.push(sql`data->>'parentId' IS NULL`)
   } else if (sessionsonly) {
     query.push(sql`data->>'parentId' IS NOT NULL`)
+  }
+  if (active) {
+    query.push(sql`data->>'isActive' = 'true'`)
   }
 
   const [output, newCursor] = await db.stream.find(query, { cursor, limit })
@@ -218,7 +222,8 @@ app.post(
       return res.json({ errors: ['not found'] })
     }
 
-    const id = uuid()
+    // The first four letters of our playback id are the shard key.
+    const id = stream.playbackId.slice(0, 4) + uuid().slice(4)
     const createdAt = Date.now()
 
     const doc = wowzaHydrate({
@@ -262,11 +267,16 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
   }
   const id = uuid()
   const createdAt = Date.now()
-  const streamKey = await generateUniqueStreamKey(req.store, [])
+  let streamKey = await generateUniqueStreamKey(req.store, [])
   // Mist doesn't allow dashes in the URLs
-  const playbackId = (
+  let playbackId = (
     await generateUniqueStreamKey(req.store, [streamKey])
   ).replace(/-/g, '')
+
+  // use the first four characters of the id as the "shard key" across all identifiers
+  const shardKey = id.slice(0, 4)
+  streamKey = shardKey + streamKey.slice(4)
+  playbackId = shardKey + playbackId.slice(4)
 
   let objectStoreId
   if (req.body.objectStoreId) {
@@ -415,16 +425,20 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
     }
   }
 
-  stream.isActive = req.body.active
+  stream.isActive = !!req.body.active
   stream.lastSeen = +new Date()
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, {
+    isActive: stream.isActive,
+    lastSeen: stream.lastSeen,
+  })
 
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false)
     if (pStream && !pStream.deleted) {
-      pStream.isActive = req.body.active
-      pStream.lastSeen = stream.lastSeen
-      await req.store.replace(pStream)
+      await db.stream.update(pStream.id, {
+        isActive: stream.isActive,
+        lastSeen: stream.lastSeen,
+      })
     }
   }
 
@@ -449,8 +463,7 @@ app.patch('/:id/record', authMiddleware({}), async (req, res) => {
   }
   console.log(`set stream ${id} record ${req.body.record}`)
 
-  stream.record = !!req.body.record
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, { record: !!req.body.record })
 
   res.status(204)
   res.end()
@@ -468,11 +481,55 @@ app.delete('/:id', authMiddleware({}), async (req, res) => {
     return res.json({ errors: ['not found'] })
   }
 
-  stream.deleted = true
-  await req.store.replace(stream)
+  await db.stream.update(stream.id, {
+    deleted: true,
+  })
 
   res.status(204)
   res.end()
+})
+
+app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
+  let { id } = req.params
+  let stream = await db.stream.getByStreamKey(id)
+  let session,
+    isPlaybackid = false,
+    isStreamKey = !!stream,
+    isSession = false
+  if (!stream) {
+    stream = await db.stream.getByPlaybackId(id)
+    isPlaybackid = !!stream
+  }
+  if (!stream) {
+    stream = await db.stream.get(id)
+  }
+  if (stream && stream.parentId) {
+    session = stream
+    isSession = true
+    stream = await db.stream.get(stream.parentId)
+  }
+  if (!stream) {
+    res.staus(404)
+    return res.json({
+      errors: ['not found'],
+    })
+  }
+  if (!session) {
+    // find last session
+    session = await db.stream.getLastSession(stream.id)
+  }
+  const user = await req.store.get(`user/${stream.userId}`)
+  const resp = {
+    stream,
+    session,
+    isPlaybackid,
+    isSession,
+    isStreamKey,
+    user,
+  }
+
+  res.status(200)
+  res.json(resp)
 })
 
 app.post('/hook', async (req, res) => {
@@ -556,8 +613,9 @@ app.post('/hook', async (req, res) => {
     req.config.recordObjectStoreId &&
     !stream.recordObjectStoreId
   ) {
-    stream.recordObjectStoreId = req.config.recordObjectStoreId
-    await req.store.replace(stream)
+    await db.stream.update(stream.id, {
+      recordObjectStoreId: req.config.recordObjectStoreId,
+    })
   }
   if (
     (live === 'live' && stream.record && stream.recordObjectStoreId) ||
@@ -578,8 +636,15 @@ app.post('/hook', async (req, res) => {
     recordObjectStore = ros.url
   }
 
+  // Use our parents' playbackId for sharded playback
+  let manifestID = streamId
+  if (stream.parentId) {
+    const parent = await db.stream.get(stream.parentId)
+    manifestID = parent.playbackId
+  }
+
   res.json({
-    manifestId: streamId,
+    manifestID: manifestID,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,

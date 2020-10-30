@@ -148,6 +148,25 @@ Receives user information
 | 200     | Success     |
 | default | Error       |
 
+#### PATCH
+
+##### Description
+
+updates a user
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| id   | path       |             | Yes      | string |
+
+##### Responses
+
+| Code    | Description |
+| ------- | ----------- |
+| 200     | Success     |
+| default | Error       |
+
 #### GET
 
 ##### Description
@@ -368,6 +387,42 @@ deletes a specific webhook details
 | email | string  | user email address<br>_Example:_ `"useremail@gmail.com"` | Yes      |
 | admin | boolean | _Example:_ `true`                                        | Yes      |
 
+#### create-customer
+
+| Name  | Type   | Description                                              | Required |
+| ----- | ------ | -------------------------------------------------------- | -------- |
+| email | string | user email address<br>_Example:_ `"useremail@gmail.com"` | Yes      |
+
+#### create-subscription
+
+| Name                          | Type   | Description                                                             | Required |
+| ----------------------------- | ------ | ----------------------------------------------------------------------- | -------- |
+| stripeCustomerId              | string | stripe customer id<br>_Example:_ `"cus_xxxxxxxxxxxxxx"`                 | Yes      |
+| stripeCustomerPaymentMethodId | string | stripe payment method id<br>_Example:_ `"src_xxxxxxxxxxxxxxxxxxxxxxxx"` | No       |
+| stripeProductId               | string | stripe product id<br>_Example:_ `"prod_0"`                              | Yes      |
+
+#### update-subscription
+
+| Name                          | Type   | Description                                                            | Required |
+| ----------------------------- | ------ | ---------------------------------------------------------------------- | -------- |
+| stripeCustomerId              | string | stripe customer id<br>_Example:_ `"cus_xxxxxxxxxxxxxx"`                | Yes      |
+| stripeCustomerSubscriptionId  | string | stripe subscription id<br>_Example:_ `"sub_xxxxxxxxxxxxxx"`            | No       |
+| stripeCustomerPaymentMethodId | string | stripe payment method id<br>_Example:_ `"pm_xxxxxxxxxxxxxxxxxxxxxxxx"` | No       |
+| stripeProductId               | string | stripe product id<br>_Example:_ `"prod_0"`                             | Yes      |
+
+#### update-customer-payment-method
+
+| Name                          | Type   | Description                                                            | Required |
+| ----------------------------- | ------ | ---------------------------------------------------------------------- | -------- |
+| stripeCustomerId              | string | stripe customer id<br>_Example:_ `"cus_xxxxxxxxxxxxxx"`                | Yes      |
+| stripeCustomerPaymentMethodId | string | stripe payment method id<br>_Example:_ `"pm_xxxxxxxxxxxxxxxxxxxxxxxx"` | Yes      |
+
+#### retrieve-customer-payment-method
+
+| Name                          | Type   | Description                                                             | Required |
+| ----------------------------- | ------ | ----------------------------------------------------------------------- | -------- |
+| stripeCustomerPaymentMethodId | string | stripe payment method id<br>_Example:_ `"src_xxxxxxxxxxxxxxxxxxxxxxxx"` | Yes      |
+
 #### password-reset
 
 | Name       | Type   | Description                                              | Required |
@@ -379,13 +434,23 @@ deletes a specific webhook details
 
 #### user
 
-| Name            | Type    | Description                                              | Required |
-| --------------- | ------- | -------------------------------------------------------- | -------- |
-| email           | string  | user email address<br>_Example:_ `"useremail@gmail.com"` | Yes      |
-| password        | string  | _Example:_ `"thisisapassword"`                           | Yes      |
-| emailValidToken | string  | _Example:_ `"E1F53135E559C253"`                          | No       |
-| emailValid      | boolean | _Example:_ `true`                                        | No       |
-| salt            | string  | _Example:_ `"E1F53135E559C253"`                          | No       |
-| admin           | boolean | _Example:_ `true`                                        | No       |
-| kind            | string  | _Example:_ `"user"`                                      | No       |
-| id              | string  | _Example:_ `"abc123"`                                    | No       |
+| Name                          | Type    | Description                                              | Required |
+| ----------------------------- | ------- | -------------------------------------------------------- | -------- |
+| email                         | string  | user email address<br>_Example:_ `"useremail@gmail.com"` | Yes      |
+| password                      | string  | _Example:_ `"thisisapassword"`                           | Yes      |
+| emailValidToken               | string  | _Example:_ `"E1F53135E559C253"`                          | No       |
+| emailValid                    | boolean | _Example:_ `true`                                        | No       |
+| salt                          | string  | _Example:_ `"E1F53135E559C253"`                          | No       |
+| admin                         | boolean | _Example:_ `true`                                        | No       |
+| kind                          | string  | _Example:_ `"user"`                                      | No       |
+| id                            | string  | _Example:_ `"abc123"`                                    | No       |
+| firstName                     | string  | _Example:_ `"Joe"`                                       | No       |
+| lastName                      | string  | _Example:_ `"Smith"`                                     | No       |
+| organization                  | string  | _Example:_ `"Livepeer"`                                  | No       |
+| phone                         | string  | _Example:_ `2034212122`                                  | No       |
+| stripeProductId               | string  | _Example:_ `"prod_0"`                                    | No       |
+| stripeCustomerId              | string  | _Example:_ `"cus_Jv6KvgT0DCH8HU"`                        | No       |
+| stripeCustomerPaymentMethodId | string  | _Example:_ `"pm_2FSSNNJfrKDAwlJ9n4EN15Du"`               | No       |
+| stripeCustomerSubscriptionId  | string  | _Example:_ `"sub_I29pdyfOTPBkjb"`                        | No       |
+| ccLast4                       | string  | _Example:_ `1234`                                        | No       |
+| ccBrand                       | string  | _Example:_ `1234`                                        | No       |

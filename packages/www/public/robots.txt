@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+Host: https://livepeer.com
+Sitemap: https://livepeer.com/sitemap.xml

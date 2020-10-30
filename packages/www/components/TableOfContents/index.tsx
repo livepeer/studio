@@ -15,6 +15,20 @@ type Props = {
   ignoreList?: string[];
 };
 
+function flatten(items) {
+  const flat = [];
+
+  items.forEach((item) => {
+    if (Array.isArray(item)) {
+      flat.push(...flatten(item));
+    } else {
+      flat.push(item);
+    }
+  });
+
+  return flat;
+}
+
 const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
   children,
   pushSx
@@ -145,10 +159,13 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
   }
 
   function renderPair(pair: Tree, isChildren = false) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [heading, children] = pair;
     const hasChildren = children?.length > 0;
-
+    const router = useRouter();
+    const isActive = flatten(children).filter(
+      (obj) => obj.slug === router?.pathname
+    ).length;
     if (ignoreList.includes(heading.content)) return <></>;
     return (
       <>
@@ -163,7 +180,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
           <Box>{renderHeading(heading, hasChildren, isChildren)}</Box>
           {hasChildren && (
             <>
-              {isOpen ? (
+              {isOpen || isActive ? (
                 <IconContainer pushSx={{ m: 0 }}>
                   <FiChevronUp />
                 </IconContainer>
@@ -178,7 +195,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
         {hasChildren && (
           <Box
             sx={{
-              display: isOpen ? "block" : "none",
+              display: isOpen || isActive ? "block" : "none",
               my: 0,
               pl: "8px"
             }}

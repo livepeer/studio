@@ -1,7 +1,6 @@
 import Link from "next/link";
 import LogoSvg from "../../public/img/logo.svg";
-import { Link as A } from "@theme-ui/components";
-import { Box } from "@theme-ui/components";
+import { Flex, Link as A } from "@theme-ui/components";
 
 type Props = {
   logoType?: boolean;
@@ -23,18 +22,38 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         }
       }}
     >
-      <LogoSvg sx={{ color: isDark ? "background" : "text" }} />
+      <LogoSvg
+        sx={{
+          color: isDark ? "background" : "text"
+        }}
+      />
       {logoType && (
-        <Box
+        <Flex
           sx={{
+            alignItems: "center",
             ml: "12px",
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: "22px"
           }}
         >
           Livepeer.com
-        </Box>
+        </Flex>
       )}
+      <span
+        sx={{
+          mt: "2px",
+          ml: logoType ? "6px" : "10px",
+          fontWeight: 700,
+          letterSpacing: 0,
+          fontSize: "10px",
+          borderRadius: 1000,
+          px: 2,
+          py: "2px",
+          bg: "rgb(148, 60, 255, .1)"
+        }}
+      >
+        beta
+      </span>
     </A>
   </Link>
 );

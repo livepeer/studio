@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, Container } from "@theme-ui/components";
+import { Box, Button, Container, Flex } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import { RelativeTime, StreamName, RenditionsDetails } from "../StreamsTable";
 import ReactTooltip from "react-tooltip";
 import { UserName } from "../AdminTokenTable";
 import { Stream, User } from "@livepeer.com/api";
+
+function dur2str(dur?: number) {
+  if (!dur) {
+    return "";
+  }
+  if (dur < 120) {
+    return `${dur.toFixed(2)} sec`;
+  }
+  const min = dur / 60;
+  if (min < 12) {
+    return `${min.toFixed(2)} min`;
+  }
+  const hour = min / 60;
+  return `${hour.toFixed(2)} hours`;
+}
 
 const Segments = ({ stream }: { stream: Stream }) => {
   const idpref = `segments-${stream.id}`;
@@ -24,6 +39,11 @@ const Segments = ({ stream }: { stream: Stream }) => {
       </ReactTooltip>
       <span data-tip data-for={`tooltip-${idpref}`}>
         {stream.sourceSegments || 0}/{stream.transcodedSegments || 0}
+      </span>
+      <br />
+      <span>
+        {dur2str(stream.sourceSegmentsDuration || 0)}/
+        {dur2str(stream.transcodedSegmentsDuration || 0)}
       </span>
     </Box>
   );
@@ -55,6 +75,7 @@ const sortActiveF = (a: Stream, b: Stream) =>
 
 export default ({ id }: { id: string }) => {
   const [broadcasters, setBroadcasters] = useState(null);
+  const [activeOnly, setActiveOnly] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStream, setSelectedStream] = useState(null);
   const [streams, setStreams] = useState([]);
@@ -62,7 +83,7 @@ export default ({ id }: { id: string }) => {
   const { getAdminStreams, deleteStream, getBroadcasters, getUsers } = useApi();
   const [sortFunc, setSortFunc] = useState(null);
   useEffect(() => {
-    getUsers(1000)
+    getUsers(10000)
       .then((users) => {
         if (Array.isArray(users)) {
           setUsers(users);
@@ -78,7 +99,7 @@ export default ({ id }: { id: string }) => {
       .catch((err) => console.error(err)); // todo: surface this
   }, []);
   useEffect(() => {
-    getAdminStreams()
+    getAdminStreams(activeOnly)
       .then((streams) => {
         if (sortFunc) {
           streams.sort(sortFunc);
@@ -86,7 +107,7 @@ export default ({ id }: { id: string }) => {
         setStreams(streams);
       })
       .catch((err) => console.error(err)); // todo: surface this
-  }, [deleteModal]);
+  }, [deleteModal, activeOnly]);
   const close = () => {
     setDeleteModal(false);
     setSelectedStream(null);
@@ -97,7 +118,7 @@ export default ({ id }: { id: string }) => {
       return;
     }
     const interval = setInterval(() => {
-      getAdminStreams()
+      getAdminStreams(activeOnly)
         .then((streams) => {
           if (sortFunc) {
             streams.sort(sortFunc);
@@ -107,7 +128,7 @@ export default ({ id }: { id: string }) => {
         .catch((err) => console.error(err)); // todo: surface this
     }, 5000);
     return () => clearInterval(interval);
-  }, [isVisible, sortFunc]);
+  }, [isVisible, sortFunc, activeOnly]);
 
   const sortUserId = () => {
     if (streams) {
@@ -178,7 +199,7 @@ export default ({ id }: { id: string }) => {
           </a>
         </Link>
         <Button
-          variant="secondarySmall"
+          variant="primarySmall"
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}
@@ -186,6 +207,13 @@ export default ({ id }: { id: string }) => {
         >
           Delete
         </Button>
+        <Flex
+          sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
+          onClick={() => setActiveOnly(!activeOnly)}
+        >
+          <Checkbox value={activeOnly} />
+          <Box sx={{ ml: "0.5em" }}> Show active only</Box>
+        </Flex>
       </Box>
       <Table
         sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto auto" }}

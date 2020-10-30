@@ -24,7 +24,7 @@
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
     "test": "lerna run --stream test --no-sort --concurrency=999 --ignore @livepeer.com/www --ignore @livepeer.com/admin",
-    "dev": "cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
+    "dev": "touch .env.local && cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
     "deploy:staging": "run-p wrangler:staging now:staging",
     "deploy:production": "run-p wrangler:production now:production",

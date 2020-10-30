@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import readingTime from "reading-time";
-import { getMaxLines } from "../../lib/utils";
+import { blocksToText, getMaxLines } from "../../lib/utils";
 import Link from "next/link";
 import { Flex, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
@@ -24,7 +24,8 @@ const BlogPostCard = ({
   post: any;
   pushSx?: SxStyleProp;
 }) => {
-  const stats = readingTime(post.body);
+  const text = blocksToText(post.contentRaw);
+  const stats = readingTime(text);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const excerptRef = useRef<HTMLParagraphElement>(null);
   const [excerptMaxLines, setExcerptMaxLines] = useState<number>();

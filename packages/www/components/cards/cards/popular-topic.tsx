@@ -59,7 +59,7 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
           sx={{
             color: "text",
             fontWeight: 600,
-            fontSize: "20px",
+            fontSize: "19px",
             lineHeight: "23px",
             letterSpacing: "-0.03em",
             pb: 2

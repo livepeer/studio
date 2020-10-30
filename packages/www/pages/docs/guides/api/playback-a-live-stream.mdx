@@ -3,22 +3,19 @@ import DocsLayout from "../../../../components/DocsLayout";
 <DocsLayout>
 
 
-## Playback a Live Stream
+# How to playback a live stream with the Livepeer.com API
 
-Once the broadcast session is started, transcoding will automatically happen.
-Users can view the live stream with any HLS video player by using the playback
-URL: `{playback_base_url}/{playbackId}/index.m3u8`. (for example, with
-[video.js](https://videojs.github.io/videojs-contrib-hls/))
+Once the broadcast session is started, transcoding will automatically happen. To playback a live stream, you’ll need the `playbackId` from when you [created a stream object](/docs/guides/api/create-a-stream). You also need to know your [playback base URL](/docs/guides/api/base-urls).
 
-You can use fetch and examine the playlist by using the playback URL, which
-should give you the full HLS playlist that includes all 4 different renditions.
-For example:
+Users can view the live stream with any HLS video player (for example [video.js](https://videojs.github.io/videojs-contrib-hls/)) by using the playback URL: `{playback_base_url}/{playbackId}/index.m3u8`. The playback URL for RTMP streams is delivered via a content delivery network (CDN). 
+
+You can use fetch and examine the playlist by using the playback URL. For example:
 
 ```bash
-curl "https://mdw-cdn.livepeer.com/hls/{playbackId}/index.m3u8"
+curl "https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8"
 ```
 
-You should see a response like:
+You should give you the full HLS playlist that includes the source and transcoded renditions. For example:
 
 ```bash
 #EXTM3U
@@ -32,8 +29,10 @@ You should see a response like:
 4_0/index.m3u8?sessId=23351
 ```
 
-If you don't see a response like this, it's likely because the stream is not
-live.
+If you don't see a response like this, it's likely because the stream is not live.
+
+Next, learn [how to list all streams created by a user with the Livepeer.com API](/docs/guides/api/list-all-streams).
+
 
 </DocsLayout>
 

@@ -28,12 +28,31 @@ type ApiState = {
 };
 
 export interface UsageData {
-  sourceSegments: number
-  transcodedSegments: number
-  sourceSegmentsDuration: number
-  transcodedSegmentsDuration: number
+  sourceSegments: number;
+  transcodedSegments: number;
+  sourceSegmentsDuration: number;
+  transcodedSegmentsDuration: number;
 }
 
+export interface StreamInfo {
+  stream: Stream;
+  session?: Stream;
+  isPlaybackid: boolean;
+  isSession: boolean;
+  isStreamKey: boolean;
+  user: User;
+}
+
+export interface Version {
+  tag: string;
+  commit: string;
+}
+
+export interface Ingest {
+  ingest: string;
+  playback: string;
+  base: string;
+}
 
 const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
 const storeToken = (token) => {
@@ -85,6 +104,7 @@ const makeContext = (state: ApiState, setState) => {
         headers.set("authorization", `JWT ${state.token}`);
       }
       const endpoint =
+        window.location.hostname.includes("livepeer.monster") ||
         window.location.hostname.includes("livepeerorg.vercel.app") ||
         window.location.hostname.includes("livepeerorg.now.sh")
           ? `https://livepeer.monster/api${url}`
@@ -131,18 +151,54 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async register(email, password) {
+    async register({
+      email,
+      password,
+      selectedPlan = 0,
+      firstName = null,
+      lastName = null,
+      phone = null,
+      organization = null
+    }) {
       trackPageView(email);
-      const [res, body] = await context.fetch("/user", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: {
-          "content-type": "application/json"
+      const [res, body] = await context.fetch(
+        `/user?selectedPlan=${selectedPlan}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password,
+            ...(firstName && { firstName }),
+            ...(lastName && { lastName }),
+            ...(organization && { organization }),
+            ...(phone && { phone })
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
         }
-      });
+      );
       if (res.status !== 201) {
         return body;
       }
+
+      // Only create stripe customer if developer explicitly enables stripe in dev mode
+      if (
+        process.env.NODE_ENV === "development" &&
+        !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+      ) {
+        return context.login(email, password);
+      }
+
+      // Create stripe customer
+      const customer: any = await context.createCustomer(email);
+
+      // Subscribe customer to free plan upon registation
+      await context.createSubscription({
+        stripeCustomerId: customer.id,
+        stripeProductId: "prod_0"
+      });
+
       return context.login(email, password);
     },
 
@@ -199,8 +255,15 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async getUsage(fromTime: number, toTime: number, userId?: number): Promise<[Response, UsageData | ApiError]> {
-      let [res, usage] = await context.fetch(`/user/usage?${qs.stringify({ fromTime, toTime, userId })}`, {});
+    async getUsage(
+      fromTime: number,
+      toTime: number,
+      userId?: number
+    ): Promise<[Response, UsageData | ApiError]> {
+      let [res, usage] = await context.fetch(
+        `/user/usage?${qs.stringify({ fromTime, toTime, userId })}`,
+        {}
+      );
 
       return [res, usage as UsageData | ApiError];
     },
@@ -213,6 +276,146 @@ const makeContext = (state: ApiState, setState) => {
           "content-type": "application/json"
         }
       });
+
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async createCustomer(email): Promise<[Response, User | ApiError]> {
+      const [, body] = await context.fetch("/user/create-customer", {
+        method: "POST",
+        body: JSON.stringify({ email: email }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      return body;
+    },
+
+    async updateUser(id, fields): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch(`/user/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ ...fields }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async createSubscription({
+      stripeCustomerId,
+      stripeProductId
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch("/user/create-subscription", {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId,
+          stripeProductId
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async updateSubscription({
+      stripeCustomerId,
+      stripeCustomerSubscriptionId,
+      stripeProductId,
+      stripeCustomerPaymentMethodId = null
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch("/user/update-subscription", {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId,
+          stripeCustomerSubscriptionId,
+          stripeProductId,
+          ...(stripeCustomerPaymentMethodId && {
+            stripeCustomerPaymentMethodId
+          })
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        return body;
+      }
+
+      return res;
+    },
+
+    async getSubscription(
+      stripeCustomerSubscriptionId: string
+    ): Promise<[Response, ApiError]> {
+      let [res, subscription] = await context.fetch(
+        `/user/retrieve-subscription`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripeCustomerSubscriptionId
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        }
+      );
+
+      return [res, subscription];
+    },
+
+    async getInvoices(stripeCustomerId: string): Promise<[Response, ApiError]> {
+      let [res, invoice] = await context.fetch(`/user/retrieve-invoices`, {
+        method: "POST",
+        body: JSON.stringify({
+          stripeCustomerId
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+
+      return [res, invoice];
+    },
+
+    async updateCustomerPaymentMethod({
+      stripeCustomerId,
+      stripeCustomerPaymentMethodId
+    }): Promise<[Response, User | ApiError]> {
+      const [res, body] = await context.fetch(
+        "/user/update-customer-payment-method",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripeCustomerId,
+            stripeCustomerPaymentMethodId
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        }
+      );
 
       if (res.status !== 201) {
         return body;
@@ -234,14 +437,21 @@ const makeContext = (state: ApiState, setState) => {
       return broadcasters;
     },
 
-    async getIngest(): Promise<
-      Array<{ ingest: string; playback: string; base: string }>
-    > {
-      const [res, ingest] = await context.fetch(`/ingest`);
+    async getIngest(all = false): Promise<Array<Ingest>> {
+      const q = all ? "?first=false" : "";
+      const [res, ingest] = await context.fetch(`/ingest${q}`);
       if (res.status !== 200) {
         throw new Error(ingest);
       }
       return ingest;
+    },
+
+    async getStreamInfo(
+      id: string
+    ): Promise<[Response, StreamInfo | ApiError]> {
+      let [res, info] = await context.fetch(`/stream/${id}/info`);
+
+      return [res, info as StreamInfo | ApiError];
     },
 
     async getStream(streamId): Promise<Stream> {
@@ -254,8 +464,12 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getAdminStreams(): Promise<Array<Stream>> {
-      const [res, streams] = await context.fetch(`/stream?streamsonly=1`);
+    async getAdminStreams(active = false): Promise<Array<Stream>> {
+      let url = `/stream?streamsonly=1`;
+      if (active) {
+        url += `&active=1`;
+      }
+      const [res, streams] = await context.fetch(url);
       if (res.status !== 200) {
         throw new Error(streams);
       }
@@ -394,6 +608,14 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 204) {
         throw new Error(body);
       }
+    },
+
+    async getVersion(): Promise<Version> {
+      let [res, info] = await context.fetch(`/version`);
+      if (res.status === 200) {
+        return info as Version;
+      }
+      return { tag: "unknown", commit: "unknowm" };
     }
   };
   return context;

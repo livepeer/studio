@@ -123,7 +123,8 @@ const NavigationBase = ({
                   Log in
                 </Link>
                 <Button
-                  variant="buttons.secondarySmall"
+                  sx={{ py: "6px" }}
+                  variant="buttons.primarySmall"
                   href="/register"
                   isLink
                 >
@@ -133,13 +134,25 @@ const NavigationBase = ({
             )}
             {loggedIn && (
               <>
+                {isDashboard &&
+                  user?.stripeProductId === "prod_0" &&
+                  user?.emailValid !== false && (
+                    <Button
+                      sx={{ mr: 4, py: "6px" }}
+                      isLink
+                      href="/app/user/plans"
+                      variant="buttons.gradientOutlineSmall"
+                    >
+                      Upgrade
+                    </Button>
+                  )}
                 {user && user.admin && !isDashboard && (
                   <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin
                   </Link>
                 )}
                 {isDashboard && (
-                  <Link href="/docs/guides" variant="nav">
+                  <Link href="/docs" variant="nav">
                     Docs
                   </Link>
                 )}
@@ -157,9 +170,10 @@ const NavigationBase = ({
                 </A>
                 {!isDashboard && (
                   <Button
+                    sx={{ py: "6px" }}
                     isLink
                     href="/app/user"
-                    variant="buttons.secondarySmall"
+                    variant="buttons.primarySmall"
                   >
                     Dashboard
                   </Button>
@@ -171,7 +185,8 @@ const NavigationBase = ({
             sx={{
               color: "black",
               display: ["flex", "flex", "none"],
-              fontSize: 6
+              fontSize: 6,
+              flexShrink: 0
             }}
             onClick={() => setMobileMenuIsOpen(true)}
           >

@@ -85,6 +85,7 @@
     "source-map-support": "^0.5.19",
     "sql-template-strings": "^2.2.2",
     "string-template": "^1.0.0",
+    "stripe": "^8.93.0",
     "uuid": "^3.3.2",
     "whatwg-fetch": "^3.4.0",
     "winston": "^3.2.1",
@@ -100,6 +101,7 @@
     "@types/jest": "^26.0.10",
     "@types/pg": "^7.14.4",
     "ajv-pack": "^0.3.1",
+    "babel-plugin-git-version": "^0.2.0",
     "cloudflare": "^2.7.0",
     "esm": "^3.2.22",
     "istanbul-api": "^2.1.6",
@@ -125,6 +127,14 @@
     "presets": [
       "@babel/preset-env",
       "@babel/preset-typescript"
+    ],
+    "plugins": [
+      [
+        "git-version",
+        {
+          "showDirty": true
+        }
+      ]
     ]
   },
   "browserslist": [
