@@ -162,21 +162,17 @@ app.get('/playback/:playbackId', authMiddleware({}), async (req, res) => {
 
 // returns stream by steamKey
 app.get('/key/:streamKey', authMiddleware({}), async (req, res) => {
-  const {
-    data: [stream],
-  } = await req.store.queryObjects({
-    kind: 'stream',
-    query: { streamKey: req.params.streamKey },
-  })
+  const useReplica = req.query.main !== 'true'
+  const [docs] = await db.stream.find({ streamKey: req.params.streamKey }, { useReplica })
   if (
-    !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
+    !docs.length ||
+    ((docs[0].userId !== req.user.id || docs[0].deleted) && !req.user.admin)
   ) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
   res.status(200)
-  res.json(stream)
+  res.json(docs[0])
 })
 
 // Needed for Mist server
