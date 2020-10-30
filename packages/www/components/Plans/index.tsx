@@ -298,9 +298,31 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     "rgba(0, 0, 0, .1)"
                   ]
                 }}
-                title="1000 minutes / month"
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Transcoding:
+                    </span>{" "}
+                    1000 minutes / month
+                  </span>
+                }
               />
-              <Item title="None" displayX={true} displayCheck={false} />
+              <Item
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Storage:
+                    </span>{" "}
+                    None
+                  </span>
+                }
+                displayX={true}
+                displayCheck={false}
+              />
               <Item
                 title={
                   <span>
@@ -308,7 +330,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       sx={{ display: ["inline", "inline", "inline", "none"] }}
                     >
                       Streaming:
-                    </span>
+                    </span>{" "}
                     10 concurrent viewers / account
                   </span>
                 }
@@ -357,17 +379,44 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             <List>
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="$0.005 USD / min video ingested"
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Transcoding:
+                    </span>{" "}
+                    $0.005 USD / min video ingested
+                  </span>
+                }
                 color="pink"
               />
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="Coming soon"
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Storage:
+                    </span>{" "}
+                    Coming soon
+                  </span>
+                }
                 color="pink"
               />
               <Item
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
-                title="$0.01 USD / gb video streamed"
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Streaming:
+                    </span>{" "}
+                    $0.01 USD / gb video streamed
+                  </span>
+                }
                 color="pink"
               />
             </List>
@@ -403,9 +452,45 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             />
 
             <List>
-              <Item title="Custom pricing available" color="purple" />
-              <Item title="Coming soon" color="purple" />
-              <Item title="Custom pricing available" color="purple" />
+              <Item
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Transcoding:
+                    </span>{" "}
+                    Custom pricing available
+                  </span>
+                }
+                color="purple"
+              />
+              <Item
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Storage:
+                    </span>{" "}
+                    Coming soon
+                  </span>
+                }
+                color="purple"
+              />
+              <Item
+                title={
+                  <span>
+                    <span
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}
+                    >
+                      Streaming:
+                    </span>{" "}
+                    Custom pricing available
+                  </span>
+                }
+                color="purple"
+              />
             </List>
           </Box>
         </Flex>
