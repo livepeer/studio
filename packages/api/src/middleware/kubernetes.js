@@ -31,13 +31,13 @@ export default function kubernetesMiddleware({
       return endpoints
     } catch (e) {
       if (cache[cacheKey]) {
-        console.log(
+        console.error(
           'WARNING: kubernetes control plane unavailable, returning cached data',
           e,
         )
         return cache[cacheKey]
       }
-      console.log(
+      console.error(
         'ERROR: kubernetes control plane unavailable, cached data unavailable, cannot provide orchestrator list',
       )
       throw e
