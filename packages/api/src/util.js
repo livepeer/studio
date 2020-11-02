@@ -4,10 +4,15 @@ export const timeout = (ms, fn) => {
       reject(Error('timed out'))
     }, ms)
 
-    fn().then((...ret) => {
-      clearTimeout(handle)
-      resolve(...ret)
-    })
+    fn()
+      .then((...ret) => {
+        clearTimeout(handle)
+        resolve(...ret)
+      })
+      .catch((err) => {
+        clearTimeout(handle)
+        reject(err)
+      })
   })
 }
 

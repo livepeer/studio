@@ -33,6 +33,7 @@ export default function kubernetesMiddleware({
       if (cache[cacheKey]) {
         console.log(
           'WARNING: kubernetes control plane unavailable, returning cached data',
+          e,
         )
         return cache[cacheKey]
       }
@@ -41,6 +42,7 @@ export default function kubernetesMiddleware({
       )
       throw e
     }
+    throw new Error('???')
   }
 
   const getBroadcasters = async () => {
