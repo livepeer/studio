@@ -42,7 +42,6 @@ export default function kubernetesMiddleware({
       )
       throw e
     }
-    throw new Error('???')
   }
 
   const getBroadcasters = async () => {
