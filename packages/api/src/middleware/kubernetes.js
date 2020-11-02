@@ -21,6 +21,7 @@ export default function kubernetesMiddleware({
 
   // Try to read namespaced endpoints, return most recent data if we can't
   const cachedReadNamespacedEndpoints = async (kubeService, kubeNamespace) => {
+    // % isn't allowed in k8s names, so it's a suitable delimiter
     const cacheKey = `${kubeService}%${kubeNamespace}`
     try {
       const endpoints = await timeout(5000, () =>
