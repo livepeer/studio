@@ -1,4 +1,5 @@
 import kubernetes from './kubernetes'
+import * as k8s from '@kubernetes/client-node'
 
 /**
  * See also the mock implementation of @kubernetes/client-node in __mocks__
@@ -7,6 +8,9 @@ import kubernetes from './kubernetes'
 describe('kubernetes middleware', () => {
   let middleware
   let req
+  beforeEach(async () => {
+    k8s.testOpts.fail = false
+  })
 
   describe('success cases', () => {
     beforeEach(async () => {
@@ -57,6 +61,22 @@ describe('kubernetes middleware', () => {
           cliAddress: 'http://10.40.2.59:7935',
         },
       ])
+    })
+
+    it('should survive failure of the control pane', async () => {
+      k8s.testOpts.fail = true
+      let error
+      try {
+        await req.getBroadcasters()
+      } catch (e) {
+        error = e
+      }
+      expect(error).toEqual(new Error('intentional test failure'))
+      k8s.testOpts.fail = false
+      const firstResponse = await req.getBroadcasters()
+      k8s.testOpts.fail = true
+      const secondResponse = await req.getBroadcasters()
+      expect(firstResponse).toEqual(secondResponse)
     })
   })
 

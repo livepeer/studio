@@ -1,5 +1,8 @@
 import { broadcasterResponse, orchestratorResponse } from './test-data.json'
 
+// Triggering intentional failures
+export const testOpts = { fail: false }
+
 // For testing the no-endpoints case
 const scrub = (response) => {
   // Cheap "deep copy"
@@ -13,6 +16,9 @@ const orchestratorResponseNoAddress = scrub(orchestratorResponse)
 
 export class KubeApiClient {
   async readNamespacedEndpoints(serviceName, namespaceName) {
+    if (testOpts.fail === true) {
+      throw new Error('intentional test failure')
+    }
     if (serviceName === 'broadcaster') {
       return broadcasterResponse
     }
