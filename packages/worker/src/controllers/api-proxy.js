@@ -42,8 +42,13 @@ app.use(geolocateMiddleware({ region: 'api-region' }), async (req, res) => {
   if (upstreamRes.status === 204) {
     return res.end()
   }
-  const resBody = await upstreamRes.json()
-  res.json(resBody)
+  if (upstreamRes.status >= 200 && upstreamRes.status <= 299) {
+    const resBody = await upstreamRes.json()
+    res.json(resBody)
+  } else {
+    const resText = await upstreamRes.text()
+    res.end(resText)
+  }
 })
 
 export default app
