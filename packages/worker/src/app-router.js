@@ -135,18 +135,20 @@ export default async function makeApp(params) {
     geolocateMiddleware({}),
     getBroadcasterHandler,
   )
+  const useApiRegion = params.apiRegion && params.apiRegion.length > 0
   for (const [name, controller] of Object.entries(controllers)) {
     // if we're operating in api-region mode, only handle geolocation traffic, forward the rest on
-    if (
-      params.apiRegion &&
-      params.apiRegion.length > 0 &&
-      !GEOLOCATION_ENDPOINTS.includes(name)
-    ) {
+    if (useApiRegion && !GEOLOCATION_ENDPOINTS.includes(name)) {
       prefixRouter.use(`/${name}`, apiProxy)
     } else {
       prefixRouter.use(`/${name}`, controller)
     }
   }
+  app.use(httpPrefix, prefixRouter)
+  if (useApiRegion) {
+    prefixRouter.use('*', apiProxy)
+  }
+
   app.use(httpPrefix, prefixRouter)
   // Special case: handle /stream proxies off that endpoint
   app.use('/stream', streamProxy)
