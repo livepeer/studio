@@ -509,7 +509,7 @@ app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
     stream = await db.stream.get(stream.parentId)
   }
   if (!stream) {
-    res.staus(404)
+    res.status(404)
     return res.json({
       errors: ['not found'],
     })
