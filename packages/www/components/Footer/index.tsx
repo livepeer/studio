@@ -27,7 +27,8 @@ const linksLists: LinksListProps[] = [
       { children: "Documentation", href: "/docs" },
       { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
-      { children: "Privacy Policy", href: "/privacy-policy" }
+      { children: "Privacy Policy", href: "/privacy-policy" },
+      { children: "Terms of Service", href: "/terms-of-service" }
     ]
   }
 ];
