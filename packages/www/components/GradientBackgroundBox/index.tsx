@@ -36,7 +36,8 @@ const GradientBackgroundBox = ({
     >
       {gradient && (
         <>
-          {slide && !isMobile && !isSafari ? (
+          {/* TODO: Improve the performance of the Slider */}
+          {false ? (
             <div
               sx={{
                 position: "absolute",
