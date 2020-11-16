@@ -263,6 +263,10 @@ components:
           description: Livepeer-compatible object store URL
           example: s3://access-key:secret-key@us-west-2/bucket-name
           writeOnly: true
+        publicUrl:
+          type: string
+          description: Public URL at which data in this object storage can be accessed
+          example: https://reg-rec.livepeer.live/some/path
         id:
           type: string
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
