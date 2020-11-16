@@ -588,7 +588,8 @@ app.post('/hook', async (req, res) => {
     return res.json({ errors: ['not found'] })
   }
   let objectStore,
-    recordObjectStore = undefined
+    recordObjectStore = undefined,
+    recordObjectStoreUrl
   if (stream.objectStoreId) {
     const os = await req.store.get(
       `object-store/${stream.objectStoreId}`,
@@ -630,6 +631,9 @@ app.post('/hook', async (req, res) => {
       })
     }
     recordObjectStore = ros.url
+    if (ros.publicUrl) {
+      recordObjectStoreUrl = ros.publicUrl
+    }
   }
 
   // Use our parents' playbackId for sharded playback
@@ -645,6 +649,7 @@ app.post('/hook', async (req, res) => {
     profiles: stream.profiles,
     objectStore,
     recordObjectStore,
+    recordObjectStoreUrl,
   })
 })
 
