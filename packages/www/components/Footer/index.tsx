@@ -81,7 +81,9 @@ const Footer = () => {
   const { data: mailchimpResponseData } = mailchimp;
 
   useEffect(() => {
-    getVersion().then((v) => setVersion(v));
+    if (process.env.NODE_ENV === "production") {
+      getVersion().then((v) => setVersion(v));
+    }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {

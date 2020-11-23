@@ -20,7 +20,8 @@
     "dashboard-widget-document-list",
     "media",
     "markdown",
-    "@sanity/code-input"
+    "@sanity/code-input",
+    "mux-input"
   ],
   "parts": [
     {

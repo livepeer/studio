@@ -68,6 +68,10 @@ export default {
         {
           type: 'code',
         },
+        {
+          title: 'Video',
+          type: 'mux.video'
+        }
       ],
     },
   ],
