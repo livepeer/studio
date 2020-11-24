@@ -134,6 +134,10 @@ class statusPoller {
       return
     }
     // console.log(`got status: `, status)
+    const playback2session = new Map<string, string>()
+    for (const k of Object.keys(status.InternalManifests || {})) {
+      playback2session.set(status.InternalManifests[k], k)
+    }
     for (const mid of Object.keys(status.Manifests)) {
       let si,
         needUpdate = false
@@ -151,7 +155,8 @@ class statusPoller {
       const manifest = status.Manifests[mid]
       countSegments(si, manifest)
       if (needUpdate) {
-        let storedInfo: Stream = await db.stream.get(mid)
+        const sid = playback2session.has(mid) ? playback2session.get(mid) : mid
+        let storedInfo: Stream = await db.stream.get(sid)
         if (!storedInfo) {
           const [objs, _] = await db.stream.find({ playbackId: mid })
           if (objs?.length) {
