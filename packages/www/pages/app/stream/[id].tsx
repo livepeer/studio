@@ -297,6 +297,9 @@ export default () => {
                     </A>
                   </Link>
                 </Box>
+                {!ingest.length && (
+                  <Spinner sx={{ mb: 3, width: 32, height: 32 }} />
+                )}
                 {ingest.map((_, i) => {
                   return (
                     <>
