@@ -85,6 +85,7 @@ export interface MasterPlaylistDictionary {
 export interface StatusResponse {
   // Manifests: Map<string, MasterPlaylist>
   Manifests: MasterPlaylistDictionary
+  InternalManifests: Map<string, string>
   OrchestratorPool: Array<string>
   Version: string
   GolangRuntimeVersion: string
