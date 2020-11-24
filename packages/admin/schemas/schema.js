@@ -73,6 +73,6 @@ export default createSchema({
     jobsSection,
     post,
     author,
-    category,
+    category
   ]),
 })

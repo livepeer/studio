@@ -18,6 +18,7 @@ import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { blocksToText } from "../../lib/utils";
+import Player from "../../components/Player";
 
 const serializers = {
   types: {
@@ -25,7 +26,8 @@ const serializers = {
       <SyntaxHighlighter language={props.node.language || "text"}>
         {props.node.code}
       </SyntaxHighlighter>
-    )
+    ),
+    "mux.video": (props) => <Player assetId={props.node.asset._ref} />
   }
 };
 
