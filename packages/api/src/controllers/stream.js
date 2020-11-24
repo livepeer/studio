@@ -163,7 +163,10 @@ app.get('/playback/:playbackId', authMiddleware({}), async (req, res) => {
 // returns stream by steamKey
 app.get('/key/:streamKey', authMiddleware({}), async (req, res) => {
   const useReplica = req.query.main !== 'true'
-  const [docs] = await db.stream.find({ streamKey: req.params.streamKey }, { useReplica })
+  const [docs] = await db.stream.find(
+    { streamKey: req.params.streamKey },
+    { useReplica },
+  )
   if (
     !docs.length ||
     ((docs[0].userId !== req.user.id || docs[0].deleted) && !req.user.admin)
@@ -629,7 +632,9 @@ app.post('/hook', async (req, res) => {
     }
     objectStore = os.url
   }
+  const isLive = live === 'live'
   if (
+    isLive &&
     stream.record &&
     req.config.recordObjectStoreId &&
     !stream.recordObjectStoreId
@@ -637,11 +642,9 @@ app.post('/hook', async (req, res) => {
     await db.stream.update(stream.id, {
       recordObjectStoreId: req.config.recordObjectStoreId,
     })
+    stream.recordObjectStoreId = req.config.recordObjectStoreId
   }
-  if (
-    (live === 'live' && stream.record && stream.recordObjectStoreId) ||
-    (live !== 'live' && stream.recordObjectStoreId)
-  ) {
+  if (stream.recordObjectStoreId) {
     const ros = await req.store.get(
       `object-store/${stream.recordObjectStoreId}`,
       false,
