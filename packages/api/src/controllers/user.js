@@ -33,12 +33,15 @@ app.get('/usage', authMiddleware({}), async (req, res) => {
 })
 
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, livepeer, filter } = req.query
+  let { limit, cursor, livepeer, filter, product } = req.query
   const query = []
   if (livepeer && livepeer !== 'false' && livepeer !== '0') {
     query.push(sql`data->>'email' LIKE '%livepeer%'`)
   } else if (filter) {
     query.push(sql`data->>'email' LIKE ${'%' + filter + '%'}`)
+  }
+  if (product) {
+    query.push(sql`data->>'stripeProductId' LIKE ${'%' + product + '%'}`)
   }
   if (isNaN(parseInt(limit))) {
     limit = undefined
