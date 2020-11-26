@@ -259,8 +259,12 @@ const makeContext = (state: ApiState, setState) => {
       return [res, user as User | ApiError];
     },
 
-    async getUsers(limit = 100, cursor?: string, livepeer?: boolean, filter?: string): Promise<[Array<User>, string] | ApiError> {
-      let [res, users] = await context.fetch(`/user?limit=${limit}&cursor=${cursor}&livepeer=${livepeer}&filter=${filter}`);
+    async getUsers(limit = 100, cursor?: string, livepeer?: boolean, filter?: string, product?: string): Promise<[Array<User>, string] | ApiError> {
+      let uri = `/user?limit=${limit}&cursor=${cursor}&livepeer=${livepeer}&filter=${filter}`
+      if (product) {
+        uri += `&product=${product}`
+      }
+      let [res, users] = await context.fetch(uri);
       console.log(res)
 
       if (res.status === 200) {

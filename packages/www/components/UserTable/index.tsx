@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { useApi, useDebounce } from "../../hooks";
-import { Box, Button, Flex, Container, Input } from "@theme-ui/components";
+import {
+  Box,
+  Button,
+  Flex,
+  Container,
+  Input,
+  Select
+} from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
+import { products } from "@livepeer.com/api/src/config";
 
 type UserTableProps = {
   userId: string;
@@ -19,6 +27,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [prevCursor, setPrevCursor] = useState([]);
   const [nextCursor, setNextCursor] = useState("");
   const [filterInput, setFilterInput] = useState("");
+  const [product, setProduct] = useState("");
   const filter = useDebounce(filterInput, 500, (v) => {
     setPrevCursor([]);
     setNextCursor("");
@@ -27,7 +36,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
     setUsers([]);
-    getUsers(100, cursor, livepeerOnly, filter)
+    getUsers(100, cursor, livepeerOnly, filter, product)
       .then((result) => {
         if (Array.isArray(result)) {
           const [users, nextCursor] = result;
@@ -45,7 +54,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
     selectedUser,
     livepeerOnly,
     cursor,
-    filter
+    filter,
+    product
   ]);
   const close = () => {
     setAdminModal(false);
@@ -173,12 +183,18 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           onChange={(e) => setFilterInput(e.target.value)}
           placeholder="email"
         ></Input>
+        <Select sx={{ ml: "1em" }} onChange={(e) => setProduct(e.target.value)}>
+          <option value="">--</option>
+          {Object.keys(products).map((id) => (
+            <option value={id}>{products[id].name}</option>
+          ))}
+        </Select>
       </Flex>
       {users.length === 0 ? (
         <p>No users created yet</p>
       ) : (
         <Table sx={{ gridTemplateColumns: "auto 1fr auto auto auto" }}>
-          <TableRow variant={TableRowVariant.Header}>
+          <TableRow variant={TableRowVariant.Header} key="header">
             <Box></Box>
             <Box>ID</Box>
             <Box>Email</Box>
