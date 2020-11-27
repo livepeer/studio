@@ -225,6 +225,23 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4)
     const createdAt = Date.now()
 
+    // find previous sessions to form 'user' session
+    const query = []
+      query.push(sql`data->>'parentId' = ${stream.id}`)
+
+    if (!all) {
+      query.push(sql`data->>'deleted' IS NULL`)
+    }
+    if (streamsonly) {
+    } else if (sessionsonly) {
+      query.push(sql`data->>'parentId' IS NOT NULL`)
+    }
+    if (active) {
+      query.push(sql`data->>'isActive' = 'true'`)
+    }
+
+    const [output, newCursor] = await db.stream.find(query, { cursor, limit })
+
     const doc = wowzaHydrate({
       ...req.body,
       kind: 'stream',

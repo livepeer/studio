@@ -120,11 +120,17 @@ components:
           readOnly: true
           description: Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
+          index: true
         parentId:
           type: string
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
           index: true
+        previousSessions:
+          description: Ids of the previous sessions which are part of `user's` session
+          type: array
+          items:
+            type: string
         streamKey:
           type: string
           example: hgebdhhigq
