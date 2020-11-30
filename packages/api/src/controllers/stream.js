@@ -544,7 +544,7 @@ app.delete('/', authMiddleware({}), async (req, res) => {
   res.end()
 })
 
-app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
+app.get('/:id/info', authMiddleware({}), async (req, res) => {
   let { id } = req.params
   let stream = await db.stream.getByStreamKey(id)
   let session,
@@ -563,7 +563,10 @@ app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
     isSession = true
     stream = await db.stream.get(stream.parentId)
   }
-  if (!stream) {
+  if (
+    !stream ||
+    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+  ) {
     res.status(404)
     return res.json({
       errors: ['not found'],
@@ -580,7 +583,7 @@ app.get('/:id/info', authMiddleware({ anyAdmin: true }), async (req, res) => {
     isPlaybackid,
     isSession,
     isStreamKey,
-    user,
+    user: req.user.admin ? user : undefined,
   }
 
   res.status(200)
