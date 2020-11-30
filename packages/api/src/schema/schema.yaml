@@ -91,6 +91,7 @@ components:
         lastSeen:
           type: number
           example: 1587667174725
+          index: true
         sourceSegments:
           type: number
           example: 1
@@ -126,6 +127,9 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
           index: true
+        partialSession:
+          description: Indicates that this is not final object of `user's` session
+          type: boolean
         previousSessions:
           description: Ids of the previous sessions which are part of `user's` session
           type: array

@@ -22,6 +22,7 @@ export interface QueryOptions {
 export interface FindOptions extends QueryOptions {
   cursor?: string
   limit?: number
+  order?: string
 }
 
 export interface GetOptions {
