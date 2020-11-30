@@ -14,6 +14,7 @@ import { db } from '../store'
 import sql from 'sql-template-strings'
 
 const WEBHOOK_TIMEOUT = 5 * 1000
+const USER_SESSION_TIMEOUT = 5 * 60 * 1000 // 5 min
 
 const isLocalIP = require('is-local-ip')
 const { Resolver } = require('dns').promises
@@ -225,22 +226,35 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4)
     const createdAt = Date.now()
 
-    // find previous sessions to form 'user' session
-    const query = []
+    let previousSessions
+    if (stream.record && req.config.recordObjectStoreId) {
+      // find previous sessions to form 'user' session
+      const tooOld = createdAt - USER_SESSION_TIMEOUT
+      const query = []
       query.push(sql`data->>'parentId' = ${stream.id}`)
+      query.push(sql`data->>'lastSeen' > ${tooOld}`)
 
-    if (!all) {
-      query.push(sql`data->>'deleted' IS NULL`)
+      const [prevSessionsDocs] = await db.stream.find(query, {
+        order: `data->>'lastSeen' DESC`,
+      })
+      if (
+        prevSessionsDocs.length &&
+        (!prevSessionsDocs[0].recordObjectStoreId ||
+          prevSessionsDocs[0].recordObjectStoreId ==
+            req.config.recordObjectStoreId)
+      ) {
+        previousSessions = prevSessionsDocs[0].previousSessions
+        if (!Array.isArray(previousSessions)) {
+          previousSessions = []
+        }
+        previousSessions.push(prevSessionsDocs[0].id)
+        setImmediate(() => {
+          db.stream.update(prevSessionsDocs[0].id, {
+            partialSession: true,
+          })
+        })
+      }
     }
-    if (streamsonly) {
-    } else if (sessionsonly) {
-      query.push(sql`data->>'parentId' IS NOT NULL`)
-    }
-    if (active) {
-      query.push(sql`data->>'isActive' = 'true'`)
-    }
-
-    const [output, newCursor] = await db.stream.find(query, { cursor, limit })
 
     const doc = wowzaHydrate({
       ...req.body,
@@ -253,6 +267,7 @@ app.post(
       id,
       createdAt,
       parentId: stream.id,
+      previousSessions,
     })
 
     doc.profiles = hackMistSettings(req, doc.profiles)
@@ -694,6 +709,7 @@ app.post('/hook', async (req, res) => {
     objectStore,
     recordObjectStore,
     recordObjectStoreUrl,
+    previousSessions: stream.previousSessions,
   })
 })
 

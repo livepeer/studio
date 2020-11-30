@@ -70,7 +70,7 @@ export default class Table<T extends DBObject> {
     query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
-    const { cursor = '', limit = 100, useReplica = true } = opts
+    const { cursor = '', limit = 100, useReplica = true, order = 'id ASC' } = opts
 
     const q = sql`SELECT * FROM `.append(this.name)
     let filters = []
@@ -101,7 +101,7 @@ export default class Table<T extends DBObject> {
       q.append(' ')
     }
 
-    q.append(' ORDER BY id ASC')
+    q.append(` ORDER BY ${order}`)
     q.append(sql` LIMIT ${limit}`)
 
     let res
