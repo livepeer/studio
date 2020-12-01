@@ -1,17 +1,23 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout>
+<DocsLayout title="How to create a stream - Livepeer.com" description="How to create a stream with the Livepeer.com API">
 
 
 # How to create a stream with the Livepeer.com API
 
 To create a stream, send a `POST` request to `https://livepeer.com/api/stream`.
 
-Use the API key as a part of the authorization header, and use a JSON body to specify the configuration for the stream. The only parameter you are required to set is the `name` of your stream, but we also highly recommend that you define the `profiles` parameter with 720p, 480p and 360p renditions. 
+Use the API key as a part of the authorization header, and use a JSON body to
+specify the configuration for the stream. The only parameter you are required to
+set is the `name` of your stream, but we also highly recommend that you define
+the `profiles` parameter with 720p, 480p and 360p renditions.
 
-If you do not define transcoding rendition profiles when creating the stream, no transcoding will happen. Your playback video will have the attributes of the source stream only, will not take advantage of adaptive bitrate streaming and will likely buffer.
+If you do not define transcoding rendition profiles when creating the stream, no
+transcoding will happen. Your playback video will have the attributes of the
+source stream only, will not take advantage of adaptive bitrate streaming and
+will likely buffer.
 
-Here is an example request: 
+Here is an example request:
 
 ```bash
 curl -X POST \
@@ -62,9 +68,11 @@ This is an example stream object response to the request above:
 }
 ```
 
-`streamKey`, `playbackId`, and `id` (a.k.a. the stream ID) are unique to the stream object and important to remember.
+`streamKey`, `playbackId`, and `id` (a.k.a. the stream ID) are unique to the
+stream object and important to remember.
 
-Next, learn [how to find your ingest and playback base URLs](/docs/guides/api/base-urls).
+Next, learn
+[how to find your ingest and playback base URLs](/docs/guides/api/base-urls).
 
 </DocsLayout>
 

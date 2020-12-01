@@ -1,6 +1,7 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout>
+<DocsLayout title="How to transcode .ts segments - Livepeer.com" description="How to transcode .ts segments">
+
 
 [Back to Video Segment Based Transcoding Guide](/docs/guides/segment-based-ingest/segment-based-ingest)
 
@@ -19,12 +20,12 @@ To transcode a video segment, `POST` your .ts segment to
 In the header be sure to `Accept: multipart/mixed`.
 
 A continuous livestream should start with the media_number set to 1.ts and count
-upward to 2.ts, 3.ts and so on for each segment. 
+upward to 2.ts, 3.ts and so on for each segment.
 
-There is currently a limit of 1 segment at a time per stream. If you encounter 
-a problem uploading a segment, try making a new request for a list of broadcasters 
-and `POST` to a different broadcaster address. You can still expect the stream to be 
-at the same URL.
+There is currently a limit of 1 segment at a time per stream. If you encounter a
+problem uploading a segment, try making a new request for a list of broadcasters
+and `POST` to a different broadcaster address. You can still expect the stream
+to be at the same URL.
 
 Here is an example request:
 
@@ -36,8 +37,8 @@ curl -X POST https://example-broadcaster-url-1.livepeer.live/live/stream_id/100.
 --data-binary "@100.ts" > out.ts
 ```
 
-
 Here is an example response
+
 ```
 
 HTTP/1.1 100 Continue
