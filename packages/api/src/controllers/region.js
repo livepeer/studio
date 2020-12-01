@@ -9,7 +9,11 @@ const getOrchestrators = async (req, res, next) => {
   return res.json(orchestrators.map(({ address }) => ({ address })))
 }
 
-app.get('/:region', authMiddleware({ admin: true }), getOrchestrators)
+app.get('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
+  const region = await req.store.get(`region/${req.params.region}`)
+  return res.json(region)
+})
+
 app.get('/orchestrator', getOrchestrators)
 
 export default app
