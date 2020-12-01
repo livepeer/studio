@@ -1,6 +1,7 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout>
+<DocsLayout title="How to delete a stream - Livepeer.com" description="How to delete a stream with the Livepeer.com API">
+
 
 # How to delete a stream with the Livepeer.com API
 
@@ -8,9 +9,11 @@ import DocsLayout from "../../../../components/DocsLayout";
   <font color="red">Deleting a stream cannot be undone.</font>
 </p>
 
-To delete a stream, you’ll need the `id` (a.k.a. the stream ID) from when you [created a stream object](/docs/guides/api/create-a-stream).
+To delete a stream, you’ll need the `id` (a.k.a. the stream ID) from when you
+[created a stream object](/docs/guides/api/create-a-stream).
 
-Delete the stream by sending a `DELETE` request to `https://livepeer.com/api/stream/`. For example: 
+Delete the stream by sending a `DELETE` request to
+`https://livepeer.com/api/stream/`. For example:
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \

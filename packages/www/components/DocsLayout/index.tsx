@@ -5,6 +5,7 @@ import TableOfContents from "../TableOfContents";
 import guides from "./guides";
 import { useRouter } from "next/router";
 import { DocsNav } from "../Navigation";
+import { Tree } from "../TableOfContents";
 
 const ignoreList = [
   "/password-reset",
@@ -20,15 +21,35 @@ const ignoreList = [
   "user"
 ];
 
-const DocsLayout = ({ children, tree = guides }) => {
-  const { pathname } = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+interface Props {
+  children?: JSX.Element[] | JSX.Element;
+  title?: string;
+  description?: string;
+  image?: any;
+  url?: string;
+  noindex?: boolean;
+  tree?: Tree[];
+}
 
+const DocsLayout = ({
+  children,
+  tree = guides,
+  title,
+  description,
+  url
+}: Props) => {
+  const { pathname, asPath } = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  console.log(asPath);
   return (
     <Layout
-      title={`Docs - Livepeer.com`}
-      description={`An introduction to the Livepeer.com platform and how to get started creating streams.`}
-      url={`https://livepeer.com/docs`}
+      title={title ? title : `Docs - Livepeer.com`}
+      description={
+        description
+          ? description
+          : `An introduction to the Livepeer.com platform and how to get started creating streams.`
+      }
+      url={`https://livepeer.com${asPath}`}
       customNav={<DocsNav />}
     >
       <Container

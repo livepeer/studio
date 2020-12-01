@@ -14,7 +14,10 @@ import FeaturedBlogPostCard from "../../components/cards/FeaturedBlogPost";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
-  const { slug } = router.query;
+  const {
+    query: { slug },
+    asPath
+  } = router;
 
   if (router.isFallback) {
     return (
@@ -36,11 +39,17 @@ const BlogIndex = ({ categories, posts }) => {
     featuredPost = posts[0];
   }
 
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   return (
     <Layout
-      title={`Blog - Livepeer.com`}
+      title={`Blog - ${
+        slug ? capitalizeFirstLetter(slug) + " Category - " : ""
+      }Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
-      url={`https://livepeer.com/blog`}
+      url={`https://livepeer.com${asPath}`}
       withGradientBackground
     >
       <Container variant="hero">
