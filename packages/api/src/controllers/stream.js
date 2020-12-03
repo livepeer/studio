@@ -273,6 +273,10 @@ app.post(
         })
       }
     }
+    let region
+    if (req.config.ownRegion) {
+      region = req.config.ownRegion
+    }
 
     const doc = wowzaHydrate({
       ...req.body,
@@ -286,6 +290,7 @@ app.post(
       createdAt,
       parentId: stream.id,
       previousSessions,
+      region,
     })
 
     doc.profiles = hackMistSettings(
