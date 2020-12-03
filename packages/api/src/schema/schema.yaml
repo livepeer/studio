@@ -248,6 +248,10 @@ components:
           type: object
           additionalProperties:
             type: string
+        region:
+          type: string
+          example: fra
+          description: Region in which this session object was created
 
     error:
       required:
