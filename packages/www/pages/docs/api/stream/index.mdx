@@ -1,0 +1,44 @@
+import DocsLayout from "../../../../components/DocsLayout";
+
+<DocsLayout>
+
+# Stream
+
+The `stream` object represents a livestream. When the `stream` object has a `parentId` attribute, it represents a single livestream session.
+
+Create a `stream` object to create a livestream with configuration details for live broadcasting software and generate a playback URL for stream viewers.
+
+`POST /stream`
+
+You can also retrieve the `stream` object to get stream (or livestream session) status, transcoding settings and attributes.
+
+`GET /stream`
+
+### Attributes
+
+| JSON parameter               | Type    | Description |
+| ---------------------------- | ------- |-------------------------------------- |
+| `createdAt`                  | number  | Timestamp when the asset was created.  Reported in Unix epoch time. |
+| `createdByTokenName`         | string  | Livepeer.com user-assigned name for the API key that created the `stream` object. |
+| `id`                         | string  | Unique identifier for the asset. The asset could be a livestream or single livestream session. |
+| `isActive`                   | boolean | True if the asset is active. An active livestream means segments are being ingested. |
+| `kind`                       | string  | Livepeer.com API object type. |
+| `lastSeen`                   | number  | Timestamp when the asset was last active. Reported in Unix epoch time. An active livestream means segments are being ingested. |
+|  `name`                      | string  | Required with `POST`<br />Additional identifier for the asset. Often set to a human readable string. This identifier does not need to be unique.|
+| `parentId`                   | string  |  Points to a parent `stream` object. Only used on `stream` objects that represent a single livestream session. |
+| `playbackId`                 | string  | Unique identifier used to form the playback URL. |
+| `profiles`                   | array   | Transcoding rendition settings. The source will be delivered with the renditions in the HLS and does not need to be redefined in the `profiles` parameter. If no `profiles` are defined, only the source will be delivered for playback. |
+| `profiles..bitrate`          | integer | `minimum: 400`<br />kbit/s setting for the transcoded rendition. |
+| `profiles..fps`              | integer | `minimum: 0`<br />Framerate setting for the transcoded rendition. When set to `0`, the source framerate is adopted for the transcoded rendition framerate. All `profiles` for a `source` object must be configured with the same `fps`.|
+| `profiles..height`           | integer | `minimum: 128`<br />Pixel height setting for the transcoded rendition. |
+| `profiles..name`             | string  | `minLength: 1, maxLength: 500`<br />Identifier for the transcoded rendition settings.|
+| `profiles..width`            | integer | `minimum: 128`<br />Pixel width setting for the transcoded rendition. |
+| `sourceSegments`             | number  | Number of asset source segments processed. |
+| `sourceSegmentsDuration`     | number  | Duration in seconds of asset source processed. |
+| `streamKey`                  | string  | Unique secret key used to form the RTMP ingest URL. |
+| `transcodedSegments`         | number  | Number of asset transcoded rendition segments processed. Should be (`sourceSegments` * number of `profiles`). |
+| `transcodedSegmentsDuration` | number  | Duration in seconds of asset transcoded renditions processed. Should be (`sourceSegmentsDuration` * number of `profiles`). |
+| `userID`                     | string  | Unique identifier for the Livepeer.com user account that created the `stream` object. |
+
+</DocsLayout>
+
