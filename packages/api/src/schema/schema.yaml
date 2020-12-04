@@ -112,6 +112,7 @@ components:
         isActive:
           type: boolean
           description: If currently active
+          index: true
         createdByTokenName:
           type: string
           readOnly: true
