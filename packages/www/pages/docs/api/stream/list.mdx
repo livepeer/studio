@@ -22,14 +22,5 @@ curl -H 'authorization: Bearer <api-key>' \
 "https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
 ```
 
-### List all livestream sessions of a single `stream` object
-
-You can retrieve all `stream` objects with the same `userID` but exclude stream objects *without* a `parentId`. This returns all livestream sessions for a single livestream configuration.
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>?sessionsonly=1"
-```
-
 
 </DocsLayout>
