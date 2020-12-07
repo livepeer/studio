@@ -18,7 +18,7 @@ import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { blocksToText } from "../../lib/utils";
-import Player from "../../components/Player";
+import Player from "../../components/BlogVideoPlayer";
 
 const serializers = {
   types: {

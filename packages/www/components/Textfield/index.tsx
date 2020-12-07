@@ -31,7 +31,7 @@ const Textfield = ({
 }) => {
   const [focused, setFocused] = useState(false);
   const [scopedValue, setScopedValue] = useState("");
-
+  console.log(value);
   return (
     <Box
       sx={{

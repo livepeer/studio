@@ -8,6 +8,7 @@ import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import Help from "../../public/img/help.svg";
 import moment from "moment";
 import { Stream } from "@livepeer.com/api";
+import { MdArrowForward } from "react-icons/md";
 
 type ProfileProps = {
   id: string;
@@ -233,26 +234,80 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             if (selectedStream.length === 1) {
               deleteStream(selectedStream[0].id).then(close);
             } else if (selectedStream.length > 1) {
-              deleteStreams(selectedStream.map(s => s.id)).then(close);
+              deleteStreams(selectedStream.map((s) => s.id)).then(close);
             }
           }}
         />
       )}
-      <Box sx={{ mb: 3 }}>
-        <Link href="/app/stream/new-stream" passHref>
-          <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
-            Create
-          </A>
+      <Flex
+        sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}
+      >
+        <Box>
+          <Link href="/app/stream/new-stream" passHref>
+            <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
+              Create
+            </A>
+          </Link>
+          <Button
+            variant="primarySmall"
+            aria-label="Delete Stream button"
+            disabled={!selectedStream.length}
+            onClick={() => selectedStream.length && setDeleteModal(true)}
+          >
+            Delete
+          </Button>
+        </Box>
+        <Link href="/app/debugger" passHref>
+          <a
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontWeight: 500,
+              fontSize: 1,
+              borderRadius: 6,
+              ".HoverArrow": {
+                position: "relative",
+                top: "1px",
+                marginLeft: "8px",
+                strokeWidth: "2",
+                fill: "none",
+                stroke: "currentColor"
+              },
+              ".HoverArrow__linePath": {
+                opacity: "0",
+                transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s"
+              },
+              ".HoverArrow__tipPath": {
+                transition:
+                  "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s"
+              },
+              ":hover .HoverArrow": {
+                transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
+                ".HoverArrow__linePath": {
+                  opacity: 1
+                },
+                ".HoverArrow__tipPath": {
+                  transform: "translateX(3px)"
+                }
+              }
+            }}
+          >
+            <span>Stream debugger</span>
+            <svg
+              className="HoverArrow"
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              aria-hidden="true"
+            >
+              <g fillRule="evenodd">
+                <path className="HoverArrow__linePath" d="M0 5h7" />
+                <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
+              </g>
+            </svg>
+          </a>
         </Link>
-        <Button
-          variant="primarySmall"
-          aria-label="Delete Stream button"
-          disabled={!selectedStream.length}
-          onClick={() => selectedStream.length && setDeleteModal(true)}
-        >
-          Delete
-        </Button>
-      </Box>
+      </Flex>
       <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>
           <Flex
