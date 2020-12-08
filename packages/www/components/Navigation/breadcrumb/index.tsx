@@ -1,6 +1,7 @@
 import Link from "../../Link";
 import Logo from "../../Logo";
 import { useState } from "react";
+import { Box } from "@theme-ui/components";
 import { MdChevronLeft } from "react-icons/md";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
@@ -54,7 +55,18 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
               }}
             >
               <Divider />
-              <Link
+              <Box
+                sx={{
+                  fontWeight: 800,
+                  fontSize: ["16px", "16px", "22px"],
+                  color: "text",
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                {slugify(item.children.toString())}
+              </Box>
+              {/* <Link
                 {...item}
                 children={slugify(item.children.toString())}
                 sx={{
@@ -63,7 +75,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                   color: "text",
                   "&:hover": { textDecoration: "none" }
                 }}
-              />
+              /> */}
             </span>
             {item.mobileDropdownLinks && (
               <span
@@ -81,7 +93,23 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                     item.mobileDropdownLinks.find((l) => l.isSelected) ??
                     item.mobileDropdownLinks.find((l) => l.href === "/docs");
                   return (
-                    <Link
+                    <>
+                      <Box
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: ["16px", "16px", "22px"],
+                          color: "text",
+                          display: "flex",
+                          alignItems: "center"
+                        }}
+                      >
+                        {slugify(
+                          children.toString() === "API Reference"
+                            ? "API"
+                            : children.toString()
+                        )}
+                      </Box>
+                      {/* <Link
                       {...selectedProps}
                       onClick={handleSelectedLinkClick}
                       sx={{
@@ -116,7 +144,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                           }}
                         />
                       </i>
-                    </Link>
+                    </Link> */}
+                    </>
                   );
                 })()}
                 <BreadcrumbDropdown
