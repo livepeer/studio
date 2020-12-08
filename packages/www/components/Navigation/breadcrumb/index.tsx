@@ -1,7 +1,7 @@
 import Link from "../../Link";
 import Logo from "../../Logo";
 import { useState } from "react";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { MdChevronLeft } from "react-icons/md";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
 
@@ -100,13 +100,21 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                       )}
                       <i
                         sx={{
-                          ml: "6px",
+                          ml: "4px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center"
                         }}
                       >
-                        {openDropdown ? <FiChevronUp /> : <FiChevronDown />}
+                        <MdChevronLeft
+                          sx={{
+                            fontWeight: "bold",
+                            fontSize: 22,
+                            transform: openDropdown
+                              ? "rotate(90deg)"
+                              : "rotate(-90deg)"
+                          }}
+                        />
                       </i>
                     </Link>
                   );
