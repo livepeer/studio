@@ -93,7 +93,11 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                         "&:hover": { textDecoration: "none" }
                       }}
                     >
-                      {slugify(children.toString())}
+                      {slugify(
+                        children.toString() === "API Reference"
+                          ? "API"
+                          : children.toString()
+                      )}
                       <i
                         sx={{
                           ml: "6px",
@@ -114,21 +118,31 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 >
                   {item.mobileDropdownLinks
                     .filter((l) => !l.isSelected)
-                    .map((link) => (
-                      <Link
-                        key={`dropdown-link-${link.href}`}
-                        {...link}
-                        sx={{
-                          display: "block",
-                          fontWeight: 500,
-                          fontSize: "16px",
-                          color: "text",
-                          ":not(:last-of-type)": {
-                            mb: 3
-                          }
-                        }}
-                      />
-                    ))}
+                    .map(
+                      (link) => (
+                        console.log(link),
+                        (
+                          <Link
+                            key={`dropdown-link-${link.href}`}
+                            {...link}
+                            children={
+                              link.children === "API Reference"
+                                ? "API"
+                                : link.children
+                            }
+                            sx={{
+                              display: "block",
+                              fontWeight: 500,
+                              fontSize: "16px",
+                              color: "text",
+                              ":not(:last-of-type)": {
+                                mb: 3
+                              }
+                            }}
+                          />
+                        )
+                      )
+                    )}
                 </BreadcrumbDropdown>
               </span>
             )}
