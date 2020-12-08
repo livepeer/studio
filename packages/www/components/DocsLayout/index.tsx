@@ -7,7 +7,6 @@ import reference from "./reference";
 import { useRouter } from "next/router";
 import { DocsNav } from "../Navigation";
 import { Tree } from "../TableOfContents";
-import guidesTree from "./guides";
 
 const ignoreList = [
   "/password-reset",
@@ -39,19 +38,15 @@ const DocsLayout = ({
   tree,
   title,
   description,
-  url, 
+  url,
   width
 }: Props) => {
   const { pathname, asPath } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   console.log(asPath);
-  pathname.includes("/docs/api") ? (
-    tree = reference,
-    width = 200
-  ) : (
-    tree = guides,
-    width = 350
-  );
+  pathname.includes("/docs/api")
+    ? ((tree = reference), (width = 200))
+    : ((tree = guides), (width = 350));
   return (
     <Layout
       title={title ? title : `Docs - Livepeer.com`}
@@ -61,7 +56,7 @@ const DocsLayout = ({
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
       url={`https://livepeer.com${asPath}`}
-      customNav={<DocsNav />}
+      customNav={<DocsNav tree={tree} />}
     >
       <Container
         sx={{

@@ -110,7 +110,7 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
         <DocsMobileSubMenu
           tree={tree}
           ignoreList={ignoreList}
-          mobileSubmenuVisible={mobileSubmenuVisible}
+          mobileSubmenuVisible={true}
         />
       )}
     </>
