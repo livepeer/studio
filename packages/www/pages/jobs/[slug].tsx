@@ -119,7 +119,6 @@ export async function getStaticProps({ params, preview = false }) {
   return {
     props: {
       ...job,
-      noindex: true,
       preview
     },
     revalidate: 1
