@@ -2,7 +2,6 @@ import Link from "../../Link";
 import Logo from "../../Logo";
 import { useState } from "react";
 import { Box } from "@theme-ui/components";
-import { MdChevronLeft } from "react-icons/md";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
 
@@ -66,16 +65,6 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
               >
                 {slugify(item.children.toString())}
               </Box>
-              {/* <Link
-                {...item}
-                children={slugify(item.children.toString())}
-                sx={{
-                  fontWeight: 800,
-                  fontSize: ["16px", "16px", "22px"],
-                  color: "text",
-                  "&:hover": { textDecoration: "none" }
-                }}
-              /> */}
             </span>
             {item.mobileDropdownLinks && (
               <span
@@ -109,42 +98,6 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                             : children.toString()
                         )}
                       </Box>
-                      {/* <Link
-                      {...selectedProps}
-                      onClick={handleSelectedLinkClick}
-                      sx={{
-                        fontWeight: 800,
-                        fontSize: ["16px", "16px", "22px"],
-                        color: "text",
-                        display: "flex",
-                        alignItems: "center",
-                        "&:hover": { textDecoration: "none" }
-                      }}
-                    >
-                      {slugify(
-                        children.toString() === "API Reference"
-                          ? "API"
-                          : children.toString()
-                      )}
-                      <i
-                        sx={{
-                          ml: "4px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}
-                      >
-                        <MdChevronLeft
-                          sx={{
-                            fontWeight: "bold",
-                            fontSize: 22,
-                            transform: openDropdown
-                              ? "rotate(90deg)"
-                              : "rotate(-90deg)"
-                          }}
-                        />
-                      </i>
-                    </Link> */}
                     </>
                   );
                 })()}
