@@ -23,7 +23,7 @@ const Divider = () => (
       ml: "12px",
       mr: "6px",
       fontWeight: 800,
-      fontSize: ["14px", "22px"],
+      fontSize: ["14px", "14px", "22px"],
       color: "text"
     }}
   >
@@ -59,13 +59,13 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 children={slugify(item.children.toString())}
                 sx={{
                   fontWeight: 800,
-                  fontSize: ["16px", "22px"],
+                  fontSize: ["16px", "16px", "22px"],
                   color: "text",
                   "&:hover": { textDecoration: "none" }
                 }}
               />
             </span>
-            {/* {item.mobileDropdownLinks && (
+            {item.mobileDropdownLinks && (
               <span
                 sx={{
                   position: "relative",
@@ -86,7 +86,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                       onClick={handleSelectedLinkClick}
                       sx={{
                         fontWeight: 800,
-                        fontSize: ["16px", "22px"],
+                        fontSize: ["16px", "16px", "22px"],
                         color: "text",
                         display: "flex",
                         alignItems: "center",
@@ -131,7 +131,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                     ))}
                 </BreadcrumbDropdown>
               </span>
-            )} */}
+            )}
           </span>
         ))}
       </>

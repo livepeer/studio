@@ -64,7 +64,7 @@ const DocsMobileSubMenu = ({
               fontWeight: 600
             }}
           >
-            {pathname.includes("/docs/reference") ? (
+            {pathname.includes("/docs/api") ? (
               <Box>API Reference</Box>
             ) : (
               <Box>Guides</Box>

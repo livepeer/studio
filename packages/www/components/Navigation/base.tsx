@@ -15,7 +15,7 @@ import Button from "../Button";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import { SxStyleProp } from "theme-ui";
 
-const sidesWidth = "280px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
+const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
 type Props = {
   links: React.ComponentProps<typeof Link>[];
