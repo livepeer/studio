@@ -89,8 +89,8 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
             },
             {
               children: "API Reference",
-              href: "/docs/reference",
-              isSelected: pathname === "/docs/reference"
+              href: "/docs/api",
+              isSelected: pathname === "/docs/api"
             }
           ]
         }
