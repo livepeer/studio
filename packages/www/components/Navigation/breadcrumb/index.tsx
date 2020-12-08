@@ -118,31 +118,26 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 >
                   {item.mobileDropdownLinks
                     .filter((l) => !l.isSelected)
-                    .map(
-                      (link) => (
-                        console.log(link),
-                        (
-                          <Link
-                            key={`dropdown-link-${link.href}`}
-                            {...link}
-                            children={
-                              link.children === "API Reference"
-                                ? "API"
-                                : link.children
-                            }
-                            sx={{
-                              display: "block",
-                              fontWeight: 500,
-                              fontSize: "16px",
-                              color: "text",
-                              ":not(:last-of-type)": {
-                                mb: 3
-                              }
-                            }}
-                          />
-                        )
-                      )
-                    )}
+                    .map((link) => (
+                      <Link
+                        key={`dropdown-link-${link.href}`}
+                        {...link}
+                        children={
+                          link.children === "API Reference"
+                            ? "API"
+                            : link.children
+                        }
+                        sx={{
+                          display: "block",
+                          fontWeight: 500,
+                          fontSize: "16px",
+                          color: "text",
+                          ":not(:last-of-type)": {
+                            mb: 3
+                          }
+                        }}
+                      />
+                    ))}
                 </BreadcrumbDropdown>
               </span>
             )}
