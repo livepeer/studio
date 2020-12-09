@@ -210,6 +210,7 @@ app.post(
         errors: ['missing name'],
       })
     }
+    const start = Date.now()
     let stream
     let useParentProfiles = false
     if (req.config.baseStreamName === req.params.streamId) {
@@ -306,6 +307,7 @@ app.post(
     }
     res.status(201)
     res.json(doc)
+    logger.info(`stream session created for stream_id=${stream.id} stream_name='${stream.name}' playbackid=${stream.playbackId} session_id=${id} elapsed=${Date.now() - start}ms`)
   },
 )
 
