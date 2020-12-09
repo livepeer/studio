@@ -134,7 +134,7 @@ export class DB {
   }
 
   // Internal logging function — use query() or replicaQuery() externally
-  runQuery<T, I extends any[] = any[]>(
+  async runQuery<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
     values?: I,
@@ -150,7 +150,7 @@ export class DB {
     logger.info(`runQuery phase=start query=${queryLog}`)
     const start = Date.now()
     try {
-      result = pool.query(query, values)
+      result = await pool.query(query, values)
     }
     catch (e) {
       logger.error(`runQuery phase=error elapsed=${Date.now() - start}ms error=${e.message} query=${queryLog}`)
