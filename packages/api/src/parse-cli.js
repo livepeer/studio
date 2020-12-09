@@ -173,6 +173,11 @@ export default function parseCli(argv) {
             "id of the object store that should be used for `record: true` requests that don't otherwise have an os",
           type: 'string',
         },
+        'base-stream-name': {
+          describe:
+            'base stream name to be used in wildcard-based routing scheme.',
+          type: 'string',
+        },
       })
       .help()
       .parse(argv)
