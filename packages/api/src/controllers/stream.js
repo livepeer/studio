@@ -212,7 +212,7 @@ app.post(
     }
     let stream
     let useParentProfiles = false
-    if (req.config.baseStreamId === req.params.streamId) {
+    if (req.config.baseStreamName === req.params.streamId) {
       if (!req.body.name.includes('+')) {
         res.status(422)
         return res.json({
