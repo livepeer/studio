@@ -1,0 +1,61 @@
+import DocsLayout from "../../../../components/DocsLayout";
+
+<DocsLayout>
+
+# `POST /stream` to create and asset
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer <api key>' \
+-d '{
+  "name": "test_stream"
+}' \
+https://livepeer.com/api/stream
+``` 
+### 201 Created
+
+```bash
+{
+  "name":"test_stream",
+  "kind":"stream",
+  "userId":"xxxxxxxx-xxxx-xxxx-xxxx-xxxx",
+  "id":"yyyyyyyy-yyyy-yyyy-yyyy-yyyy",
+  "createdAt":1595721600,
+  "streamKey":"zzzz-zzzz-zzzz-zzzz",
+  "playbackId":"xyz123xyz123",
+  "createdByTokenName":"test-api-key",
+  <other asset object keys, like profiles>
+}
+```
+### Example JSON request
+```bash
+{
+  "name": "test_stream",
+  "profiles": [
+    {
+      "name": "720p",
+      "bitrate": 2000000,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "480p",
+      "bitrate": 1000000,
+      "fps": 30,
+      "width": 854,
+      "height": 480
+    },
+    {
+      "name": "360p",
+      "bitrate": 500000,
+      "fps": 30,
+      "width": 640,
+      "height": 360
+    }
+  ]
+}
+```
+
+</DocsLayout>

@@ -3,6 +3,7 @@ import { Flex, Box, Container } from "@theme-ui/components";
 import { useState } from "react";
 import TableOfContents from "../TableOfContents";
 import guides from "./guides";
+import reference from "./reference";
 import { useRouter } from "next/router";
 import { DocsNav } from "../Navigation";
 import { Tree } from "../TableOfContents";
@@ -27,20 +28,25 @@ interface Props {
   description?: string;
   image?: any;
   url?: string;
+  width?: number;
   noindex?: boolean;
   tree?: Tree[];
 }
 
 const DocsLayout = ({
   children,
-  tree = guides,
+  tree,
   title,
   description,
-  url
+  url,
+  width
 }: Props) => {
   const { pathname, asPath } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   console.log(asPath);
+  pathname.includes("/docs/api")
+    ? ((tree = reference), (width = 200))
+    : ((tree = guides), (width = 350));
   return (
     <Layout
       title={title ? title : `Docs - Livepeer.com`}
@@ -50,7 +56,7 @@ const DocsLayout = ({
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
       url={`https://livepeer.com${asPath}`}
-      customNav={<DocsNav />}
+      customNav={<DocsNav tree={tree} />}
     >
       <Container
         sx={{
@@ -70,8 +76,8 @@ const DocsLayout = ({
                 "calc(100vh - 105px)"
               ],
               overflow: "scroll",
-              minWidth: ["100%", "100%", 350],
-              maxWidth: ["100%", "100%", 350],
+              minWidth: ["100%", "100%", width],
+              maxWidth: ["100%", "100%", width],
               display: [
                 isOpen ? "block" : "none",
                 isOpen ? "block" : "none",
@@ -83,7 +89,7 @@ const DocsLayout = ({
               pl: [19, 19, 1]
             }}
           >
-            {pathname.includes("/docs/reference") ? (
+            {pathname.includes("/docs/api") ? (
               <h4 sx={{ mb: 3 }}>API Reference</h4>
             ) : (
               <h4 sx={{ mb: 3 }}>Guides</h4>

@@ -1,7 +1,7 @@
 import Link from "../../Link";
 import Logo from "../../Logo";
 import { useState } from "react";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { Box } from "@theme-ui/components";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
 
@@ -23,7 +23,7 @@ const Divider = () => (
       ml: "12px",
       mr: "6px",
       fontWeight: 800,
-      fontSize: ["14px", "22px"],
+      fontSize: ["14px", "14px", "22px"],
       color: "text"
     }}
   >
@@ -54,18 +54,19 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
               }}
             >
               <Divider />
-              <Link
-                {...item}
-                children={slugify(item.children.toString())}
+              <Box
                 sx={{
                   fontWeight: 800,
-                  fontSize: ["16px", "22px"],
+                  fontSize: ["16px", "16px", "22px"],
                   color: "text",
-                  "&:hover": { textDecoration: "none" }
+                  display: "flex",
+                  alignItems: "center"
                 }}
-              />
+              >
+                {slugify(item.children.toString())}
+              </Box>
             </span>
-            {/* {item.mobileDropdownLinks && (
+            {item.mobileDropdownLinks && (
               <span
                 sx={{
                   position: "relative",
@@ -81,30 +82,23 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                     item.mobileDropdownLinks.find((l) => l.isSelected) ??
                     item.mobileDropdownLinks.find((l) => l.href === "/docs");
                   return (
-                    <Link
-                      {...selectedProps}
-                      onClick={handleSelectedLinkClick}
-                      sx={{
-                        fontWeight: 800,
-                        fontSize: ["16px", "22px"],
-                        color: "text",
-                        display: "flex",
-                        alignItems: "center",
-                        "&:hover": { textDecoration: "none" }
-                      }}
-                    >
-                      {slugify(children.toString())}
-                      <i
+                    <>
+                      <Box
                         sx={{
-                          ml: "6px",
+                          fontWeight: 800,
+                          fontSize: ["16px", "16px", "22px"],
+                          color: "text",
                           display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
+                          alignItems: "center"
                         }}
                       >
-                        {openDropdown ? <FiChevronUp /> : <FiChevronDown />}
-                      </i>
-                    </Link>
+                        {slugify(
+                          children.toString() === "API Reference"
+                            ? "API"
+                            : children.toString()
+                        )}
+                      </Box>
+                    </>
                   );
                 })()}
                 <BreadcrumbDropdown
@@ -118,6 +112,11 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                       <Link
                         key={`dropdown-link-${link.href}`}
                         {...link}
+                        children={
+                          link.children === "API Reference"
+                            ? "API"
+                            : link.children
+                        }
                         sx={{
                           display: "block",
                           fontWeight: 500,
@@ -131,7 +130,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                     ))}
                 </BreadcrumbDropdown>
               </span>
-            )} */}
+            )}
           </span>
         ))}
       </>

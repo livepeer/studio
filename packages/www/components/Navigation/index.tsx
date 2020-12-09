@@ -66,11 +66,11 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
         {
           href: "/docs/guides",
           children: "Guides"
-        }
-        /*{
-          href: "/docs/reference",
+        },
+        {
+          href: "/docs/api",
           children: "API Reference"
-        }*/
+        }
       ],
       breadcrumb: [
         {
@@ -89,8 +89,8 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
             },
             {
               children: "API Reference",
-              href: "/docs/reference",
-              isSelected: pathname === "/docs/reference"
+              href: "/docs/api",
+              isSelected: pathname === "/docs/api"
             }
           ]
         }
@@ -110,7 +110,7 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
         <DocsMobileSubMenu
           tree={tree}
           ignoreList={ignoreList}
-          mobileSubmenuVisible={mobileSubmenuVisible}
+          mobileSubmenuVisible={true}
         />
       )}
     </>
