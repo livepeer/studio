@@ -122,18 +122,42 @@ export class DB {
     query: string | QueryConfig<I>,
     values?: I,
   ): Promise<QueryResult<T>> {
-    console.log(query)
-    return this.pool.query(query, values)
+    return this.runQuery(this.pool, query, values)
   }
 
   replicaQuery<T, I extends any[] = any[]>(
     query: string | QueryConfig<I>,
     values?: I,
   ): Promise<QueryResult<T>> {
-    console.log(query)
-    return this.replicaPool
-      ? this.replicaPool.query(query, values)
-      : this.pool.query(query, values)
+    let pool = this.replicaPool ?? this.pool
+    return this.runQuery(pool, query, values)
+  }
+
+  // Internal logging function — use query() or replicaQuery() externally
+  runQuery<T, I extends any[] = any[]>(
+    pool: Pool,
+    query: string | QueryConfig<I>,
+    values?: I,
+  ): Promise<QueryResult<T>> {
+    let queryLog;
+    if (typeof query === "string") {
+      queryLog = JSON.stringify({query: query.trim(), values})
+    }
+    else {
+      queryLog = JSON.stringify(query)
+    }
+    let result;
+    logger.info(`runQuery phase=start query=${queryLog}`)
+    const start = Date.now()
+    try {
+      result = pool.query(query, values)
+    }
+    catch (e) {
+      logger.error(`runQuery phase=error elapsed=${Date.now() - start}ms error=${e.message} query=${queryLog}`)
+      throw e;
+    }
+    logger.info(`runQuery phase=success elapsed=${Date.now() - start}ms query=${queryLog}`)
+    return result;
   }
 }
 
