@@ -210,8 +210,25 @@ app.post(
         errors: ['missing name'],
       })
     }
+    let stream
+    let useParentProfiles = false
+    if (req.config.baseStreamId === req.params.streamId) {
+      if (!req.body.name.includes('+')) {
+        res.status(422)
+        return res.json({
+          errors: ['wrong name'],
+        })
+      }
+      const playbackId = req.body.name.split('+')[1]
+      const [docs] = await db.stream.find({ playbackId }, { useReplica: false })
+      if (docs.length) {
+        stream = docs[0]
+        useParentProfiles = true
+      }
+    } else {
+      stream = await req.store.get(`stream/${req.params.streamId}`)
+    }
 
-    const stream = await req.store.get(`stream/${req.params.streamId}`)
     if (
       !stream ||
       ((stream.userId !== req.user.id || stream.deleted) &&
@@ -270,7 +287,10 @@ app.post(
       previousSessions,
     })
 
-    doc.profiles = hackMistSettings(req, doc.profiles)
+    doc.profiles = hackMistSettings(
+      req,
+      useParentProfiles ? stream.profiles : doc.profiles,
+    )
 
     try {
       await req.store.create(doc)
