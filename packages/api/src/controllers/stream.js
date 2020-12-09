@@ -188,13 +188,13 @@ app.get(
 
 async function generateUniqueStreamKey(store, otherKeys) {
   while (true) {
-    const streamId = await generateStreamKey()
+    const streamKey = await generateStreamKey()
     const qres = await store.query({
       kind: 'stream',
-      query: { streamId },
+      query: { streamKey },
     })
-    if (!qres.data.length && !otherKeys.includes(streamId)) {
-      return streamId
+    if (!qres.data.length && !otherKeys.includes(streamKey)) {
+      return streamKey
     }
   }
 }
@@ -307,7 +307,13 @@ app.post(
     }
     res.status(201)
     res.json(doc)
-    logger.info(`stream session created for stream_id=${stream.id} stream_name='${stream.name}' playbackid=${stream.playbackId} session_id=${id} elapsed=${Date.now() - start}ms`)
+    logger.info(
+      `stream session created for stream_id=${stream.id} stream_name='${
+        stream.name
+      }' playbackid=${stream.playbackId} session_id=${id} elapsed=${
+        Date.now() - start
+      }ms`,
+    )
   },
 )
 
