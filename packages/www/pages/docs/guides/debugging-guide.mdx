@@ -44,11 +44,11 @@ Check the stream status below the Livepeer.com test player. Is it active?
 
 ## Step 5
 
-Check if you are transcoding. Is there only one `profile` or zero `profiles` listed next to `Playback settings` below the Livepeer.com test player? 
+Check if you are transcoding. Is there only one `profile` listed next to `Playback settings` below the Livepeer.com test player? 
 
-- **No:** You are not transcoding your source stream, and only the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
+- **Yes:** You are not transcoding your source stream, and only the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
 <br />Or, depending on the resolution, fps and bitrate of your source and the bandwidth of your internet, playback may be slow and choppy. Consider transcoding your ingested video to take advantage of ABR in playback.
-- **Yes:** If two or more `profiles` are listed. Go to the next step.
+- **No:** If two or more `profiles` are listed, go to the next step.
 
 ## Step 6
 
