@@ -1,0 +1,71 @@
+import DocsLayout from "../../../components/DocsLayout";
+
+<DocsLayout>
+
+
+# Debugging Livepeer.com Stream Playback
+
+This step-by-step guide will help you debug common stream playback problems. Try these steps before reaching out to Livepeer.com directly.
+
+We will use the [Livepeer.com test player](/app/test-player) to debug. You must be logged into the Livepeer.com dashboard. 
+
+#### Prerequisite: Locate your playback URL. 
+
+Your playback URL is specific to the stream ingest region. 
+- This [Livepeer.com API guide](/docs/guides/api/playback-a-live-stream) touches on finding your playback URL by combining a base url with a `playbackId`. If you don't know your stream `playbackId`, you can retrieve it via [`GET /stream/<id>`](/docs/api/stream/get-stream).
+- You can also find the playback URL on the Livepeer.com dashboard stream page, `https://livepeer.com/app/stream/<stream-id>`. Learn more [here](/docs/guides/dashboard/playback-a-stream).
+
+## Step 1
+
+Load your playback URL in the [Livepeer.com test player](/app/test-player).
+
+## Step 2
+
+Does anything playback in *your* own player?
+
+- **No:** Go to the next step.
+- **Yes, but the quality is poor:** Go to step 5.
+
+## Step 3
+
+Does anything playback in the [Livepeer.com test players](/app/test-player)?
+
+- **Yes, the quality is great:** There may be something wrong with your player configuration.
+- **No:** Go to the next step.
+- **Yes, but the quality is poor:** Go to step 5
+
+## Step 4
+
+Check the stream status below the Livepeer.com test player. Is it active?
+
+- **No:** No video is being ingested. Confirm your or your streamer’s broadcast software RTMP configuration is set up properly. 
+- **Yes:** Go to the next step.
+
+## Step 5
+
+Check if you are transcoding. Is there configuration data listed next to `Playback settings` below the Livepeer.com test player? 
+
+- **No:** You are not transcoding your source stream, and only  the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
+<br />Or, depending on the resolution, fps and bitrate of your source and the bandwidth of your internet, playback may be slow and choppy. Consider transcoding your ingested video to take advantage of ABR in playback.
+- **Yes:** Go to the next step.
+
+## Step 6
+
+Do all the profiles have the same FPS? Between 5 FPS and 60 FPS work best.
+
+- **No:** Your profiles FPS is configured incorrectly. Set all profiles FPS to the same value. Setting to `0` will pass through the source FPS to the renditions.
+- **Yes:** Go to the next step.
+
+## Step 7
+
+Check if something is wrong with the source stream. 
+
+Configure the left player to only playback the source stream (as served by our CDN).  Click on ⋮ in the lower right corner. Select the source resolution, usually the highest resolution.
+
+Compare that left source only playback with the different renditions on the player right (ABR). Do the renditions on the right player show more problem than in the left source?
+
+- **No:** There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
+- **Yes:** If you created your stream via the Livepeer.com API, confirm your profile bitrate settings are [reasonable](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices). And if they are, reach out to Livepeer.com for further help, <a href="mailto:support@livepeer.org">support@livepeer.org</a>.
+
+
+</DocsLayout>

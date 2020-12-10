@@ -24,7 +24,7 @@ const DocsCategoryCard = ({
         background: "linear-gradient(212.62deg, #1C1C1C 0%, #292935 100%)",
         borderRadius: 16,
         width: 276,
-        height: "345px",
+        height: "244px",
         padding: 24,
         display: "block",
         textAlign: "left",
@@ -41,7 +41,7 @@ const DocsCategoryCard = ({
       <div
         sx={{
           width: "100%",
-          height: "208px",
+          height: "156px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

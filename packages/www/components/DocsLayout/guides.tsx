@@ -11,9 +11,17 @@ const guidesTree: Tree[] = [
   ],
   [
     {
-      content: "Feature Support Matrix",
+      content: "Supported codecs and workflows",
       slug: "/docs/guides/support-matrix",
       iconComponentName: "FiInfo"
+    },
+    []
+  ],
+  [
+    {
+      content: "Debugging Stream Playback",
+      slug: "/docs/guides/debugging-guide",
+      iconComponentName: "FiPlayCircle"
     },
     []
   ],
