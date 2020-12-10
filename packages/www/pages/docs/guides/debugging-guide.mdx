@@ -24,8 +24,8 @@ Load your playback URL in the [Livepeer.com test player](/app/test-player). If y
 Does anything playback in the player of *your* choice?
 
 - **No:** Go to the next step.
+- **I don't know. I haven't tested in my own player.**: Go to step 4.
 - **Yes, but the quality is poor:** Go to step 5.
-- **I don't know. I haven't tested in my own player.**: Go to step 5.
 
 ## Step 3
 
@@ -47,21 +47,21 @@ Check the stream status below the Livepeer.com test player. Is it active?
 Check if you are transcoding. Is there only one `profile` listed next to `Playback settings` below the Livepeer.com test player? 
 
 - **Yes:** You are not transcoding your source stream, and only the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
-<br />Or, depending on the resolution, fps and bitrate of your source and the bandwidth of your internet, playback may be slow and choppy. Consider transcoding your ingested video to take advantage of ABR in playback.
+<br />Or, depending on the resolution, FPS and bitrate of your source and the bandwidth of your internet, playback may be slow and choppy. Consider transcoding your ingested video. If no transcoding renditions are available for playback, you are not making use of ABR.
 - **No:** If two or more `profiles` are listed, go to the next step.
 
 ## Step 6
 
 Do all the `profiles` have the same FPS? Between 5 FPS and 60 FPS work best. Setting FPS to `0` is also acceptable and passes through the source FPS to the transcoded renditions.
 
-- **No:** Your `profiles` FPS is configured incorrectly. Set all `profiles` FPS to the same value. 
+- **No:** Your `profiles` FPS is configured incorrectly. Create a new stream, and set all `profiles` FPS to the same value.  
 - **Yes:** Go to the next step.
 
 ## Step 7
 
-Check if something is wrong with the source stream. 
+Check if something is wrong with the source stream. The source stream is the stream sent from your broadcast software. Livepeer serves the source stream with the transcoded renditions via the playback URL.
 
-The left player is configured to only playback the highest resolution available. Except for in rare occassions, the highest resolution is non-transcoded source stream, as served by our CDN. 
+The left player shows your source stream, as served by the Livepeer.com CDN. This player is configured to only playback the highest resolution available. Except for in rare occassions, the highest resolution is the non-transcoded source stream. 
 
 Compare the source in the left player with the transcoded renditions in the player on the right (ABR). You can manually switch between transcoded renditions by clicking on the &#8942; symbol in the lower right corner of the player. Do the renditions on the right player show more problems than in the left source?
 
