@@ -21,11 +21,11 @@ Load your playback URL in the [Livepeer.com test player](/app/test-player). If y
 
 ## Step 2
 
-Does anything playback in the player of *your* choice?
+What seems to be the problem you are experiencing?
 
-- **No:** Go to the next step.
-- **I don't know. I haven't tested in my own player.**: Go to step 4.
-- **Yes, but the quality is poor:** Go to step 5.
+- **The video is not playing in my application at all.** Go to the next step.
+- **The video is playing, but the quality is poor.** Go to step 5.
+- **I don't know.**: Go to step 4.
 
 ## Step 3
 
@@ -46,8 +46,8 @@ Check the stream status below the Livepeer.com test player. Is it active?
 
 Check if you are transcoding. Is there only one `profile` listed next to `Playback settings` below the Livepeer.com test player? 
 
-- **Yes:** You are not transcoding your source stream, and only the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
-<br />Or, depending on the resolution, FPS and bitrate of your source and the bandwidth of your internet, playback may be slow and choppy. Consider transcoding your ingested video. If no transcoding renditions are available for playback, you are not making use of ABR.
+- **Yes:** You are not transcoding your source stream, and only the source profile is available for playback (no ABR) via the Livepeer.com CDN. There may be something wrong with your source stream. If you can, instruct the streamer to set the keyframe interval to 2 in their broadcasting software; this can help.  In general, make sure your broadcasting workflow is stable. The RTMP stream hitting Livepeer's ingest server has problems. Try ensuring a stronger internet connection at the source via a wired ethernet connection or by broadcasting on a more reliable network.
+<br />Or, if the resolution, FPS and/or bitrate of the source stream is very high and if your internet bandwidth is low, playback will be slow and choppy. Consider transcoding your livestreams. If no transcoding renditions are available for playback, you are not making use of ABR.
 - **No:** If two or more `profiles` are listed, go to the next step.
 
 ## Step 6
@@ -65,7 +65,7 @@ The left player shows your source stream, as served by the Livepeer.com CDN. Thi
 
 Compare the source in the left player with the transcoded renditions in the player on the right (ABR). You can manually switch between transcoded renditions by clicking on the &#8942; symbol in the lower right corner of the player. Do the renditions on the right player show more problems than in the left source?
 
-- **No:** If the problems in the source-only stream are also present in the transcoded renditions, there is something wrong with your source stream. Confirm the keyframe interval is set to 2 in your broadcasting software. Try switching the broadcast software internet provider.
+- **No:** If the problems in the source-only stream are also present in the transcoded renditions, there is something wrong with your source stream. If you can, instruct the streamer to set the keyframe interval to 2 in their broadcasting software; this can help.  In general, make sure your broadcasting workflow is stable. The RTMP stream hitting Livepeer's ingest server has problems. Try ensuring a stronger internet connection at the source via a wired ethernet connection or by broadcasting on a more reliable network.
 - **Yes:** If you created your stream via the Livepeer.com API, confirm your `profile bitrate` settings are [reasonable](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices). And if they are, reach out to Livepeer.com for further help, <a href="mailto:help@livepeer.com">help@livepeer.com</a>.
 
 
