@@ -39,7 +39,7 @@ const Debugger = () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
-  const tabs = getTabs(0);
+  const tabs = getTabs(2);
   return (
     <TabbedLayout tabs={tabs}>
       <Box sx={{ width: "100%", pt: 5, pb: 5, borderColor: "muted" }}>
@@ -168,7 +168,7 @@ const Debugger = () => {
                 <Box>Status:</Box>
                 <Box>{info.stream.isActive ? "Active" : "Idle"}</Box>
 
-                <Box>Playback settings</Box>
+                <Box>Playback settings:</Box>
                 <Box>{JSON.stringify(info.session.profiles)}</Box>
               </Grid>
             </>

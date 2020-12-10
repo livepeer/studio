@@ -17,16 +17,16 @@ export function getTabs(i: number): Array<TabType> {
       href: "/app/user/keys"
     },
     {
+      name: "Test Player",
+      href: "/app/test-player"
+    },
+    {
       name: "Usage",
       href: "/app/user/usage"
     },
     {
       name: "Plans",
       href: "/app/user/plans"
-    },
-    {
-      name: "Test Player",
-      href: "/app/test-player"
     }
   ];
 
@@ -57,7 +57,7 @@ export default () => {
     return <Layout />;
   }
   console.log(user);
-  const tabs = getTabs(4);
+  const tabs = getTabs(0);
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
