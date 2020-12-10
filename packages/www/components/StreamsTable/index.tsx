@@ -290,7 +290,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               }
             }}
           >
-            <span>Stream debugger</span>
+            <span>Test Player</span>
             <svg
               className="HoverArrow"
               width="10"
