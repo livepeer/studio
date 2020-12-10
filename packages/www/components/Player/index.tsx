@@ -1,28 +1,56 @@
-import { useEffect, useState } from "react";
-import SanityMuxPlayer from "sanity-mux-player";
+import React, { useEffect, useRef } from "react";
+import muxjs from "mux.js";
 
-const Player = ({ assetId }) => {
-  const [document, setDocument] = useState(null);
+const shaka = require("shaka-player/dist/shaka-player.ui.js");
+
+const Player = ({ src, licenseServer, posterUrl, config = {} }) => {
+  const video: any = useRef(null);
+  const videoContainer: any = useRef(null);
+  const controller: any = useRef({});
+
   useEffect(() => {
-    async function init() {
-      const response = await fetch(
-        `https://dp4k3mpw.api.sanity.io/v1/data/doc/production/${assetId}`
-      );
-      const { documents } = await response.json();
-      setDocument(documents[0]);
-    }
-    init();
+    window["muxjs"] = muxjs;
+    const player = new shaka.Player(video.current);
+    const ui = new shaka.ui.Overlay(
+      player,
+      videoContainer.current,
+      video.current
+    );
+
+    ui.configure(config);
+
+    // Store Shaka's API in order to expose it as a handle.
+    controller.current = {
+      player,
+      ui,
+      videoElement: video.current,
+      config: {}
+    };
+
+    return () => {
+      player.destroy();
+      ui.destroy();
+    };
   }, []);
 
+  // Load the source url when we have one.
+  useEffect(() => {
+    const { player } = controller.current;
+    if (player) {
+      player.load(src.trim());
+    }
+  }, [src]);
+
   return (
-    <SanityMuxPlayer
-      assetDocument={document}
-      autoload={true}
-      autoplay={false}
-      showControls={true}
-      muted={false}
-      loop={false}
-    />
+    <div className="shadow-lg mx-auto max-w-full" ref={videoContainer}>
+      <video
+        autoPlay
+        id="video"
+        ref={video}
+        className="w-full h-full"
+        poster={posterUrl}
+      />
+    </div>
   );
 };
 

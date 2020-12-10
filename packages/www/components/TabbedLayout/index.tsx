@@ -5,7 +5,7 @@ import { FunctionComponent } from "react";
 
 type TabbedLayoutProps = {
   tabs: Array<TabType>;
-  logout: Function;
+  logout?: Function;
 };
 
 const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({

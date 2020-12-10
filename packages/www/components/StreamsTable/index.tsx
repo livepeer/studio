@@ -8,6 +8,7 @@ import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import Help from "../../public/img/help.svg";
 import moment from "moment";
 import { Stream } from "@livepeer.com/api";
+import { MdArrowForward } from "react-icons/md";
 
 type ProfileProps = {
   id: string;
@@ -233,26 +234,28 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             if (selectedStream.length === 1) {
               deleteStream(selectedStream[0].id).then(close);
             } else if (selectedStream.length > 1) {
-              deleteStreams(selectedStream.map(s => s.id)).then(close);
+              deleteStreams(selectedStream.map((s) => s.id)).then(close);
             }
           }}
         />
       )}
-      <Box sx={{ mb: 3 }}>
-        <Link href="/app/stream/new-stream" passHref>
-          <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
-            Create
-          </A>
-        </Link>
-        <Button
-          variant="primarySmall"
-          aria-label="Delete Stream button"
-          disabled={!selectedStream.length}
-          onClick={() => selectedStream.length && setDeleteModal(true)}
-        >
-          Delete
-        </Button>
-      </Box>
+      <Flex sx={{ alignItems: "center", mb: 3 }}>
+        <Box>
+          <Link href="/app/stream/new-stream" passHref>
+            <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
+              Create
+            </A>
+          </Link>
+          <Button
+            variant="primarySmall"
+            aria-label="Delete Stream button"
+            disabled={!selectedStream.length}
+            onClick={() => selectedStream.length && setDeleteModal(true)}
+          >
+            Delete
+          </Button>
+        </Box>
+      </Flex>
       <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>
           <Flex

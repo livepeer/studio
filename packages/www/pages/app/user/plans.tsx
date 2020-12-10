@@ -16,7 +16,7 @@ const PlansPage = () => {
     return <Layout />;
   }
 
-  const tabs = getTabs(3);
+  const tabs = getTabs(4);
 
   return (
     <Elements stripe={getStripe()}>

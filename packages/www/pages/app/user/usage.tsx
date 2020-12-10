@@ -54,7 +54,7 @@ const Usage = () => {
     return <Layout />;
   }
 
-  const tabs = getTabs(2);
+  const tabs = getTabs(3);
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
       <Box
