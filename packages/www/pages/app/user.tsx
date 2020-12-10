@@ -23,6 +23,10 @@ export function getTabs(i: number): Array<TabType> {
     {
       name: "Plans",
       href: "/app/user/plans"
+    },
+    {
+      name: "Test Player",
+      href: "/app/test-player"
     }
   ];
 
@@ -53,7 +57,7 @@ export default () => {
     return <Layout />;
   }
   console.log(user);
-  const tabs = getTabs(0);
+  const tabs = getTabs(4);
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>

@@ -240,7 +240,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         />
       )}
       <Flex sx={{ alignItems: "center", mb: 3 }}>
-        <Box sx={{ mr: 4 }}>
+        <Box>
           <Link href="/app/stream/new-stream" passHref>
             <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
               Create
@@ -255,56 +255,6 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             Delete
           </Button>
         </Box>
-        <Link href="/app/test-player" passHref>
-          <a
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontWeight: 500,
-              fontSize: 1,
-              borderRadius: 6,
-              ".HoverArrow": {
-                position: "relative",
-                top: "1px",
-                marginLeft: "8px",
-                strokeWidth: "2",
-                fill: "none",
-                stroke: "currentColor"
-              },
-              ".HoverArrow__linePath": {
-                opacity: "0",
-                transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s"
-              },
-              ".HoverArrow__tipPath": {
-                transition:
-                  "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s"
-              },
-              ":hover .HoverArrow": {
-                transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
-                ".HoverArrow__linePath": {
-                  opacity: 1
-                },
-                ".HoverArrow__tipPath": {
-                  transform: "translateX(3px)"
-                }
-              }
-            }}
-          >
-            <span>Test Player</span>
-            <svg
-              className="HoverArrow"
-              width="10"
-              height="10"
-              viewBox="0 0 10 10"
-              aria-hidden="true"
-            >
-              <g fillRule="evenodd">
-                <path className="HoverArrow__linePath" d="M0 5h7" />
-                <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
-              </g>
-            </svg>
-          </a>
-        </Link>
       </Flex>
       <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>

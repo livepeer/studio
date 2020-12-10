@@ -51,7 +51,7 @@ const Debugger = () => {
             <Box sx={{ maxWidth: 700, color: "offBlack" }}>
               Test and debug your Livepeer.com stream. For more information
               follow the step-by-step process in the{" "}
-              <Link href="/guide" passHref>
+              <Link href="/docs/guides/debugging-guide" passHref>
                 <a sx={{ textDecoration: "underline" }}>
                   Livepeer.com debugging guide.
                 </a>
@@ -106,7 +106,9 @@ const Debugger = () => {
                 }}
               >
                 <Box>
-                  <Box sx={{ mb: 2, fontWeight: 600 }}>Source</Box>
+                  <Box sx={{ mb: 2, fontWeight: 600 }}>
+                    Source (highest resolution only)
+                  </Box>
                   <Player
                     licenseServer={licenseServer}
                     src={manifestUrl}
@@ -128,7 +130,7 @@ const Debugger = () => {
                 </Box>
                 <Box>
                   <Box sx={{ mb: 2, fontWeight: 600 }}>
-                    ABR (source + renditions)
+                    ABR (source + transcoded renditions)
                   </Box>
                   <Player
                     licenseServer={licenseServer}
@@ -164,10 +166,10 @@ const Debugger = () => {
                 }}
               >
                 <Box>Status:</Box>
-                <Box>{info.stream.isActive ? "Active" : "Inactive"}</Box>
+                <Box>{info.stream.isActive ? "Active" : "Idle"}</Box>
 
                 <Box>Playback settings</Box>
-                <Box>{JSON.stringify(info.stream.profiles)}</Box>
+                <Box>{JSON.stringify(info.session.profiles)}</Box>
               </Grid>
             </>
           )}
