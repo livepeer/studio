@@ -18,7 +18,6 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       sx: { width: "105px" }
     },
     title: "Start with Livepeer.com guides",
-    //description: "Start live streaming now!",
     link: { href: "/docs/guides" }
   },
   {
@@ -28,7 +27,6 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       sx: { width: "105px" }
     },
     title: "Supported codecs & workflows",
-    //description: "Learn about compatible video formats and workflows.",
     link: { href: "/docs/guides/support-matrix" }
   },
   {
@@ -38,7 +36,6 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
       sx: { width: "90px" }
     },
     title: "Debugging Stream Playback",
-    //description: "Solve common stream playback problems.",
     link: { href: "/docs/guides/debugging-guide" }
   }
 ];

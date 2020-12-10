@@ -6,7 +6,7 @@ type Props = {
   img: { src: string; alt?: string; sx?: SxStyleProp };
   link: { href: string; asPath?: string };
   title: string;
-  // description: string;
+  description?: string;
   className?: string;
 };
 
@@ -14,7 +14,7 @@ const DocsCategoryCard = ({
   img,
   link,
   title,
-  // description,
+  description,
   className
 }: Props) => (
   <Link href={link.href} as={link.asPath} passHref>
@@ -24,8 +24,8 @@ const DocsCategoryCard = ({
         background: "linear-gradient(212.62deg, #1C1C1C 0%, #292935 100%)",
         borderRadius: 16,
         width: 276,
-        height: "244px",
-        padding: 24,
+        px: 24,
+        py: 32,
         display: "block",
         textAlign: "left",
         boxShadow:
@@ -62,16 +62,18 @@ const DocsCategoryCard = ({
       >
         {title}
       </h3>
-     <p
-        sx={{
-          color: "#A5A5A5",
-          fontSize: "18px",
-          lineHeight: "24px",
-          letterSpacing: "-0.03em"
-        }}
-      >
-        
-      </p>
+      {description && (
+        <p
+          sx={{
+            color: "#A5A5A5",
+            fontSize: "18px",
+            lineHeight: "24px",
+            letterSpacing: "-0.03em"
+          }}
+        >
+          {description}
+        </p>
+      )}
     </A>
   </Link>
 );
