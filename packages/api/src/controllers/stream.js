@@ -385,7 +385,8 @@ app.post('/', authMiddleware({}), validatePost('stream'), async (req, res) => {
 app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   const { id } = req.params
   // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
-  const stream = await req.store.get(`stream/${id}`, false)
+  const useReplica = !req.body.active
+  const stream = await db.stream.get(id, { useReplica })
   if (!stream || stream.deleted || !req.user.admin) {
     res.status(404)
     return res.json({ errors: ['not found'] })
