@@ -239,10 +239,8 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
           }}
         />
       )}
-      <Flex
-        sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}
-      >
-        <Box>
+      <Flex sx={{ alignItems: "center", mb: 3 }}>
+        <Box sx={{ mr: 4 }}>
           <Link href="/app/stream/new-stream" passHref>
             <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
               Create
@@ -257,7 +255,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             Delete
           </Button>
         </Box>
-        <Link href="/app/debugger" passHref>
+        <Link href="/app/test-player" passHref>
           <a
             sx={{
               display: "flex",

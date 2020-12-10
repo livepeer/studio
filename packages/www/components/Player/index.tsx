@@ -3,7 +3,7 @@ import muxjs from "mux.js";
 
 const shaka = require("shaka-player/dist/shaka-player.ui.js");
 
-const Player = ({ src, licenseServer, posterUrl }) => {
+const Player = ({ src, licenseServer, posterUrl, config = {} }) => {
   const video: any = useRef(null);
   const videoContainer: any = useRef(null);
   const controller: any = useRef({});
@@ -16,6 +16,8 @@ const Player = ({ src, licenseServer, posterUrl }) => {
       videoContainer.current,
       video.current
     );
+
+    ui.configure(config);
 
     // Store Shaka's API in order to expose it as a handle.
     controller.current = {
@@ -35,7 +37,7 @@ const Player = ({ src, licenseServer, posterUrl }) => {
   useEffect(() => {
     const { player } = controller.current;
     if (player) {
-      player.load(src);
+      player.load(src.trim());
     }
   }, [src]);
 

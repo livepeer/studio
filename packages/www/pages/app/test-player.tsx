@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 import TabbedLayout from "../../components/TabbedLayout";
 import { getTabs } from "./user";
 import Button from "../../components/Button";
-import moment from "moment";
 
 const Player = dynamic(import("../../components/Player"), { ssr: false });
 const licenseServer = "https://widevine-proxy.appspot.com/proxy";
@@ -47,10 +46,16 @@ const Debugger = () => {
         <Container>
           <Box sx={{ mb: 4 }}>
             <Heading as="h2" sx={{ fontSize: 5, mb: 2 }}>
-              Stream Debugger
+              Test Player
             </Heading>
             <Box sx={{ maxWidth: 700, color: "offBlack" }}>
-              Test and debug streams created with Livepeer.com.
+              Test and debug your Livepeer.com stream. For more information
+              follow the step-by-step process in the{" "}
+              <Link href="/guide" passHref>
+                <a sx={{ textDecoration: "underline" }}>
+                  Livepeer.com debugging guide.
+                </a>
+              </Link>
             </Box>
           </Box>
           <Box sx={{ mb: 5 }}>
@@ -88,8 +93,7 @@ const Debugger = () => {
               </Button>
             </form>
             <Box sx={{ mt: 1, pl: 3, fontSize: 0, color: "rgba(0,0,0,.5)" }}>
-              ie.{" "}
-              https://fra-cdn.livepeer.monster/hls/44hr1pyl7voo6v5t/index.m3u8
+              ie. https://fra-cdn.livepeer.com/hls/123456abcdef7890/index.m3u8
             </Box>
           </Box>
           {message === "Not found" && <Box>Stream not found.</Box>}
@@ -107,6 +111,19 @@ const Debugger = () => {
                     licenseServer={licenseServer}
                     src={manifestUrl}
                     posterUrl={videoThumbnail}
+                    config={{
+                      abr: { enabled: false },
+                      controlPanelElements: [
+                        "time_and_duration",
+                        "play_pause",
+                        "rewind",
+                        "fast_forward",
+                        "volume",
+                        "spacer",
+                        "fullscreen"
+                      ],
+                      overflowMenuButtons: []
+                    }}
                   />
                 </Box>
                 <Box>
@@ -117,19 +134,23 @@ const Debugger = () => {
                     licenseServer={licenseServer}
                     src={manifestUrl}
                     posterUrl={videoThumbnail}
+                    config={{
+                      controlPanelElements: [
+                        "time_and_duration",
+                        "play_pause",
+                        "rewind",
+                        "fast_forward",
+                        "volume",
+                        "spacer",
+                        "overflow_menu",
+                        "fullscreen"
+                      ],
+                      overflowMenuButtons: ["quality"]
+                    }}
                   />
                 </Box>
               </Grid>
-              <Box sx={{ mb: 4 }}>
-                <Box sx={{ fontWeight: 500, fontSize: 2, mb: 1 }}>
-                  Does something not look right?
-                </Box>
-                <Box sx={{ fontSize: 0 }}>
-                  If you observe problems with your stream playback or need
-                  debugging guidance, start with the{" "}
-                  <a href="">Livepeer.com debugging guide</a>.
-                </Box>
-              </Box>
+
               <Box sx={{ fontWeight: 600, fontSize: 3, mb: 3 }}>
                 Stream info
               </Box>
@@ -142,25 +163,9 @@ const Debugger = () => {
                   gridTemplateColumns: "200px auto"
                 }}
               >
-                <Box>Name:</Box>
-                <Link
-                  href={{ pathname: "/app/stream/[id]" }}
-                  as={`/app/stream/${info.stream.id}`}
-                >
-                  <a sx={{ color: "primary" }}>{info.stream.name}</a>
-                </Link>
-                <Box>Author:</Box>
-                <Box>{info.user.email}</Box>
-                <Box>Created:</Box>
-                <Box>
-                  {moment.unix(info.stream.createdAt / 1000.0).fromNow()}
-                </Box>
                 <Box>Status:</Box>
                 <Box>{info.stream.isActive ? "Active" : "Inactive"}</Box>
-                <Box>Seconds streamed:</Box>
-                <Box>
-                  {info?.stream?.sourceSegmentsDuration.toFixed(2)} seconds
-                </Box>
+
                 <Box>Playback settings</Box>
                 <Box>{JSON.stringify(info.stream.profiles)}</Box>
               </Grid>
