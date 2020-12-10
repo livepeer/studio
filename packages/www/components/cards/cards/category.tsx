@@ -6,7 +6,7 @@ type Props = {
   img: { src: string; alt?: string; sx?: SxStyleProp };
   link: { href: string; asPath?: string };
   title: string;
-  description: string;
+  // description: string;
   className?: string;
 };
 
@@ -14,7 +14,7 @@ const DocsCategoryCard = ({
   img,
   link,
   title,
-  description,
+  // description,
   className
 }: Props) => (
   <Link href={link.href} as={link.asPath} passHref>
@@ -62,7 +62,7 @@ const DocsCategoryCard = ({
       >
         {title}
       </h3>
-      <p
+     <p
         sx={{
           color: "#A5A5A5",
           fontSize: "18px",
@@ -70,7 +70,7 @@ const DocsCategoryCard = ({
           letterSpacing: "-0.03em"
         }}
       >
-        {description}
+        
       </p>
     </A>
   </Link>
