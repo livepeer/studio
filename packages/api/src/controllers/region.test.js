@@ -71,7 +71,7 @@ describe('controllers/region', () => {
         ],
       }
 
-      let res = await client.post(`/region/${region.region}`, { ...region })
+      let res = await client.put(`/region/${region.region}`, { ...region })
       expect(res.status).toBe(200)
 
       let getResp = await client.get(`/region/${region.region}`)

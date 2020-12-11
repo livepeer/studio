@@ -1155,3 +1155,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+    put:
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      description: updates a specific region
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/region'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      description: deletes a specific region
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
