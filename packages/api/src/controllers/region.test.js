@@ -64,10 +64,10 @@ describe('controllers/region', () => {
       const region = {
         region: 'BER',
         orchestrators: [
-          { address: 'localhost:7935' },
-          { address: 'localhost:7935' },
-          { address: 'localhost:7935' },
-          { address: 'localhost:7935' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
         ],
       }
 
@@ -77,6 +77,57 @@ describe('controllers/region', () => {
       let getResp = await client.get(`/region/${region.region}`)
       expect(getResp).toBeDefined()
       expect(getResp.status).toBe(200)
+      let regionObj = await getResp.json()
+      expect(regionObj).toBeDefined()
+      expect(regionObj.orchestrators).toBeDefined()
+      expect(regionObj.region).toBeDefined()
+    })
+
+    it('get a list of regions', async () => {
+      const region = {
+        region: 'BER',
+        orchestrators: [
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+        ],
+      }
+
+      let res = await client.put(`/region/${region.region}`, { ...region })
+      expect(res.status).toBe(200)
+
+      const region2 = {
+        region: 'VNO',
+        orchestrators: [
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+        ],
+      }
+
+      let res2 = await client.put(`/region/${region2.region}`, { ...region2 })
+      expect(res2.status).toBe(200)
+
+      const region3 = {
+        region: 'OTP',
+        orchestrators: [
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+        ],
+      }
+      let res3 = await client.put(`/region/${region3.region}`, { ...region3 })
+      expect(res3.status).toBe(200)
+
+      let getResp = await client.get(`/region`)
+      expect(getResp).toBeDefined()
+      expect(getResp.status).toBe(200)
+      let regionObj = await getResp.json()
+      expect(regionObj).toBeDefined()
+      expect(regionObj.length).toBeDefined()
     })
   })
 })

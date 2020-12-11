@@ -1,16 +1,28 @@
 import Router from 'express/lib/router'
 import { authMiddleware } from '../middleware'
+import { db } from '../store'
 
 const app = Router()
 
-const getOrchestrators = async (req, res, next) => {
-  const orchestrators = await req.getOrchestrators(req)
+app.get('/', authMiddleware({ admin: true }), async (req, res, next) => {
+  const [regions, cursor] = await db.region.find()
+  if (req.query.grouped) {
+    return res.json(regions)
+  }
 
-  return res.json(orchestrators.map(({ address }) => ({ address })))
-}
+  const flatOrchList = []
+  regions.forEach((region) => {
+    region.orchestrators.forEach((orch) => {
+      orch.region = region.region
+      flatOrchList.push(orch)
+    })
+  })
+
+  return res.json(flatOrchList)
+})
 
 app.get('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
-  const region = await req.store.get(`region/${req.params.region}`)
+  const region = await db.region.get(req.params.region)
   return res.json(region)
 })
 
@@ -29,11 +41,11 @@ app.put('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
     orchestrators: req.body.orchestrators || [],
   }
 
-  console.log(`req.body ${JSON.stringify(req.body)}`)
   const resp = await req.store.create({
     id: region.region,
     kind: 'region',
-    ...region,
+    region: region.region,
+    orchestrators: region.orchestrators,
   })
 
   return res.json(region)
@@ -47,7 +59,5 @@ app.delete(
     return res.json({ ok: 1 })
   },
 )
-
-app.get('/orchestrator', getOrchestrators)
 
 export default app
