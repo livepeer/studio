@@ -149,17 +149,21 @@ export default class Table<T extends DBObject> {
     }
   }
 
-  async update(id: string, doc: T) {
+  async update(id: string, doc: T, where: string = '', doNotThrow = false) {
     const q = sql`UPDATE `.append(this.name).append(sql`
       SET data = data || ${JSON.stringify(doc)}
       WHERE id = ${id}
     `)
+    if (where) {
+      q.append(' AND ' + where)
+    }
 
     const res = await this.db.query(q)
 
-    if (res.rowCount < 1) {
+    if (res.rowCount < 1 && !doNotThrow) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`)
     }
+    return res
   }
 
   // Takes in an object of {"field": number} and increases all the fields by the specified amounts
