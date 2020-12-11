@@ -524,6 +524,7 @@ components:
       table: regions
       required:
         - region
+        - orchestrators
       properties:
         region:
           type: string

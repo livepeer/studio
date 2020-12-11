@@ -41,7 +41,7 @@ app.put('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
     orchestrators: req.body.orchestrators || [],
   }
 
-  const resp = await req.store.create({
+  const resp = await db.region.create({
     id: region.region,
     kind: 'region',
     region: region.region,
@@ -55,7 +55,7 @@ app.delete(
   '/:region',
   authMiddleware({ admin: true }),
   async (req, res, next) => {
-    const resp = await req.store.delete(`region/${req.params.region}`)
+    const resp = await db.region.delete(`region/${req.params.region}`)
     return res.json({ ok: 1 })
   },
 )
