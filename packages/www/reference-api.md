@@ -309,6 +309,8 @@ deletes a specific webhook details
 | createdByTokenName | string | Name of the token used to create this object | No |
 | createdAt | number | Timestamp (in milliseconds) at which stream object was created<br>_Example:_ `1587667174725` | No |
 | parentId | string | Points to parent stream object<br>_Example:_ `"de7818e7-610a-4057-8f6f-b785dc1e6f88"` | No |
+| partialSession | boolean | Indicates that this is not final object of `user's` session | No |
+| previousSessions | [ string ] | Ids of the previous sessions which are part of `user's` session | No |
 | streamKey | string | Used to form RTMP ingest URL<br>_Example:_ `"hgebdhhigq"` | No |
 | playbackId | string | Used to form playback URL<br>_Example:_ `"eaw4nk06ts2d0mzb"` | No |
 | profiles | [ object ] |  | No |
@@ -318,6 +320,7 @@ deletes a specific webhook details
 | recordObjectStoreId | string | ID of object store where to which this stream was recorded<br>_Example:_ `"D8321C3E-B29C-45EB-A1BB-A623D8BE0F65"` | No |
 | wowza | object |  | No |
 | renditions | object |  | No |
+| region | string | Region in which this session object was created<br>_Example:_ `"fra"` | No |
 
 #### error
 
