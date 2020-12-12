@@ -2,10 +2,119 @@ import { authMiddleware } from '../middleware'
 import Router from 'express/lib/router'
 import { db } from '../store'
 import sql from 'sql-template-strings'
+import consul from 'consul'
+
+// const consul = require('consul')()
 
 const ACTIVE_TIMEOUT = 1 * 3600 * 1000 // 1h
 
 const app = Router()
+const traefikKeyPathRouters = `traefik/http/routers/`
+const traefikKeyPathServices = `traefik/http/services/`
+const traefikKeyPathMiddlewares = `traefik/http/middlewares/`
+
+app.post(
+  '/consul-routes-clean',
+  authMiddleware({ anyAdmin: true }),
+  async (req, res) => {
+    // check if there is routes in the consul that belongs to the streams that
+    // are not active anymore
+    let baseUrl
+    if (req.config.consul) {
+      baseUrl = req.config.consul
+      if (!baseUrl.endsWith('/v1')) {
+        baseUrl += '/v1'
+      }
+    }
+    const cc = consul({ promisify: true, baseUrl })
+    let keys
+    try {
+      keys = await cc.kv.keys({
+        key: traefikKeyPathRouters,
+        separator: '/',
+      })
+      keys = keys.map((k) => k.split('/')[3])
+    } catch (e) {
+      if (e.statusCode == 404) {
+        return res.json({ msg: 'no keys' })
+      } else {
+        console.log(`error getting keys:`, e)
+        res.statusCode = 500
+        return res.json({ error: String(e) })
+      }
+    }
+    let i = 0,
+      found = 0
+    const toClean = []
+    const now = Date.now()
+    for (const key of keys) {
+      const stream = await db.stream.getByPlaybackId(key)
+      if (stream) {
+        const lastSeen = new Date(stream.lastSeen).getTime()
+        const needClean = !stream.isActive && now - lastSeen > ACTIVE_TIMEOUT
+        found++
+        if (needClean) {
+          toClean.push(key)
+        }
+      }
+      const msg = `${i}/${found}/${keys.length}`
+      res.write(msg + '\n')
+      i++
+    }
+    let cleaned = 0
+    i = 0
+    for (const key of toClean) {
+      const keysResp = await cc.transaction.create([
+        {
+          KV: {
+            Verb: 'get-tree',
+            Key: traefikKeyPathRouters + key,
+          },
+        },
+        {
+          KV: {
+            Verb: 'get-tree',
+            Key: traefikKeyPathServices + key,
+          },
+        },
+        {
+          KV: {
+            Verb: 'get-tree',
+            Key: traefikKeyPathMiddlewares + key,
+          },
+        },
+      ])
+      if (keysResp && keysResp.Results) {
+        // deleting keys
+        const deleteTxn = keysResp.Results.map((rk) => {
+          return {
+            KV: {
+              Verb: 'delete-cas',
+              Key: rk.KV.Key,
+              Index: rk.KV.ModifyIndex,
+            },
+          }
+        })
+        let deleteResp
+        try {
+          deleteResp = await cc.transaction.create(deleteTxn)
+        } catch (e) {
+          if (e.statusCode !== 409) {
+            console.error(`Error deleting keys: `, e)
+          }
+        }
+        if (deleteResp && !deleteResp.Errors) {
+          cleaned++
+          console.log(`cleaned routes for ${key}`)
+        }
+      }
+      const msg = `${i}/${cleaned}/${toClean.length}`
+      res.write(msg + '\n')
+      i++
+    }
+    res.end(`cleaned routes for ${cleaned}/${toClean.length} streams\n`)
+  },
+)
 
 app.post(
   '/active-clean',

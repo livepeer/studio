@@ -182,6 +182,11 @@ export default function parseCli(argv) {
             "identify region in which this server runs (fra, mdw, etc)",
           type: 'string',
         },
+        'consul': {
+          describe:
+            "url of the Consul agent",
+          type: 'string',
+        },
       })
       .help()
       .parse(argv)

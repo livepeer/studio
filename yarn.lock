@@ -7011,6 +7011,13 @@ constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
 
+consul@^0.39.0:
+  version "0.39.0"
+  resolved "https://registry.yarnpkg.com/consul/-/consul-0.39.0.tgz#4cca710c9caf10b2a3ba6b819914602f8a83186b"
+  integrity sha512-FeEr+B+ADEGzoKonNkheKu0QbODdYKbY9TbWaxX9MHcdlmBuJWlIFMcD1JVrQpTrZEM+z+7AJBz+uw5MOD3giA==
+  dependencies:
+    papi "^0.29.0"
+
 container-query-toolkit@0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/container-query-toolkit/-/container-query-toolkit-0.1.3.tgz#79ece9fe491d9187b7051247067f1faac6ce00b0"
@@ -15125,6 +15132,11 @@ palx@^1.0.3:
   dependencies:
     chroma-js "^1.2.1"
     micro "^6.1.0"
+
+papi@^0.29.0:
+  version "0.29.1"
+  resolved "https://registry.yarnpkg.com/papi/-/papi-0.29.1.tgz#7373e2c527f5117d61fd2a0e6c6b1dd72bf7f180"
+  integrity sha512-Y9ipSMfWuuVFO3zY9PlxOmEg+bQ7CeJ28sa9/a0veYNynLf9fwjR3+3fld5otEy7okUaEOUuCHVH62MyTmACXQ==
 
 parallel-transform@^1.1.0:
   version "1.2.0"
