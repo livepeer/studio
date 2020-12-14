@@ -69,8 +69,71 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   res.json(output)
 })
 
+// returns only 'user' sessions and adds
+app.get('/:parentId/sessions', authMiddleware({}), async (req, res) => {
+  const { parentId } = req.params
+  const { record } = req.query
+
+  const ingests = await req.getIngest(req)
+  if (!ingests.length) {
+      res.status(501)
+      return res.json({ errors: ['Ingest not configured'] })
+  }
+  const ingest = ingests[0].base
+
+  const stream = await req.store.get(`stream/${parentId}`)
+  if (
+    !stream ||
+    stream.deleted ||
+    (stream.userId !== req.user.id && !req.isUIAdmin)
+  ) {
+    res.status(404)
+    return res.json({ errors: ['not found'] })
+  }
+
+  let filterOut
+  const query = []
+  query.push(sql`data->>'parentId' = ${stream.id}`)
+  query.push(sql`(data->>'lastSeen')::bigint > 0`)
+  query.push(sql`data->>'partialSession' IS NULL`)
+  if (record) {
+    if (record === 'true' || record === '1') {
+      query.push(sql`data->>'record' = 'true'`)
+      query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`)
+    } else if (record === 'false' || record === '0') {
+      query.push(sql`data->>'recordObjectStoreId' IS NULL`)
+      filterOut = true
+    }
+  }
+
+  let [sessions] = await db.stream.find(query, {
+    order: `data->>'lastSeen' DESC`,
+    limit: 0, // do not limit sessions until we develop new pagination not based on ids
+  })
+
+  const olderThen = Date.now() - USER_SESSION_TIMEOUT
+  for (const session of sessions) {
+    delete session.previousSessions
+    if (session.record && session.recordObjectStoreId) {
+      delete session.recordObjectStoreId
+      const isReady = session.lastSeen < olderThen
+      session.recordingStatus = isReady ? 'ready' : 'waiting'
+      if (isReady) {
+        session.recordingUrl = ingest + `/recordings/${session.id}/index.m3u8`
+      }
+    }
+  }
+  if (filterOut) {
+    sessions = sessions.filter(sess => !sess.record)
+  }
+
+  res.status(200)
+  res.json(sessions)
+})
+
 app.get('/sessions/:parentId', authMiddleware({}), async (req, res) => {
-  const { parentId, limit, cursor } = req.params
+  const { parentId } = req.params
+  const { limit, cursor } = req.query
   logger.info(`cursor params ${cursor}, limit ${limit}`)
 
   const stream = await req.store.get(`stream/${parentId}`)
