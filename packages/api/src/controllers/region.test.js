@@ -129,5 +129,37 @@ describe('controllers/region', () => {
       expect(regionObj).toBeDefined()
       expect(regionObj.length).toBeDefined()
     })
+
+    it('update should not duplicate a region', async () => {
+      let region = {
+        region: 'BER',
+        orchestrators: [
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+          { address: 'https://orchestrator.example.com:443' },
+        ],
+      }
+
+      let res = await client.put(`/region/${region.region}`, { ...region })
+      expect(res.status).toBe(200)
+
+      region = {
+        region: 'BER',
+        orchestrators: [
+          { address: 'https://orchestrator2.example.com:443' },
+          { address: 'https://orchestrator2.example.com:443' },
+        ],
+      }
+
+      let res2 = await client.put(`/region/${region.region}`, { ...region })
+      expect(res.status).toBe(200)
+
+      let getResp = await client.get(`/region`)
+      expect(getResp).toBeDefined()
+      expect(getResp.status).toBe(200)
+      let regionObj = await getResp.json()
+      expect(regionObj.length).toBe(2)
+    })
   })
 })
