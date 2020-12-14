@@ -5,8 +5,8 @@ import { db } from '../store'
 const app = Router()
 
 app.get('/', authMiddleware({ admin: true }), async (req, res, next) => {
-  const [regions, cursor] = await db.region.find()
-  if (req.query.grouped) {
+  const [regions, cursor] = await db.region.find({}, { limit: 100 })
+  if (req.query.grouped === 'true') {
     return res.json(regions)
   }
 
@@ -40,9 +40,11 @@ app.put(
       orchestrators: req.body.orchestrators || [],
     }
 
-    const currentRegion = await db.region.get(req.params.region)
+    const currentRegion = await db.region.get(req.body.region)
+
     if (currentRegion) {
       const updateResp = await db.region.update(req.params.region, region)
+      console.log('update Resp: ', updateResp)
     } else {
       const resp = await db.region.create({
         id: region.region,

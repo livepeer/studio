@@ -536,6 +536,9 @@ components:
           type: array
           items:
             type: object
+            additionalProperties: false
+            required:
+              - address
             properties:
               address:
                 type: string
