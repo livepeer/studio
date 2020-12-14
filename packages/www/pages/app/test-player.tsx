@@ -8,9 +8,9 @@ import dynamic from "next/dynamic";
 import TabbedLayout from "../../components/TabbedLayout";
 import { getTabs } from "./user";
 import Button from "../../components/Button";
+import SyntaxHighlighter from "react-syntax-highlighter";
 
 const Player = dynamic(import("../../components/Player"), { ssr: false });
-const licenseServer = "https://widevine-proxy.appspot.com/proxy";
 const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
 const Debugger = () => {
@@ -28,7 +28,7 @@ const Debugger = () => {
     const [, rinfo] = await getStreamInfo(playbackId);
     if (!rinfo || rinfo.isSession === undefined) {
       setMessage("Not found");
-    } else if (rinfo.stream && rinfo.user) {
+    } else if (rinfo.stream) {
       const info = rinfo as StreamInfo;
       setInfo(info);
       setMessage("");
@@ -39,6 +39,7 @@ const Debugger = () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
+
   const tabs = getTabs(2);
   return (
     <TabbedLayout tabs={tabs}>
@@ -110,7 +111,6 @@ const Debugger = () => {
                     Source (highest resolution only)
                   </Box>
                   <Player
-                    licenseServer={licenseServer}
                     src={manifestUrl}
                     posterUrl={videoThumbnail}
                     config={{
@@ -120,6 +120,7 @@ const Debugger = () => {
                         "play_pause",
                         "rewind",
                         "fast_forward",
+                        "mute",
                         "volume",
                         "spacer",
                         "fullscreen"
@@ -133,7 +134,6 @@ const Debugger = () => {
                     ABR (source + transcoded renditions)
                   </Box>
                   <Player
-                    licenseServer={licenseServer}
                     src={manifestUrl}
                     posterUrl={videoThumbnail}
                     config={{
@@ -142,10 +142,11 @@ const Debugger = () => {
                         "play_pause",
                         "rewind",
                         "fast_forward",
+                        "mute",
                         "volume",
                         "spacer",
-                        "overflow_menu",
-                        "fullscreen"
+                        "fullscreen",
+                        "overflow_menu"
                       ],
                       overflowMenuButtons: ["quality"]
                     }}
@@ -169,7 +170,22 @@ const Debugger = () => {
                 <Box>{info.stream.isActive ? "Active" : "Idle"}</Box>
 
                 <Box>Playback settings:</Box>
-                <Box>{JSON.stringify(info.session.profiles)}</Box>
+                <Box
+                  sx={{
+                    pre: {
+                      padding: "0 !important",
+                      background: "transparent !important"
+                    },
+                    code: {
+                      overflowX: "auto",
+                      whiteSpace: "pre-wrap"
+                    }
+                  }}
+                >
+                  <SyntaxHighlighter language={"json"}>
+                    {JSON.stringify(info.session.profiles)}
+                  </SyntaxHighlighter>
+                </Box>
               </Grid>
             </>
           )}

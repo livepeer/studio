@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import muxjs from "mux.js";
 
+// Use compiled versions of these libraries so they work with ad blockers
+const muxjs = require("mux.js/dist/mux.js");
 const shaka = require("shaka-player/dist/shaka-player.ui.js");
 
-const Player = ({ src, licenseServer, posterUrl, config = {} }) => {
+const Player = ({ src, posterUrl, config = {} }) => {
   const video: any = useRef(null);
   const videoContainer: any = useRef(null);
   const controller: any = useRef({});
@@ -44,6 +45,7 @@ const Player = ({ src, licenseServer, posterUrl, config = {} }) => {
   return (
     <div className="shadow-lg mx-auto max-w-full" ref={videoContainer}>
       <video
+        muted
         autoPlay
         id="video"
         ref={video}
