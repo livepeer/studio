@@ -6,7 +6,7 @@ type Props = {
   img: { src: string; alt?: string; sx?: SxStyleProp };
   link: { href: string; asPath?: string };
   title: string;
-  description: string;
+  description?: string;
   className?: string;
 };
 
@@ -24,8 +24,8 @@ const DocsCategoryCard = ({
         background: "linear-gradient(212.62deg, #1C1C1C 0%, #292935 100%)",
         borderRadius: 16,
         width: 276,
-        height: "345px",
-        padding: 24,
+        px: 24,
+        py: 32,
         display: "block",
         textAlign: "left",
         boxShadow:
@@ -41,7 +41,7 @@ const DocsCategoryCard = ({
       <div
         sx={{
           width: "100%",
-          height: "208px",
+          height: "156px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -62,16 +62,18 @@ const DocsCategoryCard = ({
       >
         {title}
       </h3>
-      <p
-        sx={{
-          color: "#A5A5A5",
-          fontSize: "18px",
-          lineHeight: "24px",
-          letterSpacing: "-0.03em"
-        }}
-      >
-        {description}
-      </p>
+      {description && (
+        <p
+          sx={{
+            color: "#A5A5A5",
+            fontSize: "18px",
+            lineHeight: "24px",
+            letterSpacing: "-0.03em"
+          }}
+        >
+          {description}
+        </p>
+      )}
     </A>
   </Link>
 );

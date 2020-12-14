@@ -15,31 +15,28 @@ const categories: React.ComponentProps<typeof DocsCategoryCard>[] = [
     img: {
       src: "/img/docs/flag.png",
       alt: "flag",
-      sx: { width: "140px" }
+      sx: { width: "105px" }
     },
-    title: "Getting started",
-    description: "Start live streaming now!",
+    title: "Start with Livepeer.com guides",
     link: { href: "/docs/guides" }
   },
   {
     img: {
       src: "/img/docs/puzzle.png",
       alt: "puzzle",
-      sx: { width: "140px" }
+      sx: { width: "105px" }
     },
-    title: "Feature support matrix",
-    description: "Learn about compatible video formats and workflows.",
+    title: "Supported codecs & workflows",
     link: { href: "/docs/guides/support-matrix" }
   },
   {
     img: {
       src: "/img/docs/stopwatch.png",
       alt: "stopwatch",
-      sx: { width: "120px" }
+      sx: { width: "90px" }
     },
-    title: "Your first stream in under 5 minutes",
-    description: "Read the Livepeer.com blog post.",
-    link: { href: "/blog/first-livepeer-stream-in-five-minutes" }
+    title: "Debugging Stream Playback",
+    link: { href: "/docs/guides/debugging-guide" }
   }
 ];
 
