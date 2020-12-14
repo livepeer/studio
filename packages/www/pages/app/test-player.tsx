@@ -28,7 +28,7 @@ const Debugger = () => {
     const [, rinfo] = await getStreamInfo(playbackId);
     if (!rinfo || rinfo.isSession === undefined) {
       setMessage("Not found");
-    } else if (rinfo.stream && rinfo.user) {
+    } else if (rinfo.stream) {
       const info = rinfo as StreamInfo;
       setInfo(info);
       setMessage("");
@@ -39,6 +39,7 @@ const Debugger = () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
+
   const tabs = getTabs(2);
   return (
     <TabbedLayout tabs={tabs}>
