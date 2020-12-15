@@ -30,7 +30,7 @@ const BlogIndex = ({ categories, posts }) => {
   let featuredPost = posts
     .sort(
       (x, y) =>
-        new Date(y._updatedAt).getTime() - new Date(x._updatedAt).getTime()
+        new Date(y._createdAt).getTime() - new Date(x._createdAt).getTime()
     )
     .find((p) => p.featured);
 
