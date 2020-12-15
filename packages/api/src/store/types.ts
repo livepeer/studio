@@ -28,3 +28,7 @@ export interface FindOptions extends QueryOptions {
 export interface GetOptions {
   useReplica?: boolean
 }
+
+export interface UpdateOptions {
+  throwIfEmpty?: boolean
+}
