@@ -70,7 +70,8 @@ export default class Table<T extends DBObject> {
     query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
-    const { cursor = '', limit = 100, useReplica = true, order = 'id ASC' } = opts
+    const { cursor = '', useReplica = true, order = 'id ASC' } = opts
+    const limit = opts.hasOwnProperty('limit') ? opts.limit : 100
 
     const q = sql`SELECT * FROM `.append(this.name)
     let filters = []
@@ -102,7 +103,9 @@ export default class Table<T extends DBObject> {
     }
 
     q.append(` ORDER BY ${order}`)
-    q.append(sql` LIMIT ${limit}`)
+    if (limit) {
+      q.append(sql` LIMIT ${limit}`)
+    }
 
     let res
     if (useReplica) {
