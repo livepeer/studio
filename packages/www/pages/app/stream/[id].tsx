@@ -92,7 +92,7 @@ const Cell = ({ children }) => {
   return <Box sx={{ m: "0.4em" }}>{children}</Box>;
 };
 
-export default () => {
+const ID = () => {
   useLoggedIn();
   const {
     user,
@@ -489,7 +489,7 @@ export default () => {
                 Delete
               </Button>
             </Flex>
-            {/* <StreamSessionsTable streamId={stream.id} /> */}
+            {user.admin ? <StreamSessionsTable streamId={stream.id} /> : null}
           </>
         ) : notFound ? (
           <Box>Not found</Box>
@@ -503,3 +503,4 @@ export default () => {
     </TabbedLayout>
   );
 };
+export default ID;
