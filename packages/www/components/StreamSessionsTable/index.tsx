@@ -8,16 +8,12 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
 
 type RecordingURLProps = {
-  manifestId: string;
-  baseUrl: string;
-  hasRecording: boolean;
+  id: string;
+  status: string;
+  recUrl: string;
 };
 
-export const RecordingURL = ({
-  manifestId,
-  baseUrl,
-  hasRecording
-}: RecordingURLProps) => {
+export const RecordingURL = ({ id, status, recUrl }: RecordingURLProps) => {
   const [isCopied, setCopied] = useState(0);
   useEffect(() => {
     if (isCopied) {
@@ -27,40 +23,30 @@ export const RecordingURL = ({
       return () => clearTimeout(interval);
     }
   }, [isCopied]);
-  const fullUrl = hasRecording
-    ? pathJoin(baseUrl, "recordings", manifestId, "index.m3u8")
-    : "";
-  const anchor = true;
   return (
     <Flex
-      key={"recurl-" + manifestId}
+      key={"recurl-" + id}
       sx={{
         justifyContent: "flex-start",
         alignItems: "center",
         wordBreak: "break-all"
       }}
     >
-      {fullUrl ? (
-        <CopyToClipboard text={fullUrl} onCopy={() => setCopied(2000)}>
+      {recUrl ? (
+        <CopyToClipboard text={recUrl} onCopy={() => setCopied(2000)}>
           <Flex sx={{ alignItems: "center" }}>
-            {anchor ? (
-              <a
-                sx={{
-                  fontSize: 12,
-                  fontFamily: "monospace",
-                  mr: 1,
-                  wordBreak: "break-all"
-                }}
-                href={fullUrl}
-                target="_blank"
-              >
-                {breakablePath(fullUrl)}
-              </a>
-            ) : (
-              <span sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}>
-                {fullUrl}
-              </span>
-            )}
+            <a
+              sx={{
+                fontSize: 12,
+                fontFamily: "monospace",
+                mr: 1,
+                wordBreak: "break-all"
+              }}
+              href={recUrl}
+              target="_blank"
+            >
+              {breakablePath(recUrl)}
+            </a>
             <Copy
               sx={{
                 mr: 1,
@@ -72,7 +58,9 @@ export const RecordingURL = ({
             />
           </Flex>
         </CopyToClipboard>
-      ) : null}
+      ) : (
+        <Box>{status}</Box>
+      )}
       {!!isCopied && <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>}
     </Flex>
   );
@@ -86,17 +74,7 @@ const StreamSessionsTable = ({
   mt?: string | number;
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
-  const [baseUrl, setBaseUrl] = useState(null);
-  const { user, getStreamSessions, getIngest } = useApi();
-  useEffect(() => {
-    getIngest()
-      .then((ingest) => {
-        if (ingest && ingest.length) {
-          setBaseUrl(ingest[0].base);
-        }
-      })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [streamId]);
+  const { user, getStreamSessions } = useApi();
   useEffect(() => {
     getStreamSessions(streamId)
       .then((streams) => setStreamsSessions(streams))
@@ -116,58 +94,57 @@ const StreamSessionsTable = ({
   }, [streamId, isVisible]);
 
   return streamsSessions.length ? (
-    <Container sx={{ mb: 5, mt: 2 }}>
+    <Box sx={{ mb: "0.5em", mt: "2em" }}>
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
       <Table
         sx={{
-          gridTemplateColumns: user.admin
-            ? "auto auto auto auto"
-            : "auto auto auto "
+          gridTemplateColumns: "auto auto"
         }}
       >
         <TableRow variant={TableRowVariant.Header}>
-          <Box>Created</Box>
           <Box>Last Active</Box>
           <Box>Recording URL</Box>
-          {user.admin ? <Box>Papertrail</Box> : null}
         </TableRow>
         {streamsSessions.map((stream) => {
-          const { id, lastSeen, createdAt } = stream;
+          const { id, lastSeen } = stream;
           return (
-            <TableRow key={id} selectable={false} textSelectable={true}>
-              <RelativeTime
-                id={id}
-                prefix="createdat"
-                tm={createdAt}
-                swap={true}
-              />
-              <RelativeTime
-                id={id}
-                prefix="lastSeen"
-                tm={lastSeen}
-                swap={true}
-              />
-              <RecordingURL
-                manifestId={stream.id}
-                hasRecording={!!stream.recordObjectStoreId}
-                baseUrl={baseUrl}
-              />
+            <>
               {user.admin ? (
-                <Box>
+                <Box
+                  sx={{
+                    mt: "0.8em",
+                    mb: -10,
+                    gridColumn: "1/-1",
+                    fontSize: [8, 10]
+                  }}
+                >
                   <a
                     target="_blank"
                     href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
                     sx={{ userSelect: "all" }}
                   >
-                    {stream.id}
+                    Papertrail link {stream.id}
                   </a>
                 </Box>
               ) : null}
-            </TableRow>
+              <TableRow key={id} selectable={false} textSelectable={true}>
+                <RelativeTime
+                  id={id}
+                  prefix="lastSeen"
+                  tm={lastSeen}
+                  swap={true}
+                />
+                <RecordingURL
+                  id={stream.id}
+                  recUrl={stream.recordingUrl}
+                  status={stream.recordingStatus}
+                />
+              </TableRow>
+            </>
           );
         })}
       </Table>
-    </Container>
+    </Box>
   ) : null;
 };
 

@@ -502,11 +502,11 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async getStreamSessions(id): Promise<Array<Stream>> {
-      const [res, streams] = await context.fetch(`/stream/sessions/${id}`);
+      const [res, streams] = await context.fetch(`/stream/${id}/sessions`);
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+      return streams;
     },
 
     async deleteStream(id: string): Promise<void> {
