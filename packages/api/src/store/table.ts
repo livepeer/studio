@@ -10,6 +10,7 @@ import {
   DBObject,
   FindQuery,
   FindOptions,
+  UpdateOptions,
   DBLegacyObject,
 } from './types'
 
@@ -149,18 +150,26 @@ export default class Table<T extends DBObject> {
     }
   }
 
-  async update(id: string, doc: T, where: string = '', doNotThrow = false) {
+  async update(query: string | Array<SQLStatement>, doc: T, opts: UpdateOptions = {},) {
+    const { throwIfEmpty = true } = opts
     const q = sql`UPDATE `.append(this.name).append(sql`
       SET data = data || ${JSON.stringify(doc)}
-      WHERE id = ${id}
     `)
-    if (where) {
-      q.append(' AND ' + where)
+    q.append(`WHERE `)
+    if (Array.isArray(query)) {
+      query.forEach((v, i) => {
+        if (i) {
+          q.append(' AND ')
+        }
+        q.append(v)
+      })
+    } else {
+      q.append(sql` id = ${query}`)
     }
 
     const res = await this.db.query(q)
 
-    if (res.rowCount < 1 && !doNotThrow) {
+    if (res.rowCount < 1 && throwIfEmpty) {
       throw new NotFoundError(`${this.name} id=${doc.id} not found`)
     }
     return res

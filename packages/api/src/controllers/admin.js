@@ -4,8 +4,6 @@ import { db } from '../store'
 import sql from 'sql-template-strings'
 import consul from 'consul'
 
-// const consul = require('consul')()
-
 const ACTIVE_TIMEOUT = 1 * 3600 * 1000 // 1h
 
 const app = Router()
@@ -25,6 +23,9 @@ app.post(
       if (!baseUrl.endsWith('/v1')) {
         baseUrl += '/v1'
       }
+    } else {
+      res.status(501)
+      return res.end()
     }
     const cc = consul({ promisify: true, baseUrl })
     let keys
@@ -40,7 +41,7 @@ app.post(
       } else {
         console.log(`error getting keys:`, e)
         res.statusCode = 500
-        return res.json({ error: String(e) })
+        return res.json({ errors: [String(e)] })
       }
     }
     let i = 0,
@@ -86,6 +87,9 @@ app.post(
       ])
       if (keysResp && keysResp.Results) {
         // deleting keys
+        // 'delete-cas' will not delete key in case it was
+        // modified after we've read it
+        // (could happend if stream started after we've read key)
         const deleteTxn = keysResp.Results.map((rk) => {
           return {
             KV: {
@@ -147,12 +151,12 @@ app.post(
     let cleaned = 0
     for (const stream of toClean) {
       const upRes = await db.stream.update(
-        stream.id,
-        {
-          isActive: false,
-        },
-        ` (data->>'lastSeen')::bigint = ${stream.lastSeen}`,
-        true,
+        [
+          sql`id = ${stream.id}`,
+          sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
+        ],
+        { isActive: false },
+        { throwIfEmpty: false },
       )
       if (upRes.rowCount) {
         console.log(
