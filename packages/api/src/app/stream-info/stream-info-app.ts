@@ -175,6 +175,7 @@ class statusPoller {
           await db.stream.add(storedInfo.id, incObj as Stream)
           if (storedInfo.parentId) {
             await db.stream.add(storedInfo.parentId, incObj as Stream)
+            await db.stream.update(storedInfo.parentId, { lastSeen: si.lastSeen.valueOf() } as Stream)
           }
           si.lastUpdated = new Date()
           si.sourceSegmentsLastUpdated = si.sourceSegments
