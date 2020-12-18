@@ -24,7 +24,8 @@ app.get('/', authMiddleware({ admin: true }), async (req, res, next) => {
 app.get('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
   const region = await db.region.get(req.params.region)
   if (!region) {
-    return res.status(404)
+    res.status(404)
+    return res.json({ errors: ['not found'] })
   }
 
   return res.json(region)
@@ -44,7 +45,6 @@ app.put(
 
     if (currentRegion) {
       const updateResp = await db.region.update(req.params.region, region)
-      console.log('update Resp: ', updateResp)
     } else {
       const resp = await db.region.create({
         id: region.region,
@@ -62,7 +62,7 @@ app.delete(
   '/:region',
   authMiddleware({ admin: true }),
   async (req, res, next) => {
-    const resp = await db.region.delete(`region/${req.params.region}`)
+    const resp = await db.region.delete(eq.params.region)
     return res.status(204)
   },
 )
