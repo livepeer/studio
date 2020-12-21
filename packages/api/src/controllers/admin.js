@@ -4,7 +4,7 @@ import { db } from '../store'
 import sql from 'sql-template-strings'
 import consul from 'consul'
 
-const ACTIVE_TIMEOUT = 1 * 3600 * 1000 // 1h
+const ACTIVE_TIMEOUT = 5 * 60 * 1000 // 5min
 
 const app = Router()
 const traefikKeyPathRouters = `traefik/http/routers/`
