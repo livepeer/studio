@@ -462,7 +462,7 @@ app.put('/:id/setactive', authMiddleware({}), async (req, res) => {
   // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
   const useReplica = !req.body.active
   const stream = await db.stream.get(id, { useReplica })
-  if (!stream || stream.deleted || !req.user.admin) {
+  if (!stream || (stream.deleted && !req.user.admin)) {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
