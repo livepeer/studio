@@ -12,9 +12,11 @@ import { geolocateMiddleware } from '../middleware'
 import { getBroadcasterHandler } from './broadcaster'
 import { db } from '../store'
 import sql from 'sql-template-strings'
+import { setActiveToFalse } from './admin'
 
 const WEBHOOK_TIMEOUT = 5 * 1000
 const USER_SESSION_TIMEOUT = 5 * 60 * 1000 // 5 min
+const ACTIVE_TIMEOUT = 90 * 1000
 
 const isLocalIP = require('is-local-ip')
 const { Resolver } = require('dns').promises
@@ -43,6 +45,34 @@ const hackMistSettings = (req, profiles) => {
   })
 }
 
+function isActuallyNotActive(stream) {
+  return (
+    stream.isActive &&
+    !isNaN(stream.lastSeen) &&
+    Date.now() - stream.lastSeen > ACTIVE_TIMEOUT
+  )
+}
+
+function activeCleanupOne(stream) {
+  if (isActuallyNotActive(stream)) {
+    setActiveToFalse(stream)
+    stream.isActive = false
+    return true
+  }
+  return false
+}
+
+function activeCleanup(streams, activeOnly = false) {
+  let hasStreamsToClean
+  for (const stream of streams) {
+    hasStreamsToClean = activeCleanupOne(stream)
+  }
+  if (activeOnly && hasStreamsToClean) {
+    return streams.filter((s) => !isActuallyNotActive(s))
+  }
+  return streams
+}
+
 app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   let { limit, cursor, streamsonly, sessionsonly, all, active } = req.query
 
@@ -66,7 +96,7 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) })
   }
-  res.json(output)
+  res.json(activeCleanup(output, !!active))
 })
 
 // returns only 'user' sessions and adds
@@ -76,8 +106,8 @@ app.get('/:parentId/sessions', authMiddleware({}), async (req, res) => {
 
   const ingests = await req.getIngest(req)
   if (!ingests.length) {
-      res.status(501)
-      return res.json({ errors: ['Ingest not configured'] })
+    res.status(501)
+    return res.json({ errors: ['Ingest not configured'] })
   }
   const ingest = ingests[0].base
 
@@ -124,7 +154,7 @@ app.get('/:parentId/sessions', authMiddleware({}), async (req, res) => {
     }
   }
   if (filterOut) {
-    sessions = sessions.filter(sess => !sess.record)
+    sessions = sessions.filter((sess) => !sess.record)
   }
 
   res.status(200)
@@ -187,7 +217,7 @@ app.get('/user/:userId', authMiddleware({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) })
   }
-  res.json(streams)
+  res.json(activeCleanup(streams))
 })
 
 app.get('/:id', authMiddleware({}), async (req, res) => {
@@ -200,6 +230,7 @@ app.get('/:id', authMiddleware({}), async (req, res) => {
     res.status(404)
     return res.json({ errors: ['not found'] })
   }
+  activeCleanupOne(stream)
   res.status(200)
   res.json(stream)
 })
@@ -681,6 +712,7 @@ app.get('/:id/info', authMiddleware({}), async (req, res) => {
       errors: ['not found'],
     })
   }
+  activeCleanupOne(stream)
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id)
