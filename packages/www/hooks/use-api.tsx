@@ -260,12 +260,8 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async getUsers(limit = 100, cursor?: string, filter?: string, product?: string): Promise<[Array<User>, string] | ApiError> {
-      let uri = `/user?limit=${limit}&cursor=${cursor}&filter=${filter}`
-      if (product) {
-        uri += `&product=${product}`
-      }
+      const uri = `/user?${qs.stringify({ limit, cursor, filter, product })}`;
       let [res, users] = await context.fetch(uri);
-      console.log(res)
 
       if (res.status === 200) {
         const nextCursor = getCursor(res.headers.get("link"));
