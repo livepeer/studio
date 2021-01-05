@@ -145,7 +145,7 @@ app.post(
           toClean.push(stream)
         }
       }
-    } while (cursor && docs.length === 100)
+    } while (cursor)
     res.write('\n')
     let i = 0
     let cleaned = 0

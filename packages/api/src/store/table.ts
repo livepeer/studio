@@ -14,6 +14,8 @@ import {
   DBLegacyObject,
 } from './types'
 
+const DEFAULT_SORT = 'id ASC'
+
 export default class Table<T extends DBObject> {
   db: DB
   schema: TableSchema
@@ -71,7 +73,7 @@ export default class Table<T extends DBObject> {
     query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions = {},
   ): Promise<[Array<T>, string]> {
-    const { cursor = '', useReplica = true, order = 'id ASC' } = opts
+    const { cursor = '', useReplica = true, order = DEFAULT_SORT } = opts
     let limit = opts.hasOwnProperty('limit') ? opts.limit : 100
     if (typeof limit === "string") {
       limit = parseInt(limit)
@@ -91,7 +93,7 @@ export default class Table<T extends DBObject> {
         filters.push(sql``.append(`data->>'${key}' = `).append(sql`${value}`))
       }
     }
-    if (cursor) {
+    if (cursor && !cursor.includes('skip')) {
       filters.push(sql`data->>'id' > ${cursor}`)
     }
     let first = true
@@ -110,6 +112,9 @@ export default class Table<T extends DBObject> {
     if (limit) {
       q.append(sql` LIMIT ${limit}`)
     }
+    if (cursor && cursor.includes('skip')) {
+      q.append(sql` OFFSET ${cursor.replace('skip', '')}`)
+    }
 
     let res
     if (useReplica) {
@@ -120,7 +125,23 @@ export default class Table<T extends DBObject> {
 
     const docs = res.rows.map(({ data }) => data)
 
-    return [docs, (docs.length > 0 && docs.length === limit) ? docs[docs.length - 1].id : null]
+    if (docs.length < 1) {
+      return [docs, null]
+    }
+    let newCursor
+    if (limit && docs.length == limit) {
+      if (order !== DEFAULT_SORT) {
+        let curSkip = 0
+        if (cursor && cursor.includes('skip')) {
+          curSkip = Number(cursor.replace('skip', ''))
+        }
+        newCursor = `skip${curSkip + Number(limit)}`
+      } else {
+        newCursor = docs[docs.length - 1].id
+      }
+    }
+
+    return [docs, newCursor]
   }
 
   async create(doc: T): Promise<T> {
