@@ -17,12 +17,13 @@ type UserTableProps = {
   id: string;
 };
 
+const USERS_PER_PAGE = 100;
+
 const UserTable = ({ userId, id }: UserTableProps) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [adminModal, setAdminModal] = useState(false);
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
-  const [livepeerOnly, setLivepeerOnly] = useState(false);
   const [cursor, setCursor] = useState("");
   const [prevCursor, setPrevCursor] = useState([]);
   const [nextCursor, setNextCursor] = useState("");
@@ -36,7 +37,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const { getUsers, makeUserAdmin } = useApi();
   useEffect(() => {
     setUsers([]);
-    getUsers(100, cursor, livepeerOnly, filter, product)
+    getUsers(USERS_PER_PAGE, cursor, filter, product)
       .then((result) => {
         if (Array.isArray(result)) {
           const [users, nextCursor] = result;
@@ -52,7 +53,6 @@ const UserTable = ({ userId, id }: UserTableProps) => {
     adminModal,
     removeAdminModal,
     selectedUser,
-    livepeerOnly,
     cursor,
     filter,
     product
@@ -141,16 +141,6 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         >
           Remove Admin Rights
         </Button>
-        <Flex
-          sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
-          onClick={() => {
-            setUsers([]);
-            setLivepeerOnly(!livepeerOnly);
-          }}
-        >
-          <Checkbox value={livepeerOnly} />
-          <Box sx={{ ml: "0.5em" }}> Show Livepeer's users only</Box>
-        </Flex>
         <Button
           variant="secondarySmall"
           disabled={prevCursor.length === 0}
@@ -165,7 +155,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         </Button>
         <Button
           variant="secondarySmall"
-          disabled={users.length < 100 || nextCursor === ""}
+          disabled={users.length < USERS_PER_PAGE || nextCursor === ""}
           sx={{ margin: 2, mb: 4 }}
           onClick={() => {
             prevCursor.push(cursor);
