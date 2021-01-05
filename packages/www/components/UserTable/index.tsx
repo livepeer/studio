@@ -62,6 +62,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
     setRemoveAdminModal(false);
     setSelectedUser(null);
   };
+  const getProductName = (productId) => products? `${products[productId]?.name}` : productId;
+
   return (
     <Container
       id={id}
@@ -183,16 +185,17 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       {users.length === 0 ? (
         <p>No users created yet</p>
       ) : (
-        <Table sx={{ gridTemplateColumns: "auto 1fr auto auto auto" }}>
+        <Table sx={{ gridTemplateColumns: "auto 1fr auto auto auto auto" }}>
           <TableRow variant={TableRowVariant.Header} key="header">
             <Box></Box>
             <Box>ID</Box>
             <Box>Email</Box>
             <Box>EmailValid</Box>
             <Box>Admin</Box>
+            <Box>Plan</Box>
           </TableRow>
           {users.map((user) => {
-            const { id, email, emailValid, admin } = user;
+            const { id, email, emailValid, admin, stripeProductId } = user;
             const selected = selectedUser && selectedUser.id === id;
             return (
               <TableRow
@@ -211,6 +214,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 <Box>{email}</Box>
                 <Box>{JSON.stringify(emailValid)}</Box>
                 <Box>{JSON.stringify(admin)}</Box>
+                <Box>{getProductName(stripeProductId)}</Box>
               </TableRow>
             );
           })}
