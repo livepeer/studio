@@ -157,7 +157,7 @@ export class DB {
       logger.error(`runQuery phase=error elapsed=${Date.now() - start}ms error=${e.message} query=${queryLog}`)
       throw e;
     }
-    logger.info(`runQuery phase=success elapsed=${Date.now() - start}ms query=${queryLog}`)
+    logger.info(`runQuery phase=success elapsed=${Date.now() - start}ms rows=${result?.rowCount} query=${queryLog}`)
     return result;
   }
 }

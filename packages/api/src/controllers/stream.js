@@ -89,7 +89,11 @@ app.get('/', authMiddleware({ admin: true }), async (req, res) => {
     query.push(sql`data->>'isActive' = 'true'`)
   }
 
-  const [output, newCursor] = await db.stream.find(query, { cursor, limit })
+  const [output, newCursor] = await db.stream.find(query, {
+    cursor,
+    limit,
+    order: `data->>'lastSeen' DESC NULLS LAST, data->>'createdAt' DESC NULLS LAST`,
+  })
 
   res.status(200)
 
@@ -137,7 +141,7 @@ app.get('/:parentId/sessions', authMiddleware({}), async (req, res) => {
   }
 
   let [sessions] = await db.stream.find(query, {
-    order: `data->>'lastSeen' DESC`,
+    order: `data->>'lastSeen' DESC NULLS LAST`,
     limit: 0, // do not limit sessions until we develop new pagination not based on ids
   })
 
@@ -210,7 +214,11 @@ app.get('/user/:userId', authMiddleware({}), async (req, res) => {
     query.push(sql`data->>'parentId' IS NOT NULL`)
   }
 
-  const [streams, newCursor] = await db.stream.find(query, { cursor, limit })
+  const [streams, newCursor] = await db.stream.find(query, {
+    cursor,
+    limit,
+    order: `data->>'lastSeen' DESC NULLS LAST, data->>'createdAt' DESC NULLS LAST`,
+  })
 
   res.status(200)
 

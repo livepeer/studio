@@ -480,7 +480,7 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async getAdminStreams(active = false): Promise<Array<Stream>> {
-      let url = `/stream?streamsonly=1`;
+      let url = `/stream?streamsonly=1&limit=100`;
       if (active) {
         url += `&active=1`;
       }
@@ -488,7 +488,7 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+      return streams;
     },
 
     async getStreams(userId): Promise<Array<Stream>> {
@@ -498,7 +498,7 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+      return streams;
     },
 
     async createStream(params): Promise<Stream> {
