@@ -169,10 +169,11 @@ const Footer = () => {
             <LinksList key={`links-list-${list.heading}`} {...list} />
           ))}
           <ul>
-            <li sx={{ fontWeight: 600, mb: 3 }}>Livepeer Inc.</li>
+            <li sx={{ fontWeight: 600, mb: 3 }}>Livepeer, Inc.</li>
             <li>
-              16 Vestry Street, Floor 4<br />
-              New York, NY 10013
+              223 Bedford Ave PMB 530
+              <br />
+              Brooklyn, NY 11211
             </li>
             <li sx={{ mt: 4, mb: 3 }}>
               <Link
