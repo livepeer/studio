@@ -1,11 +1,16 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
-import { trackAction, makeNextHREF } from "./helpers";
+import { trackAction, makeNextHREF, parseOrder, parseFilters } from "./helpers";
 import logger from "../logger";
 import uuid from "uuid/v4";
+import { db } from "../store";
 
 const app = Router();
+
+async function sleep(millis) {
+  return new Promise((resolve) => setTimeout(resolve, millis));
+}
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
@@ -39,8 +44,19 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
+const fieldsMap = {
+  id: `api_token.ID`,
+  name: `api_token.data->>'name'`,
+  lastSeen: `api_token.data->'lastSeen'`,
+  userId: `api_token.data->>'userId'`,
+  "user.email": `users.data->>'email'`,
+};
+
 app.get("/", authMiddleware({}), async (req, res) => {
-  const { userId, cursor, limit } = req.query;
+  let { userId, cursor, limit, order, filters } = req.query;
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
 
   if (!userId && !req.user.admin) {
     res.status(400);
@@ -50,16 +66,26 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
 
   if (!userId) {
-    const resp = await req.store.list({
-      prefix: `api-token/`,
-      cursor,
+    const query = parseFilters(fieldsMap, filters);
+
+    const fields =
+      " api_token.id as id, api_token.data as data, users.id as usersId, users.data as usersdata";
+    const from = `api_token left join users on api_token.data->>'userId' = users.id`;
+    const [output, newCursor] = await db.apiToken.find(query, {
       limit,
+      cursor,
+      fields,
+      from,
+      order: parseOrder(fieldsMap, order),
+      process: ({ data, usersdata }) => {
+        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+      },
     });
-    let output = resp.data;
+
     res.status(200);
 
-    if (output.length > 0) {
-      res.links({ next: makeNextHREF(req, resp.cursor) });
+    if (output.length > 0 && newCursor) {
+      res.links({ next: makeNextHREF(req, newCursor) });
     }
     res.json(output);
     return;

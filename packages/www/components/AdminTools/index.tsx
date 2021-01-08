@@ -2,21 +2,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks";
 import { StreamInfo, Ingest } from "../../hooks/use-api";
-import {
-  Select,
-  Container,
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Input,
-} from "@theme-ui/components";
-import Modal from "../Modal";
-import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
-import { UserName } from "../AdminTokenTable";
-import { User, Webhook } from "@livepeer.com/api";
+import { Container, Box, Button, Input } from "@theme-ui/components";
 import moment from "moment";
-import { FaInfo } from "react-icons/fa";
 
 const AdminTools = ({ id }: { id: string }) => {
   const [message, setMessage] = useState("");
@@ -39,8 +26,8 @@ const AdminTools = ({ id }: { id: string }) => {
   useEffect(() => {
     getUsers(10000)
       .then((result) => {
-        if (Array.isArray(result)) {
-          const [users] = result;
+        const [users, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(users)) {
           users.sort((a, b) => a.email.localeCompare(b.email));
           setUsers(users);
           setUsersMap(users.reduce((a, cv) => (a[cv.email] = cv), {}));

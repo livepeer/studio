@@ -268,17 +268,15 @@ const makeContext = (state: ApiState, setState) => {
     async getUsers(
       limit = 100,
       cursor?: string,
-      filter?: string,
-      product?: string
-    ): Promise<[Array<User>, string] | ApiError> {
-      const uri = `/user?${qs.stringify({ limit, cursor, filter, product })}`;
+      order?: string,
+      filters?: Array<{ id: string; vaule: string }>
+    ): Promise<[Array<User> | ApiError, string, Response]> {
+      const f = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/user?${qs.stringify({ limit, cursor, filters: f, order })}`;
       let [res, users] = await context.fetch(uri);
 
-      if (res.status === 200) {
-        const nextCursor = getCursor(res.headers.get("link"));
-        return [users, nextCursor];
-      }
-      return res;
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [users, nextCursor, res];
     },
 
     async getUsage(
@@ -490,16 +488,26 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getAdminStreams(active = false): Promise<Array<Stream>> {
-      let url = `/stream?streamsonly=1&limit=100`;
-      if (active) {
-        url += `&active=1`;
-      }
-      const [res, streams] = await context.fetch(url);
-      if (res.status !== 200) {
-        throw new Error(streams);
-      }
-      return streams;
+    async getAdminStreams(
+      active = false,
+      order?: string,
+      filters?: Array<{ id: string; vaule: string }>,
+      limit?: number,
+      cursor?: string
+    ): Promise<[Array<Stream> | ApiError, string, Response]> {
+      const f = filters ? JSON.stringify(filters) : undefined;
+      const [res, streams] = await context.fetch(
+        `/stream?${qs.stringify({
+          active,
+          streamsonly: true,
+          order,
+          limit,
+          cursor,
+          filters: f
+        })}`
+      );
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor, res];
     },
 
     async getStreams(userId): Promise<Array<Stream>> {
@@ -576,19 +584,27 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
-    async getWebhooks(allUsers, all: boolean): Promise<Array<Webhook>> {
-      let uri = `/webhook?`;
-      if (allUsers) {
-        uri += `allUsers=1`;
-      }
-      if (all) {
-        uri += `&all=1`;
-      }
-      const [res, webhooks] = await context.fetch(uri);
-      if (res.status !== 200) {
-        throw new Error(webhooks);
-      }
-      return webhooks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    async getWebhooks(
+      allUsers: boolean,
+      all: boolean,
+      order?: string,
+      filters?: Array<{ id: string; vaule: string }>,
+      limit?: number,
+      cursor?: string
+    ): Promise<[Array<Webhook> | ApiError, string, Response]> {
+      const f = filters ? JSON.stringify(filters) : undefined;
+      const [res, streams] = await context.fetch(
+        `/webhook?${qs.stringify({
+          allUsers: allUsers ? true : undefined,
+          all: all ? true : undefined,
+          order,
+          limit,
+          cursor,
+          filters: f
+        })}`
+      );
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor, res];
     },
 
     async createWebhook(params): Promise<Webhook> {
@@ -615,14 +631,25 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
-    async getApiTokens(userId?: string): Promise<[ApiToken]> {
+    async getApiTokens(
+      userId?: string,
+      order?: string,
+      filters?: Array<{ id: string; vaule: string }>,
+      limit?: number,
+      cursor?: string
+    ): Promise<[Array<ApiToken> | ApiError, string, Response]> {
+      const f = filters ? JSON.stringify(filters) : undefined;
       const [res, tokens] = await context.fetch(
-        `/api-token?${qs.stringify({ userId })}`
+        `/api-token?${qs.stringify({
+          userId,
+          order,
+          limit,
+          cursor,
+          filters: f
+        })}`
       );
-      if (res.status !== 200) {
-        throw new Error(tokens);
-      }
-      return tokens;
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [tokens, nextCursor, res];
     },
 
     async createApiToken(params): Promise<ApiToken> {

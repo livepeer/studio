@@ -214,3 +214,58 @@ export async function getWebhooks(
 
   return { data: webhooks, cursor: nextCursor };
 }
+
+export function parseOrder(fieldsMap, val) {
+  if (!val) {
+    return;
+  }
+  if (!fieldsMap || Object.keys(fieldsMap).length === 0) {
+    return;
+  }
+  const prep = val
+    .split(",")
+    .map((v) => {
+      const vp = v.split("-");
+      if (vp.length !== 2 || !fieldsMap[vp[0]]) {
+        return;
+      }
+      return (
+        fieldsMap[vp[0]] +
+        " " +
+        (vp[1] === "true" ? "DESC" : "ASC") +
+        " NULLS LAST"
+      );
+    })
+    .filter((v) => !!v);
+  return prep.length ? prep.join(", ") : undefined;
+}
+
+export function parseFilters(fieldsMap, val) {
+  const q = [];
+  if (!val) {
+    return q;
+  }
+  if (!fieldsMap || Object.keys(fieldsMap).length === 0) {
+    return q;
+  }
+  let json;
+  try {
+    json = JSON.parse(decodeURIComponent(val));
+  } catch (e) {
+    console.log("error decoding filters", e);
+    return q;
+  }
+  if (!Array.isArray(json)) {
+    return q;
+  }
+  for (const filter of json) {
+    if (fieldsMap[filter.id]) {
+      q.push(
+        sql``
+          .append(fieldsMap[filter.id])
+          .append(sql` LIKE ${"%" + filter.value + "%"}`)
+      );
+    }
+  }
+  return q;
+}

@@ -14,7 +14,7 @@ import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { useRouter } from "next/router";
 
-export default () => {
+const NewStream = () => {
   useLoggedIn();
   const [creating, setCreating] = useState(false);
   const router = useRouter();
@@ -119,3 +119,5 @@ export default () => {
     </Layout>
   );
 };
+
+export default NewStream;
