@@ -4,24 +4,58 @@ import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import { makeNextHREF, trackAction, getWebhooks } from "./helpers";
+import {
+  makeNextHREF,
+  trackAction,
+  getWebhooks,
+  parseFilters,
+  parseOrder,
+} from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 
 const app = Router();
 
-app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers } = req.query;
+const fieldsMap = {
+  id: `webhook.ID`,
+  name: `webhook.data->>'name'`,
+  url: `webhook.data->>'url'`,
+  blocking: `webhook.data->'blocking'`,
+  deleted: `webhook.data->'deleted'`,
+  createdAt: `webhook.data->'createdAt'`,
+  userId: `webhook.data->>'userId'`,
+  "user.email": `users.data->>'email'`,
+};
 
-  if (req.user.admin && allUsers) {
-    const query = [];
-    if (!all) {
-      query.push(sql`data->>'deleted' IS NULL`);
+app.get("/", authMiddleware({}), async (req, res) => {
+  let { limit, cursor, all, event, allUsers, order, filters } = req.query;
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
+
+  if (req.user.admin && allUsers && allUsers !== "false") {
+    const query = parseFilters(fieldsMap, filters);
+    if (!all || all === "false") {
+      query.push(sql`webhook.data->>'deleted' IS NULL`);
     }
-    const [output, newCursor] = await db.webhook.find(query, { cursor });
+
+    const fields =
+      " webhook.id as id, webhook.data as data, users.id as usersId, users.data as usersdata";
+    const from = `webhook left join users on webhook.data->>'userId' = users.id`;
+    const [output, newCursor] = await db.webhook.find(query, {
+      limit,
+      cursor,
+      fields,
+      from,
+      order: parseOrder(fieldsMap, order),
+      process: ({ data, usersdata }) => {
+        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+      },
+    });
+
     res.status(200);
 
-    if (output.length > 0) {
+    if (output.length > 0 && newCursor) {
       res.links({ next: makeNextHREF(req, newCursor) });
     }
     return res.json(output);

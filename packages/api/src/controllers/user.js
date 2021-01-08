@@ -5,7 +5,13 @@ import uuid from "uuid/v4";
 import ms from "ms";
 import jwt from "jsonwebtoken";
 import validator from "email-validator";
-import { makeNextHREF, sendgridEmail, trackAction } from "./helpers";
+import {
+  makeNextHREF,
+  sendgridEmail,
+  trackAction,
+  parseFilters,
+  parseOrder,
+} from "./helpers";
 import hash from "../hash";
 import qs from "qs";
 import { db } from "../store";
@@ -32,19 +38,25 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
   res.json(usageRes);
 });
 
+const fieldsMap = {
+  id: `users.ID`,
+  email: `data->>'email'`,
+  emailValid: `data->>'emailValid'`,
+  admin: `data->>'admin'`,
+  stripeProductId: `data->>'stripeProductId'`,
+};
+
 app.get("/", authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, filter, product } = req.query;
-  const query = [];
-  if (filter) {
-    query.push(sql`data->>'email' LIKE ${"%" + filter + "%"}`);
-  }
-  if (product) {
-    query.push(sql`data->>'stripeProductId' LIKE ${"%" + product + "%"}`);
-  }
+  let { limit, cursor, order, filters } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
-  const [output, newCursor] = await db.user.find(query, { limit, cursor });
+  const query = parseFilters(fieldsMap, filters);
+  const [output, newCursor] = await db.user.find(query, {
+    limit,
+    cursor,
+    order: parseOrder(fieldsMap, order),
+  });
 
   res.status(200);
 

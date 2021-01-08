@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import {
   Container,
@@ -10,9 +10,11 @@ import {
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
-import { RelativeTime } from "../StreamsTable";
-import { UserName } from "../AdminTokenTable";
-import { User, Webhook } from "@livepeer.com/api";
+import { RelativeTime } from "../CommonAdminTable";
+import { Webhook } from "@livepeer.com/api";
+import CommonAdminTable from "../CommonAdminTable";
+
+const ROWS_PER_PAGE = 25;
 
 type DeleteWebhookModalProps = {
   name: string;
@@ -46,31 +48,7 @@ const DeleteWebhookModal = ({
   );
 };
 
-const sortNameF = (a: Webhook, b: Webhook) =>
-  ((a && a.name) || "").localeCompare((b && b.name) || "");
-
-const sortUrlF = (a: Webhook, b: Webhook) =>
-  ((a && a.url) || "").localeCompare((b && b.url) || "");
-
-const sortUserName = (users: Array<User>, a: Webhook, b: Webhook) => {
-  const userA = users.find((u) => u.id === a.userId);
-  const userB = users.find((u) => u.id === b.userId);
-  if (userA && userB) {
-    return userA.email.localeCompare(userB.email);
-  }
-  return ((a && a.name) || "").localeCompare((b && b.name) || "");
-};
-
-const sortUserIdF = (a: Webhook, b: Webhook) =>
-  ((a && a.userId) || "").localeCompare((b && b.userId) || "");
-
-const sortCreatedF = (a: Webhook, b: Webhook) =>
-  (b.createdAt || 0) - (a.createdAt || 0);
-
-const sortDeletedF = (a: Webhook, b: Webhook) =>
-  +(b.deleted || false) - +(a.deleted || false);
-
-export default ({ id }: { id: string }) => {
+const AdminWebhookTable = ({ id }: { id: string }) => {
   const [message, setMessage] = useState("");
   const [webhookName, setWebhookName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
@@ -78,40 +56,104 @@ export default ({ id }: { id: string }) => {
 
   const [deleteModal, setDeleteModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
-  const [selectedStream, setSelectedStream] = useState(null);
+  const [selectedWebhook, setSelectedWebhook] = useState(null);
   const [webhooks, setWebhooks] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [nextCursor, setNextCursor] = useState("");
+  const [lastCursor, setLastCursor] = useState("");
+  const [lastOrder, setLastOrder] = useState("");
+  const [lastFilters, setLastFilters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState("");
   const { getWebhooks, createWebhook, deleteWebhook, getUsers } = useApi();
-  const [sortFunc, setSortFunc] = useState(null);
-  useEffect(() => {
-    getUsers(10000)
-      .then((users) => {
-        if (Array.isArray(users)) {
-          setUsers(users[0]);
+
+  const columns: any = useMemo(
+    () => [
+      {
+        Header: "User Name",
+        accessor: "user.email"
+      },
+      {
+        Header: "Name",
+        accessor: "name"
+      },
+      {
+        Header: "Url",
+        accessor: "url"
+      },
+      {
+        Header: "Blocking",
+        accessor: "blocking",
+        Cell: (cell) => {
+          return <Checkbox value={cell.value} />;
+        }
+      },
+      {
+        Header: "Created",
+        accessor: "createdAt"
+      },
+      {
+        Header: "Status",
+        accessor: "deleted",
+        Cell: (cell) => {
+          return cell.value ? "Deleted" : "Active";
+        }
+      }
+    ],
+    [nextCursor, lastFilters]
+  );
+
+  const filtersDesc = useMemo(
+    () => [
+      { id: "user.email", placeholder: "user's email" },
+      { id: "name", placeholder: "name" },
+      { id: "url", placeholder: "url" }
+    ],
+    []
+  );
+
+  const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
+    setLoading(true);
+    if (!refetch) {
+      setLastCursor(cursor);
+      setLastFilters(filters);
+      setLastOrder(order);
+    }
+    getWebhooks(true, true, order, filters, ROWS_PER_PAGE, cursor)
+      .then((result) => {
+        const [hooks, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(hooks)) {
+          setLoadingError("");
+          setNextCursor(nextCursor);
+          setWebhooks(hooks);
         } else {
-          console.log(users);
+          const errors = JSON.stringify(hooks["errors"] || resp.statusText);
+          setLoadingError(errors);
+          console.error(errors);
         }
       })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, []);
-  useEffect(() => {
-    getWebhooks(true, true)
-      .then((webhooks) => {
-        if (sortFunc) {
-          webhooks.sort(sortFunc);
-        }
-        setWebhooks(webhooks);
+      .catch((err) => {
+        setLoadingError(`${err}`);
+        console.error(err);
       })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [deleteModal]);
+      .finally(() => setLoading(false));
+  };
+
+  const refecth = () => {
+    fetchData(
+      { order: lastOrder, cursor: lastCursor, filters: lastFilters },
+      true
+    );
+  };
+
   const close = () => {
     setDeleteModal(false);
     setCreateModal(false);
-    setSelectedStream(null);
+    setSelectedWebhook(null);
     setWebhookName("");
     setWebhookUrl("");
     setBlocking(true);
   };
+
   const doCreateWebhook = () => {
     close();
     if (!webhookUrl) {
@@ -129,67 +171,13 @@ export default ({ id }: { id: string }) => {
       url: webhookUrl,
       blocking,
     })
-      .then(() => setMessage("Webhook created"))
+      .then(() => {
+        setMessage("Webhook created");
+        refecth();
+      })
       .catch((e) => setMessage(`Error: ${e}`));
   };
-  const isVisible = usePageVisibility();
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      getWebhooks(true, true)
-        .then((webhooks) => {
-          if (sortFunc) {
-            webhooks.sort(sortFunc);
-          }
-          setWebhooks(webhooks);
-        })
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isVisible, sortFunc]);
 
-  const sortUserId = () => {
-    if (webhooks) {
-      if (users) {
-        webhooks.sort(sortUserName.bind(null, users));
-        setSortFunc(() => sortUserName.bind(null, users));
-      } else {
-        webhooks.sort(sortUserIdF);
-        setSortFunc(() => sortUserIdF);
-      }
-      setWebhooks([...webhooks]);
-    }
-  };
-  const sortName = () => {
-    if (webhooks) {
-      webhooks.sort(sortNameF);
-      setSortFunc(() => sortNameF);
-      setWebhooks([...webhooks]);
-    }
-  };
-  const sortUrl = () => {
-    if (webhooks) {
-      webhooks.sort(sortUrlF);
-      setSortFunc(() => sortUrlF);
-      setWebhooks([...webhooks]);
-    }
-  };
-  const sortCreated = () => {
-    if (webhooks) {
-      webhooks.sort(sortCreatedF);
-      setSortFunc(() => sortCreatedF);
-      setWebhooks([...webhooks]);
-    }
-  };
-  const sortDeleted = () => {
-    if (webhooks) {
-      webhooks.sort(sortDeletedF);
-      setSortFunc(() => sortDeletedF);
-      setWebhooks([...webhooks]);
-    }
-  };
   return (
     <Container
       id={id}
@@ -260,23 +248,35 @@ export default ({ id }: { id: string }) => {
           </Flex>
         </Modal>
       )}
-      {deleteModal && selectedStream && (
+      {deleteModal && selectedWebhook && (
         <DeleteWebhookModal
-          name={selectedStream.name}
+          name={selectedWebhook.name}
           onClose={close}
           onDelete={() => {
             setMessage("Deleting webhook...");
             close();
-            deleteWebhook(selectedStream.id)
+            deleteWebhook(selectedWebhook.id)
               .then(() => {
                 setMessage("Webhook deleted");
+                refecth();
               })
               .catch((e) => setMessage(`Error: ${e}`));
           }}
         />
       )}
       <Box sx={{ mt: "2em" }}>{message}</Box>
-      <Box sx={{ mt: "2em" }}>
+      <CommonAdminTable
+        onRowSelected={setSelectedWebhook}
+        setNextCursor={setNextCursor}
+        onFetchData={fetchData}
+        loading={loading}
+        data={webhooks}
+        nextCursor={nextCursor}
+        rowsPerPage={ROWS_PER_PAGE}
+        err={loadingError}
+        columns={columns}
+        filtersDesc={filtersDesc}
+      >
         <Button
           variant="outlineSmall"
           sx={{ margin: 2 }}
@@ -289,85 +289,15 @@ export default ({ id }: { id: string }) => {
         <Button
           variant="primarySmall"
           aria-label="Delete Stream button"
-          disabled={!selectedStream}
+          disabled={!selectedWebhook}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedStream && setDeleteModal(true)}>
+          onClick={() => selectedWebhook && setDeleteModal(true)}
+        >
           Delete
         </Button>
-      </Box>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto" }}>
-        <TableRow variant={TableRowVariant.Header} key="webhook header">
-          <Box></Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortUserId}>
-            User name ⭥
-          </Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortName}>
-            Name ⭥
-          </Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortUrl}>
-            URL ⭥
-          </Box>
-          <Box>Blocking</Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortCreated}>
-            Created ⭥
-          </Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortDeleted}>
-            Status ⭥
-          </Box>
-        </TableRow>
-        {webhooks.map((webhook: Webhook) => {
-          const { id, name, userId, url, createdAt, deleted } = webhook;
-          const selected = selectedStream && selectedStream.id === id;
-          return (
-            <>
-              <TableRow
-                key={id}
-                variant={TableRowVariant.Normal}
-                selected={selected}
-                onClick={() => {
-                  if (selected) {
-                    setSelectedStream(null);
-                  } else {
-                    setSelectedStream(webhook);
-                  }
-                }}>
-                <Checkbox value={selected} />
-                <UserName id={userId} users={users} />
-                <Box>{name}</Box>
-                <Box>{url}</Box>
-                <Checkbox value={webhook.blocking} />
-                <RelativeTime
-                  id={id}
-                  prefix="createdat"
-                  tm={createdAt}
-                  swap={true}
-                />
-                <Box>{deleted ? "Deleted" : "Active"}</Box>
-              </TableRow>
-            </>
-          );
-        })}
-      </Table>
+      </CommonAdminTable>
     </Container>
   );
 };
+
+export default AdminWebhookTable;

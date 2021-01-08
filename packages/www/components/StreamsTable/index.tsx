@@ -6,9 +6,8 @@ import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import Help from "../../public/img/help.svg";
-import moment from "moment";
 import { Stream } from "@livepeer.com/api";
-import { MdArrowForward } from "react-icons/md";
+import { RelativeTime, StreamName } from "../CommonAdminTable";
 
 type ProfileProps = {
   id: string;
@@ -49,82 +48,6 @@ const Profile = ({
       <Box>{height}</Box>
       <Box>bitrate:</Box>
       <Box>{bitrate}</Box>
-    </Box>
-  );
-};
-
-type RelativeTimeProps = {
-  id: string;
-  prefix: string;
-  tm: number;
-  swap?: boolean;
-};
-
-export const RelativeTime = ({
-  id,
-  prefix,
-  tm,
-  swap = false,
-}: RelativeTimeProps) => {
-  const idpref = `time-${prefix}-${id}`;
-  let main = moment.unix(tm / 1000.0).fromNow();
-  let toolTip = moment.unix(tm / 1000.0).format("LLL");
-  if (swap) {
-    const s = main;
-    main = toolTip;
-    toolTip = s;
-  }
-  return (
-    <Box id={idpref} key={idpref}>
-      {tm ? (
-        <>
-          <ReactTooltip
-            id={`tooltip-${idpref}`}
-            className="tooltip"
-            place="top"
-            type="dark"
-            effect="solid">
-            {toolTip}
-          </ReactTooltip>
-          <span data-tip data-for={`tooltip-${idpref}`}>
-            {main}
-          </span>
-        </>
-      ) : (
-        <em>unseen</em>
-      )}
-    </Box>
-  );
-};
-
-export const StreamName = ({
-  stream,
-  admin = false,
-}: {
-  stream: Stream;
-  admin?: boolean;
-}) => {
-  const pid = `stream-name-${stream.id}-${name}`;
-  const query = admin ? { admin: true } : {};
-  return (
-    <Box>
-      {stream.createdByTokenName ? (
-        <ReactTooltip
-          id={pid}
-          className="tooltip"
-          place="top"
-          type="dark"
-          effect="solid">
-          Created by token <b>{stream.createdByTokenName}</b>
-        </ReactTooltip>
-      ) : null}
-      <Box data-tip data-for={pid}>
-        <Link
-          href={{ pathname: "/app/stream/[id]", query }}
-          as={`/app/stream/${stream.id}`}>
-          <a>{stream.name}</a>
-        </Link>
-      </Box>
     </Box>
   );
 };

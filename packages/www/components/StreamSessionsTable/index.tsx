@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Container, Flex } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
-import { RelativeTime } from "../StreamsTable";
+import { RelativeTime } from "../CommonAdminTable";
 import { pathJoin, breakablePath } from "../../lib/utils";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../public/img/copy.svg";
