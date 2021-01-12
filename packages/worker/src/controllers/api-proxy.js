@@ -28,7 +28,10 @@ app.use(geolocateMiddleware({ region: 'api-region' }), async (req, res) => {
   // Oddly, req.body seems present even during GET and HEAD, so double-check
   if (
     req.body &&
-    (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH')
+    (req.method === 'POST' ||
+      req.method === 'PUT' ||
+      req.method === 'PATCH' ||
+      req.method === 'DELETE')
   ) {
     params.body = JSON.stringify(req.body)
   }
