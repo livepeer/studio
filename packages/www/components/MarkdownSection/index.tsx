@@ -23,8 +23,7 @@ export default ({ markdown }) => {
         sx={{
           maxWidth: 958,
           padding: 3,
-        }}
-      >
+        }}>
         <ReactMarkdown renderers={renderers}>{markdown}</ReactMarkdown>
       </Box>
     </Flex>

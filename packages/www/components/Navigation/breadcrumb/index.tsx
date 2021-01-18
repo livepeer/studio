@@ -24,9 +24,8 @@ const Divider = () => (
       mr: "6px",
       fontWeight: 800,
       fontSize: ["14px", "14px", "22px"],
-      color: "text"
-    }}
-  >
+      color: "text",
+    }}>
     /
   </span>
 );
@@ -50,9 +49,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 position: "relative",
                 display: "inline-flex",
                 alignItems: "center",
-                height: "33px"
-              }}
-            >
+                height: "33px",
+              }}>
               <Divider />
               <Box
                 sx={{
@@ -60,9 +58,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                   fontSize: ["16px", "16px", "22px"],
                   color: "text",
                   display: "flex",
-                  alignItems: "center"
-                }}
-              >
+                  alignItems: "center",
+                }}>
                 {slugify(item.children.toString())}
               </Box>
             </span>
@@ -73,9 +70,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                   display: ["inline-flex", null, "none"],
                   alignItems: "center",
                   height: "33px",
-                  ml: "-6px"
-                }}
-              >
+                  ml: "-6px",
+                }}>
                 <Divider />
                 {(() => {
                   const { children, ...selectedProps } =
@@ -89,9 +85,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                           fontSize: ["16px", "16px", "22px"],
                           color: "text",
                           display: "flex",
-                          alignItems: "center"
-                        }}
-                      >
+                          alignItems: "center",
+                        }}>
                         {slugify(
                           children.toString() === "API Reference"
                             ? "API"
@@ -104,8 +99,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 <BreadcrumbDropdown
                   isOpen={openDropdown}
                   close={() => setOpenDropdown(false)}
-                  tipSx={{ right: ["12px", "15px"] }}
-                >
+                  tipSx={{ right: ["12px", "15px"] }}>
                   {item.mobileDropdownLinks
                     .filter((l) => !l.isSelected)
                     .map((link) => (
@@ -123,8 +117,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                           fontSize: "16px",
                           color: "text",
                           ":not(:last-of-type)": {
-                            mb: 3
-                          }
+                            mb: 3,
+                          },
                         }}
                       />
                     ))}

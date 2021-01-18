@@ -1,79 +1,79 @@
-import fetch from 'isomorphic-fetch'
-import { generateJWT, prepareConfig } from './firestore-helpers'
-import * as qs from 'query-string'
+import fetch from "isomorphic-fetch";
+import { generateJWT, prepareConfig } from "./firestore-helpers";
+import * as qs from "query-string";
 
-const DEFAULT_LIMIT = 100
+const DEFAULT_LIMIT = 100;
 const COLLECTIONS = [
-  'api-token',
-  'object-store',
-  'password-reset-token',
-  'stream',
-  'user',
-  'webhook',
-]
+  "api-token",
+  "object-store",
+  "password-reset-token",
+  "stream",
+  "user",
+  "webhook",
+];
 export default class FirestoreStore {
   constructor({ firestoreCredentials, firestoreCollection }) {
     if (!firestoreCredentials) {
-      throw new Error('missing --firestore-credentials')
+      throw new Error("missing --firestore-credentials");
     }
     if (!firestoreCollection) {
-      throw new Error('missing --firestore-collection')
+      throw new Error("missing --firestore-collection");
     }
-    this.config = prepareConfig(firestoreCredentials)
-    this.url = this.config.url
-    this.collection = firestoreCollection
+    this.config = prepareConfig(firestoreCredentials);
+    this.url = this.config.url;
+    this.collection = firestoreCollection;
     // Key prefix for stripping out in list operations
-    this.keyPrefix = `${this.config.docsPath}/docs/${firestoreCollection}/`
-    this.token = null
-    this.tokenExpires = 0
+    this.keyPrefix = `${this.config.docsPath}/docs/${firestoreCollection}/`;
+    this.token = null;
+    this.tokenExpires = 0;
   }
 
   // Firestore's paths work like: collection/document/collection/document. So we can't store at,
   // say, /staging/user/ABC123; we have to store at /staging/docs/user/ABC123
   // For our join keys, we store e.g. `user+email/example@livepeer.org/ABC123` at `user+email_example@livepeer.org/ABC123`.
   getPath(key) {
-    let parts = [...key.split('/')].filter((x) => !!x)
-    if (parts[0] && parts[0].includes('+')) {
+    let parts = [...key.split("/")].filter((x) => !!x);
+    if (parts[0] && parts[0].includes("+")) {
       if (!parts[1]) {
         throw new Error(
-          `I'm confused, what do I convert this key into for firestore? ${key}`,
-        )
+          `I'm confused, what do I convert this key into for firestore? ${key}`
+        );
       }
-      parts[1] = `${parts[0]}_${parts[1]}`
-      parts.shift()
+      parts[1] = `${parts[0]}_${parts[1]}`;
+      parts.shift();
     }
-    parts = parts.map((part) => encodeURIComponent(part))
-    return [this.collection, 'docs', ...parts].join('/')
+    parts = parts.map((part) => encodeURIComponent(part));
+    return [this.collection, "docs", ...parts].join("/");
   }
 
   async fetch(url, opts = {}) {
     // Regenerate token if it's within a minute of expiring
     if (this.tokenExpires - 60000 < Date.now()) {
-      const [token, expiry] = generateJWT(this.config)
-      this.token = token
-      this.tokenExpires = expiry
+      const [token, expiry] = generateJWT(this.config);
+      this.token = token;
+      this.tokenExpires = expiry;
     }
-    opts.headers = opts.headers || {}
-    opts.headers.authorization = `Bearer ${this.token}`
-    opts.method = opts.method || 'GET'
-    const res = await fetch(url, opts)
-    return res
+    opts.headers = opts.headers || {};
+    opts.headers.authorization = `Bearer ${this.token}`;
+    opts.method = opts.method || "GET";
+    const res = await fetch(url, opts);
+    return res;
   }
 
   async get(key) {
-    const path = this.getPath(key)
-    const res = await this.fetch(`${this.url}/${path}`)
+    const path = this.getPath(key);
+    const res = await this.fetch(`${this.url}/${path}`);
     if (res.status === 404) {
-      return null
+      return null;
     } else if (res.status !== 200) {
-      throw new Error(await res.text())
+      throw new Error(await res.text());
     }
-    const text = await res.text()
-    const doc = JSON.parse(text)
+    const text = await res.text();
+    const doc = JSON.parse(text);
     if (!doc.fields) {
-      return null
+      return null;
     }
-    return JSON.parse(doc.fields.data.stringValue)
+    return JSON.parse(doc.fields.data.stringValue);
   }
 
   // async replace(key, data) {
@@ -105,93 +105,93 @@ export default class FirestoreStore {
       data: {
         stringValue: JSON.stringify(data),
       },
-    }
-    const path = this.getPath(key)
-    const split = path.split('/')
-    const documentId = split.pop()
-    const collectionId = split.join('/')
-    const query = qs.stringify({ documentId })
-    const url = `${this.url}/${collectionId}?${query}`
+    };
+    const path = this.getPath(key);
+    const split = path.split("/");
+    const documentId = split.pop();
+    const collectionId = split.join("/");
+    const query = qs.stringify({ documentId });
+    const url = `${this.url}/${collectionId}?${query}`;
     const res = await this.fetch(url, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({
         fields,
       }),
-    })
+    });
     if (res.status !== 200) {
-      throw new Error(await res.text())
+      throw new Error(await res.text());
     }
   }
 
   // Only needed for the test harness so it's a little hacky
   async *listWholeDatabase() {
     for (const record of COLLECTIONS) {
-      console.log(record)
-      const rec = record.replace('_', '/')
-      let [docs, next] = await this.doList(rec, null, 1000)
+      console.log(record);
+      const rec = record.replace("_", "/");
+      let [docs, next] = await this.doList(rec, null, 1000);
       for (const doc of docs) {
-        yield doc
+        yield doc;
       }
       while (next) {
-        ;[docs, next] = await this.doList(rec, next, 1000)
+        [docs, next] = await this.doList(rec, next, 1000);
         for (const doc of docs) {
-          yield doc
+          yield doc;
         }
       }
     }
   }
 
   // Helper for list() and listKeys()
-  async doList(prefix = '', cursor = null, limit = DEFAULT_LIMIT) {
-    if (prefix === '') {
-      return this.listWholeDatabase()
+  async doList(prefix = "", cursor = null, limit = DEFAULT_LIMIT) {
+    if (prefix === "") {
+      return this.listWholeDatabase();
     }
     const query = {
-      orderBy: 'id',
+      orderBy: "id",
       pageSize: limit,
-    }
+    };
     if (cursor) {
-      query.pageToken = cursor
+      query.pageToken = cursor;
     }
-    const path = this.getPath(prefix).split('/').join('/')
-    const url = `${this.url}/${path}?${qs.stringify(query)}`
+    const path = this.getPath(prefix).split("/").join("/");
+    const url = `${this.url}/${path}?${qs.stringify(query)}`;
     const res = await this.fetch(url, {
-      method: 'GET',
-    })
+      method: "GET",
+    });
     if (res.status === 404) {
-      return [[], null]
+      return [[], null];
     } else if (res.status !== 200) {
-      throw new Error(await res.text())
+      throw new Error(await res.text());
     }
-    const data = await res.json()
-    let { documents, nextPageToken } = data
+    const data = await res.json();
+    let { documents, nextPageToken } = data;
     // Firestore doesn't even return the key if there's nothing
     if (!documents) {
-      documents = []
+      documents = [];
     }
-    return [documents, nextPageToken]
+    return [documents, nextPageToken];
   }
 
   async list(prefix, cursor, limit) {
-    const [results, nextPageToken] = await this.doList(prefix, cursor, limit)
+    const [results, nextPageToken] = await this.doList(prefix, cursor, limit);
     const data = results.map((doc) => {
       return {
-        [doc.name.split('docs/')[1]]: JSON.parse(doc.fields.data.stringValue),
-      }
-    })
+        [doc.name.split("docs/")[1]]: JSON.parse(doc.fields.data.stringValue),
+      };
+    });
     return {
       data,
       cursor: nextPageToken,
-    }
+    };
   }
 
   async listKeys(prefix, cursor, limit) {
-    const [results, nextPageToken] = await this.doList(prefix, cursor, limit)
+    const [results, nextPageToken] = await this.doList(prefix, cursor, limit);
     const data = results.map((doc) => {
-      const name = doc.name.slice(this.keyPrefix.length).replace('_', '/')
-      return name
-    })
-    return [data, nextPageToken]
+      const name = doc.name.slice(this.keyPrefix.length).replace("_", "/");
+      return name;
+    });
+    return [data, nextPageToken];
   }
 
   // async delete(key) {

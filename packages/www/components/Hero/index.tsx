@@ -33,18 +33,16 @@ const Hero = ({
         borderBottom: skinny ? "0" : "1px solid",
         borderColor: "muted",
         pt: skinny ? 4 : 0,
-        pb: skinny ? 4 : "65px"
+        pb: skinny ? 4 : "65px",
       }}
-      {...props}
-    >
+      {...props}>
       <Container>
         <Grid
           columns={[1, 1, 1, centered ? 1 : 2]}
           sx={{
             alignItems: "center",
-            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"]
-          }}
-        >
+            minHeight: ["auto", "auto", skinny ? 200 : "calc(100vh - 130px)"],
+          }}>
           <Box
             sx={{
               mb: [4, 4, 4, 0],
@@ -54,16 +52,14 @@ const Hero = ({
                 "center",
                 "center",
                 "center",
-                centered ? "center" : "left"
-              ]
-            }}
-          >
+                centered ? "center" : "left",
+              ],
+            }}>
             {heading && (
               <Styled.h1
                 sx={{
-                  fontSize: [48, 56, 7]
-                }}
-              >
+                  fontSize: [48, 56, 7],
+                }}>
                 {heading}
               </Styled.h1>
             )}
@@ -71,9 +67,8 @@ const Hero = ({
               <Box
                 sx={{
                   mt: 4,
-                  fontSize: "18px"
-                }}
-              >
+                  fontSize: "18px",
+                }}>
                 {tagline}
               </Box>
             )}
@@ -86,12 +81,11 @@ const Hero = ({
                     "center",
                     "center",
                     "center",
-                    centered ? "center" : "flex-start"
+                    centered ? "center" : "flex-start",
                   ],
                   width: "100%",
-                  alignItems: "center"
-                }}
-              >
+                  alignItems: "center",
+                }}>
                 {ctas.map((cta, i) => (
                   <Box key={i}>{renderSwitch(cta)}</Box>
                 ))}
@@ -109,7 +103,7 @@ const Hero = ({
                 width: ["100%", "100%", "100%", centered ? "'100%'" : "auto"],
                 mr: [0, 0, -260],
                 position: "relative",
-                right: [0, 0, 0, -100]
+                right: [0, 0, 0, -100],
               }}
               className="lazyload"
               data-src={builder.image(image).url()}
@@ -135,8 +129,7 @@ function renderSwitch(cta) {
           sx={{ display: "flex", alignItems: "center" }}
           variant={cta.variant}
           target="__blank"
-          href={cta.externalLink}
-        >
+          href={cta.externalLink}>
           {cta.title}
           <ArrowRight sx={{ ml: 2 }} />
         </A>
@@ -146,8 +139,7 @@ function renderSwitch(cta) {
         <ScrollLink offset={-40} to={cta.anchorLink} spy smooth>
           <Box
             variant="buttons.secondary"
-            sx={{ mr: [0, 0, 4], mb: [3, 3, 0] }}
-          >
+            sx={{ mr: [0, 0, 4], mb: [3, 3, 0] }}>
             {cta.title}
           </Box>
         </ScrollLink>

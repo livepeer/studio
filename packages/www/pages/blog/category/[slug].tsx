@@ -15,7 +15,7 @@ export async function getStaticPaths() {
   }
   return {
     fallback: true,
-    paths
+    paths,
   };
 }
 
@@ -27,7 +27,7 @@ export async function getStaticProps({ params }) {
   );
   categories.push({ title: "All", slug: { current: "" } });
   const {
-    allPost: posts
+    allPost: posts,
   } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
@@ -37,9 +37,9 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       categories: categories.reverse(),
-      posts
+      posts,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

@@ -19,7 +19,7 @@ const cardPadding = 24;
 
 const BlogPostCard = ({
   post,
-  pushSx
+  pushSx,
 }: {
   post: any;
   pushSx?: SxStyleProp;
@@ -73,10 +73,9 @@ const BlogPostCard = ({
             ":hover": {
               textDecoration: "none",
               boxShadow:
-                "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-            }
-          }}
-        >
+                "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+            },
+          }}>
           {post.mainImage && (
             <img
               alt={post.mainImage?.alt}
@@ -85,7 +84,7 @@ const BlogPostCard = ({
               sx={{
                 height: imageHeight,
                 width: "100%",
-                objectFit: "cover"
+                objectFit: "cover",
               }}
               className="lazyload"
               data-src={builder.image(post.mainImage).url()}
@@ -96,9 +95,8 @@ const BlogPostCard = ({
               p: cardPadding,
               flexDirection: "column",
               justifyContent: "space-between",
-              height: cardContentHeight
-            }}
-          >
+              height: cardContentHeight,
+            }}>
             <div>
               <Box
                 sx={{
@@ -108,9 +106,8 @@ const BlogPostCard = ({
                   fontSize: "12px",
                   letterSpacing: "-0.02em",
                   fontWeight: 600,
-                  height: categoryTagHeight
-                }}
-              >
+                  height: categoryTagHeight,
+                }}>
                 {post.category.title}
               </Box>
               <Flex
@@ -118,9 +115,8 @@ const BlogPostCard = ({
                   alignItems: "center",
                   pt: 3,
                   pb: 24,
-                  height: authorHeight
-                }}
-              >
+                  height: authorHeight,
+                }}>
                 <img
                   alt={post.author.image?.alt}
                   width={30}
@@ -131,7 +127,7 @@ const BlogPostCard = ({
                     width: 30,
                     borderRadius: 1000,
                     objectFit: "cover",
-                    mr: 3
+                    mr: 3,
                   }}
                   className="lazyload"
                   data-src={builder.image(post.author.image).url()}
@@ -141,9 +137,8 @@ const BlogPostCard = ({
                     fontWeight: 600,
                     textOverflow: "ellipsis",
                     overflow: "hidden",
-                    whiteSpace: "nowrap"
-                  }}
-                >
+                    whiteSpace: "nowrap",
+                  }}>
                   {post.author.name}
                 </Box>
                 <Box sx={{ mx: 2, width: "2px", height: 16, bg: "grey" }} />
@@ -151,9 +146,8 @@ const BlogPostCard = ({
                   sx={{
                     textOverflow: "ellipsis",
                     overflow: "hidden",
-                    whiteSpace: "nowrap"
-                  }}
-                >
+                    whiteSpace: "nowrap",
+                  }}>
                   {stats.text}
                 </Box>
               </Flex>
@@ -165,9 +159,8 @@ const BlogPostCard = ({
                   letterSpacing: "-0.03em",
                   fontWeight: 500,
                   pb: 3,
-                  transition: "color .3s"
-                }}
-              >
+                  transition: "color .3s",
+                }}>
                 {post.title}
               </h2>
               <Box
@@ -178,11 +171,10 @@ const BlogPostCard = ({
                   WebkitLineClamp: excerptMaxLines,
                   WebkitBoxOrient: "vertical",
                   overflow: "hidden",
-                  display: excerptMaxLines <= 0 ? "none" : "-webkit-box"
+                  display: excerptMaxLines <= 0 ? "none" : "-webkit-box",
                 }}
                 ref={excerptRef}
-                as="p"
-              >
+                as="p">
                 {post.excerpt}
               </Box>
             </div>

@@ -30,9 +30,8 @@ const ForgotPasswordPage = () => {
             alignItems: "center",
             justifyContent: "center",
             flexGrow: 1,
-            flexDirection: "column"
-          }}
-        >
+            flexDirection: "column",
+          }}>
           Password reset link sent to your email.
         </Flex>
       </Layout>
@@ -46,9 +45,8 @@ const ForgotPasswordPage = () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
-          py: 6
-        }}
-      >
+          py: 6,
+        }}>
         <h3 sx={{ mb: 4 }}>Reset your password</h3>
         <Login
           id="forgot-password"

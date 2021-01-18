@@ -18,15 +18,13 @@ const Prefooter = () => (
         borderRadius: 24,
         color: "background",
         backgroundImage: "url(/img/prefooter-background.svg)",
-        backgroundSize: "cover"
-      }}
-    >
+        backgroundSize: "cover",
+      }}>
       <Heading
         sx={{
           fontSize: ["32px", "72px"],
-          mb: [3, 4]
-        }}
-      >
+          mb: [3, 4],
+        }}>
         Ready to get started?
       </Heading>
       <Text
@@ -34,9 +32,8 @@ const Prefooter = () => (
           fontSize: ["16px", "18px"],
           mb: [4, 5],
           maxWidth: "700px",
-          mx: "auto"
-        }}
-      >
+          mx: "auto",
+        }}>
         Create a free account instantly and start creating streams. You can also
         contact us to design a custom package for your business.
       </Text>
@@ -44,9 +41,8 @@ const Prefooter = () => (
         sx={{
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: ["column", "row"]
-        }}
-      >
+          flexDirection: ["column", "row"],
+        }}>
         <Button href="/register" sx={{ mr: [0, 2], mb: [2, 0] }} isLink>
           Sign up for free
         </Button>
@@ -61,7 +57,7 @@ const Prefooter = () => (
             bg: "rgba(255,255,255,0)",
             transition: "background-color .1s",
             "&:hover": {
-              bg: "rgba(255,255,255,0.08)"
+              bg: "rgba(255,255,255,0.08)",
             },
             ".HoverArrow": {
               position: "relative",
@@ -69,36 +65,34 @@ const Prefooter = () => (
               marginLeft: "8px",
               strokeWidth: "2",
               fill: "none",
-              stroke: "currentColor"
+              stroke: "currentColor",
             },
             ".HoverArrow__linePath": {
               opacity: "0",
-              transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s"
+              transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s",
             },
             ".HoverArrow__tipPath": {
               transition:
-                "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s"
+                "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s",
             },
             ":hover .HoverArrow": {
               transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
               ".HoverArrow__linePath": {
-                opacity: 1
+                opacity: 1,
               },
               ".HoverArrow__tipPath": {
-                transform: "translateX(3px)"
-              }
-            }
+                transform: "translateX(3px)",
+              },
+            },
           }}
-          isLink
-        >
+          isLink>
           Contact us
           <svg
             className="HoverArrow"
             width="10"
             height="10"
             viewBox="0 0 10 10"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <g fillRule="evenodd">
               <path className="HoverArrow__linePath" d="M0 5h7" />
               <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />

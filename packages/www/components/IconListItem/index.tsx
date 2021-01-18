@@ -12,16 +12,15 @@ const IconListItem = ({
   icon,
   title,
   description,
-  pushSx
+  pushSx,
 }: IconListItemProps) => (
   <div
     sx={{
       display: "flex",
       alignItems: "flex-start",
       flexDirection: ["column", "row"],
-      ...pushSx
-    }}
-  >
+      ...pushSx,
+    }}>
     <i
       sx={{
         fontSize: [20, 22],
@@ -30,9 +29,8 @@ const IconListItem = ({
         alignItems: "center",
         justifyContent: "center",
         color: "primary",
-        mr: 3
-      }}
-    >
+        mr: 3,
+      }}>
       {icon}
     </i>
     <div>

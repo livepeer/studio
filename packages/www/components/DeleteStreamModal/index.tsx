@@ -12,7 +12,7 @@ export default ({
   streamName,
   onClose,
   onDelete,
-  numStreamsToDelete
+  numStreamsToDelete,
 }: DeleteStreamModalProps) => {
   return (
     <Modal onClose={onClose}>
@@ -29,8 +29,7 @@ export default ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}
-        >
+          sx={{ mr: 2 }}>
           Cancel
         </Button>
         <Button type="button" variant="primarySmall" onClick={onDelete}>

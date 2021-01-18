@@ -25,7 +25,7 @@ const Slider: React.FC<Props> = ({
   children,
   pushSx,
   isFullScreen = true,
-  numberOfCopies = 2
+  numberOfCopies = 2,
 }) => {
   if (numberOfCopies % 2 !== 0 && isDev) {
     throw new Error("numberOfCopies must be even");
@@ -52,25 +52,22 @@ const Slider: React.FC<Props> = ({
         whiteSpace: "nowrap",
         position: "relative",
         width: isFullScreen ? "100vw" : "100%",
-        ...pushSx
-      }}
-    >
+        ...pushSx,
+      }}>
       <div
         sx={{
           display: "inline-block",
           whiteSpace: "nowrap",
           overflow: "hidden",
-          animation: `${slide} ${duration * 2}s linear infinite`
-        }}
-      >
+          animation: `${slide} ${duration * 2}s linear infinite`,
+        }}>
         {Array.from({ length: numberOfCopies }, (_, i) => i + 1).map((n) => (
           <div
             key={`auto-slider-copy-${n}`}
             sx={{
               display: "inline-flex",
-              "& > div": { display: "inline-block" }
-            }}
-          >
+              "& > div": { display: "inline-block" },
+            }}>
             {getChild(n)}
           </div>
         ))}

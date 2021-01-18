@@ -11,8 +11,7 @@ const LinksList = ({ heading, links }: LinksListProps) => (
     {links.map((link, i) => (
       <li
         key={`link-${link.href}-${i}`}
-        sx={{ "&:not(:last-of-type)": { mb: 3 } }}
-      >
+        sx={{ "&:not(:last-of-type)": { mb: 3 } }}>
         <Link {...link} variant="footer" />
       </li>
     ))}

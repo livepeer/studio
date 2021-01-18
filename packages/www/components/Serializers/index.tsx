@@ -4,8 +4,8 @@ import Figure from "../Figure";
 const serializers = {
   types: {
     EmbedHtml: EmbedHtml,
-    figure: Figure
-  }
+    figure: Figure,
+  },
 };
 
 export default serializers;

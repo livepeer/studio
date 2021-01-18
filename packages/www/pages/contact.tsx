@@ -15,7 +15,7 @@ const ContactPage = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -38,8 +38,7 @@ const ContactPage = () => {
       title={`Contact - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com/contact`}
-      withGradientBackground
-    >
+      withGradientBackground>
       <Container variant="hero">
         <Box sx={{ mb: 80 }}>
           <h1 sx={{ variant: "text.heading.hero" }}>Get in touch with us</h1>
@@ -59,11 +58,9 @@ const ContactPage = () => {
         <form
           ref={formEl}
           onSubmit={handleSubmit}
-          sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}
-        >
+          sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}>
           <Flex
-            sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
-          >
+            sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}>
             <Textfield
               htmlFor="firstname"
               id="firstname"
@@ -82,8 +79,7 @@ const ContactPage = () => {
             />
           </Flex>
           <Flex
-            sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
-          >
+            sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}>
             <Textfield
               htmlFor="email"
               id="email"

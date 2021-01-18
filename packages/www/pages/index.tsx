@@ -11,7 +11,7 @@ import {
   FiCode,
   FiPlayCircle,
   FiCheckSquare,
-  FiGlobe
+  FiGlobe,
 } from "react-icons/fi";
 import Prefooter from "../components/Prefooter";
 import Hero from "../components/HomeHero";
@@ -24,26 +24,26 @@ const benefitsListItems: IconListItemProps[] = [
     icon: <FiUserCheck />,
     title: "Easy to use",
     description:
-      "Our straight forward API’s make integrating Livepeer.com into your UGC platform a quick and easy task."
+      "Our straight forward API’s make integrating Livepeer.com into your UGC platform a quick and easy task.",
   },
   {
     icon: <FiPlay />,
     title: "Reliable",
     description:
-      "Ensure content creator audiences remain engaged by delivering high quality streams with 99.99% reliability."
+      "Ensure content creator audiences remain engaged by delivering high quality streams with 99.99% reliability.",
   },
   {
     icon: <FiMaximize2 />,
     title: "Scalable",
     description:
-      "Freedom to scale up or down so you can manage content creator demand without over investing in infrastructure."
+      "Freedom to scale up or down so you can manage content creator demand without over investing in infrastructure.",
   },
   {
     icon: <FiZap />,
     title: "Affordable",
     description:
-      "Live Streaming at a fraction of the cost of comparable services."
-  }
+      "Live Streaming at a fraction of the cost of comparable services.",
+  },
 ];
 
 const featuresListItems: IconListItemProps[] = [
@@ -51,26 +51,26 @@ const featuresListItems: IconListItemProps[] = [
     icon: <FiCode />,
     title: "Transcoding",
     description:
-      "High quality, reliable transcoding at a cost that makes running a video centric UGC platform with millions of content creators viable."
+      "High quality, reliable transcoding at a cost that makes running a video centric UGC platform with millions of content creators viable.",
   },
   {
     icon: <FiPlayCircle />,
     title: "Smart video",
     description:
-      "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running UGC platforms."
+      "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running UGC platforms.",
   },
   {
     icon: <FiCheckSquare />,
     title: "Interactivity",
     description:
-      "Key features to enable interactive use cases that drive engagement on UGC platforms including low latency and object detection."
+      "Key features to enable interactive use cases that drive engagement on UGC platforms including low latency and object detection.",
   },
   {
     icon: <FiGlobe />,
     title: "Integration API",
     description:
-      "Simple and easy to implement API’s that support seamless integration with your UGC platform."
-  }
+      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
+  },
 ];
 
 const HomePage = () => {
@@ -79,8 +79,7 @@ const HomePage = () => {
       title={`Home - Livepeer.com`}
       description={`The platform built to power video-centric UGC applications at scale.`}
       url={`https://livepeer.com`}
-      withGradientBackground
-    >
+      withGradientBackground>
       {/* Do not wrap the <Hero /> in <Fade />. It completely breaks in Safari */}
       <Hero />
       <Fade key={1} fraction={0.05}>
@@ -92,11 +91,10 @@ const HomePage = () => {
             cta: {
               isLink: true,
               href: "/register",
-              children: "Sign up for free"
-            }
+              children: "Sign up for free",
+            },
           }}
-          gradient="colorful"
-        >
+          gradient="colorful">
           <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
             {benefitsListItems.map((item) => (
               <IconListItem
@@ -116,10 +114,9 @@ const HomePage = () => {
             cta: {
               isLink: true,
               href: "/register",
-              children: "Sign up for free"
-            }
-          }}
-        >
+              children: "Sign up for free",
+            },
+          }}>
           <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
             {featuresListItems.map((item) => (
               <IconListItem

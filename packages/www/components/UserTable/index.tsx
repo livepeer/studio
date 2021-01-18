@@ -6,7 +6,7 @@ import {
   Flex,
   Container,
   Input,
-  Select
+  Select,
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
@@ -55,22 +55,22 @@ const UserTable = ({ userId, id }: UserTableProps) => {
     selectedUser,
     cursor,
     filter,
-    product
+    product,
   ]);
   const close = () => {
     setAdminModal(false);
     setRemoveAdminModal(false);
     setSelectedUser(null);
   };
-  const getProductName = (productId) => products? `${products[productId]?.name}` : productId;
+  const getProductName = (productId) =>
+    products ? `${products[productId]?.name}` : productId;
 
   return (
     <Container
       id={id}
       sx={{
-        my: 2
-      }}
-    >
+        my: 2,
+      }}>
       {adminModal && selectedUser && (
         <Modal onClose={close}>
           <h3>Make User Admin</h3>
@@ -82,8 +82,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}
-            >
+              sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -91,8 +90,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               variant="secondarySmall"
               onClick={() => {
                 makeUserAdmin(selectedUser.email, true).then(close);
-              }}
-            >
+              }}>
               Make User Admin
             </Button>
           </Flex>
@@ -110,8 +108,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}
-            >
+              sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -119,8 +116,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               variant="secondarySmall"
               onClick={() => {
                 makeUserAdmin(selectedUser.email, false).then(close);
-              }}
-            >
+              }}>
               Remove Admin Rights
             </Button>
           </Flex>
@@ -131,16 +127,14 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           variant="secondarySmall"
           disabled={!selectedUser || selectedUser.admin}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedUser && setAdminModal(true)}
-        >
+          onClick={() => selectedUser && setAdminModal(true)}>
           Make User Admin
         </Button>
         <Button
           variant="secondarySmall"
           disabled={!selectedUser || !selectedUser.admin}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedUser && setRemoveAdminModal(true)}
-        >
+          onClick={() => selectedUser && setRemoveAdminModal(true)}>
           Remove Admin Rights
         </Button>
         <Button
@@ -151,8 +145,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             setNextCursor(cursor);
             setCursor(prevCursor.pop());
             setPrevCursor([...prevCursor]);
-          }}
-        >
+          }}>
           Previouse page
         </Button>
         <Button
@@ -164,8 +157,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             setPrevCursor([...prevCursor]);
             setCursor(nextCursor);
             setNextCursor("");
-          }}
-        >
+          }}>
           Next page
         </Button>
         <Input
@@ -173,8 +165,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           label="filterInput"
           value={filterInput}
           onChange={(e) => setFilterInput(e.target.value)}
-          placeholder="email"
-        ></Input>
+          placeholder="email"></Input>
         <Select sx={{ ml: "1em" }} onChange={(e) => setProduct(e.target.value)}>
           <option value="">--</option>
           {Object.keys(products).map((id) => (
@@ -207,8 +198,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                   } else {
                     setSelectedUser(user);
                   }
-                }}
-              >
+                }}>
                 <Checkbox value={selected} />
                 <Box>{id}</Box>
                 <Box>{email}</Box>

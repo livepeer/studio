@@ -29,11 +29,10 @@ const TeamMember = ({
         transition: "box-shadow .15s",
         "&:hover": {
           boxShadow:
-            "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-        }
+            "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+        },
       }}
-      {...props}
-    >
+      {...props}>
       <div>
         <Image
           sx={{
@@ -41,7 +40,7 @@ const TeamMember = ({
             width: 130,
             height: 130,
             objectFit: "cover",
-            m: "0 auto 8px"
+            m: "0 auto 8px",
           }}
           width={130}
           height={130}
@@ -55,9 +54,8 @@ const TeamMember = ({
               mb: 2,
               mt: 3,
               fontWeight: 500,
-              fontSize: "20px"
-            }}
-          >
+              fontSize: "20px",
+            }}>
             {fullname}
           </Heading>
           <Box sx={{ fontSize: 2, color: "gray" }}>{role}</Box>
@@ -68,9 +66,8 @@ const TeamMember = ({
           maxWidth: 120,
           margin: "0 auto",
           justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
+          alignItems: "center",
+        }}>
         {twitter && (
           <Link
             sx={{
@@ -78,12 +75,11 @@ const TeamMember = ({
               color: "black",
               fontSize: 3,
               transition: "color .15s",
-              "&:hover": { color: "primary" }
+              "&:hover": { color: "primary" },
             }}
             href={twitter}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaTwitter />
           </Link>
         )}
@@ -94,12 +90,11 @@ const TeamMember = ({
               color: "black",
               fontSize: 3,
               transition: "color .15s",
-              "&:hover": { color: "primary" }
+              "&:hover": { color: "primary" },
             }}
             href={linkedin}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaLinkedin />
           </Link>
         )}
@@ -110,12 +105,11 @@ const TeamMember = ({
               color: "black",
               fontSize: 3,
               transition: "color .15s",
-              "&:hover": { color: "primary" }
+              "&:hover": { color: "primary" },
             }}
             href={medium}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaMedium />
           </Link>
         )}
@@ -126,12 +120,11 @@ const TeamMember = ({
               color: "black",
               fontSize: 3,
               transition: "color .15s",
-              "&:hover": { color: "primary" }
+              "&:hover": { color: "primary" },
             }}
             href={github}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaGithub />
           </Link>
         )}

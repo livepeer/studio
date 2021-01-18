@@ -7,7 +7,7 @@ import {
   Flex,
   Heading,
   Container,
-  Link as A
+  Link as A,
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -27,7 +27,7 @@ import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
 import {
   RelativeTime,
-  RenditionsDetails
+  RenditionsDetails,
 } from "../../../components/StreamsTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
@@ -63,8 +63,7 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
             <a
               sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}
               href={url}
-              target="_blank"
-            >
+              target="_blank">
               {url}
             </a>
           ) : (
@@ -78,7 +77,7 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               cursor: "pointer",
               width: 14,
               height: 14,
-              color: "offBlack"
+              color: "offBlack",
             }}
           />
         </Flex>
@@ -100,7 +99,7 @@ const ID = () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord
+    setRecord,
   } = useApi();
   const router = useRouter();
   const { query, asPath } = router;
@@ -205,8 +204,7 @@ const ID = () => {
                 type="button"
                 variant="outlineSmall"
                 onClick={close}
-                sx={{ mr: 2 }}
-              >
+                sx={{ mr: 2 }}>
                 Cancel
               </Button>
               <Button
@@ -215,8 +213,7 @@ const ID = () => {
                 onClick={() => {
                   close();
                   doSetRecord(stream, false);
-                }}
-              >
+                }}>
                 Turn off recording
               </Button>
             </Flex>
@@ -229,9 +226,8 @@ const ID = () => {
               fontWeight: 500,
               mb: 3,
               color: "text",
-              display: "block"
-            }}
-          >
+              display: "block",
+            }}>
             {"← stream list"}
           </A>
         </Link>
@@ -241,9 +237,8 @@ const ID = () => {
               sx={{
                 justifyContent: "flex-start",
                 alignItems: "baseline",
-                flexDirection: "column"
-              }}
-            >
+                flexDirection: "column",
+              }}>
               <Heading as="h3" sx={{ mb: "0.5em" }}>
                 {stream.name}
               </Heading>
@@ -253,9 +248,8 @@ const ID = () => {
                   alignItems: "center",
                   gridTemplateColumns: "10em auto",
                   width: "100%",
-                  fontSize: 0
-                }}
-              >
+                  fontSize: 0,
+                }}>
                 <Cell>Stream name</Cell>
                 <Cell>{stream.name}</Cell>
                 <Cell>Stream ID</Cell>
@@ -269,15 +263,13 @@ const ID = () => {
                       type="button"
                       variant="outlineSmall"
                       onClick={() => setKeyRevealed(true)}
-                      sx={{ mr: 0, py: "4px", fontSize: 0 }}
-                    >
+                      sx={{ mr: 0, py: "4px", fontSize: 0 }}>
                       Show secret stream key
                     </Button>
                   )}
                 </Cell>
                 <Box
-                  sx={{ mx: "0.4em", mt: "2em", mb: "0", gridColumn: "1/-1" }}
-                >
+                  sx={{ mx: "0.4em", mt: "2em", mb: "0", gridColumn: "1/-1" }}>
                   <h5>Ingest and playback URL pairs:</h5>
                 </Box>
                 <Box
@@ -285,13 +277,11 @@ const ID = () => {
                     mx: "0.4em",
                     mt: "0.4em",
                     mb: "1.5em",
-                    gridColumn: "1/-1"
-                  }}
-                >
+                    gridColumn: "1/-1",
+                  }}>
                   <Link
                     href="/docs/guides/dashboard/ingest-playback-url-pair"
-                    passHref
-                  >
+                    passHref>
                     <A target="_blank">
                       <i>Learn how to pick an ingest and playback URL pair.</i>
                     </A>
@@ -316,16 +306,14 @@ const ID = () => {
                           <Flex
                             sx={{
                               justifyContent: "flex-start",
-                              alignItems: "center"
-                            }}
-                          >
+                              alignItems: "center",
+                            }}>
                             <Box
                               sx={{
                                 minWidth: 125,
                                 fontSize: 12,
-                                paddingRight: "1em"
-                              }}
-                            >
+                                paddingRight: "1em",
+                              }}>
                               {getIngestURL(stream, false, i)}
                               <b>stream-key</b>
                             </Box>
@@ -335,17 +323,15 @@ const ID = () => {
                       <Box
                         sx={{
                           m: "0.4em",
-                          mb: "1.4em"
-                        }}
-                      >
+                          mb: "1.4em",
+                        }}>
                         Playback URL {i + 1}
                       </Box>
                       <Box
                         sx={{
                           m: "0.4em",
-                          mb: "1.4em"
-                        }}
-                      >
+                          mb: "1.4em",
+                        }}>
                         <ShowURL
                           text=""
                           url={getPlaybackURL(stream, i)}
@@ -393,7 +379,7 @@ const ID = () => {
                       sx={{
                         m: "0.4em",
                         justifySelf: "flex-start",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                       onClick={() => {
                         if (stream.record) {
@@ -401,8 +387,7 @@ const ID = () => {
                         } else {
                           doSetRecord(stream, true);
                         }
-                      }}
-                    >
+                      }}>
                       <Flex>
                         <Checkbox value={stream.record} />
                         <ReactTooltip
@@ -410,8 +395,7 @@ const ID = () => {
                           className="tooltip"
                           place="top"
                           type="dark"
-                          effect="solid"
-                        >
+                          effect="solid">
                           <p>
                             When checked, transcoded streaming sessions will be
                             recorded and stored by Livepeer.com.
@@ -426,7 +410,7 @@ const ID = () => {
                           sx={{
                             color: "muted",
                             cursor: "pointer",
-                            ml: 1
+                            ml: 1,
                           }}
                         />
                       </Flex>
@@ -446,8 +430,7 @@ const ID = () => {
                       <a
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.streamKey}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.streamKey}
                       </a>
                     </Cell>
@@ -456,8 +439,7 @@ const ID = () => {
                       <a
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.playbackId}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.playbackId}
                       </a>
                     </Cell>
@@ -466,8 +448,7 @@ const ID = () => {
                       <a
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.id}
                       </a>
                     </Cell>
@@ -478,14 +459,12 @@ const ID = () => {
             <Flex
               sx={{
                 justifyContent: "flex-end",
-                mb: 3
-              }}
-            >
+                mb: 3,
+              }}>
               <Button
                 type="button"
                 variant="outlineSmall"
-                onClick={() => setDeleteModal(true)}
-              >
+                onClick={() => setDeleteModal(true)}>
                 Delete
               </Button>
             </Flex>

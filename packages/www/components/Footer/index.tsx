@@ -18,8 +18,8 @@ const linksLists: LinksListProps[] = [
       { children: "Home", href: "/" },
       { children: "Contact", href: "/contact" },
       { children: "Team", href: "/team" },
-      { children: "Jobs", href: "/jobs" }
-    ]
+      { children: "Jobs", href: "/jobs" },
+    ],
   },
   {
     heading: "Resources",
@@ -28,14 +28,14 @@ const linksLists: LinksListProps[] = [
       { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
       { children: "Privacy Policy", href: "/privacy-policy" },
-      { children: "Terms of Service", href: "/terms-of-service" }
-    ]
-  }
+      { children: "Terms of Service", href: "/terms-of-service" },
+    ],
+  },
 ];
 
 const MailchimpResponse = ({
   result,
-  msg
+  msg,
 }: {
   result?: string;
   msg?: string;
@@ -61,9 +61,8 @@ const MailchimpResponse = ({
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
         overflow: "hidden",
-        width: "90%"
-      }}
-    >
+        width: "90%",
+      }}>
       {message}
     </Text>
   );
@@ -75,7 +74,7 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [mailchimp, subscribe] = useMailchimp({
     url:
-      "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158"
+      "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158",
   });
 
   const { data: mailchimpResponseData } = mailchimp;
@@ -97,9 +96,8 @@ const Footer = () => {
         py: 5,
         bg: "text",
         color: "background",
-        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)"
-      }}
-    >
+        boxShadow: "0px 0px 60px rgba(0, 0, 0, 0.08)",
+      }}>
       <Container>
         <Grid
           columns={[1, null, null, "2fr 1fr 1fr 1fr"]}
@@ -107,9 +105,8 @@ const Footer = () => {
           sx={{
             alignItems: "flex-start",
             justifyContent: "center",
-            textAlign: ["center", null, null, "left"]
-          }}
-        >
+            textAlign: ["center", null, null, "left"],
+          }}>
           <form onSubmit={handleSubmit} sx={{ position: "relative" }}>
             <Logo isDark />
             <Text
@@ -120,9 +117,8 @@ const Footer = () => {
                 display: "block",
                 mt: 4,
                 maxWidth: "276px",
-                mx: ["auto", null, null, "0"]
-              }}
-            >
+                mx: ["auto", null, null, "0"],
+              }}>
               Join our newsletter to stay up to date on features and new
               releases.
             </Text>
@@ -130,9 +126,8 @@ const Footer = () => {
               sx={{
                 position: "relative",
                 width: "fit-content",
-                mx: ["auto", null, null, "unset"]
-              }}
-            >
+                mx: ["auto", null, null, "unset"],
+              }}>
               <Textfield
                 label="Enter your email"
                 name="email"
@@ -154,10 +149,9 @@ const Footer = () => {
                   right: "0",
                   height: "55px",
                   width: "55px",
-                  color: "text"
+                  color: "text",
                 }}
-                type="submit"
-              >
+                type="submit">
                 <FiArrowRight />
               </IconButton>
             </div>
@@ -180,8 +174,7 @@ const Footer = () => {
                 href="mailto:hello@livepeer.com"
                 variant="footer"
                 sx={{ fontWeight: 600, textDecoration: "underline" }}
-                isExternal
-              >
+                isExternal>
                 hello@livepeer.com
               </Link>
             </li>
@@ -193,8 +186,7 @@ const Footer = () => {
                   viewBox="0 0 32 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  sx={{ display: "inline-block", mr: 2 }}
-                >
+                  sx={{ display: "inline-block", mr: 2 }}>
                   <path
                     fillRule="evenodd"
                     clipRule="evenodd"
@@ -210,8 +202,7 @@ const Footer = () => {
                   viewBox="0 0 32 32"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  sx={{ display: "inline-block" }}
-                >
+                  sx={{ display: "inline-block" }}>
                   <path
                     fillRule="evenodd"
                     clipRule="evenodd"
@@ -227,8 +218,7 @@ const Footer = () => {
                   isExternal
                   variant="footer"
                   sx={{ textDecoration: "underline" }}
-                  href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}
-                >
+                  href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}>
                   version {version.commit.substring(0, 8)}
                 </Link>
               )}

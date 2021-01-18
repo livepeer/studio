@@ -33,8 +33,7 @@ const Segments = ({ stream }: { stream: Stream }) => {
         className="tooltip"
         place="top"
         type="dark"
-        effect="solid"
-      >
+        effect="solid">
         Source segments / Transcoded segments
       </ReactTooltip>
       <span data-tip data-for={`tooltip-${idpref}`}>
@@ -175,9 +174,8 @@ export default ({ id }: { id: string }) => {
       id={id}
       sx={{
         mb: 5,
-        mt: 2
-      }}
-    >
+        mt: 2,
+      }}>
       {deleteModal && selectedStream && (
         <DeleteStreamModal
           streamName={selectedStream.name}
@@ -190,8 +188,7 @@ export default ({ id }: { id: string }) => {
       <Box>
         <Link
           href={{ pathname: "/app/stream/new-stream", query: { admin: true } }}
-          as="/app/stream/new-stream"
-        >
+          as="/app/stream/new-stream">
           <a>
             <Button variant="outlineSmall" sx={{ margin: 2 }}>
               Create
@@ -203,63 +200,55 @@ export default ({ id }: { id: string }) => {
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedStream && setDeleteModal(true)}
-        >
+          onClick={() => selectedStream && setDeleteModal(true)}>
           Delete
         </Button>
         <Flex
           sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
-          onClick={() => setActiveOnly(!activeOnly)}
-        >
+          onClick={() => setActiveOnly(!activeOnly)}>
           <Checkbox value={activeOnly} />
           <Box sx={{ ml: "0.5em" }}> Show active only</Box>
         </Flex>
       </Box>
       <Table
-        sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto auto" }}
-      >
+        sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>
           <Box></Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortUserId}
-          >
+            onClick={sortUserId}>
             User name ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortName}
-          >
+            onClick={sortName}>
             Name ⭥
           </Box>
           <Box>Details</Box>
           <Box>Segments</Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortCreated}
-          >
+            onClick={sortCreated}>
             Created ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortLastSeen}
-          >
+            onClick={sortLastSeen}>
             Last Active ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortActive}
-          >
+            onClick={sortActive}>
             Status ⭥
           </Box>
         </TableRow>
@@ -271,7 +260,7 @@ export default ({ id }: { id: string }) => {
             sourceSegments,
             transcodedSegments,
             createdAt,
-            isActive
+            isActive,
           } = stream;
           const selected = selectedStream && selectedStream.id === id;
           return (
@@ -286,8 +275,7 @@ export default ({ id }: { id: string }) => {
                   } else {
                     setSelectedStream(stream);
                   }
-                }}
-              >
+                }}>
                 <Checkbox value={selected} />
                 <UserName id={stream.userId} users={users} />
                 <StreamName stream={stream} admin={true} />

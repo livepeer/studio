@@ -8,8 +8,7 @@ const TeamSection = ({ teamMembers }) => {
       <Grid
         columns={[1, 2, 3, null, 4]}
         gap={3}
-        sx={{ maxWidth: 1200, margin: "0 auto" }}
-      >
+        sx={{ maxWidth: 1200, margin: "0 auto" }}>
         {teamMembers.map((t, i) => (
           <TeamMember
             key={i}

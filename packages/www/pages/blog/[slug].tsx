@@ -27,8 +27,8 @@ const serializers = {
         {props.node.code}
       </SyntaxHighlighter>
     ),
-    "mux.video": (props) => <Player assetId={props.node.asset._ref} />
-  }
+    "mux.video": (props) => <Player assetId={props.node.asset._ref} />,
+  },
 };
 
 const Post = ({
@@ -41,7 +41,7 @@ const Post = ({
   noindex = false,
   preview,
   contentRaw,
-  furtherReading
+  furtherReading,
 }) => {
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
@@ -61,30 +61,27 @@ const Post = ({
       noindex={noindex}
       image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
       url={`https://livepeer.com${asPath}`}
-      preview={preview}
-    >
+      preview={preview}>
       <Container variant="blogPost" sx={{ my: 5 }}>
         <Flex
           sx={{
             mb: 2,
             alignItems: "center",
             fontSize: 1,
-            justifyContent: "space-between"
-          }}
-        >
+            justifyContent: "space-between",
+          }}>
           <Box
             sx={{
               textOverflow: "ellipsis",
               overflow: "hidden",
               whiteSpace: "nowrap",
-              mr: 2
-            }}
-          >
+              mr: 2,
+            }}>
             {new Date(_createdAt).toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
               month: "long",
-              day: "numeric"
+              day: "numeric",
             })}
           </Box>
           <Link
@@ -94,8 +91,7 @@ const Post = ({
                 ? "/blog"
                 : `/blog/category/${category.slug.current}`
             }
-            passHref
-          >
+            passHref>
             <Box
               as="a"
               sx={{
@@ -106,10 +102,9 @@ const Post = ({
                 letterSpacing: "-0.02em",
                 fontWeight: 600,
                 "&:hover": {
-                  textDecoration: "underline"
-                }
-              }}
-            >
+                  textDecoration: "underline",
+                },
+              }}>
               {category.title}
             </Box>
           </Link>
@@ -130,7 +125,7 @@ const Post = ({
                     borderRadius: 1000,
                     objectFit: "cover",
                     ml: 3,
-                    mr: 2
+                    mr: 2,
                   }}
                   className="lazyload"
                   data-src={builder.image(author.image).url()}
@@ -140,9 +135,8 @@ const Post = ({
                     fontWeight: 600,
                     textOverflow: "ellipsis",
                     overflow: "hidden",
-                    whiteSpace: "nowrap"
-                  }}
-                >
+                    whiteSpace: "nowrap",
+                  }}>
                   {author.name}
                 </span>
               </Box>
@@ -151,9 +145,8 @@ const Post = ({
                 sx={{
                   textOverflow: "ellipsis",
                   overflow: "hidden",
-                  whiteSpace: "nowrap"
-                }}
-              >
+                  whiteSpace: "nowrap",
+                }}>
                 {stats.text}
               </Box>
             </Flex>
@@ -199,7 +192,7 @@ export async function getStaticPaths() {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
   const { allPost } = await graphQLClient.request(print(allPosts), {
-    where: {}
+    where: {},
   });
 
   let paths = [];
@@ -208,7 +201,7 @@ export async function getStaticPaths() {
   }
   return {
     fallback: true,
-    paths
+    paths,
   };
 }
 
@@ -219,7 +212,7 @@ export async function getStaticProps({ params }) {
   );
 
   let data: any = await graphQLClient.request(print(allPosts), {
-    where: {}
+    where: {},
   });
 
   let post = data.allPost.find((p) => p.slug.current === slug);
@@ -233,8 +226,8 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       ...post,
-      furtherReading
+      furtherReading,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }

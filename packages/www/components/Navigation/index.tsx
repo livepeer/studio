@@ -11,21 +11,21 @@ const defaultNavProps: NavProps = {
   links: [
     {
       href: "/docs",
-      children: "Docs"
+      children: "Docs",
     },
     {
       href: "/blog",
-      children: "Blog"
+      children: "Blog",
     },
     {
       href: "/pricing",
-      children: "Pricing"
+      children: "Pricing",
     },
     {
       href: "/contact",
-      children: "Contact"
-    }
-  ]
+      children: "Contact",
+    },
+  ],
 };
 
 const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
@@ -61,16 +61,16 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
       links: [
         {
           href: "/docs",
-          children: "Overview"
+          children: "Overview",
         },
         {
           href: "/docs/guides",
-          children: "Guides"
+          children: "Guides",
         },
         {
           href: "/docs/api",
-          children: "API Reference"
-        }
+          children: "API Reference",
+        },
       ],
       breadcrumb: [
         {
@@ -80,21 +80,21 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
             {
               children: "Overview",
               href: "/docs",
-              isSelected: pathname === "/docs"
+              isSelected: pathname === "/docs",
             },
             {
               children: "Guides",
               href: "/docs/guides",
-              isSelected: pathname === "/docs/guides"
+              isSelected: pathname === "/docs/guides",
             },
             {
               children: "API Reference",
               href: "/docs/api",
-              isSelected: pathname === "/docs/api"
-            }
-          ]
-        }
-      ]
+              isSelected: pathname === "/docs/api",
+            },
+          ],
+        },
+      ],
     }),
     [pathname]
   );

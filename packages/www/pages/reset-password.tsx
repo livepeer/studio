@@ -33,8 +33,7 @@ export default () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
-        }}
-      >
+        }}>
         <h3 sx={{ mb: [3, 3] }}>Reset your password</h3>
         <Login
           id="reset-password"

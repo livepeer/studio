@@ -8,7 +8,7 @@ const investorIds = [
   "compound",
   "dgc",
   "collaborative-fund",
-  "notation"
+  "notation",
 ];
 
 const InvestorsSection = () => {
@@ -17,18 +17,16 @@ const InvestorsSection = () => {
       sx={{
         position: "relative",
         py: [64, 64, 128],
-        bg: "text"
-      }}
-    >
+        bg: "text",
+      }}>
       <Container>
         <Text
           sx={{
             fontSize: [2, 3],
             textAlign: "center",
             color: "lightGray",
-            mb: 4
-          }}
-        >
+            mb: 4,
+          }}>
           Backed by these amazing organizations and trusted by the best
         </Text>
       </Container>
@@ -36,8 +34,7 @@ const InvestorsSection = () => {
         <Grid
           sx={{ justifyContent: "center", alignItems: "center" }}
           gap={[5]}
-          columns={[1, 3, 5]}
-        >
+          columns={[1, 3, 5]}>
           {investorIds.map((id) => (
             <img
               key={id}

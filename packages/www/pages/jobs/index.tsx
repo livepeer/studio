@@ -21,26 +21,23 @@ const Page = ({ positions, preview }) => {
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs`}
       preview={preview}
-      withGradientBackground
-    >
+      withGradientBackground>
       <Container
         sx={{
           pb: 5,
           ul: { mb: 4 },
           p: { mb: 4 },
           maxWidth: 960,
-          margin: "0 auto"
-        }}
-      >
+          margin: "0 auto",
+        }}>
         <h1
           sx={{
             lineHeight: ["48px", "72px"],
             my: [4, 5],
             fontSize: ["40px", "8"],
             letterSpacing: "-0.05em",
-            textAlign: "center"
-          }}
-        >
+            textAlign: "center",
+          }}>
           Join Livepeer, Inc.
         </h1>
         <Grid columns={1} mb={5} gap={4}>
@@ -50,8 +47,7 @@ const Page = ({ positions, preview }) => {
                 key={i}
                 href={p.title === "All" ? "/jobs" : `/jobs/[slug]`}
                 as={p.title === "All" ? "/jobs" : `/jobs/${p.slug.current}`}
-                passHref
-              >
+                passHref>
                 <A
                   sx={{
                     width: "100%",
@@ -69,10 +65,9 @@ const Page = ({ positions, preview }) => {
                     ":hover": {
                       textDecoration: "none",
                       boxShadow:
-                        "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-                    }
-                  }}
-                >
+                        "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+                    },
+                  }}>
                   <p
                     sx={{
                       fontSize: [24, 32],
@@ -80,9 +75,8 @@ const Page = ({ positions, preview }) => {
                       px: 4,
                       pt: 4,
                       mr: 4,
-                      mb: 0
-                    }}
-                  >
+                      mb: 0,
+                    }}>
                     {p.title}
                   </p>
                   <Box
@@ -91,18 +85,16 @@ const Page = ({ positions, preview }) => {
                       fontWeight: 400,
                       px: 4,
                       pb: 4,
-                      mr: 4
-                    }}
-                  >
+                      mr: 4,
+                    }}>
                     <Box
                       sx={{
                         display: "-webkit-box",
                         textOverflow: "ellipsis",
                         WebkitLineClamp: 3,
                         WebkitBoxOrient: "vertical",
-                        overflow: "hidden"
-                      }}
-                    >
+                        overflow: "hidden",
+                      }}>
                       {getFirstParagraph(p.body)}
                     </Box>
                   </Box>
@@ -112,9 +104,8 @@ const Page = ({ positions, preview }) => {
                       fontWeight: 600,
                       px: 4,
                       mr: 4,
-                      mb: 0
-                    }}
-                  >
+                      mb: 0,
+                    }}>
                     Apply
                   </p>
                 </A>
@@ -136,15 +127,15 @@ export async function getStaticProps({ params, preview = false }) {
   );
 
   let data: any = await graphQLClient.request(print(allJobs), {
-    where: {}
+    where: {},
   });
 
   return {
     props: {
       positions: data.allJob,
-      preview: false
+      preview: false,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

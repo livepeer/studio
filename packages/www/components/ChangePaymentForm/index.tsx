@@ -17,13 +17,13 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
   function createPaymentMethod({
     cardElement,
     stripeCustomerId,
-    billingDetails
+    billingDetails,
   }) {
     return stripe
       .createPaymentMethod({
         type: "card",
         card: cardElement,
-        billing_details: billingDetails
+        billing_details: billingDetails,
       })
       .then(async (result) => {
         const paymentMethod = result.paymentMethod;
@@ -32,7 +32,7 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
         } else {
           updateCustomerPaymentMethod({
             stripeCustomerId,
-            stripeCustomerPaymentMethodId: paymentMethod.id
+            stripeCustomerPaymentMethodId: paymentMethod.id,
           })
             // If the card is declined, display an error to the user.
             .then((result: any) => {
@@ -77,9 +77,9 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
           line1: data.address,
           city: data.city,
           state: data.state,
-          postal_code: data.postalCode
-        }
-      }
+          postal_code: data.postalCode,
+        },
+      },
     });
   };
 
@@ -109,9 +109,8 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
               alignItems: "center",
-              mb: 3
-            }}
-          >
+              mb: 3,
+            }}>
             <Textfield
               inputRef={register({ required: true })}
               htmlFor="email"
@@ -158,9 +157,8 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               gridTemplateColumns: "1fr 1fr 1fr",
               width: "100%",
               alignItems: "center",
-              mb: 3
-            }}
-          >
+              mb: 3,
+            }}>
             <Textfield
               inputRef={register({ required: true })}
               htmlFor="city"
@@ -210,22 +208,20 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               pb: "5px",
               mb: 3,
               "&:hover": {
-                borderColor: "primary"
+                borderColor: "primary",
               },
               "&:focus": {
                 outline: "none",
-                borderColor: "primary"
-              }
-            }}
-          >
+                borderColor: "primary",
+              },
+            }}>
             <Box
               sx={{
                 fontSize: 0,
                 color: "offBlack",
                 fontWeight: 500,
-                mb: 1
-              }}
-            >
+                mb: 1,
+              }}>
               Card
             </Box>
             <CardElement
@@ -245,8 +241,7 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
               onAbort();
             }}
             variant="outlineSmall"
-            sx={{ mr: 2 }}
-          >
+            sx={{ mr: 2 }}>
             Cancel
           </Button>
           <Button
@@ -255,8 +250,7 @@ const ChangePaymentForm = ({ onAbort, onSuccess }) => {
             disabled={
               !["initial", "succeeded", "error"].includes(status) || !stripe
             }
-            variant="primarySmall"
-          >
+            variant="primarySmall">
             Continue
           </Button>
         </Flex>

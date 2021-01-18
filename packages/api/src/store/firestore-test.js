@@ -1,14 +1,14 @@
-import FirestoreStore from './firestore-store'
-;(async () => {
+import FirestoreStore from "./firestore-store";
+(async () => {
   const store = new FirestoreStore({
-    firestoreCollection: 'test1586991163083',
+    firestoreCollection: "test1586991163083",
     firestoreCredentials: process.env.LP_FIRESTORE_CREDENTIALS,
-  })
+  });
   console.log(
     await store.listKeys(
-      'api-token+userId/6b3905bc-33aa-4bff-9a6c-bf97d62fd324',
-    ),
-  )
+      "api-token+userId/6b3905bc-33aa-4bff-9a6c-bf97d62fd324"
+    )
+  );
   // const stuff = await store.get(
   //   'api-token+userId/6b3905bc-33aa-4bff-9a6c-bf97d62fd324/62abb3f9-421c-4213-bd19-fc80820df66f',
   // )
@@ -44,4 +44,4 @@ import FirestoreStore from './firestore-store'
   // }
   // ;[result] = await store.listKeys('user', null, 50)
   // console.log('after: ' + result.length)
-})()
+})();

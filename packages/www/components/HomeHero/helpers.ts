@@ -16,28 +16,28 @@ const breakpoints: { [key: string]: Breakpoint } = {
     initial: 45,
     target: 0,
     formatter: (rotateX: number) =>
-      `perspective(800px) rotateX(${rotateX}deg) rotateY(0deg) scale(1)`
+      `perspective(800px) rotateX(${rotateX}deg) rotateY(0deg) scale(1)`,
   },
   opacity: {
     initial: 0.7,
     target: 1,
-    formatter: (v: number) => `${v}`
+    formatter: (v: number) => `${v}`,
   },
   gradientOpacity: {
     initial: 1,
     target: 0,
-    formatter: (v: number) => `${v}`
+    formatter: (v: number) => `${v}`,
   },
   maxWidth: {
     initial: 916,
     target: phoneFrameMaxWidth - phonePadding, // 40 is the padding of the phone
-    formatter: (v: number) => `${v}px`
+    formatter: (v: number) => `${v}px`,
   },
   aspectRatio: {
     initial: 50,
     target: 46.5,
-    formatter: (v: number) => `${v.toFixed(2)}%`
-  }
+    formatter: (v: number) => `${v.toFixed(2)}%`,
+  },
 };
 
 /**
@@ -90,8 +90,8 @@ function getDynamicBreakpoints(): DynamicBreakpoints {
           ? initialMaxWidthCandidate
           : maxMaxWidth,
       target: clientWidth - phonePadding * 2,
-      formatter: (v: number) => `${v}px`
-    }
+      formatter: (v: number) => `${v}px`,
+    },
   };
 }
 
@@ -101,5 +101,5 @@ export {
   breakpoints,
   getProportionalValue,
   getPhonePadding,
-  getDynamicBreakpoints
+  getDynamicBreakpoints,
 };

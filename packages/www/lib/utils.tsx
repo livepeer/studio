@@ -13,8 +13,7 @@ export const getComponent = (component) => {
         offset={-20}
         key={component._type}
         id={component._type}
-        name={component._type}
-      >
+        name={component._type}>
         <Component {...component} />
       </Element>
     );
@@ -157,7 +156,7 @@ export function formatAmountForDisplay(
   let numberFormat = new Intl.NumberFormat(["en-US"], {
     style: "currency",
     currency: currency,
-    currencyDisplay: "symbol"
+    currencyDisplay: "symbol",
   });
   return numberFormat.format(amount);
 }
@@ -169,7 +168,7 @@ export function formatAmountForStripe(
   let numberFormat = new Intl.NumberFormat(["en-US"], {
     style: "currency",
     currency: currency,
-    currencyDisplay: "symbol"
+    currencyDisplay: "symbol",
   });
   const parts = numberFormat.formatToParts(amount);
   let zeroDecimalCurrency: boolean = true;
@@ -199,12 +198,12 @@ export async function fetchPostJSON(url: string, data?: {}) {
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *client
-      body: JSON.stringify(data || {}) // body data type must match "Content-Type" header
+      body: JSON.stringify(data || {}), // body data type must match "Content-Type" header
     });
     return await response.json(); // parses JSON response into native JavaScript objects
   } catch (err) {
@@ -224,15 +223,15 @@ export const CARD_OPTIONS = {
       fontSize: "16px",
       fontSmoothing: "antialiased",
       "::placeholder": {
-        color: "#a0aec0"
+        color: "#a0aec0",
       },
       ":-webkit-autofill": {
-        color: "transparent"
-      }
+        color: "transparent",
+      },
     },
     invalid: {
       iconColor: theme.colors.red,
-      color: theme.colors.red
-    }
-  }
+      color: theme.colors.red,
+    },
+  },
 };

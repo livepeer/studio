@@ -1,22 +1,22 @@
-import Router from 'express/lib/router'
-import { geolocateMiddleware } from '../middleware'
-import { amalgamate } from './broadcaster'
-import { shuffle } from '../util'
+import Router from "express/lib/router";
+import { geolocateMiddleware } from "../middleware";
+import { amalgamate } from "./broadcaster";
+import { shuffle } from "../util";
 
-const app = Router()
+const app = Router();
 
 app.get(
-  '/',
-  geolocateMiddleware({ region: 'ingest-region' }),
+  "/",
+  geolocateMiddleware({ region: "ingest-region" }),
   async (req, res, next) => {
-    let ingestPoints
+    let ingestPoints;
     if (req.region && req.region.servers) {
-      ingestPoints = await amalgamate(req, 'ingest')
+      ingestPoints = await amalgamate(req, "ingest");
     } else {
-      ingestPoints = await req.getIngest(req)
+      ingestPoints = await req.getIngest(req);
     }
-    res.json(shuffle(ingestPoints))
-  },
-)
+    res.json(shuffle(ingestPoints));
+  }
+);
 
-export default app
+export default app;

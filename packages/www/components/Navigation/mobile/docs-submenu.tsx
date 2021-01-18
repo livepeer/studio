@@ -15,7 +15,7 @@ type Props = {
 const DocsMobileSubMenu = ({
   tree,
   ignoreList,
-  mobileSubmenuVisible
+  mobileSubmenuVisible,
 }: Props) => {
   const { pathname } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ const DocsMobileSubMenu = ({
           position: "sticky",
           top: 64,
           height: 64,
-          display: ["block", null, "none"]
+          display: ["block", null, "none"],
         }}
       />
       <Box
@@ -45,9 +45,8 @@ const DocsMobileSubMenu = ({
             : "rgba(0, 0, 0, 0.02) 0px 30px 30px, rgba(0, 0, 0, 0.03) 0px 0px 8px, rgba(0, 0, 0, 0.05) 0px 1px 0px",
           opacity: mobileSubmenuVisible || isOpen ? 1 : 0,
           visibility: mobileSubmenuVisible || isOpen ? "visible" : "hidden",
-          transition: "opacity .2s"
-        }}
-      >
+          transition: "opacity .2s",
+        }}>
         <Container>
           <Flex
             onClick={() => setIsOpen(!isOpen)}
@@ -61,9 +60,8 @@ const DocsMobileSubMenu = ({
               fontSize: "24px",
               lineHeight: "29px",
               letterSpacing: "-0.04em",
-              fontWeight: 600
-            }}
-          >
+              fontWeight: 600,
+            }}>
             {pathname.includes("/docs/api") ? (
               <Box>API Reference</Box>
             ) : (
@@ -82,17 +80,15 @@ const DocsMobileSubMenu = ({
             width: "100%",
             bg: "rgba(0,0,0,.35)",
             overflow: "hidden",
-            transition: "height .2s"
+            transition: "height .2s",
           }}
-          onClick={handleClick}
-        >
+          onClick={handleClick}>
           <Container
             sx={{
               bg: "background",
               height: "calc(100vh - 228px)",
-              overflow: "auto"
-            }}
-          >
+              overflow: "auto",
+            }}>
             <TableOfContents
               onClose={() => setIsOpen(false)}
               tree={tree}

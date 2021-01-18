@@ -21,8 +21,7 @@ export default ({ copy, onCopy = () => {} }) => {
         alignItems: "center",
         justifyItems: "flex-end",
         cursor: "pointer",
-      }}
-    >
+      }}>
       <Input
         value={copy}
         spellCheck={false}

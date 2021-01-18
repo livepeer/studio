@@ -12,8 +12,7 @@ const Code = ({ language, value, children, className, ...rest }) => {
       {...rest}
       code={value ?? children}
       language={language}
-      theme={theme}
-    >
+      theme={theme}>
       {({ tokens, getLineProps, getTokenProps }) => (
         <pre className="codeblock-pre-container">
           {tokens.map((line, i) => {

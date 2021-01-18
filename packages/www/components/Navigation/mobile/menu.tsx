@@ -20,7 +20,7 @@ const Menu = ({
   token,
   user,
   links,
-  breadcrumb
+  breadcrumb,
 }: Props) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) setMobileMenuIsOpen(false);
@@ -37,26 +37,23 @@ const Menu = ({
         overflow: "hidden",
         width: "100%",
         zIndex: "dropdown",
-        visibility: mobileMenuIsOpen ? "visible" : "hidden"
+        visibility: mobileMenuIsOpen ? "visible" : "hidden",
       }}
-      onClick={handleClick}
-    >
+      onClick={handleClick}>
       <Container
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           py: 3,
-          bg: "background"
-        }}
-      >
+          bg: "background",
+        }}>
         <div sx={{ display: "flex", alignItems: "center" }}>
           <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType={!token} />
         </div>
         <IconButton
           sx={{ fontSize: 6 }}
-          onClick={() => setMobileMenuIsOpen(false)}
-        >
+          onClick={() => setMobileMenuIsOpen(false)}>
           <FiX size="24px" />
         </IconButton>
       </Container>
@@ -67,9 +64,8 @@ const Menu = ({
           display: "flex",
           flexDirection: "column",
           height: `calc(100vh -70px)`,
-          bg: "background"
-        }}
-      >
+          bg: "background",
+        }}>
         <Flex sx={{ flexDirection: "column" }}>
           {links.map((link) => (
             <Link
@@ -89,8 +85,7 @@ const Menu = ({
                   href="/app/admin"
                   variant="buttons.outline"
                   sx={{ mt: 3 }}
-                  isLink
-                >
+                  isLink>
                   Admin
                 </Button>
               )}
@@ -104,8 +99,7 @@ const Menu = ({
                 href="/login"
                 variant="buttons.outline"
                 sx={{ mt: 3 }}
-                isLink
-              >
+                isLink>
                 Login
               </Button>
             </>

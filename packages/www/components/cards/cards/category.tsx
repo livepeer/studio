@@ -15,7 +15,7 @@ const DocsCategoryCard = ({
   link,
   title,
   description,
-  className
+  className,
 }: Props) => (
   <Link href={link.href} as={link.asPath} passHref>
     <A
@@ -34,10 +34,9 @@ const DocsCategoryCard = ({
         "&:hover": {
           textDecoration: "none",
           boxShadow:
-            "0px 24px 40px rgba(0, 0, 0, 0.24), 0px 30px 30px rgba(0, 0, 0, 0.02)"
-        }
-      }}
-    >
+            "0px 24px 40px rgba(0, 0, 0, 0.24), 0px 30px 30px rgba(0, 0, 0, 0.02)",
+        },
+      }}>
       <div
         sx={{
           width: "100%",
@@ -45,9 +44,8 @@ const DocsCategoryCard = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          p: 3
-        }}
-      >
+          p: 3,
+        }}>
         <img {...img} sx={{ ...img.sx }} />
       </div>
       <h3
@@ -57,9 +55,8 @@ const DocsCategoryCard = ({
           fontWeight: 600,
           lineHeight: 1.2,
           mb: 2,
-          letterSpacing: "-0.03em"
-        }}
-      >
+          letterSpacing: "-0.03em",
+        }}>
         {title}
       </h3>
       {description && (
@@ -68,9 +65,8 @@ const DocsCategoryCard = ({
             color: "#A5A5A5",
             fontSize: "18px",
             lineHeight: "24px",
-            letterSpacing: "-0.03em"
-          }}
-        >
+            letterSpacing: "-0.03em",
+          }}>
           {description}
         </p>
       )}

@@ -21,13 +21,13 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
     stripeCustomerId,
     stripeCustomerSubscriptionId,
     stripeProductId,
-    billingDetails
+    billingDetails,
   }) {
     return stripe
       .createPaymentMethod({
         type: "card",
         card: cardElement,
-        billing_details: billingDetails
+        billing_details: billingDetails,
       })
       .then(async (result) => {
         const paymentMethod = result.paymentMethod;
@@ -39,7 +39,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
             stripeCustomerId,
             stripeCustomerPaymentMethodId: paymentMethod.id,
             stripeCustomerSubscriptionId,
-            stripeProductId
+            stripeProductId,
           })
             // If the card is declined, display an error to the user.
             .then((result: any) => {
@@ -56,7 +56,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
             .then((result) => {
               return {
                 paymentMethodId: paymentMethod.id,
-                subscription: result
+                subscription: result,
               };
             })
             // Some payment methods require a customer to be on session
@@ -84,14 +84,14 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
   function handlePaymentThatRequiresCustomerAction({
     subscription,
     invoice,
-    paymentMethodId
+    paymentMethodId,
   }) {
     let setupIntent = subscription.pending_setup_intent;
 
     if (setupIntent && setupIntent.status === "requires_action") {
       return stripe
         .confirmCardSetup(setupIntent.client_secret, {
-          payment_method: paymentMethodId
+          payment_method: paymentMethodId,
         })
         .then((result) => {
           if (result.error) {
@@ -109,7 +109,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
               return {
                 subscription: subscription,
                 invoice: invoice,
-                paymentMethodId: paymentMethodId
+                paymentMethodId: paymentMethodId,
               };
             }
           }
@@ -133,7 +133,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
         stripeCustomerId: user.stripeCustomerId,
         stripeCustomerPaymentMethodId: user.stripeCustomerPaymentMethodId,
         stripeCustomerSubscriptionId: user.stripeCustomerSubscriptionId,
-        stripeProductId
+        stripeProductId,
       });
       setStatus("succeeded");
       onSuccess();
@@ -152,9 +152,9 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
             line1: data.address,
             city: data.city,
             state: data.state,
-            postal_code: data.postalCode
-          }
-        }
+            postal_code: data.postalCode,
+          },
+        },
       });
     }
   };
@@ -188,9 +188,8 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
                 gridTemplateColumns: "1fr 1fr",
                 width: "100%",
                 alignItems: "center",
-                mb: 3
-              }}
-            >
+                mb: 3,
+              }}>
               <Textfield
                 inputRef={register({ required: true })}
                 htmlFor="email"
@@ -237,9 +236,8 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
                 gridTemplateColumns: "1fr 1fr 1fr",
                 width: "100%",
                 alignItems: "center",
-                mb: 3
-              }}
-            >
+                mb: 3,
+              }}>
               <Textfield
                 inputRef={register({ required: true })}
                 htmlFor="city"
@@ -289,22 +287,20 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
                 pb: "5px",
                 mb: 3,
                 "&:hover": {
-                  borderColor: "primary"
+                  borderColor: "primary",
                 },
                 "&:focus": {
                   outline: "none",
-                  borderColor: "primary"
-                }
-              }}
-            >
+                  borderColor: "primary",
+                },
+              }}>
               <Box
                 sx={{
                   fontSize: 0,
                   color: "offBlack",
                   fontWeight: 500,
-                  mb: 1
-                }}
-              >
+                  mb: 1,
+                }}>
                 Card
               </Box>
               <CardElement
@@ -334,8 +330,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
               onAbort();
             }}
             variant="outlineSmall"
-            sx={{ mr: 2 }}
-          >
+            sx={{ mr: 2 }}>
             Cancel
           </Button>
           <Button
@@ -344,8 +339,7 @@ const PlanForm = ({ stripeProductId, onAbort, onSuccess }) => {
             disabled={
               !["initial", "succeeded", "error"].includes(status) || !stripe
             }
-            variant="primarySmall"
-          >
+            variant="primarySmall">
             Continue
           </Button>
         </Flex>

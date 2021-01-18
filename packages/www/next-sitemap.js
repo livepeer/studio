@@ -11,7 +11,7 @@ module.exports = {
       loc: url,
       changefreq: config.changefreq,
       priority: config.priority,
-      lastmod: config.autoLastmod ? new Date().toISOString() : undefined
+      lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
     };
-  }
+  },
 };

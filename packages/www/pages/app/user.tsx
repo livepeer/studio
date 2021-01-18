@@ -10,24 +10,24 @@ export function getTabs(i: number): Array<TabType> {
   let tabs: Array<TabType> = [
     {
       name: "Streams",
-      href: "/app/user"
+      href: "/app/user",
     },
     {
       name: "API Keys",
-      href: "/app/user/keys"
+      href: "/app/user/keys",
     },
     {
       name: "Test Player",
-      href: "/app/test-player"
+      href: "/app/test-player",
     },
     {
       name: "Usage",
-      href: "/app/user/usage"
+      href: "/app/user/usage",
     },
     {
       name: "Plans",
-      href: "/app/user/plans"
-    }
+      href: "/app/user/plans",
+    },
   ];
 
   // hide tabs that interact with stripe if it's not enabled in dev mode
@@ -38,12 +38,12 @@ export function getTabs(i: number): Array<TabType> {
     tabs = [
       {
         name: "Streams",
-        href: "/app/user"
+        href: "/app/user",
       },
       {
         name: "API Keys",
-        href: "/app/user/keys"
-      }
+        href: "/app/user/keys",
+      },
     ];
   }
 

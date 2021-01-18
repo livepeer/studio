@@ -14,7 +14,7 @@ const DefaultError = () => {
           left: "50%",
           top: "50%",
           transform: ["translate(-50%,-150%)", "translate(-50%, -50%)"],
-          zIndex: "-1"
+          zIndex: "-1",
         }}
       />
       <Container sx={{ py: "250px", my: "auto" }}>
@@ -24,20 +24,17 @@ const DefaultError = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            textAlign: "center"
-          }}
-        >
+            textAlign: "center",
+          }}>
           <Heading
             as="h1"
-            sx={{ mb: 4, fontSize: [6, 7, 9], fontWeight: "bold" }}
-          >
+            sx={{ mb: 4, fontSize: [6, 7, 9], fontWeight: "bold" }}>
             Something went wrong.
           </Heading>
           <Text
             sx={{
-              fontSize: [3, 3, 4]
-            }}
-          >
+              fontSize: [3, 3, 4],
+            }}>
             The page you requested could not be found.
           </Text>
           <Button sx={{ my: "30px" }} href="/" isLink>

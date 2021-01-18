@@ -25,7 +25,7 @@ const RegisterPage = () => {
     firstName,
     lastName,
     organization,
-    phone
+    phone,
   }) => {
     const selectedPlan = router.query?.selectedPlan;
     setLoading(true);
@@ -37,7 +37,7 @@ const RegisterPage = () => {
       ...(firstName && { firstName }),
       ...(lastName && { lastName }),
       ...(organization && { organization }),
-      ...(phone && { phone })
+      ...(phone && { phone }),
     });
     // Don't need to worry about the success case, we'll redirect
     if (res.errors) {
@@ -52,18 +52,16 @@ const RegisterPage = () => {
           justifyContent: "center",
           flexGrow: 1,
           flexDirection: "column",
-          py: 5
-        }}
-      >
+          py: 5,
+        }}>
         <h3 sx={{ mb: 4 }}>Create an Account</h3>
         <Box
           sx={{
             mb: 4,
             textAlign: "center",
             maxWidth: 630,
-            mx: "auto"
-          }}
-        >
+            mx: "auto",
+          }}>
           Sign up to try Livepeer.com's video-centric UGC platform, and qualify
           for 1,000 free transcoding input minutes per month.
         </Box>

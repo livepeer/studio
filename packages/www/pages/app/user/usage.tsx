@@ -63,9 +63,8 @@ const Usage = () => {
           width: "100%",
           pt: 5,
           pb: 5,
-          borderColor: "muted"
-        }}
-      >
+          borderColor: "muted",
+        }}>
         <Container>
           <Heading as="h2" sx={{ fontSize: 5, mb: 2 }}>
             Usage
@@ -82,9 +81,8 @@ const Usage = () => {
             textAlign: "center",
             mb: 4,
             fontSize: 1,
-            textTransform: "uppercase"
-          }}
-        >
+            textTransform: "uppercase",
+          }}>
           {subscription && (
             <Box>
               {new Date(
@@ -92,7 +90,7 @@ const Usage = () => {
               ).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
-                day: "numeric"
+                day: "numeric",
               })}{" "}
               -{" "}
               {new Date(
@@ -100,7 +98,7 @@ const Usage = () => {
               ).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
-                day: "numeric"
+                day: "numeric",
               })}{" "}
             </Box>
           )}
@@ -111,9 +109,8 @@ const Usage = () => {
               flexDirection: "column",
               alignItems: "center",
               py: 3,
-              px: 4
-            }}
-          >
+              px: 4,
+            }}>
             <Flex sx={{ alignItems: "center" }}>
               <Box sx={{ mr: 2, fontWeight: "500", fontSize: 5 }}>
                 {usage &&
@@ -126,9 +123,8 @@ const Usage = () => {
                 sx={{
                   alignItems: "center",
                   fontSize: 2,
-                  color: "gray"
-                }}
-              >
+                  color: "gray",
+                }}>
                 /
                 {!products[user.stripeProductId].order ? (
                   <span sx={{ mt: "3px", ml: 2 }}>1,000 min</span>
@@ -194,9 +190,8 @@ const Usage = () => {
             sx={{
               fontWeight: 600,
               textAlign: "center",
-              mb: !products[user.stripeProductId].order ? 3 : 4
-            }}
-          >
+              mb: !products[user.stripeProductId].order ? 3 : 4,
+            }}>
             Upcoming Invoice
           </Box>
           {!products[user.stripeProductId].order ? (
@@ -205,9 +200,8 @@ const Usage = () => {
                 maxWidth: 600,
                 mx: "auto",
                 textAlign: "center",
-                color: "offBlack"
-              }}
-            >
+                color: "offBlack",
+              }}>
               The Personal plan is free of charge up to 1000 minutes per month
               and limited to 10 concurrent viewers per account
             </Box>

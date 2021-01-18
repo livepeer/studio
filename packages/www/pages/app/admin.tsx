@@ -10,33 +10,33 @@ export function getTabs(i: number): Array<TabType> {
     {
       name: "Users",
       href: "/app/admin",
-      isActive: false
+      isActive: false,
     },
     {
       name: "API Keys",
       href: "/app/admin/keys",
-      isActive: false
+      isActive: false,
     },
     {
       name: "Streams",
       href: "/app/admin/streams",
-      isActive: false
+      isActive: false,
     },
     {
       name: "Webhooks",
       href: "/app/admin/webhooks",
-      isActive: false
+      isActive: false,
     },
     {
       name: "Usage",
       href: "/app/admin/usage",
-      isActive: false
+      isActive: false,
     },
     {
       name: "Tools",
       href: "/app/admin/tools",
-      isActive: false
-    }
+      isActive: false,
+    },
   ];
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }

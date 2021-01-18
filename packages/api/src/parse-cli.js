@@ -1,16 +1,16 @@
-import yargs from 'yargs'
-import path from 'path'
-import os from 'os'
+import yargs from "yargs";
+import path from "path";
+import os from "os";
 
 function coerceArr(arg) {
   if (!Array.isArray(arg)) {
-    const arr = []
+    const arr = [];
     for (const [key, value] of Object.entries(arg)) {
-      arr[key] = value
+      arr[key] = value;
     }
-    return arr
+    return arr;
   }
-  return arg
+  return arg;
 }
 
 export default function parseCli(argv) {
@@ -24,171 +24,169 @@ export default function parseCli(argv) {
 
     --broadcaster and --orchestrator options should be of the form
     [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
-    `,
+    `
       )
-      .env('LP_')
+      .env("LP_")
       //.strict(true)
       .options({
         port: {
-          describe: 'port to listen on',
+          describe: "port to listen on",
           default: 3004,
           demandOption: true,
-          type: 'number',
+          type: "number",
         },
-        'postgres-url': {
-          describe: 'url of a postgres database',
-          type: 'string',
+        "postgres-url": {
+          describe: "url of a postgres database",
+          type: "string",
           demandOption: true,
-          default: 'postgresql://postgres@localhost/livepeer',
+          default: "postgresql://postgres@localhost/livepeer",
         },
-        'postgres-replica-url': {
-          describe: 'url of a postgres read replica database',
-          type: 'string',
+        "postgres-replica-url": {
+          describe: "url of a postgres read replica database",
+          type: "string",
         },
-        'client-id': {
-          describe: 'google auth ID',
-          type: 'string',
+        "client-id": {
+          describe: "google auth ID",
+          type: "string",
         },
-        'frontend-domain': {
-          describe: 'the domain used in templating urls, example: livepeer.org',
-          type: 'string',
+        "frontend-domain": {
+          describe: "the domain used in templating urls, example: livepeer.org",
+          type: "string",
         },
-        'kube-namespace': {
+        "kube-namespace": {
           describe:
             "namespace of the Kubernetes cluster we're in. required for Kubernetes service discovery.",
-          type: 'string',
+          type: "string",
         },
-        'kube-broadcaster-service': {
-          describe: 'name of the service we should look at for broadcasters.',
-          type: 'string',
+        "kube-broadcaster-service": {
+          describe: "name of the service we should look at for broadcasters.",
+          type: "string",
         },
-        'kube-broadcaster-template': {
+        "kube-broadcaster-template": {
           describe:
-            'template string of the form https://{{nodeName}}.example.com to give broadcasters external identity.',
-          type: 'string',
-          default: 'https://{{nodeName}}.livepeer.live',
+            "template string of the form https://{{nodeName}}.example.com to give broadcasters external identity.",
+          type: "string",
+          default: "https://{{nodeName}}.livepeer.live",
         },
-        'kube-orchestrator-service': {
-          describe: 'name of the service we should look at for orchestrators.',
-          type: 'string',
+        "kube-orchestrator-service": {
+          describe: "name of the service we should look at for orchestrators.",
+          type: "string",
         },
-        'kube-orchestrator-template': {
+        "kube-orchestrator-template": {
           describe:
-            'template string of the form {{ip}} for the broadcaster webhook.',
-          type: 'string',
-          default: 'https://{{ip}}:8935',
+            "template string of the form {{ip}} for the broadcaster webhook.",
+          type: "string",
+          default: "https://{{ip}}:8935",
         },
-        'http-prefix': {
-          describe: 'accept requests at this prefix',
-          default: '/api',
+        "http-prefix": {
+          describe: "accept requests at this prefix",
+          default: "/api",
           demandOption: true,
-          type: 'string',
+          type: "string",
         },
-        'fallback-proxy': {
+        "fallback-proxy": {
           describe:
-            'if a request would otherwise be a 404, send it here instead. useful for dev.',
-          type: 'string',
+            "if a request would otherwise be a 404, send it here instead. useful for dev.",
+          type: "string",
         },
-        'jwt-secret': {
+        "jwt-secret": {
           describe:
-            'phrase used to sign JSON web token, a way to securely transmit information between parties',
-          type: 'string',
+            "phrase used to sign JSON web token, a way to securely transmit information between parties",
+          type: "string",
         },
-        'jwt-audience': {
-          describe: 'identifies the recipients that the JWT is intended for',
-          type: 'string',
+        "jwt-audience": {
+          describe: "identifies the recipients that the JWT is intended for",
+          type: "string",
         },
         broadcasters: {
           describe:
-            'hardcoded list of broadcasters to return from /api/broadcaster.',
-          type: 'string',
-          default: '[]',
+            "hardcoded list of broadcasters to return from /api/broadcaster.",
+          type: "string",
+          default: "[]",
         },
         orchestrators: {
           describe:
-            'hardcoded list of orchestrators to return from /api/orchestrator.',
-          type: 'string',
-          default: '[]',
+            "hardcoded list of orchestrators to return from /api/orchestrator.",
+          type: "string",
+          default: "[]",
         },
         ingest: {
           describe:
-            'hardcoded list of ingest points to return from /api/ingest.',
-          type: 'string',
-          default: '[]',
+            "hardcoded list of ingest points to return from /api/ingest.",
+          type: "string",
+          default: "[]",
         },
         supportAddr: {
           describe:
-            'email address where outgoing emails originate. should be of the form name/email@example.com',
-          type: 'string',
+            "email address where outgoing emails originate. should be of the form name/email@example.com",
+          type: "string",
           coerce: (supportAddr) => {
-            const split = supportAddr.split('/')
+            const split = supportAddr.split("/");
             if (split.length !== 2) {
               throw new Error(
-                `supportAddr should be of the form name/email, got ${supportAddr}`,
-              )
+                `supportAddr should be of the form name/email, got ${supportAddr}`
+              );
             }
-            return split
+            return split;
           },
         },
         sendgridApiKey: {
-          describe: 'sendgrid api key for sending emails',
-          type: 'string',
+          describe: "sendgrid api key for sending emails",
+          type: "string",
         },
         segmentApiKey: {
-          describe: 'segment api key for tracking events',
-          type: 'string',
+          describe: "segment api key for tracking events",
+          type: "string",
         },
         sendgridTemplateId: {
-          describe: 'sendgrid template id to use',
-          type: 'string',
+          describe: "sendgrid template id to use",
+          type: "string",
         },
         insecureTestToken: {
           describe:
-            '[DO NOT USE EXCEPT FOR TESTING] token that test harness can use to bypass validation and access the database',
-          type: 'string',
+            "[DO NOT USE EXCEPT FOR TESTING] token that test harness can use to bypass validation and access the database",
+          type: "string",
         },
         region: {
           describe:
-            'list of ingest endpoints to use as options for /api/geolocate',
-          type: 'array',
+            "list of ingest endpoints to use as options for /api/geolocate",
+          type: "array",
           default: [],
           coerce: coerceArr,
         },
-        'ingest-region': {
+        "ingest-region": {
           describe:
-            'list of ingest endpoints to use as servers to consult for /api/ingest',
-          type: 'array',
+            "list of ingest endpoints to use as servers to consult for /api/ingest",
+          type: "array",
           default: [],
           coerce: coerceArr,
         },
-        'api-region': {
+        "api-region": {
           describe:
-            'list of api endpoints to forward on incoming API requests. defining this delegates all non-geolocation tasks to the upstream servers',
-          type: 'array',
+            "list of api endpoints to forward on incoming API requests. defining this delegates all non-geolocation tasks to the upstream servers",
+          type: "array",
           default: [],
           coerce: coerceArr,
         },
-        'record-object-store-id': {
+        "record-object-store-id": {
           describe:
             "id of the object store that should be used for `record: true` requests that don't otherwise have an os",
-          type: 'string',
+          type: "string",
         },
-        'base-stream-name': {
+        "base-stream-name": {
           describe:
-            'base stream name to be used in wildcard-based routing scheme.',
+            "base stream name to be used in wildcard-based routing scheme.",
         },
-        'own-region': {
-          describe:
-            "identify region in which this server runs (fra, mdw, etc)",
-          type: 'string',
+        "own-region": {
+          describe: "identify region in which this server runs (fra, mdw, etc)",
+          type: "string",
         },
-        'consul': {
-          describe:
-            "url of the Consul agent",
-          type: 'string',
+        consul: {
+          describe: "url of the Consul agent",
+          type: "string",
         },
       })
       .help()
       .parse(argv)
-  )
+  );
 }

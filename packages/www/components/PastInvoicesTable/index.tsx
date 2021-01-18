@@ -19,7 +19,7 @@ const PastInvoicesTable = ({ invoices }) => {
             <Box>
               {new Date(invoice.created * 1000).toLocaleDateString("en-US", {
                 year: "numeric",
-                month: "long"
+                month: "long",
               })}
             </Box>
             <Box>
@@ -40,8 +40,7 @@ const PastInvoicesTable = ({ invoices }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href={invoice.hosted_invoice_url}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+                sx={{ display: "flex", alignItems: "center" }}>
                 Invoice
                 <FiArrowUpRight sx={{ ml: 1 }} />
               </A>

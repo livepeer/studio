@@ -29,9 +29,8 @@ export const RecordingURL = ({ id, status, recUrl }: RecordingURLProps) => {
       sx={{
         justifyContent: "flex-start",
         alignItems: "center",
-        wordBreak: "break-all"
-      }}
-    >
+        wordBreak: "break-all",
+      }}>
       {recUrl ? (
         <CopyToClipboard text={recUrl} onCopy={() => setCopied(2000)}>
           <Flex sx={{ alignItems: "center" }}>
@@ -40,11 +39,10 @@ export const RecordingURL = ({ id, status, recUrl }: RecordingURLProps) => {
                 fontSize: 12,
                 fontFamily: "monospace",
                 mr: 1,
-                wordBreak: "break-all"
+                wordBreak: "break-all",
               }}
               href={recUrl}
-              target="_blank"
-            >
+              target="_blank">
               {breakablePath(recUrl)}
             </a>
             <Copy
@@ -53,7 +51,7 @@ export const RecordingURL = ({ id, status, recUrl }: RecordingURLProps) => {
                 cursor: "pointer",
                 width: 14,
                 height: 14,
-                color: "offBlack"
+                color: "offBlack",
               }}
             />
           </Flex>
@@ -68,7 +66,7 @@ export const RecordingURL = ({ id, status, recUrl }: RecordingURLProps) => {
 
 const StreamSessionsTable = ({
   streamId,
-  mt = null
+  mt = null,
 }: {
   streamId: string;
   mt?: string | number;
@@ -98,9 +96,8 @@ const StreamSessionsTable = ({
       <h4 sx={{ mb: "0.5em" }}>Sessions</h4>
       <Table
         sx={{
-          gridTemplateColumns: "auto auto"
-        }}
-      >
+          gridTemplateColumns: "auto auto",
+        }}>
         <TableRow variant={TableRowVariant.Header}>
           <Box>Last Active</Box>
           <Box>Recording URL</Box>
@@ -115,14 +112,12 @@ const StreamSessionsTable = ({
                     mt: "0.8em",
                     mb: -10,
                     gridColumn: "1/-1",
-                    fontSize: [8, 10]
-                  }}
-                >
+                    fontSize: [8, 10],
+                  }}>
                   <a
                     target="_blank"
                     href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
-                    sx={{ userSelect: "all" }}
-                  >
+                    sx={{ userSelect: "all" }}>
                     Papertrail link {stream.id}
                   </a>
                 </Box>

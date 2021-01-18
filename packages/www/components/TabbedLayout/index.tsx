@@ -10,7 +10,7 @@ type TabbedLayoutProps = {
 
 const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
   tabs,
-  children
+  children,
 }) => {
   return (
     <Layout>
@@ -18,9 +18,8 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
         sx={{
           flexDirection: "column",
           flexGrow: 1,
-          alignItems: "center"
-        }}
-      >
+          alignItems: "center",
+        }}>
         <Tabs tabs={tabs} />
         {children}
       </Flex>

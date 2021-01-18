@@ -17,7 +17,7 @@ const Login = ({
   buttonText,
   onSubmit,
   loading,
-  errors
+  errors,
 }) => {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
@@ -49,7 +49,7 @@ const Login = ({
             firstName,
             lastName,
             organization,
-            phone
+            phone,
           });
         }}
         sx={{
@@ -61,18 +61,16 @@ const Login = ({
           mb: 3,
           maxWidth: 600,
           ml: "auto",
-          mr: "auto"
+          mr: "auto",
         }}
-        id={id}
-      >
+        id={id}>
         {showName && (
           <Grid
             sx={{
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
-              alignItems: "center"
-            }}
-          >
+              alignItems: "center",
+            }}>
             <Textfield
               htmlFor="firstName"
               id="firstName"
@@ -102,9 +100,8 @@ const Login = ({
             sx={{
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
-              alignItems: "center"
-            }}
-          >
+              alignItems: "center",
+            }}>
             <Textfield
               htmlFor="organization"
               id="organization"

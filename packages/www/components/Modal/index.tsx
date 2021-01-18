@@ -25,20 +25,18 @@ export default ({ children, onClose, maxWidth = "500px" }) => {
         backgroundColor: "rgba(0,0,0,0.5)",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100
+        zIndex: 100,
       }}
-      onClick={onClose}
-    >
+      onClick={onClose}>
       <Box
         sx={{
           borderRadius: 6,
           backgroundColor: "white",
           padding: [4, 4],
           width: "100%",
-          maxWidth
+          maxWidth,
         }}
-        onClick={(e) => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
         {children}
       </Box>
     </Flex>

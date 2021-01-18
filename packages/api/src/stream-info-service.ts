@@ -1,8 +1,8 @@
-import 'source-map-support/register'
-import makeApp from './app/stream-info/stream-info-app'
-import yargs from 'yargs'
-import path from 'path'
-import os from 'os'
+import "source-map-support/register";
+import makeApp from "./app/stream-info/stream-info-app";
+import yargs from "yargs";
+import path from "path";
+import os from "os";
 
 function parseCli() {
   return (
@@ -13,41 +13,41 @@ function parseCli() {
 
     Options my also be provided as LP_ prefixed environment variables, e.g. LP_PORT=5000 is the same as --port=5000.
 
-    `,
+    `
       )
-      .env('LP_')
+      .env("LP_")
       //.strict(true)
       .options({
         port: {
-          describe: 'port to listen on',
+          describe: "port to listen on",
           default: 3010,
           demandOption: true,
-          type: 'number',
+          type: "number",
         },
         host: {
-          describe: 'host to bind to',
-          type: 'string',
-          default: 'localhost',
+          describe: "host to bind to",
+          type: "string",
+          default: "localhost",
         },
         broadcaster: {
-          describe: 'broadcaster host:port to fetch info from',
-          type: 'string',
-          default: 'localhost:7935',
+          describe: "broadcaster host:port to fetch info from",
+          type: "string",
+          default: "localhost:7935",
         },
-        'postgres-url': {
-          describe: 'url of a postgres database',
-          type: 'string',
+        "postgres-url": {
+          describe: "url of a postgres database",
+          type: "string",
           demandOption: true,
         },
       })
       .help()
       .parse()
-  )
+  );
 }
 
 function main() {
-  require('dotenv').config()
-  makeApp(parseCli())
+  require("dotenv").config();
+  makeApp(parseCli());
 }
 
-main()
+main();

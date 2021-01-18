@@ -30,9 +30,8 @@ const LoginPage = () => {
           flexGrow: 1,
           flexDirection: "column",
           mx: [3, 0],
-          py: 6
-        }}
-      >
+          py: 6,
+        }}>
         <h3 sx={{ mb: 4 }}>Log in</h3>
         <Login
           id="login"

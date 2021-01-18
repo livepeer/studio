@@ -44,10 +44,9 @@ const Textfield = ({
         position: "relative",
         minWidth: "0",
         flexDirection: "column",
-        verticalAlign: "top"
+        verticalAlign: "top",
       }}
-      {...props}
-    >
+      {...props}>
       <Box
         as="label"
         sx={{
@@ -72,11 +71,10 @@ const Textfield = ({
           padding: 0,
           fontSize: 16,
           lineHeight: 1,
-          fontWeight: fixedLabel ? 500 : 400
+          fontWeight: fixedLabel ? 500 : 400,
         }}
         htmlFor={htmlFor}
-        id={id}
-      >
+        id={id}>
         {label}
       </Box>
       <Box
@@ -90,9 +88,8 @@ const Textfield = ({
           fontSize: "1rem",
           boxSizing: "border-box",
           alignItems: "center",
-          lineHeight: "1.1875em"
-        }}
-      >
+          lineHeight: "1.1875em",
+        }}>
         <Box
           as={as ? as : "input"}
           rows={rows}
@@ -127,7 +124,7 @@ const Textfield = ({
             borderColor: "ultraLightGray",
             transition: "border-color .2s",
             "&:hover": {
-              borderColor: "primary"
+              borderColor: "primary",
             },
             "&:focus": {
               outline: "none",
@@ -135,9 +132,9 @@ const Textfield = ({
                 variant === "outlined"
                   ? "0px 0px 0px 3px rgba(148, 60, 255, 0.3)"
                   : "none",
-              borderColor: "primary"
+              borderColor: "primary",
             },
-            ...pushInputSx
+            ...pushInputSx,
           }}
           id={id}
           type={type}
@@ -150,9 +147,8 @@ const Textfield = ({
             color: error ? "red" : messageColor,
             pt: "62px",
             pl: "12px",
-            fontSize: 0
-          }}
-        >
+            fontSize: 0,
+          }}>
           {message}
         </Box>
       )}

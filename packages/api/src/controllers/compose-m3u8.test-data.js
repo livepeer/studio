@@ -13,7 +13,7 @@ export const playlist1 = `#EXTM3U
 #EXTINF:1.791,
 /stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/545.ts
 #EXTINF:1.500,
-/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/546.ts`
+/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/546.ts`;
 
 export const playlist2 = `#EXTM3U
 #EXT-X-VERSION:3
@@ -30,7 +30,7 @@ export const playlist2 = `#EXTM3U
 #EXTINF:1.625,
 /stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/544.ts
 #EXTINF:2.000,
-/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/547.ts`
+/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/547.ts`;
 
 export const playlist3 = `#EXTM3U
 #EXT-X-VERSION:3
@@ -47,7 +47,7 @@ export const playlist3 = `#EXTM3U
 #EXTINF:1.167,
 /stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/541.ts
 #EXTINF:2.000,
-/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/550.ts`
+/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/550.ts`;
 
 export const combinedPlaylist = `#EXTM3U
 #EXT-X-VERSION:3
@@ -76,28 +76,28 @@ test://playlist1/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/545.
 #EXTINF:1.500,
 test://playlist1/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/546.ts
 #EXTINF:2.000,
-test://playlist2/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/547.ts`
+test://playlist2/stream/60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9/547.ts`;
 
 export const masterPlaylist1 = `#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=4000000,RESOLUTION=0x0
 60f2242c-f588-4752-a779-e15b6384a720/source.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=400000,RESOLUTION=256x144
-60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9.m3u8`
+60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9.m3u8`;
 
 export const masterPlaylist2 = `#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=4000000,RESOLUTION=0x0
 60f2242c-f588-4752-a779-e15b6384a720/source.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=1200000,RESOLUTION=640x360
-60f2242c-f588-4752-a779-e15b6384a720/P360p30fps16x9.m3u8`
+60f2242c-f588-4752-a779-e15b6384a720/P360p30fps16x9.m3u8`;
 
 export const masterPlaylist3 = `#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=400000,RESOLUTION=256x144
 60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=1200000,RESOLUTION=640x360
-60f2242c-f588-4752-a779-e15b6384a720/P360p30fps16x9.m3u8`
+60f2242c-f588-4752-a779-e15b6384a720/P360p30fps16x9.m3u8`;
 
 export const combinedMasterPlaylist = `#EXTM3U
 #EXT-X-VERSION:3
@@ -106,10 +106,10 @@ export const combinedMasterPlaylist = `#EXTM3U
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=1200000,RESOLUTION=640x360
 60f2242c-f588-4752-a779-e15b6384a720/P360p30fps16x9.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=0,BANDWIDTH=400000,RESOLUTION=256x144
-60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9.m3u8`
+60f2242c-f588-4752-a779-e15b6384a720/P144p30fps16x9.m3u8`;
 
 export const emptyPlaylist = `#EXTM3U
-#EXT-X-VERSION:3`
+#EXT-X-VERSION:3`;
 
 export const longPlaylistStore = `#EXTM3U
 #EXT-X-VERSION:3
@@ -160,7 +160,7 @@ test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/sourc
 #EXTINF:2.000,
 test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/21.ts
 #EXTINF:2.000,
-test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/22.ts`
+test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/22.ts`;
 
 export const longPlaylistBroadcaster = `#EXTM3U
 #EXT-X-VERSION:3
@@ -177,7 +177,7 @@ export const longPlaylistBroadcaster = `#EXTM3U
 #EXTINF:2.000,
 /stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/25.ts
 #EXTINF:2.000,
-/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`
+/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`;
 
 export const longPlaylistCombined = `#EXTM3U
 #EXT-X-VERSION:3
@@ -236,7 +236,7 @@ test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/sourc
 #EXTINF:2.000,
 test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/25.ts
 #EXTINF:2.000,
-test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`
+test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`;
 
 export const longPlaylistCombinedTen = `#EXTM3U
 #EXT-X-VERSION:3
@@ -261,13 +261,13 @@ test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/sourc
 #EXTINF:2.000,
 test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/25.ts
 #EXTINF:2.000,
-test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`
+test://longPlaylistBroadcaster/stream/6e028727-bb4d-4cf4-8bc0-cad57de4cd89/source/26.ts`;
 
 export const longPlaylistStoreRewritten = longPlaylistStore.replace(
   /test:\/\/longPlaylistBroadcaster\/stream/g,
-  'https://example.com/store',
-)
+  "https://example.com/store"
+);
 export const longPlaylistCombinedRewritten = longPlaylistCombined.replace(
   /test:\/\/longPlaylistBroadcaster\/stream/g,
-  'https://example.com/store',
-)
+  "https://example.com/store"
+);
