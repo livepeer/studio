@@ -61,6 +61,20 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
       }}
     >
       <figure sx={{ width: "100%", position: "relative" }}>
+        <img
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            objectFit: "cover",
+            height: "100%",
+            width: "100%"
+          }}
+          src="/hero-videos/poster.png"
+          alt="video poster"
+        />
         {videos.map(({ src }, i) => (
           <video
             onEnded={() => onVideoEnded(i)}
