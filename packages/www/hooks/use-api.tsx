@@ -116,12 +116,18 @@ const makeContext = (state: ApiState, setState) => {
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
-      const endpoint =
+
+      let endpoint =
         window.location.hostname.includes("livepeer.monster") ||
         window.location.hostname.includes("livepeerorg.vercel.app") ||
         window.location.hostname.includes("livepeerorg.now.sh")
           ? `https://livepeer.monster/api${url}`
           : `/api${url}`;
+
+      if (process.env.NODE_ENV === "development") {
+        endpoint = `http://0.0.0.0:3004/api${url}`;
+      }
+
       const res = await fetch(endpoint, {
         ...opts,
         headers,

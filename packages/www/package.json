@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "yarn run md-docs && cd ../api && yarn run prepare",
     "md-docs": "npx swagger-markdown -i ../api/src/schema/schema.yaml -o ./reference-api.md",
-    "dev": "next --port=3008",
+    "dev": "next",
     "build": "next build",
     "start": "next start",
     "postbuild": "next-sitemap"
