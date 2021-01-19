@@ -19,10 +19,9 @@ const StyledA = ({ href, children }) => {
         "&:hover": {
           textDecoration: "none",
           transition: ".3s opacity",
-          opacity: 0.75
-        }
-      }}
-    >
+          opacity: 0.75,
+        },
+      }}>
       {children}
     </a>
   );
@@ -45,7 +44,7 @@ const components = {
   a: StyledA,
   ul: Styled.ul,
   ol: Styled.ol,
-  li: Styled.li
+  li: Styled.li,
 };
 
 const MarkdownProvider = ({ children }) => (

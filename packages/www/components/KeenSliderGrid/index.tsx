@@ -7,7 +7,7 @@ import {
   useState,
   useCallback,
   Children,
-  isValidElement
+  isValidElement,
 } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
@@ -26,7 +26,7 @@ type Props = {
 const keenSliderGridDefaultBreakpoints: Breakpoint[] = [
   { value: "320px", slidesPerView: 1 },
   { value: "664px", slidesPerView: 2 },
-  { value: "1152px", slidesPerView: 3 }
+  { value: "1152px", slidesPerView: 3 },
 ];
 
 const getMedia = (value: string) => `(min-width: ${value})`;
@@ -36,7 +36,7 @@ const KeenSliderGrid: React.FC<Props> = ({
   config,
   pushSx,
   breakpoints = keenSliderGridDefaultBreakpoints,
-  withArrowControls = false
+  withArrowControls = false,
 }) => {
   const [slidesPerView, setSlidesPerView] = useState(3);
 
@@ -44,7 +44,7 @@ const KeenSliderGrid: React.FC<Props> = ({
     slidesPerView,
     duration: 1000,
     spacing: 20,
-    ...config
+    ...config,
   });
 
   const handleScreenSizeChange = useCallback(() => {
@@ -102,9 +102,8 @@ const KeenSliderGrid: React.FC<Props> = ({
           position: "relative",
           overflow: "visible",
           width: "100%",
-          ...pushSx
-        }}
-      >
+          ...pushSx,
+        }}>
         {Children.map(children, (child) => {
           // Add the keen-slider__slide className to children
           if (isValidElement(child)) {
@@ -114,8 +113,8 @@ const KeenSliderGrid: React.FC<Props> = ({
                 ...child.props,
                 className: `${
                   child.props.className ? `${child.props.className} ` : ""
-                }keen-slider__slide`
-              }
+                }keen-slider__slide`,
+              },
             };
           }
           return child;
@@ -127,9 +126,8 @@ const KeenSliderGrid: React.FC<Props> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            mt: 4
-          }}
-        >
+            mt: 4,
+          }}>
           <IconButton
             sx={{
               borderRadius: "full",
@@ -139,10 +137,9 @@ const KeenSliderGrid: React.FC<Props> = ({
               mr: 2,
               color: "gray",
               transition: "color .1s",
-              "&:hover": { color: "text" }
+              "&:hover": { color: "text" },
             }}
-            onClick={slider?.prev}
-          >
+            onClick={slider?.prev}>
             <FiChevronLeft />
           </IconButton>
           <IconButton
@@ -153,10 +150,9 @@ const KeenSliderGrid: React.FC<Props> = ({
               fontSize: 4,
               color: "gray",
               transition: "color .1s",
-              "&:hover": { color: "text" }
+              "&:hover": { color: "text" },
             }}
-            onClick={slider?.next}
-          >
+            onClick={slider?.next}>
             <FiChevronRight />
           </IconButton>
         </Box>

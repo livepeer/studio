@@ -25,7 +25,7 @@ const Player = ({ src, posterUrl, config = {} }) => {
       player,
       ui,
       videoElement: video.current,
-      config: {}
+      config: {},
     };
 
     return () => {

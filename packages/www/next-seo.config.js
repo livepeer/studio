@@ -17,14 +17,14 @@ export default {
         url: "https://livepeer.com/img/share-icon.png",
         width: 325,
         height: 325,
-        alt: "Livepeer"
-      }
+        alt: "Livepeer",
+      },
     ],
-    site_name: "Livepeer"
+    site_name: "Livepeer",
   },
   twitter: {
     handle: "@livepeerorg",
     site: "@site",
-    cardType: "summary_large_image"
-  }
+    cardType: "summary_large_image",
+  },
 };

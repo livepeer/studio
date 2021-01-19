@@ -6,7 +6,7 @@ import {
   Flex,
   Input,
   Container,
-  Heading
+  Heading,
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
@@ -60,8 +60,7 @@ export default ({ userId, id }: TokenTableProps) => {
                   .catch((e) => {
                     setCreating(false);
                   });
-              }}
-            >
+              }}>
               <Heading as={"h3"} sx={{ mb: 2 }}>
                 Create token
               </Heading>
@@ -74,15 +73,13 @@ export default ({ userId, id }: TokenTableProps) => {
                 label="Name"
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
-                placeholder="New Token"
-              ></Input>
+                placeholder="New Token"></Input>
               <Flex sx={{ justifyContent: "flex-end", pt: 3 }}>
                 <Button
                   type="button"
                   variant="outlineSmall"
                   onClick={close}
-                  sx={{ mr: 2 }}
-                >
+                  sx={{ mr: 2 }}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primarySmall">
@@ -110,9 +107,8 @@ export default ({ userId, id }: TokenTableProps) => {
                 sx={{
                   justifyContent: "space-between",
                   alignItems: "center",
-                  py: 3
-                }}
-              >
+                  py: 3,
+                }}>
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>
                 <Button type="button" variant="primarySmall" onClick={close}>
                   Close
@@ -131,8 +127,7 @@ export default ({ userId, id }: TokenTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}
-            >
+              sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -140,8 +135,7 @@ export default ({ userId, id }: TokenTableProps) => {
               variant="primarySmall"
               onClick={() => {
                 deleteApiToken(selectedToken.id).then(close);
-              }}
-            >
+              }}>
               Delete
             </Button>
           </Flex>
@@ -154,15 +148,13 @@ export default ({ userId, id }: TokenTableProps) => {
           sx={{ mr: 2 }}
           onClick={() => {
             setCreateModal(true);
-          }}
-        >
+          }}>
           Create
         </Button>
         <Button
           variant="primarySmall"
           disabled={!selectedToken}
-          onClick={() => selectedToken && setDeleteModal(true)}
-        >
+          onClick={() => selectedToken && setDeleteModal(true)}>
           Delete
         </Button>
       </Box>
@@ -198,8 +190,7 @@ export default ({ userId, id }: TokenTableProps) => {
                 } else {
                   setSelectedToken(token);
                 }
-              }}
-            >
+              }}>
               <Checkbox value={selected} />
               <Box>{name}</Box>
               <Box>{formattedLastSeen}</Box>

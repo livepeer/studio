@@ -46,7 +46,7 @@ const Layout = ({
   noindex = false,
   preview = false,
   withGradientBackground,
-  customNav
+  customNav,
 }: Props) => {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
@@ -64,10 +64,10 @@ const Layout = ({
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/share-icon.png",
-          alt: image ? image.alt : "Livepeer.com"
-        }
-      ]
-    }
+          alt: image ? image.alt : "Livepeer.com",
+        },
+      ],
+    },
   };
   return (
     <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
@@ -79,9 +79,8 @@ const Layout = ({
             top: 0,
             width: "100%",
             pointerEvents: "none",
-            zIndex: 0
-          }}
-        >
+            zIndex: 0,
+          }}>
           <GradientBackgroundBox
             id="layout"
             gradient="violet"
@@ -96,9 +95,8 @@ const Layout = ({
           flexDirection: "column",
           justifyContent: "flex-start",
           zIndex: 1,
-          position: "relative"
-        }}
-      >
+          position: "relative",
+        }}>
         {preview && (
           <Box
             sx={{
@@ -111,9 +109,8 @@ const Layout = ({
               fontWeight: "500",
               bg: "primary",
               color: "white",
-              lineHeight: "32px"
-            }}
-          >
+              lineHeight: "32px",
+            }}>
             Preview Mode
           </Box>
         )}

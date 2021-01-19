@@ -63,7 +63,7 @@ const Debugger = () => {
             <form
               sx={{
                 display: "flex",
-                justifyContent: "flex-start"
+                justifyContent: "flex-start",
               }}
               onSubmit={(e: any) => {
                 e.preventDefault();
@@ -73,8 +73,7 @@ const Debugger = () => {
                 }
                 setManifestUrl(e.target.manifestUrl.value);
                 doGetInfo(e.target.manifestUrl.value);
-              }}
-            >
+              }}>
               <Input
                 sx={{ width: "30em" }}
                 label="manifestUrl"
@@ -88,8 +87,7 @@ const Debugger = () => {
                 variant="primarySmall"
                 aria-label="Get info button"
                 disabled={loading}
-                sx={{ ml: 2 }}
-              >
+                sx={{ ml: 2 }}>
                 Load my stream
               </Button>
             </form>
@@ -103,9 +101,8 @@ const Debugger = () => {
               <Grid
                 sx={{
                   mb: 4,
-                  gridTemplateColumns: "repeat(2, 1fr)"
-                }}
-              >
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                }}>
                 <Box>
                   <Box sx={{ mb: 2, fontWeight: 600 }}>
                     Source (highest resolution only)
@@ -123,9 +120,9 @@ const Debugger = () => {
                         "mute",
                         "volume",
                         "spacer",
-                        "fullscreen"
+                        "fullscreen",
                       ],
-                      overflowMenuButtons: []
+                      overflowMenuButtons: [],
                     }}
                   />
                 </Box>
@@ -146,9 +143,9 @@ const Debugger = () => {
                         "volume",
                         "spacer",
                         "fullscreen",
-                        "overflow_menu"
+                        "overflow_menu",
                       ],
-                      overflowMenuButtons: ["quality"]
+                      overflowMenuButtons: ["quality"],
                     }}
                   />
                 </Box>
@@ -163,9 +160,8 @@ const Debugger = () => {
                   width: "100%",
                   fontSize: 1,
                   gridGap: "10px",
-                  gridTemplateColumns: "200px auto"
-                }}
-              >
+                  gridTemplateColumns: "200px auto",
+                }}>
                 <Box>Status:</Box>
                 <Box>{info.stream.isActive ? "Active" : "Idle"}</Box>
 
@@ -174,14 +170,13 @@ const Debugger = () => {
                   sx={{
                     pre: {
                       padding: "0 !important",
-                      background: "transparent !important"
+                      background: "transparent !important",
                     },
                     code: {
                       overflowX: "auto",
-                      whiteSpace: "pre-wrap"
-                    }
-                  }}
-                >
+                      whiteSpace: "pre-wrap",
+                    },
+                  }}>
                   <SyntaxHighlighter language={"json"}>
                     {JSON.stringify(info.session.profiles)}
                   </SyntaxHighlighter>

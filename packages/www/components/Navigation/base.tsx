@@ -3,7 +3,7 @@ import {
   Flex,
   Container,
   Link as A,
-  IconButton
+  IconButton,
 } from "@theme-ui/components";
 import Link from "../Link";
 import { useApi } from "../../hooks";
@@ -28,7 +28,7 @@ const NavigationBase = ({
   links,
   breadcrumb,
   withShadow = true,
-  pushSx
+  pushSx,
 }: Props) => {
   const { pathname } = useRouter();
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -72,20 +72,21 @@ const NavigationBase = ({
         position: "sticky",
         top: 0,
         zIndex: mobileMenuIsOpen ? 22 : 22,
-        ...pushSx
-      }}
-    >
+        ...pushSx,
+      }}>
       <Container>
         <Flex
           sx={{
             py: 3,
             justifyContent: "space-between",
-            alignItems: "center"
-          }}
-        >
+            alignItems: "center",
+          }}>
           <div
-            sx={{ minWidth: sidesWidth, display: "flex", alignItems: "center" }}
-          >
+            sx={{
+              minWidth: sidesWidth,
+              display: "flex",
+              alignItems: "center",
+            }}>
             <NavigationBreadcrumb
               breadcrumb={breadcrumb}
               withLogoType={!isDashboard}
@@ -97,9 +98,8 @@ const NavigationBase = ({
                 display: ["none", "none", "flex"],
                 width: "100%",
                 justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
+                alignItems: "center",
+              }}>
               {links.map((link) => (
                 <Link {...link} key={`nav-link-${link.href}`} variant="nav" />
               ))}
@@ -110,24 +110,21 @@ const NavigationBase = ({
               display: ["none", "none", "flex"],
               alignItems: "center",
               justifyContent: "flex-end",
-              minWidth: sidesWidth
-            }}
-          >
+              minWidth: sidesWidth,
+            }}>
             {!loggedIn && (
               <>
                 <Link
                   href="/login"
                   variant="nav"
-                  sx={{ fontWeight: 600, mr: 3 }}
-                >
+                  sx={{ fontWeight: 600, mr: 3 }}>
                   Log in
                 </Link>
                 <Button
                   sx={{ py: "6px" }}
                   variant="buttons.primarySmall"
                   href="/register"
-                  isLink
-                >
+                  isLink>
                   Sign up
                 </Button>
               </>
@@ -141,8 +138,7 @@ const NavigationBase = ({
                       sx={{ mr: 4, py: "6px" }}
                       isLink
                       href="/app/user/plans"
-                      variant="buttons.gradientOutlineSmall"
-                    >
+                      variant="buttons.gradientOutlineSmall">
                       Upgrade
                     </Button>
                   )}
@@ -164,8 +160,7 @@ const NavigationBase = ({
                 <A
                   variant="nav"
                   sx={{ mr: 3, cursor: "pointer" }}
-                  onClick={() => logout()}
-                >
+                  onClick={() => logout()}>
                   Log Out
                 </A>
                 {!isDashboard && (
@@ -173,8 +168,7 @@ const NavigationBase = ({
                     sx={{ py: "6px" }}
                     isLink
                     href="/app/user"
-                    variant="buttons.primarySmall"
-                  >
+                    variant="buttons.primarySmall">
                     Dashboard
                   </Button>
                 )}
@@ -186,10 +180,9 @@ const NavigationBase = ({
               color: "black",
               display: ["flex", "flex", "none"],
               fontSize: 6,
-              flexShrink: 0
+              flexShrink: 0,
             }}
-            onClick={() => setMobileMenuIsOpen(true)}
-          >
+            onClick={() => setMobileMenuIsOpen(true)}>
             <FiMenu size="24px" />
           </IconButton>
         </Flex>

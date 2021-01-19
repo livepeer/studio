@@ -18,13 +18,12 @@ const Logo = ({ logoType = true, isDark }: Props) => (
         cursor: "pointer",
         letterSpacing: "-.5px",
         ":hover": {
-          textDecoration: "none"
-        }
-      }}
-    >
+          textDecoration: "none",
+        },
+      }}>
       <LogoSvg
         sx={{
-          color: isDark ? "background" : "text"
+          color: isDark ? "background" : "text",
         }}
       />
       {logoType && (
@@ -33,9 +32,8 @@ const Logo = ({ logoType = true, isDark }: Props) => (
             alignItems: "center",
             ml: "12px",
             fontWeight: 700,
-            fontSize: "22px"
-          }}
-        >
+            fontSize: "22px",
+          }}>
           Livepeer.com
         </Flex>
       )}
@@ -49,9 +47,8 @@ const Logo = ({ logoType = true, isDark }: Props) => (
           borderRadius: 1000,
           px: 2,
           py: "2px",
-          bg: "rgb(148, 60, 255, .1)"
-        }}
-      >
+          bg: "rgb(148, 60, 255, .1)",
+        }}>
         beta
       </span>
     </A>

@@ -14,7 +14,7 @@ import {
   breakpoints,
   maxScroll,
   getDynamicBreakpoints,
-  getPhonePadding
+  getPhonePadding,
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 import { Heading } from "@theme-ui/components";
@@ -99,27 +99,24 @@ const HomeHero = () => {
         mt: [3, 3, 4, 0],
         overflow: "hidden",
         pt: 6,
-        pb: "65px"
-      }}
-    >
+        pb: "65px",
+      }}>
       <Container
         sx={{
           minHeight: ["auto", "auto", "calc(100vh - 130px)"],
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          px: [3, null, 0]
-        }}
-      >
+          px: [3, null, 0],
+        }}>
         <Box
           sx={{
             width: "100%",
             mb: [4, 4, 4, 0],
             maxWidth: 1000,
             mx: "auto",
-            textAlign: "center"
-          }}
-        >
+            textAlign: "center",
+          }}>
           <div sx={{ zIndex: notchZIndex + 1, position: "relative" }}>
             <Styled.h1 sx={{ fontSize: [40, 56, 64, 72] }}>
               <span sx={{ fontWeight: 400 }}>The platform built to power</span>
@@ -131,16 +128,14 @@ const HomeHero = () => {
                 e.preventDefault();
                 router.push(`/register?email=${encodeURIComponent(email)}`);
               }}
-              sx={{ mt: 5 }}
-            >
+              sx={{ mt: 5 }}>
               <Flex
                 sx={{
                   flexDirection: ["column", "row"],
                   justifyContent: "center",
                   width: "100%",
-                  alignItems: "center"
-                }}
-              >
+                  alignItems: "center",
+                }}>
                 <Textfield
                   required
                   type="email"
@@ -158,9 +153,8 @@ const HomeHero = () => {
                     height: "55px",
                     ml: [0, 3],
                     mt: [3, 0],
-                    width: ["100%", "unset"]
-                  }}
-                >
+                    width: ["100%", "unset"],
+                  }}>
                   Get Started
                 </Button>
               </Flex>
@@ -175,9 +169,8 @@ const HomeHero = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-end"
-            }}
-          >
+              justifyContent: "flex-end",
+            }}>
             <div
               ref={videoContainerRef}
               sx={{
@@ -185,9 +178,8 @@ const HomeHero = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 width: "100vw",
-                zIndex: notchZIndex - 1
-              }}
-            >
+                zIndex: notchZIndex - 1,
+              }}>
               <HeroVideo ref={videoRef} />
             </div>
             <PhoneSvg ref={phoneRef} />

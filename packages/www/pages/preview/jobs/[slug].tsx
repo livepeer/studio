@@ -11,16 +11,16 @@ export async function getServerSideProps({ params }) {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     {
       headers: {
-        authorization: `Bearer ${process.env.SANITY_API_TOKEN}`
-      }
+        authorization: `Bearer ${process.env.SANITY_API_TOKEN}`,
+      },
     }
   );
 
   let data: any = await graphQLClient.request(print(allJobs), {
     where: {
       _: { is_draft: true },
-      slug: { current: { eq: slug } }
-    }
+      slug: { current: { eq: slug } },
+    },
   });
 
   // if in preview mode but no draft exists, then return published post
@@ -28,8 +28,8 @@ export async function getServerSideProps({ params }) {
     data = await graphQLClient.request(print(allJobs), {
       where: {
         _: { is_draft: false },
-        slug: { current: { eq: slug } }
-      }
+        slug: { current: { eq: slug } },
+      },
     });
   }
 
@@ -39,7 +39,7 @@ export async function getServerSideProps({ params }) {
     props: {
       ...job,
       noindex: true,
-      preview: true
-    }
+      preview: true,
+    },
   };
 }

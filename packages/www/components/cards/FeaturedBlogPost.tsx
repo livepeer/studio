@@ -63,10 +63,9 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           ":hover": {
             textDecoration: "none",
             boxShadow:
-              "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-          }
-        }}
-      >
+              "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+          },
+        }}>
         {post.mainImage && (
           <img
             alt={post.mainImage?.alt}
@@ -75,7 +74,7 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             sx={{
               height: "100%",
               width: "40%",
-              objectFit: "cover"
+              objectFit: "cover",
             }}
             className="lazyload"
             data-src={builder.image(post.mainImage).url()}
@@ -87,9 +86,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             px: 32,
             flexDirection: "column",
             justifyContent: "space-between",
-            height: cardContentHeight
-          }}
-        >
+            height: cardContentHeight,
+          }}>
           <div>
             <Box
               sx={{
@@ -99,9 +97,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 fontSize: "12px",
                 letterSpacing: "-0.02em",
                 fontWeight: 600,
-                height: categoryTagHeight
-              }}
-            >
+                height: categoryTagHeight,
+              }}>
               {post.category.title}
             </Box>
             <Flex
@@ -109,9 +106,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 alignItems: "center",
                 pt: 3,
                 pb: 24,
-                height: authorHeight
-              }}
-            >
+                height: authorHeight,
+              }}>
               <img
                 alt={post.author.image?.alt}
                 width={30}
@@ -122,7 +118,7 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   width: 30,
                   borderRadius: 1000,
                   objectFit: "cover",
-                  mr: 3
+                  mr: 3,
                 }}
                 className="lazyload"
                 data-src={builder.image(post.author.image).url()}
@@ -132,9 +128,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   fontWeight: 600,
                   textOverflow: "ellipsis",
                   overflow: "hidden",
-                  whiteSpace: "nowrap"
-                }}
-              >
+                  whiteSpace: "nowrap",
+                }}>
                 {post.author.name}
               </Box>
               <Box sx={{ mx: 2, width: "2px", height: 16, bg: "grey" }} />
@@ -142,9 +137,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 sx={{
                   textOverflow: "ellipsis",
                   overflow: "hidden",
-                  whiteSpace: "nowrap"
-                }}
-              >
+                  whiteSpace: "nowrap",
+                }}>
                 {stats.text}
               </Box>
             </Flex>
@@ -156,9 +150,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 letterSpacing: "-0.03em",
                 fontWeight: 500,
                 pb: 3,
-                transition: "color .3s"
-              }}
-            >
+                transition: "color .3s",
+              }}>
               {post.title}
             </h2>
             <Box
@@ -169,10 +162,9 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 WebkitLineClamp: excerptMaxLines,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                display: excerptMaxLines <= 0 ? "none" : "-webkit-box"
+                display: excerptMaxLines <= 0 ? "none" : "-webkit-box",
               }}
-              ref={excerptRef}
-            >
+              ref={excerptRef}>
               {post.excerpt}
             </Box>
           </div>

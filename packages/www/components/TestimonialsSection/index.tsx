@@ -10,8 +10,8 @@ const testimonials: TestimonialCardProps[] = [
     author: {
       name: "Flávio Ribeiro",
       role: "Director of Engineering",
-      company: "CBS Interactive"
-    }
+      company: "CBS Interactive",
+    },
   },
   {
     quote:
@@ -20,8 +20,8 @@ const testimonials: TestimonialCardProps[] = [
     author: {
       name: "Ben Rubin",
       role: "CEO",
-      company: "Houseparty (Acquired by Epic Games)"
-    }
+      company: "Houseparty (Acquired by Epic Games)",
+    },
   },
   {
     quote:
@@ -30,9 +30,9 @@ const testimonials: TestimonialCardProps[] = [
     author: {
       name: "Tom Burman",
       role: "Co-founder",
-      company: "PlayDJ.TV"
-    }
-  }
+      company: "PlayDJ.TV",
+    },
+  },
 ];
 
 const TestimonialsSection = () => (
@@ -40,14 +40,12 @@ const TestimonialsSection = () => (
     id="testimonials"
     gradient="colorful"
     gradientSx={{ minWidth: ["5000px", null, null, "unset"] }}
-    slide
-  >
+    slide>
     <Container sx={{ py: [5, 6] }}>
       <Grid
         sx={{ justifyContent: "center", alignItems: "center" }}
         gap={[3, 3, 3, 4]}
-        columns={[1, null, null, testimonials.length]}
-      >
+        columns={[1, null, null, testimonials.length]}>
         {testimonials.map((testimonial, i) => (
           <TestimonialCard key={i} {...testimonial} />
         ))}

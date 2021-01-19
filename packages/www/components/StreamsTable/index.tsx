@@ -27,7 +27,7 @@ type Rendition = {
 const Profile = ({
   id,
   i,
-  rendition: { fps, name, width, height, bitrate }
+  rendition: { fps, name, width, height, bitrate },
 }: ProfileProps) => {
   return (
     <Box
@@ -37,9 +37,8 @@ const Profile = ({
         padding: "0.5em",
         display: "grid",
         alignItems: "space-around",
-        gridTemplateColumns: "auto auto"
-      }}
-    >
+        gridTemplateColumns: "auto auto",
+      }}>
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -65,7 +64,7 @@ export const RelativeTime = ({
   id,
   prefix,
   tm,
-  swap = false
+  swap = false,
 }: RelativeTimeProps) => {
   const idpref = `time-${prefix}-${id}`;
   let main = moment.unix(tm / 1000.0).fromNow();
@@ -84,8 +83,7 @@ export const RelativeTime = ({
             className="tooltip"
             place="top"
             type="dark"
-            effect="solid"
-          >
+            effect="solid">
             {toolTip}
           </ReactTooltip>
           <span data-tip data-for={`tooltip-${idpref}`}>
@@ -101,7 +99,7 @@ export const RelativeTime = ({
 
 export const StreamName = ({
   stream,
-  admin = false
+  admin = false,
 }: {
   stream: Stream;
   admin?: boolean;
@@ -116,16 +114,14 @@ export const StreamName = ({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid"
-        >
+          effect="solid">
           Created by token <b>{stream.createdByTokenName}</b>
         </ReactTooltip>
       ) : null}
       <Box data-tip data-for={pid}>
         <Link
           href={{ pathname: "/app/stream/[id]", query }}
-          as={`/app/stream/${stream.id}`}
-        >
+          as={`/app/stream/${stream.id}`}>
           <a>{stream.name}</a>
         </Link>
       </Box>
@@ -171,8 +167,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid"
-            >
+              effect="solid">
               {detailsTooltip}
             </ReactTooltip>
             <Help
@@ -181,7 +176,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               sx={{
                 color: "muted",
                 cursor: "pointer",
-                ml: 1
+                ml: 1,
               }}
             />
           </Flex>
@@ -250,8 +245,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             variant="primarySmall"
             aria-label="Delete Stream button"
             disabled={!selectedStream.length}
-            onClick={() => selectedStream.length && setDeleteModal(true)}
-          >
+            onClick={() => selectedStream.length && setDeleteModal(true)}>
             Delete
           </Button>
         </Box>
@@ -266,8 +260,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               } else {
                 setSelectedStream([...streams]);
               }
-            }}
-          >
+            }}>
             <Checkbox
               value={streams.length && streams.length === selectedStream.length}
             />
@@ -286,7 +279,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             sourceSegments,
             transcodedSegments,
             createdAt,
-            isActive
+            isActive,
           } = stream;
           const selected =
             selectedStream && selectedStream.some((stream) => stream.id === id);
@@ -305,8 +298,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
                     selectedStream.push(stream);
                     setSelectedStream([...selectedStream]);
                   }
-                }}
-              >
+                }}>
                 <Checkbox value={selected} />
                 <StreamName stream={stream} />
                 <RenditionsDetails stream={stream} />

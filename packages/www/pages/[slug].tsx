@@ -18,9 +18,8 @@ const Page = ({ title, content, noindex = false, preview }) => {
             py: 5,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
+            justifyContent: "center",
+          }}>
           <Spinner />
         </Box>
       </Layout>
@@ -37,8 +36,7 @@ const Page = ({ title, content, noindex = false, preview }) => {
       description={`Scalable, secure live transcoding at a fraction of the cost`}
       url={`https://livepeer.com`}
       noindex={noindex}
-      preview={preview}
-    >
+      preview={preview}>
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}
@@ -51,7 +49,7 @@ export async function getStaticPaths() {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPages),
     {
-      where: {}
+      where: {},
     }
   );
   let paths = [];
@@ -65,7 +63,7 @@ export async function getStaticPaths() {
   );
   return {
     fallback: true,
-    paths
+    paths,
   };
 }
 
@@ -77,17 +75,17 @@ export async function getStaticProps({ params }) {
 
   let data: any = await graphQLClient.request(print(allPages), {
     where: {
-      slug: { current: { eq: slug } }
-    }
+      slug: { current: { eq: slug } },
+    },
   });
 
   let page = data.allPage.find((p) => p.slug.current === slug);
 
   return {
     props: {
-      ...page
+      ...page,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

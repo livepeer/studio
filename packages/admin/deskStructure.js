@@ -1,53 +1,53 @@
-import S from '@sanity/desk-tool/structure-builder'
+import S from "@sanity/desk-tool/structure-builder";
 import {
   MdDashboard,
   MdSettings,
   MdWork,
   MdDescription,
   MdPerson,
-} from 'react-icons/md'
+} from "react-icons/md";
 
 // We filter document types defined in structure to prevent
 // them from being listed twice
 const hiddenDocTypes = (listItem) =>
-  !['page', 'job', 'route', 'site-config'].includes(listItem.getId())
+  !["page", "job", "route", "site-config"].includes(listItem.getId());
 
 export default () =>
   S.list()
-    .title('Site')
+    .title("Site")
     .items([
       S.listItem()
-        .title('Site config')
+        .title("Site config")
         .icon(MdSettings)
         .child(
           S.editor()
-            .id('config')
-            .schemaType('site-config')
-            .documentId('global-config'),
+            .id("config")
+            .schemaType("site-config")
+            .documentId("global-config")
         ),
       S.listItem()
-        .title('Pages')
+        .title("Pages")
         .icon(MdDashboard)
-        .schemaType('page')
-        .child(S.documentTypeList('page').title('Pages')),
+        .schemaType("page")
+        .child(S.documentTypeList("page").title("Pages")),
       S.listItem()
-        .title('Blog Posts')
+        .title("Blog Posts")
         .icon(MdDescription)
-        .schemaType('post')
-        .child(S.documentTypeList('post').title('Blog Posts')),
+        .schemaType("post")
+        .child(S.documentTypeList("post").title("Blog Posts")),
       S.listItem()
-        .title('Blog Categories')
+        .title("Blog Categories")
         .icon(MdDescription)
-        .schemaType('category')
-        .child(S.documentTypeList('category').title('Categories')),
+        .schemaType("category")
+        .child(S.documentTypeList("category").title("Categories")),
       S.listItem()
-        .title('Authors')
+        .title("Authors")
         .icon(MdPerson)
-        .schemaType('author')
-        .child(S.documentTypeList('author').title('Authors')),
+        .schemaType("author")
+        .child(S.documentTypeList("author").title("Authors")),
       S.listItem()
-        .title('Jobs')
+        .title("Jobs")
         .icon(MdWork)
-        .schemaType('job')
-        .child(S.documentTypeList('job').title('Jobs')),
-    ])
+        .schemaType("job")
+        .child(S.documentTypeList("job").title("Jobs")),
+    ]);

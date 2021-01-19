@@ -1,32 +1,32 @@
 export default {
   widgets: [
     {
-      name: 'project-info',
+      name: "project-info",
       options: {
         data: [
           {
-            title: 'GitHub repo',
-            value: 'https://github.com/livepeer/livepeer.com',
-            category: 'Code',
+            title: "GitHub repo",
+            value: "https://github.com/livepeer/livepeer.com",
+            category: "Code",
           },
           {
-            title: 'Frontend',
-            value: 'https://livepeer.com',
-            category: 'apps',
+            title: "Frontend",
+            value: "https://livepeer.com",
+            category: "apps",
           },
         ],
       },
     },
-    { name: 'project-users', layout: { height: 'auto' } },
+    { name: "project-users", layout: { height: "auto" } },
     {
-      name: 'document-list',
+      name: "document-list",
       options: {
-        title: 'Recently edited',
-        order: '_updatedAt desc',
+        title: "Recently edited",
+        order: "_updatedAt desc",
         limit: 10,
-        types: ['page', 'job'],
+        types: ["page", "job"],
       },
-      layout: { width: 'medium' },
+      layout: { width: "medium" },
     },
   ],
-}
+};

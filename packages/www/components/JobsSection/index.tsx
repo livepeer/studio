@@ -15,21 +15,18 @@ export default ({ jobs }) => {
             transition: "all 200ms ease-in-out",
             ":hover": {
               boxShadow: "0 0 30px 0 rgba(0,0,0,0.12)",
-              borderRadius: "8px"
-            }
-          }}
-        >
+              borderRadius: "8px",
+            },
+          }}>
           <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
             <a
               sx={{
                 textDecoration: "none",
-                ":hover": { textDecoration: "underline" }
-              }}
-            >
+                ":hover": { textDecoration: "underline" },
+              }}>
               <Heading
                 as="h2"
-                sx={{ fontWeight: 600, fontSize: 3, color: "black" }}
-              >
+                sx={{ fontWeight: 600, fontSize: 3, color: "black" }}>
                 {j.title}
               </Heading>
             </a>
@@ -39,9 +36,8 @@ export default ({ jobs }) => {
               sx={{
                 textDecoration: "none",
                 ":hover": { textDecoration: "underline" },
-                color: "primary"
-              }}
-            >
+                color: "primary",
+              }}>
               Apply
             </a>
           </Link>

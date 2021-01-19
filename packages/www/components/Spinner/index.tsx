@@ -22,6 +22,5 @@ export default ({ loading, ...props }: Props) => (
       height: 26,
       animation: `${rotate} 1s linear`,
       animationIterationCount: "infinite",
-    }}
-  ></div>
+    }}></div>
 );

@@ -1,6 +1,6 @@
-import { InternalServerError, ForbiddenError } from '../store/errors'
-import jwt from 'jsonwebtoken'
-import tracking from './tracking'
+import { InternalServerError, ForbiddenError } from "../store/errors";
+import jwt from "jsonwebtoken";
+import tracking from "./tracking";
 
 /**
  * creates an authentication middleware that can be customized.
@@ -9,70 +9,70 @@ import tracking from './tracking'
 function authFactory(params) {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
-    const authToken = req.headers.authorization
-    let user
-    let tokenObject
-    let userId
+    const authToken = req.headers.authorization;
+    let user;
+    let tokenObject;
+    let userId;
 
     if (!authToken) {
-      throw new ForbiddenError(`no token object ${authToken} found`)
-    } else if (authToken.startsWith('Bearer')) {
-      tokenObject = await req.store.get(`api-token/${req.token}`)
+      throw new ForbiddenError(`no token object ${authToken} found`);
+    } else if (authToken.startsWith("Bearer")) {
+      tokenObject = await req.store.get(`api-token/${req.token}`);
       if (!tokenObject) {
-        throw new ForbiddenError(`no token object ${authToken} found`)
+        throw new ForbiddenError(`no token object ${authToken} found`);
       }
-      userId = tokenObject.userId
+      userId = tokenObject.userId;
       // track last seen
-      tracking.record(req.store, tokenObject)
-    } else if (authToken.startsWith('JWT')) {
-      const jwtToken = authToken.substr(4)
+      tracking.record(req.store, tokenObject);
+    } else if (authToken.startsWith("JWT")) {
+      const jwtToken = authToken.substr(4);
       try {
         const verified = jwt.verify(jwtToken, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
-        })
-        userId = verified.sub
+        });
+        userId = verified.sub;
       } catch (err) {
-        throw new ForbiddenError(err.message)
+        throw new ForbiddenError(err.message);
       }
     }
 
-    user = await req.store.get(`user/${userId}`)
+    user = await req.store.get(`user/${userId}`);
 
     if (!user) {
-      throw new InternalServerError(`no user found for token ${authToken}`)
+      throw new InternalServerError(`no user found for token ${authToken}`);
     }
 
     if (!params.allowUnverified && user.emailValid === false) {
       throw new ForbiddenError(
-        `useremail ${user.email} has not been verified. Please check your inbox for verification email.`,
-      )
+        `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
+      );
     }
 
-    req.user = user
-    req.authTokenType = authToken.startsWith('Bearer') ? 'Bearer' : 'JWT'
-    req.isUIAdmin = req.user.admin && req.authTokenType == 'JWT'
+    req.user = user;
+    req.authTokenType = authToken.startsWith("Bearer") ? "Bearer" : "JWT";
+    req.isUIAdmin = req.user.admin && req.authTokenType == "JWT";
     if (tokenObject && tokenObject.name) {
-      req.tokenName = tokenObject.name
+      req.tokenName = tokenObject.name;
     }
 
     if (params.admin) {
       // admins must have a JWT
       if (
-        (authToken.startsWith('JWT') && user.admin !== true) ||
-        authToken.startsWith('Bearer')
+        (authToken.startsWith("JWT") && user.admin !== true) ||
+        authToken.startsWith("Bearer")
       ) {
-        throw new ForbiddenError(`user does not have admin priviledges`)
+        throw new ForbiddenError(`user does not have admin priviledges`);
       }
     }
 
     if (params.anyAdmin) {
       if (user.admin !== true) {
-        throw new ForbiddenError(`user does not have admin priviledges`)
+        throw new ForbiddenError(`user does not have admin priviledges`);
       }
     }
-    return next()
-  }
+    return next();
+  };
 }
 
 // export default router
-export default authFactory
+export default authFactory;

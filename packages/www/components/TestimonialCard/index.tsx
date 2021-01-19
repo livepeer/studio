@@ -17,7 +17,7 @@ const TestimonialCard = ({
   id,
   quote,
   author,
-  pushSx
+  pushSx,
 }: TestimonialCardProps) => (
   <Box
     sx={{
@@ -33,9 +33,8 @@ const TestimonialCard = ({
       transition: "box-shadow .3s",
       boxShadow:
         "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
-      ...pushSx
-    }}
-  >
+      ...pushSx,
+    }}>
     <img
       alt={`${id} logo`}
       className="lazyload"
@@ -48,9 +47,8 @@ const TestimonialCard = ({
         alignItems: "center",
         justifyContent: "flex-start",
         marginTop: "auto",
-        height: [75, 90]
-      }}
-    >
+        height: [75, 90],
+      }}>
       <img
         alt={`${author.name} avatar`}
         src={`/img/testimonials/${id}/avatar.png`}
@@ -63,7 +61,7 @@ const TestimonialCard = ({
           objectFit: "cover",
           objectPosition: "center",
           borderRadius: 1000,
-          mr: 2
+          mr: 2,
         }}
       />
       <Box>

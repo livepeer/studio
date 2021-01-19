@@ -17,8 +17,7 @@ const SectionLayout = ({ children, heading, gradient }: Props) => (
   <GradientBackgroundBox
     id={slugify(heading.title)}
     gradient={gradient ?? null}
-    slide
-  >
+    slide>
     <Container variant="content" sx={{ pt: gradient ? [6, 7] : undefined }}>
       <div>
         <Text
@@ -28,17 +27,15 @@ const SectionLayout = ({ children, heading, gradient }: Props) => (
             fontWeight: "bold",
             letterSpacing: "0.24em",
             mb: 3,
-            fontSize: [1, 2]
-          }}
-        >
+            fontSize: [1, 2],
+          }}>
           {heading.tag}
         </Text>
         <Flex
           sx={{
             alignItems: ["flex-start", "center"],
-            flexDirection: ["column", "row"]
-          }}
-        >
+            flexDirection: ["column", "row"],
+          }}>
           <Heading sx={{ fontWeight: "bold" }} variant="heading.section">
             {heading.title}
           </Heading>

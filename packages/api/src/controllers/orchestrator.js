@@ -1,14 +1,14 @@
-import Router from 'express/lib/router'
+import Router from "express/lib/router";
 
-const app = Router()
+const app = Router();
 
 const getOrchestrators = async (req, res, next) => {
-  const orchestrators = await req.getOrchestrators(req)
+  const orchestrators = await req.getOrchestrators(req);
 
-  return res.json(orchestrators.map(({ address }) => ({ address })))
-}
+  return res.json(orchestrators.map(({ address }) => ({ address })));
+};
 
-app.get('/', getOrchestrators)
-app.get('/ext/:token', getOrchestrators)
+app.get("/", getOrchestrators);
+app.get("/ext/:token", getOrchestrators);
 
-export default app
+export default app;

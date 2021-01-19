@@ -1,73 +1,73 @@
-import serverPromise from '../test-server'
-import { TestClient, clearDatabase } from '../test-helpers'
-import uuid from 'uuid/v4'
+import serverPromise from "../test-server";
+import { TestClient, clearDatabase } from "../test-helpers";
+import uuid from "uuid/v4";
 
-let server
-let mockUser
-let mockAdminUser
-let mockNonAdminUser
+let server;
+let mockUser;
+let mockAdminUser;
+let mockNonAdminUser;
 
-jest.setTimeout(70000)
+jest.setTimeout(70000);
 
 beforeAll(async () => {
-  server = await serverPromise
+  server = await serverPromise;
   mockUser = {
     email: `mock_user@gmail.com`,
-    password: 'z'.repeat(64),
-  }
+    password: "z".repeat(64),
+  };
 
   mockAdminUser = {
-    email: 'user_admin@gmail.com',
-    password: 'x'.repeat(64),
-  }
+    email: "user_admin@gmail.com",
+    password: "x".repeat(64),
+  };
 
   mockNonAdminUser = {
-    email: 'user_non_admin@gmail.com',
-    password: 'y'.repeat(64),
-  }
-})
+    email: "user_non_admin@gmail.com",
+    password: "y".repeat(64),
+  };
+});
 
 afterEach(async () => {
-  await clearDatabase(server)
-})
+  await clearDatabase(server);
+});
 
-describe('controllers/api-token', () => {
-  describe('basic CRUD with JWT authorization', () => {
-    let client
-    let adminUser
-    let nonAdminToken
-    let nonAdminUser
+describe("controllers/api-token", () => {
+  describe("basic CRUD with JWT authorization", () => {
+    let client;
+    let adminUser;
+    let nonAdminToken;
+    let nonAdminUser;
 
     beforeEach(async () => {
       client = new TestClient({
         server,
-      })
+      });
 
       // setting up admin user and token
-      const userRes = await client.post(`/user/`, { ...mockAdminUser })
-      adminUser = await userRes.json()
+      const userRes = await client.post(`/user/`, { ...mockAdminUser });
+      adminUser = await userRes.json();
 
-      let tokenRes = await client.post(`/user/token`, { ...mockAdminUser })
-      const adminToken = await tokenRes.json()
-      client.jwtAuth = `${adminToken['token']}`
+      let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
+      const adminToken = await tokenRes.json();
+      client.jwtAuth = `${adminToken["token"]}`;
 
-      const user = await server.store.get(`user/${adminUser.id}`, false)
-      adminUser = { ...user, admin: true, emailValid: true }
-      await server.store.replace(adminUser)
+      const user = await server.store.get(`user/${adminUser.id}`, false);
+      adminUser = { ...user, admin: true, emailValid: true };
+      await server.store.replace(adminUser);
 
-      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser })
-      nonAdminUser = await nonAdminRes.json()
+      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser });
+      nonAdminUser = await nonAdminRes.json();
 
-      tokenRes = await client.post(`/user/token`, { ...mockNonAdminUser })
-      nonAdminToken = await tokenRes.json()
+      tokenRes = await client.post(`/user/token`, { ...mockNonAdminUser });
+      nonAdminToken = await tokenRes.json();
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
-        false,
-      )
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true }
-      await server.store.replace(nonAdminUser)
-    })
+        false
+      );
+      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
+      await server.store.replace(nonAdminUser);
+    });
 
     // it('should get all tokens with admin authorization', async () => {
     //   for (let i = 0; i < 4; i += 1) {
@@ -111,49 +111,49 @@ describe('controllers/api-token', () => {
     //   expect(apiTokens.length).toEqual(11)
     // })
 
-    it('should accept empty body for creating an apiToken', async () => {
-      const res = await client.post('/api-token')
-      expect(res.status).toBe(201)
-    })
+    it("should accept empty body for creating an apiToken", async () => {
+      const res = await client.post("/api-token");
+      expect(res.status).toBe(201);
+    });
 
-    it('should not accept additional properties for creating an apiToken', async () => {
-      const res = await client.post('/api-token', { livepeer: 'livepeer' })
-      expect(res.status).toBe(422)
-      const apiToken = await res.json()
-      expect(apiToken.id).toBeUndefined()
-    })
+    it("should not accept additional properties for creating an apiToken", async () => {
+      const res = await client.post("/api-token", { livepeer: "livepeer" });
+      expect(res.status).toBe(422);
+      const apiToken = await res.json();
+      expect(apiToken.id).toBeUndefined();
+    });
 
-    it('should create an apiToken, delete it, and error when attempting additional detele or replace', async () => {
-      const res = await client.post('/api-token')
-      expect(res.status).toBe(201)
-      const tokenRes = await res.json()
-      expect(tokenRes.id).toBeDefined()
+    it("should create an apiToken, delete it, and error when attempting additional detele or replace", async () => {
+      const res = await client.post("/api-token");
+      expect(res.status).toBe(201);
+      const tokenRes = await res.json();
+      expect(tokenRes.id).toBeDefined();
 
-      const resGet = await server.store.get(`api-token/${tokenRes.id}`)
-      expect(resGet.id).toEqual(tokenRes.id)
+      const resGet = await server.store.get(`api-token/${tokenRes.id}`);
+      expect(resGet.id).toEqual(tokenRes.id);
 
       // test that apiToken is deleted
-      await server.store.delete(`api-token/${tokenRes.id}`)
-      const deleted = await server.store.get(`api-token/${tokenRes.id}`)
-      expect(deleted).toBeDefined()
+      await server.store.delete(`api-token/${tokenRes.id}`);
+      const deleted = await server.store.get(`api-token/${tokenRes.id}`);
+      expect(deleted).toBeDefined();
 
       // it should return a NotFound Error when trying to delete a record that doesn't exist
-      let deleteTokenErr
+      let deleteTokenErr;
       try {
-        await server.store.delete(`api-token/${tokenRes.id}`)
+        await server.store.delete(`api-token/${tokenRes.id}`);
       } catch (err) {
-        deleteTokenErr = err
+        deleteTokenErr = err;
       }
-      expect(deleteTokenErr.status).toBe(404)
+      expect(deleteTokenErr.status).toBe(404);
 
-      let replaceError
+      let replaceError;
       try {
-        await server.store.replace(tokenRes)
+        await server.store.replace(tokenRes);
       } catch (err) {
-        replaceError = err
+        replaceError = err;
       }
-      expect(replaceError.status).toBe(404)
-    })
+      expect(replaceError.status).toBe(404);
+    });
 
     // it('should not get all apiTokens with non-admin user', async () => {
     //   // setting up non-admin user
@@ -174,102 +174,102 @@ describe('controllers/api-token', () => {
     //   expect(res.status).toBe(403)
     // })
 
-    it('should return all user apiTokens that belong to a user', async () => {
+    it("should return all user apiTokens that belong to a user", async () => {
       for (let i = 0; i < 4; i += 1) {
         const u = {
           userId: adminUser.id,
           id: uuid(),
-          kind: 'api-token',
-        }
-        await server.store.create(u)
-        const res = await client.get(`/api-token/${u.id}`)
-        expect(res.status).toBe(200)
-        const apiTokenRes = await res.json()
-        expect(apiTokenRes.userId).toEqual(adminUser.id)
-        expect(apiTokenRes.id).toEqual(u.id)
+          kind: "api-token",
+        };
+        await server.store.create(u);
+        const res = await client.get(`/api-token/${u.id}`);
+        expect(res.status).toBe(200);
+        const apiTokenRes = await res.json();
+        expect(apiTokenRes.userId).toEqual(adminUser.id);
+        expect(apiTokenRes.id).toEqual(u.id);
       }
 
-      let res = await client.get(`/api-token?userId=${adminUser.id}`)
-      expect(res.status).toBe(200)
-      let apiTokens = await res.json()
-      expect(apiTokens.length).toEqual(4)
+      let res = await client.get(`/api-token?userId=${adminUser.id}`);
+      expect(res.status).toBe(200);
+      let apiTokens = await res.json();
+      expect(apiTokens.length).toEqual(4);
 
       // create apiToken belonging to nonadmin user
       const u = {
         userId: nonAdminUser.id,
         id: uuid(),
-        kind: 'api-token',
-      }
-      await server.store.create(u)
-      res = await client.get(`/api-token/${u.id}`)
-      expect(res.status).toBe(200)
+        kind: "api-token",
+      };
+      await server.store.create(u);
+      res = await client.get(`/api-token/${u.id}`);
+      expect(res.status).toBe(200);
 
       // should return all apiTokens that belong to admin user
-      res = await client.get(`/api-token?userId=${adminUser.id}`)
-      expect(res.status).toBe(200)
-      let tokenRes = await res.json()
+      res = await client.get(`/api-token?userId=${adminUser.id}`);
+      expect(res.status).toBe(200);
+      let tokenRes = await res.json();
 
-      expect(tokenRes.length).toEqual(4)
+      expect(tokenRes.length).toEqual(4);
 
       // should return all apiTokens that belong to nonAdmin user as admin user
-      res = await client.get(`/api-token?userId=${nonAdminUser.id}`)
-      expect(res.status).toBe(200)
-      tokenRes = await res.json()
-      expect(tokenRes.length).toEqual(1)
+      res = await client.get(`/api-token?userId=${nonAdminUser.id}`);
+      expect(res.status).toBe(200);
+      tokenRes = await res.json();
+      expect(tokenRes.length).toEqual(1);
 
       // should return all apiTokens that belong to nonAdmin user as nonAdmin user
-      client.jwtAuth = `${nonAdminToken['token']}`
-      res = await client.get(`/api-token?userId=${nonAdminUser.id}`)
-      expect(res.status).toBe(200)
-      tokenRes = await res.json()
-      expect(tokenRes.length).toEqual(1)
+      client.jwtAuth = `${nonAdminToken["token"]}`;
+      res = await client.get(`/api-token?userId=${nonAdminUser.id}`);
+      expect(res.status).toBe(200);
+      tokenRes = await res.json();
+      expect(tokenRes.length).toEqual(1);
 
       // should not return all apiTokens that belong to admin user as nonAdmin user
-      res = await client.get(`/api-token?userId=${adminUser.id}`)
-      expect(res.status).toBe(403)
-    })
-  })
+      res = await client.get(`/api-token?userId=${adminUser.id}`);
+      expect(res.status).toBe(403);
+    });
+  });
 
-  describe('user endpoint with api key', () => {
-    let client
-    const adminApiKey = uuid()
-    const nonAdminApiKey = uuid()
+  describe("user endpoint with api key", () => {
+    let client;
+    const adminApiKey = uuid();
+    const nonAdminApiKey = uuid();
 
     beforeEach(async () => {
       client = new TestClient({
         server,
         apiKey: uuid(),
-      })
+      });
 
-      const userRes = await client.post(`/user/`, { ...mockAdminUser })
-      let adminUser = await userRes.json()
+      const userRes = await client.post(`/user/`, { ...mockAdminUser });
+      let adminUser = await userRes.json();
 
-      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser })
-      let nonAdminUser = await nonAdminRes.json()
+      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser });
+      let nonAdminUser = await nonAdminRes.json();
 
       await server.store.create({
         id: adminApiKey,
-        kind: 'api-token',
+        kind: "api-token",
         userId: adminUser.id,
-      })
+      });
 
       await server.store.create({
         id: nonAdminApiKey,
-        kind: 'api-token',
+        kind: "api-token",
         userId: nonAdminUser.id,
-      })
+      });
 
-      const user = await server.store.get(`user/${adminUser.id}`, false)
-      adminUser = { ...user, admin: true, emailValid: true }
-      await server.store.replace(adminUser)
+      const user = await server.store.get(`user/${adminUser.id}`, false);
+      adminUser = { ...user, admin: true, emailValid: true };
+      await server.store.replace(adminUser);
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
-        false,
-      )
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true }
-      await server.store.replace(nonAdminUser)
-    })
+        false
+      );
+      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
+      await server.store.replace(nonAdminUser);
+    });
 
     // it('should not get all apiTokens', async () => {
     //   client.apiKey = nonAdminApiKey
@@ -280,5 +280,5 @@ describe('controllers/api-token', () => {
     //   res = await client.get('/api-token')
     //   expect(res.status).toBe(403)
     // })
-  })
-})
+  });
+});

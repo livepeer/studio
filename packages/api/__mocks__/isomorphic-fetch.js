@@ -1,17 +1,17 @@
-import realFetch from 'isomorphic-fetch'
+import realFetch from "isomorphic-fetch";
 
-let mocks = {}
+let mocks = {};
 
 export const setMock = (url, responseGenerator) => {
-  mocks[url] = responseGenerator
-}
+  mocks[url] = responseGenerator;
+};
 export const clearMocks = () => {
-  mocks = {}
-}
+  mocks = {};
+};
 
 export default async (url, params) => {
   if (mocks[url]) {
-    return mocks[url]()
+    return mocks[url]();
   }
-  return realFetch(url, params)
-}
+  return realFetch(url, params);
+};

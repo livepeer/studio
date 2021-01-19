@@ -1,22 +1,22 @@
 // import { schemaWalk } from '@cloudflare/json-schema-walker'
-import validators from '../schema/validators'
+import validators from "../schema/validators";
 
 export const validatePost = (name) => {
-  const validate = validators[name]
+  const validate = validators[name];
   if (!validate) {
-    throw new Error(`no validator found for ${name}`)
+    throw new Error(`no validator found for ${name}`);
   }
 
   return (req, res, next) => {
-    const { body } = req
+    const { body } = req;
     if (!validate(body)) {
-      res.status(422)
+      res.status(422);
       return res.json({
         errors: validate.errors.map((err) => JSON.stringify(err)),
-      })
+      });
     }
-    next()
-  }
+    next();
+  };
 
   // Enforcement of required read-only properties, currently unused
 
@@ -38,7 +38,7 @@ export const validatePost = (name) => {
   //     return true
   //   })
   // })
-}
+};
 
 // Unused, should be rethought.
 

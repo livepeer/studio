@@ -32,8 +32,7 @@ const GradientBackgroundBox = ({
   return (
     <Box
       sx={{ position: "relative", overflow: "hidden", ...sx }}
-      {...moreProps}
-    >
+      {...moreProps}>
       {gradient && (
         <>
           {/* TODO: Improve the performance of the Slider */}
@@ -44,9 +43,8 @@ const GradientBackgroundBox = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 pointerEvents: "none",
-                top: 0
-              }}
-            >
+                top: 0,
+              }}>
               <Slider duration={4}>{gradientMarkup}</Slider>
             </div>
           ) : (
@@ -56,15 +54,13 @@ const GradientBackgroundBox = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 pointerEvents: "none",
-                top: 0
-              }}
-            >
+                top: 0,
+              }}>
               <div
                 sx={{
                   position: "relative",
-                  width: "100vw"
-                }}
-              >
+                  width: "100vw",
+                }}>
                 {gradientMarkup}
               </div>
             </div>

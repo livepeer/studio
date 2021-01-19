@@ -31,7 +31,7 @@ function flatten(items) {
 
 const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
   children,
-  pushSx
+  pushSx,
 }) => (
   <i
     sx={{
@@ -42,9 +42,8 @@ const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
       width: "16px",
       height: "16px",
       color: "text",
-      ...pushSx
-    }}
-  >
+      ...pushSx,
+    }}>
     {children}
   </i>
 );
@@ -73,9 +72,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             alignItems: "center",
             display: "flex",
             pl: "0",
-            py: "12px"
-          }}
-        >
+            py: "12px",
+          }}>
           <IconContainer>
             <Icon />
           </IconContainer>
@@ -89,7 +87,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
       fontWeight: 600,
       px: 2,
       py: "2px",
-      borderRadius: 4
+      borderRadius: 4,
     };
     return (
       <Link href={heading.slug} passHref>
@@ -110,10 +108,9 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             pl: isChildren ? "12px" : "0",
             display: "flex",
             ":hover": {
-              color: "primary"
-            }
-          }}
-        >
+              color: "primary",
+            },
+          }}>
           <IconContainer>
             <Icon />
           </IconContainer>
@@ -121,22 +118,21 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             sx={{
               ...(heading.content === "POST" && {
                 bg: "green",
-                ...labelStyles
+                ...labelStyles,
               }),
               ...(heading.content === "GET" && {
                 bg: "blue",
-                ...labelStyles
+                ...labelStyles,
               }),
               ...(heading.content === "DELETE" && {
                 bg: "red",
-                ...labelStyles
+                ...labelStyles,
               }),
               ...(heading.content === "PUT" && {
                 bg: "orange",
-                ...labelStyles
-              })
-            }}
-          >
+                ...labelStyles,
+              }),
+            }}>
             {heading.content}
           </Box>
         </a>
@@ -174,9 +170,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
           sx={{
             cursor: "pointer",
             alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
+            justifyContent: "space-between",
+          }}>
           <Box>{renderHeading(heading, hasChildren, isChildren)}</Box>
           {hasChildren && (
             <>
@@ -197,9 +192,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             sx={{
               display: isOpen || isActive ? "block" : "none",
               my: 0,
-              pl: "8px"
-            }}
-          >
+              pl: "8px",
+            }}>
             {renderChildren(children)}
           </Box>
         )}

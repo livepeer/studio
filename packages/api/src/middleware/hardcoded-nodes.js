@@ -9,25 +9,25 @@ export default function hardcodedNodes({
   ingest,
 }) {
   try {
-    broadcasters = JSON.parse(broadcasters)
-    orchestrators = JSON.parse(orchestrators)
-    ingest = JSON.parse(ingest)
+    broadcasters = JSON.parse(broadcasters);
+    orchestrators = JSON.parse(orchestrators);
+    ingest = JSON.parse(ingest);
   } catch (e) {
     console.error(
-      'Error parsing LP_BROADCASTERS and LP_ORCHESTRATORS and LP_INGEST',
-    )
-    throw e
+      "Error parsing LP_BROADCASTERS and LP_ORCHESTRATORS and LP_INGEST"
+    );
+    throw e;
   }
   return (req, res, next) => {
     if (!req.getBroadcasters) {
-      req.getBroadcasters = async () => broadcasters
+      req.getBroadcasters = async () => broadcasters;
     }
     if (!req.getOrchestrators) {
-      req.getOrchestrators = async () => orchestrators
+      req.getOrchestrators = async () => orchestrators;
     }
     if (!req.getIngest) {
-      req.getIngest = async () => ingest
+      req.getIngest = async () => ingest;
     }
-    next()
-  }
+    next();
+  };
 }

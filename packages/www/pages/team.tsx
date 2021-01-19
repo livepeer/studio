@@ -16,8 +16,7 @@ const TeamPage = ({ content }) => {
       title={`Team - Livepeer.com`}
       description={`We’re building the future of video infrastructure services.`}
       url={`https://livepeer.com/team`}
-      withGradientBackground
-    >
+      withGradientBackground>
       <Container variant="hero">
         <h1 sx={{ variant: "text.heading.hero" }}>
           We’re building the future of video infrastructure services.
@@ -44,16 +43,16 @@ export async function getStaticProps() {
 
   const data: any = await graphQLClient.request(print(allPages), {
     where: {
-      slug: { current: { eq: "team" } }
-    }
+      slug: { current: { eq: "team" } },
+    },
   });
 
   return {
     props: {
       ...data.allPage[0],
-      preview: false
+      preview: false,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

@@ -49,9 +49,8 @@ export default () => {
             alignItems: "center",
             textAlign: "center",
             height: "calc(100vh - 280px)",
-            mb: 65
-          }}
-        >
+            mb: 65,
+          }}>
           Verifying...
         </Flex>
       </Container>
@@ -66,9 +65,8 @@ export default () => {
           alignItems: "center",
           textAlign: "center",
           height: "calc(100vh - 280px)",
-          mb: 65
-        }}
-      >
+          mb: 65,
+        }}>
         <Flex
           sx={{
             width: 80,
@@ -76,14 +74,13 @@ export default () => {
             alignItems: "center",
             justifyContent: "center",
             bg: "primary",
-            borderRadius: 1000
-          }}
-        >
+            borderRadius: 1000,
+          }}>
           <LogoSvg
             sx={{
               color: "background",
               minWidth: 32,
-              minHeight: 32
+              minHeight: 32,
             }}
           />
         </Flex>

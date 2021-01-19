@@ -1,70 +1,70 @@
-import crypto from 'isomorphic-webcrypto'
-import util from 'util'
-import fetch from 'isomorphic-fetch'
-import SendgridMail from '@sendgrid/mail'
-import { db } from '../store'
-import sql from 'sql-template-strings'
+import crypto from "isomorphic-webcrypto";
+import util from "util";
+import fetch from "isomorphic-fetch";
+import SendgridMail from "@sendgrid/mail";
+import { db } from "../store";
+import sql from "sql-template-strings";
 
-let Encoder
-if (typeof TextEncoder === 'undefined') {
-  Encoder = util.TextEncoder
+let Encoder;
+if (typeof TextEncoder === "undefined") {
+  Encoder = util.TextEncoder;
 } else {
-  Encoder = TextEncoder
+  Encoder = TextEncoder;
 }
 
-const ITERATIONS = 10000
+const ITERATIONS = 10000;
 
 export async function hash(password, salt) {
-  let saltBuffer
+  let saltBuffer;
   if (salt) {
-    saltBuffer = fromHexString(salt)
+    saltBuffer = fromHexString(salt);
   } else {
-    saltBuffer = crypto.getRandomValues(new Uint8Array(8))
+    saltBuffer = crypto.getRandomValues(new Uint8Array(8));
   }
 
-  var encoder = new Encoder('utf-8')
-  var passphraseKey = encoder.encode(password)
+  var encoder = new Encoder("utf-8");
+  var passphraseKey = encoder.encode(password);
 
   // You should firstly import your passphrase Uint8array into a CryptoKey
   const key = await crypto.subtle.importKey(
-    'raw',
+    "raw",
     passphraseKey,
-    { name: 'PBKDF2' },
+    { name: "PBKDF2" },
     false,
-    ['deriveBits', 'deriveKey'],
-  )
+    ["deriveBits", "deriveKey"]
+  );
   const webKey = await crypto.subtle.deriveKey(
     {
-      name: 'PBKDF2',
+      name: "PBKDF2",
       salt: saltBuffer,
       // don't get too ambitious, or at least remember
       // that low-power phones will access your app
       iterations: ITERATIONS,
-      hash: 'SHA-256',
+      hash: "SHA-256",
     },
     key,
 
     // Note: for this demo we don't actually need a cipher suite,
     // but the api requires that it must be specified.
     // For AES the length required to be 128 or 256 bits (not bytes)
-    { name: 'AES-CBC', length: 256 },
+    { name: "AES-CBC", length: 256 },
 
     // Whether or not the key is extractable (less secure) or not (more secure)
     // when false, the key can only be passed as a web crypto object, not inspected
     true,
 
     // this web crypto object will only be allowed for these functions
-    ['encrypt', 'decrypt'],
-  )
-  const buffer = await crypto.subtle.exportKey('raw', webKey)
+    ["encrypt", "decrypt"]
+  );
+  const buffer = await crypto.subtle.exportKey("raw", webKey);
 
-  const outKey = bytesToHexString(new Uint8Array(buffer))
-  const outSalt = bytesToHexString(saltBuffer)
-  return [outKey, outSalt]
+  const outKey = bytesToHexString(new Uint8Array(buffer));
+  const outSalt = bytesToHexString(saltBuffer);
+  return [outKey, outSalt];
 }
 
 const fromHexString = (hexString) =>
-  new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
+  new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
 function bytesToHexString(bytes, separate) {
   /// <signature>
@@ -74,35 +74,35 @@ function bytesToHexString(bytes, separate) {
   ///     <returns type="String" />
   /// </signature>
 
-  var result = ''
-  if (typeof separate === 'undefined') {
-    separate = false
+  var result = "";
+  if (typeof separate === "undefined") {
+    separate = false;
   }
 
   for (var i = 0; i < bytes.length; i++) {
     if (separate && i % 4 === 0 && i !== 0) {
-      result += '-'
+      result += "-";
     }
 
-    var hexval = bytes[i].toString(16).toUpperCase()
+    var hexval = bytes[i].toString(16).toUpperCase();
     // Add a leading zero if needed.
     if (hexval.length === 1) {
-      result += '0'
+      result += "0";
     }
 
-    result += hexval
+    result += hexval;
   }
 
-  return result
+  return result;
 }
 
 export function makeNextHREF(req, nextCursor) {
   let baseUrl = new URL(
-    `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-  )
-  let next = baseUrl
-  next.searchParams.set('cursor', nextCursor)
-  return next.href
+    `${req.protocol}://${req.get("host")}${req.originalUrl}`
+  );
+  let next = baseUrl;
+  next.searchParams.set("cursor", nextCursor);
+  return next.href;
 }
 
 export async function sendgridEmail({
@@ -117,7 +117,7 @@ export async function sendgridEmail({
   buttonUrl,
   unsubscribe,
 }) {
-  const [supportName, supportEmail] = supportAddr
+  const [supportName, supportEmail] = supportAddr;
   const msg = {
     personalizations: [
       {
@@ -142,15 +142,15 @@ export async function sendgridEmail({
     },
     // email template id: https://mc.sendgrid.com/dynamic-templates
     template_id: sendgridTemplateId,
-  }
+  };
 
-  SendgridMail.setApiKey(sendgridApiKey)
-  await SendgridMail.send(msg)
+  SendgridMail.setApiKey(sendgridApiKey);
+  await SendgridMail.send(msg);
 }
 
 export async function trackAction(userId, email, event, apiKey) {
   if (!apiKey) {
-    return
+    return;
   }
 
   const identifyInfo = {
@@ -159,12 +159,12 @@ export async function trackAction(userId, email, event, apiKey) {
       email,
     },
     email,
-  }
-  await fetchSegmentApi(identifyInfo, 'identify', apiKey)
+  };
+  await fetchSegmentApi(identifyInfo, "identify", apiKey);
 
-  let properties = {}
-  if ('properties' in event) {
-    properties = { ...properties, ...event.properties }
+  let properties = {};
+  if ("properties" in event) {
+    properties = { ...properties, ...event.properties };
   }
 
   const trackInfo = {
@@ -172,24 +172,24 @@ export async function trackAction(userId, email, event, apiKey) {
     event: event.name,
     email,
     properties,
-  }
+  };
 
-  await fetchSegmentApi(trackInfo, 'track', apiKey)
+  await fetchSegmentApi(trackInfo, "track", apiKey);
 }
 
 export async function fetchSegmentApi(body, endpoint, apiKey) {
-  const segmentApiUrl = 'https://api.segment.io/v1'
+  const segmentApiUrl = "https://api.segment.io/v1";
 
   const headers = {
-    'Content-Type': 'application/json',
-    Authorization: 'Basic ' + Buffer.from(`${apiKey}:`).toString('base64'),
-  }
+    "Content-Type": "application/json",
+    Authorization: "Basic " + Buffer.from(`${apiKey}:`).toString("base64"),
+  };
 
   await fetch(`${segmentApiUrl}/${endpoint}`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(body),
     headers: headers,
-  })
+  });
 }
 
 export async function getWebhooks(
@@ -198,16 +198,19 @@ export async function getWebhooks(
   event,
   limit = 100,
   cursor = undefined,
-  includeDeleted = false,
+  includeDeleted = false
 ) {
-  const query = [sql`data->>'userId' = ${userId}`]
+  const query = [sql`data->>'userId' = ${userId}`];
   if (event) {
-    query.push(sql`data->>'event' = ${event}`)
+    query.push(sql`data->>'event' = ${event}`);
   }
   if (!includeDeleted) {
-    query.push(sql`data->>'deleted' IS NULL`)
+    query.push(sql`data->>'deleted' IS NULL`);
   }
-  const [webhooks, nextCursor] = await db.webhook.find(query, { limit, cursor })
+  const [webhooks, nextCursor] = await db.webhook.find(query, {
+    limit,
+    cursor,
+  });
 
-  return { data: webhooks, cursor: nextCursor }
+  return { data: webhooks, cursor: nextCursor };
 }

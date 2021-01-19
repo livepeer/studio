@@ -1,22 +1,22 @@
 export default {
-  type: 'object',
-  name: 'markdownSection',
-  title: 'Markdown text',
+  type: "object",
+  name: "markdownSection",
+  title: "Markdown text",
   fields: [
     {
-      name: 'markdown',
-      type: 'markdown',
-      title: 'Markdown',
+      name: "markdown",
+      type: "markdown",
+      title: "Markdown",
     },
   ],
   preview: {
     select: {
-      heading: 'markdownSection',
+      heading: "markdownSection",
     },
     prepare({ heading }) {
       return {
         title: `Markdown section`,
-      }
+      };
     },
   },
-}
+};

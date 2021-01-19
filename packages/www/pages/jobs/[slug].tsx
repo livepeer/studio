@@ -16,22 +16,19 @@ const Page = ({ title, body, noindex = false, preview }) => {
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs`}
       noindex={noindex}
-      preview={preview}
-    >
+      preview={preview}>
       <Container
         sx={{
           pb: 5,
           ul: { mb: 4 },
-          p: { mb: 4 }
-        }}
-      >
+          p: { mb: 4 },
+        }}>
         <h1
           sx={{
             lineHeight: ["42px", "72px"],
             my: 5,
-            fontSize: ["32px", "56px"]
-          }}
-        >
+            fontSize: ["32px", "56px"],
+          }}>
           {title}
         </h1>
         <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -59,10 +56,9 @@ const Page = ({ title, body, noindex = false, preview }) => {
               ":hover": {
                 textDecoration: "none",
                 boxShadow:
-                  "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)"
-              }
-            }}
-          >
+                  "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+              },
+            }}>
             <p sx={{ fontSize: 20, mb: 0 }}>How to Apply</p>
             <p sx={{ color: "gray" }}>
               If you are interested in applying for this position, please send
@@ -72,8 +68,7 @@ const Page = ({ title, body, noindex = false, preview }) => {
               isExternal
               isLink
               href="mailto:work@livepeer.com"
-              sx={{ width: "100%" }}
-            >
+              sx={{ width: "100%" }}>
               Send email
             </Button>
           </Box>
@@ -91,14 +86,14 @@ export async function getStaticPaths() {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allJobs),
     {
-      where: {}
+      where: {},
     }
   );
   let paths = [];
   allJob.map((page) => paths.push({ params: { slug: page.slug.current } }));
   return {
     fallback: true,
-    paths
+    paths,
   };
 }
 
@@ -110,8 +105,8 @@ export async function getStaticProps({ params, preview = false }) {
 
   let data: any = await graphQLClient.request(print(allJobs), {
     where: {
-      slug: { current: { eq: slug } }
-    }
+      slug: { current: { eq: slug } },
+    },
   });
 
   let job = data.allJob.find((j) => j.slug.current === slug);
@@ -119,9 +114,9 @@ export async function getStaticProps({ params, preview = false }) {
   return {
     props: {
       ...job,
-      preview
+      preview,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

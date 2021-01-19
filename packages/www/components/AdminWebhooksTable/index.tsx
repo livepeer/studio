@@ -6,7 +6,7 @@ import {
   Button,
   Flex,
   Grid,
-  Input
+  Input,
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
@@ -23,7 +23,7 @@ type DeleteWebhookModalProps = {
 const DeleteWebhookModal = ({
   name,
   onClose,
-  onDelete
+  onDelete,
 }: DeleteWebhookModalProps) => {
   return (
     <Modal onClose={onClose}>
@@ -35,8 +35,7 @@ const DeleteWebhookModal = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}
-        >
+          sx={{ mr: 2 }}>
           Cancel
         </Button>
         <Button type="button" variant="primarySmall" onClick={onDelete}>
@@ -128,7 +127,7 @@ export default ({ id }: { id: string }) => {
       event: "streamStarted",
       name: webhookName,
       url: webhookUrl,
-      blocking
+      blocking,
     })
       .then(() => setMessage("Webhook created"))
       .catch((e) => setMessage(`Error: ${e}`));
@@ -196,9 +195,8 @@ export default ({ id }: { id: string }) => {
       id={id}
       sx={{
         mb: 5,
-        mt: 2
-      }}
-    >
+        mt: 2,
+      }}>
       {createModal && (
         <Modal onClose={close} maxWidth="1000px">
           <h3>Create webhook</h3>
@@ -206,9 +204,8 @@ export default ({ id }: { id: string }) => {
             gap={2}
             columns={[3, "1fr 3fr 3fr"]}
             sx={{
-              alignItems: "center"
-            }}
-          >
+              alignItems: "center",
+            }}>
             <Box>Name</Box>
             <Box>
               <Input
@@ -218,11 +215,10 @@ export default ({ id }: { id: string }) => {
                 sx={{
                   border: "white",
                   borderBottom: "2px solid black",
-                  borderRadius: "0px"
+                  borderRadius: "0px",
                 }}
                 onChange={(e) => setWebhookName(e.target.value)}
-                placeholder="new-wehbook-name-123"
-              ></Input>
+                placeholder="new-wehbook-name-123"></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>URL</Box>
@@ -234,11 +230,10 @@ export default ({ id }: { id: string }) => {
                 sx={{
                   border: "white",
                   borderBottom: "2px solid black",
-                  borderRadius: "0px"
+                  borderRadius: "0px",
                 }}
                 onChange={(e) => setWebhookUrl(e.target.value)}
-                placeholder="https://own.site/hook1"
-              ></Input>
+                placeholder="https://own.site/hook1"></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>Blocking</Box>
@@ -253,15 +248,13 @@ export default ({ id }: { id: string }) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2, mt: 2 }}
-            >
+              sx={{ mr: 2, mt: 2 }}>
               Cancel
             </Button>
             <Button
               type="button"
               variant="primarySmall"
-              onClick={doCreateWebhook}
-            >
+              onClick={doCreateWebhook}>
               Create
             </Button>
           </Flex>
@@ -290,8 +283,7 @@ export default ({ id }: { id: string }) => {
           onClick={() => {
             setMessage("");
             setCreateModal(true);
-          }}
-        >
+          }}>
           Create
         </Button>
         <Button
@@ -299,8 +291,7 @@ export default ({ id }: { id: string }) => {
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedStream && setDeleteModal(true)}
-        >
+          onClick={() => selectedStream && setDeleteModal(true)}>
           Delete
         </Button>
       </Box>
@@ -309,43 +300,38 @@ export default ({ id }: { id: string }) => {
           <Box></Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortUserId}
-          >
+            onClick={sortUserId}>
             User name ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortName}
-          >
+            onClick={sortName}>
             Name ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortUrl}
-          >
+            onClick={sortUrl}>
             URL ⭥
           </Box>
           <Box>Blocking</Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortCreated}
-          >
+            onClick={sortCreated}>
             Created ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortDeleted}
-          >
+            onClick={sortDeleted}>
             Status ⭥
           </Box>
         </TableRow>
@@ -364,8 +350,7 @@ export default ({ id }: { id: string }) => {
                   } else {
                     setSelectedStream(webhook);
                   }
-                }}
-              >
+                }}>
                 <Checkbox value={selected} />
                 <UserName id={userId} users={users} />
                 <Box>{name}</Box>

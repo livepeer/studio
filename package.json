@@ -34,11 +34,13 @@
     "now:build-production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY",
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
-    "postinstall": "lerna run --stream postinstall"
+    "postinstall": "lerna run --stream postinstall",
+    "prettier": "prettier --write '**/*.{ts,js,css,html,md,tsx,mdx}'"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
     "@commitlint/config-conventional": "^7.5.0",
+    "@livepeer/prettier-config": "^1.0.1",
     "commitizen": "^3.1.1",
     "cz-conventional-changelog": "^2.1.0",
     "depcheck": "^0.7.1",
@@ -47,8 +49,8 @@
     "lcov-result-merger": "^3.0.0",
     "lerna": "^3.13.3",
     "vercel": "^19.2.0",
-    "prettier": "^2.0.5",
-    "pretty-quick": "^2.0.1"
+    "prettier": "^2.2.1",
+    "pretty-quick": "^3.1.0"
   },
   "config": {
     "commitizen": {
@@ -66,6 +68,6 @@
     }
   },
   "lint-staged": {
-    "*.{js,css,md,tsx}": "prettier --write"
+    "*.{ts,js,css,html,md,tsx,mdx}": "prettier --write"
   }
 }

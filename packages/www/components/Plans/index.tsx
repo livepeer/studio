@@ -15,8 +15,8 @@ const Tour: any = dynamic(() => import("reactour"), { ssr: false });
 const steps = [
   {
     selector: ".upgrade-card",
-    content: `Welcome to Livepeer.com! You're currently subscribed to the free plan. Click "Upgrade" to enter your credit card information and switch over to the pay-as-you-go plan for unlimited transcoding minutes.`
-  }
+    content: `Welcome to Livepeer.com! You're currently subscribed to the free plan. Click "Upgrade" to enter your credit card information and switch over to the pay-as-you-go plan for unlimited transcoding minutes.`,
+  },
   // ...
 ];
 
@@ -25,7 +25,7 @@ const Item = ({
   displayCheck = true,
   displayX = false,
   color = "black",
-  styles = null
+  styles = null,
 }) => (
   <Flex
     sx={{
@@ -35,9 +35,8 @@ const Item = ({
       borderBottom: "1px solid",
       letterSpacing: -0.3,
       borderColor: "rgba(0, 0, 0, .1)",
-      ...styles
-    }}
-  >
+      ...styles,
+    }}>
     {displayCheck && <MdCheck sx={{ mr: 2, color: color }} />}
     {displayX && <MdClose sx={{ mr: 2, color: color }} />}
     {title}
@@ -56,10 +55,9 @@ const Header = ({ title, subtitle, cta, ...props }) => (
       mb: 3,
       flexDirection: "column",
       justifyContent: "space-between",
-      height: 116
+      height: 116,
     }}
-    {...props}
-  >
+    {...props}>
     <Heading as="h3" sx={{ mb: 2, fontSize: 4, fontWeight: 700 }}>
       {title}
     </Heading>
@@ -67,8 +65,7 @@ const Header = ({ title, subtitle, cta, ...props }) => (
     <Button
       disabled={cta.disabled}
       variant={cta.variant}
-      sx={{ width: "100%" }}
-    >
+      sx={{ width: "100%" }}>
       {cta.text}
     </Button>
   </Flex>
@@ -162,9 +159,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     color: "black",
                     border: "1px solid",
                     borderColor: "muted",
-                    bg: "rgba(0,0,0,.05)"
-                  }}
-                >
+                    bg: "rgba(0,0,0,.05)",
+                  }}>
                   {user?.stripeProductId
                     ? products[user.stripeProductId].name
                     : products["prod_0"].name}
@@ -180,22 +176,19 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   borderRadius: 6,
                   bg: "rgba(0,0,0,.02)",
                   border: "1px solid",
-                  borderColor: "muted"
-                }}
-              >
+                  borderColor: "muted",
+                }}>
                 <Flex
                   sx={{
                     alignItems: "center",
                     width: "100%",
-                    justifyContent: "space-between"
-                  }}
-                >
+                    justifyContent: "space-between",
+                  }}>
                   <Flex sx={{ color: "text", alignItems: "center", mr: 4 }}>
                     <MdCreditCard sx={{ mr: 2, fontSize: 4 }} />{" "}
                     <Box sx={{ fontSize: 1, mr: 2 }}>Credit Card: </Box>
                     <Box
-                      sx={{ textTransform: "capitalize", mr: 4, fontSize: 1 }}
-                    >
+                      sx={{ textTransform: "capitalize", mr: 4, fontSize: 1 }}>
                       {user.ccBrand} •••• {user.ccLast4}
                     </Box>
                   </Flex>
@@ -204,8 +197,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     variant="primarySmall"
                     onClick={() => {
                       setUpdatePaymentModal(true);
-                    }}
-                  >
+                    }}>
                     Change
                   </Button>
                 </Flex>
@@ -219,35 +211,31 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
           borderRadius: 16,
           position: "relative",
           py: 5,
-          mb: 100
-        }}
-      >
+          mb: 100,
+        }}>
         <Flex
           sx={{
             flexDirection: ["column", "column", "column", "row"],
             alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
+            justifyContent: "space-between",
+          }}>
           <Box
             sx={{
               pl: 4,
               width: ["100%", "100%", "100%", "25%"],
               maxWidth: 174,
               "@media screen and (max-width: 1200px)": {
-                display: "none"
-              }
-            }}
-          >
+                display: "none",
+              },
+            }}>
             <Flex
               sx={{
                 mb: 3,
                 flexDirection: "column",
                 justifyContent: "flex-end",
                 height: 116,
-                fontWeight: 500
-              }}
-            >
+                fontWeight: 500,
+              }}>
               Usage
             </Flex>
             <List>
@@ -263,9 +251,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               p: 4,
               borderRadius: 16,
               width: ["100%", "100%", "100%", "25%"],
-              minWidth: 300
-            }}
-          >
+              minWidth: 300,
+            }}>
             <Header
               title={products["prod_0"].name}
               subtitle="Free"
@@ -277,7 +264,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   : "Sign up",
                 disabled:
                   dashboard && stripeProductId === "prod_0" ? true : false,
-                variant: "tertiarySmall"
+                variant: "tertiarySmall",
               }}
               onClick={() => {
                 if (dashboard) {
@@ -295,14 +282,13 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                     "transparent",
                     "transparent",
                     "transparent",
-                    "rgba(0, 0, 0, .1)"
-                  ]
+                    "rgba(0, 0, 0, .1)",
+                  ],
                 }}
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
                     </span>{" "}
                     1000 minutes / month
@@ -313,8 +299,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
                     </span>{" "}
                     None
@@ -327,8 +312,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
                     </span>{" "}
                     10 concurrent viewers / account
@@ -347,9 +331,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.08)",
               borderRadius: "16px",
               p: 4,
-              minWidth: 300
-            }}
-          >
+              minWidth: 300,
+            }}>
             <Header
               title={products["prod_1"].name}
               subtitle="Pay as you go"
@@ -363,7 +346,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   : "Sign up",
                 disabled:
                   dashboard && stripeProductId === "prod_1" ? true : false,
-                variant: "secondarySmall"
+                variant: "secondarySmall",
               }}
               onClick={() => {
                 if (dashboard) {
@@ -382,8 +365,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
                     </span>{" "}
                     $0.005 USD / min video ingested
@@ -396,8 +378,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
                     </span>{" "}
                     Coming soon
@@ -410,8 +391,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
                     </span>{" "}
                     $0.01 USD / gb video streamed
@@ -428,9 +408,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               borderRadius: 16,
               p: 4,
               width: ["100%", "100%", "100%", "25%"],
-              minWidth: 300
-            }}
-          >
+              minWidth: 300,
+            }}>
             <Header
               title={products["prod_2"].name}
               subtitle="Custom pricing"
@@ -442,7 +421,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   : "Contact sales",
                 disabled:
                   dashboard && stripeProductId === "prod_2" ? true : false,
-                variant: "primarySmall"
+                variant: "primarySmall",
               }}
               onClick={() => {
                 router.push(
@@ -456,8 +435,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
                     </span>{" "}
                     Custom pricing available
@@ -469,8 +447,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
                     </span>{" "}
                     Coming soon
@@ -482,8 +459,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 title={
                   <span>
                     <span
-                      sx={{ display: ["inline", "inline", "inline", "none"] }}
-                    >
+                      sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
                     </span>{" "}
                     Custom pricing available
@@ -502,9 +478,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             mt: 5,
             mx: "auto",
             fontStyle: "italic",
-            color: "offBlack"
-          }}
-        >
+            color: "offBlack",
+          }}>
           *Currently, we are not charging for Streaming. We’ll be sure to reach
           out before we start to do so. Thanks for streaming with Livepeer.com.
         </Container>

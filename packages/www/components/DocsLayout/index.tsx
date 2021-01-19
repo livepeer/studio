@@ -19,7 +19,7 @@ const ignoreList = [
   "password-reset-token",
   "make-admin",
   "user-verification",
-  "user"
+  "user",
 ];
 
 interface Props {
@@ -39,7 +39,7 @@ const DocsLayout = ({
   title,
   description,
   url,
-  width
+  width,
 }: Props) => {
   const { pathname, asPath } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -56,14 +56,12 @@ const DocsLayout = ({
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
       url={`https://livepeer.com${asPath}`}
-      customNav={<DocsNav tree={tree} />}
-    >
+      customNav={<DocsNav tree={tree} />}>
       <Container
         sx={{
           pb: 4,
-          mt: [20, 20, 40]
-        }}
-      >
+          mt: [20, 20, 40],
+        }}>
         <Flex sx={{ flexDirection: ["column", "column", "row"] }}>
           <Box
             sx={{
@@ -73,7 +71,7 @@ const DocsLayout = ({
               height: [
                 "calc(100vh - 130)",
                 "calc(100vh - 130)",
-                "calc(100vh - 105px)"
+                "calc(100vh - 105px)",
               ],
               overflow: "scroll",
               minWidth: ["100%", "100%", width],
@@ -81,14 +79,13 @@ const DocsLayout = ({
               display: [
                 isOpen ? "block" : "none",
                 isOpen ? "block" : "none",
-                "block"
+                "block",
               ],
               left: 0,
               zIndex: 10,
               pt: 2,
-              pl: [19, 19, 1]
-            }}
-          >
+              pl: [19, 19, 1],
+            }}>
             {pathname.includes("/docs/api") ? (
               <h4 sx={{ mb: 3 }}>API Reference</h4>
             ) : (
@@ -107,9 +104,8 @@ const DocsLayout = ({
               "> div :last-child": { mb: 0 },
               pt: [2, 2, 1],
               a: { color: "primary" },
-              pl: [0, 0, 4]
-            }}
-          >
+              pl: [0, 0, 4],
+            }}>
             {children}
           </Box>
         </Flex>

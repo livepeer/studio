@@ -10,9 +10,8 @@ export default ({ heading, cta }) => (
       textAlign: "center",
       position: "relative",
       py: 100,
-      bg: "secondary"
-    }}
-  >
+      bg: "secondary",
+    }}>
     <Container>
       {heading && (
         <Styled.h3 as="h2" sx={{ mb: 4, fontWeight: 600 }}>
@@ -34,8 +33,7 @@ function renderSwitch(cta) {
           variant="buttons.outline"
           sx={{ display: "inline-flex", alignItems: "center" }}
           target="__blank"
-          href={cta.externalLink}
-        >
+          href={cta.externalLink}>
           {cta.title}
           <ArrowRight sx={{ ml: 2 }} />
         </A>

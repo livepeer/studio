@@ -1,31 +1,31 @@
 export default {
-  type: 'object',
-  name: 'testimonialsSection',
-  title: 'Testimonials Section',
+  type: "object",
+  name: "testimonialsSection",
+  title: "Testimonials Section",
   fields: [
     {
-      name: 'heading',
-      type: 'string',
-      title: 'Heading',
+      name: "heading",
+      type: "string",
+      title: "Heading",
     },
     {
-      name: 'testimonials',
-      type: 'array',
-      title: 'Testimonials',
-      of: [{ type: 'testimonial' }],
+      name: "testimonials",
+      type: "array",
+      title: "Testimonials",
+      of: [{ type: "testimonial" }],
     },
   ],
   preview: {
     select: {
-      title: 'heading',
-      media: 'image',
+      title: "heading",
+      media: "image",
     },
     prepare({ title, media }) {
       return {
         title,
-        subtitle: 'Testimonials section',
+        subtitle: "Testimonials section",
         media,
-      }
+      };
     },
   },
-}
+};

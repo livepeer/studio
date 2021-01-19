@@ -6,7 +6,7 @@ import {
   Button,
   Flex,
   Input,
-  Container
+  Container,
 } from "@theme-ui/components";
 import Modal from "../Modal";
 import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
@@ -21,16 +21,14 @@ export const UserName = ({ id, users }: { id: string; users: Array<User> }) => {
     <Box
       sx={{
         overflow: "hidden",
-        textOverflow: "ellipsis"
-      }}
-    >
+        textOverflow: "ellipsis",
+      }}>
       <ReactTooltip
         id={tid}
         className="tooltip"
         place="top"
         type="dark"
-        effect="solid"
-      >
+        effect="solid">
         {user ? user.email : id}
       </ReactTooltip>
       <span data-tip data-for={tid}>
@@ -65,7 +63,7 @@ export default ({ id }: TokenTableProps) => {
     createApiToken,
     deleteApiToken,
     getUser,
-    getUsers
+    getUsers,
   } = useApi();
   useEffect(() => {
     getApiTokens(null)
@@ -134,9 +132,8 @@ export default ({ id }: TokenTableProps) => {
     <Container
       sx={{
         mb: 5,
-        mt: 2
-      }}
-    >
+        mt: 2,
+      }}>
       {createModal && (
         <Modal onClose={close}>
           {!newToken && (
@@ -156,8 +153,7 @@ export default ({ id }: TokenTableProps) => {
                   .catch((e) => {
                     setCreating(false);
                   });
-              }}
-            >
+              }}>
               <h3>Create token</h3>
               <p>
                 Enter a name for your token to differentiate it from other
@@ -167,12 +163,10 @@ export default ({ id }: TokenTableProps) => {
                 label="Name"
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
-                placeholder="New Token"
-              ></Input>
+                placeholder="New Token"></Input>
               <Select
                 sx={{ mt: "1em" }}
-                onChange={(e) => setNewTokenUserId(e.target.value)}
-              >
+                onChange={(e) => setNewTokenUserId(e.target.value)}>
                 {users.map((user) => (
                   <option value={user.id}>{user.email}</option>
                 ))}
@@ -182,8 +176,7 @@ export default ({ id }: TokenTableProps) => {
                   type="button"
                   variant="outlineSmall"
                   onClick={close}
-                  sx={{ mr: 2 }}
-                >
+                  sx={{ mr: 2 }}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primarySmall">
@@ -211,9 +204,8 @@ export default ({ id }: TokenTableProps) => {
                 sx={{
                   justifyContent: "space-between",
                   alignItems: "center",
-                  py: 3
-                }}
-              >
+                  py: 3,
+                }}>
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>
                 <Button type="button" variant="primarySmall" onClick={close}>
                   Close
@@ -232,8 +224,7 @@ export default ({ id }: TokenTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}
-            >
+              sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -241,8 +232,7 @@ export default ({ id }: TokenTableProps) => {
               variant="primarySmall"
               onClick={() => {
                 deleteApiToken(selectedToken.id).then(close);
-              }}
-            >
+              }}>
               Delete
             </Button>
           </Flex>
@@ -254,16 +244,14 @@ export default ({ id }: TokenTableProps) => {
           sx={{ margin: 2 }}
           onClick={() => {
             setCreateModal(true);
-          }}
-        >
+          }}>
           Create
         </Button>
         <Button
           variant="primarySmall"
           disabled={!selectedToken}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedToken && setDeleteModal(true)}
-        >
+          onClick={() => selectedToken && setDeleteModal(true)}>
           Delete
         </Button>
       </Box>
@@ -273,26 +261,23 @@ export default ({ id }: TokenTableProps) => {
           <Box>id</Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortUser}
-          >
+            onClick={sortUser}>
             User ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortName}
-          >
+            onClick={sortName}>
             Name ⭥
           </Box>
           <Box
             sx={{
-              cursor: "pointer"
+              cursor: "pointer",
             }}
-            onClick={sortLastAact}
-          >
+            onClick={sortLastAact}>
             Last Active ⭥
           </Box>
         </TableRow>
@@ -318,8 +303,7 @@ export default ({ id }: TokenTableProps) => {
                 } else {
                   setSelectedToken(token);
                 }
-              }}
-            >
+              }}>
               <Checkbox value={selected} />
               <Box>{token.id}</Box>
               <UserName id={token.userId} users={users} />

@@ -6,7 +6,10 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 ### Created by the same user
 
-You can retrieve all `stream` objects with the same `userID`. With any filter appended to the API call, the response will include both stream objects that represent a livestream configuration and stream objects that represent a single livestream session.
+You can retrieve all `stream` objects with the same `userID`. With any filter
+appended to the API call, the response will include both stream objects that
+represent a livestream configuration and stream objects that represent a single
+livestream session.
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
@@ -15,12 +18,12 @@ curl -H 'authorization: Bearer <api-key>' \
 
 ### Created by the same user, excluding livestream sessions
 
-You can retrieve all `stream` objects with the same `userID` but exclude stream objects *with* a `parentId`.
+You can retrieve all `stream` objects with the same `userID` but exclude stream
+objects _with_ a `parentId`.
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
 "https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
 ```
-
 
 </DocsLayout>

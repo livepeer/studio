@@ -1,34 +1,33 @@
-
 export interface TableSchema {
-  table: string
+  table: string;
 }
 
 export interface DBObject {
-  id: string
+  id: string;
 }
 
 export interface DBLegacyObject extends DBObject {
-  data: Object
+  data: Object;
 }
 
 export interface FindQuery {
-  [key: string]: any
+  [key: string]: any;
 }
 
 export interface QueryOptions {
-  useReplica?: boolean
+  useReplica?: boolean;
 }
 
 export interface FindOptions extends QueryOptions {
-  cursor?: string
-  limit?: number
-  order?: string
+  cursor?: string;
+  limit?: number;
+  order?: string;
 }
 
 export interface GetOptions {
-  useReplica?: boolean
+  useReplica?: boolean;
 }
 
 export interface UpdateOptions {
-  throwIfEmpty?: boolean
+  throwIfEmpty?: boolean;
 }

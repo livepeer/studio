@@ -50,10 +50,9 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
           transition: "background-color .2s",
           "&:hover": {
             bg: "#F0F0F0",
-            textDecoration: "none"
-          }
-        }}
-      >
+            textDecoration: "none",
+          },
+        }}>
         <h4
           ref={titleRef}
           sx={{
@@ -62,9 +61,8 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
             fontSize: "19px",
             lineHeight: "23px",
             letterSpacing: "-0.03em",
-            pb: 2
-          }}
-        >
+            pb: 2,
+          }}>
           {title}
         </h4>
         <Box
@@ -77,10 +75,9 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
             overflow: "hidden",
             display: excerptMaxLines <= 0 ? "none" : "-webkit-box",
             fontSize: "18px",
-            lineHeight: 1.6
+            lineHeight: 1.6,
           }}
-          ref={excerptRef}
-        >
+          ref={excerptRef}>
           {excerpt}
         </Box>
       </A>

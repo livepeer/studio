@@ -10,9 +10,8 @@ const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
       justifyContent: "center",
       px: "16px",
       my: 4,
-      ...pushSx
-    }}
-  >
+      ...pushSx,
+    }}>
     <img
       {...imageProps}
       sx={{
@@ -24,11 +23,11 @@ const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
         borderRadius: ["16px", "24px"],
         objectFit: "cover",
         '&[align="right"]': {
-          pl: "20px"
+          pl: "20px",
         },
         '&[align="left"]': {
-          pr: "20px"
-        }
+          pr: "20px",
+        },
       }}
     />
   </span>

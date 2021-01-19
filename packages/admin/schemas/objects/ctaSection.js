@@ -1,28 +1,28 @@
 export default {
-  type: 'object',
-  name: 'ctaSection',
-  title: 'CTA Section',
+  type: "object",
+  name: "ctaSection",
+  title: "CTA Section",
   fields: [
     {
-      name: 'heading',
-      type: 'string',
-      title: 'Heading',
+      name: "heading",
+      type: "string",
+      title: "Heading",
     },
     {
-      name: 'cta',
-      type: 'cta',
-      title: 'CTA',
+      name: "cta",
+      type: "cta",
+      title: "CTA",
     },
   ],
   preview: {
     select: {
-      title: 'heading',
+      title: "heading",
     },
     prepare({ title, media }) {
       return {
         title,
-        subtitle: 'CTA section',
-      }
+        subtitle: "CTA section",
+      };
     },
   },
-}
+};

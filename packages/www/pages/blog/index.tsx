@@ -16,7 +16,7 @@ const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
   const {
     query: { slug },
-    asPath
+    asPath,
   } = router;
 
   if (router.isFallback) {
@@ -50,8 +50,7 @@ const BlogIndex = ({ categories, posts }) => {
       }Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
       url={`https://livepeer.com${asPath}`}
-      withGradientBackground
-    >
+      withGradientBackground>
       <Container variant="hero">
         <h1 sx={{ variant: "text.heading.hero" }}>Blog</h1>
         <p sx={{ variant: "text.heroDescription" }}>
@@ -68,9 +67,8 @@ const BlogIndex = ({ categories, posts }) => {
           sx={{
             borderBottom: "1px solid rgba(55,54,77,.1)",
             alignItems: "center",
-            mb: 4
-          }}
-        >
+            mb: 4,
+          }}>
           {categories.map((c, i) => {
             const isSelected =
               slug === c.slug.current || (!slug && c.title === "All");
@@ -83,18 +81,16 @@ const BlogIndex = ({ categories, posts }) => {
                     ? "/blog"
                     : `/blog/category/${c.slug.current}`
                 }
-                passHref
-              >
+                passHref>
                 <A
                   sx={{
                     display: "block",
                     color: "black",
                     textDecoration: "none",
                     ":hover": {
-                      textDecoration: "none"
-                    }
-                  }}
-                >
+                      textDecoration: "none",
+                    },
+                  }}>
                   <Box
                     key={i + 1}
                     sx={{
@@ -103,9 +99,8 @@ const BlogIndex = ({ categories, posts }) => {
                       color: isSelected ? "primary" : "text",
                       fontWeight: isSelected ? 600 : 500,
                       pb: 3,
-                      mr: 4
-                    }}
-                  >
+                      mr: 4,
+                    }}>
                     {c.title}
                   </Box>
                 </A>
@@ -121,7 +116,7 @@ const BlogIndex = ({ categories, posts }) => {
                 display:
                   p._id === featuredPost._id
                     ? ["block", null, "none"]
-                    : undefined
+                    : undefined,
               }}
               key={`post-${i}`}
             />
@@ -142,7 +137,7 @@ export async function getStaticProps({ params }) {
   );
   categories.push({ title: "All", slug: { current: "" } });
   const {
-    allPost: posts
+    allPost: posts,
   } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
@@ -152,9 +147,9 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       categories: categories.reverse(),
-      posts
+      posts,
     },
-    revalidate: 1
+    revalidate: 1,
   };
 }
 

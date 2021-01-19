@@ -23,9 +23,8 @@ const Notch = () => (
       transform: "translateY(-50%)",
       width: "4%",
       left: "3%",
-      maxWidth: "27px"
-    }}
-  >
+      maxWidth: "27px",
+    }}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
@@ -39,8 +38,7 @@ const Notch = () => (
       x="2"
       y="77"
       width="8"
-      height="48"
-    >
+      height="48">
       <rect x="2" y="77" width="8" height="48" rx="4" fill="#F5F5F5" />
     </mask>
     <g mask="url(#phone-notch-mask0)">
@@ -208,9 +206,8 @@ const Frame = () => (
       bottom: 0,
       right: 0,
       left: 0,
-      maxWidth: "100%"
-    }}
-  >
+      maxWidth: "100%",
+    }}>
     <path
       d="M57 392.5H109.5C109.5 393.052 109.948 393.5 110.5 393.5H139.5C140.052 393.5 140.5 393.052 140.5 392.5H174C174 393.052 174.448 393.5 175 393.5H234C234.552 393.5 235 393.052 235 392.5H252C252.276 392.5 252.5 392.724 252.5 393C252.5 393.276 252.724 393.5 253 393.5H312.5C312.776 393.5 313 393.276 313 393C313 392.724 313.224 392.5 313.5 392.5H731C762.48 392.5 788 366.98 788 335.5V254.5C788 223.02 762.48 197.5 731 197.5H57C25.5198 197.5 0 223.02 0 254.5V335.5C0 366.98 25.5198 392.5 57 392.5Z"
       fill="url(#phone-frame-paint0_linear)"
@@ -237,8 +234,7 @@ const Frame = () => (
         y1="197.5"
         x2="394"
         y2="393.5"
-        gradientUnits="userSpaceOnUse"
-      >
+        gradientUnits="userSpaceOnUse">
         <stop stopColor="white" stopOpacity="0" />
         <stop offset="1" stopColor="#F2F2F2" />
       </linearGradient>
@@ -248,8 +244,7 @@ const Frame = () => (
         y1="0"
         x2="394"
         y2="197.5"
-        gradientUnits="userSpaceOnUse"
-      >
+        gradientUnits="userSpaceOnUse">
         <stop stopColor="#F2F2F2" />
         <stop offset="1" stopColor="white" stopOpacity="0" />
       </linearGradient>
@@ -263,18 +258,16 @@ const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
     sx={{
       width: "100%",
       maxWidth: phoneFrameMaxWidth,
-      mx: "auto"
-    }}
-  >
+      mx: "auto",
+    }}>
     <div
       sx={{
         position: "relative",
         height: 0,
         width: "100%",
         maxWidth: phoneFrameMaxWidth,
-        pb: phoneAspectRatio
-      }}
-    >
+        pb: phoneAspectRatio,
+      }}>
       <Notch />
       <Frame />
     </div>

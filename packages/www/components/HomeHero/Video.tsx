@@ -9,18 +9,18 @@ const videos = [
   {
     src:
       "https://cdn.sanity.io/files/dp4k3mpw/production/637be3e2106acb746559af41d5f57fae1edb535d.mp4",
-    views: Math.round(100 + Math.random() * 500)
+    views: Math.round(100 + Math.random() * 500),
   },
   {
     src:
       "https://cdn.sanity.io/files/dp4k3mpw/production/24a650d65020ffb01beaa6c06bb79427ec5431b5.mp4",
-    views: Math.round(100 + Math.random() * 500)
+    views: Math.round(100 + Math.random() * 500),
   },
   {
     src:
       "https://cdn.sanity.io/files/dp4k3mpw/production/bc7f603cf9e28c8545ce6394a6d1118e88293211.mp4",
-    views: Math.round(100 + Math.random() * 500)
-  }
+    views: Math.round(100 + Math.random() * 500),
+  },
 ];
 
 const randomIntFromInterval = (min: number, max: number) =>
@@ -57,9 +57,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
         width: "100%",
         mx: "auto",
         overflow: "hidden",
-        borderRadius: ["4vw", null, null, "36px"]
-      }}
-    >
+        borderRadius: ["4vw", null, null, "36px"],
+      }}>
       <figure sx={{ width: "100%", position: "relative" }}>
         {videos.map(({ src }, i) => (
           <video
@@ -76,7 +75,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               height: "100%",
               width: "100%",
               opacity: i === currentVideo ? 1 : 0,
-              transition: "opacity 1s ease-out"
+              transition: "opacity 1s ease-out",
             }}
             src={src}
             muted
@@ -90,9 +89,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             left: 3,
             display: "flex",
             alignItems: "center",
-            width: "fit-content"
-          }}
-        >
+            width: "fit-content",
+          }}>
           <Text
             sx={{
               bg: "primary",
@@ -102,9 +100,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               color: "background",
               px: 2,
               py: 1,
-              mr: 2
-            }}
-          >
+              mr: 2,
+            }}>
             Live
           </Text>
           <Text
@@ -116,9 +113,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               px: 2,
               py: 1,
               color: "background",
-              bg: "rgba(0,0,0,0.5)"
-            }}
-          >
+              bg: "rgba(0,0,0,0.5)",
+            }}>
             <i sx={{ display: "flex", alignItems: "center", mr: 1 }}>
               <FiEye />
             </i>
@@ -132,9 +128,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             left: 3,
             right: 3,
             display: "flex",
-            alignItems: "center"
-          }}
-        >
+            alignItems: "center",
+          }}>
           <input
             placeholder="Write a comment..."
             sx={{
@@ -147,13 +142,13 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               color: "background",
               fontSize: "14px",
               "&:placeholder": {
-                color: "#CDCDCD"
+                color: "#CDCDCD",
               },
               "&:focus": {
                 outline: "none",
                 boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                borderColor: "primary"
-              }
+                borderColor: "primary",
+              },
             }}
           />
           <IconButton
@@ -166,9 +161,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               minWidth: "42px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
+              justifyContent: "center",
+            }}>
             <FiHeart />
           </IconButton>
         </div>
@@ -182,7 +176,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             "linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
           height: "100%",
           top: 0,
-          pointerEvents: "none"
+          pointerEvents: "none",
         }}
       />
     </div>

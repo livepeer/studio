@@ -49,7 +49,7 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
             {
               year: "numeric",
               month: "long",
-              day: "numeric"
+              day: "numeric",
             }
           )}
         </Box>

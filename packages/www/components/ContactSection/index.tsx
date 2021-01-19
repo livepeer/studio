@@ -11,7 +11,7 @@ const ContactSection = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -31,9 +31,8 @@ const ContactSection = () => {
   return (
     <Container
       sx={{
-        py: 88
-      }}
-    >
+        py: 88,
+      }}>
       <Box sx={{ mb: 48, textAlign: "center" }}>
         <Styled.h2 sx={{ fontSize: [5, 5, 6], mb: 3 }}>
           Get in touch with us
@@ -53,11 +52,9 @@ const ContactSection = () => {
       <form
         ref={formEl}
         onSubmit={handleSubmit}
-        sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}
-      >
+        sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}>
         <Flex
-          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
-        >
+          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}>
           <Textfield
             htmlFor="firstname"
             id="firstname"
@@ -76,8 +73,7 @@ const ContactSection = () => {
           />
         </Flex>
         <Flex
-          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}
-        >
+          sx={{ flexDirection: ["column", "row"], mb: [3, 4], mx: [0, -3] }}>
           <Textfield
             htmlFor="email"
             id="email"
