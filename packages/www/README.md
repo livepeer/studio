@@ -1,6 +1,6 @@
 # @livepeer.com/www
 
-The package is a Next.js application and contains all the pages and components
+This package is a Next.js application and contains all the pages and components
 for the Livepeer.com user interface.
 
 ## Local Development
