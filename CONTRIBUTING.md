@@ -1,4 +1,4 @@
-# Contributing to livepeer.com
+# Contributing to Livepeer.com
 
 Hey there, potential contributor!
 
@@ -6,7 +6,7 @@ Thanks for your interest in this project. Every contribution is welcome and
 appreciated. We're super excited to help you to get started 😎
 
 > **Note:** If you still have questions after reading through this guide,
-> [open an issue](https://github.com/livepeer/livepeer.com/issues) or
+> [open an issue](https://github.com/livepeer/livepeer-com/issues) or
 > [talk to us on Discord](https://discordapp.com/invite/7wRSUGX).
 
 ## Getting Started
@@ -14,9 +14,9 @@ appreciated. We're super excited to help you to get started 😎
 First off, here are a few important notes:
 
 - **Read the
-  [Code of Conduct](https://github.com/livepeer/livepeer.com/blob/master/CODE_OF_CONDUCT.md).**
+  [Code of Conduct](https://github.com/livepeer/livepeer-com/blob/master/CODE_OF_CONDUCT.md).**
   For most, this will be common sense. But please take a couple minutes to
-  understand your responsibilities as a member of the livepeer.com community and
+  understand your responsibilities as a member of the Livepeer.com community and
   how you are expected to treat others.
 - **[Yarn](https://yarnpkg.com/en/) is the npm client used in this project.**
   Please do not use `npm` or you will encounter issues.
@@ -33,7 +33,7 @@ First off, here are a few important notes:
 - **Always be rebasing.** We tend to prefer a nice linear trail of commits in
   our Git history. Merge commits throw that off and make us 😰😰😰. To minimize
   conflicts, please
-  `git remote add livepeer https://github.com/livepeer/livepeer.com.git` so you
+  `git remote add livepeer https://github.com/livepeer/livepeer-com.git` so you
   can `git fetch livepeer && git rebase livepeer/master` often. And if your fork
   is far behind HEAD, consider deleting it and re-forking or using
   [`git rebase --onto`](https://stackoverflow.com/a/29916361).
@@ -46,7 +46,7 @@ First off, here are a few important notes:
 
 ### How You Can Help
 
-livepeer.com contributions will generally fall into one of the following
+Livepeer.com contributions will generally fall into one of the following
 categories:
 
 #### 📖 Updating documentation
@@ -54,7 +54,7 @@ categories:
 This could be as simple as adding some extra notes to a README.md file, or as
 complex as creating some new `package.json` scripts to generate docs. Either
 way, we'd really really love your help with this 💖. Look for
-[open documentation issues](https://github.com/livepeer/livepeer.com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%93%96+documentation%22),
+[open documentation issues](https://github.com/livepeer/livepeer-com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%93%96+documentation%22),
 create your own, or just submit a PR with the updates you want to see.
 
 #### 💬 Getting involved in issues
@@ -62,23 +62,23 @@ create your own, or just submit a PR with the updates you want to see.
 Many issues are open discussions. Feel free to add your own concerns, ideas, and
 workarounds. If you don't see what you're looking for, you can always open a new
 issue. Check out some of the
-[open discussions](https://github.com/livepeer/livepeer.com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%92%AC+Discussion%22)
+[open discussions](https://github.com/livepeer/livepeer-com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%92%AC+Discussion%22)
 and
-[good first issues](https://github.com/livepeer/livepeer.com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%98%8B+good+first+issue%22).
+[good first issues](https://github.com/livepeer/livepeer-com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%98%8B+good+first+issue%22).
 
 #### 🐛 Fixing bugs, 🕶️ adding feature/enhancements, or 👌 improving code quality
 
 If you're into this whole coding thing, maybe try fixing a
-[bug](https://github.com/livepeer/livepeer.com/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
+[bug](https://github.com/livepeer/livepeer-com/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22),
 tackling an
-[enhancement](https://github.com/livepeer/livepeer.com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%E2%9E%95+enhancement%22),
+[enhancement](https://github.com/livepeer/livepeer-com/issues?q=is%3Aissue+is%3Aopen+label%3A%22%E2%9E%95+enhancement%22),
 or taking on a
-[feature request](https://github.com/livepeer/livepeer.com/labels/%F0%9F%95%B6%20feature).
+[feature request](https://github.com/livepeer/livepeer-com/labels/%F0%9F%95%B6%20feature).
 
 If picking up issues isn't your thing, no worries -- you can always add more
 tests to improve coverage or refactor code to increase maintainability. Check
 out Code Climate for some insight into
-[code quality & coverage](https://codeclimate.com/github/livepeer/livepeer.com/issues)
+[code quality & coverage](https://codeclimate.com/github/livepeer/livepeer-com/issues)
 on a file-by-file basis. Whatever you do, be sure to check out the section about
 [useful tools](#useful-tools).
 
@@ -86,7 +86,7 @@ on a file-by-file basis. Whatever you do, be sure to check out the section about
 
 #### 🛠️ Updating scripts and tooling
 
-We want to make sure livepeer.com contributors have a pleasant developer
+We want to make sure Livepeer.com contributors have a pleasant developer
 experience (DX). The tools we use to code continually change and improve. If you
 see ways to reduce the amount of repetition or stress when it comes to coding in
 this project, feel free to create an issue and/or PR to discuss. Let's continue
@@ -99,9 +99,9 @@ to improve this codebase for everyone.
 
 ## FAQ
 
-### How can I run livepeer.com on Windows?
+### How can I run Livepeer.com on Windows?
 
-You need a unix shell to run livepeer.com. You can get one on Windows by
+You need a unix shell to run Livepeer.com. You can get one on Windows by
 installing the Linux on Windows subsystem on Windows 10. You can find
 instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 
@@ -116,7 +116,7 @@ instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
     require many paragraphs of text. In fact, if you write too much, it's
     difficult to understand what you are actually trying to communicate.
     **Consider
-    [starting a discussion](https://github.com/livepeer/livepeer.com/issues/new?template=Custom.md)
+    [starting a discussion](https://github.com/livepeer/livepeer-com/issues/new?template=Custom.md)
     if you're not clear on something or want feedback from the community.**
 
 - **If you are submitting a pull request...**
@@ -138,11 +138,6 @@ when it comes to coding. I highly recommend taking a look 🤓.
 
 You can expect a response from a maintainer within 7 days. If you haven’t heard
 anything by then, feel free to ping the thread.
-
-### How much time is spent on this project?
-
-Currently, there is a single full-time maintainer dedicated to this project and
-all of its public/private packages.
 
 ### What types of contributions are accepted?
 
