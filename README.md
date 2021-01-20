@@ -45,5 +45,5 @@ your username on our
 | Name                                                                                          | Description                              |
 | --------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | [`@livepeer.com/api`](https://github.com/livepeer/livepeer-com/tree/master/packages/api)      | Livepeer.com API for controlling streams |
-| [`@livepeer.com/www`](https://github.com/livepeer/livepeer-com/tree/master/packages/subgraph) | The Livepeer.com frontend                |
+| [`@livepeer.com/www`](https://github.com/livepeer/livepeer-com/tree/master/packages/www) | The Livepeer.com frontend                |
 | [`@livepeer.com/admin`](https://github.com/livepeer/livepeer-com/tree/master/packages/admin)  | The Livepeer.com Sanity CMS              |
