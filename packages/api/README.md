@@ -2,10 +2,24 @@
 
 ## How to dev
 
+### Step 1
+
+Ensure Docker is running.
+
+### Step 2
+
+Start the postgres database.
+
+```bash
+yarn run postgres:start
 ```
-yarn install
-yarn run build
-node -r esm src/cli.js --help
+
+### Step 3
+
+Start the server.
+
+```bash
+yarn dev
 ```
 
 ## Local go-livepeer
