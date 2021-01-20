@@ -1,4 +1,4 @@
-# Livepeer API Node
+# @livepeer.com/api
 
 ## How to dev
 
