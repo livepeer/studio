@@ -30,7 +30,7 @@ yarn run postgres:start
 
 ### Step 3
 
-While inside @livepeer/api, start the server.
+While inside `@livepeer/api`, start the server.
 
 ```bash
 yarn dev
