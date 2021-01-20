@@ -125,7 +125,7 @@ const makeContext = (state: ApiState, setState) => {
           : `/api${url}`;
 
       if (process.env.NODE_ENV === "development") {
-        endpoint = `http://0.0.0.0:3004/api${url}`;
+        endpoint = `http://localhost:3004/api${url}`;
       }
 
       const res = await fetch(endpoint, {
