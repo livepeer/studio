@@ -76,6 +76,7 @@ export default async function makeApp(params) {
   const whitelist = [
     "https://livepeer.com",
     "https://livepeer.monster",
+    "http://localhost:3000",
     /\.livepeerorg.vercel\.app$/,
     /\.livepeerorg.now\.sh$/,
   ];
