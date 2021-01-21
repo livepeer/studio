@@ -1,9 +1,8 @@
 import { Text } from "@theme-ui/components";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";
-import { forwardRef, useRef, useCallback } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { forwardRef, useRef, useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 
 const videos = [
   {
@@ -61,7 +60,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
       }}
     >
       <figure sx={{ width: "100%", position: "relative" }}>
-        <img
+        <div
           sx={{
             position: "absolute",
             top: 0,
@@ -72,9 +71,13 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             height: "100%",
             width: "100%"
           }}
-          src="/hero-videos/poster.png"
-          alt="video poster"
-        />
+        >
+          <Image
+            layout="fill"
+            src="/hero-videos/poster.png"
+            alt="video poster"
+          />
+        </div>
         {videos.map(({ src }, i) => (
           <video
             onEnded={() => onVideoEnded(i)}
