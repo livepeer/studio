@@ -67,13 +67,13 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             left: 0,
             bottom: 0,
             right: 0,
-            objectFit: "cover",
             height: "100%",
             width: "100%"
           }}
         >
           <Image
             layout="fill"
+            objectFit="cover"
             src="/hero-videos/poster.png"
             alt="video poster"
           />
