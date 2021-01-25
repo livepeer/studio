@@ -1,6 +1,6 @@
 import { Box, Flex } from "@theme-ui/components";
 import { SxStyleProp } from "theme-ui";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
 
 type TableProps = {
   className?: string;
@@ -172,5 +172,52 @@ export const Checkbox = ({ value }: { value: boolean }) => {
           borderColor: "primary",
         }}></Box>
     </Flex>
+  );
+};
+
+export type SortOrder = "asc" | "desc";
+
+interface TableHeadProps {
+  children?: React.ReactNode;
+  sx?: SxStyleProp;
+  onSort?: (order: SortOrder) => void;
+  isActiveSort?: boolean;
+}
+
+export const TableHead = ({
+  children,
+  sx,
+  onSort,
+  isActiveSort,
+}: TableHeadProps) => {
+  const [order, setOrder] = useState<SortOrder>();
+
+  const handleClick = useCallback(() => {
+    if (!onSort) return;
+    const newOrder = order && order === "asc" ? "desc" : "asc";
+    setOrder(newOrder);
+    onSort(newOrder);
+  }, [order, onSort]);
+
+  const arrow = useMemo(() => {
+    if (!onSort) return null;
+    if (!isActiveSort) return "⭥";
+    switch (order) {
+      case "asc":
+        return "⭡";
+      case "desc":
+        return "⭣";
+      default:
+        return "⭥";
+    }
+  }, [order, isActiveSort]);
+
+  return (
+    <Box
+      sx={{ cursor: onSort ? "pointer" : undefined, ...sx }}
+      onClick={handleClick}>
+      {children}
+      {arrow}
+    </Box>
   );
 };

@@ -12,7 +12,7 @@ type TabsProps = {
   tabs: Array<TabType>;
 };
 
-export default ({ tabs }: TabsProps) => {
+const Tabs = ({ tabs }: TabsProps) => {
   return (
     <Box
       sx={{
@@ -47,3 +47,5 @@ export default ({ tabs }: TabsProps) => {
     </Box>
   );
 };
+
+export default Tabs;
