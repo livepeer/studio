@@ -7,28 +7,30 @@ interface Props {
   onNextPage: () => void;
 }
 
-// TODO fix this tailwind
 const Paginator = ({
   canPreviousPage,
   canNextPage,
   onPreviousPage,
   onNextPage,
-}: Props) => (
-  <nav
-    className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
-    aria-label="Pagination">
-    <div className="flex-1 flex justify-between sm:justify-end space-x-3">
+}: Props) =>
+  canPreviousPage || canNextPage ? (
+    <nav
+      aria-label="Pagination"
+      sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
       <Button
-        variant="white"
+        variant="outlineSmall"
         onClick={onPreviousPage}
-        disabled={!canPreviousPage}>
-        Previous
+        disabled={!canPreviousPage}
+        sx={{ mr: 3 }}>
+        Previous page
       </Button>
-      <Button variant="white" onClick={onNextPage} disabled={!canNextPage}>
-        Next
+      <Button
+        variant="outlineSmall"
+        onClick={onNextPage}
+        disabled={!canNextPage}>
+        Next page
       </Button>
-    </div>
-  </nav>
-);
+    </nav>
+  ) : null;
 
 export default Paginator;

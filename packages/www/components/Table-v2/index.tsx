@@ -1,19 +1,37 @@
-import { Column, Row, usePagination, useSortBy, useTable } from "react-table";
-import { useEffect, useState } from "react";
+import {
+  Column,
+  Row,
+  usePagination,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
+import { useEffect, useMemo } from "react";
 import Paginator from "./paginator";
+import ReactTooltip from "react-tooltip";
+import Help from "../../public/img/help.svg";
+import Checkbox from "components/Checkbox";
 
 type Props<D extends Record<string, unknown>> = {
   columns: Column<D>[];
   data: D[];
   pageSize?: number;
+  config?: { rowSelection?: "individual" | "all" | null };
+  onRowSelectionChange?: (rows: Row<D>[]) => void;
 };
 
 const Table = <D extends Record<string, unknown>>({
   columns,
   data,
   pageSize = 100,
+  config = {},
+  onRowSelectionChange,
 }: Props<D>) => {
-  const [memoizedSortBy, setMemoizedSortBy] = useState([]);
+  const someColumnCanSort = useMemo(() => {
+    // To see if we show the sort help tooltip or not
+    // @ts-ignore
+    return columns.every((column) => !column.disableSortBy);
+  }, [columns]);
 
   const {
     getTableProps,
@@ -31,25 +49,64 @@ const Table = <D extends Record<string, unknown>>({
     // @ts-ignore
     canNextPage,
     // @ts-ignore
-    state: { pageIndex, sortBy },
-    ...rest
+    toggleAllRowsSelected,
+    // @ts-ignore
+    selectedFlatRows,
   } = useTable(
     {
       // @ts-ignore
       columns,
       data,
       // @ts-ignore
-      initialState: { pageSize, pageIndex: 0, sortBy: memoizedSortBy },
+      initialState: { pageSize, pageIndex: 0 },
       manualSortBy: false,
+      autoResetSortBy: false,
+      autoResetSelectedRows: false,
     },
     useSortBy,
-    usePagination
+    usePagination,
+    useRowSelect,
+    (hooks) => {
+      if (config.rowSelection) {
+        const isIndividualSelection = config.rowSelection === "individual";
+        hooks.visibleColumns.push((columns) => [
+          // Let's make a column for selection
+          {
+            id: "selection",
+            // The header can use the table's getToggleAllRowsSelectedProps method
+            // to render a checkbox
+            // @ts-ignore
+            Header: ({ getToggleAllRowsSelectedProps }) => {
+              const props = getToggleAllRowsSelectedProps();
+              return isIndividualSelection ? null : (
+                <Checkbox onClick={props.onChange} value={props.checked} />
+              );
+            },
+            // The cell can use the individual row's getToggleRowSelectedProps method
+            // to the render a checkbox
+            Cell: ({ row }) => {
+              return (
+                <Checkbox
+                  // @ts-ignore
+                  value={row.isSelected}
+                  onClick={() => {
+                    isIndividualSelection && toggleAllRowsSelected(false);
+                    // @ts-ignore
+                    row.toggleRowSelected(!row.isSelected);
+                  }}
+                />
+              );
+            },
+          },
+          ...columns,
+        ]);
+      }
+    }
   );
 
   useEffect(() => {
-    // A bit of a hack, to prevent the reseting of sortBy when new data arrives
-    setMemoizedSortBy(sortBy);
-  }, [sortBy]);
+    onRowSelectionChange?.(selectedFlatRows);
+  }, [selectedFlatRows, onRowSelectionChange]);
 
   return (
     <div>
@@ -67,46 +124,96 @@ const Table = <D extends Record<string, unknown>>({
                 <tr
                   {...headerGroup.getHeaderGroupProps()}
                   sx={{ borderRadius: "8px" }}>
-                  {headerGroup.headers.map((column) => (
-                    <th
-                      scope="col"
-                      // @ts-ignore
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                      sx={{
-                        textTransform: "uppercase",
-                        bg: "rgba(0,0,0,.03)",
-                        border: 0,
-                        borderBottom: "1px solid",
-                        borderTop: "1px solid",
-                        borderColor: "muted",
-                        fontSize: 0,
-                        color: "gray",
-                        px: 4,
-                        py: 2,
-                        fontWeight: 400,
-                        "&:first-of-type": {
-                          borderLeft: "1px solid",
+                  {headerGroup.headers.map((column, i) => {
+                    const withHelpTooltip =
+                      someColumnCanSort && i === headerGroup.headers.length - 1;
+                    return (
+                      <th
+                        scope="col"
+                        {...column.getHeaderProps(
+                          // @ts-ignore
+                          column.getSortByToggleProps()
+                        )}
+                        sx={{
+                          textTransform: "uppercase",
+                          bg: "rgba(0,0,0,.03)",
+                          border: 0,
+                          borderBottom: "1px solid",
+                          borderTop: "1px solid",
                           borderColor: "muted",
-                          borderTopLeftRadius: 6,
-                          borderBottomLeftRadius: 6,
-                        },
-                        "&:last-of-type": {
-                          borderRight: "1px solid",
-                          borderColor: "muted",
-                          borderTopRightRadius: 6,
-                          borderBottomRightRadius: 6,
-                        },
-                      }}>
-                      {column.render("Header")}
-                      {/*@ts-ignore */}
-                      {column.isSorted
-                        ? // @ts-ignore
-                          column.isSortedDesc
-                          ? " ⭣"
-                          : " ⭡"
-                        : ""}
-                    </th>
-                  ))}
+                          fontSize: 0,
+                          color: "gray",
+                          px: 4,
+                          py: 2,
+                          fontWeight: 400,
+                          position: "relative",
+                          "&:first-of-type": {
+                            borderLeft: "1px solid",
+                            borderColor: "muted",
+                            borderTopLeftRadius: 6,
+                            borderBottomLeftRadius: 6,
+                          },
+                          "&:last-of-type": {
+                            borderRight: "1px solid",
+                            borderColor: "muted",
+                            borderTopRightRadius: 6,
+                            borderBottomRightRadius: 6,
+                          },
+                        }}>
+                        <div
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mr: withHelpTooltip ? 3 : 0,
+                          }}>
+                          <span sx={{ whiteSpace: "nowrap" }}>
+                            {column.render("Header")}
+                          </span>
+                          {/*@ts-ignore */}
+                          {column.canSort && (
+                            <span sx={{ ml: 2 }}>
+                              {/* @ts-ignore */}
+                              {column.isSorted
+                                ? // @ts-ignore
+                                  column.isSortedDesc
+                                  ? " ⭣"
+                                  : " ⭡"
+                                : " ⭥"}
+                            </span>
+                          )}
+                        </div>
+                        {withHelpTooltip && (
+                          <div
+                            sx={{
+                              alignItems: "center",
+                              display: "flex",
+                              position: "absolute",
+                              right: 3,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                            }}>
+                            <ReactTooltip
+                              id={`tooltip-multiorder`}
+                              className="tooltip"
+                              place="top"
+                              type="dark"
+                              effect="solid">
+                              To multi-sot (sort by two column simultaneously)
+                              hold shift while clicking on second column name.
+                            </ReactTooltip>
+                            <Help
+                              data-tip
+                              data-for={`tooltip-multiorder`}
+                              sx={{
+                                cursor: "pointer",
+                                ml: 1,
+                              }}
+                            />
+                          </div>
+                        )}
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -118,7 +225,6 @@ const Table = <D extends Record<string, unknown>>({
                     {row.cells.map((cell) => (
                       <td
                         {...cell.getCellProps()}
-                        className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600"
                         sx={{
                           px: 4,
                           py: 3,
@@ -126,6 +232,7 @@ const Table = <D extends Record<string, unknown>>({
                           borderBottom: "1px solid",
                           borderBottomColor: "muted",
                           bg: "background",
+                          fontSize: 1,
                         }}>
                         {cell.render("Cell")}
                       </td>
