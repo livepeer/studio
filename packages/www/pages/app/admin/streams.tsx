@@ -2,10 +2,10 @@ import useApi from "../../../hooks/use-api";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import TabbedLayout from "../../../components/TabbedLayout";
-import AdminStreamsTable from "../../../components/AdminStreamsTable/index-copy";
+import AdminStreamsTable from "../../../components/AdminStreamsTable";
 import { getTabs } from "../admin";
 
-export default () => {
+const AdminStreamsPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
@@ -19,3 +19,5 @@ export default () => {
     </TabbedLayout>
   );
 };
+
+export default AdminStreamsPage;

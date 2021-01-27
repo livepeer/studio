@@ -51,10 +51,6 @@ const Table = <D extends Record<string, unknown>>({
     setMemoizedSortBy(sortBy);
   }, [sortBy]);
 
-  const captionData = useMemo(() => {
-    return { pageFirstRowIndex: 1 + pageSize * pageIndex };
-  }, [pageIndex, pageSize]);
-
   return (
     <div>
       <div sx={{ overflow: "hidden" }}>
@@ -141,13 +137,10 @@ const Table = <D extends Record<string, unknown>>({
           </table>
         </div>
         <Paginator
-          pageFirstRowIndex={captionData.pageFirstRowIndex}
-          pageLastRowIndex={captionData.pageFirstRowIndex + page.length - 1}
           canPreviousPage={canPreviousPage}
           canNextPage={canNextPage}
           onPreviousPage={previousPage}
           onNextPage={nextPage}
-          numberOfRows={data.length}
         />
       </div>
     </div>
