@@ -256,7 +256,6 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         data={data}
         config={{ rowSelection: "all" }}
         onRowSelectionChange={handleRowSelectionChange}
-        pageSize={1}
       />
     </Container>
   );
