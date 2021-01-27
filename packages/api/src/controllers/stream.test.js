@@ -164,6 +164,8 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(200);
       const streams = await res.json();
       expect(streams.length).toEqual(2);
+      sources[3].user = {};
+      sources[4].user = {};
       expect(streams[0]).toStrictEqual(sources[3]);
       expect(streams[1]).toStrictEqual(sources[4]);
     });

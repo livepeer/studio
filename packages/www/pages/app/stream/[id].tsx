@@ -26,9 +26,11 @@ import Modal from "../../../components/Modal";
 import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
 import {
-  RelativeTime,
-  RenditionsDetails,
+  RenditionsDetails
 } from "../../../components/StreamsTable";
+import {
+  RelativeTime
+} from "../../../components/CommonAdminTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
 

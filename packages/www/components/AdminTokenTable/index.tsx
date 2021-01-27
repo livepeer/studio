@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment, useMemo, useReducer } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useApi } from "../../hooks";
 import {
   Select,
@@ -9,45 +9,17 @@ import {
   Container,
 } from "@theme-ui/components";
 import Modal from "../Modal";
-import { Table, TableRow, Checkbox, TableRowVariant } from "../Table";
 import CopyBox from "../CopyBox";
-import { User } from "@livepeer.com/api";
-import ReactTooltip from "react-tooltip";
+import CommonAdminTable from "../CommonAdminTable";
 
-export const UserName = ({ id, users }: { id: string; users: Array<User> }) => {
-  const user = users.find((o) => o.id === id);
-  const tid = `tooltip-name-${id}`;
-  return (
-    <Box
-      sx={{
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }}>
-      <ReactTooltip
-        id={tid}
-        className="tooltip"
-        place="top"
-        type="dark"
-        effect="solid">
-        {user ? user.email : id}
-      </ReactTooltip>
-      <span data-tip data-for={tid}>
-        {user
-          ? user.email.includes("@")
-            ? user.email.split("@").join("@\u{200B}")
-            : user.email
-          : id}
-      </span>
-    </Box>
-  );
-};
+const ROWS_PER_PAGE = 25;
 
 type TokenTableProps = {
   userId: string;
   id: string;
 };
 
-export default ({ id }: TokenTableProps) => {
+const AdminTokenTable = ({ id }: TokenTableProps) => {
   const [tokens, setTokens] = useState([]);
   const [tokenName, setTokenName] = useState("");
   const [newTokenUserId, setNewTokenUserId] = useState("");
@@ -55,37 +27,30 @@ export default ({ id }: TokenTableProps) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newToken, setNewToken] = useState(null);
-  const [selectedToken, setSelectedToken] = useState(null);
   const [copyTime, setCopyTime] = useState(null);
   const [users, setUsers] = useState([]);
-  const {
-    getApiTokens,
-    createApiToken,
-    deleteApiToken,
-    getUser,
-    getUsers,
-  } = useApi();
-  useEffect(() => {
-    getApiTokens(null)
-      .then((tokens) => {
-        if (tokens) {
-          tokens.sort((a, b) => a.userId.localeCompare(b.userId));
-        }
-        setTokens(tokens);
-      })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [newToken, deleteModal]);
+  const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState("");
+  const [nextCursor, setNextCursor] = useState("");
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [lastCursor, setLastCursor] = useState("");
+  const [lastOrder, setLastOrder] = useState("");
+  const [lastFilters, setLastFilters] = useState([]);
+  const { getApiTokens, createApiToken, deleteApiToken, getUsers } = useApi();
+
   useEffect(() => {
     getUsers(10000)
-      .then((users) => {
-        if (Array.isArray(users)) {
-          setUsers(users[0]);
+      .then((result) => {
+        const [users, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(users)) {
+          setUsers(users);
         } else {
           console.log(users);
         }
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, []);
+
   const close = () => {
     setCreateModal(false);
     setDeleteModal(false);
@@ -94,40 +59,72 @@ export default ({ id }: TokenTableProps) => {
     setNewToken(null);
     setCopyTime(null);
   };
-  const sortUser = () => {
-    if (tokens && users) {
-      if (users) {
-        tokens.sort((a, b) => {
-          const userA = users.find((u) => u.id === a.userId);
-          const userB = users.find((u) => u.id === b.userId);
-          if (userA && userB) {
-            return userA.email.localeCompare(userB.email);
-          }
-          return a.userId.localeCompare(b.userId);
-        });
-      } else {
-        tokens.sort((a, b) => a.userId.localeCompare(b.userId));
+
+  const columns: any = useMemo(
+    () => [
+      {
+        Header: "ID",
+        accessor: "id"
+        // Header: ({ rows, getToggleAllRowsSelectedProps }) => {
+        //   console.log(`--> ID header rows:`, rows, `nextCur='${nextCursor}'`);
+        //   return "ID";
+        // }
+      },
+      {
+        Header: "User",
+        accessor: "user.email"
+      },
+      {
+        Header: "Name",
+        accessor: "name"
+      },
+      {
+        Header: "Last Active",
+        accessor: "lastSeen"
       }
-      setTokens([...tokens]);
-      return;
+    ],
+    [nextCursor, lastFilters]
+  );
+
+  const filtersDesc = [
+    { id: "name", placeholder: "token name" },
+    { id: "user.email", placeholder: "user's email" }
+  ];
+
+  const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
+    setLoading(true);
+    if (!refetch) {
+      setLastCursor(cursor);
+      setLastFilters(filters);
+      setLastOrder(order);
     }
-    if (tokens) {
-      tokens.sort((a, b) => a.userId.localeCompare(b.userId));
-      setTokens([...tokens]);
-    }
+    getApiTokens(null, order, filters, ROWS_PER_PAGE, cursor)
+      .then((result) => {
+        const [tokens, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(tokens)) {
+          setLoadingError("");
+          setNextCursor(nextCursor);
+          setTokens(tokens);
+        } else {
+          const errors = JSON.stringify(tokens["errors"] || resp.statusText);
+          setLoadingError(errors);
+          console.error(errors);
+        }
+      })
+      .catch((err) => {
+        setLoadingError(`${err}`);
+        console.error(err);
+      })
+      .finally(() => setLoading(false));
   };
-  const sortLastAact = () => {
-    if (tokens) {
-      tokens.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
-      setTokens([...tokens]);
-    }
+
+  const refecth = () => {
+    fetchData(
+      { order: lastOrder, cursor: lastCursor, filters: lastFilters },
+      true
+    );
   };
-  const sortName = () => {
-    if (tokens) {
-      tokens.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-      setTokens([...tokens]);
-    }
-  };
+
   return (
     <Container
       sx={{
@@ -149,8 +146,10 @@ export default ({ id }: TokenTableProps) => {
                   .then((newToken) => {
                     setNewToken(newToken);
                     setCreating(false);
+                    refecth();
                   })
                   .catch((e) => {
+                    console.error(e);
                     setCreating(false);
                   });
               }}>
@@ -166,9 +165,15 @@ export default ({ id }: TokenTableProps) => {
                 placeholder="New Token"></Input>
               <Select
                 sx={{ mt: "1em" }}
-                onChange={(e) => setNewTokenUserId(e.target.value)}>
+                onChange={(e) => setNewTokenUserId(e.target.value)}
+              >
+                <option key="empty" value="">
+                  --
+                </option>
                 {users.map((user) => (
-                  <option value={user.id}>{user.email}</option>
+                  <option key={user.id} value={user.id}>
+                    {user.email}
+                  </option>
                 ))}
               </Select>
               <Flex sx={{ justifyContent: "flex-end", py: 3 }}>
@@ -215,10 +220,10 @@ export default ({ id }: TokenTableProps) => {
           )}
         </Modal>
       )}
-      {deleteModal && selectedToken && (
+      {deleteModal && selectedRow && (
         <Modal onClose={close}>
           <h3>Delete token</h3>
-          <p>Are you sure you want to delete token "{selectedToken.name}"?</p>
+          <p>Are you sure you want to delete token "{selectedRow.name}"?</p>
           <Flex sx={{ justifyContent: "flex-end" }}>
             <Button
               type="button"
@@ -231,88 +236,50 @@ export default ({ id }: TokenTableProps) => {
               type="button"
               variant="primarySmall"
               onClick={() => {
-                deleteApiToken(selectedToken.id).then(close);
-              }}>
+                deleteApiToken(selectedRow.id).finally(() => {
+                  refecth();
+                  close();
+                });
+              }}
+            >
               Delete
             </Button>
           </Flex>
         </Modal>
       )}
-      <Box>
+      <CommonAdminTable
+        onRowSelected={setSelectedRow}
+        setNextCursor={setNextCursor}
+        onFetchData={fetchData}
+        loading={loading}
+        data={tokens}
+        nextCursor={nextCursor}
+        rowsPerPage={ROWS_PER_PAGE}
+        err={loadingError}
+        columns={columns}
+        filtersDesc={filtersDesc}
+      >
         <Button
+          key="createBut"
           variant="outlineSmall"
-          sx={{ margin: 2 }}
+          sx={{ ml: "1em" }}
           onClick={() => {
             setCreateModal(true);
           }}>
           Create
         </Button>
         <Button
-          variant="primarySmall"
-          disabled={!selectedToken}
-          sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedToken && setDeleteModal(true)}>
+          key="deleteBut"
+          variant="outlineSmall"
+          disabled={!selectedRow}
+          sx={{ ml: "1em" }}
+          onClick={() => setDeleteModal(true)}
+        >
           Delete
         </Button>
-      </Box>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto" }}>
-        <TableRow variant={TableRowVariant.Header}>
-          <Box></Box>
-          <Box>id</Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortUser}>
-            User ⭥
-          </Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortName}>
-            Name ⭥
-          </Box>
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-            onClick={sortLastAact}>
-            Last Active ⭥
-          </Box>
-        </TableRow>
-        {tokens.map((token) => {
-          const { id, name, lastSeen } = token;
-          let formattedLastSeen = <em>unused</em>;
-          if (lastSeen) {
-            formattedLastSeen = (
-              <span>
-                {new Date(lastSeen).toLocaleDateString()}&nbsp;
-                {new Date(lastSeen).toLocaleTimeString()}
-              </span>
-            );
-          }
-          const selected = selectedToken && selectedToken.id === id;
-          return (
-            <TableRow
-              selected={selected}
-              key={id}
-              onClick={() => {
-                if (selected) {
-                  setSelectedToken(null);
-                } else {
-                  setSelectedToken(token);
-                }
-              }}>
-              <Checkbox value={selected} />
-              <Box>{token.id}</Box>
-              <UserName id={token.userId} users={users} />
-              <Box>{name}</Box>
-              <Box>{formattedLastSeen}</Box>
-            </TableRow>
-          );
-        })}
-      </Table>
+      </CommonAdminTable>
     </Container>
   );
 };
+
+export default AdminTokenTable;

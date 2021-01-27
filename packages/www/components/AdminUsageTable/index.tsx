@@ -22,8 +22,8 @@ export default ({ id }: { id: string }) => {
   useEffect(() => {
     getUsers(10000)
       .then((result) => {
-        if (Array.isArray(result)) {
-          const [users] = result;
+        const [users, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(users)) {
           users.sort((a, b) => a.email.localeCompare(b.email));
           setUsers(users);
         } else {

@@ -22,6 +22,9 @@ export interface FindOptions extends QueryOptions {
   cursor?: string;
   limit?: number;
   order?: string;
+  fields?: string;
+  from?: string;
+  process?: Function;
 }
 
 export interface GetOptions {

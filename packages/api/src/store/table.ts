@@ -81,13 +81,20 @@ export default class Table<T extends DBObject> {
     query: FindQuery | Array<SQLStatement> = {},
     opts: FindOptions = {}
   ): Promise<[Array<T>, string]> {
-    const { cursor = "", useReplica = true, order = DEFAULT_SORT } = opts;
+    const {
+      cursor = "",
+      useReplica = true,
+      order = DEFAULT_SORT,
+      fields = "*",
+      from = this.name,
+      process,
+    } = opts;
     let limit = opts.hasOwnProperty("limit") ? opts.limit : 100;
     if (typeof limit === "string") {
       limit = parseInt(limit);
     }
 
-    const q = sql`SELECT * FROM `.append(this.name);
+    const q = sql`SELECT `.append(fields).append(` FROM `).append(from);
     let filters = [];
 
     // We can either pass in an array of sql`` statements...
@@ -102,7 +109,9 @@ export default class Table<T extends DBObject> {
       }
     }
     if (cursor && !cursor.includes("skip")) {
-      filters.push(sql`data->>'id' > ${cursor}`);
+      filters.push(
+        sql``.append(this.name + ".").append(sql`data->>'id' > ${cursor}`)
+      );
     }
     let first = true;
     for (const filter of filters) {
@@ -131,7 +140,7 @@ export default class Table<T extends DBObject> {
       res = await this.db.query(q);
     }
 
-    const docs = res.rows.map(({ data }) => data);
+    const docs = res.rows.map(process ? process : ({ data }) => data);
 
     if (docs.length < 1) {
       return [docs, null];
@@ -261,6 +270,21 @@ export default class Table<T extends DBObject> {
     if (res.rowCount < 1) {
       throw new NotFoundError(`couldn't find ${this.name} ids=${ids}`);
     }
+  }
+
+  cleanWriteOnlyResponse(doc: Array<T>): Array<T> {
+    // obfuscate writeOnly fields in objects returned
+    const res = { ...doc };
+    if (this.schema.properties) {
+      for (const [fieldName, fieldArray] of Object.entries(
+        this.schema.properties
+      )) {
+        if (fieldArray.writeOnly) {
+          delete res[fieldName];
+        }
+      }
+    }
+    return res;
   }
 
   cleanWriteOnlyResponses(docs: Array<T>): Array<T> {

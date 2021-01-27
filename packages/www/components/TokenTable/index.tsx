@@ -29,7 +29,14 @@ export default ({ userId, id }: TokenTableProps) => {
   const { getApiTokens, createApiToken, deleteApiToken } = useApi();
   useEffect(() => {
     getApiTokens(userId)
-      .then((tokens) => setTokens(tokens))
+      .then((result) => {
+        const [tokens, nextCursor, resp] = result;
+        if (resp.ok && Array.isArray(tokens)) {
+          setTokens(tokens);
+        } else {
+          console.error(result);
+        }
+      })
       .catch((err) => console.error(err)); // todo: surface this
   }, [userId, newToken, deleteModal]);
   const close = () => {

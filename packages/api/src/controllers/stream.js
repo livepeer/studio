@@ -6,7 +6,13 @@ import logger from "../logger";
 import uuid from "uuid/v4";
 import wowzaHydrate from "./wowza-hydrate";
 import { fetchWithTimeout } from "../util";
-import { makeNextHREF, trackAction, getWebhooks } from "./helpers";
+import {
+  makeNextHREF,
+  trackAction,
+  getWebhooks,
+  parseFilters,
+  parseOrder,
+} from "./helpers";
 import { generateStreamKey } from "./generate-stream-key";
 import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
@@ -73,26 +79,62 @@ function activeCleanup(streams, activeOnly = false) {
   return streams;
 }
 
+const fieldsMap = {
+  id: `stream.ID`,
+  name: `stream.data->>'name'`,
+  sourceSegments: `stream.data->'sourceSegments'`,
+  lastSeen: `stream.data->'lastSeen'`,
+  createdAt: `stream.data->'createdAt'`,
+  userId: `stream.data->>'userId'`,
+  isActive: `stream.data->>'isActive'`,
+  "user.email": `users.data->>'email'`,
+};
+
 app.get("/", authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, streamsonly, sessionsonly, all, active } = req.query;
-
-  const query = [];
-  if (!all) {
-    query.push(sql`data->>'deleted' IS NULL`);
-  }
-  if (streamsonly) {
-    query.push(sql`data->>'parentId' IS NULL`);
-  } else if (sessionsonly) {
-    query.push(sql`data->>'parentId' IS NOT NULL`);
-  }
-  if (active) {
-    query.push(sql`data->>'isActive' = 'true'`);
-  }
-
-  const [output, newCursor] = await db.stream.find(query, {
-    cursor,
+  let {
     limit,
-    order: `data->>'lastSeen' DESC NULLS LAST, data->>'createdAt' DESC NULLS LAST`,
+    cursor,
+    streamsonly,
+    sessionsonly,
+    all,
+    active,
+    order,
+    filters,
+  } = req.query;
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
+
+  const query = parseFilters(fieldsMap, filters);
+  if (!all || all === "false") {
+    query.push(sql`stream.data->>'deleted' IS NULL`);
+  }
+  if (streamsonly && streamsonly !== "false") {
+    query.push(sql`stream.data->>'parentId' IS NULL`);
+  } else if (sessionsonly && sessionsonly !== "false") {
+    query.push(sql`stream.data->>'parentId' IS NOT NULL`);
+  }
+  if (active && active !== "false") {
+    query.push(sql`stream.data->>'isActive' = 'true'`);
+  }
+
+  order = parseOrder(fieldsMap, order);
+  if (!order) {
+    order = `stream.data->>'lastSeen' DESC NULLS LAST, stream.data->>'createdAt' DESC NULLS LAST`;
+  }
+
+  const fields =
+    " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
+  const from = `stream left join users on stream.data->>'userId' = users.id`;
+  const [output, newCursor] = await db.stream.find(query, {
+    limit,
+    cursor,
+    fields,
+    from,
+    order,
+    process: ({ data, usersdata }) => {
+      return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+    },
   });
 
   res.status(200);
