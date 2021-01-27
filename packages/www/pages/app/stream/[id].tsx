@@ -25,12 +25,8 @@ import DeleteStreamModal from "../../../components/DeleteStreamModal";
 import Modal from "../../../components/Modal";
 import Help from "../../../public/img/help.svg";
 import { pathJoin } from "../../../lib/utils";
-import {
-  RenditionsDetails
-} from "../../../components/StreamsTable";
-import {
-  RelativeTime
-} from "../../../components/CommonAdminTable";
+import { RenditionsDetails } from "../../../components/StreamsTable";
+import { RelativeTime } from "../../../components/CommonAdminTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
 
@@ -104,13 +100,23 @@ const ID = () => {
     setRecord,
   } = useApi();
   const router = useRouter();
-  const { query, asPath } = router;
+  const { query } = router;
   const id = query.id;
   const [stream, setStream] = useState(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [recordOffModal, setRecordOffModal] = useState(false);
+  const [isCopied, setCopied] = useState(0);
+
+  useEffect(() => {
+    if (isCopied) {
+      const timeout = setTimeout(() => {
+        setCopied(0);
+      }, isCopied);
+      return () => clearTimeout(timeout);
+    }
+  }, [isCopied]);
 
   useEffect(() => {
     getIngest(true)
@@ -259,7 +265,33 @@ const ID = () => {
                 <Cell>Stream key</Cell>
                 <Cell>
                   {keyRevealed ? (
-                    stream.streamKey
+                    <Flex>
+                      {stream.streamKey}
+                      <CopyToClipboard
+                        text={stream.streamKey}
+                        onCopy={() => setCopied(2000)}>
+                        <Flex
+                          sx={{
+                            alignItems: "center",
+                            cursor: "pointer",
+                            ml: 1,
+                          }}>
+                          <Copy
+                            sx={{
+                              mr: 1,
+                              width: 14,
+                              height: 14,
+                              color: "offBlack",
+                            }}
+                          />
+                          {!!isCopied && (
+                            <Box sx={{ fontSize: 12, color: "offBlack" }}>
+                              Copied
+                            </Box>
+                          )}
+                        </Flex>
+                      </CopyToClipboard>
+                    </Flex>
                   ) : (
                     <Button
                       type="button"
