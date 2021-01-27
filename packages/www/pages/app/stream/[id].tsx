@@ -24,7 +24,7 @@ import StreamSessionsTable from "../../../components/StreamSessionsTable";
 import DeleteStreamModal from "../../../components/DeleteStreamModal";
 import Modal from "../../../components/Modal";
 import Help from "../../../public/img/help.svg";
-import { pathJoin } from "../../../lib/utils";
+import { pathJoin, isStaging, isDevelopment } from "../../../lib/utils";
 import { RenditionsDetails } from "../../../components/StreamsTable";
 import { RelativeTime } from "../../../components/CommonAdminTable";
 import { getTabs } from "../user";
@@ -402,11 +402,11 @@ const ID = () => {
                 </Cell>
                 <Cell>Status</Cell>
                 <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-                {user.admin ? (
+                {user.admin || isStaging() || isDevelopment() ? (
                   <>
                     <Cell> </Cell>
                     <Cell>
-                      <strong>Admin only fields:</strong>
+                      <strong>Admin or staging only fields:</strong>
                     </Cell>
                     <Cell>Record stream</Cell>
                     <Box
@@ -449,6 +449,14 @@ const ID = () => {
                         />
                       </Flex>
                     </Box>
+                  </>
+                ) : null}
+                {user.admin ? (
+                  <>
+                    <Cell> </Cell>
+                    <Cell>
+                      <strong>Admin only fields:</strong>
+                    </Cell>
                     <Cell>Deleted</Cell>
                     <Cell>{stream.deleted ? <strong>Yes</strong> : "No"}</Cell>
                     <Cell>Source segments</Cell>
@@ -502,7 +510,9 @@ const ID = () => {
                 Delete
               </Button>
             </Flex>
-            {user.admin ? <StreamSessionsTable streamId={stream.id} /> : null}
+            {user.admin || isStaging() || isDevelopment() ? (
+              <StreamSessionsTable streamId={stream.id} />
+            ) : null}
           </>
         ) : notFound ? (
           <Box>Not found</Box>
