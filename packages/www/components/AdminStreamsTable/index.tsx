@@ -3,14 +3,7 @@ import Link from "next/link";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Button, Container, Flex } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
-import {
-  Table,
-  TableRow,
-  TableRowVariant,
-  Checkbox,
-  SortOrder,
-  TableHead,
-} from "../Table";
+import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
 import { RelativeTime, StreamName, RenditionsDetails } from "../StreamsTable";
 import ReactTooltip from "react-tooltip";
 import { UserName } from "../AdminTokenTable";
@@ -55,70 +48,29 @@ const Segments = ({ stream }: { stream: Stream }) => {
   );
 };
 
-type SortFWithOrder = (a: Stream, b: Stream, order: SortOrder) => number;
-type SortF = (a: Stream, b: Stream, order: SortOrder) => number;
+const sortNameF = (a: Stream, b: Stream) =>
+  ((a && a.name) || "").localeCompare((b && b.name) || "");
 
-/**
- * Helper for adding the `order` param to the passed sort function
- */
-const getSortF = (order: SortOrder, sortFWithOrder: SortFWithOrder) => {
-  const f: SortF = (a, b) => sortFWithOrder(a, b, order);
-  return f;
-};
-
-const sortUserName = (
-  users: Array<User>,
-  a: Stream,
-  b: Stream,
-  order: SortOrder
-) => {
+const sortUserName = (users: Array<User>, a: Stream, b: Stream) => {
   const userA = users.find((u) => u.id === a.userId);
   const userB = users.find((u) => u.id === b.userId);
   if (userA && userB) {
-    return order === "asc"
-      ? userB.email.localeCompare(userA.email)
-      : userA.email.localeCompare(userB.email);
+    return userA.email.localeCompare(userB.email);
   }
-  const aItem = (a && a.name) || "";
-  const bItem = (b && b.name) || "";
-  return order === "asc"
-    ? bItem.localeCompare(aItem)
-    : aItem.localeCompare(bItem);
+  return ((a && a.name) || "").localeCompare((b && b.name) || "");
 };
 
-const sortNameF: SortFWithOrder = (a, b, order) => {
-  const aItem = (a && a.name) || "";
-  const bItem = (b && b.name) || "";
-  return order === "asc"
-    ? bItem.localeCompare(aItem)
-    : aItem.localeCompare(bItem);
-};
+const sortUserIdF = (a: Stream, b: Stream) =>
+  ((a && a.userId) || "").localeCompare((b && b.userId) || "");
 
-const sortUserIdF: SortFWithOrder = (a, b, order) => {
-  const aItem = (a && a.userId) || "";
-  const bItem = (b && b.userId) || "";
-  return order === "asc"
-    ? bItem.localeCompare(aItem)
-    : aItem.localeCompare(bItem);
-};
+const sortCreatedF = (a: Stream, b: Stream) =>
+  (b.createdAt || 0) - (a.createdAt || 0);
 
-const sortCreatedF: SortFWithOrder = (a, b, order) => {
-  const aItem = b.createdAt || 0;
-  const bItem = a.createdAt || 0;
-  return order === "asc" ? bItem - aItem : aItem - bItem;
-};
+const sortLastSeenF = (a: Stream, b: Stream) =>
+  (b.lastSeen || 0) - (a.lastSeen || 0);
 
-const sortLastSeenF: SortFWithOrder = (a, b, order) => {
-  const aItem = b.lastSeen || 0;
-  const bItem = a.lastSeen || 0;
-  return order === "asc" ? bItem - aItem : aItem - bItem;
-};
-
-const sortActiveF: SortFWithOrder = (a, b, order) => {
-  const aItem = +(b.isActive || false);
-  const bItem = +(a.isActive || false);
-  return order === "asc" ? bItem - aItem : aItem - bItem;
-};
+const sortActiveF = (a: Stream, b: Stream) =>
+  +(b.isActive || false) - +(a.isActive || false);
 
 export default ({ id }: { id: string }) => {
   const [broadcasters, setBroadcasters] = useState(null);
@@ -129,8 +81,6 @@ export default ({ id }: { id: string }) => {
   const [users, setUsers] = useState([]);
   const { getAdminStreams, deleteStream, getBroadcasters, getUsers } = useApi();
   const [sortFunc, setSortFunc] = useState(null);
-  const [activeSort, setActiveSort] = useState("");
-
   useEffect(() => {
     getUsers(10000)
       .then((users) => {
@@ -179,49 +129,53 @@ export default ({ id }: { id: string }) => {
     return () => clearInterval(interval);
   }, [isVisible, sortFunc, activeOnly]);
 
-  const sortUserId = (order: SortOrder) => {
+  const sortUserId = () => {
     if (streams) {
       if (users) {
-        streams.sort((a, b) => sortUserName(users, a, b, order));
-        setSortFunc(() => getSortF(order, sortUserName.bind(null, users)));
+        streams.sort(sortUserName.bind(null, users));
+        setSortFunc(() => sortUserName.bind(null, users));
       } else {
-        streams.sort((a, b) => sortUserIdF(a, b, order));
-        setSortFunc(() => getSortF(order, sortUserIdF));
+        streams.sort(sortUserIdF);
+        setSortFunc(() => sortUserIdF);
       }
       setStreams([...streams]);
     }
   };
-  const sortName = (order: SortOrder) => {
+  const sortName = () => {
     if (streams) {
-      streams.sort((a, b) => sortNameF(a, b, order));
-      setSortFunc(() => getSortF(order, sortNameF));
+      streams.sort(sortNameF);
+      setSortFunc(() => sortNameF);
       setStreams([...streams]);
     }
   };
-  const sortCreated = (order: SortOrder) => {
+  const sortCreated = () => {
     if (streams) {
-      streams.sort((a, b) => sortCreatedF(a, b, order));
-      setSortFunc(() => getSortF(order, sortCreatedF));
+      streams.sort(sortCreatedF);
+      setSortFunc(() => sortCreatedF);
       setStreams([...streams]);
     }
   };
-  const sortLastSeen = (order: SortOrder) => {
+  const sortLastSeen = () => {
     if (streams) {
-      streams.sort((a, b) => sortLastSeenF(a, b, order));
-      setSortFunc(() => getSortF(order, sortLastSeenF));
+      streams.sort(sortLastSeenF);
+      setSortFunc(() => sortLastSeenF);
       setStreams([...streams]);
     }
   };
-  const sortActive = (order: SortOrder) => {
+  const sortActive = () => {
     if (streams) {
-      streams.sort((a, b) => sortActiveF(a, b, order));
-      setSortFunc(() => getSortF(order, sortActiveF));
+      streams.sort(sortActiveF);
+      setSortFunc(() => sortActiveF);
       setStreams([...streams]);
     }
   };
-
   return (
-    <Container id={id} sx={{ mb: 5, mt: 2 }}>
+    <Container
+      id={id}
+      sx={{
+        mb: 5,
+        mt: 2,
+      }}>
       {deleteModal && selectedStream && (
         <DeleteStreamModal
           streamName={selectedStream.name}
@@ -260,48 +214,43 @@ export default ({ id }: { id: string }) => {
         sx={{ gridTemplateColumns: "auto auto auto auto auto auto auto auto" }}>
         <TableRow variant={TableRowVariant.Header}>
           <Box></Box>
-          <TableHead
-            onSort={(order) => {
-              setActiveSort("user-name");
-              sortUserId(order);
+          <Box
+            sx={{
+              cursor: "pointer",
             }}
-            isActiveSort={activeSort === "user-name"}>
-            User Name
-          </TableHead>
-          <TableHead
-            onSort={(order) => {
-              setActiveSort("name");
-              sortName(order);
+            onClick={sortUserId}>
+            User name ⭥
+          </Box>
+          <Box
+            sx={{
+              cursor: "pointer",
             }}
-            isActiveSort={activeSort === "name"}>
-            Name
-          </TableHead>
-          <TableHead>Details</TableHead>
-          <TableHead>Segments</TableHead>
-          <TableHead
-            onSort={(order) => {
-              setActiveSort("created");
-              sortCreated(order);
+            onClick={sortName}>
+            Name ⭥
+          </Box>
+          <Box>Details</Box>
+          <Box>Segments</Box>
+          <Box
+            sx={{
+              cursor: "pointer",
             }}
-            isActiveSort={activeSort === "created"}>
-            Created
-          </TableHead>
-          <TableHead
-            onSort={(order) => {
-              setActiveSort("last-active");
-              sortLastSeen(order);
+            onClick={sortCreated}>
+            Created ⭥
+          </Box>
+          <Box
+            sx={{
+              cursor: "pointer",
             }}
-            isActiveSort={activeSort === "last-active"}>
-            Last Active
-          </TableHead>
-          <TableHead
-            onSort={(order) => {
-              setActiveSort("status");
-              sortActive(order);
+            onClick={sortLastSeen}>
+            Last Active ⭥
+          </Box>
+          <Box
+            sx={{
+              cursor: "pointer",
             }}
-            isActiveSort={activeSort === "status"}>
-            Status
-          </TableHead>
+            onClick={sortActive}>
+            Status ⭥
+          </Box>
         </TableRow>
         {streams.map((stream: Stream) => {
           const {
