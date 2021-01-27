@@ -1,5 +1,5 @@
 import { Column, Row, usePagination, useSortBy, useTable } from "react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Paginator from "./paginator";
 
 type Props<D extends Record<string, unknown>> = {
