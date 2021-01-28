@@ -30,7 +30,7 @@ const Table = <D extends Record<string, unknown>>({
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
     // @ts-ignore
-    return columns.every((column) => !column.disableSortBy);
+    return columns.some((column) => !column.disableSortBy);
   }, [columns]);
 
   const {
