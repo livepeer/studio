@@ -50,7 +50,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which stream object was created
+          description:
+            Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         event:
           type: string
@@ -64,7 +65,9 @@ components:
         blocking:
           type: boolean
           default: true
-          description: If true, returning non 2xx value from webhook will prevent stream from starting
+          description:
+            If true, returning non 2xx value from webhook will prevent stream
+            from starting
 
     stream:
       type: object
@@ -120,7 +123,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which stream object was created
+          description:
+            Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
           index: true
         parentId:
@@ -129,10 +133,12 @@ components:
           description: Points to parent stream object
           index: true
         partialSession:
-          description: Indicates that this is not final object of `user's` session
+          description:
+            Indicates that this is not final object of `user's` session
           type: boolean
         previousSessions:
-          description: Ids of the previous sessions which are part of `user's` session
+          description:
+            Ids of the previous sessions which are part of `user's` session
           type: array
           items:
             type: string
@@ -206,13 +212,16 @@ components:
               - P144p30fps16x9
             example: P720p60fps16x9
         record:
-          description: Should this stream be recorded? Uses default settings. For more customization, create and configure an object store.
+          description:
+            Should this stream be recorded? Uses default settings. For more
+            customization, create and configure an object store.
           type: boolean
           example: false
         recordObjectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
-          description: ID of object store where to which this stream was recorded
+          description:
+            ID of object store where to which this stream was recorded
         wowza:
           type: object
           required:
@@ -264,7 +273,7 @@ components:
           minItems: 1
           items:
             type: string
-            example: ['id not provided', 'user not found']
+            example: ["id not provided", "user not found"]
 
     object-store:
       type: object
@@ -280,7 +289,8 @@ components:
           writeOnly: true
         publicUrl:
           type: string
-          description: Public URL at which data in this object storage can be accessed
+          description:
+            Public URL at which data in this object storage can be accessed
           example: https://reg-rec.livepeer.live/some/path
         id:
           type: string
@@ -294,7 +304,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which object store object was created
+          description:
+            Timestamp (in milliseconds) at which object store object was created
           example: 1587667174725
 
     api-token:
@@ -322,7 +333,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which token object was created
+          description:
+            Timestamp (in milliseconds) at which token object was created
           example: 1587667174725
 
     user-verification:
@@ -570,7 +582,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/stream'
+              $ref: "#/components/schemas/stream"
 
       responses:
         200:
@@ -580,13 +592,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/stream'
+                  $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
     get:
       description: Lists streams
@@ -598,13 +610,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/stream'
+                  $ref: "#/components/schemas/stream"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /object-store:
     tags:
@@ -617,7 +629,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/object-store'
+              $ref: "#/components/schemas/object-store"
 
       responses:
         200:
@@ -627,13 +639,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/object-store'
+                  $ref: "#/components/schemas/object-store"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
     get:
       description: Lists object store credentials by userId
@@ -645,13 +657,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/object-store'
+                  $ref: "#/components/schemas/object-store"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /user-verification:
     tags:
@@ -664,7 +676,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/user-verification'
+              $ref: "#/components/schemas/user-verification"
 
       responses:
         200:
@@ -674,13 +686,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/user-verification'
+                  $ref: "#/components/schemas/user-verification"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /password-reset-token:
     tags:
@@ -693,7 +705,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/password-reset-token'
+              $ref: "#/components/schemas/password-reset-token"
 
       responses:
         200:
@@ -703,13 +715,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/password-reset'
+                  $ref: "#/components/schemas/password-reset"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /password-reset:
     tags:
@@ -722,7 +734,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/password-reset'
+              $ref: "#/components/schemas/password-reset"
 
       responses:
         200:
@@ -732,13 +744,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/user'
+                  $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /make-admin:
     tags:
@@ -751,7 +763,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/make-admin'
+              $ref: "#/components/schemas/make-admin"
 
       responses:
         200:
@@ -761,13 +773,13 @@ paths:
               schema:
                 type: object
                 items:
-                  $ref: '#/components/schemas/user'
+                  $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /user/token:
     tags:
@@ -780,7 +792,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/user'
+              $ref: "#/components/schemas/user"
 
       responses:
         200:
@@ -790,13 +802,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/user'
+                  $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /user:
     tags:
@@ -809,7 +821,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/user'
+              $ref: "#/components/schemas/user"
 
       responses:
         200:
@@ -819,13 +831,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/user'
+                  $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     patch:
       parameters:
         - name: id
@@ -840,13 +852,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     get:
       description: Lists users
       responses:
@@ -857,13 +869,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/user'
+                  $ref: "#/components/schemas/user"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /api-token:
     tags:
@@ -876,7 +888,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: '#/components/schemas/api-token'
+              $ref: "#/components/schemas/api-token"
 
       responses:
         200:
@@ -886,13 +898,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/api-token'
+                  $ref: "#/components/schemas/api-token"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
     get:
       description: Lists api tokens
@@ -904,13 +916,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/api-token'
+                  $ref: "#/components/schemas/api-token"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/api-token'
+                $ref: "#/components/schemas/api-token"
 
   /webhook:
     tags:
@@ -925,13 +937,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/webhook'
+                  $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     post:
       description: creates a new webhook
       responses:
@@ -940,13 +952,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /webhook/{id}:
     tags:
@@ -965,13 +977,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     put:
       parameters:
         - name: id
@@ -986,13 +998,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: id
@@ -1007,10 +1019,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
