@@ -35,7 +35,7 @@
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "postinstall": "lerna run --stream postinstall",
-    "prettier": "prettier --write '**/*.{ts,js,css,html,md,tsx,mdx}'"
+    "prettier": "prettier --write '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
@@ -68,6 +68,6 @@
     }
   },
   "lint-staged": {
-    "*.{ts,js,css,html,md,tsx,mdx}": "prettier --write"
+    "*.{ts,js,css,html,md,tsx,mdx,yaml,yml}": "prettier --write"
   }
 }
