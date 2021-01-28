@@ -569,6 +569,40 @@ components:
         ccBrand:
           type: string
           example: 1234
+    usage:
+      type: object
+      table: usage
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: day associated with usage
+          example: 2021-01-30
+          unique: true
+          index: true
+        kind:
+          type: string
+          readOnly: true
+          example: usage
+        date:
+          type: number
+          readOnly: true
+          example: usage
+        sourceSegments:
+          type: number
+          example: 200000
+        transcodedSegments:
+          type: number
+          example: 200000
+        sourceSegmentsDuration:
+          type: number
+          example: 200000
+        transcodedSegmentsDuration:
+          type: number
+          example: 200000
+        streamCount:
+          type: number
+          example: 200000
 
 paths:
   /stream:

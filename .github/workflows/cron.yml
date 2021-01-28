@@ -1,0 +1,13 @@
+name: 24-hour-cron
+on:
+  schedule:
+    - cron: "0 0 * * *" # run every day at midnight
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update usage table
+        run: |
+          curl --request POST \
+          --url 'https://livepeer.monster/api/usage/update' \
+          --header 'Authorization: Bearer ${{ secrets.LP_API_TOKEN }}'

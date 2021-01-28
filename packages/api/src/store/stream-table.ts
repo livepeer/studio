@@ -1,15 +1,17 @@
-import sql, { SQLStatement } from "sql-template-strings";
+import sql from "sql-template-strings";
 import Table from "./table";
 import { Stream } from "../schema/types";
-import { QueryArrayResult, QueryResult, QueryResultRow } from "pg";
-
-import { DBLegacyObject, FindOptions, QueryOptions } from "./types";
+import { QueryResult, QueryResultRow } from "pg";
+import { DBLegacyObject, QueryOptions } from "./types";
 
 interface UsageData {
+  id?: string;
+  date?: number;
   sourceSegments: number;
   transcodedSegments: number;
   sourceSegmentsDuration: number;
   transcodedSegmentsDuration: number;
+  streamCount: number;
 }
 
 interface dbUsageData extends QueryResultRow {
@@ -17,9 +19,140 @@ interface dbUsageData extends QueryResultRow {
   transcodedsegments: string;
   sourcesegmentsduration: number;
   transcodedsegmentsduration: number;
+  streamCount: number;
+}
+
+interface dbUsageHistoryData extends QueryResultRow {
+  id: string;
+  date: number;
+  sourcesegments: string;
+  transcodedsegments: string;
+  sourcesegmentsduration: number;
+  transcodedsegmentsduration: number;
+  streamCount: number;
 }
 
 export default class StreamTable extends Table<Stream> {
+  async cachedUsageHistory(
+    fromTime: number,
+    toTime: number,
+    opts?: QueryOptions
+  ): Promise<UsageData[]> {
+    let usage = [];
+    const q1 = sql`SELECT
+      id,
+      (data->>'date')::real as date,
+      (data->>'sourceSegmentsDuration')::real as sourceSegmentsDuration,
+      (data->>'transcodedSegmentsDuration')::real as transcodedSegmentsDuration,
+      (data->>'sourceSegments')::real as sourceSegments,
+      (data->>'transcodedSegments')::real as transcodedSegments,
+      (data->>'streamCount')::real as streamCount
+    
+    FROM usage WHERE data->>'date' >= ${fromTime}
+      AND data->>'date' < ${toTime}
+    `;
+
+    let res: QueryResult<dbUsageData>;
+    res = await this.db.queryWithOpts(q1, opts);
+
+    if (res.rowCount > 0) {
+      for (const row of res.rows) {
+        usage.push({
+          id: row.id,
+          date: row.date,
+          sourceSegments: row.sourcesegments,
+          transcodedSegments: row.transcodedsegments,
+          sourceSegmentsDuration: row.sourcesegmentsduration,
+          transcodedSegmentsDuration: row.transcodedsegmentsduration,
+          streamCount: row.streamcount,
+        });
+      }
+    }
+    return usage;
+  }
+
+  async usageHistory(fromTime: number, toTime: number, opts?: QueryOptions) {
+    const q1 = sql`SELECT
+      TO_TIMESTAMP((data->>'createdAt')::bigint/1000)::date as day,
+      sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
+      sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
+      sum((data->>'transcodedSegments')::int) as transcodedSegments, 
+      sum((data->>'sourceSegments')::numeric) as sourceSegments,
+      count(*)::int as streamCount
+      
+    FROM stream WHERE data->>'sourceSegmentsDuration' IS NOT NULL
+      AND data->>'parentId' IS NOT NULL 
+      AND (data->>'createdAt')::bigint >= ${fromTime}
+      AND (data->>'createdAt')::bigint < ${toTime}
+      GROUP BY day
+      ORDER BY day
+    `;
+
+    let usage = [];
+
+    let res: QueryResult<dbUsageHistoryData>;
+    res = await this.db.queryWithOpts(q1, opts);
+
+    if (res.rowCount > 0) {
+      for (const row of res.rows) {
+        let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
+        usage.push({
+          id: new Date(row.day).toLocaleDateString("en-CA"),
+          date: dayStartTimestamp,
+          sourceSegments: +row.sourcesegments,
+          transcodedSegments: +row.transcodedsegments,
+          sourceSegmentsDuration: row.sourcesegmentsduration,
+          transcodedSegmentsDuration: row.transcodedsegmentsduration,
+          streamCount: row.streamcount,
+        });
+      }
+    }
+    const q2 = sql`SELECT
+      TO_TIMESTAMP((data->>'createdAt')::bigint/1000)::date as day,
+      sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
+      sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
+      sum((data->>'transcodedSegments')::int) as transcodedSegments, 
+      sum((data->>'sourceSegments')::numeric) as sourceSegments,
+      count(*)::int as streamCount
+      
+    FROM stream s WHERE data->>'sourceSegmentsDuration' IS NOT NULL
+      AND data->>'parentId' IS NULL
+      AND (SELECT COUNT(C.id) FROM stream C WHERE C.data->>'parentId' = S.Id) = 0
+      AND (data->>'createdAt')::bigint >= ${fromTime}
+      AND (data->>'createdAt')::bigint < ${toTime}
+      GROUP BY day
+      ORDER BY day
+    `;
+    res = await this.db.queryWithOpts(q2, opts);
+
+    if (res.rowCount > 0) {
+      for (const row of res.rows) {
+        let existingRow = usage.filter((r) => r.day === row.day);
+        if (existingRow.length) {
+          let index = usage.findIndex((r) => r.day === row.day);
+          usage[index].sourceSegments += +row.sourcesegments;
+          usage[index].transcodedSegments += +row.transcodedsegments;
+          usage[index].sourceSegmentsDuration += row.sourcesegmentsduration;
+          usage[index].transcodedSegmentsDuration +=
+            row.transcodedsegmentsduration;
+          usage[index].streamCount += row.streamcount;
+        } else {
+          let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
+          usage.push({
+            id: new Date(row.day).toLocaleDateString("en-CA"),
+            date: dayStartTimestamp,
+            sourceSegments: +row.sourcesegments,
+            transcodedSegments: +row.transcodedsegments,
+            sourceSegmentsDuration: row.sourcesegmentsduration,
+            transcodedSegmentsDuration: row.transcodedsegmentsduration,
+            streamCount: row.streamcount,
+          });
+        }
+      }
+    }
+    return usage;
+  }
+
   async usage(
     userId: string,
     fromTime: number,
@@ -30,7 +163,8 @@ export default class StreamTable extends Table<Stream> {
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
-      sum((data->>'transcodedSegments')::int) as transcodedSegments
+      sum((data->>'transcodedSegments')::int) as transcodedSegments,
+      count(*)::int as streamCount
     
     FROM stream WHERE data->>'userId' = ${userId}
       AND data->>'sourceSegmentsDuration' IS NOT NULL 
@@ -44,6 +178,7 @@ export default class StreamTable extends Table<Stream> {
       transcodedSegments: 0,
       sourceSegmentsDuration: 0,
       transcodedSegmentsDuration: 0,
+      streamCount: 0,
     };
 
     let res: QueryResult<dbUsageData>;
@@ -54,12 +189,14 @@ export default class StreamTable extends Table<Stream> {
       usage.transcodedSegments += parseInt(dbUsage.transcodedsegments);
       usage.sourceSegmentsDuration += dbUsage.sourcesegmentsduration;
       usage.transcodedSegmentsDuration += dbUsage.transcodedsegmentsduration;
+      usage.streamCount += dbUsage.streamcount;
     }
     const q2 = sql`SELECT 
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
-      sum((data->>'transcodedSegments')::int) as transcodedSegments
+      sum((data->>'transcodedSegments')::int) as transcodedSegments,
+      count(*)::int as streamCount
     
     FROM stream S WHERE data->>'userId' = ${userId}
       AND data->>'sourceSegmentsDuration' IS NOT NULL
@@ -75,6 +212,7 @@ export default class StreamTable extends Table<Stream> {
       usage.transcodedSegments += parseInt(dbUsage.transcodedsegments);
       usage.sourceSegmentsDuration += dbUsage.sourcesegmentsduration;
       usage.transcodedSegmentsDuration += dbUsage.transcodedsegmentsduration;
+      usage.streamCount += dbUsage.streamcount;
     }
     return usage;
   }
