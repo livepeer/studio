@@ -1,5 +1,4 @@
-import { Box } from "@theme-ui/components";
-import { Flex } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 
 const Checkbox = ({
   value,
