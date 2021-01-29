@@ -33,17 +33,13 @@ app.post(
     let fromTime = +new Date(2020, 0); // start at beginning
     let toTime = +new Date();
 
-    let cachedUsageHistory = await db.stream.cachedUsageHistory(
-      fromTime,
-      toTime,
-      {
-        useReplica: true,
-      }
-    );
+    let lastUpdatedRow = (
+      await db.usage.find({}, { limit: 1, order: "data->>'date' DESC" })
+    )[0];
 
     // get last updated date from cache
-    if (cachedUsageHistory.length) {
-      fromTime = cachedUsageHistory[cachedUsageHistory.length - 1].date;
+    if (lastUpdatedRow.length) {
+      fromTime = lastUpdatedRow[0].date;
     }
 
     // get all usage up until now
@@ -56,7 +52,7 @@ app.post(
     // store each day of usage
     for (const row of usageHistory) {
       // if row already exists in cache, update it, otherwise create it
-      if (cachedUsageHistory.find((c) => c.id === row.id)) {
+      if (fromTime === row.date) {
         await req.store.replace({ kind: "usage", ...row });
       } else {
         await req.store.create({ kind: "usage", ...row });
