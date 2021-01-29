@@ -14,6 +14,8 @@ import {
   RenditionDetailsCellProps,
   RenditionsDetailsCell,
 } from "components/Table-v2/cells/streams-table";
+import { dateSort, stringSort } from "components/Table-v2/sorts";
+import { SortTypeArgs } from "components/Table-v2/types";
 
 type ProfileProps = {
   id: string;
@@ -160,6 +162,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         Header: "Name",
         accessor: "name",
         Cell: TextCell,
+        sortType: (...params: SortTypeArgs) => stringSort('original.name.children', ...params)
       },
       {
         Header: "Details",
@@ -171,11 +174,13 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         Header: "Created",
         accessor: "created",
         Cell: DateCell,
+        sortType: (...params: SortTypeArgs) => dateSort('original.created.date', ...params)
       },
       {
         Header: "Last Active",
         accessor: "lastActive",
         Cell: DateCell,
+        sortType: (...params: SortTypeArgs) => dateSort('original.lastActive.date', ...params)
       },
       {
         Header: "Status",
