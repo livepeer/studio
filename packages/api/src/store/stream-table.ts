@@ -93,8 +93,11 @@ export default class StreamTable extends Table<Stream> {
     let res: QueryResult<dbUsageHistoryData>;
     res = await this.db.queryWithOpts(q1, opts);
 
+    let knownDays = {};
+
     if (res.rowCount > 0) {
       for (const row of res.rows) {
+        knownDays[row.day] = row.day;
         let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
         usage.push({
           id: new Date(row.day).toLocaleDateString("en-CA"),
@@ -123,12 +126,12 @@ export default class StreamTable extends Table<Stream> {
       GROUP BY day
       ORDER BY day
     `;
+
     res = await this.db.queryWithOpts(q2, opts);
 
     if (res.rowCount > 0) {
       for (const row of res.rows) {
-        let existingRow = usage.filter((r) => r.day === row.day);
-        if (existingRow.length) {
+        if (knownDays[row.day]) {
           let index = usage.findIndex((r) => r.day === row.day);
           usage[index].sourceSegments += +row.sourcesegments;
           usage[index].transcodedSegments += +row.transcodedsegments;
