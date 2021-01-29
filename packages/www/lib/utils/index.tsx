@@ -235,3 +235,15 @@ export const CARD_OPTIONS = {
     },
   },
 };
+
+export function isStaging(): boolean {
+  return (
+    window.location.hostname.includes("livepeer.monster") ||
+    window.location.hostname.includes("livepeerorg.vercel.app") ||
+    window.location.hostname.includes("livepeerorg.now.sh")
+  );
+}
+
+export function isDevelopment(): boolean {
+  return process.env.NODE_ENV === "development";
+}

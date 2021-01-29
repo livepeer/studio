@@ -9,6 +9,7 @@ import {
   Webhook,
 } from "@livepeer.com/api";
 import qs from "qs";
+import { isStaging, isDevelopment } from "../lib/utils";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -117,14 +118,11 @@ const makeContext = (state: ApiState, setState) => {
         headers.set("authorization", `JWT ${state.token}`);
       }
 
-      let endpoint =
-        window.location.hostname.includes("livepeer.monster") ||
-        window.location.hostname.includes("livepeerorg.vercel.app") ||
-        window.location.hostname.includes("livepeerorg.now.sh")
-          ? `https://livepeer.monster/api${url}`
-          : `/api${url}`;
+      let endpoint = isStaging()
+        ? `https://livepeer.monster/api${url}`
+        : `/api${url}`;
 
-      if (process.env.NODE_ENV === "development") {
+      if (isDevelopment()) {
         endpoint = `http://localhost:3004/api${url}`;
       }
 
@@ -503,7 +501,7 @@ const makeContext = (state: ApiState, setState) => {
           order,
           limit,
           cursor,
-          filters: f
+          filters: f,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
@@ -600,7 +598,7 @@ const makeContext = (state: ApiState, setState) => {
           order,
           limit,
           cursor,
-          filters: f
+          filters: f,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
@@ -645,7 +643,7 @@ const makeContext = (state: ApiState, setState) => {
           order,
           limit,
           cursor,
-          filters: f
+          filters: f,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
