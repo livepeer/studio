@@ -60,6 +60,7 @@ const Table = <D extends Record<string, unknown>>({
       // @ts-ignore
       initialState: { pageSize, pageIndex: 0 },
       manualSortBy: false,
+      autoResetPage: false,
       autoResetSortBy: false,
       autoResetSelectedRows: false,
     },
