@@ -1,7 +1,7 @@
 name: 24-hour-cron
 on:
   schedule:
-    - cron: "0 0 * * *" # run every day at midnight
+    - cron: "0 * * * *" # run every hour
 jobs:
   cron:
     runs-on: ubuntu-latest

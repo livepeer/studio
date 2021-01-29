@@ -50,13 +50,11 @@ app.post("/update", async (req, res) => {
 
   // get last updated date from cache
   if (cachedUsageHistory.length) {
-    let lastUpdatedDate =
-      cachedUsageHistory[cachedUsageHistory.length - 1].date;
-    fromTime = lastUpdatedDate + 86400000; // the day after the last updated date
+    fromTime = cachedUsageHistory[cachedUsageHistory.length - 1].date;
   }
 
-  // get all usage up until midnight yesterday
-  toTime = new Date(new Date().setUTCHours(0, 0, 0, 0)).getTime(); // midnight yesterday
+  // get all usage up until now
+  toTime = new Date().getTime();
 
   let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
     useReplica: true,
@@ -64,7 +62,12 @@ app.post("/update", async (req, res) => {
 
   // store each day of usage
   for (const row of usageHistory) {
-    await req.store.create({ kind: "usage", ...row });
+    // if row already exists in cache, update it, otherwise create it
+    if (cachedUsageHistory.find((c) => c.id === row.id)) {
+      await req.store.replace({ kind: "usage", ...row });
+    } else {
+      await req.store.create({ kind: "usage", ...row });
+    }
   }
 
   res.status(200);
