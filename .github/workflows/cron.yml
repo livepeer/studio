@@ -1,4 +1,4 @@
-name: 24-hour-cron
+name: 1-hour-cron
 on:
   schedule:
     - cron: "0 * * * *" # run every hour
@@ -10,4 +10,4 @@ jobs:
         run: |
           curl --request POST \
           --url 'https://livepeer.monster/api/usage/update' \
-          --header 'Authorization: Bearer ${{ secrets.LP_API_TOKEN }}'
+          --header 'Authorization: Bearer ${{ secrets.LP_API_ADMIN_TOKEN }}'

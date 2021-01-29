@@ -4,6 +4,18 @@ import { db } from "../store";
 const app = Router();
 
 app.get("/", async (req, res) => {
+  if (!req.headers.authorization) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
+  let token = req.headers.authorization.split(" ")[1]; // Bearer <token>
+
+  if (process.env.LP_API_ADMIN_TOKEN != token) {
+    res.status(403);
+    return res.json({ errors: ["unauthorized"] });
+  }
+
   let { fromTime, toTime } = req.query;
 
   // if time range isn't specified return all usage
@@ -25,14 +37,14 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/update", async (req, res) => {
-  let { apiToken } = req.body;
-
-  if (!apiToken) {
+  if (!req.headers.authorization) {
     res.status(403);
-    return res.json({ errors: ["missing api token"] });
+    return res.json({ errors: ["unauthorized"] });
   }
 
-  if (process.env.LP_API_TOKEN != req.body.apiToken) {
+  let token = req.headers.authorization.split(" ")[1]; // Bearer <token>
+
+  if (process.env.LP_API_ADMIN_TOKEN != token) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }
