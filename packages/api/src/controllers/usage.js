@@ -1,21 +1,10 @@
 import Router from "express/lib/router";
 import { db } from "../store";
+import { authMiddleware, validatePost } from "../middleware";
 
 const app = Router();
 
-app.get("/", async (req, res) => {
-  if (!req.headers.authorization) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
-
-  let token = req.headers.authorization.split(" ")[1]; // Bearer <token>
-
-  if (process.env.LP_API_ADMIN_TOKEN != token) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
-
+app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
   let { fromTime, toTime } = req.query;
 
   // if time range isn't specified return all usage
@@ -36,54 +25,47 @@ app.get("/", async (req, res) => {
   res.json(cachedUsageHistory);
 });
 
-app.post("/update", async (req, res) => {
-  if (!req.headers.authorization) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
+app.post(
+  "/update",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("usage"),
+  async (req, res) => {
+    let fromTime = +new Date(2020, 0); // start at beginning
+    let toTime = +new Date();
 
-  let token = req.headers.authorization.split(" ")[1]; // Bearer <token>
+    let cachedUsageHistory = await db.stream.cachedUsageHistory(
+      fromTime,
+      toTime,
+      {
+        useReplica: true,
+      }
+    );
 
-  if (process.env.LP_API_ADMIN_TOKEN != token) {
-    res.status(403);
-    return res.json({ errors: ["unauthorized"] });
-  }
+    // get last updated date from cache
+    if (cachedUsageHistory.length) {
+      fromTime = cachedUsageHistory[cachedUsageHistory.length - 1].date;
+    }
 
-  let fromTime = +new Date(2020, 0); // start at beginning
-  let toTime = +new Date();
+    // get all usage up until now
+    toTime = new Date().getTime();
 
-  let cachedUsageHistory = await db.stream.cachedUsageHistory(
-    fromTime,
-    toTime,
-    {
+    let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
       useReplica: true,
+    });
+
+    // store each day of usage
+    for (const row of usageHistory) {
+      // if row already exists in cache, update it, otherwise create it
+      if (cachedUsageHistory.find((c) => c.id === row.id)) {
+        await req.store.replace({ kind: "usage", ...row });
+      } else {
+        await req.store.create({ kind: "usage", ...row });
+      }
     }
-  );
 
-  // get last updated date from cache
-  if (cachedUsageHistory.length) {
-    fromTime = cachedUsageHistory[cachedUsageHistory.length - 1].date;
+    res.status(200);
+    res.json(usageHistory);
   }
-
-  // get all usage up until now
-  toTime = new Date().getTime();
-
-  let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
-    useReplica: true,
-  });
-
-  // store each day of usage
-  for (const row of usageHistory) {
-    // if row already exists in cache, update it, otherwise create it
-    if (cachedUsageHistory.find((c) => c.id === row.id)) {
-      await req.store.replace({ kind: "usage", ...row });
-    } else {
-      await req.store.create({ kind: "usage", ...row });
-    }
-  }
-
-  res.status(200);
-  res.json(usageHistory);
-});
+);
 
 export default app;
