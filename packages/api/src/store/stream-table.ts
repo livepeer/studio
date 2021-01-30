@@ -97,7 +97,6 @@ export default class StreamTable extends Table<Stream> {
 
     if (res.rowCount > 0) {
       for (const row of res.rows) {
-        knownDays[row.day] = row.day;
         let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
         usage.push({
           id: new Date(row.day).toLocaleDateString("en-CA"),
@@ -108,6 +107,7 @@ export default class StreamTable extends Table<Stream> {
           transcodedSegmentsDuration: row.transcodedsegmentsduration,
           streamCount: row.streamcount,
         });
+        knownDays[row.day] = usage.length - 1;
       }
     }
     const q2 = sql`SELECT
@@ -132,7 +132,7 @@ export default class StreamTable extends Table<Stream> {
     if (res.rowCount > 0) {
       for (const row of res.rows) {
         if (knownDays[row.day]) {
-          let index = usage.findIndex((r) => r.day === row.day);
+          let index = knownDays[row.day];
           usage[index].sourceSegments += +row.sourcesegments;
           usage[index].transcodedSegments += +row.transcodedsegments;
           usage[index].sourceSegmentsDuration += row.sourcesegmentsduration;
