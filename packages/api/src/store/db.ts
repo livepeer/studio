@@ -12,6 +12,7 @@ import {
   User,
   Webhook,
   PasswordResetToken,
+  Usage,
 } from "../schema/types";
 import Table from "./table";
 import StreamTable from "./stream-table";
@@ -27,6 +28,7 @@ export class DB {
   objectStore: Table<ObjectStore>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
+  usage: Table<Usage>;
   webhook: Table<Webhook>;
   passwordResetToken: Table<PasswordResetToken>;
 
@@ -91,6 +93,7 @@ export class DB {
       schema: schemas["api-token"],
     });
     this.user = new Table<User>({ db: this, schema: schemas["user"] });
+    this.usage = new Table<Usage>({ db: this, schema: schemas["usage"] });
     this.webhook = new Table<Webhook>({ db: this, schema: schemas["webhook"] });
     this.passwordResetToken = new Table<PasswordResetToken>({
       db: this,
