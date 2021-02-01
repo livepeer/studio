@@ -34,7 +34,10 @@ app.post(
     let toTime = +new Date();
 
     let lastUpdatedRow = (
-      await db.usage.find({}, { limit: 1, order: "data->>'date' DESC" })
+      await db.usage.find(
+        {},
+        { limit: 1, order: "data->>'date' DESC", useReplica: false }
+      )
     )[0];
 
     // get last updated date from cache
