@@ -17,7 +17,7 @@ app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     {
-      useReplica: true,
+      useReplica: false,
     }
   );
 
@@ -46,7 +46,7 @@ app.post(
     toTime = new Date().getTime();
 
     let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
-      useReplica: true,
+      useReplica: false,
     });
 
     // store each day of usage
