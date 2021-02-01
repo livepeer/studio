@@ -10,6 +10,7 @@ import webhook from "./webhook";
 import stripe from "./stripe";
 import version from "./version";
 import admin from "./admin";
+import usage from "./usage";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -25,4 +26,5 @@ export default {
   stripe,
   version,
   admin,
+  usage,
 };
