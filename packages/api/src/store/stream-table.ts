@@ -99,7 +99,7 @@ export default class StreamTable extends Table<Stream> {
       for (const row of res.rows) {
         let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
         usage.push({
-          id: new Date(row.day).toLocaleDateString("en-CA"),
+          id: new Date(row.day).toISOString().split("T")[0],
           date: dayStartTimestamp,
           sourceSegments: +row.sourcesegments,
           transcodedSegments: +row.transcodedsegments,
@@ -142,7 +142,7 @@ export default class StreamTable extends Table<Stream> {
         } else {
           let dayStartTimestamp = new Date(row.day).setUTCHours(0, 0, 0, 0);
           usage.push({
-            id: new Date(row.day).toLocaleDateString("en-CA"),
+            id: new Date(row.day).toISOString().split("T")[0],
             date: dayStartTimestamp,
             sourceSegments: +row.sourcesegments,
             transcodedSegments: +row.transcodedsegments,
