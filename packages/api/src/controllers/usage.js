@@ -34,7 +34,10 @@ app.post(
     let toTime = +new Date();
 
     let lastUpdatedRow = (
-      await db.usage.find({}, { limit: 1, order: "data->>'date' DESC" })
+      await db.usage.find(
+        {},
+        { limit: 1, order: "data->>'date' DESC", useReplica: false }
+      )
     )[0];
 
     // get last updated date from cache
@@ -46,7 +49,7 @@ app.post(
     toTime = new Date().getTime();
 
     let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
-      useReplica: true,
+      useReplica: false,
     });
 
     // store each day of usage
