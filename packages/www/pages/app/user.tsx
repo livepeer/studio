@@ -56,7 +56,6 @@ export default () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
-  console.log(user);
   const tabs = getTabs(0);
 
   return (

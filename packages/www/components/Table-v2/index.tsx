@@ -26,9 +26,9 @@ type Props<D extends Record<string, unknown>> = {
 const Table = <D extends Record<string, unknown>>({
   columns,
   data,
-  config = { pageSize: 100 },
+  config = {},
 }: Props<D>) => {
-  const { pageSize, onRowSelectionChange, initialSortBy } = config;
+  const { pageSize = 100, onRowSelectionChange, initialSortBy } = config;
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
