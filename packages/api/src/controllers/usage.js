@@ -36,7 +36,7 @@ app.post(
     let lastUpdatedRow = (
       await db.usage.find(
         {},
-        { limit: 1, order: "data->>'date' DESC", useReplica: false }
+        { limit: 1, order: "data->>'date' DESC", useReplica: true }
       )
     )[0];
 
@@ -49,7 +49,7 @@ app.post(
     toTime = new Date().getTime();
 
     let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
-      useReplica: false,
+      useReplica: true,
     });
 
     // store each day of usage
