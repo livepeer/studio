@@ -17,7 +17,7 @@ app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
     fromTime,
     toTime,
     {
-      useReplica: false,
+      useReplica: true,
     }
   );
 
