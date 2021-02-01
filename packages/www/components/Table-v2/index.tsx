@@ -15,18 +15,21 @@ import Checkbox from "components/Checkbox";
 type Props<D extends Record<string, unknown>> = {
   columns: Column<D>[];
   data: D[];
-  pageSize?: number;
-  config?: { rowSelection?: "individual" | "all" | null };
-  onRowSelectionChange?: (rows: Row<D>[]) => void;
+  config?: {
+    rowSelection?: "individual" | "all" | null;
+    pageSize?: number;
+    onRowSelectionChange?: (rows: Row<D>[]) => void;
+    initialSortBy?: { id: keyof D; desc: boolean }[];
+  };
 };
 
 const Table = <D extends Record<string, unknown>>({
   columns,
   data,
-  pageSize = 100,
-  config = {},
-  onRowSelectionChange,
+  config = { pageSize: 100 },
 }: Props<D>) => {
+  const { pageSize, onRowSelectionChange, initialSortBy } = config;
+
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
     // @ts-ignore
@@ -58,7 +61,7 @@ const Table = <D extends Record<string, unknown>>({
       columns,
       data,
       // @ts-ignore
-      initialState: { pageSize, pageIndex: 0 },
+      initialState: { pageSize, pageIndex: 0, sortBy: initialSortBy },
       manualSortBy: false,
       autoResetPage: false,
       autoResetSortBy: false,
