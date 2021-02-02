@@ -262,11 +262,9 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
       <TableV2
         columns={columns}
         data={data}
-        config={{
-          rowSelection: "all",
-          onRowSelectionChange: handleRowSelectionChange,
-          initialSortBy: [{ id: "created", desc: true }],
-        }}
+        rowSelection="all"
+        onRowSelectionChange={handleRowSelectionChange}
+        initialSortBy={[{ id: "created", desc: true }]}
       />
     </Container>
   );
