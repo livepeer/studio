@@ -12,36 +12,38 @@ import Paginator from "./paginator";
 import ReactTooltip from "react-tooltip";
 import Help from "../../public/img/help.svg";
 import Checkbox from "components/Checkbox";
+import {
+  CheckboxFilter,
+  CheckboxFilterProps,
+  InputFilterProps,
+  TextFilter,
+} from "./filters";
 
-type Props<D extends Record<string, unknown>> = {
-  columns: Column<D>[];
-  data: D[];
+type Filter<Table extends Record<string, unknown>> =
+  | { type: "text"; props: InputFilterProps<Table> }
+  | { type: "checkbox"; props: CheckboxFilterProps<Table> };
+
+type Props<Table extends Record<string, unknown>> = {
+  columns: Column<Table>[];
+  data: Table[];
   header?: React.ReactNode;
-  config?: {
-    rowSelection?: "individual" | "all" | null;
-    pageSize?: number;
-    onRowSelectionChange?: (rows: Row<D>[]) => void;
-    initialSortBy?: { id: keyof D; desc: boolean }[];
-    filters?: ((props: {
-      setFilter: (id: keyof D, value: any) => void;
-      currentFilters: { id: keyof D; value: any }[];
-    }) => JSX.Element)[];
-  };
+  rowSelection?: "individual" | "all" | null;
+  pageSize?: number;
+  onRowSelectionChange?: (rows: Row<Table>[]) => void;
+  initialSortBy?: { id: keyof Table; desc: boolean }[];
+  filters?: Filter<Table>[];
 };
 
-const Table = <D extends Record<string, unknown>>({
+const Table = <Table extends Record<string, unknown>>({
   columns,
   data,
   header,
-  config = {},
-}: Props<D>) => {
-  const {
-    pageSize = 100,
-    onRowSelectionChange,
-    initialSortBy,
-    filters,
-  } = config;
-
+  pageSize = 100,
+  rowSelection,
+  onRowSelectionChange,
+  initialSortBy,
+  filters,
+}: Props<Table>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
     // @ts-ignore
@@ -86,15 +88,15 @@ const Table = <D extends Record<string, unknown>>({
       autoResetPage: false,
       autoResetFilters: false,
       autoResetSortBy: false,
-      autoResetSelectedRows: false,
+      autoResetSelectedRows: true,
     },
     useFilters,
     useSortBy,
     usePagination,
     useRowSelect,
     (hooks) => {
-      if (config.rowSelection) {
-        const isIndividualSelection = config.rowSelection === "individual";
+      if (rowSelection) {
+        const isIndividualSelection = rowSelection === "individual";
         hooks.visibleColumns.push((columns) => [
           // Let's make a column for selection
           {
@@ -153,13 +155,38 @@ const Table = <D extends Record<string, unknown>>({
                 alignItems: "center",
                 justifyContent: "flex-end",
               }}>
-              {filters.map((FilterComponent, i) => (
-                <FilterComponent
-                  setFilter={setFilter}
-                  currentFilters={currentFilters}
-                  key={i}
-                />
-              ))}
+              {filters.map((f) => {
+                let filter: JSX.Element;
+                switch (f.type) {
+                  case "text":
+                    filter = (
+                      <TextFilter
+                        {...f.props}
+                        setFilter={setFilter}
+                        currentFilters={currentFilters}
+                      />
+                    );
+                    break;
+                  case "checkbox":
+                    filter = (
+                      <CheckboxFilter
+                        {...f.props}
+                        setFilter={setFilter}
+                        currentFilters={currentFilters}
+                      />
+                    );
+                    break;
+                  default:
+                    return null;
+                }
+                return (
+                  <div
+                    key={`${f.type}-${f.props.columnId}`}
+                    sx={{ ":not(:last-of-type)": { mr: 3 } }}>
+                    {filter}
+                  </div>
+                );
+              })}
             </div>
           ) : null}
         </div>

@@ -211,45 +211,25 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       <Table
         columns={columns}
         data={data}
-        config={{
-          pageSize: 5,
-          initialSortBy: [{ id: "created", desc: true }],
-          rowSelection: "all",
-          onRowSelectionChange: handleRowSelectionChange,
-          filters: [
-            ({ setFilter, currentFilters }) => {
-              const isChecked =
-                currentFilters?.find((f) => f.id === "status")?.value ===
-                "active";
-              return (
-                <Flex
-                  sx={{ display: "inline-flex", alignItems: "baseline", mr: 3 }}
-                  onClick={() =>
-                    setFilter("status", isChecked ? undefined : "active")
-                  }>
-                  <Checkbox value={isChecked} />
-                  <Box
-                    sx={{ ml: "0.5em", userSelect: "none", cursor: "default" }}>
-                    Show active only
-                  </Box>
-                </Flex>
-              );
+        pageSize={5}
+        initialSortBy={[{ id: "created", desc: true }]}
+        rowSelection={"all"}
+        onRowSelectionChange={handleRowSelectionChange}
+        filters={[
+          {
+            type: "checkbox",
+            props: {
+              label: "Show active only",
+              columnId: "status",
+              valueIfTrue: "active",
+              valueIfFalse: undefined,
             },
-            ({ setFilter, currentFilters }) => (
-              <div>
-                <Input
-                  sx={{ width: "100%", maxWidth: "300px" }}
-                  placeholder="Filter by email"
-                  value={
-                    currentFilters?.find((f) => f.id === "userName")?.value ??
-                    ""
-                  }
-                  onChange={(e) => setFilter("userName", e.target.value)}
-                />
-              </div>
-            ),
-          ],
-        }}
+          },
+          {
+            type: "text",
+            props: { placeholder: "Filter by email", columnId: "userName" },
+          },
+        ]}
         header={
           <>
             <Link
@@ -269,7 +249,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
               aria-label="Delete Stream button"
               disabled={!selectedStreams.length}
               sx={{ ml: 3 }}
-              onClick={() => selectedStreams.length && setDeleteModal(true)}>
+              onClick={() => setDeleteModal(true)}>
               Delete
             </Button>
           </>
