@@ -491,7 +491,8 @@ const makeContext = (state: ApiState, setState) => {
       order?: string,
       filters?: Array<{ id: string; vaule: string }>,
       limit?: number,
-      cursor?: string
+      cursor?: string,
+      nonLivepeerOnly?: boolean
     ): Promise<[Array<Stream> | ApiError, string, Response]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const [res, streams] = await context.fetch(
@@ -502,6 +503,7 @@ const makeContext = (state: ApiState, setState) => {
           limit,
           cursor,
           filters: f,
+          nonLivepeerOnly,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));

@@ -53,6 +53,7 @@ const Segments = ({ stream }: { stream: Stream }) => {
 
 const AdminStreamsTable = ({ id }: { id: string }) => {
   const [activeOnly, setActiveOnly] = useState(true);
+  const [nonLivepeerOnly, setNonLivepeerOnly] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStream, setSelectedStream] = useState(null);
   const [streams, setStreams] = useState([]);
@@ -134,7 +135,14 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       setLastFilters(filters);
       setLastOrder(order);
     }
-    getAdminStreams(activeOnly, order, filters, ROWS_PER_PAGE, cursor)
+    getAdminStreams(
+      activeOnly,
+      order,
+      filters,
+      ROWS_PER_PAGE,
+      cursor,
+      nonLivepeerOnly
+    )
       .then((result) => {
         const [users, nextCursor, resp] = result;
         if (resp.ok && Array.isArray(users)) {
@@ -163,7 +171,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
 
   useEffect(() => {
     refecth();
-  }, [activeOnly]);
+  }, [activeOnly, nonLivepeerOnly]);
 
   return (
     <Container
@@ -220,6 +228,15 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
           onClick={() => setActiveOnly(!activeOnly)}>
           <Checkbox value={activeOnly} />
           <Box sx={{ ml: "0.5em" }}> Show active only</Box>
+        </Flex>
+        <Flex
+          sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
+          onClick={() => setNonLivepeerOnly(!nonLivepeerOnly)}>
+          <Checkbox value={nonLivepeerOnly} />
+          <Box sx={{ ml: "0.5em" }}>
+            {" "}
+            Exclude streams from a Livepeer email address
+          </Box>
         </Flex>
       </CommonAdminTable>
     </Container>
