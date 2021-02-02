@@ -9,5 +9,5 @@ jobs:
       - name: Update usage table
         run: |
           curl --request POST \
-          --url 'https://livepeer.monster/api/usage/update' \
+          --url 'https://livepeer.com/api/usage/update' \
           --header 'Authorization: Bearer ${{ secrets.LP_API_ADMIN_TOKEN }}'
