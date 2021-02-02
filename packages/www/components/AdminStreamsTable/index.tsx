@@ -135,14 +135,14 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       setLastFilters(filters);
       setLastOrder(order);
     }
-    getAdminStreams(
-      activeOnly,
+    getAdminStreams({
       order,
       filters,
-      ROWS_PER_PAGE,
       cursor,
-      nonLivepeerOnly
-    )
+      nonLivepeerOnly,
+      limit: ROWS_PER_PAGE,
+      active: activeOnly,
+    })
       .then((result) => {
         const [users, nextCursor, resp] = result;
         if (resp.ok && Array.isArray(users)) {

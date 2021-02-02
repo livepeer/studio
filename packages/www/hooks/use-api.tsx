@@ -486,14 +486,21 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getAdminStreams(
-      active = false,
-      order?: string,
-      filters?: Array<{ id: string; vaule: string }>,
-      limit?: number,
-      cursor?: string,
-      nonLivepeerOnly?: boolean
-    ): Promise<[Array<Stream> | ApiError, string, Response]> {
+    async getAdminStreams({
+      active,
+      nonLivepeerOnly,
+      order,
+      filters,
+      limit,
+      cursor,
+    }: {
+      active?: boolean;
+      nonLivepeerOnly?: boolean;
+      order?: string;
+      filters?: Array<{ id: string; vaule: string }>;
+      limit?: number;
+      cursor?: string;
+    }): Promise<[Array<Stream> | ApiError, string, Response]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const [res, streams] = await context.fetch(
         `/stream?${qs.stringify({
