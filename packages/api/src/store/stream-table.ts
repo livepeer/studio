@@ -128,10 +128,9 @@ export default class StreamTable extends Table<Stream> {
     `;
 
     res = await this.db.queryWithOpts(q2, opts);
-
     if (res.rowCount > 0) {
       for (const row of res.rows) {
-        if (knownDays[row.day]) {
+        if (knownDays[row.day] !== undefined) {
           let index = knownDays[row.day];
           usage[index].sourceSegments += +row.sourcesegments;
           usage[index].transcodedSegments += +row.transcodedsegments;
