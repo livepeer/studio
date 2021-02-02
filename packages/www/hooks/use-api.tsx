@@ -489,7 +489,7 @@ const makeContext = (state: ApiState, setState) => {
     async getAdminStreams(
       active = false,
       order?: string,
-      filters?: Array<{ id: string; vaule: string }>,
+      filters?: Array<{ id: string; value: string }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<Stream> | ApiError, string, Response]> {

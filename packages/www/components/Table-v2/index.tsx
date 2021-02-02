@@ -1,6 +1,7 @@
 import {
   Column,
   Row,
+  useAsyncDebounce,
   useFilters,
   usePagination,
   useRowSelect,
@@ -19,22 +20,32 @@ import {
   TextFilter,
 } from "./filters";
 
-type Filter<Table extends Record<string, unknown>> =
+type FilterItem<Table extends Record<string, unknown>> =
   | { type: "text"; props: InputFilterProps<Table> }
   | { type: "checkbox"; props: CheckboxFilterProps<Table> };
 
-type Props<Table extends Record<string, unknown>> = {
-  columns: Column<Table>[];
-  data: Table[];
+type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
+type Filter<T extends Record<string, unknown>> = { id: keyof T; value: any };
+export type FetchDataF<T extends Record<string, unknown>> = (
+  filters: Filter<T>[],
+  sortBy: Sort<T>[],
+  lastRow: Row<T> | null
+) => void;
+
+type Props<T extends Record<string, unknown>> = {
+  fetchData?: FetchDataF<T>;
+  columns: Column<T>[];
+  data: T[];
   header?: React.ReactNode;
   rowSelection?: "individual" | "all" | null;
   pageSize?: number;
-  onRowSelectionChange?: (rows: Row<Table>[]) => void;
-  initialSortBy?: { id: keyof Table; desc: boolean }[];
-  filters?: Filter<Table>[];
+  onRowSelectionChange?: (rows: Row<T>[]) => void;
+  initialSortBy?: Sort<T>[];
+  filters?: FilterItem<T>[];
 };
 
-const Table = <Table extends Record<string, unknown>>({
+const Table = <T extends Record<string, unknown>>({
+  fetchData,
   columns,
   data,
   header,
@@ -43,7 +54,7 @@ const Table = <Table extends Record<string, unknown>>({
   onRowSelectionChange,
   initialSortBy,
   filters,
-}: Props<Table>) => {
+}: Props<T>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
     // @ts-ignore
@@ -54,6 +65,7 @@ const Table = <Table extends Record<string, unknown>>({
     getTableProps,
     getTableBodyProps,
     prepareRow,
+    rows,
     headerGroups,
     // @ts-ignore
     page,
@@ -72,7 +84,7 @@ const Table = <Table extends Record<string, unknown>>({
     // @ts-ignore
     setFilter,
     // @ts-ignore
-    state: { filters: currentFilters },
+    state: { filters: currentFilters, sortBy },
   } = useTable(
     {
       // @ts-ignore
@@ -85,9 +97,9 @@ const Table = <Table extends Record<string, unknown>>({
         ...(initialSortBy ? { sortBy: initialSortBy } : undefined),
       },
       manualSortBy: false,
-      autoResetPage: false,
       autoResetFilters: false,
       autoResetSortBy: false,
+      autoResetPage: false,
       autoResetSelectedRows: true,
     },
     useFilters,
@@ -135,6 +147,23 @@ const Table = <Table extends Record<string, unknown>>({
   useEffect(() => {
     onRowSelectionChange?.(selectedFlatRows);
   }, [selectedFlatRows, onRowSelectionChange]);
+
+  const debouncedFetchData = useAsyncDebounce(fetchData, 500);
+
+  useEffect(() => {
+    if (!canNextPage && fetchData) {
+      // Should fetch next page of data
+      const lastRow = rows[rows.length - 1] ?? null;
+      debouncedFetchData(currentFilters, sortBy, lastRow as any);
+    }
+  }, [
+    rows,
+    currentFilters,
+    sortBy,
+    canNextPage,
+    debouncedFetchData,
+    fetchData,
+  ]);
 
   return (
     <div>

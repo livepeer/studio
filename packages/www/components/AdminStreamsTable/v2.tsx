@@ -1,21 +1,10 @@
-import {
-  useEffect,
-  useState,
-  useMemo,
-  ComponentProps,
-  useCallback,
-} from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { useApi, usePageVisibility } from "../../hooks";
-import { Box, Button, Container, Flex } from "@theme-ui/components";
+import { uniqBy } from "lodash";
+import { useApi } from "../../hooks";
+import { Box, Button, Container } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
-import { Checkbox } from "../Table";
-import { RenditionsDetails } from "../StreamsTable";
-import ReactTooltip from "react-tooltip";
-import { Stream } from "@livepeer.com/api";
-import CommonAdminTable from "../CommonAdminTable";
-import { StreamName } from "../CommonAdminTable";
-import Table from "components/Table-v2";
+import Table, { FetchDataF } from "components/Table-v2";
 import TextCell, { TextCellProps } from "components/Table-v2/cells/text";
 import {
   WithStreamProps,
@@ -26,7 +15,6 @@ import DateCell, { DateCellProps } from "components/Table-v2/cells/date";
 import { Column, Row } from "react-table";
 import { SortTypeArgs } from "components/Table-v2/types";
 import { dateSort, stringSort } from "components/Table-v2/sorts";
-import { Input } from "@theme-ui/components";
 
 const ROWS_PER_PAGE = 20;
 
@@ -45,11 +33,13 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
-  const [nextCursor, setNextCursor] = useState("");
-  const [lastCursor, setLastCursor] = useState("");
-  const [lastOrder, setLastOrder] = useState("");
-  const [lastFilters, setLastFilters] = useState([]);
   const { getAdminStreams, deleteStream, deleteStreams } = useApi();
+
+  const [lastFetchData, setLastFetchData] = useState<{
+    cursor?: string;
+    filters?: string;
+    sort?: string;
+  }>();
 
   const close = useCallback(() => {
     setDeleteModal(false);
@@ -104,7 +94,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         disableSortBy: true,
       },
     ],
-    [nextCursor, lastFilters]
+    []
   );
 
   const data: AdminStreamsTableData[] = useMemo(() => {
@@ -133,41 +123,50 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
     });
   }, [streams]);
 
-  const fetchData = useCallback(
-    ({ order, cursor, filters }, refetch: boolean = false) => {
-      if (!refetch) {
-        setLastCursor(cursor);
-        setLastFilters(filters);
-        setLastOrder(order);
+  const fetchData: FetchDataF<AdminStreamsTableData> = useCallback(
+    async (filters, sortBy) => {
+      const parsedSort = sortBy.map((o) => `${o.id}-${o.desc}`).join(",");
+      const parsedFilters = filters ? JSON.stringify(filters) : undefined;
+
+      let cursorToUse = lastFetchData?.cursor;
+      if (
+        lastFetchData?.filters !== parsedFilters ||
+        lastFetchData?.sort !== parsedSort
+      ) {
+        // Reset cursor when filtering or sorting changes
+        cursorToUse = undefined;
       }
-      getAdminStreams(false, order, filters, ROWS_PER_PAGE, cursor)
-        .then((result) => {
-          const [users, nextCursor, resp] = result;
-          if (resp.ok && Array.isArray(users)) {
-            setNextCursor(nextCursor);
-            setStreams(users);
-          } else {
-            const errors = JSON.stringify(users["errors"] || resp.statusText);
-            console.error(errors);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+
+      try {
+        const [streams, nextCursor, resp] = await getAdminStreams(
+          false,
+          parsedSort,
+          filters,
+          ROWS_PER_PAGE,
+          cursorToUse
+        );
+        if (resp.ok && Array.isArray(streams)) {
+          setStreams((prev) => uniqBy([...prev, ...streams], "id"));
+          setLastFetchData({
+            cursor: nextCursor,
+            filters: parsedFilters,
+            sort: parsedSort,
+          });
+        } else {
+          const errors = JSON.stringify(streams["errors"] || resp.statusText);
+          console.error(errors);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
-    [getAdminStreams]
+    [getAdminStreams, streams, lastFetchData]
   );
 
   const refetch = useCallback(() => {
-    fetchData(
-      { order: lastOrder, cursor: lastCursor, filters: lastFilters },
-      true
-    );
+    // TODO pass last filter and sort data
+    fetchData([], [], null);
   }, [fetchData]);
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   const handleRowSelectionChange = useCallback(
     (rows: Row<AdminStreamsTableData>[]) => {
@@ -209,6 +208,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       )}
       <Box sx={{ mt: 3 }} />
       <Table
+        fetchData={fetchData}
         columns={columns}
         data={data}
         pageSize={5}
