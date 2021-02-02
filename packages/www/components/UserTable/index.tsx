@@ -38,33 +38,33 @@ const UserTable = ({ userId, id }: UserTableProps) => {
     () => [
       {
         Header: "ID",
-        accessor: "id"
+        accessor: "id",
       },
       {
         Header: "Email",
-        accessor: "email"
+        accessor: "email",
       },
       {
         Header: "EmailValid",
         accessor: "emailValid",
         Cell: (cell) => {
           return cell.value ? "true" : "false";
-        }
+        },
       },
       {
         Header: "Admin",
         accessor: "admin",
         Cell: (cell) => {
           return cell.value ? "true" : "false";
-        }
+        },
       },
       {
         Header: "Plan",
         accessor: "stripeProductId",
         Cell: ({ value }) => {
           return getProductName(value);
-        }
-      }
+        },
+      },
     ],
     [nextCursor, lastFilters]
   );
@@ -78,8 +78,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           return (
             <Select
               sx={{ ml: "1em", width: "8em" }}
-              onChange={(e) => setValue(e.target.value)}
-            >
+              onChange={(e) => setValue(e.target.value)}>
               <option id="empty" value="">
                 —
               </option>
@@ -90,8 +89,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               ))}
             </Select>
           );
-        }
-      }
+        },
+      },
     ],
     []
   );
@@ -157,8 +156,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 makeUserAdmin(selectedUser.email, true)
                   .then(refecth)
                   .finally(close);
-              }}
-            >
+              }}>
               Make User Admin
             </Button>
           </Flex>
@@ -186,8 +184,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 makeUserAdmin(selectedUser.email, false)
                   .then(refecth)
                   .finally(close);
-              }}
-            >
+              }}>
               Remove Admin Rights
             </Button>
           </Flex>
@@ -204,21 +201,19 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         err={loadingError}
         columns={columns}
         filtersDesc={filtersDesc}
-      >
+        initialSortBy={[{ id: "email", desc: false }]}>
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || selectedUser.admin}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setAdminModal(true)}
-        >
+          onClick={() => selectedUser && setAdminModal(true)}>
           Make User Admin
         </Button>
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || !selectedUser.admin}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setRemoveAdminModal(true)}
-        >
+          onClick={() => selectedUser && setRemoveAdminModal(true)}>
           Remove Admin Rights
         </Button>
       </CommonAdminTable>
