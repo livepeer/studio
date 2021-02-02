@@ -18,6 +18,7 @@ app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
     toTime,
     {
       useReplica: true,
+      orderBy: "date",
     }
   );
 
