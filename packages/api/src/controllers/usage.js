@@ -30,23 +30,27 @@ app.post(
   authMiddleware({ anyAdmin: true }),
   validatePost("usage"),
   async (req, res) => {
-    let fromTime = +new Date(2020, 0); // start at beginning
-    let toTime = +new Date();
+    let { fromTime, toTime } = req.query;
 
-    let lastUpdatedRow = (
-      await db.usage.find(
-        {},
-        { limit: 1, order: "data->>'date' DESC", useReplica: true }
-      )
-    )[0];
+    // if time range isn't specified return all usage
+    if (!fromTime) {
+      let rows = (
+        await db.usage.find(
+          {},
+          { limit: 1, order: "data->>'date' DESC", useReplica: true }
+        )
+      )[0];
 
-    // get last updated date from cache
-    if (lastUpdatedRow.length) {
-      fromTime = lastUpdatedRow[0].date;
+      if (rows.length) {
+        fromTime = rows[0].date; // get last updated date from cache
+      } else {
+        fromTime = +new Date(2020, 0); // start at beginning
+      }
     }
 
-    // get all usage up until now
-    toTime = new Date().getTime();
+    if (!toTime) {
+      toTime = +new Date();
+    }
 
     let usageHistory = await db.stream.usageHistory(fromTime, toTime, {
       useReplica: true,
@@ -54,8 +58,9 @@ app.post(
 
     // store each day of usage
     for (const row of usageHistory) {
+      const dbRow = await req.store.get(`usage/${row.id}`);
       // if row already exists in cache, update it, otherwise create it
-      if (fromTime === row.date) {
+      if (dbRow) {
         await req.store.replace({ kind: "usage", ...row });
       } else {
         await req.store.create({ kind: "usage", ...row });
