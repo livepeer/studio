@@ -48,7 +48,7 @@ const Profile = ({
   );
 };
 
-export type RenditionDetailsCellProps = {
+export type WithStreamProps = {
   stream: Stream;
 };
 
@@ -56,7 +56,7 @@ const RenditionsDetailsCell = <D extends TableData>({
   cell: {
     value: { stream },
   },
-}: CellComponentProps<D, RenditionDetailsCellProps>) => {
+}: CellComponentProps<D, WithStreamProps>) => {
   let details = "";
   let detailsTooltip;
   if (stream.presets?.length) {
@@ -113,4 +113,47 @@ const RenditionsDetailsCell = <D extends TableData>({
   );
 };
 
-export { RenditionsDetailsCell };
+function dur2str(dur?: number) {
+  if (!dur) {
+    return "";
+  }
+  if (dur < 120) {
+    return `${dur.toFixed(2)} sec`;
+  }
+  const min = dur / 60;
+  if (min < 12) {
+    return `${min.toFixed(2)} min`;
+  }
+  const hour = min / 60;
+  return `${hour.toFixed(2)} hours`;
+}
+
+const SegmentsCell = <D extends TableData>({
+  cell: {
+    value: { stream },
+  },
+}: CellComponentProps<D, WithStreamProps>) => {
+  const idpref = `segments-${stream.id}`;
+  return (
+    <Box id={idpref} key={idpref}>
+      <ReactTooltip
+        id={`tooltip-${idpref}`}
+        className="tooltip"
+        place="top"
+        type="dark"
+        effect="solid">
+        Source segments / Transcoded segments
+      </ReactTooltip>
+      <span data-tip data-for={`tooltip-${idpref}`}>
+        {stream.sourceSegments || 0}/{stream.transcodedSegments || 0}
+      </span>
+      <br />
+      <span>
+        {dur2str(stream.sourceSegmentsDuration || 0)}/
+        {dur2str(stream.transcodedSegmentsDuration || 0)}
+      </span>
+    </Box>
+  );
+};
+
+export { RenditionsDetailsCell, SegmentsCell };

@@ -9,6 +9,7 @@ import ReactTooltip from "react-tooltip";
 import { Stream } from "@livepeer.com/api";
 import CommonAdminTable from "../CommonAdminTable";
 import { StreamName } from "../CommonAdminTable";
+import Table from "components/Table-v2";
 
 const ROWS_PER_PAGE = 20;
 
@@ -72,14 +73,14 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
     () => [
       {
         Header: "User Name",
-        accessor: "user.email"
+        accessor: "user.email",
       },
       {
         Header: "Name",
         accessor: "name",
         Cell: (cell) => {
           return <StreamName stream={cell.row.original} admin={true} />;
-        }
+        },
       },
       {
         Header: "Details",
@@ -87,30 +88,30 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         disableSortBy: true,
         Cell: (cell) => {
           return <RenditionsDetails stream={cell.row.original} />;
-        }
+        },
       },
       {
         Header: "Segments",
         accessor: "sourceSegments",
         Cell: (cell) => {
           return <Segments stream={cell.row.original} />;
-        }
+        },
       },
       {
         Header: "Created",
-        accessor: "createdAt"
+        accessor: "createdAt",
       },
       {
         Header: "Last Active",
-        accessor: "lastSeen"
+        accessor: "lastSeen",
       },
       {
         Header: "Status",
         accessor: "isActive",
         Cell: (cell) => {
           return cell.value ? "Active" : "Idle";
-        }
-      }
+        },
+      },
     ],
     [nextCursor, lastFilters]
   );
@@ -118,7 +119,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
   const filtersDesc = useMemo(
     () => [
       { id: "name", placeholder: "name" },
-      { id: "user.email", placeholder: "user's email" }
+      { id: "user.email", placeholder: "user's email" },
     ],
     []
   );
@@ -157,19 +158,6 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
     );
   };
 
-  /*
-  const isVisible = usePageVisibility();
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      refecth();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isVisible]);
-  */
-
   useEffect(() => {
     refecth();
   }, [activeOnly]);
@@ -205,9 +193,8 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         filtersDesc={filtersDesc}
         initialSortBy={[
           { id: "lastSeen", desc: true },
-          { id: "createdAt", desc: true }
-        ]}
-      >
+          { id: "createdAt", desc: true },
+        ]}>
         <Link
           href={{ pathname: "/app/stream/new-stream", query: { admin: true } }}
           as="/app/stream/new-stream">

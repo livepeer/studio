@@ -11,7 +11,7 @@ import TextCell, { TextCellProps } from "components/Table-v2/cells/text";
 import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "components/Table-v2/cells/date";
 import {
-  RenditionDetailsCellProps,
+  WithStreamProps,
   RenditionsDetailsCell,
 } from "components/Table-v2/cells/streams-table";
 import { dateSort, stringSort } from "components/Table-v2/sorts";
@@ -120,7 +120,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
 type StreamsTableData = {
   id: string;
   name: TextCellProps;
-  details: RenditionDetailsCellProps;
+  details: WithStreamProps;
   created: DateCellProps;
   lastActive: DateCellProps;
   status: string;
@@ -243,22 +243,6 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
           }}
         />
       )}
-      <Flex sx={{ alignItems: "center", mb: 3 }}>
-        <Box>
-          <Link href="/app/stream/new-stream" passHref>
-            <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
-              Create
-            </A>
-          </Link>
-          <Button
-            variant="primarySmall"
-            aria-label="Delete Stream button"
-            disabled={!selectedStreams.length}
-            onClick={() => selectedStreams.length && setDeleteModal(true)}>
-            Delete
-          </Button>
-        </Box>
-      </Flex>
       <TableV2
         columns={columns}
         data={data}
@@ -267,6 +251,22 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
           onRowSelectionChange: handleRowSelectionChange,
           initialSortBy: [{ id: "created", desc: true }],
         }}
+        header={
+          <>
+            <Link href="/app/stream/new-stream" passHref>
+              <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
+                Create
+              </A>
+            </Link>
+            <Button
+              variant="primarySmall"
+              aria-label="Delete Stream button"
+              disabled={!selectedStreams.length}
+              onClick={() => selectedStreams.length && setDeleteModal(true)}>
+              Delete
+            </Button>
+          </>
+        }
       />
     </Container>
   );

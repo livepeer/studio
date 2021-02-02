@@ -1,6 +1,7 @@
 import {
   Column,
   Row,
+  useFilters,
   usePagination,
   useRowSelect,
   useSortBy,
@@ -15,20 +16,31 @@ import Checkbox from "components/Checkbox";
 type Props<D extends Record<string, unknown>> = {
   columns: Column<D>[];
   data: D[];
+  header?: React.ReactNode;
   config?: {
     rowSelection?: "individual" | "all" | null;
     pageSize?: number;
     onRowSelectionChange?: (rows: Row<D>[]) => void;
     initialSortBy?: { id: keyof D; desc: boolean }[];
+    filters?: ((props: {
+      setFilter: (id: keyof D, value: any) => void;
+      currentFilters: { id: keyof D; value: any }[];
+    }) => JSX.Element)[];
   };
 };
 
 const Table = <D extends Record<string, unknown>>({
   columns,
   data,
+  header,
   config = {},
 }: Props<D>) => {
-  const { pageSize = 100, onRowSelectionChange, initialSortBy } = config;
+  const {
+    pageSize = 100,
+    onRowSelectionChange,
+    initialSortBy,
+    filters,
+  } = config;
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -55,18 +67,28 @@ const Table = <D extends Record<string, unknown>>({
     toggleAllRowsSelected,
     // @ts-ignore
     selectedFlatRows,
+    // @ts-ignore
+    setFilter,
+    // @ts-ignore
+    state: { filters: currentFilters },
   } = useTable(
     {
       // @ts-ignore
       columns,
       data,
-      // @ts-ignore
-      initialState: { pageSize, pageIndex: 0, sortBy: initialSortBy },
+      initialState: {
+        // @ts-ignore
+        pageSize,
+        pageIndex: 0,
+        ...(initialSortBy ? { sortBy: initialSortBy } : undefined),
+      },
       manualSortBy: false,
       autoResetPage: false,
+      autoResetFilters: false,
       autoResetSortBy: false,
       autoResetSelectedRows: false,
     },
+    useFilters,
     useSortBy,
     usePagination,
     useRowSelect,
@@ -114,8 +136,36 @@ const Table = <D extends Record<string, unknown>>({
 
   return (
     <div>
+      {header || filters ? (
+        <div
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 3,
+          }}>
+          <div>{header}</div>
+          {filters ? (
+            <div
+              sx={{
+                flex: "1",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}>
+              {filters.map((FilterComponent, i) => (
+                <FilterComponent
+                  setFilter={setFilter}
+                  currentFilters={currentFilters}
+                  key={i}
+                />
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <div sx={{ overflow: "hidden" }}>
-        <div className="overflow-x-auto" sx={{ overflowX: "auto" }}>
+        <div sx={{ overflowX: "auto" }}>
           <table
             {...getTableProps()}
             sx={{
