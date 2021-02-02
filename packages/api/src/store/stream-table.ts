@@ -50,6 +50,7 @@ export default class StreamTable extends Table<Stream> {
     
     FROM usage WHERE data->>'date' >= ${fromTime}
       AND data->>'date' < ${toTime}
+      ORDER BY date
     `;
 
     let res: QueryResult<dbUsageData>;
