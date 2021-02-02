@@ -5,7 +5,7 @@ import TabbedLayout from "../../../components/TabbedLayout";
 import AdminStreamsTable from "../../../components/AdminStreamsTable";
 import { getTabs } from "../admin";
 
-export default () => {
+const AdminStreamsPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
@@ -19,3 +19,5 @@ export default () => {
     </TabbedLayout>
   );
 };
+
+export default AdminStreamsPage;

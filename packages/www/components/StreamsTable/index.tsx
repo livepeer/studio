@@ -1,13 +1,21 @@
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
-import { Table, TableRow, TableRowVariant, Checkbox } from "../Table";
+import TableV2 from "../Table-v2";
 import Help from "../../public/img/help.svg";
 import { Stream } from "@livepeer.com/api";
-import { RelativeTime, StreamName } from "../CommonAdminTable";
+import TextCell, { TextCellProps } from "components/Table-v2/cells/text";
+import { Column, Row } from "react-table";
+import DateCell, { DateCellProps } from "components/Table-v2/cells/date";
+import {
+  RenditionDetailsCellProps,
+  RenditionsDetailsCell,
+} from "components/Table-v2/cells/streams-table";
+import { dateSort, stringSort } from "components/Table-v2/sorts";
+import { SortTypeArgs } from "components/Table-v2/types";
 
 type ProfileProps = {
   id: string;
@@ -109,27 +117,33 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
   );
 };
 
+type StreamsTableData = {
+  id: string;
+  name: TextCellProps;
+  details: RenditionDetailsCellProps;
+  created: DateCellProps;
+  lastActive: DateCellProps;
+  status: string;
+};
+
 const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
-  const [broadcasters, setBroadcasters] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedStream, setSelectedStream] = useState([]);
+  const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
-  useEffect(() => {
-    getBroadcasters()
-      .then((broadcasters) => setBroadcasters(broadcasters))
-      .catch((err) => console.error(err)); // todo: surface this
-  }, []);
+
   useEffect(() => {
     getStreams(userId)
       .then((streams) => setStreams(streams))
       .catch((err) => console.error(err)); // todo: surface this
   }, [userId, deleteModal]);
-  const close = () => {
+
+  const close = useCallback(() => {
     setDeleteModal(false);
-    setSelectedStream([]);
-  };
+  }, []);
+
   const isVisible = usePageVisibility();
+
   useEffect(() => {
     if (!isVisible) {
       return;
@@ -141,18 +155,90 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
     }, 5000);
     return () => clearInterval(interval);
   }, [userId, isVisible]);
+
+  const columns: Column<StreamsTableData>[] = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "name",
+        Cell: TextCell,
+        sortType: (...params: SortTypeArgs) =>
+          stringSort("original.name.children", ...params),
+      },
+      {
+        Header: "Details",
+        accessor: "details",
+        Cell: RenditionsDetailsCell,
+        disableSortBy: true,
+      },
+      {
+        Header: "Created",
+        accessor: "created",
+        Cell: DateCell,
+        sortType: (...params: SortTypeArgs) =>
+          dateSort("original.created.date", ...params),
+      },
+      {
+        Header: "Last Active",
+        accessor: "lastActive",
+        Cell: DateCell,
+        sortType: (...params: SortTypeArgs) =>
+          dateSort("original.lastActive.date", ...params),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        disableSortBy: true,
+      },
+    ],
+    []
+  );
+
+  const data: StreamsTableData[] = useMemo(() => {
+    return streams.map((stream) => {
+      return {
+        id: stream.id,
+        name: {
+          children: stream.name,
+          tooltipChildren: stream.createdByTokenName ? (
+            <>
+              Created by token <b>{stream.createdByTokenName}</b>
+            </>
+          ) : null,
+          href: `/app/stream/${stream.id}`,
+        },
+        details: { stream },
+        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        lastActive: {
+          date: new Date(stream.lastSeen),
+          fallback: <i>unseen</i>,
+        },
+        status: stream.isActive ? "Active" : "Idle",
+      };
+    });
+  }, [streams]);
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Row<StreamsTableData>[]) => {
+      setSelectedStreams(
+        rows.map((r) => streams.find((s) => s.id === r.original.id))
+      );
+    },
+    [streams]
+  );
+
   return (
     <Container sx={{ mb: 5 }} id={id}>
-      {deleteModal && selectedStream.length && (
+      {deleteModal && selectedStreams.length && (
         <DeleteStreamModal
-          numStreamsToDelete={selectedStream.length}
-          streamName={selectedStream[0].name}
+          numStreamsToDelete={selectedStreams.length}
+          streamName={selectedStreams[0].name}
           onClose={close}
           onDelete={() => {
-            if (selectedStream.length === 1) {
-              deleteStream(selectedStream[0].id).then(close);
-            } else if (selectedStream.length > 1) {
-              deleteStreams(selectedStream.map((s) => s.id)).then(close);
+            if (selectedStreams.length === 1) {
+              deleteStream(selectedStreams[0].id).then(close);
+            } else if (selectedStreams.length > 1) {
+              deleteStreams(selectedStreams.map((s) => s.id)).then(close);
             }
           }}
         />
@@ -167,82 +253,21 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
           <Button
             variant="primarySmall"
             aria-label="Delete Stream button"
-            disabled={!selectedStream.length}
-            onClick={() => selectedStream.length && setDeleteModal(true)}>
+            disabled={!selectedStreams.length}
+            onClick={() => selectedStreams.length && setDeleteModal(true)}>
             Delete
           </Button>
         </Box>
       </Flex>
-      <Table sx={{ gridTemplateColumns: "auto auto auto auto auto auto" }}>
-        <TableRow variant={TableRowVariant.Header}>
-          <Flex
-            sx={{ alignItems: "end" }}
-            onClick={() => {
-              if (streams.length && streams.length === selectedStream.length) {
-                setSelectedStream([]);
-              } else {
-                setSelectedStream([...streams]);
-              }
-            }}>
-            <Checkbox
-              value={streams.length && streams.length === selectedStream.length}
-            />
-          </Flex>
-          <Box>Name</Box>
-          <Box>Details</Box>
-          <Box>Created</Box>
-          <Box>Last Active</Box>
-          <Box>Status</Box>
-        </TableRow>
-        {streams.map((stream: Stream) => {
-          const {
-            id,
-            name,
-            lastSeen,
-            sourceSegments,
-            transcodedSegments,
-            createdAt,
-            isActive,
-          } = stream;
-          const selected =
-            selectedStream && selectedStream.some((stream) => stream.id === id);
-          return (
-            <>
-              <TableRow
-                key={id}
-                variant={TableRowVariant.Normal}
-                selected={selected}
-                onClick={() => {
-                  if (selected) {
-                    setSelectedStream(
-                      selectedStream.filter((s) => s.id !== id)
-                    );
-                  } else {
-                    selectedStream.push(stream);
-                    setSelectedStream([...selectedStream]);
-                  }
-                }}>
-                <Checkbox value={selected} />
-                <StreamName stream={stream} />
-                <RenditionsDetails stream={stream} />
-                <RelativeTime
-                  id={id}
-                  prefix="createdat"
-                  tm={createdAt}
-                  swap={true}
-                />
-                <RelativeTime
-                  id={id}
-                  prefix="lastSeen"
-                  tm={lastSeen}
-                  swap={true}
-                />
-                <Box>{isActive ? "Active" : "Idle"}</Box>
-              </TableRow>
-            </>
-          );
-        })}
-      </Table>
+      <TableV2
+        columns={columns}
+        data={data}
+        config={{
+          rowSelection: "all",
+          onRowSelectionChange: handleRowSelectionChange,
+          initialSortBy: [{ id: "created", desc: true }],
+        }}
+      />
     </Container>
   );
 };

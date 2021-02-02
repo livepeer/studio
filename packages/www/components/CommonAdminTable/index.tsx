@@ -8,7 +8,7 @@ import {
   useFilters,
   useSortBy,
   useAsyncDebounce,
-  useRowSelect
+  useRowSelect,
 } from "react-table";
 import Help from "../../public/img/help.svg";
 import ReactTooltip from "react-tooltip";
@@ -35,7 +35,7 @@ const loadingAnim = keyframes`
 
 export const StreamName = ({
   stream,
-  admin = false
+  admin = false,
 }: {
   stream: Stream;
   admin?: boolean;
@@ -50,16 +50,14 @@ export const StreamName = ({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid"
-        >
+          effect="solid">
           Created by token <b>{stream.createdByTokenName}</b>
         </ReactTooltip>
       ) : null}
       <Box data-tip data-for={pid}>
         <Link
           href={{ pathname: "/app/stream/[id]", query }}
-          as={`/app/stream/${stream.id}`}
-        >
+          as={`/app/stream/${stream.id}`}>
           <a>{stream.name}</a>
         </Link>
       </Box>
@@ -78,7 +76,7 @@ export const RelativeTime = ({
   id,
   prefix,
   tm,
-  swap = false
+  swap = false,
 }: RelativeTimeProps) => {
   const idpref = `time-${prefix}-${id}`;
   let main = moment.unix(tm / 1000.0).fromNow();
@@ -97,8 +95,7 @@ export const RelativeTime = ({
             className="tooltip"
             place="top"
             type="dark"
-            effect="solid"
-          >
+            effect="solid">
             {toolTip}
           </ReactTooltip>
           <span data-tip data-for={`tooltip-${idpref}`}>
@@ -118,16 +115,14 @@ export const UserName = ({ user }: { user: User }) => {
     <Box
       sx={{
         overflow: "hidden",
-        textOverflow: "ellipsis"
-      }}
-    >
+        textOverflow: "ellipsis",
+      }}>
       <ReactTooltip
         id={tid}
         className="tooltip"
         place="top"
         type="dark"
-        effect="solid"
-      >
+        effect="solid">
         <span>{user.id}</span>
         <span>{user.firstName}</span>
         <span>{user.lastName}</span>
@@ -143,7 +138,7 @@ export const UserName = ({ user }: { user: User }) => {
 
 const Checkbox = ({
   value,
-  onClick
+  onClick,
 }: {
   value: boolean;
   onClick: Function;
@@ -151,8 +146,7 @@ const Checkbox = ({
   return (
     <Flex
       sx={{ height: "100%", alignItems: "center", justifyContent: "center" }}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       <Box
         sx={{
           width: "12px",
@@ -161,9 +155,8 @@ const Checkbox = ({
           borderWidth: "1px",
           borderRadius: "3px",
           borderStyle: "solid",
-          borderColor: "primary"
-        }}
-      ></Box>
+          borderColor: "primary",
+        }}></Box>
     </Flex>
   );
 };
@@ -252,7 +245,7 @@ const CommonAdminTable = ({
   filtersDesc,
   rowsPerPage,
   initialSortBy = [],
-  children
+  children,
 }: CommonAdminTableProps) => {
   const [cursor, setCursor] = useState("");
   const [prevCursor, setPrevCursor] = useState([]);
@@ -274,7 +267,7 @@ const CommonAdminTable = ({
     autoResetSortBy: false,
     manualSortBy: true,
     maxMultiSortColCount: 2,
-    initialState: { sortBy: initialSortBy }
+    initialState: { sortBy: initialSortBy },
   };
 
   const {
@@ -286,7 +279,7 @@ const CommonAdminTable = ({
     toggleAllRowsSelected,
     setFilter,
     state: { filters, sortBy },
-    rows
+    rows,
   }: any = useTable(
     tableOptions,
     useFilters,
@@ -299,7 +292,7 @@ const CommonAdminTable = ({
           id: "selection",
           // The header can use the table's getToggleAllRowsSelectedProps method
           // to render a checkbox
-          Header: ({ rows, getToggleAllRowsSelectedProps }) => {
+          Header: ({ rows }) => {
             return (
               <>
                 <Button
@@ -310,8 +303,7 @@ const CommonAdminTable = ({
                     setNextCursor(cursor);
                     setCursor(prevCursor.pop());
                     setPrevCursor([...prevCursor]);
-                  }}
-                >
+                  }}>
                   ⭠
                 </Button>
                 <Button
@@ -323,8 +315,7 @@ const CommonAdminTable = ({
                     setPrevCursor([...prevCursor]);
                     setCursor(nextCursor);
                     setNextCursor("");
-                  }}
-                >
+                  }}>
                   ⭢
                 </Button>
               </>
@@ -335,16 +326,18 @@ const CommonAdminTable = ({
           Cell: ({ row }) => (
             <div>
               <Checkbox
+                // @ts-ignore
                 value={row.isSelected}
                 onClick={(e) => {
                   toggleAllRowsSelected(false);
+                  // @ts-ignore
                   row.toggleRowSelected(!row.isSelected);
                 }}
               />
             </div>
-          )
+          ),
         },
-        ...columns
+        ...columns,
       ]);
     }
   );
@@ -368,18 +361,20 @@ const CommonAdminTable = ({
       id={id}
       sx={{
         mb: 0,
-        mt: 0
-      }}
-    >
+        mt: 0,
+      }}>
       <Flex
-        sx={{ justifyContent: "flex-start", alignItems: "baseline", my: "1em" }}
-      >
+        sx={{
+          justifyContent: "flex-start",
+          alignItems: "baseline",
+          my: "1em",
+        }}>
         {children}
         {filtersDesc.map((fd) => {
           if (typeof fd.render === "function") {
             return fd.render({
               value: (filters.find((o) => o.id === fd.id) || [])[0]?.value,
-              setValue: (v) => setFilter(fd.id, v)
+              setValue: (v) => setFilter(fd.id, v),
             });
           }
           return (
@@ -389,8 +384,7 @@ const CommonAdminTable = ({
               label={`${fd.placeholder || fd.id} filter input`}
               value={(filters.find((o) => o.id === fd.id) || [])[0]?.value}
               onChange={(e) => setFilter(fd.id, e.target.value)}
-              placeholder={fd.placeholder}
-            ></Input>
+              placeholder={fd.placeholder}></Input>
           );
         })}
       </Flex>
@@ -402,10 +396,9 @@ const CommonAdminTable = ({
             width: "100%",
             borderCollapse: "inherit",
             borderSpacing: "0",
-            border: 0
+            border: 0,
           }}
-          {...getTableProps()}
-        >
+          {...getTableProps()}>
           <thead sx={{ position: "relative" }}>
             {headerGroups.map((headerGroup, i) => (
               <tr key={i} {...headerGroup.getHeaderGroupProps()}>
@@ -428,21 +421,20 @@ const CommonAdminTable = ({
                         borderLeft: "1px solid",
                         borderColor: "muted",
                         borderTopLeftRadius: 6,
-                        borderBottomLeftRadius: 6
+                        borderBottomLeftRadius: 6,
                       },
                       "&:last-of-type": {
                         borderRight: "1px solid",
                         borderColor: "muted",
                         borderTopRightRadius: 6,
-                        borderBottomRightRadius: 6
-                      }
+                        borderBottomRightRadius: 6,
+                      },
                     }}
                     align="left"
                     {...column.getHeaderProps(
                       column.getSortByToggleProps({ title: "" })
                     )}
-                    key={i}
-                  >
+                    key={i}>
                     <Flex sx={{ mr: "-18px" }}>
                       {column.render("Header")}
                       <span>
@@ -455,16 +447,14 @@ const CommonAdminTable = ({
                       </span>
                       {i === headerGroup.headers.length - 1 && (
                         <Flex
-                          sx={{ alignItems: "center", ml: "auto", mr: "1em" }}
-                        >
+                          sx={{ alignItems: "center", ml: "auto", mr: "1em" }}>
                           <Flex>
                             <ReactTooltip
                               id={`tooltip-multiorder`}
                               className="tooltip"
                               place="top"
                               type="dark"
-                              effect="solid"
-                            >
+                              effect="solid">
                               To multi-sot (sort by two column simultaneously)
                               hold shift while clicking on second column name.
                             </ReactTooltip>
@@ -473,7 +463,7 @@ const CommonAdminTable = ({
                               data-for={`tooltip-multiorder`}
                               sx={{
                                 cursor: "pointer",
-                                ml: 1
+                                ml: 1,
                               }}
                             />
                           </Flex>
@@ -491,27 +481,24 @@ const CommonAdminTable = ({
                   border: 0,
                   bg: "transparent !important",
                   margin: 0,
-                  padding: 0
-                }}
-              >
+                  padding: 0,
+                }}>
                 <th
                   sx={{ border: 0, bg: "transparent", margin: 0, padding: 0 }}
-                  colSpan={1000}
-                >
+                  colSpan={1000}>
                   <div sx={{ width: "100%", position: "relative" }}>
                     <div
                       sx={{
                         position: "absolute",
                         top: "-1px",
                         left: "6px",
-                        right: "0px"
-                      }}
-                    >
+                        right: "0px",
+                      }}>
                       <div
                         sx={{
                           backgroundColor: "dodgerblue",
                           height: "1px",
-                          animation: `${loadingAnim} 3s ease-in-out infinite`
+                          animation: `${loadingAnim} 3s ease-in-out infinite`,
                         }}
                       />
                     </div>
@@ -527,10 +514,9 @@ const CommonAdminTable = ({
               return (
                 <tr
                   sx={{
-                    bg: "transparent !important"
+                    bg: "transparent !important",
                   }}
-                  {...row.getRowProps()}
-                >
+                  {...row.getRowProps()}>
                   {row.cells.map((cell) => {
                     return (
                       <td
@@ -541,10 +527,9 @@ const CommonAdminTable = ({
                           borderBottomStyle: "solid",
                           borderTop: "0px solid",
                           borderLeft: "0px solid",
-                          borderRight: "0px solid"
+                          borderRight: "0px solid",
                         }}
-                        {...cell.getCellProps()}
-                      >
+                        {...cell.getCellProps()}>
                         {renderCell(cell)}
                       </td>
                     );
