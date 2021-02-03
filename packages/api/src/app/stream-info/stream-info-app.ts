@@ -10,8 +10,8 @@ import fetch from "isomorphic-fetch";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";
 
-const pollInterval = 5000;
-const updateInterval = 60 * 1000;
+const pollInterval = 2 * 1000;
+const updateInterval = 2 * 1000;
 const deleteTimeout = 5 * 60 * 1000;
 const seenSegmentsTimeout = 60 * 1000;
 
