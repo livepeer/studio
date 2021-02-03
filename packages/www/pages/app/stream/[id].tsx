@@ -24,7 +24,12 @@ import StreamSessionsTable from "../../../components/StreamSessionsTable";
 import DeleteStreamModal from "../../../components/DeleteStreamModal";
 import Modal from "../../../components/Modal";
 import Help from "../../../public/img/help.svg";
-import { pathJoin, isStaging, isDevelopment } from "../../../lib/utils";
+import {
+  pathJoin,
+  isStaging,
+  isDevelopment,
+  formatNumber,
+} from "../../../lib/utils";
 import { RenditionsDetails } from "../../../components/StreamsTable";
 import { RelativeTime } from "../../../components/CommonAdminTable";
 import { getTabs } from "../user";
@@ -464,9 +469,40 @@ const ID = () => {
                     <Cell>Transcoded segments</Cell>
                     <Cell>{stream.transcodedSegments || 0}</Cell>
                     <Cell>Source duration</Cell>
-                    <Cell>{stream.sourceSegmentsDuration || 0} sec</Cell>
+                    <Cell>
+                      {formatNumber(stream.sourceSegmentsDuration || 0, 0)} sec
+                      (
+                      {formatNumber(
+                        (stream.sourceSegmentsDuration || 0) / 60,
+                        2
+                      )}{" "}
+                      min)
+                    </Cell>
                     <Cell>Transcoded duration</Cell>
-                    <Cell>{stream.transcodedSegmentsDuration || 0} sec</Cell>
+                    <Cell>
+                      {formatNumber(stream.transcodedSegmentsDuration || 0, 0)}{" "}
+                      sec (
+                      {formatNumber(
+                        (stream.transcodedSegmentsDuration || 0) / 60,
+                        2
+                      )}{" "}
+                      min)
+                    </Cell>
+                    <Cell>Source bytes</Cell>
+                    <Cell>{formatNumber(stream.sourceBytes || 0, 0)}</Cell>
+                    <Cell>Transcoded bytes</Cell>
+                    <Cell>{formatNumber(stream.transcodedBytes || 0, 0)}</Cell>
+                    <Cell>Ingest rate</Cell>
+                    <Cell>
+                      {formatNumber(stream.ingestRate || 0, 3)} bytes/sec (
+                      {formatNumber((stream.ingestRate || 0) * 8, 0)}) bits/sec
+                    </Cell>
+                    <Cell>Outgoing rate</Cell>
+                    <Cell>
+                      {formatNumber(stream.outgoingRate || 0, 3)} bytes/sec (
+                      {formatNumber((stream.outgoingRate || 0) * 8, 0)})
+                      bits/sec
+                    </Cell>
                     <Cell>Papertrail to stream key</Cell>
                     <Cell>
                       <a

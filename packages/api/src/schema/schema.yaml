@@ -109,6 +109,20 @@ components:
           type: number
           example: 2
           description: Duration of all the transcoded segments, sec
+        sourceBytes:
+          type: number
+          example: 1
+        transcodedBytes:
+          type: number
+          example: 2
+        ingestRate:
+          type: number
+          example: 1
+          description: Rate at which sourceBytes increases (bytes/second)
+        outgoingRate:
+          type: number
+          example: 2
+          description: Rate at which transcodedBytes increases (bytes/second)
         deleted:
           type: boolean
           description: Set to true when stream deleted

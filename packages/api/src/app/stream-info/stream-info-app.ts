@@ -94,6 +94,12 @@ interface streamInfo {
   sourceSegmentsDurationLastUpdated: number;
   transcodedSegmentsDurationLastUpdated: number;
   seenSegments: Map<string, Date>;
+  sourceBytes: number;
+  transcodedBytes: number;
+  ingestRate: number;
+  outgoingRate: number;
+  sourceBytesLastUpdated: number;
+  transcodedBytesLastUpdated: number;
 }
 
 function newStreamInfo(): streamInfo {
@@ -108,6 +114,12 @@ function newStreamInfo(): streamInfo {
     transcodedSegmentsLastUpdated: 0,
     sourceSegmentsDurationLastUpdated: 0.0,
     transcodedSegmentsDurationLastUpdated: 0.0,
+    sourceBytes: 0,
+    transcodedBytes: 0,
+    sourceBytesLastUpdated: 0,
+    transcodedBytesLastUpdated: 0,
+    ingestRate: 0.0,
+    outgoingRate: 0.0,
     seenSegments: new Map(),
   };
 }
@@ -138,8 +150,21 @@ class statusPoller {
     for (const k of Object.keys(status.InternalManifests || {})) {
       playback2session.set(status.InternalManifests[k], k);
     }
+    const getObjectByMid = async (mid: string): Promise<Stream | null> => {
+      const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
+      let storedInfo: Stream = await db.stream.get(sid);
+      if (!storedInfo) {
+        const [objs, _] = await db.stream.find({ playbackId: mid });
+        if (objs?.length) {
+          storedInfo = objs[0];
+        }
+      }
+      return storedInfo;
+    }
+    const now = new Date();
     for (const mid of Object.keys(status.Manifests)) {
       let si,
+        timeSinceLastSeen = 0,
         needUpdate = false;
       if (!this.seenStreams.has(mid)) {
         // new stream
@@ -149,25 +174,32 @@ class statusPoller {
         needUpdate = true;
       } else {
         si = this.seenStreams.get(mid);
-        needUpdate = Date.now() - si.lastUpdated.valueOf() > updateInterval;
-        si.lastSeen = new Date();
+        needUpdate = now.valueOf() - si.lastUpdated.valueOf() > updateInterval;
+        timeSinceLastSeen = (now.valueOf() - si.lastSeen.valueOf()) / 1000;
+        si.lastSeen = now;
+      }
+      if (mid in (status.StreamInfo || {})) {
+        const statusStreamInfo = status.StreamInfo[mid];
+        if (si.sourceBytes > 0 && statusStreamInfo.SourceBytes > si.sourceBytes && timeSinceLastSeen > 0) {
+          si.ingestRate = (statusStreamInfo.SourceBytes - si.sourceBytes) / timeSinceLastSeen;
+        }
+        if (si.transcodedBytes > 0 && statusStreamInfo.TranscodedBytes > si.transcodedBytes && timeSinceLastSeen > 0) {
+          si.outgoingRate = (statusStreamInfo.TranscodedBytes - si.transcodedBytes) / timeSinceLastSeen;
+        }
+        si.sourceBytes = statusStreamInfo.SourceBytes;
+        si.transcodedBytes = statusStreamInfo.TranscodedBytes;
       }
       const manifest = status.Manifests[mid];
       countSegments(si, manifest);
       if (needUpdate) {
-        const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
-        let storedInfo: Stream = await db.stream.get(sid);
-        if (!storedInfo) {
-          const [objs, _] = await db.stream.find({ playbackId: mid });
-          if (objs?.length) {
-            storedInfo = objs[0];
-          }
-        }
+        const storedInfo: Stream = await getObjectByMid(mid);
         // console.log(`got stream info from store: `, storedInfo)
         if (storedInfo) {
-          await db.stream.update(storedInfo.id, {
+          const setObj = {
             lastSeen: si.lastSeen.valueOf(),
-          } as Stream);
+            ingestRate: si.ingestRate,
+            outgoingRate: si.outgoingRate,
+          } as Stream;
           const incObj = {
             sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
             transcodedSegments:
@@ -177,13 +209,14 @@ class statusPoller {
             transcodedSegmentsDuration:
               si.transcodedSegmentsDuration -
               si.transcodedSegmentsDurationLastUpdated,
+            sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
+            transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
           };
+          await db.stream.update(storedInfo.id, setObj);
           await db.stream.add(storedInfo.id, incObj as Stream);
           if (storedInfo.parentId) {
             await db.stream.add(storedInfo.parentId, incObj as Stream);
-            await db.stream.update(storedInfo.parentId, {
-              lastSeen: si.lastSeen.valueOf(),
-            } as Stream);
+            await db.stream.update(storedInfo.parentId, setObj);
           }
           si.lastUpdated = new Date();
           si.sourceSegmentsLastUpdated = si.sourceSegments;
@@ -191,6 +224,8 @@ class statusPoller {
           si.sourceSegmentsDurationLastUpdated = si.sourceSegmentsDuration;
           si.transcodedSegmentsDurationLastUpdated =
             si.transcodedSegmentsDuration;
+          si.sourceBytesLastUpdated = si.sourceBytesLastUpdated;
+          si.transcodedBytesLastUpdated = si.transcodedBytes;
         }
       }
     }
@@ -200,10 +235,17 @@ class statusPoller {
         const notSeenFor: number = now - si.lastSeen.valueOf();
         if (notSeenFor > deleteTimeout) {
           this.seenStreams.delete(mid);
+          const storedInfo: Stream = await getObjectByMid(mid);
+          if (storedInfo) {
+            await db.stream.update(storedInfo.id, {
+              ingestRate: 0,
+              outgoingRate: 0,
+            } as Stream);
+          }
         }
+        // console.log(`seen: `, this.seenStreams)
       }
     }
-    // console.log(`seen: `, this.seenStreams)
   }
 
   private async getStatus(broadcaster: string): Promise<StatusResponse> {
