@@ -1,55 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useApi, usePageVisibility } from "../../hooks";
+import { useApi } from "../../hooks";
 import { Box, Button, Container, Flex } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import { Checkbox } from "../Table";
-import { RenditionsDetails } from "../StreamsTable";
-import ReactTooltip from "react-tooltip";
-import { Stream } from "@livepeer.com/api";
 import CommonAdminTable from "../CommonAdminTable";
 import { StreamName } from "../CommonAdminTable";
 
 const ROWS_PER_PAGE = 20;
-
-function dur2str(dur?: number) {
-  if (!dur) {
-    return "";
-  }
-  if (dur < 120) {
-    return `${dur.toFixed(2)} sec`;
-  }
-  const min = dur / 60;
-  if (min < 12) {
-    return `${min.toFixed(2)} min`;
-  }
-  const hour = min / 60;
-  return `${hour.toFixed(2)} hours`;
-}
-
-const Segments = ({ stream }: { stream: Stream }) => {
-  const idpref = `segments-${stream.id}`;
-  return (
-    <Box id={idpref} key={idpref}>
-      <ReactTooltip
-        id={`tooltip-${idpref}`}
-        className="tooltip"
-        place="top"
-        type="dark"
-        effect="solid">
-        Source segments / Transcoded segments
-      </ReactTooltip>
-      <span data-tip data-for={`tooltip-${idpref}`}>
-        {stream.sourceSegments || 0}/{stream.transcodedSegments || 0}
-      </span>
-      <br />
-      <span>
-        {dur2str(stream.sourceSegmentsDuration || 0)}/
-        {dur2str(stream.transcodedSegmentsDuration || 0)}
-      </span>
-    </Box>
-  );
-};
 
 const AdminStreamsTable = ({ id }: { id: string }) => {
   const [activeOnly, setActiveOnly] = useState(true);
@@ -84,21 +42,6 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         accessor: "name",
         Cell: (cell) => {
           return <StreamName stream={cell.row.original} admin={true} />;
-        },
-      },
-      {
-        Header: "Details",
-        accessor: "presets",
-        disableSortBy: true,
-        Cell: (cell) => {
-          return <RenditionsDetails stream={cell.row.original} />;
-        },
-      },
-      {
-        Header: "Segments",
-        accessor: "sourceSegments",
-        Cell: (cell) => {
-          return <Segments stream={cell.row.original} />;
         },
       },
       {
