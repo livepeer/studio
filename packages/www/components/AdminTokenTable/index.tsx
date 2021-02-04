@@ -64,31 +64,27 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
     () => [
       {
         Header: "ID",
-        accessor: "id"
-        // Header: ({ rows, getToggleAllRowsSelectedProps }) => {
-        //   console.log(`--> ID header rows:`, rows, `nextCur='${nextCursor}'`);
-        //   return "ID";
-        // }
+        accessor: "id",
       },
       {
         Header: "User",
-        accessor: "user.email"
+        accessor: "user.email",
       },
       {
         Header: "Name",
-        accessor: "name"
+        accessor: "name",
       },
       {
         Header: "Last Active",
-        accessor: "lastSeen"
-      }
+        accessor: "lastSeen",
+      },
     ],
     [nextCursor, lastFilters]
   );
 
   const filtersDesc = [
     { id: "name", placeholder: "token name" },
-    { id: "user.email", placeholder: "user's email" }
+    { id: "user.email", placeholder: "user's email" },
   ];
 
   const fetchData = ({ order, cursor, filters }, refetch: boolean = false) => {
@@ -165,8 +161,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                 placeholder="New Token"></Input>
               <Select
                 sx={{ mt: "1em" }}
-                onChange={(e) => setNewTokenUserId(e.target.value)}
-              >
+                onChange={(e) => setNewTokenUserId(e.target.value)}>
                 <option key="empty" value="">
                   --
                 </option>
@@ -240,8 +235,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                   refecth();
                   close();
                 });
-              }}
-            >
+              }}>
               Delete
             </Button>
           </Flex>
@@ -258,7 +252,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
         err={loadingError}
         columns={columns}
         filtersDesc={filtersDesc}
-      >
+        initialSortBy={[{ id: "lastSeen", desc: true }]}>
         <Button
           key="createBut"
           variant="outlineSmall"
@@ -273,8 +267,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
           variant="outlineSmall"
           disabled={!selectedRow}
           sx={{ ml: "1em" }}
-          onClick={() => setDeleteModal(true)}
-        >
+          onClick={() => setDeleteModal(true)}>
           Delete
         </Button>
       </CommonAdminTable>

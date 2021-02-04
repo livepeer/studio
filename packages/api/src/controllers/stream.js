@@ -98,6 +98,7 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
     sessionsonly,
     all,
     active,
+    nonLivepeerOnly,
     order,
     filters,
   } = req.query;
@@ -116,6 +117,9 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   }
   if (active && active !== "false") {
     query.push(sql`stream.data->>'isActive' = 'true'`);
+  }
+  if (nonLivepeerOnly && nonLivepeerOnly !== "false") {
+    query.push(sql`users.data->>'email' NOT LIKE '%livepeer%'`);
   }
 
   order = parseOrder(fieldsMap, order);
