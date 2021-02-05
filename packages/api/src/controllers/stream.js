@@ -872,16 +872,16 @@ app.post("/hook", async (req, res) => {
     req.config.recordObjectStoreId &&
     !stream.recordObjectStoreId
   ) {
-    await db.stream.update(stream.id, {
-      recordObjectStoreId: req.config.recordObjectStoreId,
-    });
-    stream.recordObjectStoreId = req.config.recordObjectStoreId;
+    const ros = await db.objectStore.get(req.config.recordObjectStoreId);
+    if (ros && !ros.disabled) {
+      await db.stream.update(stream.id, {
+        recordObjectStoreId: req.config.recordObjectStoreId,
+      });
+      stream.recordObjectStoreId = req.config.recordObjectStoreId;
+    }
   }
   if (stream.recordObjectStoreId) {
-    const ros = await req.store.get(
-      `object-store/${stream.recordObjectStoreId}`,
-      false
-    );
+    const ros = await db.objectStore.get(req.config.recordObjectStoreId);
     if (!ros) {
       res.status(500);
       return res.json({

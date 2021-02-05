@@ -272,7 +272,7 @@ export default class Table<T extends DBObject> {
     }
   }
 
-  cleanWriteOnlyResponse(doc: Array<T>): Array<T> {
+  cleanWriteOnlyResponse(doc: T): T {
     // obfuscate writeOnly fields in objects returned
     const res = { ...doc };
     if (this.schema.properties) {

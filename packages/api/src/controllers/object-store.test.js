@@ -157,14 +157,14 @@ describe("controllers/object-stores", () => {
       expect(res.status).toBe(201);
       const objStore = await res.json();
       expect(objStore.id).toBeDefined();
-      expect(objStore.url).toEqual(null);
+      expect(objStore.url).toEqual(undefined);
       expect(objStore.name).toEqual("test name");
       expect(objStore.createdAt).toBeGreaterThanOrEqual(now);
 
       const resp = await client.get(`/object-store/${objStore.id}`);
       expect(resp.status).toBe(200);
       const objStoreGet = await resp.json();
-      expect(objStore.url).toEqual(null);
+      expect(objStore.url).toEqual(undefined);
       expect(objStore.userId).toBe(objStoreGet.userId);
 
       // if same request is made, should return a 201
