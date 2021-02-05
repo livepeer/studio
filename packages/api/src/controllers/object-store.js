@@ -1,14 +1,9 @@
-import { parse as parsePath } from "path";
-import { parse as parseQS } from "querystring";
-import { parse as parseUrl } from "url";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import { makeNextHREF } from "./helpers";
-import logger from "../logger";
 import uuid from "uuid/v4";
-import wowzaHydrate from "./wowza-hydrate";
-import path from "path";
+import { db } from "../store";
 
 const app = Router();
 
@@ -68,25 +63,66 @@ app.post(
   async (req, res) => {
     const id = uuid();
 
-    await req.store.create({
+    await db.objectStore.create({
       id: id,
       url: req.body.url,
       name: req.body.name,
+      publicUrl: req.body.publicUrl,
       userId: req.user.id,
-      kind: `object-store`,
       createdAt: Date.now(),
     });
 
-    const store = await req.store.get(`object-store/${id}`);
+    const store = await db.objectStore.get(id, { useReplica: false });
 
     if (store) {
       res.status(201);
-      res.json(store);
+      res.json(db.objectStore.cleanWriteOnlyResponse(store));
     } else {
       res.status(403);
       res.json({ errors: ["store not created"] });
     }
   }
 );
+
+app.delete("/:id", authMiddleware({}), async (req, res) => {
+  const { id } = req.params;
+  const objectStore = await db.objectStore.get(id);
+  if (!objectStore) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  if (!req.user.admin && req.user.id !== objectStore.userId) {
+    res.status(403);
+    return res.json({
+      errors: ["users may only delete their own object stores"],
+    });
+  }
+  await db.objectStore.delete(id);
+  res.status(204);
+  res.end();
+});
+
+app.patch("/:id", authMiddleware({}), async (req, res) => {
+  const { id } = req.params;
+  const objectStore = await db.objectStore.get(id);
+  if (!objectStore) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  if (!req.user.admin && req.user.id !== objectStore.userId) {
+    res.status(403);
+    return res.json({
+      errors: ["users may change only their own object stores"],
+    });
+  }
+  if (req.body.disabled === undefined) {
+    res.status(400);
+    return res.json({ errors: ["disabled field required"] });
+  }
+  console.log(`set object store ${id} disabled=${req.body.disabled}`);
+  await db.objectStore.update(id, { disabled: !!req.body.disabled });
+  res.status(204);
+  res.end();
+});
 
 export default app;

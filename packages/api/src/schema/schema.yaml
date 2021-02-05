@@ -306,6 +306,11 @@ components:
           description:
             Public URL at which data in this object storage can be accessed
           example: https://reg-rec.livepeer.live/some/path
+        disabled:
+          type: boolean
+          description:
+              If true then these object store will not be used for recording
+              even if it is configured in the API command line.
         id:
           type: string
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
