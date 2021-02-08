@@ -1,6 +1,7 @@
 import { InternalServerError, ForbiddenError } from "../store/errors";
 import jwt from "jsonwebtoken";
 import tracking from "./tracking";
+import { db } from "../store";
 
 /**
  * creates an authentication middleware that can be customized.
@@ -23,7 +24,7 @@ function authFactory(params) {
       }
       userId = tokenObject.userId;
       // track last seen
-      tracking.record(req.store, tokenObject);
+      tracking.recordToken(db, tokenObject);
     } else if (authToken.startsWith("JWT")) {
       const jwtToken = authToken.substr(4);
       try {
@@ -31,6 +32,7 @@ function authFactory(params) {
           audience: req.config.jwtAudience,
         });
         userId = verified.sub;
+        tracking.recordUser(db, userId);
       } catch (err) {
         throw new ForbiddenError(err.message);
       }

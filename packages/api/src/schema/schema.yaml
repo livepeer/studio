@@ -588,6 +588,33 @@ components:
         ccBrand:
           type: string
           example: 1234
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which user object was created
+          example: 1587667174725
+        verifiedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which user object was verified
+          example: 1587667174725
+        planChangedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which user object was verified
+          example: 1587667174725
+        lastStreamedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which user streamed RTMP stream
+            last time
+          example: 1587667174725
+        lastSeen:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which user's password was used
+          example: 1587667174725
     usage:
       type: object
       table: usage

@@ -1,15 +1,28 @@
 "use strict";
 
 const tracking = {
-  record: function record(store, tokenObject) {
-    tokenObject.lastSeen = Date.now();
-    store
-      .replace(tokenObject)
+  recordToken: function recordToken(db, tokenObject) {
+    db.apiToken
+      .update(tokenObject.id, {
+        lastSeen: Date.now(),
+      })
       .then((_) => {
         // all good
       })
       .catch((e) => {
-        console.log("tracking record error: ", e);
+        console.log("token tracking record error: ", e);
+      });
+  },
+  recordUser: function recordUser(db, userId) {
+    db.user
+      .update(userId, {
+        lastSeen: Date.now(),
+      })
+      .then((_) => {
+        // all good
+      })
+      .catch((e) => {
+        console.log("user tracking record error: ", e);
       });
   },
 };

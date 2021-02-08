@@ -66,6 +66,13 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   res.json(db.user.cleanWriteOnlyResponses(output));
 });
 
+const adminOnlyFields = ["verifiedAt", "planChangedAt"];
+function cleanAdminOnlyFields(aof, obj) {
+  for (const f of aof) {
+    delete obj[f];
+  }
+}
+
 app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
   const user = await req.store.get(`user/${req.params.id}`);
   if (req.user.admin !== true && req.user.id !== req.params.id) {
@@ -74,6 +81,9 @@ app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
       errors: ["user can only request information on their own user object"],
     });
   } else {
+    if (!req.user.admin) {
+      cleanAdminOnlyFields(adminOnlyFields, user);
+    }
     res.status(200);
     res.json(user);
   }
@@ -119,6 +129,7 @@ app.post("/", validatePost("user"), async (req, res) => {
       lastName,
       organization,
       phone,
+      createdAt: Date.now(),
     }),
     trackAction(
       id,
@@ -276,7 +287,10 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 
     // return user
     user = { ...user, emailValid: true };
-    await req.store.replace(user);
+    await db.user.update(user.id, {
+      emailValid: true,
+      verifiedAt: Date.now(),
+    });
     res.status(201);
     res.json({ email: user.email, emailValid: user.emailValid });
   } else {
@@ -702,6 +716,7 @@ app.post(
     // Update user's product subscription in our db
     await db.user.update(user.id, {
       stripeProductId: req.body.stripeProductId,
+      planChangedAt: Date.now(),
     });
     res.send(updatedSubscription);
   }
