@@ -660,6 +660,10 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     lastSeen: stream.lastSeen,
   });
 
+  db.user.update(stream.userId, {
+    lastStreamedAt: Date.now(),
+  });
+
   if (stream.parentId) {
     const pStream = await req.store.get(`stream/${id}`, false);
     if (pStream && !pStream.deleted) {
