@@ -276,6 +276,10 @@ components:
           type: string
           example: fra
           description: Region in which this session object was created
+        activeRegion:
+          type: string
+          example: fra
+          description: Region in which this stream was last time streamed
 
     error:
       required:

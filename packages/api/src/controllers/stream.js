@@ -670,6 +670,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
       await db.stream.update(pStream.id, {
         isActive: stream.isActive,
         lastSeen: stream.lastSeen,
+        activeRegion: stream.isActive ? stream.region : undefined,
       });
     }
   }
