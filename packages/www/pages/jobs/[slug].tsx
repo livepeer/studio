@@ -9,12 +9,13 @@ import Prefooter from "../../components/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
 import Code from "../../components/renderers/Code";
 
-const Page = ({ title, body, noindex = false, preview }) => {
+const Page = ({ title, slug, body, noindex = false, preview }) => {
   return (
     <Layout
       title={`${title} - Livepeer.com`}
       description={`Join Us. From Anywhere.`}
-      url={`https://livepeer.com/jobs`}
+      url={`https://livepeer.com/jobs/${slug}`}
+      canonical={`https://livepeer.org/jobs/${slug}`}
       noindex={noindex}
       preview={preview}>
       <Container
@@ -114,6 +115,7 @@ export async function getStaticProps({ params, preview = false }) {
   return {
     props: {
       ...job,
+      slug,
       preview,
     },
     revalidate: 1,

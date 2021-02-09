@@ -20,6 +20,7 @@ const Page = ({ positions, preview }) => {
       title={`Jobs - Livepeer.com`}
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs`}
+      canonical={`https://livepeer.org/jobs`}
       preview={preview}
       withGradientBackground>
       <Container

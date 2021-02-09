@@ -15,6 +15,7 @@ interface Props {
   description?: string;
   image?: any;
   url?: string;
+  canonical?: string;
   noindex?: boolean;
   preview?: boolean;
   withGradientBackground?: boolean;
@@ -43,6 +44,7 @@ const Layout = ({
   children,
   image,
   url,
+  canonical,
   noindex = false,
   preview = false,
   withGradientBackground,
@@ -51,7 +53,7 @@ const Layout = ({
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
-  const seo = {
+  let seo = {
     title: title,
     description: description,
     noindex: noindex,
@@ -69,6 +71,11 @@ const Layout = ({
       ],
     },
   };
+
+  if (canonical) {
+    seo["canonical"] = canonical;
+  }
+
   return (
     <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
       <NextSeo {...seo} />
