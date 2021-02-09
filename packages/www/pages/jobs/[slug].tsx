@@ -15,7 +15,7 @@ const Page = ({ title, slug, body, noindex = false, preview }) => {
       title={`${title} - Livepeer.com`}
       description={`Join Us. From Anywhere.`}
       url={`https://livepeer.com/jobs/${slug}`}
-      canonical={`https://livepeer.org/jobs/${slug}`}
+      canonical={`https://livepeer.com/jobs/${slug}`}
       noindex={noindex}
       preview={preview}>
       <Container
