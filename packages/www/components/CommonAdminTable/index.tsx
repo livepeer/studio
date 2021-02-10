@@ -455,7 +455,7 @@ const CommonAdminTable = ({
                               place="top"
                               type="dark"
                               effect="solid">
-                              To multi-sot (sort by two column simultaneously)
+                              To multi-sort (sort by two column simultaneously)
                               hold shift while clicking on second column name.
                             </ReactTooltip>
                             <Help
