@@ -124,7 +124,7 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
 
   order = parseOrder(fieldsMap, order);
   if (!order) {
-    order = `stream.data->>'lastSeen' DESC NULLS LAST, stream.data->>'createdAt' DESC NULLS LAST`;
+    order = `stream.data->'lastSeen' DESC NULLS LAST, stream.data->'createdAt' DESC NULLS LAST`;
   }
 
   const fields =
@@ -187,7 +187,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   }
 
   let [sessions] = await db.stream.find(query, {
-    order: `data->>'lastSeen' DESC NULLS LAST`,
+    order: `data->'lastSeen' DESC NULLS LAST`,
     limit: 0, // do not limit sessions until we develop new pagination not based on ids
   });
 
@@ -263,7 +263,7 @@ app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   const [streams, newCursor] = await db.stream.find(query, {
     cursor,
     limit,
-    order: `data->>'lastSeen' DESC NULLS LAST, data->>'createdAt' DESC NULLS LAST`,
+    order: `data->'lastSeen' DESC NULLS LAST, data->'createdAt' DESC NULLS LAST`,
   });
 
   res.status(200);
@@ -401,10 +401,10 @@ app.post(
       const tooOld = createdAt - USER_SESSION_TIMEOUT;
       const query = [];
       query.push(sql`data->>'parentId' = ${stream.id}`);
-      query.push(sql`data->>'lastSeen' > ${tooOld}`);
+      query.push(sql`(data->'lastSeen')::bigint > ${tooOld}`);
 
       const [prevSessionsDocs] = await db.stream.find(query, {
-        order: `data->>'lastSeen' DESC`,
+        order: `data->'lastSeen' DESC`,
       });
       if (
         prevSessionsDocs.length &&
