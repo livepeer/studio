@@ -152,7 +152,7 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
 // returns only 'user' sessions and adds
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
-  const { record } = req.query;
+  const { record, forceUrl } = req.query;
 
   const ingests = await req.getIngest(req);
   if (!ingests.length) {
@@ -198,7 +198,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
       delete session.recordObjectStoreId;
       const isReady = session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
-      if (isReady) {
+      if (isReady || req.user.admin && forceUrl) {
         session.recordingUrl = ingest + `/recordings/${session.id}/index.m3u8`;
       }
     }
