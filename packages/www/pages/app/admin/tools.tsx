@@ -11,7 +11,7 @@ const ToolsPage = () => {
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
-  const tabs = getTabs(5);
+  const tabs = getTabs(6);
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>

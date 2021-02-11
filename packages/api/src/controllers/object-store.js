@@ -1,14 +1,58 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
-import { makeNextHREF } from "./helpers";
+import {
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+} from "./helpers";
 import uuid from "uuid/v4";
 import { db } from "../store";
 
 const app = Router();
 
+const fieldsMap = {
+  id: `object_store.ID`,
+  name: `object_store.data->>'name'`,
+  url: `object_store.data->>'url'`,
+  publicUrl: `object_store.data->>'publicUrl'`,
+  disabled: `object_store.data->'disabled'`,
+  createdAt: `object_store.data->'createdAt'`,
+  userId: `object_store.data->>'userId'`,
+  "user.email": `users.data->>'email'`,
+};
+
 app.get("/", authMiddleware({}), async (req, res) => {
-  const { limit, cursor, userId } = req.query;
+  let { limit, cursor, userId, order, filters } = req.query;
+  if (isNaN(parseInt(limit))) {
+    limit = undefined;
+  }
+
+  if (req.user.admin && !userId) {
+    const query = parseFilters(fieldsMap, filters);
+
+    const fields =
+      " object_store.id as id, object_store.data as data, users.id as usersId, users.data as usersdata";
+    const from = `object_store left join users on object_store.data->>'userId' = users.id`;
+    const [output, newCursor] = await db.objectStore.find(query, {
+      limit,
+      cursor,
+      fields,
+      from,
+      order: parseOrder(fieldsMap, order),
+      process: ({ data, usersdata }) => {
+        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+      },
+    });
+
+    res.status(200);
+
+    if (output.length > 0 && newCursor) {
+      res.links({ next: makeNextHREF(req, newCursor) });
+    }
+    return res.json(output);
+  }
+
   if (!userId) {
     res.status(400);
     return res.json({
