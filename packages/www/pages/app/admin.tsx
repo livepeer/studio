@@ -28,6 +28,11 @@ export function getTabs(i: number): Array<TabType> {
       isActive: false,
     },
     {
+      name: "Object Store",
+      href: "/app/admin/objectstore",
+      isActive: false,
+    },
+    {
       name: "Usage",
       href: "/app/admin/usage",
       isActive: false,

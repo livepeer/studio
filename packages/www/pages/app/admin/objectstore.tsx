@@ -2,22 +2,25 @@ import useApi from "../../../hooks/use-api";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import TabbedLayout from "../../../components/TabbedLayout";
-import AdminUsageTable from "../../../components/AdminUsageTable";
+import AdminObjectStoreTable from "../../../components/AdminObjectStoreTable";
 import { getTabs } from "../admin";
 
-const Usage = () => {
+const ObjectStore = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
-  const tabs = getTabs(5);
+  const tabs = getTabs(4);
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
-      <AdminUsageTable id="Admin API Usage Table" key="usage" />
+      <AdminObjectStoreTable
+        id="Admin API Object Store Table"
+        key="objectstore"
+      />
     </TabbedLayout>
   );
 };
 
-export default Usage;
+export default ObjectStore;
