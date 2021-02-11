@@ -886,7 +886,7 @@ app.post("/hook", async (req, res) => {
     }
   }
   if (stream.recordObjectStoreId) {
-    const ros = await db.objectStore.get(req.config.recordObjectStoreId);
+    const ros = await db.objectStore.get(stream.recordObjectStoreId);
     if (!ros) {
       res.status(500);
       return res.json({
