@@ -101,9 +101,17 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
     nonLivepeerOnly,
     order,
     filters,
+    userId,
   } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
+  }
+
+  if (userId && req.user.admin !== true && req.user.id !== userId) {
+    res.status(403);
+    return res.json({
+      errors: ["user can only request information on their own streams"],
+    });
   }
 
   const query = parseFilters(fieldsMap, filters);
@@ -120,6 +128,9 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   }
   if (nonLivepeerOnly && nonLivepeerOnly !== "false") {
     query.push(sql`users.data->>'email' NOT LIKE '%livepeer%'`);
+  }
+  if (userId) {
+    query.push(sql`stream.data->>'userId' = ${userId}`);
   }
 
   order = parseOrder(fieldsMap, order);

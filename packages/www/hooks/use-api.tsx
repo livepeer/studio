@@ -520,7 +520,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async getStreams(userId): Promise<Array<Stream>> {
       const [res, streams] = await context.fetch(
-        `/stream/user/${userId}?streamsonly=1`
+        `/stream?userId=${userId}&streamsonly=1`
       );
       if (res.status !== 200) {
         throw new Error(streams);
