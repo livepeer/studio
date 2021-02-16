@@ -90,7 +90,7 @@ const fieldsMap = {
   "user.email": `users.data->>'email'`,
 };
 
-app.get("/", authMiddleware({ admin: true }), async (req, res) => {
+app.get("/", authMiddleware({}), async (req, res) => {
   let {
     limit,
     cursor,
