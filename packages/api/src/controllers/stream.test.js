@@ -373,8 +373,8 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(403);
     });
 
-    it("should not get all streams for admin user", async () => {
-      client.apiKey = adminApiKey;
+    it("should not get all streams for non admin user", async () => {
+      client.apiKey = nonAdminApiKey;
       client.jwtAuth = null;
       const res = await client.get(`/stream`);
       expect(res.status).toBe(403);
