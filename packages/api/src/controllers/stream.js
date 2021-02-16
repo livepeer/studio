@@ -107,7 +107,8 @@ app.get("/", authMiddleware({}), async (req, res) => {
     limit = undefined;
   }
 
-  if (userId && req.user.admin !== true && req.user.id !== userId) {
+  if (req.user.admin !== true && (!userId || req.user.id !== userId)) {
+    // Not admin, and requesting all streams, or streams that don't belong to the user.
     res.status(403);
     return res.json({
       errors: ["user can only request information on their own streams"],
