@@ -7,14 +7,16 @@ export default function hardcodedNodes({
   broadcasters,
   orchestrators,
   ingest,
+  prices,
 }) {
   try {
     broadcasters = JSON.parse(broadcasters);
     orchestrators = JSON.parse(orchestrators);
     ingest = JSON.parse(ingest);
+    prices = JSON.parse(prices);
   } catch (e) {
     console.error(
-      "Error parsing LP_BROADCASTERS and LP_ORCHESTRATORS and LP_INGEST"
+      "Error parsing LP_BROADCASTERS, LP_ORCHESTRATORS, LP_INGEST and AND LP_PRICES"
     );
     throw e;
   }
@@ -27,6 +29,9 @@ export default function hardcodedNodes({
     }
     if (!req.getIngest) {
       req.getIngest = async () => ingest;
+    }
+    if (!req.prices) {
+      req.getPrices = async () => prices;
     }
     next();
   };

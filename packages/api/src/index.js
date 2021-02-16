@@ -27,6 +27,7 @@ export default async function makeApp(params) {
     fallbackProxy,
     orchestrators,
     broadcasters,
+    prices,
     s3Url,
     s3UrlExternal,
     s3Access,
