@@ -116,8 +116,16 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
 
   const query = parseFilters(fieldsMap, filters);
-  if (userId || !all || all === "false") {
+  if (!all || all === "false" || !req.user.admin) {
     query.push(sql`stream.data->>'deleted' IS NULL`);
+  }
+  if (req.user.admin) {
+    if (nonLivepeerOnly && nonLivepeerOnly !== "false") {
+      query.push(sql`users.data->>'email' NOT LIKE '%livepeer%'`);
+    }
+  }
+  if (active && active !== "false") {
+    query.push(sql`stream.data->>'isActive' = 'true'`);
   }
   if (streamsonly && streamsonly !== "false") {
     query.push(sql`stream.data->>'parentId' IS NULL`);
@@ -126,13 +134,6 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   if (userId) {
     query.push(sql`stream.data->>'userId' = ${userId}`);
-  } else {
-    if (active && active !== "false") {
-      query.push(sql`stream.data->>'isActive' = 'true'`);
-    }
-    if (nonLivepeerOnly && nonLivepeerOnly !== "false") {
-      query.push(sql`users.data->>'email' NOT LIKE '%livepeer%'`);
-    }
   }
 
   order = parseOrder(fieldsMap, order);
@@ -150,7 +151,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
     from,
     order,
     process: ({ data, usersdata }) => {
-      return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+      return req.user.admin
+        ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
+        : { ...data };
     },
   });
 
