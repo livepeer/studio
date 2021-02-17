@@ -7,7 +7,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
 import ReactTooltip from "react-tooltip";
 import Help from "../../public/img/help.svg";
@@ -58,6 +58,10 @@ const Table = <T extends Record<string, unknown>>({
     return columns.some((column) => !column.disableSortBy);
   }, [columns]);
 
+  const getRowId = useCallback((row, relativeIndex, parent) => {
+    return row?.id ? row.id : relativeIndex;
+  }, []);
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -86,6 +90,7 @@ const Table = <T extends Record<string, unknown>>({
       // @ts-ignore
       columns,
       data,
+      getRowId,
       initialState: {
         // @ts-ignore
         pageSize,
@@ -96,7 +101,7 @@ const Table = <T extends Record<string, unknown>>({
       autoResetFilters: false,
       autoResetSortBy: false,
       autoResetPage: false,
-      autoResetSelectedRows: true,
+      autoResetSelectedRows: false,
     },
     useFilters,
     useSortBy,
