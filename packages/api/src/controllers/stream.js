@@ -107,12 +107,8 @@ app.get("/", authMiddleware({}), async (req, res) => {
     limit = undefined;
   }
 
-  if (req.user.admin !== true && (!userId || req.user.id !== userId)) {
-    // Not admin, and requesting all streams, or streams that don't belong to the user.
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own streams"],
-    });
+  if (!req.user.admin) {
+    userId = req.user.id;
   }
 
   const query = parseFilters(fieldsMap, filters);
@@ -214,7 +210,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
       delete session.recordObjectStoreId;
       const isReady = session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
-      if (isReady || req.user.admin && forceUrl) {
+      if (isReady || (req.user.admin && forceUrl)) {
         session.recordingUrl = ingest + `/recordings/${session.id}/index.m3u8`;
       }
     }
