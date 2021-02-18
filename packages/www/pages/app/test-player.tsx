@@ -43,20 +43,43 @@ const Debugger = () => {
   const tabs = getTabs(2);
   return (
     <TabbedLayout tabs={tabs}>
-      <Box sx={{ width: "100%", pt: 5, pb: 5, borderColor: "muted" }}>
-        <Container>
-          <Box sx={{ mb: 4 }}>
-            <Heading as="h2" sx={{ fontSize: 5, mb: 2 }}>
+      <Box
+        sx={{
+          width: "100%",
+          pt: 5,
+          pb: 5,
+          borderColor: "muted",
+          minHeight: "100vh",
+        }}>
+        <Container
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginTop: ["0px", "50px", "100px"],
+          }}>
+          <Box
+            sx={{
+              mb: 4,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: "60px",
+            }}>
+            <img
+              src="/img/videoPlayer.svg"
+              sx={{
+                objectFit: "cover",
+                width: "80px",
+                height: "80px",
+                mb: "35px",
+              }}
+            />
+            <Heading as="h2" sx={{ fontSize: 5, mb: "16px" }}>
               Test Player
             </Heading>
-            <Box sx={{ maxWidth: 700, color: "offBlack" }}>
-              Test and debug your Livepeer.com stream. For more information
-              follow the step-by-step process in the{" "}
-              <Link href="/docs/guides/debugging-guide" passHref>
-                <a sx={{ textDecoration: "underline" }}>
-                  Livepeer.com debugging guide.
-                </a>
-              </Link>
+            <Box sx={{ maxWidth: 700, color: "offBlack", textAlign: "center" }}>
+              Paste your Playback URL to test and debug your Livepeer.com stream
             </Box>
           </Box>
           <Box sx={{ mb: 5 }}>
@@ -75,23 +98,25 @@ const Debugger = () => {
                 doGetInfo(e.target.manifestUrl.value);
               }}>
               <Input
-                sx={{ width: "30em" }}
+                sx={{
+                  width: ["100%", "470px"],
+                  borderRadius: "8px",
+                  border: "1px solid #CCCCCC",
+                  height: "48px",
+                }}
                 label="manifestUrl"
                 name="manifestUrl"
                 required
                 placeholder="Playback URL"
               />
-
-              <Button
-                type="submit"
-                variant="primarySmall"
-                aria-label="Get info button"
-                disabled={loading}
-                sx={{ ml: 2 }}>
-                Load my stream
-              </Button>
             </form>
-            <Box sx={{ mt: 1, pl: 3, fontSize: 0, color: "rgba(0,0,0,.5)" }}>
+            <Box
+              sx={{
+                mt: "12px",
+                fontSize: "12px",
+                color: "rgba(0,0,0,.5)",
+                fontStyle: "italic",
+              }}>
               ie. https://fra-cdn.livepeer.com/hls/123456abcdef7890/index.m3u8
             </Box>
           </Box>
