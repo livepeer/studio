@@ -284,7 +284,11 @@ describe("controllers/stream", () => {
       client.jwtAuth = nonAdminToken["token"];
 
       const res = await client.get(`/stream`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(200);
+      const streams = await res.json();
+      expect(Array.isArray(streams)).toBe(true);
+      expect(streams).toHaveLength(3);
+      expect(streams[0].userId).toBe(nonAdminUser.id);
     });
 
     it("should not accept empty body for creating a stream", async () => {
@@ -370,13 +374,6 @@ describe("controllers/stream", () => {
     it("should not get others streams", async () => {
       client.apiKey = nonAdminApiKey;
       let res = await client.get(`/stream/user/otherUserId`);
-      expect(res.status).toBe(403);
-    });
-
-    it("should not get all streams for non admin user", async () => {
-      client.apiKey = nonAdminApiKey;
-      client.jwtAuth = null;
-      const res = await client.get(`/stream`);
       expect(res.status).toBe(403);
     });
   });
