@@ -78,6 +78,10 @@ export default function parseCli(argv) {
           type: "string",
           default: "https://{{ip}}:8935",
         },
+        "subgraph-url": {
+          describe: "URL of subgraph to look for orchestrators",
+          type: "string",
+        },
         "http-prefix": {
           describe: "accept requests at this prefix",
           default: "/api",
