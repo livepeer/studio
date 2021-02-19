@@ -11,9 +11,6 @@ import Button from "../../components/Button";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import VideoContainer from "components/TestPlayer/videoContainer";
 
-const Player = dynamic(import("../../components/Player"), { ssr: false });
-const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
-
 const Arrow = () => {
   return (
     <svg
@@ -53,8 +50,6 @@ const Debugger = () => {
   const [manifestUrl, setManifestUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<StreamInfo | null>(null);
-
-  console.log(manifestUrl);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -160,6 +155,9 @@ const Debugger = () => {
               }}>
               ie. https://fra-cdn.livepeer.com/hls/123456abcdef7890/index.m3u8
             </Box>
+            {message === "Not found" && (
+              <Box sx={{ mt: "16px" }}>Stream not found.</Box>
+            )}
           </Box>
           <Box
             sx={{
@@ -249,95 +247,6 @@ const Debugger = () => {
               </div>
             </div>
           </Box>
-          {message === "Not found" && <Box>Stream not found.</Box>}
-          {!loading && info && info.stream && (
-            <>
-              <Grid
-                sx={{
-                  mb: 4,
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                }}>
-                <Box>
-                  <Box sx={{ mb: 2, fontWeight: 600 }}>
-                    Source (highest resolution only)
-                  </Box>
-                  <Player
-                    src={manifestUrl}
-                    posterUrl={videoThumbnail}
-                    config={{
-                      abr: { enabled: false },
-                      controlPanelElements: [
-                        "time_and_duration",
-                        "play_pause",
-                        "rewind",
-                        "fast_forward",
-                        "mute",
-                        "volume",
-                        "spacer",
-                        "fullscreen",
-                      ],
-                      overflowMenuButtons: [],
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Box sx={{ mb: 2, fontWeight: 600 }}>
-                    ABR (source + transcoded renditions)
-                  </Box>
-                  <Player
-                    src={manifestUrl}
-                    posterUrl={videoThumbnail}
-                    config={{
-                      controlPanelElements: [
-                        "time_and_duration",
-                        "play_pause",
-                        "rewind",
-                        "fast_forward",
-                        "mute",
-                        "volume",
-                        "spacer",
-                        "fullscreen",
-                        "overflow_menu",
-                      ],
-                      overflowMenuButtons: ["quality"],
-                    }}
-                  />
-                </Box>
-              </Grid>
-
-              <Box sx={{ fontWeight: 600, fontSize: 3, mb: 3 }}>
-                Stream info
-              </Box>
-              <Grid
-                sx={{
-                  alignItems: "flex-start",
-                  width: "100%",
-                  fontSize: 1,
-                  gridGap: "10px",
-                  gridTemplateColumns: "200px auto",
-                }}>
-                <Box>Status:</Box>
-                <Box>{info?.stream.isActive ? "Active" : "Idle"}</Box>
-
-                <Box>Playback settings:</Box>
-                <Box
-                  sx={{
-                    pre: {
-                      padding: "0 !important",
-                      background: "transparent !important",
-                    },
-                    code: {
-                      overflowX: "auto",
-                      whiteSpace: "pre-wrap",
-                    },
-                  }}>
-                  <SyntaxHighlighter language={"json"}>
-                    {JSON.stringify(info?.session.profiles)}
-                  </SyntaxHighlighter>
-                </Box>
-              </Grid>
-            </>
-          )}
         </Container>
       </Box>
     </TabbedLayout>
