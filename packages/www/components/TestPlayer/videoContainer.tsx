@@ -7,9 +7,15 @@ type Props = {
   title: string;
   description?: string;
   manifestUrl: string;
+  withOverflow?: boolean;
 };
 
-const VideoContainer = ({ title, description, manifestUrl }: Props) => {
+const VideoContainer = ({
+  title,
+  description,
+  manifestUrl,
+  withOverflow,
+}: Props) => {
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
   return (
@@ -35,9 +41,9 @@ const VideoContainer = ({ title, description, manifestUrl }: Props) => {
               "volume",
               "spacer",
               "fullscreen",
-              title === "ABR" && "overflow_menu",
+              withOverflow && "overflow_menu",
             ],
-            overflowMenuButtons: [title === "ABR" && "quality"],
+            overflowMenuButtons: [withOverflow && "quality"],
           }}
         />
       ) : (

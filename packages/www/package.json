@@ -69,6 +69,7 @@
     "react-use-mailchimp": "^0.4.0",
     "reactour": "^1.18.0",
     "reading-time": "^1.2.0",
+    "recharts": "^2.0.7",
     "remark-emoji": "^2.1.0",
     "sanity-mux-player": "^0.0.27",
     "shaka-player": "^3.0.6",
