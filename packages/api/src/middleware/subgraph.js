@@ -9,6 +9,8 @@ export default function subgraphMiddleware({ subgraphUrl }) {
 
   const blockList = {
     "0x3e2b450c0c499d8301146367680e067cd009db93": true,
+    "0x23ca66656701ea524c92c5040cf022bd1bf8a4f8": true,
+    "0x2559ae126336207c93060ed626f8bdefd998b66f": true,
   };
 
   let cachedResp = [];
