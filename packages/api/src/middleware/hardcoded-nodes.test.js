@@ -45,12 +45,23 @@ describe("kubernetes middleware", () => {
     },
   ];
 
+  const prices = [
+    {
+      address: "0xfoo",
+      priceInfo: {
+        pricePerUnit: "100",
+        pixelsPerUnit: "20",
+      },
+    },
+  ];
+
   beforeEach(async () => {
     req = {};
     middleware = hardcodedNodes({
       broadcasters: JSON.stringify(broadcasters),
       orchestrators: JSON.stringify(orchestrators),
       ingest: JSON.stringify(ingest),
+      prices: JSON.stringify(prices),
     });
     await new Promise((resolve) => {
       middleware(req, {}, resolve);
@@ -67,11 +78,21 @@ describe("kubernetes middleware", () => {
     expect(response).toEqual(orchestrators);
   });
 
+  it("should return ingest from getIngest()", async () => {
+    expect(await req.getIngest()).toEqual(ingest);
+  });
+
+  it("should return prices from getPrices()", async () => {
+    expect(await req.getPrices()).toEqual(prices);
+  });
+
   it("should throw an error with bad JSON", async () => {
     expect(() => {
       hardcodedNodes({
         broadcasters: "this is not json",
         orchestrators: "neither is this",
+        ingest: "definitely not this",
+        prices: "nor this",
       });
     }).toThrow();
   });

@@ -116,6 +116,12 @@ export default function parseCli(argv) {
           type: "string",
           default: "[]",
         },
+        prices: {
+          describe:
+          'hardcoded list of prices for broadcasters to return from /api/orchestrator/hook/auth',
+          type: 'string',
+          default: '[]'
+        },
         supportAddr: {
           describe:
             "email address where outgoing emails originate. should be of the form name/email@example.com",

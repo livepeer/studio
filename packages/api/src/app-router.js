@@ -53,6 +53,7 @@ export default async function makeApp(params) {
     orchestrators = "[]",
     broadcasters = "[]",
     ingest = "[]",
+    prices = "[]",
     insecureTestToken,
     firestoreCredentials,
     firestoreCollection,
@@ -111,7 +112,7 @@ export default async function makeApp(params) {
     );
   }
 
-  app.use(hardcodedNodes({ orchestrators, broadcasters, ingest }));
+  app.use(hardcodedNodes({ orchestrators, broadcasters, ingest, prices }))
 
   // Add a controller for each route at the /${httpPrefix} route
   const prefixRouter = Router(); // amalgamates our endpoints together and serves them out
