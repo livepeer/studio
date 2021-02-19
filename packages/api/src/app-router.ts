@@ -6,6 +6,7 @@ import {
   errorHandler,
   healthCheck,
   kubernetes,
+  subgraph,
   hardcodedNodes,
   insecureTest,
   geolocateMiddleware,
@@ -52,6 +53,7 @@ export default async function makeApp(params) {
     kubeBroadcasterTemplate,
     kubeOrchestratorService,
     kubeOrchestratorTemplate,
+    subgraphUrl,
     fallbackProxy,
     orchestrators = "[]",
     broadcasters = "[]",
@@ -144,6 +146,14 @@ export default async function makeApp(params) {
   }
 
   app.use(hardcodedNodes({ orchestrators, broadcasters, ingest, prices }));
+
+  if (subgraphUrl) {
+    app.use(
+      subgraph({
+        subgraphUrl,
+      })
+    );
+  }
 
   // Add a controller for each route at the /${httpPrefix} route
   const prefixRouter = Router(); // amalgamates our endpoints together and serves them out
