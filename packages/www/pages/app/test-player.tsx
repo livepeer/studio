@@ -1,16 +1,14 @@
 import { useState } from "react";
 import useApi, { StreamInfo } from "../../hooks/use-api";
-import { Box, Grid, Input, Container, Heading } from "@theme-ui/components";
+import { Box, Input, Container, Heading } from "@theme-ui/components";
 import Link from "next/link";
 import Layout from "../../components/Layout";
 import useLoggedIn from "../../hooks/use-logged-in";
-import dynamic from "next/dynamic";
 import TabbedLayout from "../../components/TabbedLayout";
 import { getTabs } from "./user";
-import Button from "../../components/Button";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import VideoContainer from "components/TestPlayer/videoContainer";
 import Chart from "components/Chart";
+import JSONHighlighter from "components/JSONHighlighter";
 
 type Props = {
   active?: string;
@@ -74,7 +72,7 @@ const Arrow = ({ active }: Props) => {
 const Checked = () => {
   return (
     <svg
-      sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}
+      sx={{ ml: "12px" }}
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -183,7 +181,16 @@ const Debugger = () => {
               <div
                 sx={{
                   display: "flex",
-                  flexDirection: ["column", "row"],
+                  flexDirection: [
+                    `${
+                      message === "Not found"
+                        ? "column"
+                        : message !== "Not found" && info
+                        ? "row"
+                        : ""
+                    }`,
+                    "row",
+                  ],
                   alignItems: "center",
                   width: "100%",
                 }}>
@@ -300,15 +307,36 @@ const Debugger = () => {
                     borderRadius: "8px",
                     minHeight: "128px",
                     width: "100%",
+                    maxWidth: '100%',
+                    overflowX: 'scroll',
                     padding: "16px",
                   }}>
-                  {info?.session && (
-                    <SyntaxHighlighter
-                      language={"json"}
-                      sx={{ fontSize: "12px", lineHeight: "24px" }}>
-                      {JSON.stringify(info?.session.profiles)}
-                    </SyntaxHighlighter>
-                  )}
+                  {/* {info?.session && ( */}
+                  <JSONHighlighter
+                  json={{
+                    "something": [
+                      {
+                        "name": "240p0",
+                        "width": 426,
+                        "height": 240,
+                        "bitrate": 250000
+                      }, 
+                      {
+                        "name": "330p0",
+                        "width": 650,
+                        "height": 400,
+                        "bitrate": 450000
+                      },
+                      {
+                        "name": "640p0",
+                        "width": 310,
+                        "height": 410,
+                        "bitrate": 800000
+                      },
+                    ]
+                  }}
+                  />
+                  {/* )} */}
                 </div>
               </div>
             </div>

@@ -25,28 +25,51 @@ const CustomTooltip = ({ label }) => {
 
 const Chart = ({ data }) => {
   return (
-    <ResponsiveContainer width="99%" height={300}>
-      <AreaChart data={data}>
-        <defs>
-          <linearGradient id="colorKbps" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <CartesianGrid vertical={false} />
-        <Tooltip content={<CustomTooltip label={data.kbps} />} />
-        <Area
-          cursor="pointer"
-          type="monotone"
-          dataKey="kbps"
-          stroke="#943CFF"
-          strokeWidth="2px"
-          fill="url(#colorKbps)"
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+    <div sx={{ width: "100%", position: "relative" }}>
+      <p
+        sx={{
+          color: "#666666",
+          fontSize: "12px",
+          transform: "rotate(-90deg)",
+          position: "absolute",
+          left: "-10px",
+          bottom: "40px",
+        }}>
+        kbps
+      </p>
+      <p
+        sx={{
+          color: "#666666",
+          fontSize: "12px",
+          position: "absolute",
+          bottom: "-20px",
+          left: "70px",
+        }}>
+        sec
+      </p>
+      <ResponsiveContainer width="99%" height={300}>
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id="colorKbps" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid vertical={false} />
+          <Tooltip content={<CustomTooltip label={data.kbps} />} />
+          <Area
+            cursor="pointer"
+            type="monotone"
+            dataKey="kbps"
+            stroke="#943CFF"
+            strokeWidth="2px"
+            fill="url(#colorKbps)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

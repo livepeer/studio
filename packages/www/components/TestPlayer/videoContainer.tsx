@@ -27,32 +27,34 @@ const VideoContainer = ({
         {description}
       </p>
       {manifestUrl ? (
-        <Player
-          src={manifestUrl}
-          posterUrl={videoThumbnail}
-          config={{
-            abr: { enabled: false },
-            controlPanelElements: [
-              "time_and_duration",
-              "play_pause",
-              "rewind",
-              "fast_forward",
-              "mute",
-              "volume",
-              "spacer",
-              "fullscreen",
-              withOverflow && "overflow_menu",
-            ],
-            overflowMenuButtons: [withOverflow && "quality"],
-          }}
-        />
+        <div sx={{ borderRadius: "8px", overflow: "hidden" }}>
+          <Player
+            src={manifestUrl}
+            posterUrl={videoThumbnail}
+            config={{
+              abr: { enabled: false },
+              controlPanelElements: [
+                "time_and_duration",
+                "play_pause",
+                "rewind",
+                "fast_forward",
+                "mute",
+                "volume",
+                "spacer",
+                "fullscreen",
+                withOverflow && "overflow_menu",
+              ],
+              overflowMenuButtons: [withOverflow && "quality"],
+            }}
+          />
+        </div>
       ) : (
         <div
           sx={{
             background: "#FBFBFB",
             border: "1px solid #CCCCCC",
             borderRadius: "8px",
-            height: "312px",
+            height: ["183px", "250px", "312px"],
             width: "100%",
           }}
         />
