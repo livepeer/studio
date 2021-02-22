@@ -305,36 +305,36 @@ const Debugger = () => {
                     background: "#FBFBFB",
                     border: "1px solid #CCCCCC",
                     borderRadius: "8px",
-                    minHeight: "128px",
+                    minHeight: info?.session ? "auto" : "128px",
                     width: "100%",
-                    maxWidth: '100%',
-                    overflowX: 'scroll',
+                    maxWidth: "100%",
+                    overflowX: "scroll",
                     padding: "16px",
                   }}>
                   {/* {info?.session && ( */}
                   <JSONHighlighter
-                  json={{
-                    "something": [
-                      {
-                        "name": "240p0",
-                        "width": 426,
-                        "height": 240,
-                        "bitrate": 250000
-                      }, 
-                      {
-                        "name": "330p0",
-                        "width": 650,
-                        "height": 400,
-                        "bitrate": 450000
-                      },
-                      {
-                        "name": "640p0",
-                        "width": 310,
-                        "height": 410,
-                        "bitrate": 800000
-                      },
-                    ]
-                  }}
+                    json={{
+                      something: [
+                        {
+                          name: "240p0",
+                          width: 426,
+                          height: 240,
+                          bitrate: 250000,
+                        },
+                        {
+                          name: "330p0",
+                          width: 650,
+                          height: 400,
+                          bitrate: 450000,
+                        },
+                        {
+                          name: "640p0",
+                          width: 310,
+                          height: 410,
+                          bitrate: 800000,
+                        },
+                      ],
+                    }}
                   />
                   {/* )} */}
                 </div>

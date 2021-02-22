@@ -12,7 +12,7 @@ type Props = {
 const JSONHighlighter = ({ json, className }: Props) => {
   const html = useMemo(() => {
     const parsed = typeof json === "string" ? JSON.parse(json) : json;
-    let jsonString = JSON.stringify(parsed, null, 2);
+    let jsonString = JSON.stringify(parsed);
 
     jsonString = jsonString
       .replace(/&/g, "&amp;")
@@ -34,18 +34,24 @@ const JSONHighlighter = ({ json, className }: Props) => {
         } else if (/null/.test(match)) {
           cls = "null";
         }
-        return `<span style="color: ${cls === 'number' ? '#943CFF' : 'black'}" >${match}</span>`;
+        return `<span style="color: ${
+          cls === "number" ? "#943CFF" : "black"
+        }" >${match}</span>`;
       }
     );
   }, [json]);
-
 
   return (
     <pre
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: html }}
       className={className}
-      sx={{ fontSize: '12px' }}
+      sx={{
+        fontSize: "12px",
+        lineHeight: "24px",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+      }}
     />
   );
 };
