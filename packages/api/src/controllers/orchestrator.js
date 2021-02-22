@@ -28,6 +28,6 @@ async function discoveryAuthWebhookHandler(req, res) {
   return res.status(200).json(responseObj);
 }
 
-app.get("/hook/auth", discoveryAuthWebhookHandler);
+app.post("/hook/auth", discoveryAuthWebhookHandler);
 
 export default app;
