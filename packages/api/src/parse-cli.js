@@ -179,6 +179,11 @@ export default function parseCli(argv) {
             "id of the object store that should be used for `record: true` requests that don't otherwise have an os",
           type: "string",
         },
+        "supress-record-in-hook": {
+          describe:
+            "do not return record object store in /stream/hook response, even if it is specified in the stream object",
+          type: "boolean",
+        },
         "base-stream-name": {
           describe:
             "base stream name to be used in wildcard-based routing scheme.",

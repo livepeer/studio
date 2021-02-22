@@ -897,7 +897,7 @@ app.post("/hook", async (req, res) => {
       stream.recordObjectStoreId = req.config.recordObjectStoreId;
     }
   }
-  if (stream.recordObjectStoreId) {
+  if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
     const ros = await db.objectStore.get(stream.recordObjectStoreId);
     if (!ros) {
       res.status(500);
