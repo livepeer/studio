@@ -229,12 +229,22 @@ export function parseOrder(fieldsMap, val) {
       if (vp.length !== 2 || !fieldsMap[vp[0]]) {
         return;
       }
-      return (
-        fieldsMap[vp[0]] +
-        " " +
-        (vp[1] === "true" ? "DESC" : "ASC") +
-        " NULLS LAST"
-      );
+      const fv = fieldsMap[vp[0]];
+      const dir = vp[1] === "true" ? "DESC" : "ASC";
+      if (typeof fv === "string") {
+        return `${fv} ${dir} NULLS LAST`;
+      }
+      if (fv.val) {
+        if (fv.type == "boolean") {
+          return `coalesce((${fv.val})::boolean, FALSE) ${dir} `
+        } else if (fv.type == "int") {
+          return `coalesce((${fv.val})::bigint, 0) ${dir} `
+        } else if (fv.type == "real") {
+          return `coalesce((${fv.val})::real, 0.0) ${dir} `
+        } else {
+          return `${fv.val} ${dir} NULLS LAST`;
+        }
+      }
     })
     .filter((v) => !!v);
   return prep.length ? prep.join(", ") : undefined;
@@ -259,12 +269,25 @@ export function parseFilters(fieldsMap, val) {
     return q;
   }
   for (const filter of json) {
-    if (fieldsMap[filter.id]) {
-      q.push(
-        sql``
-          .append(fieldsMap[filter.id])
-          .append(sql` LIKE ${"%" + filter.value + "%"}`)
-      );
+    const fv = fieldsMap[filter.id];
+    if (fv) {
+      if (typeof fv === "string") {
+        q.push(sql``.append(fv).append(sql` LIKE ${"%" + filter.value + "%"}`));
+      } else if (fv.val) {
+        if (fv.type === "boolean") {
+          q.push(
+            sql``.append(
+              `coalesce((${fv.val})::boolean, FALSE) IS ${
+                filter.value ? "TRUE" : "FALSE"
+              } `
+            )
+          );
+        } else {
+          q.push(
+            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
+          );
+        }
+      }
     }
   }
   return q;

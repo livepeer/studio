@@ -132,7 +132,7 @@ describe("controllers/stream", () => {
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
-        expect(stream).toEqual(document);
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
       }
 
       const res = await client.get("/stream");
@@ -156,7 +156,7 @@ describe("controllers/stream", () => {
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
-        expect(stream).toEqual(document);
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
         sources.push(stream);
       }
 
@@ -179,7 +179,7 @@ describe("controllers/stream", () => {
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
-        expect(stream).toEqual(document);
+        expect(stream).toEqual(server.db.stream.addDefaultFields(document));
       }
       const res = await client.get(`/stream?limit=11`);
       const streams = await res.json();
@@ -204,7 +204,7 @@ describe("controllers/stream", () => {
       expect(stream.name).toBe("test_stream");
       expect(stream.createdAt).toBeGreaterThanOrEqual(now);
       const document = await server.store.get(`stream/${stream.id}`);
-      expect(document).toEqual(stream);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
     });
 
     it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {
@@ -215,7 +215,7 @@ describe("controllers/stream", () => {
       expect(stream.id).toBeDefined();
 
       const document = await server.store.get(`stream/${stream.id}`);
-      expect(document).toEqual(stream);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
 
       await server.store.delete(`stream/${stream.id}`);
       const deleted = await server.store.get(`stream/${stream.id}`);
