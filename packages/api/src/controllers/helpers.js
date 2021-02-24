@@ -292,3 +292,20 @@ export function parseFilters(fieldsMap, val) {
   }
   return q;
 }
+
+export function pathJoin2(p1, p2) {
+  if (!p1) {
+    return p2;
+  }
+  if (p1[p1.length - 1] === "/") {
+    p1 = p1.slice(0, p1.length - 1);
+  }
+  if (p2 && p2[0] === "/") {
+    p2 = p2.slice(1);
+  }
+  return p1 + "/" + (p2 || "");
+}
+
+export function pathJoin(...items) {
+  return items.reduce(pathJoin2, "");
+}
