@@ -83,11 +83,22 @@ const fieldsMap = {
   id: `stream.ID`,
   name: `stream.data->>'name'`,
   sourceSegments: `stream.data->'sourceSegments'`,
-  lastSeen: `stream.data->'lastSeen'`,
-  createdAt: `stream.data->'createdAt'`,
+  lastSeen: { val: `stream.data->'lastSeen'`, type: "int" },
+  createdAt: { val: `stream.data->'createdAt'`, type: "int" },
   userId: `stream.data->>'userId'`,
-  isActive: `stream.data->>'isActive'`,
+  isActive: { val: `stream.data->'isActive'`, type: "boolean" },
   "user.email": `users.data->>'email'`,
+  parentId: `stream.data->>'parentId'`,
+  record: { val: `stream.data->'record'`, type: "boolean" },
+  sourceSegmentsDuration: {
+    val: `stream.data->'sourceSegmentsDuration'`,
+    type: "real",
+  },
+  transcodedSegments: { val: `stream.data->'transcodedSegments'`, type: "int" },
+  transcodedSegmentsDuration: {
+    val: `stream.data->'transcodedSegmentsDuration'`,
+    type: "real",
+  },
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
@@ -132,10 +143,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
     query.push(sql`stream.data->>'userId' = ${userId}`);
   }
 
-  order = parseOrder(fieldsMap, order);
   if (!order) {
-    order = `stream.data->'lastSeen' DESC NULLS LAST, stream.data->'createdAt' DESC NULLS LAST`;
+    order = "lastSeen-true%2CcreatedAt-true";
   }
+  order = parseOrder(fieldsMap, order);
 
   const fields =
     " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
@@ -158,7 +169,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(activeCleanup(output, !!active));
+  res.json(activeCleanup(db.stream.addDefaultFieldsMany(output), !!active));
 });
 
 // returns only 'user' sessions and adds
@@ -186,7 +197,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   let filterOut;
   const query = [];
   query.push(sql`data->>'parentId' = ${stream.id}`);
-  query.push(sql`(data->>'lastSeen')::bigint > 0`);
+  query.push(sql`(data->'lastSeen')::bigint > 0`);
   query.push(sql`data->>'partialSession' IS NULL`);
   if (record) {
     if (record === "true" || record === "1") {
@@ -220,7 +231,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   }
 
   res.status(200);
-  res.json(sessions);
+  res.json(db.stream.addDefaultFieldsMany(sessions));
 });
 
 app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
@@ -248,7 +259,7 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   if (streams.length > 0 && cursorOut) {
     res.links({ next: makeNextHREF(req, cursorOut) });
   }
-  res.json(streams);
+  res.json(db.stream.addDefaultFieldsMany(streams));
 });
 
 app.get("/user/:userId", authMiddleware({}), async (req, res) => {
@@ -283,7 +294,7 @@ app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(activeCleanup(streams));
+  res.json(activeCleanup(db.stream.addDefaultFieldsMany(streams)));
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
@@ -298,7 +309,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   }
   activeCleanupOne(stream);
   res.status(200);
-  res.json(stream);
+  res.json(db.stream.addDefaultFields(stream));
 });
 
 // returns stream by steamKey
@@ -318,7 +329,7 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(stream);
+  res.json(db.stream.addDefaultFields(stream));
 });
 
 // returns stream by steamKey
@@ -336,7 +347,7 @@ app.get("/key/:streamKey", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(docs[0]);
+  res.json(db.stream.addDefaultFields(docs[0]));
 });
 
 // Needed for Mist server
@@ -454,6 +465,8 @@ app.post(
       parentId: stream.id,
       previousSessions,
       region,
+      lastSeen: 0,
+      isActive: false,
     });
 
     doc.profiles = hackMistSettings(
@@ -539,6 +552,8 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     streamKey,
     playbackId,
     createdByTokenName: req.tokenName,
+    isActive: false,
+    lastSeen: 0,
   });
 
   doc.profiles = hackMistSettings(req, doc.profiles);
@@ -554,7 +569,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   ]);
 
   res.status(201);
-  res.json(doc);
+  res.json(db.stream.addDefaultFields(doc));
 });
 
 app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
@@ -790,10 +805,13 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
   if (!session) {
     // find last session
     session = await db.stream.getLastSession(stream.id);
+    if (session) {
+      session = db.stream.addDefaultFields(session);
+    }
   }
   const user = await req.store.get(`user/${stream.userId}`);
   const resp = {
-    stream,
+    stream: db.stream.addDefaultFields(stream),
     session,
     isPlaybackid,
     isSession,

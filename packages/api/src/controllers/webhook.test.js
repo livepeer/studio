@@ -240,7 +240,7 @@ describe("controllers/webhook", () => {
       expect(stream.name).toBe("eli_is_cool");
       expect(stream.createdAt).toBeGreaterThanOrEqual(now);
       const document = await server.store.get(`stream/${stream.id}`);
-      expect(document).toEqual(stream);
+      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
 
       // trigger
       const setActiveRes = await client.put(`/stream/${stream.id}/setactive`, {

@@ -41,8 +41,8 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
 const fieldsMap = {
   id: `users.ID`,
   email: `data->>'email'`,
-  emailValid: `data->>'emailValid'`,
-  admin: `data->>'admin'`,
+  emailValid: { val: `data->'emailValid'`, type: "boolean" },
+  admin: { val: `data->'admin'`, type: "boolean" },
   stripeProductId: `data->>'stripeProductId'`,
 };
 

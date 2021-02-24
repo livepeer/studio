@@ -255,4 +255,21 @@ export default class StreamTable extends Table<Stream> {
     );
     return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
   }
+
+  addDefaultFieldsMany(objs: Array<Stream>): Array<Stream> {
+    return objs.map(this.addDefaultFields);
+  }
+
+  addDefaultFields(obj: Stream): Stream {
+    return {
+      lastSeen: 0,
+      isActive: false,
+      record: false,
+      sourceSegments: 0,
+      transcodedSegments: 0,
+      sourceSegmentsDuration: 0,
+      transcodedSegmentsDuration: 0,
+      ...obj
+    }
+  }
 }
