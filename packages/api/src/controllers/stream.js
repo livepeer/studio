@@ -12,6 +12,7 @@ import {
   getWebhooks,
   parseFilters,
   parseOrder,
+  pathJoin,
 } from "./helpers";
 import { generateStreamKey } from "./generate-stream-key";
 import { geolocateMiddleware } from "../middleware";
@@ -169,13 +170,19 @@ app.get("/", authMiddleware({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(activeCleanup(db.stream.addDefaultFieldsMany(output), !!active));
+  res.json(
+    activeCleanup(
+      db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(output)),
+      !!active
+    )
+  );
 });
 
 // returns only 'user' sessions and adds
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
   const { record, forceUrl } = req.query;
+  const raw = req.query.raw && req.user.admin;
 
   const ingests = await req.getIngest(req);
   if (!ingests.length) {
@@ -184,7 +191,8 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   }
   const ingest = ingests[0].base;
 
-  const stream = await req.store.get(`stream/${parentId}`);
+  // const stream = await req.store.get(`stream/${parentId}`);
+  const stream = await db.stream.get(parentId);
   if (
     !stream ||
     stream.deleted ||
@@ -215,22 +223,44 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   });
 
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  for (const session of sessions) {
-    delete session.previousSessions;
+  sessions = sessions.map((session) => {
     if (session.record && session.recordObjectStoreId) {
-      delete session.recordObjectStoreId;
       const isReady = session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
       if (isReady || (req.user.admin && forceUrl)) {
-        session.recordingUrl = ingest + `/recordings/${session.id}/index.m3u8`;
+        session.recordingUrl = pathJoin(
+          ingest,
+          `recordings`,
+          session.id,
+          `index.m3u8`
+        );
       }
     }
-  }
+    if (!raw) {
+      if (session.previousSessions && session.previousSessions.length) {
+        session.id = session.previousSessions[0]; // return id of the first session object so
+        // user always see same id for the 'user' session
+      }
+      const combinedStats = getCombinedStats(
+        session,
+        session.previousStats || {}
+      );
+      return {
+        ...session,
+        ...combinedStats,
+        createdAt: session.userSessionCreatedAt || session.createdAt,
+      };
+    }
+    return session;
+  });
   if (filterOut) {
     sessions = sessions.filter((sess) => !sess.record);
   }
 
   res.status(200);
+  if (!raw) {
+    db.stream.removePrivateFieldsMany(sessions);
+  }
   res.json(db.stream.addDefaultFieldsMany(sessions));
 });
 
@@ -259,7 +289,9 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   if (streams.length > 0 && cursorOut) {
     res.links({ next: makeNextHREF(req, cursorOut) });
   }
-  res.json(db.stream.addDefaultFieldsMany(streams));
+  res.json(
+    db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(streams))
+  );
 });
 
 app.get("/user/:userId", authMiddleware({}), async (req, res) => {
@@ -294,11 +326,16 @@ app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(activeCleanup(db.stream.addDefaultFieldsMany(streams)));
+  res.json(
+    activeCleanup(
+      db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(streams))
+    )
+  );
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const stream = await req.store.get(`stream/${req.params.id}`);
+  const raw = req.query.raw && req.user.admin;
+  let stream = await db.stream.get(req.params.id);
   if (
     !stream ||
     ((stream.userId !== req.user.id || stream.deleted) && !req.isUIAdmin)
@@ -308,7 +345,29 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   activeCleanupOne(stream);
+  // fixup 'user' session
+  if (!raw && stream.lastSessionId) {
+    const lastSession = await db.stream.get(stream.lastSessionId);
+    if (!lastSession) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+    lastSession.createdAt = stream.createdAt;
+    // for 'user' session we're returning stats which
+    // is a sum of all sessions
+    const combinedStats = getCombinedStats(
+      lastSession,
+      lastSession.previousStats || {}
+    );
+    stream = {
+      ...lastSession,
+      ...combinedStats,
+    };
+  }
   res.status(200);
+  if (!raw) {
+    db.stream.removePrivateFields(stream);
+  }
   res.json(db.stream.addDefaultFields(stream));
 });
 
@@ -329,7 +388,7 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(db.stream.addDefaultFields(stream));
+  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(stream)));
 });
 
 // returns stream by steamKey
@@ -347,7 +406,7 @@ app.get("/key/:streamKey", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(db.stream.addDefaultFields(docs[0]));
+  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(docs[0])));
 });
 
 // Needed for Mist server
@@ -401,7 +460,7 @@ app.post(
         useParentProfiles = true;
       }
     } else {
-      stream = await req.store.get(`stream/${req.params.streamId}`);
+      stream = await db.stream.get(req.params.streamId);
     }
 
     if (
@@ -418,7 +477,7 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    let previousSessions;
+    let previousSessions, previousStats, userSessionCreatedAt;
     if (stream.record && req.config.recordObjectStoreId) {
       // find previous sessions to form 'user' session
       const tooOld = createdAt - USER_SESSION_TIMEOUT;
@@ -431,17 +490,28 @@ app.post(
       });
       if (
         prevSessionsDocs.length &&
-        (!prevSessionsDocs[0].recordObjectStoreId ||
-          prevSessionsDocs[0].recordObjectStoreId ==
-            req.config.recordObjectStoreId)
+        prevSessionsDocs[0].recordObjectStoreId ==
+          req.config.recordObjectStoreId
       ) {
-        previousSessions = prevSessionsDocs[0].previousSessions;
+        const latestSession = prevSessionsDocs[0];
+        userSessionCreatedAt =
+          latestSession.userSessionCreatedAt || latestSession.createdAt;
+        previousSessions = latestSession.previousSessions;
         if (!Array.isArray(previousSessions)) {
           previousSessions = [];
         }
-        previousSessions.push(prevSessionsDocs[0].id);
+        previousSessions.push(latestSession.id);
+        previousStats = getCombinedStats(
+          latestSession,
+          latestSession.previousStats || {}
+        );
         setImmediate(() => {
-          db.stream.update(prevSessionsDocs[0].id, {
+          db.stream.update(previousSessions[0], {
+            lastSessionId: id,
+          });
+        });
+        setImmediate(() => {
+          db.stream.update(latestSession.id, {
             partialSession: true,
           });
         });
@@ -464,6 +534,8 @@ app.post(
       createdAt,
       parentId: stream.id,
       previousSessions,
+      previousStats,
+      userSessionCreatedAt,
       region,
       lastSeen: 0,
       isActive: false,
@@ -499,7 +571,7 @@ app.post(
       throw e;
     }
     res.status(201);
-    res.json(doc);
+    res.json(db.stream.removePrivateFields(doc));
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
@@ -569,7 +641,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   ]);
 
   res.status(201);
-  res.json(db.stream.addDefaultFields(doc));
+  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(doc)));
 });
 
 app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
@@ -811,7 +883,7 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
   }
   const user = await req.store.get(`user/${stream.userId}`);
   const resp = {
-    stream: db.stream.addDefaultFields(stream),
+    stream: db.stream.addDefaultFields(db.stream.removePrivateFields(stream)),
     session,
     isPlaybackid,
     isSession,
@@ -948,5 +1020,22 @@ app.post("/hook", async (req, res) => {
     previousSessions: stream.previousSessions,
   });
 });
+
+const statsFields = [
+  "sourceBytes",
+  "transcodedBytes",
+  "sourceSegments",
+  "transcodedSegments",
+  "sourceSegmentsDuration",
+  "transcodedSegmentsDuration",
+];
+
+function getCombinedStats(stream1, stream2) {
+  const res = {};
+  for (const fn of statsFields) {
+    res[fn] = (stream1[fn] || 0) + (stream2[fn] || 0);
+  }
+  return res;
+}
 
 export default app;

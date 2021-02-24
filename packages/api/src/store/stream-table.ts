@@ -272,4 +272,19 @@ export default class StreamTable extends Table<Stream> {
       ...obj
     }
   }
+
+  removePrivateFields(obj: Stream): Stream {
+    for (const fn of privateFields) {
+      delete obj[fn];
+    }
+    return obj;
+  }
+
+  removePrivateFieldsMany(objs: Array<Stream>): Array<Stream> {
+    return objs.map(this.removePrivateFields);
+  }
+
 }
+
+const privateFields = ["recordObjectStoreId", "previousSessions",
+  "partialSession", "previousStats", "lastSessionId", 'userSessionCreatedAt'];
