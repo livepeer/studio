@@ -94,6 +94,8 @@ const Debugger = () => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<StreamInfo | null>(null);
 
+  const myJson = JSON.stringify(info?.session?.profiles);
+
   const handleChange = (e) => {
     const value = e.target.value;
     const pattern = new RegExp(
@@ -111,6 +113,7 @@ const Debugger = () => {
     } else {
       setManifestUrl("");
       setMessage("");
+      setInfo(null);
     }
   };
 
@@ -311,32 +314,7 @@ const Debugger = () => {
                     overflowX: "scroll",
                     padding: "16px",
                   }}>
-                  {/* {info?.session && ( */}
-                  <JSONHighlighter
-                    json={{
-                      something: [
-                        {
-                          name: "240p0",
-                          width: 426,
-                          height: 240,
-                          bitrate: 250000,
-                        },
-                        {
-                          name: "330p0",
-                          width: 650,
-                          height: 400,
-                          bitrate: 450000,
-                        },
-                        {
-                          name: "640p0",
-                          width: 310,
-                          height: 410,
-                          bitrate: 800000,
-                        },
-                      ],
-                    }}
-                  />
-                  {/* )} */}
+                  {info?.session && <JSONHighlighter json={myJson} />}
                 </div>
               </div>
             </div>
