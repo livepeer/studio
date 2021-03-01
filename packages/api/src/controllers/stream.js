@@ -129,7 +129,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   if (req.user.admin) {
     if (nonLivepeerOnly && nonLivepeerOnly !== "false") {
-      query.push(sql`users.data->>'email' NOT LIKE '%livepeer%'`);
+      query.push(sql`users.data->>'email' NOT LIKE '%@livepeer.%'`);
     }
   }
   if (active && active !== "false") {
