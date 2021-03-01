@@ -25,17 +25,17 @@ const CustomTooltip = ({ label }) => {
 
 const Chart = ({ data }) => {
   return (
-    <div sx={{ width: "100%", position: "relative" }}>
+    <div sx={{ width: "100%", position: "relative"}}>
       <p
         sx={{
           color: "#666666",
           fontSize: "12px",
           transform: "rotate(-90deg)",
           position: "absolute",
-          left: "-10px",
-          bottom: "40px",
+          left: '-70px',
+          bottom: "70px",
         }}>
-        kbps
+        kbps (multiplied by 1000)
       </p>
       <p
         sx={{
@@ -56,7 +56,7 @@ const Chart = ({ data }) => {
             </linearGradient>
           </defs>
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis domain={["dataMin - 200", "dataMax + 200"]} />
           <CartesianGrid vertical={false} />
           <Tooltip content={<CustomTooltip label={data.kbps} />} />
           <Area

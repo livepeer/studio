@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import useApi, { StreamInfo } from "../../hooks/use-api";
 import { Box, Input, Container, Heading } from "@theme-ui/components";
 import Link from "next/link";
@@ -14,28 +14,8 @@ type Props = {
   active?: string;
 };
 
-const data = [
-  {
-    name: "0",
-    kbps: 1400,
-  },
-  {
-    name: "10",
-    kbps: 2300,
-  },
-  {
-    name: "20",
-    kbps: 1800,
-  },
-  {
-    name: "30",
-    kbps: 1000,
-  },
-  {
-    name: "40",
-    kbps: 1500,
-  },
-];
+const interval = 10000;
+const maxItems = 5;
 
 const Arrow = ({ active }: Props) => {
   return (
@@ -91,46 +71,89 @@ const Debugger = () => {
   const { user, getStreamInfo } = useApi();
   const [message, setMessage] = useState("");
   const [manifestUrl, setManifestUrl] = useState("");
-  const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<StreamInfo | null>(null);
+  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>(
+    []
+  );
 
-  const myJson = JSON.stringify(info?.session?.profiles);
+  const myJson = useMemo(() => JSON.stringify(info?.session?.profiles), [
+    info?.session?.profiles,
+  ]);
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    const pattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
-    );
-    if (pattern.test(value)) {
-      setManifestUrl(value);
-      doGetInfo(value);
-    } else {
-      setManifestUrl("");
-      setMessage("");
+  const doGetInfo = useCallback(
+    async (id: string) => {
       setInfo(null);
-    }
-  };
+      const playbackId = id.split("/")[4];
+      const [, rinfo] = await getStreamInfo(playbackId);
+      if (!rinfo || rinfo.isSession === undefined) {
+        setMessage("Not found");
+      } else if (rinfo.stream) {
+        const info = rinfo as StreamInfo;
+        setInfo(info);
+        setMessage("");
+      }
+    },
+    [getStreamInfo]
+  );
 
-  const doGetInfo = async (id: string) => {
-    setLoading(true);
-    setInfo(null);
-    const playbackId = id.split("/")[4];
-    const [, rinfo] = await getStreamInfo(playbackId);
-    if (!rinfo || rinfo.isSession === undefined) {
-      setMessage("Not found");
-    } else if (rinfo.stream) {
-      const info = rinfo as StreamInfo;
-      setInfo(info);
-      setMessage("");
-    }
-    setLoading(false);
-  };
+  const getIngestRate = useCallback(
+    async (id: string) => {
+      const playbackId = id.split("/")[4];
+      const [, rinfo] = await getStreamInfo(playbackId);
+      if (!rinfo) {
+        setMessage("Not found");
+      } else if (rinfo.stream) {
+        const newInfo = rinfo as StreamInfo;
+        setDataChart((prev) => {
+          const lastItem = prev[prev.length - 1];
+          return [
+            ...prev,
+            {
+              name: lastItem ? lastItem.name + interval / 1000 : 0,
+              kbps: Math.round(newInfo.session.ingestRate / 1000),
+            },
+          ].slice(Math.max(prev.length - maxItems, 0));
+        });
+      }
+    },
+    [getStreamInfo]
+  );
+
+  const handleChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      const pattern = new RegExp(
+        "^(https?:\\/\\/)?" + // protocol
+          "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+          "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+          "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+          "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+          "(\\#[-a-z\\d_]*)?$",
+        "i"
+      );
+      if (pattern.test(value)) {
+        setManifestUrl(value);
+        doGetInfo(value);
+      } else {
+        setManifestUrl("");
+        setMessage("");
+        setInfo(null);
+      }
+    },
+    [doGetInfo]
+  );
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      if (info) {
+        getIngestRate(manifestUrl)
+      } else return null
+    }, interval);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [getIngestRate]);
 
   if (!user || user.emailValid === false) {
     return <Layout />;
@@ -210,12 +233,12 @@ const Debugger = () => {
                   placeholder="Playback URL"
                   onChange={handleChange}
                 />
-                {message === "Not found" && (
+                {!info && manifestUrl && (
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Stream not found.
                   </Box>
                 )}
-                {message !== "Not found" && info && <Checked />}
+                {info && <Checked />}
               </div>
             </form>
             <Box
@@ -272,7 +295,7 @@ const Debugger = () => {
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "48px" }}>
                   Session ingest rate
                 </p>
-                <Chart data={data} />
+                <Chart data={dataChart} />
               </div>
               <div>
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "19px" }}>
