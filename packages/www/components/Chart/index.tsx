@@ -42,10 +42,10 @@ const Chart = ({ data }) => {
           color: "#666666",
           fontSize: "12px",
           position: "absolute",
-          bottom: "-20px",
-          left: "70px",
+          bottom: ["-30px", "-20px"],
+          left: "50px",
         }}>
-        sec
+        Seconds since stream loaded in test player
       </p>
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart data={data}>

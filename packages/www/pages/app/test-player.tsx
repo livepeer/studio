@@ -290,18 +290,16 @@ const Debugger = () => {
             }}>
             <VideoContainer
               manifestUrl={manifestUrl}
+              title='Your source stream only'
               description="Only the source is streaming."
-            >
-              <p>Your source stream only</p>
-            </VideoContainer>
+            />
             <Arrow active={manifestUrl} />
             <VideoContainer
               manifestUrl={manifestUrl}
-              withOverflow
+              title='Source stream + Livpeeer.com transcoded renditions'
               description="Adaptive bitrate streaming"
-            >
-              <p>Source stream + <Link href='/'><a sx={{textDecoration: 'underline', cursor: 'pointer'}}>Livpeeer.com</a></Link> transcoded renditions</p>
-            </VideoContainer>
+              withOverflow
+            />
           </Box>
           <hr
             sx={{

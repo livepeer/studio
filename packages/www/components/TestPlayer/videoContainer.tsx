@@ -4,14 +4,14 @@ import dynamic from "next/dynamic";
 const Player = dynamic(import("../../components/Player"), { ssr: false });
 
 type Props = {
-  children: React.ReactNode;
+  title: string;
   description?: string;
   manifestUrl: string;
   withOverflow?: boolean;
 };
 
 const VideoContainer = ({
-  children,
+  title,
   description,
   manifestUrl,
   withOverflow,
@@ -22,7 +22,7 @@ const VideoContainer = ({
     <div sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
       <div>
         <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
-          {children}
+          {title}
         </h1>
         <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "32px" }}>
           {description}
