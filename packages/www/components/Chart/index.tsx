@@ -58,7 +58,7 @@ const Chart = ({ data }) => {
           <XAxis dataKey="name" />
           <YAxis domain={["dataMin - 200", "dataMax + 200"]} />
           <CartesianGrid vertical={false} />
-          <Tooltip content={<CustomTooltip label={data.kbps} />} />
+          <Tooltip content={<CustomTooltip label={data?.kbps} />} />
           <Area
             cursor="pointer"
             type="monotone"

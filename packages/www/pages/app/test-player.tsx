@@ -72,6 +72,7 @@ const Debugger = () => {
   const [message, setMessage] = useState("");
   const [manifestUrl, setManifestUrl] = useState("");
   const [info, setInfo] = useState<StreamInfo | null>(null);
+  const [loading, setLoading] = useState<boolean>(false)
   const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>(
     []
   );
@@ -83,14 +84,17 @@ const Debugger = () => {
   const doGetInfo = useCallback(
     async (id: string) => {
       setInfo(null);
+      setLoading(true)
       const playbackId = id.split("/")[4];
       const [, rinfo] = await getStreamInfo(playbackId);
       if (!rinfo || rinfo.isSession === undefined) {
         setMessage("Not found");
+        setLoading(false)
       } else if (rinfo.stream) {
         const info = rinfo as StreamInfo;
         setInfo(info);
         setMessage("");
+        setLoading(false)
       }
     },
     [getStreamInfo]
@@ -121,6 +125,7 @@ const Debugger = () => {
 
   const handleChange = useCallback(
     (e) => {
+      setInfo(null)
       const value = e.target.value;
       const pattern = new RegExp(
         "^(https?:\\/\\/)?" + // protocol
@@ -134,6 +139,10 @@ const Debugger = () => {
       if (pattern.test(value)) {
         setManifestUrl(value);
         doGetInfo(value);
+      } else if (value && !pattern.test(value)) {
+        setManifestUrl("Not valid");
+        setMessage("");
+        setInfo(null);
       } else {
         setManifestUrl("");
         setMessage("");
@@ -153,7 +162,7 @@ const Debugger = () => {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [getIngestRate]);
+  }, [getIngestRate, info]);
 
   if (!user || user.emailValid === false) {
     return <Layout />;
@@ -209,7 +218,7 @@ const Debugger = () => {
                   display: "flex",
                   flexDirection: [
                     `${
-                      message === "Not found"
+                      message === "Not found" || loading || manifestUrl === 'Not valid'
                         ? "column"
                         : message !== "Not found" && info
                         ? "row"
@@ -217,7 +226,7 @@ const Debugger = () => {
                     }`,
                     "row",
                   ],
-                  alignItems: "center",
+                  alignItems: [`${message === "Not found" || loading || manifestUrl === 'Not valid' ? 'flex-start' : "center"}`, 'center'],
                   width: "100%",
                 }}>
                 <Input
@@ -226,6 +235,7 @@ const Debugger = () => {
                     borderRadius: "8px",
                     border: "1px solid #CCCCCC",
                     height: "48px",
+                    alignSelf: 'center'
                   }}
                   label="manifestUrl"
                   name="manifestUrl"
@@ -233,7 +243,15 @@ const Debugger = () => {
                   placeholder="Playback URL"
                   onChange={handleChange}
                 />
-                {!info && manifestUrl && (
+                {loading && <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
+                    Loading...
+                  </Box>}
+                {!info && manifestUrl === 'Not valid' && !loading &&(
+                  <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
+                    Not a valid url.
+                  </Box>
+                )}
+                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl &&(
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Stream not found.
                   </Box>
@@ -295,7 +313,7 @@ const Debugger = () => {
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "48px" }}>
                   Session ingest rate
                 </p>
-                <Chart data={dataChart} />
+                <Chart data={info ? dataChart : null} />
               </div>
               <div>
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "19px" }}>
