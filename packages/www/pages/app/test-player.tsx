@@ -15,7 +15,7 @@ type Props = {
 };
 
 const interval = 10000;
-const maxItems = 5;
+const maxItems = 6;
 
 const Arrow = ({ active }: Props) => {
   return (
@@ -322,8 +322,11 @@ const Debugger = () => {
                 width: "100%",
               }}>
               <div>
-                <p sx={{ fontSize: "20px", fontWeight: "600", mb: "48px" }}>
+                <p sx={{ fontSize: "20px", fontWeight: "600", mb: "8px" }}>
                   Session ingest rate
+                </p>
+                <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "48px" }}>
+                  After the stream loads, ingest rate updates every 10 seconds.
                 </p>
                 <Chart data={info ? dataChart : null} />
               </div>
