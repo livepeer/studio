@@ -4,14 +4,14 @@ import dynamic from "next/dynamic";
 const Player = dynamic(import("../../components/Player"), { ssr: false });
 
 type Props = {
-  title: string;
+  children: React.ReactNode;
   description?: string;
   manifestUrl: string;
   withOverflow?: boolean;
 };
 
 const VideoContainer = ({
-  title,
+  children,
   description,
   manifestUrl,
   withOverflow,
@@ -19,13 +19,15 @@ const VideoContainer = ({
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
   return (
-    <div>
-      <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
-        {title}
-      </h1>
-      <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "32px" }}>
-        {description}
-      </p>
+    <div sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+      <div>
+        <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
+          {children}
+        </h1>
+        <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "32px" }}>
+          {description}
+        </p>
+      </div>
       {manifestUrl ? (
         <div sx={{ borderRadius: "8px", overflow: "hidden" }}>
           <Player

@@ -269,6 +269,16 @@ const Debugger = () => {
               }}>
               ie. https://fra-cdn.livepeer.com/hls/123456abcdef7890/index.m3u8
             </Box>
+            <Box
+              sx={{
+                mt: "2px",
+                fontSize: "12px",
+                color: "rgba(0,0,0,.5)",
+                fontStyle: "italic",
+                wordBreak: "break-word",
+              }}>
+              Stream playback will work in all browsers and devices, but this test player tool works best in Chrome.
+            </Box>
           </Box>
           <Box
             sx={{
@@ -280,16 +290,18 @@ const Debugger = () => {
             }}>
             <VideoContainer
               manifestUrl={manifestUrl}
-              title="Source"
-              description="Highest resolution only"
-            />
+              description="Only the source is streaming."
+            >
+              <p>Your source stream only</p>
+            </VideoContainer>
             <Arrow active={manifestUrl} />
             <VideoContainer
               manifestUrl={manifestUrl}
               withOverflow
-              title="ABR"
-              description="Source + transcoded renditions"
-            />
+              description="Adaptive bitrate streaming"
+            >
+              <p>Source stream + <Link href='/'><a sx={{textDecoration: 'underline', cursor: 'pointer'}}>Livpeeer.com</a></Link> transcoded renditions</p>
+            </VideoContainer>
           </Box>
           <hr
             sx={{
