@@ -20,7 +20,7 @@ async function discoveryAuthWebhookHandler(req, res) {
     return res.status(400).send({ message: err.message });
   }
   for (let i = 0; i < prices.length; i++) {
-    if (prices[i].address == req.body.id) {
+    if (prices[i].address.toLowerCase() == req.body.id.toLowerCase()) {
       responseObj["priceInfo"] = prices[i].priceInfo;
       break;
     }
