@@ -2,14 +2,12 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
-# List all streams
+# List streams
 
 ### Created by the same user
 
-You can retrieve all `stream` objects with the same `userID`. With any filter
-appended to the API call, the response will include both stream objects that
-represent a livestream configuration and stream objects that represent a single
-livestream session.
+You can retrieve all `stream` objects with the same `userID`. With any filter appended to the API call, the response will include both `stream` objects that
+represent a livestream configuration and stream objects that represent a single livestream session. 
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
@@ -18,12 +16,10 @@ curl -H 'authorization: Bearer <api-key>' \
 
 ### Query parameters
 
-You can retrieve all `stream` objects with the same `userID` but exclude stream
-objects _with_ a `parentId`. This fi
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
-```
+| JSON parameter              | Type    | Description                                                                                                                                                                                                                               |
+| ----------------------------| ------- | ----------------------------------------------------------------------|
+| `isActive`                  | boolean | `true` returns active `stream` objects. `false` returns idle `stream` objects. Noted that the default value for new `stream` objects is `false`. |
+| `parentId`                  | number  | To return all sessions of the same `stream` object, set to the the value of the parent `stream` object` id `. To return only  "parent" `stream` objects, set the value to ???? |
+| `record`                    | boolean | `true` returns `stream` objects with recording on. `false` returns `stream` objects with recording off. Noted that the default value for new `stream` objects is `false`. |
 
 </DocsLayout>
