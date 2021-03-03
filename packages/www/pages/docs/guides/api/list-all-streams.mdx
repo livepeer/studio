@@ -17,21 +17,38 @@ The following examples show decoded JSON object. But, remember that anything pas
 
 #### Exclude sessions
 
-You can retrieve all `stream` objects with the same `userID` but exclude stream
-objects _with_ a `parentId`. This fi
-
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
+"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"}]"
 ```
 
 #### Only return sessions with the same `parentId`
 
+```bash
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "1234abcd-1234-abcd-1234-abcd1234abcd"}]"
+```
+
 #### Only return sessions with the same  `parentId` with recording on
 
-#### Return active streams
+```bash
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "1234abcd-1234-abcd-1234-abcd1234abcd"},{"id": "record", "value": "true"}]"
+```
 
-#### Retun all idle streams
+#### Return active streams and exclude sessions
+
+```bash
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"},{"id": "isActive", "value": "true"}]"
+```
+
+#### Retun all idle streams and exclude session
+
+```bash
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"},{"id": "isActive", "value": "false"}]"
+```
 
 Next learn
 [how to delete a stream with the Livepeer.com API](/docs/guides/api/delete-a-stream).
