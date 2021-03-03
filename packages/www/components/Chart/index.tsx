@@ -56,7 +56,7 @@ const Chart = ({ data }) => {
             </linearGradient>
           </defs>
           <XAxis dataKey="name" />
-          <YAxis domain={["dataMin - 500", "dataMax + 500"]} />
+          <YAxis domain={[0, 1600]} />
           <CartesianGrid vertical={false} />
           <Tooltip  content={<CustomTooltip label={data?.kbps} />} />
           <Area
