@@ -11,7 +11,7 @@ import Chart from "components/Chart";
 import JSONHighlighter from "components/JSONHighlighter";
 
 type Props = {
-  active?: string;
+  active?: boolean;
 };
 
 const interval = 10000;
@@ -91,7 +91,7 @@ const Debugger = () => {
       if (!rinfo || rinfo.isSession === undefined) {
         setMessage("Not found");
         setLoading(false)
-      } else if (rinfo.stream) {
+      } else if (rinfo.stream && videoExists) {
         const info = rinfo as StreamInfo;
         setInfo(info);
         setMessage("");
@@ -252,7 +252,7 @@ const Debugger = () => {
                     Not a valid url.
                   </Box>
                 )}
-                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl &&(
+                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl && !videoExists &&(
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Stream not found.
                   </Box>
@@ -299,7 +299,7 @@ const Debugger = () => {
               title='Your source stream only'
               description="Only the source is streaming."
             />
-            <Arrow active={manifestUrl} />
+            <Arrow active={videoExists} />
             <VideoContainer
               manifestUrl={manifestUrl}
               title='Source stream + Livpeeer.com transcoded renditions'
