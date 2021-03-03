@@ -4,8 +4,8 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # List streams
 
-You can retrieve all `stream` objects with the same `userID`. With any filter appended to the API call, the response will include both `stream` objects that
-represent a livestream configuration and stream objects that represent a single livestream session. 
+You can retrieve all `stream` objects with the same `userID`. The response will include both `stream` objects that
+represent a livestream configuration (no `parentId` parameter) and stream objects that represent a single livestream session (`parentId` is the same as the `id` of the parent `stream` object). 
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
