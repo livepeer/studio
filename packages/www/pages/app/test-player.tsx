@@ -91,7 +91,7 @@ const Debugger = () => {
       if (!rinfo || rinfo.isSession === undefined) {
         setMessage("Not found");
         setLoading(false)
-      } else if (rinfo.stream && videoExists) {
+      } else if (rinfo.stream) {
         const info = rinfo as StreamInfo;
         setInfo(info);
         setMessage("");
@@ -139,7 +139,9 @@ const Debugger = () => {
       );
       if (pattern.test(value)) {
         setManifestUrl(value);
-        doGetInfo(value);
+        if (videoExists) {
+          doGetInfo(value);
+        }
       } else if (value && !pattern.test(value)) {
         setManifestUrl("Not valid");
         setMessage("");
