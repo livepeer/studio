@@ -139,15 +139,20 @@ const Debugger = () => {
       );
       if (pattern.test(value)) {
         setManifestUrl(value);
-        doGetInfo(value);
+        setLoading(true)
+        setTimeout(() => {
+          doGetInfo(value);
+        }, 1000);
       } else if (value && !pattern.test(value)) {
         setManifestUrl("Not valid");
         setMessage("");
         setInfo(null);
+        setLoading(false)
       } else {
         setManifestUrl("");
         setMessage("");
         setInfo(null);
+        setLoading(false)
       }
     },
     [doGetInfo]
@@ -252,7 +257,7 @@ const Debugger = () => {
                     Not a valid url.
                   </Box>
                 )}
-                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl && !videoExists &&(
+                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl &&(
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Stream not found.
                   </Box>
