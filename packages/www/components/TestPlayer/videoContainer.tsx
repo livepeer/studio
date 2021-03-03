@@ -8,6 +8,7 @@ type Props = {
   description?: string;
   manifestUrl: string;
   withOverflow?: boolean;
+  setVideo?: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 const VideoContainer = ({
@@ -15,6 +16,7 @@ const VideoContainer = ({
   description,
   manifestUrl,
   withOverflow,
+  setVideo
 }: Props) => {
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
@@ -31,6 +33,7 @@ const VideoContainer = ({
       {manifestUrl ? (
         <div sx={{ borderRadius: "8px", overflow: "hidden" }}>
           <Player
+            setVideo={setVideo}
             src={manifestUrl}
             posterUrl={videoThumbnail}
             config={{

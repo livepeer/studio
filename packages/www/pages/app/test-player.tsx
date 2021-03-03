@@ -76,6 +76,7 @@ const Debugger = () => {
   const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>(
     [{name: 0, kbps: 0}]
   );
+  const [videoExists, setVideoExists] = useState<boolean>(false)
 
   const myJson = useMemo(() => JSON.stringify(info?.session?.profiles), [
     info?.session?.profiles,
@@ -218,7 +219,7 @@ const Debugger = () => {
                   display: "flex",
                   flexDirection: [
                     `${
-                      message === "Not found" || loading || manifestUrl === 'Not valid'
+                      message === "Not found" || loading || manifestUrl === 'Not valid' || !videoExists
                         ? "column"
                         : message !== "Not found" && info
                         ? "row"
@@ -226,7 +227,7 @@ const Debugger = () => {
                     }`,
                     "row",
                   ],
-                  alignItems: [`${message === "Not found" || loading || manifestUrl === 'Not valid' ? 'flex-start' : "center"}`, 'center'],
+                  alignItems: [`${message === "Not found" || loading || manifestUrl === 'Not valid' || !videoExists ? 'flex-start' : "center"}`, 'center'],
                   width: "100%",
                 }}>
                 <Input
@@ -256,7 +257,12 @@ const Debugger = () => {
                     Stream not found.
                   </Box>
                 )}
-                {info && <Checked />}
+                {info && !videoExists && !loading &&(
+                  <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
+                    The stream exists but the url is invalid.
+                  </Box>
+                )}
+                {info && videoExists && <Checked />}
               </div>
             </form>
             <Box
@@ -299,6 +305,7 @@ const Debugger = () => {
               title='Source stream + Livpeeer.com transcoded renditions'
               description="Adaptive bitrate streaming"
               withOverflow
+              setVideo={setVideoExists}
             />
           </Box>
           <hr
@@ -326,13 +333,13 @@ const Debugger = () => {
                 <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "48px" }}>
                   After the stream loads, ingest rate updates every 10 seconds.
                 </p>
-                <Chart data={info ? dataChart : null} />
+                <Chart data={info && videoExists ? dataChart : null} />
               </div>
               <div>
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "19px" }}>
                   Status
                 </p>
-                {info?.stream ? (
+                {info?.stream && videoExists ? (
                   <div sx={{ display: "flex", alignItems: "center" }}>
                     <div
                       sx={{
@@ -368,7 +375,7 @@ const Debugger = () => {
                     overflowX: "scroll",
                     padding: "16px",
                   }}>
-                  {info?.session && <JSONHighlighter json={myJson} />}
+                  {info?.session && videoExists && <JSONHighlighter json={myJson} />}
                 </div>
               </div>
             </div>
