@@ -74,7 +74,7 @@ const Debugger = () => {
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false)
   const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>(
-    []
+    [{name: 0, kbps: 500}]
   );
 
   const myJson = useMemo(() => JSON.stringify(info?.session?.profiles), [
