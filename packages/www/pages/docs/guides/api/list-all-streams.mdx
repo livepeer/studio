@@ -29,13 +29,6 @@ curl -H 'authorization: Bearer <api-key>' \
 "https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "1234abcd-1234-abcd-1234-abcd1234abcd"}]"
 ```
 
-#### Only return sessions with the same  `parentId` with recording on
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "1234abcd-1234-abcd-1234-abcd1234abcd"},{"id": "record", "value": "true"}]"
-```
-
 #### Return active streams and exclude sessions
 
 ```bash
@@ -43,7 +36,7 @@ curl -H 'authorization: Bearer <api-key>' \
 "https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"},{"id": "isActive", "value": "true"}]"
 ```
 
-#### Retun all idle streams and exclude session
+#### Retrun all idle streams and exclude session
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
