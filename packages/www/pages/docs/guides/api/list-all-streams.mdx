@@ -4,6 +4,8 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to use the Livepeer.com API to list and filter streams
 
+You can retrieve all `stream` objects with the same `userID`. The response will include both `stream` objects that represent a livestream configuration and stream objects that represent a single livestream session. The latter have a `parentId` set to its parent `stream` object's `id`.
+
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
 "https://livepeer.com/api/stream"
