@@ -13,13 +13,13 @@ livestream session.
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>"
+"https://livepeer.com/api/stream/"
 ```
 
-### Created by the same user, excluding livestream sessions
+### Query parameters
 
 You can retrieve all `stream` objects with the same `userID` but exclude stream
-objects _with_ a `parentId`.
+objects _with_ a `parentId`. This fi
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
