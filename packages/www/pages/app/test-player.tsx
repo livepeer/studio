@@ -139,9 +139,7 @@ const Debugger = () => {
       );
       if (pattern.test(value)) {
         setManifestUrl(value);
-        if (videoExists) {
-          doGetInfo(value);
-        }
+        doGetInfo(value);
       } else if (value && !pattern.test(value)) {
         setManifestUrl("Not valid");
         setMessage("");
