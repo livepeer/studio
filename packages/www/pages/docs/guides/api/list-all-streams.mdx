@@ -1,37 +1,35 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout title="How to list streams - Livepeer.com" description="How to use the Livepeer.com API to list all streams created by a Livepeer.com user">
+<DocsLayout title="How to list streams - Livepeer.com" description="How to use the Livepeer.com API to list and filter streamsr">
 
-# How to use the Livepeer.com API to list all streams created by a Livepeer.com user
-
-To list all the streams created by a user, you will need the `userId` from the
-API key object.
-
-The simplest way to find your userId is by fetching the API key information. For
-example:
+# How to use the Livepeer.com API to list and filter streams
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
-"https://livepeer.com/api/api-token/{api_key}”
+"https://livepeer.com/api/stream"
 ```
 
-You will get the API key object in the response. For example:
+### Common examples
+
+The following examples show decoded JSON object. But, remember that anything passed as a parametre in a GET request URL must be URL encoded. 
+
+#### Exclude sessions
+
+You can retrieve all `stream` objects with the same `userID` but exclude stream
+objects _with_ a `parentId`. This fi
 
 ```bash
-{
-    "id":"{api_key}",
-    "userId":"1234abcd-1234-abcd-1234-abcd1234abcd",
-    "name":"example-api-key",
-    "createdAt":1596047053660
-}
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
 ```
 
-Use the `userId` to fetch all the streams created by the user. For example:
+#### Only return sessions with the same `parentId`
 
-```bash
-curl -H 'authorization: Bearer {api_key}' \
-"https://livepeer.com/api/stream/user/{user_id}"
-```
+#### Only return sessions with the same  `parentId` with recording on
+
+#### Return active streams
+
+#### Retun all idle streams
 
 Next learn
 [how to delete a stream with the Livepeer.com API](/docs/guides/api/delete-a-stream).
