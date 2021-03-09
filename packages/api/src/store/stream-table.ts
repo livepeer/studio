@@ -264,11 +264,13 @@ export default class StreamTable extends Table<Stream> {
     return {
       lastSeen: 0,
       isActive: false,
-      record: false,
+      // record: false, // hide until recording feature gets out of beta
       sourceSegments: 0,
       transcodedSegments: 0,
       sourceSegmentsDuration: 0,
       transcodedSegmentsDuration: 0,
+      sourceBytes: 0,
+      transcodedBytes: 0,
       ...obj
     }
   }
