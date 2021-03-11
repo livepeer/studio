@@ -44,6 +44,10 @@ export function getTabs(i: number): Array<TabType> {
         name: "API Keys",
         href: "/app/user/keys",
       },
+      {
+        name: "Test Player",
+        href: "/app/test-player",
+      },
     ];
   }
 

@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 const muxjs = require("mux.js/dist/mux.js");
 const shaka = require("shaka-player/dist/shaka-player.ui.js");
 
-const Player = ({ src, posterUrl, config = {} }) => {
+const Player = ({ src, posterUrl, config = {}, setVideo }) => {
   const video: any = useRef(null);
   const videoContainer: any = useRef(null);
   const controller: any = useRef({});
@@ -45,6 +45,12 @@ const Player = ({ src, posterUrl, config = {} }) => {
   return (
     <div className="shadow-lg mx-auto max-w-full" ref={videoContainer}>
       <video
+        onEmptied={() => {
+          setVideo ? setVideo(false) : null
+        }}
+        onCanPlay={() => {
+          setVideo ? setVideo(true) : null
+        }}
         muted
         autoPlay
         id="video"
