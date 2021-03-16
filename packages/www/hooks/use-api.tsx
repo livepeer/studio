@@ -309,6 +309,30 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
+    async setUserSuspended(
+      userId: string,
+      suspended: boolean
+    ): Promise<[Response, ApiError]> {
+      const [res, body] = await context.fetch(`/user/${userId}/suspended`, {
+        method: "PATCH",
+        body: JSON.stringify({ suspended }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 204) {
+        if (body && body.errors) {
+          return [res, body];
+        }
+        return [
+          res,
+          { errors: [res.body ? `${body}` : `http status ${res.status}`] },
+        ];
+      }
+      return [res, null];
+    },
+
     async createCustomer(email): Promise<[Response, User | ApiError]> {
       const [, body] = await context.fetch("/user/create-customer", {
         method: "POST",

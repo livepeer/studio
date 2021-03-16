@@ -17,6 +17,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [adminModal, setAdminModal] = useState(false);
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
+  const [suspendModal, setSuspendModal] = useState(false);
+  const [unsuspendModal, setUnsuspendModal] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
   const [lastCursor, setLastCursor] = useState("");
   const [lastOrder, setLastOrder] = useState("");
@@ -24,11 +26,13 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [loading, setLoading] = useState(true);
   const [loadingError, setLoadingError] = useState("");
 
-  const { getUsers, makeUserAdmin } = useApi();
+  const { getUsers, makeUserAdmin, setUserSuspended } = useApi();
 
   const close = () => {
     setAdminModal(false);
     setRemoveAdminModal(false);
+    setSuspendModal(false);
+    setUnsuspendModal(false);
   };
 
   const getProductName = (productId) =>
@@ -54,6 +58,13 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       {
         Header: "Admin",
         accessor: "admin",
+        Cell: (cell) => {
+          return cell.value ? "true" : "false";
+        },
+      },
+      {
+        Header: "Suspended",
+        accessor: "suspended",
         Cell: (cell) => {
           return cell.value ? "true" : "false";
         },
@@ -135,6 +146,61 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       sx={{
         my: 2,
       }}>
+      {suspendModal && selectedUser && (
+        <Modal onClose={close}>
+          <h3>Suspend user</h3>
+          <p>
+            Are you sure you want to <b>suspend</b> user "{selectedUser.email}"?
+          </p>
+          <Flex sx={{ justifyContent: "flex-end" }}>
+            <Button
+              type="button"
+              variant="outlineSmall"
+              onClick={close}
+              sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="primarySmall"
+              onClick={() => {
+                setUserSuspended(selectedUser.id, true)
+                  .then(refecth)
+                  .finally(close);
+              }}>
+              Suspend User
+            </Button>
+          </Flex>
+        </Modal>
+      )}
+      {unsuspendModal && selectedUser && (
+        <Modal onClose={close}>
+          <h3>Unsuspend user</h3>
+          <p>
+            Are you sure you want to <i>unsuspend</i> user "{selectedUser.email}
+            "?
+          </p>
+          <Flex sx={{ justifyContent: "flex-end" }}>
+            <Button
+              type="button"
+              variant="outlineSmall"
+              onClick={close}
+              sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="primarySmall"
+              onClick={() => {
+                setUserSuspended(selectedUser.id, false)
+                  .then(refecth)
+                  .finally(close);
+              }}>
+              Unsuspend User
+            </Button>
+          </Flex>
+        </Modal>
+      )}
       {adminModal && selectedUser && (
         <Modal onClose={close}>
           <h3>Make User Admin</h3>
@@ -215,6 +281,20 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           sx={{ ml: "1em" }}
           onClick={() => selectedUser && setRemoveAdminModal(true)}>
           Remove Admin Rights
+        </Button>
+        <Button
+          variant="outlineSmall"
+          disabled={!selectedUser || selectedUser.suspended}
+          sx={{ ml: "1em" }}
+          onClick={() => selectedUser && setSuspendModal(true)}>
+          Suspend User
+        </Button>
+        <Button
+          variant="outlineSmall"
+          disabled={!selectedUser || !selectedUser.suspended}
+          sx={{ ml: "1em" }}
+          onClick={() => selectedUser && setUnsuspendModal(true)}>
+          Unsuspend User
         </Button>
       </CommonAdminTable>
     </Container>
