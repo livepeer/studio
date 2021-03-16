@@ -321,22 +321,6 @@ const makeContext = (state: ApiState, setState) => {
       return body;
     },
 
-    async updateUser(id, fields): Promise<[Response, User | ApiError]> {
-      const [res, body] = await context.fetch(`/user/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ ...fields }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-
-      if (res.status !== 201) {
-        return body;
-      }
-
-      return res;
-    },
-
     async createSubscription({
       stripeCustomerId,
       stripeProductId,

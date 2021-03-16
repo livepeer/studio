@@ -187,6 +187,7 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
+/*
 app.patch("/:id", async (req, res) => {
   let user = await req.store.get(`user/${req.params.id}`, false);
   if (!user) {
@@ -209,6 +210,7 @@ app.patch("/:id", async (req, res) => {
   res.status(200);
   res.json(fullUser);
 });
+*/
 
 app.post("/token", validatePost("user"), async (req, res) => {
   const { data: userIds } = await req.store.query({
