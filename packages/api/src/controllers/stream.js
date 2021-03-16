@@ -191,7 +191,6 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   }
   const ingest = ingests[0].base;
 
-  // const stream = await req.store.get(`stream/${parentId}`);
   const stream = await db.stream.get(parentId);
   if (
     !stream ||
@@ -269,7 +268,7 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   const { limit, cursor } = req.query;
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
-  const stream = await req.store.get(`stream/${parentId}`);
+  const stream = await db.stream.get(parentId);
   if (
     !stream ||
     stream.deleted ||
@@ -552,11 +551,11 @@ app.post(
         // execute in parallel to not slowdown stream creation
         try {
           let email = req.user.email;
-          const user = await req.store.get(`user/${stream.userId}`);
+          const user = await db.user.get(stream.userId);
           if (user) {
             email = user.email;
           }
-          trackAction(
+          await trackAction(
             stream.userId,
             email,
             { name: "Stream Session Created" },
@@ -604,7 +603,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
 
   let objectStoreId;
   if (req.body.objectStoreId) {
-    const store = await req.store.get(`object-store/${req.body.objectStoreId}`);
+    const store = await db.objectStore.get(req.body.objectStoreId);
     if (!store) {
       res.status(400);
       return res.json({
@@ -652,6 +651,17 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   if (!stream || (stream.deleted && !req.user.admin)) {
     res.status(404);
     return res.json({ errors: ["not found"] });
+  }
+
+  const user = await db.user.get(stream.userId);
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+
+  if (user.suspended) {
+    res.status(403);
+    return res.json({ errors: ["user is suspended"] });
   }
 
   if (req.body.active) {
@@ -764,7 +774,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   });
 
   if (stream.parentId) {
-    const pStream = await req.store.get(`stream/${id}`, false);
+    const pStream = await db.stream.get(id);
     if (pStream && !pStream.deleted) {
       await db.stream.update(pStream.id, {
         isActive: stream.isActive,
@@ -780,7 +790,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
 
 app.patch("/:id/record", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
-  const stream = await req.store.get(`stream/${id}`, false);
+  const stream = await db.stream.get(id);
   if (!stream || stream.deleted) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -803,7 +813,7 @@ app.patch("/:id/record", authMiddleware({}), async (req, res) => {
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
-  const stream = await req.store.get(`stream/${id}`, false);
+  const stream = await db.stream.get(id);
   if (
     !stream ||
     stream.deleted ||
@@ -881,7 +891,7 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
       session = db.stream.addDefaultFields(session);
     }
   }
-  const user = await req.store.get(`user/${stream.userId}`);
+  const user = await db.user.get(stream.userId);
   const resp = {
     stream: db.stream.addDefaultFields(db.stream.removePrivateFields(stream)),
     session,
@@ -949,19 +959,28 @@ app.post("/hook", async (req, res) => {
     return res.json({ errors: ["ingest url must start with /live/"] });
   }
 
-  const stream = await req.store.get(`stream/${streamId}`, false);
+  const stream = await db.stream.get(streamId);
   if (!stream) {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
+
+  const user = await db.user.get(stream.userId);
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+
+  if (user.suspended) {
+    res.status(403);
+    return res.json({ errors: ["user is suspended"] });
+  }
+
   let objectStore,
     recordObjectStore = undefined,
     recordObjectStoreUrl;
   if (stream.objectStoreId) {
-    const os = await req.store.get(
-      `object-store/${stream.objectStoreId}`,
-      false
-    );
+    const os = await db.objectStore.get(stream.objectStoreId);
     if (!os) {
       res.status(500);
       return res.json({

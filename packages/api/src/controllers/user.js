@@ -12,6 +12,7 @@ import {
   parseFilters,
   parseOrder,
 } from "./helpers";
+import logger from "../logger";
 import hash from "../hash";
 import qs from "qs";
 import { db } from "../store";
@@ -187,6 +188,25 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
+app.patch("/:id/suspended", authMiddleware({ admin: true }), async (req, res) => {
+  const { id } = req.params;
+  const user = await db.user.get(id);
+  if (!user) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  if (req.body.suspended === undefined) {
+    res.status(400);
+    return res.json({ errors: ["suspended field required"] });
+  }
+  logger.info(`set user ${id} (${user.email}) suspended ${req.body.suspended}`);
+
+  await db.user.update(id, { suspended: !!req.body.suspended });
+
+  res.status(204);
+  res.end();
+});
+
 app.post("/token", validatePost("user"), async (req, res) => {
   const { data: userIds } = await req.store.query({
     kind: "user",
@@ -209,6 +229,12 @@ app.post("/token", validatePost("user"), async (req, res) => {
     res.json({ errors: ["incorrect password"] });
     return;
   }
+
+  if (user.suspended) {
+    res.status(403);
+    return res.json({ errors: ["user is suspended"] });
+  }
+
   const token = jwt.sign(
     { sub: user.id, aud: req.config.jwtAudience },
     req.config.jwtSecret,

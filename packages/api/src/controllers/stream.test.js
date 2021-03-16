@@ -382,16 +382,22 @@ describe("controllers/stream", () => {
     let stream;
     let data;
     let res;
-    let client;
+    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
 
     beforeEach(async () => {
-      client = new TestClient({
-        server,
-      });
+      ({
+        client,
+        adminUser,
+        adminToken,
+        nonAdminUser,
+        nonAdminToken,
+      } = await setupUsers(server));
+
       await server.store.create(mockStore);
       stream = {
         id: uuid(),
         kind: "stream",
+        userId: nonAdminUser.id,
         presets: ["P720p30fps16x9", "P360p30fps4x3", "P144p30fps16x9"],
         objectStoreId: mockStore.id,
       };

@@ -44,6 +44,10 @@ function authFactory(params) {
       throw new InternalServerError(`no user found for token ${authToken}`);
     }
 
+    if (user.suspended) {
+      throw new ForbiddenError(`user is suspended`);
+    }
+
     if (!params.allowUnverified && user.emailValid === false) {
       throw new ForbiddenError(
         `useremail ${user.email} has not been verified. Please check your inbox for verification email.`

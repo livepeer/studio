@@ -570,6 +570,8 @@ components:
         emailValid:
           type: boolean
           example: true
+        suspended:
+          type: boolean
         salt:
           type: string
           example: E1F53135E559C253
