@@ -519,6 +519,30 @@ components:
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
 
+    region:
+      type: object
+      table: regions
+      required:
+        - region
+        - orchestrators
+      properties:
+        region:
+          type: string
+          description: region name
+          example: ber
+          unique: true
+          index: true
+        orchestrators:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - address
+            properties:
+              address:
+                type: string
+
     user:
       type: object
       table: users # 'user' is a keyword in postgres, this causes problems otherwise
@@ -1109,4 +1133,71 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: '#/components/schemas/error'
+
+  /region/{region}:
+    tags:
+      - regions
+    get:
+      description: get a regions list of orchestrators
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/region'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      description: updates a specific region
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/region'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      parameters:
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+      description: deletes a specific region
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'

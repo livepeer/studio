@@ -11,6 +11,7 @@ import stripe from "./stripe";
 import version from "./version";
 import admin from "./admin";
 import usage from "./usage";
+import region from './region';
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -23,6 +24,7 @@ export default {
   geolocate,
   ingest,
   webhook,
+  region,
   stripe,
   version,
   admin,
