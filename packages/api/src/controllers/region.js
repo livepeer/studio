@@ -4,7 +4,7 @@ import { db } from '../store'
 
 const app = Router()
 
-app.get('/', authMiddleware({ admin: true }), async (req, res, next) => {
+app.get('/', authMiddleware({ anyAdmin: true }), async (req, res, next) => {
   const [regions, cursor] = await db.region.find({}, { limit: 100 })
   if (req.query.grouped === 'true') {
     return res.json(regions)
@@ -21,7 +21,7 @@ app.get('/', authMiddleware({ admin: true }), async (req, res, next) => {
   return res.json(flatOrchList)
 })
 
-app.get('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
+app.get('/:region', authMiddleware({ anyAdmin: true }), async (req, res, next) => {
   const region = await db.region.get(req.params.region)
   if (!region) {
     res.status(404)
@@ -33,7 +33,7 @@ app.get('/:region', authMiddleware({ admin: true }), async (req, res, next) => {
 
 app.put(
   '/:region',
-  authMiddleware({ admin: true }),
+  authMiddleware({ anyAdmin: true }),
   validatePost('region'),
   async (req, res, next) => {
     let region = {
@@ -60,7 +60,7 @@ app.put(
 
 app.delete(
   '/:region',
-  authMiddleware({ admin: true }),
+  authMiddleware({ anyAdmin: true }),
   async (req, res, next) => {
     const resp = await db.region.delete(eq.params.region)
     return res.status(204)
