@@ -612,3 +612,10 @@ video {
   max-width: 100%;
   height: auto;
 }
+
+.Collapsible {
+  background: #FAFAFA;
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 16px;
+}

@@ -140,6 +140,10 @@ const PricingCard = ({
               fontSize: "14px",
               letterSpacing: "-0.03em",
               fontWeight: "600",
+              transition: 'all 0.3s',
+              ':hover': {
+                  opacity: '0.9'
+              }
             }}>
             {btn.display}
           </a>
