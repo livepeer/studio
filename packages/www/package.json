@@ -35,7 +35,7 @@
     "graphql": "^14.6.0",
     "graphql-request": "^1.8.2",
     "isomorphic-unfetch": "^3.0.0",
-    "keen-slider": "^5.2.3",
+    "keen-slider": "^5.4.0",
     "lazysizes": "^5.2.0",
     "markdown-it": "^11.0.0",
     "markdown-it-anchor": "^5.3.0",

@@ -1,6 +1,9 @@
 import { Box, Heading, Container } from "@theme-ui/components";
+import PricingCard, {
+  PricingCardContent,
+} from "components/Pricing/pricingCard";
+import PricingCardsContainer from "components/Pricing/pricingCardsContainer";
 import Layout from "../components/Layout";
-import Plans from "../components/Plans";
 
 const Pricing = () => {
   return (
@@ -30,7 +33,7 @@ const Pricing = () => {
             Flexible pricing for projects of all sizes.
           </Heading>
         </Box>
-        <Plans />
+        <PricingCardsContainer />
       </Container>
     </Layout>
   );
