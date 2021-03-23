@@ -40,6 +40,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "2 types of stream objects: parent-config and child-session",
+          slug: "/docs/guides/api/parent-streams-and-sessions",
+        },
+        [],
+      ],
+      [
+        {
           content: "Create a stream",
           slug: "/docs/guides/api/create-a-stream",
         },
@@ -61,7 +68,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Verify stream status",
+          content: "Verify stream is live",
           slug: "/docs/guides/api/verify-stream-status",
         },
         [],
@@ -75,8 +82,29 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Record a stream session",
+          slug: "/docs/guides/api/record-stream",
+        },
+        [],
+      ],
+      [
+        {
+          content: "Playback a recorded session",
+          slug: "/docs/guides/api/playback-recording",
+        },
+        [],
+      ],
+      [
+        {
           content: "List all streams",
           slug: "/docs/guides/api/list-all-streams",
+        },
+        [],
+      ],
+      [
+        {
+          content: "Filter a list of streams",
+          slug: "/docs/guides/api/filtered-stream-list",
         },
         [],
       ],
