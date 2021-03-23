@@ -174,6 +174,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Record stream sessions",
+          slug: "/docs/guides/dashboard/record-stream",
+        },
+        [],
+      ],
+      [
+        {
           content: "Delete a stream",
           slug: "/docs/guides/dashboard/delete-a-stream",
         },
