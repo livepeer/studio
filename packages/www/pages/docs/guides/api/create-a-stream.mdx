@@ -4,7 +4,9 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to create a stream with the Livepeer.com API
 
-To create a stream, send a `POST` request to `https://livepeer.com/api/stream`.
+Send a `POST` request to `https://livepeer.com/api/stream`.
+
+This creates a new *parent* `stream` object. The `id` in the POST request response will be the `parentId` for all future *session* `stream` objects for this stream. This guide explains the [relationship between parent-config and child-session `stream` objects](/docs/guides/api/parent-streams-and-sessions)
 
 Use the API key as a part of the authorization header, and use a JSON body to
 specify the configuration for the stream. The only parameter you are required to
