@@ -54,7 +54,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Find base urls",
+          content: "Find regional base urls",
           slug: "/docs/guides/api/base-urls",
         },
         [],
