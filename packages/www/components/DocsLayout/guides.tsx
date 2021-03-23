@@ -40,7 +40,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "2 types of stream objects: parent-config and child-session",
+          content: "Core concept: parent stream and stream session",
           slug: "/docs/guides/api/parent-streams-and-sessions",
         },
         [],
