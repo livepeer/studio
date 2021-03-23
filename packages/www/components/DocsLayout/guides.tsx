@@ -82,7 +82,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Record a stream session",
+          content: "Record stream sessions",
           slug: "/docs/guides/api/record-stream",
         },
         [],

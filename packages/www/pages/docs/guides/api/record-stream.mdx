@@ -1,9 +1,49 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout title="How to record a live stream session - Livepeer.com" description="How to record a live stream session">
+<DocsLayout title="How to record live stream sessions - Livepeer.com" description="How to record live stream sessions">
 
-# How to record a live stream session
+# How to record live stream sessions with the Livepeer.com API
 
-content goes here 
+*Please note this beta feature is a new and still being optimized. Send feedback to help@livepeer.com.*
+
+**Recording Livepeer.com livestreams is easy.**
+
+Enabling recording on a Livepeer.com livestream is super simple. Enable recording with an API call when creating a stream or updating an asset's configuration. The `recordingStatus` parameter tells you when the recording is ready for playback a few minutes after the stream ends. 
+
+This recording feature provides Livepeer.com users with a link to an adaptive bitrate streaming (ABR) recording of their completed livestream. 
+
+The ABR settings for the recording are inherited from the transcoding  `profiles` set for the livestream. At this time you cannot set recording-specific ABR settings. Playback is delivered via Livepeer.com's CDN by default.
+
+## The `record` parameter
+
+To turn recording on and off, update the `record` parameter on the `stream` object. The `record` parameter is a boolean with a `false` default value.
+
+> 💡 Before proceeding, it will be helpful to review this guide about the
+[relationship between parent-config and child-session `stream` objects](/docs/guides/api/parent-streams-and-sessions). Understanding this core concept make using the recording feautre simple.
+
+On a parent `stream` object.
+
+- `record: true` means that new sessions are recorded.
+- `record: false` means that new sessions are not recorded.
+
+On a child-session `stream` object, the `record` value is read-only.
+
+- `record: true` means that the session is actively being recorded or was recorded. 
+- `record: false` means that the session is not being recorded or was not recorded. 
+
+The absence of a `record` parameter on a `stream` object is equivalent to `record: false`.
+
+## Notable JSON parameters for a `stream` session with `record:true`
+
+*A list of JSON parameters for the `stream` object is at [https://livepeer.com/docs/api/stream](https://livepeer.com/docs/api/stream).*
+
+- `id`: This string is the unique identifier for the asset, in this case a single livestream session. This string is also used to form the playback URL for the recorded session.
+- `parentId`: Equivalent to the `id` of the parent `stream` object.
+- `createdAt`: This number is the timestamp when the livestream session began and the asset was created. Reported in Unix epoch time.
+- `sourceSegmentsDuration`: This number is the duration in seconds of asset source processed. When the livestream session is over, this number equates to the length of the livestream session and recording.
+- `recordingStatus`: This boolean appears only when `record: true`, and it is either `ready` when the recorded livestream is available for playback or `waiting` while the livestream is still active or just recently completed.
+
+Next, learn
+[how to playback a recorded session](/docs/guides/api/playback-recording).
 
 </DocsLayout>
