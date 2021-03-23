@@ -551,12 +551,14 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getStreamSessions(id): Promise<Array<Stream>> {
-      const [res, streams] = await context.fetch(`/stream/${id}/sessions`);
+    async getStreamSessions(id, cursor?: string, limit: number = 20): Promise<[Array<Stream>, string]> {
+      const uri = `/stream/${id}/sessions?${qs.stringify({ limit, cursor })}`;
+      const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams;
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor];
     },
 
     async deleteStream(id: string): Promise<void> {
