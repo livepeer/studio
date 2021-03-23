@@ -117,8 +117,8 @@ const Table = <T extends Record<string, unknown>>({
             // The header can use the table's getToggleAllRowsSelectedProps method
             // to render a checkbox
             // @ts-ignore
-            Header: ({ getToggleAllRowsSelectedProps }) => {
-              const props = getToggleAllRowsSelectedProps();
+            Header: ({ getToggleAllPageRowsSelectedProps }) => {
+              const props = getToggleAllPageRowsSelectedProps();
               return isIndividualSelection ? null : (
                 <Checkbox onClick={props.onChange} value={props.checked} />
               );
