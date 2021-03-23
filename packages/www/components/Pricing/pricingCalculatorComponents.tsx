@@ -19,6 +19,7 @@ type CalculatorItemProps = {
   max: number;
   value?: number | undefined | null;
   setValue?: React.Dispatch<React.SetStateAction<number>>;
+  marginTop?: string;
 };
 
 type ScaleCalculatorProps = {
@@ -28,13 +29,13 @@ type ScaleCalculatorProps = {
 };
 
 type CalculatorProps = {
-    streamLength: number
-    monthlyStreams: number
-    viewCount: number
-    setStreamLength: React.Dispatch<React.SetStateAction<number>>
-    setMonthlyStreams: React.Dispatch<React.SetStateAction<number>>
-    setViewCount: React.Dispatch<React.SetStateAction<number>>
-}
+  streamLength: number;
+  monthlyStreams: number;
+  viewCount: number;
+  setStreamLength: React.Dispatch<React.SetStateAction<number>>;
+  setMonthlyStreams: React.Dispatch<React.SetStateAction<number>>;
+  setViewCount: React.Dispatch<React.SetStateAction<number>>;
+};
 
 const scaleCalculatorValues = [25, 50, 75, 100];
 
@@ -45,6 +46,7 @@ const CalculatorItem = ({
   min,
   value,
   setValue,
+  marginTop,
 }: CalculatorItemProps) => {
   const handleChange = (e) => {
     const value = e.target.value;
@@ -72,9 +74,10 @@ const CalculatorItem = ({
       </h1>
       <div
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: "grid",
+          gridTemplateColumns: ['1fr', '1fr', '56% 38%', '56% 38%'],
+          alignItems: 'center',
+          gap: ['20px', '20px', '6%', '6%'],
         }}>
         {children}
         <input
@@ -86,9 +89,10 @@ const CalculatorItem = ({
           sx={{
             outline: "none",
             height: "2px",
-            width: "172px",
+            width: "100%",
             appearance: "none",
             background: "#E1E1E1",
+            mt: ['0', '0', `${marginTop ?? ""}`],
             "::-webkit-slider-thumb": {
               appearance: "none",
               width: "12px",
@@ -161,7 +165,7 @@ const Calculator = ({
         display: "flex",
         flexDirection: "column",
         pt: "32px",
-        width: "480px",
+        width: "100%",
       }}>
       <p
         sx={{
@@ -175,25 +179,82 @@ const Calculator = ({
       </p>
       <CalculatorItem
         title="Average length of stream"
+        marginTop="-26px"
         setValue={setStreamLength}
         min={0}
         max={57599}
         value={streamLength}>
-        <input
-          value={streamLength}
-          sx={{
-            height: "48px",
-            width: "276px",
-            borderRadius: "6px",
-            border: "1px solid #E6E6E6",
-            fontSize: "20px",
-            letterSpacing: "-0.02em",
-            px: "16px",
-            "::placeholder": {
-              color: "#7D7D7D",
-            },
-          }}
-        />
+        <div sx={{ display: "flex", flexDirection: "column", width: '100%' }}>
+          <div
+            sx={{
+              height: "48px",
+              width: "100%",
+              maxWidth: ['100%', '100%', "276px"],
+              borderRadius: "6px",
+              border: "1px solid #E6E6E6",
+              fontSize: "20px",
+              letterSpacing: "-0.02em",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              px: "16px",
+              "::placeholder": {
+                color: "#7D7D7D",
+              },
+            }}>
+            <input
+              placeholder="00"
+              sx={{
+                width: "36px",
+                display: "flex",
+                justifyContent: "center",
+                px: "6px",
+              }}
+            />
+            <p sx={{ color: "#7D7D7D" }}>:</p>
+            <input
+              placeholder="00"
+              sx={{ width: "36px", display: "flex", justifyContent: "center" }}
+            />
+            <p sx={{ color: "#7D7D7D" }}>:</p>
+            <input
+              placeholder="00"
+              sx={{ width: "36px", display: "flex", justifyContent: "center" }}
+            />
+          </div>
+          <div
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: "8px",
+              px: "16px",
+            }}>
+            <p
+              sx={{
+                fontSize: "12px",
+                letterSpacing: "-0.04em",
+                color: "#525252",
+              }}>
+              hours
+            </p>
+            <p
+              sx={{
+                fontSize: "12px",
+                letterSpacing: "-0.04em",
+                color: "#525252",
+              }}>
+              minutes
+            </p>
+            <p
+              sx={{
+                fontSize: "12px",
+                letterSpacing: "-0.04em",
+                color: "#525252",
+              }}>
+              seconds
+            </p>
+          </div>
+        </div>
       </CalculatorItem>
       <CalculatorItem
         title="Monthly live streams"
@@ -205,18 +266,15 @@ const Calculator = ({
           value={monthlyStreams
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-          placeholder="0"
           sx={{
             height: "48px",
-            width: "276px",
+            width: "100%",
             borderRadius: "6px",
             border: "1px solid #E6E6E6",
             fontSize: "20px",
             letterSpacing: "-0.02em",
             px: "16px",
-            "::placeholder": {
-              color: "#7D7D7D",
-            },
+            color: monthlyStreams == 0 ? "#7D7D7D" : "black",
           }}
         />
       </CalculatorItem>
@@ -228,19 +286,16 @@ const Calculator = ({
         value={viewCount}>
         <input
           value={viewCount}
-          placeholder="0"
           type="number"
           sx={{
             height: "48px",
-            width: "276px",
+            width: "100%",
             borderRadius: "6px",
             border: "1px solid #E6E6E6",
             fontSize: "20px",
             letterSpacing: "-0.02em",
             px: "16px",
-            "::placeholder": {
-              color: "#7D7D7D",
-            },
+            color: viewCount == 0 ? "#7D7D7D" : "black",
           }}
         />
       </CalculatorItem>
@@ -297,12 +352,13 @@ const PreviewItem = ({
     <div
       sx={{
         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
-        minHeight: "136px",
+        minHeight: '136px',
         pt: "48px",
         pb: "32px",
         width: "100%",
         display: "flex",
-        alignItems: "center",
+        flexDirection: ['column', 'column', 'row'],
+        alignItems: ["flex-start", "flex-start", "center"],
         justifyContent: "space-between",
       }}>
       <div
@@ -311,6 +367,8 @@ const PreviewItem = ({
           justifyContent: "center",
           flexDirection: "column",
           maxWidth: "244px",
+          mr: ['0', '0', '15px'],
+          mb: ['8px', '8px', '0']
         }}>
         <h1
           sx={{
@@ -337,14 +395,15 @@ const PreviewItem = ({
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
-          alignItems: 'flex-end'
+          alignItems: "flex-end",
         }}>
         <h1
           sx={{
-            fontSize: "32px",
-            lineHeight: "40px",
+            fontSize: ['24px', "24px", "26px", "32px"],
+            lineHeight: '40px',
             letterSpacing: "-0.04em",
             fontWeight: "600",
+            textAlign: 'right'
           }}>
           {value}
         </h1>
@@ -372,7 +431,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         display: "flex",
         flexDirection: "column",
         padding: "32px",
-        width: "584px",
+        width: "100%",
       }}>
       <div
         sx={{
@@ -424,7 +483,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           color: "white",
           letterSpacing: "-0.03em",
           height: "56px",
-          background: "#CCCCCC",
+          background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
           borderRadius: "6px",
           mt: "10px",
         }}>

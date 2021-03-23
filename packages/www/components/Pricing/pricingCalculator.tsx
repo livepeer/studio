@@ -29,9 +29,9 @@ const PricingCalculator = () => {
       </p>
       <div
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "135px",
+          display: "grid",
+          gridTemplateColumns: '40% 48%',
+          gap: '12%',
         }}>
         <Calculator
           streamLength={streamLength}
