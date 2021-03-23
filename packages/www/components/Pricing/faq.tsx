@@ -54,16 +54,16 @@ const PlusIcon = () => {
       <path
         d="M12 5V19"
         stroke="black"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M5 12H19"
         stroke="black"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -102,7 +102,7 @@ const PricingFaq = () => {
         mb: '112px'
       }}>
       <h1
-        sx={{ fontSize: [5, 5, 6], mb: ["42px", "64px"], textAlign: "center" }}>
+        sx={{ fontSize: [5, 5, 6], mb: ["42px", "64px"], textAlign: "center", letterSpacing: '-0.04em' }}>
         Frequently asked questions
       </h1>
       {faq.map((question, idx) => (

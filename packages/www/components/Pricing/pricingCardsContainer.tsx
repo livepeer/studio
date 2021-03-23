@@ -113,7 +113,7 @@ const MobileContainer = () => {
         cardBg="#943CFF"
         btn={{
           display: "Sign up",
-          href: "",
+          href: "/register",
         }}>
         <div sx={{ mt: "20px" }}>
           <PricingCardContent color="white">
@@ -334,7 +334,7 @@ const DesktopContainer = () => {
         titleColor="#943CFF"
         btn={{
           display: "Sign up",
-          href: "",
+          href: "/register",
           color: "white",
           bg: "#943CFF",
         }}>
@@ -450,7 +450,7 @@ const DesktopContainer = () => {
         cardBg="#3B375A"
         btn={{
           display: "Contact Sales",
-          href: "",
+          href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
           color: "white",
           bg: "#943CFF",
         }}>

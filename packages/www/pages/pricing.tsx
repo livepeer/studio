@@ -1,6 +1,7 @@
 import { Box, Heading, Container } from "@theme-ui/components";
 import Prefooter from "components/Prefooter";
 import PricingFaq from "components/Pricing/faq";
+import PricingCalculator from "components/Pricing/pricingCalculator";
 import PricingCardsContainer from "components/Pricing/pricingCardsContainer";
 import Layout from "../components/Layout";
 
@@ -33,6 +34,7 @@ const Pricing = () => {
           </Heading>
         </Box>
         <PricingCardsContainer />
+        <PricingCalculator />
         <PricingFaq />
         <Prefooter />
       </Container>
