@@ -8,6 +8,8 @@ import {
   Heading,
   Container,
   Link as A,
+  Label,
+  Radio,
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -383,6 +385,84 @@ const ID = () => {
                 <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                   <hr />
                 </Box>
+                <Cell>Record sessions</Cell>
+                <Box
+                  sx={{
+                    m: "0.4em",
+                    justifySelf: "flex-start",
+                    cursor: "pointer",
+                  }}>
+                  <Flex
+                    sx={{
+                      alignItems: "flex-start",
+                      justifyItems: "center",
+                    }}>
+                    <Label
+                      onClick={() => {
+                        if (!stream.record) {
+                          doSetRecord(stream, true);
+                        }
+                      }}>
+                      <Radio
+                        autocomplete="off"
+                        name="record-mode"
+                        value={`${!!stream.record}`}
+                        checked={!!stream.record}
+                      />
+                      <Flex sx={{ alignItems: "center" }}>On</Flex>
+                    </Label>
+                    <Label sx={{ml: "0.5em"}}>
+                      <Radio
+                        autocomplete="off"
+                        name="record-mode"
+                        value={`${!stream.record}`}
+                        checked={!stream.record}
+                        onClick={(e) => {
+                          if (stream.record) {
+                            setRecordOffModal(true);
+                          }
+                        }}
+                      />
+                      <Flex sx={{ alignItems: "center" }}>Off</Flex>
+                    </Label>
+                    <Flex
+                      sx={{
+                        ml: "0.5em",
+                        minWidth: "24px",
+                        height: "24px",
+                        alignItems: "center",
+                      }}>
+                      <Help
+                        data-tip
+                        data-for={`tooltip-record-${stream.id}`}
+                        sx={{
+                          color: "muted",
+                          cursor: "pointer",
+                          ml: 1,
+                          width: "18px",
+                          height: "18px",
+                        }}
+                      />
+                    </Flex>
+                  </Flex>
+                  <ReactTooltip
+                    id={`tooltip-record-${stream.id}`}
+                    className="tooltip"
+                    place="top"
+                    type="dark"
+                    effect="solid">
+                    <p>
+                      When checked, transcoded streaming sessions will be
+                      recorded and stored by Livepeer.com.
+                      <br /> Each recorded session will have a recording .m3u8
+                      URL for playback. <br />
+                      This feature is currently in beta and free.
+                    </p>
+                  </ReactTooltip>
+                </Box>
+                <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
+                  <hr />
+                </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
@@ -413,47 +493,6 @@ const ID = () => {
                     <Cell>
                       <strong>Admin or staging only fields:</strong>
                     </Cell>
-                    <Cell>Record stream</Cell>
-                    <Box
-                      sx={{
-                        m: "0.4em",
-                        justifySelf: "flex-start",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        if (stream.record) {
-                          setRecordOffModal(true);
-                        } else {
-                          doSetRecord(stream, true);
-                        }
-                      }}>
-                      <Flex>
-                        <Checkbox value={stream.record} />
-                        <ReactTooltip
-                          id={`tooltip-record-${stream.id}`}
-                          className="tooltip"
-                          place="top"
-                          type="dark"
-                          effect="solid">
-                          <p>
-                            When checked, transcoded streaming sessions will be
-                            recorded and stored by Livepeer.com.
-                            <br /> Each recorded session will have a recording
-                            .m3u8 URL for playback. <br />
-                            This feature is currently in beta and free.
-                          </p>
-                        </ReactTooltip>
-                        <Help
-                          data-tip
-                          data-for={`tooltip-record-${stream.id}`}
-                          sx={{
-                            color: "muted",
-                            cursor: "pointer",
-                            ml: 1,
-                          }}
-                        />
-                      </Flex>
-                    </Box>
                   </>
                 ) : null}
                 {user.admin ? (
