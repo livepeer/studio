@@ -182,6 +182,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
   const { record, forceUrl } = req.query;
+  let { limit, cursor } = req.query;
   const raw = req.query.raw && req.user.admin;
 
   const ingests = await req.getIngest(req);
@@ -194,7 +195,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const stream = await db.stream.get(parentId);
   if (
     !stream ||
-    stream.deleted ||
+    (stream.deleted && !req.isUIAdmin) ||
     (stream.userId !== req.user.id && !req.isUIAdmin)
   ) {
     res.status(404);
@@ -205,6 +206,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const query = [];
   query.push(sql`data->>'parentId' = ${stream.id}`);
   query.push(sql`(data->'lastSeen')::bigint > 0`);
+  query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
   query.push(sql`data->>'partialSession' IS NULL`);
   if (record) {
     if (record === "true" || record === "1") {
@@ -218,7 +220,8 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
   let [sessions] = await db.stream.find(query, {
     order: `data->'lastSeen' DESC NULLS LAST`,
-    limit: 0, // do not limit sessions until we develop new pagination not based on ids
+    limit,
+    cursor,
   });
 
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
