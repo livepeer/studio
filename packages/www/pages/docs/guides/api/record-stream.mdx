@@ -80,7 +80,7 @@ https://livepeer.com/api/stream
 Turn recording on. All new sessions will be recorded. In progress sessions will not be recorded.
 
 ```bash
-curl -X PATCH [https://livepeer.com/api/stream/<id>/record](https://livepeer.monster/api/stream/06896e99-e02a-4cf9-977a-18f6c9271840/record) \
+curl -X PATCH https://livepeer.com/api/stream/<id>/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer <api key>' \
 -d '{"record":true}'
@@ -89,7 +89,7 @@ curl -X PATCH [https://livepeer.com/api/stream/<id>/record](https://livepeer.mon
 Turns recording off. All new sessions will not be recorded. In progress sessions will still be recorded.
 
 ```bash
-curl -X PATCH [https://livepeer.com/api/stream/<id>/record](https://livepeer.monster/api/stream/06896e99-e02a-4cf9-977a-18f6c9271840/record) \
+curl -X PATCH https://livepeer.com/api/stream/<id>/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer <api key>' \
 -d '{"record":false}'
