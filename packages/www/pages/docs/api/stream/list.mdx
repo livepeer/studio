@@ -4,19 +4,27 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # List streams
 
-You can retrieve all `stream` objects with the same `userID`. The response will include both `stream` objects that
-represent a livestream configuration (no `parentId` parameter) and stream objects that represent a single livestream session (`parentId` is the same as the `id` of the parent `stream` object). 
+You can retrieve all `stream` objects with the same `userID`. The response will include both parent `stream` objects that
+represent a livestream configuration and child-session `stream` objects. 
 
 ```bash
 curl -H 'authorization: Bearer <api-key>' \
 "https://livepeer.com/api/stream/"
 ```
 
-### Query parameters
+### Quick filters
+
+| JSON parameter              | Example    |Description                                                                                                                                                                                                                               |
+| ----------------------------| -----------|----------------------------------------------------------------------|
+| `streamsonly=1`             | `/api/stream?streamsonly=1` | Excludes child-session `stream` objects |
+| `sessionsonly=1`            | `/api/stream?sessionsonly=1` | Excludes parent objects and only returns child-session `stream` objects |
+| `record=1`                  | `api/stream/<parentId>/sessions?record=1` | Returns all sessions `stream` objects with the same `parentId` and `record: true` |
+
+
+### Additional query parameters
 
 | JSON parameter              | Type    | Description                                                                                                                                                                                                                               |
 | ----------------------------| ------- | ----------------------------------------------------------------------|
-| `isActive`                  | boolean | `true` returns active `stream` objects. `false` returns idle `stream` objects. The default value for new `stream` objects is `false`. |
-| `parentId`                  | number  | To return all sessions of the same `stream` object, set to the the value of the parent `stream` object` id `. To return only  "parent" `stream` objects, set the value to ???? |
+| `isActive`                  | boolean | `true` returns active `stream` objects. `false` returns idle `stream` objects. The default value for new `stream` objects is `false`. Exclude child-session objects example `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]`. This example showed a decoded JSON object. But, remember that anything passed as a parameter in a GET request URL must be URL encoded.|
 
 </DocsLayout>

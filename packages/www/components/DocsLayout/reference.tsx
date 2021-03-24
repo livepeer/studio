@@ -36,21 +36,42 @@ const referenceTree: Tree[] = [
       ],
       [
         {
-          content: "POST /stream",
+          content: "POST create a stream object",
           slug: "/docs/api/stream/post-stream",
         },
         [],
       ],
       [
         {
-          content: "GET /stream/<id>",
+          content: "GET retrieve stream object",
           slug: "/docs/api/stream/get-stream",
         },
         [],
       ],
       [
         {
-          content: "List all streams",
+          content: "GET retrieve stream session",
+          slug: "/docs/api/stream/get-session",
+        },
+        [],
+      ],
+      [
+        {
+          content: "PATCH turn on/off recording",
+          slug: "/docs/api/stream/record-on-off",
+        },
+        [],
+      ],
+      [
+        {
+          content: "GET retrieve recorded stream session",
+          slug: "/docs/api/stream/get-recorded-session",
+        },
+        [],
+      ],
+      [
+        {
+          content: "GET list stream objects",
           slug: "/docs/api/stream/list",
         },
         [],

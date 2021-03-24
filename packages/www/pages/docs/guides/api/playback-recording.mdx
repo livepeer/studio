@@ -4,9 +4,16 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to playback a recorded session
 
-A livestream session recording is available approximately 5 minutes after the livestream session has ended. When the recording is ready, the session `stream` object `recordingStatus` value will change from `waiting` to `ready`.  
+Use `/stream/<parentId>/sessions?record=1` to a return list of recorded sessions with the same `parentId` using `record=1`
 
-> ⚠️ You will need to poll this endpoint to get the updated `recordingStatus` value. In the future, we will support webhooks.
+```bash
+curl -H 'authorization: Bearer <api key>' \
+"https://livepeer.com/api/stream/<parentId>/sessions?record=1"
+```
+
+A livestream session recording is available approximately 5 minutes after the livestream session has ended. When the recording is ready, the most recent session `stream` object `recordingStatus` value will change from `waiting` to `ready`.  
+
+> ⚠️ You will need to poll this endpoint to get the updated `recordingStatus` values of all listed recorded sessions. In the future, we will support webhooks.
 
 Once the recording is ready, the the session `stream` object's `recordingUrl` parameteter will return the .m3u8 recording playback URL. 
 
