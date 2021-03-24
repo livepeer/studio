@@ -4,19 +4,17 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # Stream
 
-The `stream` object represents a livestream. When the `stream` object has a
-`parentId` attribute, it represents a single livestream session.
+## There are two types of `stream` objects.
+- **A** ***child***  **`stream` object is a single live streaming session.**
+- **A** ***parent*** **`stream` object shows the configuration and metadata totals of all the *child* stream sessions.**
 
-Create a `stream` object to create a livestream with configuration details for
-live broadcasting software and generate a playback URL for stream viewers.
-`name` is the only parameter required to `POST`.
+**Core concepts** about the `stream` object parent-child relationship:
+- The `parentId` of a child-session `stream` object is same as the `id` of its parent stream object.
+- Child-session `stream` objects are read-only.
+- Parent `stream` objects are read-write.
+- The playback URL for a live (`isActive: true`) parent `stream` object is the same for all its sessions.
+- The recording playback URL for each completed live streaming session is unique and available as a parameter on the child-session `stream` object.
 
-`POST /stream`
-
-You can also retrieve the `stream` object to get stream (or livestream session)
-status, transcoding settings and attributes.
-
-`GET /stream`
 
 ### Attributes
 
@@ -37,6 +35,7 @@ status, transcoding settings and attributes.
 | `profiles..height`           | integer | `minimum: 128`<br />Pixel height setting for the transcoded rendition.                                                                                                                                                                   |
 | `profiles..name`             | string  | `minLength: 1, maxLength: 500`<br />Identifier for the transcoded rendition settings.                                                                                                                                                    |
 | `profiles..width`            | integer | `minimum: 128`<br />Pixel width setting for the transcoded rendition.                                                                                                                                                                    |
+| `record         `            | boolean | On a parent `stream` object, `true` means that new sessions are recorded, and `false` means they are not. On a child-session `stream` object, the value is read-only; `true` means that the session is actively being recorded or was recorded, and `false` means that the session is not being recorded or was not recorded.|
 | `sourceSegments`             | number  | Number of asset source segments processed.                                                                                                                                                                                               |
 | `sourceSegmentsDuration`     | number  | Duration in seconds of asset source processed.                                                                                                                                                                                           |
 | `streamKey`                  | string  | Unique secret key used to form the RTMP ingest URL.                                                                                                                                                                                      |
