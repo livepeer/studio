@@ -2,8 +2,29 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout title="How to playback a stream configured in the Livepeer.com dashboard - Livepeer.com" description="How to playback a stream configured in the Livepeer.com dashboard">
 
-# How to record stream session with the Livepeer.com Dashboard
+# How to record stream sessions with the Livepeer.com Dashboard
 
-content goes here 
+*Please note this beta feature is a new and still being optimized. Send feedback to help@livepeer.com.*
+
+**Recording Livepeer.com livestreams is easy.**
+- Recording is turned off by default
+- **Record ON** means that new sessions are recorded.
+- **Record OFF** means that new sessions are not recorded.
+- When updating this setting, note that in progress sessions will adhere to the on/off setting when the livestream began. The changed setting only applies to *new* stream sessions.
+- The adaptive bitrate (ABR) settings for the recording are inherited from the transcoding profiles set for the livestream. At this time you cannot set recording-specific ABR settings. 
+- Playback is delivered via Livepeer.com's CDN by default.
+
+## Turn recording on/off
+Open your Livepeer.com account and navigate to the *streams list page*, https://livepeer.com/app/user, and create a new stream or click on existing stream. You will be redirected to the *stream page*.
+
+In the **Recording sessions** row, select **Record ON** to turn recording on or **Record OFF** to turn recording off.
+
+The page will refresh, saving your recording settings.
+
+## Recording playback URL
+The session recording playback URL will be available about 5 minutes after the live stream ends and will appear in the **session table** at the bottom of the **stream page**. *Note the **session table** only appears after one completed livestreaming session.*
+
+Next, learn
+[how to delete a stream in the Livepeer.com dashboard](/docs/guides/dashboard/delete-a-stream).
 
 </DocsLayout>
