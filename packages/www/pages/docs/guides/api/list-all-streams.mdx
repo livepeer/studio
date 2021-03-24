@@ -2,48 +2,17 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout title="How to list streams - Livepeer.com" description="How to use the Livepeer.com API to list and filter streamsr">
 
-# How to use the Livepeer.com API to list and filter streams
+# How to use the Livepeer.com API to list all `stream` objects
 
-You can retrieve all `stream` objects with the same `userID`. The response will include both `stream` objects that represent a livestream configuration and stream objects that represent a single livestream session. The latter have a `parentId` set to its parent `stream` object's `id`.
+You can retrieve all `stream` objects with the same `userID`. These are all streams created via the same Livepeer.com account. 
+
+This response will include both parent-config and child-session `stream` objects. This [guide](/docs/guides/api/parent-streams-and-sessions) explains the relationship between parent-config and child-session `stream` objects.
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
 "https://livepeer.com/api/stream"
 ```
-
-### Common examples
-
-The following examples show decoded JSON object. But, remember that anything passed as a parametre in a GET request URL must be URL encoded. 
-
-#### Exclude sessions
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"}]"
-```
-
-#### Only return sessions with the same `parentId`
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "1234abcd-1234-abcd-1234-abcd1234abcd"}]"
-```
-
-#### Return active streams and exclude sessions
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"},{"id": "isActive", "value": "true"}]"
-```
-
-#### Retrun all idle streams and exclude session
-
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream?filters=[{"id": "parentId", "value": "???"},{"id": "isActive", "value": "false"}]"
-```
-
-Next learn
-[how to delete a stream with the Livepeer.com API](/docs/guides/api/delete-a-stream).
+Next learn about
+[filtering your list of `stream` objects](/docs/guides/api/delete-a-stream).
 
 </DocsLayout>
