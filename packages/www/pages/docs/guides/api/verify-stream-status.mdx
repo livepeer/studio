@@ -27,9 +27,12 @@ This is an example response:
     {"bitrate":500000,"fps":30,"height":360,"name":"360p","width":640}],
   "id":"2d10f1fd-dbf7-495b-8aef-08916507fcce",
   "createdAt":1596118509635,
+  "isActive":true,
   "lastSeen":1596119750455
 }
 ```
+
+`isActive: true` means video segments are currently being ingested by Livepeer.com. `isActive: false` means the live stream is *idle* and no video segments are currently being ingested by Livepeer.com. 
 
 `lastSeen` represents when the stream was last observed by the monitoring
 system. The time is reported in Unix epoch time. If the stream is running, the
