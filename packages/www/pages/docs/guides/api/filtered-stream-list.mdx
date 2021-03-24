@@ -12,7 +12,7 @@ Some of the examples show decoded JSON objects. But, remember that anything pass
 Excludes child-session `stream` objects
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
+curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1"
 ```
 
@@ -20,14 +20,14 @@ curl -H 'authorization: Bearer <api-key>' \
 Exclude child-session objects
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
+curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]"
 ```
 
 ### Return all idle livestreams
 Exclude child-session objects
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
+curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"
 ```
 
@@ -35,22 +35,22 @@ curl -H 'authorization: Bearer <api-key>' \
 Excludes parent objects and only returns child-session `stream` objects
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
+curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?sessionsonly=1"
 ```
 ### Use `/stream/<parentId>/sessions` to return only sessions with the same `parentId`
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/<parentId>/sessions
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{parentId}/sessions
 ```
 
 ### Return only recorded sessions with the same `parentId` using `record=1`
 All sessions with `stream` objects with the same `parentId` and `record: true`
 
 ```bash
-curl -H 'authorization: Bearer <api key>' \
-"https://livepeer.com/api/stream/<parentId>/sessions?record=1"
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{parentId}/sessions?record=1"
 ```
 
 Next learn

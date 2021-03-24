@@ -71,35 +71,35 @@ https://livepeer.com/api/stream
   "streamKey":"zzzz-zzzz-zzzz-zzzz",
   "playbackId":"xyz123xyz123",
   "createdByTokenName":"test-api-key",
-  <other asset object keys, like profiles>
+  {other asset object keys, like profiles}
 }
 ```
 
-### PATCH /stream/<id> to turn on/off recording for an existing asset
+### PATCH /stream/{id} to turn on/off recording for an existing asset
 
 Turn recording on. All new sessions will be recorded. In progress sessions will not be recorded.
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/<id>/record \
+curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -H 'content-type: application/json' \
--H 'authorization: Bearer <api key>' \
+-H 'authorization: Bearer {api-key}' \
 -d '{"record":true}'
 ```
 
 Turns recording off. All new sessions will not be recorded. In progress sessions will still be recorded.
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/<id>/record \
+curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -H 'content-type: application/json' \
--H 'authorization: Bearer <api key>' \
+-H 'authorization: Bearer {api-key}' \
 -d '{"record":false}'
 ```
 
-### GET /stream/<id> to retrieve an asset and `record` value
+### GET /stream/{id} to retrieve an asset and `record` value
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/<id>"
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{id}"
 ```
 
 200 OK
@@ -116,7 +116,7 @@ If the `record` parameter is not returned in the JSON response, recording is **n
   "createdAt":1595721600,
   "streamKey":"zzzz-zzzz-zzzz-zzzz"
   "createdByTokenName":"test-api-key",
-  <other asset object keys, like parentId and profiles>
+  {other asset object keys, like parentId and profiles}
 }
 ```
 
