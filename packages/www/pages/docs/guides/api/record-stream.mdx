@@ -43,6 +43,83 @@ The absence of a `record` parameter on a `stream` object is equivalent to `recor
 - `sourceSegmentsDuration`: This number is the duration in seconds of asset source processed. When the livestream session is over, this number equates to the length of the livestream session and recording.
 - `recordingStatus`: This boolean appears only when `record: true`, and it is either `ready` when the recorded livestream is available for playback or `waiting` while the livestream is still active or just recently completed.
 
+## Reference code examples
+
+### POST /stream to create a parent `stream` object with recording turned on. All sessions will be recorded.
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer <api key>' \
+-d '{
+  "name": "test_stream_recording_on",
+  "record": true
+}' \
+https://livepeer.com/api/stream
+```
+
+201 created
+
+```bash
+{ 
+  "name":"test_stream_recording_on",
+  "record":true,
+  "kind":"stream",
+  "userId":"xxxxxxxx-xxxx-xxxx-xxxx-xxxx",
+  "id":"yyyyyyyy-yyyy-yyyy-yyyy-yyyy",
+  "createdAt":1595721600,
+  "streamKey":"zzzz-zzzz-zzzz-zzzz",
+  "playbackId":"xyz123xyz123",
+  "createdByTokenName":"test-api-key",
+  <other asset object keys, like profiles>
+}
+```
+
+### PATCH /stream/<id> to turn on/off recording for an existing asset
+
+Turn recording on. All new sessions will be recorded. In progress sessions will not be recorded.
+
+```bash
+curl -X PATCH [https://livepeer.com/api/stream/<id>/record](https://livepeer.monster/api/stream/06896e99-e02a-4cf9-977a-18f6c9271840/record) \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer <api key>' \
+-d '{"record":true}'
+```
+
+Turns recording off. All new sessions will not be recorded. In progress sessions will still be recorded.
+
+```bash
+curl -X PATCH [https://livepeer.com/api/stream/<id>/record](https://livepeer.monster/api/stream/06896e99-e02a-4cf9-977a-18f6c9271840/record) \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer <api key>' \
+-d '{"record":false}'
+```
+
+### GET /stream/<id> to retrieve an asset and `record` value
+
+```bash
+curl -H 'authorization: Bearer <api-key>' \
+"https://livepeer.com/api/stream/<id>"
+```
+
+200 OK
+
+If the `record` parameter is not returned in the JSON response, recording is **not** turned on. An absent `record` parameter is equivalent to `"record": false`.
+
+```bash
+{
+  "id":"yyyyyyyy-yyyy-yyyy-yyyy-yyyy",
+  "kind":"stream",
+  "name":"test_stream",
+  "record": false,
+  "userId":"xxxxxxxx-xxxx-xxxx-xxxx-xxxx",
+  "createdAt":1595721600,
+  "streamKey":"zzzz-zzzz-zzzz-zzzz"
+  "createdByTokenName":"test-api-key",
+  <other asset object keys, like parentId and profiles>
+}
+```
+
 Next, learn
 [how to playback a recorded session](/docs/guides/api/playback-recording).
 
