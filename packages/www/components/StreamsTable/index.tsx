@@ -257,6 +257,27 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             onClick={() => selectedStreams.length && setDeleteModal(true)}>
             Delete
           </Button>
+          <Box
+            sx={{
+              ml: "1.4em",
+              display: ["none", "none", "none", "inline-block"],
+            }}>
+            <b>New beta feature</b>: Record your live streams. Send feedback to
+            help@livepeer.com.
+            <a
+              target="_blank"
+              href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
+              sx={{
+                display: "inline-block",
+                ml: "0.2em",
+                textDecoration: "none",
+                color: "primary",
+                cursor: "pointer",
+                ":hover": { textDecoration: "underline" },
+              }}>
+              <b>Read more ⬈</b>
+            </a>
+          </Box>
         </Box>
       </Flex>
       <TableV2
