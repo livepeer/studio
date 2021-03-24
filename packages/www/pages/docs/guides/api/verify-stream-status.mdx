@@ -38,6 +38,21 @@ This is an example response:
 system. The time is reported in Unix epoch time. If the stream is running, the
 epoch will be close to the current time.
 
+### Return all active livestreams
+Exclude child-session objects
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]"
+```
+
+### Return all idle livestreams
+Exclude child-session objects
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"
+```
+
 Next, learn
 [how to playback a live stream with the Livepeer.com API](/docs/guides/api/playback-a-live-stream).
 

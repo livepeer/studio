@@ -10,12 +10,12 @@ Livestreaming with Livepeer.com is easy. The first step is understanding the `st
 - **A** ***child***  **`stream` object is a single live streaming session.**
 - **A** ***parent*** **`stream` object shows the configuration and metadata totals of all its *child* stream sessions.**
 
-Here are some core concepts about the `stream` object parent-child relationship:
+Here are some core concepts about the `stream` object:
 - The `parentId` of a child-session `stream` object is the same as the `id` of its parent stream object.
 - Child-session `stream` objects are read-only.
 - Parent `stream` objects are read-write.
 - The playback URL for a live (`isActive: true`) parent `stream` object is the same for all its sessions.
-- The recording playback URL for each completed live streaming session is unique and available as a parameter on the child-session `stream` object.
+- The recording playback URL for each completed live streaming session is unique and available as a parameter on the child-session `stream` object when requesting a list of stream sessions.
 
 Next, learn
 [how to create a parent-config `stream` object with the Livepeer.com API](/docs/guides/api/create-a-stream).

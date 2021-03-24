@@ -2,11 +2,11 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
-# `GET /stream/<id>` to retrieve a `stream` object
+# `GET /stream/{id}` to retrieve a `stream` object
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/<id>"
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{id}"
 ```
 
 ### 200 OK
@@ -21,7 +21,7 @@ curl -H 'authorization: Bearer <api-key>' \
   "streamKey":"zzzz-zzzz-zzzz-zzzz",
   "playbackId":"xyz123xyz123",
   "createdByTokenName":"test-api-key",
-  <other asset object keys, like parentId and profiles>
+  {other asset object keys, like parentId and profiles}
 }
 ```
 

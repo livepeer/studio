@@ -18,7 +18,7 @@ curl -H 'authorization: Bearer {api-key}' \
 | ----------------------------| -----------|----------------------------------------------------------------------|
 | `streamsonly=1`             | `/api/stream?streamsonly=1` | Excludes child-session `stream` objects |
 | `sessionsonly=1`            | `/api/stream?sessionsonly=1` | Excludes parent objects and only returns child-session `stream` objects |
-| `record=1`                  | `api/stream/{parentId}/sessions?record=1` | Returns all sessions `stream` objects with the same `parentId` and `record: true` |
+| `record=1`                  | `/api/stream/{parentId}/sessions?record=1` | Returns all sessions `stream` objects with the same `parentId` and `record: true` |
 
 
 ### Additional query parameters

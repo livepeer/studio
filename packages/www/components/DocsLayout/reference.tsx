@@ -64,8 +64,8 @@ const referenceTree: Tree[] = [
       ],
       [
         {
-          content: "GET retrieve recorded stream session",
-          slug: "/docs/api/stream/get-recorded-session",
+          content: "GET list recorded sessions",
+          slug: "/docs/api/stream/get-recorded-sessions",
         },
         [],
       ],
