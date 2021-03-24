@@ -40,6 +40,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Core concept: parent stream and stream session",
+          slug: "/docs/guides/api/parent-streams-and-sessions",
+        },
+        [],
+      ],
+      [
+        {
           content: "Create a stream",
           slug: "/docs/guides/api/create-a-stream",
         },
@@ -47,7 +54,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Find base urls",
+          content: "Find regional base urls",
           slug: "/docs/guides/api/base-urls",
         },
         [],
@@ -61,7 +68,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Verify stream status",
+          content: "Verify stream is live",
           slug: "/docs/guides/api/verify-stream-status",
         },
         [],
@@ -75,8 +82,29 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Record stream sessions",
+          slug: "/docs/guides/api/record-stream",
+        },
+        [],
+      ],
+      [
+        {
+          content: "Playback a recorded session",
+          slug: "/docs/guides/api/playback-recording",
+        },
+        [],
+      ],
+      [
+        {
           content: "List all streams",
           slug: "/docs/guides/api/list-all-streams",
+        },
+        [],
+      ],
+      [
+        {
+          content: "Filter a list of streams",
+          slug: "/docs/guides/api/filtered-stream-list",
         },
         [],
       ],
@@ -141,6 +169,13 @@ const guidesTree: Tree[] = [
         {
           content: "Playback a stream",
           slug: "/docs/guides/dashboard/playback-a-stream",
+        },
+        [],
+      ],
+      [
+        {
+          content: "Record stream sessions",
+          slug: "/docs/guides/dashboard/record-stream",
         },
         [],
       ],

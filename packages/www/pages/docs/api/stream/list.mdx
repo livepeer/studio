@@ -2,28 +2,29 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
-# List all streams
+# List streams
 
-### Created by the same user
-
-You can retrieve all `stream` objects with the same `userID`. With any filter
-appended to the API call, the response will include both stream objects that
-represent a livestream configuration and stream objects that represent a single
-livestream session.
+You can retrieve all `stream` objects with the same `userID`. The response will include both parent `stream` objects that
+represent a livestream configuration and child-session `stream` objects. 
 
 ```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>"
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/"
 ```
 
-### Created by the same user, excluding livestream sessions
+### Quick filters
 
-You can retrieve all `stream` objects with the same `userID` but exclude stream
-objects _with_ a `parentId`.
+| JSON parameter              | Example    |Description                                                                                                                                                                                                                               |
+| ----------------------------| -----------|----------------------------------------------------------------------|
+| `streamsonly=1`             | `/api/stream?streamsonly=1` | Excludes child-session `stream` objects |
+| `sessionsonly=1`            | `/api/stream?sessionsonly=1` | Excludes parent objects and only returns child-session `stream` objects |
+| `record=1`                  | `/api/stream/{parentId}/sessions?record=1` | Returns all sessions `stream` objects with the same `parentId` and `record: true` |
 
-```bash
-curl -H 'authorization: Bearer <api-key>' \
-"https://livepeer.com/api/stream/user/<userId>?streamsonly=1"
-```
+
+### Additional query parameters
+
+| JSON parameter              | Type    | Description                                                                                                                                                                                                                               |
+| ----------------------------| ------- | ----------------------------------------------------------------------|
+| `isActive`                  | boolean | `true` returns active `stream` objects. `false` returns idle `stream` objects. The default value for new `stream` objects is `false`. Exclude child-session objects example `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]`. This example showed a decoded JSON object. But, remember that anything passed as a parameter in a GET request URL must be URL encoded.|
 
 </DocsLayout>

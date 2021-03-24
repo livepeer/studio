@@ -1,0 +1,40 @@
+import DocsLayout from "../../../../components/DocsLayout";
+
+<DocsLayout>
+
+# `GET /stream/{parentId}/sessions?record=1` to retrieve list of recorded sessions
+
+Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions with the same `parentId`
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{parentId}/sessions?record=1"
+```
+
+### 200 OK
+
+`recordingStatus` and `recordingUrl` are only returned as parameters on the session `stream` object in response to the above request.
+
+```bash
+[
+  {
+    "sourceSegmentsDuration":250,,
+    "id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+    "record":true,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    "recordingStatus":"ready",
+    "recordingUrl":"https://fra-cdn.livepeer.com/recordings/aaaaaaaa-aaaa-aaaa-aaaa-aaaa/index.m3u8"},
+    {other asset object keys, like createdAt and profiles}
+  {
+    "sourceSegmentsDuration":30.266,
+    "id":"bbbbbbbb-bbbb-bbbb-bbbb-bbbb",
+    "record":true,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    "recordingStatus":"ready",
+    "recordingUrl":"https://fra-cdn.livepeer.com/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
+    {other asset object keys, like createdAt and profiles}
+  }
+]
+```
+
+</DocsLayout>

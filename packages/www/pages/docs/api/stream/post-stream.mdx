@@ -2,12 +2,14 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 <DocsLayout>
 
-# `POST /stream` to create an asset
+# `POST /stream` to create a `stream` object
+
+`POST /stream` creates a *parent* stream object. The *parent* configuration is inherited by all future child-session `stream` objects.
 
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
--H 'authorization: Bearer <api key>' \
+-H 'authorization: Bearer {api-key}' \
 -d '{
   "name": "test_stream"
 }' \
@@ -26,7 +28,7 @@ https://livepeer.com/api/stream
   "streamKey":"zzzz-zzzz-zzzz-zzzz",
   "playbackId":"xyz123xyz123",
   "createdByTokenName":"test-api-key",
-  <other asset object keys, like profiles>
+  {other asset object keys, like profiles}
 }
 ```
 
@@ -35,6 +37,7 @@ https://livepeer.com/api/stream
 ```bash
 {
   "name": "test_stream",
+  "record": true,
   "profiles": [
     {
       "name": "720p",

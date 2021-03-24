@@ -12,8 +12,8 @@ appended. You received the `id` in the response when you
 Here is an example request:
 
 ```bash
-curl -H 'authorization: Bearer {api_key}' \
-"https://livepeer.com/api/stream/{streamId}"
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{id}"
 ```
 
 This is an example response:
@@ -27,13 +27,31 @@ This is an example response:
     {"bitrate":500000,"fps":30,"height":360,"name":"360p","width":640}],
   "id":"2d10f1fd-dbf7-495b-8aef-08916507fcce",
   "createdAt":1596118509635,
+  "isActive":true,
   "lastSeen":1596119750455
 }
 ```
 
+`isActive: true` means video segments are currently being ingested by Livepeer.com. `isActive: false` means the live stream is *idle* and no video segments are currently being ingested by Livepeer.com. 
+
 `lastSeen` represents when the stream was last observed by the monitoring
 system. The time is reported in Unix epoch time. If the stream is running, the
 epoch will be close to the current time.
+
+### Return all active livestreams
+Exclude child-session objects
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]"
+```
+
+### Return all idle livestreams
+Exclude child-session objects
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"
+```
 
 Next, learn
 [how to playback a live stream with the Livepeer.com API](/docs/guides/api/playback-a-live-stream).

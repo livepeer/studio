@@ -9,6 +9,8 @@ page**, [https://livepeer.com/app/user](/app/user).
 
 The **stream name** is at the top of the **stream page**.
 
+The **session table** at the bottom of the page shows all completed and in progress streaming sessions and the session recording playback URL when applicable. *Note the **session table** only appears after one completed livestreaming session.*
+
 These are the other fields on the **stream page**.
 
 | Field                         | Notes                                                                                                                                                                                                                                                                                                                    |
@@ -17,6 +19,7 @@ These are the other fields on the **stream page**.
 | Ingest and playback URL pairs | For any stream session, you must use the ingest URL and playback URL pair from the same region. Learn [how to pick an RTMP ingest and playback URL pair](/docs/guides/dashboard/ingest-playback-url-pair).                                                                                                               |
 | RTMP ingest URL               | The RTMP ingest point should be close to where the stream is broadcasted. This is an example of how the RTMP ingest URL is formatted: <ul><li>rtmp://{region}-rtmp.livepeer.com/live/{stream-key}</li></ul>                                                                                                              |
 | Playback URL                  | The playback URL is based on the region your stream originates in. Even though the playback URL references the ingest location, playback will work for your viewers everywhere. This is an example of how the playback URL is formatted: <ul><li>https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8</li></ul> |
+| Record sessions               | Off by default; new live stream sessions are not recorded. When turned On, new sessions are recorded. When updating this setting, note that in progress sessions will adhere to the on/off setting when the livestream session began.                                                                                            |
 | Renditions                    | The width (pixels), height (pixels) and frame rate (frames per second) for each transcoded rendition of your source stream are listed.                                                                                                                                                                                   |
 | Created at                    | This is the local date (MM/DD/YYYY) and time the stream was created.                                                                                                                                                                                                                                                     |
 | Last seen at                  | This is the most recent date and time a video segment for this stream was transcoded.                                                                                                                                                                                                                                    |
