@@ -411,7 +411,7 @@ const ID = () => {
                       />
                       <Flex sx={{ alignItems: "center" }}>On</Flex>
                     </Label>
-                    <Label sx={{ml: "0.5em"}}>
+                    <Label sx={{ ml: "0.5em" }}>
                       <Radio
                         autocomplete="off"
                         name="record-mode"
@@ -585,9 +585,7 @@ const ID = () => {
                 Delete
               </Button>
             </Flex>
-            {user.admin || isStaging() || isDevelopment() ? (
-              <StreamSessionsTable streamId={stream.id} />
-            ) : null}
+            <StreamSessionsTable streamId={stream.id} />
           </>
         ) : notFound ? (
           <Box>Not found</Box>
