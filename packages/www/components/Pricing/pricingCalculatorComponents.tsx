@@ -75,9 +75,9 @@ const CalculatorItem = ({
       <div
         sx={{
           display: "grid",
-          gridTemplateColumns: ['1fr', '1fr', '56% 38%', '56% 38%'],
-          alignItems: 'center',
-          gap: ['20px', '20px', '6%', '6%'],
+          gridTemplateColumns: ["1fr", "1fr", "56% 38%", "56% 38%"],
+          alignItems: "center",
+          gap: ["20px", "20px", "6%", "6%"],
         }}>
         {children}
         <input
@@ -92,7 +92,7 @@ const CalculatorItem = ({
             width: "100%",
             appearance: "none",
             background: "#E1E1E1",
-            mt: ['0', '0', `${marginTop ?? ""}`],
+            mt: ["0", "0", `${marginTop ?? ""}`],
             "::-webkit-slider-thumb": {
               appearance: "none",
               width: "12px",
@@ -121,7 +121,7 @@ const ScaleCalculator = ({
     <div
       onClick={handleClick}
       sx={{
-        width: "96px",
+        width: ["100%", "96px"],
         height: "56px",
         borderRadius: "8px",
         display: "flex",
@@ -184,12 +184,12 @@ const Calculator = ({
         min={0}
         max={57599}
         value={streamLength}>
-        <div sx={{ display: "flex", flexDirection: "column", width: '100%' }}>
+        <div sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
           <div
             sx={{
               height: "48px",
               width: "100%",
-              maxWidth: ['100%', '100%', "276px"],
+              maxWidth: ["100%", "100%", "276px"],
               borderRadius: "6px",
               border: "1px solid #E6E6E6",
               fontSize: "20px",
@@ -318,7 +318,7 @@ const Calculator = ({
           }}>
           What percentage of the stream does the average viewer watch?
         </h1>
-        <div sx={{ display: "flex", gap: "16px" }}>
+        <div sx={{ display: ["grid", "flex"], gap: ["12px", "16px"], gridTemplateColumns: ['repeat(4, 1fr)', null] }}>
           {scaleCalculatorValues.map((each, idx) => (
             <ScaleCalculator
               key={idx}
@@ -352,12 +352,12 @@ const PreviewItem = ({
     <div
       sx={{
         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
-        minHeight: '136px',
-        pt: "48px",
-        pb: "32px",
+        minHeight: ["104px", "136px"],
+        pt: ["24px", "48px"],
+        pb: ["8px", "32px"],
         width: "100%",
         display: "flex",
-        flexDirection: ['column', 'column', 'row'],
+        flexDirection: ["column", "column", "row"],
         alignItems: ["flex-start", "flex-start", "center"],
         justifyContent: "space-between",
       }}>
@@ -367,8 +367,8 @@ const PreviewItem = ({
           justifyContent: "center",
           flexDirection: "column",
           maxWidth: "244px",
-          mr: ['0', '0', '15px'],
-          mb: ['8px', '8px', '0']
+          mr: ["0", "0", "15px"],
+          mb: ["8px", "8px", "0"],
         }}>
         <h1
           sx={{
@@ -395,15 +395,15 @@ const PreviewItem = ({
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
-          alignItems: "flex-end",
+          alignItems: ["flex-start", "flex-start", "flex-end", "flex-end"],
         }}>
         <h1
           sx={{
-            fontSize: ['24px', "24px", "26px", "32px"],
-            lineHeight: '40px',
+            fontSize: ["24px", "24px", "26px", "32px"],
+            lineHeight: "40px",
             letterSpacing: "-0.04em",
             fontWeight: "600",
-            textAlign: 'right'
+            textAlign: ["left", "right", "right"],
           }}>
           {value}
         </h1>
