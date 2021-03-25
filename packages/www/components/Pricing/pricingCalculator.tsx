@@ -5,6 +5,16 @@ const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(0);
   const [monthlyStreams, setMonthlyStreams] = useState<number>(0);
   const [viewCount, setViewCount] = useState<number>(0);
+  const [percentageWatched, setPercentageWatched] = useState<number>(0);
+
+  const transcoding = (streamLength / 60) * monthlyStreams * 0.005;
+
+  const streaming =
+    ((((60 * (streamLength / 60) * monthlyStreams * 10000) / 8) / 1024) / 1024) *
+    viewCount *
+    percentageWatched *
+    0.01;
+
   return (
     <div sx={{ display: "flex", flexDirection: "column", mt: "144px" }}>
       <h1
@@ -30,9 +40,9 @@ const PricingCalculator = () => {
       <div
         sx={{
           display: "grid",
-          gridTemplateColumns: ['1fr', '40% 48%'],
-          gap: ['40px', '12%'],
-          maxWidth: '100%'
+          gridTemplateColumns: ["1fr", "40% 48%"],
+          gap: ["40px", "12%"],
+          maxWidth: "100%",
         }}>
         <Calculator
           streamLength={streamLength}
@@ -41,8 +51,10 @@ const PricingCalculator = () => {
           setViewCount={setViewCount}
           setMonthlyStreams={setMonthlyStreams}
           setStreamLength={setStreamLength}
+          percentageWatched={percentageWatched}
+          setPercentageWatched={setPercentageWatched}
         />
-        <Preview transcoding={streamLength} streaming={monthlyStreams} />
+        <Preview transcoding={transcoding} streaming={streaming} />
       </div>
     </div>
   );

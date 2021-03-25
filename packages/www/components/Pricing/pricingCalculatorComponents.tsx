@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import { parse } from "graphql";
+import { ReactNode } from "react";
 
 type PreviewItemProps = {
   title: string;
@@ -24,8 +25,8 @@ type CalculatorItemProps = {
 
 type ScaleCalculatorProps = {
   value: number;
-  isSelected: boolean;
-  handleClick?: React.MouseEventHandler<HTMLDivElement>;
+  percentageWatched: number;
+  setPercentageWatched: React.Dispatch<React.SetStateAction<number>>;
 };
 
 type CalculatorProps = {
@@ -35,6 +36,8 @@ type CalculatorProps = {
   setStreamLength: React.Dispatch<React.SetStateAction<number>>;
   setMonthlyStreams: React.Dispatch<React.SetStateAction<number>>;
   setViewCount: React.Dispatch<React.SetStateAction<number>>;
+  percentageWatched: number;
+  setPercentageWatched: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const scaleCalculatorValues = [25, 50, 75, 100];
@@ -50,7 +53,7 @@ const CalculatorItem = ({
 }: CalculatorItemProps) => {
   const handleChange = (e) => {
     const value = e.target.value;
-    setValue(value);
+    setValue(parseFloat(value));
   };
   return (
     <div
@@ -114,9 +117,16 @@ const CalculatorItem = ({
 
 const ScaleCalculator = ({
   value,
-  isSelected,
-  handleClick,
+  percentageWatched,
+  setPercentageWatched,
 }: ScaleCalculatorProps) => {
+  const handleClick = () => {
+    if (percentageWatched === value) {
+      setPercentageWatched(0);
+    } else {
+      setPercentageWatched(value);
+    }
+  };
   return (
     <div
       onClick={handleClick}
@@ -129,7 +139,7 @@ const ScaleCalculator = ({
         justifyContent: "center",
         border: "1px solid #E6E6E6",
         boxSizing: "border-box",
-        background: isSelected ? "#943CFF" : "#FBFBFB",
+        background: percentageWatched === value ? "#943CFF" : "#FBFBFB",
         cursor: "pointer",
         transition: "all 0.2s",
         ":hover": {
@@ -140,8 +150,8 @@ const ScaleCalculator = ({
         sx={{
           fontSize: "14px",
           letterSpacing: "-0.04em",
-          color: isSelected ? "white" : "black",
-          fontWeight: isSelected ? "600" : "400",
+          color: percentageWatched === value ? "white" : "black",
+          fontWeight: percentageWatched === value ? "600" : "400",
         }}>
         {value}%
       </p>
@@ -156,8 +166,14 @@ const Calculator = ({
   setStreamLength,
   setMonthlyStreams,
   setViewCount,
+  percentageWatched,
+  setPercentageWatched,
 }: CalculatorProps) => {
-  const [selectedValue, setSelectedValue] = useState<number | null>(null);
+  const streamLengthDividedTime = {
+    hours: (streamLength / 60 / 60).toString().split('.')[0],
+    minutes: ((streamLength / 60) % 60).toString().split('.')[0],
+    seconds: streamLength % 60,
+  }
 
   return (
     <div
@@ -203,6 +219,8 @@ const Calculator = ({
               },
             }}>
             <input
+              maxLength={2}
+              value={streamLengthDividedTime.hours}
               placeholder="00"
               sx={{
                 width: "36px",
@@ -213,13 +231,27 @@ const Calculator = ({
             />
             <p sx={{ color: "#7D7D7D" }}>:</p>
             <input
+              maxLength={2}
+              value={streamLengthDividedTime.minutes}
               placeholder="00"
-              sx={{ width: "36px", display: "flex", justifyContent: "center" }}
+              sx={{
+                width: "36px",
+                display: "flex",
+                justifyContent: "center",
+                px: "6px",
+              }}
             />
             <p sx={{ color: "#7D7D7D" }}>:</p>
             <input
+              maxLength={2}
+              value={streamLengthDividedTime.seconds}
               placeholder="00"
-              sx={{ width: "36px", display: "flex", justifyContent: "center" }}
+              sx={{
+                width: "36px",
+                display: "flex",
+                justifyContent: "center",
+                px: "6px",
+              }}
             />
           </div>
           <div
@@ -263,9 +295,14 @@ const Calculator = ({
         max={100000}
         value={monthlyStreams}>
         <input
-          value={monthlyStreams
-            .toString()
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          value={monthlyStreams}
+          // .toString()
+          // .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          maxLength={6}
+          onChange={(e) => {
+            const monthly = parseFloat(e.target.value);
+            setMonthlyStreams(monthly > 0 ? monthly : 0);
+          }}
           sx={{
             height: "48px",
             width: "100%",
@@ -286,7 +323,12 @@ const Calculator = ({
         value={viewCount}>
         <input
           value={viewCount}
-          type="number"
+          placeholder="0"
+          maxLength={8}
+          onChange={(e) => {
+            const view = parseFloat(e.target.value);
+            setViewCount(view > 0 ? view : 0);
+          }}
           sx={{
             height: "48px",
             width: "100%",
@@ -318,22 +360,18 @@ const Calculator = ({
           }}>
           What percentage of the stream does the average viewer watch?
         </h1>
-        <div sx={{ display: ["grid", "flex"], gap: ["12px", "16px"], gridTemplateColumns: ['repeat(4, 1fr)', null] }}>
+        <div
+          sx={{
+            display: ["grid", "flex"],
+            gap: ["12px", "16px"],
+            gridTemplateColumns: ["repeat(4, 1fr)", null],
+          }}>
           {scaleCalculatorValues.map((each, idx) => (
             <ScaleCalculator
               key={idx}
               value={each}
-              isSelected={selectedValue === each}
-              handleClick={() => {
-                if (selectedValue === each) {
-                  setSelectedValue(null);
-                } else {
-                  setSelectedValue(each);
-                  setViewCount((10000000 * each) / 100);
-                  setMonthlyStreams((100000 * each) / 100);
-                  setStreamLength((57599 * each) / 100);
-                }
-              }}
+              percentageWatched={percentageWatched}
+              setPercentageWatched={setPercentageWatched}
             />
           ))}
         </div>
@@ -412,6 +450,8 @@ const PreviewItem = ({
             fontSize: "16px",
             lineHeight: "24px",
             letterSpacing: "-0.04em",
+            alignSelf: "flex-end",
+            textAlign: "right",
           }}>
           {valueClarification}
         </p>
@@ -459,7 +499,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           Prices listed in USD
         </p>
       </div>
-      <PreviewItem title="Transcoding" value="$0" />
+      <PreviewItem title="Transcoding" value={`$${transcoding.toFixed(2)}`} />
       <PreviewItem title="Streaming via CDN" value="$0" />
       <PreviewItem
         title="Recording Storage"
@@ -469,8 +509,10 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
       <PreviewItem
         title="Total cost"
         description="Transcoding + Streaming via CDN"
-        value={`$${transcoding + streaming}`}
-        valueClarification={`$${transcoding} + $${streaming}`}
+        value={`$${(transcoding + streaming).toFixed(2)}`}
+        valueClarification={`$${transcoding.toFixed(2)} + $${streaming.toFixed(
+          2
+        )}`}
       />
       <button
         sx={{
