@@ -9,6 +9,7 @@ import {
 } from "recharts";
 
 const CustomTooltip = ({ label }) => {
+  console.log('tooltip label value', label)
   return (
     <div
       sx={{
@@ -58,7 +59,8 @@ const Chart = ({ data }) => {
           <XAxis dataKey="name" />
           <YAxis domain={[0, 1600]} />
           <CartesianGrid vertical={false} />
-          <Tooltip  content={<CustomTooltip label={data?.kbps} />} />
+          { console.log(data) }
+          <Tooltip />
           <Area
             cursor="pointer"
             type="monotone"
