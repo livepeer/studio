@@ -3,6 +3,7 @@ import Collapsible from "react-collapsible";
 
 type TriggerProps = {
   question: string;
+  isOpen: boolean;
 };
 
 const faq = [
@@ -50,7 +51,8 @@ const PlusIcon = () => {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M12 5V19"
         stroke="black"
@@ -69,7 +71,7 @@ const PlusIcon = () => {
   );
 };
 
-const Trigger = ({ question }: TriggerProps) => {
+const Trigger = ({ question, isOpen }: TriggerProps) => {
   return (
     <div
       sx={{
@@ -78,9 +80,16 @@ const Trigger = ({ question }: TriggerProps) => {
         justifyContent: "space-between",
         alignItems: "center",
         cursor: "pointer",
-      }}>
+        padding: '24px'
+      }}
+    >
       <p sx={{ fontSize: "20px", fontWeight: "600" }}>{question}</p>
-      <i>
+      <i
+        sx={{
+          transform: isOpen ? "rotate(-45deg)" : "",
+          transition: "all 0.2s",
+        }}
+      >
         <PlusIcon />
       </i>
     </div>
@@ -99,10 +108,17 @@ const PricingFaq = () => {
         width: "100%",
         maxWidth: "790px",
         mt: "144px",
-        mb: '112px'
-      }}>
+        mb: "112px",
+      }}
+    >
       <h1
-        sx={{ fontSize: [5, 5, 6], mb: ["42px", "64px"], textAlign: "center", letterSpacing: '-0.04em' }}>
+        sx={{
+          fontSize: [5, 5, 6],
+          mb: ["42px", "64px"],
+          textAlign: "center",
+          letterSpacing: "-0.04em",
+        }}
+      >
         Frequently asked questions
       </h1>
       {faq.map((question, idx) => (
@@ -113,14 +129,22 @@ const PricingFaq = () => {
           }
           open={questionOpen === idx}
           transitionTime={200}
-          trigger={<Trigger question={question.trigger} />}>
+          trigger={
+            <Trigger
+              question={question.trigger}
+              isOpen={questionOpen === idx}
+            />
+          }
+        >
           <p
             sx={{
+              pb: '24px',
+              px: '24px',
               color: "#525252",
               fontSize: "18px",
               lineHeight: "1.6",
-              mt: "16px",
-            }}>
+            }}
+          >
             {question.answer}
           </p>
         </Collapsible>

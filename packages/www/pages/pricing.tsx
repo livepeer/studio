@@ -36,8 +36,8 @@ const Pricing = () => {
         <PricingCardsContainer />
         <PricingCalculator />
         <PricingFaq />
-        <Prefooter />
       </Container>
+        <Prefooter />
     </Layout>
   );
 };

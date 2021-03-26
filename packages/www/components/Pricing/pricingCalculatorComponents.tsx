@@ -1,5 +1,5 @@
 import { parse } from "graphql";
-import { ReactNode, useCallback } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
 
 type PreviewItemProps = {
   title: string;
@@ -55,6 +55,14 @@ const CalculatorItem = ({
     const value = e.target.value;
     setValue(parseFloat(value));
   };
+
+  const handleInput = useCallback((e) => {
+    const { value, min, max } = e.target;
+    const realValue = ((value - min) / (max - min)) * 100;
+    e.target.style.background =
+      `linear-gradient(to right, #943CFF ${realValue}%, #E1E1E1 0%)`
+  }, [value, min, max]);
+
   return (
     <div
       sx={{
@@ -84,9 +92,11 @@ const CalculatorItem = ({
         }}>
         {children}
         <input
+          className="pricing__range__input"
           min={min}
           max={max}
           value={value}
+          onInput={handleInput}
           onChange={handleChange}
           type="range"
           sx={{
@@ -98,15 +108,11 @@ const CalculatorItem = ({
             mt: ["0", "0", `${marginTop ?? ""}`],
             "::-webkit-slider-thumb": {
               appearance: "none",
-              width: "12px",
-              height: "12px",
+              width: ["16px", "12px"],
+              height: ["16px", "12px"],
               borderRadius: "12px",
               background: "#943CFF",
-            },
-            "::-webkit-progress-bar": {
-              appearance: "none",
-              background: "#943CFF !important",
-              height: "100%",
+              cursor: "grabbing",
             },
           }}
         />
@@ -128,7 +134,8 @@ const ScaleCalculator = ({
     }
   };
   return (
-    <div
+    <button
+      aria-label={`${value} Percentage Watched`}
       onClick={handleClick}
       sx={{
         width: ["100%", "96px"],
@@ -142,8 +149,13 @@ const ScaleCalculator = ({
         background: percentageWatched === value ? "#943CFF" : "#FBFBFB",
         cursor: "pointer",
         transition: "all 0.2s",
-        ":hover": {
-          boxShadow: "1px 1px 20px rgba(0, 0, 0, 0.05)",
+        "&:hover": {
+          borderColor: "primary",
+        },
+        "&:focus": {
+          outline: "none",
+          boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+          borderColor: "primary",
         },
       }}>
       <p
@@ -155,7 +167,7 @@ const ScaleCalculator = ({
         }}>
         {value}%
       </p>
-    </div>
+    </button>
   );
 };
 
@@ -245,8 +257,12 @@ const Calculator = ({
               justifyContent: "space-between",
               alignItems: "center",
               px: "16px",
+              transition: "all 0.2s",
               "::placeholder": {
                 color: "#7D7D7D",
+              },
+              "&:hover": {
+                borderColor: "primary",
               },
             }}>
             <input
@@ -260,6 +276,12 @@ const Calculator = ({
                 display: "flex",
                 justifyContent: "center",
                 px: "6px",
+                transition: "all 0.2s",
+                borderRadius: "6px",
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+                },
               }}
             />
             <p sx={{ color: "#7D7D7D" }}>:</p>
@@ -274,6 +296,12 @@ const Calculator = ({
                 display: "flex",
                 justifyContent: "center",
                 px: "6px",
+                transition: "all 0.2s",
+                borderRadius: "6px",
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+                },
               }}
             />
             <p sx={{ color: "#7D7D7D" }}>:</p>
@@ -288,6 +316,12 @@ const Calculator = ({
                 display: "flex",
                 justifyContent: "center",
                 px: "6px",
+                transition: "all 0.2s",
+                borderRadius: "6px",
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+                },
               }}
             />
           </div>
@@ -333,8 +367,6 @@ const Calculator = ({
         value={monthlyStreams}>
         <input
           value={monthlyStreams}
-          // .toString()
-          // .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           maxLength={6}
           onChange={(e) => {
             const monthly = parseFloat(e.target.value);
@@ -349,6 +381,15 @@ const Calculator = ({
             letterSpacing: "-0.02em",
             px: "16px",
             color: monthlyStreams == 0 ? "#7D7D7D" : "black",
+            transition: "all 0.2s",
+            "&:hover": {
+              borderColor: "primary",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+              borderColor: "primary",
+            },
           }}
         />
       </CalculatorItem>
@@ -375,6 +416,15 @@ const Calculator = ({
             letterSpacing: "-0.02em",
             px: "16px",
             color: viewCount == 0 ? "#7D7D7D" : "black",
+            transition: "all 0.2s",
+            "&:hover": {
+              borderColor: "primary",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+              borderColor: "primary",
+            },
           }}
         />
       </CalculatorItem>
@@ -565,6 +615,11 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
           borderRadius: "6px",
           mt: "10px",
+          transition: "all 0.2s",
+          "&:focus": {
+            outline: "none",
+            boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+          },
         }}>
         Get Started
       </button>

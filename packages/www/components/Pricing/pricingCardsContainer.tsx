@@ -113,7 +113,7 @@ const MobileContainer = () => {
         cardBg="#943CFF"
         btn={{
           display: "Sign up",
-          href: "/register",
+          href: "/register?selectedPlan=1",
         }}>
         <div sx={{ mt: "20px" }}>
           <PricingCardContent color="white">
