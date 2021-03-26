@@ -1,5 +1,5 @@
 import { parse } from "graphql";
-import { ReactNode } from "react";
+import { ReactNode, useCallback } from "react";
 
 type PreviewItemProps = {
   title: string;
@@ -170,10 +170,41 @@ const Calculator = ({
   setPercentageWatched,
 }: CalculatorProps) => {
   const streamLengthDividedTime = {
-    hours: (streamLength / 60 / 60).toString().split('.')[0],
-    minutes: ((streamLength / 60) % 60).toString().split('.')[0],
+    hours: parseFloat((streamLength / 60 / 60).toString().split(".")[0]),
+    minutes: parseFloat(((streamLength / 60) % 60).toString().split(".")[0]),
     seconds: streamLength % 60,
-  }
+  };
+
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      let seconds = 0;
+      switch (name) {
+        case "hours":
+          seconds =
+            streamLengthDividedTime.minutes * 60 +
+            streamLengthDividedTime.seconds +
+            value * 60 * 60;
+          break;
+        case "minutes":
+          seconds =
+            streamLengthDividedTime.hours * 60 * 60 +
+            streamLengthDividedTime.seconds +
+            value * 60;
+          break;
+        case "seconds":
+          seconds =
+            streamLengthDividedTime.hours * 60 * 60 +
+            streamLengthDividedTime.minutes * 60 +
+            value * 1;
+          break;
+        default:
+          break;
+      }
+      setStreamLength(seconds > 0 ? seconds : 0);
+    },
+    [setStreamLength, streamLengthDividedTime, streamLength]
+  );
 
   return (
     <div
@@ -220,6 +251,8 @@ const Calculator = ({
             }}>
             <input
               maxLength={2}
+              name="hours"
+              onChange={handleChange}
               value={streamLengthDividedTime.hours}
               placeholder="00"
               sx={{
@@ -232,6 +265,8 @@ const Calculator = ({
             <p sx={{ color: "#7D7D7D" }}>:</p>
             <input
               maxLength={2}
+              name="minutes"
+              onChange={handleChange}
               value={streamLengthDividedTime.minutes}
               placeholder="00"
               sx={{
@@ -244,6 +279,8 @@ const Calculator = ({
             <p sx={{ color: "#7D7D7D" }}>:</p>
             <input
               maxLength={2}
+              name="seconds"
+              onChange={handleChange}
               value={streamLengthDividedTime.seconds}
               placeholder="00"
               sx={{
