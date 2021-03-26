@@ -56,12 +56,14 @@ const CalculatorItem = ({
     setValue(parseFloat(value));
   };
 
-  const handleInput = useCallback((e) => {
-    const { value, min, max } = e.target;
-    const realValue = ((value - min) / (max - min)) * 100;
-    e.target.style.background =
-      `linear-gradient(to right, #943CFF ${realValue}%, #E1E1E1 0%)`
-  }, [value, min, max]);
+  const handleInput = useCallback(
+    (e) => {
+      const { value, min, max } = e.target;
+      const realValue = ((value - min) / (max - min)) * 100;
+      e.target.style.background = `linear-gradient(to right, #943CFF ${realValue}%, #E1E1E1 0%)`;
+    },
+    [value, min, max]
+  );
 
   return (
     <div
@@ -602,6 +604,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         )}`}
       />
       <button
+        disabled={streaming + transcoding === 0}
         sx={{
           width: "100%",
           display: "flex",
@@ -612,6 +615,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           color: "white",
           letterSpacing: "-0.03em",
           height: "56px",
+          cursor: streaming + transcoding === 0 ? 'not-allowed' : 'pointer',
           background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
           borderRadius: "6px",
           mt: "10px",
