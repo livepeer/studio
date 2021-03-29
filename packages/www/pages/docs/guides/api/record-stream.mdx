@@ -14,6 +14,8 @@ This recording feature provides Livepeer.com users with a link to an adaptive bi
 
 The ABR settings for the recording are inherited from the transcoding  `profiles` set for the livestream. At this time you cannot set recording-specific ABR settings. Playback is delivered via Livepeer.com's CDN by default.
 
+*Please note if you are using OBS, set your keyframe interval to 2 for Livepeer.com beta recording to work best.*
+
 ## The `record` parameter
 
 To turn recording on and off, update the `record` parameter on the `stream` object. The `record` parameter is a boolean with a `false` default value.
