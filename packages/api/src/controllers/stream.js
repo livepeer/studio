@@ -778,7 +778,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   });
 
   if (stream.parentId) {
-    const pStream = await db.stream.get(id);
+    const pStream = await db.stream.get(stream.parentId);
     if (pStream && !pStream.deleted) {
       await db.stream.update(pStream.id, {
         isActive: stream.isActive,
