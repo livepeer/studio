@@ -626,6 +626,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     streamKey,
     playbackId,
     createdByTokenName: req.tokenName,
+    createdByTokenId: req.tokenId,
     isActive: false,
     lastSeen: 0,
   });

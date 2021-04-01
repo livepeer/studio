@@ -60,6 +60,9 @@ function authFactory(params) {
     if (tokenObject && tokenObject.name) {
       req.tokenName = tokenObject.name;
     }
+    if (tokenObject && tokenObject.id) {
+      req.tokenId = tokenObject.id;
+    }
 
     if (params.admin) {
       // admins must have a JWT

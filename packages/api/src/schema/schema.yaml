@@ -134,6 +134,9 @@ components:
           type: string
           readOnly: true
           description: Name of the token used to create this object
+        createdByTokenId:
+          type: string
+          readOnly: true
         createdAt:
           type: number
           readOnly: true
