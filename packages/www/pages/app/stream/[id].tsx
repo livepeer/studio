@@ -213,6 +213,21 @@ const ID = () => {
   const isAdmin = query.admin === "true";
   const tabs = isAdmin ? getTabsAdmin(2) : getTabs(0);
   const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
+  const _stream = stream || {};
+  let { broadcasterHost, region } = _stream;
+  if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
+    broadcasterHost = lastSession.broadcasterHost;
+  }
+  if (!region && lastSession && lastSession.region) {
+    region = lastSession.region;
+  }
+  let broadcasterPlaybackUrl;
+  const domain = isStaging() ? "monster" : "com";
+  if (stream && stream.region && stream.broadcasterHost) {
+    broadcasterPlaybackUrl = `https://${stream.region}.livepeer.${domain}/stream/${stream.id}.m3u8`;
+  } else if (lastSession && lastSession.region) {
+    broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${stream.playbackId}.m3u8`;
+  }
 
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
@@ -581,23 +596,27 @@ const ID = () => {
                       </a>
                     </Cell>
                     <Cell>Papertrail to stream id</Cell>
-                    {lastSession ? (
+                    <Cell>
+                      <a
+                        target="_blank"
+                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                        sx={{ userSelect: "all" }}>
+                        {stream.id}
+                      </a>
+                    </Cell>
+                    <Cell>Region/Broadcaster</Cell>
+                    <Cell>
+                      {region} {broadcasterHost ? " / " + broadcasterHost : ""}
+                    </Cell>
+                    {broadcasterPlaybackUrl ? (
                       <>
-                        <Cell>
-                          <a
-                            target="_blank"
-                            href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
-                            sx={{ userSelect: "all" }}>
-                            {stream.id}
-                          </a>
-                        </Cell>
                         <Cell>Broadcaster playback</Cell>
                         <Cell>
                           <a
                             target="_blank"
-                            href={`https://${lastSession.region}.livepeer.com/stream/${stream.playbackId}.m3u8`}
+                            href={broadcasterPlaybackUrl}
                             sx={{ userSelect: "all" }}>
-                            {`https://${lastSession.region}.livepeer.com/stream/${stream.playbackId}.m3u8`}
+                            {broadcasterPlaybackUrl}
                           </a>
                         </Cell>
                       </>
