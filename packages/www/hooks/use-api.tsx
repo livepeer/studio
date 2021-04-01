@@ -268,7 +268,7 @@ const makeContext = (state: ApiState, setState) => {
       limit = 100,
       cursor?: string,
       order?: string,
-      filters?: Array<{ id: string; vaule: string }>
+      filters?: Array<{ id: string; value: string }>
     ): Promise<[Array<User> | ApiError, string, Response]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const uri = `/user?${qs.stringify({ limit, cursor, filters: f, order })}`;
@@ -506,7 +506,7 @@ const makeContext = (state: ApiState, setState) => {
       active?: boolean;
       nonLivepeerOnly?: boolean;
       order?: string;
-      filters?: Array<{ id: string; vaule: string }>;
+      filters?: Array<{ id: string; value: string }>;
       limit?: number;
       cursor?: string;
     }): Promise<[Array<Stream> | ApiError, string, Response]> {
@@ -605,7 +605,7 @@ const makeContext = (state: ApiState, setState) => {
     async getObjectStore(
       userId?: string,
       order?: string,
-      filters?: Array<{ id: string; vaule: string }>,
+      filters?: Array<{ id: string; value: string }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<Webhook> | ApiError, string, Response]> {
@@ -663,7 +663,7 @@ const makeContext = (state: ApiState, setState) => {
       allUsers: boolean,
       all: boolean,
       order?: string,
-      filters?: Array<{ id: string; vaule: string }>,
+      filters?: Array<{ id: string; value: string }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<Webhook> | ApiError, string, Response]> {
@@ -709,7 +709,7 @@ const makeContext = (state: ApiState, setState) => {
     async getApiTokens(
       userId?: string,
       order?: string,
-      filters?: Array<{ id: string; vaule: string }>,
+      filters?: Array<{ id: string; value: string }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<ApiToken> | ApiError, string, Response]> {
