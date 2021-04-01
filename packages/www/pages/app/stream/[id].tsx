@@ -105,6 +105,7 @@ const ID = () => {
     deleteStream,
     getIngest,
     setRecord,
+    getAdminStreams,
   } = useApi();
   const router = useRouter();
   const { query } = router;
@@ -115,6 +116,25 @@ const ID = () => {
   const [notFound, setNotFound] = useState(false);
   const [recordOffModal, setRecordOffModal] = useState(false);
   const [isCopied, setCopied] = useState(0);
+  const [lastSession, setLastSession] = useState(null);
+
+  useEffect(() => {
+    if (user && user.admin && stream) {
+      getAdminStreams({
+        sessionsonly: true,
+        limit: 1,
+        order: "createdAt-true",
+        filters: [{ id: "parentId", value: stream.id }],
+      })
+        .then((res) => {
+          const [streamsOrError] = res;
+          if (Array.isArray(streamsOrError) && streamsOrError.length > 0) {
+            setLastSession(streamsOrError[0]);
+          }
+        })
+        .catch((e) => console.log(e));
+    }
+  }, [user, stream]);
 
   useEffect(() => {
     if (isCopied) {
@@ -561,14 +581,27 @@ const ID = () => {
                       </a>
                     </Cell>
                     <Cell>Papertrail to stream id</Cell>
-                    <Cell>
-                      <a
-                        target="_blank"
-                        href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
-                        sx={{ userSelect: "all" }}>
-                        {stream.id}
-                      </a>
-                    </Cell>
+                    {lastSession ? (
+                      <>
+                        <Cell>
+                          <a
+                            target="_blank"
+                            href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
+                            sx={{ userSelect: "all" }}>
+                            {stream.id}
+                          </a>
+                        </Cell>
+                        <Cell>Broadcaster playback</Cell>
+                        <Cell>
+                          <a
+                            target="_blank"
+                            href={`https://${lastSession.region}.livepeer.com/stream/${stream.playbackId}.m3u8`}
+                            sx={{ userSelect: "all" }}>
+                            {`https://${lastSession.region}.livepeer.com/stream/${stream.playbackId}.m3u8`}
+                          </a>
+                        </Cell>
+                      </>
+                    ) : null}
                   </>
                 ) : null}
               </Box>

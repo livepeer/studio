@@ -145,7 +145,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
 
   if (!order) {
-    order = "lastSeen-true%2CcreatedAt-true";
+    order = "lastSeen-true,createdAt-true";
   }
   order = parseOrder(fieldsMap, order);
 
