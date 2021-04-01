@@ -19,7 +19,6 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { setActiveToFalse } from "./admin";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -62,7 +61,7 @@ function isActuallyNotActive(stream) {
 
 function activeCleanupOne(stream) {
   if (isActuallyNotActive(stream)) {
-    setActiveToFalse(stream);
+    db.stream.setActiveToFalse(stream);
     stream.isActive = false;
     return true;
   }
@@ -768,9 +767,11 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
 
   stream.isActive = !!req.body.active;
   stream.lastSeen = +new Date();
+  const { ownRegion: region } = req.config;
   await db.stream.update(stream.id, {
     isActive: stream.isActive,
     lastSeen: stream.lastSeen,
+    region,
   });
 
   db.user.update(stream.userId, {
@@ -783,7 +784,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
       await db.stream.update(pStream.id, {
         isActive: stream.isActive,
         lastSeen: stream.lastSeen,
-        activeRegion: stream.isActive ? stream.region : undefined,
+        region,
       });
     }
   }

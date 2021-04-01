@@ -150,7 +150,7 @@ app.post(
     let i = 0;
     let cleaned = 0;
     for (const stream of toClean) {
-      const upRes = await setActiveToFalse(stream);
+      const upRes = await db.stream.setActiveToFalse(stream);
       cleaned += upRes.rowCount;
       res.write(`index=${i} cleaned=${cleaned} total=${toClean.length}\n`);
       i++;
@@ -159,31 +159,5 @@ app.post(
   }
 );
 
-export async function setActiveToFalse(stream) {
-  let upRes;
-  try {
-    upRes = await db.stream.update(
-      [
-        sql`id = ${stream.id}`,
-        sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
-      ],
-      { isActive: false },
-      { throwIfEmpty: false }
-    );
-    if (upRes.rowCount) {
-      console.log(
-        `cleaned timed out stream id=${stream.id} lastSeen=${new Date(
-          stream.lastSeen
-        )} name=${stream.name}`
-      );
-    }
-  } catch (e) {
-    console.error(
-      `error setting stream active to false id=${stream.id} name=${stream.name} err=${e}`
-    );
-    upRes = { rowCount: 0 };
-  }
-  return upRes;
-}
 
 export default app;

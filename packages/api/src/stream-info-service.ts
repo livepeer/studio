@@ -29,6 +29,10 @@ function parseCli() {
           type: "string",
           default: "localhost",
         },
+        "own-region": {
+          describe: "identify region in which this service runs (fra, mdw, etc)",
+          type: "string",
+        },
         broadcaster: {
           describe: "broadcaster host:port to fetch info from",
           type: "string",

@@ -256,6 +256,33 @@ export default class StreamTable extends Table<Stream> {
     return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
   }
 
+  async setActiveToFalse(stream): Promise<{ rowCount: number }> {
+    let upRes;
+    try {
+      upRes = await this.update(
+        [
+          sql`id = ${stream.id}`,
+          sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
+        ],
+        { isActive: false } as Stream,
+        { throwIfEmpty: false }
+      );
+      if (upRes.rowCount) {
+        console.log(
+          `cleaned timed out stream id=${stream.id} lastSeen=${new Date(
+            stream.lastSeen
+          )} name=${stream.name}`
+        );
+      }
+    } catch (e) {
+      console.error(
+        `error setting stream active to false id=${stream.id} name=${stream.name} err=${e}`
+      );
+      upRes = { rowCount: 0 };
+    }
+    return upRes;
+  }
+
   addDefaultFieldsMany(objs: Array<Stream>): Array<Stream> {
     return objs.map(this.addDefaultFields);
   }

@@ -7,12 +7,13 @@ import { healthCheck } from "../../middleware";
 import logger from "../../logger";
 import { Stream } from "../../schema/types";
 import fetch from "isomorphic-fetch";
+import { hostname } from "os";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";
 
 const pollInterval = 2 * 1000;
 const updateInterval = 2 * 1000;
-const deleteTimeout = 5 * 60 * 1000;
+const deleteTimeout = 30 * 1000;
 const seenSegmentsTimeout = 60 * 1000;
 
 async function makeRouter(params) {
@@ -126,16 +127,20 @@ function newStreamInfo(): streamInfo {
 
 class statusPoller {
   broadcaster: string;
+  region: string;
+  hostname: string;
 
   private seenStreams: Map<string, streamInfo>;
 
-  constructor(broadcaster: string) {
+  constructor(broadcaster: string, region: string) {
     this.broadcaster = broadcaster;
+    this.region = region;
     this.seenStreams = new Map<string, streamInfo>();
+    this.hostname = hostname();
   }
 
   private async pollStatus() {
-    // console.log(`Polling b ${this.broadcaster} store ${this.store}`)
+    // console.log(`Polling b ${this.broadcaster} `)
     let status;
     try {
       status = await this.getStatus(this.broadcaster);
@@ -199,6 +204,7 @@ class statusPoller {
             lastSeen: si.lastSeen.valueOf(),
             ingestRate: si.ingestRate,
             outgoingRate: si.outgoingRate,
+            broadcasterHost: this.hostname,
           } as Stream;
           const incObj = {
             sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
@@ -212,6 +218,11 @@ class statusPoller {
             sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
             transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
           };
+          if (!storedInfo.parentId && !playback2session.has(mid)) {
+            // this is not a session created by our Mist, so manage isActive field for this stream
+            setObj.isActive = true;
+            setObj.region = this.region;
+          }
           await db.stream.update(storedInfo.id, setObj);
           await db.stream.add(storedInfo.id, incObj as Stream);
           if (storedInfo.parentId) {
@@ -241,6 +252,10 @@ class statusPoller {
               ingestRate: 0,
               outgoingRate: 0,
             } as Stream);
+            if (!storedInfo.parentId && !playback2session.has(mid)) {
+              // this is not a session created by our Mist, so manage isActive field for this stream
+              await db.stream.setActiveToFalse({ id: storedInfo.id, lastSeen: si.lastSeen.valueOf() })
+            }
           }
         }
         // console.log(`seen: `, this.seenStreams)
@@ -263,14 +278,9 @@ class statusPoller {
 
 export default async function makeApp(params) {
   const {
-    storage,
-    dbPath,
     port,
-    host,
     postgresUrl,
-    cloudflareNamespace,
-    cloudflareAccount,
-    cloudflareAuth,
+    ownRegion,
     listen = true,
     broadcaster,
   } = params;
@@ -299,7 +309,7 @@ export default async function makeApp(params) {
     });
   }
 
-  const poller = new statusPoller(broadcaster);
+  const poller = new statusPoller(broadcaster, ownRegion);
   const pid = poller.startPoller();
 
   const close = async () => {

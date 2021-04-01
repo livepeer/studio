@@ -279,10 +279,9 @@ components:
           type: string
           example: fra
           description: Region in which this session object was created
-        activeRegion:
+        broadcasterHost:
           type: string
-          example: fra
-          description: Region in which this stream was last time streamed
+          description: Hostname of the broadcaster that transcodes that stream
 
     error:
       required:
