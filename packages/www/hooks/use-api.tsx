@@ -502,6 +502,7 @@ const makeContext = (state: ApiState, setState) => {
       filters,
       limit,
       cursor,
+      sessionsonly,
     }: {
       active?: boolean;
       nonLivepeerOnly?: boolean;
@@ -509,17 +510,20 @@ const makeContext = (state: ApiState, setState) => {
       filters?: Array<{ id: string; value: string }>;
       limit?: number;
       cursor?: string;
+      sessionsonly?: boolean;
     }): Promise<[Array<Stream> | ApiError, string, Response]> {
       const f = filters ? JSON.stringify(filters) : undefined;
+      const streamsonly = !sessionsonly ? true : undefined;
       const [res, streams] = await context.fetch(
         `/stream?${qs.stringify({
           active,
-          streamsonly: true,
+          streamsonly,
           order,
           limit,
           cursor,
           filters: f,
           nonLivepeerOnly,
+          sessionsonly,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
@@ -551,7 +555,11 @@ const makeContext = (state: ApiState, setState) => {
       return stream;
     },
 
-    async getStreamSessions(id, cursor?: string, limit: number = 20): Promise<[Array<Stream>, string]> {
+    async getStreamSessions(
+      id,
+      cursor?: string,
+      limit: number = 20
+    ): Promise<[Array<Stream>, string]> {
       const uri = `/stream/${id}/sessions?${qs.stringify({ limit, cursor })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
