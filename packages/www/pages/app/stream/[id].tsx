@@ -607,6 +607,7 @@ const ID = () => {
                     <Cell>Region/Broadcaster</Cell>
                     <Cell>
                       {region} {broadcasterHost ? " / " + broadcasterHost : ""}
+                      {stream && stream.mistHost ? " / " + stream.mistHost : ""}
                     </Cell>
                     {broadcasterPlaybackUrl ? (
                       <>
