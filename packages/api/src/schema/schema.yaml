@@ -282,6 +282,9 @@ components:
         broadcasterHost:
           type: string
           description: Hostname of the broadcaster that transcodes that stream
+        mistHost:
+          type: string
+          description: Hostname of the Mist server that processes that stream
 
     error:
       required:

@@ -768,9 +768,11 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   stream.isActive = !!req.body.active;
   stream.lastSeen = +new Date();
   const { ownRegion: region } = req.config;
+  const { hostName: mistHost } = req.body;
   await db.stream.update(stream.id, {
     isActive: stream.isActive,
     lastSeen: stream.lastSeen,
+    mistHost,
     region,
   });
 
