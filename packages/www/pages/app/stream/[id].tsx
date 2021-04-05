@@ -223,7 +223,7 @@ const ID = () => {
   }
   let broadcasterPlaybackUrl;
   const domain = isStaging() ? "monster" : "com";
-  if (stream && stream.region && stream.broadcasterHost) {
+  if (stream && stream.region && !lastSession) {
     broadcasterPlaybackUrl = `https://${stream.region}.livepeer.${domain}/stream/${stream.id}.m3u8`;
   } else if (lastSession && lastSession.region) {
     broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${stream.playbackId}.m3u8`;
