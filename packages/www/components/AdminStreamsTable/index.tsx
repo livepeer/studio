@@ -59,6 +59,13 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
           return cell.value ? "Active" : "Idle";
         },
       },
+      {
+        Header: "Suspended",
+        accessor: "suspended",
+        Cell: (cell) => {
+          return cell.value ? "Suspended" : "Normal";
+        },
+      },
     ],
     [nextCursor, lastFilters]
   );

@@ -569,6 +569,42 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor];
     },
 
+    async suspendStream(id: string, suspended: boolean): Promise<void> {
+      const [res, body] = await context.fetch(`/stream/${id}/suspended`, {
+        method: "PATCH",
+        body: JSON.stringify({ suspended }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        if (body && body.errors) {
+          throw new Error(body.errors);
+        }
+        throw new Error(body);
+      }
+      if (body && body.errors) {
+        throw new Error(body.errors);
+      }
+      return;
+    },
+
+    async terminateStream(id: string): Promise<boolean> {
+      const [res, body] = await context.fetch(`/stream/${id}/terminate`, {
+        method: "DELETE",
+      });
+      if (res.status !== 200) {
+        if (body && body.errors) {
+          throw new Error(body.errors);
+        }
+        throw new Error(body);
+      }
+      if (body && body.errors) {
+        throw new Error(body.errors);
+      }
+      return body.result;
+    },
+
     async deleteStream(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/stream/${id}`, {
         method: "DELETE",

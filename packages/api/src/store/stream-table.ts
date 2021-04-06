@@ -292,6 +292,7 @@ export default class StreamTable extends Table<Stream> {
       lastSeen: 0,
       isActive: false,
       record: false, // hide until recording feature gets out of beta
+      suspended: false,
       sourceSegments: 0,
       transcodedSegments: 0,
       sourceSegmentsDuration: 0,
@@ -302,18 +303,25 @@ export default class StreamTable extends Table<Stream> {
     }
   }
 
-  removePrivateFields(obj: Stream): Stream {
+  removePrivateFields(obj: Stream, isAdmin: boolean = false): Stream {
     for (const fn of privateFields) {
       delete obj[fn];
+    }
+    if (!isAdmin) {
+      for (const fn of adminOnlyFields) {
+        delete obj[fn];
+      }
     }
     return obj;
   }
 
-  removePrivateFieldsMany(objs: Array<Stream>): Array<Stream> {
-    return objs.map(this.removePrivateFields);
+  removePrivateFieldsMany(objs: Array<Stream>, isAdmin: boolean = false): Array<Stream> {
+    return objs.map(o => this.removePrivateFields(o, isAdmin));
   }
 
 }
+
+const adminOnlyFields = ["mistHost", "broadcasterHost"];
 
 const privateFields = ["recordObjectStoreId", "previousSessions",
   "partialSession", "previousStats", "lastSessionId", 'userSessionCreatedAt'];

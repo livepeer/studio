@@ -196,6 +196,19 @@ export default function parseCli(argv) {
           describe: "url of the Consul agent",
           type: "string",
         },
+        "mist-port": {
+          describe: "port of the Mist server",
+          default: 4242,
+          type: "number",
+        },
+        "mist-username": {
+          describe: "username for Mist server",
+          type: "string",
+        },
+        "mist-password": {
+          describe: "password for Mist server",
+          type: "string",
+        },
       })
       .help()
       .parse(argv)

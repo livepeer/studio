@@ -6,6 +6,7 @@ import logger from "../logger";
 import uuid from "uuid/v4";
 import wowzaHydrate from "./wowza-hydrate";
 import { fetchWithTimeout } from "../util";
+import fetch from "isomorphic-fetch";
 import {
   makeNextHREF,
   trackAction,
@@ -14,6 +15,7 @@ import {
   parseOrder,
   pathJoin,
 } from "./helpers";
+import { terminateStream, listActiveStreams } from "./mist-api";
 import { generateStreamKey } from "./generate-stream-key";
 import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
@@ -90,6 +92,7 @@ const fieldsMap = {
   "user.email": `users.data->>'email'`,
   parentId: `stream.data->>'parentId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
+  suspended: { val: `stream.data->'suspended'`, type: "boolean" },
   sourceSegmentsDuration: {
     val: `stream.data->'sourceSegmentsDuration'`,
     type: "real",
@@ -171,7 +174,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   res.json(
     activeCleanup(
-      db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(output)),
+      db.stream.addDefaultFieldsMany(
+        db.stream.removePrivateFieldsMany(output, req.user.admin)
+      ),
       !!active
     )
   );
@@ -260,7 +265,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
   res.status(200);
   if (!raw) {
-    db.stream.removePrivateFieldsMany(sessions);
+    db.stream.removePrivateFieldsMany(sessions, req.user.admin);
   }
   res.json(db.stream.addDefaultFieldsMany(sessions));
 });
@@ -291,7 +296,9 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, cursorOut) });
   }
   res.json(
-    db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(streams))
+    db.stream.addDefaultFieldsMany(
+      db.stream.removePrivateFieldsMany(streams, req.user.admin)
+    )
   );
 });
 
@@ -329,7 +336,9 @@ app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   }
   res.json(
     activeCleanup(
-      db.stream.addDefaultFieldsMany(db.stream.removePrivateFieldsMany(streams))
+      db.stream.addDefaultFieldsMany(
+        db.stream.removePrivateFieldsMany(streams, req.user.admin)
+      )
     )
   );
 });
@@ -367,7 +376,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   }
   res.status(200);
   if (!raw) {
-    db.stream.removePrivateFields(stream);
+    db.stream.removePrivateFields(stream, req.user.admin);
   }
   res.json(db.stream.addDefaultFields(stream));
 });
@@ -389,7 +398,11 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(stream)));
+  res.json(
+    db.stream.addDefaultFields(
+      db.stream.removePrivateFields(stream, req.user.admin)
+    )
+  );
 });
 
 // returns stream by steamKey
@@ -407,7 +420,11 @@ app.get("/key/:streamKey", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(docs[0])));
+  res.json(
+    db.stream.addDefaultFields(
+      db.stream.removePrivateFields(docs[0], req.user.admin)
+    )
+  );
 });
 
 // Needed for Mist server
@@ -572,7 +589,7 @@ app.post(
       throw e;
     }
     res.status(201);
-    res.json(db.stream.removePrivateFields(doc));
+    res.json(db.stream.removePrivateFields(doc, req.user.admin));
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
@@ -643,7 +660,11 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   ]);
 
   res.status(201);
-  res.json(db.stream.addDefaultFields(db.stream.removePrivateFields(doc)));
+  res.json(
+    db.stream.addDefaultFields(
+      db.stream.removePrivateFields(doc, req.user.admin)
+    )
+  );
 });
 
 app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
@@ -654,6 +675,11 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   if (!stream || (stream.deleted && !req.user.admin)) {
     res.status(404);
     return res.json({ errors: ["not found"] });
+  }
+
+  if (stream.suspended) {
+    res.status(403);
+    return res.json({ errors: ["stream is suspended"] });
   }
 
   const user = await db.user.get(stream.userId);
@@ -900,7 +926,9 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
   }
   const user = await db.user.get(stream.userId);
   const resp = {
-    stream: db.stream.addDefaultFields(db.stream.removePrivateFields(stream)),
+    stream: db.stream.addDefaultFields(
+      db.stream.removePrivateFields(stream, req.user.admin)
+    ),
     session,
     isPlaybackid,
     isSession,
@@ -911,6 +939,105 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
   res.status(200);
   res.json(resp);
 });
+
+app.patch("/:id/suspended", authMiddleware({}), async (req, res) => {
+  const { id } = req.params;
+  if (
+    !req.body ||
+    !Object.prototype.hasOwnProperty.call(req.body, "suspended") ||
+    typeof req.body.suspended !== "boolean"
+  ) {
+    res.status(422);
+    return res.json({
+      errors: ["missing suspended property"],
+    });
+  }
+  const { suspended } = req.body;
+  const stream = await db.stream.get(id);
+  if (
+    !stream ||
+    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+  ) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  await db.stream.update(stream.id, { suspended });
+  if (suspended) {
+    // now kill live stream
+    await terminateStreamReq(req, stream);
+  }
+  res.status(204);
+  res.end();
+});
+
+app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
+  const { id } = req.params;
+  const stream = await db.stream.get(id);
+  if (
+    !stream ||
+    (!req.user.admin && (stream.deleted || stream.userId !== req.user.id))
+  ) {
+    res.status(404);
+    return res.json({ errors: ["not found"] });
+  }
+  const { status, result, errors } = await terminateStreamReq(req, stream);
+  res.status(status);
+  return res.json({ result, errors });
+});
+
+async function terminateStreamReq(req, stream) {
+  if (!stream.isActive) {
+    return { status: 410, errors: ["not active"] };
+  }
+  if (!stream.region) {
+    return { status: 400, errors: ["region not found"] };
+  }
+  if (!stream.mistHost) {
+    return { status: 400, errors: ["Mist host not found"] };
+  }
+
+  const mistHost = stream.mistHost;
+  const { ownRegion, mistUsername, mistPassword, mistPort } = req.config;
+  if (!ownRegion || !mistPassword || !mistUsername) {
+    return { status: 500, errors: ["server not properly configured"] };
+  }
+  if (stream.region != ownRegion) {
+    // redirect request to other region
+    const protocol =
+      req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+
+    const regionalUrl = `${protocol}://${stream.region}.${req.frontendDomain}/api/stream/${stream.id}/terminate`;
+    const redRes = await fetch(regionalUrl, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        authorization: req.headers.authorization,
+      },
+    });
+    const body = await redRes.json();
+    const { result, errors } = body;
+    return { status: redRes.status, result, errors };
+  }
+  const streams = await listActiveStreams(
+    mistHost,
+    mistPort,
+    mistUsername,
+    mistPassword
+  );
+  const mistStreamName = streams.find((sn) => sn.endsWith(stream.playbackId));
+  if (!mistStreamName) {
+    return { status: 200, result: false, errors: ["not found on Mist"] };
+  }
+
+  const nukeRes = await terminateStream(
+    mistHost,
+    mistPort,
+    mistStreamName,
+    mistUsername,
+    mistPassword
+  );
+  return { status: 200, result: nukeRes };
+}
 
 app.post("/hook", async (req, res) => {
   if (!req.body || !req.body.url) {
@@ -970,6 +1097,11 @@ app.post("/hook", async (req, res) => {
   if (!stream) {
     res.status(404);
     return res.json({ errors: ["not found"] });
+  }
+
+  if (stream.suspended) {
+    res.status(403);
+    return res.json({ errors: ["stream is suspended"] });
   }
 
   const user = await db.user.get(stream.userId);

@@ -8,7 +8,7 @@ type DeleteStreamModalProps = {
   numStreamsToDelete?: number;
 };
 
-export default ({
+const DeleteStreamModal = ({
   streamName,
   onClose,
   onDelete,
@@ -39,3 +39,5 @@ export default ({
     </Modal>
   );
 };
+
+export default DeleteStreamModal;

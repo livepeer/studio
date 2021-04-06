@@ -10,6 +10,8 @@ import {
   Link as A,
   Label,
   Radio,
+  Alert,
+  Close,
 } from "@theme-ui/components";
 import Layout from "../../../components/Layout";
 import useLoggedIn from "../../../hooks/use-logged-in";
@@ -24,6 +26,7 @@ import TabbedLayout from "../../../components/TabbedLayout";
 import { Checkbox } from "../../../components/Table";
 import StreamSessionsTable from "../../../components/StreamSessionsTable";
 import DeleteStreamModal from "../../../components/DeleteStreamModal";
+import ConfirmationModal from "../../../components/ConfirmationModal";
 import Modal from "../../../components/Modal";
 import Help from "../../../public/img/help.svg";
 import {
@@ -36,6 +39,31 @@ import { RenditionsDetails } from "../../../components/StreamsTable";
 import { RelativeTime } from "../../../components/CommonAdminTable";
 import { getTabs } from "../user";
 import { getTabs as getTabsAdmin } from "../admin";
+
+type TimedAlertProps = {
+  text: string;
+  close: Function;
+  variant?: string;
+};
+
+const TimedAlert = ({ text, variant, close }: TimedAlertProps) => {
+  const isShown = !!text;
+  const closeVariant = variant ? `close-${variant}` : "close";
+  useEffect(() => {
+    if (isShown) {
+      const interval = setTimeout(() => {
+        close();
+      }, 3000);
+      return () => clearTimeout(interval);
+    }
+  }, [text]);
+  return isShown ? (
+    <Alert variant={variant} sx={{ m: 2 }}>
+      {text}
+      <Close variant={closeVariant} ml="auto" mr={-2} onClick={() => close()} />
+    </Alert>
+  ) : null;
+};
 
 type ShowURLProps = {
   text: string;
@@ -142,21 +170,30 @@ const ID = () => {
     getIngest,
     setRecord,
     getAdminStreams,
+    terminateStream,
+    suspendStream,
   } = useApi();
+  const userIsAdmin = user && user.admin;
   const router = useRouter();
   const { query } = router;
   const id = query.id;
   const [stream, setStream] = useState(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [terminateModal, setTerminateModal] = useState(false);
+  const [suspendModal, setSuspendModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [recordOffModal, setRecordOffModal] = useState(false);
   const [isCopied, setCopied] = useState(0);
   const [lastSession, setLastSession] = useState(null);
+  const [lastSessionLoading, setLastSessionLoading] = useState(false);
   const [regionalUrlsVisible, setRegionalUrlsVisible] = useState(false);
+  const [resultText, setResultText] = useState("");
+  const [alertText, setAlertText] = useState("");
 
   useEffect(() => {
-    if (user && user.admin && stream) {
+    if (user && user.admin && stream && !lastSessionLoading) {
+      setLastSessionLoading(true);
       getAdminStreams({
         sessionsonly: true,
         limit: 1,
@@ -169,7 +206,8 @@ const ID = () => {
             setLastSession(streamsOrError[0]);
           }
         })
-        .catch((e) => console.log(e));
+        .catch((e) => console.log(e))
+        .finally(() => setLastSessionLoading(false));
     }
   }, [user, stream]);
 
@@ -219,6 +257,8 @@ const ID = () => {
   }, [id, isVisible]);
   const [keyRevealed, setKeyRevealed] = useState(false);
   const close = () => {
+    setSuspendModal(false);
+    setTerminateModal(false);
     setDeleteModal(false);
     setRecordOffModal(false);
   };
@@ -273,6 +313,48 @@ const ID = () => {
   return (
     <TabbedLayout tabs={tabs} logout={logout}>
       <Container>
+        {suspendModal && stream && (
+          <ConfirmationModal
+            actionText="Confirm"
+            onClose={close}
+            onAction={() => {
+              const newValue = !stream.suspended;
+              suspendStream(stream.id, !stream.suspended)
+                .then((res) => {
+                  stream.suspended = newValue;
+                })
+                .catch((e) => {
+                  console.error(e);
+                })
+                .finally(close);
+            }}>
+            {!stream.suspended
+              ? `Are you sure you want to suspend and block this stream? 
+            Any active stream sessions will immediately end. 
+            New sessions will be prevented from starting until unchecked.`
+              : `Are you sure you want to allow new stream sessions again?`}
+          </ConfirmationModal>
+        )}
+        {terminateModal && stream && (
+          <ConfirmationModal
+            actionText="Terminate"
+            onClose={close}
+            onAction={() => {
+              terminateStream(stream.id)
+                .then((res) => {
+                  setResultText(`sucess: ${res}`);
+                })
+                .catch((e) => {
+                  console.error(e);
+                  setAlertText(`${e}`);
+                })
+                .finally(close);
+            }}>
+            Are you sure you want to terminate (stop running live) stream{" "}
+            <b>{stream.name}</b>? Terminating a stream will break RTMP
+            connection.
+          </ConfirmationModal>
+        )}
         {deleteModal && stream && (
           <DeleteStreamModal
             streamName={stream.name}
@@ -574,6 +656,51 @@ const ID = () => {
                 <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                   <hr />
                 </Box>
+                <Cell>Suspend and block</Cell>
+                <Box
+                  sx={{
+                    m: "0.4em",
+                    justifySelf: "flex-start",
+                    cursor: "pointer",
+                  }}>
+                  <Flex
+                    sx={{
+                      alignItems: "flex-start",
+                      justifyItems: "center",
+                    }}>
+                    <Label
+                      onClick={() => {
+                        if (!stream.suspended) {
+                          setSuspendModal(true);
+                        }
+                      }}>
+                      <Radio
+                        autocomplete="off"
+                        name="suspend-mode"
+                        value={`${!!stream.suspended}`}
+                        checked={!!stream.suspended}
+                      />
+                      <Flex sx={{ alignItems: "center" }}>On</Flex>
+                    </Label>
+                    <Label sx={{ ml: "0.5em" }}>
+                      <Radio
+                        autocomplete="off"
+                        name="suspend-mode"
+                        value={`${!stream.suspended}`}
+                        checked={!stream.suspended}
+                        onClick={(e) => {
+                          if (stream.suspended) {
+                            setSuspendModal(true);
+                          }
+                        }}
+                      />
+                      <Flex sx={{ alignItems: "center" }}>Off</Flex>
+                    </Label>
+                  </Flex>
+                </Box>
+                <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
+                  <hr />
+                </Box>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
@@ -598,6 +725,8 @@ const ID = () => {
                 </Cell>
                 <Cell>Status</Cell>
                 <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
+                <Cell>Suspended</Cell>
+                <Cell>{stream.suspended ? "Suspended" : "Normal"}</Cell>
                 {user.admin || isStaging() || isDevelopment() ? (
                   <>
                     <Cell> </Cell>
@@ -702,11 +831,32 @@ const ID = () => {
                 ) : null}
               </Box>
             </Flex>
+            <TimedAlert
+              text={resultText}
+              close={() => setResultText("")}
+              variant="info"
+            />
+            <TimedAlert
+              text={alertText}
+              close={() => setAlertText("")}
+              variant="attention"
+            />
             <Flex
               sx={{
                 justifyContent: "flex-end",
                 mb: 3,
               }}>
+              {userIsAdmin ? (
+                <Flex>
+                  <Button
+                    sx={{ mr: 3 }}
+                    type="button"
+                    variant="outlineSmall"
+                    onClick={() => setTerminateModal(true)}>
+                    Terminate
+                  </Button>
+                </Flex>
+              ) : null}
               <Button
                 type="button"
                 variant="outlineSmall"

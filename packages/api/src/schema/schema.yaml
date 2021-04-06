@@ -285,6 +285,9 @@ components:
         mistHost:
           type: string
           description: Hostname of the Mist server that processes that stream
+        suspended:
+          type: boolean
+          description: If currently suspended
 
     error:
       required:
