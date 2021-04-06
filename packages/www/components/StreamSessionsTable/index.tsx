@@ -27,6 +27,7 @@ const StreamSessionsTable = ({
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
   const { user, getStreamSessions } = useApi();
+  const [sessionsLoading, setSessionsLoading] = useState(false);
   useEffect(() => {
     getStreamSessions(streamId, undefined, 0)
       .then(([streams, nextCursor]) => {
@@ -40,11 +41,15 @@ const StreamSessionsTable = ({
       return;
     }
     const interval = setInterval(() => {
-      getStreamSessions(streamId, undefined, 0)
-        .then(([streams, nextCursor]) => {
-          setStreamsSessions(streams);
-        })
-        .catch((err) => console.error(err)); // todo: surface this
+      if (!sessionsLoading) {
+        setSessionsLoading(true);
+        getStreamSessions(streamId, undefined, 0)
+          .then(([streams, nextCursor]) => {
+            setStreamsSessions(streams);
+          })
+          .catch((err) => console.error(err)) // todo: surface this
+          .finally(()=> setSessionsLoading(false));
+      }
     }, 10000);
     return () => clearInterval(interval);
   }, [streamId, isVisible]);

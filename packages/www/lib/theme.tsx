@@ -179,6 +179,15 @@ export const theme = {
         boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
       },
     },
+    close: {
+      color: 'primary',
+    },
+    'close-info': {
+      color: 'primary',
+    },
+    'close-attention': {
+      color: 'background',
+    },
   },
   forms: {
     input: {
@@ -346,6 +355,23 @@ export const theme = {
       maxWidth: "100%",
     },
   },
+  alerts: {
+    attention: {
+      backgroundColor: 'red'
+    },
+    info: {
+      color: "#fff",
+      border: "2px solid #943CFF",
+      letterSpacing: "0",
+      display: "flex",
+      alignItems: "center",
+      background: "linear-gradient(-131deg, #ef00ff 0%, #7300ff 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      marginRight: "30px",
+
+    }
+  }
 };
 
 const ThemeProvider = memo(({ children, ...props }) => (
