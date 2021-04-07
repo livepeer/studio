@@ -10,9 +10,9 @@ const PricingCalculator = () => {
   const transcoding = (streamLength / 60) * monthlyStreams * 0.005;
 
   const streaming =
-    ((((60 * (streamLength / 60) * monthlyStreams * 10000) / 8) / 1024) / 1024) *
+    ((60 * (streamLength / 60) * monthlyStreams * 2000) / 8 / 1024 / 1024) *
     viewCount *
-    percentageWatched *
+    (percentageWatched / 100) *
     0.01;
 
   return (

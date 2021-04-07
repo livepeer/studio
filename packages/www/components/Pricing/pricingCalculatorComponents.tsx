@@ -6,6 +6,8 @@ type PreviewItemProps = {
   description?: string;
   value: string;
   valueClarification?: string;
+  children?: ReactNode;
+  color?: string;
 };
 
 type PreviewProps = {
@@ -474,6 +476,8 @@ const PreviewItem = ({
   description,
   value,
   valueClarification,
+  children,
+  color,
 }: PreviewItemProps) => {
   return (
     <div
@@ -497,16 +501,19 @@ const PreviewItem = ({
           mr: ["0", "0", "15px"],
           mb: ["8px", "8px", "0"],
         }}>
-        <h1
-          sx={{
-            fontSize: "20px",
-            lineHeight: "24px",
-            letterSpacing: "-0.04em",
-            mb: "8px",
-            fontWeight: "600",
-          }}>
-          {title}
-        </h1>
+        <div sx={{ display: "flex", flexDirection: 'column', mb: "8px" }}>
+          <h1
+            sx={{
+              fontSize: "20px",
+              minWidth: "fit-content",
+              lineHeight: "24px",
+              letterSpacing: "-0.04em",
+              fontWeight: "600",
+            }}>
+            {title}
+          </h1>
+          {children}
+        </div>
         <p
           sx={{
             color: "#525252",
@@ -531,6 +538,7 @@ const PreviewItem = ({
             letterSpacing: "-0.04em",
             fontWeight: "600",
             textAlign: ["left", "right", "right"],
+            color: color ?? "black",
           }}>
           {value}
         </h1>
@@ -550,6 +558,7 @@ const PreviewItem = ({
 };
 
 const Preview = ({ transcoding, streaming }: PreviewProps) => {
+  const totalValue = parseFloat((transcoding + streaming).toFixed(2));
   return (
     <div
       sx={{
@@ -588,21 +597,53 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           Prices listed in USD
         </p>
       </div>
-      <PreviewItem title="Transcoding" value={`$${transcoding.toFixed(2)}`} />
-      <PreviewItem title="Streaming via CDN" value="$0" />
+      <PreviewItem
+        title="Transcoding"
+        value={
+          totalValue > 6000 ? "Contact Sales" : `$${transcoding.toFixed(2)}`
+        }
+        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+      />
+      <PreviewItem
+        title="Streaming via CDN"
+        value={totalValue > 6000 ? "Contact Sales" : `$${streaming.toFixed(2)}`}
+        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+      />
       <PreviewItem
         title="Recording Storage"
         description="We will start charging for storage by the end of 2021"
-        value="Coming soon"
+        value={
+          transcoding + streaming > 6000 ? "Contact Sales" : "Cooming Soon"
+        }
+        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Total cost"
         description="Transcoding + Streaming via CDN"
-        value={`$${(transcoding + streaming).toFixed(2)}`}
-        valueClarification={`$${transcoding.toFixed(2)} + $${streaming.toFixed(
-          2
-        )}`}
-      />
+        value={totalValue > 6000 ? "Contact Sales" : `$${totalValue}`}
+        valueClarification={
+          totalValue > 6000
+            ? ""
+            : `$${transcoding.toFixed(2)} + $${streaming.toFixed(2)}`
+        }
+        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}>
+        {transcoding + streaming > 500 && (
+          <p
+            sx={{
+              background: "#00A55F",
+              borderRadius: "4px",
+              padding: "6px 8px",
+              mt: "8px",
+              color: "white",
+              fontWeight: "600",
+              fontSize: "12px",
+              letterSpacing: "-0.03em",
+              minWidth: "fit-content",
+            }}>
+            {totalValue > 6000 ? 'Contact Sales For High Volume Discounts' : 'High Volume Discounts Available'}
+          </p>
+        )}
+      </PreviewItem>
       <button
         disabled={streaming + transcoding === 0}
         sx={{
@@ -615,7 +656,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           color: "white",
           letterSpacing: "-0.03em",
           height: "56px",
-          cursor: streaming + transcoding === 0 ? 'not-allowed' : 'pointer',
+          cursor: streaming + transcoding === 0 ? "not-allowed" : "pointer",
           background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
           borderRadius: "6px",
           mt: "10px",
@@ -625,7 +666,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
           },
         }}>
-        Get Started
+        {totalValue > 6000 ? "Contact Sales" : "Get Started"}
       </button>
     </div>
   );

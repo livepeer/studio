@@ -1,8 +1,12 @@
 import PricingCard, { PricingCardContent } from "./pricingCard";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
+import { useState } from "react";
+
+const slides = [0, 1, 2];
 
 const MobileContainer = () => {
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
     slidesPerView: 2,
     duration: 400,
@@ -19,229 +23,266 @@ const MobileContainer = () => {
         slidesPerView: 1.2,
       },
     },
+    slideChanged(s) {
+      setCurrentSlide(s.details().relativeSlide);
+    },
   });
+
   return (
-    <div
-      className="keen-slider"
-      ref={sliderRef}
-      sx={{
-        display: ["flex", null, null, "none"],
-        mt: "72px",
-        width: "100%",
-      }}>
-      <PricingCard
-        className="keen-slider__slide"
-        pricingTitle="Personal"
-        pricingDescription="Free"
-        cardBg="linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)"
-        titleColor="#943CFF"
-        btn={{
-          display: "Sign up",
-          href: "",
-          color: "white",
-          bg: "#943CFF",
+    <div    sx={{
+      display: ["flex", null, null, "none"],
+      flexDirection: 'column',
+      mt: "72px",
+      width: "100%",
+    }}>
+      <div
+        className="keen-slider"
+        ref={sliderRef}
+        sx={{
+          width: "100%",
+          display: 'flex'
         }}>
-        <div sx={{ mt: "20px" }}>
-          <PricingCardContent>
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Transcoding
-            </p>
-            <h1
-              sx={{
-                fontSize: "32px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              1000
-            </h1>
-            <p
-              sx={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                letterSpacing: "-0.04em",
-              }}>
-              minutes/month
-            </p>
-          </PricingCardContent>
-          <PricingCardContent comingSoon>
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Recording Storage
-            </p>
-          </PricingCardContent>
-          <PricingCardContent>
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Streaming*
-            </p>
-            <h1
-              sx={{
-                fontSize: "32px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              10
-            </h1>
-            <p
-              sx={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                letterSpacing: "-0.04em",
-              }}>
-              current viewers
-            </p>
-          </PricingCardContent>
-        </div>
-      </PricingCard>
-      <PricingCard
-        className="keen-slider__slide"
-        pricingTitle="Pro"
-        pricingDescription="Pay as you go"
-        cardBg="#943CFF"
-        btn={{
-          display: "Sign up",
-          href: "/register?selectedPlan=1",
-        }}>
-        <div sx={{ mt: "20px" }}>
-          <PricingCardContent color="white">
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Transcoding
-            </p>
-            <h1
-              sx={{
-                fontSize: "32px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              $0.005
-              <span
+        <PricingCard
+          className="keen-slider__slide"
+          pricingTitle="Personal"
+          pricingDescription="Free"
+          cardBg="linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)"
+          titleColor="black"
+          btn={{
+            display: "Sign up",
+            href: "",
+            color: "white",
+            bg: "#943CFF",
+          }}>
+          <div sx={{ mt: "20px" }}>
+            <PricingCardContent>
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Transcoding
+              </p>
+              <h1
+                sx={{
+                  fontSize: "32px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                1000
+              </h1>
+              <p
                 sx={{
                   fontSize: "16px",
+                  lineHeight: "24px",
                   letterSpacing: "-0.04em",
-                  fontWeight: "normal",
-                  ml: "4px",
                 }}>
-                USD
-              </span>
-            </h1>
-            <p
-              sx={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                letterSpacing: "-0.04em",
-              }}>
-              / min video ingested
-            </p>
-          </PricingCardContent>
-          <PricingCardContent comingSoon color="white">
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Recording Storage
-            </p>
-          </PricingCardContent>
-          <PricingCardContent color="white">
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Streaming*
-            </p>
-            <h1
-              sx={{
-                fontSize: "32px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              $0.01
-              <span
+                minutes/month
+              </p>
+            </PricingCardContent>
+            <PricingCardContent comingSoon>
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Recording Storage
+              </p>
+            </PricingCardContent>
+            <PricingCardContent>
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Streaming*
+              </p>
+              <h1
+                sx={{
+                  fontSize: "32px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                10
+              </h1>
+              <p
                 sx={{
                   fontSize: "16px",
+                  lineHeight: "24px",
                   letterSpacing: "-0.04em",
-                  fontWeight: "normal",
-                  ml: "4px",
                 }}>
-                USD
-              </span>
-            </h1>
-            <p
-              sx={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                letterSpacing: "-0.04em",
-              }}>
-              / GB video streamed
-            </p>
-          </PricingCardContent>
-        </div>
-      </PricingCard>
-      <PricingCard
-        className="keen-slider__slide"
-        pricingTitle="Business"
-        pricingDescription="Custom pricing"
-        cardBg="#3B375A"
-        btn={{
-          display: "Contact Sales",
-          href: "",
-          color: "white",
-          bg: "#943CFF",
+                current viewers
+              </p>
+            </PricingCardContent>
+          </div>
+        </PricingCard>
+        <PricingCard
+          className="keen-slider__slide"
+          pricingTitle="Pro"
+          pricingDescription="Pay as you go"
+          cardBg="#943CFF"
+          btn={{
+            display: "Sign up",
+            href: "/register?selectedPlan=1",
+          }}>
+          <div sx={{ mt: "20px" }}>
+            <PricingCardContent color="white">
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Transcoding
+              </p>
+              <h1
+                sx={{
+                  fontSize: "32px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                $0.005
+                <span
+                  sx={{
+                    fontSize: "16px",
+                    letterSpacing: "-0.04em",
+                    fontWeight: "normal",
+                    ml: "4px",
+                  }}>
+                  USD
+                </span>
+              </h1>
+              <p
+                sx={{
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  letterSpacing: "-0.04em",
+                }}>
+                / min video ingested
+              </p>
+            </PricingCardContent>
+            <PricingCardContent comingSoon color="white">
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Recording Storage
+              </p>
+            </PricingCardContent>
+            <PricingCardContent color="white">
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Streaming*
+              </p>
+              <h1
+                sx={{
+                  fontSize: "32px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                $0.01
+                <span
+                  sx={{
+                    fontSize: "16px",
+                    letterSpacing: "-0.04em",
+                    fontWeight: "normal",
+                    ml: "4px",
+                  }}>
+                  USD
+                </span>
+              </h1>
+              <p
+                sx={{
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  letterSpacing: "-0.04em",
+                }}>
+                / GB video streamed
+              </p>
+            </PricingCardContent>
+          </div>
+        </PricingCard>
+        <PricingCard
+          className="keen-slider__slide"
+          pricingTitle="Business"
+          pricingDescription="Custom pricing"
+          cardBg="#3B375A"
+          btn={{
+            display: "Contact Sales",
+            href: "",
+            color: "white",
+            bg: "#943CFF",
+          }}>
+          <div sx={{ mt: "20px" }}>
+            <PricingCardContent color="white" customPricing>
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Transcoding
+              </p>
+            </PricingCardContent>
+            <PricingCardContent comingSoon color="white">
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Recording Storage
+              </p>
+            </PricingCardContent>
+            <PricingCardContent color="white" customPricing>
+              <p
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  letterSpacing: "-0.04em",
+                }}>
+                Streaming*
+              </p>
+            </PricingCardContent>
+          </div>
+        </PricingCard>
+      </div>
+      <div
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          mt: "30px",
+          alignSelf: "center",
         }}>
-        <div sx={{ mt: "20px" }}>
-          <PricingCardContent color="white" customPricing>
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Transcoding
-            </p>
-          </PricingCardContent>
-          <PricingCardContent comingSoon color="white">
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Recording Storage
-            </p>
-          </PricingCardContent>
-          <PricingCardContent color="white" customPricing>
-            <p
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-                letterSpacing: "-0.04em",
-              }}>
-              Streaming*
-            </p>
-          </PricingCardContent>
-        </div>
-      </PricingCard>
+        {slides.map((slide) => (
+          <div
+            key={slide}
+            onClick={() => {
+              slider.moveToSlide(slide);
+              setCurrentSlide(slide);
+            }}
+            sx={{
+              width: "12px",
+              height: "12px",
+              borderRadius: "50%",
+              background: currentSlide === slide ? "#943CFF" : "#CCCCCC",
+              mr: "15px",
+              ":last-child": {
+                mr: "0",
+              },
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -331,7 +372,7 @@ const DesktopContainer = () => {
         pricingTitle="Personal"
         pricingDescription="Free"
         cardBg="linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)"
-        titleColor="#943CFF"
+        titleColor="black"
         btn={{
           display: "Sign up",
           href: "/register",
