@@ -54,8 +54,15 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Find regional base urls",
+          content: "RTMP ingest and playback URLs",
           slug: "/docs/guides/api/base-urls",
+        },
+        [],
+      ],
+      [
+        {
+          content: "CNAME ingest URL",
+          slug: "/docs/guides/api/cname",
         },
         [],
       ],
@@ -139,7 +146,7 @@ const guidesTree: Tree[] = [
       ],
       [
         {
-          content: "Ingest and playback URL pairs",
+          content: "RTMP ingest and playback URLs",
           slug: "/docs/guides/dashboard/ingest-playback-url-pair",
         },
         [],
