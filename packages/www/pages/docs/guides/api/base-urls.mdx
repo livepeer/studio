@@ -1,29 +1,39 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout title="How to find ingest and playback base URLs - Livepeer.com" description="How to find ingest and playback base URLs">
+<DocsLayout title="Global and regional RTMP ingest and playback URL pairs - Livepeer.com" description="Global and regional RTMP ingest and playback URL pairs">
 
-# How to find regional ingest and playback base URLs
+# Global and regional RTMP ingest and playback URL pairs
 
-There are two types of base URLs: ingest and playback.
+Livepeer.com routes your live streams go to the nearest available datacenter to ensure your streamers and livestream viewers have a consistent, high quality experience with the minimum latency Livepeer.com can provide. These global URLs are the best option for nearly all Livepeer.com users. 
 
-1. The **ingest base URL** is the first part of the (rtmp) ingest URL, used for
-   the broadcaster to ingest the video stream.
-1. The **playback base URL** is the first part of the playback URL, used for the
-   viewers to watch the stream.
+These are the Livepeer.com ingest and playback URLs:
 
-A base URL pair references hardware in different parts of the world. This is
-important because the ingest point should be as physically close to the
-broadcaster as possible. Each region is three letters, the airport code of the
-server location. **Use the ingest and playback URL pair in the region closest to
-your broadcaster.**
+1. Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
+2. Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
 
-For any stream session, **you must use the ingest base URL and playback base URL
-pair from the same region**. Even though the playback base URL references the
-ingest location, playback will work for your viewers everywhere.
+### Regional ingest and playback URLs
+The global RTMP ingest and playback URL pair above auto detects livestreamer and viewer locations to provide the optimal Livepeer.com experience. Some Livepeer.com users forgo the global ingest and playback URLs and select a regional URL pair to have more nuanced control over how their stream is routed through Livepeer.com's infrastructure.
 
-### Find the closest ingest point
+While more control can be helpful, there are downsides to forgoing the global ingest and playback URLs and selecting a regional URL pair.
+- **increased latency**: If you stream into a regional ingest URL, Livepeer.com routes the stream to that region's datacenter for ingest. Playback also originates in that datacenter. If the livestreamer is far away from that datacenter region, this will introduce latency that could have been avoided if they streamed into the global ingest URL, `rtmp://rtmp.livepeer.com/live/`. Additionally, very distant livestream viewers will have a more latent experience than if the stream was ingested via the global ingest URL.
+- **riskier during unforseen outages**: On the rare occasional that a Livepeer.com ingest data center goes completely offline, all active live streams into that datacenter region will need to restart their streams using a different regional ingest URL ... and send all their livestream viewers a *different regional playback URL*. This could be a bad user experience for your stream viewers. the stream was ingested via the global ingest URL, rtmp://rtmp.livepeer.com/live/, the playback URL would stay the same even if the livestream had to reconnect.
 
-You can get the base URL pair for the ingest point nearest to you by calling
+If you decide to opt out of the global ingest and playback URLs and select a regional URL pair, here's what you need to know.
+
+1. Stream into: `rtmp://{region}-rtmp.livepeer.com/live/{stream-key}`.
+1. Playback from: `https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+
+An RTMP ingest and playback URL pair references hardware in different parts of
+the world. Each region is three letters, the airport
+code of the server location. **Use the ingest and playback URL pair in the
+region closest to your broadcaster.**
+
+For any stream session, **you must use the RTMP ingest URL and playback URL pair
+from the same region.** 
+
+#### Find the closest ingest point
+
+You can get the base URL pair for the regional ingest point nearest to you by calling
 `https://livepeer.com/api/ingest`. For example:
 
 ```bash
@@ -41,7 +51,7 @@ And you should get results like this:
 ];
 ```
 
-### Return a list of all base URL pairs
+#### Return a list of all regional base URL pairs
 
 At times, you will want to use a base URL pair of a region different from the
 one closest to you. You can get a list of all base URL pairs by calling
