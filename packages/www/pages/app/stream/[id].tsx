@@ -399,10 +399,9 @@ const ID = () => {
                 <Box
                   sx={{
                     mx: "0.4em",
-                    mt: "2em",
+                    mt: "0.4em",
                     mb: "0",
                     gridColumn: "1/-1",
-                    fontSize: 2,
                   }}>
                   <Box
                     onClick={() => setRegionalUrlsVisible(!regionalUrlsVisible)}
@@ -423,6 +422,7 @@ const ID = () => {
                     gridColumn: "1/-1",
                     position: "relative",
                     overflow: "hidden",
+                    mb: "0.8em",
                   }}>
                   <Box
                     sx={{
@@ -438,7 +438,6 @@ const ID = () => {
                       sx={{
                         mx: "0.4em",
                         mt: "0.4em",
-                        mb: "1.5em",
                         gridColumn: "1/-1",
                         width: ["100%", "100%", "75%", "50%"],
                       }}>
@@ -464,30 +463,12 @@ const ID = () => {
                         <>
                           <Cell>RTMP ingest URL {i + 1}</Cell>
                           <Cell>
-                            {keyRevealed ? (
-                              <ShowURL
-                                text=""
-                                url={getIngestURL(stream, keyRevealed, i)}
-                                urlToCopy={getIngestURL(stream, true, i)}
-                                anchor={false}
-                              />
-                            ) : (
-                              <Flex
-                                sx={{
-                                  justifyContent: "flex-start",
-                                  alignItems: "center",
-                                }}>
-                                <Box
-                                  sx={{
-                                    minWidth: 125,
-                                    fontSize: 12,
-                                    paddingRight: "1em",
-                                  }}>
-                                  {getIngestURL(stream, false, i)}
-                                  <b>stream-key</b>
-                                </Box>
-                              </Flex>
-                            )}
+                            <ShowURL
+                              text=""
+                              url={getIngestURL(stream, false, i)}
+                              urlToCopy={getIngestURL(stream, false, i)}
+                              anchor={false}
+                            />
                           </Cell>
                           <Box
                             sx={{
