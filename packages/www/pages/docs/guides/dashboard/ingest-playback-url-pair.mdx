@@ -1,40 +1,35 @@
 import DocsLayout from "../../../../components/DocsLayout";
 
-<DocsLayout title="How to pick an RTMP ingest and playback URL pair - Livepeer.com" description="How to pick an RTMP ingest and playback URL pair">
+<DocsLayout title="The RTMP ingest and playback URL - Livepeer.com" description="The RTMP ingest and playback URL">
 
-# How to pick an RTMP ingest and playback URL pair
+# The RTMP ingest and playback URL
 
-Your users or your application will need to use two Livepeer.com URLs, an RTMP
-ingest URL and a playback URL.
+Livepeer.com routes your live streams go to the nearest available datacenter to ensure your streamers and livestream viewers have a consistent, high quality experience with the minimum latency Livepeer.com can provide.
 
-1. The RTMP ingest URL is for the broadcaster to ingest the video stream, for
-   example `rtmp://{region}-rtmp.livepeer.com/live/{stream-key}`.
-1. The playback URL is for the viewers to watch the stream, for example
-   `https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+These are the Livepeer.com ingest and playback URLs:
+
+1. Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
+2. Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
+
+#### Regional ingest and playback URLs
+The global RTMP ingest and playback URL pair above auto detects livestreamer and viewer locations to provide the optimal Livepeer.com experience. These global URLs are the best option for nearly all Livepeer.com users. However, some Livepeer.com users forgo the global ingest and playback URLs and select a regional URL pair to have more nuanced control over how their stream is routed through Livepeer.com's infrastructure.
+
+While more control can be helpful, there are downsides to forgoing the global ingest and playback URLs and selecting a regional URL pair.
+- **increased latency**: If you stream into a regional ingest URL, Livepeer.com routes the stream to that region's datacenter for ingest. Playback also originates in that datacenter. If the livestreamer is far away from that datacenter region, this will introduce latency that could have been avoided if they streamed into the global ingest URL, `rtmp://rtmp.livepeer.com/live/`. Additionally, very distant livestream viewers will have a more latent experience than if the stream was ingested via the global ingest URL.
+- **riskier during unforseen outages**: On the rare occasional that a Livepeer.com ingest data center goes completely offline, all active live streams into that datacenter region will need to restart their streams using a different regional ingest URL ... and send all their livestream viewers a *different regional playback URL*. This could be a bad user experience for your stream viewers. the stream was ingested via the global ingest URL, rtmp://rtmp.livepeer.com/live/, the playback URL would stay the same even if the livestream had to reconnect.
+
+If you decide to opt out of the global ingest and playback URLs and select a regional URL pair, here's what you need to know.
+
+1. Stream into: `rtmp://{region}-rtmp.livepeer.com/live/{stream-key}`.
+1. Playback from: `https://{region}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
 
 An RTMP ingest and playback URL pair references hardware in different parts of
-the world. This is important because the ingest point should be as physically
-close to the broadcaster as possible. Each region is three letters, the airport
+the world. Each region is three letters, the airport
 code of the server location. **Use the ingest and playback URL pair in the
 region closest to your broadcaster.**
 
 For any stream session, **you must use the RTMP ingest URL and playback URL pair
-from the same region.** Even though the playback URL references the ingest
-location, playback will work for your viewers everywhere.
-
-### Examples
-
-FRA is the airport code for Frankfurt International Airport in Germany.
-Frankfurt is the location of Livepeer.com's ingest server in the EU. Anyone
-broadcasting from Europe will want to select this RTMP ingest URL and playback
-URL pair: `rtmp://fra-rtmp.livepeer.com/live/{stream-key}` and
-`https://fra-cdn.livepeer.com/hls/{playbackId}/index.m3u8`
-
-MDW is the airport code for Chicago Midway International Airport, an airport in
-the middle of the United States of America. Anyone broadcasting from the
-Americas would see better performance selecting this RTMP ingest URL and
-playback URL pair: `rtmp://mdw-rtmp.livepeer.com/live/{stream-key}` and
-`https://mdw-cdn.livepeer.com/hls/{playbackId}/index.m3u8`
+from the same region.** 
 
 Next, learn about the
 [specifications on the stream page](/docs/guides/dashboard/stream-page-specifications).
