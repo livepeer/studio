@@ -61,6 +61,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "CNAME ingest URL",
+          slug: "/docs/guides/api/cname",
+        },
+        [],
+      ],
+      [
+        {
           content: "Broadcast a live stream",
           slug: "/docs/guides/api/broadcast-a-live-stream",
         },
