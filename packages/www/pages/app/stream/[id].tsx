@@ -96,6 +96,42 @@ const Cell = ({ children }) => {
   return <Box sx={{ m: "0.4em" }}>{children}</Box>;
 };
 
+const ClipBut = ({ text }) => {
+  const [isCopied, setCopied] = useState(0);
+  useEffect(() => {
+    if (isCopied) {
+      const timeout = setTimeout(() => {
+        setCopied(0);
+      }, isCopied);
+      return () => clearTimeout(timeout);
+    }
+  }, [isCopied]);
+  return (
+    <CopyToClipboard text={text} onCopy={() => setCopied(2000)}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          cursor: "pointer",
+          ml: 0,
+          mr: 0,
+        }}>
+        <Box sx={{ mr: 2 }}>{text}</Box>
+        <Copy
+          sx={{
+            mr: 1,
+            width: 14,
+            height: 14,
+            color: "offBlack",
+          }}
+        />
+        {!!isCopied && (
+          <Box sx={{ fontSize: 12, color: "offBlack" }}>Copied</Box>
+        )}
+      </Flex>
+    </CopyToClipboard>
+  );
+};
+
 const ID = () => {
   useLoggedIn();
   const {
@@ -117,6 +153,7 @@ const ID = () => {
   const [recordOffModal, setRecordOffModal] = useState(false);
   const [isCopied, setCopied] = useState(0);
   const [lastSession, setLastSession] = useState(null);
+  const [regionalUrlsVisible, setRegionalUrlsVisible] = useState(false);
 
   useEffect(() => {
     if (user && user.admin && stream) {
@@ -222,11 +259,15 @@ const ID = () => {
     region = lastSession.region;
   }
   let broadcasterPlaybackUrl;
+  const playbackId = (stream || {}).playbackId || "";
   const domain = isStaging() ? "monster" : "com";
+  const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
+  const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
+
   if (stream && stream.region && !lastSession) {
     broadcasterPlaybackUrl = `https://${stream.region}.livepeer.${domain}/stream/${stream.id}.m3u8`;
   } else if (lastSession && lastSession.region) {
-    broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${stream.playbackId}.m3u8`;
+    broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${playbackId}.m3u8`;
   }
 
   return (
@@ -299,11 +340,14 @@ const ID = () => {
                   gridTemplateColumns: "10em auto",
                   width: "100%",
                   fontSize: 0,
+                  position: "relative",
                 }}>
                 <Cell>Stream name</Cell>
                 <Cell>{stream.name}</Cell>
                 <Cell>Stream ID</Cell>
-                <Cell>{stream.id}</Cell>
+                <Cell>
+                  <ClipBut text={stream.id}></ClipBut>
+                </Cell>
                 <Cell>Stream key</Cell>
                 <Cell>
                   {keyRevealed ? (
@@ -344,79 +388,130 @@ const ID = () => {
                     </Button>
                   )}
                 </Cell>
-                <Box
-                  sx={{ mx: "0.4em", mt: "2em", mb: "0", gridColumn: "1/-1" }}>
-                  <h5>Ingest and playback URL pairs:</h5>
-                </Box>
+                <Cell>RTMP ingest URL</Cell>
+                <Cell>
+                  <ShowURL text="" url={globalIngestUrl} anchor={true} />
+                </Cell>
+                <Cell>Playback URL</Cell>
+                <Cell>
+                  <ShowURL text="" url={globalPlaybackUrl} anchor={true} />
+                </Cell>
                 <Box
                   sx={{
                     mx: "0.4em",
-                    mt: "0.4em",
-                    mb: "1.5em",
+                    mt: "2em",
+                    mb: "0",
                     gridColumn: "1/-1",
+                    fontSize: 2,
                   }}>
-                  <Link
-                    href="/docs/guides/dashboard/ingest-playback-url-pair"
-                    passHref>
-                    <A target="_blank">
-                      <i>Learn how to pick an ingest and playback URL pair.</i>
-                    </A>
-                  </Link>
+                  <Box
+                    onClick={() => setRegionalUrlsVisible(!regionalUrlsVisible)}
+                    sx={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                      transform: regionalUrlsVisible
+                        ? "rotate(90deg)"
+                        : "rotate(0deg)",
+                      transition: "transform 0.4s ease",
+                    }}>
+                    ▶
+                  </Box>{" "}
+                  Regional ingest and playback URL pairs
                 </Box>
-                {!ingest.length && (
-                  <Spinner sx={{ mb: 3, width: 32, height: 32 }} />
-                )}
-                {ingest.map((_, i) => {
-                  return (
-                    <>
-                      <Cell>RTMP ingest URL {i + 1}</Cell>
-                      <Cell>
-                        {keyRevealed ? (
-                          <ShowURL
-                            text=""
-                            url={getIngestURL(stream, keyRevealed, i)}
-                            urlToCopy={getIngestURL(stream, true, i)}
-                            anchor={false}
-                          />
-                        ) : (
-                          <Flex
+                <Box
+                  sx={{
+                    gridColumn: "1/-1",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}>
+                  <Box
+                    sx={{
+                      position: "relative",
+                      overflow: "hidden",
+                      transition: "margin-bottom .4s ease",
+                      mb: regionalUrlsVisible ? "0" : "-100%",
+                      display: "grid",
+                      alignItems: "center",
+                      gridTemplateColumns: "10em auto",
+                    }}>
+                    <Box
+                      sx={{
+                        mx: "0.4em",
+                        mt: "0.4em",
+                        mb: "1.5em",
+                        gridColumn: "1/-1",
+                        width: ["100%", "100%", "75%", "50%"],
+                      }}>
+                      The global RTMP ingest and playback URL pair above auto
+                      detects livestreamer and viewer locations to provide the
+                      optimal Livepeer.com experience.
+                      <Link
+                        href="/docs/guides/dashboard/ingest-playback-url-pair"
+                        passHref>
+                        <A target="_blank">
+                          <i>
+                            Learn more about forgoing the global ingest and
+                            playback URLs before selecting a regional URL pair.
+                          </i>
+                        </A>
+                      </Link>
+                    </Box>
+                    {!ingest.length && (
+                      <Spinner sx={{ mb: 3, width: 32, height: 32 }} />
+                    )}
+                    {ingest.map((_, i) => {
+                      return (
+                        <>
+                          <Cell>RTMP ingest URL {i + 1}</Cell>
+                          <Cell>
+                            {keyRevealed ? (
+                              <ShowURL
+                                text=""
+                                url={getIngestURL(stream, keyRevealed, i)}
+                                urlToCopy={getIngestURL(stream, true, i)}
+                                anchor={false}
+                              />
+                            ) : (
+                              <Flex
+                                sx={{
+                                  justifyContent: "flex-start",
+                                  alignItems: "center",
+                                }}>
+                                <Box
+                                  sx={{
+                                    minWidth: 125,
+                                    fontSize: 12,
+                                    paddingRight: "1em",
+                                  }}>
+                                  {getIngestURL(stream, false, i)}
+                                  <b>stream-key</b>
+                                </Box>
+                              </Flex>
+                            )}
+                          </Cell>
+                          <Box
                             sx={{
-                              justifyContent: "flex-start",
-                              alignItems: "center",
+                              m: "0.4em",
+                              mb: "1.4em",
                             }}>
-                            <Box
-                              sx={{
-                                minWidth: 125,
-                                fontSize: 12,
-                                paddingRight: "1em",
-                              }}>
-                              {getIngestURL(stream, false, i)}
-                              <b>stream-key</b>
-                            </Box>
-                          </Flex>
-                        )}
-                      </Cell>
-                      <Box
-                        sx={{
-                          m: "0.4em",
-                          mb: "1.4em",
-                        }}>
-                        Playback URL {i + 1}
-                      </Box>
-                      <Box
-                        sx={{
-                          m: "0.4em",
-                          mb: "1.4em",
-                        }}>
-                        <ShowURL
-                          text=""
-                          url={getPlaybackURL(stream, i)}
-                          anchor={true}
-                        />
-                      </Box>
-                    </>
-                  );
-                })}
+                            Playback URL {i + 1}
+                          </Box>
+                          <Box
+                            sx={{
+                              m: "0.4em",
+                              mb: "1.4em",
+                            }}>
+                            <ShowURL
+                              text=""
+                              url={getPlaybackURL(stream, i)}
+                              anchor={true}
+                            />
+                          </Box>
+                        </>
+                      );
+                    })}
+                  </Box>
+                </Box>
                 <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                   <hr />
                 </Box>
