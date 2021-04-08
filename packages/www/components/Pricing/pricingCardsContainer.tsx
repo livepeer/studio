@@ -98,7 +98,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Streaming*
+                Stream delivery via CDN*
               </p>
               <h1
                 sx={{
@@ -181,7 +181,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Streaming*
+                Stream delivery via CDN*
               </p>
               <h1
                 sx={{
@@ -250,7 +250,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Streaming*
+                Stream delivery via CDN*
               </p>
             </PricingCardContent>
           </div>
@@ -354,7 +354,7 @@ const DesktopContainer = () => {
               mb: "4px",
               letterSpacing: "-0.04em",
             }}>
-            Streaming*
+            Stream delivery via CDN*
           </h1>
           <p
             sx={{

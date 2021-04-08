@@ -605,7 +605,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
-        title="Streaming via CDN"
+        title="Stream delivery via CDN"
         value={totalValue > 3000 ? "Contact Sales" : `$${streaming.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
@@ -613,7 +613,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         title="Recording Storage"
         description="We will start charging for storage by the end of 2021"
         value={
-          transcoding + streaming > 3000 ? "Contact Sales" : "Cooming Soon"
+          transcoding + streaming > 3000 ? "Contact Sales" : "Coming Soon"
         }
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />

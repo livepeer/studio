@@ -48,7 +48,8 @@ export const PricingCardContent = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "112px",
+        minHeight: "112px",
+        py: '12px',
         justifyContent: "center",
         borderTop: color
           ? "1px solid rgba(225, 225, 225, 0.2)"

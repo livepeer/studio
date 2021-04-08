@@ -5,7 +5,7 @@ const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(0);
   const [monthlyStreams, setMonthlyStreams] = useState<number>(0);
   const [viewCount, setViewCount] = useState<number>(0);
-  const [percentageWatched, setPercentageWatched] = useState<number>(0);
+  const [percentageWatched, setPercentageWatched] = useState<number>(75);
 
   const transcoding = (streamLength / 60) * monthlyStreams * 0.005;
 
