@@ -398,10 +398,10 @@ const Calculator = ({
         />
       </CalculatorItem>
       <CalculatorItem
-        title="Monthly live stream view count"
+        title="Number of viewers per stream"
         setValue={setViewCount}
         min={0}
-        max={10000000}
+        max={1000000}
         value={viewCount}>
         <input
           value={viewCount}
