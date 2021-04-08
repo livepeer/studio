@@ -600,33 +600,33 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
       <PreviewItem
         title="Transcoding"
         value={
-          totalValue > 6000 ? "Contact Sales" : `$${transcoding.toFixed(2)}`
+          totalValue > 3000 ? "Contact Sales" : `$${transcoding.toFixed(2)}`
         }
-        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Streaming via CDN"
-        value={totalValue > 6000 ? "Contact Sales" : `$${streaming.toFixed(2)}`}
-        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+        value={totalValue > 3000 ? "Contact Sales" : `$${streaming.toFixed(2)}`}
+        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Recording Storage"
         description="We will start charging for storage by the end of 2021"
         value={
-          transcoding + streaming > 6000 ? "Contact Sales" : "Cooming Soon"
+          transcoding + streaming > 3000 ? "Contact Sales" : "Cooming Soon"
         }
-        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Total cost"
         description="Transcoding + Streaming via CDN"
-        value={totalValue > 6000 ? "Contact Sales" : `$${totalValue}`}
+        value={totalValue > 3000 ? "Contact Sales" : `$${totalValue}`}
         valueClarification={
-          totalValue > 6000
+          totalValue > 3000
             ? ""
             : `$${transcoding.toFixed(2)} + $${streaming.toFixed(2)}`
         }
-        color={totalValue > 6000 ? "rgba(0, 0, 0, 0.2)" : "black"}>
+        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}>
         {transcoding + streaming > 500 && (
           <p
             sx={{
@@ -640,7 +640,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
               letterSpacing: "-0.03em",
               minWidth: "fit-content",
             }}>
-            {totalValue > 6000 ? 'Contact Sales For High Volume Discounts' : 'High Volume Discounts Available'}
+            {totalValue > 3000 ? 'Contact Sales For High Volume Discounts' : 'High Volume Discounts Available'}
           </p>
         )}
       </PreviewItem>
@@ -666,7 +666,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
           },
         }}>
-        {totalValue > 6000 ? "Contact Sales" : "Get Started"}
+        {totalValue > 3000 ? "Contact Sales" : "Get Started"}
       </button>
     </div>
   );
