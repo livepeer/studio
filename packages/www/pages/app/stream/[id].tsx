@@ -696,7 +696,38 @@ const ID = () => {
                       />
                       <Flex sx={{ alignItems: "center" }}>Off</Flex>
                     </Label>
+                    <Flex
+                      sx={{
+                        ml: "0.5em",
+                        minWidth: "24px",
+                        height: "24px",
+                        alignItems: "center",
+                      }}>
+                      <Help
+                        data-tip
+                        data-for={`tooltip-suspend-${stream.id}`}
+                        sx={{
+                          color: "muted",
+                          cursor: "pointer",
+                          ml: 1,
+                          width: "18px",
+                          height: "18px",
+                        }}
+                      />
+                    </Flex>
                   </Flex>
+                  <ReactTooltip
+                    id={`tooltip-suspend-${stream.id}`}
+                    className="tooltip"
+                    place="top"
+                    type="dark"
+                    effect="solid">
+                    <p>
+                      When turned on, any active stream sessions will
+                      immediately end.<br />New sessions will be prevented from
+                      starting until turned off.
+                    </p>
+                  </ReactTooltip>
                 </Box>
                 <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                   <hr />
