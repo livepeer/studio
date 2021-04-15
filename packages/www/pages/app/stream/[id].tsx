@@ -845,6 +845,10 @@ const ID = () => {
                       {region} {broadcasterHost ? " / " + broadcasterHost : ""}
                       {stream && stream.mistHost ? " / " + stream.mistHost : ""}
                     </Cell>
+                    <Cell>Stream type</Cell>
+                    <Cell>
+                      {stream && stream.ingestType ? stream.ingestType : "not set yet"}
+                    </Cell>
                     {broadcasterPlaybackUrl ? (
                       <>
                         <Cell>Broadcaster playback</Cell>
