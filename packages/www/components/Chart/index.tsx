@@ -8,31 +8,37 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const CustomTooltip = ({ label }) => {
-  return (
-    <div
-      sx={{
-        background: "rgba(0, 0, 0, 0.9)",
-        padding: "8px",
-        borderRadius: "4px",
-      }}>
-      <p sx={{ fontSize: "12px", color: "white" }}>
-        Rate: <b>{label} kbps</b>
-      </p>
-    </div>
-  );
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload) {
+    return (
+      <div
+        sx={{
+          background: "rgba(0, 0, 0, 0.9)",
+          padding: "8px",
+          borderRadius: "4px",
+        }}>
+        <p
+          sx={{
+            fontSize: "12px",
+            color: "white",
+          }}>Rate: <b>{payload[0].value} kbps</b></p>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 const Chart = ({ data }) => {
   return (
-    <div sx={{ width: "100%", position: "relative"}}>
+    <div sx={{ width: "100%", position: "relative" }}>
       <p
         sx={{
           color: "#666666",
           fontSize: "12px",
           transform: "rotate(-90deg)",
           position: "absolute",
-          left: '-70px',
+          left: "-70px",
           bottom: "70px",
         }}>
         kbps (multiplied by 1000)
@@ -58,7 +64,7 @@ const Chart = ({ data }) => {
           <XAxis dataKey="name" />
           <YAxis domain={[0, 1600]} />
           <CartesianGrid vertical={false} />
-          <Tooltip  content={<CustomTooltip label={data?.kbps} />} />
+          <Tooltip content={<CustomTooltip />} />
           <Area
             cursor="pointer"
             type="monotone"
