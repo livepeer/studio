@@ -14,6 +14,7 @@ import {
   PasswordResetToken,
   Usage,
   Region,
+  Session,
 } from "../schema/types";
 import Table from "./table";
 import StreamTable from "./stream-table";
@@ -103,6 +104,7 @@ export class DB {
     });
 
     this.region =  new Table<Region>({ db: this, schema: schemas['region']})
+    this.session =  new Table<Session>({ db: this, schema: schemas['session']})
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => !!schema.table

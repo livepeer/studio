@@ -496,6 +496,7 @@ app.post(
     const createdAt = Date.now();
 
     let previousSessions, previousStats, userSessionCreatedAt;
+    let firstSession = true;
     if (stream.record && req.config.recordObjectStoreId) {
       // find previous sessions to form 'user' session
       const tooOld = createdAt - USER_SESSION_TIMEOUT;
@@ -525,6 +526,7 @@ app.post(
           latestSession,
           latestSession.previousStats || {}
         );
+        firstSession = false;
         setImmediate(() => {
           db.stream.update(previousSessions[0], {
             lastSessionId: id,
@@ -537,6 +539,7 @@ app.post(
         });
       }
     }
+
     let region;
     if (req.config.ownRegion) {
       region = req.config.ownRegion;
@@ -565,6 +568,37 @@ app.post(
       req,
       useParentProfiles ? stream.profiles : doc.profiles
     );
+
+    if (firstSession) {
+      // create 'session' object in 'session table
+      const session = {
+        id,
+        parentId: stream.id,
+        playbackId: stream.playbackId,
+        userId: stream.userId,
+        kind: "session",
+        name: req.body.name,
+        createdAt,
+        lastSeen: 0,
+        sourceSegments: 0,
+        transcodedSegments: 0,
+        sourceSegmentsDuration: 0,
+        transcodedSegmentsDuration: 0,
+        sourceBytes: 0,
+        transcodedBytes: 0,
+        ingestRate: 0,
+        outgoingRate: 0,
+        deleted: false,
+        recordObjectStoreId: stream.recordObjectStoreId,
+        record: stream.record,
+        profiles: doc.profiles,
+      };
+      if (session.record) {
+        session.recordingStatus = "waiting";
+        session.recordingUrl = "";
+      }
+      await db.session.create(session);
+    }
 
     try {
       await req.store.create(doc);
@@ -1147,6 +1181,11 @@ app.post("/hook", async (req, res) => {
         recordObjectStoreId: req.config.recordObjectStoreId,
       });
       stream.recordObjectStoreId = req.config.recordObjectStoreId;
+      if (stream.parentId && !stream.previousSessions) {
+        await db.session.update(stream.id, {
+          recordObjectStoreId: req.config.recordObjectStoreId,
+        });
+      }
     }
   }
   if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
