@@ -322,6 +322,7 @@ const ID = () => {
               suspendStream(stream.id, !stream.suspended)
                 .then((res) => {
                   stream.suspended = newValue;
+                  setStream({ ...stream, suspended: newValue });
                 })
                 .catch((e) => {
                   console.error(e);
