@@ -289,6 +289,140 @@ components:
           type: boolean
           description: If currently suspended
 
+    session:
+      type: object
+      table: session
+      required:
+        - name
+        - streamId
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          example: stream
+        name:
+          type: string
+          example: test_session
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+        lastSeen:
+          type: number
+          example: 1587667174725
+          index: true
+        sourceSegments:
+          type: number
+          example: 1
+        transcodedSegments:
+          type: number
+          example: 2
+        sourceSegmentsDuration:
+          type: number
+          example: 1
+          description: Duration of all the source segments, sec
+        transcodedSegmentsDuration:
+          type: number
+          example: 2
+          description: Duration of all the transcoded segments, sec
+        sourceBytes:
+          type: number
+          example: 1
+        transcodedBytes:
+          type: number
+          example: 2
+        ingestRate:
+          type: number
+          example: 1
+          description: Rate at which sourceBytes increases (bytes/second)
+        outgoingRate:
+          type: number
+          example: 2
+          description: Rate at which transcodedBytes increases (bytes/second)
+        deleted:
+          type: boolean
+          description: Set to true when stream deleted
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+          index: true
+        parentId:
+          type: string
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+          description: Points to parent stream object
+          index: true
+        record:
+          description:
+            Should this stream be recorded? Uses default settings. For more
+            customization, create and configure an object store.
+          type: boolean
+          example: false
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description:
+            ID of object store where to which this stream was recorded
+        playbackId:
+          type: string
+          example: eaw4nk06ts2d0mzb
+          description: Used to form playback URL
+        profiles:
+          type: array
+          items:
+            type: object
+            required:
+              - width
+              - name
+              - height
+              - bitrate
+              - fps
+            additionalProperties: false
+            properties:
+              width:
+                type: integer
+                minimum: 128
+              name:
+                type: string
+                minLength: 1
+                maxLength: 500
+                example: aac
+              height:
+                type: integer
+                minimum: 128
+              bitrate:
+                type: integer
+                minimum: 400
+              fps:
+                type: integer
+                minimum: 0
+              fpsDen:
+                type: integer
+                minimum: 1
+              gop:
+                type: string
+              profile:
+                type: string
+                enum:
+                  - H264Baseline
+                  - H264Main
+                  - H264High
+                  - H264ConstrainedHigh
+          recordingStatus:
+            type: string
+            enum:
+              - ready
+              - waiting
+          recordingUrl:
+            type: string
+
     error:
       required:
         - errors
