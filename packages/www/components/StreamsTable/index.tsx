@@ -199,6 +199,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
       return {
         id: stream.id,
         name: {
+          id: stream.id,
           children: stream.name,
           tooltipChildren: stream.createdByTokenName ? (
             <>
