@@ -1,4 +1,3 @@
-import useComponentId from "hooks/use-component-id";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
@@ -7,12 +6,13 @@ export type TextCellProps = {
   children?: React.ReactNode;
   tooltipChildren?: React.ReactNode;
   href?: string;
+  id?: string;
 };
 
 const TextCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, TextCellProps>) => {
-  const pid = useComponentId();
+  const pid = 'tooltip-' +  cell.value.id;
   return (
     <div>
       {cell.value.tooltipChildren ? (
