@@ -859,6 +859,8 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   await db.stream.update(stream.id, {
     deleted: true,
   });
+  // now kill live stream
+  await terminateStreamReq(req, stream);
   res.status(204);
   res.end();
 });
