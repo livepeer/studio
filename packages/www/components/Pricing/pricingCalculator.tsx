@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
 
 const PricingCalculator = () => {
-  const [streamLength, setStreamLength] = useState<number>(0);
-  const [monthlyStreams, setMonthlyStreams] = useState<number>(0);
-  const [viewCount, setViewCount] = useState<number>(0);
+  const [streamLength, setStreamLength] = useState<number>(600);
+  const [monthlyStreams, setMonthlyStreams] = useState<number>(100);
+  const [viewCount, setViewCount] = useState<number>(500);
   const [percentageWatched, setPercentageWatched] = useState<number>(75);
 
   const transcoding = (streamLength / 60) * monthlyStreams * 0.005;

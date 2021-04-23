@@ -29,18 +29,19 @@ const MobileContainer = () => {
   });
 
   return (
-    <div    sx={{
-      display: ["flex", null, null, "none"],
-      flexDirection: 'column',
-      mt: "72px",
-      width: "100%",
-    }}>
+    <div
+      sx={{
+        display: ["flex", null, null, "none"],
+        flexDirection: "column",
+        mt: "72px",
+        width: "100%",
+      }}>
       <div
         className="keen-slider"
         ref={sliderRef}
         sx={{
           width: "100%",
-          display: 'flex'
+          display: "flex",
         }}>
         <PricingCard
           className="keen-slider__slide"
@@ -98,7 +99,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Stream delivery via CDN*
+                Stream Delivery via CDN*
               </p>
               <h1
                 sx={{
@@ -181,7 +182,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Stream delivery via CDN*
+                Stream Delivery via CDN*
               </p>
               <h1
                 sx={{
@@ -217,7 +218,7 @@ const MobileContainer = () => {
           pricingDescription="Custom pricing"
           cardBg="#3B375A"
           btn={{
-            display: "Contact Sales",
+            display: "Contact us",
             href: "",
             color: "white",
             bg: "#943CFF",
@@ -250,7 +251,7 @@ const MobileContainer = () => {
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
-                Stream delivery via CDN*
+                Stream Delivery via CDN*
               </p>
             </PricingCardContent>
           </div>
@@ -354,7 +355,7 @@ const DesktopContainer = () => {
               mb: "4px",
               letterSpacing: "-0.04em",
             }}>
-            Stream delivery via CDN*
+            Stream Delivery via CDN*
           </h1>
           <p
             sx={{
@@ -490,7 +491,7 @@ const DesktopContainer = () => {
         pricingDescription="Custom pricing"
         cardBg="#3B375A"
         btn={{
-          display: "Contact Sales",
+          display: "Contact us",
           href:
             "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
           color: "white",
@@ -521,9 +522,9 @@ const PricingCardsContainer = () => {
           alignSelf: "center",
           mt: "64px",
         }}>
-        *Currently, we are not charging for Streaming. We’ll be sure to reach
-        out before we start to do so. <br /> Thanks for streaming with
-        Livepeer.com.
+        Currently, we are not charging for Stream Delivery via CDN. We’ll be
+        sure to reach out before we start to do so. <br /> Thanks for streaming
+        with Livepeer.com.
       </p>
     </div>
   );

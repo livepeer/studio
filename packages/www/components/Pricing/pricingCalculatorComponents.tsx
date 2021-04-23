@@ -23,6 +23,7 @@ type CalculatorItemProps = {
   value?: number | undefined | null;
   setValue?: React.Dispatch<React.SetStateAction<number>>;
   marginTop?: string;
+  step?: number;
 };
 
 type ScaleCalculatorProps = {
@@ -52,6 +53,7 @@ const CalculatorItem = ({
   value,
   setValue,
   marginTop,
+  step,
 }: CalculatorItemProps) => {
   const handleChange = (e) => {
     const value = e.target.value;
@@ -103,6 +105,7 @@ const CalculatorItem = ({
           onInput={handleInput}
           onChange={handleChange}
           type="range"
+          step={step}
           sx={{
             outline: "none",
             height: "2px",
@@ -245,7 +248,8 @@ const Calculator = ({
         marginTop="-26px"
         setValue={setStreamLength}
         min={0}
-        max={57599}
+        max={43200}
+        step={900}
         value={streamLength}>
         <div sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
           <div
@@ -299,7 +303,7 @@ const Calculator = ({
                 width: "36px",
                 display: "flex",
                 justifyContent: "center",
-                px: "6px",
+                pl: "6px",
                 transition: "all 0.2s",
                 borderRadius: "6px",
                 "&:focus": {
@@ -367,7 +371,8 @@ const Calculator = ({
         title="Monthly live streams"
         setValue={setMonthlyStreams}
         min={0}
-        max={100000}
+        max={10000}
+        step={50}
         value={monthlyStreams}>
         <input
           value={monthlyStreams}
@@ -401,7 +406,8 @@ const Calculator = ({
         title="Number of viewers per stream"
         setValue={setViewCount}
         min={0}
-        max={1000000}
+        max={10000}
+        step={50}
         value={viewCount}>
         <input
           value={viewCount}
@@ -501,7 +507,7 @@ const PreviewItem = ({
           mr: ["0", "0", "15px"],
           mb: ["8px", "8px", "0"],
         }}>
-        <div sx={{ display: "flex", flexDirection: 'column', mb: "8px" }}>
+        <div sx={{ display: "flex", flexDirection: "column", mb: "8px" }}>
           <h1
             sx={{
               fontSize: "20px",
@@ -599,28 +605,26 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
       </div>
       <PreviewItem
         title="Transcoding"
-        value={
-          totalValue > 3000 ? "Contact Sales" : `$${transcoding.toFixed(2)}`
-        }
+        description="Livepeer.com creates multiple versions of your source livestream for different devices in real time."
+        value={totalValue > 3000 ? "Contact us" : `$${transcoding.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
-        title="Stream delivery via CDN"
-        value={totalValue > 3000 ? "Contact Sales" : `$${streaming.toFixed(2)}`}
+        title="Stream Delivery via CDN"
+        description="Livepeer.com optimizes playback for your viewers across the globe via a CDN. Delivery via CDN is currently free. We will charge for it in the future."
+        value={totalValue > 3000 ? "Contact us" : `$${streaming.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Recording Storage"
-        description="We will start charging for storage by the end of 2021"
-        value={
-          transcoding + streaming > 3000 ? "Contact Sales" : "Coming Soon"
-        }
+        description="Livepeer.com can automatically store your transcoded renditions for VoD playback. Storage is currently free. We will charge for it in the future."
+        value={transcoding + streaming > 3000 ? "Contact us" : "Coming Soon"}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Total cost"
         description="Transcoding + Streaming via CDN"
-        value={totalValue > 3000 ? "Contact Sales" : `$${totalValue}`}
+        value={totalValue > 3000 ? "Contact us" : `$${totalValue}`}
         valueClarification={
           totalValue > 3000
             ? ""
@@ -640,7 +644,9 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
               letterSpacing: "-0.03em",
               minWidth: "fit-content",
             }}>
-            {totalValue > 3000 ? 'Contact Sales For High Volume Discounts' : 'High Volume Discounts Available'}
+            {totalValue > 3000
+              ? "Contact us For High Volume Discounts"
+              : "High Volume Discounts Available"}
           </p>
         )}
       </PreviewItem>
@@ -666,7 +672,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
           },
         }}>
-        {totalValue > 3000 ? "Contact Sales" : "Get Started"}
+        {totalValue > 3000 ? "Contact us" : "Get Started"}
       </button>
     </div>
   );
