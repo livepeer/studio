@@ -14,7 +14,7 @@ import { StatusResponse, MasterPlaylist } from "./livepeer-types";
 const pollInterval = 2 * 1000;
 const updateInterval = 2 * 1000;
 const deleteTimeout = 30 * 1000;
-const seenSegmentsTimeout = 60 * 1000;
+const seenSegmentsTimeout = 2 * 60 * 1000; // should be at least two time longer than HTTP push timeout in go-livepeer
 
 async function makeRouter(params) {
   const bodyParser = require("body-parser");
@@ -101,6 +101,7 @@ interface streamInfo {
   outgoingRate: number;
   sourceBytesLastUpdated: number;
   transcodedBytesLastUpdated: number;
+  objectId: string;
 }
 
 function newStreamInfo(): streamInfo {
@@ -122,7 +123,16 @@ function newStreamInfo(): streamInfo {
     ingestRate: 0.0,
     outgoingRate: 0.0,
     seenSegments: new Map(),
+    objectId: null,
   };
+}
+
+function getSessionId(storedInfo: Stream): string {
+  let userSessionId = storedInfo.id;
+  if (Array.isArray(storedInfo.previousSessions) && storedInfo.previousSessions.length > 0) {
+    userSessionId = storedInfo.previousSessions[0];
+  }
+  return userSessionId;
 }
 
 class statusPoller {
@@ -199,7 +209,10 @@ class statusPoller {
       if (needUpdate) {
         const storedInfo: Stream = await getObjectByMid(mid);
         // console.log(`got stream info from store: `, storedInfo)
+        // console.log(`---> manifest`, JSON.stringify(manifest, null, 2))
+        // console.log(`---> si:`, si)
         if (storedInfo) {
+          si.objectId = storedInfo.id;
           const setObj = {
             lastSeen: si.lastSeen.valueOf(),
             ingestRate: si.ingestRate,
@@ -223,11 +236,21 @@ class statusPoller {
             setObj.isActive = true;
             setObj.region = this.region;
           }
+          // console.log(`---> setting`, setObj)
+          // console.log(`---> inc`, incObj)
           await db.stream.update(storedInfo.id, setObj);
           await db.stream.add(storedInfo.id, incObj as Stream);
           if (storedInfo.parentId) {
             await db.stream.add(storedInfo.parentId, incObj as Stream);
             await db.stream.update(storedInfo.parentId, setObj);
+            const userSessionId = getSessionId(storedInfo);
+            // update session table
+            try {
+              await db.session.add(userSessionId, incObj as Stream);
+              await db.session.update(userSessionId, setObj);
+            } catch (e) {
+              console.log(`error updating session table:`, e);
+            }
           }
           si.lastUpdated = new Date();
           si.sourceSegmentsLastUpdated = si.sourceSegments;
@@ -235,7 +258,7 @@ class statusPoller {
           si.sourceSegmentsDurationLastUpdated = si.sourceSegmentsDuration;
           si.transcodedSegmentsDurationLastUpdated =
             si.transcodedSegmentsDuration;
-          si.sourceBytesLastUpdated = si.sourceBytesLastUpdated;
+          si.sourceBytesLastUpdated = si.sourceBytes;
           si.transcodedBytesLastUpdated = si.transcodedBytes;
         }
       }
@@ -246,13 +269,19 @@ class statusPoller {
         const notSeenFor: number = now - si.lastSeen.valueOf();
         if (notSeenFor > deleteTimeout) {
           this.seenStreams.delete(mid);
-          const storedInfo: Stream = await getObjectByMid(mid);
+          const storedInfo: Stream = await getObjectByMid(si.objectId || mid);
           if (storedInfo) {
-            await db.stream.update(storedInfo.id, {
+            const zeroRate = {
               ingestRate: 0,
               outgoingRate: 0,
-            } as Stream);
-            if (!storedInfo.parentId && !playback2session.has(mid)) {
+            } as Stream;
+            await db.stream.update(storedInfo.id, zeroRate);
+            if (storedInfo.parentId) {
+              await db.stream.update(storedInfo.parentId, zeroRate);
+              const userSessionId = getSessionId(storedInfo);
+              await db.session.update(userSessionId, zeroRate);
+            }
+            if (!storedInfo.parentId) {
               // this is not a session created by our Mist, so manage isActive field for this stream
               await db.stream.setActiveToFalse({ id: storedInfo.id, lastSeen: si.lastSeen.valueOf() })
             }
