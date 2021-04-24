@@ -501,10 +501,12 @@ app.post(
       const tooOld = createdAt - USER_SESSION_TIMEOUT;
       const query = [];
       query.push(sql`data->>'parentId' = ${stream.id}`);
-      query.push(sql`(data->'lastSeen')::bigint > ${tooOld}`);
+      query.push(
+        sql`((data->'lastSeen')::bigint > ${tooOld} OR  (data->'createdAt')::bigint > ${tooOld})`
+      );
 
       const [prevSessionsDocs] = await db.stream.find(query, {
-        order: `data->'lastSeen' DESC`,
+        order: `data->'lastSeen' DESC, data->'createdAt' DESC `,
       });
       if (
         prevSessionsDocs.length &&
