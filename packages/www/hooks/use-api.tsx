@@ -560,7 +560,7 @@ const makeContext = (state: ApiState, setState) => {
       cursor?: string,
       limit: number = 20
     ): Promise<[Array<Stream>, string]> {
-      const uri = `/stream/${id}/sessions?${qs.stringify({ limit, cursor })}`;
+      const uri = `/session?${qs.stringify({ limit, cursor, parentId: id })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);

@@ -11,7 +11,8 @@ import stripe from "./stripe";
 import version from "./version";
 import admin from "./admin";
 import usage from "./usage";
-import region from './region';
+import region from "./region";
+import session from "./session";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -29,4 +30,5 @@ export default {
   version,
   admin,
   usage,
+  session,
 };

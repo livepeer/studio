@@ -23,7 +23,7 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
-const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
+export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
 const isLocalIP = require("is-local-ip");
@@ -1231,7 +1231,7 @@ const statsFields = [
   "transcodedSegmentsDuration",
 ];
 
-function getCombinedStats(stream1, stream2) {
+export function getCombinedStats(stream1, stream2) {
   const res = {};
   for (const fn of statsFields) {
     res[fn] = (stream1[fn] || 0) + (stream2[fn] || 0);
