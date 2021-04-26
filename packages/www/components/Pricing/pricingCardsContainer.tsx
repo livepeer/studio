@@ -209,6 +209,15 @@ const MobileContainer = () => {
                 }}>
                 / GB video streamed
               </p>
+              <p
+                sx={{
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  letterSpacing: "-0.04em",
+                  mt: "10px",
+                }}>
+                * comming soon
+              </p>
             </PricingCardContent>
           </div>
         </PricingCard>
@@ -482,6 +491,15 @@ const DesktopContainer = () => {
                 letterSpacing: "-0.04em",
               }}>
               / GB video streamed
+            </p>
+            <p
+              sx={{
+                fontSize: "16px",
+                lineHeight: "24px",
+                letterSpacing: "-0.04em",
+                mt: "10px",
+              }}>
+              * comming soon
             </p>
           </PricingCardContent>
         </div>

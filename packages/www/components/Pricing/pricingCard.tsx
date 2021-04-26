@@ -49,7 +49,7 @@ export const PricingCardContent = ({
         display: "flex",
         flexDirection: "column",
         minHeight: "112px",
-        py: '12px',
+        py: "12px",
         justifyContent: "center",
         borderTop: color
           ? "1px solid rgba(225, 225, 225, 0.2)"
@@ -141,10 +141,10 @@ const PricingCard = ({
               fontSize: "14px",
               letterSpacing: "-0.03em",
               fontWeight: "600",
-              transition: 'all 0.3s',
-              ':hover': {
-                  opacity: '0.9'
-              }
+              transition: "all 0.3s",
+              ":hover": {
+                opacity: "0.9",
+              },
             }}>
             {btn.display}
           </a>
