@@ -614,7 +614,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         description="Livepeer.com optimizes playback for your viewers across the globe via a CDN. Delivery via CDN is currently free. We will charge for it in the future."
         value={totalValue > 3000 ? "Contact us" : `$${streaming.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
-        valueClarification='* comming soon'
+        valueClarification='* coming soon'
       />
       <PreviewItem
         title="Recording Storage"

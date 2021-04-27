@@ -216,7 +216,7 @@ const MobileContainer = () => {
                   letterSpacing: "-0.04em",
                   mt: "10px",
                 }}>
-                * comming soon
+                * coming soon
               </p>
             </PricingCardContent>
           </div>
@@ -499,7 +499,7 @@ const DesktopContainer = () => {
                 letterSpacing: "-0.04em",
                 mt: "10px",
               }}>
-              * comming soon
+              * coming soon
             </p>
           </PricingCardContent>
         </div>
