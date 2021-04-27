@@ -26,7 +26,6 @@ export default function subgraphMiddleware({ subgraphUrl }) {
       }
     `;
 
-    const ret = cachedResp;
     if (lastCachedRespUpdate + CACHE_REFRESH_INTERVAL < Date.now()) {
       try {
         const res = await fetch(subgraphUrl, {
@@ -39,24 +38,25 @@ export default function subgraphMiddleware({ subgraphUrl }) {
         });
 
         const transcoders = (await res.json()).data.transcoders;
+        const cacheUpdate = []
         for (const tr of transcoders) {
           if (tr.id.toLowerCase() in blockList) {
             continue;
           }
 
-          ret.push({
+          cacheUpdate.push({
             address: tr.serviceURI,
           });
         }
+
+        cachedResp = cacheUpdate
+        lastCachedRespUpdate = Date.now();
       } catch (e) {
         console.error(e);
       }
-
-      cachedResp = ret;
-      lastCachedRespUpdate = Date.now();
     }
 
-    return ret;
+    return cachedResp;
   };
 
   return (req, res, next) => {
