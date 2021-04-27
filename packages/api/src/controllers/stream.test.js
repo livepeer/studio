@@ -699,103 +699,12 @@ describe("controllers/stream", () => {
       expect(sessions[0].recordingUrl).toEqual(`https://test/recordings/${sess2r.id}/index.m3u8`);
     });
   });
-
-  describe("prevent misusage", () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
-
-    beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-    });
-
-    it("should prevent misusage for rtmp", async () => {
-      await server.store.create(mockStore);
-      // create stream
-      let res = await client.post("/stream", smallerStream);
-      expect(res.status).toBe(201);
-      const createdStream = await res.json();
-      expect(createdStream.ingestType).toBeUndefined();
-      // call setactive - should set ingestType to rtmp
-      res = await client.put(`/stream/${createdStream.id}/setactive`, { active: true });
-      expect(res.status).toBe(204);
-      res = await client.get(`/stream/${createdStream.id}`);
-      expect(res.status).toBe(200);
-      let csup = await res.json();
-      expect(csup.ingestType).toEqual("rtmp");
-      // now should reject http transcode
-      res = await client.post("/stream/hook", { url: `http://localhost/live/${createdStream.id}` });
-      expect(res.status).toBe(403);
-      res = await client.put(`/stream/${createdStream.id}/setactive`, { active: false });
-      expect(res.status).toBe(204);
-      res = await client.put(`/stream/${createdStream.id}/setactive`, { active: true });
-      expect(res.status).toBe(204);
-      // create session
-      res = await client.post(`/stream/${createdStream.id}/stream`, {
-        ...smallerStream,
-        name: "sess2",
-      });
-      expect(res.status).toBe(201);
-      let sess2 = await res.json();
-      expect(sess2.parentId).toEqual(createdStream.id);
-      // should allow transcoding for session object
-      res = await client.post("/stream/hook", { url: `http://localhost/live/${sess2.id}` });
-      expect(res.status).toBe(200);
-    });
-
-    it("should prevent misusage for http", async () => {
-      await server.store.create(mockStore);
-      // create stream
-      let res = await client.post("/stream", smallerStream);
-      expect(res.status).toBe(201);
-      const createdStream = await res.json();
-      expect(createdStream.ingestType).toBeUndefined();
-      // allow http transcoding
-      res = await client.post("/stream/hook", { url: `http://localhost/live/${createdStream.id}` });
-      expect(res.status).toBe(200);
-      res = await client.get(`/stream/${createdStream.id}`);
-      expect(res.status).toBe(200);
-      let csup = await res.json();
-      expect(csup.ingestType).toEqual("http");
-      // now rtmp should be rejected
-      res = await client.put(`/stream/${createdStream.id}/setactive`, { active: true });
-      expect(res.status).toBe(403);
-      // in case someone created session object through API - it should be rejected too
-      // create session
-      res = await client.post(`/stream/${createdStream.id}/stream`, {
-        ...smallerStream,
-        name: "sess2",
-      });
-      expect(res.status).toBe(201);
-      let sess2 = await res.json();
-      expect(sess2.parentId).toEqual(createdStream.id);
-      res = await client.post("/stream/hook", { url: `http://localhost/live/${sess2.id}` });
-      expect(res.status).toBe(403);
-    });
-  });
 });
 
 const smallStream = {
   id: "231e7a49-8351-400b-a3df-0bcde13754e4",
   name: "small01",
   record: true,
-  profiles: [
-    {
-      fps: 0,
-      name: "240p0",
-      width: 426,
-      height: 240,
-      bitrate: 250000,
-    },
-  ],
-};
-
-const smallerStream = {
-  name: "smaller01",
   profiles: [
     {
       fps: 0,

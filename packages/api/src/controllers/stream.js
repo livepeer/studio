@@ -718,11 +718,6 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["stream is suspended"] });
   }
 
-  if (stream.ingestType && stream.ingestType !== "rtmp") {
-    res.status(403);
-    return res.json({ errors: ["wrong stream type"] });
-  }
-
   const user = await db.user.get(stream.userId);
   if (!user) {
     res.status(404);
@@ -836,16 +831,11 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   stream.lastSeen = +new Date();
   const { ownRegion: region } = req.config;
   const { hostName: mistHost } = req.body;
-  let ingestType;
-  if (!stream.ingestType) {
-    ingestType = "rtmp";
-  }
   await db.stream.update(stream.id, {
     isActive: stream.isActive,
     lastSeen: stream.lastSeen,
     mistHost,
     region,
-    ingestType,
   });
 
   db.user.update(stream.userId, {
@@ -1141,10 +1131,7 @@ app.post("/hook", async (req, res) => {
     return res.json({ errors: ["ingest url must start with /live/"] });
   }
 
-  const isLive = live === "live";
-  const useReplica = !isLive;
-
-  const stream = await db.stream.get(streamId, { useReplica });
+  const stream = await db.stream.get(streamId);
   if (!stream) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -1181,6 +1168,7 @@ app.post("/hook", async (req, res) => {
     }
     objectStore = os.url;
   }
+  const isLive = live === "live";
   if (
     isLive &&
     stream.record &&
@@ -1218,42 +1206,9 @@ app.post("/hook", async (req, res) => {
 
   // Use our parents' playbackId for sharded playback
   let manifestID = streamId;
-  let parent;
   if (stream.parentId) {
-    parent = await db.stream.get(stream.parentId, { useReplica });
-    if (!parent) {
-      res.status(500);
-      return res.json({
-        errors: [
-          `data integity error: parent object ${stream.parentId} not found`,
-        ],
-      });
-    }
+    const parent = await db.stream.get(stream.parentId);
     manifestID = parent.playbackId;
-  }
-  if (isLive) {
-    // check stream type
-    if (protocol === "rtmp:") {
-      // Own broadcaster's RTMP ingest which we don't use now
-    } else {
-      if (stream.parentId) {
-        // Should be used for own RTMP only
-        if (parent.ingestType !== "rtmp") {
-          res.status(403);
-          return res.json({ errors: ["wrong stream type"] });
-        }
-      } else {
-        if (stream.ingestType && stream.ingestType !== "http") {
-          res.status(403);
-          return res.json({ errors: ["wrong stream type"] });
-        }
-        if (!stream.ingestType) {
-          await db.stream.update(stream.id, {
-            ingestType: "http",
-          });
-        }
-      }
-    }
   }
 
   res.json({

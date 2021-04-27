@@ -288,14 +288,6 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
-        ingestType:
-          type: string
-          description: 
-             Set on first usage. Once type is set, this object will not accept
-             ingests of other types.
-          enum:
-            - http
-            - rtmp
 
     session:
       type: object
