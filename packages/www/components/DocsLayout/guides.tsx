@@ -103,6 +103,13 @@ const guidesTree: Tree[] = [
       ],
       [
         {
+          content: "Track stream usage and duration",
+          slug: "/docs/guides/api/stream-metrics",
+        },
+        [],
+      ],
+      [
+        {
           content: "List all streams",
           slug: "/docs/guides/api/list-all-streams",
         },
