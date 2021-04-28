@@ -34,7 +34,7 @@ const Pricing = () => {
         </Box>
         <PricingCardsContainer />
         <PricingCalculator />
-        <div style={{ marginTop: "256px" }} />
+        <div style={{ marginTop: "156px" }} />
         {/* <PricingFaq /> */}
       </Container>
       <Prefooter />
