@@ -6,7 +6,13 @@ export type PricingCard = {
   titleColor?: string;
   cardBg: string;
   pricingDescription: string;
-  btn: { href: string; display: string; bg?: string; color?: string };
+  btn: {
+    display: string;
+    bg?: string;
+    color?: string;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    disabled?: boolean
+  };
   children: ReactNode;
   className?: string;
 };
@@ -127,7 +133,7 @@ const PricingCard = ({
           }}>
           {pricingDescription}
         </p>
-        <Link href={btn.href} passHref>
+        <button disabled={btn.disabled} onClick={btn.onClick}>
           <a
             sx={{
               width: "100%",
@@ -142,13 +148,14 @@ const PricingCard = ({
               letterSpacing: "-0.03em",
               fontWeight: "600",
               transition: "all 0.3s",
+              cursor: btn.disabled ? 'not-allowed' : 'pointer',
               ":hover": {
-                opacity: "0.9",
+                opacity: btn.disabled ? '' : "0.9",
               },
             }}>
             {btn.display}
           </a>
-        </Link>
+        </button>
       </div>
       <div sx={{ display: "flex", flexDirection: "column" }}>{children}</div>
     </div>

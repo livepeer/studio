@@ -1,11 +1,20 @@
 import PricingCard, { PricingCardContent } from "./pricingCard";
 import "keen-slider/keen-slider.min.css";
+import useApi from "hooks/use-api";
 import { useKeenSlider } from "keen-slider/react";
 import { useState } from "react";
+import { Router, useRouter } from "next/router";
+
+type Props = {
+  inApp?: boolean;
+  setModal?: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const slides = [0, 1, 2];
 
-const MobileContainer = () => {
+const MobileContainer = ({ inApp, setModal }: Props) => {
+  const { user } = useApi();
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
     slidesPerView: 2,
@@ -50,8 +59,19 @@ const MobileContainer = () => {
           cardBg="linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)"
           titleColor="black"
           btn={{
-            display: "Sign up",
-            href: "",
+            display: inApp
+              ? user.stripeProductId === "prod_0"
+                ? "Current plan"
+                : "Downgrade"
+              : "Sign up",
+            onClick: () => {
+              if (inApp) {
+                setModal(true);
+              } else {
+                router.push("/register");
+              }
+            },
+            disabled: inApp && user.stripeProductId === "prod_0" ? true : false,
             color: "white",
             bg: "#943CFF",
           }}>
@@ -126,8 +146,20 @@ const MobileContainer = () => {
           pricingDescription="Pay as you go"
           cardBg="#943CFF"
           btn={{
-            display: "Sign up",
-            href: "/register?selectedPlan=1",
+            display: inApp
+              ? user.stripeProductId === "prod_1"
+                ? "Current plan"
+                : user.stripeProductId === "prod_2"
+                ? "Downgrade"
+                : "Upgrade"
+              : "Sign up",
+            onClick: () => {
+              if (inApp) {
+                setModal(true);
+              } else {
+                router.push("/register?selectedPlan=1");
+              }
+            },
           }}>
           <div sx={{ mt: "20px" }}>
             <PricingCardContent color="white">
@@ -227,8 +259,15 @@ const MobileContainer = () => {
           pricingDescription="Custom pricing"
           cardBg="#3B375A"
           btn={{
-            display: "Contact us",
-            href: "",
+            display: inApp
+              ? user.stripeProductId === "prod_2"
+                ? "Current plan"
+                : "Contact us"
+              : "Contact us",
+            onClick: () =>
+              router.push(
+                "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
+              ),
             color: "white",
             bg: "#943CFF",
           }}>
@@ -297,7 +336,9 @@ const MobileContainer = () => {
   );
 };
 
-const DesktopContainer = () => {
+const DesktopContainer = ({ inApp, setModal }: Props) => {
+  const { user } = useApi();
+  const router = useRouter();
   return (
     <div
       sx={{
@@ -384,8 +425,19 @@ const DesktopContainer = () => {
         cardBg="linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)"
         titleColor="black"
         btn={{
-          display: "Sign up",
-          href: "/register",
+          display: inApp
+            ? user.stripeProductId === "prod_0"
+              ? "Current plan"
+              : "Downgrade"
+            : "Sign up",
+          onClick: () => {
+            if (inApp) {
+              setModal(true);
+            } else {
+              router.push("/register");
+            }
+          },
+          disabled: inApp && user.stripeProductId === "prod_0" ? true : false,
           color: "white",
           bg: "#943CFF",
         }}>
@@ -434,8 +486,20 @@ const DesktopContainer = () => {
         pricingDescription="Pay as you go"
         cardBg="#943CFF"
         btn={{
-          display: "Sign up",
-          href: "",
+          display: inApp
+            ? user.stripeProductId === "prod_1"
+              ? "Current plan"
+              : user.stripeProductId === "prod_2"
+              ? "Downgrade"
+              : "Upgrade"
+            : "Sign up",
+          onClick: () => {
+            if (inApp) {
+              setModal(true);
+            } else {
+              router.push("/register?selectedPlan=1");
+            }
+          },
         }}>
         <div sx={{ mt: "20px" }}>
           <PricingCardContent color="white">
@@ -509,9 +573,15 @@ const DesktopContainer = () => {
         pricingDescription="Custom pricing"
         cardBg="#3B375A"
         btn={{
-          display: "Contact us",
-          href:
-            "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
+          display: inApp
+            ? user.stripeProductId === "prod_2"
+              ? "Current plan"
+              : "Contact us"
+            : "Contact us",
+          onClick: () =>
+            router.push(
+              "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
+            ),
           color: "white",
           bg: "#943CFF",
         }}>
@@ -525,11 +595,11 @@ const DesktopContainer = () => {
   );
 };
 
-const PricingCardsContainer = () => {
+const PricingCardsContainer = ({ inApp, setModal }: Props) => {
   return (
     <div sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-      <DesktopContainer />
-      <MobileContainer />
+      <DesktopContainer inApp={inApp} setModal={setModal} />
+      <MobileContainer inApp={inApp} setModal={setModal} />
       <p
         sx={{
           color: "#525252",
