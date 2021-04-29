@@ -417,8 +417,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 text: dashboard
                   ? stripeProductId === "prod_2"
                     ? "Current plan"
-                    : "Contact sales"
-                  : "Contact sales",
+                    : "Contact us"
+                  : "Contact us",
                 disabled:
                   dashboard && stripeProductId === "prod_2" ? true : false,
                 variant: "primarySmall",

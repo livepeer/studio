@@ -275,6 +275,62 @@ deletes a specific webhook details
 | 200 | Success |
 | default | Error |
 
+### /region/{region}
+
+#### GET
+##### Description
+
+get a regions list of orchestrators
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| region | path |  | Yes | string |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+| default | Error |
+
+#### PUT
+##### Description
+
+updates a specific region
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| region | path |  | Yes | string |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+| default | Error |
+
+#### DELETE
+##### Description
+
+deletes a specific region
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| region | path |  | Yes | string |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Success |
+| default | Error |
+
 ### Models
 
 #### webhook
@@ -422,6 +478,13 @@ deletes a specific webhook details
 | password | string | _Example:_ `"thisisapassword"` | Yes |
 | userId | string | _Example:_ `"66E2161C-7670-4D05-B71D-DA2D6979556F"` | No |
 
+#### region
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| region | string | region name<br>_Example:_ `"ber"` | Yes |
+| orchestrators | [ object ] |  | Yes |
+
 #### user
 
 | Name | Type | Description | Required |
@@ -430,6 +493,7 @@ deletes a specific webhook details
 | password | string | _Example:_ `"thisisapassword"` | Yes |
 | emailValidToken | string | _Example:_ `"E1F53135E559C253"` | No |
 | emailValid | boolean | _Example:_ `true` | No |
+| suspended | boolean |  | No |
 | salt | string | _Example:_ `"E1F53135E559C253"` | No |
 | admin | boolean | _Example:_ `true` | No |
 | kind | string | _Example:_ `"user"` | No |

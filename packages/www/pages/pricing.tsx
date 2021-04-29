@@ -1,6 +1,8 @@
 import { Box, Heading, Container } from "@theme-ui/components";
+import Prefooter from "components/Prefooter";
+import PricingCalculator from "components/Pricing/pricingCalculator";
+import PricingCardsContainer from "components/Pricing/pricingCardsContainer";
 import Layout from "../components/Layout";
-import Plans from "../components/Plans";
 
 const Pricing = () => {
   return (
@@ -9,7 +11,7 @@ const Pricing = () => {
       description={`Flexible pricing for projects of all sizes.`}
       url={`https://livepeer.com`}
       withGradientBackground>
-      <Container>
+      <Container sx={{ display: "flex", flexDirection: "column" }}>
         <Box sx={{ pt: 5, pb: [0, 0, 0, 5], textAlign: "center" }}>
           <Heading
             as="h1"
@@ -30,8 +32,12 @@ const Pricing = () => {
             Flexible pricing for projects of all sizes.
           </Heading>
         </Box>
-        <Plans />
+        <PricingCardsContainer />
+        <PricingCalculator />
+        <div style={{ marginTop: "156px" }} />
+        {/* <PricingFaq /> */}
       </Container>
+      <Prefooter />
     </Layout>
   );
 };
