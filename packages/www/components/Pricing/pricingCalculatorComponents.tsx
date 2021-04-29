@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { parse } from "graphql";
 import { ReactNode, useCallback, useEffect } from "react";
+import { useApi } from "hooks";
 
 type PreviewItemProps = {
   title: string;
@@ -565,6 +567,8 @@ const PreviewItem = ({
 
 const Preview = ({ transcoding, streaming }: PreviewProps) => {
   const totalValue = parseFloat((transcoding + streaming).toFixed(2));
+  const { token } = useApi();
+
   return (
     <div
       sx={{
@@ -614,7 +618,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         description="Livepeer.com optimizes playback for your viewers across the globe via a CDN. Delivery via CDN is currently free. We will charge for it in the future."
         value={totalValue > 3000 ? "Contact us" : `$${streaming.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
-        valueClarification='* coming soon'
+        valueClarification="* coming soon"
       />
       <PreviewItem
         title="Recording Storage"
@@ -651,30 +655,32 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           </p>
         )}
       </PreviewItem>
-      <button
-        disabled={streaming + transcoding === 0}
-        sx={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "600",
-          fontSize: "20px",
-          color: "white",
-          letterSpacing: "-0.03em",
-          height: "56px",
-          cursor: streaming + transcoding === 0 ? "not-allowed" : "pointer",
-          background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
-          borderRadius: "6px",
-          mt: "10px",
-          transition: "all 0.2s",
-          "&:focus": {
-            outline: "none",
-            boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-          },
-        }}>
-        {totalValue > 3000 ? "Contact us" : "Get Started"}
-      </button>
+      <Link href={token ? '/app/user/plans' : '/register'}>
+        <button
+          disabled={streaming + transcoding === 0}
+          sx={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "600",
+            fontSize: "20px",
+            color: "white",
+            letterSpacing: "-0.03em",
+            height: "56px",
+            cursor: streaming + transcoding === 0 ? "not-allowed" : "pointer",
+            background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
+            borderRadius: "6px",
+            mt: "10px",
+            transition: "all 0.2s",
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
+            },
+          }}>
+          {totalValue > 3000 ? "Contact us" : "Get Started"}
+        </button>
+      </Link>
     </div>
   );
 };
