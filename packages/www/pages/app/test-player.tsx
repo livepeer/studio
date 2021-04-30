@@ -307,7 +307,7 @@ const Debugger = () => {
             <Arrow active={videoExists} />
             <VideoContainer
               manifestUrl={manifestUrl}
-              title='Source stream + Livpeeer.com transcoded renditions'
+              title='Source stream + Livepeer.com transcoded renditions'
               description="Adaptive bitrate streaming"
               withOverflow
               setVideo={setVideoExists}
