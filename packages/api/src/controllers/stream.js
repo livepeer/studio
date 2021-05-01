@@ -528,13 +528,24 @@ app.post(
         );
         firstSession = false;
         setImmediate(() => {
+          db.session.update(previousSessions[0], {
+            lastSessionId: id,
+          }).catch(e => {
+            logger.error(e)
+          });
+        });
+        setImmediate(() => {
           db.stream.update(previousSessions[0], {
             lastSessionId: id,
+          }).catch(e => {
+            logger.error(e)
           });
         });
         setImmediate(() => {
           db.stream.update(latestSession.id, {
             partialSession: true,
+          }).catch(e => {
+            logger.error(e)
           });
         });
       }
@@ -1151,15 +1162,6 @@ app.post("/hook", async (req, res) => {
   if (user.suspended) {
     res.status(403);
     return res.json({ errors: ["user is suspended"] });
-  }
-
-  if (live === "recordings" && stream.lastSessionId) {
-    const lastSession = await db.stream.get(stream.lastSessionId);
-    if (!lastSession) {
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
-    stream = lastSession;
   }
 
   let objectStore,

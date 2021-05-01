@@ -422,6 +422,8 @@ components:
               - waiting
           recordingUrl:
             type: string
+          lastSessionId:
+            type: string
 
     error:
       required:
