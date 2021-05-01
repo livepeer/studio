@@ -112,6 +112,41 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
 });
 
 app.get(
+  "/migrate2",
+  authMiddleware({ anyAdmin: true }),
+  async (req, res, next) => {
+    const query = [];
+    query.push(sql`data->>'record' = 'true'`);
+    query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
+
+    let docs, cursor;
+    const now = Date.now();
+    const toClean = [];
+    res.writeHead(200);
+    res.flushHeaders();
+    let processed = 0;
+    do {
+      [docs, cursor] = await db.session.find(query, { cursor, limit: 100 });
+      // sending progress should prevent request timing out
+      res.write(".");
+      for (const session of docs) {
+        if (!session.lastSessionId) {
+          const stream = await db.stream.get(session.id)
+          if (stream && stream.lastSessionId) {
+            await db.session.update(session.id, {
+              lastSessionId: stream.lastSessionId,
+            });
+          }
+        }
+        processed++;
+      }
+    } while (cursor);
+    res.write("\n");
+    res.end(`processed ${processed} sessions\n`);
+  }
+);
+
+app.get(
   "/migrate",
   authMiddleware({ anyAdmin: true }),
   async (req, res, next) => {
