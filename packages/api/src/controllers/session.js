@@ -36,6 +36,15 @@ const fieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
+function getRecordingUrl(ingest, session) {
+  return pathJoin(
+    ingest,
+    `recordings`,
+    session.lastSessionId ? session.lastSessionId : session.id,
+    `index.m3u8`
+  );
+}
+
 app.get("/", authMiddleware({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId } = req.query;
   const { forceUrl } = req.query;
@@ -96,12 +105,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
       const isReady = session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
       if (isReady || (req.user.admin && forceUrl)) {
-        session.recordingUrl = pathJoin(
-          ingest,
-          `recordings`,
-          session.id,
-          `index.m3u8`
-        );
+        session.recordingUrl = getRecordingUrl(ingest, session);
       }
     }
   });
@@ -131,7 +135,7 @@ app.get(
       res.write(".");
       for (const session of docs) {
         if (!session.lastSessionId) {
-          const stream = await db.stream.get(session.id)
+          const stream = await db.stream.get(session.id);
           if (stream && stream.lastSessionId) {
             await db.session.update(session.id, {
               lastSessionId: stream.lastSessionId,
@@ -228,12 +232,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     const isReady = session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady) {
-      session.recordingUrl = pathJoin(
-        ingest,
-        `recordings`,
-        session.id,
-        `index.m3u8`
-      );
+      session.recordingUrl = getRecordingUrl(ingest, session);
     }
   }
   if (!req.user.admin) {
