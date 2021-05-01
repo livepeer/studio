@@ -1131,7 +1131,7 @@ app.post("/hook", async (req, res) => {
     return res.json({ errors: ["ingest url must start with /live/"] });
   }
 
-  const stream = await db.stream.get(streamId);
+  let stream = await db.stream.get(streamId);
   if (!stream) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -1151,6 +1151,15 @@ app.post("/hook", async (req, res) => {
   if (user.suspended) {
     res.status(403);
     return res.json({ errors: ["user is suspended"] });
+  }
+
+  if (live === "recordings" && stream.lastSessionId) {
+    const lastSession = await db.stream.get(stream.lastSessionId);
+    if (!lastSession) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+    stream = lastSession;
   }
 
   let objectStore,
