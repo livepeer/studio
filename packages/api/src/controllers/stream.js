@@ -528,25 +528,31 @@ app.post(
         );
         firstSession = false;
         setImmediate(() => {
-          db.session.update(previousSessions[0], {
-            lastSessionId: id,
-          }).catch(e => {
-            logger.error(e)
-          });
+          db.session
+            .update(previousSessions[0], {
+              lastSessionId: id,
+            })
+            .catch((e) => {
+              logger.error(e);
+            });
         });
         setImmediate(() => {
-          db.stream.update(previousSessions[0], {
-            lastSessionId: id,
-          }).catch(e => {
-            logger.error(e)
-          });
+          db.stream
+            .update(previousSessions[0], {
+              lastSessionId: id,
+            })
+            .catch((e) => {
+              logger.error(e);
+            });
         });
         setImmediate(() => {
-          db.stream.update(latestSession.id, {
-            partialSession: true,
-          }).catch(e => {
-            logger.error(e)
-          });
+          db.stream
+            .update(latestSession.id, {
+              partialSession: true,
+            })
+            .catch((e) => {
+              logger.error(e);
+            });
         });
       }
     }

@@ -12,7 +12,7 @@ export type TextCellProps = {
 const TextCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, TextCellProps>) => {
-  const pid = 'tooltip-' +  cell.value.id;
+  const pid = "tooltip-" + cell.value.id;
   return (
     <div>
       {cell.value.tooltipChildren ? (

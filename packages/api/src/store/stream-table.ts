@@ -299,8 +299,8 @@ export default class StreamTable extends Table<Stream> {
       transcodedSegmentsDuration: 0,
       sourceBytes: 0,
       transcodedBytes: 0,
-      ...obj
-    }
+      ...obj,
+    };
   }
 
   removePrivateFields(obj: Stream, isAdmin: boolean = false): Stream {
@@ -315,13 +315,21 @@ export default class StreamTable extends Table<Stream> {
     return obj;
   }
 
-  removePrivateFieldsMany(objs: Array<Stream>, isAdmin: boolean = false): Array<Stream> {
-    return objs.map(o => this.removePrivateFields(o, isAdmin));
+  removePrivateFieldsMany(
+    objs: Array<Stream>,
+    isAdmin: boolean = false
+  ): Array<Stream> {
+    return objs.map((o) => this.removePrivateFields(o, isAdmin));
   }
-
 }
 
 const adminOnlyFields = ["mistHost", "broadcasterHost"];
 
-const privateFields = ["recordObjectStoreId", "previousSessions",
-  "partialSession", "previousStats", "lastSessionId", 'userSessionCreatedAt'];
+const privateFields = [
+  "recordObjectStoreId",
+  "previousSessions",
+  "partialSession",
+  "previousStats",
+  "lastSessionId",
+  "userSessionCreatedAt",
+];

@@ -48,7 +48,7 @@ const StreamSessionsTable = ({
             setStreamsSessions(streams);
           })
           .catch((err) => console.error(err)) // todo: surface this
-          .finally(()=> setSessionsLoading(false));
+          .finally(() => setSessionsLoading(false));
       }
     }, 10000);
     return () => clearInterval(interval);

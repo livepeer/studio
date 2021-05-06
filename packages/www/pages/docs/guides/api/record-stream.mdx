@@ -4,24 +4,34 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to record live stream sessions with the Livepeer.com API
 
-*Please note this beta feature is a new and still being optimized. Send feedback to help@livepeer.com.*
+_Please note this beta feature is a new and still being optimized. Send feedback
+to help@livepeer.com._
 
 **Recording Livepeer.com livestreams is easy.**
 
-Enabling recording on a Livepeer.com livestream is super simple. Enable recording with an API call when creating a stream or updating an asset's configuration. The `recordingStatus` parameter tells you when the recording is ready for playback a few minutes after the stream ends. 
+Enabling recording on a Livepeer.com livestream is super simple. Enable
+recording with an API call when creating a stream or updating an asset's
+configuration. The `recordingStatus` parameter tells you when the recording is
+ready for playback a few minutes after the stream ends.
 
-This recording feature provides Livepeer.com users with a link to an adaptive bitrate streaming (ABR) recording of their completed livestream. 
+This recording feature provides Livepeer.com users with a link to an adaptive
+bitrate streaming (ABR) recording of their completed livestream.
 
-The ABR settings for the recording are inherited from the transcoding  `profiles` set for the livestream. At this time you cannot set recording-specific ABR settings. Playback is delivered via Livepeer.com's CDN by default.
+The ABR settings for the recording are inherited from the transcoding `profiles`
+set for the livestream. At this time you cannot set recording-specific ABR
+settings. Playback is delivered via Livepeer.com's CDN by default.
 
-*Please note if you are using OBS, set your keyframe interval to 2 for Livepeer.com beta recording to work best.*
+_Please note if you are using OBS, set your keyframe interval to 2 for
+Livepeer.com beta recording to work best._
 
 ## The `record` parameter
 
-To turn recording on and off, update the `record` parameter on the `stream` object. The `record` parameter is a boolean with a `false` default value.
+To turn recording on and off, update the `record` parameter on the `stream`
+object. The `record` parameter is a boolean with a `false` default value.
 
 > 💡 Before proceeding, it will be helpful to review this guide about the
-[relationship between parent-config and child-session `stream` objects](/docs/guides/api/parent-streams-and-sessions). Understanding this core concept make using the recording feautre simple.
+> [relationship between parent-config and child-session `stream` objects](/docs/guides/api/parent-streams-and-sessions).
+> Understanding this core concept make using the recording feautre simple.
 
 On a parent `stream` object.
 
@@ -30,20 +40,31 @@ On a parent `stream` object.
 
 On a child-session `stream` object, the `record` value is read-only.
 
-- `record: true` means that the session is actively being recorded or was recorded. 
-- `record: false` means that the session is not being recorded or was not recorded. 
+- `record: true` means that the session is actively being recorded or was
+  recorded.
+- `record: false` means that the session is not being recorded or was not
+  recorded.
 
-The absence of a `record` parameter on a `stream` object is equivalent to `record: false`.
+The absence of a `record` parameter on a `stream` object is equivalent to
+`record: false`.
 
 ## Notable JSON parameters for a `stream` session with `record:true`
 
-*A list of JSON parameters for the `stream` object is at [https://livepeer.com/docs/api/stream](https://livepeer.com/docs/api/stream).*
+_A list of JSON parameters for the `stream` object is at
+[https://livepeer.com/docs/api/stream](https://livepeer.com/docs/api/stream)._
 
-- `id`: This string is the unique identifier for the asset, in this case a single livestream session. This string is also used to form the playback URL for the recorded session.
+- `id`: This string is the unique identifier for the asset, in this case a
+  single livestream session. This string is also used to form the playback URL
+  for the recorded session.
 - `parentId`: Equivalent to the `id` of the parent `stream` object.
-- `createdAt`: This number is the timestamp when the livestream session began and the asset was created. Reported in Unix epoch time.
-- `sourceSegmentsDuration`: This number is the duration in seconds of asset source processed. When the livestream session is over, this number equates to the length of the livestream session and recording.
-- `recordingStatus`: This boolean appears only when `record: true`, and it is either `ready` when the recorded livestream is available for playback or `waiting` while the livestream is still active or just recently completed.
+- `createdAt`: This number is the timestamp when the livestream session began
+  and the asset was created. Reported in Unix epoch time.
+- `sourceSegmentsDuration`: This number is the duration in seconds of asset
+  source processed. When the livestream session is over, this number equates to
+  the length of the livestream session and recording.
+- `recordingStatus`: This boolean appears only when `record: true`, and it is
+  either `ready` when the recorded livestream is available for playback or
+  `waiting` while the livestream is still active or just recently completed.
 
 ## Reference code examples
 
@@ -63,7 +84,7 @@ https://livepeer.com/api/stream
 201 created
 
 ```bash
-{ 
+{
   "name":"test_stream_recording_on",
   "record":true,
   "kind":"stream",
@@ -79,7 +100,8 @@ https://livepeer.com/api/stream
 
 ### PATCH /stream/{id} to turn on/off recording for an existing asset
 
-Turn recording on. All new sessions will be recorded. In progress sessions will not be recorded.
+Turn recording on. All new sessions will be recorded. In progress sessions will
+not be recorded.
 
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
@@ -88,7 +110,8 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -d '{"record":true}'
 ```
 
-Turns recording off. All new sessions will not be recorded. In progress sessions will still be recorded.
+Turns recording off. All new sessions will not be recorded. In progress sessions
+will still be recorded.
 
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
@@ -106,7 +129,9 @@ curl -H 'authorization: Bearer {api-key}' \
 
 200 OK
 
-If the `record` parameter is not returned in the JSON response, recording is **not** turned on. An absent `record` parameter is equivalent to `"record": false`.
+If the `record` parameter is not returned in the JSON response, recording is
+**not** turned on. An absent `record` parameter is equivalent to
+`"record": false`.
 
 ```bash
 {

@@ -655,7 +655,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           </p>
         )}
       </PreviewItem>
-      <Link href={token ? '/app/user/plans' : '/register'}>
+      <Link href={token ? "/app/user/plans" : "/register"}>
         <button
           disabled={streaming + transcoding === 0}
           sx={{

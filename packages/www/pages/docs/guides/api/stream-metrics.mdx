@@ -4,10 +4,15 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to track stream usage and duration
 
-If you are operating a live-streaming or user generated content platform, you will want to know the the total duration of the "parent" `stream` object and the duration of a "child" `stream` session.
+If you are operating a live-streaming or user generated content platform, you
+will want to know the the total duration of the "parent" `stream` object and the
+duration of a "child" `stream` session.
 
 ## `GET /stream/{id}` to retrieve a `stream` object or a session `stream` object
-Stream sessions are a type of `stream` object. Use the same `GET /stream/{id}` request to retieve any type of `stream` object, whether it be a parent object or a child-session object.
+
+Stream sessions are a type of `stream` object. Use the same `GET /stream/{id}`
+request to retieve any type of `stream` object, whether it be a parent object or
+a child-session object.
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
@@ -15,7 +20,13 @@ curl -H 'authorization: Bearer {api-key}' \
 ```
 
 ### `sourceSegmentsDuration`
-The value of `sourceSegmentsDuration` returned is the duration in seconds of the asset source processed by Livepeer.com. On the parent object, this value equates to the total amount of source video ingested by Livepeer.com all time. On the child-session object, this value is the length of the live stream session (and session recording). Learn more about the `stream` object in the [API reference](/docs/api/stream).
+
+The value of `sourceSegmentsDuration` returned is the duration in seconds of the
+asset source processed by Livepeer.com. On the parent object, this value equates
+to the total amount of source video ingested by Livepeer.com all time. On the
+child-session object, this value is the length of the live stream session (and
+session recording). Learn more about the `stream` object in the
+[API reference](/docs/api/stream).
 
 ```bash
 {
@@ -36,7 +47,7 @@ The value of `sourceSegmentsDuration` returned is the duration in seconds of the
 }
 ```
 
-Next, learn
-Next, learn [how to list all `stream` objects](/docs/guides/api/list-all-streams).
+Next, learn Next, learn
+[how to list all `stream` objects](/docs/guides/api/list-all-streams).
 
 </DocsLayout>

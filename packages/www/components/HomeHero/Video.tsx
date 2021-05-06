@@ -67,9 +67,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             bottom: 0,
             right: 0,
             height: "100%",
-            width: "100%"
-          }}
-        >
+            width: "100%",
+          }}>
           <Image
             layout="fill"
             objectFit="cover"

@@ -457,8 +457,8 @@ components:
         disabled:
           type: boolean
           description:
-              If true then these object store will not be used for recording
-              even if it is configured in the API command line.
+            If true then these object store will not be used for recording even
+            if it is configured in the API command line.
         id:
           type: string
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
@@ -781,8 +781,8 @@ components:
         lastStreamedAt:
           type: number
           description:
-            Timestamp (in milliseconds) at which user streamed RTMP stream
-            last time
+            Timestamp (in milliseconds) at which user streamed RTMP stream last
+            time
           example: 1587667174725
         lastSeen:
           type: number
@@ -1279,7 +1279,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
 
   /region/{region}:
     tags:
@@ -1298,13 +1298,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/region'
+                $ref: "#/components/schemas/region"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     put:
       parameters:
         - name: region
@@ -1319,13 +1319,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/region'
+                $ref: "#/components/schemas/region"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
     delete:
       parameters:
         - name: region
@@ -1340,10 +1340,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/webhook'
+                $ref: "#/components/schemas/webhook"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"

@@ -10,7 +10,7 @@ const DurationCell = <D extends TableData>({
     return "In progress";
   }
   if (cell.value.duration === 0) {
-      return "n/a";
+    return "n/a";
   }
   try {
     const dur = intervalToDuration({

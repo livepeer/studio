@@ -1,11 +1,7 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
-import {
-  makeNextHREF,
-  parseFilters,
-  parseOrder,
-} from "./helpers";
+import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import uuid from "uuid/v4";
 import { db } from "../store";
 

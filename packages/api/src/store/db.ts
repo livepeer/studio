@@ -103,8 +103,8 @@ export class DB {
       schema: schemas["password-reset-token"],
     });
 
-    this.region =  new Table<Region>({ db: this, schema: schemas['region']})
-    this.session =  new Table<Session>({ db: this, schema: schemas['session']})
+    this.region = new Table<Region>({ db: this, schema: schemas["region"] });
+    this.session = new Table<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => !!schema.table

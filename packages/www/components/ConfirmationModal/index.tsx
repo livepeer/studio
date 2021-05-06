@@ -33,12 +33,15 @@ const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({
         {showWheel ? (
           <Spinner></Spinner>
         ) : (
-        <Button type="button" variant="primarySmall" onClick={() => {
-          setShowWheel(true);
-          onAction();
-        }}>
-          {actionText}
-        </Button>
+          <Button
+            type="button"
+            variant="primarySmall"
+            onClick={() => {
+              setShowWheel(true);
+              onAction();
+            }}>
+            {actionText}
+          </Button>
         )}
       </Flex>
     </Modal>

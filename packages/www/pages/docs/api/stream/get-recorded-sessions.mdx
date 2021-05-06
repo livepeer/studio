@@ -4,7 +4,8 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # `GET /stream/{parentId}/sessions?record=1` to retrieve list of recorded sessions
 
-Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions with the same `parentId`
+Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions
+with the same `parentId`
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
@@ -13,7 +14,8 @@ curl -H 'authorization: Bearer {api-key}' \
 
 ### 200 OK
 
-`recordingStatus` and `recordingUrl` are only returned as parameters on the session `stream` object in response to the above request.
+`recordingStatus` and `recordingUrl` are only returned as parameters on the
+session `stream` object in response to the above request.
 
 ```bash
 [
