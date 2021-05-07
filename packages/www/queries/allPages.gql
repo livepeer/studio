@@ -3,6 +3,7 @@ query allPage($where: PageFilter) {
   allPage(where: $where) {
     _id
     title
+    description
     slug {
       current
     }
