@@ -4,20 +4,29 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to playback a recorded session
 
-Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions with the same `parentId` using `record=1`
+Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions
+with the same `parentId` using `record=1`
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{parentId}/sessions?record=1"
 ```
 
-A livestream session recording is available approximately 5 minutes after the livestream session has ended. When the recording is ready, the most recent session `stream` object `recordingStatus` value will change from `waiting` to `ready`.  
+A livestream session recording is available approximately 5 minutes after the
+livestream session has ended. When the recording is ready, the most recent
+session `stream` object `recordingStatus` value will change from `waiting` to
+`ready`.
 
-> ⚠️ You will need to poll this endpoint to get the updated `recordingStatus` values of all listed recorded sessions. In the future, we will support webhooks.
+> ⚠️ You will need to poll this endpoint to get the updated `recordingStatus`
+> values of all listed recorded sessions. In the future, we will support
+> webhooks.
 
-Once the recording is ready, the session `stream` object's `recordingUrl` parameter will return the .m3u8 recording playback URL. 
+Once the recording is ready, the session `stream` object's `recordingUrl`
+parameter will return the .m3u8 recording playback URL.
 
-The recording playback URL will look something like this: `https://region-cdn.livepeer.com/recordings/{id-of-stream-session}/index.m3u8`. View the live stream with any HLS video player.
+The recording playback URL will look something like this:
+`https://region-cdn.livepeer.com/recordings/{id-of-stream-session}/index.m3u8`.
+View the live stream with any HLS video player.
 
 Next, learn [track stream usage and duration](/docs/guides/api/stream-metrics).
 

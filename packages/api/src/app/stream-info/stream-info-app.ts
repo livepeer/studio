@@ -129,7 +129,10 @@ function newStreamInfo(): streamInfo {
 
 function getSessionId(storedInfo: Stream): string {
   let userSessionId = storedInfo.id;
-  if (Array.isArray(storedInfo.previousSessions) && storedInfo.previousSessions.length > 0) {
+  if (
+    Array.isArray(storedInfo.previousSessions) &&
+    storedInfo.previousSessions.length > 0
+  ) {
     userSessionId = storedInfo.previousSessions[0];
   }
   return userSessionId;
@@ -175,7 +178,7 @@ class statusPoller {
         }
       }
       return storedInfo;
-    }
+    };
     const now = new Date();
     for (const mid of Object.keys(status.Manifests)) {
       let si,
@@ -195,11 +198,22 @@ class statusPoller {
       }
       if (mid in (status.StreamInfo || {})) {
         const statusStreamInfo = status.StreamInfo[mid];
-        if (si.sourceBytes > 0 && statusStreamInfo.SourceBytes > si.sourceBytes && timeSinceLastSeen > 0) {
-          si.ingestRate = (statusStreamInfo.SourceBytes - si.sourceBytes) / timeSinceLastSeen;
+        if (
+          si.sourceBytes > 0 &&
+          statusStreamInfo.SourceBytes > si.sourceBytes &&
+          timeSinceLastSeen > 0
+        ) {
+          si.ingestRate =
+            (statusStreamInfo.SourceBytes - si.sourceBytes) / timeSinceLastSeen;
         }
-        if (si.transcodedBytes > 0 && statusStreamInfo.TranscodedBytes > si.transcodedBytes && timeSinceLastSeen > 0) {
-          si.outgoingRate = (statusStreamInfo.TranscodedBytes - si.transcodedBytes) / timeSinceLastSeen;
+        if (
+          si.transcodedBytes > 0 &&
+          statusStreamInfo.TranscodedBytes > si.transcodedBytes &&
+          timeSinceLastSeen > 0
+        ) {
+          si.outgoingRate =
+            (statusStreamInfo.TranscodedBytes - si.transcodedBytes) /
+            timeSinceLastSeen;
         }
         si.sourceBytes = statusStreamInfo.SourceBytes;
         si.transcodedBytes = statusStreamInfo.TranscodedBytes;
@@ -283,7 +297,10 @@ class statusPoller {
             }
             if (!storedInfo.parentId) {
               // this is not a session created by our Mist, so manage isActive field for this stream
-              await db.stream.setActiveToFalse({ id: storedInfo.id, lastSeen: si.lastSeen.valueOf() })
+              await db.stream.setActiveToFalse({
+                id: storedInfo.id,
+                lastSeen: si.lastSeen.valueOf(),
+              });
             }
           }
         }
@@ -306,13 +323,7 @@ class statusPoller {
 }
 
 export default async function makeApp(params) {
-  const {
-    port,
-    postgresUrl,
-    ownRegion,
-    listen = true,
-    broadcaster,
-  } = params;
+  const { port, postgresUrl, ownRegion, listen = true, broadcaster } = params;
   // Storage init
   await db.start({ postgresUrl, postgresReplicaUrl: undefined });
 

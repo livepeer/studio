@@ -46,10 +46,10 @@ const Player = ({ src, posterUrl, config = {}, setVideo }) => {
     <div className="shadow-lg mx-auto max-w-full" ref={videoContainer}>
       <video
         onEmptied={() => {
-          setVideo ? setVideo(false) : null
+          setVideo ? setVideo(false) : null;
         }}
         onCanPlay={() => {
-          setVideo ? setVideo(true) : null
+          setVideo ? setVideo(true) : null;
         }}
         muted
         autoPlay

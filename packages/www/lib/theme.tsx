@@ -180,13 +180,13 @@ export const theme = {
       },
     },
     close: {
-      color: 'primary',
+      color: "primary",
     },
-    'close-info': {
-      color: 'primary',
+    "close-info": {
+      color: "primary",
     },
-    'close-attention': {
-      color: 'background',
+    "close-attention": {
+      color: "background",
     },
   },
   forms: {
@@ -357,7 +357,7 @@ export const theme = {
   },
   alerts: {
     attention: {
-      backgroundColor: 'red'
+      backgroundColor: "red",
     },
     info: {
       color: "#fff",
@@ -369,9 +369,8 @@ export const theme = {
       WebkitBackgroundClip: "text",
       WebkitTextFillColor: "transparent",
       marginRight: "30px",
-
-    }
-  }
+    },
+  },
 };
 
 const ThemeProvider = memo(({ children, ...props }) => (

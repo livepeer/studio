@@ -72,11 +72,11 @@ const Debugger = () => {
   const [message, setMessage] = useState("");
   const [manifestUrl, setManifestUrl] = useState("");
   const [info, setInfo] = useState<StreamInfo | null>(null);
-  const [loading, setLoading] = useState<boolean>(false)
-  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>(
-    [{name: 0, kbps: 0}]
-  );
-  const [videoExists, setVideoExists] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
+  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
+    { name: 0, kbps: 0 },
+  ]);
+  const [videoExists, setVideoExists] = useState<boolean>(false);
 
   const myJson = useMemo(() => JSON.stringify(info?.session?.profiles), [
     info?.session?.profiles,
@@ -85,17 +85,17 @@ const Debugger = () => {
   const doGetInfo = useCallback(
     async (id: string) => {
       setInfo(null);
-      setLoading(true)
+      setLoading(true);
       const playbackId = id.split("/")[4];
       const [, rinfo] = await getStreamInfo(playbackId);
       if (!rinfo || rinfo.isSession === undefined) {
         setMessage("Not found");
-        setLoading(false)
+        setLoading(false);
       } else if (rinfo.stream) {
         const info = rinfo as StreamInfo;
         setInfo(info);
         setMessage("");
-        setLoading(false)
+        setLoading(false);
       }
     },
     [getStreamInfo]
@@ -126,7 +126,7 @@ const Debugger = () => {
 
   const handleChange = useCallback(
     (e) => {
-      setInfo(null)
+      setInfo(null);
       const value = e.target.value;
       const pattern = new RegExp(
         "^(https?:\\/\\/)?" + // protocol
@@ -139,7 +139,7 @@ const Debugger = () => {
       );
       if (pattern.test(value)) {
         setManifestUrl(value);
-        setLoading(true)
+        setLoading(true);
         setTimeout(() => {
           doGetInfo(value);
         }, 1000);
@@ -147,12 +147,12 @@ const Debugger = () => {
         setManifestUrl("Not valid");
         setMessage("");
         setInfo(null);
-        setLoading(false)
+        setLoading(false);
       } else {
         setManifestUrl("");
         setMessage("");
         setInfo(null);
-        setLoading(false)
+        setLoading(false);
       }
     },
     [doGetInfo]
@@ -161,8 +161,8 @@ const Debugger = () => {
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       if (info) {
-        getIngestRate(manifestUrl)
-      } else return null
+        getIngestRate(manifestUrl);
+      } else return null;
     }, interval);
 
     return () => {
@@ -224,7 +224,10 @@ const Debugger = () => {
                   display: "flex",
                   flexDirection: [
                     `${
-                      message === "Not found" || loading || manifestUrl === 'Not valid' || !videoExists
+                      message === "Not found" ||
+                      loading ||
+                      manifestUrl === "Not valid" ||
+                      !videoExists
                         ? "column"
                         : message !== "Not found" && info
                         ? "row"
@@ -232,7 +235,17 @@ const Debugger = () => {
                     }`,
                     "row",
                   ],
-                  alignItems: [`${message === "Not found" || loading || manifestUrl === 'Not valid' || !videoExists ? 'flex-start' : "center"}`, 'center'],
+                  alignItems: [
+                    `${
+                      message === "Not found" ||
+                      loading ||
+                      manifestUrl === "Not valid" ||
+                      !videoExists
+                        ? "flex-start"
+                        : "center"
+                    }`,
+                    "center",
+                  ],
                   width: "100%",
                 }}>
                 <Input
@@ -241,7 +254,7 @@ const Debugger = () => {
                     borderRadius: "8px",
                     border: "1px solid #CCCCCC",
                     height: "48px",
-                    alignSelf: 'center'
+                    alignSelf: "center",
                   }}
                   label="manifestUrl"
                   name="manifestUrl"
@@ -249,20 +262,25 @@ const Debugger = () => {
                   placeholder="Playback URL"
                   onChange={handleChange}
                 />
-                {loading && <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
+                {loading && (
+                  <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Loading...
-                  </Box>}
-                {!info && manifestUrl === 'Not valid' && !loading &&(
+                  </Box>
+                )}
+                {!info && manifestUrl === "Not valid" && !loading && (
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     Not a valid url.
                   </Box>
                 )}
-                {!info && manifestUrl !== 'Not valid' && !loading && manifestUrl &&(
-                  <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
-                    Stream not found.
-                  </Box>
-                )}
-                {info && !videoExists && !loading &&(
+                {!info &&
+                  manifestUrl !== "Not valid" &&
+                  !loading &&
+                  manifestUrl && (
+                    <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
+                      Stream not found.
+                    </Box>
+                  )}
+                {info && !videoExists && !loading && (
                   <Box sx={{ mt: ["16px", "0"], ml: ["0", "12px"] }}>
                     The stream exists but the url is invalid.
                   </Box>
@@ -288,7 +306,8 @@ const Debugger = () => {
                 fontStyle: "italic",
                 wordBreak: "break-word",
               }}>
-              Stream playback will work in all browsers and devices, but this test player tool works best in Chrome.
+              Stream playback will work in all browsers and devices, but this
+              test player tool works best in Chrome.
             </Box>
           </Box>
           <Box
@@ -301,13 +320,13 @@ const Debugger = () => {
             }}>
             <VideoContainer
               manifestUrl={manifestUrl}
-              title='Your source stream only'
+              title="Your source stream only"
               description="Only the source is streaming."
             />
             <Arrow active={videoExists} />
             <VideoContainer
               manifestUrl={manifestUrl}
-              title='Source stream + Livepeer.com transcoded renditions'
+              title="Source stream + Livepeer.com transcoded renditions"
               description="Adaptive bitrate streaming"
               withOverflow
               setVideo={setVideoExists}
@@ -335,7 +354,12 @@ const Debugger = () => {
                 <p sx={{ fontSize: "20px", fontWeight: "600", mb: "8px" }}>
                   Session ingest rate
                 </p>
-                <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "48px" }}>
+                <p
+                  sx={{
+                    fontSize: "16px",
+                    color: "offBlack",
+                    marginBottom: "48px",
+                  }}>
                   After the stream loads, ingest rate updates every 10 seconds.
                 </p>
                 <Chart data={info && videoExists ? dataChart : null} />
@@ -380,7 +404,9 @@ const Debugger = () => {
                     overflowX: "scroll",
                     padding: "16px",
                   }}>
-                  {info?.session && videoExists && <JSONHighlighter json={myJson} />}
+                  {info?.session && videoExists && (
+                    <JSONHighlighter json={myJson} />
+                  )}
                 </div>
               </div>
             </div>

@@ -236,11 +236,11 @@ export function parseOrder(fieldsMap, val) {
       }
       if (fv.val) {
         if (fv.type == "boolean") {
-          return `coalesce((${fv.val})::boolean, FALSE) ${dir} `
+          return `coalesce((${fv.val})::boolean, FALSE) ${dir} `;
         } else if (fv.type == "int") {
-          return `coalesce((${fv.val})::bigint, 0) ${dir} `
+          return `coalesce((${fv.val})::bigint, 0) ${dir} `;
         } else if (fv.type == "real") {
-          return `coalesce((${fv.val})::real, 0.0) ${dir} `
+          return `coalesce((${fv.val})::real, 0.0) ${dir} `;
         } else {
           return `${fv.val} ${dir} NULLS LAST`;
         }

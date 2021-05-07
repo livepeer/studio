@@ -8,7 +8,7 @@ type Props = {
   description?: string;
   manifestUrl: string;
   withOverflow?: boolean;
-  setVideo?: React.Dispatch<React.SetStateAction<boolean>>
+  setVideo?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const VideoContainer = ({
@@ -16,12 +16,18 @@ const VideoContainer = ({
   description,
   manifestUrl,
   withOverflow,
-  setVideo
+  setVideo,
 }: Props) => {
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
   return (
-    <div sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+    <div
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}>
       <div>
         <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
           {title}

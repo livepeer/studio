@@ -70,34 +70,34 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
     () => [
       {
         Header: "User Name",
-        accessor: "user.email"
+        accessor: "user.email",
       },
       {
         Header: "Name",
-        accessor: "name"
+        accessor: "name",
       },
       {
         Header: "Url",
-        accessor: "url"
+        accessor: "url",
       },
       {
         Header: "Blocking",
         accessor: "blocking",
         Cell: (cell) => {
           return <Checkbox value={cell.value} />;
-        }
+        },
       },
       {
         Header: "Created",
-        accessor: "createdAt"
+        accessor: "createdAt",
       },
       {
         Header: "Status",
         accessor: "deleted",
         Cell: (cell) => {
           return cell.value ? "Deleted" : "Active";
-        }
-      }
+        },
+      },
     ],
     [nextCursor, lastFilters]
   );
@@ -106,7 +106,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
     () => [
       { id: "user.email", placeholder: "user's email" },
       { id: "name", placeholder: "name" },
-      { id: "url", placeholder: "url" }
+      { id: "url", placeholder: "url" },
     ],
     []
   );
@@ -275,8 +275,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
         rowsPerPage={ROWS_PER_PAGE}
         err={loadingError}
         columns={columns}
-        filtersDesc={filtersDesc}
-      >
+        filtersDesc={filtersDesc}>
         <Button
           variant="outlineSmall"
           sx={{ margin: 2 }}
@@ -291,8 +290,7 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
           aria-label="Delete Stream button"
           disabled={!selectedWebhook}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedWebhook && setDeleteModal(true)}
-        >
+          onClick={() => selectedWebhook && setDeleteModal(true)}>
           Delete
         </Button>
       </CommonAdminTable>

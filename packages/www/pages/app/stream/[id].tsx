@@ -725,8 +725,10 @@ const ID = () => {
                     effect="solid">
                     <p>
                       When turned on, any active stream sessions will
-                      immediately end.<br />New sessions will be prevented from
-                      starting until turned off.
+                      immediately end.
+                      <br />
+                      New sessions will be prevented from starting until turned
+                      off.
                     </p>
                   </ReactTooltip>
                 </Box>

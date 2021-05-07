@@ -51,8 +51,7 @@ const PlusIcon = () => {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+      xmlns="http://www.w3.org/2000/svg">
       <path
         d="M12 5V19"
         stroke="black"
@@ -80,16 +79,14 @@ const Trigger = ({ question, isOpen }: TriggerProps) => {
         justifyContent: "space-between",
         alignItems: "center",
         cursor: "pointer",
-        padding: '24px'
-      }}
-    >
+        padding: "24px",
+      }}>
       <p sx={{ fontSize: "20px", fontWeight: "600" }}>{question}</p>
       <i
         sx={{
           transform: isOpen ? "rotate(-45deg)" : "",
           transition: "all 0.2s",
-        }}
-      >
+        }}>
         <PlusIcon />
       </i>
     </div>
@@ -109,16 +106,14 @@ const PricingFaq = () => {
         maxWidth: "790px",
         mt: "144px",
         mb: "112px",
-      }}
-    >
+      }}>
       <h1
         sx={{
           fontSize: [5, 5, 6],
           mb: ["42px", "64px"],
           textAlign: "center",
           letterSpacing: "-0.04em",
-        }}
-      >
+        }}>
         Frequently asked questions
       </h1>
       {faq.map((question, idx) => (
@@ -134,17 +129,15 @@ const PricingFaq = () => {
               question={question.trigger}
               isOpen={questionOpen === idx}
             />
-          }
-        >
+          }>
           <p
             sx={{
-              pb: '24px',
-              px: '24px',
+              pb: "24px",
+              px: "24px",
               color: "#525252",
               fontSize: "18px",
               lineHeight: "1.6",
-            }}
-          >
+            }}>
             {question.answer}
           </p>
         </Collapsible>

@@ -696,7 +696,9 @@ describe("controllers/stream", () => {
       expect(sessions[0].id).toEqual(sess1r.id);
       expect(sessions[0].transcodedSegments).toEqual(12);
       expect(sessions[0].createdAt).toEqual(sess1r.createdAt);
-      expect(sessions[0].recordingUrl).toEqual(`https://test/recordings/${sess2r.id}/index.m3u8`);
+      expect(sessions[0].recordingUrl).toEqual(
+        `https://test/recordings/${sess2r.id}/index.m3u8`
+      );
     });
   });
 });

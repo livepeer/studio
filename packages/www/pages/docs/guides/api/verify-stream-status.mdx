@@ -32,13 +32,16 @@ This is an example response:
 }
 ```
 
-`isActive: true` means video segments are currently being ingested by Livepeer.com. `isActive: false` means the live stream is *idle* and no video segments are currently being ingested by Livepeer.com. 
+`isActive: true` means video segments are currently being ingested by
+Livepeer.com. `isActive: false` means the live stream is _idle_ and no video
+segments are currently being ingested by Livepeer.com.
 
 `lastSeen` represents when the stream was last observed by the monitoring
 system. The time is reported in Unix epoch time. If the stream is running, the
 epoch will be close to the current time.
 
 ### Return all active livestreams
+
 Exclude child-session objects
 
 ```bash
@@ -47,7 +50,9 @@ curl -H 'authorization: Bearer {api-key}' \
 ```
 
 ### Return all idle livestreams
+
 Exclude child-session objects
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"

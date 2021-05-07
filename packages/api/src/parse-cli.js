@@ -118,9 +118,9 @@ export default function parseCli(argv) {
         },
         prices: {
           describe:
-          'hardcoded list of prices for broadcasters to return from /api/orchestrator/hook/auth',
-          type: 'string',
-          default: '[]'
+            "hardcoded list of prices for broadcasters to return from /api/orchestrator/hook/auth",
+          type: "string",
+          default: "[]",
         },
         supportAddr: {
           describe:

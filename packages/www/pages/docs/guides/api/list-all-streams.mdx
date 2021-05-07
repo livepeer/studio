@@ -4,14 +4,18 @@ import DocsLayout from "../../../../components/DocsLayout";
 
 # How to use the Livepeer.com API to list all `stream` objects
 
-You can retrieve all `stream` objects with the same `userID`. These are all streams created via the same Livepeer.com account. 
+You can retrieve all `stream` objects with the same `userID`. These are all
+streams created via the same Livepeer.com account.
 
-This response will include both parent-config and child-session `stream` objects. This [guide](/docs/guides/api/parent-streams-and-sessions) explains the relationship between parent-config and child-session `stream` objects.
+This response will include both parent-config and child-session `stream`
+objects. This [guide](/docs/guides/api/parent-streams-and-sessions) explains the
+relationship between parent-config and child-session `stream` objects.
 
 ```bash
 curl -H 'authorization: Bearer {api_key}' \
 "https://livepeer.com/api/stream"
 ```
+
 Next learn about
 [filtering your list of `stream` objects](/docs/guides/api/filtered-stream-list).
 

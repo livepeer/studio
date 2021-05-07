@@ -21,7 +21,9 @@ const CustomTooltip = ({ active, payload }: any) => {
           sx={{
             fontSize: "12px",
             color: "white",
-          }}>Rate: <b>{payload[0].value} kbps</b></p>
+          }}>
+          Rate: <b>{payload[0].value} kbps</b>
+        </p>
       </div>
     );
   }

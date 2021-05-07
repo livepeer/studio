@@ -30,7 +30,8 @@ function parseCli() {
           default: "localhost",
         },
         "own-region": {
-          describe: "identify region in which this service runs (fra, mdw, etc)",
+          describe:
+            "identify region in which this service runs (fra, mdw, etc)",
           type: "string",
         },
         broadcaster: {
