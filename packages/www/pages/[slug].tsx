@@ -8,7 +8,7 @@ import { getComponent } from "../lib/utils";
 import { useRouter } from "next/router";
 import { Spinner, Box } from "@theme-ui/components";
 
-const Page = ({ title, content, noindex = false, preview }) => {
+const Page = ({ title, description, content, noindex = false, preview }) => {
   const router = useRouter();
   if (router.isFallback) {
     return (
@@ -33,7 +33,11 @@ const Page = ({ title, content, noindex = false, preview }) => {
   return (
     <Layout
       title={`${title} - Livepeer.com`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
+      description={
+        description
+          ? description
+          : `Scalable, secure live transcoding at a fraction of the cost`
+      }
       url={`https://livepeer.com`}
       noindex={noindex}
       preview={preview}>
