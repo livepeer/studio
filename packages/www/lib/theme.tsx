@@ -198,6 +198,11 @@ export const theme = {
     },
   },
   links: {
+    download: {
+      color: "body",
+      textDecoration: "none",
+      fontSize: 1,
+    },
     nav: {
       color: "body",
       textDecoration: "none",

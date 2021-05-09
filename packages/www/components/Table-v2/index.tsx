@@ -40,6 +40,7 @@ type Props<T extends Record<string, unknown>> = {
   onRowSelectionChange?: (rows: Row<T>[]) => void;
   initialSortBy?: Sort<T>[];
   filters?: FilterItem<T>[];
+  showOverflow?: boolean;
 };
 
 const Table = <T extends Record<string, unknown>>({
@@ -51,6 +52,7 @@ const Table = <T extends Record<string, unknown>>({
   onRowSelectionChange,
   initialSortBy,
   filters,
+  showOverflow,
 }: Props<T>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -204,8 +206,8 @@ const Table = <T extends Record<string, unknown>>({
           ) : null}
         </div>
       ) : null}
-      <div sx={{ overflow: "hidden" }}>
-        <div sx={{ overflowX: "auto" }}>
+      <div sx={{ overflow: showOverflow ? "visible" : "hidden" }}>
+        <div sx={{ overflowX: showOverflow ? "visible" : "auto" }}>
           <table
             {...getTableProps()}
             sx={{
