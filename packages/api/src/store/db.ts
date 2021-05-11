@@ -18,11 +18,17 @@ import {
 } from "../schema/types";
 import Table from "./table";
 import StreamTable from "./stream-table";
+import QueueTable from "./queue";
 import { kebabToCamel } from "../util";
 import { QueryOptions } from "./types";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
+
+interface PostgresParams {
+  postgresUrl: string;
+  postgresReplicaUrl?: string;
+}
 
 export class DB {
   // Table objects
@@ -34,6 +40,7 @@ export class DB {
   webhook: Table<Webhook>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
+  queue: QueueTable;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -46,7 +53,7 @@ export class DB {
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl, postgresReplicaUrl }) {
+  async start({ postgresUrl, postgresReplicaUrl }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
       throw new Error("no postgres url provided");
@@ -104,6 +111,7 @@ export class DB {
     });
 
     this.region = new Table<Region>({ db: this, schema: schemas["region"] });
+    this.queue = new QueueTable({ db: this, schema: schemas["queue"] });
     this.session = new Table<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
