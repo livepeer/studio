@@ -22,9 +22,53 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
+  - name: queue
+    description: Webhooks msg queue
 
 components:
   schemas:
+    queue:
+      type: object
+      table: queue
+      required:
+        - time
+        - channel
+        - event
+        - userId
+        - streamId
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: 256d47d4-d59b-4fd5-a87d-d98a68ac27ef
+        kind:
+          type: string
+          readOnly: true
+          example: queue
+        time:
+          type: number
+          readOnly: true
+          example: usage
+        channel:
+          type: string
+          readOnly: true
+          example: webhook_recording_started
+        event:
+          type: string
+          readOnly: true
+          example: stream_started
+        userId:
+          type: string
+          readOnly: true
+          index: true
+        streamId:
+          type: string
+          readOnly: true
+          index: true
+        isConsumed:
+          type: boolean
+          default: false
+
     webhook:
       type: object
       table: webhook
