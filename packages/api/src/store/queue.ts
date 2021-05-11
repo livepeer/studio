@@ -29,7 +29,7 @@ export default class QueueTable extends Table<Queue> {
         sql`SELECT data FROM `
           .append(this.name)
           .append(
-            sql`LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
+            sql` LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
               `${this.name}_next_event`
             )
           )
@@ -39,7 +39,7 @@ export default class QueueTable extends Table<Queue> {
         sql`SELECT data FROM `
           .append(this.name)
           .append(
-            sql`LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
+            sql` LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
               `${this.name}_next_event`
             )
           )

@@ -39,5 +39,7 @@ describe("Queue", () => {
     });
     const event = await db.queue.pop();
     expect(event.channel).toEqual("test.channel");
+    const next = await db.queue.pop();
+    expect(next).toEqual(null);
   });
 });
