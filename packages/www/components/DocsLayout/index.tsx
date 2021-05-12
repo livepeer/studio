@@ -58,7 +58,7 @@ const DocsLayout = ({
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
       url={`https://livepeer.com${asPath}`}
-      customNav={<DocsNav />}>
+      >
       <Container
         sx={{
           pb: 4,
