@@ -1,6 +1,6 @@
 import { transform } from "@babel/core";
 import { useState } from "react";
-import { Download } from "./helpers";
+import { Download } from "./icons";
 
 type SideNavProps = {
   hideTopNav: boolean;
@@ -14,7 +14,7 @@ const SideNav = ({ hideTopNav, hideSideBar, setHideSideBar }: SideNavProps) => {
     <div
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
-        display: "flex",
+        display: ["none", "flex", "flex"],
         position: 'relative',
       }}>
       <div

@@ -21,6 +21,7 @@
     "@mdx-js/react": "^1.6.16",
     "@mdx-js/tag": "^0.20.3",
     "@next/mdx": "^9.5.2",
+    "@radix-ui/react-dropdown-menu": "^0.0.19",
     "@sanity/block-content-to-react": "^2.0.7",
     "@sanity/client": "^1.149.2",
     "@sanity/image-url": "^0.140.17",
