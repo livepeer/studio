@@ -1,13 +1,34 @@
 import { transform } from "@babel/core";
 import { useState } from "react";
 import { Download } from "./icons";
+import { keyframes } from "@emotion/react";
 
 type SideNavProps = {
   hideTopNav: boolean;
-  hideSideBar: boolean
-  setHideSideBar: React.Dispatch<React.SetStateAction<boolean>>
+  hideSideBar: boolean;
+  setHideSideBar: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const fadeOut = keyframes`
+  0% {
+    position: unset;
+    left: 0;
+  }
+  100% {
+    position: absolute;
+    left: -230px;
+  }
+`;
+const fadeIn = keyframes`
+  0% {
+    position: absolute;
+    left: -230px;
+  }
+  100% {
+    position: unset;
+    left: 0;
+  }
+`;
 
 const SideNav = ({ hideTopNav, hideSideBar, setHideSideBar }: SideNavProps) => {
   return (
@@ -15,15 +36,16 @@ const SideNav = ({ hideTopNav, hideSideBar, setHideSideBar }: SideNavProps) => {
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
         display: ["none", "flex", "flex"],
-        position: 'relative',
+        position: "relative",
       }}>
       <div
         sx={{
-          position: hideSideBar ? "absolute" : "unset",
-          left: hideSideBar ? "-230px" : "0",
+          animation: hideSideBar ? fadeOut : fadeIn,
+          animationDuration: "0.2s",
+          animationFillMode: "forwards",
           transition: "all 0.2s",
-          padding: '24px 0',
-          width: '202px'
+          padding: "24px 0",
+          width: "202px",
         }}>
         <p
           sx={{
@@ -40,7 +62,7 @@ const SideNav = ({ hideTopNav, hideSideBar, setHideSideBar }: SideNavProps) => {
       <div
         sx={{
           borderRight: "1px solid #E6E6E6",
-          height: '100%',
+          height: "100%",
           padding: "24px",
           transition: "all 0.2s",
         }}>

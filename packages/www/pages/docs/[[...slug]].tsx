@@ -17,42 +17,41 @@ import {
 
 const mobileCategories = [
   {
-    name: 'Homepage',
-    icon: <IconHouse id='mobileHouse' />
+    name: "Homepage",
+    icon: <IconHouse id="mobileHouse" />,
   },
   {
-    name: 'Video Guides',
-    icon: <IconVideoGuides id='mobileVideoGuides' />
+    name: "Video Guides",
+    icon: <IconVideoGuides id="mobileVideoGuides" />,
   },
   {
-    name: 'API Reference',
-    icon: <IconApiReference id='mobileApiReference' />
+    name: "API Reference",
+    icon: <IconApiReference id="mobileApiReference" />,
   },
-]
+];
 
 const categories = [
   {
-    name: 'Homepage',
-    icon: <IconHouse />
+    name: "Homepage",
+    icon: <IconHouse />,
   },
   {
-    name: 'Video Guides',
-    icon: <IconVideoGuides />
+    name: "Video Guides",
+    icon: <IconVideoGuides />,
   },
   {
-    name: 'API Reference',
-    icon: <IconApiReference />
+    name: "API Reference",
+    icon: <IconApiReference />,
   },
-]
+];
 
 const DocsIndex = () => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(categories[0]);
+  const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
 
   return (
-    <Box
-      sx={{ display: "flex", position: "relative", flexDirection: "column" }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       <DocsNav
         hideTopNav={hideTopNav}
         setHideTopNav={setHideTopNav}
@@ -61,12 +60,15 @@ const DocsIndex = () => {
         categories={categories}
         mobileCategories={mobileCategories}
       />
-      <div sx={{ display: "flex" }}>
+      <div
+        sx={{
+          display: "flex",
+          position: "sticky",
+          top: hideTopNav ? "76px" : "136px",
+        }}>
         <div
           sx={{
-            position: "absolute",
             transition: "all 0.2s",
-            top: hideTopNav ? "76px" : "136px",
           }}>
           <SideNav
             hideTopNav={hideTopNav}
@@ -76,9 +78,8 @@ const DocsIndex = () => {
         </div>
         <Container
           sx={{
-            ml: ['0', hideSideBar ? "70px" : "272px"],
             mt: hideTopNav ? "-12px" : "48px",
-            mr: 0,
+            mx: 0,
             transition: "all 0.2s",
             display: "flex",
             justifyContent: "center",
@@ -138,6 +139,14 @@ const DocsIndex = () => {
       </div>
     </Box>
   );
+};
+
+export const getStaticPaths = async () => {
+  return {};
+};
+
+export const getStaticProps = async () => {
+  return {};
 };
 
 export default DocsIndex;
