@@ -35,8 +35,13 @@ const SideNav = ({ hideTopNav, hideSideBar, setHideSideBar }: SideNavProps) => {
     <div
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
-        display: ["none", "flex", "flex"],
-        position: "relative",
+        display: ["none", 'none', "flex", "flex"],
+        position: "sticky",
+        gridColumn: hideSideBar ? [null, null, '1 / 2', '1 / 2'] : [null, null, '1 / 5', '1 / 4'],
+        marginTop: hideTopNav ? '-60px' : '',
+        transition: 'all 0.2s',
+        background: 'white',
+        top: hideTopNav ? 76 : 136
       }}>
       <div
         sx={{

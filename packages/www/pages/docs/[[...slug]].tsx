@@ -83,7 +83,7 @@ const DocsIndex = ({ doc, menu }) => {
   });
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box sx={{ display: "grid", gridTemplateColumns: 'repeat(15, 1fr)', gridTemplateRows: 'auto auto' }}>
       <DocsNav
         hideTopNav={hideTopNav}
         setHideTopNav={setHideTopNav}
@@ -92,43 +92,33 @@ const DocsIndex = ({ doc, menu }) => {
         categories={categories}
         mobileCategories={mobileCategories}
       />
-      <div
+      <SideNav
+        hideTopNav={hideTopNav}
+        hideSideBar={hideSideBar}
+        setHideSideBar={setHideSideBar}
+      />
+      <Container
         sx={{
+          mt: hideTopNav ? "-12px" : "48px",
+          gridColumn: hideSideBar ? ['1 / 16', '1 / 16', '2 / 16', '2 / 16'] : ['1 / 16', '1 / 16', '5 / 16', '4 / 16'],
+          justifyItems: 'center',
+          mx: 0,
+          transition: "all 0.2s",
           display: "flex",
-          position: "sticky",
-          top: hideTopNav ? "76px" : "136px",
+          justifyContent: "center",
+          alignItems: "flex-start",
         }}>
         <div
+          className={styles.markdown}
           sx={{
-            transition: "all 0.2s",
-          }}>
-          <SideNav
-            hideTopNav={hideTopNav}
-            hideSideBar={hideSideBar}
-            setHideSideBar={setHideSideBar}
-          />
-        </div>
-        <Container
-          sx={{
-            mt: hideTopNav ? "-12px" : "48px",
-            mx: 0,
-            transition: "all 0.2s",
             display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
+            flexDirection: "column",
+            maxWidth: "768px",
+            paddingBottom: "80px",
           }}>
-          <div
-            className={styles.markdown}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              maxWidth: "768px",
-              paddingBottom: "80px",
-            }}>
-            {content}
-          </div>
-        </Container>
-      </div>
+          {content}
+        </div>
+      </Container>
     </Box>
   );
 };
@@ -175,7 +165,8 @@ export const getStaticProps = async (context) => {
             description: eachChild.description,
             children: allSlugs.filter(
               (secondChild) =>
-                secondChild.slug.split("/")[1] === eachChild.slug.split('/')[1] &&
+                secondChild.slug.split("/")[1] ===
+                  eachChild.slug.split("/")[1] &&
                 secondChild.slug.split("/").length == 3
             ),
           };

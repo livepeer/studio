@@ -51,6 +51,7 @@ const DocsNav = ({
     <Box
       sx={{
         borderBottom: "1px solid #E6E6E6",
+        gridColumn: '1 / 16',
         position: "sticky",
         paddingBottom: "24px",
         transition: "all 0.2s",
