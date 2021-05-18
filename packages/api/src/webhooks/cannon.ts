@@ -35,6 +35,10 @@ export default class WebhookCannon {
   stop() {}
 
   async onTrigger(event: Queue) {
+    if (!event) {
+      return;
+    }
+
     const { data: webhooksList } = await getWebhooks(
       this.store,
       event.userId,
