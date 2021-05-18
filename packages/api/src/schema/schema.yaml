@@ -85,6 +85,46 @@ components:
           description: Timestamp (in milliseconds)
           example: 1587667174725
 
+    webhookResponse:
+      type: object
+      table: webhookResponse
+      required:
+        - webhookId
+        - eventId
+        - statusCode
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          example: webhookResponse
+        webhookId:
+          type: string
+          readOnly: true
+          index: true
+        eventId:
+          type: string
+          readOnly: true
+          index: true
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+        statusCode:
+          type: number
+          default: 0
+        responseObject:
+          type: object
+          additionalProperties: true
+          properties:
+            body:
+              type: string
+
     webhook:
       type: object
       table: webhook

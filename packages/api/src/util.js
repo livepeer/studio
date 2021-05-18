@@ -54,6 +54,13 @@ export const fetchWithTimeout = (url, options) =>
     );
   });
 
+export const fetchWithTimeoutAndSleep = (url, options, sleep) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      fetchWithTimeout(url, options).then(resolve).catch(reject);
+    }, sleep);
+  });
+};
 // turns foo-bar-baz into fooBarBaz
 export const kebabToCamel = (str) => {
   let out = "";

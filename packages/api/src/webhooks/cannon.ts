@@ -1,8 +1,8 @@
 import { DB } from "../store/db";
-import { Queue } from "../schema/types";
+import { Queue, Webhook } from "../schema/types";
 import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeout, fetchWithTimeoutAndSleep } from "../util";
 import logger from "../logger";
 
 import { parse as parseUrl } from "url";
@@ -37,6 +37,9 @@ export default class WebhookCannon {
   stop() {}
 
   calcBackoff(lastInterval): number {
+    if (!lastInterval || lastInterval < 1000) {
+      lastInterval = 5000;
+    }
     let newInterval = lastInterval * BACKOFF_COEF;
     if (newInterval > MAX_BACKOFF) {
       return lastInterval;
@@ -49,6 +52,17 @@ export default class WebhookCannon {
     event.status = "pending";
     event.reteries = event.reteries ? event.reteries + 1 : 1;
     this.db.queue.updateMsg(event);
+  }
+
+  async storeResponse(webhook: Webhook, event: Queue, resp: Response) {
+    // TODO
+    // store response for each time a webhook fires.
+    await this.db.webhookResponse.create({
+      webhookId: webhook.id,
+      eventId: event.id,
+      statusCode: resp.status,
+      response: resp,
+    });
   }
 
   async onTrigger(event: Queue) {
@@ -124,20 +138,30 @@ export default class WebhookCannon {
 
             try {
               logger.info(`webhook ${webhook.id} firing`);
-              let resp = await fetchWithTimeout(webhook.url, params);
+              let resp = await fetchWithTimeoutAndSleep(
+                webhook.url,
+                params,
+                event.lastInterval
+              );
               if (resp.status >= 200 && resp.status < 300) {
                 // 2xx requests are cool.
                 // all is good
                 logger.info(`webhook ${webhook.id} fired successfully`);
+                this.storeResponse(webhook, event, resp);
                 return true;
               }
               console.error(
                 `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
               );
+              this.storeResponse(webhook, event, resp);
+              // retry
+              this.retry(event);
+              return;
               // return !webhook.blocking;
             } catch (e) {
               console.log("firing error", e);
               // return !webhook.blocking;
+              return;
             }
           }
         })
