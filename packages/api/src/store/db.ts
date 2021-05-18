@@ -88,6 +88,11 @@ export class DB {
     if (!this.pool) {
       return;
     }
+
+    if (this.queue) {
+      this.queue.stop();
+    }
+
     await this.pool.end();
   }
 
