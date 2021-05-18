@@ -31,13 +31,14 @@ const DocsNav = ({
   currentCategory,
   setCurrentCategory,
   categories,
-  mobileCategories
+  mobileCategories,
 }: DocsNavProps) => {
   const { pathname } = useRouter();
   const [menuMobile, setMenuMobile] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
+  const router = useRouter();
 
   useEffect(() => {
     if (token) {
@@ -51,7 +52,7 @@ const DocsNav = ({
     <Box
       sx={{
         borderBottom: "1px solid #E6E6E6",
-        gridColumn: '1 / 16',
+        gridColumn: "1 / 16",
         position: "sticky",
         paddingBottom: "24px",
         transition: "all 0.2s",
@@ -174,8 +175,10 @@ const DocsNav = ({
           }}>
           {categories.map((each, idx) => (
             <div
-              onClick={() => setCurrentCategory(each)}
-              key={idx}
+              onClick={() => {
+                setCurrentCategory(each);
+                router.push(each.slug);
+              }}
               sx={{
                 cursor: "pointer",
                 display: "flex",
@@ -183,7 +186,7 @@ const DocsNav = ({
                 mr: "32px",
               }}>
               <i>{each.icon}</i>
-              <p
+              <span
                 sx={{
                   fontSize: "14px",
                   fontWeight: "500",
@@ -197,7 +200,7 @@ const DocsNav = ({
                     each.name === currentCategory.name ? "black" : "#828282",
                 }}>
                 {each.name}
-              </p>
+              </span>
             </div>
           ))}
         </Flex>
@@ -259,16 +262,19 @@ const DocsNav = ({
                 .map((each, idx) => (
                   <DropdownMenu.Item
                     key={idx}
-                    onSelect={() => setCurrentCategory(each)}
+                    onSelect={() => {
+                      setCurrentCategory(each);
+                      router.push(each.slug);
+                    }}
                     sx={{
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       width: "100%",
                       pt: "24px",
-                      ':last-child': {
-                          pb: '24px'
-                      }
+                      ":last-child": {
+                        pb: "24px",
+                      },
                     }}>
                     <i>{each.icon}</i>
                     <p

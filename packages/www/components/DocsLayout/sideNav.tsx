@@ -4,6 +4,8 @@ import { keyframes } from "@emotion/react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import { TiArrowSortedDown } from "react-icons/ti";
+import Link from "next/link";
+import { BiBorderRadius } from "react-icons/bi";
 
 type SideNavProps = {
   hideTopNav: boolean;
@@ -31,19 +33,37 @@ type MenuProps = {
 
 type TriggerProps = {
   label: string;
+  isOpen: boolean;
+  isSelected: boolean;
 };
 
-const Trigger = ({ label }: TriggerProps) => {
+const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
   return (
     <div
       sx={{
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         cursor: "pointer",
         background: "white",
+        minHeight: "fit-content",
+        pl: "24px",
+        position: "relative",
       }}>
+      <div
+        sx={{
+          position: "absolute",
+          left: "0",
+          width: "4px",
+          height: "100%",
+          transition: "all 0.2s",
+          background: isSelected ? "#943CFF" : "transparent",
+          borderRadius: " 0 2px 2px 0",
+        }}
+      />
       <p
         sx={{
+          fontWeight: isSelected ? "600" : "400",
+          transition: "all 0.2s",
           mr: "8px",
           fontSize: "14px",
           letterSpacing: "-0.02em",
@@ -51,42 +71,101 @@ const Trigger = ({ label }: TriggerProps) => {
         }}>
         {label}
       </p>
-      <TiArrowSortedDown color="#AFAFAF" size={12} />
+      <i
+        sx={{
+          transform: isOpen ? "rotate(-90deg)" : "",
+          transition: "all 0.1s",
+          mt: "6px",
+        }}>
+        <TiArrowSortedDown color="#AFAFAF" size={12} />
+      </i>
     </div>
   );
 };
 
 const Menu = ({ menu }: MenuProps) => {
+  const router = useRouter();
+  const [currentSection, setCurrentSection] = useState("");
+  const currentPath = router.asPath.split("/").slice(0, 4).join("/");
   return (
     <div
       sx={{
         mt: "24px",
-        pl: "24px",
         display: "flex",
         flexDirection: "column",
       }}>
-      {menu[0].children.map((route, idx) => (
-        <Collapsible
-          transitionTime={200}
-          sx={{ background: "none" }}
-          key={idx}
-          trigger={<Trigger label={route.title} />}>
-          {route.children.map((child, idx2) => (
-            <p
-              key={idx2}
+      {menu[0]?.children.map((route, idx) =>
+        route.children.length > 0 ? (
+          <Collapsible
+            handleTriggerClick={() =>
+              currentSection === route.title
+                ? setCurrentSection(null)
+                : setCurrentSection(route.title)
+            }
+            open={currentSection === route.title}
+            transitionTime={200}
+            sx={{ background: "none", mt: "16px" }}
+            key={idx}
+            trigger={
+              <Trigger
+                isOpen={route.title === currentSection}
+                label={route.title}
+                isSelected={currentPath === `/${route.slug}`}
+              />
+            }>
+            {route.children.map((child, idx2) => (
+              <Link href={`/${child.slug}`}>
+                <a
+                  key={idx2}
+                  sx={{
+                    fontSize: "14px",
+                    letterSpacing: "-0.02em",
+                    color:
+                      router.asPath === `/${child.slug}`
+                        ? "#943CFF"
+                        : "#3C3C3C",
+                    ml: "48px !important",
+                    mt: "16px !important",
+                    transition: "all 0.2s",
+                    cursor: "pointer",
+                  }}>
+                  {child.title}
+                </a>
+              </Link>
+            ))}
+          </Collapsible>
+        ) : (
+          <Link href={`/${route.slug}`}>
+            <a
               sx={{
                 fontSize: "14px",
                 letterSpacing: "-0.02em",
                 color: "#3C3C3C",
-                ml: '24px !important',
-                mt: '16px !important',
-                cursor: 'pointer'
+                mt: "16px !important",
+                cursor: "pointer",
+                position: "relative",
+                fontWeight: currentPath === `/${route.slug}` ? '600' : '400',
+                pl: '24px'
               }}>
-              {child.title}
-            </p>
-          ))}
-        </Collapsible>
-      ))}
+              <div
+                sx={{
+                  position: "absolute",
+                  left: "0",
+                  width: "4px",
+                  height: "100%",
+                  transition: "all 0.2s",
+                  background:
+                    currentPath === `/${route.slug}`
+                      ? "#943CFF"
+                      : "transparent",
+                  borderRadius: " 0 2px 2px 0",
+                }}
+              />
+              <span>{route.title}</span>
+            </a>
+          </Link>
+        )
+      )}
     </div>
   );
 };
@@ -119,12 +198,15 @@ const SideNav = ({
   menu,
 }: SideNavProps & MenuProps) => {
   const router = useRouter();
-  const currentMenu = menu.filter((a) => `/${a.slug}` === router.asPath);
+  const currentMenu = menu.filter(
+    (a) => `/${a.slug}` === router.asPath.split("/").slice(0, 3).join("/")
+  );
   return (
     <div
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
         display: ["none", "none", "flex", "flex"],
+        justifyContent: "space-between",
         position: "sticky",
         gridColumn: hideSideBar
           ? [null, null, "1 / 2", "1 / 2"]
@@ -141,7 +223,7 @@ const SideNav = ({
           animationFillMode: "forwards",
           transition: "all 0.2s",
           padding: "24px 0",
-          width: "202px",
+          maxWidth: "100%",
         }}>
         <p
           sx={{
