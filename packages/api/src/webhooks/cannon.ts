@@ -11,6 +11,8 @@ const { Resolver } = require("dns").promises;
 const resolver = new Resolver();
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
+const MAX_BACKOFF = 10 * 60 * 1000;
+const BACKOFF_COEF = 1.2;
 
 export default class WebhookCannon {
   db: DB;
@@ -33,6 +35,21 @@ export default class WebhookCannon {
   }
 
   stop() {}
+
+  calcBackoff(lastInterval): number {
+    let newInterval = lastInterval * BACKOFF_COEF;
+    if (newInterval > MAX_BACKOFF) {
+      return lastInterval;
+    }
+    return newInterval;
+  }
+
+  retry(event) {
+    event.lastInterval = this.calcBackoff(event.lastInterval);
+    event.status = "pending";
+    event.reteries = event.reteries ? event.reteries + 1 : 1;
+    this.db.queue.updateMsg(event);
+  }
 
   async onTrigger(event: Queue) {
     if (!event) {
@@ -117,10 +134,10 @@ export default class WebhookCannon {
               console.error(
                 `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
               );
-              return !webhook.blocking;
+              // return !webhook.blocking;
             } catch (e) {
               console.log("firing error", e);
-              return !webhook.blocking;
+              // return !webhook.blocking;
             }
           }
         })
