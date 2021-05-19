@@ -203,6 +203,16 @@ export const theme = {
       textDecoration: "none",
       fontSize: 1,
     },
+    downloadOutline: {
+      variant: "links.download",
+      borderRadius: 6,
+      borderWidth: "1px",
+      borderColor: "black",
+      bg: "transparent",
+      color: "text",
+      transition: "background-color .15s",
+      "&:hover": { bg: "muted" },
+    },
     nav: {
       color: "body",
       textDecoration: "none",
