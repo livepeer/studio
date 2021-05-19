@@ -111,3 +111,68 @@
     font-size: 12px;
     margin-right: 12px;
 }
+
+.markdown p code {
+    font-size: 12px;
+
+    padding: 4px;
+    font-weight: 400;
+
+    letter-spacing: -0.03rem;
+
+    background: #F1F1F1;
+    border-radius: 4px
+}
+
+.markdown table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid #E8ECEF;
+    border-radius: 8px;
+    margin: 0 0 56px;
+    overflow: hidden;
+}
+
+.markdown table th, .markdown table td  {
+    min-height: 48px !important;
+    padding: 12px 16px;
+    border: none;
+}
+
+.markdown table th {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.markdown table td {
+    letter-spacing: 0.02em;
+    font-size: 14px;
+    font-weight: 500;
+    background: white;
+}
+
+.markdown table th:not(:last-of-type) {
+    border-right: 1px solid #E8ECEF;
+}
+
+.markdown table td {
+    border-top: 1px solid #E8ECEF;
+}
+
+.markdown table td:not(:last-of-type) {
+    border-right: 1px solid #E8ECEF;
+}
+
+.markdown table td:nth-child(1) {
+    background: #FBFCFF;
+    min-width: 230px;
+    border-right: 1px solid #E8ECEF;
+}
+
+@media (max-width: 640px) {
+    .markdown table td:nth-child(1) {
+        min-width: 140px;
+    }
+}

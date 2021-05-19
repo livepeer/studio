@@ -5,11 +5,23 @@ description: Livepeer Documentation
 
 # Video Guides Introduction
 
-There are multiple ways to livestream with livepeer.com. The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
+``Use `code` in your Markdown file.`` There are multiple ways to livestream with livepeer.com. The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
 
 You can integrate your streaming application directly with the Livepeer.com API. If you are creating a live streaming platform or application, the Livepeer.com API will best meet your needs.
 
 Or you can use the Livepeer.com dashboard to livestream without writing any code. If you are doing manual broadcasts like streaming events, concerts, or webinars, you can use the Livepeer.com dashboard.
+
+| Field                   | Notes                                                                             | 
+| :---                    |    :----:                                                                         |
+| Location                | EU, US                                                                            |
+| Ingest Format           | RTMP                                                                              |
+| Ingest Codec            | H264 + AAC                                                                        |
+| Ingest Authentication   | Webhook based                                                                     |
+| Encoder Software        | Supported tested: OBS 25.0.8, ffmpeg 4.3, Streamaxia                              |
+|                         | Supported untested: Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders |
+|                         | **Unsupported:** WebRTC and SRT encoders                                          |
+| Resolution              | **Supported tested:** custom resolution up to 1080p                               |
+|                         | **Supported untested:** custom resolution up to 4k                                |
 
 Either way, the first thing you’ll need to do is [create an account on Livepeer.com](/sign-up).
 

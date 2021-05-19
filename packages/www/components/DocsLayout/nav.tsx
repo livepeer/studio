@@ -175,6 +175,7 @@ const DocsNav = ({
           }}>
           {categories.map((each, idx) => (
             <div
+              key={idx}
               onClick={() => {
                 setCurrentCategory(each);
                 router.push(each.slug);

@@ -219,7 +219,6 @@ const SideNav = ({
       <div
         sx={{
           animation: hideSideBar ? fadeOut : fadeIn,
-          animationDuration: "0.2s",
           animationFillMode: "forwards",
           transition: "all 0.2s",
           padding: "24px 0",
