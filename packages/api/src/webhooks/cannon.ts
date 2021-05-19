@@ -17,24 +17,30 @@ const BACKOFF_COEF = 1.2;
 export default class WebhookCannon {
   db: DB;
   store: Model;
+  running: boolean;
   constructor({ db, store }) {
     this.db = db;
     this.store = store;
+    this.running = true;
     this.start();
   }
 
   async start() {
-    while (true) {
-      let event = this.db.queue.pop();
-      try {
-        await this.onTrigger(event);
-      } catch (e) {
-        console.error("webhook loop error", e);
+    if (this.running) {
+      while (true) {
+        let event = this.db.queue.pop();
+        try {
+          await this.onTrigger(event);
+        } catch (e) {
+          console.error("webhook loop error", e);
+        }
       }
     }
   }
 
-  stop() {}
+  stop() {
+    this.running = false;
+  }
 
   calcBackoff(lastInterval): number {
     if (!lastInterval || lastInterval < 1000) {
