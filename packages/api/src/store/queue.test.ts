@@ -9,7 +9,6 @@ jest.setTimeout(15000);
 
 describe("Queue", () => {
   let db: DB;
-  let table: QueueTable;
 
   beforeEach(async () => {
     try {
@@ -20,7 +19,7 @@ describe("Queue", () => {
       await pool.query("DROP DATABASE test");
       await pool.end();
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
 
     db = new DB();

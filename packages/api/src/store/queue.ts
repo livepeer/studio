@@ -24,7 +24,11 @@ export default class QueueTable extends Table<Queue> {
   }
 
   async stop() {
-    await this.client.release();
+    try {
+      await this.client.release();
+    } catch (e) {
+      console.log("QueueTable: Stop: ", e);
+    }
   }
   // name: string;
   // constructor({ db, schema }) {
