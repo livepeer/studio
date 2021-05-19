@@ -14,6 +14,7 @@ import {
   PasswordResetToken,
   Usage,
   Region,
+  WebhookResponse,
   Session,
 } from "../schema/types";
 import Table from "./table";

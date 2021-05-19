@@ -24,6 +24,8 @@ tags:
     description: Webhooks endpoints
   - name: queue
     description: Webhooks msg queue
+  - name: webhookResponse
+    description: webhook client responses
 
 components:
   schemas:
@@ -87,7 +89,7 @@ components:
 
     webhookResponse:
       type: object
-      table: webhookResponse
+      table: webhook_response
       required:
         - webhookId
         - eventId
