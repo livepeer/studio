@@ -23,8 +23,8 @@ export default class QueueTable extends Table<Queue> {
     this.client = await this.db.pool.connect();
   }
 
-  stop() {
-    this.client.release();
+  async stop() {
+    await this.client.release();
   }
   // name: string;
   // constructor({ db, schema }) {

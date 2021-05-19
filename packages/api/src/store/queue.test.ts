@@ -12,11 +12,11 @@ describe("Queue", () => {
   let table: QueueTable;
 
   beforeEach(async () => {
-    const pool = new Pool({
-      connectionString: `postgresql://postgres@localhost/postgres`,
-      connectionTimeoutMillis: 5000,
-    });
     try {
+      const pool = new Pool({
+        connectionString: `postgresql://postgres@localhost/postgres`,
+        connectionTimeoutMillis: 5000,
+      });
       await pool.query("DROP DATABASE test");
       await pool.end();
     } catch (e) {
@@ -74,6 +74,6 @@ describe("Queue", () => {
     console.log("event3 ", event3);
     expect(event3).toEqual(null);
 
-    db.queue.stop();
+    await db.queue.stop();
   });
 });
