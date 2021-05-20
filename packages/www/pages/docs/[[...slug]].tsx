@@ -11,14 +11,15 @@ import {
   DocsPost,
   SimpleCard,
   DocsGrid,
+  Heading,
 } from "components/DocsLayout/helpers";
 import {
   IconApiReference,
   IconHouse,
   IconVideoGuides,
 } from "components/DocsLayout/icons";
-import { Heading } from "@theme-ui/components";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const mobileCategories = [
   {
@@ -61,7 +62,7 @@ const components = {
     return <Heading as="h1">{children}</Heading>;
   },
   h2: ({ children }) => {
-    return <Heading as="h2">{children}</Heading>;
+    return <Heading as="h3">{children}</Heading>;
   },
   h3: ({ children }) => {
     return <Heading as="h3">{children}</Heading>;
@@ -83,10 +84,13 @@ const DocsIndex = ({ doc, menu }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
+  const router = useRouter();
 
   const content = useHydrate(doc, {
     components: components,
   });
+
+  const breadCrumb = router.asPath.split("#")[0].split("/");
 
   return (
     <Box
@@ -130,6 +134,26 @@ const DocsIndex = ({ doc, menu }) => {
             maxWidth: "768px",
             paddingBottom: "80px",
           }}>
+          <div
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              color: "#202020",
+              fontSize: "12px",
+              letterSpacing: "-0.02em",
+              mb: "16px",
+            }}>
+            {breadCrumb.slice(2, 5).map((a, idx) => (
+              <div key={idx} sx={{ display: "flex", alignItems: "center" }}>
+                <span sx={{ textTransform: "capitalize" }}>
+                  {a.split("-").join(" ")}
+                </span>
+                {idx < breadCrumb.length - 3 && (
+                  <span sx={{ mx: "6px" }}>/</span>
+                )}
+              </div>
+            ))}
+          </div>
           {content}
         </div>
       </Container>
@@ -167,9 +191,7 @@ export const getStaticProps = async (context) => {
     );
   });
 
-  const routePaths = sorted.filter(
-    (each) => each.slug.split("/").length <= 2
-  );
+  const routePaths = sorted.filter((each) => each.slug.split("/").length <= 2);
 
   const menu = routePaths.map((each) => {
     return {
@@ -179,7 +201,7 @@ export const getStaticProps = async (context) => {
       children: sorted
         .filter(
           (child) =>
-            child.slug.split("/")[1] === each.slug.split('/')[1] &&
+            child.slug.split("/")[1] === each.slug.split("/")[1] &&
             child.slug.split("/").length == 3
         )
         .map((eachChild) => {

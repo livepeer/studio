@@ -1,6 +1,7 @@
 import { Grid } from "@theme-ui/components";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
 
@@ -29,6 +30,11 @@ type GridProps = {
   cols: number | string;
 };
 
+type HeadingProps = {
+  as: "h1" | "h2" | "h3";
+  children: ReactNode;
+};
+
 const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
   return (
     <div
@@ -47,8 +53,12 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
             "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
         },
       }}>
-      <div>
-        <p
+      <div
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}>
+        <span
           sx={{
             mb: "16px",
             fontWeight: "600",
@@ -58,8 +68,8 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
             color: "white",
           }}>
           {title}
-        </p>
-        <p
+        </span>
+        <span
           sx={{
             fontSize: "16px",
             color: "white",
@@ -67,7 +77,7 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
             letterSpacing: "-0.02em",
           }}>
           {description}
-        </p>
+        </span>
       </div>
       <Link href={href}>
         <a
@@ -100,7 +110,7 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
     <div
       sx={{
         width: "100%",
-        maxWidth: '240px',
+        maxWidth: "240px",
         padding: "24px",
         border: "1px solid #E6E6E6",
         minHeight: "152px",
@@ -146,7 +156,13 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
 const DocsPost = ({ description, title, image, href }: PostProps) => {
   return (
     <Link href={href}>
-      <a sx={{ display: "flex", flexDirection: "column", width: "100%", cursor: 'pointer' }}>
+      <a
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          cursor: "pointer",
+        }}>
         <Image
           src={image}
           layout="responsive"
@@ -190,8 +206,8 @@ const DocsGrid = ({ children, cols }: GridProps) => {
     <Grid
       sx={{
         gap: "24px",
-        mb: '56px',
-        justifyItems: 'center',
+        mb: "56px",
+        justifyItems: "center",
         gridTemplateColumns: ["1fr", "1fr 1fr", `repeat(${cols}, 1fr)`],
       }}>
       {children}
@@ -199,4 +215,27 @@ const DocsGrid = ({ children, cols }: GridProps) => {
   );
 };
 
-export { SimpleCard, NavigationCard, DocsPost, DocsGrid };
+const Heading = ({ children, as }: HeadingProps) => {
+  const id = children[0].props.href;
+  const router = useRouter();
+  const path = router?.asPath;
+  return (
+    <div sx={{ position: "relative" }}>
+      <span
+        id={id.replace("#", "")}
+        sx={{ position: "absolute", top: "-150px" }}
+      />
+      <Link href={`${path?.split("#")[0]}${id}`}>
+        {as === "h1" ? (
+          <h1 sx={{ cursor: "pointer" }}>{children}</h1>
+        ) : as === "h2" ? (
+          <h2 sx={{ cursor: "pointer" }}>{children}</h2>
+        ) : (
+          <h3 sx={{ cursor: "pointer" }}>{children}</h3>
+        )}
+      </Link>
+    </div>
+  );
+};
+
+export { SimpleCard, NavigationCard, DocsPost, DocsGrid, Heading };
