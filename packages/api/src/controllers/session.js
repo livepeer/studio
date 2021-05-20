@@ -36,12 +36,12 @@ const fieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
-function getRecordingUrl(ingest, session) {
+function getRecordingUrl(ingest, session, mp4 = false) {
   return pathJoin(
     ingest,
     `recordings`,
     session.lastSessionId ? session.lastSessionId : session.id,
-    `index.m3u8`
+    mp4 ? `source.mp4` : `index.m3u8`
   );
 }
 
@@ -106,6 +106,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
       session.recordingStatus = isReady ? "ready" : "waiting";
       if (isReady || (req.user.admin && forceUrl)) {
         session.recordingUrl = getRecordingUrl(ingest, session);
+        session.mp4Url = getRecordingUrl(ingest, session, true);
       }
     }
   });
@@ -233,6 +234,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady) {
       session.recordingUrl = getRecordingUrl(ingest, session);
+      session.mp4Url = getRecordingUrl(ingest, session, true);
     }
   }
   if (!req.user.admin) {
