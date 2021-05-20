@@ -422,6 +422,8 @@ components:
               - waiting
           recordingUrl:
             type: string
+          mp4Url:
+            type: string
           lastSessionId:
             type: string
 

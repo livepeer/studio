@@ -182,6 +182,28 @@ app.get("/", authMiddleware({}), async (req, res) => {
   );
 });
 
+function setRecordingStatus(req, ingest, session, forceUrl) {
+  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
+  if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
+    const isReady = session.lastSeen < olderThen;
+    session.recordingStatus = isReady ? "ready" : "waiting";
+    if (isReady || (req.user.admin && forceUrl)) {
+      session.recordingUrl = pathJoin(
+        ingest,
+        `recordings`,
+        session.id,
+        `index.m3u8`
+      );
+      session.mp4Url = pathJoin(
+        ingest,
+        `recordings`,
+        session.id,
+        `source.mp4`
+      );
+    }
+  }
+}
+
 // returns only 'user' sessions and adds
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
@@ -230,18 +252,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   sessions = sessions.map((session) => {
-    if (session.record && session.recordObjectStoreId) {
-      const isReady = session.lastSeen < olderThen;
-      session.recordingStatus = isReady ? "ready" : "waiting";
-      if (isReady || (req.user.admin && forceUrl)) {
-        session.recordingUrl = pathJoin(
-          ingest,
-          `recordings`,
-          session.id,
-          `index.m3u8`
-        );
-      }
-    }
+    setRecordingStatus(req, ingest, session, forceUrl);
     if (!raw) {
       if (session.previousSessions && session.previousSessions.length) {
         session.id = session.previousSessions[0]; // return id of the first session object so
@@ -373,6 +384,13 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
       ...lastSession,
       ...combinedStats,
     };
+  }
+  if (stream.record) {
+    const ingests = await req.getIngest(req);
+    if (ingests.length) {
+      const ingest = ingests[0].base;
+      setRecordingStatus(req, ingest, stream, false);
+    }
   }
   res.status(200);
   if (!raw) {
