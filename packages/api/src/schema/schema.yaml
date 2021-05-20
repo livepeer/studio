@@ -68,6 +68,20 @@ components:
         isConsumed:
           type: boolean
           default: false
+        retries:
+          type: number
+          default: 0
+        lastInterval:
+          type: number
+          default: 1
+        status:
+          type: string
+          default: pending
+        modifiedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds)
+          example: 1587667174725
 
     webhook:
       type: object

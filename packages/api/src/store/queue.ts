@@ -59,6 +59,7 @@ export default class QueueTable extends Table<Queue> {
     let originalData = res.rows[0].data;
     // res.rows[0].data.isConsumed = true;
     res.rows[0].data.status = "processing";
+    res.rows[0].data.modifiedAt = Date.now();
     console.log("id: ", res.rows);
     await this.client.query(
       sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
@@ -91,6 +92,7 @@ export default class QueueTable extends Table<Queue> {
   }
 
   async updateMsg(doc: Queue): Promise<Queue> {
+    doc.modifiedAt = Date.now();
     await this.client.query(
       sql`UPDATE queue SET data = data || ${doc} `.append(
         ` WHERE id = '${doc.id}'`
