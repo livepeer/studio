@@ -34,11 +34,12 @@ const DocsNav = ({
   mobileCategories,
 }: DocsNavProps) => {
   const { pathname } = useRouter();
-  const [menuMobile, setMenuMobile] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
   const router = useRouter();
+  const currentPath = router.asPath.split("/").slice(0, 3).join("/").split('#')[0];
 
   useEffect(() => {
     if (token) {
@@ -61,6 +62,19 @@ const DocsNav = ({
         background: "white",
         zIndex: 100,
       }}>
+      <div
+        sx={{
+          display: ["flex", "flex", "none", "none"],
+          position: "fixed",
+          top: "0px",
+          left: "0px",
+          width: "100vw",
+          height: selectOpen ? "100vh" : "0px",
+          transition: "all 0.2s",
+          background: "rgba(0, 0, 0, 0.32)",
+          zIndex: 90,
+        }}
+      />
       <Box sx={{ padding: "0 24px" }}>
         <Flex
           sx={{
@@ -177,7 +191,6 @@ const DocsNav = ({
             <div
               key={idx}
               onClick={() => {
-                setCurrentCategory(each);
                 router.push(each.slug);
               }}
               sx={{
@@ -193,12 +206,9 @@ const DocsNav = ({
                   fontWeight: "500",
                   transition: "all 0.2s",
                   textShadow:
-                    each.name === currentCategory.name
-                      ? "0.4px 0 0 currentColor"
-                      : "",
+                    each.slug === currentPath ? "0.4px 0 0 currentColor" : "",
                   ml: "12px",
-                  color:
-                    each.name === currentCategory.name ? "black" : "#828282",
+                  color: each.slug === currentPath ? "black" : "#828282",
                 }}>
                 {each.name}
               </span>
@@ -218,7 +228,6 @@ const DocsNav = ({
       <Box
         sx={{
           display: ["flex", "none", "none"],
-          padding: "0 24px",
           mt: "8px",
         }}>
         <DropdownMenu.Root>
@@ -232,6 +241,7 @@ const DocsNav = ({
                 width: "100%",
                 display: "flex",
                 alignItems: "center",
+                px: "24px",
                 justifyContent: "space-between",
               }}>
               <div
@@ -239,14 +249,22 @@ const DocsNav = ({
                   display: "flex",
                   alignItems: "center",
                 }}>
-                <i>{currentCategory.icon}</i>
+                <i>
+                  {
+                    mobileCategories.filter((a) => a.slug === currentPath)[0]
+                      .icon
+                  }
+                </i>
                 <p
                   sx={{
                     fontSize: "14px",
                     fontWeight: "500",
                     ml: "12px",
                   }}>
-                  {currentCategory.name}
+                  {
+                    mobileCategories.filter((a) => a.slug === currentPath)[0]
+                      .name
+                  }
                 </p>
               </div>
               <GoTriangleDown />
@@ -255,16 +273,15 @@ const DocsNav = ({
               sx={{
                 width: "100vw",
                 background: "white",
-                px: "24px",
                 alignSelf: "flex-start",
+                px: "24px",
               }}>
               {mobileCategories
-                ?.filter((a) => a.name !== currentCategory.name)
+                ?.filter((a) => a.slug !== currentPath)
                 .map((each, idx) => (
                   <DropdownMenu.Item
                     key={idx}
                     onSelect={() => {
-                      setCurrentCategory(each);
                       router.push(each.slug);
                     }}
                     sx={{

@@ -1,6 +1,6 @@
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
-import SideNav from "components/DocsLayout/sideNav";
+import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { useState } from "react";
@@ -13,20 +13,13 @@ import {
   DocsGrid,
   Heading,
 } from "components/DocsLayout/helpers";
-import {
-  IconApiReference,
-  IconHouse,
-  IconVideoGuides,
-} from "components/DocsLayout/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
+import { FiList } from "react-icons/fi";
+import { CgClose } from "react-icons/cg";
 
 const mobileCategories = [
-  {
-    name: "Homepage",
-    icon: <IconHouse id="mobileHouse" />,
-    slug: "/docs",
-  },
   {
     name: "Video Guides",
     icon: <IconVideoGuides id="mobileVideoGuides" />,
@@ -40,11 +33,6 @@ const mobileCategories = [
 ];
 
 const categories = [
-  {
-    name: "Homepage",
-    icon: <IconHouse />,
-    slug: "/docs",
-  },
   {
     name: "Video Guides",
     icon: <IconVideoGuides />,
@@ -84,7 +72,12 @@ const DocsIndex = ({ doc, menu }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
+  const [mobileSideNavOpen, setMobileSideNavOpen] = useState(false);
   const router = useRouter();
+
+  const currentMenu = menu.filter(
+    (a) => `/${a.slug}` === router.asPath.split("/").slice(0, 3).join("/")
+  );
 
   const content = useHydrate(doc, {
     components: components,
@@ -93,71 +86,96 @@ const DocsIndex = ({ doc, menu }) => {
   const breadCrumb = router.asPath.split("#")[0].split("/");
 
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(15, 1fr)",
-        gridTemplateRows: "auto auto",
-      }}>
-      <DocsNav
-        hideTopNav={hideTopNav}
-        setHideTopNav={setHideTopNav}
-        currentCategory={currentCategory}
-        setCurrentCategory={setCurrentCategory}
-        categories={categories}
-        mobileCategories={mobileCategories}
-      />
-      <SideNav
-        menu={menu}
-        hideTopNav={hideTopNav}
-        hideSideBar={hideSideBar}
-        setHideSideBar={setHideSideBar}
-      />
-      <Container
+    <>
+      <div
+        onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
         sx={{
-          mt: hideTopNav ? "-12px" : "48px",
-          gridColumn: hideSideBar
-            ? ["1 / 16", "1 / 16", "2 / 16", "2 / 16"]
-            : ["1 / 16", "1 / 16", "5 / 16", "4 / 16"],
-          justifyItems: "center",
-          mx: 0,
-          transition: "all 0.2s",
-          display: "flex",
+          display: ["flex", "flex", "none", "none"],
+          position: "fixed",
+          alignItems: "center",
           justifyContent: "center",
-          alignItems: "flex-start",
+          zIndex: 200,
+          right: "16px",
+          bottom: "120px",
+          background: "black",
+          width: "64px",
+          height: "64px",
+          borderRadius: "50%",
+          cursor: 'pointer'
         }}>
-        <div
-          className={styles.markdown}
+        {mobileSideNavOpen ? (
+          <CgClose color="white" size={24} />
+        ) : (
+          <FiList color="white" size={24} />
+        )}
+      </div>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(15, 1fr)",
+          gridTemplateRows: "auto auto",
+        }}>
+        <DocsNav
+          hideTopNav={hideTopNav}
+          setHideTopNav={setHideTopNav}
+          currentCategory={currentCategory}
+          setCurrentCategory={setCurrentCategory}
+          categories={categories}
+          mobileCategories={mobileCategories}
+        />
+        <SideNav
+          menu={currentMenu}
+          hideTopNav={hideTopNav}
+          hideSideBar={hideSideBar}
+          setHideSideBar={setHideSideBar}
+        />
+        <MobileSideNav isOpen={mobileSideNavOpen} menu={currentMenu} />
+        <Container
           sx={{
+            mt: hideTopNav ? "-12px" : "48px",
+            gridColumn: hideSideBar
+              ? ["1 / 16", "1 / 16", "2 / 16", "2 / 16"]
+              : ["1 / 16", "1 / 16", "5 / 16", "4 / 16"],
+            justifyItems: "center",
+            mx: 0,
+            transition: "all 0.2s",
             display: "flex",
-            flexDirection: "column",
-            maxWidth: "768px",
-            paddingBottom: "80px",
+            justifyContent: "center",
+            alignItems: "flex-start",
           }}>
           <div
+            className={styles.markdown}
             sx={{
               display: "flex",
-              alignItems: "center",
-              color: "#202020",
-              fontSize: "12px",
-              letterSpacing: "-0.02em",
-              mb: "16px",
+              flexDirection: "column",
+              maxWidth: "768px",
+              paddingBottom: "80px",
             }}>
-            {breadCrumb.slice(2, 5).map((a, idx) => (
-              <div key={idx} sx={{ display: "flex", alignItems: "center" }}>
-                <span sx={{ textTransform: "capitalize" }}>
-                  {a.split("-").join(" ")}
-                </span>
-                {idx < breadCrumb.length - 3 && (
-                  <span sx={{ mx: "6px" }}>/</span>
-                )}
-              </div>
-            ))}
+            <div
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                color: "#202020",
+                fontSize: "12px",
+                letterSpacing: "-0.02em",
+                mb: "16px",
+              }}>
+              {breadCrumb.slice(2, 5).map((a, idx) => (
+                <div key={idx} sx={{ display: "flex", alignItems: "center" }}>
+                  <span sx={{ textTransform: "capitalize" }}>
+                    {a.split("-").join(" ")}
+                  </span>
+                  {idx < breadCrumb.length - 3 && (
+                    <span sx={{ mx: "6px" }}>/</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            {content}
           </div>
-          {content}
-        </div>
-      </Container>
-    </Box>
+        </Container>
+      </Box>
+    </>
   );
 };
 

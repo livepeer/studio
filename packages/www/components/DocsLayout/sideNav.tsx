@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download } from "./icons";
 import { keyframes } from "@emotion/react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import { TiArrowSortedDown } from "react-icons/ti";
 import Link from "next/link";
-import { BiBorderRadius } from "react-icons/bi";
 
 type SideNavProps = {
   hideTopNav: boolean;
@@ -29,6 +28,10 @@ type MenuProps = {
       }[];
     }[];
   }[];
+};
+
+type MobileSideNavProps = {
+  isOpen: boolean;
 };
 
 type TriggerProps = {
@@ -135,7 +138,7 @@ const Menu = ({ menu }: MenuProps) => {
             ))}
           </Collapsible>
         ) : (
-          <Link href={`/${route.slug}`}>
+          <Link href={`/${route.slug}`} key={idx}>
             <a
               sx={{
                 fontSize: "14px",
@@ -144,8 +147,8 @@ const Menu = ({ menu }: MenuProps) => {
                 mt: "16px !important",
                 cursor: "pointer",
                 position: "relative",
-                fontWeight: currentPath === `/${route.slug}` ? '600' : '400',
-                pl: '24px'
+                fontWeight: currentPath === `/${route.slug}` ? "600" : "400",
+                pl: "24px",
               }}>
               <div
                 sx={{
@@ -197,10 +200,6 @@ const SideNav = ({
   setHideSideBar,
   menu,
 }: SideNavProps & MenuProps) => {
-  const router = useRouter();
-  const currentMenu = menu.filter(
-    (a) => `/${a.slug}` === router.asPath.split("/").slice(0, 3).join("/")
-  );
   return (
     <div
       sx={{
@@ -235,7 +234,7 @@ const SideNav = ({
           }}>
           CONTENT
         </p>
-        <Menu menu={currentMenu} />
+        <Menu menu={menu} />
       </div>
       <div
         sx={{
@@ -254,6 +253,55 @@ const SideNav = ({
           }}>
           <Download />
         </i>
+      </div>
+    </div>
+  );
+};
+
+export const MobileSideNav = ({
+  menu,
+  isOpen,
+}: MobileSideNavProps & MenuProps) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.removeProperty("overflow");
+    }
+  }, [isOpen]);
+  return (
+    <div
+      sx={{
+        display: ["flex", "flex", "none", "none"],
+        height: "100vh",
+        width: isOpen ? "100vw" : "0px",
+        overflowX: "hidden",
+        transition: "all 0.2s",
+        position: "fixed",
+        background: "rgba(0, 0, 0, 0.32)",
+        zIndex: 100,
+        top: 0,
+        left: 0,
+      }}>
+      <div
+        sx={{
+          padding: "24px 38px 24px 0",
+          maxWidth: "100%",
+          background: "white",
+        }}>
+        <p
+          sx={{
+            fontSize: "10px",
+            color: "#4F4F4F",
+            letterSpacing: "0.08em",
+            fontWeight: "bold",
+            ml: "24px",
+            mt: "8px",
+            mb: '-16px'
+          }}>
+          CONTENT
+        </p>
+        <Menu menu={menu} />
       </div>
     </div>
   );
