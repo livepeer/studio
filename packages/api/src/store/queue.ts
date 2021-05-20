@@ -23,11 +23,11 @@ export default class QueueTable extends Table<Queue> {
     this.client = await this.db.pool.connect();
   }
 
-  async stop() {
+  stop() {
     try {
-      await this.client.release();
-    } catch (e) {
-      console.log("QueueTable: Stop: ", e);
+      this.client.release();
+    } catch (error) {
+      console.log("error releasing pg client", error);
     }
   }
   // name: string;
@@ -46,7 +46,7 @@ export default class QueueTable extends Table<Queue> {
       sql`SELECT data FROM `
         .append(this.name)
         .append(
-          sql` WHERE data->>'isConsumed' = 'false' LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
+          sql` WHERE data->>'isConsumed' = 'false' AND data->>'status' = 'pending' LIMIT 1 FOR UPDATE SKIP LOCKED`.setName(
             `${this.name}_next_event`
           )
         )
@@ -57,7 +57,8 @@ export default class QueueTable extends Table<Queue> {
     }
 
     let originalData = res.rows[0].data;
-    res.rows[0].data.isConsumed = true;
+    // res.rows[0].data.isConsumed = true;
+    res.rows[0].data.status = "processing";
     console.log("id: ", res.rows);
     await this.client.query(
       sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
@@ -70,6 +71,10 @@ export default class QueueTable extends Table<Queue> {
   }
 
   async emit(doc: Queue): Promise<Queue> {
+    if (!doc.status) {
+      doc.status = "pending";
+    }
+
     try {
       await this.db.query(
         `INSERT INTO ${this.name} VALUES ($1, $2)`, //p
@@ -83,5 +88,13 @@ export default class QueueTable extends Table<Queue> {
     }
     logger.debug(`MsgQueue emitting ${doc.id}`);
     return doc;
+  }
+
+  async updateMsg(doc: Queue): Promise<Queue> {
+    await this.client.query(
+      sql`UPDATE queue SET data = data || ${doc} `.append(
+        ` WHERE id = '${doc.id}'`
+      )
+    );
   }
 }
