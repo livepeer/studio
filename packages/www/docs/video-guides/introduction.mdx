@@ -5,13 +5,22 @@ description: Livepeer Documentation
 
 # Video Guides Introduction
 
-``Use `code` in your Markdown file.`` There are multiple ways to livestream with livepeer.com. The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
+There are multiple ways to livestream with livepeer.com. The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
 
 You can integrate your streaming application directly with the Livepeer.com API. If you are creating a live streaming platform or application, the Livepeer.com API will best meet your needs.
 
 Or you can use the Livepeer.com dashboard to livestream without writing any code. If you are doing manual broadcasts like streaming events, concerts, or webinars, you can use the Livepeer.com dashboard.
 
 `Use code in your Markdown file.`
+
+``asasc``
+
+```
+curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{“record”:true}’
+```
 
 | Field                   | Notes                                                                             | 
 | :---                    |    :----:                                                                         |

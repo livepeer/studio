@@ -63,11 +63,17 @@ const components = {
       </Link>
     );
   },
+  inlineCode: ({ children }) => {
+    return <p sx={{ color: "blue", background: 'red' }}>{children}</p>;
+  },
+  code: ({ children }) => {
+    return <p sx={{ color: "red", background: 'yellow' }}>{children}</p>;
+  },
   NavigationCard,
   DocsPost,
   SimpleCard,
   DocsGrid,
-  CodeBlock
+  CodeBlock,
 };
 
 const DocsIndex = ({ doc, menu }) => {
@@ -103,7 +109,7 @@ const DocsIndex = ({ doc, menu }) => {
           width: "64px",
           height: "64px",
           borderRadius: "50%",
-          cursor: 'pointer'
+          cursor: "pointer",
         }}>
         {mobileSideNavOpen ? (
           <CgClose color="white" size={24} />
@@ -174,7 +180,6 @@ const DocsIndex = ({ doc, menu }) => {
               ))}
             </div>
             {content}
-            <CodeBlock />
           </div>
         </Container>
       </Box>
