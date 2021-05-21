@@ -11,6 +11,7 @@ import {
   DocsPost,
   SimpleCard,
   DocsGrid,
+  CodeBlock,
   Heading,
 } from "components/DocsLayout/helpers";
 import Link from "next/link";
@@ -66,6 +67,7 @@ const components = {
   DocsPost,
   SimpleCard,
   DocsGrid,
+  CodeBlock
 };
 
 const DocsIndex = ({ doc, menu }) => {
@@ -172,6 +174,7 @@ const DocsIndex = ({ doc, menu }) => {
               ))}
             </div>
             {content}
+            <CodeBlock />
           </div>
         </Container>
       </Box>

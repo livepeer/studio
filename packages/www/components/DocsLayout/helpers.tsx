@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import DocsJSONHighlighter from "./jsonHighlighter";
 
 type CardProps = {
   title: string;
@@ -32,6 +34,10 @@ type GridProps = {
 
 type HeadingProps = {
   as: "h1" | "h2" | "h3";
+  children: ReactNode;
+};
+
+type CodeBlockProps = {
   children: ReactNode;
 };
 
@@ -223,7 +229,7 @@ const Heading = ({ children, as }: HeadingProps) => {
     <div sx={{ position: "relative" }}>
       <span
         id={id.replace("#", "")}
-        sx={{ position: "absolute", top: "-150px" }}
+        sx={{ position: "absolute", top: "-130px" }}
       />
       <Link href={`${path?.split("#")[0]}${id}`}>
         {as === "h1" ? (
@@ -238,4 +244,41 @@ const Heading = ({ children, as }: HeadingProps) => {
   );
 };
 
-export { SimpleCard, NavigationCard, DocsPost, DocsGrid, Heading };
+const CodeBlock = () => {
+  const thisCode = {
+    glossary: {
+      title: "example glossary",
+      GlossDiv: {
+        title: "S",
+        GlossList: {
+          GlossEntry: {
+            ID: "SGML",
+            SortAs: "SGML",
+            GlossTerm: "Standard Generalized Markup Language",
+            Acronym: 10000,
+            Abbrev: "ISO 8879:1986",
+            GlossDef: {
+              para: "A meta-markup language, used to create markup languages such as DocBook.",
+              GlossSeeAlso: ["GML", "XML"],
+            },
+            GlossSee: "markup",
+          },
+        },
+      },
+    },
+  };
+  const json = JSON.stringify(thisCode);
+  return (
+    <div
+      sx={{
+        background: "#3B375A",
+        borderRadius: "16px",
+        width: "100%",
+        padding: "24px 16px 16px 24px",
+      }}>
+      <DocsJSONHighlighter json={json} />
+    </div>
+  );
+};
+
+export { SimpleCard, NavigationCard, DocsPost, DocsGrid, Heading, CodeBlock };

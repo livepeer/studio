@@ -36,3 +36,37 @@ The next step is to visit one of these two documentation sections:
 2. he video is not playing in my application at all. Go to the next step
 3. [create an account on Livepeer.com](/sign-up)
 
+`code`
+
+```
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_stream",
+  "profiles": [
+    {
+      "name": "720p",
+      "bitrate": 2000000,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "480p",
+      "bitrate": 1000000,
+      "fps": 30,
+      "width": 854,
+      "height": 480
+    },
+    {
+      "name": "360p",
+      "bitrate": 500000,
+      "fps": 30,
+      "width": 640,
+      "height": 360
+    }
+  ]
+}' \
+https://livepeer.com/api/stream
+```
