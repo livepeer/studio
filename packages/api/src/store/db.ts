@@ -5,6 +5,7 @@ import { parse as parseUrl, format as stringifyUrl } from "url";
 import { IStore } from "../types/common";
 import schema from "../schema/schema.json";
 import { QueryArrayResult, QueryResult, QueryConfig } from "pg";
+import { hostname } from "os";
 import {
   Stream,
   ObjectStore,
@@ -23,6 +24,12 @@ import { QueryOptions } from "./types";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
+
+interface PostgresParams {
+  postgresUrl: string;
+  postgresReplicaUrl?: string;
+  appName?: string;
+}
 
 export class DB {
   // Table objects
@@ -46,7 +53,7 @@ export class DB {
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl, postgresReplicaUrl }) {
+  async start({ postgresUrl, postgresReplicaUrl, appName = "api" }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
       throw new Error("no postgres url provided");
@@ -60,6 +67,7 @@ export class DB {
     this.pool = new Pool({
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
+      application_name: `${appName}-${hostname()}`
     });
 
     if (postgresReplicaUrl) {
