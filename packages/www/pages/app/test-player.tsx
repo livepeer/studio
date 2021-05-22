@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import useApi, { StreamInfo } from "../../hooks/use-api";
 import { Box, Input, Container, Heading } from "@theme-ui/components";

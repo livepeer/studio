@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { getAspectRatio } from "../../lib/utils";
 import { forwardRef } from "react";
 

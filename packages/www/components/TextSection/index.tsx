@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import SimpleBlockContent from "../SimpleBlockContent";
 import { Container, Box } from "@theme-ui/components";
 

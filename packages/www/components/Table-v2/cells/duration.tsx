@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { CellComponentProps, TableData } from "../types";
 

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
 

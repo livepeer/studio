@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import useApi from "../../../hooks/use-api";
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect } from "react";

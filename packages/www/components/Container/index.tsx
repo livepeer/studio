@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Flex, Container } from "@theme-ui/components";
 
 export default ({ children }) => {

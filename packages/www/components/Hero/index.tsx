@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Styled } from "theme-ui";
 import { Grid, Flex, Container, Box, Link as A } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";

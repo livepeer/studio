@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Grid, Box } from "@theme-ui/components";
 import { Styled } from "theme-ui";
 import { Flex } from "@theme-ui/components";

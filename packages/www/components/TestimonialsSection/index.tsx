@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Grid, Container } from "@theme-ui/components";
 import TestimonialCard, { TestimonialCardProps } from "../TestimonialCard";
 import GradientBackgroundBox from "../GradientBackgroundBox";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Heading, Container } from "@theme-ui/components";
 import Prefooter from "components/Prefooter";
 import PricingCalculator from "components/Pricing/pricingCalculator";

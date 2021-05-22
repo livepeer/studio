@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import React, { useMemo, useState, useCallback, useEffect } from "react";
 import NavigationBase from "./base";
 import { useRouter } from "next/router";

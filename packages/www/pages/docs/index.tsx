@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
 import Layout from "../../layouts";
 import { Container } from "@theme-ui/components";

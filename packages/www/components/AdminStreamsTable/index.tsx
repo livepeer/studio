@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useApi } from "../../hooks";

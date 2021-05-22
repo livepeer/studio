@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { DefaultNav } from "../components/Navigation";
 import Footer from "../components/Footer";

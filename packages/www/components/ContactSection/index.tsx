@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useRef, useState, useEffect } from "react";
 import { Styled } from "theme-ui";
 import { Box, Flex, Container } from "@theme-ui/components";

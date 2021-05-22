@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Plans from "../../../components/Plans";
 import useApi from "../../../hooks/use-api";
 import Layout from "../../../layouts";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Layout from "../../layouts";
 import Button from "../Button";
 import { Container, Heading, Box, Text } from "@theme-ui/components";

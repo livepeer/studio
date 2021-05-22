@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Container, Grid } from "@theme-ui/components";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";

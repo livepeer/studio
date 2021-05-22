@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useState } from "react";
 import Link from "next/link";
 import useApi from "../../../hooks/use-api";

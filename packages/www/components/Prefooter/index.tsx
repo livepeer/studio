@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container } from "@theme-ui/components";
 import { Heading } from "@theme-ui/components";
 import { Text } from "@theme-ui/components";
