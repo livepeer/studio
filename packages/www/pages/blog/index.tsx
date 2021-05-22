@@ -1,5 +1,7 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
-import Layout from "../../components/Layout";
+import Layout from "../../layouts";
 import { request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allCategories from "../../queries/allCategories.gql";

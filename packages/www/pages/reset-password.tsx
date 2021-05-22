@@ -1,4 +1,6 @@
-import Layout from "../components/Layout";
+/** @jsx jsx */
+import { jsx } from "theme-ui";
+import Layout from "../layouts";
 import Login from "../components/Login";
 import Link from "next/link";
 import { Flex, Box } from "@theme-ui/components";

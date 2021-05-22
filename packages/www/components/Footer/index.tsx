@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container, Box } from "@theme-ui/components";
 import Logo from "../Logo";
 import { Text } from "@theme-ui/components";

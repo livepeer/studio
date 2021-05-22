@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container } from "@theme-ui/components";
 import TeamMember from "../TeamMember";
 import { Grid } from "@theme-ui/components";

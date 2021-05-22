@@ -1,6 +1,8 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
 import { Container, Flex, Box } from "@theme-ui/components";
-import Layout from "../../components/Layout";
+import Layout from "../../layouts";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPosts from "../../queries/allPosts.gql";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Flex } from "@theme-ui/components";
 import Link from "next/link";
 import { useRouter } from "next/router";

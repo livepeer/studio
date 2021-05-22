@@ -1,6 +1,8 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Plans from "../../../components/Plans";
 import useApi from "../../../hooks/use-api";
-import Layout from "../../../components/Layout";
+import Layout from "../../../layouts";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import TabbedLayout from "../../../components/TabbedLayout";
 import { getTabs } from "../user";

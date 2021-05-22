@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import PricingCard, { PricingCardContent } from "./pricingCard";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Flex, Image, Heading, Link } from "@theme-ui/components";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../lib/client";

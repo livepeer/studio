@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container, Box, Flex, Heading } from "@theme-ui/components";
 import { MdCheck, MdClose } from "react-icons/md";
 import Button from "../Button";

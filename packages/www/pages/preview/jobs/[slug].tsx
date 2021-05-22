@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Job from "../../jobs/[slug]";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";

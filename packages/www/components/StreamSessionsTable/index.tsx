@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Button, Flex, Link as A } from "@theme-ui/components";

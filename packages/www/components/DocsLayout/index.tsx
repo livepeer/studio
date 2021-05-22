@@ -1,4 +1,6 @@
-import Layout from "../Layout";
+/** @jsx jsx */
+import { jsx } from "theme-ui";
+import Layout from "../../layouts";
 import { Flex, Box, Container } from "@theme-ui/components";
 import { useState } from "react";
 import TableOfContents from "../TableOfContents";

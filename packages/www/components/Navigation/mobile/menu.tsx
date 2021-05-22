@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Flex, Container, IconButton } from "@theme-ui/components";
 import Button from "../../Button";
 import { FiX } from "react-icons/fi";

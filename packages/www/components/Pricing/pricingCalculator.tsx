@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
 

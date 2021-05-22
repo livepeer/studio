@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Stream } from "@livepeer.com/api";
 import { Box } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";

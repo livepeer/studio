@@ -1,4 +1,5 @@
-import { Styled } from "theme-ui";
+/** @jsx jsx */
+import { Styled, jsx } from "theme-ui";
 import { Box, Container, Link as A } from "@theme-ui/components";
 import Button from "../Button";
 import { Link as ScrollLink } from "react-scroll";

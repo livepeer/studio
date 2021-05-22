@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { SortFn } from "../types";
 import { get } from "lodash";
 

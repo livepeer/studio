@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import ReactMarkdown from "react-markdown";
 import { Box, Flex } from "@theme-ui/components";
 import { Styled } from "theme-ui";

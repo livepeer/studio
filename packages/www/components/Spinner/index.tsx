@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { keyframes } from "@emotion/core";
 
 const rotate = keyframes`

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Heading, Text, Flex, Container } from "@theme-ui/components";
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";

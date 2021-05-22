@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
   <span
     sx={{

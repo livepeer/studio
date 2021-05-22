@@ -34,17 +34,11 @@ export default class MyApp extends App {
           />
         </Head>
         <>
-          <ThemeProvider>
-            <MarkdownProvider>
-              <ApiProvider>
-                <Box sx={{ minHeight: "100vh" }}>
-                  <DefaultSeo {...SEO} />
-                  <Reset />
-                  <Component {...pageProps} />
-                </Box>
-              </ApiProvider>
-            </MarkdownProvider>
-          </ThemeProvider>
+          <ApiProvider>
+            <DefaultSeo {...SEO} />
+            <Reset />
+            <Component {...pageProps} />
+          </ApiProvider>
         </>
       </>
     );

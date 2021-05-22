@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Modal from "../Modal";
 import { Box, Button, Flex, Spinner } from "@theme-ui/components";
 import { FunctionComponent, useState } from "react";

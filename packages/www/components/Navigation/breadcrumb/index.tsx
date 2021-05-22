@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "../../Link";
 import Logo from "../../Logo";
 import { useState } from "react";

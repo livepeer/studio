@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "next/link";
 import LogoSvg from "../../public/img/logo.svg";
 import { Flex, Link as A } from "@theme-ui/components";

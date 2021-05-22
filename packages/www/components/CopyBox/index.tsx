@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Input, Box } from "@theme-ui/components";
 import CopyBoxIcon from "./CopyBoxIcon";
 import { useRef, MutableRefObject } from "react";
