@@ -1,5 +1,5 @@
 import Fade from "react-reveal/Fade";
-import Layout from "../components/Layout";
+import Layout from "../layouts";
 import { useRef, useState, useEffect } from "react";
 import { Box, Flex, Container } from "@theme-ui/components";
 import Textfield from "../components/Textfield";

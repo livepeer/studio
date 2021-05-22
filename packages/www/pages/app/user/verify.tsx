@@ -2,7 +2,7 @@ import useApi from "../../../hooks/use-api";
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "../../../components/Layout";
+import Layout from "../../../layouts";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import LogoSvg from "../../../public/img/logo.svg";
 

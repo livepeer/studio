@@ -1,5 +1,5 @@
 import Fade from "react-reveal/Fade";
-import Layout from "../components/Layout";
+import Layout from "../layouts";
 import SectionLayout from "../components/SectionLayout";
 import IconListItem, { IconListItemProps } from "../components/IconListItem";
 import { Grid } from "@theme-ui/components";

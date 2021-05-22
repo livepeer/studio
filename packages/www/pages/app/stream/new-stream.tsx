@@ -10,7 +10,7 @@ import {
   Container,
   Heading,
 } from "@theme-ui/components";
-import Layout from "../../../components/Layout";
+import Layout from "../../../layouts";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { useRouter } from "next/router";
 

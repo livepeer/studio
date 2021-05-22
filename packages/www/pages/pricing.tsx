@@ -2,7 +2,7 @@ import { Box, Heading, Container } from "@theme-ui/components";
 import Prefooter from "components/Prefooter";
 import PricingCalculator from "components/Pricing/pricingCalculator";
 import PricingCardsContainer from "components/Pricing/pricingCardsContainer";
-import Layout from "../components/Layout";
+import Layout from "../layouts";
 
 const Pricing = () => {
   return (

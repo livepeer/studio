@@ -1,5 +1,5 @@
 import useApi from "../../hooks/use-api";
-import Layout from "../../components/Layout";
+import Layout from "../../layouts";
 import useLoggedIn from "../../hooks/use-logged-in";
 import StreamsTable from "../../components/StreamsTable";
 import TabbedLayout from "../../components/TabbedLayout";

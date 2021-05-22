@@ -1,5 +1,5 @@
 import Fade from "react-reveal/Fade";
-import Layout from "../components/Layout";
+import Layout from "../layouts";
 import { Container } from "@theme-ui/components";
 import Prefooter from "../components/Prefooter";
 import TeamSection from "../components/TeamSection";

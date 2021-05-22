@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import useApi, { StreamInfo } from "../../hooks/use-api";
 import { Box, Input, Container, Heading } from "@theme-ui/components";
 import Link from "next/link";
-import Layout from "../../components/Layout";
+import Layout from "../../layouts";
 import useLoggedIn from "../../hooks/use-logged-in";
 import TabbedLayout from "../../components/TabbedLayout";
 import { getTabs } from "./user";

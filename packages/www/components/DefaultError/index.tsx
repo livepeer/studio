@@ -1,4 +1,4 @@
-import Layout from "../Layout";
+import Layout from "../../layouts";
 import Button from "../Button";
 import { Container, Heading, Box, Text } from "@theme-ui/components";
 
