@@ -58,25 +58,25 @@ const Sidebar = () => {
         <ThemeSwitch />
       </Flex>
       <Grid css={{ px: "$4" }} gap="3">
-        <Link href="/" passHref>
+        <Link href="/dashboard" passHref>
           <NavLink active css={{ textDecoration: "none" }}>
             <HomeIcon />
             <Box css={{ ml: "$1" }}>Home</Box>
           </NavLink>
         </Link>
-        <Link href="/" passHref>
+        <Link href="/dashboard/streams" passHref>
           <NavLink css={{ textDecoration: "none" }}>
-            <BillingIcon />
+            <StreamIcon />
             <Box css={{ ml: "$1" }}>Streams</Box>
           </NavLink>
         </Link>
-        <Link href="/" passHref>
+        <Link href="/dashboard/developers/api-keys" passHref>
           <NavLink css={{ textDecoration: "none" }}>
             <TerminalIcon />
             <Box css={{ ml: "$1" }}>Developers</Box>
           </NavLink>
         </Link>
-        <Link href="/" passHref>
+        <Link href="/dashboard/billing" passHref>
           <NavLink css={{ textDecoration: "none" }}>
             <BillingIcon />
             <Box css={{ ml: "$1" }}>Billing</Box>
