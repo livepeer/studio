@@ -18,10 +18,10 @@ const StyledSwitch = styled(Switch.Root, {
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px royalblue",
+    boxShadow: "0 0 0 2px $colors$indigo900",
   },
   '&[data-state="checked"]': {
-    backgroundColor: "dodgerblue",
+    backgroundColor: "$colors$indigo900",
   },
 });
 
