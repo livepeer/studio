@@ -10,7 +10,7 @@ import {
 const GettingStarted = () => {
   return (
     <>
-      <Heading size="2" css={{ letterSpacing: "0", fontWeight: 700, mb: "$5" }}>
+      <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$5" }}>
         Get started with Livepeer.com, Paige
       </Heading>
       <Accordion type="single">

@@ -9,17 +9,19 @@ import { Stream } from "@livepeer.com/api";
 
 const Dashboard = () => {
   useLoggedIn();
-  const { user, logout } = useApi();
+  const { user } = useApi();
+
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
+
   return (
     <Layout>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <GettingStarted />
         </Box>
-        <Box css={{ mb: "$8" }}>
+        <Box css={{ mb: "$9" }}>
           <UsageSummary />
         </Box>
         <Box css={{ mb: "$8" }}>
