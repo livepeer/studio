@@ -1,4 +1,4 @@
-import { styled } from "@modulz/design-system";
+import { styled, Text } from "@modulz/design-system";
 
 const DEFAULT_TAG = "a";
 

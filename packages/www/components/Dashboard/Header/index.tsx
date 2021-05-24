@@ -35,15 +35,15 @@ const Header = () => {
       }}>
       <Breadcrumbs aria-label="breadcrumb">
         {/* <Link href="/" passHref>
-          <A variant="blue">Streams</A>
+          <A variant="indigo">Streams</A>
         </Link>
         <Link href="/" passHref>
-          <A variant="blue">Banana</A>
+          <A variant="indigo">Banana</A>
         </Link> */}
         <Text>Home</Text>
       </Breadcrumbs>
-      <Flex align="center">
-        <Flex align="center" css={{ cursor: "pointer", mr: "$3" }}>
+      <Flex align="center" css={{ fontSize: "$3" }}>
+        <Flex align="center" css={{ cursor: "pointer", mr: "$4" }}>
           <StyledHornIcon />
           <Box css={{ color: "$hiContrast" }}>Feedback</Box>
         </Flex>
