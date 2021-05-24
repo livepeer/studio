@@ -38,7 +38,10 @@ const UsageSummary = () => {
               }}>
               Usage
             </Box>
-            <Badge size="1" css={{ letterSpacing: 0, mt: "7px" }}>
+            <Badge
+              size="1"
+              variant="indigo"
+              css={{ letterSpacing: 0, mt: "7px" }}>
               Personal Plan
             </Badge>
           </Flex>
@@ -74,7 +77,7 @@ const UsageSummary = () => {
           Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
         </Flex>
         <Link href="/" passHref>
-          <A variant="blue" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="indigo" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>
         </Link>
