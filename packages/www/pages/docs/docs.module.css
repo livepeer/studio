@@ -7,6 +7,9 @@
     margin-bottom: 24px;
 
     letter-spacing: -0.04em;
+
+    display: flex;
+    align-items: center;
 }
 
 .markdown h3 {
@@ -122,6 +125,23 @@
 
     background: #F1F1F1;
     border-radius: 4px
+}
+
+.markdown h1 code {
+    font-size: 18px;
+
+    padding: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 12px;
+
+    letter-spacing: -0.03rem;
+
+    background: #F1F1F1;
+    border-radius: 4px;
+    max-height: 32px;
 }
 
 .markdown table {
