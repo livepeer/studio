@@ -11,7 +11,6 @@ import {
   DocsPost,
   SimpleCard,
   DocsGrid,
-  CodeBlock,
   Heading,
 } from "components/DocsLayout/helpers";
 import Link from "next/link";
@@ -19,6 +18,7 @@ import { useRouter } from "next/router";
 import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
 import { FiList } from "react-icons/fi";
 import { CgClose } from "react-icons/cg";
+import Code from "components/renderers/Code";
 
 const mobileCategories = [
   {
@@ -64,13 +64,17 @@ const components = {
     );
   },
   code: ({ children }) => {
-    return <p sx={{ color: "red", background: "yellow" }}>{children}</p>;
+    return (
+      // @ts-ignore
+      <Code custom language="json">
+        {children}
+      </Code>
+    );
   },
   NavigationCard,
   DocsPost,
   SimpleCard,
   DocsGrid,
-  CodeBlock,
 };
 
 const DocsIndex = ({ doc, menu }) => {
