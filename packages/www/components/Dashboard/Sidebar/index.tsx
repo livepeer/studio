@@ -20,13 +20,14 @@ const NavLink = styled(A, {
   fontSize: "$3",
   display: "flex",
   alignItems: "center",
+  color: "$hiContrast",
   "&:hover": {
     textDecoration: "none",
   },
   variants: {
     active: {
       true: {
-        color: "$blue900",
+        color: "$indigo900",
         fontWeight: 700,
       },
     },
@@ -61,25 +62,25 @@ const Sidebar = () => {
         <Link href="/dashboard" passHref>
           <NavLink active css={{ textDecoration: "none" }}>
             <HomeIcon />
-            <Box css={{ ml: "$1" }}>Home</Box>
+            <Box css={{ ml: "$2" }}>Home</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/streams" passHref>
           <NavLink css={{ textDecoration: "none" }}>
             <StreamIcon />
-            <Box css={{ ml: "$1" }}>Streams</Box>
+            <Box css={{ ml: "$2" }}>Streams</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/developers/api-keys" passHref>
           <NavLink css={{ textDecoration: "none" }}>
             <TerminalIcon />
-            <Box css={{ ml: "$1" }}>Developers</Box>
+            <Box css={{ ml: "$2" }}>Developers</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/billing" passHref>
           <NavLink css={{ textDecoration: "none" }}>
             <BillingIcon />
-            <Box css={{ ml: "$1" }}>Billing</Box>
+            <Box css={{ ml: "$2" }}>Billing</Box>
           </NavLink>
         </Link>
       </Grid>
