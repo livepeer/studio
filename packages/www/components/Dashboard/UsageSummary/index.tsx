@@ -4,9 +4,16 @@ import {
   Badge,
   Flex,
   Link as A,
+  styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import UpcomingIcon from "../../../public/img/icons/upcoming.svg";
+
+const StyledUpcomingIcon = styled(UpcomingIcon, {
+  mr: "$2",
+  color: "$hiContrast",
+});
 
 const UsageSummary = () => {
   return (
@@ -26,7 +33,7 @@ const UsageSummary = () => {
             <Box
               css={{
                 mr: "$3",
-                fontWeight: 700,
+                fontWeight: 600,
                 letterSpacing: "0",
               }}>
               Usage
@@ -63,6 +70,7 @@ const UsageSummary = () => {
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Flex align="center">
+          <StyledUpcomingIcon />
           Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
         </Flex>
         <Link href="/" passHref>
