@@ -136,15 +136,14 @@ const Code = ({
             background: custom ? "#3B375A" : "",
             borderRadius: custom ? "16px" : "",
             width: "100%",
-            maxWidth: "100%",
-            overflowX: "scroll",
+            maxWidth: "calc(100vw - 64px)",
             display: "flex",
             flexDirection: "column",
             marginBottom: custom ? "56px" : "",
             padding: custom ? "24px 16px 60px 24px" : "",
             position: 'relative'
           }}>
-          <div sx={{ maxWidth: "500px" }}>
+          <div sx={{ maxWidth: "100%", overflowX: 'scroll' }}>
             {tokens.map((line, i) => {
               // Workaround for MDX rendering trailing lines on everything
               const lastLine = i === tokens.length - 1;
@@ -166,6 +165,7 @@ const Code = ({
             onClick={handleCopy}
             sx={{
               position: 'absolute',
+              alignSelf: 'flex-end',
               bottom: '16px',
               right: '16px',
               background: "#943CFF",
