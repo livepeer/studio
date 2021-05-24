@@ -268,7 +268,10 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               }}>
               Active Streams
             </Box>
-            <Badge size="1" css={{ letterSpacing: 0, mt: "7px" }}>
+            <Badge
+              size="1"
+              variant="indigo"
+              css={{ letterSpacing: 0, mt: "7px" }}>
               1 active right now
             </Badge>
           </Flex>
@@ -305,7 +308,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               </Box>
             </Box> */}
           <Link href="/app/stream/new-stream" passHref>
-            <Button variant="blue" css={{ display: "flex", align: "center" }}>
+            <Button variant="indigo" css={{ display: "flex", align: "center" }}>
               <StyledPlusIcon /> Create new stream
             </Button>
           </Link>
@@ -339,7 +342,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Link href="/" passHref>
-          <A variant="blue" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="indigo" css={{ display: "flex", alignItems: "center" }}>
             View all <ArrowRightIcon />
           </A>
         </Link>
