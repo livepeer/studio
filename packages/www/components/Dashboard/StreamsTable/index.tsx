@@ -263,7 +263,8 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             <Box
               css={{
                 mr: "$3",
-                fontWeight: 700,
+                fontWeight: 600,
+                letterSpacing: 0,
               }}>
               Active Streams
             </Box>
