@@ -191,7 +191,7 @@ const DocsNav = ({
             <div
               key={idx}
               onClick={() => {
-                router.push(each.slug);
+                router.push(each?.slug);
               }}
               sx={{
                 cursor: "pointer",
@@ -199,16 +199,16 @@ const DocsNav = ({
                 alignItems: "center",
                 mr: "32px",
               }}>
-              <i>{each.icon}</i>
+              <i>{each?.icon}</i>
               <span
                 sx={{
                   fontSize: "14px",
                   fontWeight: "500",
                   transition: "all 0.2s",
                   textShadow:
-                    each.slug === currentPath ? "0.4px 0 0 currentColor" : "",
+                    each?.slug === currentPath ? "0.4px 0 0 currentColor" : "",
                   ml: "12px",
-                  color: each.slug === currentPath ? "black" : "#828282",
+                  color: each?.slug === currentPath ? "black" : "#828282",
                 }}>
                 {each.name}
               </span>
@@ -252,7 +252,7 @@ const DocsNav = ({
                 <i>
                   {
                     mobileCategories.filter((a) => a.slug === currentPath)[0]
-                      .icon
+                      ?.icon
                   }
                 </i>
                 <p
@@ -263,7 +263,7 @@ const DocsNav = ({
                   }}>
                   {
                     mobileCategories.filter((a) => a.slug === currentPath)[0]
-                      .name
+                      ?.name
                   }
                 </p>
               </div>
@@ -282,7 +282,7 @@ const DocsNav = ({
                   <DropdownMenu.Item
                     key={idx}
                     onSelect={() => {
-                      router.push(each.slug);
+                      router.push(each?.slug);
                     }}
                     sx={{
                       cursor: "pointer",
@@ -294,7 +294,7 @@ const DocsNav = ({
                         pb: "24px",
                       },
                     }}>
-                    <i>{each.icon}</i>
+                    <i>{each?.icon}</i>
                     <p
                       sx={{
                         fontSize: "14px",
@@ -302,7 +302,7 @@ const DocsNav = ({
                         ml: "12px",
                         color: "#828282",
                       }}>
-                      {each.name}
+                      {each?.name}
                     </p>
                   </DropdownMenu.Item>
                 ))}
