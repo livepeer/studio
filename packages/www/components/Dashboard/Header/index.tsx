@@ -1,13 +1,32 @@
-import { Box, Text, Link as A } from "@livepeer.com/design-system";
+import {
+  Flex,
+  Box,
+  Text,
+  Link as A,
+  styled,
+} from "@livepeer.com/design-system";
 import Breadcrumbs from "../Breadcrumbs";
 import Link from "next/link";
+import HornIcon from "../../../public/img/icons/horn.svg";
+import QuestionIcon from "../../../public/img/icons/question.svg";
+
+const StyledHornIcon = styled(HornIcon, {
+  color: "$hiContrast",
+  mr: "$2",
+});
+
+const StyledQuestionMarkIcon = styled(QuestionIcon, {
+  color: "$hiContrast",
+  cursor: "pointer",
+  mr: "$1",
+});
 
 const Header = () => {
   return (
-    <Box
+    <Flex
+      align="center"
+      justify="between"
       css={{
-        display: "flex",
-        alignItems: "center",
         px: "$6",
         height: 60,
         width: "100%",
@@ -23,7 +42,14 @@ const Header = () => {
         </Link> */}
         <Text>Home</Text>
       </Breadcrumbs>
-    </Box>
+      <Flex align="center">
+        <Flex align="center" css={{ cursor: "pointer", mr: "$3" }}>
+          <StyledHornIcon />
+          <Box css={{ color: "$hiContrast" }}>Feedback</Box>
+        </Flex>
+        <StyledQuestionMarkIcon />
+      </Flex>
+    </Flex>
   );
 };
 
