@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import DocsJSONHighlighter from "./jsonHighlighter";
 
 type CardProps = {
