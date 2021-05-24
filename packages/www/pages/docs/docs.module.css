@@ -112,7 +112,7 @@
     margin-right: 12px;
 }
 
-/* .markdown p code {
+.markdown code {
     font-size: 12px;
 
     padding: 4px;
@@ -122,7 +122,7 @@
 
     background: #F1F1F1;
     border-radius: 4px
-} */
+}
 
 .markdown table {
     border-collapse: separate !important;
