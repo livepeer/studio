@@ -64,10 +64,23 @@ const components = {
     );
   },
   inlineCode: ({ children }) => {
-    return <p sx={{ color: "blue", background: 'red' }}>{children}</p>;
+    return (
+      <p
+        sx={{
+          background: "#F1F1F1",
+          fontSize: "!12px",
+          padding: "4px",
+          borderRadius: "4px",
+          letterSpacing: "-0.03rem",
+          fontWeight: "400",
+          maxWidth: 'fit-content',
+        }}>
+        {children}
+      </p>
+    );
   },
   code: ({ children }) => {
-    return <p sx={{ color: "red", background: 'yellow' }}>{children}</p>;
+    return <p sx={{ color: "red", background: "yellow" }}>{children}</p>;
   },
   NavigationCard,
   DocsPost,
