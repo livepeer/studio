@@ -258,6 +258,9 @@ const SideNav = ({
           height: "100%",
           padding: "24px",
           transition: "all 0.2s",
+          width: hideSideBar ? '100%' : '',
+          display: 'flex',
+          justifyContent: 'center'
         }}>
         <i
           onClick={() => setHideSideBar(!hideSideBar)}
@@ -267,6 +270,11 @@ const SideNav = ({
             cursor: "pointer",
             transition: "all 0.2s",
             display: "flex",
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxHeight: '22px',
+            height: '22px',
+            width: '22px',
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
           <Download hovered={iconHover} />
