@@ -10,10 +10,7 @@ import {
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
-import HomeIcon from "../../../public/img/icons/home.svg";
-import StreamIcon from "../../../public/img/icons/stream.svg";
-import TerminalIcon from "../../../public/img/icons/terminal.svg";
-import BillingIcon from "../../../public/img/icons/billing.svg";
+import { HomeIcon, StreamIcon, TerminalIcon, BillingIcon } from "./NavIcons";
 
 const NavLink = styled(A, {
   textDecoration: "none",
@@ -24,29 +21,33 @@ const NavLink = styled(A, {
   "&:hover": {
     textDecoration: "none",
   },
+  "&:focus": {
+    outline: "none",
+  },
   variants: {
     active: {
       true: {
-        color: "$indigo900",
-        fontWeight: 700,
+        color: "$violet900",
+        fontWeight: 600,
       },
     },
   },
 });
 
-const Sidebar = () => {
+const Sidebar = ({ id }) => {
   return (
     <Box
       css={{
         borderRight: "1px solid",
         borderColor: "$slate500",
         zIndex: 10,
+        maxWidth: 270,
         width: 270,
         top: 0,
         position: "fixed",
         justifyContent: "flex-end",
         bottom: 0,
-        backgroundColor: "$loContrast",
+        backgroundColor: "$slate100",
       }}>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <Flex align="center" css={{ cursor: "pointer" }}>
@@ -60,26 +61,28 @@ const Sidebar = () => {
       </Flex>
       <Grid css={{ px: "$4" }} gap="3">
         <Link href="/dashboard" passHref>
-          <NavLink active css={{ textDecoration: "none" }}>
-            <HomeIcon />
+          <NavLink active={id === "home"} css={{ textDecoration: "none" }}>
+            <HomeIcon active={id === "home"} />
             <Box css={{ ml: "$2" }}>Home</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/streams" passHref>
-          <NavLink css={{ textDecoration: "none" }}>
-            <StreamIcon />
+          <NavLink active={id === "streams"} css={{ textDecoration: "none" }}>
+            <StreamIcon active={id === "streams"} />
             <Box css={{ ml: "$2" }}>Streams</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/developers/api-keys" passHref>
-          <NavLink css={{ textDecoration: "none" }}>
-            <TerminalIcon />
+          <NavLink
+            active={id === "developers"}
+            css={{ textDecoration: "none" }}>
+            <TerminalIcon active={id === "developers"} />
             <Box css={{ ml: "$2" }}>Developers</Box>
           </NavLink>
         </Link>
         <Link href="/dashboard/billing" passHref>
-          <NavLink css={{ textDecoration: "none" }}>
-            <BillingIcon />
+          <NavLink active={id === "billing"} css={{ textDecoration: "none" }}>
+            <BillingIcon active={id === "billing"} />
             <Box css={{ ml: "$2" }}>Billing</Box>
           </NavLink>
         </Link>

@@ -36,11 +36,17 @@ const globalStyles = global({
   },
 });
 
+type Breadcrumb = {
+  title: string;
+  href?: string;
+};
 interface Props {
   children?: JSX.Element[] | JSX.Element;
+  breadcrumbs?: Breadcrumb[];
+  id?: string;
 }
 
-function DashboardLayout({ children }: Props) {
+function DashboardLayout({ id, children, breadcrumbs }: Props) {
   globalStyles();
 
   return (
@@ -51,9 +57,9 @@ function DashboardLayout({ children }: Props) {
           attribute="class"
           value={{ light: "light-theme", dark: darkTheme.className }}
           defaultTheme="system">
-          <Sidebar />
+          <Sidebar id={id} />
           <Box css={{ pl: 270, width: "100%" }}>
-            <Header />
+            <Header breadcrumbs={breadcrumbs} />
             {children}
           </Box>
         </ThemeProvider>
