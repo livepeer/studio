@@ -23,7 +23,7 @@ const Plans = () => {
             align="end"
             css={{
               borderBottom: "1px solid",
-              borderColor: "$slate500",
+              borderColor: "$slate6",
               pb: "$4",
               mb: "$5",
               width: "100%",
