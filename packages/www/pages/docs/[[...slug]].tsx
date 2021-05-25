@@ -19,6 +19,7 @@ import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
 import { FiList } from "react-icons/fi";
 import { CgClose } from "react-icons/cg";
 import Code from "components/renderers/Code";
+import { NextSeo } from "next-seo";
 
 const mobileCategories = [
   {
@@ -94,8 +95,26 @@ const DocsIndex = ({ doc, menu }) => {
 
   const breadCrumb = router.asPath.split("#")[0].split("/");
 
+  let seo = {
+    title: "Livepeer Docs",
+    description: "Livepeer Docs",
+    openGraph: {
+      title: "Livepeer.com Docs",
+      description:
+        "The platform built to power video-centric UGC applications at scale.",
+      url: "https://livepeer.com/docs",
+      images: [
+        {
+          url: "https://livepeer.com/img/share-icon.png",
+          alt: "Livepeer.com",
+        },
+      ],
+    },
+  };
+
   return (
     <>
+      <NextSeo {...seo} />
       <div
         onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
         sx={{
@@ -121,7 +140,7 @@ const DocsIndex = ({ doc, menu }) => {
       <Box
         sx={{
           display: ["flex", "flex", "grid", "grid"],
-          flexDirection: 'column',
+          flexDirection: "column",
           gridTemplateColumns: ["min-content 1fr"],
           gridTemplateRows: "auto auto",
         }}>
@@ -145,12 +164,12 @@ const DocsIndex = ({ doc, menu }) => {
         <Container
           sx={{
             mt: hideTopNav ? "-12px" : "48px",
-            gridColumn: '1fr',
+            gridColumn: "1fr",
             justifyItems: "center",
             mx: 0,
             transition: "all 0.2s",
             display: "flex",
-            minWidth: '100%',
+            minWidth: "100%",
             justifyContent: "center",
             alignItems: "flex-start",
           }}>
