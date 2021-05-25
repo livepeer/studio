@@ -18,8 +18,8 @@
     "ds:release": "yarn ds:build && np"
   },
   "dependencies": {
-    "@modulz/design-system": "0.2.1",
-    "@radix-ui/colors": "^0.1.4",
+    "@modulz/design-system": "npm:@adamsoffer/design-system",
+    "@radix-ui/colors": "0.1.5",
     "@radix-ui/react-accordion": "0.0.7",
     "@radix-ui/react-alert-dialog": "0.0.8",
     "@radix-ui/react-aspect-ratio": "^0.0.6",
