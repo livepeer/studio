@@ -4,8 +4,14 @@ import Table from "./table";
 import { Pool } from "pg";
 import QueueTable from "./queue";
 import schema from "../schema/schema.json";
+import { Queue } from "../schema/types";
 
 jest.setTimeout(15000);
+
+async function processEvent(doc: Queue) {
+  console.log("processing doc id: ", doc.id);
+  return doc.id;
+}
 
 describe("Queue", () => {
   let db: DB;
@@ -60,7 +66,7 @@ describe("Queue", () => {
       isConsumed: false,
     });
 
-    const event = await db.queue.pop();
+    const event = await db.queue.pop(processEvent);
     console.log("event db1: ", event);
     console.log("event Channel: ", event.channel);
     expect(event.channel).toEqual("test.channel");

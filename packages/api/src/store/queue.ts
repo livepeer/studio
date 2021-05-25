@@ -39,7 +39,10 @@ export default class QueueTable extends Table<Queue> {
   // }
 
   // get next event in queue
-  async pop(opts: GetOptions = { useReplica: true }): Promise<Queue> {
+  async pop(
+    processFunc: Function,
+    opts: GetOptions = { useReplica: true }
+  ): Promise<Queue> {
     let res: QueryResult<DBLegacyObject>;
     await this.client.query("BEGIN");
     res = await this.client.query(
@@ -57,15 +60,27 @@ export default class QueueTable extends Table<Queue> {
     }
 
     let originalData = res.rows[0].data;
-    // res.rows[0].data.isConsumed = true;
-    res.rows[0].data.status = "processing";
-    res.rows[0].data.modifiedAt = Date.now();
-    console.log("id: ", res.rows);
-    await this.client.query(
-      sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
-        ` WHERE id = '${res.rows[0].data.id}'`
-      )
-    );
+    // this allows us to pass a function that will process the event within the lock
+    if (processFunc) {
+      await processFunc(originalData as Queue);
+      res.rows[0].data.isConsumed = true;
+      res.rows[0].data.modifiedAt = Date.now();
+      await this.client.query(
+        sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
+          ` WHERE id = '${res.rows[0].data.id}'`
+        )
+      );
+    } else {
+      res.rows[0].data.status = "processing";
+      res.rows[0].data.modifiedAt = Date.now();
+      console.log("id: ", res.rows);
+      await this.client.query(
+        sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
+          ` WHERE id = '${res.rows[0].data.id}'`
+        )
+      );
+    }
+
     await this.client.query("COMMIT;");
     logger.debug(`MsgQueue consuming ${res.rows[0].id}`);
     return originalData as Queue;
