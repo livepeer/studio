@@ -223,9 +223,7 @@ const SideNav = ({
         display: ["none", "none", "flex", "flex"],
         justifyContent: "space-between",
         position: "sticky",
-        gridColumn: hideSideBar
-          ? [null, null, "1 / 2", "1 / 2"]
-          : [null, null, "1 / 5", '1/5', "1 / 4"],
+        width: hideSideBar ? '60px' : '300px',
         marginTop: hideTopNav ? "-60px" : "",
         transition: "all 0.2s",
         background: "white",
@@ -256,9 +254,9 @@ const SideNav = ({
         sx={{
           borderRight: "1px solid #E6E6E6",
           height: "100%",
-          padding: "24px",
+          pt: "24px",
           transition: "all 0.2s",
-          width: hideSideBar ? '100%' : '',
+          width: '60px',
           display: 'flex',
           justifyContent: 'center'
         }}>

@@ -120,8 +120,9 @@ const DocsIndex = ({ doc, menu }) => {
       </div>
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(15, 1fr)",
+          display: ["flex", "flex", "grid", "grid"],
+          flexDirection: 'column',
+          gridTemplateColumns: ["min-content 1fr"],
           gridTemplateRows: "auto auto",
         }}>
         <DocsNav
@@ -144,9 +145,7 @@ const DocsIndex = ({ doc, menu }) => {
         <Container
           sx={{
             mt: hideTopNav ? "-12px" : "48px",
-            gridColumn: hideSideBar
-              ? ["1 / 16", "1 / 16", "2 / 16", "2 / 16"]
-              : ["1 / 16", "1 / 16", "5 / 16", "5/16", "4 / 16"],
+            gridColumn: '1fr',
             justifyItems: "center",
             mx: 0,
             transition: "all 0.2s",
