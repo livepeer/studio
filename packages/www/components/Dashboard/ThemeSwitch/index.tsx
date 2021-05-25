@@ -11,17 +11,17 @@ const StyledSwitch = styled(Switch.Root, {
   padding: 0,
   width: 25,
   height: 12,
-  backgroundColor: "$colors$slate500",
+  backgroundColor: "$colors$slate6",
   borderRadius: 25,
   position: "relative",
   display: "flex",
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px $colors$violet800",
+    boxShadow: "0 0 0 2px $colors$violet9",
   },
   '&[data-state="checked"]': {
-    linearGradient: "to right, $colors$violet700, $colors$violet400",
+    linearGradient: "to right, $colors$violet8, $colors$violet5",
   },
 });
 
@@ -40,7 +40,7 @@ const StyledThumb = styled(Switch.Thumb, {
     display: "none",
   },
   '&[data-state="checked"]': {
-    backgroundColor: "$colors$slate500",
+    backgroundColor: "$colors$slate6",
     transform: "translateX(12px)",
     "> :nth-child(1)": {
       display: "none",
