@@ -24,22 +24,15 @@ const NavLink = styled(A, {
   "&:focus": {
     outline: "none",
   },
-  variants: {
-    active: {
-      true: {
-        color: "$violet900",
-        fontWeight: 600,
-      },
-    },
-  },
 });
 
 const Sidebar = ({ id }) => {
   return (
     <Box
       css={{
+        backgroundColor: "$slate3",
         borderRight: "1px solid",
-        borderColor: "$slate500",
+        borderColor: "$slate6",
         zIndex: 10,
         maxWidth: 270,
         width: 270,
@@ -47,7 +40,6 @@ const Sidebar = ({ id }) => {
         position: "fixed",
         justifyContent: "flex-end",
         bottom: 0,
-        backgroundColor: "$slate100",
       }}>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <Flex align="center" css={{ cursor: "pointer" }}>
@@ -61,29 +53,68 @@ const Sidebar = ({ id }) => {
       </Flex>
       <Grid css={{ px: "$4" }} gap="3">
         <Link href="/dashboard" passHref>
-          <NavLink active={id === "home"} css={{ textDecoration: "none" }}>
+          <NavLink>
             <HomeIcon active={id === "home"} />
-            <Box css={{ ml: "$2" }}>Home</Box>
+            <Text
+              gradient={id === "home"}
+              variant={id === "home" ? "violet" : null}
+              css={{
+                fontWeight: id === "home" ? 700 : 400,
+                WebkitBackgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+              }}>
+              Home
+            </Text>
           </NavLink>
         </Link>
         <Link href="/dashboard/streams" passHref>
-          <NavLink active={id === "streams"} css={{ textDecoration: "none" }}>
+          <NavLink>
             <StreamIcon active={id === "streams"} />
-            <Box css={{ ml: "$2" }}>Streams</Box>
+            <Text
+              gradient={id === "streams"}
+              variant={id === "streams" ? "violet" : null}
+              css={{
+                fontWeight: id === "streams" ? 700 : 400,
+                WebkitBackgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+              }}>
+              Streams
+            </Text>
           </NavLink>
         </Link>
         <Link href="/dashboard/developers/api-keys" passHref>
-          <NavLink
-            active={id === "developers"}
-            css={{ textDecoration: "none" }}>
+          <NavLink>
             <TerminalIcon active={id === "developers"} />
-            <Box css={{ ml: "$2" }}>Developers</Box>
+            <Text
+              gradient={id === "developers"}
+              variant={id === "developers" ? "violet" : null}
+              css={{
+                fontWeight: id === "developers" ? 700 : 400,
+                WebkitBackgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+              }}>
+              Developers
+            </Text>
           </NavLink>
         </Link>
         <Link href="/dashboard/billing" passHref>
-          <NavLink active={id === "billing"} css={{ textDecoration: "none" }}>
+          <NavLink>
             <BillingIcon active={id === "billing"} />
-            <Box css={{ ml: "$2" }}>Billing</Box>
+            <Text
+              gradient={id === "billing"}
+              variant={id === "billing" ? "violet" : null}
+              css={{
+                display: "flex",
+                fontWeight: id === "billing" ? 700 : 400,
+                WebkitBackgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+              }}>
+              Billing
+            </Text>
           </NavLink>
         </Link>
       </Grid>
