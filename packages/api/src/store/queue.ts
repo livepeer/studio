@@ -35,6 +35,10 @@ export default class QueueTable extends Table<Queue> {
     }
   }
 
+  unsetMsgHandler() {
+    this.setMsgHandler(QueueTable.prototype.handleMsg);
+  }
+
   async listen() {
     this.listener = await this.db.pool.connect();
     this.listener.query(`LISTEN ${this.channel}`);
@@ -51,6 +55,10 @@ export default class QueueTable extends Table<Queue> {
     this.listener.on("notice", (error) => {
       console.warn("Msg Queue Listener Notice: ", error);
     });
+  }
+
+  setMsgHandler(func: (msg: Notification) => Promise<void>) {
+    this.handleMsg = func;
   }
 
   async handleMsg(msg: Notification) {

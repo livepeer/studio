@@ -27,18 +27,16 @@ export default class WebhookCannon {
 
   async start() {
     if (this.running) {
-      while (true) {
-        let event = this.db.queue.pop();
-        try {
-          await this.onTrigger(event);
-        } catch (e) {
-          console.error("webhook loop error", e);
-        }
-      }
+      this.db.queue.setMsgHandler(this.processEvent.bind(this));
     }
   }
 
+  async processEvent(msg: Notification) {
+    let event = await this.db.queue.pop(this.onTrigger.bind(this));
+  }
+
   stop() {
+    this.db.queue.unsetMsgHandler();
     this.running = false;
   }
 
