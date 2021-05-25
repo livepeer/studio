@@ -10,7 +10,7 @@ const Sessions = () => {
     return <Layout />;
   }
   return (
-    <Layout>
+    <Layout id="sessions" breadcrumbs={[{ title: "Sessions" }]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <Flex

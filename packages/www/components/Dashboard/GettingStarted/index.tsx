@@ -10,12 +10,12 @@ import {
 const GettingStarted = () => {
   return (
     <>
-      <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$5" }}>
+      <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
         Get started with Livepeer.com, Paige
       </Heading>
       <Accordion type="single">
         <AccordionItem value="accordion-one">
-          <AccordionButton css={{ color: "$indigo900" }}>
+          <AccordionButton css={{ color: "$slate1000" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first live stream
             </Text>
@@ -30,7 +30,7 @@ const GettingStarted = () => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-two">
-          <AccordionButton css={{ color: "$indigo900" }}>
+          <AccordionButton css={{ color: "$slate1000" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Integrate with the API
             </Text>
@@ -45,7 +45,7 @@ const GettingStarted = () => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-three">
-          <AccordionButton css={{ color: "$indigo900" }}>
+          <AccordionButton css={{ color: "$slate1000" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first app
             </Text>

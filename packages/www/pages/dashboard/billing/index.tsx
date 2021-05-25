@@ -10,7 +10,7 @@ const Billing = () => {
     return <Layout />;
   }
   return (
-    <Layout>
+    <Layout id="billing" breadcrumbs={[{ title: "Billing" }]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <Flex
