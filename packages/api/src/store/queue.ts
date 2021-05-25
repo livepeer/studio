@@ -2,10 +2,10 @@ import sql, { SQLStatement } from "sql-template-strings";
 import { DB } from "./db";
 import logger from "../logger";
 import { BadRequestError } from "./errors";
-import { QueryResult, PoolClient } from "pg";
+import { QueryResult, PoolClient, Pool } from "pg";
 import Table from "./table";
 import { Queue } from "../schema/types";
-
+import { Notification } from "pg/index";
 import { TableSchema, GetOptions, DBObject, DBLegacyObject } from "./types";
 
 const DEFAULT_SORT = "id ASC";
@@ -14,6 +14,8 @@ export default class QueueTable extends Table<Queue> {
   db: DB;
   schema: TableSchema;
   client: PoolClient;
+  listener: PoolClient;
+  channel = "webhook_main";
   constructor({ db, schema }) {
     super({ db, schema });
     this.start();
@@ -21,14 +23,39 @@ export default class QueueTable extends Table<Queue> {
 
   async start() {
     this.client = await this.db.pool.connect();
+    await this.listen();
   }
 
   stop() {
     try {
       this.client.release();
+      this.listener.release();
     } catch (error) {
       console.log("error releasing pg client", error);
     }
+  }
+
+  async listen() {
+    this.listener = await this.db.pool.connect();
+    this.listener.query(`LISTEN ${this.channel}`);
+    this.listener.on("notification", async (msg) => {
+      console.log("listener got notification: ", msg.channel);
+      await this.handleMsg(msg);
+    });
+    this.listener.on("error", (error) => {
+      console.error("Msg Queue Listener Error ", error);
+    });
+    this.listener.on("end", () => {
+      console.log("Msq queue listener ended");
+    });
+    this.listener.on("notice", (error) => {
+      console.warn("Msg Queue Listener Notice: ", error);
+    });
+  }
+
+  async handleMsg(msg: Notification) {
+    // emit it here
+    console.log("got NOTIFICATION: ", msg.channel, msg.payload);
   }
   // name: string;
   // constructor({ db, schema }) {
@@ -96,6 +123,12 @@ export default class QueueTable extends Table<Queue> {
         `INSERT INTO ${this.name} VALUES ($1, $2)`, //p
         [doc.id, JSON.stringify(doc)] //p
       );
+
+      if (this.listener) {
+        // emit it via notifications
+        console.log("emitting NOTIFY");
+        await this.db.query(`NOTIFY ${this.channel}, '${doc.id}';`);
+      }
     } catch (e) {
       if (e.message.includes("duplicate key value")) {
         throw new BadRequestError(e.detail);
