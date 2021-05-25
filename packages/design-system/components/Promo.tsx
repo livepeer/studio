@@ -34,28 +34,28 @@ export const Promo = styled(DEFAULT_TAG, {
         backgroundColor: "$loContrast",
       },
       gray: {
-        backgroundColor: "$slate100",
-        boxShadow: "0 0 0 1px $colors$slate500",
+        backgroundColor: "$slate2",
+        boxShadow: "0 0 0 1px $colors$slate6",
       },
       blue: {
-        backgroundColor: "$blue200",
-        boxShadow: "0 0 0 1px $colors$blue500",
+        backgroundColor: "$blue2",
+        boxShadow: "0 0 0 1px $colors$blue6",
       },
       green: {
-        backgroundColor: "$green200",
-        boxShadow: "0 0 0 1px $colors$green500",
+        backgroundColor: "$green2",
+        boxShadow: "0 0 0 1px $colors$green6",
       },
       indigo: {
-        backgroundColor: "$indigo200",
-        boxShadow: "0 0 0 1px $colors$indigo500",
+        backgroundColor: "$indigo2",
+        boxShadow: "0 0 0 1px $colors$indigo6",
       },
       violet: {
-        backgroundColor: "$violet200",
-        boxShadow: "0 0 0 1px $colors$violet500",
+        backgroundColor: "$violet2",
+        boxShadow: "0 0 0 1px $colors$violet6",
       },
       red: {
-        backgroundColor: "$red200",
-        boxShadow: "0 0 0 1px $colors$red500",
+        backgroundColor: "$red2",
+        boxShadow: "0 0 0 1px $colors$red6",
       },
     },
     rounded: {
@@ -74,35 +74,35 @@ export const Promo = styled(DEFAULT_TAG, {
       border: "true",
       variant: "gray",
       css: {
-        borderColor: "$slate500",
+        borderColor: "$slate6",
       },
     },
     {
       border: "true",
       variant: "blue",
       css: {
-        borderColor: "$blue900",
+        borderColor: "$blue11",
       },
     },
     {
       border: "true",
       variant: "indigo",
       css: {
-        borderColor: "$indigo900",
+        borderColor: "$indigo11",
       },
     },
     {
       border: "true",
       variant: "violet",
       css: {
-        borderColor: "$violet900",
+        borderColor: "$violet11",
       },
     },
     {
       border: "true",
       variant: "loContrast",
       css: {
-        borderColor: "$slate500",
+        borderColor: "$slate6",
       },
     },
   ],

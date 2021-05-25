@@ -91,6 +91,7 @@ import {
   TriangleUpIcon,
   VideoIcon,
   RocketIcon,
+  InfoCircledIcon,
 } from "@radix-ui/react-icons";
 import { styled } from "../stitches.config";
 
@@ -105,26 +106,32 @@ import {
 import { Button } from "../components/Button";
 import { Link } from "../components/Link";
 import { Promo } from "../components/Promo";
+import { AppBar } from "../custom/AppBar";
 
 const StyledCross1Icon = styled(Cross1Icon, {
   color: "$hiContrast",
 });
 
+const StyledInfoIcon = styled(InfoCircledIcon, {
+  color: "$slate9",
+  mr: "$2",
+  minWidth: 15,
+  minHeight: 15,
+});
+
 function Home() {
   return (
     <Box>
-      <DarkThemeButton />
-
-      <Banner id="banner" variant="indigo">
+      <Banner id="banner" variant="violet" rounded>
         <RocketIcon />
         <Text size="2" css={{ fontWeight: 500 }}>
-          Livepeer raises a $15M Series B.
+          The Livepeer.com dashboard got a redesign!
         </Text>
         <Separator orientation="vertical" />
-        <Link variant="indigo" href="#">
-          <Flex>
+        <Link variant="blue" href="#">
+          <Flex align="center">
             <Text size="2" css={{ mr: "$1" }}>
-              Read the story
+              Read more
             </Text>
             <ArrowRightIcon />
           </Flex>
@@ -133,17 +140,20 @@ function Home() {
           <Cross1Icon />
         </IconButton>
       </Banner>
+      <AppBar size="2" color="loContrast" border sticky glass>
+        <DarkThemeButton />
+      </AppBar>
       <Box
         css={{
           position: "fixed",
-          top: "$7",
+          top: "$8",
           left: 0,
           bottom: 0,
           overflowY: "auto",
           width: 250,
           px: "$6",
           py: "$6",
-          background: "$loContrast",
+          backgroundColor: "$loContrast",
         }}>
         <Heading>Quick nav</Heading>
         <Box as="ul" css={{ listStyle: "none", p: 0 }}>
@@ -514,7 +524,7 @@ function Home() {
               Livepeer.com UI test suite
             </Heading>
             <Paragraph size="2" css={{ ta: "center" }}>
-              An environment for testing the Livepeer.com Design System.
+              An environment for testing the Livepeer.com design system.
             </Paragraph>
           </Container>
         </Section>
@@ -527,17 +537,17 @@ function Home() {
               Section
             </Heading>
           </Container>
-          <Section size="1" css={{ bc: "$slate200" }}>
+          <Section size="1" css={{ bc: "$slate3" }}>
             <Text as="p" size="4" css={{ ta: "center" }}>
               Section 1
             </Text>
           </Section>
-          <Section size="2" css={{ bc: "$slate200", my: "$1" }}>
+          <Section size="2" css={{ bc: "$slate3", my: "$1" }}>
             <Text as="p" size="4" css={{ ta: "center" }}>
               Section 2
             </Text>
           </Section>
-          <Section size="3" css={{ bc: "$slate200" }}>
+          <Section size="3" css={{ bc: "$slate3" }}>
             <Text as="p" size="4" css={{ ta: "center" }}>
               Section 3
             </Text>
@@ -556,29 +566,29 @@ function Home() {
             <Box
               css={{
                 p: "$5",
-                border: "1px solid $slate500",
+                border: "1px solid $slate6",
                 borderRadius: "$3",
               }}>
               <form>
                 <TextField
                   type="email"
-                  size="3"
+                  size="2"
                   placeholder="Email"
                   autoComplete="off"
                   css={{ mb: "$3" }}
                 />
                 <TextField
                   type="password"
-                  size="3"
+                  size="2"
                   placeholder="Password"
                   autoComplete="off"
                   css={{ mb: "$3" }}
                 />
                 <Flex css={{ ai: "center", jc: "space-between" }}>
-                  <Text size="2" css={{ color: "$slate900" }}>
+                  <Text size="2" css={{ color: "$slate11" }}>
                     Forgot password
                   </Text>
-                  <Button size="2" variant="indigo">
+                  <Button size="2" variant="blue">
                     Log in
                   </Button>
                 </Flex>
@@ -631,7 +641,7 @@ function Home() {
             <Text
               as="p"
               size="3"
-              css={{ ta: "center", bc: "$slate200", py: "$2" }}>
+              css={{ ta: "center", bc: "$slate3", py: "$2" }}>
               No max width
             </Text>
           </Container>
@@ -645,9 +655,9 @@ function Home() {
               Flex
             </Heading>
             <Flex direction="column" align="center" gap="6">
-              <Box css={{ width: "$8", height: "$8", bc: "$blue800" }}></Box>
-              <Box css={{ width: "$5", height: "$5", bc: "$blue800" }}></Box>
-              <Box css={{ width: "$7", height: "$7", bc: "$blue800" }}></Box>
+              <Box css={{ width: "$8", height: "$8", bc: "$blue9" }}></Box>
+              <Box css={{ width: "$5", height: "$5", bc: "$blue9" }}></Box>
+              <Box css={{ width: "$7", height: "$7", bc: "$blue9" }}></Box>
             </Flex>
           </Container>
         </Section>
@@ -660,13 +670,13 @@ function Home() {
               Grid
             </Heading>
             <Grid columns="4" align="center" gapX="3" gapY="6">
-              <Box css={{ height: "$9", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
-              <Box css={{ height: "$7", bc: "$blue800" }}></Box>
+              <Box css={{ height: "$9", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
+              <Box css={{ height: "$7", bc: "$blue9" }}></Box>
             </Grid>
           </Container>
         </Section>
@@ -1563,40 +1573,28 @@ function Home() {
             <Flex css={{ ai: "flex-start", gap: "$6" }}>
               <TextField size="1" placeholder="Size 1" />
               <TextField size="2" placeholder="Size 2" />
-              <TextField size="3" placeholder="Size 3" />
             </Flex>
             <Flex css={{ ai: "flex-start", gap: "$6", mt: "$6" }}>
               <TextField size="1" placeholder="Ghost" variant="ghost" />
               <TextField size="2" placeholder="Ghost" variant="ghost" />
-              <TextField size="3" placeholder="Ghost" variant="ghost" />
             </Flex>
             <Flex css={{ ai: "flex-start", gap: "$6", mt: "$6" }}>
-              <TextField size="2" placeholder="Invalid" state="invalid" />
-              <TextField size="2" placeholder="Valid" state="valid" />
+              <TextField placeholder="Invalid" state="invalid" />
+              <TextField placeholder="Valid" state="valid" />
             </Flex>
             <Flex css={{ ai: "flex-start", gap: "$6", mt: "$6" }}>
-              <TextField
-                size="2"
-                placeholder="Cursor default"
-                cursor="default"
-              />
-              <TextField size="2" placeholder="Cursor text" cursor="text" />
+              <TextField placeholder="Cursor default" cursor="default" />
+              <TextField placeholder="Cursor text" cursor="text" />
             </Flex>
             <Flex css={{ ai: "flex-start", gap: "$6", mt: "$6" }}>
+              <TextField placeholder="Read only placeholder" readOnly />
               <TextField
-                size="2"
-                placeholder="Read only placeholder"
-                readOnly
-              />
-              <TextField
-                size="2"
                 placeholder="Read only value"
                 defaultValue="100"
                 readOnly
               />
-              <TextField size="2" placeholder="Disabled placeholder" disabled />
+              <TextField placeholder="Disabled placeholder" disabled />
               <TextField
-                size="2"
                 placeholder="Disabled value"
                 defaultValue="100"
                 disabled
@@ -1714,7 +1712,7 @@ function Home() {
                 Adam Soffer
               </Text>
               <VerifiedBadge css={{ as: "center", mx: "$1" }} />
-              <Text size="3" css={{ color: "$slate900" }}>
+              <Text size="3" css={{ color: "$slate11" }}>
                 @adamsoffer
               </Text>
             </Flex>
@@ -1730,7 +1728,7 @@ function Home() {
             </Heading>
             <Heading css={{ mb: "$6" }}>Link variants</Heading>
             <Flex css={{ gap: "$6", mb: "$6" }}>
-              <Link variant="indigo" href="#">
+              <Link variant="blue" href="#">
                 <Text size="4">Link with jy descenders</Text>
               </Link>
               <Link variant="subtle" href="#">
@@ -1785,55 +1783,47 @@ function Home() {
               <Box css={{ width: 250 }}>
                 <Card css={{ p: "$3" }}>
                   <Heading css={{ mb: "$2" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Ipsam officia libero, porro delectus error dolores labore
-                    cum earum, reprehenderit placeat eos tempora totam maiores?
-                    Sit necessitatibus laborum aliquid cumque fugiat.
+                    Modulz raises $4.2M to close the gap between design and code
                   </Heading>
                   <Text
                     size="3"
-                    css={{ color: "$slate900", lineHeight: "23px" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Consequatur blanditiis distinctio dignissimos enim. Cumque,
-                    quos officia non velit nihil natus, quas, possimus vero
-                    voluptatem in ratione quisquam ipsa. Nam, fugit?
+                    css={{ color: "$slate11", lineHeight: "23px" }}>
+                    Modulz is a visual code editor that empowers teams to
+                    design, develop, document and deploy a design system,
+                    without writing code.
                   </Text>
                 </Card>
               </Box>
               <Box css={{ width: 250 }}>
                 <Card as="a" href="#" css={{ p: "$3" }} variant="interactive">
                   <Heading css={{ mb: "$2" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Quae delectus, iste rerum nisi doloribus quia quis nam
-                    maiores assumenda nostrum ducimus enim suscipit placeat
-                    incidunt quisquam velit aut quibusdam ex.
+                    Modulz raises $4.2M to close the gap between design and code
                   </Heading>
                   <Text
                     size="3"
-                    css={{ color: "$slate900", lineHeight: "23px" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Quam placeat, omnis laudantium ipsa libero totam eos
-                    explicabo quasi culpa enim fuga mollitia officiis, eius
-                    minima neque nam nemo consequuntur debitis.
+                    css={{ color: "$slate11", lineHeight: "23px" }}>
+                    Modulz is a visual code editor that empowers teams to
+                    design, develop, document and deploy a design system,
+                    without writing code.
                   </Text>
                   <Flex css={{ ai: "center", jc: "space-between", mt: "$3" }}>
                     <Flex css={{ ai: "center" }}>
                       <Avatar
                         size="2"
                         alt="John Smith"
-                        src="https://pbs.twimg.com/profile_images/1058145114915291137/L_uKuBpN_400x400.jpg"
+                        src="https://pbs.twimg.com/profile_images/864164353771229187/Catw6Nmh_400x400.jpg"
                         fallback="J"
                         css={{
                           mr: "$1",
                         }}
                       />
-                      <Text size="2" css={{ color: "$slate900" }}>
+                      <Text size="2" css={{ color: "$slate11" }}>
                         Adam Soffer
                       </Text>
                     </Flex>
                     <Box>
-                      <Text size="2" css={{ color: "$slate900" }}>
-                        May 2021
+                      <Text size="2" css={{ color: "$slate11" }}>
+                        May 2020
                       </Text>
                     </Box>
                   </Flex>
@@ -1847,38 +1837,34 @@ function Home() {
                   />
                   <Box css={{ p: "$3" }}>
                     <Heading css={{ mb: "$2" }}>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Alias necessitatibus deserunt quidem aliquid vero quos
-                      consectetur. Dolorum accusantium magni consequatur sed
-                      illo expedita qui rerum, temporibus adipisci saepe,
-                      quaerat blanditiis.
+                      Modulz raises $4.2M to close the gap between design and
+                      code
                     </Heading>
                     <Text
                       size="3"
-                      css={{ color: "$slate900", lineHeight: "23px" }}>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      Libero veritatis dolores, optio architecto cupiditate,
-                      tenetur facere rem officia voluptate debitis ad. Tenetur
-                      ab repellat sequi non quo. Provident, doloremque iure?
+                      css={{ color: "$slate11", lineHeight: "23px" }}>
+                      Modulz is a visual code editor that empowers teams to
+                      design, develop, document and deploy a design system,
+                      without writing code.
                     </Text>
                     <Flex css={{ ai: "center", jc: "space-between", mt: "$3" }}>
                       <Flex css={{ ai: "center" }}>
                         <Avatar
                           size="2"
                           alt="John Smith"
-                          src="https://pbs.twimg.com/profile_images/1058145114915291137/L_uKuBpN_400x400.jpg"
+                          src="https://pbs.twimg.com/profile_images/864164353771229187/Catw6Nmh_400x400.jpg"
                           fallback="J"
                           css={{
                             mr: "$1",
                           }}
                         />
-                        <Text size="2" css={{ color: "$slate900" }}>
+                        <Text size="2" css={{ color: "$slate11" }}>
                           Adam Soffer
                         </Text>
                       </Flex>
                       <Box>
-                        <Text size="2" css={{ color: "$slate900" }}>
-                          May 2021
+                        <Text size="2" css={{ color: "$slate11" }}>
+                          May 2020
                         </Text>
                       </Box>
                     </Flex>
@@ -1892,37 +1878,33 @@ function Home() {
                     css={{ br: "$1", mb: "$3" }}
                   />
                   <Heading css={{ mb: "$2" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. In
-                    sed earum mollitia possimus assumenda harum labore aut alias
-                    omnis obcaecati! Cum ratione adipisci explicabo
-                    exercitationem libero, neque provident porro id.
+                    Modulz raises $4.2M to close the gap between design and code
                   </Heading>
                   <Text
                     size="3"
-                    css={{ color: "$slate900", lineHeight: "23px" }}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. In
-                    sed earum mollitia possimus assumenda harum labore aut alias
-                    omnis obcaecati! Cum ratione adipisci explicabo
-                    exercitationem libero, neque provident porro id.
+                    css={{ color: "$slate11", lineHeight: "23px" }}>
+                    Modulz is a visual code editor that empowers teams to
+                    design, develop, document and deploy a design system,
+                    without writing code.
                   </Text>
                   <Flex css={{ ai: "center", jc: "space-between", mt: "$3" }}>
                     <Flex css={{ ai: "center" }}>
                       <Avatar
                         size="2"
                         alt="John Smith"
-                        src="https://pbs.twimg.com/profile_images/1058145114915291137/L_uKuBpN_400x400.jpg"
+                        src="https://pbs.twimg.com/profile_images/864164353771229187/Catw6Nmh_400x400.jpg"
                         fallback="J"
                         css={{
                           mr: "$1",
                         }}
                       />
-                      <Text size="2" css={{ color: "$slate900" }}>
+                      <Text size="2" css={{ color: "$slate11" }}>
                         Adam Soffer
                       </Text>
                     </Flex>
                     <Box>
-                      <Text size="2" css={{ color: "$slate900" }}>
-                        May 2021
+                      <Text size="2" css={{ color: "$slate11" }}>
+                        May 2020
                       </Text>
                     </Box>
                   </Flex>
@@ -1935,9 +1917,8 @@ function Home() {
                   </Text>
                   <Text
                     size="3"
-                    css={{ color: "$slate900", lineHeight: "23px" }}>
-                    The platform built to power video-centric creator platforms
-                    at scale.
+                    css={{ color: "$slate11", lineHeight: "23px" }}>
+                    Modulz is a visual code.
                   </Text>
                 </Card>
               </Box>
@@ -2023,6 +2004,42 @@ function Home() {
         <Flex css={{ jc: "center" }}>
           <Separator size="2" />
         </Flex>
+        <Section size="3">
+          <Container size="2">
+            <Heading id="promo" css={{ mb: "$6", scrollMarginTop: "$7" }}>
+              Promo
+            </Heading>
+            <Heading css={{ mb: "$6" }}>Default</Heading>
+            <Box css={{ mb: "$6" }}>
+              <Promo size="2" css={{ mb: "$7" }}>
+                <Flex>
+                  <StyledInfoIcon />
+                  <Box>
+                    <Text
+                      size="2"
+                      css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
+                      Upgrade to Pro
+                    </Text>
+                    <Text size="2" css={{ lineHeight: 1.4, color: "$slate11" }}>
+                      Upgrade to the Pro plan and enjoy unlimited transcoding
+                      and streaming minutes.
+                    </Text>
+                  </Box>
+                </Flex>
+                <Flex align="center" justify="end">
+                  <Button css={{ mr: "$3" }}>Upgrade to Pro</Button>
+                  <IconButton
+                    variant="ghost"
+                    css={{
+                      mixBlendMode: "initial",
+                    }}>
+                    <StyledCross1Icon />
+                  </IconButton>
+                </Flex>
+              </Promo>
+            </Box>
+          </Container>
+        </Section>
         <Flex css={{ jc: "center" }}>
           <Separator size="2" />
         </Flex>
@@ -2044,7 +2061,7 @@ function Home() {
             <Box css={{ mb: "$6" }}>
               <Text size="2">Download 50% complete</Text>
               <ProgressBar max={100} value={80} css={{ my: "$2" }} />
-              <Text size="1" css={{ color: "$slate900" }}>
+              <Text size="1" css={{ color: "$slate11" }}>
                 46 hours remaining
               </Text>
             </Box>
@@ -2055,40 +2072,6 @@ function Home() {
             <Heading css={{ mb: "$6" }}>Blue variant</Heading>
             <Box>
               <ProgressBar variant="blue" max={100} value={50} />
-            </Box>
-          </Container>
-        </Section>
-        <Flex css={{ jc: "center" }}>
-          <Separator size="2" />
-        </Flex>
-        <Section size="3">
-          <Container size="2">
-            <Heading id="promo" css={{ mb: "$6", scrollMarginTop: "$7" }}>
-              Promo
-            </Heading>
-            <Heading css={{ mb: "$6" }}>Default</Heading>
-            <Box css={{ mb: "$6" }}>
-              <Promo size="2">
-                <Box>
-                  <Text size="3" css={{ mb: "$1", fontWeight: 500 }}>
-                    Upgrade to Pro
-                  </Text>
-                  <Text css={{ lineHeight: 1.4, color: "$slate900" }}>
-                    Upgrade to the Pro plan and enjoy unlimited transcoding and
-                    streaming minutes.
-                  </Text>
-                </Box>
-                <Flex align="center" justify="end">
-                  <Button css={{ mr: "$3" }}>Upgrade to Pro</Button>
-                  <IconButton
-                    variant="ghost"
-                    css={{
-                      mixBlendMode: "initial",
-                    }}>
-                    <StyledCross1Icon />
-                  </IconButton>
-                </Flex>
-              </Promo>
             </Box>
           </Container>
         </Section>
@@ -2378,7 +2361,7 @@ function Home() {
                 TabLink
               </Heading>
             </Container>
-            <Flex css={{ borderBottom: "1px solid $slate500" }}>
+            <Flex css={{ borderBottom: "1px solid $slate6" }}>
               <TabLink href="#" active>
                 <Box css={{ mr: "$1" }}>
                   <CodeIcon />
@@ -2552,7 +2535,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2561,7 +2544,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2570,7 +2553,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2579,7 +2562,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2588,7 +2571,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2612,7 +2595,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2621,7 +2604,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2630,7 +2613,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2639,7 +2622,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2648,7 +2631,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2672,7 +2655,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2681,7 +2664,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2690,7 +2673,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2699,7 +2682,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2708,7 +2691,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2732,7 +2715,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2741,7 +2724,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2750,7 +2733,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2759,7 +2742,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2768,7 +2751,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2792,7 +2775,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2801,7 +2784,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2810,7 +2793,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2819,7 +2802,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2828,7 +2811,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2854,7 +2837,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2863,7 +2846,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2872,7 +2855,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2881,7 +2864,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2890,7 +2873,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2941,7 +2924,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2950,7 +2933,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2959,7 +2942,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2968,7 +2951,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -2977,7 +2960,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3006,7 +2989,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3015,7 +2998,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3024,7 +3007,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3033,7 +3016,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3042,7 +3025,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3087,7 +3070,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3096,7 +3079,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3105,7 +3088,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3114,7 +3097,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3123,7 +3106,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3152,7 +3135,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3161,7 +3144,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3170,7 +3153,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3179,7 +3162,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3188,7 +3171,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3217,7 +3200,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3226,7 +3209,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3235,7 +3218,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3244,7 +3227,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3253,7 +3236,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3284,7 +3267,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3293,7 +3276,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3302,7 +3285,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3311,7 +3294,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3320,7 +3303,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3366,7 +3349,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3375,7 +3358,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3384,7 +3367,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3393,7 +3376,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3402,7 +3385,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3426,7 +3409,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3435,7 +3418,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3444,7 +3427,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3453,7 +3436,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3462,7 +3445,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3486,7 +3469,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3495,7 +3478,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3504,7 +3487,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3513,7 +3496,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3522,7 +3505,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3546,7 +3529,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3555,7 +3538,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3564,7 +3547,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3573,7 +3556,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3582,7 +3565,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3606,7 +3589,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3615,7 +3598,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3624,7 +3607,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3633,7 +3616,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3642,7 +3625,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3668,7 +3651,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3677,7 +3660,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3686,7 +3669,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3695,7 +3678,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3704,7 +3687,7 @@ function Home() {
                         css={{
                           width: 15,
                           height: 15,
-                          bc: "$green800",
+                          bc: "$green9",
                           borderRadius: "$round",
                         }}>
                         <CheckIcon />
@@ -3836,8 +3819,8 @@ function Home() {
                     ai: "center",
                     jc: "center",
                     height: "$9",
-                    bc: "$slate100",
-                    border: "2px dashed $colors$slate500",
+                    bc: "$slate2",
+                    border: "2px dashed $colors$slate6",
                     br: "$2",
                   }}>
                   <Text variant="gray">Right-click me</Text>
