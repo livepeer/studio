@@ -195,13 +195,13 @@ const fadeOut = keyframes`
   }
   100% {
     position: absolute;
-    left: -230px;
+    left: -233px;
   }
 `;
 const fadeIn = keyframes` 
   0% {
     position: absolute;
-    left: -230px;
+    left: -233px;
   }
   100% {
     position: unset;
@@ -233,9 +233,9 @@ const SideNav = ({
         sx={{
           animation: hideSideBar ? fadeOut : fadeIn,
           animationFillMode: "forwards",
+          width: '233px',
           transition: "all 0.2s",
           padding: "24px 0",
-          maxWidth: "100%",
         }}>
         <p
           sx={{
