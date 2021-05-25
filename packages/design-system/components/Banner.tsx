@@ -29,22 +29,22 @@ export const Banner = styled(DEFAULT_TAG, {
         backgroundColor: "$loContrast",
       },
       gray: {
-        backgroundColor: "$slate200",
+        backgroundColor: "$slate3",
       },
       blue: {
-        backgroundColor: "$blue200",
+        backgroundColor: "$blue3",
       },
       green: {
-        backgroundColor: "$green200",
+        backgroundColor: "$green3",
       },
       indigo: {
-        backgroundColor: "$indigo200",
+        backgroundColor: "$indigo3",
       },
       violet: {
-        backgroundColor: "$violet200",
+        backgroundColor: "$violet3",
       },
       red: {
-        backgroundColor: "$red200",
+        backgroundColor: "$red3",
       },
     },
     rounded: {
@@ -63,7 +63,7 @@ export const Banner = styled(DEFAULT_TAG, {
       border: "true",
       variant: "gray",
       css: {
-        borderColor: "$slate500",
+        borderColor: "$slate6",
       },
     },
     {
@@ -91,7 +91,7 @@ export const Banner = styled(DEFAULT_TAG, {
       border: "true",
       variant: "loContrast",
       css: {
-        borderColor: "$slate500",
+        borderColor: "$slate6",
       },
     },
   ],
