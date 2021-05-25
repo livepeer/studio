@@ -42,54 +42,54 @@ type CodeBlockProps = {
 
 const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
   return (
-    <div
-      sx={{
-        background: "linear-gradient(212.62deg, #B75EFF 0%, #943CFF 100%)",
-        minHeight: "272px",
-        padding: "32px 24px 24px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        transition: "all 0.2s",
-        width: "100%",
-        borderRadius: "16px",
-        ":hover": {
-          boxShadow:
-            "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
-        },
-      }}>
+    <Link href={href}>
       <div
         sx={{
+          background: "linear-gradient(212.62deg, #B75EFF 0%, #943CFF 100%)",
+          minHeight: "272px",
+          cursor: 'pointer',
+          padding: "32px 24px 24px",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "space-between",
+          transition: "all 0.2s",
+          width: "100%",
+          borderRadius: "16px",
+          ":hover": {
+            boxShadow:
+              "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
+          },
         }}>
-        <span
+        <div
           sx={{
-            mb: "16px",
-            fontWeight: "600",
-            fontSize: "18px",
-            lineHeight: "24px",
-            letterSpacing: "-0.03em",
-            color: "white",
+            display: "flex",
+            flexDirection: "column",
           }}>
-          {title}
-        </span>
-        <span
-          sx={{
-            fontSize: "16px",
-            color: "white",
-            lineHeight: "28px",
-            letterSpacing: "-0.02em",
-          }}>
-          {description}
-        </span>
-      </div>
-      <Link href={href}>
+          <span
+            sx={{
+              mb: "16px",
+              fontWeight: "600",
+              fontSize: "18px",
+              lineHeight: "24px",
+              letterSpacing: "-0.03em",
+              color: "white",
+            }}>
+            {title}
+          </span>
+          <span
+            sx={{
+              fontSize: "16px",
+              color: "white",
+              lineHeight: "28px",
+              letterSpacing: "-0.02em",
+            }}>
+            {description}
+          </span>
+        </div>
         <a
           sx={{
             display: "flex",
             alignItems: "center",
-            cursor: "pointer",
             maxWidth: "fit-content",
             mt: "32px",
           }}>
@@ -105,8 +105,8 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
           </span>
           <BsArrowRightShort color="white" size={24} />
         </a>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 };
 
@@ -228,7 +228,7 @@ const Heading = ({ children, as }: HeadingProps) => {
     <div sx={{ position: "relative" }}>
       <span
         id={id.replace("#", "")}
-        sx={{ position: "absolute", top: "-130px" }}
+        sx={{ position: "absolute", top: "-150px" }}
       />
       <Link href={`${path?.split("#")[0]}${id}`}>
         {as === "h1" ? (
@@ -243,41 +243,4 @@ const Heading = ({ children, as }: HeadingProps) => {
   );
 };
 
-const CodeBlock = () => {
-  const thisCode = {
-    glossary: {
-      title: "example glossary",
-      GlossDiv: {
-        title: "S",
-        GlossList: {
-          GlossEntry: {
-            ID: "SGML",
-            SortAs: "SGML",
-            GlossTerm: "Standard Generalized Markup Language",
-            Acronym: 10000,
-            Abbrev: "ISO 8879:1986",
-            GlossDef: {
-              para: "A meta-markup language, used to create markup languages such as DocBook.",
-              GlossSeeAlso: ["GML", "XML"],
-            },
-            GlossSee: "markup",
-          },
-        },
-      },
-    },
-  };
-  const json = JSON.stringify(thisCode);
-  return (
-    <div
-      sx={{
-        background: "#3B375A",
-        borderRadius: "16px",
-        width: "100%",
-        padding: "24px 16px 16px 24px",
-      }}>
-      <DocsJSONHighlighter json={json} />
-    </div>
-  );
-};
-
-export { SimpleCard, NavigationCard, DocsPost, DocsGrid, Heading, CodeBlock };
+export { SimpleCard, NavigationCard, DocsPost, DocsGrid, Heading };

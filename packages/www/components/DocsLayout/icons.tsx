@@ -2,6 +2,10 @@ type IconProps = {
   id?: string;
 };
 
+type CollapseIconProps = {
+  hovered: boolean;
+};
+
 const IconHouse = ({ id }: IconProps) => {
   return (
     <svg
@@ -122,7 +126,7 @@ const IconVideoGuides = ({ id }: IconProps) => {
   );
 };
 
-const Download = () => {
+const Download = ({ hovered }: CollapseIconProps) => {
   return (
     <svg
       width="20"
@@ -132,7 +136,10 @@ const Download = () => {
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M4.16732 2.5L15.834 2.5M14.1673 11.6667L10.0007 7.5M10.0007 7.5L5.83398 11.6667M10.0007 7.5L10.0006 17.5"
-        stroke="#828282"
+        sx={{
+          stroke: hovered ? "#000" : "#828282",
+          transition: "0.2s",
+        }}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

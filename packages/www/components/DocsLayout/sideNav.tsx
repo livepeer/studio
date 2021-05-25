@@ -71,6 +71,9 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           fontSize: "14px",
           letterSpacing: "-0.02em",
           color: "#3C3C3C",
+          ":hover": {
+            color: "#000000",
+          },
         }}>
         {label}
       </p>
@@ -93,7 +96,7 @@ const Menu = ({ menu }: MenuProps) => {
   return (
     <div
       sx={{
-        mt: "24px",
+        mt: "8px",
         display: "flex",
         flexDirection: "column",
       }}>
@@ -131,6 +134,9 @@ const Menu = ({ menu }: MenuProps) => {
                     mt: "16px !important",
                     transition: "all 0.2s",
                     cursor: "pointer",
+                    ':hover': {
+                      color: '#000000'
+                    }
                   }}>
                   {child.title}
                 </a>
@@ -164,7 +170,15 @@ const Menu = ({ menu }: MenuProps) => {
                   borderRadius: " 0 2px 2px 0",
                 }}
               />
-              <span>{route.title}</span>
+              <span
+                sx={{
+                  color: "#3C3C3C",
+                  ":hover": {
+                    color: "#000000",
+                  },
+                }}>
+                {route.title}
+              </span>
             </a>
           </Link>
         )
@@ -200,6 +214,7 @@ const SideNav = ({
   setHideSideBar,
   menu,
 }: SideNavProps & MenuProps) => {
+  const [iconHover, setIconHover] = useState(false)
   return (
     <div
       sx={{
@@ -245,13 +260,15 @@ const SideNav = ({
         }}>
         <i
           onClick={() => setHideSideBar(!hideSideBar)}
+          onMouseOver={() => setIconHover(true)}
+          onMouseOut={() => setIconHover(false)}
           sx={{
             cursor: "pointer",
             transition: "all 0.2s",
             display: "flex",
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
-          <Download />
+          <Download  hovered={iconHover} />
         </i>
       </div>
     </div>
@@ -297,7 +314,7 @@ export const MobileSideNav = ({
             fontWeight: "bold",
             ml: "24px",
             mt: "8px",
-            mb: '-16px'
+            mb: "-16px",
           }}>
           CONTENT
         </p>

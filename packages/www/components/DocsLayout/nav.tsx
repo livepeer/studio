@@ -14,13 +14,6 @@ import { Download } from "./icons";
 type DocsNavProps = {
   hideTopNav: boolean;
   setHideTopNav: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentCategory: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      icon: JSX.Element;
-    }>
-  >;
-  currentCategory: { name: string; icon: JSX.Element; slug: string };
   categories: { name: string; icon: JSX.Element; slug: string }[];
   mobileCategories: { name: string; icon: JSX.Element; slug: string }[];
 };
@@ -28,8 +21,6 @@ type DocsNavProps = {
 const DocsNav = ({
   hideTopNav,
   setHideTopNav,
-  currentCategory,
-  setCurrentCategory,
   categories,
   mobileCategories,
 }: DocsNavProps) => {
@@ -39,7 +30,12 @@ const DocsNav = ({
   const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
   const router = useRouter();
-  const currentPath = router.asPath.split("/").slice(0, 3).join("/").split('#')[0];
+  const currentPath = router.asPath
+    .split("/")
+    .slice(0, 3)
+    .join("/")
+    .split("#")[0];
+  const [iconHover, setIconHover] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -217,12 +213,14 @@ const DocsNav = ({
         </Flex>
         <i
           onClick={() => setHideTopNav(!hideTopNav)}
+          onMouseOver={() => setIconHover(true)}
+          onMouseOut={() => setIconHover(false)}
           sx={{
             cursor: "pointer",
             transition: "all 0.2s",
             transform: hideTopNav ? "rotate(-180deg)" : "rotate(0deg)",
           }}>
-          <Download />
+          <Download hovered={iconHover} />
         </i>
       </Box>
       <Box

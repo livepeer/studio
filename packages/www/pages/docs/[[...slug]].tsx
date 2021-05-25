@@ -127,8 +127,6 @@ const DocsIndex = ({ doc, menu }) => {
         <DocsNav
           hideTopNav={hideTopNav}
           setHideTopNav={setHideTopNav}
-          currentCategory={currentCategory}
-          setCurrentCategory={setCurrentCategory}
           categories={categories}
           mobileCategories={mobileCategories}
         />
@@ -157,6 +155,7 @@ const DocsIndex = ({ doc, menu }) => {
             sx={{
               display: "flex",
               flexDirection: "column",
+              width: '100%',
               maxWidth: "768px",
               paddingBottom: "80px",
             }}>
