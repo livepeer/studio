@@ -10,7 +10,12 @@ const ApiKeys = () => {
     return <Layout />;
   }
   return (
-    <Layout>
+    <Layout
+      id="developers"
+      breadcrumbs={[
+        { title: "Developers", href: "/dashboard/developers/api-keys" },
+        { title: "API Keys" },
+      ]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <Flex

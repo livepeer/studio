@@ -21,7 +21,7 @@ const StyledQuestionMarkIcon = styled(QuestionIcon, {
   mr: "$1",
 });
 
-const Header = () => {
+const Header = ({ breadcrumbs = [] }) => {
   return (
     <Flex
       align="center"
@@ -34,13 +34,16 @@ const Header = () => {
         borderColor: "$slate500",
       }}>
       <Breadcrumbs aria-label="breadcrumb">
-        {/* <Link href="/" passHref>
-          <A variant="indigo">Streams</A>
-        </Link>
-        <Link href="/" passHref>
-          <A variant="indigo">Banana</A>
-        </Link> */}
-        <Text>Home</Text>
+        {breadcrumbs.map((breadcrumb, i) => {
+          if (breadcrumb?.href) {
+            return (
+              <Link key={i} href={breadcrumb.href} passHref>
+                <A variant="violet">{breadcrumb.title}</A>
+              </Link>
+            );
+          }
+          return <Text key={i}>{breadcrumb.title}</Text>;
+        })}
       </Breadcrumbs>
       <Flex align="center" css={{ fontSize: "$3" }}>
         <Flex align="center" css={{ cursor: "pointer", mr: "$4" }}>
