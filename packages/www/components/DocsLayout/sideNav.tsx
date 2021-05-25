@@ -198,7 +198,7 @@ const fadeOut = keyframes`
     left: -230px;
   }
 `;
-const fadeIn = keyframes`
+const fadeIn = keyframes` 
   0% {
     position: absolute;
     left: -230px;

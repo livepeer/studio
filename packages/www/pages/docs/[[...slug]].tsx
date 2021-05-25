@@ -151,6 +151,7 @@ const DocsIndex = ({ doc, menu }) => {
             mx: 0,
             transition: "all 0.2s",
             display: "flex",
+            minWidth: '100%',
             justifyContent: "center",
             alignItems: "flex-start",
           }}>
