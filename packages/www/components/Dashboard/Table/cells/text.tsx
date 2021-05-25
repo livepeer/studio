@@ -29,7 +29,7 @@ const TextCell = <D extends TableData>({
       <Box data-tip data-for={pid}>
         {cell.value.href ? (
           <Link href={cell.value.href}>
-            <A variant="indigo">{cell.value.children}</A>
+            <A variant="violet">{cell.value.children}</A>
           </Link>
         ) : (
           cell.value.children

@@ -18,10 +18,10 @@ const StyledSwitch = styled(Switch.Root, {
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px $colors$indigo900",
+    boxShadow: "0 0 0 2px $colors$violet800",
   },
   '&[data-state="checked"]': {
-    backgroundColor: "$colors$indigo900",
+    linearGradient: "to right, $colors$violet700, $colors$violet400",
   },
 });
 
@@ -34,7 +34,6 @@ const StyledThumb = styled(Switch.Thumb, {
   backgroundColor: "$loContrast",
   borderRadius: "$round",
   boxShadow: "rgba(0, 0, 0, 0.3) 0px 0px 2px",
-  transition: "transform 100ms",
   transform: "translateX(-7px)",
   willChange: "transform",
   "> :nth-child(2)": {
@@ -54,7 +53,7 @@ const StyledThumb = styled(Switch.Thumb, {
 });
 
 const ThemeSwitch = () => {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme, theme } = useTheme();
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
@@ -71,10 +70,7 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <StyledSwitch
-      checked={checked}
-      name="themeSwitcher"
-      onCheckedChange={handleChange}>
+    <StyledSwitch checked={checked} onCheckedChange={handleChange}>
       <StyledThumb>
         <Sun />
         <Moon />
