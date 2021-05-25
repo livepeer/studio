@@ -25,13 +25,13 @@ const UsageCard = ({ title, usage, limit }) => {
       css={{
         px: "$5",
         py: "$4",
-        boxShadow: "0 0 0 1px $colors$slate500",
+        boxShadow: "0 0 0 1px $colors$slate6",
         borderRadius: "$1",
-        backgroundColor: "$slate100",
+        backgroundColor: "$slate2",
         color: "$hiContrast",
         mb: "$6",
       }}>
-      <Box css={{ mb: "$2", color: "$slate800" }}>{title}</Box>
+      <Box css={{ mb: "$2", color: "$slate9" }}>{title}</Box>
       <Flex align="center" css={{ fontSize: "$6" }}>
         <Box css={{ fontWeight: 700 }}>{usage}</Box>
         {limit && <Box css={{ mx: "$1" }}>/</Box>}
@@ -58,7 +58,6 @@ const UsageSummary = () => {
     const doGetUsage = async (fromTime, toTime, userId) => {
       const [res, usage] = await getUsage(fromTime, toTime, userId);
       if (res.status == 200) {
-        console.log(`got usage data:`, usage);
         setUsage(usage);
       }
     };
@@ -87,7 +86,7 @@ const UsageSummary = () => {
         align="end"
         css={{
           borderBottom: "1px solid",
-          borderColor: "$slate500",
+          borderColor: "$slate6",
           pb: "$4",
           mb: "$5",
           width: "100%",
@@ -113,7 +112,7 @@ const UsageSummary = () => {
             </Badge>
           </Flex>
         </Heading>
-        <Flex css={{ fontSize: "$3", color: "$slate800" }}>
+        <Flex css={{ fontSize: "$3", color: "$slate9" }}>
           Current billing period (
           {subscription && (
             <Flex>
