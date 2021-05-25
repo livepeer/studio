@@ -6,7 +6,7 @@ import { ChevronRightIcon } from "@radix-ui/react-icons";
 import * as Polymorphic from "@radix-ui/react-polymorphic";
 
 const StyledAccordion = styled(AccordionPrimitive.Root, {
-  boxShadow: "0 0 0 1px $colors$slate500",
+  boxShadow: "0 0 0 1px $colors$slate6",
   borderRadius: "$1",
 });
 
@@ -14,7 +14,7 @@ const StyledPanel = styled(AccordionPrimitive.Panel, {
   pt: "$0",
   pb: "$5",
   px: "$7",
-  backgroundColor: "$slate100",
+  backgroundColor: "$slate2",
 });
 
 const StyledButton = styled(AccordionPrimitive.Button, {
@@ -37,7 +37,7 @@ const StyledButton = styled(AccordionPrimitive.Button, {
 
   "@hover": {
     "&:hover": {
-      backgroundColor: "$slate100",
+      backgroundColor: "$slate2",
     },
   },
 
@@ -51,7 +51,7 @@ const StyledButton = styled(AccordionPrimitive.Button, {
   },
 
   '&[data-state="open"]': {
-    backgroundColor: "$slate100",
+    backgroundColor: "$slate2",
     svg: {
       transform: "rotate(90deg)",
     },
@@ -59,7 +59,7 @@ const StyledButton = styled(AccordionPrimitive.Button, {
 });
 
 const StyledItem = styled(AccordionPrimitive.Item, {
-  borderBottom: "1px solid $colors$slate500",
+  borderBottom: "1px solid $colors$slate6",
 
   "&:last-of-type": {
     borderBottom: 0,
