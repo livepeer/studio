@@ -32,6 +32,7 @@ type MenuProps = {
 
 type MobileSideNavProps = {
   isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type TriggerProps = {
@@ -134,9 +135,9 @@ const Menu = ({ menu }: MenuProps) => {
                     mt: "16px !important",
                     transition: "all 0.2s",
                     cursor: "pointer",
-                    ':hover': {
-                      color: '#000000'
-                    }
+                    ":hover": {
+                      color: "#000000",
+                    },
                   }}>
                   {child.title}
                 </a>
@@ -214,7 +215,7 @@ const SideNav = ({
   setHideSideBar,
   menu,
 }: SideNavProps & MenuProps) => {
-  const [iconHover, setIconHover] = useState(false)
+  const [iconHover, setIconHover] = useState(false);
   return (
     <div
       sx={{
@@ -268,7 +269,7 @@ const SideNav = ({
             display: "flex",
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
-          <Download  hovered={iconHover} />
+          <Download hovered={iconHover} />
         </i>
       </div>
     </div>
@@ -278,6 +279,7 @@ const SideNav = ({
 export const MobileSideNav = ({
   menu,
   isOpen,
+  setIsOpen,
 }: MobileSideNavProps & MenuProps) => {
   useEffect(() => {
     if (isOpen) {
@@ -295,16 +297,29 @@ export const MobileSideNav = ({
         overflowX: "hidden",
         transition: "all 0.2s",
         position: "fixed",
-        background: "rgba(0, 0, 0, 0.32)",
         zIndex: 100,
         top: 0,
         left: 0,
       }}>
       <div
+        onClick={() => setIsOpen(false)}
+        sx={{
+          position: "fixed",
+          background: "rgba(0, 0, 0, 0.32)",
+          height: "100vh",
+          width: isOpen ? "100vw" : "0px",
+          transition: "all 0.2s",
+          top: 0,
+          zIndex: 1,
+          right: 0,
+        }}
+      />
+      <div
         sx={{
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
           background: "white",
+          zIndex: 100,
         }}>
         <p
           sx={{
@@ -314,7 +329,6 @@ export const MobileSideNav = ({
             fontWeight: "bold",
             ml: "24px",
             mt: "8px",
-            mb: "-16px",
           }}>
           CONTENT
         </p>

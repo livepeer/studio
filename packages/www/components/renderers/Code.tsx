@@ -11,8 +11,8 @@ const Code = ({ language, custom, value, children, className, ...rest }) => {
   }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(children)
-    setCopyState(true)
+    navigator.clipboard.writeText(children);
+    setCopyState(true);
     setTimeout(() => {
       setCopyState(false);
     }, 5000);
@@ -155,28 +155,34 @@ const Code = ({ language, custom, value, children, className, ...rest }) => {
             })}
           </div>
           <textarea sx={{ display: "none" }} />
-          <button
-            onClick={handleCopy}
-            sx={{
-              position: "absolute",
-              alignSelf: "flex-end",
-              bottom: "16px",
-              right: "16px",
-              background: "#943CFF",
-              borderRadius: "6px",
-              width: "60px",
-              height: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: "14px",
-              fontWeight: "500",
-              letterSpacing: "-0.03em",
-              cursor: "pointer",
-            }}>
-            {copyState ? "Copied" : "Copy"}
-          </button>
+          {custom && (
+            <button
+              onClick={handleCopy}
+              sx={{
+                position: "absolute",
+                alignSelf: "flex-end",
+                bottom: "16px",
+                right: "16px",
+                background: "#943CFF",
+                borderRadius: "6px",
+                width: "60px",
+                height: "32px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "500",
+                letterSpacing: "-0.03em",
+                cursor: "pointer",
+                outline: 'none',
+                ':focus': {
+                  outline: 'none'
+                }
+              }}>
+              {copyState ? "Copied" : "Copy"}
+            </button>
+          )}
         </pre>
       )}
     </Highlight>

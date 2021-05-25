@@ -136,7 +136,7 @@ const DocsIndex = ({ doc, menu }) => {
           hideSideBar={hideSideBar}
           setHideSideBar={setHideSideBar}
         />
-        <MobileSideNav isOpen={mobileSideNavOpen} menu={currentMenu} />
+        <MobileSideNav isOpen={mobileSideNavOpen} menu={currentMenu} setIsOpen={setMobileSideNavOpen} />
         <Container
           sx={{
             mt: hideTopNav ? "-12px" : "48px",
