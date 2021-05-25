@@ -148,7 +148,13 @@ type StreamsTableData = {
   status: string;
 };
 
-const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
+const StreamsTable = ({
+  title = "Streams",
+  userId,
+}: {
+  title: string;
+  userId: string;
+}) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
@@ -251,7 +257,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
   );
 
   return (
-    <Box id={id}>
+    <Box>
       <Flex
         align="end"
         justify="between"
@@ -266,11 +272,11 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
                 fontWeight: 600,
                 letterSpacing: 0,
               }}>
-              Active Streams
+              {title}
             </Box>
             <Badge
               size="1"
-              variant="indigo"
+              variant="violet"
               css={{ letterSpacing: 0, mt: "7px" }}>
               1 active right now
             </Badge>
@@ -308,8 +314,8 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               </Box>
             </Box> */}
           <Link href="/app/stream/new-stream" passHref>
-            <Button variant="indigo" css={{ display: "flex", align: "center" }}>
-              <StyledPlusIcon /> Create new stream
+            <Button variant="violet" css={{ display: "flex", align: "center" }}>
+              <StyledPlusIcon /> Create stream
             </Button>
           </Link>
         </Flex>
@@ -342,7 +348,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Link href="/" passHref>
-          <A variant="indigo" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
             View all <ArrowRightIcon />
           </A>
         </Link>

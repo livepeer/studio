@@ -61,7 +61,7 @@ const RecordingUrlCell = <D extends TableData>({
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
               <A
-                variant="indigo"
+                variant="violet"
                 target="_blank"
                 href={makeMP4Url(cell.value.href, "source")}
                 sx={{ p: 1 }}>
