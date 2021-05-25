@@ -27,6 +27,7 @@ const DocsNav = ({
   const { pathname } = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
+  const [closeSelect, setCloseSelect] = useState(false);
   const { token, user, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
   const router = useRouter();
@@ -45,270 +46,282 @@ const DocsNav = ({
     }
   }, [token]);
 
+  const handleClick = () => {
+    setSelectOpen(!selectOpen);
+    setCloseSelect(!closeSelect);
+  };
+
   return (
-    <Box
-      sx={{
-        borderBottom: "1px solid #E6E6E6",
-        gridColumn: "1 / 16",
-        position: "sticky",
-        paddingBottom: "24px",
-        transition: "all 0.2s",
-        transform: hideTopNav ? "translateY(-60px)" : "",
-        top: 0,
-        background: "white",
-        zIndex: 100,
-      }}>
+    <>
       <div
-        sx={{
-          display: ["flex", "flex", "none", "none"],
-          position: "fixed",
-          top: "0px",
-          left: "0px",
-          width: "100vw",
-          height: selectOpen ? "100vh" : "0px",
-          transition: "all 0.2s",
-          background: "rgba(0, 0, 0, 0.32)",
-          zIndex: 90,
-        }}
-      />
-      <Box sx={{ padding: "0 24px" }}>
-        <Flex
-          sx={{
-            py: 3,
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}>
-          <div
-            sx={{
-              display: "flex",
-              alignItems: "center",
-            }}>
-            <div sx={{ display: "flex", alignItems: "center" }}>
-              <Logo logoType={false} withoutBeta />
-              <span sx={{ fontSize: "16px", fontWeight: "600", mx: "12px" }}>
-                /
-              </span>
-              <p
-                sx={{
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  letterSpacing: "-0.06em",
-                }}>
-                docs
-              </p>
-            </div>
-            <div
-              sx={{
-                display: ["none", "flex", "flex"],
-                alignItems: "center",
-                justifyContent: "space-between",
-                border: "1px solid #E6E6E6",
-                borderRadius: "8px",
-                padding: "6px 6px 6px 10px",
-                width: "215px",
-                ml: "21px",
-                cursor: "pointer",
-              }}>
-              <Flex sx={{ alignItems: "center" }}>
-                <BiSearch size={14} />
-                <p sx={{ fontSize: "12px", color: "#525252", ml: "6px" }}>
-                  Search
-                </p>
-              </Flex>
-              <div
-                sx={{
-                  border: "1px solid #E6E6E6",
-                  borderRadius: "4px",
-                  padding: "4px",
-                }}>
-                <p sx={{ fontSize: "10px" }}>⌘ K</p>
-              </div>
-            </div>
-          </div>
-          <Flex
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-            }}>
-            {!loggedIn && (
-              <>
-                <Link
-                  href="/login"
-                  variant="nav"
-                  sx={{ fontWeight: 600, mr: 3 }}>
-                  Log in
-                </Link>
-                <Button
-                  sx={{ py: "6px", ml: "20px" }}
-                  variant="buttons.primarySmall"
-                  href="/register"
-                  isLink>
-                  Sign up
-                </Button>
-              </>
-            )}
-            {loggedIn && (
-              <>
-                <A
-                  variant="nav"
-                  sx={{ mr: 3, cursor: "pointer" }}
-                  onClick={() => logout()}>
-                  Log Out
-                </A>
-                {!isDashboard && (
-                  <Button
-                    sx={{ py: "6px", ml: 3 }}
-                    isLink
-                    href="/app/user"
-                    variant="buttons.primarySmall">
-                    Dashboard
-                  </Button>
-                )}
-              </>
-            )}
-          </Flex>
-        </Flex>
-      </Box>
-      <Box
-        sx={{
-          display: ["none", "flex", "flex"],
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "0 24px",
-          mt: "16px",
-        }}>
-        <Flex
-          sx={{
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          {categories.map((each, idx) => (
-            <div
-              key={idx}
-              onClick={() => {
-                router.push(each?.slug);
-              }}
-              sx={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                mr: "32px",
-              }}>
-              <i>{each?.icon}</i>
-              <span
-                sx={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  transition: "all 0.2s",
-                  textShadow:
-                    each?.slug === currentPath ? "0.4px 0 0 currentColor" : "",
-                  ml: "12px",
-                  color: each?.slug === currentPath ? "black" : "#828282",
-                }}>
-                {each.name}
-              </span>
-            </div>
-          ))}
-        </Flex>
-        <i
-          onClick={() => setHideTopNav(!hideTopNav)}
-          onMouseOver={() => setIconHover(true)}
-          onMouseOut={() => setIconHover(false)}
-          sx={{
-            cursor: "pointer",
-            transition: "all 0.2s",
-            transform: hideTopNav ? "rotate(-180deg)" : "rotate(0deg)",
-          }}>
-          <Download hovered={iconHover} />
-        </i>
-      </Box>
-      <Box
+        onClick={() => setCloseSelect(false)}
         sx={{
           display: ["flex", "none", "none"],
-          mt: "8px",
+          height: selectOpen ? "100vh" : '0px',
+          transition: 'all 0.2s',
+          width: "100vw",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          background: "rgba(0, 0, 0, 0.32)",
+        }}
+      />
+      <Box
+        sx={{
+          borderBottom: "1px solid #E6E6E6",
+          gridColumn: "1 / 16",
+          position: "sticky",
+          paddingBottom: "24px",
+          transition: "all 0.2s",
+          transform: hideTopNav ? "translateY(-60px)" : "",
+          top: 0,
+          background: "white",
+          zIndex: 100,
         }}>
-        <DropdownMenu.Root>
-          <div
+        <Box sx={{ padding: "0 24px" }}>
+          <Flex
             sx={{
-              width: "100%",
-              display: ["flex", "none", "none"],
+              py: 3,
+              justifyContent: "space-between",
+              alignItems: "center",
             }}>
-            <DropdownMenu.Trigger
+            <div
               sx={{
-                width: "100%",
                 display: "flex",
                 alignItems: "center",
-                px: "24px",
-                justifyContent: "space-between",
               }}>
+              <div sx={{ display: "flex", alignItems: "center" }}>
+                <Logo logoType={false} withoutBeta />
+                <span sx={{ fontSize: "16px", fontWeight: "600", mx: "12px" }}>
+                  /
+                </span>
+                <p
+                  sx={{
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    letterSpacing: "-0.06em",
+                  }}>
+                  docs
+                </p>
+              </div>
               <div
                 sx={{
+                  display: ["none", "flex", "flex"],
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  border: "1px solid #E6E6E6",
+                  borderRadius: "8px",
+                  padding: "6px 6px 6px 10px",
+                  width: "215px",
+                  ml: "21px",
+                  cursor: "pointer",
+                }}>
+                <Flex sx={{ alignItems: "center" }}>
+                  <BiSearch size={14} />
+                  <p sx={{ fontSize: "12px", color: "#525252", ml: "6px" }}>
+                    Search
+                  </p>
+                </Flex>
+                <div
+                  sx={{
+                    border: "1px solid #E6E6E6",
+                    borderRadius: "4px",
+                    padding: "4px",
+                  }}>
+                  <p sx={{ fontSize: "10px" }}>⌘ K</p>
+                </div>
+              </div>
+            </div>
+            <Flex
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}>
+              {!loggedIn && (
+                <>
+                  <Link
+                    href="/login"
+                    variant="nav"
+                    sx={{ fontWeight: 600, mr: 3 }}>
+                    Log in
+                  </Link>
+                  <Button
+                    sx={{ py: "6px", ml: "20px" }}
+                    variant="buttons.primarySmall"
+                    href="/register"
+                    isLink>
+                    Sign up
+                  </Button>
+                </>
+              )}
+              {loggedIn && (
+                <>
+                  <A
+                    variant="nav"
+                    sx={{ mr: 3, cursor: "pointer" }}
+                    onClick={() => logout()}>
+                    Log Out
+                  </A>
+                  {!isDashboard && (
+                    <Button
+                      sx={{ py: "6px", ml: 3 }}
+                      isLink
+                      href="/app/user"
+                      variant="buttons.primarySmall">
+                      Dashboard
+                    </Button>
+                  )}
+                </>
+              )}
+            </Flex>
+          </Flex>
+        </Box>
+        <Box
+          sx={{
+            display: ["none", "flex", "flex"],
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 24px",
+            mt: "16px",
+          }}>
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+            {categories.map((each, idx) => (
+              <div
+                key={idx}
+                onClick={() => {
+                  router.push(each?.slug);
+                }}
+                sx={{
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
+                  mr: "32px",
                 }}>
-                <i>
-                  {
-                    mobileCategories.filter((a) => a.slug === currentPath)[0]
-                      ?.icon
-                  }
-                </i>
-                <p
+                <i>{each?.icon}</i>
+                <span
                   sx={{
                     fontSize: "14px",
                     fontWeight: "500",
+                    transition: "all 0.2s",
+                    textShadow:
+                      each?.slug === currentPath
+                        ? "0.4px 0 0 currentColor"
+                        : "",
                     ml: "12px",
+                    color: each?.slug === currentPath ? "black" : "#828282",
                   }}>
-                  {
-                    mobileCategories.filter((a) => a.slug === currentPath)[0]
-                      ?.name
-                  }
-                </p>
+                  {each.name}
+                </span>
               </div>
-              <GoTriangleDown />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
+            ))}
+          </Flex>
+          <i
+            onClick={() => setHideTopNav(!hideTopNav)}
+            onMouseOver={() => setIconHover(true)}
+            onMouseOut={() => setIconHover(false)}
+            sx={{
+              cursor: "pointer",
+              transition: "all 0.2s",
+              transform: hideTopNav ? "rotate(-180deg)" : "rotate(0deg)",
+            }}>
+            <Download hovered={iconHover} />
+          </i>
+        </Box>
+        <Box
+          sx={{
+            display: ["flex", "none", "none"],
+            mt: "8px",
+          }}>
+          <DropdownMenu.Root onOpenChange={handleClick} open={selectOpen}>
+            <div
               sx={{
-                width: "100vw",
-                background: "white",
-                alignSelf: "flex-start",
-                px: "24px",
+                width: "100%",
+                display: ["flex", "none", "none"],
               }}>
-              {mobileCategories
-                ?.filter((a) => a.slug !== currentPath)
-                .map((each, idx) => (
-                  <DropdownMenu.Item
-                    key={idx}
-                    onSelect={() => {
-                      router.push(each?.slug);
-                    }}
+              <DropdownMenu.Trigger
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  px: "24px",
+                  justifyContent: "space-between",
+                  ":focus": {
+                    outline: "none",
+                  },
+                }}>
+                <div
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}>
+                  <i>
+                    {
+                      mobileCategories.filter((a) => a.slug === currentPath)[0]
+                        ?.icon
+                    }
+                  </i>
+                  <p
                     sx={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      pt: "24px",
-                      ":last-child": {
-                        pb: "24px",
-                      },
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      ml: "12px",
                     }}>
-                    <i>{each?.icon}</i>
-                    <p
+                    {
+                      mobileCategories.filter((a) => a.slug === currentPath)[0]
+                        ?.name
+                    }
+                  </p>
+                </div>
+                <GoTriangleDown />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content
+                sx={{
+                  width: "100vw",
+                  background: "white",
+                  alignSelf: "flex-start",
+                  px: "24px",
+                }}>
+                {mobileCategories
+                  ?.filter((a) => a.slug !== currentPath)
+                  .map((each, idx) => (
+                    <DropdownMenu.Item
+                      key={idx}
+                      onSelect={() => {
+                        router.push(each?.slug);
+                      }}
                       sx={{
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        ml: "12px",
-                        color: "#828282",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                        pt: "24px",
+                        ":last-child": {
+                          pb: "24px",
+                        },
                       }}>
-                      {each?.name}
-                    </p>
-                  </DropdownMenu.Item>
-                ))}
-            </DropdownMenu.Content>
-          </div>
-        </DropdownMenu.Root>
+                      <i>{each?.icon}</i>
+                      <p
+                        sx={{
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          ml: "12px",
+                          color: "#828282",
+                        }}>
+                        {each?.name}
+                      </p>
+                    </DropdownMenu.Item>
+                  ))}
+              </DropdownMenu.Content>
+            </div>
+          </DropdownMenu.Root>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

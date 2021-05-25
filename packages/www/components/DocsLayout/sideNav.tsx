@@ -130,7 +130,7 @@ const Menu = ({ menu }: MenuProps) => {
                     color:
                       router.asPath === `/${child.slug}`
                         ? "#943CFF"
-                        : "#3C3C3C",
+                        : "#777777",
                     ml: "48px !important",
                     mt: "16px !important",
                     transition: "all 0.2s",
@@ -225,7 +225,7 @@ const SideNav = ({
         position: "sticky",
         gridColumn: hideSideBar
           ? [null, null, "1 / 2", "1 / 2"]
-          : [null, null, "1 / 5", "1 / 4"],
+          : [null, null, "1 / 5", '1/5', "1 / 4"],
         marginTop: hideTopNav ? "-60px" : "",
         transition: "all 0.2s",
         background: "white",

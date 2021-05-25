@@ -136,13 +136,17 @@ const DocsIndex = ({ doc, menu }) => {
           hideSideBar={hideSideBar}
           setHideSideBar={setHideSideBar}
         />
-        <MobileSideNav isOpen={mobileSideNavOpen} menu={currentMenu} setIsOpen={setMobileSideNavOpen} />
+        <MobileSideNav
+          isOpen={mobileSideNavOpen}
+          menu={currentMenu}
+          setIsOpen={setMobileSideNavOpen}
+        />
         <Container
           sx={{
             mt: hideTopNav ? "-12px" : "48px",
             gridColumn: hideSideBar
               ? ["1 / 16", "1 / 16", "2 / 16", "2 / 16"]
-              : ["1 / 16", "1 / 16", "5 / 16", "4 / 16"],
+              : ["1 / 16", "1 / 16", "5 / 16", "5/16", "4 / 16"],
             justifyItems: "center",
             mx: 0,
             transition: "all 0.2s",
@@ -155,7 +159,7 @@ const DocsIndex = ({ doc, menu }) => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              width: '100%',
+              width: "100%",
               maxWidth: "768px",
               paddingBottom: "80px",
             }}>
