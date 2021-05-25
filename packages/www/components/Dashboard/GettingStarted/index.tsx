@@ -15,7 +15,7 @@ const GettingStarted = () => {
       </Heading>
       <Accordion type="single">
         <AccordionItem value="accordion-one">
-          <AccordionButton css={{ color: "$slate1000" }}>
+          <AccordionButton css={{ color: "$slate12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first live stream
             </Text>
@@ -30,7 +30,7 @@ const GettingStarted = () => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-two">
-          <AccordionButton css={{ color: "$slate1000" }}>
+          <AccordionButton css={{ color: "$slate12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Integrate with the API
             </Text>
@@ -45,7 +45,7 @@ const GettingStarted = () => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-three">
-          <AccordionButton css={{ color: "$slate1000" }}>
+          <AccordionButton css={{ color: "$slate12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first app
             </Text>

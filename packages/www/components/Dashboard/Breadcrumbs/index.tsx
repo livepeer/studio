@@ -16,7 +16,7 @@ const BreadcrumbsSeparator = styled("li", {
   userSelect: "none",
   marginLeft: 8,
   marginRight: 8,
-  color: "$gray700",
+  color: "$gray8",
   mb: 0,
 });
 

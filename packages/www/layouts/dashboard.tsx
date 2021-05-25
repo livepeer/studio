@@ -4,6 +4,7 @@ import {
   darkTheme,
   DesignSystemProvider,
   Box,
+  theme,
 } from "@livepeer.com/design-system";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
@@ -27,7 +28,7 @@ const globalStyles = global({
   "pre, code": { margin: 0, fontFamily: "$mono" },
 
   "::selection": {
-    backgroundColor: "$violet300",
+    backgroundColor: "$violet4",
   },
 
   "#__next": {
@@ -55,8 +56,7 @@ function DashboardLayout({ id, children, breadcrumbs }: Props) {
         <ThemeProvider
           disableTransitionOnChange
           attribute="class"
-          value={{ light: "light-theme", dark: darkTheme.className }}
-          defaultTheme="system">
+          value={{ light: theme.className, dark: darkTheme.className }}>
           <Sidebar id={id} />
           <Box css={{ pl: 270, width: "100%" }}>
             <Header breadcrumbs={breadcrumbs} />

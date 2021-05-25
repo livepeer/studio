@@ -3620,12 +3620,12 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
-"@modulz/design-system@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@modulz/design-system/-/design-system-0.2.1.tgz#731eb5971f20af54f828159165edbf5376e56a39"
-  integrity sha512-KNPcgtLX+b33pNqM4CsvF73E+As7xo0LFet//03zyYe1bCQHtpgdzdIXoot+E1joipbvxMVjUa7iFOsQn6+8Qw==
+"@modulz/design-system@npm:@adamsoffer/design-system":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@adamsoffer/design-system/-/design-system-0.2.2.tgz#9ffdda493588791c06fe71aaf5057408ca2a4139"
+  integrity sha512-P/7LirOQRrNoLyHDejWrtxoyMIXQ33D1Y09rLyKtrMmL8pQMeiAU3UwEoTuj4pJuaf3dc13P5OoKczJjRD7A/w==
   dependencies:
-    "@radix-ui/colors" "^0.1.4"
+    "@radix-ui/colors" "0.1.5"
     "@radix-ui/react-accordion" "0.0.7"
     "@radix-ui/react-alert-dialog" "0.0.8"
     "@radix-ui/react-aspect-ratio" "^0.0.6"
@@ -4002,10 +4002,10 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
   integrity sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q==
 
-"@radix-ui/colors@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.4.tgz#22696402b864a190cc0c1aac4243bdaa1e5894e9"
-  integrity sha512-w5BxyjellZVWFCoeE6VH6SlW62PwkdTuo/ZG2CQ6Y7l9bZSBO+AFy68/T9zSiJeEclG+qIsKjQx0CtybEA4oxg==
+"@radix-ui/colors@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.5.tgz#0d207d44826ece6b5114e10f43cc36e4913f84e6"
+  integrity sha512-IaQLmE+vlp7FhkaiWENwUtBKPVEO8TzZHcyIK9iNa1hBEZW6jLESM1iTbv/sJP6CLHC742Cy2kHlUNskU7TYbA==
 
 "@radix-ui/number@0.0.1":
   version "0.0.1"

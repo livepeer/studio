@@ -44,7 +44,7 @@ type Rendition = {
 };
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
-  color: "$gray700",
+  color: "$gray8",
   cursor: "pointer",
   ml: "$1",
 });
@@ -127,7 +127,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               data-tip
               data-for={`tooltip-details-${stream.id}`}
               css={{
-                color: "muted",
+                color: "$slate7",
                 cursor: "pointer",
                 ml: 1,
               }}
