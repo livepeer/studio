@@ -1,7 +1,7 @@
 import { theme as t } from "@modulz/design-system";
 import {
   gray,
-  quartz,
+  mauve,
   slate,
   sage,
   olive,
@@ -29,7 +29,7 @@ import {
   bronze,
   gold,
   grayDark,
-  quartzDark,
+  mauveDark,
   slateDark,
   sageDark,
   oliveDark,
@@ -62,7 +62,7 @@ import {
 export const theme = t("theme-default", {
   colors: {
     ...gray,
-    ...quartz,
+    ...mauve,
     ...slate,
     ...sage,
     ...olive,
@@ -91,11 +91,10 @@ export const theme = t("theme-default", {
     ...gold,
 
     // Semantic colors
-    hiContrast: "$slate1000",
-    // loContrast: '$slate000',
+    hiContrast: "$slate12",
     loContrast: "white",
     canvas: "hsl(0 0% 93%)",
-    panel: "white",
+    panel: "$slate2",
     transparentPanel: "hsl(0 0% 0% / 97%)",
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
@@ -158,7 +157,7 @@ export const theme = t("theme-default", {
 export const darkTheme = t("dark-theme", {
   colors: {
     ...grayDark,
-    ...quartzDark,
+    ...mauveDark,
     ...slateDark,
     ...sageDark,
     ...oliveDark,
@@ -187,10 +186,10 @@ export const darkTheme = t("dark-theme", {
     ...goldDark,
 
     // Semantic colors
-    hiContrast: "$slate1000",
-    loContrast: "$slate000",
+    hiContrast: "$slate12",
+    loContrast: "$slate1",
     canvas: "hsl(0 0% 15%)",
-    panel: "$slate200",
+    panel: "$slate3",
     transparentPanel: "hsl(0 100% 100% / 97%)",
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
