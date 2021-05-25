@@ -3,19 +3,83 @@ import {
   Heading,
   Badge,
   Flex,
+  Grid,
   Link as A,
   styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../../public/img/icons/upcoming.svg";
+import { useEffect, useState } from "react";
+import { useApi } from "hooks";
+import { products } from "@livepeer.com/api/src/config";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
   color: "$hiContrast",
 });
 
+const UsageCard = ({ title, usage, limit }) => {
+  return (
+    <Box
+      css={{
+        px: "$5",
+        py: "$4",
+        boxShadow: "0 0 0 1px $colors$slate500",
+        borderRadius: "$1",
+        backgroundColor: "$slate100",
+        color: "$hiContrast",
+        mb: "$6",
+      }}>
+      <Box css={{ mb: "$2", color: "$slate800" }}>{title}</Box>
+      <Flex align="center" css={{ fontSize: "$6" }}>
+        <Box css={{ fontWeight: 700 }}>{usage}</Box>
+        {limit && <Box css={{ mx: "$1" }}>/</Box>}
+        {limit && <Box>{limit}</Box>}
+      </Flex>
+    </Box>
+  );
+};
+
 const UsageSummary = () => {
+  const { user, logout, getUsage, getSubscription, getInvoices } = useApi();
+  const [usage, setUsage] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [invoices, setInvoices] = useState(null);
+
+  useEffect(() => {
+    const doGetInvoices = async (stripeCustomerId) => {
+      const [res, invoices] = await getInvoices(stripeCustomerId);
+      if (res.status == 200) {
+        setInvoices(invoices);
+      }
+    };
+
+    const doGetUsage = async (fromTime, toTime, userId) => {
+      const [res, usage] = await getUsage(fromTime, toTime, userId);
+      if (res.status == 200) {
+        console.log(`got usage data:`, usage);
+        setUsage(usage);
+      }
+    };
+    const getSubscriptionAndUsage = async (subscriptionId) => {
+      const [res, subscription] = await getSubscription(subscriptionId);
+      if (res.status == 200) {
+        setSubscription(subscription);
+      }
+      doGetUsage(
+        subscription?.current_period_start,
+        subscription?.current_period_end,
+        user.id
+      );
+    };
+
+    if (user) {
+      doGetInvoices(user.stripeCustomerId);
+      getSubscriptionAndUsage(user.stripeCustomerSubscriptionId);
+    }
+  }, [user]);
+
   return (
     <>
       <Flex
@@ -40,34 +104,47 @@ const UsageSummary = () => {
             </Box>
             <Badge
               size="1"
-              variant="indigo"
+              variant="violet"
               css={{ letterSpacing: 0, mt: "7px" }}>
-              Personal Plan
+              {user?.stripeProductId
+                ? products[user.stripeProductId].name
+                : products["prod_0"].name}{" "}
+              Plan
             </Badge>
           </Flex>
         </Heading>
-        <Box css={{ fontSize: "$3", color: "$gray800" }}>
-          Current billing period (Apr 22 to May 22)
-        </Box>
-      </Flex>
-      <Box
-        css={{
-          px: "$5",
-          py: "$4",
-          maxWidth: "33%",
-          boxShadow: "0 0 0 1px $colors$slate500",
-          borderRadius: "$1",
-          backgroundColor: "$slate200",
-          color: "$hiContrast",
-          mb: "$6",
-        }}>
-        <Box css={{ mb: "$2", color: "$hiContrast" }}>Transcoding minutes</Box>
-        <Flex align="center" css={{ fontSize: "$6" }}>
-          <Box css={{ fontWeight: 700 }}>345</Box>
-          <Box css={{ mx: "$1" }}>/</Box>
-          <Box>1000</Box>
+        <Flex css={{ fontSize: "$3", color: "$slate800" }}>
+          Current billing period (
+          {subscription && (
+            <Flex>
+              {new Date(
+                subscription.current_period_start * 1000
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}{" "}
+              to{" "}
+              {new Date(
+                subscription.current_period_end * 1000
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}{" "}
+            </Flex>
+          )}
+          )
         </Flex>
-      </Box>
+      </Flex>
+      <Grid gap="4" columns="3">
+        <UsageCard
+          title="Transcoding minutes"
+          usage={
+            usage &&
+            (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
+          }
+          limit={!products[user.stripeProductId].order ? 1000 : false}
+        />
+      </Grid>
       <Flex
         justify="between"
         align="center"
@@ -77,7 +154,7 @@ const UsageSummary = () => {
           Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
         </Flex>
         <Link href="/" passHref>
-          <A variant="indigo" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

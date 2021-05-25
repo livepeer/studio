@@ -10,7 +10,12 @@ const Plans = () => {
     return <Layout />;
   }
   return (
-    <Layout>
+    <Layout
+      id="plans"
+      breadcrumbs={[
+        { title: "Billing", href: "/dashboard/billing" },
+        { title: "Plans" },
+      ]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <Flex
