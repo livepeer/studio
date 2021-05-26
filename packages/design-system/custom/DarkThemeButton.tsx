@@ -1,20 +1,13 @@
-import React from "react";
 import { Button } from "../";
 import { darkTheme } from "../stitches.config";
+import { useTheme } from "next-themes";
 
 export function DarkThemeButton() {
-  const [theme, setTheme] = React.useState("theme-default");
-
-  React.useEffect(() => {
-    document.body.classList.remove("theme-default", darkTheme);
-    document.body.classList.add(theme);
-  }, [theme]);
-
+  const { resolvedTheme, setTheme, theme } = useTheme();
+  console.log("resolvedTheme", resolvedTheme);
   return (
     <Button
-      onClick={() =>
-        setTheme(theme === "theme-default" ? darkTheme : "theme-default")
-      }>
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
       Toggle theme
     </Button>
   );
