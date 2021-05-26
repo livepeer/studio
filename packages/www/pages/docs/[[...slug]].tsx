@@ -96,10 +96,10 @@ const DocsIndex = ({ doc, menu }) => {
   const breadCrumb = router.asPath.split("#")[0].split("/");
 
   let seo = {
-    title: "Livepeer Docs",
-    description: "Livepeer Docs",
+    title: "Docs - Livepeer.com",
+    description: "Docs - Livepeer.com",
     openGraph: {
-      title: "Livepeer.com Docs",
+      title: "Docs - Livepeer.com",
       description:
         "The platform built to power video-centric UGC applications at scale.",
       url: "https://livepeer.com/docs",
