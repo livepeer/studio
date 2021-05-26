@@ -183,24 +183,27 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
             },
           }}
         />
-        <p
+        <span
           sx={{
             margin: "24px 0 8px",
             fontSize: "24px",
             lineHeight: "32px",
             fontWeight: "600",
             letterSpacing: "-0.04em",
+            color: 'black'
           }}>
           {title}
-        </p>
-        <p
+        </span>
+        <span
           sx={{
             fontSize: "16px",
             lineHeight: "28px",
             letterSpacing: "-0.02em",
+            color: 'black',
+            fontWeight: '400'
           }}>
           {description}
-        </p>
+        </span>
       </a>
     </Link>
   );

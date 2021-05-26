@@ -188,27 +188,6 @@ const Menu = ({ menu }: MenuProps) => {
   );
 };
 
-const fadeOut = keyframes`
-  0% {
-    position: unset;
-    left: 0;
-  }
-  100% {
-    position: absolute;
-    left: -233px;
-  }
-`;
-const fadeIn = keyframes` 
-  0% {
-    position: absolute;
-    left: -233px;
-  }
-  100% {
-    position: unset;
-    left: 0;
-  }
-`;
-
 const SideNav = ({
   hideTopNav,
   hideSideBar,
@@ -223,18 +202,17 @@ const SideNav = ({
         display: ["none", "none", "flex", "flex"],
         justifyContent: "space-between",
         position: "sticky",
-        width: hideSideBar ? '60px' : '300px',
         marginTop: hideTopNav ? "-60px" : "",
+        marginLeft: hideSideBar ? '-233px' : '0px',
         transition: "all 0.2s",
         background: "white",
         top: hideTopNav ? 76 : 136,
       }}>
       <div
         sx={{
-          animation: hideSideBar ? fadeOut : fadeIn,
-          animationFillMode: "forwards",
-          animationDuration: '0.2s',
           width: '233px',
+          minWidth: '233px',
+          maxWidth: '233px',
           padding: "24px 0",
         }}>
         <p
@@ -257,6 +235,7 @@ const SideNav = ({
           pt: "24px",
           transition: "all 0.2s",
           width: '60px',
+          minWidth: '60px',
           display: 'flex',
           justifyContent: 'center'
         }}>
