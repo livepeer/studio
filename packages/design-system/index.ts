@@ -29,10 +29,6 @@ export {
   ContextMenuSeparator,
   ControlGroup,
   DesignSystemProvider,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -109,6 +105,12 @@ export {
   AccordionItem,
   AccordionPanel,
 } from "./components/Accordian";
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTrigger,
+} from "./components/Dialog";
 export { Button } from "./components/Button";
 export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
