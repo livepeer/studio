@@ -27,7 +27,6 @@ import { Avatar } from "../";
 import { TabLink } from "../";
 import { SimpleToggle } from "../";
 import { Slider } from "../";
-import { Dialog, DialogTrigger, DialogContent } from "../";
 import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from "../";
 import { Checkbox } from "../";
 import { RadioGroup, Radio } from "../";
@@ -103,6 +102,7 @@ import {
   AccordionItem,
   AccordionPanel,
 } from "../components/Accordian";
+import { Dialog, DialogContent, DialogTrigger } from "../components/Dialog";
 import { Button } from "../components/Button";
 import { Link } from "../components/Link";
 import { Promo } from "../components/Promo";
@@ -158,6 +158,7 @@ function Home() {
           backgroundColor: "$slate3",
           opacity: 0.9,
           backdropFilter: "blur(12px) saturate(160%)",
+          zIndex: 1000,
         }}>
         <Heading>Quick nav</Heading>
         <Box as="ul" css={{ listStyle: "none", p: 0 }}>
@@ -1981,7 +1982,6 @@ function Home() {
 
             <Dialog>
               <DialogTrigger as={Button}>Dialog</DialogTrigger>
-
               <DialogContent>
                 <Text size="5" as="h6" css={{ fontWeight: 500, mb: "$3" }}>
                   Dialog Heading
