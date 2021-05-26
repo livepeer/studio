@@ -240,6 +240,7 @@ export const getStaticProps = async (context) => {
     );
   });
 
+  
   const routePaths = sorted.filter((each) => each.slug.split("/").length <= 2);
 
   const menu = routePaths.map((each) => {
@@ -251,7 +252,8 @@ export const getStaticProps = async (context) => {
         .filter(
           (child) =>
             child.slug.split("/")[1] === each.slug.split("/")[1] &&
-            child.slug.split("/").length == 3
+            child.slug.split("/").length == 3 || child.slug.split("/")[1] === each.slug.split("/")[1] &&
+            child.slug.split("/").length === 2
         )
         .map((eachChild) => {
           return {
