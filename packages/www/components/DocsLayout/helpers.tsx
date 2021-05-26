@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
-import DocsJSONHighlighter from "./jsonHighlighter";
 
 type CardProps = {
   title: string;
@@ -33,10 +32,6 @@ type GridProps = {
 
 type HeadingProps = {
   as: "h1" | "h2" | "h3";
-  children: ReactNode;
-};
-
-type CodeBlockProps = {
   children: ReactNode;
 };
 
