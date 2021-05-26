@@ -1,5 +1,5 @@
 import { Flex } from "@theme-ui/components";
-import { Button } from "@theme-ui/components";
+import Button from 'components/Button'
 import { Box, Link as A } from "@theme-ui/components";
 import Logo from "components/Logo";
 import { useApi } from "hooks";
@@ -57,13 +57,15 @@ const DocsNav = ({
         onClick={() => setCloseSelect(false)}
         sx={{
           display: ["flex", "none", "none"],
-          height: selectOpen ? "100vh" : '0px',
-          transition: 'all 0.2s',
+          height: "100vh",
+          transition: "all 0.2s",
           width: "100vw",
           position: "fixed",
           bottom: 0,
           left: 0,
           background: "rgba(0, 0, 0, 0.32)",
+          visibility: selectOpen ? 'visible' : 'hidden',
+          opacity: selectOpen ? '1' : '0'
         }}
       />
       <Box
@@ -143,7 +145,7 @@ const DocsNav = ({
                   <Link
                     href="/login"
                     variant="nav"
-                    sx={{ fontWeight: 600, mr: 3 }}>
+                    sx={{ fontWeight: 600, mr: 0 }}>
                     Log in
                   </Link>
                   <Button
@@ -237,7 +239,7 @@ const DocsNav = ({
             display: ["flex", "none", "none"],
             mt: "8px",
           }}>
-          <DropdownMenu.Root onOpenChange={handleClick} open={selectOpen}>
+          <DropdownMenu.Root onOpenChange={handleClick}>
             <div
               sx={{
                 width: "100%",

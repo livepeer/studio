@@ -296,11 +296,13 @@ export const MobileSideNav = ({
           position: "fixed",
           background: "rgba(0, 0, 0, 0.32)",
           height: "100vh",
-          width: isOpen ? "100vw" : "0px",
+          width: '100vw',
           transition: "all 0.2s",
           top: 0,
           zIndex: 1,
           right: 0,
+          opacity: isOpen ? '1' : '0',
+          visibility: isOpen ? 'visible' : 'hidden'
         }}
       />
       <div
