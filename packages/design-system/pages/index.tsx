@@ -122,7 +122,7 @@ const StyledInfoIcon = styled(InfoCircledIcon, {
 function Home() {
   return (
     <Box>
-      <Banner id="banner" variant="violet" rounded>
+      <Banner id="banner" variant="violet">
         <RocketIcon />
         <Text size="2" css={{ fontWeight: 500 }}>
           The Livepeer.com dashboard got a redesign!
@@ -141,19 +141,23 @@ function Home() {
         </IconButton>
       </Banner>
       <AppBar size="2" color="loContrast" border sticky glass>
-        <DarkThemeButton />
+        <Box css={{ px: "$6" }}>
+          <DarkThemeButton />
+        </Box>
       </AppBar>
       <Box
         css={{
           position: "fixed",
-          top: "$8",
+          top: "$6",
           left: 0,
           bottom: 0,
           overflowY: "auto",
           width: 250,
           px: "$6",
-          py: "$6",
-          backgroundColor: "$loContrast",
+          py: "$8",
+          backgroundColor: "$slate3",
+          opacity: 0.9,
+          backdropFilter: "blur(12px) saturate(160%)",
         }}>
         <Heading>Quick nav</Heading>
         <Box as="ul" css={{ listStyle: "none", p: 0 }}>

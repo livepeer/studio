@@ -118,7 +118,7 @@ export { Promo } from "./components/Promo";
 export {
   styled,
   css,
-  theme,
+  lightTheme,
   darkTheme,
   getCssString,
   global,
