@@ -6,6 +6,7 @@ import {
   Grid,
   Link as A,
   styled,
+  Skeleton,
   Text,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -20,7 +21,7 @@ const StyledUpcomingIcon = styled(UpcomingIcon, {
   color: "$hiContrast",
 });
 
-const UsageCard = ({ title, usage, limit }) => {
+const UsageCard = ({ title, usage, limit, loading = false }) => {
   return (
     <Box
       css={{
@@ -31,19 +32,34 @@ const UsageCard = ({ title, usage, limit }) => {
         backgroundColor: "$slate2",
         color: "$hiContrast",
         mb: "$6",
+        minHeight: 92,
       }}>
-      <Box css={{ mb: "$2", color: "$slate9" }}>{title}</Box>
-      <Flex align="center" css={{ fontSize: "$6" }}>
-        <Box css={{ fontWeight: 700 }}>{usage}</Box>
-        {limit && <Box css={{ mx: "$1" }}>/</Box>}
-        {limit && <Box>{limit}</Box>}
-      </Flex>
+      {loading ? (
+        <Box
+          css={{
+            display: "flex",
+            fd: "column",
+            gap: "$3",
+          }}>
+          <Skeleton variant="title" css={{ width: "50%" }} />
+          <Skeleton variant="heading" css={{ width: "25%" }} />
+        </Box>
+      ) : (
+        <>
+          <Box css={{ mb: "$2", color: "$slate9" }}>{title}</Box>
+          <Flex align="center" css={{ fontSize: "$6" }}>
+            <Box css={{ fontWeight: 700 }}>{usage}</Box>
+            {limit && <Box css={{ mx: "$1" }}>/</Box>}
+            {limit && <Box>{limit}</Box>}
+          </Flex>
+        </>
+      )}
     </Box>
   );
 };
 
 const UsageSummary = () => {
-  const { user, logout, getUsage, getSubscription, getInvoices } = useApi();
+  const { user, getUsage, getSubscription, getInvoices } = useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
@@ -138,6 +154,7 @@ const UsageSummary = () => {
       <Grid gap="4" columns="3">
         <UsageCard
           title="Transcoding minutes"
+          loading={!usage}
           usage={
             usage &&
             (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
