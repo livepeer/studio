@@ -62,10 +62,10 @@ const RecordingUrlCell = <D extends TableData>({
             <Box>
               <A
                 variant="downloadOutline"
-                target="_blank"
+                // target="_blank"
                 href={makeMP4Url(cell.value.href, "source")}
                 sx={{ p: 1 }}>
-                Download&nbsp;mp4
+                Download&nbsp;mp4&nbsp;beta
               </A>
             </Box>
           ) : null}
