@@ -3157,7 +3157,7 @@
   resolved "https://registry.yarnpkg.com/@radix-ui/react-id/-/react-id-0.0.1.tgz#f04627366a64c3ceab321258731dcb9515a31451"
   integrity sha512-b6ihKYxBV/4B6A49NBRMYdHVpyvavk8QakFMm+6JFwQqad4iSPbJt8aN4wOeLyEfG97rDf6hVR1YdOuA/x85dg==
 
-"@radix-ui/react-id@0.0.6", "@radix-ui/react-id@^0.0.6":
+"@radix-ui/react-id@0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-id/-/react-id-0.0.6.tgz#c4b27d11861805e91ac296e7758ab47e3947b65c"
   integrity sha512-PzmraF34fYggsYvTIZVJ5S68WMp3aKUN3HkSmGnz4zn9zpRjkAbbg7Xn3ueQI3FQsLWKgyUfnpsmWFDndpcqYg==

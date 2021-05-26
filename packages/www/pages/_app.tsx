@@ -27,12 +27,10 @@ export default class MyApp extends App {
             rel="stylesheet"
           />
         </Head>
-        <IdProvider>
-          <ApiProvider>
-            <DefaultSeo {...SEO} />
-            <Component {...pageProps} />
-          </ApiProvider>
-        </IdProvider>
+        <ApiProvider>
+          <DefaultSeo {...SEO} />
+          <Component {...pageProps} />
+        </ApiProvider>
       </>
     );
   }
