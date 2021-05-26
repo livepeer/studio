@@ -47,7 +47,7 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
         sx={{
           background: "linear-gradient(212.62deg, #B75EFF 0%, #943CFF 100%)",
           minHeight: "272px",
-          cursor: 'pointer',
+          cursor: "pointer",
           padding: "32px 24px 24px",
           display: "flex",
           flexDirection: "column",
@@ -112,34 +112,35 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
 
 const NavigationCard = ({ title, href, label }: CardProps) => {
   return (
-    <div
-      sx={{
-        width: "100%",
-        maxWidth: "240px",
-        padding: "24px",
-        border: "1px solid #E6E6E6",
-        minHeight: "152px",
-        display: "flex",
-        flexDirection: "column",
-        borderRadius: "16px",
-      }}>
-      <p
+    <Link href={href}>
+      <div
         sx={{
-          letterSpacing: "-0.03em",
-          fontSize: "14px",
-          fontWeight: "600",
-          lineHeight: "24px",
+          width: "100%",
+          cursor: "pointer",
+          maxWidth: "240px",
+          padding: "24px",
+          border: "1px solid #E6E6E6",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "16px",
         }}>
-        {title}
-      </p>
-      <Link href={href}>
-        <a
+        <p
+          sx={{
+            letterSpacing: "-0.03em",
+            fontSize: "14px",
+            fontWeight: "600",
+            lineHeight: "24px",
+            marginBottom: "0px",
+          }}>
+          {title}
+        </p>
+        <div
           sx={{
             display: "flex",
             alignItems: "center",
-            cursor: "pointer",
             maxWidth: "fit-content",
-            mt: "32px",
+            mt: "8px",
+            mb: "0px",
           }}>
           <span
             sx={{
@@ -152,9 +153,9 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
             {label ?? "Read guide"}
           </span>
           <BsArrowRightShort color="#943CFF" size={22} />
-        </a>
-      </Link>
-    </div>
+        </div>
+      </div>
+    </Link>
   );
 };
 
@@ -190,7 +191,7 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
             lineHeight: "32px",
             fontWeight: "600",
             letterSpacing: "-0.04em",
-            color: 'black'
+            color: "black",
           }}>
           {title}
         </span>
@@ -199,8 +200,8 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
             fontSize: "16px",
             lineHeight: "28px",
             letterSpacing: "-0.02em",
-            color: 'black',
-            fontWeight: '400'
+            color: "black",
+            fontWeight: "400",
           }}>
           {description}
         </span>
@@ -215,6 +216,7 @@ const DocsGrid = ({ children, cols }: GridProps) => {
       sx={{
         gap: "24px",
         mb: "56px",
+        mt: "32px",
         justifyItems: "center",
         gridTemplateColumns: ["1fr", "1fr 1fr", `repeat(${cols}, 1fr)`],
       }}>
