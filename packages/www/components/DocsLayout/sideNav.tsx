@@ -5,6 +5,7 @@ import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import { TiArrowSortedDown } from "react-icons/ti";
 import Link from "next/link";
+import Marked from "./Marked";
 
 type SideNavProps = {
   hideTopNav: boolean;
@@ -76,7 +77,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
             color: "#000000",
           },
         }}>
-        {label}
+        <Marked>{label}</Marked>
       </p>
       <i
         sx={{
@@ -93,7 +94,11 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
 const Menu = ({ menu }: MenuProps) => {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState("");
-  const currentPath = router.asPath.split('#')[0].split("/").slice(0, 4).join("/");
+  const currentPath = router.asPath
+    .split("#")[0]
+    .split("/")
+    .slice(0, 4)
+    .join("/");
   return (
     <div
       sx={{
@@ -143,7 +148,7 @@ const Menu = ({ menu }: MenuProps) => {
                       color: "#000000",
                     },
                   }}>
-                  {child.title}
+                  <Marked>{child.title}</Marked>
                 </a>
               </Link>
             ))}
@@ -182,7 +187,7 @@ const Menu = ({ menu }: MenuProps) => {
                     color: "#000000",
                   },
                 }}>
-                {route.title}
+                <Marked>{route.title}</Marked>
               </span>
             </a>
           </Link>
@@ -296,13 +301,13 @@ export const MobileSideNav = ({
           position: "fixed",
           background: "rgba(0, 0, 0, 0.32)",
           height: "100vh",
-          width: '100vw',
+          width: "100vw",
           transition: "all 0.2s",
           top: 0,
           zIndex: 1,
           right: 0,
-          opacity: isOpen ? '1' : '0',
-          visibility: isOpen ? 'visible' : 'hidden'
+          opacity: isOpen ? "1" : "0",
+          visibility: isOpen ? "visible" : "hidden",
         }}
       />
       <div

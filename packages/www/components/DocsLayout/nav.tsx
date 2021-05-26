@@ -10,6 +10,7 @@ import { BiSearch } from "react-icons/bi";
 import { GoTriangleDown } from "react-icons/go";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Download } from "./icons";
+import { useHydrate } from "next-mdx/client";
 
 type DocsNavProps = {
   hideTopNav: boolean;
