@@ -93,7 +93,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
 const Menu = ({ menu }: MenuProps) => {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState("");
-  const currentPath = router.asPath.split("/").slice(0, 4).join("/");
+  const currentPath = router.asPath.split('#')[0].split("/").slice(0, 4).join("/");
   return (
     <div
       sx={{

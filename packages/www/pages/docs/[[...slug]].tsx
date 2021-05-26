@@ -86,7 +86,7 @@ const DocsIndex = ({ doc, menu }) => {
   const router = useRouter();
 
   const currentMenu = menu.filter(
-    (a) => `/${a.slug}` === router.asPath.split("/").slice(0, 3).join("/")
+    (a) => `/${a.slug}` === router.asPath.split('#')[0].split("/").slice(0, 3).join("/")
   );
 
   const content = useHydrate(doc, {
