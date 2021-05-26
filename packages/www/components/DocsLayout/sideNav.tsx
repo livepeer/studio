@@ -105,11 +105,15 @@ const Menu = ({ menu }: MenuProps) => {
         route.children.length > 0 ? (
           <Collapsible
             handleTriggerClick={() =>
-              currentSection === route.title
+              currentPath === `/${route.slug}`
+                ? null
+                : currentSection === route.title
                 ? setCurrentSection(null)
                 : setCurrentSection(route.title)
             }
-            open={currentSection === route.title}
+            open={
+              currentSection === route.title || currentPath === `/${route.slug}`
+            }
             transitionTime={200}
             sx={{ background: "none", mt: "16px" }}
             key={idx}
@@ -203,16 +207,16 @@ const SideNav = ({
         justifyContent: "space-between",
         position: "sticky",
         marginTop: hideTopNav ? "-60px" : "",
-        marginLeft: hideSideBar ? '-233px' : '0px',
+        marginLeft: hideSideBar ? "-233px" : "0px",
         transition: "all 0.2s",
         background: "white",
         top: hideTopNav ? 76 : 136,
       }}>
       <div
         sx={{
-          width: '233px',
-          minWidth: '233px',
-          maxWidth: '233px',
+          width: "233px",
+          minWidth: "233px",
+          maxWidth: "233px",
           padding: "24px 0",
         }}>
         <p
@@ -234,10 +238,10 @@ const SideNav = ({
           height: "100%",
           pt: "24px",
           transition: "all 0.2s",
-          width: '60px',
-          minWidth: '60px',
-          display: 'flex',
-          justifyContent: 'center'
+          width: "60px",
+          minWidth: "60px",
+          display: "flex",
+          justifyContent: "center",
         }}>
         <i
           onClick={() => setHideSideBar(!hideSideBar)}
@@ -247,11 +251,11 @@ const SideNav = ({
             cursor: "pointer",
             transition: "all 0.2s",
             display: "flex",
-            alignItems: 'center',
-            justifyContent: 'center',
-            maxHeight: '22px',
-            height: '22px',
-            width: '22px',
+            alignItems: "center",
+            justifyContent: "center",
+            maxHeight: "22px",
+            height: "22px",
+            width: "22px",
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
           <Download hovered={iconHover} />
