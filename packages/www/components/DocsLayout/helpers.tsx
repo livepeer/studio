@@ -254,8 +254,9 @@ const Heading = ({ children, as }: HeadingProps) => {
         }}
         aria-label="Anchor"
         href={`#${id}`}
+        className="no-index"
       />
-      {children}
+      <span>{children}</span>
     </Comp>
   );
 };
