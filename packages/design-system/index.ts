@@ -115,6 +115,7 @@ export { Button } from "./components/Button";
 export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
 export { Promo } from "./components/Promo";
+export { Label } from "./components/Label";
 
 // Stitches
 export {
