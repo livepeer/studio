@@ -58,6 +58,15 @@ const components = {
   h3: ({ children }) => {
     return <Heading as="h3">{children}</Heading>;
   },
+  h4: ({ children }) => {
+    return <Heading as="h4">{children}</Heading>;
+  },
+  h5: ({ children }) => {
+    return <Heading as="h5">{children}</Heading>;
+  },
+  h6: ({ children }) => {
+    return <Heading as="h6">{children}</Heading>;
+  },
   a: ({ children, href }) => {
     return (
       <Link href={href} passHref>
