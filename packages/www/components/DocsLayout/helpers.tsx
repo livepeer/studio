@@ -163,15 +163,17 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
           flexDirection: "column",
           width: "100%",
           cursor: "pointer",
+          ":hover": {
+            div: {
+              boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
+            },
+          },
         }}>
         <div
           sx={{
             transition: "all 0.2s",
             borderRadius: "16px",
             overflow: "hidden",
-            ":hover": {
-              boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
-            },
           }}>
           <Image
             src={image}

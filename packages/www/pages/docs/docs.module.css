@@ -94,6 +94,10 @@
     display: inline-flex;
 }
 
+.markdown ol li p, .markdown ul li p {
+    margin: 0 !important;
+}
+
 .markdown ol li:last-of-type {
     margin-bottom: 0;
 }
