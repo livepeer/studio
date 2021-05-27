@@ -1,135 +1,37 @@
 ---
-title: Introduction
-description: Livepeer Documentation
+title: Livepeer.com Video Guides Introduction
+description: Livepeer.com Documentation
 ---
 
-# Video Guides Introduction
+# Livepeer.com documentation
 
-There are multiple ways to livestream with livepeer.com. The only prerequisite
-for using livepeer.com is to be able to create an RTMP stream.
-
-You can integrate your streaming application directly with the Livepeer.com API.
-If you are creating a live streaming platform or application, the Livepeer.com
-API will best meet your needs.
-
-Or you can use the Livepeer.com dashboard to livestream without writing any
-code. If you are doing manual broadcasts like streaming events, concerts, or
-webinars, you can use the Livepeer.com dashboard.
-
-`Use code in your Markdown file.`
-
-`asasc`
-
-```bash
-curl -X POST \
--H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
--d '{
-  "name": "test_stream",
-  "profiles": [
-    {
-      "name": "720p",
-      "bitrate": 2000000,
-      "fps": 30,
-      "width": 1280,
-      "height": 720
-    },
-    {
-      "name": "480p",
-      "bitrate": 1000000,
-      "fps": 30,
-      "width": 854,
-      "height": 480
-    },
-    {
-      "name": "360p",
-      "bitrate": 500000,
-      "fps": 30,
-      "width": 640,
-      "height": 360
-    }
-  ]
-}' \
-https://livepeer.com/api/stream
-```
-
-| Field                 |                                       Notes                                       |
-| :-------------------- | :-------------------------------------------------------------------------------: |
-| Location              |                                      EU, US                                       |
-| Ingest Format         |                                       RTMP                                        |
-| Ingest Codec          |                                    H264 + AAC                                     |
-| Ingest Authentication |                                   Webhook based                                   |
-| Encoder Software      |               Supported tested: OBS 25.0.8, ffmpeg 4.3, Streamaxia                |
-|                       | Supported untested: Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders |
-|                       |                     **Unsupported:** WebRTC and SRT encoders                      |
-| Resolution            |                **Supported tested:** custom resolution up to 1080p                |
-|                       |                **Supported untested:** custom resolution up to 4k                 |
-
-Either way, the first thing you’ll need to do is
-[create an account on Livepeer.com](/sign-up).
-
-The next step is to visit one of these two documentation sections:
-
-# This is a H1 title
-
-<DocsGrid cols={2}>
-  <SimpleCard
-    title="How to live stream with the Livepeer.com API"
-    description="How to set up your integration with the Livepeer.com API."
-    label="Read More"
-    href="/"
-  />
-  <SimpleCard
-    title="How to live stream with the Livepeer.com API"
-    description="How to set up your integration with the Livepeer.com API."
-    label="Read More"
-    href="/"
-  />
-</DocsGrid>
-
-`Use code in your Markdown file.`
-
-There are multiple ways to livestream with livepeer.com. The only prerequisite
-for using livepeer.com is to be able to create an RTMP stream.
-
-You can integrate your streaming application directly with the Livepeer.com API.
-If you are creating a live streaming platform or application, the Livepeer.com
-API will best meet your needs.
-
-Or you can use the Livepeer.com dashboard to livestream without writing any
-code. If you are doing manual broadcasts like streaming events, concerts, or
-webinars, you can use the Livepeer.com dashboard.
-
-### This is an H3 title
-
-Either way, the first thing you’ll need to do is
-[create an account on Livepeer.com](/sign-up).
-
-The next step is to visit one of these two documentation sections:
-
-| Field                 |                                       Notes                                       |
-| :-------------------- | :-------------------------------------------------------------------------------: |
-| Location              |                                      EU, US                                       |
-| Ingest Format         |                                       RTMP                                        |
-| Ingest Codec          |                                    H264 + AAC                                     |
-| Ingest Authentication |                                   Webhook based                                   |
-| Encoder Software      |               Supported tested: OBS 25.0.8, ffmpeg 4.3, Streamaxia                |
-|                       | Supported untested: Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders |
-|                       |                     **Unsupported:** WebRTC and SRT encoders                      |
-| Resolution            |                **Supported tested:** custom resolution up to 1080p                |
-|                       |                **Supported untested:** custom resolution up to 4k                 |
+## Explore guides, tutorials and sample code. 
 
 <DocsGrid cols={2}>
   <DocsPost
     title="Start Live Streaming (no code required)"
-    description="Start to livestream with Livepeer.com"
+    description="Quickly get started with Livepeer.com"
     href="/"
     image="/img/thumbnail.png"
   />
   <DocsPost
-    title="Supported codecs"
-    description="Feature Support Matrix"
+    title="Supported Codecs and Workflows"
+    description="Review the workflows Livepeer.com supports"
     href="/"
     image="/img/thumbnail.png"
   />
+</DocsGrid>
+
+### Popular guides
+
+<DocsGrid cols={3}>
+    <NavigationCard href='/' title='Debug live stream issues'/>
+    <NavigationCard href='/' title='Using livepeer.com in your app' />
+    <NavigationCard href='/' title='Clone an example application' />
+</DocsGrid>
+
+<DocsGrid cols={3}>
+    <NavigationCard href='/' title='Configure broadcast software' />
+    <NavigationCard href='/' title='Playback a live stream' />
+    <NavigationCard href='/' title='Recording live stream' />
 </DocsGrid>
