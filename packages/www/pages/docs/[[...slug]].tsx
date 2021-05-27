@@ -21,6 +21,7 @@ import { CgClose } from "react-icons/cg";
 import Code from "components/renderers/Code";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
+import clsx from "clsx";
 
 const mobileCategories = [
   {
@@ -191,7 +192,7 @@ const DocsIndex = ({ doc, menu }) => {
             alignItems: "flex-start",
           }}>
           <div
-            className={styles.markdown}
+            className={clsx(styles.markdown, "docs-container")}
             sx={{
               display: "flex",
               flexDirection: "column",
