@@ -222,9 +222,7 @@ const DocsGrid = ({ children, cols }: GridProps) => {
 };
 
 const Heading = ({ children, as }: HeadingProps) => {
-  console.log(children);
   const id = slugify(children.toString());
-  console.log(id);
   const Comp = as;
 
   return (
