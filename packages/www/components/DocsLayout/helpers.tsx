@@ -51,8 +51,7 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
           width: "100%",
           borderRadius: "16px",
           ":hover": {
-            boxShadow:
-              "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
+            boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
           },
         }}>
         <div
@@ -171,8 +170,7 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
             borderRadius: "16px",
             overflow: "hidden",
             ":hover": {
-              boxShadow:
-                "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
+              boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
             },
           }}>
           <Image
