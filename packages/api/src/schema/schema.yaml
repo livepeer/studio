@@ -68,6 +68,7 @@ components:
         isConsumed:
           type: boolean
           default: false
+          index: true
         retries:
           type: number
           default: 0
@@ -77,6 +78,7 @@ components:
         status:
           type: string
           default: pending
+          index: true
         modifiedAt:
           type: number
           readOnly: true

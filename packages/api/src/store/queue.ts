@@ -66,10 +66,7 @@ export default class QueueTable extends Table<Queue> {
   // }
 
   // get next event in queue
-  async pop(
-    processFunc: Function,
-    opts: GetOptions = { useReplica: true }
-  ): Promise<Queue> {
+  async pop(processFunc: Function): Promise<Queue> {
     let res: QueryResult<DBLegacyObject>;
     await this.client.query("BEGIN");
     res = await this.client.query(
@@ -89,7 +86,13 @@ export default class QueueTable extends Table<Queue> {
     let originalData = res.rows[0].data;
     // this allows us to pass a function that will process the event within the lock
     if (processFunc) {
-      await processFunc(originalData as Queue);
+      try {
+        await processFunc(originalData as Queue);
+      } catch (error) {
+        console.log("Msg queue process function error: ", error);
+        await this.client.query("ROLLBACK;");
+        throw error; // throwing the error till we can handle it better
+      }
       res.rows[0].data.isConsumed = true;
       res.rows[0].data.modifiedAt = Date.now();
       await this.client.query(
@@ -119,7 +122,8 @@ export default class QueueTable extends Table<Queue> {
     }
 
     try {
-      await this.db.query(
+      await this.client.query("BEGIN;");
+      await this.client.query(
         `INSERT INTO ${this.name} VALUES ($1, $2)`, //p
         [doc.id, JSON.stringify(doc)] //p
       );
@@ -127,8 +131,9 @@ export default class QueueTable extends Table<Queue> {
       if (this.listener) {
         // emit it via notifications
         console.log("emitting NOTIFY");
-        await this.db.query(`NOTIFY ${this.channel}, '${doc.id}';`);
+        await this.client.query(`NOTIFY ${this.channel}, '${doc.id}';`);
       }
+      this.client.query("COMMIT;");
     } catch (e) {
       if (e.message.includes("duplicate key value")) {
         throw new BadRequestError(e.detail);
