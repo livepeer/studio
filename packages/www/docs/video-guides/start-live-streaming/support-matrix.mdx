@@ -3,4 +3,54 @@ title: Supported codecs and workflows
 description: Codecs and workflows supported by Livepeer.com
 ---
 
-# Supported codecs and workflowsw
+# Supported codecs and workflows 
+
+**Ingest Support**
+
+| Field                             | Notes                                                                                 |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| **Location**                      | EU, US                                                                                |
+| **Ingest Format**                 | RTMP                                                                                  |
+| **Ingest Codec**                  | H264 + AAC                                                                            |
+| **Ingest Authentication**         | Webhook based                                                                         |
+| **Encoder Software**              | **Supported tested**: OBS 25.0.8, ffmpeg 4.3, Streamaxia                              |
+|                                   | **Supported untested**: Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders |
+|                                   | **Unsupported**: WebRTC and SRT encoders                                              |
+| **Resolution**                    | **Supported tested**: custom resolution up to 1080p                                   |
+|                                   | **Supported untested**: custom resolution up to 4k                                    |
+| **Framerate**                     | between 5fps and 60fps, passthrough or custom                                         |
+| **GOP Size (Keyframe Interval) ** | **Supported tested**: Constant GOP, Variable GOP of 0.5s to 8s                        |
+|                                   | **Supported untested**: Variable GOP not within 0.5s to 8s                            |
+
+**Transcoding Support**
+
+| Field                         | Notes                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| **Location**                  | EU, US                                                                  |
+| **Codec**                     | H264 + AAC                                                              |
+| **H264 Transcoding Profiles** | Baseline, Main, High                                                    |
+| **FPS**                       | **Supported tested**: 24, 25, 30, 60 fps, uniform across all renditions |
+|                               | **Supported untested**: custom fps, uniform across all renditions       |
+| **Resolution**                | **Supported tested**: custom resolution up to 1080p                     |
+|                               | **Supported untested**: custom resolution up to 4k                      |
+| **Pixel Format**              | YUV4:2:0                                                                |
+
+**Video Workflow Support**
+
+| Field                       | Notes                                                                                                                                                       |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Latency**                 | 10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player                                                         |
+| **Live Output Format**      | HLS playback URL (m3u8)                                                                                                                                     |                                                                                                                                  |
+| **Video Players**           | **Supported tested**: video.js, hls.js, safari/ios native player, Theoplayer                                                                                |
+|                             | **Supported untested**: JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove                                                                          |
+| **Video Delivery Location** | **Supported tested**: EU, US                                                                                                                                |
+|                             | **Supported untested**: Asia, South America, Australia, Africa                                                                                              |
+| \*\*Live stream recording   | ONLY available for paying users. HLS playback URL (m3u8) available 5 minutes after session ends. Livepeer.com stores recording and serves playback via CDN. |
+| **Recording Output Format** | HLS playback URL (m3u8)   
+| **CDN Delivery**            | CDN delivery is ONLY available for paying users                                                                                                             |
+| **Non-CDN Delivery**        | Non-CDN delivery for free tier users is limited to to 10 viewers per account                                                                                |
+|                             | Free tier users will have transcoding limited to 240p after 30 free minutes                                                                                 |
+| **Custom CDN**              | Only for custom pricing tier users                                                                                                                          |
+| **Stream Status**           | `active` or `inactive`                                                                                                                                      |
+| **Stream Length**           | Up to 5 hours                                                                                                                                               |
+| **Scalability**             | EU: 40 concurrent streams across all users; North America: 50 concurrent streams across all users                                                           |
