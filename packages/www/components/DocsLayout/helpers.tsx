@@ -164,21 +164,24 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
           width: "100%",
           cursor: "pointer",
         }}>
-        <Image
-          src={image}
-          layout="responsive"
-          objectFit="cover"
-          width={372}
-          height={272}
+        <div
           sx={{
-            borderRadius: "16px",
             transition: "all 0.2s",
+            borderRadius: '16px',
+            overflow: 'hidden',
             ":hover": {
               boxShadow:
                 "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
             },
-          }}
-        />
+          }}>
+          <Image
+            src={image}
+            layout="responsive"
+            objectFit="cover"
+            width={372}
+            height={272}
+          />
+        </div>
         <span
           sx={{
             margin: "24px 0 8px",
