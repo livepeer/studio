@@ -200,9 +200,8 @@ const DocsNav = ({
             }}>
             {categories.map((each, idx) => {
               return (
-                <NextLink href={each?.slug} passHref>
+                <NextLink href={each?.slug} key={idx} passHref>
                   <a
-                    key={idx}
                     sx={{
                       cursor: "pointer",
                       display: "flex",
