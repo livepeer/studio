@@ -21,7 +21,6 @@ import { CgClose } from "react-icons/cg";
 import Code from "components/renderers/Code";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
-import clsx from "clsx";
 
 const mobileCategories = [
   {

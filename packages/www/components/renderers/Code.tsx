@@ -156,7 +156,7 @@ const Code = ({
             padding: custom ? "24px 16px 60px 24px" : "",
             position: "relative",
           }}>
-          <div sx={{ maxWidth: "100%", overflowX: "scroll" }}>
+          <div sx={{ maxWidth: "100%", overflowX: ["scroll", 'scroll', null, null] }}>
             {tokens.map((line, i) => {
               // Workaround for MDX rendering trailing lines on everything
               const lastLine = i === tokens.length - 1;

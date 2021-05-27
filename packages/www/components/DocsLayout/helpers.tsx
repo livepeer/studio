@@ -117,6 +117,7 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
           border: "1px solid #E6E6E6",
           display: "flex",
           flexDirection: "column",
+          justifyContent: 'space-between',
           borderRadius: "16px",
         }}>
         <p
@@ -254,9 +255,8 @@ const Heading = ({ children, as }: HeadingProps) => {
         }}
         aria-label="Anchor"
         href={`#${id}`}
-        className="no-index"
       />
-      <span>{children}</span>
+      {children}
     </Comp>
   );
 };
