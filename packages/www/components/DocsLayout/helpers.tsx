@@ -117,7 +117,7 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
           border: "1px solid #E6E6E6",
           display: "flex",
           flexDirection: "column",
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
           borderRadius: "16px",
         }}>
         <p
@@ -168,8 +168,8 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
         <div
           sx={{
             transition: "all 0.2s",
-            borderRadius: '16px',
-            overflow: 'hidden',
+            borderRadius: "16px",
+            overflow: "hidden",
             ":hover": {
               boxShadow:
                 "0px 2px 2px rgba(0, 0, 0, 0.2), 0px 0px 8px rgba(0, 0, 0, 0.03), 0px 30px 30px rgba(0, 0, 0, 0.02)",
@@ -240,23 +240,18 @@ const Heading = ({ children, as }: HeadingProps) => {
       id={id}>
       <a
         style={{
+          position: "absolute",
+          marginLeft: "-16px",
+          paddingRight: "8px",
           fontSize: "inherit",
           lineHeight: "inherit",
         }}
-        sx={{
-          "::before": {
-            content: '"#"',
-            position: "absolute",
-            marginLeft: "-16px",
-            paddingRight: "8px",
-            fontSize: "inherit",
-            lineHeight: "inherit",
-          },
-        }}
         aria-label="Anchor"
         href={`#${id}`}
-      />
-      {children}
+        className="no-index">
+        #
+      </a>
+      <span>{children}</span>
     </Comp>
   );
 };
