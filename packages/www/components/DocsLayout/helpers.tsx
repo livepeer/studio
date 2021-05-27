@@ -2,7 +2,6 @@ import slugify from "@sindresorhus/slugify";
 import { Grid } from "@theme-ui/components";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
 
@@ -237,16 +236,22 @@ const Heading = ({ children, as }: HeadingProps) => {
       id={id}>
       <a
         style={{
-          position: "absolute",
-          marginLeft: "-16px",
-          paddingRight: "8px",
           fontSize: "inherit",
           lineHeight: "inherit",
         }}
+        sx={{
+          "::before": {
+            content: '"#"',
+            position: "absolute",
+            marginLeft: "-16px",
+            paddingRight: "8px",
+            fontSize: "inherit",
+            lineHeight: "inherit",
+          },
+        }}
         aria-label="Anchor"
-        href={`#${id}`}>
-        #
-      </a>
+        href={`#${id}`}
+      />
       {children}
     </Comp>
   );
