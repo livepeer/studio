@@ -4,6 +4,7 @@ import { Box, Link as A } from "@theme-ui/components";
 import Logo from "components/Logo";
 import { useApi } from "hooks";
 import Link from "../Link";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
@@ -197,35 +198,36 @@ const DocsNav = ({
               justifyContent: "center",
               alignItems: "center",
             }}>
-            {categories.map((each, idx) => (
-              <div
-                key={idx}
-                onClick={() => {
-                  router.push(each?.slug);
-                }}
-                sx={{
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  mr: "32px",
-                }}>
-                <i>{each?.icon}</i>
-                <span
-                  sx={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    transition: "all 0.2s",
-                    textShadow:
-                      each?.slug === currentPath
-                        ? "0.4px 0 0 currentColor"
-                        : "",
-                    ml: "12px",
-                    color: each?.slug === currentPath ? "black" : "#828282",
-                  }}>
-                  {each.name}
-                </span>
-              </div>
-            ))}
+            {categories.map((each, idx) => {
+              return (
+                <NextLink href={each?.slug} passHref>
+                  <a
+                    key={idx}
+                    sx={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      mr: "32px",
+                    }}>
+                    <i>{each?.icon}</i>
+                    <span
+                      sx={{
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        transition: "all 0.2s",
+                        textShadow:
+                          each?.slug === currentPath
+                            ? "0.4px 0 0 currentColor"
+                            : "",
+                        ml: "12px",
+                        color: each?.slug === currentPath ? "black" : "#828282",
+                      }}>
+                      {each.name}
+                    </span>
+                  </a>
+                </NextLink>
+              );
+            })}
           </Flex>
           <i
             onClick={() => setHideTopNav(!hideTopNav)}

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Download } from "./icons";
-import { keyframes } from "@emotion/react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import { TiArrowSortedDown } from "react-icons/ti";
@@ -131,7 +130,7 @@ const Menu = ({ menu }: MenuProps) => {
               />
             }>
             {route.children.map((child, idx2) => (
-              <Link href={`/${child.slug}`} key={idx2}>
+              <Link href={`/${child.slug}`} key={idx2} passHref>
                 <a
                   sx={{
                     fontSize: "14px",
@@ -154,7 +153,7 @@ const Menu = ({ menu }: MenuProps) => {
             ))}
           </Collapsible>
         ) : (
-          <Link href={`/${route.slug}`} key={idx}>
+          <Link href={`/${route.slug}`} key={idx} passHref>
             <a
               sx={{
                 fontSize: "14px",
