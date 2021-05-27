@@ -14,18 +14,18 @@ You can integrate your streaming application directly with the Livepeer.com API.
 In this quick tutorial, you will learn how to create a unique stream object, broadcast live video content and playback your live stream with Livepeer.com.
 
 <DocsGrid cols={3}>
-    <NavigationCard href='/' title='Create a stream' label='Jump to section' />
-    <NavigationCard href='/' title='Broadcast live video using OBS' label='Jump to section' />
-    <NavigationCard href='/' title='Playback your live stream' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#create-a-stream' title='Create a stream' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#broadcast-live-video-using-obs' title='Broadcast live video using OBS' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#playback-your-live-stream' title='Playback your live stream' label='Jump to section' />
 </DocsGrid>
 
-### 1. Create a stream
+### Create a stream
 
 Login to the Livepeer.com Dashboard, and navigate to the streams list page, [livepeer.com/app/user](https://livepeer.com/app/user). Click on the Create button. When you name your stream, pick a unique name and include URL compatible characters only.
 
 Then you’ll be redirected to a detailed page with information about your new stream. Keep this page open. You will need this information for configuring OBS in step 2 and playing back your live stream in step 3.
 
-### 2. Broadcast live video using OBS
+### Broadcast live video using OBS
 
 OBS is free and open source software for live streaming. [Download and install OBS.](https://obsproject.com/download)
 
@@ -50,7 +50,7 @@ Next, let’s configure OBS to point to Livepeer.com’s RTMP ingest data center
 
 When you are ready to start your live stream, click Start Streaming in the lower right corner of OBS.
 
-### 3. Playback your live stream
+### Playback your live stream
 
 Navigate to your stream detail page in the Livepeer.com Dashboard, and copy the Playback URL, `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`. The playback URL is an M3U8 file, the basis for the HTTP Live Streaming (HLS) format.
 
