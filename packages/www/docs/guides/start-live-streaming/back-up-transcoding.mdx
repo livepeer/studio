@@ -11,7 +11,7 @@ These globally-optimized URLs are the best option for nearly all Livepeer.com us
 - Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
 - Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
 
-## Back-up Transcoding with Regional ingest and playback URLs
+## Back-up transcoding with regional ingest and playback URLs
 
 To leverage back-up transcoding, you will need to create two streams, each with a unique `streamKey`. Then instead of streaming into the global ingest URL above, you’ll point one stream towards a specific region’s ingest datacenter and the other stream towards a different region’s ingest data center.
 
@@ -22,7 +22,7 @@ While more control can be helpful, there are downsides to forgoing the global in
 
 If you decide to opt out of the global ingest and playback URLs and use regional URL pairs, here's what you need to know.
 
-1. You can not use the same `streamKey` to connect to multiple regional ingest URLs simultaneously. For simultaneous, back-up stream transcoding, create multiple unique stream keys.
+1. You can not use the same stream key to connect to multiple regional ingest URLs simultaneously. For simultaneous, back-up stream transcoding, create multiple unique stream keys.
 2. Stream into: `rtmp://{region-X}-rtmp.livepeer.com/live/{stream-key}`.
 3. Playback from: `https://{region-X}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
 

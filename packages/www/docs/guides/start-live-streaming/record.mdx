@@ -7,11 +7,11 @@ description: Record a Livepeer.com live stream session
 
 *Please note this beta feature is new and still being optimized. Send feedback to [help@livepeer.com](mailto:help@livepeer.com).*
 
-Recording Livepeer.com livestreams is easy.
+Recording Livepeer.com live streams is easy.
 
-- Recording is turned off by default. Recording OFF means that new sessions are not recorded.
-- Turning recording ON means that new sessions are recorded.
-- When updating this setting, note that in progress sessions will adhere to the on/off setting when the live stream began. The changed setting only applies to new stream sessions.
+- Recording is turned off by default. Recording OFF means that *new* sessions are not recorded.
+- Turning recording ON means that *new* sessions are recorded.
+- When updating this setting, note that in progress sessions will adhere to the on/off setting when the live stream began. The changed setting only applies to *new* stream sessions.
 - The adaptive bitrate (ABR) settings for the recording are inherited from the transcoding profiles set for the livestream. At this time you cannot set recording-specific ABR settings.
 - Recording playback is delivered via Livepeer.com's CDN by default.
 
@@ -86,6 +86,7 @@ https://livepeer.com/api/stream
 ```
 
 **`PATCH /stream/{id}/record` to turn on/off recording for an existing asset**
+
 Turn recording on. All new sessions will be recorded. In progress sessions will not be recorded.
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
