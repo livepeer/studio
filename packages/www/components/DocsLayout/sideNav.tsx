@@ -207,6 +207,7 @@ const SideNav = ({
     <div
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
+        overflowY: 'auto',
         display: ["none", "none", "flex", "flex"],
         justifyContent: "space-between",
         position: "sticky",
