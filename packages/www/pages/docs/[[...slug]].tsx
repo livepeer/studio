@@ -192,7 +192,7 @@ const DocsIndex = ({ doc, menu }) => {
             alignItems: "flex-start",
           }}>
           <div
-            className={clsx(styles.markdown, "docs-container")}
+            className={styles.markdown}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -220,7 +220,7 @@ const DocsIndex = ({ doc, menu }) => {
                 </div>
               ))}
             </div>
-            {content}
+            <main className="docs-container">{content}</main>
           </div>
         </Container>
       </Box>
@@ -292,10 +292,7 @@ export const getStaticProps = async (context: GetStaticPathsContext) => {
   const doc = await getMdxNode("doc", context, {
     components,
     mdxOptions: {
-      remarkPlugins: [
-        require("remark-slug"),
-        require("remark-autolink-headings"),
-      ],
+      remarkPlugins: [require("remark-slug")],
     },
   });
 

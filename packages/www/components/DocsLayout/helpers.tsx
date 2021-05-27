@@ -1,3 +1,4 @@
+import slugify from "@sindresorhus/slugify";
 import { Grid } from "@theme-ui/components";
 import Image from "next/image";
 import Link from "next/link";
@@ -221,25 +222,35 @@ const DocsGrid = ({ children, cols }: GridProps) => {
 };
 
 const Heading = ({ children, as }: HeadingProps) => {
-  const id = children[0].props.href;
-  const router = useRouter();
-  const path = router?.asPath;
+  console.log(children);
+  const id = slugify(children.toString());
+  console.log(id);
+  const Comp = as;
+
   return (
-    <div sx={{ position: "relative" }}>
-      <span
-        id={id.replace("#", "")}
-        sx={{ position: "absolute", top: "-150px" }}
-      />
-      <Link href={`${path?.split("#")[0]}${id}`}>
-        {as === "h1" ? (
-          <h1 sx={{ cursor: "pointer" }}>{children}</h1>
-        ) : as === "h2" ? (
-          <h2 sx={{ cursor: "pointer" }}>{children}</h2>
-        ) : (
-          <h3 sx={{ cursor: "pointer" }}>{children}</h3>
-        )}
-      </Link>
-    </div>
+    <Comp
+      sx={{
+        scrollMarginTop: "150px",
+        position: "relative",
+        ":first-child": { a: { display: "none" } },
+        a: { opacity: 0 },
+        ":hover": { a: { opacity: 1 } },
+      }}
+      id={id}>
+      <a
+        style={{
+          position: "absolute",
+          marginLeft: "-16px",
+          paddingRight: "8px",
+          fontSize: "inherit",
+          lineHeight: "inherit",
+        }}
+        aria-label="Anchor"
+        href={`#${id}`}>
+        #
+      </a>
+      {children}
+    </Comp>
   );
 };
 
