@@ -106,6 +106,7 @@ import { Dialog, DialogContent, DialogTrigger } from "../components/Dialog";
 import { Button } from "../components/Button";
 import { Link } from "../components/Link";
 import { Promo } from "../components/Promo";
+import { Label } from "../components/Label";
 import { AppBar } from "../custom/AppBar";
 
 const StyledCross1Icon = styled(Cross1Icon, {
@@ -476,6 +477,16 @@ function Home() {
               css={{ display: "inline-flex" }}>
               <Text size="2" css={{ lineHeight: "20px" }}>
                 TextField
+              </Text>
+            </Link>
+          </Box>
+          <Box css={{ my: "$1" }}>
+            <Link
+              href="#Label"
+              variant="subtle"
+              css={{ display: "inline-flex" }}>
+              <Text size="2" css={{ lineHeight: "20px" }}>
+                Label
               </Text>
             </Link>
           </Box>
@@ -1603,6 +1614,25 @@ function Home() {
                 placeholder="Disabled value"
                 defaultValue="100"
                 disabled
+              />
+            </Flex>
+          </Container>
+        </Section>
+        <Flex css={{ jc: "center" }}>
+          <Separator size="2" />
+        </Flex>
+        <Section size="3">
+          <Container size="2">
+            <Heading id="Label" css={{ mb: "$6", scrollMarginTop: "$7" }}>
+              Label
+            </Heading>
+            <Flex direction="column" gap="2">
+              <Label htmlFor="firstName">First name</Label>
+              <TextField
+                size="2"
+                type="text"
+                id="firstName"
+                placeholder="Jane Doe"
               />
             </Flex>
           </Container>

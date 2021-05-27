@@ -2964,12 +2964,12 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
-"@modulz/design-system@npm:@adamsoffer/design-system":
+"@modulz/design-system@0.2.2":
   version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@adamsoffer/design-system/-/design-system-0.2.2.tgz#9ffdda493588791c06fe71aaf5057408ca2a4139"
-  integrity sha512-P/7LirOQRrNoLyHDejWrtxoyMIXQ33D1Y09rLyKtrMmL8pQMeiAU3UwEoTuj4pJuaf3dc13P5OoKczJjRD7A/w==
+  resolved "https://registry.yarnpkg.com/@modulz/design-system/-/design-system-0.2.2.tgz#4ad8e33f884d7738361b7c3437e947e27e165351"
+  integrity sha512-8n5CtDIPPA4Fazd72mTXDkD6NrBFXNVbbJiR8FfBJLOBGueGGyI0oG9uuE0wT8C9Dk70zTLOoupkaZKn/oPmDA==
   dependencies:
-    "@radix-ui/colors" "0.1.5"
+    "@radix-ui/colors" "0.1.7"
     "@radix-ui/react-accordion" "0.0.7"
     "@radix-ui/react-alert-dialog" "0.0.8"
     "@radix-ui/react-aspect-ratio" "^0.0.6"
@@ -3318,6 +3318,11 @@
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.5.tgz#0d207d44826ece6b5114e10f43cc36e4913f84e6"
   integrity sha512-IaQLmE+vlp7FhkaiWENwUtBKPVEO8TzZHcyIK9iNa1hBEZW6jLESM1iTbv/sJP6CLHC742Cy2kHlUNskU7TYbA==
+
+"@radix-ui/colors@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.7.tgz#055cdf104f92ae58a7d6a7f1c7327c635b90747f"
+  integrity sha512-E6+ZPQ+FFn1/NZ4c/KRvZTu9KjC/MXrbJNETYs1HKe96gyxQivPu65FkhOsRnPigvJ0YJ9ZxYGxayqDNmaC1cQ==
 
 "@radix-ui/number@0.0.1":
   version "0.0.1"
