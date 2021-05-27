@@ -14,18 +14,18 @@ You can integrate your streaming application directly with the Livepeer.com API.
 In this quick tutorial, you will learn how to create a unique stream object, broadcast live video content and playback your live stream with Livepeer.com.
 
 <DocsGrid cols={3}>
-    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#1&#46;-create-a-stream' title='Create a stream' label='Jump to section' />
-    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#2&#46;-broadcast-live-video-using-obs' title='Broadcast live video using OBS' label='Jump to section' />
-    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#3&#46;-playback-your-live-stream' title='Playback your live stream' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#create-a-stream' title='Create a stream' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#broadcast-live-video-using-obs' title='Broadcast live video using OBS' label='Jump to section' />
+    <NavigationCard href='/docs/video-guides/start-live-streaming/tutorial#playback-your-live-stream' title='Playback your live stream' label='Jump to section' />
 </DocsGrid>
 
-### 1&#46;Create a stream
+## Create a stream
 
 Login to the Livepeer.com Dashboard, and navigate to the streams list page, [livepeer.com/app/user](/app/user). Click on the Create button. When you name your stream, pick a unique name and include URL compatible characters only.
 
 Then you’ll be redirected to a detailed page with information about your new stream. Keep this page open. You will need this information for configuring OBS in step 2 and playing back your live stream in step 3.
 
-### 2&#46;Broadcast live video using OBS
+## Broadcast live video using OBS
 
 OBS is free and open source software for live streaming. [Download and install OBS.](https://obsproject.com/download)
 
@@ -43,14 +43,16 @@ Next, let’s configure OBS to point to Livepeer.com’s RTMP ingest data center
 2. At the top, select Custom from the Service dropdown menu.
 3. Input `rtmp://rtmp.livepeer.com/live` in the Server text field.
 4. Navigate to the stream detail page, click the “Show secret stream key” button, and copy the stream key 
-   ![Livepeer.com Dashboard secret stream key button](/img/docs/secret-stream-key.png)
+
+    ![Livepeer.com Dashboard secret stream key button](/img/docs/secret-stream-key.png)
+    
 5. Navigate back to OBS, and paste your stream key into the Stream Key text field
 6. Confirm the Use Authentication checkbox is unchecked.
 7. Click OK in the lower right corner to save your updated server and keyframe interval settings.
 
 When you are ready to start your live stream, click Start Streaming in the lower right corner of OBS.
 
-### 3&#46;Playback your live stream
+## Playback your live stream
 
 Navigate to your stream detail page in the Livepeer.com Dashboard, and copy the Playback URL, `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`. The playback URL is an M3U8 file, the basis for the HTTP Live Streaming (HLS) format.
 
