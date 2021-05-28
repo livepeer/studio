@@ -96,6 +96,11 @@ const Menu = ({ menu }: MenuProps) => {
   const currentPath = router.asPath
     .split("#")[0]
     .split("/")
+    .slice(0, 5)
+    .join("/");
+  const currentPathSection = router.asPath
+    .split("#")[0]
+    .split("/")
     .slice(0, 4)
     .join("/");
 
@@ -126,7 +131,7 @@ const Menu = ({ menu }: MenuProps) => {
               <Trigger
                 isOpen={route.title === currentSection}
                 label={route.title}
-                isSelected={currentPath === `/${route.slug}`}
+                isSelected={currentPathSection === `/${route.slug}`}
               />
             }>
             {route.children.map((child, idx2) => (
@@ -136,9 +141,7 @@ const Menu = ({ menu }: MenuProps) => {
                     fontSize: "14px",
                     letterSpacing: "-0.02em",
                     color:
-                      router.asPath === `/${child.slug}`
-                        ? "#943CFF"
-                        : "#777777",
+                      currentPath === `/${child.slug}` ? "#943CFF" : "#777777",
                     ml: "48px !important",
                     mt: "16px !important",
                     transition: "all 0.2s",
@@ -207,7 +210,7 @@ const SideNav = ({
     <div
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
-        overflowY: 'auto',
+        overflowY: "auto",
         display: ["none", "none", "flex", "flex"],
         justifyContent: "space-between",
         position: "sticky",
