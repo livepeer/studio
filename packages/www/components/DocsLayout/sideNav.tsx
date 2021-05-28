@@ -122,7 +122,8 @@ const Menu = ({ menu }: MenuProps) => {
                 : setCurrentSection(route.title)
             }
             open={
-              currentSection === route.title || currentPath === `/${route.slug}`
+              currentSection === route.title ||
+              currentPathSection === `/${route.slug}`
             }
             transitionTime={200}
             sx={{ background: "none", mt: "16px" }}
