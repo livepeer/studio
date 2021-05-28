@@ -1,15 +1,6 @@
-import React from "react";
-import { Text } from "@modulz/design-system";
 import * as BaseLabel from "@radix-ui/react-label";
-import type * as Polymorphic from "@radix-ui/react-polymorphic";
+import { styled } from "../stitches.config";
 
-type LabelOwnProps = Polymorphic.OwnProps<typeof BaseLabel.Root>;
-
-type LabelComponent = Polymorphic.ForwardRefComponent<
-  Polymorphic.IntrinsicElement<typeof BaseLabel.Root>,
-  LabelOwnProps
->;
-
-export const Label = React.forwardRef((props, forwardedRef) => {
-  return <Text as={BaseLabel.Root} {...props} ref={forwardedRef} />;
-}) as LabelComponent;
+export const Label = styled(BaseLabel.Root, {
+  fontSize: "$2",
+});
