@@ -9,7 +9,9 @@ import {
   DialogTrigger,
   DialogContent,
   DialogClose,
+  TextField,
   Text,
+  Label,
   styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -329,19 +331,59 @@ const StreamsTable = ({
             <DialogTrigger
               as={Button}
               variant="violet"
-              css={{ display: "flex", align: "center" }}>
+              css={{ display: "flex", alignItems: "center" }}>
               <StyledPlusIcon /> Create stream
             </DialogTrigger>
-            <DialogContent>
-              <Text size="5" as="h6" css={{ fontWeight: 500, mb: "$3" }}>
-                Dialog Heading
-              </Text>
-              <Text size="3" as="p" css={{ lineHeight: "25px" }}>
-                There are 5 variants to choose from. Use is for positive states.
-                This is a link Traditional business literature won’t help you
-                solve it- most of that stuff is focused on life after
-                product/market fit, after the Trough of Sorrow.
-              </Text>
+            <DialogContent css={{ p: 0 }}>
+              <Box
+                css={{
+                  p: "$4",
+                  fontWeight: 500,
+                  borderBottom: "1px solid",
+                  borderColor: "$slate6",
+                }}>
+                <Text size="3" as="h6">
+                  Create a new stream
+                </Text>
+              </Box>
+
+              <Box as="form">
+                <Box
+                  css={{
+                    px: "$4",
+                    pt: "$4",
+                    pb: "$4",
+                    borderBottom: "1px solid",
+                    borderColor: "$slate6",
+                  }}>
+                  <Flex direction="column" gap="2">
+                    <Label htmlFor="firstName">Stream name</Label>
+                    <TextField
+                      size="2"
+                      type="text"
+                      id="firstName"
+                      placeholder="e.g. My First Live Stream"
+                    />
+                    <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
+                      A-Z, a-z, 0-9, -, _, ~ only
+                    </Text>
+                  </Flex>
+                  <Text size="2" as="p" css={{ mt: "$5", color: "$gray11" }}>
+                    Newly created streams are assigned a special key and RTMP
+                    ingest URL to stream into.
+                  </Text>
+                </Box>
+                <Box css={{ py: "$3", px: "$4" }}>
+                  <Flex css={{ ai: "center", jc: "flex-end" }}>
+                    <DialogClose as={Button} size="2" css={{ mr: "$2" }}>
+                      Cancel
+                    </DialogClose>
+                    <Button size="2" variant="violet">
+                      Create stream
+                    </Button>
+                  </Flex>
+                </Box>
+              </Box>
             </DialogContent>
           </Dialog>
         </Flex>
