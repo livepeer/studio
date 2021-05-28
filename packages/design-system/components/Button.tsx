@@ -47,13 +47,21 @@ export const Button = styled(DEFAULT_TAG, {
         lineHeight: "$sizes$5",
       },
       "2": {
+        borderRadius: "$1",
+        height: "$5",
+        px: "$3",
+        py: "$3",
+        fontSize: "$2",
+        lineHeight: "$sizes$6",
+      },
+      "3": {
         borderRadius: "$2",
         height: "$6",
         px: "$3",
         fontSize: "$3",
         lineHeight: "$sizes$6",
       },
-      "3": {
+      "4": {
         borderRadius: "$2",
         height: "$7",
         px: "$4",
@@ -140,7 +148,8 @@ export const Button = styled(DEFAULT_TAG, {
           boxShadow: "inset 0 0 0 1px $colors$violet8",
         },
         "&:focus": {
-          boxShadow: "inset 0 0 0 1px $colors$violet8, 0 0 0 1px $colors$blue8",
+          boxShadow:
+            "inset 0 0 0 1px $colors$violet8, 0 0 0 1px $colors$violet8",
         },
         '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
           backgroundColor: "$violet4",
