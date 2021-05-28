@@ -44,7 +44,6 @@ export {
   Heading,
   IconButton,
   Image,
-  TextField,
   Kbd,
   Menu,
   MenuCheckboxItem,
@@ -98,7 +97,7 @@ export {
   VerifiedBadge,
 } from "@modulz/design-system";
 
-// Custom components
+// Customized modulz components
 export {
   Accordion,
   AccordionButton,
@@ -116,6 +115,7 @@ export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
 export { Promo } from "./components/Promo";
 export { Label } from "./components/Label";
+export { TextField } from "./components/TextField";
 
 // Stitches
 export {

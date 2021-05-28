@@ -1479,6 +1479,7 @@ function Home() {
               <Button>Button</Button>
               <Button size="2">Button</Button>
               <Button size="3">Button</Button>
+              <Button size="4">Button</Button>
             </Flex>
             <Flex css={{ mt: "$6", gap: "$6" }}>
               <Button>Button</Button>

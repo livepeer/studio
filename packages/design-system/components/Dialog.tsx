@@ -1,8 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { css, keyframes, styled } from "../stitches.config";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { keyframes, styled } from "../stitches.config";
 import React from "react";
-import { IconButton } from "@modulz/design-system";
 
 import type * as Polymorphic from "@radix-ui/react-polymorphic";
 
@@ -58,12 +56,12 @@ export function Dialog({ children, ...props }: DialogProps) {
   );
 }
 
-const content = css({
+const StyledDialog = styled(DialogPrimitive.Content, {
   position: "fixed",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  minWidth: 200,
+  minWidth: 400,
   maxHeight: "85vh",
   padding: "$4",
   marginTop: "-5vh",
@@ -95,12 +93,6 @@ const content = css({
   },
 });
 
-const StyledCloseButton = styled(IconButton, {
-  position: "absolute",
-  top: "$2",
-  right: "$2",
-});
-
 type DialogContentOwnProps = Polymorphic.OwnProps<
   typeof DialogPrimitive.Content
 > & {
@@ -115,18 +107,11 @@ type DialogContentComponent = Polymorphic.ForwardRefComponent<
 export const DialogContent = React.forwardRef(
   ({ children, animation = "scale", ...props }: any, forwardedRef) => (
     <DialogPrimitive.Content
-      {...props}
-      className={content({ animation })}
-      ref={forwardedRef}>
+      as={StyledDialog}
+      animation={animation}
+      ref={forwardedRef}
+      {...props}>
       {children}
-      <DialogPrimitive.Close
-        as={StyledCloseButton}
-        variant="ghost"
-        css={{
-          mixBlendMode: "initial",
-        }}>
-        <Cross1Icon />
-      </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   )
 ) as DialogContentComponent;
