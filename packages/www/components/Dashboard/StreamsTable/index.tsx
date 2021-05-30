@@ -35,6 +35,7 @@ import {
   PlusIcon,
   ArrowRightIcon,
 } from "@radix-ui/react-icons";
+import CreateStream from "./CreateStream";
 
 type ProfileProps = {
   id: string;
@@ -241,7 +242,7 @@ const StreamsTable = ({
               Created by token <b>{stream.createdByTokenName}</b>
             </>
           ) : null,
-          href: `/app/stream/${stream.id}`,
+          href: `/dashboard/streams/${stream.id}`,
         },
         details: { stream },
         created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
@@ -321,71 +322,7 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          {/* <Link href="/app/stream/new-stream" passHref>
-            <Button variant="violet" css={{ display: "flex", align: "center" }}>
-              <StyledPlusIcon /> Create stream
-            </Button>
-          </Link> */}
-
-          <Dialog>
-            <DialogTrigger
-              as={Button}
-              variant="violet"
-              css={{ display: "flex", alignItems: "center" }}>
-              <StyledPlusIcon /> Create stream
-            </DialogTrigger>
-            <DialogContent css={{ p: 0 }}>
-              <Box
-                css={{
-                  p: "$4",
-                  fontWeight: 500,
-                  borderBottom: "1px solid",
-                  borderColor: "$slate6",
-                }}>
-                <Text size="3" as="h6">
-                  Create a new stream
-                </Text>
-              </Box>
-
-              <Box as="form">
-                <Box
-                  css={{
-                    px: "$4",
-                    pt: "$4",
-                    pb: "$4",
-                    borderBottom: "1px solid",
-                    borderColor: "$slate6",
-                  }}>
-                  <Flex direction="column" gap="2">
-                    <Label htmlFor="firstName">Stream name</Label>
-                    <TextField
-                      size="2"
-                      type="text"
-                      id="firstName"
-                      placeholder="e.g. My First Live Stream"
-                    />
-                    <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
-                      A-Z, a-z, 0-9, -, _, ~ only
-                    </Text>
-                  </Flex>
-                  <Text size="2" as="p" css={{ mt: "$5", color: "$gray11" }}>
-                    Newly created streams are assigned a special key and RTMP
-                    ingest URL to stream into.
-                  </Text>
-                </Box>
-                <Box css={{ py: "$3", px: "$4" }}>
-                  <Flex css={{ ai: "center", jc: "flex-end" }}>
-                    <DialogClose as={Button} size="2" css={{ mr: "$2" }}>
-                      Cancel
-                    </DialogClose>
-                    <Button size="2" variant="violet">
-                      Create stream
-                    </Button>
-                  </Flex>
-                </Box>
-              </Box>
-            </DialogContent>
-          </Dialog>
+          <CreateStream />
         </Flex>
       </Flex>
       {deleteModal && selectedStreams.length && (
@@ -415,7 +352,7 @@ const StreamsTable = ({
         justify="end"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/" passHref>
+        <Link href="/dashboard/streams" passHref>
           <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
             View all <ArrowRightIcon />
           </A>

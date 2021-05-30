@@ -34,7 +34,6 @@ const Profile = ({
       id={`profile-${id}-${i}-${name}`}
       key={`profile-${id}-${i}-${name}`}
       css={{
-        padding: "0.5em",
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",

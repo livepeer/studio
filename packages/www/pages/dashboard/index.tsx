@@ -62,7 +62,7 @@ const Dashboard = () => {
           </Flex>
         </Promo>
         <Box css={{ mb: "$8" }}>
-          <GettingStarted />
+          <GettingStarted firstName={user?.firstName} />
         </Box>
         <Box css={{ mb: "$8" }}>
           <UsageSummary />
