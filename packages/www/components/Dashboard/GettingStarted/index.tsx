@@ -7,11 +7,11 @@ import {
   Text,
 } from "@livepeer.com/design-system";
 
-const GettingStarted = () => {
+const GettingStarted = ({ firstName = "" }) => {
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Get started with Livepeer.com, Paige
+        Get started with Livepeer.com{firstName && `, ${firstName}`}
       </Heading>
       <Accordion type="single">
         <AccordionItem value="accordion-one">
