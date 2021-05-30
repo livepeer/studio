@@ -159,7 +159,7 @@ const UsageSummary = () => {
             usage &&
             (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
           }
-          limit={!products[user.stripeProductId].order ? 1000 : false}
+          limit={!products[user.stripeProductId]?.order ? 1000 : false}
         />
       </Grid>
       <Flex
