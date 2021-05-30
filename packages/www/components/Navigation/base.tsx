@@ -169,7 +169,7 @@ const NavigationBase = ({
                   <Button
                     sx={{ py: "6px" }}
                     isLink
-                    href="/app/user"
+                    href="/dashboard"
                     variant="buttons.primarySmall">
                     Dashboard
                   </Button>
