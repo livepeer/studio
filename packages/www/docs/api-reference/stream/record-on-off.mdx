@@ -5,4 +5,24 @@ description: Livepeer.com API Reference | PATCH turn on/off recording
 
 # `PATCH` turn on/off recording
 
-asdf
+`PATCH /stream/{id}/record` can only modify a `stream` object. You cannot modify the `record` value on a `session` object or the historic `stream` objects with a `parentId` (stream objects representing a single live stream session).
+
+The record value is inherited by all future child `session` objects. Child session objects are read-only.
+
+### Turn recording on
+```bash
+curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{"record":true}'
+```
+
+### Turn recording off
+```bash
+curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{"record":false}'
+```
+
+A `204` no content success status response indicates the record value was updated.
