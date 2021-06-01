@@ -62,6 +62,7 @@ const RecordingUrlCell = <D extends TableData>({
             <Box>
               <A
                 variant="downloadOutline"
+                download
                 // target="_blank"
                 href={makeMP4Url(cell.value.href, "source")}
                 sx={{ p: 1 }}>
