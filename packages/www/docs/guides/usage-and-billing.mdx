@@ -5,68 +5,8 @@ description: Livepeer.com usage and billing documentation
 
 # Usage and Billing
 
-There are multiple ways to livestream with livepeer.com. 
-The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
+Login to the Livepeer.com Dashboard, and navigate to the Usage tab, [livepeer.com/app/user/usage](/app/user/usage). On this page, you can track your transcoding usage over the current billing cycle. Livepeer.com does not currently charge for stream delivery via CDN or recording storage. We’ll be sure to reach out before we start to do so.
 
-You can integrate your streaming application directly with the Livepeer.com API. 
-If you are creating a live streaming platform or application, the Livepeer.com API will best meet your needs.
+You can also view past invoices and what Livepeer.com plan you were subscribed to during that billing cycle.
 
-Or you can use the Livepeer.com dashboard to livestream without writing any code. 
-If you are doing manual broadcasts like streaming events, concerts, or webinars, you can use the Livepeer.com dashboard.
-
-Either way, the first thing you’ll need to do is [create an account on Livepeer.com](/sign-up).
-
-The next step is to visit one of these two documentation sections:
-
-<DocsGrid cols={3}>
-    <NavigationCard href='/' title='Title' label='Read here' />
-    <NavigationCard href='/' title='Title' />
-    <NavigationCard href='/' title='Title' />
-</DocsGrid>
-
-- he video is not playing in my application at all. Go to the next step
-- Second item
-- he video is not playing in my application at all. [create an account on Livepeer.com](/sign-up)
-
-### This is an h3 Title
-
-The next step is to visit one of these two documentation sections:
-
-1. First item
-2. he video is not playing in my application at all. Go to the next step
-3. [create an account on Livepeer.com](/sign-up)
-
-`code`
-
-```
-curl -X POST \
--H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
--d '{
-  "name": "test_stream",
-  "profiles": [
-    {
-      "name": "720p",
-      "bitrate": 2000000,
-      "fps": 30,
-      "width": 1280,
-      "height": 720
-    },
-    {
-      "name": "480p",
-      "bitrate": 1000000,
-      "fps": 30,
-      "width": 854,
-      "height": 480
-    },
-    {
-      "name": "360p",
-      "bitrate": 500000,
-      "fps": 30,
-      "width": 640,
-      "height": 360
-    }
-  ]
-}' \
-https://livepeer.com/api/stream
-```
+To upgrade, downgrade or change your credit card information, login to the Livepeer.com Dashboard, and navigate to the Plans tab, [livepeer.com/app/user/plans](/app/user/plans).

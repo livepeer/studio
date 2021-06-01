@@ -5,68 +5,22 @@ description: Livepeer.com API requests documentation
 
 # API Requests
 
-There are multiple ways to livestream with livepeer.com. 
-The only prerequisite for using livepeer.com is to be able to create an RTMP stream.
+The Livepeer.com API is a video live streaming API. With the Livepeer.com API, you or the client can configure details for live broadcasting software, generate a playback URL for stream viewers, get usage data about your stream sessions and more. Explore the [Livepeer.com API reference](/docs/api-reference) for more information.
 
-You can integrate your streaming application directly with the Livepeer.com API. 
-If you are creating a live streaming platform or application, the Livepeer.com API will best meet your needs.
+The Livepeer.com API base url is `https://livepeer.com/api/`. As you make requests, the Livepeer.com API returns JSON responses.
 
-Or you can use the Livepeer.com dashboard to livestream without writing any code. 
-If you are doing manual broadcasts like streaming events, concerts, or webinars, you can use the Livepeer.com dashboard.
+## Authentication
+The Livepeer.com API uses API keys to authenticate most requests, including all requests associated with creating and retrieving a stream or session object.
 
-Either way, the first thing you’ll need to do is [create an account on Livepeer.com](/sign-up).
-
-The next step is to visit one of these two documentation sections:
-
-<DocsGrid cols={3}>
-    <NavigationCard href='/' title='Title' label='Read here' />
-    <NavigationCard href='/' title='Title' />
-    <NavigationCard href='/' title='Title' />
-</DocsGrid>
-
-- he video is not playing in my application at all. Go to the next step
-- Second item
-- he video is not playing in my application at all. [create an account on Livepeer.com](/sign-up)
-
-### This is an h3 Title
-
-The next step is to visit one of these two documentation sections:
-
-1. First item
-2. he video is not playing in my application at all. Go to the next step
-3. [create an account on Livepeer.com](/sign-up)
-
-`code`
-
+The Livepeer.com API uses Bearer authentication. You or the client must send an API key in the Authorization header when making requests to protected information:
+```bash
+Authorization: Bearer <api-key>
 ```
-curl -X POST \
--H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
--d '{
-  "name": "test_stream",
-  "profiles": [
-    {
-      "name": "720p",
-      "bitrate": 2000000,
-      "fps": 30,
-      "width": 1280,
-      "height": 720
-    },
-    {
-      "name": "480p",
-      "bitrate": 1000000,
-      "fps": 30,
-      "width": 854,
-      "height": 480
-    },
-    {
-      "name": "360p",
-      "bitrate": 500000,
-      "fps": 30,
-      "width": 640,
-      "height": 360
-    }
-  ]
-}' \
-https://livepeer.com/api/stream
-```
+All API requests must be made over HTTPS. API requests without proper authentication will fail.
+
+## Errors
+The Livepeer.com API uses conventional HTTP status codes.
+
+`2XX` = success
+`4XX` = client error, problem with information provided
+`5XX` = internal server error, problem with Livepeer servers

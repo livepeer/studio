@@ -5,4 +5,38 @@ description: Livepeer.com per stream metrics
 
 # Per stream metrics
 
-asdf
+If you are operating a live-streaming or user generated content platform, you will want to know the total duration of the "parent" stream object and the duration of a "child" stream session.
+
+## sourceSegmentsDuration
+
+The value of sourceSegmentsDuration returned is the duration in seconds of the asset source processed by Livepeer.com. On the parent stream object, this value equates to the total amount of source video ingested by Livepeer.com all time. On the session object, this value is the length of the live stream session (or the session recording). 
+
+**`GET /stream/{id}` to retrieve a stream object**
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{id}"
+```
+
+**GET /session/{id} to retrieve a session object**
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/session/{id}"
+```
+
+200 OK example response
+```bash
+{
+    "name":"test_stream",
+    "id":"ijkl61f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "createdAt":1596081229373,
+    "streamKey":"abcd-uimq-jtgy-x98v",
+    "playbackId":"efghb2mxupongp5k",
+    "isActive":"true",
+    "lastSeen":1596119750455",
+    "sourceSegments":1360,
+    "transcodedSegments":5480,
+    "sourceSegmentsDuration":2630.53200000000004,
+    "transcodedSegmentsDuration":10620.1280000000004,
+    {other asset object keys, like profiles and parentId}
+}
+```
