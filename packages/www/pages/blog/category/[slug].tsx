@@ -16,7 +16,7 @@ export async function getStaticPaths() {
     paths.push({ params: { slug: category.slug.current } });
   }
   return {
-    fallback: true,
+    fallback: !process.env.LP_STATIC_BUILD,
     paths,
   };
 }

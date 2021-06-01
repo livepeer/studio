@@ -68,7 +68,7 @@ export async function getStaticPaths() {
     (p) => p.params.slug !== "jobs" && p.params.slug !== "team"
   );
   return {
-    fallback: true,
+    fallback: !process.env.LP_STATIC_BUILD,
     paths,
   };
 }

@@ -202,7 +202,7 @@ export async function getStaticPaths() {
     paths.push({ params: { slug: post.slug.current } });
   }
   return {
-    fallback: true,
+    fallback: !process.env.LP_STATIC_BUILD,
     paths,
   };
 }

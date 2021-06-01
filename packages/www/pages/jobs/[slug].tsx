@@ -95,7 +95,7 @@ export async function getStaticPaths() {
   let paths = [];
   allJob.map((page) => paths.push({ params: { slug: page.slug.current } }));
   return {
-    fallback: true,
+    fallback: !process.env.LP_STATIC_BUILD,
     paths,
   };
 }

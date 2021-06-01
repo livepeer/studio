@@ -10,7 +10,10 @@
     "start": "next start",
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
-    "docs-positions": "node ./generate-docs-positions.js"
+    "docs-positions": "node ./generate-docs-positions.js",
+    "docker:build": "yarn run static-export && docker build -t livepeerci/www:${DOCKER_TAG:-master} .",
+    "docker:push": "docker push livepeerci/www:${DOCKER_TAG:-master}",
+    "static-export": "export LP_STATIC_BUILD=true; next build; next export || true"
   },
   "license": "MIT",
   "dependencies": {

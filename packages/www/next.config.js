@@ -156,6 +156,16 @@ const config = {
   },
 };
 
+if (process.env.LP_STATIC_BUILD === "true") {
+  config.images = {
+    loader: "imgix",
+    path: "https://example.com/myaccount/",
+  };
+  config.env = {
+    LP_STATIC_BUILD: "true",
+  };
+}
+
 module.exports = withPlugins(
   [
     [
