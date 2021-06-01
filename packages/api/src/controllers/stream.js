@@ -185,7 +185,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 function setRecordingStatus(req, ingest, session, forceUrl) {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
-    const isReady = session.lastSeen < olderThen;
+    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady || (req.user.admin && forceUrl)) {
       session.recordingUrl = pathJoin(
@@ -631,6 +631,7 @@ app.post(
       if (session.record) {
         session.recordingStatus = "waiting";
         session.recordingUrl = "";
+        session.mp4Url = "";
       }
       await db.session.create(session);
     }
