@@ -1,5 +1,5 @@
 import { DB } from "../store/db";
-import { Queue, Webhook } from "../schema/types";
+import { Queue, Webhook, User, Stream } from "../schema/types";
 import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
 import { fetchWithTimeout, fetchWithTimeoutAndSleep } from "../util";
@@ -54,11 +54,101 @@ export default class WebhookCannon {
   retry(event) {
     event.lastInterval = this.calcBackoff(event.lastInterval);
     event.status = "pending";
-    event.reteries = event.reteries ? event.reteries + 1 : 1;
+    event.retries = event.retries ? event.retries + 1 : 1;
     this.db.queue.updateMsg(event);
   }
 
-  async storeResponse(webhook: Webhook, event: Queue, resp: Response) {
+  async _fireHook(
+    event: Queue,
+    webhook: Webhook,
+    sanitized: Stream,
+    user: User
+  ) {
+    console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
+    let ips, urlObj, isLocal;
+    try {
+      urlObj = parseUrl(webhook.url);
+      if (urlObj.host) {
+        ips = await resolver.resolve4(urlObj.hostname);
+      }
+    } catch (e) {
+      console.error("error: ", e);
+      throw e;
+    }
+
+    // This is mainly useful for local testing
+    if (user.admin) {
+      isLocal = false;
+    } else {
+      try {
+        if (ips && ips.length) {
+          isLocal = isLocalIP(ips[0]);
+        } else {
+          isLocal = true;
+        }
+      } catch (e) {
+        console.error("isLocal Error", isLocal, e);
+        throw e;
+      }
+    }
+    if (isLocal) {
+      // don't fire this webhook.
+      console.log(
+        `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`
+      );
+    } else {
+      console.log("preparing to fire webhook ", webhook.url);
+      // go ahead
+      let params = {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "user-agent": "livepeer.com",
+        },
+        timeout: WEBHOOK_TIMEOUT,
+        body: JSON.stringify({
+          id: webhook.id,
+          event: webhook.event,
+          stream: sanitized,
+        }),
+      };
+
+      try {
+        logger.info(`webhook ${webhook.id} firing`);
+        let resp = await fetchWithTimeoutAndSleep(
+          webhook.url,
+          params,
+          event.lastInterval
+        );
+        if (resp.status >= 200 && resp.status < 300) {
+          // 2xx requests are cool.
+          // all is good
+          logger.info(`webhook ${webhook.id} fired successfully`);
+          await this.storeResponse(webhook, event, resp);
+          return true;
+        }
+        console.error(
+          `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
+        );
+        await this.storeResponse(webhook, event, resp);
+        // retry
+        this.retry(event);
+        return;
+        // return !webhook.blocking;
+      } catch (e) {
+        console.log("firing error", e);
+        // return !webhook.blocking;
+        return;
+      }
+    }
+  }
+
+  async storeResponse(
+    webhook: Webhook,
+    event: Queue,
+    resp: Response,
+    duration = 0
+  ) {
     // TODO
     // store response for each time a webhook fires.
     await this.db.webhookResponse.create({
@@ -71,6 +161,9 @@ export default class WebhookCannon {
 
   async onTrigger(event: Queue) {
     if (!event) {
+      // throw new Error('onTrigger requires a Queue event!')
+      // this is fine because pop could return a null if some other client raced and picked the task
+      // faster when it got the NOTIFY call.
       return;
     }
 
@@ -85,88 +178,15 @@ export default class WebhookCannon {
     let sanitized = { ...stream };
     delete sanitized.streamKey;
 
-    let user = await this.store.get(`user/${event.userId}`);
+    let user = await this.db.user.get(`user/${event.userId}`);
 
     try {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {
-          // console.log('webhook: ', webhook)
-          console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
-          let ips, urlObj, isLocal;
           try {
-            urlObj = parseUrl(webhook.url);
-            if (urlObj.host) {
-              ips = await resolver.resolve4(urlObj.hostname);
-            }
-          } catch (e) {
-            console.error("error: ", e);
-            throw e;
-          }
-
-          // This is mainly useful for local testing
-          if (user.admin) {
-            isLocal = false;
-          } else {
-            try {
-              if (ips && ips.length) {
-                isLocal = isLocalIP(ips[0]);
-              } else {
-                isLocal = true;
-              }
-            } catch (e) {
-              console.error("isLocal Error", isLocal, e);
-              throw e;
-            }
-          }
-          if (isLocal) {
-            // don't fire this webhook.
-            console.log(
-              `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`
-            );
-          } else {
-            console.log("preparing to fire webhook ", webhook.url);
-            // go ahead
-            let params = {
-              method: "POST",
-              headers: {
-                "content-type": "application/json",
-                "user-agent": "livepeer.com",
-              },
-              timeout: WEBHOOK_TIMEOUT,
-              body: JSON.stringify({
-                id: webhook.id,
-                event: webhook.event,
-                stream: sanitized,
-              }),
-            };
-
-            try {
-              logger.info(`webhook ${webhook.id} firing`);
-              let resp = await fetchWithTimeoutAndSleep(
-                webhook.url,
-                params,
-                event.lastInterval
-              );
-              if (resp.status >= 200 && resp.status < 300) {
-                // 2xx requests are cool.
-                // all is good
-                logger.info(`webhook ${webhook.id} fired successfully`);
-                this.storeResponse(webhook, event, resp);
-                return true;
-              }
-              console.error(
-                `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
-              );
-              this.storeResponse(webhook, event, resp);
-              // retry
-              this.retry(event);
-              return;
-              // return !webhook.blocking;
-            } catch (e) {
-              console.log("firing error", e);
-              // return !webhook.blocking;
-              return;
-            }
+            await this._fireHook(event, webhook, sanitized, user);
+          } catch (error) {
+            console.log("_fireHook Error", error);
           }
         })
       );

@@ -24,7 +24,7 @@ tags:
     description: Webhooks endpoints
   - name: queue
     description: Webhooks msg queue
-  - name: webhookResponse
+  - name: webhook-response
     description: webhook client responses
 
 components:
@@ -87,7 +87,7 @@ components:
           description: Timestamp (in milliseconds)
           example: 1587667174725
 
-    webhookResponse:
+    webhook-response:
       type: object
       table: webhook_response
       required:
