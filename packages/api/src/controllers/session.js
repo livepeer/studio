@@ -102,7 +102,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   let sessions = output.map((session) => {
     if (session.record && session.recordObjectStoreId) {
-      const isReady = session.lastSeen < olderThen;
+      const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
       if (isReady || (req.user.admin && forceUrl)) {
         session.recordingUrl = getRecordingUrl(ingest, session);
@@ -175,7 +175,7 @@ app.get(
       // sending progress should prevent request timing out
       res.write(".");
       for (const stream of docs) {
-        const isReady = stream.lastSeen < olderThen;
+        const isReady = stream.lastSeen > 0 && stream.lastSeen < olderThen;
         if (!isReady) {
           continue;
         }
@@ -230,7 +230,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   const ingest = ingests && ingests.length ? ingests[0].base : "";
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId) {
-    const isReady = session.lastSeen < olderThen;
+    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady) {
       session.recordingUrl = getRecordingUrl(ingest, session);
