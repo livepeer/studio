@@ -2,8 +2,8 @@ import Router from "express/lib/router";
 import sql from "sql-template-strings";
 import { authMiddleware } from "../middleware";
 import { db } from "../store";
-import { USER_SESSION_TIMEOUT, getCombinedStats } from "./stream";
-import { makeNextHREF, parseFilters, parseOrder, pathJoin } from "./helpers";
+import { USER_SESSION_TIMEOUT, getCombinedStats, getRecordingUrl } from "./stream";
+import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 
 const app = Router();
 
@@ -35,15 +35,6 @@ const fieldsMap = {
   outgoingRate: { val: `session.data->'outgoingRate'`, type: "real" },
   recordingStatus: `session.data->'recordingStatus'`,
 };
-
-function getRecordingUrl(ingest, session, mp4 = false) {
-  return pathJoin(
-    ingest,
-    `recordings`,
-    session.lastSessionId ? session.lastSessionId : session.id,
-    mp4 ? `source.mp4` : `index.m3u8`
-  );
-}
 
 app.get("/", authMiddleware({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId } = req.query;

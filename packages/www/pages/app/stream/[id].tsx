@@ -900,7 +900,7 @@ const ID = () => {
                 Delete
               </Button>
             </Flex>
-            <StreamSessionsTable streamId={stream.id} />
+            <StreamSessionsTable streamId={stream.id} streamName={stream.name} />
           </>
         ) : notFound ? (
           <Box>Not found</Box>

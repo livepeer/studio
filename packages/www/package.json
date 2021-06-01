@@ -32,6 +32,7 @@
     "@theme-ui/components": "0.3.1",
     "@theme-ui/presets": "0.3.0",
     "date-fns": "^2.16.1",
+    "filenamify": "^4.3.0",
     "graphql": "^14.6.0",
     "graphql-request": "^1.8.2",
     "isomorphic-unfetch": "^3.0.0",
