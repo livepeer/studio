@@ -3,7 +3,7 @@ import DocsNav from "components/DocsLayout/nav";
 import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { docsPositions } from "docs-positions";
 import styles from "./docs.module.css";
 import {
@@ -21,6 +21,7 @@ import { CgClose } from "react-icons/cg";
 import Code from "components/renderers/Code";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
+import title from "title";
 
 const mobileCategories = [
   {
@@ -216,19 +217,16 @@ const DocsIndex = ({ doc, menu }) => {
                 fontSize: "12px",
                 letterSpacing: "-0.02em",
                 mb: "16px",
-              }}>
+              }}
+              className="breadcrumb">
               {breadCrumb.slice(2, 5).map((a, idx) => (
-                <div key={idx} sx={{ display: "flex", alignItems: "center" }}>
-                  <span sx={{ textTransform: "capitalize" }}>
-                    {a.split("-").join(" ")}
-                  </span>
-                  {idx < breadCrumb.length - 3 && (
-                    <span sx={{ mx: "6px" }}>/</span>
-                  )}
-                </div>
+                <Fragment key={idx}>
+                  {title(a.split("-").join(" "))}
+                  {idx < breadCrumb.length - 3 && <> / </>}
+                </Fragment>
               ))}
             </div>
-            <main className="docs-container">{content}</main>
+            <main>{content}</main>
           </div>
         </Container>
       </Box>
