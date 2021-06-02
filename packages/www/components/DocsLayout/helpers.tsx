@@ -190,7 +190,7 @@ const DocsGrid = ({ children, cols }: GridProps) => {
     <Grid
       sx={{
         gap: "24px",
-        mt: '32px',
+        mb: '56px',
         justifyItems: 'center',
         gridTemplateColumns: ["1fr", "1fr 1fr", `repeat(${cols}, 1fr)`],
       }}>

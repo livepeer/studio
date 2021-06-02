@@ -2,11 +2,10 @@ import globby from "globby";
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
 import SideNav from "components/DocsLayout/sideNav";
-import { getMdxNode, getMdxPaths } from "next-mdx/server";
-import { getTableOfContents, TableOfContents } from "next-mdx-toc";
+import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { useState } from "react";
-import styles from './docs.module.css'
+import styles from "./docs.module.css";
 import {
   NavigationCard,
   DocsPost,
@@ -74,13 +73,13 @@ const components = {
   DocsGrid,
 };
 
-const DocsIndex = ({ doc, toc }) => {
+const DocsIndex = ({ doc, menu }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
 
   const content = useHydrate(doc, {
-    components: components
+    components: components,
   });
 
   return (
@@ -124,7 +123,7 @@ const DocsIndex = ({ doc, toc }) => {
               display: "flex",
               flexDirection: "column",
               maxWidth: "768px",
-              paddingBottom: '80px'
+              paddingBottom: "80px",
             }}>
             {content}
           </div>
@@ -144,9 +143,54 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps = async (context) => {
-  const filePaths = await globby(["docs/**/*"]);
+  const posts = await getAllMdxNodes("doc");
+
+  const allSlugs = posts.map((each) => {
+    return {
+      slug: each.slug,
+      title: each.frontMatter.title,
+      description: each.frontMatter.description,
+    };
+  });
+
+  const routePaths = allSlugs.filter(
+    (each) => each.slug.split("/").length == 1
+  );
+
+  const menu = routePaths.map((each) => {
+    return {
+      slug: each.slug,
+      title: each.title,
+      description: each.description,
+      children: allSlugs
+        .filter(
+          (child) =>
+            child.slug.split("/")[0] === each.slug &&
+            child.slug.split("/").length == 2
+        )
+        .map((eachChild) => {
+          return {
+            slug: eachChild.slug,
+            title: eachChild.title,
+            description: eachChild.description,
+            children: allSlugs.filter(
+              (secondChild) =>
+                secondChild.slug.split("/")[1] === eachChild.slug.split('/')[1] &&
+                secondChild.slug.split("/").length == 3
+            ),
+          };
+        }),
+    };
+  });
+
   const doc = await getMdxNode("doc", context, {
     components: components,
+    mdxOptions: {
+      remarkPlugins: [
+        require("remark-slug"),
+        require("remark-autolink-headings"),
+      ],
+    },
   });
 
   if (!doc) {
@@ -158,7 +202,7 @@ export const getStaticProps = async (context) => {
   return {
     props: {
       doc,
-      toc: await getTableOfContents(doc),
+      menu,
     },
   };
 };

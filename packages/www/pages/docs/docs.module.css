@@ -2,10 +2,23 @@
     font-weight: bold;
     font-size: 32px;
     line-height: 40px;
+    font-weight: 700;
 
     margin-bottom: 24px;
 
     letter-spacing: -0.04em;
+}
+
+.markdown h3 {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
+
+    margin-bottom: 24px;
+
+    letter-spacing: -0.02em;
+
+    color: #202020;
 }
 
 .markdown p {
@@ -24,27 +37,41 @@
     font-size: 16px;
     line-height: 175%;
 
-    font-weight: 600;
+    font-weight: 500;
 
     letter-spacing: -0.02em;
+
+    transition: all 0.15s;
+}
+
+.markdown a:hover {
+    color: #761EE1;
 }
 
 .markdown ul, .markdown ol {
-    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
+.markdown ul li, .markdown ol li {
+    font-size: 16px;
+    line-height: 175%;
+
+    letter-spacing: -0.02em;
+
+    color: #202020;
 }
 
 .markdown ul li {
     position: relative;
-    display: flex;
-    align-items: flex-start;
     padding-left: 14px;
+    margin-left: 8px;
 }
 
 .markdown ul li::before {
     position: absolute;
     left: 0;
     content: '';
-    margin-top: 8px;
+    margin-top: 12px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -53,13 +80,15 @@
 
 .markdown ol {
     list-style: none;
-    counter-reset: my-awesome-counter;
+    display: flex;
+    flex-direction: column;
+    counter-reset: markdown-counter;
 }
 
 .markdown ol li {
-    counter-increment: my-awesome-counter;
-    display: flex;
+    counter-increment: markdown-counter;
     margin-bottom: 16px;
+    display: inline-flex;
 }
 
 .markdown ol li:last-of-type {
@@ -67,13 +96,16 @@
 }
 
 .markdown ol li::before {
-    content: "" counter(my-awesome-counter);
-    width: 24px;
-    height: 24px;
+    content: "" counter(markdown-counter);
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    margin-top: 3px;
     border: 1px solid #E6E6E6;
     font-weight: 600;
     font-size: 12px;
