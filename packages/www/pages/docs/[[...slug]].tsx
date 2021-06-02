@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
 import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";

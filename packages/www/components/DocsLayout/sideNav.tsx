@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useState, useEffect } from "react";
 import { Download } from "./icons";
 import Collapsible from "react-collapsible";

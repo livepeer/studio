@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import clsx from "clsx";
 import marked, { MarkedOptions } from "marked";
 import { useMemo } from "react";

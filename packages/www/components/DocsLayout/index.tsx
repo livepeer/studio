@@ -7,7 +7,6 @@ import TableOfContents from "../TableOfContents";
 import guides from "./guides";
 import reference from "./reference";
 import { useRouter } from "next/router";
-import DocsNav from "./nav";
 import { Tree } from "../TableOfContents";
 
 const ignoreList = [

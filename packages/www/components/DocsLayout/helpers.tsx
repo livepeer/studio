@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import slugify from "@sindresorhus/slugify";
 import { Grid } from "@theme-ui/components";
 import Image from "next/image";
