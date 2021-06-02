@@ -1,17 +1,24 @@
 ---
-title: `POST` create a stream
+title: "`POST` create a stream"
 description: Livepeer.com API Reference | POST create a stream
 ---
 
 # `POST` create a stream
 
-`POST /stream` creates a `stream` object. The configuration on this parent `stream` object is inherited by all future child `session` objects.
+`POST /stream` creates a `stream` object. The configuration on this parent
+`stream` object is inherited by all future child `session` objects.
 
-The only parameter you are required to set is the `name` of your stream, but we also highly recommend that you define the `profiles` parameter with 720p, 480p and 360p renditions.
+The only parameter you are required to set is the `name` of your stream, but we
+also highly recommend that you define the `profiles` parameter with 720p, 480p
+and 360p renditions.
 
-If you do not define transcoding rendition `profiles` when creating the `stream`, no transcoding will happen. Your playback video will have the attributes of the source stream only, will not take advantage of adaptive bitrate streaming and will likely buffer.
+If you do not define transcoding rendition `profiles` when creating the
+`stream`, no transcoding will happen. Your playback video will have the
+attributes of the source stream only, will not take advantage of adaptive
+bitrate streaming and will likely buffer.
 
 Here is an example request:
+
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
@@ -46,6 +53,7 @@ https://livepeer.com/api/stream
 ```
 
 201 Created
+
 ```bash
 {
     "name":"test_stream",
@@ -60,6 +68,3 @@ https://livepeer.com/api/stream
     {other asset object keys}
 }
 ```
-
-
-
