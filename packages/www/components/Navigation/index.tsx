@@ -12,7 +12,7 @@ type NavProps = React.ComponentProps<typeof NavigationBase>;
 const defaultNavProps: NavProps = {
   links: [
     {
-      href: "/docs/video-guides",
+      href: "/docs/guides",
       children: "Docs",
     },
     {
@@ -62,11 +62,11 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
     () => ({
       links: [
         {
-          href: "/docs/video-guides",
+          href: "/docs/guides",
           children: "Overview",
         },
         {
-          href: "/docs/video-guides",
+          href: "/docs/guides",
           children: "Guides",
         },
         {
@@ -77,17 +77,17 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
       breadcrumb: [
         {
           children: "Docs",
-          href: "/docs/video-guides",
+          href: "/docs/guides",
           mobileDropdownLinks: [
             {
               children: "Overview",
-              href: "/docs/video-guides",
+              href: "/docs/guides",
               isSelected: pathname === "/docs",
             },
             {
               children: "Guides",
               href: "/docs/vide-guides",
-              isSelected: pathname === "/docs/video-guides",
+              isSelected: pathname === "/docs/guides",
             },
             {
               children: "API Reference",

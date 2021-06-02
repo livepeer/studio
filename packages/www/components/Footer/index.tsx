@@ -26,7 +26,7 @@ const linksLists: LinksListProps[] = [
   {
     heading: "Resources",
     links: [
-      { children: "Documentation", href: "/docs/video-guides-introduction" },
+      { children: "Documentation", href: "/docs/guides" },
       { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
       { children: "Privacy Policy", href: "/privacy-policy" },

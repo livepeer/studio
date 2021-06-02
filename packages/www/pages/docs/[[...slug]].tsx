@@ -24,9 +24,9 @@ import { GetStaticPathsContext } from "next";
 
 const mobileCategories = [
   {
-    name: "Video Guides",
+    name: "Guides",
     icon: <IconVideoGuides id="mobileVideoGuides" />,
-    slug: "/docs/video-guides",
+    slug: "/docs/guides",
   },
   {
     name: "API Reference",
@@ -37,9 +37,9 @@ const mobileCategories = [
 
 const categories = [
   {
-    name: "Video Guides",
+    name: "Guides",
     icon: <IconVideoGuides />,
-    slug: "/docs/video-guides",
+    slug: "/docs/guides",
   },
   {
     name: "API Reference",

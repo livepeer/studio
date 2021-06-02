@@ -150,7 +150,7 @@ const NavigationBase = ({
                   </Link>
                 )}
                 {isDashboard && (
-                  <Link href="/docs/video-guides" variant="nav">
+                  <Link href="/docs/guides" variant="nav">
                     Docs
                   </Link>
                 )}
