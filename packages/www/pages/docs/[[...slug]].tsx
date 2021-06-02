@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import { ThemeProvider } from "lib/theme";
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
 import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
@@ -143,95 +144,97 @@ const DocsIndex = ({ doc, menu }) => {
 
   return (
     <>
-      <NextSeo {...resolvedSEO} />
-      <div
-        onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
-        sx={{
-          display: ["flex", "flex", "none", "none"],
-          position: "fixed",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 200,
-          right: "16px",
-          bottom: "80px",
-          background: "black",
-          width: "64px",
-          height: "64px",
-          borderRadius: "50%",
-          cursor: "pointer",
-        }}>
-        {mobileSideNavOpen ? (
-          <CgClose color="white" size={24} />
-        ) : (
-          <FiList color="white" size={24} />
-        )}
-      </div>
-      <Box
-        sx={{
-          display: ["flex", "flex", "grid", "grid"],
-          flexDirection: "column",
-          gridTemplateColumns: ["min-content 1fr"],
-          gridTemplateRows: "auto auto",
-        }}>
-        <DocsNav
-          hideTopNav={hideTopNav}
-          setHideTopNav={setHideTopNav}
-          categories={categories}
-          mobileCategories={mobileCategories}
-        />
-        <SideNav
-          menu={currentMenu}
-          hideTopNav={hideTopNav}
-          hideSideBar={hideSideBar}
-          setHideSideBar={setHideSideBar}
-        />
-        <MobileSideNav
-          isOpen={mobileSideNavOpen}
-          menu={currentMenu}
-          setIsOpen={setMobileSideNavOpen}
-        />
-        <Container
+      <ThemeProvider>
+        <NextSeo {...resolvedSEO} />
+        <div
+          onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
           sx={{
-            mt: hideTopNav ? "-12px" : "48px",
-            gridColumn: "1fr",
-            justifyItems: "center",
-            mx: 0,
-            transition: "all 0.2s",
-            display: "flex",
-            minWidth: "100%",
+            display: ["flex", "flex", "none", "none"],
+            position: "fixed",
+            alignItems: "center",
             justifyContent: "center",
-            alignItems: "flex-start",
+            zIndex: 200,
+            right: "16px",
+            bottom: "80px",
+            background: "black",
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            cursor: "pointer",
           }}>
-          <div
-            className={styles.markdown}
+          {mobileSideNavOpen ? (
+            <CgClose color="white" size={24} />
+          ) : (
+            <FiList color="white" size={24} />
+          )}
+        </div>
+        <Box
+          sx={{
+            display: ["flex", "flex", "grid", "grid"],
+            flexDirection: "column",
+            gridTemplateColumns: ["min-content 1fr"],
+            gridTemplateRows: "auto auto",
+          }}>
+          <DocsNav
+            hideTopNav={hideTopNav}
+            setHideTopNav={setHideTopNav}
+            categories={categories}
+            mobileCategories={mobileCategories}
+          />
+          <SideNav
+            menu={currentMenu}
+            hideTopNav={hideTopNav}
+            hideSideBar={hideSideBar}
+            setHideSideBar={setHideSideBar}
+          />
+          <MobileSideNav
+            isOpen={mobileSideNavOpen}
+            menu={currentMenu}
+            setIsOpen={setMobileSideNavOpen}
+          />
+          <Container
             sx={{
+              mt: hideTopNav ? "-12px" : "48px",
+              gridColumn: "1fr",
+              justifyItems: "center",
+              mx: 0,
+              transition: "all 0.2s",
               display: "flex",
-              flexDirection: "column",
-              width: "100%",
-              maxWidth: "768px",
-              paddingBottom: "80px",
+              minWidth: "100%",
+              justifyContent: "center",
+              alignItems: "flex-start",
             }}>
             <div
+              className={styles.markdown}
               sx={{
                 display: "flex",
-                alignItems: "center",
-                color: "#202020",
-                fontSize: "12px",
-                letterSpacing: "-0.02em",
-                mb: "16px",
-              }}
-              className="breadcrumb">
-              {breadCrumb.slice(2, 5).map((a, idx) => (
-                <Fragment key={idx}>
-                  {title(a.split("-").join(" "))}
-                  {idx < breadCrumb.length - 3 && <> / </>}
-                </Fragment>
-              ))}
+                flexDirection: "column",
+                width: "100%",
+                maxWidth: "768px",
+                paddingBottom: "80px",
+              }}>
+              <div
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#202020",
+                  fontSize: "12px",
+                  letterSpacing: "-0.02em",
+                  mb: "16px",
+                }}
+                className="breadcrumb">
+                {breadCrumb.slice(2, 5).map((a, idx) => (
+                  <Fragment key={idx}>
+                    {title(a.split("-").join(" "))}
+                    {idx < breadCrumb.length - 3 && <> / </>}
+                  </Fragment>
+                ))}
+              </div>
+              <main>{content}</main>
             </div>
-            <main>{content}</main>
-          </div>
-        </Container>
-      </Box>
+          </Container>
+        </Box>
+      </ThemeProvider>
     </>
   );
 };
