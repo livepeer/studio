@@ -69,7 +69,6 @@ const RecordingUrlCell = <D extends TableData>({
               <A
                 variant="downloadOutline"
                 download
-                // target="_blank"
                 href={makeMP4Url(cell.value.href, "source", cell.value.streamName, cell.value.createdAt)}
                 sx={{ p: 1 }}>
                 Download&nbsp;mp4&nbsp;beta
@@ -161,7 +160,7 @@ const StreamSessionsTable = ({
         id: session.id,
         recordingUrl: {
           id: session.id,
-          showMP4: user?.admin || isStaging() || isDevelopment(),
+          showMP4: true,
           profiles:
             session.recordingUrl &&
             session.recordingStatus === "ready" &&
