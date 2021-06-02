@@ -1,0 +1,81 @@
+.markdown h1 {
+    font-weight: bold;
+    font-size: 32px;
+    line-height: 40px;
+
+    margin-bottom: 24px;
+
+    letter-spacing: -0.04em;
+}
+
+.markdown p {
+    font-size: 16px;
+    line-height: 175%;
+
+    letter-spacing: -0.02em;
+
+    color: #202020;
+
+    margin-bottom: 24px;
+}
+
+.markdown a {
+    color: #943CFF;
+    font-size: 16px;
+    line-height: 175%;
+
+    font-weight: 600;
+
+    letter-spacing: -0.02em;
+}
+
+.markdown ul, .markdown ol {
+    margin-top: 48px;
+}
+
+.markdown ul li {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding-left: 14px;
+}
+
+.markdown ul li::before {
+    position: absolute;
+    left: 0;
+    content: '';
+    margin-top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: black;
+}
+
+.markdown ol {
+    list-style: none;
+    counter-reset: my-awesome-counter;
+}
+
+.markdown ol li {
+    counter-increment: my-awesome-counter;
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.markdown ol li:last-of-type {
+    margin-bottom: 0;
+}
+
+.markdown ol li::before {
+    content: "" counter(my-awesome-counter);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #E6E6E6;
+    font-weight: 600;
+    font-size: 12px;
+    margin-right: 12px;
+}

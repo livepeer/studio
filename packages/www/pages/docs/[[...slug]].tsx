@@ -1,8 +1,12 @@
-import { Grid } from "@theme-ui/components";
+import globby from "globby";
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
 import SideNav from "components/DocsLayout/sideNav";
+import { getMdxNode, getMdxPaths } from "next-mdx/server";
+import { getTableOfContents, TableOfContents } from "next-mdx-toc";
+import { useHydrate } from "next-mdx/client";
 import { useState } from "react";
+import styles from './docs.module.css'
 import {
   NavigationCard,
   DocsPost,
@@ -14,6 +18,8 @@ import {
   IconHouse,
   IconVideoGuides,
 } from "components/DocsLayout/icons";
+import { Heading } from "@theme-ui/components";
+import Link from "next/link";
 
 const mobileCategories = [
   {
@@ -45,10 +51,37 @@ const categories = [
   },
 ];
 
-const DocsIndex = () => {
+const components = {
+  h1: ({ children }) => {
+    return <Heading as="h1">{children}</Heading>;
+  },
+  h2: ({ children }) => {
+    return <Heading as="h2">{children}</Heading>;
+  },
+  h3: ({ children }) => {
+    return <Heading as="h3">{children}</Heading>;
+  },
+  a: ({ children, href }) => {
+    return (
+      <Link href={href} passHref>
+        <a>{children}</a>
+      </Link>
+    );
+  },
+  NavigationCard,
+  DocsPost,
+  SimpleCard,
+  DocsGrid,
+};
+
+const DocsIndex = ({ doc, toc }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
+
+  const content = useHydrate(doc, {
+    components: components
+  });
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -83,57 +116,17 @@ const DocsIndex = () => {
             transition: "all 0.2s",
             display: "flex",
             justifyContent: "center",
+            alignItems: "flex-start",
           }}>
           <div
+            className={styles.markdown}
             sx={{
               display: "flex",
               flexDirection: "column",
-              alignSelf: "center",
               maxWidth: "768px",
+              paddingBottom: '80px'
             }}>
-            <DocsGrid cols={2}>
-              <SimpleCard
-                title="How to live stream with the Livepeer.com API"
-                description="How to set up your integration with the Livepeer.com API."
-                href="/"
-              />
-              <SimpleCard
-                title="How to live stream with the Livepeer.com API"
-                description="How to set up your integration with the Livepeer.com API. "
-                href="/"
-                label="Read here"
-              />
-            </DocsGrid>
-            <DocsGrid cols={3}>
-              <NavigationCard
-                title="How to live stream with the Livepeer.com API"
-                href="/"
-              />
-              <NavigationCard
-                title="How to live stream with the Livepeer.com API"
-                href="/"
-                label="Read here"
-              />
-              <NavigationCard
-                title="How to live stream with the Livepeer.com API"
-                href="/"
-                label="Read here"
-              />
-            </DocsGrid>
-            <DocsGrid cols={2}>
-              <DocsPost
-                image="/img/thumbnail.png"
-                title="Start Live Streaming (no code required)"
-                description="Start to livestream with Livepeer.com"
-                href="/"
-              />
-              <DocsPost
-                image="/img/thumbnail.png"
-                title="Start Live Streaming (no code required)"
-                description="Start to livestream with Livepeer.com"
-                href="/"
-              />
-            </DocsGrid>
+            {content}
           </div>
         </Container>
       </div>
@@ -142,11 +135,32 @@ const DocsIndex = () => {
 };
 
 export const getStaticPaths = async () => {
-  return {};
+  const paths = await getMdxPaths("doc");
+  const realPaths = paths.map((a) => a.params.slug[0]);
+  return {
+    paths: paths,
+    fallback: false,
+  };
 };
 
-export const getStaticProps = async () => {
-  return {};
+export const getStaticProps = async (context) => {
+  const filePaths = await globby(["docs/**/*"]);
+  const doc = await getMdxNode("doc", context, {
+    components: components,
+  });
+
+  if (!doc) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      doc,
+      toc: await getTableOfContents(doc),
+    },
+  };
 };
 
 export default DocsIndex;
