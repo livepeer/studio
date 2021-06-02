@@ -2,14 +2,13 @@ import App from "next/app";
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import SEO from "../next-seo.config";
-import { Box } from "@theme-ui/components";
-import { Reset, ThemeProvider } from "../lib/theme";
+import { Reset } from "../lib/theme";
 import { ApiProvider } from "../hooks/use-api";
-import MarkdownProvider from "../lib/markdown-provider";
 import "shaka-player/dist/controls.css"; /* Shaka player CSS import */
 import "../css/reset.css";
 import "../css/markdown.css";
 import "../css/shaka.css";
+import "../css/algolia-docsearch.css";
 import "keen-slider/keen-slider.min.css";
 
 export default class MyApp extends App {

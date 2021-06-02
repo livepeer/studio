@@ -1,118 +1,138 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import Highlight, { defaultProps } from "prism-react-renderer";
-import theme from "prism-react-renderer/themes/vsDark";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const Code = ({ language, custom, value, children, className, ...rest }) => {
-  const [copyState, setCopyState] = useState(false);
+const Code = ({
+  language,
+  custom = true,
+  value,
+  children,
+  className,
+  ...rest
+}) => {
+  const [copied, setCopied] = useState(false);
   if (className && className.startsWith("language-")) {
     language = className.replace("language-", "");
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(children);
-    setCopyState(true);
-    setTimeout(() => {
-      setCopyState(false);
-    }, 5000);
-  };
+  const handleCopy = useCallback(() => {
+    try {
+      navigator.clipboard.writeText(children);
+      setCopied(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
-  const customTheme = {
-    plain: {
-      backgroundColor: custom ? "#3B375A" : "#9CDCFE",
-      color: custom ? "#fff" : "#1E1E1E",
-    },
-    styles: [
-      {
-        types: ["comment", "prolog", "doctype", "cdata", "punctuation"],
-        style: {
-          color: custom ? "#8782AC" : "rgb(0, 0, 128)",
-        },
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [copied]);
+
+  const theme = useMemo(() => {
+    return {
+      plain: {
+        backgroundColor: custom ? "#3B375A" : "#9CDCFE",
+        color: custom ? "#fff" : "#1E1E1E",
       },
-      {
-        types: ["namespace"],
-        style: {
-          opacity: 0.7,
+      styles: [
+        {
+          types: ["comment", "prolog", "doctype", "cdata", "punctuation"],
+          style: {
+            color: custom ? "#8782AC" : "rgb(0, 0, 128)",
+          },
         },
-      },
-      {
-        types: ["tag", "operator", "number"],
-        style: {
-          color: custom ? "#C16AB9" : "rgb(181, 206, 168)",
+        {
+          types: ["namespace"],
+          style: {
+            opacity: 0.7,
+          },
         },
-      },
-      {
-        types: ["property", "function"],
-        style: {
-          color: custom ? "#C4ED98" : "rgb(220, 220, 170)",
+        {
+          types: ["tag", "operator", "number"],
+          style: {
+            color: custom ? "#C16AB9" : "rgb(181, 206, 168)",
+          },
         },
-      },
-      {
-        types: ["tag-id", "selector", "atrule-id"],
-        style: {
-          color: custom ? "#C4ED98" : "rgb(215, 186, 125)",
+        {
+          types: ["property", "function"],
+          style: {
+            color: custom ? "#C4ED98" : "rgb(220, 220, 170)",
+          },
         },
-      },
-      {
-        types: ["attr-name"],
-        style: {
-          color: custom ? "#C4ED98" : "rgb(156, 220, 254)",
+        {
+          types: ["tag-id", "selector", "atrule-id"],
+          style: {
+            color: custom ? "#C4ED98" : "rgb(215, 186, 125)",
+          },
         },
-      },
-      {
-        types: [
-          "boolean",
-          "string",
-          "entity",
-          "url",
-          "attr-value",
-          "keyword",
-          "control",
-          "directive",
-          "unit",
-          "statement",
-          "regex",
-          "at-rule",
-          "placeholder",
-          "variable",
-        ],
-        style: {
-          color: custom ? "#C4ED98" : "rgb(206, 145, 120)",
+        {
+          types: ["attr-name"],
+          style: {
+            color: custom ? "#C4ED98" : "rgb(156, 220, 254)",
+          },
         },
-      },
-      {
-        types: ["deleted"],
-        style: {
-          textDecorationLine: "line-through",
+        {
+          types: [
+            "boolean",
+            "string",
+            "entity",
+            "url",
+            "attr-value",
+            "keyword",
+            "control",
+            "directive",
+            "unit",
+            "statement",
+            "regex",
+            "at-rule",
+            "placeholder",
+            "variable",
+          ],
+          style: {
+            color: custom ? "#C4ED98" : "rgb(206, 145, 120)",
+          },
         },
-      },
-      {
-        types: ["inserted"],
-        style: {
-          textDecorationLine: "underline",
+        {
+          types: ["deleted"],
+          style: {
+            textDecorationLine: "line-through",
+          },
         },
-      },
-      {
-        types: ["italic"],
-        style: {
-          fontStyle: "italic",
+        {
+          types: ["inserted"],
+          style: {
+            textDecorationLine: "underline",
+          },
         },
-      },
-      {
-        types: ["important", "bold"],
-        style: {
-          fontWeight: "bold",
+        {
+          types: ["italic"],
+          style: {
+            fontStyle: "italic",
+          },
         },
-      },
-      {
-        types: ["important"],
-        style: {
-          color: "#c4b9fe",
+        {
+          types: ["important", "bold"],
+          style: {
+            fontWeight: "bold",
+          },
         },
-      },
-    ],
-  };
+        {
+          types: ["important"],
+          style: {
+            color: "#c4b9fe",
+          },
+        },
+      ],
+    };
+  }, [custom]);
 
   return (
     <Highlight
@@ -121,7 +141,7 @@ const Code = ({ language, custom, value, children, className, ...rest }) => {
       code={value ?? children}
       language={language}
       // @ts-ignore
-      theme={customTheme}>
+      theme={theme}>
       {({ tokens, getLineProps, getTokenProps }) => (
         <pre
           className="codeblock-pre-container"
@@ -175,12 +195,12 @@ const Code = ({ language, custom, value, children, className, ...rest }) => {
                 fontWeight: "500",
                 letterSpacing: "-0.03em",
                 cursor: "pointer",
-                outline: 'none',
-                ':focus': {
-                  outline: 'none'
-                }
+                outline: "none",
+                ":focus": {
+                  outline: "none",
+                },
               }}>
-              {copyState ? "Copied" : "Copy"}
+              {copied ? "Copied" : "Copy"}
             </button>
           )}
         </pre>

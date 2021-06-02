@@ -1,12 +1,12 @@
 .markdown code {
-    font-size: 12px;
+  font-size: 12px;
 
-    padding: 4px;
-    font-weight: 400;
+  padding: 4px;
+  font-weight: 400;
 
-    letter-spacing: -0.03rem;
+  letter-spacing: -0.03rem;
 
-    background: #F1F1F1;
-    color: #3C3C3C !important;
-    border-radius: 4px
+  background: #f1f1f1;
+  color: #3c3c3c !important;
+  border-radius: 4px;
 }

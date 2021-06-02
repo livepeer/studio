@@ -47,7 +47,7 @@ const DocsJSONHighlighter = ({ json }: Props) => {
       sx={{
         fontSize: "14px",
         lineHeight: "24px",
-        color: 'white',
+        color: "white",
         whiteSpace: "pre-wrap",
         wordBreak: "break-word",
       }}

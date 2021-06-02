@@ -45,7 +45,6 @@ const DocsLayout = ({
 }: Props) => {
   const { pathname, asPath } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  console.log(asPath);
   pathname.includes("/docs/api")
     ? ((tree = reference), (width = 200))
     : ((tree = guides), (width = 350));
@@ -57,8 +56,7 @@ const DocsLayout = ({
           ? description
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
-      url={`https://livepeer.com${asPath}`}
-      >
+      url={`https://livepeer.com${asPath}`}>
       <Container
         sx={{
           pb: 4,

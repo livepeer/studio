@@ -65,7 +65,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           borderRadius: " 0 2px 2px 0",
         }}
       />
-      <p
+      <div
         sx={{
           fontWeight: isSelected ? "600" : "400",
           transition: "all 0.2s",
@@ -78,7 +78,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           },
         }}>
         <Marked>{label}</Marked>
-      </p>
+      </div>
       <i
         sx={{
           transform: isOpen ? "rotate(-90deg)" : "",
@@ -99,6 +99,7 @@ const Menu = ({ menu }: MenuProps) => {
     .split("/")
     .slice(0, 4)
     .join("/");
+
   return (
     <div
       sx={{
@@ -130,9 +131,8 @@ const Menu = ({ menu }: MenuProps) => {
               />
             }>
             {route.children.map((child, idx2) => (
-              <Link href={`/${child.slug}`}>
+              <Link href={`/${child.slug}`} key={idx2}>
                 <a
-                  key={idx2}
                   sx={{
                     fontSize: "14px",
                     letterSpacing: "-0.02em",
@@ -282,6 +282,7 @@ export const MobileSideNav = ({
       document.body.style.removeProperty("overflow");
     }
   }, [isOpen]);
+
   return (
     <div
       sx={{

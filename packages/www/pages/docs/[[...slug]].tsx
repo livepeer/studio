@@ -3,7 +3,7 @@ import DocsNav from "components/DocsLayout/nav";
 import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { docsPositions } from "docs-positions";
 import styles from "./docs.module.css";
 import {
@@ -19,7 +19,8 @@ import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
 import { FiList } from "react-icons/fi";
 import { CgClose } from "react-icons/cg";
 import Code from "components/renderers/Code";
-import { NextSeo } from "next-seo";
+import { NextSeo, NextSeoProps } from "next-seo";
+import { GetStaticPathsContext } from "next";
 
 const mobileCategories = [
   {
@@ -64,57 +65,73 @@ const components = {
       </Link>
     );
   },
-  code: ({ children }) => {
-    return (
-      // @ts-ignore
-      <Code custom language="json">
-        {children}
-      </Code>
-    );
-  },
+  code: Code,
   NavigationCard,
   DocsPost,
   SimpleCard,
   DocsGrid,
 };
 
+const defaultSEO: NextSeoProps = {
+  title: "Docs - Livepeer.com",
+  description: "Docs - Livepeer.com",
+  openGraph: {
+    title: "Docs - Livepeer.com",
+    description:
+      "The platform built to power video-centric UGC applications at scale.",
+    url: "https://livepeer.com/docs",
+    images: [
+      {
+        url: "https://livepeer.com/img/share-icon.png",
+        alt: "Livepeer.com",
+      },
+    ],
+  },
+};
+
 const DocsIndex = ({ doc, menu }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(mobileCategories[0]);
   const [mobileSideNavOpen, setMobileSideNavOpen] = useState(false);
   const router = useRouter();
 
-  const currentMenu = menu.filter(
-    (a) => `/${a.slug}` === router.asPath.split('#')[0].split("/").slice(0, 3).join("/")
-  );
+  const currentMenu = useMemo(() => {
+    return menu.filter(
+      (a) =>
+        `/${a.slug}` ===
+        router.asPath.split("#")[0].split("/").slice(0, 3).join("/")
+    );
+  }, [menu, router.asPath]);
 
-  const content = useHydrate(doc, {
-    components: components,
-  });
+  const content = useHydrate(doc, { components });
 
-  const breadCrumb = router.asPath.split("#")[0].split("/");
+  const breadCrumb = useMemo(() => {
+    return router.asPath.split("#")[0].split("/");
+  }, [router.asPath]);
 
-  let seo = {
-    title: "Docs - Livepeer.com",
-    description: "Docs - Livepeer.com",
-    openGraph: {
-      title: "Docs - Livepeer.com",
-      description:
-        "The platform built to power video-centric UGC applications at scale.",
-      url: "https://livepeer.com/docs",
-      images: [
-        {
-          url: "https://livepeer.com/img/share-icon.png",
-          alt: "Livepeer.com",
-        },
-      ],
-    },
-  };
+  const resolvedSEO: NextSeoProps = useMemo(() => {
+    const title = doc.frontMatter.title
+      ? `${doc.frontMatter.title} - Livepeer.com`
+      : defaultSEO.title;
+    const description = doc.frontMatter.description ?? defaultSEO.description;
+    const url = `https://livepeer.com${router.asPath}`;
+    return {
+      ...defaultSEO,
+      title,
+      description,
+      canonical: url,
+      openGraph: {
+        ...defaultSEO.openGraph,
+        title,
+        description,
+        url,
+      },
+    };
+  }, [router.asPath, doc.frontMatter]);
 
   return (
     <>
-      <NextSeo {...seo} />
+      <NextSeo {...resolvedSEO} />
       <div
         onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
         sx={{
@@ -218,7 +235,7 @@ export const getStaticPaths = async () => {
   };
 };
 
-export const getStaticProps = async (context) => {
+export const getStaticProps = async (context: GetStaticPathsContext) => {
   const posts = await getAllMdxNodes("doc");
 
   const cleanedDocsPositions = docsPositions.map((a) =>
@@ -240,7 +257,6 @@ export const getStaticProps = async (context) => {
     );
   });
 
-  
   const routePaths = sorted.filter((each) => each.slug.split("/").length <= 2);
 
   const menu = routePaths.map((each) => {
@@ -251,9 +267,10 @@ export const getStaticProps = async (context) => {
       children: sorted
         .filter(
           (child) =>
-            child.slug.split("/")[1] === each.slug.split("/")[1] &&
-            child.slug.split("/").length == 3 || child.slug.split("/")[1] === each.slug.split("/")[1] &&
-            child.slug.split("/").length === 2
+            (child.slug.split("/")[1] === each.slug.split("/")[1] &&
+              child.slug.split("/").length == 3) ||
+            (child.slug.split("/")[1] === each.slug.split("/")[1] &&
+              child.slug.split("/").length === 2)
         )
         .map((eachChild) => {
           return {
@@ -272,7 +289,7 @@ export const getStaticProps = async (context) => {
   });
 
   const doc = await getMdxNode("doc", context, {
-    components: components,
+    components,
     mdxOptions: {
       remarkPlugins: [
         require("remark-slug"),

@@ -1,5 +1,5 @@
 import { Flex } from "@theme-ui/components";
-import Button from 'components/Button'
+import Button from "components/Button";
 import { Box, Link as A } from "@theme-ui/components";
 import Logo from "components/Logo";
 import { useApi } from "hooks";
@@ -10,7 +10,7 @@ import { BiSearch } from "react-icons/bi";
 import { GoTriangleDown } from "react-icons/go";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Download } from "./icons";
-import { useHydrate } from "next-mdx/client";
+import { useDocSearch } from "components/AlgoliaDocsSearch";
 
 type DocsNavProps = {
   hideTopNav: boolean;
@@ -29,7 +29,7 @@ const DocsNav = ({
   const [loggedIn, setLoggedIn] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [closeSelect, setCloseSelect] = useState(false);
-  const { token, user, logout } = useApi();
+  const { token, logout } = useApi();
   const isDashboard = pathname.includes("/app/");
   const router = useRouter();
   const currentPath = router.asPath
@@ -52,6 +52,8 @@ const DocsNav = ({
     setCloseSelect(!closeSelect);
   };
 
+  const { SearchModal, onSearchOpen, searchButtonRef } = useDocSearch();
+
   return (
     <>
       <div
@@ -65,8 +67,8 @@ const DocsNav = ({
           bottom: 0,
           left: 0,
           background: "rgba(0, 0, 0, 0.32)",
-          visibility: selectOpen ? 'visible' : 'hidden',
-          opacity: selectOpen ? '1' : '0'
+          visibility: selectOpen ? "visible" : "hidden",
+          opacity: selectOpen ? "1" : "0",
         }}
       />
       <Box
@@ -107,7 +109,9 @@ const DocsNav = ({
                   docs
                 </p>
               </div>
-              <div
+              <button
+                onClick={onSearchOpen}
+                ref={searchButtonRef}
                 sx={{
                   display: ["none", "flex", "flex"],
                   alignItems: "center",
@@ -133,7 +137,7 @@ const DocsNav = ({
                   }}>
                   <p sx={{ fontSize: "10px" }}>⌘ K</p>
                 </div>
-              </div>
+              </button>
             </div>
             <Flex
               sx={{
@@ -324,6 +328,7 @@ const DocsNav = ({
           </DropdownMenu.Root>
         </Box>
       </Box>
+      <SearchModal />
     </>
   );
 };
