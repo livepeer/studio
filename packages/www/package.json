@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "postbuild": "next-sitemap",
-    "type-check": "tsc --pretty --noEmit"
+    "type-check": "tsc --pretty --noEmit",
+    "docs-positions": "node ./generate-docs-positions.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -35,6 +36,7 @@
     "@theme-ui/presets": "0.3.0",
     "date-fns": "^2.16.1",
     "filenamify": "^4.3.0",
+    "fs": "^0.0.1-security",
     "globby": "^11.0.3",
     "graphql": "^14.6.0",
     "graphql-request": "^1.8.2",

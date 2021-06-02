@@ -618,3 +618,11 @@ video {
   border-radius: 24px;
   margin-bottom: 16px;
 }
+
+.Collapsible__contentOuter {
+  background: white;
+}
+
+.is-open {
+  background: white;
+}

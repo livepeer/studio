@@ -1,10 +1,10 @@
-import globby from "globby";
 import { Container, Box } from "@theme-ui/components";
 import DocsNav from "components/DocsLayout/nav";
 import SideNav from "components/DocsLayout/sideNav";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { useState } from "react";
+import { docsPositions } from "docs-positions";
 import styles from "./docs.module.css";
 import {
   NavigationCard,
@@ -24,14 +24,17 @@ const mobileCategories = [
   {
     name: "Homepage",
     icon: <IconHouse id="mobileHouse" />,
+    slug: "/docs",
   },
   {
     name: "Video Guides",
     icon: <IconVideoGuides id="mobileVideoGuides" />,
+    slug: "/docs/video-guides",
   },
   {
     name: "API Reference",
     icon: <IconApiReference id="mobileApiReference" />,
+    slug: "/docs/api-reference",
   },
 ];
 
@@ -39,14 +42,17 @@ const categories = [
   {
     name: "Homepage",
     icon: <IconHouse />,
+    slug: "/docs",
   },
   {
     name: "Video Guides",
     icon: <IconVideoGuides />,
+    slug: "/docs/video-guides",
   },
   {
     name: "API Reference",
     icon: <IconApiReference />,
+    slug: "/docs/api-reference",
   },
 ];
 
@@ -83,7 +89,12 @@ const DocsIndex = ({ doc, menu }) => {
   });
 
   return (
-    <Box sx={{ display: "grid", gridTemplateColumns: 'repeat(15, 1fr)', gridTemplateRows: 'auto auto' }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(15, 1fr)",
+        gridTemplateRows: "auto auto",
+      }}>
       <DocsNav
         hideTopNav={hideTopNav}
         setHideTopNav={setHideTopNav}
@@ -93,6 +104,7 @@ const DocsIndex = ({ doc, menu }) => {
         mobileCategories={mobileCategories}
       />
       <SideNav
+        menu={menu}
         hideTopNav={hideTopNav}
         hideSideBar={hideSideBar}
         setHideSideBar={setHideSideBar}
@@ -100,8 +112,10 @@ const DocsIndex = ({ doc, menu }) => {
       <Container
         sx={{
           mt: hideTopNav ? "-12px" : "48px",
-          gridColumn: hideSideBar ? ['1 / 16', '1 / 16', '2 / 16', '2 / 16'] : ['1 / 16', '1 / 16', '5 / 16', '4 / 16'],
-          justifyItems: 'center',
+          gridColumn: hideSideBar
+            ? ["1 / 16", "1 / 16", "2 / 16", "2 / 16"]
+            : ["1 / 16", "1 / 16", "5 / 16", "4 / 16"],
+          justifyItems: "center",
           mx: 0,
           transition: "all 0.2s",
           display: "flex",
@@ -125,7 +139,6 @@ const DocsIndex = ({ doc, menu }) => {
 
 export const getStaticPaths = async () => {
   const paths = await getMdxPaths("doc");
-  const realPaths = paths.map((a) => a.params.slug[0]);
   return {
     paths: paths,
     fallback: false,
@@ -135,16 +148,27 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async (context) => {
   const posts = await getAllMdxNodes("doc");
 
+  const cleanedDocsPositions = docsPositions.map((a) =>
+    a.replace("/index.mdx", "").replace(".mdx", "")
+  );
+
   const allSlugs = posts.map((each) => {
     return {
-      slug: each.slug,
+      slug: `docs${each.slug !== "" ? `/${each.slug}` : ""}`,
       title: each.frontMatter.title,
       description: each.frontMatter.description,
     };
   });
 
-  const routePaths = allSlugs.filter(
-    (each) => each.slug.split("/").length == 1
+  const sorted = allSlugs.sort((a, b) => {
+    return (
+      cleanedDocsPositions.indexOf(a.slug) -
+      cleanedDocsPositions.indexOf(b.slug)
+    );
+  });
+
+  const routePaths = sorted.filter(
+    (each) => each.slug.split("/").length <= 2
   );
 
   const menu = routePaths.map((each) => {
@@ -152,22 +176,22 @@ export const getStaticProps = async (context) => {
       slug: each.slug,
       title: each.title,
       description: each.description,
-      children: allSlugs
+      children: sorted
         .filter(
           (child) =>
-            child.slug.split("/")[0] === each.slug &&
-            child.slug.split("/").length == 2
+            child.slug.split("/")[1] === each.slug.split('/')[1] &&
+            child.slug.split("/").length == 3
         )
         .map((eachChild) => {
           return {
             slug: eachChild.slug,
             title: eachChild.title,
             description: eachChild.description,
-            children: allSlugs.filter(
+            children: sorted.filter(
               (secondChild) =>
-                secondChild.slug.split("/")[1] ===
-                  eachChild.slug.split("/")[1] &&
-                secondChild.slug.split("/").length == 3
+                secondChild.slug.split("/")[2] ===
+                  eachChild.slug.split("/")[2] &&
+                secondChild.slug.split("/").length == 4
             ),
           };
         }),

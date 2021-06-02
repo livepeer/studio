@@ -20,9 +20,9 @@ type DocsNavProps = {
       icon: JSX.Element;
     }>
   >;
-  currentCategory: { name: string; icon: JSX.Element };
-  categories: { name: string; icon: JSX.Element }[];
-  mobileCategories: { name: string; icon: JSX.Element }[];
+  currentCategory: { name: string; icon: JSX.Element; slug: string };
+  categories: { name: string; icon: JSX.Element; slug: string }[];
+  mobileCategories: { name: string; icon: JSX.Element; slug: string }[];
 };
 
 const DocsNav = ({
