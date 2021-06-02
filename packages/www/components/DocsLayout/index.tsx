@@ -7,7 +7,7 @@ import TableOfContents from "../TableOfContents";
 import guides from "./guides";
 import reference from "./reference";
 import { useRouter } from "next/router";
-import { DocsNav } from "../Navigation";
+import DocsNav from "./nav";
 import { Tree } from "../TableOfContents";
 
 const ignoreList = [
@@ -58,7 +58,7 @@ const DocsLayout = ({
           : `An introduction to the Livepeer.com platform and how to get started creating streams.`
       }
       url={`https://livepeer.com${asPath}`}
-      customNav={<DocsNav tree={tree} />}>
+      customNav={<DocsNav />}>
       <Container
         sx={{
           pb: 4,
