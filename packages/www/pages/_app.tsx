@@ -2,7 +2,6 @@ import App from "next/app";
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import SEO from "../next-seo.config";
-import { Reset } from "../lib/theme";
 import { ApiProvider } from "../hooks/use-api";
 import "shaka-player/dist/controls.css"; /* Shaka player CSS import */
 import "../css/reset.css";
@@ -35,7 +34,6 @@ export default class MyApp extends App {
         <>
           <ApiProvider>
             <DefaultSeo {...SEO} />
-            <Reset />
             <Component {...pageProps} />
           </ApiProvider>
         </>
