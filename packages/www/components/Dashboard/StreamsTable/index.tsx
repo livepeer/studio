@@ -1,17 +1,9 @@
 import {
   Heading,
   Box,
-  Button,
   Flex,
   Link as A,
   Badge,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-  TextField,
-  Text,
-  Label,
   styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -26,7 +18,6 @@ import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import {
   RenditionDetailsCellProps,
-  RenditionsDetailsCell,
 } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
@@ -36,6 +27,7 @@ import {
   ArrowRightIcon,
 } from "@radix-ui/react-icons";
 import CreateStream from "./CreateStream";
+import FilterStream from "./FilterStream";
 
 type ProfileProps = {
   id: string;
@@ -322,6 +314,7 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
+          <FilterStream />
           <CreateStream />
         </Flex>
       </Flex>
