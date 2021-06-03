@@ -9,9 +9,9 @@ tags:
   - name: object-store
     description: Object Stores Endpoints
   - name: user
-    description: Api Token Endpoints
-  - name: api-token
     description: User Endpoints
+  - name: api-token
+    description: Api Token Endpoints
   - name: login
     description: User login
   - name: verification
