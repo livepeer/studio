@@ -47,7 +47,7 @@ curl -H 'authorization: Bearer {api-key}' \
 
 ## Return all idle live streams
 
-This example shows a decoded JSON object. But, remember that anything passed as a parameter in a `GET` request URL must be URL encoded.
+This example shows a decoded JSON object. Remember that anything passed as a parameter in a `GET` request URL must be URL encoded.
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"
