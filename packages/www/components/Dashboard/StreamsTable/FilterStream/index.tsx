@@ -1,4 +1,10 @@
-import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  TextField,
+} from "@livepeer.com/design-system";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useCallback, useState } from "react";
 import {
@@ -22,7 +28,7 @@ const filters = [
   },
   {
     name: "Created date",
-    options: ["contains", "is equal to"],
+    options: ["is equal to", "contains"],
     field: "date",
   },
   {
@@ -100,7 +106,7 @@ const StreamFilter = () => {
                         minWidth: "13px",
                         minHeight: "13px",
                         borderRadius: "4px",
-                        boxShadow: "0px 0px 2px $colors$slate",
+                        boxShadow: "0px 0px 2px #000000",
                         margin: "0px",
                         display: "flex",
                         justifyContent: "center",
@@ -128,7 +134,7 @@ const StreamFilter = () => {
                         height: "26px",
                         padding: "0px 11px",
                         borderRadius: "4px",
-                        boxShadow: "0px 0px 2px #000000",
+                        boxShadow: "inset 0 0 0 1px $colors$slate7",
                         margin: "0px",
                         display: "flex",
                         justifyContent: "center",
@@ -162,21 +168,42 @@ const StreamFilter = () => {
                       <Box
                         css={{
                           width: "100%",
-                          maxWidth: each.field === "date" ? "85px" : "100%",
+                          maxWidth: each.field === "date" ? "110px" : "100%",
                           height: "26px",
-                          padding: "0px 11px",
                           borderRadius: "4px",
-                          boxShadow: "0px 0px 2px #000000",
+                          position: "relative",
                           margin: "0px 0px 0px 11px",
                           display: "flex",
                           alignItems: "center",
                           background: "$loContrast",
                         }}>
                         {each.field === "date" && (
-                          <Flex>
+                          <Flex
+                            as="label"
+                            htmlFor={each.name}
+                            css={{
+                              zIndex: 10,
+                              position: "absolute",
+                              left: "11px",
+                            }}>
                             <CalendarIcon />
                           </Flex>
                         )}
+                        {/* @ts-ignore */}
+                        <TextField
+                          id={each.name}
+                          css={{
+                            height: "100%",
+                            width: "100%",
+                            padding:
+                              each.field === "date"
+                                ? "0px 11px 0px 30px"
+                                : "0px 11px",
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                          }}
+                        />
                       </Box>
                     </Flex>
                   </StyledPanel>
