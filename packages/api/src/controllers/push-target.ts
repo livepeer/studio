@@ -1,9 +1,10 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import { db } from "../store";
+import { ObjectStore } from "../schema/types";
 
 const app = Router();
 
@@ -19,8 +20,9 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, userId, order, filters } = req.query;
-  if (isNaN(parseInt(limit))) {
+  let { limit: limitStr, cursor, userId, order, filters } = req.query;
+  let limit = parseInt(limitStr.toString());
+  if (isNaN(limit)) {
     limit = undefined;
   }
 
@@ -32,7 +34,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     const from = `object_store left join users on object_store.data->>'userId' = users.id`;
     const [output, newCursor] = await db.objectStore.find(query, {
       limit,
-      cursor,
+      cursor: cursor.toString(),
       fields,
       from,
       order: parseOrder(fieldsMap, order),
@@ -78,7 +80,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await req.store.get(`object-store/${req.params.id}`);
+  const os = await req.store.get<ObjectStore>(`object-store/${req.params.id}`);
   if (!os) {
     res.status(404);
     return res.json({

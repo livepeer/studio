@@ -189,7 +189,7 @@ export default class Table<T extends DBObject> {
 
   async update(
     query: string | Array<SQLStatement>,
-    doc: T,
+    doc: Partial<T>,
     opts: UpdateOptions = {}
   ) {
     const { throwIfEmpty = true } = opts;
