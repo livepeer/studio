@@ -10,7 +10,7 @@ description: Record a Livepeer.com live stream session
 Recording Livepeer.com live streams is easy.
 
 - Recording is turned off by default. Recording OFF means that *new* sessions are not recorded.
-- Turning recording ON means that *new* sessions are recorded.
+- Turning recording ON means that *new* sessions are recorded. 
 - When updating this setting, note that in progress sessions will adhere to the on/off setting when the live stream began. The changed setting only applies to *new* stream sessions.
 - The adaptive bitrate (ABR) settings for the recording are inherited from the transcoding profiles set for the livestream. At this time you cannot set recording-specific ABR settings.
 - Recording playback is delivered via Livepeer.com's CDN by default.
@@ -53,6 +53,7 @@ The absence of a `record` parameter on a `stream` or `session` object is equival
 - `sourceSegmentsDuration`: This number is the duration in seconds of asset source processed. When the live stream `session` is over, this number equates to the length of the live stream `session` and recording.
 - `recordingStatus`: This boolean appears only if `record` is `true`, and it is either `ready` when the recorded live stream is available for playback or `waiting` while the livestream is still active or just recently completed.
 - `recordingUrl`: This string appears only if `record` is `true` and when `recordingStatus` changes to `ready`. It’s value is the .m3u8 URL to stream the recorded session.
+- `mp4Url` : This string appears only if `record` is `true` and when `recordingStatus` changes to `ready`.  Its value is the link to the mp4 file that represents the recording.
 
 ### Reference code examples
 
@@ -129,6 +130,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "playbackId":"efghb2mxupongp5k",
     "recordingStatus":"ready",  
     "recordingURL":"https://mdw-cdn.livepeer.monster/recordings/mnopa1c9-1775-4797-919e-40d21099d02b/index.m3u8",
+    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/mnopa1c9-1775-4797-919e-40d21099d02b/2021_05_04_02_00_31-source.mp4",
     {other asset object keys}
 }
 ```
