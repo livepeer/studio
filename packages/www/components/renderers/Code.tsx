@@ -174,7 +174,6 @@ const Code = ({
               );
             })}
           </div>
-          <textarea sx={{ display: "none" }} />
           {custom && (
             <button
               onClick={handleCopy}

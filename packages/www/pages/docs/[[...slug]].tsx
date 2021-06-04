@@ -25,6 +25,7 @@ import Code from "components/renderers/Code";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
+import { IdProvider } from "@radix-ui/react-id";
 
 const mobileCategories = [
   {
@@ -77,6 +78,11 @@ const components = {
         <a>{children}</a>
       </Link>
     );
+  },
+  table: (props) => {
+    return <div className={styles.tableContainer}>
+      <table {...props} />
+    </div>
   },
   code: Code,
   NavigationCard,
@@ -144,6 +150,7 @@ const DocsIndex = ({ doc, menu }) => {
 
   return (
     <>
+    <IdProvider>
       <ThemeProvider>
         <NextSeo {...resolvedSEO} />
         <div
@@ -235,6 +242,7 @@ const DocsIndex = ({ doc, menu }) => {
           </Container>
         </Box>
       </ThemeProvider>
+      </IdProvider>
     </>
   );
 };

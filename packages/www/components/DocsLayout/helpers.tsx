@@ -235,7 +235,7 @@ const Heading = ({ children, as }: HeadingProps) => {
       sx={{
         scrollMarginTop: "150px",
         position: "relative",
-        ":first-child": { a: { display: "none" } },
+        ":first-of-type": { a: { display: "none" } },
         a: { opacity: 0 },
         ":hover": { a: { opacity: 1 } },
       }}
