@@ -494,11 +494,13 @@ components:
           description: Livepeer-compatible push target URL (RTMP or RTMPS)
           example: rtmp://live.my-service.tv/live/secretKey
           writeOnly: true
+          format: uri
+          pattern: ^rtmps?://
         disabled:
           type: boolean
           description:
-            If true then these push target will not be used for recording even
-            if it is configured in the API command line.
+            If true then this push target will not be used for pushing even if
+            it is configured in the API command line.
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
