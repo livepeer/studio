@@ -28,19 +28,31 @@ const filters = [
   },
   {
     name: "Created date",
-    options: ["is equal to", "contains"],
+    options: ["is equal to", "is between"],
     field: "date",
   },
   {
     name: "Last active",
+    options: ["is equal to", "is between"],
+    field: "date",
   },
   {
     name: "Lifetime duration",
+    options: ["is greater than", "is less than"],
+    field: "number",
   },
 ];
 
 const StreamFilter = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [currentFilters, setCurrentFilters] = useState(
+    filters.map((filter) => {
+      return {
+        name: filter.name,
+        current: filter.options[0],
+      };
+    })
+  );
 
   const handleClear = useCallback(() => {
     setSelectedFilter("");
@@ -126,8 +138,8 @@ const StreamFilter = () => {
                     </Text>
                   </StyledButton>
                 </StyledHeader>
-                {each.options && (
-                  <StyledPanel>
+                <StyledPanel>
+                  <DropdownMenu.Root>
                     <Box
                       css={{
                         width: "100%",
@@ -141,73 +153,108 @@ const StreamFilter = () => {
                         flexDirection: "column",
                         background: "$loContrast",
                       }}>
-                      <Flex
-                        css={{
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}>
-                        <Text
-                          size="2"
-                          // @ts-ignore
-                          css={{ fontWeight: "500" }}>
-                          {each.options[0]}
-                        </Text>
-                        <Flex>
-                          <SelectIcon />
-                        </Flex>
-                      </Flex>
-                    </Box>
-                    <Flex
-                      css={{
-                        alignItems: "center",
-                        marginTop: "10px",
-                      }}>
-                      <Flex>
-                        <NextIcon />
-                      </Flex>
-                      <Box
-                        css={{
-                          width: "100%",
-                          maxWidth: each.field === "date" ? "110px" : "100%",
-                          height: "26px",
-                          borderRadius: "4px",
-                          position: "relative",
-                          margin: "0px 0px 0px 11px",
-                          display: "flex",
-                          alignItems: "center",
-                          background: "$loContrast",
-                        }}>
-                        {each.field === "date" && (
-                          <Flex
-                            as="label"
-                            htmlFor={each.name}
-                            css={{
-                              zIndex: 10,
-                              position: "absolute",
-                              left: "11px",
-                            }}>
-                            <CalendarIcon />
-                          </Flex>
-                        )}
-                        {/* @ts-ignore */}
-                        <TextField
-                          id={each.name}
+                      <DropdownMenu.Trigger as="div">
+                        <Flex
                           css={{
-                            height: "100%",
-                            width: "100%",
-                            padding:
-                              each.field === "date"
-                                ? "0px 11px 0px 30px"
-                                : "0px 11px",
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                          }}
-                        />
-                      </Box>
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}>
+                          <Text
+                            size="2"
+                            // @ts-ignore
+                            css={{ fontWeight: "500" }}>
+                            {each.options[0]}
+                          </Text>
+                          <Flex>
+                            <SelectIcon />
+                          </Flex>
+                        </Flex>
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Content
+                        align="start"
+                        sideOffset={8}
+                        alignOffset={-10}>
+                        {each.options.slice(1, 10).map((option, idx) => (
+                          <DropdownMenu.Item 
+                          // onSelect={() => {
+                          //   const currentFilter = currentFilters.filter(e => e.name === option)
+                          //   setCurrentFilters((prev) => ({...prev, currentFilter: {current: }}))
+                          // }} 
+                          key={idx}>
+                            <Box
+                              css={{
+                                width: "100%",
+                                height: "26px",
+                                padding: "0px 11px",
+                                borderRadius: "4px",
+                                boxShadow: "inset 0 0 0 1px $colors$slate7",
+                                margin: "0px",
+                                display: "flex",
+                                alignItems: "center",
+                                background: "$loContrast",
+                              }}>
+                              <Text
+                                size="2"
+                                // @ts-ignore
+                                css={{ fontWeight: "500" }}>
+                                {option}
+                              </Text>
+                            </Box>
+                          </DropdownMenu.Item>
+                        ))}
+                      </DropdownMenu.Content>
+                    </Box>
+                  </DropdownMenu.Root>
+                  <Flex
+                    css={{
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}>
+                    <Flex>
+                      <NextIcon />
                     </Flex>
-                  </StyledPanel>
-                )}
+                    <Box
+                      css={{
+                        width: "100%",
+                        maxWidth: each.field === "date" ? "110px" : "100%",
+                        height: "26px",
+                        borderRadius: "4px",
+                        position: "relative",
+                        margin: "0px 0px 0px 11px",
+                        display: "flex",
+                        alignItems: "center",
+                        background: "$loContrast",
+                      }}>
+                      {each.field === "date" && (
+                        <Flex
+                          as="label"
+                          htmlFor={each.name}
+                          css={{
+                            zIndex: 10,
+                            position: "absolute",
+                            left: "11px",
+                          }}>
+                          <CalendarIcon />
+                        </Flex>
+                      )}
+                      {/* @ts-ignore */}
+                      <TextField
+                        id={each.name}
+                        css={{
+                          height: "100%",
+                          width: "100%",
+                          padding:
+                            each.field === "date"
+                              ? "0px 11px 0px 30px"
+                              : "0px 11px",
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                        }}
+                      />
+                    </Box>
+                  </Flex>
+                </StyledPanel>
               </StyledItem>
             ))}
           </StyledAccordion>
