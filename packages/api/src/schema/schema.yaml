@@ -241,6 +241,29 @@ components:
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
           description:
             ID of object store where to which this stream was recorded
+        pushTargets:
+          type: array
+          example: [ { "id" :"PUSH123", "profile": "720p" } ]
+          description:
+            References to targets where this stream will be simulatenously pushed to
+          items:
+            type: object
+            required:
+              - id
+              - profile
+            additionalProperties: false
+            properties:
+              id:
+                type: string
+                description: ID of push target object where to push this tream
+              profile:
+                type: string
+                description:
+                  Name of transcoding profile that should be sent. Use "source"
+                  for pushing source stream data
+                minLength: 1
+                maxLength: 500
+                example: aac
         wowza:
           type: object
           required:
