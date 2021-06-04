@@ -72,17 +72,6 @@
   color: #202020;
 }
 
-.markdown ol li img,
-.markdown ul li img {
-  min-width: fit-content;
-  height: auto;
-}
-
-.markdown ol li {
-  display: grid !important;
-  grid-template-columns: min-content 1fr;
-}
-
 .markdown ul li {
   position: relative;
   padding-left: 14px;
@@ -102,15 +91,14 @@
 
 .markdown ol {
   list-style: none;
-  display: flex;
-  flex-direction: column;
   counter-reset: markdown-counter;
 }
 
 .markdown ol li {
   counter-increment: markdown-counter;
+  padding-left: 32px;
   margin-bottom: 16px;
-  display: inline-flex;
+  position: relative;
 }
 
 .markdown ol li p,
@@ -137,6 +125,8 @@
   font-weight: 600;
   font-size: 12px;
   margin-right: 12px;
+  position: absolute;
+  left: 0;
 }
 
 .markdown p code {
