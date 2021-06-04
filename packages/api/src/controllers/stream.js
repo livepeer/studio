@@ -702,6 +702,9 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     }
   }
 
+  // TODO: Validate if pushTargets are valid and that no profile has the
+  // `source` name.
+
   const doc = wowzaHydrate({
     ...req.body,
     kind: "stream",
