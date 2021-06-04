@@ -65,6 +65,7 @@ const DocsNav = ({
           display: ["flex", "none", "none"],
           height: "100vh",
           transition: "all 0.2s",
+          zIndex: 1,
           width: "100vw",
           position: "fixed",
           bottom: 0,
