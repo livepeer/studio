@@ -10,6 +10,7 @@ import {
   User,
   Webhook,
   PasswordResetToken,
+  PushTarget,
   Usage,
   Region,
   Session,
@@ -38,6 +39,7 @@ export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
+  pushTarget: Table<PushTarget>
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -102,6 +104,10 @@ export class DB {
     this.objectStore = makeTable<ObjectStore>({
       db: this,
       schema: schemas["object-store"],
+    });
+    this.pushTarget = makeTable<PushTarget>({
+      db: this,
+      schema: schemas["push-target"],
     });
     this.apiToken = makeTable<ApiToken>({
       db: this,

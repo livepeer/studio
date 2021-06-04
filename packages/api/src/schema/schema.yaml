@@ -8,6 +8,8 @@ tags:
     description: Wowza Stream Endpoints
   - name: object-store
     description: Object Stores Endpoints
+  - name: push-target
+    description: Push Target Endpoints
   - name: user
     description: User Endpoints
   - name: api-token
@@ -477,6 +479,39 @@ components:
             Timestamp (in milliseconds) at which object store object was created
           example: 1587667174725
 
+    push-target:
+      type: object
+      table: push_target
+      required:
+        - url
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        url:
+          type: string
+          description: Livepeer-compatible push target URL (RTMP or RTMPS)
+          example: rtmp://live.my-service.tv/live/secretKey
+          writeOnly: true
+        disabled:
+          type: boolean
+          description:
+            If true then these push target will not be used for recording even
+            if it is configured in the API command line.
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+        name:
+          type: string
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which push target object was created
+          example: 1587667174725
+
     api-token:
       type: object
       additionalProperties: false
@@ -914,6 +949,53 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/object-store"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /push-target:
+    tags:
+      - push-target
+    post:
+      description: Creates new push target
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: "#/components/schemas/push-target"
+
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/push-target"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+    get:
+      description: Lists existing push targets by userId
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/push-target"
         default:
           description: Error
           content:
