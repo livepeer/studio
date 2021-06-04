@@ -69,14 +69,16 @@
   letter-spacing: -0.02em;
 
   color: #202020;
-
-  display: grid !important;
-  grid-template-columns: min-content 1fr;
 }
 
 .markdown ol li img, .markdown ul li img {
   min-width: fit-content;
   height: auto;
+}
+
+.markdown ol li {
+  display: grid !important; 
+  grid-template-columns: min-content 1fr;
 }
 
 
