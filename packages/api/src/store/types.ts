@@ -1,5 +1,11 @@
+export interface FieldSpec {
+  [key: string]: any;
+  writeOnly?: boolean;
+}
+
 export interface TableSchema {
   table: string;
+  properties: Record<string, FieldSpec>;
 }
 
 export interface DBObject {

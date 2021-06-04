@@ -1,13 +1,10 @@
 import { Pool } from "pg";
 import logger from "../logger";
-import { timeout } from "../util";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import { IStore } from "../types/common";
 import schema from "../schema/schema.json";
-import { QueryArrayResult, QueryResult, QueryConfig } from "pg";
+import { QueryResult, QueryConfig } from "pg";
 import { hostname } from "os";
 import {
-  Stream,
   ObjectStore,
   ApiToken,
   User,
@@ -17,7 +14,7 @@ import {
   Region,
   Session,
 } from "../schema/types";
-import Table from "./table";
+import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions } from "./types";
@@ -31,6 +28,12 @@ interface PostgresParams {
   appName?: string;
 }
 
+type WithId<T> = T & { id: string }
+type Table<T> = BaseTable<WithId<T>>
+
+const makeTable = <T>(opts: TableOptions) =>
+  new BaseTable<WithId<T>>(opts) as Table<T>;
+
 export class DB {
   // Table objects
   stream: StreamTable;
@@ -41,6 +44,7 @@ export class DB {
   webhook: Table<Webhook>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
+  session: Table<Session>;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -95,27 +99,27 @@ export class DB {
   async makeTables() {
     const schemas = schema.components.schemas;
     this.stream = new StreamTable({ db: this, schema: schemas["stream"] });
-    this.objectStore = new Table<ObjectStore>({
+    this.objectStore = makeTable<ObjectStore>({
       db: this,
       schema: schemas["object-store"],
     });
-    this.apiToken = new Table<ApiToken>({
+    this.apiToken = makeTable<ApiToken>({
       db: this,
       schema: schemas["api-token"],
     });
-    this.user = new Table<User>({ db: this, schema: schemas["user"] });
-    this.usage = new Table<Usage>({ db: this, schema: schemas["usage"] });
-    this.webhook = new Table<Webhook>({ db: this, schema: schemas["webhook"] });
-    this.passwordResetToken = new Table<PasswordResetToken>({
+    this.user = makeTable<User>({ db: this, schema: schemas["user"] });
+    this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
+    this.webhook = makeTable<Webhook>({ db: this, schema: schemas["webhook"] });
+    this.passwordResetToken = makeTable<PasswordResetToken>({
       db: this,
       schema: schemas["password-reset-token"],
     });
 
-    this.region = new Table<Region>({ db: this, schema: schemas["region"] });
-    this.session = new Table<Session>({ db: this, schema: schemas["session"] });
+    this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
+    this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
-      ([name, schema]) => !!schema.table
+      ([name, schema]) => "table" in schema
     );
     await Promise.all(
       tables.map(([name, schema]) => {
