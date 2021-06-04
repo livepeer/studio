@@ -162,7 +162,7 @@ const DocsIndex = ({ doc, menu }) => {
             justifyContent: "center",
             zIndex: 200,
             right: "16px",
-            bottom: "80px",
+            bottom: "50px",
             background: "black",
             width: "64px",
             height: "64px",

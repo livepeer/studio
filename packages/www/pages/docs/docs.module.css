@@ -129,7 +129,7 @@
   left: 0;
 }
 
-.markdown p code {
+.markdown code {
   font-size: 12px;
 
   padding: 4px;
@@ -138,6 +138,8 @@
   letter-spacing: -0.03rem;
 
   background: #f1f1f1;
+  word-break: break-word;
+  white-space: pre-wrap;
   border-radius: 4px;
 }
 

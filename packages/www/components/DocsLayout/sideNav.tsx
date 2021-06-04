@@ -333,7 +333,8 @@ export const MobileSideNav = ({
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
           background: "white",
-          zIndex: 100,
+          overflow: 'auto',
+          zIndex: 100
         }}>
         <p
           sx={{
