@@ -14,21 +14,23 @@ type SideNavProps = {
   setHideSideBar: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+type Child = {
+  title: string;
+  description: string;
+  slug: string;
+  children: {
+    title: string;
+    description: string;
+    slug: string;
+  }[];
+};
+
 type MenuProps = {
   menu: {
     title: string;
     description: string;
     slug: string;
-    children: {
-      title: string;
-      description: string;
-      slug: string;
-      children: {
-        title: string;
-        description: string;
-        slug: string;
-      }[];
-    }[];
+    children: Child[];
   }[];
 };
 
@@ -92,6 +94,59 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
   );
 };
 
+const CollapsibleMenuItem = ({ route }: { route: Child }) => {
+  const router = useRouter();
+  const currentPath = router.asPath
+    .split("#")[0]
+    .split("/")
+    .slice(0, 5)
+    .join("/");
+  const currentPathSection = router.asPath
+    .split("#")[0]
+    .split("/")
+    .slice(0, 4)
+    .join("/");
+    
+  const [isOpen, setIsOpen] = useState(
+    currentPathSection === `/${route.slug}`
+  );
+
+  return (
+    <Collapsible
+      handleTriggerClick={() =>setIsOpen(p => !p)}
+      open={isOpen}
+      transitionTime={200}
+      sx={{ background: "none", mt: "16px" }}
+      trigger={
+        <Trigger
+          isOpen={isOpen}
+          label={route.title}
+          isSelected={currentPathSection === `/${route.slug}`}
+        />
+      }>
+      {route.children.map((child, idx2) => (
+        <Link href={`/${child.slug}`} key={idx2} passHref>
+          <a
+            sx={{
+              fontSize: "14px",
+              letterSpacing: "-0.02em",
+              color: currentPath === `/${child.slug}` ? "#943CFF" : "#777777",
+              ml: "48px !important",
+              mt: "16px !important",
+              transition: "all 0.2s",
+              cursor: "pointer",
+              ":hover": {
+                color: "#000000",
+              },
+            }}>
+            <Marked>{child.title}</Marked>
+          </a>
+        </Link>
+      ))}
+    </Collapsible>
+  );
+};
+
 const Menu = ({ menu }: MenuProps) => {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState("");
@@ -114,51 +169,7 @@ const Menu = ({ menu }: MenuProps) => {
         flexDirection: "column",
       }}>
       {menu[0]?.children.map((route, idx) =>
-        route.children.length > 0 ? (
-          <Collapsible
-            handleTriggerClick={() =>
-              currentPath === `/${route.slug}`
-                ? null
-                : currentSection === route.title
-                ? setCurrentSection(null)
-                : setCurrentSection(route.title)
-            }
-            open={
-              currentSection === route.title ||
-              currentPathSection === `/${route.slug}`
-            }
-            transitionTime={200}
-            sx={{ background: "none", mt: "16px" }}
-            key={idx}
-            trigger={
-              <Trigger
-                isOpen={route.title === currentSection}
-                label={route.title}
-                isSelected={currentPathSection === `/${route.slug}`}
-              />
-            }>
-            {route.children.map((child, idx2) => (
-              <Link href={`/${child.slug}`} key={idx2} passHref>
-                <a
-                  sx={{
-                    fontSize: "14px",
-                    letterSpacing: "-0.02em",
-                    color:
-                      currentPath === `/${child.slug}` ? "#943CFF" : "#777777",
-                    ml: "48px !important",
-                    mt: "16px !important",
-                    transition: "all 0.2s",
-                    cursor: "pointer",
-                    ":hover": {
-                      color: "#000000",
-                    },
-                  }}>
-                  <Marked>{child.title}</Marked>
-                </a>
-              </Link>
-            ))}
-          </Collapsible>
-        ) : (
+        route.children.length > 0 ? (<CollapsibleMenuItem route={route} key={idx} />) : (
           <Link href={`/${route.slug}`} key={idx} passHref>
             <a
               sx={{
