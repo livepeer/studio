@@ -333,6 +333,7 @@ export const MobileSideNav = ({
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
           background: "white",
+          paddingBottom: '120px',
           overflow: 'auto',
           zIndex: 100
         }}>
