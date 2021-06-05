@@ -16,8 +16,25 @@ the following:
    Livepeer.com `streamKey` not your stream object `name`.
 1. Server URL: Input the RTMP ingest base URL.
 1. Location or URL: Input the ingest url with the `streamKey` appended. For
-   example, if your base URL is `rtmp://{region}-rtmp.livepeer.com/live`, use
-   `rtmp:/{region}-rtmp.livepeer.com/live/streamKey`.
+   example, if your base URL is `rtmp://rtmp.livepeer.com/live`, use
+   `rtmp://rtmp.livepeer.com/live/streamKey`.
+
+You can follow
+[this guide](https://livepeer.com/blog/first-livepeer-stream-in-five-minutes)
+for more detailed information about broadcasting with OBS.
+
+### Mobile
+
+You can build a mobile broadasting application by using the
+[example React-Native app](https://github.com/livepeer/livepeer-demo-react-native)
+as a starting point.
+
+If you want to use a commercial SDK, [Streamaxia](https://www.streamaxia.com/)'s
+Android and iOS SDK has worked well with Livepeer.
+
+If you want to use an existing mobile broadcasting application,
+[Larix Broadcaster](https://softvelum.com/larix/) for Android and iOS has worked
+well with Livepeer.
 
 ### Optimization: Set keyframe intervals
 
