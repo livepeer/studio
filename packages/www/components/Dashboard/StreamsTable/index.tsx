@@ -135,7 +135,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               data-tip
               data-for={`tooltip-details-${stream.id}`}
               css={{
-                color: "$slate7",
+                color: "$mauve7",
                 cursor: "pointer",
                 ml: 1,
               }}
