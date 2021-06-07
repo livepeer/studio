@@ -10,7 +10,7 @@ type DropdownProps = {
     field: string;
   };
   setSelectedFilters: React.Dispatch<
-    SetStateAction<
+    React.SetStateAction<
       {
         name: string;
         current: string;
@@ -58,7 +58,7 @@ const DropdownFilter = ({ root, setSelectedFilters }: DropdownProps) => {
             .filter((a) => a !== currentState)
             .map((option, idx) => (
               <DropdownMenu.Item
-                onSelect={() => setSelectedFilters((prev) => ({ ...prev }))}
+                // onSelect={() => setSelectedFilters((prev) => ({ ...prev }))}
                 key={idx}>
                 <Box
                   css={{
