@@ -131,13 +131,12 @@ export default class WebhookCannon {
           `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
         );
         await this.storeResponse(webhook, event, resp);
-        // retry
-        this.retry(event);
+        // we don't retry on non 200 responses. only on timeouts
+        // this.retry(event);
         return;
-        // return !webhook.blocking;
       } catch (e) {
         console.log("firing error", e);
-        // return !webhook.blocking;
+        this.retry(event);
         return;
       }
     }
