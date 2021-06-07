@@ -1,4 +1,11 @@
-import { Box, Flex, Text, TextField } from "@livepeer.com/design-system";
+import {
+  Box,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  Flex,
+  Text,
+  TextField,
+} from "@livepeer.com/design-system";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { SelectIcon, NextIcon } from "../helpers";
 import { useState } from "react";
@@ -55,55 +62,68 @@ const ParameterSelect = ({ type }: ParameterSelectProps) => {
             </Flex>
           </Flex>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content align="start" sideOffset={8} alignOffset={-10}>
-          {options[type].map((option, i) => {
-            // const isSelected = selected.value === option.value;
-            const onSelect = () => setSelected(option);
-            switch (option.value) {
-              case "contains":
-                return (
-                  <DropdownMenu.Item key={i} onSelect={onSelect}>
-                    <Box
-                      css={{
-                        width: "100%",
-                        height: "26px",
-                        padding: "0px 11px",
-                        borderRadius: "4px",
-                        boxShadow: "inset 0 0 0 1px $colors$slate7",
-                        margin: "0px",
-                        display: "flex",
-                        alignItems: "center",
-                        background: "$loContrast",
-                      }}>
-                      <Text size="2">{option.label}</Text>
-                    </Box>
-                  </DropdownMenu.Item>
-                );
-              case "between":
-                return (
-                  <DropdownMenu.Item key={i} onSelect={onSelect}>
-                    <Box
-                      css={{
-                        width: "100%",
-                        height: "26px",
-                        padding: "0px 11px",
-                        borderRadius: "4px",
-                        boxShadow: "inset 0 0 0 1px $colors$slate7",
-                        margin: "0px",
-                        display: "flex",
-                        alignItems: "center",
-                        background: "$loContrast",
-                      }}>
-                      <Text size="2">{option.label}</Text>
-                    </Box>
-                  </DropdownMenu.Item>
-                );
+        <DropdownMenuContent align="start" sideOffset={8} alignOffset={-10}>
+          {options[type]
+            .filter((a) => a.value !== selected.value)
+            .map((option, i) => {
+              // const isSelected = selected.value === option.value;
+              const onSelect = () => setSelected(option);
+              switch (option.value) {
+                case "contains":
+                  return (
+                    <DropdownMenuItem
+                      key={i}
+                      onSelect={onSelect}
+                      css={{ padding: "0px 0px 0px 11px" }}>
+                      <Box
+                        css={
+                          {
+                            // width: "100%",
+                            // height: "26px",
+                            // padding: "0px 11px",
+                            // borderRadius: "4px",
+                            // boxShadow: "inset 0 0 0 1px $colors$slate7",
+                            // margin: "0px",
+                            // display: "flex",
+                            // alignItems: "center",
+                            // background: "$loContrast",
+                          }
+                        }>
+                        <Text size="2">{option.label}</Text>
+                      </Box>
+                    </DropdownMenuItem>
+                  );
+                case "between":
+                  return (
+                    <DropdownMenuItem
+                      key={i}
+                      onSelect={onSelect}
+                      css={{ padding: "0px 0px 0px 11px" }}>
+                      <Box
+                        css={
+                          {
+                            // width: "100%",
+                            // height: "26px",
+                            // padding: "0px 11px",
+                            // borderRadius: "4px",
+                            // boxShadow: "inset 0 0 0 1px $colors$slate7",
+                            // margin: "0px",
+                            // display: "flex",
+                            // alignItems: "center",
+                            // background: "$loContrast",
+                          }
+                        }>
+                        {option.label}
+                        {/* <Text size="2">{option.label}</Text> */}
+                      </Box>
+                    </DropdownMenuItem>
+                  );
 
-              default:
-                return null;
-            }
-          })}
-        </DropdownMenu.Content>
+                default:
+                  return null;
+              }
+            })}
+        </DropdownMenuContent>
       </Box>
     </DropdownMenu.Root>
   );
