@@ -81,6 +81,11 @@ const config = {
         permanent: false,
       },
       {
+        source: "/docs/guides/api/overview",
+        destination: "/docs/api-reference",
+        permanent: false,
+      },
+      {
         source: "/docs/guides/api/broadcast-a-live-stream",
         destination: "/docs/guides/start-live-streaming/broadcasting",
         permanent: false,
