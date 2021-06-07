@@ -7,10 +7,10 @@ import {
 } from "@livepeer.com/design-system";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useCallback, useState } from "react";
+import DropdownFilter from "./Dropdown";
 import {
   CheckIcon,
   FilterIcon,
-  SelectIcon,
   StyledAccordion,
   StyledHeader,
   StyledButton,
@@ -43,16 +43,16 @@ const filters = [
   },
 ];
 
+let currentFilters = filters.map((filter) => {
+  return {
+    name: filter.name,
+    current: filter.options[0],
+  };
+});
+
 const StreamFilter = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
-  const [currentFilters, setCurrentFilters] = useState(
-    filters.map((filter) => {
-      return {
-        name: filter.name,
-        current: filter.options[0],
-      };
-    })
-  );
+  const [selectedFilters, setSelectedFilters] = useState(currentFilters);
 
   const handleClear = useCallback(() => {
     setSelectedFilter("");
@@ -139,72 +139,10 @@ const StreamFilter = () => {
                   </StyledButton>
                 </StyledHeader>
                 <StyledPanel>
-                  <DropdownMenu.Root>
-                    <Box
-                      css={{
-                        width: "100%",
-                        height: "26px",
-                        padding: "0px 11px",
-                        borderRadius: "4px",
-                        boxShadow: "inset 0 0 0 1px $colors$slate7",
-                        margin: "0px",
-                        display: "flex",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        background: "$loContrast",
-                      }}>
-                      <DropdownMenu.Trigger as="div">
-                        <Flex
-                          css={{
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}>
-                          <Text
-                            size="2"
-                            // @ts-ignore
-                            css={{ fontWeight: "500" }}>
-                            {each.options[0]}
-                          </Text>
-                          <Flex>
-                            <SelectIcon />
-                          </Flex>
-                        </Flex>
-                      </DropdownMenu.Trigger>
-                      <DropdownMenu.Content
-                        align="start"
-                        sideOffset={8}
-                        alignOffset={-10}>
-                        {each.options.slice(1, 10).map((option, idx) => (
-                          <DropdownMenu.Item 
-                          // onSelect={() => {
-                          //   const currentFilter = currentFilters.filter(e => e.name === option)
-                          //   setCurrentFilters((prev) => ({...prev, currentFilter: {current: }}))
-                          // }} 
-                          key={idx}>
-                            <Box
-                              css={{
-                                width: "100%",
-                                height: "26px",
-                                padding: "0px 11px",
-                                borderRadius: "4px",
-                                boxShadow: "inset 0 0 0 1px $colors$slate7",
-                                margin: "0px",
-                                display: "flex",
-                                alignItems: "center",
-                                background: "$loContrast",
-                              }}>
-                              <Text
-                                size="2"
-                                // @ts-ignore
-                                css={{ fontWeight: "500" }}>
-                                {option}
-                              </Text>
-                            </Box>
-                          </DropdownMenu.Item>
-                        ))}
-                      </DropdownMenu.Content>
-                    </Box>
-                  </DropdownMenu.Root>
+                  <DropdownFilter
+                    root={each}
+                    setSelectedFilters={setSelectedFilters}
+                  />
                   <Flex
                     css={{
                       alignItems: "center",

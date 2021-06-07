@@ -1,8 +1,5 @@
-import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
 import { useTheme } from "next-themes";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Accordion from "@radix-ui/react-accordion";
-import { useCallback, useState } from "react";
 import { styled } from "@livepeer.com/design-system/stitches.config";
 
 const StyledAccordion = styled(Accordion.Root, {
