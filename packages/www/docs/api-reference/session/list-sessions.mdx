@@ -1,0 +1,39 @@
+---
+title: "`GET` a list of sessions"
+description: Livepeer.com API Reference | GET a list of sessions
+---
+
+# `GET` a list of sessions
+
+Use `/session` to a return list of sessions with the same `userId`. This will return a list of sessions created by the same Livepeer.com user.
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/session"
+```
+
+Use `/stream/{parentId}/sessions` to a return list of sessions with the same `parentId`
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{parentId}/sessions"
+```
+
+200 OK
+```bash
+[
+  {
+    "sourceSegmentsDuration":250,,
+    "id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+    "record":false,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    {other asset object keys, like createdAt and profiles}
+  {
+    "sourceSegmentsDuration":30.266,
+    "id":"bbbbbbbb-bbbb-bbbb-bbbb-bbbb",
+    "record":true,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    "recordingStatus":"ready",
+    "recordingUrl":"https://fra-cdn.livepeer.com/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
+    {other asset object keys, like createdAt and profiles}
+  }
+]
+```

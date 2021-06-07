@@ -1,0 +1,70 @@
+---
+title: "`POST` create a stream"
+description: Livepeer.com API Reference | POST create a stream
+---
+
+# `POST` create a stream
+
+`POST /stream` creates a `stream` object. The configuration on this parent
+`stream` object is inherited by all future child `session` objects.
+
+The only parameter you are required to set is the `name` of your stream, but we
+also highly recommend that you define the `profiles` parameter with 720p, 480p
+and 360p renditions.
+
+If you do not define transcoding rendition `profiles` when creating the
+`stream`, no transcoding will happen. Your playback video will have the
+attributes of the source stream only, will not take advantage of adaptive
+bitrate streaming and will likely buffer.
+
+Here is an example request:
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+  "name": "test_stream",
+  "profiles": [
+    {
+      "name": "720p",
+      "bitrate": 2000000,
+      "fps": 30,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "480p",
+      "bitrate": 1000000,
+      "fps": 30,
+      "width": 854,
+      "height": 480
+    },
+    {
+      "name": "360p",
+      "bitrate": 500000,
+      "fps": 30,
+      "width": 640,
+      "height": 360
+    }
+  ]
+}' \
+https://livepeer.com/api/stream
+```
+
+201 Created
+
+```bash
+{
+    "name":"test_stream",
+    "profiles":[
+        {"name":"720p","bitrate":2000000,"fps":30,"width":1280,"height":720},
+        {"name":"480p","bitrate":1000000,"fps":30,"width":854,"height":480}],
+        {"name":"360p","bitrate":500000,"fps":30,"width":640,"height":360}],
+    "id":"ijkl61f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "createdAt":1596081229373,
+    "streamKey":"abcd-uimq-jtgy-x98v",
+    "playbackId":"efghb2mxupongp5k",
+    {other asset object keys}
+}
+```

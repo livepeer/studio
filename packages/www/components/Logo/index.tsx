@@ -7,9 +7,10 @@ import { Flex, Link as A } from "@theme-ui/components";
 type Props = {
   logoType?: boolean;
   isDark?: boolean;
+  withoutBeta?: boolean
 };
 
-const Logo = ({ logoType = true, isDark }: Props) => (
+const Logo = ({ logoType = true, isDark, withoutBeta }: Props) => (
   <Link href="/" passHref>
     <A
       sx={{
@@ -39,7 +40,7 @@ const Logo = ({ logoType = true, isDark }: Props) => (
           Livepeer.com
         </Flex>
       )}
-      <span
+      {!withoutBeta && <span
         sx={{
           mt: "2px",
           ml: logoType ? "6px" : "10px",
@@ -52,7 +53,7 @@ const Logo = ({ logoType = true, isDark }: Props) => (
           bg: "rgb(148, 60, 255, .1)",
         }}>
         beta
-      </span>
+      </span>}
     </A>
   </Link>
 );

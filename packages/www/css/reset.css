@@ -616,5 +616,18 @@ video {
 .Collapsible {
   background: #fafafa;
   border-radius: 24px;
-  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.Collapsible__contentOuter {
+  background: white;
+}
+
+.is-open {
+  background: white;
+}
+
+.Collapsible__contentInner {
+  display: flex;
+  flex-direction: column;
 }

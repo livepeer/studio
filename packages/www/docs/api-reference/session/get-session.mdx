@@ -1,0 +1,23 @@
+---
+title: "`GET` retrieve a session"
+description: Livepeer.com API Reference | GET retrieve a session
+---
+
+# `GET` retrieve a ssession
+
+```bash```curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/session/{id}"
+```
+
+200 OK
+```bash
+{
+    "id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+    "sourceSegmentsDuration":250,
+    "record":true,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    "recordingStatus":"ready",
+    "recordingUrl":"https://cdn.livepeer.com/recordings/aaaaaaaa-aaaa-aaaa-aaaa-aaaa/index.m3u8"},
+    {other asset object keys, like createdAt and profiles}
+}
+```
