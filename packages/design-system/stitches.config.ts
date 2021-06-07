@@ -90,10 +90,10 @@ export const lightTheme = t("light-theme", {
     ...gold,
 
     // Semantic colors
-    hiContrast: "$slate12",
+    hiContrast: "$mauve12",
     loContrast: "white",
     canvas: "hsl(0 0% 93%)",
-    panel: "$slate2",
+    panel: "$mauve2",
     transparentPanel: "hsl(0 0% 0% / 97%)",
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
@@ -132,10 +132,10 @@ export const darkTheme = t("dark-theme", {
     ...goldDark,
 
     // Semantic colors
-    hiContrast: "$slate12",
-    loContrast: "$slate1",
+    hiContrast: "$mauve12",
+    loContrast: "$mauve1",
     canvas: "hsl(0 0% 15%)",
-    panel: "$slate3",
+    panel: "$mauve3",
     transparentPanel: "hsl(0 100% 100% / 97%)",
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
