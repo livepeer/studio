@@ -26,6 +26,7 @@ import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
 import { IdProvider } from "@radix-ui/react-id";
+import Head from "next/head";
 
 const mobileCategories = [
   {
@@ -80,9 +81,11 @@ const components = {
     );
   },
   table: (props) => {
-    return <div className={styles.tableContainer}>
-      <table {...props} />
-    </div>
+    return (
+      <div className={styles.tableContainer}>
+        <table {...props} />
+      </div>
+    );
   },
   code: Code,
   NavigationCard,
@@ -149,9 +152,12 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <>
     <IdProvider>
       <ThemeProvider>
+        <Head>
+          <link rel="stylesheet" href="/reset.css" />
+          <link rel="stylesheet" href="/markdown.css" />
+        </Head>
         <NextSeo {...resolvedSEO} />
         <div
           onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
@@ -242,8 +248,7 @@ const DocsIndex = ({ doc, menu }) => {
           </Container>
         </Box>
       </ThemeProvider>
-      </IdProvider>
-    </>
+    </IdProvider>
   );
 };
 
