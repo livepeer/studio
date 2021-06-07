@@ -421,7 +421,7 @@ const ID = () => {
               align="end"
               css={{
                 borderBottom: "1px solid",
-                borderColor: "$slate6",
+                borderColor: "$mauve6",
                 pb: "$3",
                 mb: "$5",
                 width: "100%",
@@ -461,7 +461,7 @@ const ID = () => {
                 <DropdownMenuTrigger as={Button}>Actions</DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuGroup>
-                    <DropdownMenuCheckboxItem checked>
+                    <DropdownMenuCheckboxItem checked={!!stream?.record}>
                       Record sessions
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem>Suspend</DropdownMenuCheckboxItem>
@@ -1007,7 +1007,7 @@ const ID = () => {
                       borderRadius: "$2",
                       overflow: "hidden",
                       position: "relative",
-                      backgroundColor: "$slate5",
+                      backgroundColor: "$mauve5",
                     }}>
                     <Badge
                       size="2"
