@@ -1,11 +1,10 @@
 import App from "next/app";
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
+import { IdProvider } from "@radix-ui/react-id";
 import SEO from "../next-seo.config";
 import { ApiProvider } from "../hooks/use-api";
 import "shaka-player/dist/controls.css"; /* Shaka player CSS import */
-import "../css/reset.css";
-import "../css/markdown.css";
 import "../css/shaka.css";
 import "../css/algolia-docsearch.css";
 import "keen-slider/keen-slider.min.css";
@@ -31,12 +30,12 @@ export default class MyApp extends App {
             rel="stylesheet"
           />
         </Head>
-        <>
+        <IdProvider>
           <ApiProvider>
             <DefaultSeo {...SEO} />
             <Component {...pageProps} />
           </ApiProvider>
-        </>
+        </IdProvider>
       </>
     );
   }
