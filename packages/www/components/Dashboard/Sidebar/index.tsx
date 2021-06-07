@@ -32,7 +32,7 @@ const Sidebar = ({ id }) => {
       css={{
         backgroundColor: "$panel",
         borderRight: "1px solid",
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
         zIndex: 10,
         maxWidth: 270,
         width: 270,

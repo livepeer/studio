@@ -245,7 +245,7 @@ const Table = <T extends Record<string, unknown>>({
                           border: 0,
                           borderBottom: "1px solid",
                           borderTop: "0",
-                          borderColor: "$slate6",
+                          borderColor: "$mauve6",
                           fontSize: "$1",
                           color: "$gray9",
                           fontWeight: 500,
@@ -320,7 +320,7 @@ const Table = <T extends Record<string, unknown>>({
                           py: "$2",
                           border: 0,
                           borderBottom: "1px solid",
-                          borderBottomColor: "$slate6",
+                          borderBottomColor: "$mauve6",
                           fontSize: "$2",
                         }}>
                         {cell.render("Cell")}

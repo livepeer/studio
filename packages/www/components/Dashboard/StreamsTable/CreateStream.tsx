@@ -42,7 +42,7 @@ const CreateStream = () => {
             p: "$4",
             fontWeight: 500,
             borderBottom: "1px solid",
-            borderColor: "$slate6",
+            borderColor: "$mauve6",
           }}>
           <Text size="4" as="h6">
             Create a new stream
@@ -108,7 +108,7 @@ const CreateStream = () => {
               pt: "$5",
               pb: "$5",
               borderBottom: "1px solid",
-              borderColor: "$slate6",
+              borderColor: "$mauve6",
             }}>
             <Flex direction="column" gap="2">
               <Label htmlFor="firstName">Stream name</Label>
