@@ -24,8 +24,6 @@ tags:
     description: Webhooks endpoints
   - name: queue
     description: Webhooks msg queue
-  - name: webhook-response
-    description: webhook client responses
 
 components:
   schemas:
@@ -33,7 +31,7 @@ components:
       type: object
       table: queue
       required:
-        - time
+        - createdAt
         - channel
         - event
         - userId
@@ -47,10 +45,11 @@ components:
           type: string
           readOnly: true
           example: queue
-        time:
+        createdAt:
           type: number
           readOnly: true
-          example: usage
+          description: Timestamp (in milliseconds)
+          example: 1587667174725
         channel:
           type: string
           readOnly: true
@@ -86,46 +85,6 @@ components:
           readOnly: true
           description: Timestamp (in milliseconds)
           example: 1587667174725
-
-    webhook-response:
-      type: object
-      table: webhook_response
-      required:
-        - webhookId
-        - eventId
-        - statusCode
-      properties:
-        id:
-          type: string
-          readOnly: true
-          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-        kind:
-          type: string
-          readOnly: true
-          example: webhookResponse
-        webhookId:
-          type: string
-          readOnly: true
-          index: true
-        eventId:
-          type: string
-          readOnly: true
-          index: true
-        createdAt:
-          type: number
-          readOnly: true
-          description:
-            Timestamp (in milliseconds) at which stream object was created
-          example: 1587667174725
-        statusCode:
-          type: number
-          default: 0
-        responseObject:
-          type: object
-          additionalProperties: true
-          properties:
-            body:
-              type: string
 
     webhook:
       type: object

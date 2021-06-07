@@ -145,6 +145,8 @@ export default class QueueTable extends Table<Queue> {
     if (!doc.status) {
       doc.status = "pending";
     }
+
+    doc.createdAt = Date.now();
     this.client = await this.db.pool.connect();
     try {
       await this.client.query("BEGIN;");
