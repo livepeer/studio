@@ -22,13 +22,15 @@ export default class QueueTable extends Table<Queue> {
   }
 
   async start() {
-    this.client = await this.db.pool.connect();
+    // this.client = await this.db.pool.connect();
     await this.listen();
   }
 
   stop() {
     try {
-      this.client.release();
+      if (this.client) {
+        this.client.release();
+      }
       this.listener.release();
     } catch (error) {
       console.log("error releasing pg client", error);
@@ -122,7 +124,11 @@ export default class QueueTable extends Table<Queue> {
     }
 
     await this.client.query("COMMIT;");
-    this.client.release();
+    try {
+      this.client.release();
+    } catch (e) {
+      console.log("pg release error: ", e);
+    }
     logger.debug(`MsgQueue consuming ${res.rows[0].id}`);
     return originalData as Queue;
   }
@@ -131,7 +137,7 @@ export default class QueueTable extends Table<Queue> {
     if (!doc.status) {
       doc.status = "pending";
     }
-
+    this.client = await this.db.pool.connect();
     try {
       await this.client.query("BEGIN;");
       await this.client.query(
@@ -145,11 +151,11 @@ export default class QueueTable extends Table<Queue> {
         await this.client.query(`NOTIFY ${this.channel}, '${doc.id}';`);
       }
       this.client.query("COMMIT;");
+      this.client.release();
     } catch (e) {
       if (e.message.includes("duplicate key value")) {
-        throw new BadRequestError(e.detail);
+        console.log(`DUPLICATE KEY ERROR : ${e.detail}`);
       }
-      throw e;
     }
     logger.debug(`MsgQueue emitting ${doc.id}`);
     return doc;
