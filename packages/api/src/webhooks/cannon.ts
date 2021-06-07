@@ -179,6 +179,12 @@ export default class WebhookCannon {
     delete sanitized.streamKey;
 
     let user = await this.db.user.get(`user/${event.userId}`);
+    if (!user) {
+      // if user isn't found. don't fire the webhook, log an error
+      throw new Error(
+        `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
+      );
+    }
 
     try {
       const responses = await Promise.all(
