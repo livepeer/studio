@@ -15,7 +15,7 @@ import {
   CheckboxFilterProps,
   InputFilterProps,
   TextFilter,
-} from "./filters";
+} from "./filters/fields";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
 import { Box, Flex, Checkbox, styled } from "@livepeer.com/design-system";
 

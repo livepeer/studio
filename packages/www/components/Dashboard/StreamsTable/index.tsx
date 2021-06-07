@@ -12,22 +12,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
 import DeleteStreamModal from "../DeleteStreamModal";
 import Table from "components/Dashboard/Table";
+import TableFilter from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
-import {
-  RenditionDetailsCellProps,
-} from "components/Dashboard/Table/cells/streams-table";
+import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import {
-  QuestionMarkIcon,
-  PlusIcon,
-  ArrowRightIcon,
-} from "@radix-ui/react-icons";
+import { QuestionMarkIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import CreateStream from "./CreateStream";
-import FilterStream from "./FilterStream";
 
 type ProfileProps = {
   id: string;
@@ -47,10 +41,6 @@ const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
   cursor: "pointer",
   ml: "$1",
-});
-
-const StyledPlusIcon = styled(PlusIcon, {
-  mr: "$1",
 });
 
 const Profile = ({
@@ -314,7 +304,12 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          <FilterStream />
+          <TableFilter
+            items={[
+              { label: "Test", type: "text" },
+              { label: "Test 2", type: "text" },
+            ]}
+          />
           <CreateStream />
         </Flex>
       </Flex>

@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
+
+# Host
 Host: https://livepeer.com
+
+# Sitemaps
 Sitemap: https://livepeer.com/sitemap.xml

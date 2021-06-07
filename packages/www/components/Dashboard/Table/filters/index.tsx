@@ -1,80 +1,194 @@
-import { Box, Flex, TextField, Checkbox } from "@livepeer.com/design-system";
-import { useCallback } from "react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
+import { useCallback, useState } from "react";
+import { FilterIcon, StyledAccordion } from "./helpers";
+import TableFilterTextField from "./fields/text";
+import { FilterType } from "./fields/new";
 
-type AnyFilterValue = string;
-
-type BaseFilterProps<
-  Table extends Record<string, unknown>,
-  Value extends AnyFilterValue = string
-> = {
-  currentFilters: { id: keyof Table; value: Value }[] | undefined;
-  setFilter: (columnId: keyof Table, newValue: Value) => void;
-};
-
-export type InputFilterProps<Table extends Record<string, unknown>> = {
-  placeholder: string;
-  columnId: keyof Table;
-};
-
-const TextFilter = <Table extends Record<string, unknown>>({
-  currentFilters,
-  setFilter,
-  placeholder,
-  columnId,
-}: BaseFilterProps<Table> & InputFilterProps<Table>) => {
-  const value = currentFilters?.find((f) => f.id === columnId)?.value ?? "";
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilter(columnId, e.target.value);
-    },
-    [setFilter]
-  );
-
-  return (
-    <TextField
-      css={{ width: "100%", maxWidth: "300px" }}
-      value={value}
-      onChange={handleChange}
-      placeholder={placeholder}
-    />
-  );
-};
-
-export type CheckboxFilterProps<Table extends Record<string, unknown>> = {
-  columnId: keyof Table;
+type FilterItem = {
   label: string;
-  valueIfTrue: string;
-  valueIfFalse: string;
+  type: FilterType;
 };
 
-const CheckboxFilter = <Table extends Record<string, unknown>>({
-  currentFilters,
-  setFilter,
-  label,
-  columnId,
-  valueIfTrue,
-  valueIfFalse,
-}: BaseFilterProps<Table> & CheckboxFilterProps<Table>) => {
-  const value = currentFilters?.find((f) => f.id === columnId)?.value ?? false;
+type TableFilterProps = {
+  items: FilterItem[];
+};
 
-  const handleClick = useCallback(() => {
-    setFilter(columnId, value === valueIfTrue ? valueIfFalse : valueIfTrue);
-  }, [value, columnId, setFilter, valueIfTrue, valueIfFalse]);
+const TableFilter = ({ items }: TableFilterProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openFields, setOpenFields] = useState<string[]>([]);
+
+  const handleClear = useCallback(() => {
+    setOpenFields([]);
+  }, []);
+
+  const handleDone = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   return (
-    <Flex
-      css={{ display: "inline-flex", alignItems: "baseline" }}
-      onClick={handleClick}>
-      <Checkbox
-        value={value === valueIfTrue ? valueIfTrue : valueIfFalse}
-        onClick={() => undefined}
-      />
-      <Box css={{ ml: "0.5rem", userSelect: "none", cursor: "default" }}>
-        {label}
-      </Box>
-    </Flex>
+    <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenu.Trigger as="div">
+        <Button
+          css={{ display: "flex", ai: "center", marginRight: "6px" }}
+          size="2"
+          variant="gray">
+          <Flex css={{ marginRight: "5px" }}>
+            <FilterIcon />
+          </Flex>
+          Filter
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content align="end" sideOffset={5}>
+        <Box
+          css={{
+            backgroundColor: "$loContrast",
+            width: "241px",
+            maxWidth: "241px",
+            display: "flex",
+            flexDirection: "column",
+            marginRight: "6px",
+            borderRadius: "4px",
+            overflow: "hidden",
+            boxShadow:
+              "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
+          }}>
+          <Flex
+            css={{
+              width: "100%",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "6px 7px",
+              background: "$panel",
+            }}>
+            <Button onClick={handleClear} size="1" variant="gray">
+              Clear
+            </Button>
+            <Text size="2" css={{ margin: "0px" }}>
+              Filters
+            </Text>
+            <Button size="1" variant="violet" onClick={handleDone}>
+              Done
+            </Button>
+          </Flex>
+          <StyledAccordion type="multiple" value={openFields}>
+            {items.map((item, i) => {
+              const isOpen = openFields.includes(item.label);
+              const onToggleOpen = () => {
+                if (isOpen) {
+                  setOpenFields((p) => p.filter((l) => l !== item.label));
+                } else setOpenFields((p) => [...p, item.label]);
+              };
+
+              switch (item.type) {
+                case "text":
+                  return (
+                    <TableFilterTextField
+                      label={item.label}
+                      key={i}
+                      isOpen={isOpen}
+                      onToggleOpen={onToggleOpen}
+                    />
+                  );
+                default:
+                  return null;
+              }
+            })}
+            {/* {filters.map((each, idx) => (
+              <StyledItem value={each.name} key={idx}>
+                <StyledHeader>
+                  <StyledButton
+                    onClick={() =>
+                      setSelectedFilter(
+                        each.name === selectedFilter ? "" : each.name
+                      )
+                    }>
+                    <Box
+                      css={{
+                        minWidth: "13px",
+                        minHeight: "13px",
+                        borderRadius: "4px",
+                        boxShadow: "0px 0px 2px #000000",
+                        margin: "0px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor:
+                          each.name === selectedFilter
+                            ? "darkgray"
+                            : "transparent",
+                      }}>
+                      {each.name === selectedFilter && <CheckIcon />}
+                    </Box>
+                    <Text
+                      size="2"
+                      // @ts-ignore
+                      css={{ marginLeft: "9px", fontWeight: "500" }}>
+                      {each.name}
+                    </Text>
+                  </StyledButton>
+                </StyledHeader>
+                <StyledPanel>
+                  <DropdownFilter
+                    root={each}
+                    setSelectedFilters={setSelectedFilters}
+                  />
+                  <Flex
+                    css={{
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}>
+                    <Flex>
+                      <NextIcon />
+                    </Flex>
+                    <Box
+                      css={{
+                        width: "100%",
+                        maxWidth: each.field === "date" ? "110px" : "100%",
+                        height: "26px",
+                        borderRadius: "4px",
+                        position: "relative",
+                        margin: "0px 0px 0px 11px",
+                        display: "flex",
+                        alignItems: "center",
+                        background: "$loContrast",
+                      }}>
+                      {each.field === "date" && (
+                        <Flex
+                          as="label"
+                          htmlFor={each.name}
+                          css={{
+                            zIndex: 10,
+                            position: "absolute",
+                            left: "11px",
+                          }}>
+                          <CalendarIcon />
+                        </Flex>
+                      )}
+                      <TextField
+                        id={each.name}
+                        css={{
+                          height: "100%",
+                          width: "100%",
+                          padding:
+                            each.field === "date"
+                              ? "0px 11px 0px 30px"
+                              : "0px 11px",
+                          position: "absolute",
+                          left: 0,
+                          top: 0,
+                        }}
+                      />
+                    </Box>
+                  </Flex>
+                </StyledPanel>
+              </StyledItem>
+            ))} */}
+          </StyledAccordion>
+        </Box>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
   );
 };
 
-export { TextFilter, CheckboxFilter };
+export default TableFilter;
