@@ -14,6 +14,7 @@ import {
   PasswordResetToken,
   Usage,
   Region,
+  WebhookResponse,
   Session,
 } from "../schema/types";
 import Table from "./table";
@@ -38,6 +39,7 @@ export class DB {
   user: Table<User>;
   usage: Table<Usage>;
   webhook: Table<Webhook>;
+  webhookResponse: Table<WebhookResponse>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   queue: QueueTable;
@@ -116,6 +118,10 @@ export class DB {
     });
 
     this.region = new Table<Region>({ db: this, schema: schemas["region"] });
+    this.webhookResponse = new Table<WebhookResponse>({
+      db: this,
+      schema: schemas["webhook-response"],
+    });
     this.queue = new QueueTable({ db: this, schema: schemas["queue"] });
     this.session = new Table<Session>({ db: this, schema: schemas["session"] });
 

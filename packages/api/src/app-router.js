@@ -15,6 +15,7 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
+import WebhookCannon from "./webhooks/cannon";
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -75,6 +76,12 @@ export default async function makeApp(params) {
     schema,
   });
 
+  // Webhooks Cannon
+  const webhookCannon = new WebhookCannon({ db, store });
+
+  process.on("beforeExit", (code) => {
+    webhookCannon.stop();
+  });
   // Logging, JSON parsing, store injection
 
   const app = Router();
