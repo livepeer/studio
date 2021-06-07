@@ -30,7 +30,7 @@ const Sidebar = ({ id }) => {
   return (
     <Box
       css={{
-        backgroundColor: "$slate3",
+        backgroundColor: "$panel",
         borderRight: "1px solid",
         borderColor: "$slate6",
         zIndex: 10,
