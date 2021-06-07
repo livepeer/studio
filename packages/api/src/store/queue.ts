@@ -68,6 +68,7 @@ export default class QueueTable extends Table<Queue> {
   // get next event in queue
   async pop(processFunc: Function): Promise<Queue> {
     let res: QueryResult<DBLegacyObject>;
+    this.client = await this.db.pool.connect();
     await this.client.query("BEGIN");
     res = await this.client.query(
       sql`SELECT data FROM `
@@ -91,7 +92,16 @@ export default class QueueTable extends Table<Queue> {
       } catch (error) {
         console.log("Msg queue process function error: ", error);
         await this.client.query("ROLLBACK;");
-        throw error; // throwing the error till we can handle it better
+        // change event status to error
+        res.rows[0].data.isConsumed = false;
+        res.rows[0].data.modifiedAt = Date.now();
+        res.rows[0].data.status = "error";
+        await this.client.query(
+          sql`UPDATE queue SET data = data || ${res.rows[0].data} `.append(
+            ` WHERE id = '${res.rows[0].data.id}'`
+          )
+        );
+        return;
       }
       res.rows[0].data.isConsumed = true;
       res.rows[0].data.modifiedAt = Date.now();
@@ -112,6 +122,7 @@ export default class QueueTable extends Table<Queue> {
     }
 
     await this.client.query("COMMIT;");
+    this.client.release();
     logger.debug(`MsgQueue consuming ${res.rows[0].id}`);
     return originalData as Queue;
   }
@@ -148,7 +159,7 @@ export default class QueueTable extends Table<Queue> {
     doc.modifiedAt = Date.now();
     await this.client.query(
       sql`UPDATE queue SET data = data || ${doc} `.append(
-        ` WHERE id = '${doc.id}'`
+        sql` WHERE id = '${doc.id}'`
       )
     );
   }

@@ -56,7 +56,7 @@ components:
         event:
           type: string
           readOnly: true
-          example: stream_started
+          example: stream.started
         userId:
           type: string
           readOnly: true
