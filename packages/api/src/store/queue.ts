@@ -66,7 +66,7 @@ export default class QueueTable extends Table<Queue> {
   // }
 
   // get next event in queue
-  async pop(processFunc: Function): Promise<Queue> {
+  async pop(processFunc: (q: Queue) => any): Promise<Queue> {
     let res: QueryResult<DBLegacyObject>;
     this.client = await this.db.pool.connect();
     await this.client.query("BEGIN");
