@@ -127,6 +127,11 @@ export default class WebhookCannon {
           await this.storeResponse(webhook, event, resp);
           return true;
         }
+
+        if (resp.status >= 500) {
+          this.retry(event);
+        }
+
         console.error(
           `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
         );
@@ -177,7 +182,7 @@ export default class WebhookCannon {
     let sanitized = { ...stream };
     delete sanitized.streamKey;
 
-    let user = await this.db.user.get(`user/${event.userId}`);
+    let user = await this.db.user.get(event.userId);
     if (!user) {
       // if user isn't found. don't fire the webhook, log an error
       throw new Error(
