@@ -13,6 +13,7 @@ import admin from "./admin";
 import usage from "./usage";
 import region from "./region";
 import session from "./session";
+import detection from "./detection";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -31,4 +32,5 @@ export default {
   admin,
   usage,
   session,
+  detection,
 };
