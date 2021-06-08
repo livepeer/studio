@@ -7,12 +7,10 @@ import {
 } from "../helpers";
 import { Box, Text } from "@livepeer.com/design-system";
 import FieldContent from "./field-content";
-import { FilterType } from "./new";
 
 export type TableFilterDateFieldProps = {
   label: string;
   isOpen: boolean;
-  type: FilterType;
   onToggleOpen: () => void;
 };
 
@@ -46,7 +44,7 @@ const TableFilterDateField = ({
         </StyledButton>
       </StyledHeader>
       <StyledPanel>
-        <FieldContent label={label} type={type} />
+        <FieldContent label={label} type="date" />
       </StyledPanel>
     </StyledItem>
   );
