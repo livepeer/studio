@@ -139,6 +139,8 @@ const FieldContent = ({ label, type }: FieldContentProps) => {
     <>
       <ParameterSelect type={type} />
       <Flex
+        as="label"
+        htmlFor={label}
         css={{
           alignItems: "center",
           marginTop: "10px",
