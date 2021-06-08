@@ -248,22 +248,46 @@ components:
             References to targets where this stream will be simulatenously pushed to
           items:
             type: object
-            required:
-              - id
-              - profile
-            additionalProperties: false
-            properties:
-              id:
-                type: string
-                description: ID of push target object where to push this tream
-              profile:
-                type: string
-                description:
-                  Name of transcoding profile that should be sent. Use "source"
-                  for pushing source stream data
-                minLength: 1
-                maxLength: 500
-                example: aac
+            allOf:
+              - required: [profile]
+                additionalProperties: false
+                properties:
+                  profile:
+                    type: string
+                    description:
+                      Name of transcoding profile that should be sent. Use "source"
+                      for pushing source stream data
+                    minLength: 1
+                    maxLength: 500
+                    example: aac
+              - oneOf:
+                - required: [id]
+                  additionalProperties: false
+                  properties:
+                    id:
+                      type: string
+                      description: ID of push target object where to push this stream
+                - required: [inline]
+                  additionalProperties: false
+                  properties:
+                    inline:
+                      type: object
+                      description:
+                        Inline push target object. Allowed on stream creation, which
+                        will automate creating the push-targets on the same request.
+                      required:
+                        - url
+                      additionalProperties: false
+                      properties:
+                        name:
+                          type: string
+                        url:
+                          type: string
+                          description: Livepeer-compatible push target URL (RTMP or RTMPS)
+                          example: rtmp://live.my-service.tv/live/secretKey
+                          writeOnly: true
+                          format: uri
+                          pattern: ^rtmps?://
         wowza:
           type: object
           required:
@@ -512,6 +536,8 @@ components:
         id:
           type: string
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
         url:
           type: string
           description: Livepeer-compatible push target URL (RTMP or RTMPS)
@@ -528,8 +554,6 @@ components:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
-        name:
-          type: string
         createdAt:
           type: number
           readOnly: true
