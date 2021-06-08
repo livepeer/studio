@@ -50,7 +50,8 @@ import {
 import Spinner from "components/Dashboard/Spinner";
 import Player from "components/Dashboard/Player";
 import React from "react";
-import RecordSwitch from "@components/Dashboard/StreamDetails/RecordSwitch";
+import Record from "@components/Dashboard/StreamDetails/Record";
+import Terminate from "@components/Dashboard/StreamDetails/Terminate";
 
 type TimedAlertProps = {
   text: string;
@@ -180,7 +181,6 @@ const ID = () => {
     getIngest,
     setRecord,
     getAdminStreams,
-    terminateStream,
     suspendStream,
   } = useApi();
   const userIsAdmin = user && user.admin;
@@ -190,7 +190,6 @@ const ID = () => {
   const [stream, setStream] = useState(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [terminateModal, setTerminateModal] = useState(false);
   const [suspendModal, setSuspendModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [recordOffModal, setRecordOffModal] = useState(false);
@@ -274,7 +273,6 @@ const ID = () => {
 
   const close = () => {
     setSuspendModal(false);
-    setTerminateModal(false);
     setDeleteModal(false);
     setRecordOffModal(false);
   };
@@ -356,26 +354,7 @@ const ID = () => {
               : `Are you sure you want to allow new stream sessions again?`}
           </ConfirmationModal>
         )}
-        {terminateModal && stream && (
-          <ConfirmationModal
-            actionText="Terminate"
-            onClose={close}
-            onAction={() => {
-              terminateStream(stream.id)
-                .then((res) => {
-                  setResultText(`sucess: ${res}`);
-                })
-                .catch((e) => {
-                  console.error(e);
-                  setAlertText(`${e}`);
-                })
-                .finally(close);
-            }}>
-            Are you sure you want to terminate (stop running live) stream{" "}
-            <b>{stream.name}</b>? Terminating a stream will break RTMP
-            connection.
-          </ConfirmationModal>
-        )}
+
         {deleteModal && stream && (
           <DeleteStreamModal
             streamName={stream.name}
@@ -468,11 +447,18 @@ const ID = () => {
                     <DropdownMenuItem>
                       <Box css={{ color: "$red9" }}>Delete</Box>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Admin only</DropdownMenuLabel>
-                    <DropdownMenuItem>
-                      <Box css={{ color: "$red9" }}>Terminate</Box>
-                    </DropdownMenuItem>
+                    {userIsAdmin && stream.isActive && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Admin only</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                          }}>
+                          <Terminate stream={stream} setStream={setStream} />
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -653,7 +639,7 @@ const ID = () => {
                     <Cell>
                       <Flex css={{ alignItems: "center" }}>
                         <Box css={{ mr: "$1" }}>
-                          <RecordSwitch stream={stream} setStream={setStream} />
+                          <Record stream={stream} setStream={setStream} />
                         </Box>
                         <Tooltip
                           multiline
@@ -914,17 +900,6 @@ const ID = () => {
                     justifyContent: "flex-end",
                     mb: 3,
                   }}>
-                  {userIsAdmin ? (
-                    <Flex>
-                      <Button
-                        css={{ mr: 3 }}
-                        type="button"
-                        variant="violet"
-                        onClick={() => setTerminateModal(true)}>
-                        Terminate
-                      </Button>
-                    </Flex>
-                  ) : null}
                   <Button
                     type="button"
                     variant="violet"
