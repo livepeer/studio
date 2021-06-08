@@ -2715,29 +2715,6 @@
     "@francoischalifour/autocomplete-preset-algolia" "^1.0.0-alpha.14"
     algoliasearch "^4.0.0"
 
-"@dollarshaveclub/cloudworker@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@dollarshaveclub/cloudworker/-/cloudworker-0.1.2.tgz#c98c1c0adede806f04c1e85724749bdfbd345bc3"
-  dependencies:
-    "@dollarshaveclub/node-fetch" "^3.2.0"
-    arraybuffer-equal "^1.0.4"
-    atob "^2.1.2"
-    btoa "^1.2.1"
-    commander "^2.20.0"
-    http-cache-semantics "^4.0.3"
-    lru-cache "^5.1.1"
-    moment "^2.24.0"
-    node-webcrypto-ossl "^1.0.48"
-    web-streams-polyfill "^2.0.3"
-
-"@dollarshaveclub/node-fetch@^3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@dollarshaveclub/node-fetch/-/node-fetch-3.2.0.tgz#3542515fc4cbcda84283b1c0f41d258e52c4610f"
-  dependencies:
-    "@mattiasbuelens/web-streams-polyfill" "^0.3.2"
-    busboy "^0.3.0"
-    formdata-node "^1.5.1"
-
 "@emotion/babel-plugin-jsx-pragmatic@0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin-jsx-pragmatic/-/babel-plugin-jsx-pragmatic-0.1.5.tgz#27debfe9c27c4d83574d509787ae553bf8a34d7e"
@@ -8670,10 +8647,6 @@ core-js-compat@^3.9.0, core-js-compat@^3.9.1:
   dependencies:
     browserslist "^4.16.6"
     semver "7.0.0"
-
-core-js-pure@^3.0.0:
-  version "3.6.5"
-  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.6.5.tgz#c79e75f5e38dbc85a662d91eea52b8256d53b813"
 
 core-js@^1.0.0:
   version "1.2.7"
@@ -21820,7 +21793,7 @@ tslib@^1.0.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^1.10.0, tslib@^1.11.1, tslib@^1.7.1, tslib@^1.9.0, tslib@^1.9.3:
+tslib@^1.10.0, tslib@^1.9.0, tslib@^1.9.3:
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.13.0.tgz#c881e13cc7015894ed914862d276436fa9a47043"
 

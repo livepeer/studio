@@ -39,8 +39,8 @@ type HeadingProps = {
 
 const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
   return (
-    <Link href={href}>
-      <div
+    <Link href={href} passHref>
+      <a
         sx={{
           background: "linear-gradient(212.62deg, #B75EFF 0%, #943CFF 100%)",
           minHeight: "272px",
@@ -82,7 +82,7 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
             {description}
           </span>
         </div>
-        <a
+        <div
           sx={{
             display: "flex",
             alignItems: "center",
@@ -100,16 +100,16 @@ const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
             {label ?? "Read guide"}
           </span>
           <BsArrowRightShort color="white" size={24} />
-        </a>
-      </div>
+        </div>
+      </a>
     </Link>
   );
 };
 
 const NavigationCard = ({ title, href, label }: CardProps) => {
   return (
-    <Link href={href}>
-      <div
+    <Link href={href} passHref>
+      <a
         sx={{
           width: "100%",
           cursor: "pointer",
@@ -151,14 +151,14 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
           </span>
           <BsArrowRightShort color="#943CFF" size={22} />
         </div>
-      </div>
+      </a>
     </Link>
   );
 };
 
 const DocsPost = ({ description, title, image, href }: PostProps) => {
   return (
-    <Link href={href}>
+    <Link href={href} passHref>
       <a
         sx={{
           display: "flex",

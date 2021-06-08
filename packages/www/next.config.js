@@ -142,6 +142,16 @@ const config = {
         destination: "/docs/guides/start-live-streaming/support-matrix",
         permanent: false,
       },
+      {
+        source: "/docs/livepeer-dot-com/create-a-stream",
+        destination: "/docs/guides/start-live-streaming/create-a-stream",
+        permanent: false,
+      },
+      {
+        source: "/docs/livepeer-api/create-api-key",
+        destination: "/docs/guides/start-live-streaming/api-key",
+        permanent: false,
+      },
     ];
   },
 };

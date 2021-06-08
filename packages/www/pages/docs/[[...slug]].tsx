@@ -80,9 +80,11 @@ const components = {
     );
   },
   table: (props) => {
-    return <div className={styles.tableContainer}>
-      <table {...props} />
-    </div>
+    return (
+      <div className={styles.tableContainer}>
+        <table {...props} />
+      </div>
+    );
   },
   code: Code,
   NavigationCard,
@@ -150,98 +152,98 @@ const DocsIndex = ({ doc, menu }) => {
 
   return (
     <>
-    <IdProvider>
-      <ThemeProvider>
-        <NextSeo {...resolvedSEO} />
-        <div
-          onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
-          sx={{
-            display: ["flex", "flex", "none", "none"],
-            position: "fixed",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            right: "16px",
-            bottom: "50px",
-            background: "black",
-            width: "64px",
-            height: "64px",
-            borderRadius: "50%",
-            cursor: "pointer",
-          }}>
-          {mobileSideNavOpen ? (
-            <CgClose color="white" size={24} />
-          ) : (
-            <FiList color="white" size={24} />
-          )}
-        </div>
-        <Box
-          sx={{
-            display: ["flex", "flex", "grid", "grid"],
-            flexDirection: "column",
-            gridTemplateColumns: ["min-content 1fr"],
-            gridTemplateRows: "auto auto",
-          }}>
-          <DocsNav
-            hideTopNav={hideTopNav}
-            setHideTopNav={setHideTopNav}
-            categories={categories}
-            mobileCategories={mobileCategories}
-          />
-          <SideNav
-            menu={currentMenu}
-            hideTopNav={hideTopNav}
-            hideSideBar={hideSideBar}
-            setHideSideBar={setHideSideBar}
-          />
-          <MobileSideNav
-            isOpen={mobileSideNavOpen}
-            menu={currentMenu}
-            setIsOpen={setMobileSideNavOpen}
-          />
-          <Container
+      <IdProvider>
+        <ThemeProvider>
+          <NextSeo {...resolvedSEO} />
+          <div
+            onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
             sx={{
-              mt: hideTopNav ? "-12px" : "48px",
-              gridColumn: "1fr",
-              justifyItems: "center",
-              mx: 0,
-              transition: "all 0.2s",
-              display: "flex",
-              minWidth: "100%",
+              display: ["flex", "flex", "none", "none"],
+              position: "fixed",
+              alignItems: "center",
               justifyContent: "center",
-              alignItems: "flex-start",
+              zIndex: 200,
+              right: "16px",
+              bottom: "50px",
+              background: "black",
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              cursor: "pointer",
             }}>
-            <div
-              className={styles.markdown}
+            {mobileSideNavOpen ? (
+              <CgClose color="white" size={24} />
+            ) : (
+              <FiList color="white" size={24} />
+            )}
+          </div>
+          <Box
+            sx={{
+              display: ["flex", "flex", "grid", "grid"],
+              flexDirection: "column",
+              gridTemplateColumns: ["min-content 1fr"],
+              gridTemplateRows: "auto auto",
+            }}>
+            <DocsNav
+              hideTopNav={hideTopNav}
+              setHideTopNav={setHideTopNav}
+              categories={categories}
+              mobileCategories={mobileCategories}
+            />
+            <SideNav
+              menu={currentMenu}
+              hideTopNav={hideTopNav}
+              hideSideBar={hideSideBar}
+              setHideSideBar={setHideSideBar}
+            />
+            <MobileSideNav
+              isOpen={mobileSideNavOpen}
+              menu={currentMenu}
+              setIsOpen={setMobileSideNavOpen}
+            />
+            <Container
               sx={{
+                mt: hideTopNav ? "-12px" : "48px",
+                gridColumn: "1fr",
+                justifyItems: "center",
+                mx: 0,
+                transition: "all 0.2s",
                 display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                maxWidth: "768px",
-                paddingBottom: "80px",
+                minWidth: "100%",
+                justifyContent: "center",
+                alignItems: "flex-start",
               }}>
               <div
+                className={styles.markdown}
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  color: "#202020",
-                  fontSize: "12px",
-                  letterSpacing: "-0.02em",
-                  mb: "16px",
-                }}
-                className="breadcrumb">
-                {breadCrumb.slice(2, 5).map((a, idx) => (
-                  <Fragment key={idx}>
-                    {title(a.split("-").join(" "))}
-                    {idx < breadCrumb.length - 3 && <> / </>}
-                  </Fragment>
-                ))}
+                  flexDirection: "column",
+                  width: "100%",
+                  maxWidth: "768px",
+                  paddingBottom: "80px",
+                }}>
+                <div
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#202020",
+                    fontSize: "12px",
+                    letterSpacing: "-0.02em",
+                    mb: "16px",
+                  }}
+                  className="breadcrumb">
+                  {breadCrumb.slice(2, 5).map((a, idx) => (
+                    <Fragment key={idx}>
+                      {title(a.split("-").join(" "))}
+                      {idx < breadCrumb.length - 3 && <> / </>}
+                    </Fragment>
+                  ))}
+                </div>
+                <main>{content}</main>
               </div>
-              <main>{content}</main>
-            </div>
-          </Container>
-        </Box>
-      </ThemeProvider>
+            </Container>
+          </Box>
+        </ThemeProvider>
       </IdProvider>
     </>
   );
@@ -250,7 +252,7 @@ const DocsIndex = ({ doc, menu }) => {
 export const getStaticPaths = async () => {
   const paths = await getMdxPaths("doc");
   return {
-    paths: paths,
+    paths,
     fallback: false,
   };
 };
