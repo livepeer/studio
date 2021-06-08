@@ -13,17 +13,13 @@ import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 import { Stream } from "@livepeer.com/api";
 
-const RecordSwitch = ({ stream, setStream }) => {
+const Record = ({ stream, setStream }) => {
   const { setRecord } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog
-      onOpenChange={() => {
-        console.log("test");
-      }}
-      open={open}>
+    <Dialog open={open}>
       <Switch
         checked={!!stream.record}
         name="record-mode"
@@ -104,4 +100,4 @@ const RecordSwitch = ({ stream, setStream }) => {
   );
 };
 
-export default RecordSwitch;
+export default Record;
