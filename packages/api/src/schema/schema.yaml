@@ -5,7 +5,7 @@ info:
 
 tags:
   - name: stream
-    description: Wowza Stream Endpoints
+    description: Stream Endpoints
   - name: object-store
     description: Object Stores Endpoints
   - name: push-target
@@ -262,11 +262,12 @@ components:
               id:
                 type: string
                 description: ID of push target object where to push this stream
-              inline:
+              spec:
                 type: object
+                writeOnly: true
                 description:
-                  Inline push target object. Allowed on stream creation, which
-                  will automate creating the push-targets on the same request.
+                  Inline push target object. Will automatically create the
+                  push-target to be used by the created stream.
                 required:
                   - url
                 additionalProperties: false
@@ -276,7 +277,7 @@ components:
                   url:
                     type: string
                     description: Livepeer-compatible push target URL (RTMP or RTMPS)
-                    example: rtmp://live.my-service.tv/live/secretKey
+                    example: rtmp://live.my-service.tv/channel/secretKey
                     writeOnly: true
                     format: uri
                     pattern: ^rtmps?://
@@ -527,23 +528,25 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
         url:
           type: string
-          description: Livepeer-compatible push target URL (RTMP or RTMPS)
-          example: rtmp://live.my-service.tv/live/secretKey
           writeOnly: true
+          description: Livepeer-compatible push target URL (RTMP or RTMPS)
+          example: rtmp://live.my-service.tv/channel/secretKey
           format: uri
           pattern: ^rtmps?://
         disabled:
           type: boolean
           description:
             If true then this push target will not be used for pushing even if
-            it is configured in the API command line.
+            it is configured in a stream object.
         userId:
           type: string
+          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
         createdAt:
@@ -907,7 +910,7 @@ paths:
     tags:
       - stream
     post:
-      description: Receives Wowza stream
+      description: Creates a stream
       requestBody:
         required: true
         content:
@@ -1000,16 +1003,9 @@ paths:
   /push-target:
     tags:
       - push-target
-    post:
-      description: Creates new push target
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              $ref: "#/components/schemas/push-target"
 
+    get:
+      description: Lists existing push targets
       responses:
         200:
           description: Success
@@ -1026,8 +1022,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-    get:
-      description: Lists existing push targets by userId
+    post:
+      description: Creates new push target
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/push-target"
       responses:
         200:
           description: Success
@@ -1037,6 +1039,80 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/push-target"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /push-target/{id}:
+    tags:
+      - push-target
+    parameters:
+      - name: id
+        description: ID of the push-target
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      description: Gets a specific push target details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/push-target"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+    patch:
+      description: Enables or disables an existing push target
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [disabled]
+              additionalProperties: false
+              properties:
+                disabled:
+                  type: boolean
+                  description:
+                    If true then this push target will not be used for pushing
+                    even if it is configured in a stream object.
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/push-target"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+    delete:
+      description: Deletes an existing push target
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/push-target"
         default:
           description: Error
           content:
