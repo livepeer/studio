@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
+import TableFilterDateField from "./fields/date";
+import TableFilterNumberField from "./fields/number";
 
 type FilterItem = {
   label: string;
@@ -25,7 +27,6 @@ const TableFilter = ({ items }: TableFilterProps) => {
   const handleDone = useCallback(() => {
     setIsOpen(false);
   }, []);
-
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger as="div">
@@ -84,6 +85,25 @@ const TableFilter = ({ items }: TableFilterProps) => {
                 case "text":
                   return (
                     <TableFilterTextField
+                      label={item.label}
+                      key={i}
+                      isOpen={isOpen}
+                      onToggleOpen={onToggleOpen}
+                    />
+                  );
+                case "date":
+                  return (
+                    <TableFilterDateField
+                      label={item.label}
+                      type="date"
+                      key={i}
+                      isOpen={isOpen}
+                      onToggleOpen={onToggleOpen}
+                    />
+                  );
+                case "number":
+                  return (
+                    <TableFilterNumberField
                       label={item.label}
                       key={i}
                       isOpen={isOpen}

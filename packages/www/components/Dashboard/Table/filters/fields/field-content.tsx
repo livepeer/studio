@@ -10,8 +10,9 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { SelectIcon, NextIcon } from "../helpers";
 import { useState } from "react";
 import { FilterType } from "./new";
+import { CalendarIcon } from "../helpers";
 
-type ParameterValue = "contains" | "between";
+type ParameterValue = "contains" | "between" | "equal";
 
 type Option = {
   label: string;
@@ -21,11 +22,17 @@ type Option = {
 const options: Record<FilterType, Option[]> = {
   text: [
     { label: "contains", value: "contains" },
-    { label: "between", value: "between" },
+    { label: "is equal to", value: "equal" },
   ],
   boolean: [{ label: "contains", value: "contains" }],
-  date: [{ label: "contains", value: "contains" }],
-  number: [{ label: "contains", value: "contains" }],
+  date: [
+    { label: "is between", value: "between" },
+    { label: "is equal to", value: "equal" },
+  ],
+  number: [
+    { label: "is between", value: "between" },
+    { label: "is equal to", value: "equal" },
+  ],
 };
 
 type ParameterSelectProps = {
@@ -75,47 +82,29 @@ const ParameterSelect = ({ type }: ParameterSelectProps) => {
                       key={i}
                       onSelect={onSelect}
                       css={{ padding: "0px 0px 0px 11px" }}>
-                      <Box
-                        css={
-                          {
-                            // width: "100%",
-                            // height: "26px",
-                            // padding: "0px 11px",
-                            // borderRadius: "4px",
-                            // boxShadow: "inset 0 0 0 1px $colors$slate7",
-                            // margin: "0px",
-                            // display: "flex",
-                            // alignItems: "center",
-                            // background: "$loContrast",
-                          }
-                        }>
+                      <Box>
                         <Text size="2">{option.label}</Text>
                       </Box>
                     </DropdownMenuItem>
                   );
+                  break;
                 case "between":
                   return (
                     <DropdownMenuItem
                       key={i}
                       onSelect={onSelect}
                       css={{ padding: "0px 0px 0px 11px" }}>
-                      <Box
-                        css={
-                          {
-                            // width: "100%",
-                            // height: "26px",
-                            // padding: "0px 11px",
-                            // borderRadius: "4px",
-                            // boxShadow: "inset 0 0 0 1px $colors$slate7",
-                            // margin: "0px",
-                            // display: "flex",
-                            // alignItems: "center",
-                            // background: "$loContrast",
-                          }
-                        }>
-                        {option.label}
-                        {/* <Text size="2">{option.label}</Text> */}
-                      </Box>
+                      <Box>{option.label}</Box>
+                    </DropdownMenuItem>
+                  );
+                  break;
+                case "equal":
+                  return (
+                    <DropdownMenuItem
+                      key={i}
+                      onSelect={onSelect}
+                      css={{ padding: "0px 0px 0px 11px" }}>
+                      <Box>{option.label}</Box>
                     </DropdownMenuItem>
                   );
 
@@ -160,14 +149,20 @@ const FieldContent = ({ label, type }: FieldContentProps) => {
             alignItems: "center",
             background: "$loContrast",
           }}>
+          {type === "date" && (
+            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+              <CalendarIcon />
+            </Box>
+          )}
           {/* @ts-ignore */}
           <TextField
             id={label}
             css={{
               height: "100%",
               width: "100%",
-              padding: "0px 11px",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
               position: "absolute",
+              maxWidth: type === 'date' ? '100px' : '',
               left: 0,
               top: 0,
             }}

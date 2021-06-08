@@ -37,6 +37,13 @@ type Rendition = {
   fps: number;
 };
 
+const filterItems = [
+    { label: "Stream name", type: "text" },
+    { label: "Created date", type: "date" },
+    { label: "Last active", type: "date" },
+    { label: "Lifetime duration", type: "number" },
+]
+
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
   cursor: "pointer",
@@ -305,10 +312,7 @@ const StreamsTable = ({
             </Box> */}
 
           <TableFilter
-            items={[
-              { label: "Test", type: "text" },
-              { label: "Test 2", type: "text" },
-            ]}
+            items={filterItems}
           />
           <CreateStream />
         </Flex>
