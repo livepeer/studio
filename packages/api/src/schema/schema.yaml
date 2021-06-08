@@ -248,46 +248,38 @@ components:
             References to targets where this stream will be simulatenously pushed to
           items:
             type: object
-            allOf:
-              - required: [profile]
+            required: [profile]
+            additionalProperties: false
+            properties:
+              profile:
+                type: string
+                description:
+                  Name of transcoding profile that should be sent. Use "source"
+                  for pushing source stream data
+                minLength: 1
+                maxLength: 500
+                example: aac
+              id:
+                type: string
+                description: ID of push target object where to push this stream
+              inline:
+                type: object
+                description:
+                  Inline push target object. Allowed on stream creation, which
+                  will automate creating the push-targets on the same request.
+                required:
+                  - url
                 additionalProperties: false
                 properties:
-                  profile:
+                  name:
                     type: string
-                    description:
-                      Name of transcoding profile that should be sent. Use "source"
-                      for pushing source stream data
-                    minLength: 1
-                    maxLength: 500
-                    example: aac
-              - oneOf:
-                - required: [id]
-                  additionalProperties: false
-                  properties:
-                    id:
-                      type: string
-                      description: ID of push target object where to push this stream
-                - required: [inline]
-                  additionalProperties: false
-                  properties:
-                    inline:
-                      type: object
-                      description:
-                        Inline push target object. Allowed on stream creation, which
-                        will automate creating the push-targets on the same request.
-                      required:
-                        - url
-                      additionalProperties: false
-                      properties:
-                        name:
-                          type: string
-                        url:
-                          type: string
-                          description: Livepeer-compatible push target URL (RTMP or RTMPS)
-                          example: rtmp://live.my-service.tv/live/secretKey
-                          writeOnly: true
-                          format: uri
-                          pattern: ^rtmps?://
+                  url:
+                    type: string
+                    description: Livepeer-compatible push target URL (RTMP or RTMPS)
+                    example: rtmp://live.my-service.tv/live/secretKey
+                    writeOnly: true
+                    format: uri
+                    pattern: ^rtmps?://
         wowza:
           type: object
           required:
