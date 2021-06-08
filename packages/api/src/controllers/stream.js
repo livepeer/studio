@@ -1246,6 +1246,27 @@ app.post("/hook", async (req, res) => {
     manifestID = parent.playbackId;
   }
 
+  // TODO: Replace this example detection config
+  const detection = {
+    // Run detection on 1 / freq segments
+    freq: 4,
+    sceneClassificationProfile: {
+      // Run scene classification on 1 / sampleRate frames of a segment
+      sampleRate: 10,
+      // Classify content into the following classes
+      classes: [
+        {
+          id: 0,
+          name: "adult"
+        },
+        {
+          id: 1,
+          name: "soccer"
+        }
+      ]
+    }
+  }
+
   res.json({
     manifestID: manifestID,
     presets: stream.presets,
@@ -1254,6 +1275,7 @@ app.post("/hook", async (req, res) => {
     recordObjectStore,
     recordObjectStoreUrl,
     previousSessions: stream.previousSessions,
+    detection,
   });
 });
 
