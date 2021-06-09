@@ -54,12 +54,14 @@ app.use(function cleanWriteOnlyResponses(req, res, next) {
     data = Array.isArray(data)
       ? db.pushTarget.cleanWriteOnlyResponses(data)
       : db.pushTarget.cleanWriteOnlyResponse(data);
-    return origResJson(data)
+    return origResJson(data);
   };
-  return next()
+  return next();
 });
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.use(authMiddleware({}));
+
+app.get("/", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const qs = toStringValues(req.query);
   const { limit: limitStr, cursor, userId, order, filters } = qs;
@@ -82,9 +84,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     if (!isAdmin && req.user.id !== userId) {
       res.status(403);
       return res.json({
-        errors: [
-          "user can only request information about their own push targets",
-        ],
+        errors: ["users can only access their own push targets"],
       });
     }
     [query, opts] = [{ userId }, { limit, cursor }];
@@ -98,9 +98,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
   res.json(output);
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
-  let data = await db.pushTarget.get(req.params.id);
+  const data = await db.pushTarget.get(req.params.id);
   if (!data) {
     res.status(404);
     return res.json({ errors: ["not found"] });
@@ -108,77 +108,74 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   if (!isAdmin && req.user.id !== data.userId) {
     res.status(403);
     return res.json({
-      errors: ["user can only request information on their own push targets"],
+      errors: ["users can only access their own push targets"],
     });
   }
   res.json(data);
 });
 
-app.post(
-  "/",
-  authMiddleware({}),
-  validatePost("object-store"),
-  async (req, res) => {
-    const id = uuid();
+app.post("/", validatePost("push-target"), async (req, res) => {
+  const id = uuid();
+  await db.pushTarget.create({
+    id,
+    name: req.body.name,
+    url: req.body.url,
+    disabled: req.body.disabled,
+    userId: req.user.id,
+    createdAt: Date.now(),
+  });
 
-    await db.objectStore.create({
-      id: id,
-      url: req.body.url,
-      name: req.body.name,
-      publicUrl: req.body.publicUrl,
-      userId: req.user.id,
-      createdAt: Date.now(),
-    });
-
-    const store = await db.objectStore.get(id, { useReplica: false });
-
-    if (store) {
-      res.status(201);
-      res.json(db.objectStore.cleanWriteOnlyResponse(store));
-    } else {
-      res.status(403);
-      res.json({ errors: ["store not created"] });
-    }
+  const data = await db.pushTarget.get(id, { useReplica: false });
+  if (!data) {
+    res.status(500);
+    return res.json({ errors: ["push target not created"] });
   }
-);
+  res.status(201);
+  res.json(data);
+});
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+app.delete("/:id", async (req, res) => {
+  const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
+  const data = await db.objectStore.get(id);
+  if (!data) {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  if (!req.user.admin && req.user.id !== objectStore.userId) {
+  if (!isAdmin && req.user.id !== data.userId) {
     res.status(403);
     return res.json({
-      errors: ["users may only delete their own object stores"],
+      errors: ["users can only access their own push targets"],
     });
   }
   await db.objectStore.delete(id);
+
   res.status(204);
   res.end();
 });
 
-app.patch("/:id", authMiddleware({}), async (req, res) => {
+app.patch("/:id", async (req, res) => {
+  const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
+  const data = await db.pushTarget.get(id);
+  if (!data) {
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
-  if (!req.user.admin && req.user.id !== objectStore.userId) {
+  if (!isAdmin && req.user.id !== data.userId) {
     res.status(403);
     return res.json({
-      errors: ["users may change only their own object stores"],
+      errors: ["users can only access their own push targets"],
     });
   }
-  if (req.body.disabled === undefined) {
+  const disabledPatch = req.body.disabled;
+  if (typeof disabledPatch !== "boolean") {
     res.status(400);
-    return res.json({ errors: ["disabled field required"] });
+    return res.json({
+      errors: ["required boolean field in payload: disabled"],
+    });
   }
-  console.log(`set object store ${id} disabled=${req.body.disabled}`);
-  await db.objectStore.update(id, { disabled: !!req.body.disabled });
+  await db.pushTarget.update(id, { disabled: !!req.body.disabled });
   res.status(204);
   res.end();
 });
