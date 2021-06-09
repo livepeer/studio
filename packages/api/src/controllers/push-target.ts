@@ -1,6 +1,6 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { v4 as uuid } from "uuid";
 import { db } from "../store";
@@ -44,6 +44,19 @@ function adminListQuery(
   return [query, opts];
 }
 
+const respondError = (res: Response, status: number, error: string) =>
+  res.status(status).json({
+    errors: [error],
+  });
+
+const notFound = (res: Response) => respondError(res, 404, "not found");
+
+const forbidden = (res: Response) =>
+  respondError(res, 403, "users can only access their own push targets");
+
+const badRequest = (res: Response, error: string) =>
+  respondError(res, 400, error);
+
 const app = Router();
 
 app.use(function cleanWriteOnlyResponses(req, res, next) {
@@ -74,18 +87,12 @@ app.get("/", async (req, res) => {
   let opts: FindOptions;
   if (!userId) {
     if (!isAdmin) {
-      res.status(400);
-      return res.json({
-        errors: [`required query parameter: userId`],
-      });
+      return badRequest(res, "required query parameter: userId");
     }
     [query, opts] = adminListQuery(limit, cursor, order, filters);
   } else {
     if (!isAdmin && req.user.id !== userId) {
-      res.status(403);
-      return res.json({
-        errors: ["users can only access their own push targets"],
-      });
+      return forbidden(res);
     }
     [query, opts] = [{ userId }, { limit, cursor }];
   }
@@ -102,14 +109,10 @@ app.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const data = await db.pushTarget.get(req.params.id);
   if (!data) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    return notFound(res);
   }
   if (!isAdmin && req.user.id !== data.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users can only access their own push targets"],
-    });
+    return forbidden(res);
   }
   res.json(data);
 });
@@ -139,14 +142,10 @@ app.delete("/:id", async (req, res) => {
   const { id } = req.params;
   const data = await db.objectStore.get(id);
   if (!data) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    return notFound(res);
   }
   if (!isAdmin && req.user.id !== data.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users can only access their own push targets"],
-    });
+    return forbidden(res);
   }
   await db.objectStore.delete(id);
 
@@ -159,21 +158,14 @@ app.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const data = await db.pushTarget.get(id);
   if (!data) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    return notFound(res);
   }
   if (!isAdmin && req.user.id !== data.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users can only access their own push targets"],
-    });
+    return forbidden(res);
   }
   const disabledPatch = req.body.disabled;
   if (typeof disabledPatch !== "boolean") {
-    res.status(400);
-    return res.json({
-      errors: ["required boolean field in payload: disabled"],
-    });
+    return badRequest(res, "required boolean field in payload: disabled");
   }
   await db.pushTarget.update(id, { disabled: !!req.body.disabled });
   res.status(204);
