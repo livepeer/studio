@@ -1,11 +1,14 @@
+import sql, { SQLStatement } from "sql-template-strings";
 import { DB } from "../store/db";
 import { Queue, Webhook, User, Stream } from "../schema/types";
-import { getWebhooks } from "../controllers/helpers";
+// import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
 import { fetchWithTimeout, fetchWithTimeoutAndSleep } from "../util";
 import logger from "../logger";
+import uuid from "uuid/v4";
 
 import { parse as parseUrl } from "url";
+import bytesToUuid from "uuid/lib/bytesToUuid";
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
 const resolver = new Resolver();
@@ -18,26 +21,35 @@ export default class WebhookCannon {
   db: DB;
   store: Model;
   running: boolean;
-  constructor({ db, store }) {
+  verifyUrls: boolean;
+  constructor({ db, store, verifyUrls }) {
     this.db = db;
     this.store = store;
     this.running = true;
-    this.start();
+    this.verifyUrls = verifyUrls;
+    // this.start();
   }
 
   async start() {
+    console.log("WEBHOOK CANNON STARTED");
     if (this.running) {
-      this.db.queue.setMsgHandler(this.processEvent.bind(this));
+      await this.db.queue.setMsgHandler(this.processEvent.bind(this));
     }
   }
 
   async processEvent(msg: Notification) {
+    console.log("EVENT TRIGGERED ON THE WEBHOOK");
     let event = await this.db.queue.pop(this.onTrigger.bind(this));
+    console.log("event: ", event);
   }
 
   stop() {
     this.db.queue.unsetMsgHandler();
     this.running = false;
+  }
+
+  disableUrlVerify() {
+    this.verifyUrls = false;
   }
 
   calcBackoff(lastInterval): number {
@@ -62,22 +74,25 @@ export default class WebhookCannon {
     event: Queue,
     webhook: Webhook,
     sanitized: Stream,
-    user: User
+    user: User,
+    verifyUrl = true
   ) {
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
     let ips, urlObj, isLocal;
-    try {
-      urlObj = parseUrl(webhook.url);
-      if (urlObj.host) {
-        ips = await resolver.resolve4(urlObj.hostname);
+    if (verifyUrl) {
+      try {
+        urlObj = parseUrl(webhook.url);
+        if (urlObj.host) {
+          ips = await resolver.resolve4(urlObj.hostname);
+        }
+      } catch (e) {
+        console.error("error: ", e);
+        throw e;
       }
-    } catch (e) {
-      console.error("error: ", e);
-      throw e;
     }
 
     // This is mainly useful for local testing
-    if (user.admin) {
+    if (user.admin || verifyUrl === false) {
       isLocal = false;
     } else {
       try {
@@ -153,9 +168,8 @@ export default class WebhookCannon {
     resp: Response,
     duration = 0
   ) {
-    // TODO
-    // store response for each time a webhook fires.
     await this.db.webhookResponse.create({
+      id: uuid(),
       webhookId: webhook.id,
       eventId: event.id,
       statusCode: resp.status,
@@ -163,7 +177,30 @@ export default class WebhookCannon {
     });
   }
 
+  async getWebhooks(
+    userId,
+    event,
+    limit = 100,
+    cursor = undefined,
+    includeDeleted = false
+  ) {
+    const query = [sql`data->>'userId' = ${userId}`];
+    if (event) {
+      query.push(sql`data->>'event' = ${event}`);
+    }
+    if (!includeDeleted) {
+      query.push(sql`data->>'deleted' IS NULL`);
+    }
+    const [webhooks, nextCursor] = await this.db.webhook.find(query, {
+      limit,
+      cursor,
+    });
+
+    return { data: webhooks, cursor: nextCursor };
+  }
+
   async onTrigger(event: Queue) {
+    console.log("ON TRIGGER triggered");
     if (!event) {
       // throw new Error('onTrigger requires a Queue event!')
       // this is fine because pop could return a null if some other client raced and picked the task
@@ -171,12 +208,12 @@ export default class WebhookCannon {
       return;
     }
 
-    const { data: webhooksList } = await getWebhooks(
-      this.store,
+    const { data: webhooksList } = await this.getWebhooks(
       event.userId,
       event.event
     );
 
+    console.log("webhooks : ", webhooksList);
     let stream = await this.db.stream.get(event.streamId);
     // basic sanitization.
     let sanitized = { ...stream };
@@ -194,7 +231,7 @@ export default class WebhookCannon {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {
           try {
-            await this._fireHook(event, webhook, sanitized, user);
+            await this._fireHook(event, webhook, sanitized, user, false);
           } catch (error) {
             console.log("_fireHook Error", error);
           }

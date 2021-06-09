@@ -15,10 +15,11 @@ export default class QueueTable extends Table<Queue> {
   schema: TableSchema;
   client: PoolClient;
   listener: PoolClient;
+  onNotification: any;
   channel = "webhook_main";
   constructor({ db, schema }) {
     super({ db, schema });
-    this.start();
+    // this.start();
   }
 
   async start() {
@@ -43,11 +44,9 @@ export default class QueueTable extends Table<Queue> {
 
   async listen() {
     this.listener = await this.db.pool.connect();
-    this.listener.query(`LISTEN ${this.channel}`);
-    this.listener.on("notification", async (msg) => {
-      console.log("listener got notification: ", msg.channel);
-      await this.handleMsg(msg);
-    });
+    await this.listener.query(`LISTEN ${this.channel}`);
+    this.onNotification = this.listener.on("notification", this.handleMsg);
+
     this.listener.on("error", (error) => {
       console.error("Msg Queue Listener Error ", error);
     });
@@ -59,8 +58,14 @@ export default class QueueTable extends Table<Queue> {
     });
   }
 
-  setMsgHandler(func: (msg: Notification) => Promise<void>) {
-    this.handleMsg = func;
+  async setMsgHandler(
+    func: (msg: Notification) => Promise<void>
+  ): Promise<any> {
+    console.log("setting msg handler");
+    // this.handleMsg = func;
+    this.listener.removeListener("notification", this.handleMsg);
+    this.listener.on("notification", func);
+    return true;
   }
 
   async handleMsg(msg: Notification) {

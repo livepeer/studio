@@ -123,6 +123,7 @@ export class DB {
       schema: schemas["webhook-response"],
     });
     this.queue = new QueueTable({ db: this, schema: schemas["queue"] });
+    await this.queue.start();
     this.session = new Table<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(

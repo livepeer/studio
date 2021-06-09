@@ -77,7 +77,8 @@ export default async function makeApp(params) {
   });
 
   // Webhooks Cannon
-  const webhookCannon = new WebhookCannon({ db, store });
+  const webhookCannon = new WebhookCannon({ db, store, verifyUrls: true });
+  await webhookCannon.start();
 
   process.on("beforeExit", (code) => {
     webhookCannon.stop();
@@ -169,6 +170,7 @@ export default async function makeApp(params) {
 
   return {
     router: app,
+    webhookCannon,
     store,
     db,
   };
