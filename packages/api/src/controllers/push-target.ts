@@ -5,78 +5,85 @@ import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { v4 as uuid } from "uuid";
 import { db } from "../store";
 import { ObjectStore } from "../schema/types";
-
-const app = Router();
+import { FindOptions, FindQuery } from "../store/types";
+import { SQLStatement } from "sql-template-strings";
 
 const fieldsMap = {
-  id: `object_store.ID`,
-  name: `object_store.data->>'name'`,
-  url: `object_store.data->>'url'`,
-  publicUrl: `object_store.data->>'publicUrl'`,
-  disabled: `object_store.data->'disabled'`,
-  createdAt: `object_store.data->'createdAt'`,
-  userId: `object_store.data->>'userId'`,
+  id: `push_target.ID`,
+  name: `push_target.data->>'name'`,
+  url: `push_target.data->>'url'`,
+  disabled: { val: `push_target.data->'disabled'`, type: "boolean" },
+  createdAt: { val: `push_target.data->'createdAt'`, type: "int" },
+  userId: `push_target.data->>'userId'`,
   "user.email": `users.data->>'email'`,
 };
 
+function toStringValues(obj: Record<string, any>): Record<string, string> {
+  const strObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
+function adminListQuery(
+  limit: number,
+  cursor: string,
+  orderStr: string,
+  filters: string
+): [SQLStatement[], FindOptions] {
+  const fields =
+    " push_target.id as id, push_target.data as data, users.id as usersId, users.data as usersData";
+  const from = `push_target left join users on push_target.data->>'userId' = users.id`;
+  const order = parseOrder(fieldsMap, orderStr);
+  const process = ({ data, usersData }) => {
+    return { ...data, user: db.user.cleanWriteOnlyResponse(usersData) };
+  };
+
+  const query = parseFilters(fieldsMap, filters);
+  const opts = { limit, cursor, fields, from, order, process };
+  return [query, opts];
+}
+
+const app = Router();
+
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit: limitStr, cursor, userId, order, filters } = req.query;
-  let limit = parseInt(limitStr.toString());
+  const qs = toStringValues(req.query);
+  const { limit: limitStr, cursor, userId, order, filters } = qs;
+  let limit = parseInt(limitStr);
   if (isNaN(limit)) {
     limit = undefined;
   }
 
-  if (req.user.admin && !userId) {
-    const query = parseFilters(fieldsMap, filters);
-
-    const fields =
-      " object_store.id as id, object_store.data as data, users.id as usersId, users.data as usersdata";
-    const from = `object_store left join users on object_store.data->>'userId' = users.id`;
-    const [output, newCursor] = await db.objectStore.find(query, {
-      limit,
-      cursor: cursor.toString(),
-      fields,
-      from,
-      order: parseOrder(fieldsMap, order),
-      process: ({ data, usersdata }) => {
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
-      },
-    });
-
-    res.status(200);
-
-    if (output.length > 0 && newCursor) {
-      res.links({ next: makeNextHREF(req, newCursor) });
-    }
-    return res.json(output);
-  }
-
+  let query: FindQuery | Array<SQLStatement>;
+  let opts: FindOptions;
   if (!userId) {
-    res.status(400);
-    return res.json({
-      errors: [`required query parameter: userId`],
-    });
+    if (!req.user.admin) {
+      res.status(400);
+      return res.json({
+        errors: [`required query parameter: userId`],
+      });
+    }
+    [query, opts] = adminListQuery(limit, cursor, order, filters);
+  } else {
+    if (!req.user.admin && req.user.id !== userId) {
+      res.status(403);
+      return res.json({
+        errors: [
+          "user can only request information about their own push targets",
+        ],
+      });
+    }
+    [query, opts] = [{ userId }, { limit, cursor }];
   }
 
-  if (req.user.admin !== true && req.user.id !== userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own object stores"],
-    });
-  }
-
-  const { data, cursor: newCursor } = await req.store.queryObjects({
-    kind: "object-store",
-    query: { userId: userId },
-    limit,
-    cursor,
-  });
+  const [output, newCursor] = await db.pushTarget.find(query, opts);
 
   res.status(200);
-  if (data.length > 0 && newCursor) {
+  if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(data);
+  res.json(output);
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
