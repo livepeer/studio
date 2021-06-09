@@ -6,6 +6,7 @@ import { v4 as uuid } from "uuid";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import { SQLStatement } from "sql-template-strings";
+import { PushTarget } from "../schema/types";
 
 const fieldsMap = {
   id: `push_target.ID`,
@@ -16,14 +17,6 @@ const fieldsMap = {
   userId: `push_target.data->>'userId'`,
   "user.email": `users.data->>'email'`,
 };
-
-function toStringValues(obj: Record<string, any>): Record<string, string> {
-  const strObj = {};
-  for (const [key, value] of Object.entries(obj)) {
-    strObj[key] = value.toString();
-  }
-  return strObj;
-}
 
 function adminListQuery(
   limit: number,
@@ -44,10 +37,19 @@ function adminListQuery(
   return [query, opts];
 }
 
-const respondError = (res: Response, status: number, error: string) =>
-  res.status(status).json({
+function toStringValues(obj: Record<string, any>): Record<string, string> {
+  const strObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
+function respondError(res: Response, status: number, error: string) {
+  return res.status(status).json({
     errors: [error],
-  });
+  })
+}
 
 const notFound = (res: Response) => respondError(res, 404, "not found");
 
@@ -118,12 +120,13 @@ app.get("/:id", async (req, res) => {
 });
 
 app.post("/", validatePost("push-target"), async (req, res) => {
+  const input = req.body as PushTarget
   const id = uuid();
   await db.pushTarget.create({
     id,
-    name: req.body.name,
-    url: req.body.url,
-    disabled: req.body.disabled,
+    name: input.name,
+    url: input.url,
+    disabled: input.disabled ?? false,
     userId: req.user.id,
     createdAt: Date.now(),
   });
