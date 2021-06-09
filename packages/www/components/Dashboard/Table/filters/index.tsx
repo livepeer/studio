@@ -1,54 +1,59 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 
-type FilterItem = {
+export type Condition =
+  | { type: "contains"; value: string }
+  | { type: "textEqual"; value: string }
+  | { type: "boolean"; value: boolean }
+  | { type: "dateEqual"; value: Date };
+export type ConditionType = Condition["type"];
+export type ConditionValue = Condition["value"];
+
+type Filter = FilterItem &
+  (
+    | {
+        isOpen: true;
+        condition: Condition;
+      }
+    | { isOpen: false }
+  );
+
+export type FilterItem = {
   label: string;
   type: FilterType;
 };
 
 type TableFilterProps = {
   items: FilterItem[];
+  onFiltersChange: (filters: Filter[]) => void;
 };
 
-export type Condition =
-  | { type: "contains"; value: string }
-  | { type: "dateEqual"; value: Date };
-export type ConditionType = Condition["type"];
-export type ConditionValue = Condition["value"];
-
-type ActiveFilter = { label: string } & (
-  | {
-      isOpen: true;
-      condition: Condition;
-    }
-  | { isOpen: false }
-);
-
-const hola: ActiveFilter = {
-  label: "hoal",
-  isOpen: false,
-};
-
-const TableFilter = ({ items }: TableFilterProps) => {
+const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [openFields, setOpenFields] = useState<string[]>([]);
-  const [filters, setFilters] = useState<ActiveFilter[]>([]);
+  const [filters, setFilters] = useState<Filter[]>(
+    items.map((i) => ({ ...i, isOpen: false }))
+  );
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
-      p.map((f) => ({ label: f.label, isOpen: false, condition: undefined }))
+      p.map((f) => ({ label: f.label, type: f.type, isOpen: false }))
     );
   }, []);
 
   const handleDone = useCallback(() => {
     setIsOpen(false);
   }, []);
+
+  useEffect(() => {
+    console.log(filters);
+    onFiltersChange(filters);
+  }, [filters]);
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -95,46 +100,91 @@ const TableFilter = ({ items }: TableFilterProps) => {
               Done
             </Button>
           </Flex>
-          <StyledAccordion type="multiple" value={openFields}>
-            {items.map((item, i) => {
+          <StyledAccordion
+            type="multiple"
+            value={filters.map((f) => (f.isOpen ? f.label : undefined))}>
+            {filters.map((filter, i) => {
               const onToggleOpen = () => {
-                setFilters((p) =>
-                  p.map((f) => {
-                    if (f.isOpen) {
-                      return { ...f, isOpen: false };
-                    } else return { ...f, isOpen: true };
-                  })
-                );
+                setFilters((p) => {
+                  const newFilters: Filter[] = [
+                    ...p.map((f) => {
+                      if (filter.label !== f.label) return f;
+                      if (f.isOpen) {
+                        return {
+                          isOpen: false as false,
+                          label: f.label,
+                          type: f.type,
+                        };
+                      } else {
+                        let defaultCondition: Condition;
+                        switch (f.type) {
+                          case "text":
+                            defaultCondition = { type: "contains", value: "" };
+                            break;
+                          default:
+                            break;
+                        }
+
+                        return {
+                          isOpen: true as true,
+                          label: f.label,
+                          type: f.type,
+                          condition: defaultCondition,
+                        };
+                      }
+                    }),
+                  ];
+                  return newFilters;
+                });
               };
 
-              switch (item.type) {
+              const onConditionChange = (condition: Condition) => {
+                setFilters((p) => {
+                  const newFilters: Filter[] = [
+                    ...p.map((f) => {
+                      if (filter.label !== f.label) return f;
+                      return {
+                        isOpen: true,
+                        label: f.label,
+                        type: f.type,
+                        condition: condition,
+                      };
+                    }),
+                  ];
+                  return newFilters;
+                });
+              };
+
+              switch (filter.type) {
                 case "text":
                   return (
                     <TableFilterTextField
-                      label={item.label}
+                      label={filter.label}
                       key={i}
-                      isOpen={isOpen}
+                      isOpen={filter.isOpen}
                       onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
                     />
                   );
-                case "date":
-                  return (
-                    <TableFilterDateField
-                      label={item.label}
-                      key={i}
-                      isOpen={isOpen}
-                      onToggleOpen={onToggleOpen}
-                    />
-                  );
-                case "number":
-                  return (
-                    <TableFilterNumberField
-                      label={item.label}
-                      key={i}
-                      isOpen={isOpen}
-                      onToggleOpen={onToggleOpen}
-                    />
-                  );
+                // case "date":
+                //   return (
+                //     <TableFilterDateField
+                //       label={filter.label}
+                //       key={i}
+                //       isOpen={filter.isOpen}
+                //       onToggleOpen={onToggleOpen}
+                //     />
+                //   );
+                // case "number":
+                //   return (
+                //     <TableFilterNumberField
+                //       label={filter.label}
+                //       key={i}
+                //       isOpen={filter.isOpen}
+                //       onToggleOpen={onToggleOpen}
+                //     />
+                //   );
                 default:
                   return null;
               }

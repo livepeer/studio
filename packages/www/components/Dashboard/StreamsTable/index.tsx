@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
 import DeleteStreamModal from "../DeleteStreamModal";
 import Table from "components/Dashboard/Table";
-import TableFilter from "components/Dashboard/Table/filters";
+import TableFilter, { FilterItem } from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Column, Row } from "react-table";
@@ -37,12 +37,13 @@ type Rendition = {
   fps: number;
 };
 
-const filterItems = [
-    { label: "Stream name", type: "text" },
-    { label: "Created date", type: "date" },
-    { label: "Last active", type: "date" },
-    { label: "Lifetime duration", type: "number" },
-]
+const filterItems: FilterItem[] = [
+  { label: "Stream name", type: "text" },
+  { label: "Another text field", type: "text" },
+  { label: "Created date", type: "date" },
+  { label: "Last active", type: "date" },
+  { label: "Lifetime duration", type: "number" },
+];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
@@ -311,9 +312,7 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          <TableFilter
-            items={filterItems}
-          />
+          <TableFilter items={filterItems} onFiltersChange={(f) => undefined} />
           <CreateStream />
         </Flex>
       </Flex>

@@ -9,9 +9,9 @@ import {
 } from "@livepeer.com/design-system";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
-import { useState } from "react";
+import { useCallback, useMemo } from "react";
 import { FilterType } from "./new";
-import { ConditionType, ConditionValue } from "..";
+import { ConditionType, Condition } from "..";
 
 const StyledDropdownTrigger = styled(DropdownMenu.Trigger, {
   width: "100%",
@@ -43,58 +43,61 @@ type Option = {
 
 const options: Record<FilterType, Option[]> = {
   text: [
+    { label: "is equal to", value: "textEqual" },
     { label: "contains", value: "contains" },
-    { label: "is equal to", value: "dateEqual" },
   ],
-  boolean: [{ label: "contains", value: "contains" }],
-  date: [
-    { label: "is equal to", value: "dateEqual" },
-    { label: "is between", value: "contains" },
-  ],
-  number: [
-    { label: "is between", value: "contains" },
-    { label: "is equal to", value: "dateEqual" },
-  ],
+  date: [{ label: "is equal to", value: "dateEqual" }],
+  number: [{ label: "is equal to", value: "textEqual" }],
+  boolean: [{ label: "is true", value: "boolean" }],
 };
 
 type ConditionSelectProps = {
   type: FilterType;
-  selectedCondition: Option;
-  onSelect: (option: Option) => void;
+  condition: Condition;
+  onSelect: (conditionType: ConditionType) => void;
 };
 
 const ConditionSelect = ({
   type,
-  selectedCondition,
+  condition,
   onSelect,
 }: ConditionSelectProps) => {
+  const { selectedOption, restOptions } = useMemo(() => {
+    let selectedOption: Option | undefined = undefined;
+    const restOptions: Option[] = [];
+    options[type].forEach((option) => {
+      if (option.value === condition.type) selectedOption = option;
+      else restOptions.push(option);
+    });
+
+    return { selectedOption, restOptions };
+  }, [type, condition.type]);
+
   return (
     <DropdownMenu.Root>
       <Box>
         <StyledDropdownTrigger>
           <Text css={{ cursor: "default" }} size="2">
-            {selectedCondition.label}
+            {selectedOption.label}
           </Text>
           <Flex>
             <SelectIcon />
           </Flex>
         </StyledDropdownTrigger>
         <DropdownMenuContent align="start" sideOffset={8} alignOffset={-10}>
-          {options[type]
-            .filter((a) => a.value !== selectedCondition.value)
-            .map((option, i) => {
-              // const isSelected = selectedCondition.value === option.value;
-              return (
-                <DropdownMenuItem
-                  key={i}
-                  onSelect={() => onSelect(option)}
-                  css={{ padding: "0px 0px 0px 11px" }}>
-                  <Box>
-                    <Text size="2">{option.label}</Text>
-                  </Box>
-                </DropdownMenuItem>
-              );
-            })}
+          {restOptions.map((option, i) => {
+            // const isSelected = selectedOption.value === option.value;
+            return (
+              <DropdownMenuItem
+                key={i}
+                onSelect={() => onSelect(option.value)}
+                css={{ padding: "0px 0px 0px 11px" }}>
+                <Box>
+                  <Text size="2">{option.label}</Text>
+                </Box>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </Box>
     </DropdownMenu.Root>
@@ -102,25 +105,29 @@ const ConditionSelect = ({
 };
 
 type ConditionValueProps = {
-  selectedCondition: Option;
   type: FilterType;
   label: string;
-  onChange: (newValue: ConditionValue) => void;
+  condition: Condition;
+  onChange: (newCondition: Condition) => void;
 };
 
 const ConditionValue = ({
   type,
   label,
-  selectedCondition,
+  condition,
   onChange,
 }: ConditionValueProps) => {
-  switch (selectedCondition.value) {
+  switch (condition.type) {
     case "contains":
+    case "textEqual":
       return (
         // @ts-ignore
         <TextField
           id={label}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) =>
+            onChange({ type: condition.type, value: e.target.value })
+          }
+          value={condition.value}
           css={{
             height: "100%",
             width: "100%",
@@ -163,20 +170,42 @@ const ConditionValue = ({
 type FieldContentProps = {
   label: string;
   type: FilterType;
+  condition: Condition;
+  onConditionChange: (condition: Condition) => void;
 };
 
-const FieldContent = ({ label, type }: FieldContentProps) => {
-  const [selectedCondition, setSelectedCondition] = useState<Option>(
-    options[type][0]
-  );
-  const [conditionValue, setConditionValue] = useState<any>();
+const FieldContent = ({
+  label,
+  type,
+  condition,
+  onConditionChange,
+}: FieldContentProps) => {
+  const handleSelect = useCallback((conditionType: ConditionType) => {
+    switch (conditionType) {
+      case "contains":
+        onConditionChange({ type: conditionType, value: "" });
+        break;
+      case "textEqual":
+        onConditionChange({ type: conditionType, value: "" });
+        break;
+      case "dateEqual":
+        onConditionChange({ type: conditionType, value: new Date() });
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const handleChange = useCallback((condition: Condition) => {
+    onConditionChange(condition);
+  }, []);
 
   return (
     <>
       <ConditionSelect
         type={type}
-        selectedCondition={selectedCondition}
-        onSelect={setSelectedCondition}
+        condition={condition}
+        onSelect={handleSelect}
       />
       <Flex
         as="label"
@@ -203,7 +232,8 @@ const FieldContent = ({ label, type }: FieldContentProps) => {
           <ConditionValue
             type={type}
             label={label}
-            selectedCondition={selectedCondition}
+            condition={condition}
+            onChange={handleChange}
           />
         </Box>
       </Flex>
