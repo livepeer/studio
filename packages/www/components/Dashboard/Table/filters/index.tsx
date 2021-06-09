@@ -11,7 +11,8 @@ export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
-  | { type: "dateEqual"; value: Date };
+  | { type: "dateEqual"; value: Date }
+  | { type: "dateBetween"; value: Date };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -51,7 +52,6 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
   }, []);
 
   useEffect(() => {
-    console.log(filters);
     onFiltersChange(filters);
   }, [filters]);
 
@@ -121,6 +121,12 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                           case "text":
                             defaultCondition = { type: "contains", value: "" };
                             break;
+                          case "date":
+                            defaultCondition = {
+                              type: "dateEqual",
+                              value: new Date(),
+                            };
+                            break;
                           default:
                             break;
                         }
@@ -167,15 +173,25 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                       onConditionChange={onConditionChange}
                     />
                   );
-                // case "date":
-                //   return (
-                //     <TableFilterDateField
-                //       label={filter.label}
-                //       key={i}
-                //       isOpen={filter.isOpen}
-                //       onToggleOpen={onToggleOpen}
-                //     />
-                //   );
+                case "date":
+                  return (
+                    <TableFilterDateField
+                      label={filter.label}
+                      key={i}
+                      isOpen={filter.isOpen}
+                      onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
+                    />
+                    // <TableFilterTextField
+                    //   label={filter.label}
+                    //   key={i}
+                    //   isOpen={filter.isOpen}
+                    //   onToggleOpen={onToggleOpen}
+                    //   condition={filter.isOpen ? filter.condition : null}
+                    //   onConditionChange={onConditionChange}
+                    // />
+                  );
                 // case "number":
                 //   return (
                 //     <TableFilterNumberField

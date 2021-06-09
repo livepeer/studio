@@ -39,10 +39,9 @@ type Rendition = {
 
 const filterItems: FilterItem[] = [
   { label: "Stream name", type: "text" },
-  { label: "Another text field", type: "text" },
   { label: "Created date", type: "date" },
   { label: "Last active", type: "date" },
-  { label: "Lifetime duration", type: "number" },
+  { label: "Lifetime duration", type: "text" },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
