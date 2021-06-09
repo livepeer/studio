@@ -4,7 +4,6 @@ import { Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { v4 as uuid } from "uuid";
 import { db } from "../store";
-import { ObjectStore } from "../schema/types";
 import { FindOptions, FindQuery } from "../store/types";
 import { SQLStatement } from "sql-template-strings";
 
@@ -47,7 +46,21 @@ function adminListQuery(
 
 const app = Router();
 
+app.use(function cleanWriteOnlyResponses(req, res, next) {
+  if (req.user.admin) return next();
+
+  const origResJson = res.json;
+  res.json = (data) => {
+    data = Array.isArray(data)
+      ? db.pushTarget.cleanWriteOnlyResponses(data)
+      : db.pushTarget.cleanWriteOnlyResponse(data);
+    return origResJson(data)
+  };
+  return next()
+});
+
 app.get("/", authMiddleware({}), async (req, res) => {
+  const isAdmin = !!req.user.admin;
   const qs = toStringValues(req.query);
   const { limit: limitStr, cursor, userId, order, filters } = qs;
   let limit = parseInt(limitStr);
@@ -58,7 +71,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   let query: FindQuery | Array<SQLStatement>;
   let opts: FindOptions;
   if (!userId) {
-    if (!req.user.admin) {
+    if (!isAdmin) {
       res.status(400);
       return res.json({
         errors: [`required query parameter: userId`],
@@ -66,7 +79,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     }
     [query, opts] = adminListQuery(limit, cursor, order, filters);
   } else {
-    if (!req.user.admin && req.user.id !== userId) {
+    if (!isAdmin && req.user.id !== userId) {
       res.status(403);
       return res.json({
         errors: [
@@ -76,11 +89,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     }
     [query, opts] = [{ userId }, { limit, cursor }];
   }
-
-  let [output, newCursor] = await db.pushTarget.find(query, opts);
-  if (!req.user.admin) {
-    output = db.pushTarget.cleanWriteOnlyResponses(output);
-  }
+  const [output, newCursor] = await db.pushTarget.find(query, opts);
 
   res.status(200);
   if (output.length > 0 && newCursor) {
@@ -90,22 +99,19 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await req.store.get<ObjectStore>(`object-store/${req.params.id}`);
-  if (!os) {
+  const isAdmin = !!req.user.admin;
+  let data = await db.pushTarget.get(req.params.id);
+  if (!data) {
     res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
+    return res.json({ errors: ["not found"] });
   }
-
-  if (req.user.admin !== true && req.user.id !== os.userId) {
+  if (!isAdmin && req.user.id !== data.userId) {
     res.status(403);
     return res.json({
-      errors: ["user can only request information on their own object stores"],
+      errors: ["user can only request information on their own push targets"],
     });
   }
-
-  res.json(os);
+  res.json(data);
 });
 
 app.post(
