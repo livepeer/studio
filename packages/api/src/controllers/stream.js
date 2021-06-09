@@ -21,6 +21,7 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../store/errors";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -52,6 +53,38 @@ const hackMistSettings = (req, profiles) => {
     return profile;
   });
 };
+
+function validatePushTarget(userId, profileNames, pushTargetRef) {
+  const {profile, id, spec} = pushTargetRef
+  if (!profileNames.contains(profile) && profile !== 'source') {
+    throw new NotFoundError(`push target must reference existing profile. not found: "${profile}"`)
+  }
+  if (!!spec === !!id) {
+    throw new BadRequestError(`push target must have either an "id" or a "spec"`);
+  }
+  if (id) {
+    const existing = await db.pushTarget.get(id);
+    if (!existing || userId !== existing.userId) {
+      throw new BadRequestError(`push target not found: "${id}"`);
+    }
+    return pushTargetRef
+  }
+
+  id = uuid()
+  await db.pushTarget.create({
+    id,
+    name: spec.name,
+    url: spec.url,
+    disabled: false,
+    userId: req.user.id,
+    createdAt: Date.now(),
+  });
+  const created = await db.pushTarget.get(id, { useReplica: false });
+  if (!created) {
+    throw new InternalServerError("error creating new push target");
+  }
+  return { profile, id };
+}
 
 export function getRecordingUrl(ingest, session, mp4 = false) {
   return pathJoin(
@@ -702,9 +735,6 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     }
   }
 
-  // TODO: Validate if pushTargets are valid and that no profile has the
-  // `source` name.
-
   const doc = wowzaHydrate({
     ...req.body,
     kind: "stream",
@@ -722,6 +752,20 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   });
 
   doc.profiles = hackMistSettings(req, doc.profiles);
+
+  const profileNames = new Set();
+  for (const { name } of doc.profiles) {
+    if (!name) continue;
+    if (name === "source") {
+      throw new BadRequestError(`profile cannot be named "source"`);
+    }
+    profileNames.add(name);
+  }
+  if (doc.pushTargets) {
+    const validated = doc.pushTargets.map(
+      pushTarget => validatePushTarget(req.user.id, profileNames, pushTarget))
+    doc.pushTargets = await Promise.all(validated)
+  }
 
   await Promise.all([
     req.store.create(doc),
