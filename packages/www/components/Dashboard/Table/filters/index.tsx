@@ -1,32 +1,60 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 
-type FilterItem = {
+export type Condition =
+  | { type: "contains"; value: string }
+  | { type: "textEqual"; value: string }
+  | { type: "boolean"; value: boolean }
+  | { type: "dateEqual"; value: Date };
+export type ConditionType = Condition["type"];
+export type ConditionValue = Condition["value"];
+
+type Filter = FilterItem &
+  (
+    | {
+        isOpen: true;
+        condition: Condition;
+      }
+    | { isOpen: false }
+  );
+
+export type FilterItem = {
   label: string;
   type: FilterType;
 };
 
 type TableFilterProps = {
   items: FilterItem[];
+  onFiltersChange: (filters: Filter[]) => void;
 };
 
-const TableFilter = ({ items }: TableFilterProps) => {
+const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [openFields, setOpenFields] = useState<string[]>([]);
+  const [filters, setFilters] = useState<Filter[]>(
+    items.map((i) => ({ ...i, isOpen: false }))
+  );
 
   const handleClear = useCallback(() => {
-    setOpenFields([]);
+    setFilters((p) =>
+      p.map((f) => ({ label: f.label, type: f.type, isOpen: false }))
+    );
   }, []);
 
   const handleDone = useCallback(() => {
     setIsOpen(false);
   }, []);
+
+  useEffect(() => {
+    console.log(filters);
+    onFiltersChange(filters);
+  }, [filters]);
+
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger as="div">
@@ -72,138 +100,95 @@ const TableFilter = ({ items }: TableFilterProps) => {
               Done
             </Button>
           </Flex>
-          <StyledAccordion type="multiple" value={openFields}>
-            {items.map((item, i) => {
-              const isOpen = openFields.includes(item.label);
+          <StyledAccordion
+            type="multiple"
+            value={filters.map((f) => (f.isOpen ? f.label : undefined))}>
+            {filters.map((filter, i) => {
               const onToggleOpen = () => {
-                if (isOpen) {
-                  setOpenFields((p) => p.filter((l) => l !== item.label));
-                } else setOpenFields((p) => [...p, item.label]);
+                setFilters((p) => {
+                  const newFilters: Filter[] = [
+                    ...p.map((f) => {
+                      if (filter.label !== f.label) return f;
+                      if (f.isOpen) {
+                        return {
+                          isOpen: false as false,
+                          label: f.label,
+                          type: f.type,
+                        };
+                      } else {
+                        let defaultCondition: Condition;
+                        switch (f.type) {
+                          case "text":
+                            defaultCondition = { type: "contains", value: "" };
+                            break;
+                          default:
+                            break;
+                        }
+
+                        return {
+                          isOpen: true as true,
+                          label: f.label,
+                          type: f.type,
+                          condition: defaultCondition,
+                        };
+                      }
+                    }),
+                  ];
+                  return newFilters;
+                });
               };
 
-              switch (item.type) {
+              const onConditionChange = (condition: Condition) => {
+                setFilters((p) => {
+                  const newFilters: Filter[] = [
+                    ...p.map((f) => {
+                      if (filter.label !== f.label) return f;
+                      return {
+                        isOpen: true,
+                        label: f.label,
+                        type: f.type,
+                        condition: condition,
+                      };
+                    }),
+                  ];
+                  return newFilters;
+                });
+              };
+
+              switch (filter.type) {
                 case "text":
                   return (
                     <TableFilterTextField
-                      label={item.label}
+                      label={filter.label}
                       key={i}
-                      isOpen={isOpen}
+                      isOpen={filter.isOpen}
                       onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
                     />
                   );
-                case "date":
-                  return (
-                    <TableFilterDateField
-                      label={item.label}
-                      type="date"
-                      key={i}
-                      isOpen={isOpen}
-                      onToggleOpen={onToggleOpen}
-                    />
-                  );
-                case "number":
-                  return (
-                    <TableFilterNumberField
-                      label={item.label}
-                      key={i}
-                      isOpen={isOpen}
-                      onToggleOpen={onToggleOpen}
-                    />
-                  );
+                // case "date":
+                //   return (
+                //     <TableFilterDateField
+                //       label={filter.label}
+                //       key={i}
+                //       isOpen={filter.isOpen}
+                //       onToggleOpen={onToggleOpen}
+                //     />
+                //   );
+                // case "number":
+                //   return (
+                //     <TableFilterNumberField
+                //       label={filter.label}
+                //       key={i}
+                //       isOpen={filter.isOpen}
+                //       onToggleOpen={onToggleOpen}
+                //     />
+                //   );
                 default:
                   return null;
               }
             })}
-            {/* {filters.map((each, idx) => (
-              <StyledItem value={each.name} key={idx}>
-                <StyledHeader>
-                  <StyledButton
-                    onClick={() =>
-                      setSelectedFilter(
-                        each.name === selectedFilter ? "" : each.name
-                      )
-                    }>
-                    <Box
-                      css={{
-                        minWidth: "13px",
-                        minHeight: "13px",
-                        borderRadius: "4px",
-                        boxShadow: "0px 0px 2px #000000",
-                        margin: "0px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor:
-                          each.name === selectedFilter
-                            ? "darkgray"
-                            : "transparent",
-                      }}>
-                      {each.name === selectedFilter && <CheckIcon />}
-                    </Box>
-                    <Text
-                      size="2"
-                      // @ts-ignore
-                      css={{ marginLeft: "9px", fontWeight: "500" }}>
-                      {each.name}
-                    </Text>
-                  </StyledButton>
-                </StyledHeader>
-                <StyledPanel>
-                  <DropdownFilter
-                    root={each}
-                    setSelectedFilters={setSelectedFilters}
-                  />
-                  <Flex
-                    css={{
-                      alignItems: "center",
-                      marginTop: "10px",
-                    }}>
-                    <Flex>
-                      <NextIcon />
-                    </Flex>
-                    <Box
-                      css={{
-                        width: "100%",
-                        maxWidth: each.field === "date" ? "110px" : "100%",
-                        height: "26px",
-                        borderRadius: "4px",
-                        position: "relative",
-                        margin: "0px 0px 0px 11px",
-                        display: "flex",
-                        alignItems: "center",
-                        background: "$loContrast",
-                      }}>
-                      {each.field === "date" && (
-                        <Flex
-                          as="label"
-                          htmlFor={each.name}
-                          css={{
-                            zIndex: 10,
-                            position: "absolute",
-                            left: "11px",
-                          }}>
-                          <CalendarIcon />
-                        </Flex>
-                      )}
-                      <TextField
-                        id={each.name}
-                        css={{
-                          height: "100%",
-                          width: "100%",
-                          padding:
-                            each.field === "date"
-                              ? "0px 11px 0px 30px"
-                              : "0px 11px",
-                          position: "absolute",
-                          left: 0,
-                          top: 0,
-                        }}
-                      />
-                    </Box>
-                  </Flex>
-                </StyledPanel>
-              </StyledItem>
-            ))} */}
           </StyledAccordion>
         </Box>
       </DropdownMenu.Content>

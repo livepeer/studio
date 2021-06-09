@@ -7,17 +7,22 @@ import {
 } from "../helpers";
 import { Box, Text } from "@livepeer.com/design-system";
 import FieldContent from "./field-content";
+import { Condition } from "..";
 
 export type TableFilterTextFieldProps = {
   label: string;
   isOpen: boolean;
   onToggleOpen: () => void;
+  condition: Condition;
+  onConditionChange: (condition: Condition) => void;
 };
 
 const TableFilterTextField = ({
   label,
   isOpen,
   onToggleOpen,
+  condition,
+  onConditionChange,
 }: TableFilterTextFieldProps) => {
   return (
     <StyledItem value={label}>
@@ -43,7 +48,14 @@ const TableFilterTextField = ({
         </StyledButton>
       </StyledHeader>
       <StyledPanel>
-        <FieldContent label={label} type="text" />
+        {isOpen && (
+          <FieldContent
+            label={label}
+            type="text"
+            condition={condition}
+            onConditionChange={onConditionChange}
+          />
+        )}
       </StyledPanel>
     </StyledItem>
   );

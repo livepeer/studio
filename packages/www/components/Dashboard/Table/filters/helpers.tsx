@@ -25,6 +25,15 @@ const StyledButton = styled(Accordion.Button, {
   alignItems: "center",
   padding: "11px",
   width: "100%",
+  outline: "none",
+  "&:focus": {
+    boxShadow:
+      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+    "&:-webkit-autofill": {
+      boxShadow:
+        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+    },
+  },
 });
 
 const StyledPanel = styled(Accordion.Panel, {

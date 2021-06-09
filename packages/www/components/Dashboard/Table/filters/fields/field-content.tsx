@@ -5,128 +5,208 @@ import {
   Flex,
   Text,
   TextField,
+  styled,
 } from "@livepeer.com/design-system";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { SelectIcon, NextIcon } from "../helpers";
-import { useState } from "react";
+import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
+import { useCallback, useMemo } from "react";
 import { FilterType } from "./new";
-import { CalendarIcon } from "../helpers";
+import { ConditionType, Condition } from "..";
 
-type ParameterValue = "contains" | "between" | "equal";
+const StyledDropdownTrigger = styled(DropdownMenu.Trigger, {
+  width: "100%",
+  height: "26px",
+  padding: "0px 11px",
+  borderRadius: "4px",
+  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  margin: "0px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  background: "$loContrast",
+  border: "none",
+  outline: "none",
+  "&:focus": {
+    boxShadow:
+      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+    "&:-webkit-autofill": {
+      boxShadow:
+        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+    },
+  },
+});
 
 type Option = {
   label: string;
-  value: ParameterValue;
+  value: ConditionType;
 };
 
 const options: Record<FilterType, Option[]> = {
   text: [
+    { label: "is equal to", value: "textEqual" },
     { label: "contains", value: "contains" },
-    { label: "is equal to", value: "equal" },
   ],
-  boolean: [{ label: "contains", value: "contains" }],
-  date: [
-    { label: "is between", value: "between" },
-    { label: "is equal to", value: "equal" },
-  ],
-  number: [
-    { label: "is between", value: "between" },
-    { label: "is equal to", value: "equal" },
-  ],
+  date: [{ label: "is equal to", value: "dateEqual" }],
+  number: [{ label: "is equal to", value: "textEqual" }],
+  boolean: [{ label: "is true", value: "boolean" }],
 };
 
-type ParameterSelectProps = {
+type ConditionSelectProps = {
   type: FilterType;
+  condition: Condition;
+  onSelect: (conditionType: ConditionType) => void;
 };
 
-const ParameterSelect = ({ type }: ParameterSelectProps) => {
-  const [selected, setSelected] = useState<Option>(options[type][0]);
+const ConditionSelect = ({
+  type,
+  condition,
+  onSelect,
+}: ConditionSelectProps) => {
+  const { selectedOption, restOptions } = useMemo(() => {
+    let selectedOption: Option | undefined = undefined;
+    const restOptions: Option[] = [];
+    options[type].forEach((option) => {
+      if (option.value === condition.type) selectedOption = option;
+      else restOptions.push(option);
+    });
+
+    return { selectedOption, restOptions };
+  }, [type, condition.type]);
 
   return (
     <DropdownMenu.Root>
-      <Box
-        css={{
-          width: "100%",
-          height: "26px",
-          padding: "0px 11px",
-          borderRadius: "4px",
-          boxShadow: "inset 0 0 0 1px $colors$slate7",
-          margin: "0px",
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          background: "$loContrast",
-        }}>
-        <DropdownMenu.Trigger as="div">
-          <Flex
-            css={{
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}>
-            <Text size="2">{selected.label}</Text>
-            <Flex>
-              <SelectIcon />
-            </Flex>
+      <Box>
+        <StyledDropdownTrigger>
+          <Text css={{ cursor: "default" }} size="2">
+            {selectedOption.label}
+          </Text>
+          <Flex>
+            <SelectIcon />
           </Flex>
-        </DropdownMenu.Trigger>
+        </StyledDropdownTrigger>
         <DropdownMenuContent align="start" sideOffset={8} alignOffset={-10}>
-          {options[type]
-            .filter((a) => a.value !== selected.value)
-            .map((option, i) => {
-              // const isSelected = selected.value === option.value;
-              const onSelect = () => setSelected(option);
-              switch (option.value) {
-                case "contains":
-                  return (
-                    <DropdownMenuItem
-                      key={i}
-                      onSelect={onSelect}
-                      css={{ padding: "0px 0px 0px 11px" }}>
-                      <Box>
-                        <Text size="2">{option.label}</Text>
-                      </Box>
-                    </DropdownMenuItem>
-                  );
-                  break;
-                case "between":
-                  return (
-                    <DropdownMenuItem
-                      key={i}
-                      onSelect={onSelect}
-                      css={{ padding: "0px 0px 0px 11px" }}>
-                      <Box>{option.label}</Box>
-                    </DropdownMenuItem>
-                  );
-                  break;
-                case "equal":
-                  return (
-                    <DropdownMenuItem
-                      key={i}
-                      onSelect={onSelect}
-                      css={{ padding: "0px 0px 0px 11px" }}>
-                      <Box>{option.label}</Box>
-                    </DropdownMenuItem>
-                  );
-
-                default:
-                  return null;
-              }
-            })}
+          {restOptions.map((option, i) => {
+            // const isSelected = selectedOption.value === option.value;
+            return (
+              <DropdownMenuItem
+                key={i}
+                onSelect={() => onSelect(option.value)}
+                css={{ padding: "0px 0px 0px 11px" }}>
+                <Box>
+                  <Text size="2">{option.label}</Text>
+                </Box>
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </Box>
     </DropdownMenu.Root>
   );
 };
 
+type ConditionValueProps = {
+  type: FilterType;
+  label: string;
+  condition: Condition;
+  onChange: (newCondition: Condition) => void;
+};
+
+const ConditionValue = ({
+  type,
+  label,
+  condition,
+  onChange,
+}: ConditionValueProps) => {
+  switch (condition.type) {
+    case "contains":
+    case "textEqual":
+      return (
+        // @ts-ignore
+        <TextField
+          id={label}
+          onChange={(e) =>
+            onChange({ type: condition.type, value: e.target.value })
+          }
+          value={condition.value}
+          css={{
+            height: "100%",
+            width: "100%",
+            padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+            position: "absolute",
+            maxWidth: type === "date" ? "100px" : "",
+            left: 0,
+            top: 0,
+          }}
+        />
+      );
+    case "dateEqual":
+      return (
+        <>
+          <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+            <CalendarIcon />
+          </Box>
+          {/* TODO date field */}
+          {/* @ts-ignore */}
+          <TextField
+            id={label}
+            css={{
+              height: "100%",
+              width: "100%",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              position: "absolute",
+              maxWidth: type === "date" ? "100px" : "",
+              left: 0,
+              top: 0,
+            }}
+          />
+        </>
+      );
+
+    default:
+      return null;
+  }
+};
+
 type FieldContentProps = {
   label: string;
   type: FilterType;
+  condition: Condition;
+  onConditionChange: (condition: Condition) => void;
 };
 
-const FieldContent = ({ label, type }: FieldContentProps) => {
+const FieldContent = ({
+  label,
+  type,
+  condition,
+  onConditionChange,
+}: FieldContentProps) => {
+  const handleSelect = useCallback((conditionType: ConditionType) => {
+    switch (conditionType) {
+      case "contains":
+        onConditionChange({ type: conditionType, value: "" });
+        break;
+      case "textEqual":
+        onConditionChange({ type: conditionType, value: "" });
+        break;
+      case "dateEqual":
+        onConditionChange({ type: conditionType, value: new Date() });
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const handleChange = useCallback((condition: Condition) => {
+    onConditionChange(condition);
+  }, []);
+
   return (
     <>
-      <ParameterSelect type={type} />
+      <ConditionSelect
+        type={type}
+        condition={condition}
+        onSelect={handleSelect}
+      />
       <Flex
         as="label"
         htmlFor={label}
@@ -149,23 +229,11 @@ const FieldContent = ({ label, type }: FieldContentProps) => {
             alignItems: "center",
             background: "$loContrast",
           }}>
-          {type === "date" && (
-            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
-              <CalendarIcon />
-            </Box>
-          )}
-          {/* @ts-ignore */}
-          <TextField
-            id={label}
-            css={{
-              height: "100%",
-              width: "100%",
-              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
-              position: "absolute",
-              maxWidth: type === 'date' ? '100px' : '',
-              left: 0,
-              top: 0,
-            }}
+          <ConditionValue
+            type={type}
+            label={label}
+            condition={condition}
+            onChange={handleChange}
           />
         </Box>
       </Flex>
