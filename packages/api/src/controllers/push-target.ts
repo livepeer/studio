@@ -77,7 +77,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
     [query, opts] = [{ userId }, { limit, cursor }];
   }
 
-  const [output, newCursor] = await db.pushTarget.find(query, opts);
+  let [output, newCursor] = await db.pushTarget.find(query, opts);
+  if (!req.user.admin) {
+    output = db.pushTarget.cleanWriteOnlyResponses(output);
+  }
 
   res.status(200);
   if (output.length > 0 && newCursor) {
