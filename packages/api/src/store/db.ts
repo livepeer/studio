@@ -29,8 +29,8 @@ interface PostgresParams {
   appName?: string;
 }
 
-type WithId<T> = T & { id: string }
-type Table<T> = BaseTable<WithId<T>>
+type WithId<T> = T & { id: string };
+type Table<T> = BaseTable<WithId<T>>;
 
 const makeTable = <T>(opts: TableOptions) =>
   new BaseTable<WithId<T>>(opts) as Table<T>;
@@ -39,7 +39,7 @@ export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
-  pushTarget: Table<PushTarget>
+  pushTarget: Table<PushTarget>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -73,7 +73,7 @@ export class DB {
     this.pool = new Pool({
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
-      application_name: `${appName}-${hostname()}`
+      application_name: `${appName}-${hostname()}`,
     });
 
     if (postgresReplicaUrl) {

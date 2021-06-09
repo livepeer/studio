@@ -21,7 +21,11 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../store/errors";
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from "../store/errors";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -54,23 +58,27 @@ const hackMistSettings = (req, profiles) => {
   });
 };
 
-function validatePushTarget(userId, profileNames, pushTargetRef) {
-  const {profile, id, spec} = pushTargetRef
-  if (!profileNames.contains(profile) && profile !== 'source') {
-    throw new NotFoundError(`push target must reference existing profile. not found: "${profile}"`)
+async function validatePushTarget(userId, profileNames, pushTargetRef) {
+  const { profile, id, spec } = pushTargetRef;
+  if (!profileNames.contains(profile) && profile !== "source") {
+    throw new NotFoundError(
+      `push target must reference existing profile. not found: "${profile}"`
+    );
   }
   if (!!spec === !!id) {
-    throw new BadRequestError(`push target must have either an "id" or a "spec"`);
+    throw new BadRequestError(
+      `push target must have either an "id" or a "spec"`
+    );
   }
   if (id) {
     const existing = await db.pushTarget.get(id);
     if (!existing || userId !== existing.userId) {
       throw new BadRequestError(`push target not found: "${id}"`);
     }
-    return pushTargetRef
+    return pushTargetRef;
   }
 
-  id = uuid()
+  id = uuid();
   await db.pushTarget.create({
     id,
     name: spec.name,
@@ -762,9 +770,10 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     profileNames.add(name);
   }
   if (doc.pushTargets) {
-    const validated = doc.pushTargets.map(
-      pushTarget => validatePushTarget(req.user.id, profileNames, pushTarget))
-    doc.pushTargets = await Promise.all(validated)
+    const validated = doc.pushTargets.map((pushTarget) =>
+      validatePushTarget(req.user.id, profileNames, pushTarget)
+    );
+    doc.pushTargets = await Promise.all(validated);
   }
 
   await Promise.all([

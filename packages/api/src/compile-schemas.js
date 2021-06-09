@@ -59,7 +59,7 @@ const types = [];
   const typeStr = types.join("\n");
   const typePath = path.resolve(schemaDir, "types.d.ts");
   write(typePath, typeStr);
-})().catch(err => {
+})().catch((err) => {
   console.error(err);
   process.exit(1);
 });

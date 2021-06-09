@@ -48,7 +48,7 @@ function toStringValues(obj: Record<string, any>): Record<string, string> {
 function respondError(res: Response, status: number, error: string) {
   return res.status(status).json({
     errors: [error],
-  })
+  });
 }
 
 const notFound = (res: Response) => respondError(res, 404, "not found");
@@ -120,7 +120,7 @@ app.get("/:id", async (req, res) => {
 });
 
 app.post("/", validatePost("push-target"), async (req, res) => {
-  const input = req.body as PushTarget
+  const input = req.body as PushTarget;
   const id = uuid();
   await db.pushTarget.create({
     id,
