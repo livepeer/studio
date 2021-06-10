@@ -183,14 +183,6 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                       condition={filter.isOpen ? filter.condition : null}
                       onConditionChange={onConditionChange}
                     />
-                    // <TableFilterTextField
-                    //   label={filter.label}
-                    //   key={i}
-                    //   isOpen={filter.isOpen}
-                    //   onToggleOpen={onToggleOpen}
-                    //   condition={filter.isOpen ? filter.condition : null}
-                    //   onConditionChange={onConditionChange}
-                    // />
                   );
                 // case "number":
                 //   return (
