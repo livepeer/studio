@@ -12,7 +12,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
 import DeleteStreamModal from "../DeleteStreamModal";
 import Table from "components/Dashboard/Table";
-import TableFilter, { FilterItem } from "components/Dashboard/Table/filters";
+import TableFilter, {
+  FilterItem,
+  ApplyFilterHandler,
+} from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Column, Row } from "react-table";
@@ -253,6 +256,11 @@ const StreamsTable = ({
     [streams]
   );
 
+  const handleApplyFilter: ApplyFilterHandler = useCallback((filters) => {
+    // TODO apply filters
+    console.log(filters);
+  }, []);
+
   return (
     <Box>
       <Flex
@@ -311,10 +319,7 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          <TableFilter
-            items={filterItems}
-            onFiltersChange={(f) => console.log(f)}
-          />
+          <TableFilter items={filterItems} onDone={handleApplyFilter} />
           <CreateStream />
         </Flex>
       </Flex>

@@ -33,12 +33,14 @@ export type FilterItem = {
   type: FilterType;
 };
 
+export type ApplyFilterHandler = (filters: Filter[]) => void;
+
 type TableFilterProps = {
   items: FilterItem[];
-  onFiltersChange: (filters: Filter[]) => void;
+  onDone: ApplyFilterHandler;
 };
 
-const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
+const TableFilter = ({ items, onDone }: TableFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Filter[]>(
     items.map((i) => ({ ...i, isOpen: false }))
@@ -52,10 +54,7 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
 
   const handleDone = useCallback(() => {
     setIsOpen(false);
-  }, []);
-
-  useEffect(() => {
-    onFiltersChange(filters);
+    onDone(filters);
   }, [filters]);
 
   return (
