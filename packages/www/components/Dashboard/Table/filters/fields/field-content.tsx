@@ -92,26 +92,10 @@ type ConditionSelectProps = {
   onSelect: (conditionType: ConditionType) => void;
 };
 
-const ConditionSelect = ({
-  type,
-  condition,
-  onSelect,
-}: ConditionSelectProps) => {
-  const { selectedOption, restOptions } = useMemo(() => {
-    let selectedOption: Option | undefined = undefined;
-    const restOptions: Option[] = [];
-    options[type].forEach((option) => {
-      if (option.value === condition.type) selectedOption = option;
-      restOptions.push(option);
-    });
-
-    return { selectedOption, restOptions };
-  }, [type, condition.type]);
-
+const ConditionSelect = ({ type, onSelect }: ConditionSelectProps) => {
   const handleChange = useCallback((e) => {
     const value = e.target.value;
-    const selectedOption = restOptions.filter((o) => o.label === value)[0];
-    onSelect(selectedOption.value);
+    onSelect(value);
   }, []);
 
   return (
@@ -127,10 +111,9 @@ const ConditionSelect = ({
         background: "$loContrast",
       }}>
       <Select onChange={handleChange}>
-        {restOptions.map((option, i) => {
-          // const isSelected = selectedOption.value === option.value;
+        {options[type].map((option, i) => {
           return (
-            <option value={option.label} key={i}>
+            <option value={option.value} key={i}>
               {option.label}
             </option>
           );
@@ -231,7 +214,7 @@ const ConditionValue = ({
           />
         </Box>
       );
-    case "textEqual":
+    case "dateEqual":
       return (
         <Box
           as="label"
