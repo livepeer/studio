@@ -6,6 +6,7 @@ import {
   Grid,
   Link as A,
   styled,
+  Text,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";

@@ -5,6 +5,11 @@ import {
   Flex,
   Link as A,
   Badge,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+  Text,
   styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -313,11 +318,32 @@ const StreamsTable = ({
                 </a>
               </Box>
             </Box> */}
-          <Link href="/app/stream/new-stream" passHref>
+
+          {/* <Link href="/app/stream/new-stream" passHref>
             <Button variant="violet" css={{ display: "flex", align: "center" }}>
               <StyledPlusIcon /> Create stream
             </Button>
-          </Link>
+          </Link> */}
+
+          <Dialog>
+            <DialogTrigger
+              as={Button}
+              variant="violet"
+              css={{ display: "flex", align: "center" }}>
+              <StyledPlusIcon /> Create stream
+            </DialogTrigger>
+            <DialogContent>
+              <Text size="5" as="h6" css={{ fontWeight: 500, mb: "$3" }}>
+                Dialog Heading
+              </Text>
+              <Text size="3" as="p" css={{ lineHeight: "25px" }}>
+                There are 5 variants to choose from. Use is for positive states.
+                This is a link Traditional business literature won’t help you
+                solve it- most of that stuff is focused on life after
+                product/market fit, after the Trough of Sorrow.
+              </Text>
+            </DialogContent>
+          </Dialog>
         </Flex>
       </Flex>
       {deleteModal && selectedStreams.length && (

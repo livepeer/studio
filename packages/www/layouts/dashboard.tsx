@@ -2,13 +2,12 @@ import { ThemeProvider } from "next-themes";
 import {
   global,
   darkTheme,
+  lightTheme,
   DesignSystemProvider,
   Box,
-  theme,
 } from "@livepeer.com/design-system";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
-import { IdProvider } from "@radix-ui/react-id";
 
 const globalStyles = global({
   body: {
@@ -51,20 +50,19 @@ function DashboardLayout({ id, children, breadcrumbs }: Props) {
   globalStyles();
 
   return (
-    <IdProvider>
-      <DesignSystemProvider>
-        <ThemeProvider
-          disableTransitionOnChange
-          attribute="class"
-          value={{ light: theme.className, dark: darkTheme.className }}>
-          <Sidebar id={id} />
-          <Box css={{ pl: 270, width: "100%" }}>
-            <Header breadcrumbs={breadcrumbs} />
-            {children}
-          </Box>
-        </ThemeProvider>
-      </DesignSystemProvider>
-    </IdProvider>
+    <DesignSystemProvider>
+      <ThemeProvider
+        disableTransitionOnChange
+        attribute="class"
+        defaultTheme="dark"
+        value={{ dark: darkTheme.className, light: lightTheme.className }}>
+        <Sidebar id={id} />
+        <Box css={{ pl: 270, width: "100%" }}>
+          <Header breadcrumbs={breadcrumbs} />
+          {children}
+        </Box>
+      </ThemeProvider>
+    </DesignSystemProvider>
   );
 }
 
