@@ -5,13 +5,14 @@ import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
+import { format } from "date-fns";
 
 export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
-  | { type: "dateBetween"; value: { first: string; second: string } };
+  | { type: "dateBetween"; value: [string, string] };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -123,7 +124,7 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                           case "date":
                             defaultCondition = {
                               type: "dateEqual",
-                              value: new Date().toString(),
+                              value: format(new Date(), "yyyy-MM-dd"),
                             };
                             break;
                           default:
