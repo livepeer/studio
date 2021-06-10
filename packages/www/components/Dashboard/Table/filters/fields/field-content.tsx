@@ -497,10 +497,7 @@ const FieldContent = ({
       case "numberBetween":
         onConditionChange({
           type: conditionType,
-          value: {
-            first: 0,
-            second: 0,
-          },
+          value: [0, 0],
         });
         break;
       default:
