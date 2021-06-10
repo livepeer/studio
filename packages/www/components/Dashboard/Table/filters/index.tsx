@@ -71,8 +71,8 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
         <Box
           css={{
             backgroundColor: "$loContrast",
-            width: "241px",
-            maxWidth: "241px",
+            width: "284px",
+            maxWidth: "284px",
             display: "flex",
             flexDirection: "column",
             marginRight: "6px",

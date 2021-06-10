@@ -34,9 +34,11 @@ const Select = styled("select", {
 const DateInput = styled("input", {
   WebkitAppearance: "none",
   height: "100%",
-  maxWidth: "95px",
+  maxWidth: "88px",
   position: "absolute",
   paddingLeft: "30px",
+  fontSize: '12px',
+  fontFamily: '$untitled',
   left: 0,
   top: 0,
   borderRadius: "4px",
@@ -253,7 +255,7 @@ const ConditionValue = ({
       );
     case "dateBetween":
       return (
-        <div style={{ marginTop: "" }}>
+        <div style={{ marginTop: "", width: '100%', display: 'flex', justifyContent: 'space-between' }}>
           <Box
             as="label"
             htmlFor={label}
