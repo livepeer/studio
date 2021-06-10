@@ -41,7 +41,7 @@ const filterItems: FilterItem[] = [
   { label: "Stream name", type: "text" },
   { label: "Created date", type: "date" },
   { label: "Last active", type: "date" },
-  { label: "Lifetime duration", type: "text" },
+  { label: "Lifetime duration", type: "number" },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {

@@ -5,13 +5,17 @@ import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
+import { CardNumberElementProps } from "@stripe/react-stripe-js";
+import TableFilterNumberField from "./fields/number";
 
 export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
-  | { type: "dateBetween"; value: { first: string; second: string } };
+  | { type: "dateBetween"; value: { first: string; second: string } }
+  | { type: "numberEqual"; value: number }
+  | { type: "numberBetween"; value: { first: number; second: number } };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -126,6 +130,12 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                               value: new Date().toString(),
                             };
                             break;
+                          case "number":
+                            defaultCondition = {
+                              type: "numberEqual",
+                              value: 0,
+                            };
+                            break;
                           default:
                             break;
                         }
@@ -183,15 +193,17 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                       onConditionChange={onConditionChange}
                     />
                   );
-                // case "number":
-                //   return (
-                //     <TableFilterNumberField
-                //       label={filter.label}
-                //       key={i}
-                //       isOpen={filter.isOpen}
-                //       onToggleOpen={onToggleOpen}
-                //     />
-                //   );
+                case "number":
+                  return (
+                    <TableFilterNumberField
+                      label={filter.label}
+                      key={i}
+                      isOpen={filter.isOpen}
+                      onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
+                    />
+                  );
                 default:
                   return null;
               }
