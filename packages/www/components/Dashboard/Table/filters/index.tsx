@@ -5,13 +5,14 @@ import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
-import TableFilterNumberField from "./fields/number";
+import { format } from "date-fns";
 
 export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
-  | { type: "dateEqual"; value: Date };
+  | { type: "dateEqual"; value: string }
+  | { type: "dateBetween"; value: [string, string] };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -51,7 +52,6 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
   }, []);
 
   useEffect(() => {
-    console.log(filters);
     onFiltersChange(filters);
   }, [filters]);
 
@@ -72,8 +72,8 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
         <Box
           css={{
             backgroundColor: "$loContrast",
-            width: "241px",
-            maxWidth: "241px",
+            width: "284px",
+            maxWidth: "284px",
             display: "flex",
             flexDirection: "column",
             marginRight: "6px",
@@ -121,6 +121,12 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                           case "text":
                             defaultCondition = { type: "contains", value: "" };
                             break;
+                          case "date":
+                            defaultCondition = {
+                              type: "dateEqual",
+                              value: format(new Date(), "yyyy-MM-dd"),
+                            };
+                            break;
                           default:
                             break;
                         }
@@ -167,15 +173,17 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                       onConditionChange={onConditionChange}
                     />
                   );
-                // case "date":
-                //   return (
-                //     <TableFilterDateField
-                //       label={filter.label}
-                //       key={i}
-                //       isOpen={filter.isOpen}
-                //       onToggleOpen={onToggleOpen}
-                //     />
-                //   );
+                case "date":
+                  return (
+                    <TableFilterDateField
+                      label={filter.label}
+                      key={i}
+                      isOpen={filter.isOpen}
+                      onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
+                    />
+                  );
                 // case "number":
                 //   return (
                 //     <TableFilterNumberField

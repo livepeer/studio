@@ -1,32 +1,61 @@
-import {
-  Box,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  Flex,
-  Text,
-  TextField,
-  styled,
-} from "@livepeer.com/design-system";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Box, Flex, TextField, styled } from "@livepeer.com/design-system";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FilterType } from "./new";
 import { ConditionType, Condition } from "..";
+import { format } from "date-fns";
 
-const StyledDropdownTrigger = styled(DropdownMenu.Trigger, {
+const Select = styled("select", {
+  WebkitAppearance: "none",
   width: "100%",
-  height: "26px",
+  height: "100%",
+  position: "absolute",
+  left: 0,
+  top: 0,
   padding: "0px 11px",
+  fontSize: "12px",
+  lineHeight: "1",
   borderRadius: "4px",
-  boxShadow: "inset 0 0 0 1px $colors$slate7",
-  margin: "0px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
   background: "$loContrast",
   border: "none",
   outline: "none",
+  boxShadow: "inset 0 0 0 1px $colors$slate7",
   "&:focus": {
+    border: "none",
+    outline: "none",
+    boxShadow:
+      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+    "&:-webkit-autofill": {
+      boxShadow:
+        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+    },
+  },
+});
+
+const DateInput = styled("input", {
+  WebkitAppearance: "none",
+  height: "100%",
+  maxWidth: "88px",
+  position: "absolute",
+  paddingLeft: "30px",
+  fontSize: "12px",
+  fontFamily: "$untitled",
+  left: 0,
+  top: 0,
+  borderRadius: "4px",
+  background: "$loContrast",
+  border: "none",
+  outline: "none",
+  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  "&::-webkit-calendar-picker-indicator": {
+    position: "absolute",
+    left: -18,
+    zIndex: 1,
+    opacity: "0",
+  },
+  "&:focus": {
+    border: "none",
+    outline: "none",
     boxShadow:
       "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
     "&:-webkit-autofill": {
@@ -46,7 +75,10 @@ const options: Record<FilterType, Option[]> = {
     { label: "is equal to", value: "textEqual" },
     { label: "contains", value: "contains" },
   ],
-  date: [{ label: "is equal to", value: "dateEqual" }],
+  date: [
+    { label: "is equal to", value: "dateEqual" },
+    { label: "is between", value: "dateBetween" },
+  ],
   number: [{ label: "is equal to", value: "textEqual" }],
   boolean: [{ label: "is true", value: "boolean" }],
 };
@@ -67,40 +99,44 @@ const ConditionSelect = ({
     const restOptions: Option[] = [];
     options[type].forEach((option) => {
       if (option.value === condition.type) selectedOption = option;
-      else restOptions.push(option);
+      restOptions.push(option);
     });
 
     return { selectedOption, restOptions };
   }, [type, condition.type]);
 
+  const handleChange = useCallback((e) => {
+    const value = e.target.value;
+    const selectedOption = restOptions.filter((o) => o.label === value)[0];
+    onSelect(selectedOption.value);
+  }, []);
+
   return (
-    <DropdownMenu.Root>
-      <Box>
-        <StyledDropdownTrigger>
-          <Text css={{ cursor: "default" }} size="2">
-            {selectedOption.label}
-          </Text>
-          <Flex>
-            <SelectIcon />
-          </Flex>
-        </StyledDropdownTrigger>
-        <DropdownMenuContent align="start" sideOffset={8} alignOffset={-10}>
-          {restOptions.map((option, i) => {
-            // const isSelected = selectedOption.value === option.value;
-            return (
-              <DropdownMenuItem
-                key={i}
-                onSelect={() => onSelect(option.value)}
-                css={{ padding: "0px 0px 0px 11px" }}>
-                <Box>
-                  <Text size="2">{option.label}</Text>
-                </Box>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </Box>
-    </DropdownMenu.Root>
+    <Box
+      css={{
+        height: "26px",
+        width: "100%",
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        margin: "0px",
+        background: "$loContrast",
+      }}>
+      <Select onChange={handleChange}>
+        {restOptions.map((option, i) => {
+          // const isSelected = selectedOption.value === option.value;
+          return (
+            <option value={option.label} key={i}>
+              {option.label}
+            </option>
+          );
+        })}
+      </Select>
+      <Flex css={{ zIndex: 1, marginRight: "11px" }}>
+        <SelectIcon />
+      </Flex>
+    </Box>
   );
 };
 
@@ -117,38 +153,33 @@ const ConditionValue = ({
   condition,
   onChange,
 }: ConditionValueProps) => {
+  const [dateBetweenValue, setDateBetweenValue] = useState<[string, string]>([
+    format(new Date(), "yyyy-MM-dd"),
+    format(new Date(), "yyyy-MM-dd"),
+  ]);
+
   switch (condition.type) {
     case "contains":
-    case "textEqual":
       return (
-        // @ts-ignore
-        <TextField
-          id={label}
-          onChange={(e) =>
-            onChange({ type: condition.type, value: e.target.value })
-          }
-          value={condition.value}
+        <Box
+          as="label"
+          htmlFor={label}
           css={{
-            height: "100%",
+            height: "26px",
             width: "100%",
-            padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
-            position: "absolute",
-            maxWidth: type === "date" ? "100px" : "",
-            left: 0,
-            top: 0,
-          }}
-        />
-      );
-    case "dateEqual":
-      return (
-        <>
-          <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
-            <CalendarIcon />
-          </Box>
-          {/* TODO date field */}
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
           {/* @ts-ignore */}
           <TextField
             id={label}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+            value={condition.value}
             css={{
               height: "100%",
               width: "100%",
@@ -159,7 +190,137 @@ const ConditionValue = ({
               top: 0,
             }}
           />
-        </>
+        </Box>
+      );
+    case "textEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            maxWidth: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          {/* @ts-ignore */}
+          <TextField
+            id={label}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+            value={condition.value}
+            css={{
+              height: "100%",
+              width: "100%",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              position: "absolute",
+              maxWidth: type === "date" ? "100px" : "",
+              left: 0,
+              top: 0,
+            }}
+          />
+        </Box>
+      );
+    case "dateEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+            <CalendarIcon />
+          </Box>
+          <DateInput
+            type="date"
+            id={label}
+            value={condition.value}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+          />
+        </Box>
+      );
+    case "dateBetween":
+      return (
+        <div
+          style={{
+            marginTop: "",
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+          }}>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              width: "100%",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+              <CalendarIcon />
+            </Box>
+            <DateInput
+              type="date"
+              id={label}
+              value={dateBetweenValue[0]}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDateBetweenValue((p) => [value, p[1]]);
+                onChange({
+                  type: condition.type,
+                  value: [value, dateBetweenValue[1]],
+                });
+              }}
+            />
+          </Box>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              width: "100%",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+              <CalendarIcon />
+            </Box>
+            <DateInput
+              type="date"
+              id={label}
+              value={dateBetweenValue[1]}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDateBetweenValue((p) => [p[0], value]);
+                onChange({
+                  type: condition.type,
+                  value: [dateBetweenValue[0], value],
+                });
+              }}
+            />
+          </Box>
+        </div>
       );
 
     default:
@@ -189,7 +350,19 @@ const FieldContent = ({
         onConditionChange({ type: conditionType, value: "" });
         break;
       case "dateEqual":
-        onConditionChange({ type: conditionType, value: new Date() });
+        onConditionChange({
+          type: conditionType,
+          value: format(new Date(), "yyyy-MM-dd"),
+        });
+        break;
+      case "dateBetween":
+        onConditionChange({
+          type: conditionType,
+          value: [
+            format(new Date(), "yyyy-MM-dd"),
+            format(new Date(), "yyyy-MM-dd"),
+          ],
+        });
         break;
       default:
         break;
@@ -211,23 +384,15 @@ const FieldContent = ({
         as="label"
         htmlFor={label}
         css={{
-          alignItems: "center",
           marginTop: "10px",
         }}>
-        <Flex>
+        <Flex css={{ marginTop: "8px" }}>
           <NextIcon />
         </Flex>
         <Box
           css={{
-            width: "100%",
-            maxWidth: "100%",
-            height: "26px",
-            borderRadius: "4px",
-            position: "relative",
             margin: "0px 0px 0px 11px",
-            display: "flex",
-            alignItems: "center",
-            background: "$loContrast",
+            width: "100%",
           }}>
           <ConditionValue
             type={type}
