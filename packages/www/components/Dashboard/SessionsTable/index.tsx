@@ -15,7 +15,7 @@ import {
   TableData,
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
-import { Box, Flex, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -52,20 +52,19 @@ const RecordingUrlCell = <D extends TableData>({
   const id = cell.value.id;
 
   return (
-    <div id={`mp4-link-dropdown-${id}`} sx={{ position: "relative" }}>
+    <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
       {cell.value.href ? (
-        <Flex sx={{ justifyContent: "space-between" }}>
-          <Link href={cell.value.href}>
-            <a>{cell.value.children}</a>
+        <Flex css={{ justifyContent: "space-between" }}>
+          <Link href={cell.value.href} passHref>
+            <A variant="violet">{cell.value.children}</A>
           </Link>
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
               <A
                 variant="violet"
                 target="_blank"
-                href={makeMP4Url(cell.value.href, "source")}
-                sx={{ p: 1 }}>
-                Download&nbsp;mp4
+                href={makeMP4Url(cell.value.href, "source")}>
+                Download mp4
               </A>
             </Box>
           ) : null}
@@ -73,7 +72,7 @@ const RecordingUrlCell = <D extends TableData>({
       ) : (
         cell.value.children
       )}
-    </div>
+    </Box>
   );
 };
 
@@ -174,8 +173,8 @@ const StreamSessionsTable = ({
   }, [streamsSessions]);
 
   return streamsSessions.length ? (
-    <Box sx={{ mb: "0.5em", mt: "2em" }}>
-      <h4 sx={{ mb: "0.5em" }}>Stream Sessions</h4>
+    <Box>
+      <Heading css={{ mb: "$4" }}>Stream Sessions</Heading>
       <Table
         columns={columns}
         data={data}

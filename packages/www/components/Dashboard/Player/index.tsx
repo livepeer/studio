@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Box } from "@livepeer.com/design-system";
+import muxjs from "mux.js/dist/mux.js";
 
 const Player = ({
   src,
@@ -12,11 +13,11 @@ const Player = ({
   const controller: any = useRef({});
 
   useEffect(() => {
+    window["muxjs"] = muxjs;
+
     // Use compiled versions of these libraries so they work with ad blockers
-    const muxjs = require("mux.js/dist/mux.js");
     const shaka = require("shaka-player/dist/shaka-player.ui.js");
 
-    window["muxjs"] = muxjs;
     const player = new shaka.Player(video.current);
     const ui = new shaka.ui.Overlay(
       player,
