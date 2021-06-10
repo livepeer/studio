@@ -7,7 +7,7 @@ const rotate = keyframes({
 const Index = ({ css = {}, speed = "1s" }) => (
   <Box
     css={{
-      color: "$violet11",
+      color: "$violet9",
       border: "3px solid",
       borderColor: "$loContrast",
       borderRadius: "50%",

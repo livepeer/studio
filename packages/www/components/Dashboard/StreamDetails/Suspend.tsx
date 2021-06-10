@@ -4,34 +4,34 @@ import {
   Flex,
   Dialog,
   DialogContent,
+  DialogClose,
   Text,
-  DropdownMenuItem,
+  Switch,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 
-const Terminate = ({ stream, setStream, ...props }) => {
-  const initialMessage = `Are you sure you want to terminate (stop running live) stream
-    ${stream.name}? Terminating a stream will break RTMPconnection.`;
-
-  const { terminateStream } = useApi();
+const Suspend = ({ stream, setStream }) => {
+  const { setRecord } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState(initialMessage);
 
   return (
-    <Dialog open={open} {...props}>
-      <Box
-        as={DropdownMenuItem}
-        onSelect={(e) => {
-          e.preventDefault();
+    <Dialog open={open}>
+      <Switch
+        checked={!!stream.record}
+        name="record-mode"
+        value={`${!!stream.record}`}
+        onCheckedChange={async () => {
+          if (!stream.record) {
+            await setRecord(stream.id, true);
+            setStream({ ...stream, record: true });
+          } else {
+            setOpen(true);
+          }
         }}
-        onClick={() => {
-          setOpen(true);
-        }}>
-        <Box css={{ color: "$red9" }}>Delete</Box>
-      </Box>
+      />
 
       <DialogContent css={{ p: 0 }}>
         <Box
@@ -48,10 +48,12 @@ const Terminate = ({ stream, setStream, ...props }) => {
               lineHeight: "20px",
               mb: "$3",
             }}>
-            Are you you want to terminate this stream?
+            Are you you want to turn off recording?
           </Text>
           <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
-            {message}
+            Future stream sessions will not be recorded. In progress stream
+            sessions will be recorded. Past sessions recordings will still be
+            available.
           </Text>
           <Flex
             css={{
@@ -61,10 +63,7 @@ const Terminate = ({ stream, setStream, ...props }) => {
             }}>
             <Button
               disabled={saving}
-              onClick={() => {
-                setMessage(initialMessage);
-                setOpen(false);
-              }}
+              onClick={() => setOpen(false)}
               size="2"
               css={{ mr: "$2" }}>
               Cancel
@@ -74,17 +73,11 @@ const Terminate = ({ stream, setStream, ...props }) => {
               size="2"
               disabled={saving}
               onClick={async () => {
-                try {
-                  setSaving(true);
-                  const res = await terminateStream(stream.id);
-                  setStream({ ...stream });
-                  setSaving(false);
-                  setMessage(initialMessage);
-                  setOpen(false);
-                } catch (e) {
-                  setMessage(e.toString());
-                  setSaving(false);
-                }
+                setSaving(true);
+                await setRecord(stream.id, false);
+                setStream({ ...stream, record: false });
+                setSaving(false);
+                setOpen(false);
               }}
               variant="violet">
               {saving && (
@@ -97,7 +90,7 @@ const Terminate = ({ stream, setStream, ...props }) => {
                   }}
                 />
               )}
-              Terminate
+              Suspend stream
             </Button>
           </Flex>
         </Box>
@@ -106,4 +99,4 @@ const Terminate = ({ stream, setStream, ...props }) => {
   );
 };
 
-export default Terminate;
+export default Suspend;
