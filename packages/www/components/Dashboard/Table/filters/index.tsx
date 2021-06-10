@@ -15,7 +15,7 @@ export type Condition =
   | { type: "dateEqual"; value: string }
   | { type: "dateBetween"; value: { first: string; second: string } }
   | { type: "numberEqual"; value: number }
-  | { type: "numberBetween"; value: { first: number; second: number } };
+  | { type: "numberBetween"; value: [number, number] };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 

@@ -163,6 +163,8 @@ const ConditionValue = ({
   const [dateBetweenSecondValue, setDateBetweenSecondValue] = useState(
     new Date().toString()
   );
+  const [numberBetweenFirstValue, setNumberBetweenFirstValue] = useState(0);
+  const [numberBetweenSecondValue, setNumberBetweenSecondValue] = useState(0);
   switch (condition.type) {
     case "contains":
       return (
@@ -277,7 +279,7 @@ const ConditionValue = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              margin: "0px 0px 5px",
+              margin: "0px",
             }}>
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
@@ -343,10 +345,14 @@ const ConditionValue = ({
           }}>
           {/* @ts-ignore */}
           <TextField
+            type="number"
             id={label}
-            // onChange={(e) =>
-            //   onChange({ type: condition.type, value: e.target.value })
-            // }
+            onChange={(e) =>
+              onChange({
+                type: condition.type,
+                value: parseInt(e.target.value),
+              })
+            }
             value={condition.value}
             css={{
               height: "100%",
@@ -366,16 +372,15 @@ const ConditionValue = ({
           style={{
             marginTop: "",
             width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "2px",
           }}>
           <Box
             as="label"
             htmlFor={label}
             css={{
               height: "26px",
-              width: "100%",
-              maxWidth: "100%",
               position: "relative",
               display: "flex",
               alignItems: "center",
@@ -385,10 +390,16 @@ const ConditionValue = ({
             {/* @ts-ignore */}
             <TextField
               id={label}
-              // onChange={(e) =>
-              //   onChange({ type: condition.type, value: e.target.value })
-              // }
-              value={condition.value}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                setNumberBetweenFirstValue(parseInt(value));
+                onChange({
+                  type: condition.type,
+                  value: [parseInt(value), numberBetweenSecondValue],
+                });
+              }}
+              value={numberBetweenFirstValue}
               css={{
                 height: "100%",
                 width: "100%",
@@ -405,8 +416,6 @@ const ConditionValue = ({
             htmlFor={label}
             css={{
               height: "26px",
-              width: "100%",
-              maxWidth: "100%",
               position: "relative",
               display: "flex",
               alignItems: "center",
@@ -416,10 +425,16 @@ const ConditionValue = ({
             {/* @ts-ignore */}
             <TextField
               id={label}
-              // onChange={(e) =>
-              //   onChange({ type: condition.type, value: e.target.value })
-              // }
-              value={condition.value}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                setNumberBetweenSecondValue(parseInt(value));
+                onChange({
+                  type: condition.type,
+                  value: [numberBetweenFirstValue, parseInt(value)],
+                });
+              }}
+              value={numberBetweenSecondValue}
               css={{
                 height: "100%",
                 width: "100%",
