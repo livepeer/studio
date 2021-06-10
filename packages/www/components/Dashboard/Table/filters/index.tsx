@@ -5,6 +5,7 @@ import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
+import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
 
 export type Condition =
@@ -12,7 +13,9 @@ export type Condition =
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
-  | { type: "dateBetween"; value: [string, string] };
+  | { type: "dateBetween"; value: [string, string] }
+  | { type: "numberEqual"; value: number }
+  | { type: "numberBetween"; value: [number, number] };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -127,6 +130,12 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                               value: format(new Date(), "yyyy-MM-dd"),
                             };
                             break;
+                          case "number":
+                            defaultCondition = {
+                              type: "numberEqual",
+                              value: 0,
+                            };
+                            break;
                           default:
                             break;
                         }
@@ -184,15 +193,17 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                       onConditionChange={onConditionChange}
                     />
                   );
-                // case "number":
-                //   return (
-                //     <TableFilterNumberField
-                //       label={filter.label}
-                //       key={i}
-                //       isOpen={filter.isOpen}
-                //       onToggleOpen={onToggleOpen}
-                //     />
-                //   );
+                case "number":
+                  return (
+                    <TableFilterNumberField
+                      label={filter.label}
+                      key={i}
+                      isOpen={filter.isOpen}
+                      onToggleOpen={onToggleOpen}
+                      condition={filter.isOpen ? filter.condition : null}
+                      onConditionChange={onConditionChange}
+                    />
+                  );
                 default:
                   return null;
               }

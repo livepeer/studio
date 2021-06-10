@@ -79,7 +79,10 @@ const options: Record<FilterType, Option[]> = {
     { label: "is equal to", value: "dateEqual" },
     { label: "is between", value: "dateBetween" },
   ],
-  number: [{ label: "is equal to", value: "textEqual" }],
+  number: [
+    { label: "is equal to", value: "numberEqual" },
+    { label: "is between", value: "numberBetween" },
+  ],
   boolean: [{ label: "is true", value: "boolean" }],
 };
 
@@ -153,6 +156,8 @@ const ConditionValue = ({
   condition,
   onChange,
 }: ConditionValueProps) => {
+  const [numberBetweenFirstValue, setNumberBetweenFirstValue] = useState(0);
+  const [numberBetweenSecondValue, setNumberBetweenSecondValue] = useState(0);
   const [dateBetweenValue, setDateBetweenValue] = useState<[string, string]>([
     format(new Date(), "yyyy-MM-dd"),
     format(new Date(), "yyyy-MM-dd"),
@@ -226,7 +231,7 @@ const ConditionValue = ({
           />
         </Box>
       );
-    case "dateEqual":
+    case "textEqual":
       return (
         <Box
           as="label"
@@ -322,6 +327,125 @@ const ConditionValue = ({
           </Box>
         </div>
       );
+    case "numberEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          {/* @ts-ignore */}
+          <TextField
+            type="number"
+            id={label}
+            onChange={(e) =>
+              onChange({
+                type: condition.type,
+                value: parseInt(e.target.value),
+              })
+            }
+            value={condition.value}
+            css={{
+              height: "100%",
+              width: "100%",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              position: "absolute",
+              maxWidth: type === "date" ? "100px" : "",
+              left: 0,
+              top: 0,
+            }}
+          />
+        </Box>
+      );
+    case "numberBetween":
+      return (
+        <div
+          style={{
+            marginTop: "",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "2px",
+          }}>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            {/* @ts-ignore */}
+            <TextField
+              id={label}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                setNumberBetweenFirstValue(parseInt(value));
+                onChange({
+                  type: condition.type,
+                  value: [parseInt(value), numberBetweenSecondValue],
+                });
+              }}
+              value={numberBetweenFirstValue}
+              css={{
+                height: "100%",
+                width: "100%",
+                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                position: "absolute",
+                maxWidth: type === "date" ? "100px" : "",
+                left: 0,
+                top: 0,
+              }}
+            />
+          </Box>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            {/* @ts-ignore */}
+            <TextField
+              id={label}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                setNumberBetweenSecondValue(parseInt(value));
+                onChange({
+                  type: condition.type,
+                  value: [numberBetweenFirstValue, parseInt(value)],
+                });
+              }}
+              value={numberBetweenSecondValue}
+              css={{
+                height: "100%",
+                width: "100%",
+                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                position: "absolute",
+                maxWidth: type === "date" ? "100px" : "",
+                left: 0,
+                top: 0,
+              }}
+            />
+          </Box>
+        </div>
+      );
 
     default:
       return null;
@@ -362,6 +486,18 @@ const FieldContent = ({
             format(new Date(), "yyyy-MM-dd"),
             format(new Date(), "yyyy-MM-dd"),
           ],
+        });
+        break;
+      case "numberEqual":
+        onConditionChange({
+          type: conditionType,
+          value: 0,
+        });
+        break;
+      case "numberBetween":
+        onConditionChange({
+          type: conditionType,
+          value: [0, 0],
         });
         break;
       default:
