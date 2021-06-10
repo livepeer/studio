@@ -311,7 +311,10 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          <TableFilter items={filterItems} onFiltersChange={(f) => undefined} />
+          <TableFilter
+            items={filterItems}
+            onFiltersChange={(f) => console.log(f)}
+          />
           <CreateStream />
         </Flex>
       </Flex>

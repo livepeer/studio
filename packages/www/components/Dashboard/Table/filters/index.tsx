@@ -5,15 +5,15 @@ import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
-import { CardNumberElementProps } from "@stripe/react-stripe-js";
 import TableFilterNumberField from "./fields/number";
+import { format } from "date-fns";
 
 export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
-  | { type: "dateBetween"; value: { first: string; second: string } }
+  | { type: "dateBetween"; value: [string, string] }
   | { type: "numberEqual"; value: number }
   | { type: "numberBetween"; value: [number, number] };
 export type ConditionType = Condition["type"];
@@ -127,7 +127,7 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                           case "date":
                             defaultCondition = {
                               type: "dateEqual",
-                              value: new Date().toString(),
+                              value: format(new Date(), "yyyy-MM-dd"),
                             };
                             break;
                           case "number":

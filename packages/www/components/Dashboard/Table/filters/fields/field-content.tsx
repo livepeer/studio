@@ -3,6 +3,7 @@ import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
 import { useCallback, useMemo, useState } from "react";
 import { FilterType } from "./new";
 import { ConditionType, Condition } from "..";
+import { format } from "date-fns";
 
 const Select = styled("select", {
   WebkitAppearance: "none",
@@ -155,14 +156,13 @@ const ConditionValue = ({
   condition,
   onChange,
 }: ConditionValueProps) => {
-  const [dateBetweenFirstValue, setDateBetweenFirstValue] = useState(
-    new Date().toString()
-  );
-  const [dateBetweenSecondValue, setDateBetweenSecondValue] = useState(
-    new Date().toString()
-  );
   const [numberBetweenFirstValue, setNumberBetweenFirstValue] = useState(0);
   const [numberBetweenSecondValue, setNumberBetweenSecondValue] = useState(0);
+  const [dateBetweenValue, setDateBetweenValue] = useState<[string, string]>([
+    format(new Date(), "yyyy-MM-dd"),
+    format(new Date(), "yyyy-MM-dd"),
+  ]);
+
   switch (condition.type) {
     case "contains":
       return (
@@ -248,10 +248,10 @@ const ConditionValue = ({
           <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
             <CalendarIcon />
           </Box>
-          {/* @ts-ignore */}
           <DateInput
             type="date"
             id={label}
+            value={condition.value}
             onChange={(e) =>
               onChange({ type: condition.type, value: e.target.value })
             }
@@ -282,16 +282,16 @@ const ConditionValue = ({
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
             </Box>
-            {/* @ts-ignore */}
             <DateInput
               type="date"
               id={label}
+              value={dateBetweenValue[0]}
               onChange={(e) => {
                 const value = e.target.value;
-                setDateBetweenFirstValue(value);
+                setDateBetweenValue((p) => [value, p[1]]);
                 onChange({
                   type: condition.type,
-                  value: { first: value, second: dateBetweenSecondValue },
+                  value: [value, dateBetweenValue[1]],
                 });
               }}
             />
@@ -311,16 +311,16 @@ const ConditionValue = ({
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
             </Box>
-            {/* @ts-ignore */}
             <DateInput
               type="date"
               id={label}
+              value={dateBetweenValue[1]}
               onChange={(e) => {
                 const value = e.target.value;
-                setDateBetweenSecondValue(value);
+                setDateBetweenValue((p) => [p[0], value]);
                 onChange({
                   type: condition.type,
-                  value: { first: dateBetweenFirstValue, second: value },
+                  value: [dateBetweenValue[0], value],
                 });
               }}
             />
@@ -476,16 +476,16 @@ const FieldContent = ({
       case "dateEqual":
         onConditionChange({
           type: conditionType,
-          value: new Date().toString(),
+          value: format(new Date(), "yyyy-MM-dd"),
         });
         break;
       case "dateBetween":
         onConditionChange({
           type: conditionType,
-          value: {
-            first: new Date().toString(),
-            second: new Date().toString(),
-          },
+          value: [
+            format(new Date(), "yyyy-MM-dd"),
+            format(new Date(), "yyyy-MM-dd"),
+          ],
         });
         break;
       case "numberEqual":
