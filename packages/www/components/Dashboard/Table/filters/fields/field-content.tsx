@@ -231,7 +231,7 @@ const ConditionValue = ({
           />
         </Box>
       );
-    case "dateEqual":
+    case "textEqual":
       return (
         <Box
           as="label"
