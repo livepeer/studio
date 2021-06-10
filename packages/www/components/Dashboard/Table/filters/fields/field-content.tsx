@@ -266,7 +266,7 @@ const ConditionValue = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              margin: "0px 0px 5px",
+              margin: "0px",
             }}>
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
