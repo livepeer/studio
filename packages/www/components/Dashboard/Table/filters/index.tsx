@@ -11,8 +11,8 @@ export type Condition =
   | { type: "contains"; value: string }
   | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
-  | { type: "dateEqual"; value: Date }
-  | { type: "dateBetween"; value: Date };
+  | { type: "dateEqual"; value: string }
+  | { type: "dateBetween"; value: { first: string; second: string } };
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
@@ -124,7 +124,7 @@ const TableFilter = ({ items, onFiltersChange }: TableFilterProps) => {
                           case "date":
                             defaultCondition = {
                               type: "dateEqual",
-                              value: new Date(),
+                              value: new Date().toString(),
                             };
                             break;
                           default:

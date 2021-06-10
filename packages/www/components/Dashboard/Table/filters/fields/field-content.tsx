@@ -1,6 +1,6 @@
 import { Box, Flex, TextField, styled } from "@livepeer.com/design-system";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FilterType } from "./new";
 import { ConditionType, Condition } from "..";
 
@@ -150,6 +150,12 @@ const ConditionValue = ({
   condition,
   onChange,
 }: ConditionValueProps) => {
+  const [dateBetweenFirstValue, setDateBetweenFirstValue] = useState(
+    new Date().toString()
+  );
+  const [dateBetweenSecondValue, setDateBetweenSecondValue] = useState(
+    new Date().toString()
+  );
   switch (condition.type) {
     case "contains":
       return (
@@ -192,7 +198,7 @@ const ConditionValue = ({
           css={{
             height: "26px",
             width: "100%",
-            maxWidth: '100%',
+            maxWidth: "100%",
             position: "relative",
             display: "flex",
             alignItems: "center",
@@ -236,7 +242,13 @@ const ConditionValue = ({
             <CalendarIcon />
           </Box>
           {/* @ts-ignore */}
-          <DateInput type="date" id={label} />
+          <DateInput
+            type="date"
+            id={label}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+          />
         </Box>
       );
     case "dateBetween":
@@ -258,7 +270,18 @@ const ConditionValue = ({
               <CalendarIcon />
             </Box>
             {/* @ts-ignore */}
-            <DateInput type="date" id={label} />
+            <DateInput
+              type="date"
+              id={label}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDateBetweenFirstValue(value);
+                onChange({
+                  type: condition.type,
+                  value: { first: value, second: dateBetweenSecondValue },
+                });
+              }}
+            />
           </Box>
           <Box
             as="label"
@@ -276,7 +299,18 @@ const ConditionValue = ({
               <CalendarIcon />
             </Box>
             {/* @ts-ignore */}
-            <DateInput type="date" id={label} />
+            <DateInput
+              type="date"
+              id={label}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDateBetweenSecondValue(value);
+                onChange({
+                  type: condition.type,
+                  value: { first: dateBetweenFirstValue, second: value },
+                });
+              }}
+            />
           </Box>
         </div>
       );
@@ -308,10 +342,19 @@ const FieldContent = ({
         onConditionChange({ type: conditionType, value: "" });
         break;
       case "dateEqual":
-        onConditionChange({ type: conditionType, value: new Date() });
+        onConditionChange({
+          type: conditionType,
+          value: new Date().toString(),
+        });
         break;
       case "dateBetween":
-        onConditionChange({ type: conditionType, value: new Date() });
+        onConditionChange({
+          type: conditionType,
+          value: {
+            first: new Date().toString(),
+            second: new Date().toString(),
+          },
+        });
         break;
       default:
         break;
@@ -341,7 +384,7 @@ const FieldContent = ({
         <Box
           css={{
             margin: "0px 0px 0px 11px",
-            width: '100%'
+            width: "100%",
           }}>
           <ConditionValue
             type={type}
