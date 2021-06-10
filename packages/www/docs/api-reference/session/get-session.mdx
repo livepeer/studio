@@ -5,11 +5,15 @@ description: Livepeer.com API Reference | GET retrieve a session
 
 # `GET` retrieve a ssession
 
-```bash```curl -H 'authorization: Bearer {api-key}' \
+You can retrieve a session with its ID.
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/session/{id}"
 ```
 
 200 OK
+
 ```bash
 {
     "id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaa",

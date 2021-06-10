@@ -106,14 +106,12 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
     .split("/")
     .slice(0, 4)
     .join("/");
-    
-  const [isOpen, setIsOpen] = useState(
-    currentPathSection === `/${route.slug}`
-  );
+
+  const [isOpen, setIsOpen] = useState(currentPathSection === `/${route.slug}`);
 
   return (
     <Collapsible
-      handleTriggerClick={() =>setIsOpen(p => !p)}
+      handleTriggerClick={() => setIsOpen((p) => !p)}
       open={isOpen}
       transitionTime={200}
       sx={{ background: "none", mt: "16px" }}
@@ -149,16 +147,10 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
 
 const Menu = ({ menu }: MenuProps) => {
   const router = useRouter();
-  const [currentSection, setCurrentSection] = useState("");
   const currentPath = router.asPath
     .split("#")[0]
     .split("/")
     .slice(0, 5)
-    .join("/");
-  const currentPathSection = router.asPath
-    .split("#")[0]
-    .split("/")
-    .slice(0, 4)
     .join("/");
 
   return (
@@ -169,7 +161,9 @@ const Menu = ({ menu }: MenuProps) => {
         flexDirection: "column",
       }}>
       {menu[0]?.children.map((route, idx) =>
-        route.children.length > 0 ? (<CollapsibleMenuItem route={route} key={idx} />) : (
+        route.children.length > 0 ? (
+          <CollapsibleMenuItem route={route} key={idx} />
+        ) : (
           <Link href={`/${route.slug}`} key={idx} passHref>
             <a
               sx={{
@@ -333,9 +327,9 @@ export const MobileSideNav = ({
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
           background: "white",
-          paddingBottom: '120px',
-          overflow: 'auto',
-          zIndex: 100
+          paddingBottom: "120px",
+          overflow: "auto",
+          zIndex: 100,
         }}>
         <p
           sx={{

@@ -5,13 +5,16 @@ description: Livepeer.com API Reference | GET a list of recorded sessions
 
 # `GET` a list of recorded sessions
 
-Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions with the same `parentId`
+Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions
+with the same `parentId`
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{parentId}/sessions?record=1"
 ```
 
 200 OK
+
 ```bash
 [
   {
@@ -21,6 +24,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
     "recordingStatus":"ready",
     "recordingUrl":"https://cdn.livepeer.com/recordings/aaaaaaaa-aaaa-aaaa-aaaa-aaaa/index.m3u8"},
+    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/ccccccc-cccc-cccc-cccc-cccccccccccccc/2021_01_01_01_00_01-source.mp4",
     {other asset object keys, like createdAt and profiles},
   {
     "sourceSegmentsDuration":30.266,
@@ -29,6 +33,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
     "recordingStatus":"ready",
     "recordingUrl":"https://cdn.livepeer.com/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
+    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee/2021_01_01_01_00_01-source.mp4",
     {other asset object keys, like createdAt and profiles}
   }
 ]

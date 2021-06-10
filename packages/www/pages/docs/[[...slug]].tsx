@@ -255,7 +255,7 @@ const DocsIndex = ({ doc, menu }) => {
 export const getStaticPaths = async () => {
   const paths = await getMdxPaths("doc");
   return {
-    paths: paths,
+    paths,
     fallback: false,
   };
 };

@@ -1,11 +1,10 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import slugify from "@sindresorhus/slugify";
-import { Grid } from "@theme-ui/components";
 import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { BsArrowRightShort } from "react-icons/bs";
+
+import s from "./styles.module.scss";
 
 type CardProps = {
   title: string;
@@ -39,144 +38,42 @@ type HeadingProps = {
 
 const SimpleCard = ({ title, description, href, label }: SimpleCardProps) => {
   return (
-    <Link href={href}>
-      <div
-        sx={{
-          background: "linear-gradient(212.62deg, #B75EFF 0%, #943CFF 100%)",
-          minHeight: "272px",
-          cursor: "pointer",
-          padding: "32px 24px 24px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          transition: "all 0.2s",
-          width: "100%",
-          borderRadius: "16px",
-          ":hover": {
-            boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
-          },
-        }}>
-        <div
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-          }}>
-          <span
-            sx={{
-              mb: "16px",
-              fontWeight: "600",
-              fontSize: "18px",
-              lineHeight: "24px",
-              letterSpacing: "-0.03em",
-              color: "white",
-            }}>
-            {title}
-          </span>
-          <span
-            sx={{
-              fontSize: "16px",
-              color: "white",
-              lineHeight: "28px",
-              letterSpacing: "-0.02em",
-            }}>
-            {description}
-          </span>
+    <Link href={href} passHref>
+      <a className={s.simpleCard}>
+        <div className={s.simpleCardContent}>
+          <span className={s.simpleCardContentTitle}>{title}</span>
+          <span className={s.simpleCardContentDescription}>{description}</span>
         </div>
-        <a
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            maxWidth: "fit-content",
-            mt: "32px",
-          }}>
-          <span
-            sx={{
-              mr: "8px",
-              color: "white",
-              fontWeight: "600",
-              fontSize: "16px",
-              letterSpacing: "-0.02em",
-            }}>
-            {label ?? "Read guide"}
-          </span>
+        <div className={s.simpleCardLink}>
+          <span className={s.simpleCardLinkLabel}>{label ?? "Read guide"}</span>
           <BsArrowRightShort color="white" size={24} />
-        </a>
-      </div>
+        </div>
+      </a>
     </Link>
   );
 };
 
 const NavigationCard = ({ title, href, label }: CardProps) => {
   return (
-    <Link href={href}>
-      <div
-        sx={{
-          width: "100%",
-          cursor: "pointer",
-          maxWidth: "240px",
-          padding: "24px",
-          border: "1px solid #E6E6E6",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          borderRadius: "16px",
-        }}>
-        <p
-          sx={{
-            letterSpacing: "-0.03em",
-            fontSize: "14px",
-            fontWeight: "600",
-            lineHeight: "24px",
-            marginBottom: "0px",
-          }}>
-          {title}
-        </p>
-        <div
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            maxWidth: "fit-content",
-            mt: "8px",
-            mb: "0px",
-          }}>
-          <span
-            sx={{
-              mr: "8px",
-              color: "#943CFF",
-              fontWeight: "600",
-              fontSize: "14px",
-              letterSpacing: "-0.02em",
-            }}>
+    <Link href={href} passHref>
+      <a className={s.navigationCard}>
+        <p className={s.navigationCardLinkTitle}>{title}</p>
+        <div className={s.navigationCardLinkContainer}>
+          <span className={s.navigationCardLinkLabel}>
             {label ?? "Read guide"}
           </span>
           <BsArrowRightShort color="#943CFF" size={22} />
         </div>
-      </div>
+      </a>
     </Link>
   );
 };
 
 const DocsPost = ({ description, title, image, href }: PostProps) => {
   return (
-    <Link href={href}>
-      <a
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          cursor: "pointer",
-          ":hover": {
-            div: {
-              boxShadow: "1px 1px 10px rgba(0, 0, 0, 0.1)",
-            },
-          },
-        }}>
-        <div
-          sx={{
-            transition: "all 0.2s",
-            borderRadius: "16px",
-            overflow: "hidden",
-          }}>
+    <Link href={href} passHref>
+      <a className={s.docsPost}>
+        <div className={s.imageContainer}>
           <Image
             src={image}
             layout="responsive"
@@ -185,27 +82,8 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
             height={272}
           />
         </div>
-        <span
-          sx={{
-            margin: "24px 0 8px",
-            fontSize: "24px",
-            lineHeight: "32px",
-            fontWeight: "600",
-            letterSpacing: "-0.04em",
-            color: "black",
-          }}>
-          {title}
-        </span>
-        <span
-          sx={{
-            fontSize: "16px",
-            lineHeight: "28px",
-            letterSpacing: "-0.02em",
-            color: "black",
-            fontWeight: "400",
-          }}>
-          {description}
-        </span>
+        <span className={s.docsPostTitle}>{title}</span>
+        <span className={s.docsPostDescription}>{description}</span>
       </a>
     </Link>
   );
@@ -213,16 +91,9 @@ const DocsPost = ({ description, title, image, href }: PostProps) => {
 
 const DocsGrid = ({ children, cols }: GridProps) => {
   return (
-    <Grid
-      sx={{
-        gap: "24px",
-        mb: "56px",
-        mt: "32px",
-        justifyItems: "center",
-        gridTemplateColumns: ["1fr", "1fr 1fr", `repeat(${cols}, 1fr)`],
-      }}>
+    <div className={s.docsGrid} style={{ ["--cols" as string]: cols }}>
       {children}
-    </Grid>
+    </div>
   );
 };
 
@@ -231,26 +102,8 @@ const Heading = ({ children, as }: HeadingProps) => {
   const Comp = as;
 
   return (
-    <Comp
-      sx={{
-        scrollMarginTop: "150px",
-        position: "relative",
-        ":first-child": { a: { display: "none" } },
-        a: { opacity: 0 },
-        ":hover": { a: { opacity: 1 } },
-      }}
-      id={id}>
-      <a
-        style={{
-          position: "absolute",
-          marginLeft: "-16px",
-          paddingRight: "8px",
-          fontSize: "inherit",
-          lineHeight: "inherit",
-        }}
-        aria-label="Anchor"
-        href={`#${id}`}
-        className="no-index">
+    <Comp className={s.heading} id={id}>
+      <a aria-label="Anchor" href={`#${id}`} className="no-index">
         #
       </a>
       <span>{children}</span>

@@ -13,59 +13,59 @@ import {
   Text,
   Label,
   styled,
-} from "@livepeer.com/design-system";
-import Link from "next/link";
-import ReactTooltip from "react-tooltip";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useApi, usePageVisibility } from "../../../hooks";
-import DeleteStreamModal from "../DeleteStreamModal";
-import Table from "components/Dashboard/Table";
-import { Stream } from "@livepeer.com/api";
-import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { Column, Row } from "react-table";
-import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
-import {
+ } from "@livepeer.com/design-system";
+ import Link from "next/link";
+ import ReactTooltip from "react-tooltip";
+ import { useCallback, useEffect, useMemo, useState } from "react";
+ import { useApi, usePageVisibility } from "../../../hooks";
+ import DeleteStreamModal from "../DeleteStreamModal";
+ import Table from "components/Dashboard/Table";
+ import { Stream } from "@livepeer.com/api";
+ import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
+ import { Column, Row } from "react-table";
+ import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
+ import {
   RenditionDetailsCellProps,
   RenditionsDetailsCell,
-} from "components/Dashboard/Table/cells/streams-table";
-import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
-import { SortTypeArgs } from "components/Dashboard/Table/types";
-import {
+ } from "components/Dashboard/Table/cells/streams-table";
+ import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
+ import { SortTypeArgs } from "components/Dashboard/Table/types";
+ import {
   QuestionMarkIcon,
   PlusIcon,
   ArrowRightIcon,
-} from "@radix-ui/react-icons";
-import CreateStream from "./CreateStream";
-
-type ProfileProps = {
+ } from "@radix-ui/react-icons";
+ import CreateStream from "./CreateStream";
+  
+ type ProfileProps = {
   id: string;
   i: number;
   rendition: Rendition;
-};
-
-type Rendition = {
+ };
+  
+ type Rendition = {
   width: number;
   name: string;
   height: number;
   bitrate: number;
   fps: number;
-};
-
-const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
+ };
+  
+ const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
   cursor: "pointer",
   ml: "$1",
-});
-
-const StyledPlusIcon = styled(PlusIcon, {
+ });
+  
+ const StyledPlusIcon = styled(PlusIcon, {
   mr: "$1",
-});
-
-const Profile = ({
+ });
+  
+ const Profile = ({
   id,
   i,
   rendition: { fps, name, width, height, bitrate },
-}: ProfileProps) => {
+ }: ProfileProps) => {
   return (
     <Box
       id={`profile-${id}-${i}-${name}`}
@@ -88,9 +88,9 @@ const Profile = ({
       <Box>{bitrate}</Box>
     </Box>
   );
-};
-
-export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
+ };
+  
+ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
   let details = "";
   let detailsTooltip;
   if (stream.presets?.length) {
@@ -145,41 +145,44 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
       ) : null}
     </Flex>
   );
-};
-
-type StreamsTableData = {
+ };
+  
+ type StreamsTableData = {
   id: string;
   name: TextCellProps;
   details: RenditionDetailsCellProps;
   created: DateCellProps;
   lastActive: DateCellProps;
   status: string;
-};
-
-const StreamsTable = ({
+ };
+  
+ const pageSize = 14;
+  
+ const StreamsTable = ({
   title = "Streams",
   userId,
-}: {
+ }: {
   title: string;
   userId: string;
-}) => {
+ }) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
-
+  
   useEffect(() => {
     getStreams(userId)
       .then((streams) => setStreams(streams))
       .catch((err) => console.error(err)); // todo: surface this
   }, [userId, deleteModal]);
-
+  
   const close = useCallback(() => {
     setDeleteModal(false);
   }, []);
-
+  
   const isVisible = usePageVisibility();
-
+  
   useEffect(() => {
     if (!isVisible) {
       return;
@@ -191,7 +194,7 @@ const StreamsTable = ({
     }, 5000);
     return () => clearInterval(interval);
   }, [userId, isVisible]);
-
+  
   const columns: Column<StreamsTableData>[] = useMemo(
     () => [
       {
@@ -229,7 +232,7 @@ const StreamsTable = ({
     ],
     []
   );
-
+  
   const data: StreamsTableData[] = useMemo(() => {
     return streams.map((stream) => {
       return {
@@ -254,7 +257,7 @@ const StreamsTable = ({
       };
     });
   }, [streams]);
-
+  
   const handleRowSelectionChange = useCallback(
     (rows: Row<StreamsTableData>[]) => {
       setSelectedStreams(
@@ -263,7 +266,21 @@ const StreamsTable = ({
     },
     [streams]
   );
-
+  
+  const slicedData = useMemo(() => {
+    return data
+      .slice(pageNumber * pageSize, (pageNumber + 1) * pageSize)
+      .map((data) => data);
+  }, [data]);
+  
+  const handleNextPage = useCallback(() => {
+    setPageNumber((prev) => prev + 1);
+  }, []);
+  
+  const handlePreviousPage = useCallback(() => {
+    setPageNumber((prev) => prev - 1);
+  }, []);
+  
   return (
     <Box>
       <Flex
@@ -290,7 +307,7 @@ const StreamsTable = ({
             </Badge>
           </Flex>
         </Heading>
-
+  
         <Flex css={{ alignItems: "center" }}>
           {/* <Box>
               <Button
@@ -321,7 +338,7 @@ const StreamsTable = ({
                 </a>
               </Box>
             </Box> */}
-
+  
           <CreateStream />
         </Flex>
       </Flex>
@@ -342,24 +359,35 @@ const StreamsTable = ({
       <Box css={{ mb: "$5" }}>
         <Table
           columns={columns}
-          data={data}
+          data={slicedData}
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
           initialSortBy={[{ id: "created", desc: true }]}
         />
       </Box>
-      <Flex
-        justify="end"
-        align="center"
-        css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/dashboard/streams" passHref>
-          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
-            View all <ArrowRightIcon />
-          </A>
-        </Link>
+      <Flex justify="between" align="center">
+        <Text>
+          <b>{data.length}</b> results
+        </Text>
+        <Flex>
+          <Button
+            css={{ marginRight: "6px" }}
+            onClick={handlePreviousPage}
+            disabled={pageNumber <= 0}>
+            Previous
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            disabled={(pageNumber + 1) * pageSize >= data.length}>
+            Next
+          </Button>
+        </Flex>
       </Flex>
     </Box>
   );
-};
-
-export default StreamsTable;
+ };
+  
+ export default StreamsTable;
+  
+ 
+ 
