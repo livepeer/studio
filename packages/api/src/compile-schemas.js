@@ -4,6 +4,7 @@ import { safeLoad as parseYaml } from "js-yaml";
 import fs from "fs-extra";
 import path from "path";
 import { compile as generateTypes } from "json-schema-to-typescript";
+import $RefParser from "json-schema-ref-parser";
 
 // This takes schema.yaml as its input and produces a few outputs.
 // 1. types.d.ts, TypeScript definitions of the JSON-schema objects
@@ -32,15 +33,18 @@ const schemaStr = fs.readFileSync(
   "utf8"
 );
 const data = parseYaml(schemaStr);
-const str = JSON.stringify(data, null, 2);
-write(path.resolve(schemaDir, "schema.json"), str);
-write(path.resolve(schemaDistDir, "schema.json"), str);
-const ajv = new Ajv({ sourceCode: true });
-
-const index = [];
-const types = [];
 
 (async () => {
+  await $RefParser.dereference({ components: data.components });
+
+  const str = JSON.stringify(data, null, 2);
+  write(path.resolve(schemaDir, "schema.json"), str);
+  write(path.resolve(schemaDistDir, "schema.json"), str);
+  const ajv = new Ajv({ sourceCode: true });
+
+  const index = [];
+  const types = [];
+
   for (const [name, schema] of Object.entries(data.components.schemas)) {
     schema.title = name;
     const type = await generateTypes(schema);

@@ -276,13 +276,7 @@ components:
                   name:
                     type: string
                   url:
-                    type: string
-                    description:
-                      Livepeer-compatible push target URL (RTMP or RTMPS)
-                    example: rtmps://live.my-service.tv/channel/secretKey
-                    writeOnly: true
-                    format: uri
-                    pattern: ^(srt|rtmps?)://
+                    $ref: "#/components/schemas/push-target/properties/url"
         wowza:
           type: object
           required:
@@ -332,6 +326,17 @@ components:
         suspended:
           type: boolean
           description: If currently suspended
+
+    stream-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        record:
+          $ref: "#/components/schemas/stream/properties/record"
+        suspended:
+          $ref: "#/components/schemas/stream/properties/suspended"
+        pushTargets:
+          $ref: "#/components/schemas/stream/properties/pushTargets"
 
     session:
       type: object
@@ -537,7 +542,7 @@ components:
         url:
           type: string
           writeOnly: true
-          description: Livepeer-compatible push target URL (RTMP or RTMPS)
+          description: Livepeer-compatible push target URL (RTMP(S) or SRT)
           example: rtmps://live.my-service.tv/channel/secretKey
           format: uri
           pattern: ^(srt|rtmps?)://
@@ -955,6 +960,51 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
+  /stream/{id}:
+    tags:
+      - stream
+    parameters:
+      - name: id
+        description: ID of the stream
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      description: Gets a specific stream details
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/stream"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+    patch:
+      description: Patch a specific stream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/stream-patch-payload"
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
   /object-store:
     tags:
       - object-store
@@ -1086,10 +1136,7 @@ paths:
               additionalProperties: false
               properties:
                 disabled:
-                  type: boolean
-                  description:
-                    If true then this push target will not be used for pushing
-                    even if it is configured in a stream object.
+                  $ref: "#/components/schemas/push-target/properties/disabled"
       responses:
         204:
           description: Success
