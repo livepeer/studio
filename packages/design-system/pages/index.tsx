@@ -5,7 +5,6 @@ import { Box } from "../";
 import { Flex } from "../";
 import { Grid } from "../";
 import { Badge } from "../";
-import { Switch } from "../";
 import { ControlGroup } from "../";
 import { Text } from "../";
 import { Banner } from "../";
@@ -103,11 +102,15 @@ import {
   AccordionPanel,
 } from "../components/Accordian";
 import { Dialog, DialogContent, DialogTrigger } from "../components/Dialog";
+import { SnackbarProvider } from "../components/Snackbar";
 import { Button } from "../components/Button";
 import { Link } from "../components/Link";
 import { Promo } from "../components/Promo";
 import { Label } from "../components/Label";
+import { Switch } from "../components/Switch";
+
 import { AppBar } from "../custom/AppBar";
+import Snackbar from "../custom/Snackbar";
 
 const StyledCross1Icon = styled(Cross1Icon, {
   color: "$hiContrast",
@@ -397,6 +400,16 @@ function Home() {
               css={{ display: "inline-flex" }}>
               <Text size="2" css={{ lineHeight: "20px" }}>
                 Slider
+              </Text>
+            </Link>
+          </Box>
+          <Box css={{ my: "$1" }}>
+            <Link
+              href="#snackbar"
+              variant="subtle"
+              css={{ display: "inline-flex" }}>
+              <Text size="2" css={{ lineHeight: "20px" }}>
+                Snackbar
               </Text>
             </Link>
           </Box>
@@ -1363,7 +1376,32 @@ function Home() {
             </Flex>
           </Container>
         </Section>
+        <Flex css={{ jc: "center" }}>
+          <Separator size="2" />
+        </Flex>
+        <Section size="3">
+          <Container size="2">
+            <Heading id="snackbar" css={{ mb: "$6", scrollMarginTop: "$7" }}>
+              Snackbar
+            </Heading>
+            <SnackbarProvider>
+              <Snackbar />
+            </SnackbarProvider>
 
+            {/* <Alert variant="loContrast">
+                <Text
+                  size="3"
+                  css={{ fontWeight: 500, lineHeight: "20px", mb: "$1" }}>
+                  Alert heading
+                </Text>
+                <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
+                  A modal dialog that interrupts the user with{" "}
+                  <Link href="#">important content</Link> and expects a
+                  response.
+                </Text>
+              </Alert> */}
+          </Container>
+        </Section>
         <Flex css={{ jc: "center" }}>
           <Separator size="2" />
         </Flex>
@@ -1682,7 +1720,7 @@ function Home() {
               <TextField placeholder="Hello world" />
             </ControlGroup>
             <ControlGroup css={{ mt: "$6" }}>
-              <TextField size="3" placeholder="Hello world" />
+              <TextField size="1" placeholder="Hello world" />
               <Button size="2">Button</Button>
             </ControlGroup>
           </Container>

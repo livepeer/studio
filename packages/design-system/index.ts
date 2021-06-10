@@ -32,9 +32,7 @@ export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -76,7 +74,6 @@ export {
   Status,
   Sup,
   Sub,
-  Switch,
   Caption,
   Tbody,
   Tfoot,
@@ -116,6 +113,12 @@ export { Banner } from "./components/Banner";
 export { Promo } from "./components/Promo";
 export { Label } from "./components/Label";
 export { TextField } from "./components/TextField";
+export {
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+} from "./components/DropdownMenu";
+export { SnackbarProvider, useSnackbar } from "./components/Snackbar";
+export { Switch } from "./components/Switch";
 
 // Stitches
 export {
