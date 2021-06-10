@@ -243,9 +243,10 @@ components:
             ID of object store where to which this stream was recorded
         pushTargets:
           type: array
-          example: [ { "id" :"PUSH123", "profile": "720p" } ]
+          example: [{ "id": "PUSH123", "profile": "720p" }]
           description:
-            References to targets where this stream will be simulatenously pushed to
+            References to targets where this stream will be simulatenously
+            pushed to
           items:
             type: object
             required: [profile]
@@ -276,11 +277,12 @@ components:
                     type: string
                   url:
                     type: string
-                    description: Livepeer-compatible push target URL (RTMP or RTMPS)
-                    example: rtmp://live.my-service.tv/channel/secretKey
+                    description:
+                      Livepeer-compatible push target URL (RTMP or RTMPS)
+                    example: rtmps://live.my-service.tv/channel/secretKey
                     writeOnly: true
                     format: uri
-                    pattern: ^rtmps?://
+                    pattern: ^(srt|rtmps?)://
         wowza:
           type: object
           required:
@@ -536,9 +538,9 @@ components:
           type: string
           writeOnly: true
           description: Livepeer-compatible push target URL (RTMP or RTMPS)
-          example: rtmp://live.my-service.tv/channel/secretKey
+          example: rtmps://live.my-service.tv/channel/secretKey
           format: uri
-          pattern: ^rtmps?://
+          pattern: ^(srt|rtmps?)://
         disabled:
           type: boolean
           description:

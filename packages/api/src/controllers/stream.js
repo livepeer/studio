@@ -71,27 +71,17 @@ async function validatePushTarget(userId, profileNames, pushTargetRef) {
     );
   }
   if (id) {
-    const existing = await db.pushTarget.get(id);
-    if (!existing || userId !== existing.userId) {
+    if (!(await db.pushTarget.hasAccess(id, userId))) {
       throw new BadRequestError(`push target not found: "${id}"`);
     }
     return pushTargetRef;
   }
-
-  id = uuid();
-  await db.pushTarget.create({
-    id,
+  const created = await db.pushTarget.fillAndCreate({
     name: spec.name,
     url: spec.url,
-    disabled: false,
     userId: req.user.id,
-    createdAt: Date.now(),
   });
-  const created = await db.pushTarget.get(id, { useReplica: false });
-  if (!created) {
-    throw new InternalServerError("error creating new push target");
-  }
-  return { profile, id };
+  return { profile, id: created.id };
 }
 
 export function getRecordingUrl(ingest, session, mp4 = false) {
@@ -947,6 +937,8 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+// TODO: patch push configurations
 
 app.patch("/:id/record", authMiddleware({}), async (req, res) => {
   const { id } = req.params;

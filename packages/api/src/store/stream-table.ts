@@ -2,7 +2,7 @@ import sql from "sql-template-strings";
 import Table from "./table";
 import { Stream } from "../schema/types";
 import { QueryResult, QueryResultRow } from "pg";
-import { DBLegacyObject, QueryOptions } from "./types";
+import { DBLegacyObject, QueryOptions, WithId } from "./types";
 
 interface UsageData {
   id?: string;
@@ -32,7 +32,7 @@ interface dbUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export default class StreamTable extends Table<Stream> {
+export default class StreamTable extends Table<WithId<Stream>> {
   async cachedUsageHistory(
     fromTime: number,
     toTime: number,
@@ -47,7 +47,7 @@ export default class StreamTable extends Table<Stream> {
       (data->>'sourceSegments')::real as sourceSegments,
       (data->>'transcodedSegments')::real as transcodedSegments,
       (data->>'streamCount')::real as streamCount
-    
+
     FROM usage WHERE data->>'date' >= ${fromTime}
       AND data->>'date' < ${toTime}
       ORDER BY date
@@ -77,12 +77,12 @@ export default class StreamTable extends Table<Stream> {
       TO_TIMESTAMP((data->>'createdAt')::bigint/1000)::date as day,
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
-      sum((data->>'transcodedSegments')::int) as transcodedSegments, 
+      sum((data->>'transcodedSegments')::int) as transcodedSegments,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
       count(*)::int as streamCount
-      
+
     FROM stream WHERE data->>'sourceSegmentsDuration' IS NOT NULL
-      AND data->>'parentId' IS NOT NULL 
+      AND data->>'parentId' IS NOT NULL
       AND (data->>'createdAt')::bigint >= ${fromTime}
       AND (data->>'createdAt')::bigint < ${toTime}
       GROUP BY day
@@ -115,10 +115,10 @@ export default class StreamTable extends Table<Stream> {
       TO_TIMESTAMP((data->>'createdAt')::bigint/1000)::date as day,
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
-      sum((data->>'transcodedSegments')::int) as transcodedSegments, 
+      sum((data->>'transcodedSegments')::int) as transcodedSegments,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
       count(*)::int as streamCount
-      
+
     FROM stream s WHERE data->>'sourceSegmentsDuration' IS NOT NULL
       AND data->>'parentId' IS NULL
       AND (SELECT COUNT(C.id) FROM stream C WHERE C.data->>'parentId' = S.Id) = 0
@@ -162,16 +162,16 @@ export default class StreamTable extends Table<Stream> {
     toTime: number,
     opts?: QueryOptions
   ): Promise<UsageData> {
-    const q1 = sql`SELECT 
+    const q1 = sql`SELECT
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
       sum((data->>'transcodedSegments')::int) as transcodedSegments,
       count(*)::int as streamCount
-    
+
     FROM stream WHERE data->>'userId' = ${userId}
-      AND data->>'sourceSegmentsDuration' IS NOT NULL 
-      AND data->>'parentId' IS NOT NULL 
+      AND data->>'sourceSegmentsDuration' IS NOT NULL
+      AND data->>'parentId' IS NOT NULL
       AND data->>'createdAt' >= ${fromTime}
       AND data->>'createdAt' < ${toTime}
     `;
@@ -194,13 +194,13 @@ export default class StreamTable extends Table<Stream> {
       usage.transcodedSegmentsDuration += dbUsage.transcodedsegmentsduration;
       usage.streamCount += dbUsage.streamcount;
     }
-    const q2 = sql`SELECT 
+    const q2 = sql`SELECT
       sum((data->>'sourceSegmentsDuration')::float) as sourceSegmentsDuration,
       sum((data->>'transcodedSegmentsDuration')::float) as transcodedSegmentsDuration,
       sum((data->>'sourceSegments')::numeric) as sourceSegments,
       sum((data->>'transcodedSegments')::int) as transcodedSegments,
       count(*)::int as streamCount
-    
+
     FROM stream S WHERE data->>'userId' = ${userId}
       AND data->>'sourceSegmentsDuration' IS NOT NULL
       AND data->>'parentId' IS NULL

@@ -2,7 +2,6 @@ import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
-import { v4 as uuid } from "uuid";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import { SQLStatement } from "sql-template-strings";
@@ -109,33 +108,25 @@ app.get("/", async (req, res) => {
 
 app.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
-  const data = await db.pushTarget.get(req.params.id);
+  const data = await db.pushTarget.getAuthed(
+    req.params.id,
+    req.user.id,
+    isAdmin
+  );
   if (!data) {
     return notFound(res);
-  }
-  if (!isAdmin && req.user.id !== data.userId) {
-    return forbidden(res);
   }
   res.json(data);
 });
 
 app.post("/", validatePost("push-target"), async (req, res) => {
   const input = req.body as PushTarget;
-  const id = uuid();
-  await db.pushTarget.create({
-    id,
+  const data = await db.pushTarget.fillAndCreate({
     name: input.name,
     url: input.url,
-    disabled: input.disabled ?? false,
+    disabled: input.disabled,
     userId: req.user.id,
-    createdAt: Date.now(),
   });
-
-  const data = await db.pushTarget.get(id, { useReplica: false });
-  if (!data) {
-    res.status(500);
-    return res.json({ errors: ["push target not created"] });
-  }
   res.status(201);
   res.json(data);
 });
@@ -143,14 +134,10 @@ app.post("/", validatePost("push-target"), async (req, res) => {
 app.delete("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  const data = await db.objectStore.get(id);
-  if (!data) {
+  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
   }
-  if (!isAdmin && req.user.id !== data.userId) {
-    return forbidden(res);
-  }
-  await db.objectStore.delete(id);
+  await db.pushTarget.delete(id);
 
   res.status(204);
   res.end();
@@ -159,12 +146,8 @@ app.delete("/:id", async (req, res) => {
 app.patch("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  const data = await db.pushTarget.get(id);
-  if (!data) {
+  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
-  }
-  if (!isAdmin && req.user.id !== data.userId) {
-    return forbidden(res);
   }
   const disabledPatch = req.body.disabled;
   if (typeof disabledPatch !== "boolean") {

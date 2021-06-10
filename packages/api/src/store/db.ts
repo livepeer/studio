@@ -18,7 +18,8 @@ import {
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
-import { QueryOptions } from "./types";
+import { QueryOptions, WithId } from "./types";
+import PushTargetTable from "./push-target-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -29,7 +30,6 @@ interface PostgresParams {
   appName?: string;
 }
 
-type WithId<T> = T & { id: string };
 type Table<T> = BaseTable<WithId<T>>;
 
 const makeTable = <T>(opts: TableOptions) =>
@@ -39,7 +39,7 @@ export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
-  pushTarget: Table<PushTarget>;
+  pushTarget: PushTargetTable;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -105,7 +105,7 @@ export class DB {
       db: this,
       schema: schemas["object-store"],
     });
-    this.pushTarget = makeTable<PushTarget>({
+    this.pushTarget = new PushTargetTable({
       db: this,
       schema: schemas["push-target"],
     });
