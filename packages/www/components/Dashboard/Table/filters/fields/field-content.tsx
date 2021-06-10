@@ -113,8 +113,6 @@ const ConditionSelect = ({
     onSelect(selectedOption.value);
   }, []);
 
-  console.log(restOptions);
-
   return (
     <Box
       css={{
