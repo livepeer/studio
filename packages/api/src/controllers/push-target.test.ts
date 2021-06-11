@@ -39,9 +39,9 @@ afterEach(async () => {
 describe("controllers/push-target", () => {
   describe("basic CRUD with JWT authorization", () => {
     let client: TestClient;
-    let nonAdminToken: string;
     let nonAdminUser: User;
     let adminUser: User;
+    let adminToken: string;
 
     beforeEach(async () => {
       client = new TestClient({
@@ -54,8 +54,8 @@ describe("controllers/push-target", () => {
       const adminTokenRes = await client.post(`/user/token`, {
         ...mockAdminUserInput,
       });
-      const adminToken = await adminTokenRes.json();
-      client.jwtAuth = adminToken.token;
+      const adminTokenJson = await adminTokenRes.json();
+      adminToken = adminTokenJson.token;
 
       const user = await server.store.get(`user/${adminUser.id}`, false);
       adminUser = { ...user, admin: true, emailValid: true };
@@ -70,7 +70,7 @@ describe("controllers/push-target", () => {
         ...mockNonAdminUserInput,
       });
       const tokenJson = await tokenRes.json();
-      nonAdminToken = tokenJson.token;
+      client.jwtAuth = tokenJson.token;
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
@@ -81,7 +81,6 @@ describe("controllers/push-target", () => {
     });
 
     it("should not get all push targets without admin authorization", async () => {
-      client.jwtAuth = nonAdminToken;
       const input = {
         ...mockPushTargetInput,
         userId: nonAdminUser.id,
@@ -118,6 +117,8 @@ describe("controllers/push-target", () => {
     });
 
     it("should get all object stores with admin authorization", async () => {
+      client.jwtAuth = adminToken;
+
       const allTargets = [];
       for (let i = 0; i < 10; i += 1) {
         const input = {
@@ -155,7 +156,7 @@ describe("controllers/push-target", () => {
       for (let i = 0; i < 13; i += 1) {
         const created = await db.pushTarget.fillAndCreate({
           ...mockPushTargetInput,
-          userId: adminUser.id,
+          userId: nonAdminUser.id,
         });
         createdIds.push(created.id);
       }
@@ -164,7 +165,7 @@ describe("controllers/push-target", () => {
       let cursor = "";
       for (let page = 1; page <= 3; page++) {
         const res = await client.get(
-          `/push-target?userId=${adminUser.id}&limit=5&cursor=${cursor}`
+          `/push-target?userId=${nonAdminUser.id}&limit=5&cursor=${cursor}`
         );
         expect(res.status).toBe(200);
 
@@ -189,9 +190,6 @@ describe("controllers/push-target", () => {
     });
 
     it("should create a push target", async () => {
-      // we only clean write fields from non-admin users
-      client.jwtAuth = nonAdminToken;
-
       const preCreationTime = Date.now();
       let res = await client.post("/push-target", mockPushTargetInput);
       expect(res.status).toBe(201);
@@ -297,15 +295,15 @@ describe("controllers/push-target", () => {
       });
 
       let res = await client.get(`/push-target/${created.id}`);
-      expect(res.status).toBe(200);
-      expect(await res.json()).toEqual(created);
-
-      client.jwtAuth = nonAdminToken;
-      res = await client.get(`/push-target/${created.id}`);
       expect(res.status).toBe(404);
 
       res = await client.get(`/push-target?userId=${created.userId}`);
       expect(res.status).toBe(403);
+
+      client.jwtAuth = adminToken;
+      res = await client.get(`/push-target/${created.id}`);
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual(created);
     });
   });
 
