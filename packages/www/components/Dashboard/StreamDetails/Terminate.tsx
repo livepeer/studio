@@ -2,8 +2,13 @@ import {
   Box,
   Button,
   Flex,
-  Dialog,
-  DialogContent,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Heading,
   Text,
   DropdownMenuItem,
 } from "@livepeer.com/design-system";
@@ -21,88 +26,71 @@ const Terminate = ({ stream, setStream, ...props }) => {
   const [message, setMessage] = useState(initialMessage);
 
   return (
-    <Dialog open={open} {...props}>
+    <AlertDialog open={open} {...props}>
       <Box
         as={DropdownMenuItem}
+        color="red"
         onSelect={(e) => {
           e.preventDefault();
-        }}
-        onClick={() => {
           setOpen(true);
         }}>
-        <Box css={{ color: "$red9" }}>Delete</Box>
+        Terminate
       </Box>
 
-      <DialogContent css={{ p: 0 }}>
-        <Box
-          css={{
-            maxWidth: 450,
-            px: "$5",
-            pt: "$5",
-            pb: "$4",
-          }}>
-          <Text
-            size="4"
-            css={{
-              fontWeight: 500,
-              lineHeight: "20px",
-              mb: "$3",
-            }}>
-            Are you you want to terminate this stream?
-          </Text>
-          <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
-            {message}
-          </Text>
-          <Flex
-            css={{
-              mt: "$4",
-              ai: "center",
-              jc: "flex-end",
-            }}>
-            <Button
-              disabled={saving}
-              onClick={() => {
-                setMessage(initialMessage);
+      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <AlertDialogTitle as={Heading} size="1">
+          Terminate stream
+        </AlertDialogTitle>
+        <AlertDialogDescription
+          as={Text}
+          size="2"
+          variant="gray"
+          css={{ mt: "$2", lineHeight: "17px" }}>
+          {message}
+        </AlertDialogDescription>
+        <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+          <AlertDialogCancel
+            size="2"
+            onClick={() => {
+              setMessage(initialMessage);
+              setOpen(false);
+            }}
+            as={Button}
+            ghost>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            size="2"
+            as={Button}
+            disabled={saving}
+            onClick={async () => {
+              try {
+                setSaving(true);
+                await terminateStream(stream.id);
+                setStream({ ...stream });
+                setSaving(false);
                 setOpen(false);
-              }}
-              size="2"
-              css={{ mr: "$2" }}>
-              Cancel
-            </Button>
-            <Button
-              css={{ display: "flex", ai: "center" }}
-              size="2"
-              disabled={saving}
-              onClick={async () => {
-                try {
-                  setSaving(true);
-                  const res = await terminateStream(stream.id);
-                  setStream({ ...stream });
-                  setSaving(false);
-                  setMessage(initialMessage);
-                  setOpen(false);
-                } catch (e) {
-                  setMessage(e.toString());
-                  setSaving(false);
-                }
-              }}
-              variant="violet">
-              {saving && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Terminate
-            </Button>
-          </Flex>
-        </Box>
-      </DialogContent>
-    </Dialog>
+              } catch (e) {
+                setMessage(e.toString());
+                setSaving(false);
+              }
+            }}
+            variant="red">
+            {saving && (
+              <Spinner
+                css={{
+                  color: "$hiContrast",
+                  width: 16,
+                  height: 16,
+                  mr: "$2",
+                }}
+              />
+            )}
+            Terminate
+          </AlertDialogAction>
+        </Flex>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

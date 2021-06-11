@@ -2,100 +2,87 @@ import {
   Box,
   Button,
   Flex,
-  Dialog,
-  DialogContent,
-  DialogClose,
+  DropdownMenuItem,
   Text,
-  Switch,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Heading,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 
 const Suspend = ({ stream, setStream }) => {
-  const { setRecord } = useApi();
+  const { suspendStream } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog open={open}>
-      <Switch
-        checked={!!stream.record}
-        name="record-mode"
-        value={`${!!stream.record}`}
-        onCheckedChange={async () => {
-          if (!stream.record) {
-            await setRecord(stream.id, true);
-            setStream({ ...stream, record: true });
-          } else {
-            setOpen(true);
-          }
-        }}
-      />
+    <AlertDialog open={open}>
+      <Box
+        as={DropdownMenuItem}
+        onSelect={(e) => {
+          e.preventDefault();
+          setOpen(true);
+        }}>
+        {!stream.suspended ? "Suspend stream" : "Unsuspend stream"}
+      </Box>
 
-      <DialogContent css={{ p: 0 }}>
-        <Box
-          css={{
-            maxWidth: 450,
-            px: "$5",
-            pt: "$5",
-            pb: "$4",
-          }}>
-          <Text
-            size="4"
-            css={{
-              fontWeight: 500,
-              lineHeight: "20px",
-              mb: "$3",
+      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <AlertDialogTitle as={Heading} size="1">
+          {!stream.suspended ? "Suspend stream" : "Unsuspend stream"}
+        </AlertDialogTitle>
+        <AlertDialogDescription
+          as={Text}
+          size="2"
+          variant="gray"
+          css={{ mt: "$2", lineHeight: "17px" }}>
+          {!stream.suspended
+            ? `Are you sure you want to suspend this stream? 
+            Any active stream sessions will immediately end. 
+            New sessions will be prevented from starting until unsuspended.`
+            : `Are you sure you want to allow new stream sessions again?`}
+        </AlertDialogDescription>
+        <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+          <AlertDialogCancel
+            size="2"
+            onClick={() => setOpen(false)}
+            as={Button}
+            ghost>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            size="2"
+            as={Button}
+            variant={stream.suspended ? "violet" : "red"}
+            disabled={saving}
+            onClick={async () => {
+              setSaving(true);
+              const newValue = !stream.suspended;
+              await suspendStream(stream.id, newValue);
+              setStream({ ...stream, suspended: newValue });
+              setSaving(false);
+              setOpen(false);
             }}>
-            Are you you want to turn off recording?
-          </Text>
-          <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
-            Future stream sessions will not be recorded. In progress stream
-            sessions will be recorded. Past sessions recordings will still be
-            available.
-          </Text>
-          <Flex
-            css={{
-              mt: "$4",
-              ai: "center",
-              jc: "flex-end",
-            }}>
-            <Button
-              disabled={saving}
-              onClick={() => setOpen(false)}
-              size="2"
-              css={{ mr: "$2" }}>
-              Cancel
-            </Button>
-            <Button
-              css={{ display: "flex", ai: "center" }}
-              size="2"
-              disabled={saving}
-              onClick={async () => {
-                setSaving(true);
-                await setRecord(stream.id, false);
-                setStream({ ...stream, record: false });
-                setSaving(false);
-                setOpen(false);
-              }}
-              variant="violet">
-              {saving && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Suspend stream
-            </Button>
-          </Flex>
-        </Box>
-      </DialogContent>
-    </Dialog>
+            {saving && (
+              <Spinner
+                css={{
+                  color: "$hiContrast",
+                  width: 16,
+                  height: 16,
+                  mr: "$2",
+                }}
+              />
+            )}
+            {stream.suspended ? "Unsuspend" : "Suspend"}
+          </AlertDialogAction>
+        </Flex>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
