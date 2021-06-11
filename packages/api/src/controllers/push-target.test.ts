@@ -12,13 +12,24 @@ let mockPushTargetInput: PushTarget;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 
+function getNextCursor(link: string | null): string {
+  link ??= "";
+  for (const part of link.split(",")) {
+    if (!/cursor=.*>;\s+rel="next"/.test(part)) {
+      continue;
+    }
+    return /cursor=([^&>]+)/.exec(part)[1];
+  }
+  return null;
+}
+
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
   server = await serverPromise;
   mockPushTargetInput = {
     url: "rtmps://live.zoo.tv/cage/s5d72b3j42o",
-    name: "live.zoo.tv",
+    name: "zoo-stream",
   };
 
   mockAdminUserInput = {
@@ -139,25 +150,36 @@ describe("controllers/push-target", () => {
       expect(listed).toEqual(allTargets);
     });
 
-    it("should get some of the object stores & get a working next Link", async () => {
-      store.userId = adminUser.id;
+    it("should support pagination", async () => {
+      const createdIds: string[] = [];
       for (let i = 0; i < 13; i += 1) {
-        const storeChangeId = JSON.parse(JSON.stringify(store));
-        storeChangeId.id = uuid();
-        await server.store.create(storeChangeId);
-        const res = await client.get(`/object-store/${storeChangeId.id}`);
-        expect(res.status).toBe(200);
-        const objStore = await res.json();
-        expect(objStore.id).toEqual(storeChangeId.id);
+        const created = await db.pushTarget.fillAndCreate({
+          ...mockPushTargetInput,
+          userId: adminUser.id,
+        });
+        createdIds.push(created.id);
       }
 
-      const res = await client.get(
-        `/object-store?userId=${store.userId}&limit=11`
-      );
-      const objStores = await res.json();
-      expect(res.headers._headers.link).toBeDefined();
-      expect(res.headers._headers.link.length).toBe(1);
-      expect(objStores.length).toEqual(11);
+      const listedIDs: string[] = [];
+      let cursor = "";
+      for (let page = 1; page <= 3; page++) {
+        const res = await client.get(
+          `/push-target?userId=${adminUser.id}&limit=5&cursor=${cursor}`
+        );
+        expect(res.status).toBe(200);
+
+        const link = res.headers.get("link");
+        expect(link).toEqual(
+          page < 3 ? expect.stringContaining("cursor=") : null
+        );
+        cursor = getNextCursor(link);
+
+        const pageItems = (await res.json()) as PushTarget[];
+        expect(pageItems.length).toBe(page < 3 ? 5 : 3);
+        listedIDs.push(...pageItems.map((t) => t.id));
+      }
+      expect(listedIDs.length).toEqual(13);
+      createdIds.forEach(expect(listedIDs).toContain);
     });
 
     it("should create an object store", async () => {
