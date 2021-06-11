@@ -224,6 +224,16 @@ describe("controllers/push-target", () => {
       expect(res.status).toBe(201);
     });
 
+    it("should use a default name with the URL host", async () => {
+      let res = await client.post("/push-target", {
+        ...mockPushTargetInput,
+        name: undefined,
+      });
+      expect(res.status).toBe(201);
+      const created = await res.json();
+      expect(created.name).toEqual("live.zoo.tv");
+    });
+
     describe("should not accept invalid payloads for creating a push target", () => {
       const testJsonError = async (expectErr: string, payload?: any) => {
         const res = await client.post("/push-target", payload);
