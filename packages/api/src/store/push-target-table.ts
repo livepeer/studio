@@ -2,7 +2,7 @@ import { PushTarget } from "../schema/types";
 import Table from "./table";
 import { GetOptions, WithId } from "./types";
 import * as uuid from "uuid";
-import { InternalServerError } from "./errors";
+import { InternalServerError, UnprocessableEntityError } from "./errors";
 
 type DbPushTarget = WithId<PushTarget>;
 
@@ -13,13 +13,20 @@ interface PushTargetInput {
   userId: string;
 }
 
-const nameFromUrl = (url: string) => new URL(url).host;
+const parseUrl = (url: string) => {
+  try {
+    return new URL(url);
+  } catch (err) {
+    throw new UnprocessableEntityError(`Bad URL ${url}: ${err}`);
+  }
+};
 
 export default class PushTargetTable extends Table<DbPushTarget> {
   async fillAndCreate(input: PushTargetInput) {
+    const url = parseUrl(input.url);
     const pushTarget: Required<PushTarget> = {
       id: uuid.v4(),
-      name: input.name || nameFromUrl(input.url),
+      name: input.name || url.host,
       url: input.url,
       disabled: input.disabled ?? false,
       userId: input.userId,

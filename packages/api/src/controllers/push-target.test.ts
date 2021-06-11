@@ -12,17 +12,6 @@ let mockPushTargetInput: PushTarget;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 
-function getNextCursor(link: string | null): string {
-  link ??= "";
-  for (const part of link.split(",")) {
-    if (!/cursor=.*>;\s+rel="next"/.test(part)) {
-      continue;
-    }
-    return /cursor=([^&>]+)/.exec(part)[1];
-  }
-  return null;
-}
-
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -150,6 +139,17 @@ describe("controllers/push-target", () => {
       expect(listed).toEqual(allTargets);
     });
 
+    const getNextCursor = (link: string | null): string => {
+      link ??= "";
+      for (const part of link.split(",")) {
+        if (!/cursor=.*>;\s+rel="next"/.test(part)) {
+          continue;
+        }
+        return /cursor=([^&>]+)/.exec(part)[1];
+      }
+      return null;
+    };
+
     it("should support pagination", async () => {
       const createdIds: string[] = [];
       for (let i = 0; i < 13; i += 1) {
@@ -182,70 +182,112 @@ describe("controllers/push-target", () => {
       createdIds.forEach(expect(listedIDs).toContain);
     });
 
-    it("should create an object store", async () => {
-      postMockStore.userId = adminUser.id;
-      postMockStore.name = "test name";
-      const now = Date.now();
-      let res = await client.post("/object-store", { ...postMockStore });
-      expect(res.status).toBe(201);
-      const objStore = await res.json();
-      expect(objStore.id).toBeDefined();
-      expect(objStore.url).toEqual(undefined);
-      expect(objStore.name).toEqual("test name");
-      expect(objStore.createdAt).toBeGreaterThanOrEqual(now);
-
-      const resp = await client.get(`/object-store/${objStore.id}`);
-      expect(resp.status).toBe(200);
-      const objStoreGet = await resp.json();
-      expect(objStore.url).toEqual(undefined);
-      expect(objStore.userId).toBe(objStoreGet.userId);
-
-      // if same request is made, should return a 201
-      res = await client.post("/object-store", { ...postMockStore });
-      expect(res.status).toBe(201);
-    });
-
-    it("should return a 404 if objectStore not found", async () => {
+    it("should return a 404 if pushTarget not found", async () => {
       const id = uuid();
-      const resp = await client.get(`/object-store/${adminUser.id}/${id}`);
+      const resp = await client.get(`/push-target/${id}`);
       expect(resp.status).toBe(404);
     });
 
-    it("should not accept an empty body for creating an object store", async () => {
-      const res = await client.post("/object-store");
-      expect(res.status).toBe(422);
+    it("should create a push target", async () => {
+      // we only clean write fields from non-admin users
+      client.jwtAuth = nonAdminToken;
+
+      const preCreationTime = Date.now();
+      let res = await client.post("/push-target", mockPushTargetInput);
+      expect(res.status).toBe(201);
+      const created = (await res.json()) as PushTarget;
+      expect(created.id).toBeDefined();
+      expect(created.url).toBeUndefined();
+      expect(created.name).toEqual(mockPushTargetInput.name);
+      expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
+
+      res = await client.get(`/push-target/${created.id}`);
+      expect(res.status).toBe(200);
+      const getResponse = await res.json();
+      expect(getResponse).toEqual(created);
     });
 
-    it("should not accept missing property for creating an object store", async () => {
-      const postMockStoreMissingProp = JSON.parse(
-        JSON.stringify(postMockStore)
-      );
-      delete postMockStoreMissingProp["url"];
-      const res = await client.post("/object-store", {
-        ...postMockStoreMissingProp,
+    it("should support RTMP, RTMPS and SRT for URL", async () => {
+      const baseUrl = mockPushTargetInput.url.split("://")[1];
+      let res = await client.post("/push-target", {
+        ...mockPushTargetInput,
+        url: `rtmp://${baseUrl}`,
       });
-      expect(res.status).toBe(422);
-      expect(res.statusText).toBe("Unprocessable Entity");
+      expect(res.status).toBe(201);
+      res = await client.post("/push-target", {
+        ...mockPushTargetInput,
+        url: `rtmps://${baseUrl}`,
+      });
+      expect(res.status).toBe(201);
+      res = await client.post("/push-target", {
+        ...mockPushTargetInput,
+        url: `srt://${baseUrl}`,
+      });
+      expect(res.status).toBe(201);
     });
 
-    it("should not accept additional properties for creating an object store", async () => {
-      const postMockStoreExtraField = JSON.parse(JSON.stringify(postMockStore));
-      postMockStoreExtraField.extraField = "extra field";
-      const res = await client.post("/object-store", {
-        ...postMockStoreExtraField,
-      });
-      expect(res.status).toBe(422);
-      expect(res.statusText).toBe("Unprocessable Entity");
-    });
+    describe("should not accept invalid payloads for creating a push target", () => {
+      const testJsonError = async (expectErr: string, payload?: any) => {
+        const res = await client.post("/push-target", payload);
+        expect(res.status).toBe(422);
 
-    it("should not accept wrong type of field for creating an object store", async () => {
-      const postMockStoreWrongType = JSON.parse(JSON.stringify(postMockStore));
-      postMockStoreWrongType.url = 123;
-      const res = await client.post("/object-store", {
-        ...postMockStoreWrongType,
+        const body = await res.json();
+        const error = JSON.parse(body.errors[0]);
+        expect(error.keyword).toEqual(expectErr);
+      };
+
+      test("no payload", async () => {
+        await testJsonError("required");
       });
-      expect(res.status).toBe(422);
-      expect(res.statusText).toBe("Unprocessable Entity");
+      test("missing property", async () => {
+        await testJsonError("required", {
+          ...mockPushTargetInput,
+          url: undefined,
+        });
+      });
+      test("additional properties", async () => {
+        await testJsonError("additionalProperties", {
+          ...mockPushTargetInput,
+          unknownField: "hello",
+        });
+      });
+      test("wrong field type", async () => {
+        await testJsonError("type", {
+          ...mockPushTargetInput,
+          url: true,
+        });
+        await testJsonError("type", {
+          ...mockPushTargetInput,
+          createdAt: "right now",
+        });
+        await testJsonError("type", {
+          ...mockPushTargetInput,
+          name: ["what", "if"],
+        });
+      });
+      test("bad field format", async () => {
+        await testJsonError("pattern", {
+          ...mockPushTargetInput,
+          url: "is this a uri?",
+        });
+        await testJsonError("pattern", {
+          ...mockPushTargetInput,
+          url: "https://webrtc.stream.it/handshake",
+        });
+        await testJsonError("format", {
+          ...mockPushTargetInput,
+          url: "rtmp://this started really well but",
+        });
+      });
+      test("bad url", async () => {
+        const res = await client.post("/push-target", {
+          ...mockPushTargetInput,
+          url: "rtmps://!@#$%^&*()_+",
+        });
+        expect(res.status).toBe(422);
+        const body = await res.json();
+        expect(body.errors[0]).toContain("Bad URL");
+      });
     });
 
     it("should not get another users object store with non-admin user", async () => {

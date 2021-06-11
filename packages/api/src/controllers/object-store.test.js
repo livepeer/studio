@@ -173,7 +173,7 @@ describe("controllers/object-stores", () => {
 
     it("should return a 404 if objectStore not found", async () => {
       const id = uuid();
-      const resp = await client.get(`/object-store/${adminUser.id}/${id}`);
+      const resp = await client.get(`/object-store/${id}`);
       expect(resp.status).toBe(404);
     });
 
