@@ -105,35 +105,38 @@ describe("controllers/push-target", () => {
 
     it("should throw 403 error if JWT is not verified", async () => {
       client.jwtAuth = "random_value";
-      const storeChangeId = JSON.parse(JSON.stringify(store));
-      storeChangeId.id = uuid();
-      await server.store.create(storeChangeId);
+      const input = {
+        ...mockPushTargetInput,
+        userId: uuid(),
+      };
+      const created = await db.pushTarget.fillAndCreate(input);
 
-      let res = await client.get(`/object-store/${store.id}`);
-      const objStore = await res.json();
+      const res = await client.get(`/push-target/${created.id}`);
       expect(res.status).toBe(403);
-      expect(objStore.errors[0]).toBe("jwt malformed");
+      const resJson = await res.json();
+      expect(resJson.errors[0]).toBe("jwt malformed");
     });
 
     it("should get all object stores with admin authorization", async () => {
-      store.userId = adminUser.id;
-      for (let i = 0; i < 4; i += 1) {
-        const storeChangeId = JSON.parse(JSON.stringify(store));
-        storeChangeId.id = uuid();
-        await server.store.create(storeChangeId);
-        const res = await client.get(`/object-store/${storeChangeId.id}`);
+      const allTargets = [];
+      for (let i = 0; i < 10; i += 1) {
+        const input = {
+          ...mockPushTargetInput,
+          userId: uuid(),
+        };
+        const created = await db.pushTarget.fillAndCreate(input);
+
+        const res = await client.get(`/push-target/${created.id}`);
         expect(res.status).toBe(200);
-        const objStore = await res.json();
-        expect(objStore.id).toEqual(storeChangeId.id);
+        expect(await res.json()).toEqual(created);
+        allTargets.push({ ...created, user: {} });
       }
 
-      const res = await client.get(`/object-store?userId=${adminUser.id}`);
+      const res = await client.get(`/push-target`);
       expect(res.status).toBe(200);
-      const objStores = await res.json();
-      expect(objStores.length).toEqual(4);
-
-      // making sure url is coming back as null
-      expect(objStores[0].url).toEqual(null);
+      const listed: PushTarget[] = await res.json();
+      listed.sort((a, b) => a.createdAt - b.createdAt);
+      expect(listed).toEqual(allTargets);
     });
 
     it("should get some of the object stores & get a working next Link", async () => {

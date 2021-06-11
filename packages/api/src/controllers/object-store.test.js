@@ -108,24 +108,23 @@ describe("controllers/object-stores", () => {
     });
 
     it("should get all object stores with admin authorization", async () => {
-      store.userId = adminUser.id;
       for (let i = 0; i < 4; i += 1) {
         const storeChangeId = JSON.parse(JSON.stringify(store));
+        storeChangeId.userId = uuid();
         storeChangeId.id = uuid();
         await server.store.create(storeChangeId);
         const res = await client.get(`/object-store/${storeChangeId.id}`);
         expect(res.status).toBe(200);
         const objStore = await res.json();
         expect(objStore.id).toEqual(storeChangeId.id);
+        // making sure url is coming back as null
+        expect(objStore.url).toEqual(null);
       }
 
-      const res = await client.get(`/object-store?userId=${adminUser.id}`);
+      const res = await client.get(`/object-store`);
       expect(res.status).toBe(200);
       const objStores = await res.json();
       expect(objStores.length).toEqual(4);
-
-      // making sure url is coming back as null
-      expect(objStores[0].url).toEqual(null);
     });
 
     it("should get some of the object stores & get a working next Link", async () => {
