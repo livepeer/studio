@@ -40,11 +40,13 @@ import {
   Cross1Icon as Close,
   CopyIcon as Copy,
   QuestionMarkCircledIcon as Help,
+  PauseIcon,
 } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import Player from "components/Dashboard/Player";
 import Record from "@components/Dashboard/StreamDetails/Record";
 import Terminate from "@components/Dashboard/StreamDetails/Terminate";
+import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
 
 type TimedAlertProps = {
@@ -388,8 +390,11 @@ const ID = () => {
                     {stream.name}
                   </Box>
                   {stream.isActive ? (
-                    <Badge size="2" variant="green" css={{ letterSpacing: 0 }}>
-                      <Box css={{ mr: 5 }}>
+                    <Badge
+                      size="2"
+                      variant="green"
+                      css={{ mt: "$1", letterSpacing: 0 }}>
+                      <Box css={{ mr: "$1" }}>
                         <Status size="1" variant="green" />
                       </Box>
                       Active
@@ -398,12 +403,28 @@ const ID = () => {
                     <Badge
                       size="2"
                       css={{
+                        mt: "$1",
                         letterSpacing: 0,
                       }}>
-                      <Box css={{ mr: 5 }}>
+                      <Box css={{ mr: "$1" }}>
                         <Status size="1" />
                       </Box>
                       Idle
+                    </Badge>
+                  )}
+                  {stream.suspended && (
+                    <Badge
+                      size="2"
+                      variant="red"
+                      css={{
+                        ml: "$1",
+                        mt: "$1",
+                        letterSpacing: 0,
+                      }}>
+                      <Box css={{ mr: 5 }}>
+                        <PauseIcon />
+                      </Box>
+                      Suspended
                     </Badge>
                   )}
                 </Flex>
@@ -417,7 +438,7 @@ const ID = () => {
                       setStream={setStream}
                       isSwitch={false}
                     />
-                    <DropdownMenuItem>Suspend stream</DropdownMenuItem>
+                    <Suspend stream={stream} setStream={setStream} />
                     <Delete stream={stream} setStream={setStream} />
 
                     {userIsAdmin && stream.isActive && (

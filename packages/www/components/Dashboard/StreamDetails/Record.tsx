@@ -2,9 +2,14 @@ import {
   Box,
   Button,
   Flex,
-  Dialog,
-  DialogContent,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
   DropdownMenuItem,
+  Heading,
   Text,
   Switch,
   useSnackbar,
@@ -20,7 +25,7 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
   const [openSnackbar] = useSnackbar();
 
   return (
-    <Dialog open={open}>
+    <AlertDialog open={open}>
       {isSwitch ? (
         <Switch
           checked={!!stream.record}
@@ -49,75 +54,59 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
               setOpen(true);
             }
           }}>
-          <Box>
-            {!stream.record ? "Turn on recording" : "Turn off recording"}
-          </Box>
+          <Box>{!stream.record ? "Enable recording" : "Disable recording"}</Box>
         </Box>
       )}
 
-      <DialogContent css={{ p: 0 }}>
-        <Box
-          css={{
-            maxWidth: 450,
-            px: "$5",
-            pt: "$5",
-            pb: "$4",
-          }}>
-          <Text
-            size="4"
-            css={{
-              fontWeight: 500,
-              lineHeight: "20px",
-              mb: "$3",
-            }}>
-            Are you you want to turn off recording?
-          </Text>
-          <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
-            Future stream sessions will not be recorded. In progress stream
-            sessions will be recorded. Past sessions recordings will still be
-            available.
-          </Text>
-          <Flex
-            css={{
-              mt: "$4",
-              ai: "center",
-              jc: "flex-end",
-            }}>
-            <Button
-              disabled={saving}
-              onClick={() => setOpen(false)}
-              size="2"
-              css={{ mr: "$2" }}>
-              Cancel
-            </Button>
-            <Button
-              css={{ display: "flex", ai: "center" }}
-              size="2"
-              disabled={saving}
-              onClick={async () => {
-                setSaving(true);
-                await setRecord(stream.id, !stream.record);
-                setStream({ ...stream, record: !stream.record });
-                openSnackbar("Recording has been turned off.");
-                setSaving(false);
-                setOpen(false);
-              }}
-              variant="violet">
-              {saving && (
-                <Spinner
-                  css={{
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Turn off recording
-            </Button>
-          </Flex>
-        </Box>
-      </DialogContent>
-    </Dialog>
+      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <AlertDialogTitle as={Heading} size="1">
+          Disable recording
+        </AlertDialogTitle>
+        <AlertDialogDescription
+          as={Text}
+          size="2"
+          variant="gray"
+          css={{ mt: "$2", lineHeight: "17px" }}>
+          Future stream sessions will not be recorded. In progress stream
+          sessions will be recorded. Past sessions recordings will still be
+          available.
+        </AlertDialogDescription>
+
+        <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+          <AlertDialogCancel
+            size="2"
+            onClick={() => setOpen(false)}
+            as={Button}
+            ghost>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            size="2"
+            as={Button}
+            disabled={saving}
+            onClick={async () => {
+              setSaving(true);
+              await setRecord(stream.id, !stream.record);
+              setStream({ ...stream, record: !stream.record });
+              openSnackbar("Recording has been turned off.");
+              setSaving(false);
+              setOpen(false);
+            }}
+            variant="red">
+            {saving && (
+              <Spinner
+                css={{
+                  width: 16,
+                  height: 16,
+                  mr: "$2",
+                }}
+              />
+            )}
+            Disable recording
+          </AlertDialogAction>
+        </Flex>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
