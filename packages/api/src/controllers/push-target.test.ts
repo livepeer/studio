@@ -116,7 +116,7 @@ describe("controllers/push-target", () => {
       expect(resJson.errors[0]).toBe("jwt malformed");
     });
 
-    it("should get all object stores with admin authorization", async () => {
+    it("should get all push targets with admin authorization", async () => {
       client.jwtAuth = adminToken;
 
       const allTargets = [];
@@ -307,10 +307,10 @@ describe("controllers/push-target", () => {
     });
   });
 
-  describe("object stores endpoint with api key", () => {
-    let client;
-    let adminUser;
-    let nonAdminUser;
+  describe("API key authorization", () => {
+    let client: TestClient;
+    let nonAdminUser: User;
+    let adminUser: User;
     const adminApiKey = uuid();
     const nonAdminApiKey = uuid();
 
@@ -320,10 +320,10 @@ describe("controllers/push-target", () => {
         apiKey: uuid(),
       });
 
-      const userRes = await client.post(`/user/`, { ...mockAdminUser });
+      const userRes = await client.post(`/user`, mockAdminUserInput);
       adminUser = await userRes.json();
 
-      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser });
+      const nonAdminRes = await client.post(`/user`, mockNonAdminUserInput);
       nonAdminUser = await nonAdminRes.json();
 
       await server.store.create({
@@ -338,8 +338,11 @@ describe("controllers/push-target", () => {
         userId: nonAdminUser.id,
       });
 
-      const user = await server.store.get(`user/${adminUser.id}`, false);
-      adminUser = { ...user, admin: true, emailValid: true };
+      const adminUserRes = await server.store.get(
+        `user/${adminUser.id}`,
+        false
+      );
+      adminUser = { ...adminUserRes, admin: true, emailValid: true };
       await server.store.replace(adminUser);
 
       const nonAdminUserRes = await server.store.get(
@@ -350,24 +353,27 @@ describe("controllers/push-target", () => {
       await server.store.replace(nonAdminUser);
     });
 
-    it("should not get all object stores with nonadmin token", async () => {
+    it("should not get all push targets with non-admin API key", async () => {
       client.apiKey = nonAdminApiKey;
-      let res = await client.get(`/object-store?userId=${adminUser.id}`);
-      const objStore = await res.json();
+      let res = await client.get(`/push-target?userId=${adminUser.id}`);
       expect(res.status).toBe(403);
+
+      res = await client.get(`/push-target`);
+      expect(res.status).toBe(400);
     });
 
-    it("should get all object stores for another user with admin token and apiKey", async () => {
+    it("should get all push targets for another user with admin API key", async () => {
       client.apiKey = adminApiKey;
-      const res = await client.get(`/object-store?userId=${nonAdminUser.id}`);
-      const objStore = await res.json();
+      let res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      expect(res.status).toBe(200);
+
+      res = await client.get(`/push-target`);
       expect(res.status).toBe(200);
     });
 
-    it("should throw forbidden error when using random api Key", async () => {
+    it("should throw forbidden error when using invalid API key", async () => {
       client.apiKey = "random_key";
-      const res = await client.get(`/object-store?userId=${nonAdminUser.id}`);
-      const objStore = await res.json();
+      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
       expect(res.status).toBe(403);
     });
 
@@ -381,10 +387,10 @@ describe("controllers/push-target", () => {
       });
       client.apiKey = tokenId;
 
-      const res = await client.get(`/object-store/${adminUser.id}`);
-      const objStore = await res.json();
+      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
       expect(res.status).toBe(500);
-      expect(objStore.errors[0]).toBe(
+      const errJson = await res.json();
+      expect(errJson.errors[0]).toEqual(
         `no user found for token Bearer ${tokenId}`
       );
     });
