@@ -27,7 +27,7 @@ export default class QueueTable extends Table<Queue> {
     await this.listen();
   }
 
-  stop() {
+  async stop() {
     try {
       this.listener.removeAllListeners("error");
       this.listener.removeAllListeners("notification");
@@ -100,6 +100,7 @@ export default class QueueTable extends Table<Queue> {
     );
 
     if (res.rowCount < 1) {
+      await this.client.release();
       return null;
     }
 
@@ -120,6 +121,7 @@ export default class QueueTable extends Table<Queue> {
             ` WHERE id = '${res.rows[0].data.id}'`
           )
         );
+        this.client.release();
         return;
       }
       res.rows[0].data.isConsumed = true;

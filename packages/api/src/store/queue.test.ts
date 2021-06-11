@@ -6,7 +6,7 @@ import QueueTable from "./queue";
 import schema from "../schema/schema.json";
 import { Queue } from "../schema/types";
 
-jest.setTimeout(15000);
+// jest.setTimeout(15000);
 
 async function processEvent(doc: Queue) {
   console.log("processing doc id: ", doc.id);
@@ -37,18 +37,24 @@ describe("Queue", () => {
 
   afterEach(async () => {
     await db.close();
-    const pool = new Pool({
-      connectionString: `postgresql://postgres@localhost/postgres`,
-      connectionTimeoutMillis: 5000,
-    });
-    await pool.query("DROP DATABASE test");
-    await pool.end();
+    console.log("db closed");
+    // try {
+    //   const pool = new Pool({
+    //     connectionString: `postgresql://postgres@localhost/postgres`,
+    //     connectionTimeoutMillis: 5000,
+    //   });
+    //   await pool.query("DROP DATABASE test");
+    //   await pool.end();
+    // } catch (error) {
+    //   console.log('gotcha ', error);
+    // }
+    console.log("afterEach done");
   });
 
-  it("should do anything", async () => {
+  it("should be able to pop events", async () => {
     await db.queue.emit({
       id: "abc123",
-      time: Date.now(),
+      createdAt: Date.now(),
       channel: "test.channel",
       event: "teststarted",
       streamId: "asdf",
@@ -58,7 +64,7 @@ describe("Queue", () => {
 
     await db.queue.emit({
       id: "abc1234",
-      time: Date.now(),
+      createdAt: Date.now(),
       channel: "test.channel",
       event: "teststarted",
       streamId: "asdf",
@@ -80,5 +86,6 @@ describe("Queue", () => {
     expect(event3).toEqual(null);
 
     await db.queue.stop();
+    console.log("done");
   });
 });

@@ -90,11 +90,13 @@ export class DB {
     if (!this.pool) {
       return;
     }
-
-    if (this.queue) {
-      this.queue.stop();
+    try {
+      if (this.queue) {
+        await this.queue.stop();
+      }
+    } catch (error) {
+      console.log("stopping queue error", error);
     }
-
     await this.pool.end();
   }
 
