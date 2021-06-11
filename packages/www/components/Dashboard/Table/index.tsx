@@ -17,7 +17,20 @@ import {
   TextFilter,
 } from "./filters";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
-import { Box, Flex, Checkbox, styled } from "@livepeer.com/design-system";
+import {
+  Table,
+  Caption,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  Box,
+  Flex,
+  Checkbox,
+  styled,
+} from "@livepeer.com/design-system";
 
 type FilterItem<Table extends Record<string, unknown>> =
   | { type: "text"; props: InputFilterProps<Table> }
@@ -49,7 +62,7 @@ const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   ml: "$1",
 });
 
-const Table = <T extends Record<string, unknown>>({
+const TableComponent = <T extends Record<string, unknown>>({
   columns,
   data,
   header,
@@ -214,49 +227,33 @@ const Table = <T extends Record<string, unknown>>({
       ) : null}
       <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
         <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
-          <Box
-            as="table"
+          <Table
             {...getTableProps()}
             css={{
               minWidth: "100%",
               borderCollapse: "separate",
               borderSpacing: 0,
-              color: "$hiContrast",
+              tableLayout: "initial",
             }}>
-            <thead>
+            <Thead>
               {headerGroups.map((headerGroup) => (
-                <Box
-                  as="tr"
+                <Tr
                   {...headerGroup.getHeaderGroupProps()}
                   css={{ borderRadius: "8px" }}>
                   {headerGroup.headers.map((column, i) => {
                     const withHelpTooltip =
                       someColumnCanSort && i === headerGroup.headers.length - 1;
                     return (
-                      <Box
-                        as="th"
+                      <Td
+                        as={i === 0 ? Th : Td}
                         scope="col"
                         {...column.getHeaderProps(
                           // @ts-ignore
                           column.getSortByToggleProps()
-                        )}
-                        css={{
-                          textTransform: "uppercase",
-                          border: 0,
-                          borderBottom: "1px solid",
-                          borderTop: "0",
-                          borderColor: "$mauve6",
-                          fontSize: "$1",
-                          color: "$gray9",
-                          fontWeight: 500,
-                          px: "$4",
-                          py: "$2",
-                          position: "relative",
-                        }}>
-                        <Box
+                        )}>
+                        <Flex
                           css={{
-                            display: "flex",
-                            alignItems: "center",
+                            ai: "center",
                             mr: withHelpTooltip ? "$3" : 0,
                           }}>
                           <Box css={{ whiteSpace: "nowrap" }}>
@@ -264,7 +261,7 @@ const Table = <T extends Record<string, unknown>>({
                           </Box>
                           {/*@ts-ignore */}
                           {column.canSort && (
-                            <Box css={{ ml: 2 }}>
+                            <Box css={{ ml: "$2" }}>
                               {/* @ts-ignore */}
                               {column.isSorted
                                 ? // @ts-ignore
@@ -274,7 +271,7 @@ const Table = <T extends Record<string, unknown>>({
                                 : " ⭥"}
                             </Box>
                           )}
-                        </Box>
+                        </Flex>
                         {withHelpTooltip && (
                           <Box
                             css={{
@@ -300,37 +297,27 @@ const Table = <T extends Record<string, unknown>>({
                             />
                           </Box>
                         )}
-                      </Box>
+                      </Td>
                     );
                   })}
-                </Box>
+                </Tr>
               ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
+            </Thead>
+            <Tbody {...getTableBodyProps()}>
               {page.map((row: Row<object>) => {
                 prepareRow(row);
                 return (
-                  <Box as="tr" {...row.getRowProps()}>
-                    {row.cells.map((cell) => (
-                      <Box
-                        as="td"
-                        {...cell.getCellProps()}
-                        css={{
-                          px: "$4",
-                          py: "$2",
-                          border: 0,
-                          borderBottom: "1px solid",
-                          borderBottomColor: "$mauve6",
-                          fontSize: "$2",
-                        }}>
+                  <Tr {...row.getRowProps()}>
+                    {row.cells.map((cell, i) => (
+                      <Td as={i === 0 ? Th : Td} {...cell.getCellProps()}>
                         {cell.render("Cell")}
-                      </Box>
+                      </Td>
                     ))}
-                  </Box>
+                  </Tr>
                 );
               })}
-            </tbody>
-          </Box>
+            </Tbody>
+          </Table>
         </Box>
         <Paginator
           canPreviousPage={canPreviousPage}
@@ -343,4 +330,4 @@ const Table = <T extends Record<string, unknown>>({
   );
 };
 
-export default Table;
+export default TableComponent;
