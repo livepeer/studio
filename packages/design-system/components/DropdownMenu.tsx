@@ -11,8 +11,8 @@ export const DropdownMenuItem = styled(DropdownMenuItemBase, {
       violet: {
         "&:focus": {
           outline: "none",
-          backgroundColor: "$violet9",
-          color: "white",
+          backgroundColor: "$violet4",
+          color: "$hiContrast",
         },
       },
       red: {
@@ -35,8 +35,8 @@ export const DropdownMenuCheckboxItem = styled(DropdownMenuCheckboxItemBase, {
       violet: {
         "&:focus": {
           outline: "none",
-          backgroundColor: "$violet9",
-          color: "white",
+          backgroundColor: "$violet4",
+          color: "$hiContrast",
         },
       },
       red: {
