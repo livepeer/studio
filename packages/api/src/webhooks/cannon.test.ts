@@ -7,7 +7,7 @@ import makeStore from "../store";
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
 
-const bodyParser = require("body-parser");
+// const bodyParser = require("body-parser");
 jest.setTimeout(15000);
 
 describe("webhook cannon", () => {
@@ -141,8 +141,11 @@ describe("webhook cannon", () => {
     });
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     listener.close();
+    server.webhook.stop();
+    webhookServer.close();
+    await db.close();
   });
 
   // afterEach(() => {
@@ -192,24 +195,13 @@ describe("webhook cannon", () => {
     client.jwtAuth = adminToken["token"];
 
     // test endpoint
+    let resp;
     webhookServer.post("/webhook", (req, res) => {
-      console.log("WEBHOOK WORKS , body", req.params.body);
-      res.send(req.body);
+      console.log("WEBHOOK WORKS , body", req.body);
+      resp = 200;
+      res.end(req.body);
     });
 
-    // const postgresUrl = server.postgresUrl
-    // const postgresReplicaUrl = null
-    // // // Storage init
-    // const [db2, store] = await makeStore({
-    //   postgresUrl,
-    //   postgresReplicaUrl,
-    //   schema,
-    // });
-
-    // Webhooks Cannon
-    // const webhookCannon = new WebhookCannon({ db, store });
-    // await webhookCannon.start();
-    // server.WebhookCannon.disableUrlVerify()
     await db.queue.emit({
       id: "webhook_test_12",
       time: Date.now(),
@@ -220,8 +212,8 @@ describe("webhook cannon", () => {
       isConsumed: false,
     });
 
-    console.log("here");
-    await sleep(10000);
+    await sleep(3000);
+    expect(resp).toBe(200);
   });
 });
 

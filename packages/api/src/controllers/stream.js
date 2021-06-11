@@ -28,7 +28,6 @@ const ACTIVE_TIMEOUT = 90 * 1000;
 
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
-const resolver = new Resolver();
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
@@ -768,6 +767,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
           try {
             urlObj = parseUrl(webhook.url);
             if (urlObj.host) {
+              const resolver = new Resolver();
               ips = await resolver.resolve4(urlObj.hostname);
             }
           } catch (e) {

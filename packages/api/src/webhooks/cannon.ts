@@ -11,7 +11,7 @@ import { parse as parseUrl } from "url";
 import bytesToUuid from "uuid/lib/bytesToUuid";
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
-const resolver = new Resolver();
+// const resolver = new Resolver();
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;
@@ -22,11 +22,13 @@ export default class WebhookCannon {
   store: Model;
   running: boolean;
   verifyUrls: boolean;
+  resolver: any;
   constructor({ db, store, verifyUrls }) {
     this.db = db;
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
+    this.resolver = new Resolver();
     // this.start();
   }
 
@@ -83,7 +85,7 @@ export default class WebhookCannon {
       try {
         urlObj = parseUrl(webhook.url);
         if (urlObj.host) {
-          ips = await resolver.resolve4(urlObj.hostname);
+          ips = await this.resolver.resolve4(urlObj.hostname);
         }
       } catch (e) {
         console.error("error: ", e);

@@ -29,10 +29,14 @@ export default class QueueTable extends Table<Queue> {
 
   stop() {
     try {
-      if (this.client) {
-        this.client.release();
-      }
+      this.listener.removeAllListeners("error");
+      this.listener.removeAllListeners("notification");
+      this.listener.removeAllListeners("end");
+      this.listener.removeAllListeners("notice");
       this.listener.release();
+      // if (this.client) {
+      //   this.client.release();
+      // }
     } catch (error) {
       console.log("error releasing pg client", error);
     }
