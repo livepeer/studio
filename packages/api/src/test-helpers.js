@@ -22,6 +22,7 @@ export class TestClient {
     if (opts.apiKey) {
       this.apiKey = opts.apiKey;
     }
+    this.jwtAuth = "";
 
     if (opts.googleAuthorization) {
       this.googleAuthorization = opts.googleAuthorization;

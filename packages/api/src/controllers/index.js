@@ -20,7 +20,7 @@ export default {
   "api-token": apiToken,
   broadcaster,
   "object-store": objectStore,
-  pushTarget,
+  "push-target": pushTarget,
   orchestrator,
   stream,
   user,

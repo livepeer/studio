@@ -23,7 +23,6 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import {
   BadRequestError,
-  InternalServerError,
   NotFoundError,
 } from "../store/errors";
 
@@ -95,7 +94,7 @@ function validatePushTargets(userId, profiles, pushTargets) {
     profileNames.add(name);
   }
 
-  if (!doc.pushTargets) {
+  if (!pushTargets) {
     return Promise.resolve(null);
   }
   return Promise.all(

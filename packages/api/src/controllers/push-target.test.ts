@@ -1,41 +1,32 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
 import { v4 as uuid } from "uuid";
+import { PushTarget, User } from "../schema/types";
+import Model from "../store/model";
+import { db } from "../store";
 
 // includes auth file tests
 
-let server;
-let store;
-let postMockStore;
-let mockUser;
-let mockAdminUser;
-let mockNonAdminUser;
+let server: { store: Model };
+let mockPushTargetInput: PushTarget;
+let mockAdminUserInput: User;
+let mockNonAdminUserInput: User;
 
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
   server = await serverPromise;
-  postMockStore = {
-    url: "s3://abc123:abc123@us-west-2/my-bucket",
+  mockPushTargetInput = {
+    url: "rtmps://live.zoo.tv/cage/s5d72b3j42o",
+    name: "live.zoo.tv",
   };
 
-  store = {
-    id: "mock-store",
-    kind: "object-store",
-    url: "s3://abc123:abc123@us-west-1/my-bucket",
-  };
-
-  mockUser = {
-    email: `mock_user@gmail.com`,
-    password: "z".repeat(64),
-  };
-
-  mockAdminUser = {
+  mockAdminUserInput = {
     email: "user_admin@gmail.com",
     password: "x".repeat(64),
   };
 
-  mockNonAdminUser = {
+  mockNonAdminUserInput = {
     email: "user_non_admin@gmail.com",
     password: "y".repeat(64),
   };
@@ -45,34 +36,41 @@ afterEach(async () => {
   await clearDatabase(server);
 });
 
-describe("controllers/object-stores", () => {
+describe("controllers/push-target", () => {
   describe("basic CRUD with JWT authorization", () => {
-    let client;
-    let nonAdminToken;
-    let nonAdminUser;
-    let adminUser;
+    let client: TestClient;
+    let nonAdminToken: string;
+    let nonAdminUser: User;
+    let adminUser: User;
 
     beforeEach(async () => {
       client = new TestClient({
         server,
       });
       // setting up admin user and token
-      const userRes = await client.post(`/user/`, { ...mockAdminUser });
+      const userRes = await client.post(`/user`, { ...mockAdminUserInput });
       adminUser = await userRes.json();
 
-      let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
-      const adminToken = await tokenRes.json();
-      client.jwtAuth = `${adminToken["token"]}`;
+      const adminTokenRes = await client.post(`/user/token`, {
+        ...mockAdminUserInput,
+      });
+      const adminToken = await adminTokenRes.json();
+      client.jwtAuth = adminToken.token;
 
       const user = await server.store.get(`user/${adminUser.id}`, false);
       adminUser = { ...user, admin: true, emailValid: true };
       await server.store.replace(adminUser);
 
       // setting up non-admin user
-      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser });
+      const nonAdminRes = await client.post(`/user`, {
+        ...mockNonAdminUserInput,
+      });
       nonAdminUser = await nonAdminRes.json();
-      tokenRes = await client.post(`/user/token`, { ...mockNonAdminUser });
-      nonAdminToken = await tokenRes.json();
+      const tokenRes = await client.post(`/user/token`, {
+        ...mockNonAdminUserInput,
+      });
+      const tokenJson = await tokenRes.json();
+      nonAdminToken = tokenJson.token;
 
       const nonAdminUserRes = await server.store.get(
         `user/${nonAdminUser.id}`,
@@ -82,17 +80,27 @@ describe("controllers/object-stores", () => {
       await server.store.replace(nonAdminUser);
     });
 
-    it("should not get all object stores without admin authorization", async () => {
-      client.jwtAuth = "";
+    it("should not get all push targets without admin authorization", async () => {
+      client.jwtAuth = nonAdminToken;
+      const input = {
+        ...mockPushTargetInput,
+        userId: nonAdminUser.id,
+      };
+      const userPushTarget = await db.pushTarget.fillAndCreate(input);
+
       for (let i = 0; i < 10; i += 1) {
-        const storeChangeId = JSON.parse(JSON.stringify(store));
-        storeChangeId.id = uuid();
-        await server.store.create(storeChangeId);
-        const res = await client.get(`/object-store/${store.id}`);
-        expect(res.status).toBe(403);
+        const input = {
+          ...mockPushTargetInput,
+          userId: uuid(),
+        };
+        const created = await db.pushTarget.fillAndCreate(input);
+
+        const res = await client.get(`/push-target/${created.id}`);
+        expect(res.status).toBe(404);
       }
-      const res = await client.get(`/object-store?userId=${store.userId}`);
-      expect(res.status).toBe(403);
+      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual([userPushTarget]);
     });
 
     it("should throw 403 error if JWT is not verified", async () => {
@@ -216,7 +224,7 @@ describe("controllers/object-stores", () => {
     });
 
     it("should not get another users object store with non-admin user", async () => {
-      client.jwtAuth = nonAdminToken["token"];
+      client.jwtAuth = nonAdminToken.token;
 
       const storeChangeId = JSON.parse(JSON.stringify(store));
       storeChangeId.userId = adminUser.id;

@@ -1,10 +1,12 @@
+import { SQLStatement } from "sql-template-strings";
+import mung from "express-mung";
+
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
-import { SQLStatement } from "sql-template-strings";
 import { PushTarget } from "../schema/types";
 
 const fieldsMap = {
@@ -60,20 +62,18 @@ const badRequest = (res: Response, error: string) =>
 
 const app = Router();
 
-app.use(function cleanWriteOnlyResponses(req, res, next) {
-  if (req.user.admin) return next();
+app.use(authMiddleware({}));
 
-  const origResJson = res.json;
-  res.json = (data) => {
-    data = Array.isArray(data)
+app.use(
+  mung.json(function cleanWriteOnlyResponses(data, req) {
+    if (req.user.admin || !data || !("id" in data)) {
+      return data;
+    }
+    return Array.isArray(data)
       ? db.pushTarget.cleanWriteOnlyResponses(data)
       : db.pushTarget.cleanWriteOnlyResponse(data);
-    return origResJson(data);
-  };
-  return next();
-});
-
-app.use(authMiddleware({}));
+  })
+);
 
 app.get("/", async (req, res) => {
   const isAdmin = !!req.user.admin;
