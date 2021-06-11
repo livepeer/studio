@@ -290,18 +290,21 @@ describe("controllers/push-target", () => {
       });
     });
 
-    it("should not get another users object store with non-admin user", async () => {
-      client.jwtAuth = nonAdminToken.token;
+    it("should not allow non-admin users to access another user's push targets", async () => {
+      const created = await db.pushTarget.fillAndCreate({
+        ...mockPushTargetInput,
+        userId: adminUser.id,
+      });
 
-      const storeChangeId = JSON.parse(JSON.stringify(store));
-      storeChangeId.userId = adminUser.id;
-      storeChangeId.id = uuid();
-      await server.store.create(storeChangeId);
+      let res = await client.get(`/push-target/${created.id}`);
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual(created);
 
-      let res = await client.get(`/object-store/${storeChangeId.id}`);
-      expect(res.status).toBe(403);
+      client.jwtAuth = nonAdminToken;
+      res = await client.get(`/push-target/${created.id}`);
+      expect(res.status).toBe(404);
 
-      res = await client.get(`/object-store?userId=${adminUser.id}`);
+      res = await client.get(`/push-target?userId=${created.userId}`);
       expect(res.status).toBe(403);
     });
   });
