@@ -2,8 +2,13 @@ import {
   Box,
   Button,
   Flex,
-  Dialog,
-  DialogContent,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Heading,
   Text,
   DropdownMenuItem,
 } from "@livepeer.com/design-system";
@@ -18,88 +23,70 @@ const Delete = ({ stream, setStream, ...props }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog open={open} {...props}>
+    <AlertDialog open={open} {...props}>
       <Box
         as={DropdownMenuItem}
         onSelect={(e) => {
           e.preventDefault();
-        }}
-        color="red"
-        onClick={() => {
           setOpen(true);
-        }}>
-        <Box>Delete</Box>
+        }}
+        color="red">
+        Delete
       </Box>
 
-      <DialogContent css={{ p: 0 }}>
-        <Box
-          css={{
-            maxWidth: 450,
-            px: "$5",
-            pt: "$5",
-            pb: "$4",
-          }}>
-          <Text
-            size="4"
-            css={{
-              fontWeight: 500,
-              lineHeight: "20px",
-              mb: "$3",
-            }}>
-            Are you you want to delete this stream?
-          </Text>
-          <Text size="2" variant="gray" css={{ lineHeight: "17px" }}>
-            Are you sure you want to delete stream {stream.name}? Deleting a
-            stream cannot be undone.`
-          </Text>
-          <Flex
-            css={{
-              mt: "$4",
-              ai: "center",
-              jc: "flex-end",
-            }}>
-            <Button
-              disabled={saving}
-              onClick={() => {
+      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <AlertDialogTitle as={Heading} size="1">
+          Delete stream
+        </AlertDialogTitle>
+        <AlertDialogDescription
+          as={Text}
+          size="2"
+          variant="gray"
+          css={{ mt: "$2", lineHeight: "17px" }}>
+          Are you sure you want to delete stream {stream.name}? Deleting a
+          stream cannot be undone.
+        </AlertDialogDescription>
+
+        <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+          <AlertDialogCancel
+            size="2"
+            onClick={() => setOpen(false)}
+            as={Button}
+            ghost>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            as={Button}
+            size="2"
+            disabled={saving}
+            onClick={async () => {
+              try {
+                setSaving(true);
+                await deleteStream(stream.id);
+                Router.replace("/dashboard");
+                setStream({ ...stream });
+                setSaving(false);
                 setOpen(false);
-              }}
-              size="2"
-              css={{ mr: "$2" }}>
-              Cancel
-            </Button>
-            <Button
-              css={{ display: "flex", ai: "center" }}
-              size="2"
-              disabled={saving}
-              onClick={async () => {
-                try {
-                  setSaving(true);
-                  await deleteStream(stream.id);
-                  Router.replace("/dashboard");
-                  setStream({ ...stream });
-                  setSaving(false);
-                  setOpen(false);
-                } catch (e) {
-                  setSaving(false);
-                }
-              }}
-              variant="violet">
-              {saving && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Delete
-            </Button>
-          </Flex>
-        </Box>
-      </DialogContent>
-    </Dialog>
+              } catch (e) {
+                setSaving(false);
+              }
+            }}
+            variant="red">
+            {saving && (
+              <Spinner
+                css={{
+                  color: "$hiContrast",
+                  width: 16,
+                  height: 16,
+                  mr: "$2",
+                }}
+              />
+            )}
+            Delete
+          </AlertDialogAction>
+        </Flex>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
