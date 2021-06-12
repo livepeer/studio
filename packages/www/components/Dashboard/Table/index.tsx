@@ -237,9 +237,7 @@ const TableComponent = <T extends Record<string, unknown>>({
             }}>
             <Thead>
               {headerGroups.map((headerGroup) => (
-                <Tr
-                  {...headerGroup.getHeaderGroupProps()}
-                  css={{ borderRadius: "8px" }}>
+                <Tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, i) => {
                     const withHelpTooltip =
                       someColumnCanSort && i === headerGroup.headers.length - 1;
@@ -307,7 +305,14 @@ const TableComponent = <T extends Record<string, unknown>>({
               {page.map((row: Row<object>) => {
                 prepareRow(row);
                 return (
-                  <Tr {...row.getRowProps()}>
+                  <Tr
+                    css={{
+                      "&:hover": {
+                        backgroundColor: "$mauve2",
+                        cursor: "pointer",
+                      },
+                    }}
+                    {...row.getRowProps()}>
                     {row.cells.map((cell, i) => (
                       <Td as={i === 0 ? Th : Td} {...cell.getCellProps()}>
                         {cell.render("Cell")}
