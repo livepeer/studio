@@ -4,6 +4,7 @@ import uuid from "uuid/v4";
 
 let server;
 let mockStore;
+let mockPushTarget;
 let mockUser;
 let mockAdminUser;
 let mockNonAdminUser;
@@ -55,6 +56,10 @@ beforeAll(async () => {
     url: "https+s3://example.com/bucket-name",
     userId: mockAdminUser.id,
     kind: "object-store",
+  };
+
+  mockPushTarget = {
+    url: "rtmps://ultimate.sports.tv/loop/1125fts",
   };
 });
 
@@ -188,23 +193,133 @@ describe("controllers/stream", () => {
       expect(streams.length).toEqual(11);
     });
 
-    it("should reject streams with object stores that don not exist", async () => {
+    it("should reject streams with object stores that do not exist", async () => {
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(400);
     });
 
-    it("should create a stream", async () => {
-      await server.store.create(mockStore);
-      const now = Date.now();
-      const res = await client.post("/stream", { ...postMockStream });
-      expect(res.status).toBe(201);
-      const stream = await res.json();
-      expect(stream.id).toBeDefined();
-      expect(stream.kind).toBe("stream");
-      expect(stream.name).toBe("test_stream");
-      expect(stream.createdAt).toBeGreaterThanOrEqual(now);
-      const document = await server.store.get(`stream/${stream.id}`);
-      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+    describe("stream push targets validation", () => {
+      let pushTarget;
+
+      beforeEach(async () => {
+        await server.store.create(mockStore);
+        pushTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: adminUser.id,
+        });
+      });
+
+      it("should reject push targets without a profile", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ id: pushTarget.id }],
+        });
+        expect(res.status).toBe(422);
+      });
+
+      it("should reject push targets referencing an inexistent profile", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "hello", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain("must reference existing profile");
+      });
+
+      it("should reject push targets with an invalid spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [
+            {
+              profile: "test_stream_360p",
+              spec: { name: "this actually needed a url" },
+            },
+          ],
+        });
+        expect(res.status).toBe(422);
+      });
+
+      it("should reject push targets without an id or spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p" }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          `must have either an "id" or a "spec"`
+        );
+      });
+
+      it(`should reject streams with a "source" profile`, async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          wowza: undefined,
+          profiles: [
+            {
+              name: "source",
+              width: 1920,
+              height: 1080,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toBe(`profile cannot be named "source"`);
+      });
+    });
+
+    describe("stream creation", () => {
+      let pushTarget;
+
+      beforeEach(async () => {
+        await server.store.create(mockStore);
+        pushTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: adminUser.id,
+        });
+      });
+
+      it("should create a stream", async () => {
+        const now = Date.now();
+        const res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(stream.kind).toBe("stream");
+        expect(stream.name).toBe("test_stream");
+        expect(stream.createdAt).toBeGreaterThanOrEqual(now);
+        const document = await server.store.get(`stream/${stream.id}`);
+        expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+      });
+
+      it("should create stream with valid push target ID", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(201);
+      });
+
+      it("should create stream with inline push target", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p", spec: mockPushTarget }],
+        });
+        expect(res.status).toBe(201);
+        const created = await res.json();
+        const resultPt = created.pushTargets[0];
+        expect(resultPt.profile).toEqual("test_stream_360p");
+        expect(resultPt.spec).toBeUndefined();
+        expect(resultPt.id).toBeDefined();
+
+        const saved = await server.db.pushTarget.get(resultPt.id);
+        expect(saved).toBeDefined();
+        expect(saved.userId).toEqual(adminUser.id);
+      });
     });
 
     it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {

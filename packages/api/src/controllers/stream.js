@@ -21,10 +21,7 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../store/errors";
+import { BadRequestError, NotFoundError } from "../store/errors";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -59,8 +56,8 @@ const hackMistSettings = (req, profiles) => {
 
 async function validatePushTarget(userId, profileNames, pushTargetRef) {
   const { profile, id, spec } = pushTargetRef;
-  if (!profileNames.contains(profile) && profile !== "source") {
-    throw new NotFoundError(
+  if (!profileNames.has(profile) && profile !== "source") {
+    throw new BadRequestError(
       `push target must reference existing profile. not found: "${profile}"`
     );
   }
@@ -78,7 +75,7 @@ async function validatePushTarget(userId, profileNames, pushTargetRef) {
   const created = await db.pushTarget.fillAndCreate({
     name: spec.name,
     url: spec.url,
-    userId: req.user.id,
+    userId,
   });
   return { profile, id: created.id };
 }
@@ -768,7 +765,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   });
 
   doc.profiles = hackMistSettings(req, doc.profiles);
-  doc.pushTarget = await validatePushTargets(
+  doc.pushTargets = await validatePushTargets(
     req.user.id,
     doc.profiles,
     doc.pushTargets
