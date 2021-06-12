@@ -6,11 +6,18 @@ import {
   Link as A,
   Avatar,
   Grid,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@livepeer.com/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
 import { HomeIcon, StreamIcon, TerminalIcon, BillingIcon } from "./NavIcons";
+import { useApi } from "../../../hooks";
+import Router from "next/router";
 
 const NavLink = styled(A, {
   textDecoration: "none",
@@ -27,6 +34,8 @@ const NavLink = styled(A, {
 });
 
 const Sidebar = ({ id }) => {
+  const { user, logout } = useApi();
+
   return (
     <Box
       css={{
@@ -42,13 +51,48 @@ const Sidebar = ({ id }) => {
         bottom: 0,
       }}>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
-        <Flex align="center" css={{ cursor: "pointer" }}>
-          <Avatar size="3" alt="Paige" fallback="P" />
-          <Text size="$3" css={{ ml: "$2", mr: "$1" }}>
-            Paige
-          </Text>
-          <ChevronDownIcon width={20} height={20} />
-        </Flex>
+        <DropdownMenu>
+          <Flex
+            as={DropdownMenuTrigger}
+            align="center"
+            css={{
+              border: 0,
+              background: "transparent",
+              p: 0,
+              cursor: "pointer",
+            }}>
+            <Avatar
+              size="3"
+              alt={user?.firstName}
+              fallback={user?.firstName.charAt(0)}
+            />
+            <Text size="$3" css={{ ml: "$2", fontSize: "$3", mr: "$1" }}>
+              {user?.firstName}
+            </Text>
+            <ChevronDownIcon width={20} height={20} />
+          </Flex>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <Box
+                as={DropdownMenuItem}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  Router.push("/dashboard/billing");
+                }}>
+                Billing
+              </Box>
+              <Box
+                as={DropdownMenuItem}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  logout();
+                }}>
+                Logout
+              </Box>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <ThemeSwitch />
       </Flex>
       <Grid css={{ px: "$4" }} gap="3">
