@@ -37,7 +37,6 @@ import {
 import { RenditionsDetails } from "components/StreamsTable";
 import { RelativeTime } from "components/CommonAdminTable";
 import {
-  Cross1Icon as Close,
   CopyIcon as Copy,
   QuestionMarkCircledIcon as Help,
   PauseIcon,
