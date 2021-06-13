@@ -34,13 +34,13 @@ const Suspend = ({ stream, setStream }) => {
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
-          {!stream.suspended ? "Suspend stream" : "Unsuspend stream"}
+          {!stream.suspended ? "Suspend stream?" : "Unsuspend stream?"}
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
-          size="2"
+          size="3"
           variant="gray"
-          css={{ mt: "$2", lineHeight: "17px" }}>
+          css={{ mt: "$2", lineHeight: "22px" }}>
           {!stream.suspended
             ? `Are you sure you want to suspend this stream? 
             Any active stream sessions will immediately end. 
