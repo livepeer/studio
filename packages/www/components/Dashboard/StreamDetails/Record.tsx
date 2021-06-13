@@ -60,13 +60,13 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
-          Disable recording
+          Disable recording?
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
-          size="2"
+          size="3"
           variant="gray"
-          css={{ mt: "$2", lineHeight: "17px" }}>
+          css={{ mt: "$2", lineHeight: "22px" }}>
           Future stream sessions will not be recorded. In progress stream
           sessions will be recorded. Past sessions recordings will still be
           available.
