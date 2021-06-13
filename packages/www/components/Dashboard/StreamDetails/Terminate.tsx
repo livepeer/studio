@@ -39,13 +39,13 @@ const Terminate = ({ stream, setStream, ...props }) => {
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
-          Terminate stream
+          Terminate stream?
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
-          size="2"
+          size="3"
           variant="gray"
-          css={{ mt: "$2", lineHeight: "17px" }}>
+          css={{ mt: "$2", lineHeight: "22px" }}>
           {message}
         </AlertDialogDescription>
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>

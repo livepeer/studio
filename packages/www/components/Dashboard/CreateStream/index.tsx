@@ -21,11 +21,11 @@ const StyledPlusIcon = styled(PlusIcon, {
   mr: "$1",
 });
 
-const CreateStream = () => {
+const Create = () => {
   const [creating, setCreating] = useState(false);
   const router = useRouter();
   const [streamName, setStreamName] = useState("");
-  const { user, createStream } = useApi();
+  const { createStream } = useApi();
 
   return (
     <Dialog>
@@ -165,4 +165,4 @@ const CreateStream = () => {
   );
 };
 
-export default CreateStream;
+export default Create;
