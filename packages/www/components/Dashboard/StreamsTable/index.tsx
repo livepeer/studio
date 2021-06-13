@@ -1,17 +1,10 @@
 import {
   Heading,
   Box,
-  Button,
   Flex,
+  Button,
   Link as A,
   Badge,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-  TextField,
-  Text,
-  Label,
   styled,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -30,12 +23,9 @@ import {
 } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import {
-  QuestionMarkIcon,
-  PlusIcon,
-  ArrowRightIcon,
-} from "@radix-ui/react-icons";
-import CreateStream from "./CreateStream";
+import { QuestionMarkIcon, ArrowRightIcon } from "@radix-ui/react-icons";
+import CreateStream from "components/Dashboard/CreateStream";
+import DeleteStreams from "./DeleteStreams";
 
 type ProfileProps = {
   id: string;
@@ -55,10 +45,6 @@ const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
   color: "$gray8",
   cursor: "pointer",
   ml: "$1",
-});
-
-const StyledPlusIcon = styled(PlusIcon, {
-  mr: "$1",
 });
 
 const Profile = ({
@@ -167,16 +153,13 @@ const StreamsTable = ({
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
+  const [onUnselect, setOnUnselect] = useState();
 
   useEffect(() => {
     getStreams(userId)
       .then((streams) => setStreams(streams))
       .catch((err) => console.error(err)); // todo: surface this
   }, [userId, deleteModal]);
-
-  const close = useCallback(() => {
-    setDeleteModal(false);
-  }, []);
 
   const isVisible = usePageVisibility();
 
@@ -292,55 +275,26 @@ const StreamsTable = ({
         </Heading>
 
         <Flex css={{ alignItems: "center" }}>
-          {/* <Box>
-              <Button
-                aria-label="Delete Stream button"
-                disabled={!selectedStreams.length}
-                onClick={() => selectedStreams.length && setDeleteModal(true)}>
-                Delete
-              </Button>
-              <Box
-                css={{
-                  ml: "1.4em",
-                  display: "inline-block",
-                }}>
-                <b>New beta feature</b>: Record your live streams. Send feedback
-                to help@livepeer.com.
-                <a
-                  target="_blank"
-                  href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
-                  css={{
-                    display: "inline-block",
-                    ml: "0.2em",
-                    textDecoration: "none",
-                    color: "primary",
-                    cursor: "pointer",
-                    ":hover": { textDecoration: "underline" },
-                  }}>
-                  <b>Read more ⬈</b>
-                </a>
-              </Box>
-            </Box> */}
-
-          <CreateStream />
+          {!!selectedStreams.length && (
+            <DeleteStreams
+              onUnselect={onUnselect}
+              total={selectedStreams.length}
+              onDelete={async () => {
+                if (selectedStreams.length === 1) {
+                  await deleteStream(selectedStreams[0].id);
+                } else if (selectedStreams.length > 1) {
+                  await deleteStreams(selectedStreams.map((s) => s.id));
+                }
+              }}
+            />
+          )}
+          {!selectedStreams.length && <CreateStream />}
         </Flex>
       </Flex>
-      {deleteModal && selectedStreams.length && (
-        <DeleteStreamModal
-          numStreamsToDelete={selectedStreams.length}
-          streamName={selectedStreams[0].name}
-          onClose={close}
-          onDelete={() => {
-            if (selectedStreams.length === 1) {
-              deleteStream(selectedStreams[0].id).then(close);
-            } else if (selectedStreams.length > 1) {
-              deleteStreams(selectedStreams.map((s) => s.id)).then(close);
-            }
-          }}
-        />
-      )}
+
       <Box css={{ mb: "$5" }}>
         <Table
+          setOnUnselect={setOnUnselect}
           columns={columns}
           data={data}
           rowSelection="all"

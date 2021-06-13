@@ -9,7 +9,6 @@ import {
 } from "react-table";
 import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
-import ReactTooltip from "react-tooltip";
 import {
   CheckboxFilter,
   CheckboxFilterProps,
@@ -19,10 +18,8 @@ import {
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
 import {
   Table,
-  Caption,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
@@ -54,6 +51,7 @@ type Props<T extends Record<string, unknown>> = {
   initialSortBy?: Sort<T>[];
   filters?: FilterItem<T>[];
   showOverflow?: boolean;
+  setOnUnselect?: any;
 };
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
@@ -72,6 +70,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   initialSortBy,
   filters,
   showOverflow,
+  setOnUnselect,
 }: Props<T>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -100,6 +99,8 @@ const TableComponent = <T extends Record<string, unknown>>({
     canNextPage,
     // @ts-ignore
     toggleAllRowsSelected,
+    // @ts-ignore
+    toggleAllPageRowsSelected,
     // @ts-ignore
     selectedFlatRows,
     // @ts-ignore
@@ -137,11 +138,19 @@ const TableComponent = <T extends Record<string, unknown>>({
             id: "selection",
             // The header can use the table's getToggleAllRowsSelectedProps method
             // to render a checkbox
-            // @ts-ignore
-            Header: ({ getToggleAllPageRowsSelectedProps }) => {
+            Header: ({
+              // @ts-ignore
+              getToggleAllPageRowsSelectedProps,
+              // @ts-ignore
+              isAllRowsSelected,
+            }) => {
               const props = getToggleAllPageRowsSelectedProps();
               return isIndividualSelection ? null : (
-                <Checkbox onClick={props.onChange} value={props.checked} />
+                <Checkbox
+                  onClick={props.onChange}
+                  value={props.checked}
+                  checked={isAllRowsSelected ? true : false}
+                />
               );
             },
             // The cell can use the individual row's getToggleRowSelectedProps method
@@ -167,6 +176,16 @@ const TableComponent = <T extends Record<string, unknown>>({
       }
     }
   );
+
+  useEffect(() => {
+    if (setOnUnselect) {
+      const onUnSelect = () => {
+        toggleAllPageRowsSelected(false);
+      };
+
+      setOnUnselect(() => onUnSelect);
+    }
+  }, [toggleAllPageRowsSelected]);
 
   useEffect(() => {
     onRowSelectionChange?.(selectedFlatRows);
@@ -270,31 +289,6 @@ const TableComponent = <T extends Record<string, unknown>>({
                             </Box>
                           )}
                         </Flex>
-                        {withHelpTooltip && (
-                          <Box
-                            css={{
-                              alignItems: "center",
-                              display: "flex",
-                              position: "absolute",
-                              right: "$3",
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                            }}>
-                            <ReactTooltip
-                              id={`tooltip-multiorder`}
-                              className="tooltip"
-                              place="top"
-                              type="dark"
-                              effect="solid">
-                              To multi-sort (sort by two column simultaneously)
-                              hold shift while clicking on second column name.
-                            </ReactTooltip>
-                            <StyledQuestionMarkIcon
-                              data-tip
-                              data-for={`tooltip-multiorder`}
-                            />
-                          </Box>
-                        )}
                       </Td>
                     );
                   })}
