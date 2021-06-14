@@ -1,10 +1,10 @@
 import { PushTarget } from "../schema/types";
 import Table from "./table";
-import { GetOptions, WithId } from "./types";
+import { GetOptions, WithID } from "./types";
 import * as uuid from "uuid";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
-type DbPushTarget = WithId<PushTarget>;
+type DBPushTarget = WithID<PushTarget>;
 
 interface PushTargetInput {
   name?: string;
@@ -21,7 +21,7 @@ const parseUrl = (url: string) => {
   }
 };
 
-export default class PushTargetTable extends Table<DbPushTarget> {
+export default class PushTargetTable extends Table<DBPushTarget> {
   async fillAndCreate(input: PushTargetInput) {
     const url = parseUrl(input.url);
     const pushTarget: Required<PushTarget> = {
@@ -41,7 +41,7 @@ export default class PushTargetTable extends Table<DbPushTarget> {
     return created;
   }
 
-  async create(doc: DbPushTarget) {
+  async create(doc: DBPushTarget) {
     throw new Error("Unimplemented API, use fillAndCreate instead");
     return doc;
   }

@@ -18,7 +18,7 @@ import {
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
-import { QueryOptions, WithId } from "./types";
+import { QueryOptions, WithID } from "./types";
 import PushTargetTable from "./push-target-table";
 
 // Should be configurable, perhaps?
@@ -30,10 +30,10 @@ interface PostgresParams {
   appName?: string;
 }
 
-type Table<T> = BaseTable<WithId<T>>;
+type Table<T> = BaseTable<WithID<T>>;
 
 const makeTable = <T>(opts: TableOptions) =>
-  new BaseTable<WithId<T>>(opts) as Table<T>;
+  new BaseTable<WithID<T>>(opts) as Table<T>;
 
 export class DB {
   // Table objects
@@ -59,7 +59,11 @@ export class DB {
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl, postgresReplicaUrl, appName = "api" }: PostgresParams) {
+  async start({
+    postgresUrl,
+    postgresReplicaUrl,
+    appName = "api",
+  }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
       throw new Error("no postgres url provided");

@@ -16,7 +16,7 @@ export interface DBLegacyObject extends DBObject {
   data: Object;
 }
 
-export type WithId<T> = T & { id: string };
+export type WithID<T> = T & { id: string };
 
 export interface FindQuery {
   [key: string]: any;

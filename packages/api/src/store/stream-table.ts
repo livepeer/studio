@@ -2,7 +2,7 @@ import sql from "sql-template-strings";
 import Table from "./table";
 import { Stream } from "../schema/types";
 import { QueryResult, QueryResultRow } from "pg";
-import { DBLegacyObject, QueryOptions, WithId } from "./types";
+import { DBLegacyObject, QueryOptions, WithID } from "./types";
 
 interface UsageData {
   id?: string;
@@ -32,7 +32,7 @@ interface dbUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export default class StreamTable extends Table<WithId<Stream>> {
+export default class StreamTable extends Table<WithID<Stream>> {
   async cachedUsageHistory(
     fromTime: number,
     toTime: number,
