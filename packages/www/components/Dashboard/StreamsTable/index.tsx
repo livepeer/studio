@@ -11,7 +11,6 @@ import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
-import DeleteStreamModal from "../DeleteStreamModal";
 import Table from "components/Dashboard/Table";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -25,7 +24,7 @@ import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { QuestionMarkIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import CreateStream from "components/Dashboard/CreateStream";
-import DeleteStreams from "./DeleteStreams";
+import Delete from "./Delete";
 
 type ProfileProps = {
   id: string;
@@ -149,7 +148,6 @@ const StreamsTable = ({
   title: string;
   userId: string;
 }) => {
-  const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
@@ -159,7 +157,7 @@ const StreamsTable = ({
     getStreams(userId)
       .then((streams) => setStreams(streams))
       .catch((err) => console.error(err)); // todo: surface this
-  }, [userId, deleteModal]);
+  }, [userId]);
 
   const isVisible = usePageVisibility();
 
@@ -276,7 +274,7 @@ const StreamsTable = ({
 
         <Flex css={{ alignItems: "center" }}>
           {!!selectedStreams.length && (
-            <DeleteStreams
+            <Delete
               onUnselect={onUnselect}
               total={selectedStreams.length}
               onDelete={async () => {
@@ -300,6 +298,7 @@ const StreamsTable = ({
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
           initialSortBy={[{ id: "created", desc: true }]}
+          cursor="pointer"
         />
       </Box>
       <Flex

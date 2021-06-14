@@ -51,14 +51,7 @@ const Dashboard = () => {
             </Box>
           </Flex>
           <Flex align="center" justify="end">
-            <Button css={{ mr: "$3" }}>Upgrade to Pro</Button>
-            <IconButton
-              variant="ghost"
-              css={{
-                mixBlendMode: "initial",
-              }}>
-              <StyledCross1Icon />
-            </IconButton>
+            <Button size="2">Upgrade to Pro</Button>
           </Flex>
         </Promo>
         <Box css={{ mb: "$8" }}>
