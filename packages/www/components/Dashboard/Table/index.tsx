@@ -52,13 +52,8 @@ type Props<T extends Record<string, unknown>> = {
   filters?: FilterItem<T>[];
   showOverflow?: boolean;
   setOnUnselect?: any;
+  cursor?: string;
 };
-
-const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
-  color: "$hiContrast",
-  cursor: "pointer",
-  ml: "$1",
-});
 
 const TableComponent = <T extends Record<string, unknown>>({
   columns,
@@ -71,6 +66,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   filters,
   showOverflow,
   setOnUnselect,
+  cursor = "default",
 }: Props<T>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -147,6 +143,7 @@ const TableComponent = <T extends Record<string, unknown>>({
               const props = getToggleAllPageRowsSelectedProps();
               return isIndividualSelection ? null : (
                 <Checkbox
+                  css={{ display: "flex" }}
                   onClick={props.onChange}
                   value={props.checked}
                   checked={isAllRowsSelected ? true : false}
@@ -158,6 +155,7 @@ const TableComponent = <T extends Record<string, unknown>>({
             Cell: ({ row }) => {
               return (
                 <Checkbox
+                  css={{ display: "flex" }}
                   // @ts-ignore
                   value={row.isSelected}
                   // @ts-ignore
@@ -264,6 +262,9 @@ const TableComponent = <T extends Record<string, unknown>>({
                       <Td
                         as={i === 0 ? Th : Td}
                         scope="col"
+                        css={{
+                          pl: i === 0 ? "$1" : 0,
+                        }}
                         {...column.getHeaderProps(
                           // @ts-ignore
                           column.getSortByToggleProps()
@@ -303,12 +304,15 @@ const TableComponent = <T extends Record<string, unknown>>({
                     css={{
                       "&:hover": {
                         backgroundColor: "$mauve2",
-                        cursor: "pointer",
+                        cursor,
                       },
                     }}
                     {...row.getRowProps()}>
                     {row.cells.map((cell, i) => (
-                      <Td as={i === 0 ? Th : Td} {...cell.getCellProps()}>
+                      <Td
+                        as={i === 0 ? Th : Td}
+                        css={{ pl: i === 0 ? "$1" : 0 }}
+                        {...cell.getCellProps()}>
                         {cell.render("Cell")}
                       </Td>
                     ))}
