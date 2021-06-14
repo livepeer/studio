@@ -145,7 +145,7 @@ type StreamsTableData = {
   status: string;
 };
 
-const pageSize = 3;
+const pageSize = 14;
 
 const StreamsTable = ({
   title = "Streams",
@@ -157,15 +157,8 @@ const StreamsTable = ({
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
-  const [loadingState, setLoadingState] = useState(false);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
   const [onUnselect, setOnUnselect] = useState();
-
-  useEffect(() => {
-    getStreams(userId)
-      .then((streams) => setStreams(streams))
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [userId]);
 
   const isVisible = usePageVisibility();
 
@@ -173,13 +166,10 @@ const StreamsTable = ({
     if (!isVisible) {
       return;
     }
-    const interval = setInterval(() => {
-      getStreams(userId)
-        .then((streams) => setStreams(streams))
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [userId, isVisible]);
+    getStreams(userId)
+      .then((streams) => setStreams(streams))
+      .catch((err) => console.error(err)); // todo: surface this
+  }, [userId]);
 
   const columns: Column<StreamsTableData>[] = useMemo(
     () => [
@@ -254,10 +244,11 @@ const StreamsTable = ({
   );
 
   const slicedData = useMemo(() => {
+    if (!data) return;
     return data
       .slice(pageNumber * pageSize, (pageNumber + 1) * pageSize)
       .map((data) => data);
-  }, [data]);
+  }, [pageNumber, data]);
 
   const handleNextPage = useCallback(() => {
     setPageNumber((prev) => prev + 1);
@@ -266,13 +257,6 @@ const StreamsTable = ({
   const handlePreviousPage = useCallback(() => {
     setPageNumber((prev) => prev - 1);
   }, []);
-
-  useEffect(() => {
-    setLoadingState(true);
-    setTimeout(() => {
-      setLoadingState(false);
-    }, 2000);
-  }, [pageNumber]);
 
   return (
     <Box
@@ -343,28 +327,12 @@ const StreamsTable = ({
         <Flex>
           <Button
             css={{ marginRight: "6px" }}
-            onClick={() => {
-              try {
-                setLoadingState(true);
-                handlePreviousPage();
-                setLoadingState(false);
-              } catch (error) {
-                setLoadingState(false);
-              }
-            }}
+            onClick={handlePreviousPage}
             disabled={pageNumber <= 0}>
             Previous
           </Button>
           <Button
-            onClick={() => {
-              try {
-                setLoadingState(true);
-                handleNextPage();
-                setLoadingState(false);
-              } catch (error) {
-                setLoadingState(false);
-              }
-            }}
+            onClick={handleNextPage}
             disabled={(pageNumber + 1) * pageSize >= data.length}>
             Next
           </Button>
