@@ -10,12 +10,10 @@ import {
   Status,
   Badge,
   Tooltip,
-  Text,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@livepeer.com/design-system";
@@ -27,7 +25,6 @@ import { useRouter } from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
-import ConfirmationModal from "components/ConfirmationModal";
 import {
   pathJoin,
   isStaging,
@@ -175,27 +172,16 @@ const ClipBut = ({ text }) => {
 
 const ID = () => {
   useLoggedIn();
-  const {
-    user,
-    logout,
-    getStream,
-    deleteStream,
-    getIngest,
-    setRecord,
-    getAdminStreams,
-    suspendStream,
-  } = useApi();
+  const { user, getStream, getIngest, setRecord, getAdminStreams } = useApi();
   const userIsAdmin = user && user.admin;
   const router = useRouter();
   const { query } = router;
   const id = query.id;
   const [stream, setStream] = useState(null);
   const [ingest, setIngest] = useState([]);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [suspendModal, setSuspendModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [recordOffModal, setRecordOffModal] = useState(false);
   const [isCopied, setCopied] = useState(0);
+  const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
   const [regionalUrlsVisible, setRegionalUrlsVisible] = useState(false);
@@ -279,14 +265,6 @@ const ID = () => {
     return () => clearInterval(interval);
   }, [id, isVisible]);
 
-  const [keyRevealed, setKeyRevealed] = useState(false);
-
-  const close = () => {
-    setSuspendModal(false);
-    setDeleteModal(false);
-    setRecordOffModal(false);
-  };
-
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
@@ -342,30 +320,6 @@ const ID = () => {
         { title: stream?.name },
       ]}>
       <Box css={{ p: "$6" }}>
-        {suspendModal && stream && (
-          <ConfirmationModal
-            actionText="Confirm"
-            onClose={close}
-            onAction={() => {
-              const newValue = !stream.suspended;
-              suspendStream(stream.id, !stream.suspended)
-                .then((res) => {
-                  stream.suspended = newValue;
-                  setStream({ ...stream, suspended: newValue });
-                })
-                .catch((e) => {
-                  console.error(e);
-                })
-                .finally(close);
-            }}>
-            {!stream.suspended
-              ? `Are you sure you want to suspend and block this stream? 
-            Any active stream sessions will immediately end. 
-            New sessions will be prevented from starting until unchecked.`
-              : `Are you sure you want to allow new stream sessions again?`}
-          </ConfirmationModal>
-        )}
-
         {stream ? (
           <>
             <Flex
@@ -516,7 +470,7 @@ const ID = () => {
                           type="button"
                           variant="violet"
                           onClick={() => setKeyRevealed(true)}>
-                          Reveal secret stream key
+                          Reveal stream key
                         </Button>
                       )}
                     </Cell>
