@@ -151,9 +151,9 @@ app.patch("/:id", async (req, res) => {
   }
   const disabledPatch = req.body.disabled;
   if (typeof disabledPatch !== "boolean") {
-    return badRequest(res, "required boolean field in payload: disabled");
+    return respondError(res, 422, "required boolean field: disabled");
   }
-  await db.pushTarget.update(id, { disabled: !!req.body.disabled });
+  await db.pushTarget.update(id, { disabled: disabledPatch });
   res.status(204);
   res.end();
 });

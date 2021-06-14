@@ -224,6 +224,27 @@ describe("controllers/push-target", () => {
       expect(getResponse).toEqual(created);
     });
 
+    it("should patch a push target", async () => {
+      let res = await client.post("/push-target", mockPushTargetInput);
+      expect(res.status).toBe(201);
+      const created = (await res.json()) as PushTarget;
+
+      res = await client.patch(`/push-target/${created.id}`, {
+        disabled: "not a bool",
+      });
+      expect(res.status).toBe(422);
+
+      res = await client.patch(`/push-target/${created.id}`, {
+        disabled: true,
+      });
+      expect(res.status).toBe(204);
+      const patched = db.pushTarget.cleanWriteOnlyResponse(
+        await db.pushTarget.get(created.id)
+      );
+      expect(patched).not.toEqual(created);
+      expect(patched).toEqual({ ...created, disabled: true });
+    });
+
     it("should support RTMP, RTMPS and SRT for URL", async () => {
       const baseUrl = mockPushTargetInput.url.split("://")[1];
       let res = await client.post("/push-target", {
