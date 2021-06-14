@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
 import Table from "components/Dashboard/Table";
-import { TextCellProps } from "components/Dashboard/Table/cells/text";
+import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
   DurationCellProps,
 } from "components/Dashboard/Table/cells/duration";
-import { dateSort, numberSort } from "components/Dashboard/Table/sorts";
+import {
+  dateSort,
+  numberSort,
+  stringSort,
+} from "components/Dashboard/Table/sorts";
 import Link from "next/link";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
@@ -65,30 +69,26 @@ const RecordingUrlCell = <D extends TableData>({
 
 type SessionsTableData = {
   id: string;
+  parentStream: TextCellProps;
   recordingUrl: TextCellProps;
   created: DateCellProps;
   duration: DurationCellProps;
 };
 
-const StreamSessionsTable = ({
-  title = "Sessions",
-  streamId,
-}: {
-  title?: string;
-  streamId: string;
-  mt?: string | number;
-}) => {
+const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
-  const { user, getStreamSessions } = useApi();
+  const { user, getStreamSessionsByUserId } = useApi();
   const [sessionsLoading, setSessionsLoading] = useState(false);
   useEffect(() => {
-    getStreamSessions(streamId, undefined, 0)
+    getStreamSessionsByUserId(user.id, undefined, 0)
       .then(([streams, nextCursor]) => {
         setStreamsSessions(streams);
       })
       .catch((err) => console.error(err)); // todo: surface this
-  }, [streamId]);
+  }, [user.id]);
+
   const isVisible = usePageVisibility();
+
   useEffect(() => {
     if (!isVisible) {
       return;
@@ -96,7 +96,7 @@ const StreamSessionsTable = ({
     const interval = setInterval(() => {
       if (!sessionsLoading) {
         setSessionsLoading(true);
-        getStreamSessions(streamId, undefined, 0)
+        getStreamSessionsByUserId(user.id, undefined, 0)
           .then(([streams, nextCursor]) => {
             setStreamsSessions(streams);
           })
@@ -105,10 +105,17 @@ const StreamSessionsTable = ({
       }
     }, 10000);
     return () => clearInterval(interval);
-  }, [streamId, isVisible]);
+  }, [isVisible]);
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
+      {
+        Header: "Stream",
+        accessor: "parentStream",
+        Cell: TextCell,
+        sortType: (...params: SortTypeArgs) =>
+          stringSort("original.parentStream.name", ...params),
+      },
       {
         Header: "Created at",
         accessor: "created",
@@ -137,6 +144,16 @@ const StreamSessionsTable = ({
     return streamsSessions.map((stream) => {
       return {
         id: stream.id,
+        parentStream: {
+          id: stream.parentId,
+          children: stream.parentStream.name,
+          tooltipChildren: stream.createdByTokenName ? (
+            <>
+              Created by stream <b>{stream.parentStream.name}</b>
+            </>
+          ) : null,
+          href: `/dashboard/streams/${stream.id}`,
+        },
         recordingUrl: {
           id: stream.id,
           showMP4: user?.admin || isStaging() || isDevelopment(),
@@ -165,7 +182,9 @@ const StreamSessionsTable = ({
 
   return streamsSessions.length ? (
     <Box>
-      <Heading css={{ mb: "$4" }}>{title}</Heading>
+      <Heading size="2" css={{ fontWeight: 600, mb: "$4" }}>
+        {title}
+      </Heading>
       <Table
         columns={columns}
         data={data}
@@ -179,4 +198,4 @@ const StreamSessionsTable = ({
   ) : null;
 };
 
-export default StreamSessionsTable;
+export default AllSessionsTable;

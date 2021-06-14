@@ -24,7 +24,7 @@ const NavLink = styled(A, {
   fontSize: "$3",
   display: "flex",
   alignItems: "center",
-  color: "$hiContrast",
+  color: "$mauve12",
   "&:hover": {
     textDecoration: "none",
   },
@@ -112,22 +112,49 @@ const Sidebar = ({ id }) => {
             </Text>
           </NavLink>
         </Link>
-        <Link href="/dashboard/streams" passHref>
-          <NavLink>
-            <StreamIcon active={id === "streams"} />
-            <Text
-              gradient={id === "streams"}
-              variant={id === "streams" ? "violet" : null}
-              css={{
-                fontWeight: id === "streams" ? 700 : 400,
-                WebkitBackgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-              }}>
-              Streams
-            </Text>
-          </NavLink>
-        </Link>
+        <Box>
+          <Link href="/dashboard/streams" passHref>
+            <NavLink>
+              <StreamIcon active={id === "streams"} />
+              <Text
+                gradient={id === "streams"}
+                variant={id === "streams" ? "violet" : null}
+                css={{
+                  fontWeight: id === "streams" ? 700 : 400,
+                  WebkitBackgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                }}>
+                Streams
+              </Text>
+            </NavLink>
+          </Link>
+          <Box
+            css={{
+              ":first-child": {
+                mt: "$1",
+              },
+            }}>
+            {id?.split("/")[0] === "streams" && (
+              <Link href="/dashboard/sessions" passHref>
+                <NavLink>
+                  <Text
+                    gradient={id === "streams/sessions"}
+                    variant={id === "streams/sessions" ? "violet" : null}
+                    css={{
+                      fontWeight: id === "streams/sessions" ? 700 : 400,
+                      WebkitBackgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Sessions
+                  </Text>
+                </NavLink>
+              </Link>
+            )}
+          </Box>
+        </Box>
         <Link href="/dashboard/developers/api-keys" passHref>
           <NavLink>
             <TerminalIcon active={id === "developers"} />
