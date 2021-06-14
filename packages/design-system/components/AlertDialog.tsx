@@ -56,7 +56,7 @@ export function AlertDialog({ children, ...props }: AlertDialogProps) {
   );
 }
 
-const StyledAlertDialog = styled(Content, {
+const StyledAlertDialogContent = styled(Content, {
   position: "fixed",
   top: "50%",
   left: "50%",
@@ -70,6 +70,10 @@ const StyledAlertDialog = styled(Content, {
   boxShadow:
     "$colors$shadowLight 0px 10px 38px -10px, $colors$shadowDark 0px 10px 20px -15px",
   color: "$black",
+
+  "&:focus": {
+    outline: "none",
+  },
 
   variants: {
     animation: {
@@ -87,32 +91,20 @@ const StyledAlertDialog = styled(Content, {
       },
     },
   },
-
-  "&:focus": {
-    outline: "none",
+  defaultVariants: {
+    animation: "scale",
   },
 });
 
-type AlertDialogContentOwnProps = Polymorphic.OwnProps<typeof Content> & {
-  css?: any;
-};
-
-type AlertDialogContentComponent = Polymorphic.ForwardRefComponent<
-  Polymorphic.IntrinsicElement<typeof Content>,
-  AlertDialogContentOwnProps
->;
-
-export const AlertDialogContent = React.forwardRef(
-  ({ children, animation = "scale", ...props }: any, forwardedRef) => (
-    <Content
-      as={StyledAlertDialog}
-      animation={animation}
-      ref={forwardedRef}
-      {...props}>
-      {children}
-    </Content>
-  )
-) as AlertDialogContentComponent;
+export const AlertDialogContent = ({
+  children,
+  animation = "scale",
+  ...props
+}: any) => (
+  <StyledAlertDialogContent animation={animation} {...props}>
+    {children}
+  </StyledAlertDialogContent>
+);
 
 export {
   Trigger as AlertDialogTrigger,
