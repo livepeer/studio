@@ -89,4 +89,17 @@ export class TestClient {
     }
     return await this.fetch(path, params);
   }
+
+  async patch(path, data) {
+    const params = {
+      method: "PATCH",
+    };
+    if (data) {
+      params.headers = {
+        "content-type": "application/json",
+      };
+      params.body = JSON.stringify(data);
+    }
+    return await this.fetch(path, params);
+  }
 }
