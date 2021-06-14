@@ -1,12 +1,5 @@
 export {
   Alert,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Avatar,
   AvatarGroup,
   AvatarNestedItem,
@@ -107,6 +100,15 @@ export {
   DialogContent,
   DialogTrigger,
 } from "./components/Dialog";
+export {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./components/AlertDialog";
 export { Button } from "./components/Button";
 export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
