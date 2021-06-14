@@ -261,7 +261,6 @@ const StreamsTable = ({
   return (
     <Box
       css={{
-        height: "calc(100vh - 130px)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
