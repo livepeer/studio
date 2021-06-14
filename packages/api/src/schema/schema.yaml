@@ -259,7 +259,7 @@ components:
                   for pushing source stream data
                 minLength: 1
                 maxLength: 500
-                example: aac
+                example: 720p
               id:
                 type: string
                 description: ID of push target object where to push this stream
