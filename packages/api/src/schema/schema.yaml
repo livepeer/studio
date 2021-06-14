@@ -245,7 +245,7 @@ components:
           type: array
           example: [{ "id": "PUSH123", "profile": "720p" }]
           description:
-            References to targets where this stream will be simulatenously
+            References to targets where this stream will be simultaneously
             pushed to
           items:
             type: object
