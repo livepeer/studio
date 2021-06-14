@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Button, Flex, Link as A } from "@theme-ui/components";
 import moment from "moment";
-import * as  filenamify from "filenamify";
+import * as filenamify from "filenamify";
 import TableV2 from "../Table-v2";
 // import { usePopper } from "react-popper";
 import TextCell, { TextCellProps } from "components/Table-v2/cells/text";

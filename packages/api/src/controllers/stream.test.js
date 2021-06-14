@@ -4,6 +4,7 @@ import uuid from "uuid/v4";
 
 let server;
 let mockStore;
+let mockPushTarget;
 let mockUser;
 let mockAdminUser;
 let mockNonAdminUser;
@@ -55,6 +56,10 @@ beforeAll(async () => {
     url: "https+s3://example.com/bucket-name",
     userId: mockAdminUser.id,
     kind: "object-store",
+  };
+
+  mockPushTarget = {
+    url: "rtmps://ultimate.sports.tv/loop/1125fts",
   };
 });
 
@@ -188,23 +193,163 @@ describe("controllers/stream", () => {
       expect(streams.length).toEqual(11);
     });
 
-    it("should reject streams with object stores that don not exist", async () => {
+    it("should reject streams with object stores that do not exist", async () => {
       const res = await client.post("/stream", { ...postMockStream });
       expect(res.status).toBe(400);
     });
 
-    it("should create a stream", async () => {
-      await server.store.create(mockStore);
-      const now = Date.now();
-      const res = await client.post("/stream", { ...postMockStream });
-      expect(res.status).toBe(201);
-      const stream = await res.json();
-      expect(stream.id).toBeDefined();
-      expect(stream.kind).toBe("stream");
-      expect(stream.name).toBe("test_stream");
-      expect(stream.createdAt).toBeGreaterThanOrEqual(now);
-      const document = await server.store.get(`stream/${stream.id}`);
-      expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+    describe("stream push targets validation", () => {
+      let pushTarget;
+
+      beforeEach(async () => {
+        await server.store.create(mockStore);
+        pushTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: adminUser.id,
+        });
+      });
+
+      it("should reject push targets without a profile", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ id: pushTarget.id }],
+        });
+        expect(res.status).toBe(422);
+      });
+
+      it("should reject push targets referencing an inexistent profile", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "hello", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain("must reference existing profile");
+      });
+
+      it("should reject push targets with an invalid spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [
+            {
+              profile: "test_stream_360p",
+              spec: { name: "this actually needed a url" },
+            },
+          ],
+        });
+        expect(res.status).toBe(422);
+      });
+
+      it("should reject push targets without an id or spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p" }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          `must have either an "id" or a "spec"`
+        );
+      });
+
+      it("should reject push targets with both an id and a spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [
+            {
+              profile: "test_stream_360p",
+              id: pushTarget.id,
+              spec: mockPushTarget,
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          `must have either an "id" or a "spec"`
+        );
+      });
+
+      it("should reject references to other users push targets", async () => {
+        client.jwtAuth = nonAdminToken["token"];
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(`push target not found`);
+      });
+
+      it(`should reject streams with a "source" profile`, async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          wowza: undefined,
+          profiles: [
+            {
+              name: "source",
+              width: 1920,
+              height: 1080,
+              bitrate: 1024,
+              fps: 30,
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toBe(`profile cannot be named "source"`);
+      });
+    });
+
+    describe("stream creation", () => {
+      let pushTarget;
+
+      beforeEach(async () => {
+        await server.store.create(mockStore);
+        pushTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: adminUser.id,
+        });
+      });
+
+      it("should create a stream", async () => {
+        const now = Date.now();
+        const res = await client.post("/stream", { ...postMockStream });
+        expect(res.status).toBe(201);
+        const stream = await res.json();
+        expect(stream.id).toBeDefined();
+        expect(stream.kind).toBe("stream");
+        expect(stream.name).toBe("test_stream");
+        expect(stream.createdAt).toBeGreaterThanOrEqual(now);
+        const document = await server.store.get(`stream/${stream.id}`);
+        expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
+      });
+
+      it("should create stream with valid push target ID", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(201);
+      });
+
+      it("should create stream with inline push target", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [{ profile: "test_stream_360p", spec: mockPushTarget }],
+        });
+        expect(res.status).toBe(201);
+        const created = await res.json();
+        const resultPt = created.pushTargets[0];
+        expect(resultPt.profile).toEqual("test_stream_360p");
+        expect(resultPt.spec).toBeUndefined();
+        expect(resultPt.id).toBeDefined();
+        expect(resultPt.id).not.toEqual(pushTarget.id);
+
+        const saved = await server.db.pushTarget.get(resultPt.id);
+        expect(saved).toBeDefined();
+        expect(saved.userId).toEqual(adminUser.id);
+      });
     });
 
     it("should create a stream, delete it, and error when attempting additional detele or replace", async () => {
@@ -234,6 +379,126 @@ describe("controllers/stream", () => {
       } catch (err) {
         expect(err.status).toBe(404);
       }
+    });
+
+    describe("stream patch", () => {
+      let pushTarget;
+      let stream;
+      let patchPath;
+
+      beforeEach(async () => {
+        await server.store.create(mockStore);
+        pushTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: adminUser.id,
+        });
+        const res = await client.post("/stream", postMockStream);
+        stream = await res.json();
+        patchPath = `/stream/${stream.id}`;
+      });
+
+      it("should disallow patching other users streams", async () => {
+        client.jwtAuth = nonAdminToken["token"];
+        const res = await client.patch(patchPath);
+        expect(res.status).toBe(404);
+      });
+
+      it("should allow an empty patch", async () => {
+        let res = await client.patch(patchPath);
+        expect(res.status).toBe(204);
+
+        res = await client.patch(patchPath, {});
+        expect(res.status).toBe(204);
+      });
+
+      it("should disallow additional fields", async () => {
+        const res = await client.patch(patchPath, {
+          name: "the stream name is immutable",
+        });
+        expect(res.status).toBe(422);
+        const json = await res.json();
+        expect(json.errors[0]).toContain("additionalProperties");
+      });
+
+      it("should validate field types", async () => {
+        const testTypeErr = async (payload) => {
+          let res = await client.patch(patchPath, payload);
+          expect(res.status).toBe(422);
+          const json = await res.json();
+          expect(json.errors[0]).toContain(`"type"`);
+        };
+
+        await testTypeErr({ record: "true" });
+        await testTypeErr({ suspended: "not even a boolean string" });
+        await testTypeErr({ pushTargets: { profile: "a", id: "b" } });
+        await testTypeErr({ pushTargets: [{ profile: 123 }] });
+      });
+
+      it("should validate url format", async () => {
+        let res = await client.patch(patchPath, {
+          pushTargets: [
+            {
+              profile: "test_stream_360p",
+              spec: { url: "rtmps://almost.url.but@" },
+            },
+          ],
+        });
+        expect(res.status).toBe(422);
+        const json = await res.json();
+        expect(json.errors[0]).toContain("Bad URL");
+      });
+
+      it("should reject references to other users push targets", async () => {
+        const nonAdminTarget = await server.db.pushTarget.fillAndCreate({
+          ...mockPushTarget,
+          userId: nonAdminUser.id,
+        });
+        const res = await client.patch(patchPath, {
+          pushTargets: [{ profile: "test_stream_360p", id: nonAdminTarget.id }],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(`push target not found`);
+      });
+
+      const testPatchField = async (patch) => {
+        const res = await client.patch(patchPath, patch);
+        expect(res.status).toBe(204);
+
+        let patched = await server.db.stream.get(stream.id);
+        patched = server.db.stream.addDefaultFields(patched);
+        expect(patched).not.toEqual(stream);
+        expect(patched).toEqual({ ...stream, ...patch });
+      };
+
+      it("should patch record field", async () => {
+        await testPatchField({ record: true });
+      });
+      it("should patch suspended field", async () => {
+        await testPatchField({ suspended: true });
+      });
+      it("should patch pushTargets", async () => {
+        await testPatchField({
+          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+        });
+      });
+      it("should also create inline pushTargets", async () => {
+        const res = await client.patch(patchPath, {
+          pushTargets: [{ profile: "test_stream_360p", spec: mockPushTarget }],
+        });
+        expect(res.status).toBe(204);
+
+        let patched = await server.db.stream.get(stream.id);
+        patched = server.db.stream.addDefaultFields(patched);
+        const createdPtId = patched.pushTargets[0].id;
+        expect(patched).toEqual({
+          ...stream,
+          pushTargets: [{ profile: "test_stream_360p", id: createdPtId }],
+        });
+
+        const savedPt = await server.db.pushTarget.get(createdPtId);
+        expect(savedPt.userId).toEqual(adminUser.id);
+      });
     });
 
     it("should get own streams with non-admin user", async () => {
