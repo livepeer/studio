@@ -2,7 +2,11 @@ import Router from "express/lib/router";
 import sql from "sql-template-strings";
 import { authMiddleware } from "../middleware";
 import { db } from "../store";
-import { USER_SESSION_TIMEOUT, getCombinedStats, getRecordingUrl } from "./stream";
+import {
+  USER_SESSION_TIMEOUT,
+  getCombinedStats,
+  getRecordingUrl,
+} from "./stream";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 
 const app = Router();
@@ -63,17 +67,22 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   order = parseOrder(fieldsMap, order);
 
   const fields =
-    " session.id as id, session.data as data, users.id as usersId, users.data as usersdata";
-  const from = `session left join users on session.data->>'userId' = users.id`;
+    "session.id as id, session.data as data, users.id as usersId, users.data as usersdata, stream.data as stream";
+  const from = `session left join users on session.data->>'userId' = users.id
+  left join stream on session.data->>'parentId' = stream.id`;
   const [output, newCursor] = await db.session.find(query, {
     limit,
     cursor,
     fields,
     from,
     order,
-    process: ({ data, usersdata }) => {
+    process: ({ data, usersdata, stream }) => {
       return req.user.admin
-        ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
+        ? {
+            ...data,
+            parentStream: stream,
+            user: db.user.cleanWriteOnlyResponse(usersdata),
+          }
         : { ...data };
     },
   });
