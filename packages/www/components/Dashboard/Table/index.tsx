@@ -155,9 +155,10 @@ const Table = <T extends Record<string, unknown>>({
     }
   );
 
-  useEffect(() => {
-    onRowSelectionChange?.(selectedFlatRows);
-  }, [selectedFlatRows, onRowSelectionChange]);
+  // useEffect(() => {
+  //   console.log(selectedFlatRows);
+  //   onRowSelectionChange?.(selectedFlatRows);
+  // }, [selectedFlatRows, onRowSelectionChange]);
 
   return (
     <Box>

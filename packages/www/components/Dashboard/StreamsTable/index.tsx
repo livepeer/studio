@@ -8,13 +8,13 @@ import {
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useApi, usePageVisibility } from "../../../hooks";
+import { useCallback, useMemo, useState } from "react";
+import { useApi } from "../../../hooks";
 import DeleteStreamModal from "../DeleteStreamModal";
 import Table from "components/Dashboard/Table";
 import TableFilter, {
   FilterItem,
-  ApplyFilterHandler,
+  useTableFilters,
 } from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -25,6 +25,7 @@ import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { QuestionMarkIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import CreateStream from "./CreateStream";
+import useSWR from "swr";
 
 type ProfileProps = {
   id: string;
@@ -148,6 +149,8 @@ type StreamsTableData = {
   status: string;
 };
 
+const page = 0;
+
 const StreamsTable = ({
   title = "Streams",
   userId,
@@ -157,32 +160,12 @@ const StreamsTable = ({
 }) => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStreams, setSelectedStreams] = useState([]);
-  const [streams, setStreams] = useState([]);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
-
-  useEffect(() => {
-    getStreams(userId)
-      .then((streams) => setStreams(streams))
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [userId, deleteModal]);
+  const { onDone, stringifiedFilters } = useTableFilters();
 
   const close = useCallback(() => {
     setDeleteModal(false);
   }, []);
-
-  const isVisible = usePageVisibility();
-
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      getStreams(userId)
-        .then((streams) => setStreams(streams))
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [userId, isVisible]);
 
   const columns: Column<StreamsTableData>[] = useMemo(
     () => [
@@ -222,7 +205,12 @@ const StreamsTable = ({
     []
   );
 
-  const data: StreamsTableData[] = useMemo(() => {
+  const { data } = useSWR([page, stringifiedFilters], async () => {
+    const streams = await getStreams(userId, {
+      page,
+      pageSize: 2,
+      filters: stringifiedFilters,
+    });
     return streams.map((stream) => {
       return {
         id: stream.id,
@@ -237,7 +225,10 @@ const StreamsTable = ({
           href: `/dashboard/streams/${stream.id}`,
         },
         details: { stream },
-        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        created: {
+          date: new Date(stream.createdAt),
+          fallback: <i>unseen</i>,
+        },
         lastActive: {
           date: new Date(stream.lastSeen),
           fallback: <i>unseen</i>,
@@ -245,21 +236,16 @@ const StreamsTable = ({
         status: stream.isActive ? "Active" : "Idle",
       };
     });
-  }, [streams]);
+  });
 
   const handleRowSelectionChange = useCallback(
     (rows: Row<StreamsTableData>[]) => {
       setSelectedStreams(
-        rows.map((r) => streams.find((s) => s.id === r.original.id))
+        rows.map((r) => (data ?? []).find((s) => s.id === r.original.id))
       );
     },
-    [streams]
+    [data]
   );
-
-  const handleApplyFilter: ApplyFilterHandler = useCallback((filters) => {
-    // TODO apply filters
-    console.log(filters);
-  }, []);
 
   return (
     <Box>
@@ -319,7 +305,7 @@ const StreamsTable = ({
               </Box>
             </Box> */}
 
-          <TableFilter items={filterItems} onDone={handleApplyFilter} />
+          <TableFilter items={filterItems} onDone={onDone} />
           <CreateStream />
         </Flex>
       </Flex>
@@ -340,7 +326,7 @@ const StreamsTable = ({
       <Box css={{ mb: "$5" }}>
         <Table
           columns={columns}
-          data={data}
+          data={data ?? []}
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
           initialSortBy={[{ id: "created", desc: true }]}

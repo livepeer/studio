@@ -79,7 +79,7 @@
     "remark-emoji": "^2.1.0",
     "sanity-mux-player": "^0.0.27",
     "shaka-player": "^3.0.6",
-    "swr": "^0.3.2",
+    "swr": "^0.5.6",
     "theme-ui": "0.3.1",
     "url": "^0.11.0",
     "uslug": "^1.0.4"

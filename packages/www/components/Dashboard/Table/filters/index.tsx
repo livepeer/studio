@@ -7,6 +7,7 @@ import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
+import { useMemo } from "react";
 
 export type Condition =
   | { type: "contains"; value: string }
@@ -19,7 +20,7 @@ export type Condition =
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
-type Filter = FilterItem &
+export type Filter = FilterItem &
   (
     | {
         isOpen: true;
@@ -59,16 +60,15 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenu.Trigger as="div">
-        <Button
-          css={{ display: "flex", ai: "center", marginRight: "6px" }}
-          size="2"
-          variant="gray">
-          <Flex css={{ marginRight: "5px" }}>
-            <FilterIcon />
-          </Flex>
-          Filter
-        </Button>
+      <DropdownMenu.Trigger
+        as={Button}
+        css={{ display: "flex", ai: "center", marginRight: "6px" }}
+        size="2"
+        variant="gray">
+        <Flex css={{ marginRight: "5px" }}>
+          <FilterIcon />
+        </Flex>
+        Filter
       </DropdownMenu.Trigger>
       <DropdownMenu.Content align="end" sideOffset={5}>
         <Box
@@ -212,6 +212,20 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );
+};
+
+export const useTableFilters = () => {
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  const onDone: ApplyFilterHandler = useCallback((f) => {
+    setFilters(f);
+  }, []);
+
+  const stringifiedFilters = useMemo(() => {
+    return JSON.stringify(filters);
+  }, [filters]);
+
+  return { onDone, filters, stringifiedFilters };
 };
 
 export default TableFilter;

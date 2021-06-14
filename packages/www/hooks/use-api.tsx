@@ -530,9 +530,14 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res];
     },
 
-    async getStreams(userId): Promise<Array<Stream>> {
+    async getStreams(
+      userId: string,
+      opts?: { filters: string; page: number; pageSize: number }
+    ): Promise<Array<Stream>> {
       const [res, streams] = await context.fetch(
-        `/stream?userId=${userId}&streamsonly=1`
+        `/stream?userId=${userId}&streamsonly=1&limit=${
+          opts?.pageSize
+        }&cursor=${opts.page * opts.pageSize}&filters=${opts?.filters}`
       );
       if (res.status !== 200) {
         throw new Error(streams);
