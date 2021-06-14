@@ -6,8 +6,8 @@ import {
   Link as A,
   Badge,
   styled,
+  Text,
 } from "@livepeer.com/design-system";
-import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
@@ -22,9 +22,13 @@ import {
 } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { QuestionMarkIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import CreateStream from "components/Dashboard/CreateStream";
 import Delete from "./Delete";
+import {
+  QuestionMarkIcon,
+  PlusIcon,
+  ArrowRightIcon,
+} from "@radix-ui/react-icons";
 
 type ProfileProps = {
   id: string;
@@ -141,6 +145,8 @@ type StreamsTableData = {
   status: string;
 };
 
+const pageSize = 14;
+
 const StreamsTable = ({
   title = "Streams",
   userId,
@@ -150,14 +156,9 @@ const StreamsTable = ({
 }) => {
   const [selectedStreams, setSelectedStreams] = useState([]);
   const [streams, setStreams] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
   const [onUnselect, setOnUnselect] = useState();
-
-  useEffect(() => {
-    getStreams(userId)
-      .then((streams) => setStreams(streams))
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [userId]);
 
   const isVisible = usePageVisibility();
 
@@ -165,13 +166,10 @@ const StreamsTable = ({
     if (!isVisible) {
       return;
     }
-    const interval = setInterval(() => {
-      getStreams(userId)
-        .then((streams) => setStreams(streams))
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [userId, isVisible]);
+    getStreams(userId)
+      .then((streams) => setStreams(streams))
+      .catch((err) => console.error(err)); // todo: surface this
+  }, [userId]);
 
   const columns: Column<StreamsTableData>[] = useMemo(
     () => [
@@ -245,8 +243,28 @@ const StreamsTable = ({
     [streams]
   );
 
+  const slicedData = useMemo(() => {
+    if (!data) return;
+    return data
+      .slice(pageNumber * pageSize, (pageNumber + 1) * pageSize)
+      .map((data) => data);
+  }, [pageNumber, data]);
+
+  const handleNextPage = useCallback(() => {
+    setPageNumber((prev) => prev + 1);
+  }, []);
+
+  const handlePreviousPage = useCallback(() => {
+    setPageNumber((prev) => prev - 1);
+  }, []);
+
   return (
-    <Box>
+    <Box
+      css={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}>
       <Flex
         align="end"
         justify="between"
@@ -294,22 +312,30 @@ const StreamsTable = ({
         <Table
           setOnUnselect={setOnUnselect}
           columns={columns}
-          data={data}
+          data={slicedData}
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
           initialSortBy={[{ id: "created", desc: true }]}
           cursor="pointer"
         />
       </Box>
-      <Flex
-        justify="end"
-        align="center"
-        css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Link href="/dashboard/streams" passHref>
-          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
-            View all <ArrowRightIcon />
-          </A>
-        </Link>
+      <Flex justify="between" align="center">
+        <Text>
+          <b>{data.length}</b> results
+        </Text>
+        <Flex>
+          <Button
+            css={{ marginRight: "6px" }}
+            onClick={handlePreviousPage}
+            disabled={pageNumber <= 0}>
+            Previous
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            disabled={(pageNumber + 1) * pageSize >= data.length}>
+            Next
+          </Button>
+        </Flex>
       </Flex>
     </Box>
   );
