@@ -252,6 +252,24 @@ describe("controllers/stream", () => {
         );
       });
 
+      it("should reject push targets with both an id and a spec", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          pushTargets: [
+            {
+              profile: "test_stream_360p",
+              id: pushTarget.id,
+              spec: mockPushTarget,
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          `must have either an "id" or a "spec"`
+        );
+      });
+
       it("should reject references to other users push targets", async () => {
         client.jwtAuth = nonAdminToken["token"];
         const res = await client.post("/stream", {
@@ -326,6 +344,7 @@ describe("controllers/stream", () => {
         expect(resultPt.profile).toEqual("test_stream_360p");
         expect(resultPt.spec).toBeUndefined();
         expect(resultPt.id).toBeDefined();
+        expect(resultPt.id).not.toEqual(pushTarget.id);
 
         const saved = await server.db.pushTarget.get(resultPt.id);
         expect(saved).toBeDefined();

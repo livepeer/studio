@@ -108,10 +108,7 @@ const getCursor = (link?: string): string => {
     return "";
   }
   const { cursor } = qs.parse(match[1]);
-  if (typeof cursor !== "string") {
-    return "";
-  }
-  return cursor;
+  return cursor?.toString() ?? "";
 };
 
 const makeContext = (state: ApiState, setState) => {
