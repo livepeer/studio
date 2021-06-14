@@ -32,6 +32,51 @@ beforeAll(async () => {
   };
 });
 
+async function createUser(client: TestClient, userData: User, admin: boolean) {
+  const userRes = await client.post(`/user`, userData);
+  let user = await userRes.json();
+
+  const tokenRes = await client.post(`/user/token`, userData);
+  const tokenJson = await tokenRes.json();
+  const token = tokenJson.token;
+
+  const storedUser = await server.store.get(`user/${user.id}`, false);
+  user = { ...storedUser, admin, emailValid: true };
+  await server.store.replace(user);
+
+  const apiKey = uuid();
+  await server.store.create({
+    id: apiKey,
+    kind: "api-token",
+    userId: user.id,
+  });
+  return { user, token, apiKey };
+}
+
+async function setupUsers(server: { store: Model }) {
+  const client = new TestClient({ server });
+  const {
+    user: adminUser,
+    token: adminToken,
+    apiKey: adminApiKey,
+  } = await createUser(client, mockAdminUserInput, true);
+  const {
+    user: nonAdminUser,
+    token: nonAdminToken,
+    apiKey: nonAdminApiKey,
+  } = await createUser(client, mockNonAdminUserInput, false);
+
+  return {
+    client,
+    adminUser,
+    adminToken,
+    adminApiKey,
+    nonAdminUser,
+    nonAdminToken,
+    nonAdminApiKey,
+  };
+}
+
 afterEach(async () => {
   await clearDatabase(server);
 });
@@ -39,45 +84,20 @@ afterEach(async () => {
 describe("controllers/push-target", () => {
   describe("basic CRUD with JWT authorization", () => {
     let client: TestClient;
-    let nonAdminUser: User;
     let adminUser: User;
     let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminToken: string;
 
     beforeEach(async () => {
-      client = new TestClient({
-        server,
-      });
-      // setting up admin user and token
-      const userRes = await client.post(`/user`, { ...mockAdminUserInput });
-      adminUser = await userRes.json();
-
-      const adminTokenRes = await client.post(`/user/token`, {
-        ...mockAdminUserInput,
-      });
-      const adminTokenJson = await adminTokenRes.json();
-      adminToken = adminTokenJson.token;
-
-      const user = await server.store.get(`user/${adminUser.id}`, false);
-      adminUser = { ...user, admin: true, emailValid: true };
-      await server.store.replace(adminUser);
-
-      // setting up non-admin user
-      const nonAdminRes = await client.post(`/user`, {
-        ...mockNonAdminUserInput,
-      });
-      nonAdminUser = await nonAdminRes.json();
-      const tokenRes = await client.post(`/user/token`, {
-        ...mockNonAdminUserInput,
-      });
-      const tokenJson = await tokenRes.json();
-      client.jwtAuth = tokenJson.token;
-
-      const nonAdminUserRes = await server.store.get(
-        `user/${nonAdminUser.id}`,
-        false
-      );
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
-      await server.store.replace(nonAdminUser);
+      ({
+        client,
+        adminUser,
+        adminToken,
+        nonAdminUser,
+        nonAdminToken,
+      } = await setupUsers(server));
+      client.jwtAuth = nonAdminToken;
     });
 
     it("should not get all push targets without admin authorization", async () => {
@@ -319,48 +339,21 @@ describe("controllers/push-target", () => {
 
   describe("API key authorization", () => {
     let client: TestClient;
-    let nonAdminUser: User;
     let adminUser: User;
-    const adminApiKey = uuid();
-    const nonAdminApiKey = uuid();
+    let adminApiKey: string;
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
 
     beforeEach(async () => {
-      client = new TestClient({
-        server,
-        apiKey: uuid(),
-      });
-
-      const userRes = await client.post(`/user`, mockAdminUserInput);
-      adminUser = await userRes.json();
-
-      const nonAdminRes = await client.post(`/user`, mockNonAdminUserInput);
-      nonAdminUser = await nonAdminRes.json();
-
-      await server.store.create({
-        id: adminApiKey,
-        kind: "api-token",
-        userId: adminUser.id,
-      });
-
-      await server.store.create({
-        id: nonAdminApiKey,
-        kind: "api-token",
-        userId: nonAdminUser.id,
-      });
-
-      const adminUserRes = await server.store.get(
-        `user/${adminUser.id}`,
-        false
-      );
-      adminUser = { ...adminUserRes, admin: true, emailValid: true };
-      await server.store.replace(adminUser);
-
-      const nonAdminUserRes = await server.store.get(
-        `user/${nonAdminUser.id}`,
-        false
-      );
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
-      await server.store.replace(nonAdminUser);
+      ({
+        client,
+        adminUser,
+        adminApiKey,
+        nonAdminUser,
+        nonAdminApiKey,
+      } = await setupUsers(server));
+      // set a default invalid api key on the client
+      client.apiKey = uuid();
     });
 
     it("should not get all push targets with non-admin API key", async () => {
