@@ -163,10 +163,9 @@ describe("controllers/push-target", () => {
     const getNextCursor = (link: string | null): string => {
       link ??= "";
       for (const part of link.split(",")) {
-        if (!/cursor=.*>;\s+rel="next"/.test(part)) {
-          continue;
-        }
-        return /cursor=([^&>]+)/.exec(part)[1];
+        const match = part.match(/cursor=([^&>]+)[^>]*>;\s+rel="next"/);
+        if (!match) continue;
+        return match[1];
       }
       return null;
     };
