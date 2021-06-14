@@ -1,5 +1,5 @@
 import Layout from "../../../layouts/dashboard";
-import { Box, Flex, Heading } from "@livepeer.com/design-system";
+import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import StreamsTable from "@components/Dashboard/StreamsTable";
 

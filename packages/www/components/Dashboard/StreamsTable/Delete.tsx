@@ -16,7 +16,7 @@ import { useState } from "react";
 import Spinner from "@components/Dashboard/Spinner";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
-const DeleteStreams = ({ total, onUnselect, onDelete }) => {
+const Delete = ({ total, onUnselect, onDelete }) => {
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
@@ -98,4 +98,4 @@ const DeleteStreams = ({ total, onUnselect, onDelete }) => {
   );
 };
 
-export default DeleteStreams;
+export default Delete;
