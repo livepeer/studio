@@ -1,3 +1,4 @@
+import { Ingest, Price } from "../middleware/hardcoded-nodes";
 import { Stream, User, ApiToken } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 
@@ -19,6 +20,11 @@ declare global {
       isUIAdmin?: boolean;
       tokenName?: string;
       tokenId?: string;
+
+      getBroadcasters?: () => Promise<any[]>;
+      getOrchestrators?: () => Promise<any[]>;
+      getIngest?: () => Promise<Ingest[]>;
+      getPrices?: () => Promise<Price[]>;
     }
   }
 }

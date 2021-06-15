@@ -2,8 +2,10 @@
  * Injects getOrchestrators() and getBroadcasters() from the local k8s environment
  */
 
+import { RequestHandler } from "express";
 import { render } from "mustache";
 import * as k8s from "@kubernetes/client-node";
+
 import { timeout } from "../util";
 
 export default function kubernetesMiddleware({
@@ -12,7 +14,7 @@ export default function kubernetesMiddleware({
   kubeOrchestratorService,
   kubeBroadcasterTemplate,
   kubeOrchestratorTemplate,
-}) {
+}): RequestHandler {
   const cache = {};
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();

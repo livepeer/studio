@@ -3,12 +3,28 @@
  * --broadcaster and --orchestrator CLI parameters. This implements those.
  */
 
+import { RequestHandler } from "express";
+
+export interface Ingest {
+  base?: string;
+  ingest: string;
+  playback: string;
+}
+
+export interface Price {
+  address: string;
+  priceInfo: {
+    pricePerUnit: string;
+    pixelsPerUnit: string;
+  };
+}
+
 export default function hardcodedNodes({
   broadcasters,
   orchestrators,
   ingest,
   prices,
-}) {
+}): RequestHandler {
   try {
     broadcasters = JSON.parse(broadcasters);
     orchestrators = JSON.parse(orchestrators);
@@ -28,11 +44,11 @@ export default function hardcodedNodes({
       req.getOrchestrators = async () => orchestrators;
     }
     if (!req.getIngest) {
-      req.getIngest = async () => ingest;
+      req.getIngest = async () => ingest as Ingest[];
     }
-    if (!req.prices) {
-      req.getPrices = async () => prices;
+    if (!req.getPrices) {
+      req.getPrices = async () => prices as Price[];
     }
-    next();
+    return next();
   };
 }

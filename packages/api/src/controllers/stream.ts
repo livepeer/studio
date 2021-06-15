@@ -271,7 +271,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   let { limit, cursor } = toStringValues(req.query);
   const raw = req.query.raw && req.user.admin;
 
-  const ingests = await req.getIngest(req);
+  const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
     return res.json({ errors: ["Ingest not configured"] });
@@ -446,7 +446,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     };
   }
   if (stream.record) {
-    const ingests = await req.getIngest(req);
+    const ingests = await req.getIngest();
     if (ingests.length) {
       const ingest = ingests[0].base;
       setRecordingStatus(req, ingest, stream, false);
