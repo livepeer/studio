@@ -1,12 +1,21 @@
+import { Router, Request } from "express";
+import fetch from "isomorphic-fetch";
+import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
+import { v4 as uuid } from "uuid";
+
+import logger from "../logger";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import { Router } from "express";
-import logger from "../logger";
-import uuid from "uuid/v4";
-import wowzaHydrate from "./wowza-hydrate";
+import { geolocateMiddleware } from "../middleware";
+import { Session, StreamPatchPayload } from "../schema/types";
+import { db } from "../store";
+import { BadRequestError } from "../store/errors";
+import { DBStream, StreamStats } from "../store/stream-table";
+import { WithID } from "../store/types";
 import { fetchWithTimeout } from "../util";
-import fetch from "isomorphic-fetch";
+import { getBroadcasterHandler } from "./broadcaster";
+import { generateStreamKey } from "./generate-stream-key";
 import {
   makeNextHREF,
   trackAction,
@@ -16,16 +25,7 @@ import {
   pathJoin,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
-import { generateStreamKey } from "./generate-stream-key";
-import { geolocateMiddleware } from "../middleware";
-import { getBroadcasterHandler } from "./broadcaster";
-import { db } from "../store";
-import sql from "sql-template-strings";
-import { BadRequestError } from "../store/errors";
-import { Request } from "express";
-import { DBStream, StreamStats } from "../store/stream-table";
-import { Session, StreamPatchPayload } from "../schema/types";
-import { WithID } from "../store/types";
+import wowzaHydrate from "./wowza-hydrate";
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;

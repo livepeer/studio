@@ -1,13 +1,14 @@
 import Router from "express/lib/router";
 import sql from "sql-template-strings";
+
 import { authMiddleware } from "../middleware";
 import { db } from "../store";
+import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import {
   USER_SESSION_TIMEOUT,
   getCombinedStats,
   getRecordingUrl,
 } from "./stream";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 
 const app = Router();
 
