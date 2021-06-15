@@ -9,15 +9,25 @@ import {
 } from "react-table";
 import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
-import ReactTooltip from "react-tooltip";
 import {
   CheckboxFilter,
   CheckboxFilterProps,
   InputFilterProps,
   TextFilter,
-} from "./filters/fields";
+} from "./filters/fields/index";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
-import { Box, Flex, Checkbox, styled } from "@livepeer.com/design-system";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Box,
+  Flex,
+  Checkbox,
+  styled,
+} from "@livepeer.com/design-system";
 
 type FilterItem<Table extends Record<string, unknown>> =
   | { type: "text"; props: InputFilterProps<Table> }
@@ -41,15 +51,11 @@ type Props<T extends Record<string, unknown>> = {
   initialSortBy?: Sort<T>[];
   filters?: FilterItem<T>[];
   showOverflow?: boolean;
+  setOnUnselect?: any;
+  cursor?: string;
 };
 
-const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
-  color: "$hiContrast",
-  cursor: "pointer",
-  ml: "$1",
-});
-
-const Table = <T extends Record<string, unknown>>({
+const TableComponent = <T extends Record<string, unknown>>({
   columns,
   data,
   header,
@@ -59,6 +65,8 @@ const Table = <T extends Record<string, unknown>>({
   initialSortBy,
   filters,
   showOverflow,
+  setOnUnselect,
+  cursor = "default",
 }: Props<T>) => {
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -87,6 +95,8 @@ const Table = <T extends Record<string, unknown>>({
     canNextPage,
     // @ts-ignore
     toggleAllRowsSelected,
+    // @ts-ignore
+    toggleAllPageRowsSelected,
     // @ts-ignore
     selectedFlatRows,
     // @ts-ignore
@@ -124,11 +134,20 @@ const Table = <T extends Record<string, unknown>>({
             id: "selection",
             // The header can use the table's getToggleAllRowsSelectedProps method
             // to render a checkbox
-            // @ts-ignore
-            Header: ({ getToggleAllPageRowsSelectedProps }) => {
+            Header: ({
+              // @ts-ignore
+              getToggleAllPageRowsSelectedProps,
+              // @ts-ignore
+              isAllRowsSelected,
+            }) => {
               const props = getToggleAllPageRowsSelectedProps();
               return isIndividualSelection ? null : (
-                <Checkbox onClick={props.onChange} value={props.checked} />
+                <Checkbox
+                  css={{ display: "flex" }}
+                  onClick={props.onChange}
+                  value={props.checked}
+                  checked={isAllRowsSelected ? true : false}
+                />
               );
             },
             // The cell can use the individual row's getToggleRowSelectedProps method
@@ -136,6 +155,7 @@ const Table = <T extends Record<string, unknown>>({
             Cell: ({ row }) => {
               return (
                 <Checkbox
+                  css={{ display: "flex" }}
                   // @ts-ignore
                   value={row.isSelected}
                   // @ts-ignore
@@ -154,6 +174,16 @@ const Table = <T extends Record<string, unknown>>({
       }
     }
   );
+
+  useEffect(() => {
+    if (setOnUnselect) {
+      const onUnSelect = () => {
+        toggleAllPageRowsSelected(false);
+      };
+
+      setOnUnselect(() => onUnSelect);
+    }
+  }, [toggleAllPageRowsSelected]);
 
   useEffect(() => {
     onRowSelectionChange?.(selectedFlatRows);
@@ -214,49 +244,34 @@ const Table = <T extends Record<string, unknown>>({
       ) : null}
       <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
         <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
-          <Box
-            as="table"
+          <Table
             {...getTableProps()}
             css={{
               minWidth: "100%",
               borderCollapse: "separate",
               borderSpacing: 0,
-              color: "$hiContrast",
+              tableLayout: "initial",
             }}>
-            <thead>
+            <Thead>
               {headerGroups.map((headerGroup) => (
-                <Box
-                  as="tr"
-                  {...headerGroup.getHeaderGroupProps()}
-                  css={{ borderRadius: "8px" }}>
+                <Tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column, i) => {
                     const withHelpTooltip =
                       someColumnCanSort && i === headerGroup.headers.length - 1;
                     return (
-                      <Box
-                        as="th"
+                      <Td
+                        as={i === 0 ? Th : Td}
                         scope="col"
+                        css={{
+                          pl: i === 0 ? "$1" : 0,
+                        }}
                         {...column.getHeaderProps(
                           // @ts-ignore
                           column.getSortByToggleProps()
-                        )}
-                        css={{
-                          textTransform: "uppercase",
-                          border: 0,
-                          borderBottom: "1px solid",
-                          borderTop: "0",
-                          borderColor: "$slate6",
-                          fontSize: "$1",
-                          color: "$gray9",
-                          fontWeight: 500,
-                          px: "$4",
-                          py: "$2",
-                          position: "relative",
-                        }}>
-                        <Box
+                        )}>
+                        <Flex
                           css={{
-                            display: "flex",
-                            alignItems: "center",
+                            ai: "center",
                             mr: withHelpTooltip ? "$3" : 0,
                           }}>
                           <Box css={{ whiteSpace: "nowrap" }}>
@@ -264,7 +279,7 @@ const Table = <T extends Record<string, unknown>>({
                           </Box>
                           {/*@ts-ignore */}
                           {column.canSort && (
-                            <Box css={{ ml: 2 }}>
+                            <Box css={{ ml: "$2" }}>
                               {/* @ts-ignore */}
                               {column.isSorted
                                 ? // @ts-ignore
@@ -274,63 +289,38 @@ const Table = <T extends Record<string, unknown>>({
                                 : " ⭥"}
                             </Box>
                           )}
-                        </Box>
-                        {withHelpTooltip && (
-                          <Box
-                            css={{
-                              alignItems: "center",
-                              display: "flex",
-                              position: "absolute",
-                              right: "$3",
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                            }}>
-                            <ReactTooltip
-                              id={`tooltip-multiorder`}
-                              className="tooltip"
-                              place="top"
-                              type="dark"
-                              effect="solid">
-                              To multi-sort (sort by two column simultaneously)
-                              hold shift while clicking on second column name.
-                            </ReactTooltip>
-                            <StyledQuestionMarkIcon
-                              data-tip
-                              data-for={`tooltip-multiorder`}
-                            />
-                          </Box>
-                        )}
-                      </Box>
+                        </Flex>
+                      </Td>
                     );
                   })}
-                </Box>
+                </Tr>
               ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
+            </Thead>
+            <Tbody {...getTableBodyProps()}>
               {page.map((row: Row<object>) => {
                 prepareRow(row);
                 return (
-                  <Box as="tr" {...row.getRowProps()}>
-                    {row.cells.map((cell) => (
-                      <Box
-                        as="td"
-                        {...cell.getCellProps()}
-                        css={{
-                          px: "$4",
-                          py: "$2",
-                          border: 0,
-                          borderBottom: "1px solid",
-                          borderBottomColor: "$slate6",
-                          fontSize: "$2",
-                        }}>
+                  <Tr
+                    css={{
+                      "&:hover": {
+                        backgroundColor: "$mauve2",
+                        cursor,
+                      },
+                    }}
+                    {...row.getRowProps()}>
+                    {row.cells.map((cell, i) => (
+                      <Td
+                        as={i === 0 ? Th : Td}
+                        css={{ pl: i === 0 ? "$1" : 0 }}
+                        {...cell.getCellProps()}>
                         {cell.render("Cell")}
-                      </Box>
+                      </Td>
                     ))}
-                  </Box>
+                  </Tr>
                 );
               })}
-            </tbody>
-          </Box>
+            </Tbody>
+          </Table>
         </Box>
         <Paginator
           canPreviousPage={canPreviousPage}
@@ -343,4 +333,4 @@ const Table = <T extends Record<string, unknown>>({
   );
 };
 
-export default Table;
+export default TableComponent;

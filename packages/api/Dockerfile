@@ -1,4 +1,4 @@
-FROM node:10 as base
+FROM node:16 as base
 
 WORKDIR /app
 RUN npm install -g --force yarn

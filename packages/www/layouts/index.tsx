@@ -3,6 +3,7 @@ import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { DefaultNav } from "../components/Navigation";
 import Footer from "../components/Footer";
+import { IdProvider } from "@radix-ui/react-id";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -12,9 +13,7 @@ import Router from "next/router";
 import GradientBackgroundBox from "../components/GradientBackgroundBox";
 import { Reset, ThemeProvider } from "../lib/theme";
 import MarkdownProvider from "../lib/markdown-provider";
-// import "../css/reset.css";
-// import "../css/markdown.css";
-// import "keen-slider/keen-slider.min.css";
+import Head from "next/head";
 
 interface Props {
   title?: string;
@@ -84,62 +83,68 @@ const Layout = ({
   }
 
   return (
-    <ThemeProvider>
-      <MarkdownProvider>
-        <Reset />
-        <Box sx={{ minHeight: "100vh" }}>
-          <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-            <NextSeo {...seo} />
-            {withGradientBackground && (
-              <div
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  width: "100%",
-                  pointerEvents: "none",
-                  zIndex: 0,
-                }}>
-                <GradientBackgroundBox
-                  id="layout"
-                  gradient="violet"
-                  sx={{ height: "1000px" }}
-                  slide
-                />
-              </div>
-            )}
-            <Flex
-              sx={{
-                flexGrow: 1,
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                zIndex: 1,
-                position: "relative",
-              }}>
-              {preview && (
-                <Box
+    <IdProvider>
+      <Head>
+        <link rel="stylesheet" href="/reset.css" />
+        <link rel="stylesheet" href="/markdown.css" />
+      </Head>
+      <ThemeProvider>
+        <MarkdownProvider>
+          <Reset />
+          <Box sx={{ minHeight: "100vh" }}>
+            <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
+              <NextSeo {...seo} />
+              {withGradientBackground && (
+                <div
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    textDecoration: "none",
-                    justifyContent: "center",
-                    height: 24,
-                    fontSize: 12,
-                    fontWeight: "500",
-                    bg: "primary",
-                    color: "white",
-                    lineHeight: "32px",
+                    position: "absolute",
+                    top: 0,
+                    width: "100%",
+                    pointerEvents: "none",
+                    zIndex: 0,
                   }}>
-                  Preview Mode
-                </Box>
+                  <GradientBackgroundBox
+                    id="layout"
+                    gradient="violet"
+                    sx={{ height: "1000px" }}
+                    slide
+                  />
+                </div>
               )}
-              {customNav ? customNav : <DefaultNav />}
-              {children}
+              <Flex
+                sx={{
+                  flexGrow: 1,
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  zIndex: 1,
+                  position: "relative",
+                }}>
+                {preview && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      textDecoration: "none",
+                      justifyContent: "center",
+                      height: 24,
+                      fontSize: 12,
+                      fontWeight: "500",
+                      bg: "primary",
+                      color: "white",
+                      lineHeight: "32px",
+                    }}>
+                    Preview Mode
+                  </Box>
+                )}
+                {customNav ? customNav : <DefaultNav />}
+                {children}
+              </Flex>
+              <Footer />
             </Flex>
-            <Footer />
-          </Flex>
-        </Box>
-      </MarkdownProvider>
-    </ThemeProvider>
+          </Box>
+        </MarkdownProvider>
+      </ThemeProvider>
+    </IdProvider>
   );
 };
 

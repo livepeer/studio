@@ -1,12 +1,5 @@
 export {
   Alert,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Avatar,
   AvatarGroup,
   AvatarNestedItem,
@@ -32,9 +25,7 @@ export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -76,7 +67,6 @@ export {
   Status,
   Sup,
   Sub,
-  Switch,
   Caption,
   Tbody,
   Tfoot,
@@ -110,12 +100,27 @@ export {
   DialogContent,
   DialogTrigger,
 } from "./components/Dialog";
+export {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./components/AlertDialog";
 export { Button } from "./components/Button";
 export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
 export { Promo } from "./components/Promo";
 export { Label } from "./components/Label";
 export { TextField } from "./components/TextField";
+export {
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+} from "./components/DropdownMenu";
+export { SnackbarProvider, useSnackbar } from "./components/Snackbar";
+export { Switch } from "./components/Switch";
 
 // Stitches
 export {

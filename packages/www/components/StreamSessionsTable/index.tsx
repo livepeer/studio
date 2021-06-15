@@ -3,6 +3,8 @@ import { jsx } from "theme-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../hooks";
 import { Box, Button, Flex, Link as A } from "@theme-ui/components";
+import moment from "moment";
+import * as filenamify from "filenamify";
 import TableV2 from "../Table-v2";
 // import { usePopper } from "react-popper";
 import TextCell, { TextCellProps } from "components/Table-v2/cells/text";
@@ -17,10 +19,23 @@ import { Column } from "react-table";
 import { CellComponentProps, TableData } from "components/Table-v2/types";
 import { isStaging, isDevelopment } from "../../lib/utils";
 
-function makeMP4Url(hlsUrl: string, profileName: string): string {
+function makeMP4Url(
+  hlsUrl: string,
+  profileName: string,
+  streamName: string,
+  createdAt: number
+): string {
+  const sanitizedName = filenamify
+    .default(streamName, { replacement: "_" })
+    .replace(/ /g, "_");
+  const timestamp = moment
+    .unix(createdAt / 1000.0)
+    .format("YYYY_MM_DD_hh_mm_ss");
   const pp = hlsUrl.split("/");
   pp.pop();
-  return pp.join("/") + "/" + profileName + ".mp4";
+  return `${pp.join(
+    "/"
+  )}/${profileName}/${sanitizedName}-${timestamp}-${profileName}.mp4`;
 }
 
 type Profile = { name: string; width: number; height: number };
@@ -31,6 +46,8 @@ export type RecordingUrlCellProps = {
   id?: string;
   profiles?: Array<Profile>;
   showMP4: boolean;
+  createdAt: number;
+  streamName: string;
 };
 
 function getHighestMP4Url(hlsUrl: string, profiles: Array<Profile>): string {
@@ -43,7 +60,7 @@ function getHighestMP4Url(hlsUrl: string, profiles: Array<Profile>): string {
     },
     ["", 0]
   );
-  return makeMP4Url(hlsUrl, profileName);
+  return makeMP4Url(hlsUrl, profileName, "", 0);
 }
 
 const RecordingUrlCell = <D extends TableData>({
@@ -62,8 +79,13 @@ const RecordingUrlCell = <D extends TableData>({
             <Box>
               <A
                 variant="downloadOutline"
-                // target="_blank"
-                href={makeMP4Url(cell.value.href, "source")}
+                download
+                href={makeMP4Url(
+                  cell.value.href,
+                  "source",
+                  cell.value.streamName,
+                  cell.value.createdAt
+                )}
                 sx={{ p: 1 }}>
                 Download&nbsp;mp4&nbsp;beta
               </A>
@@ -86,9 +108,11 @@ type SessionsTableData = {
 
 const StreamSessionsTable = ({
   streamId,
+  streamName,
   mt = null,
 }: {
   streamId: string;
+  streamName: string;
   mt?: string | number;
 }) => {
   const [streamsSessions, setStreamsSessions] = useState([]);
@@ -147,29 +171,31 @@ const StreamSessionsTable = ({
   );
 
   const data: SessionsTableData[] = useMemo(() => {
-    return streamsSessions.map((stream) => {
+    return streamsSessions.map((session) => {
       return {
-        id: stream.id,
+        id: session.id,
         recordingUrl: {
-          id: stream.id,
-          showMP4: user?.admin || isStaging() || isDevelopment(),
+          id: session.id,
+          showMP4: true,
           profiles:
-            stream.recordingUrl &&
-            stream.recordingStatus === "ready" &&
-            stream.profiles?.length
-              ? [{ name: "source" }, ...stream.profiles]
+            session.recordingUrl &&
+            session.recordingStatus === "ready" &&
+            session.profiles?.length
+              ? [{ name: "source" }, ...session.profiles]
               : undefined,
           children:
-            stream.recordingUrl && stream.recordingStatus === "ready"
-              ? stream.recordingUrl
+            session.recordingUrl && session.recordingStatus === "ready"
+              ? session.recordingUrl
               : "n/a",
-          href: stream.recordingUrl ? stream.recordingUrl : undefined,
+          href: session.recordingUrl ? session.recordingUrl : undefined,
+          streamName,
+          createdAt: session.createdAt,
         },
         duration: {
-          duration: stream.sourceSegmentsDuration || 0,
-          status: stream.recordingStatus,
+          duration: session.sourceSegmentsDuration || 0,
+          status: session.recordingStatus,
         },
-        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        created: { date: new Date(session.createdAt), fallback: <i>unseen</i> },
       };
     });
   }, [streamsSessions]);

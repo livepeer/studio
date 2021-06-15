@@ -31,7 +31,7 @@ const Header = ({ breadcrumbs = [] }) => {
         height: 60,
         width: "100%",
         borderBottom: "1px solid",
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
       }}>
       <Breadcrumbs aria-label="breadcrumb">
         {breadcrumbs.map((breadcrumb, i) => {

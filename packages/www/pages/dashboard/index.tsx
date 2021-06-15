@@ -20,7 +20,7 @@ const StyledCross1Icon = styled(Cross1Icon, {
 });
 
 const StyledInfoIcon = styled(InfoIcon, {
-  color: "$slate9",
+  color: "$mauve9",
   mr: "$2",
 });
 
@@ -44,21 +44,14 @@ const Dashboard = () => {
                 css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
                 Upgrade to Pro
               </Text>
-              <Text size="2" css={{ lineHeight: 1.4, color: "$slate11" }}>
+              <Text size="2" css={{ lineHeight: 1.4, color: "$mauve11" }}>
                 Upgrade to the Pro plan and enjoy unlimited transcoding and
                 streaming minutes.
               </Text>
             </Box>
           </Flex>
           <Flex align="center" justify="end">
-            <Button css={{ mr: "$3" }}>Upgrade to Pro</Button>
-            <IconButton
-              variant="ghost"
-              css={{
-                mixBlendMode: "initial",
-              }}>
-              <StyledCross1Icon />
-            </IconButton>
+            <Button size="2">Upgrade to Pro</Button>
           </Flex>
         </Promo>
         <Box css={{ mb: "$8" }}>
