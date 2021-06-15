@@ -7,7 +7,7 @@ import makeStore from "../store";
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
 
-// const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 jest.setTimeout(15000);
 
 describe("webhook cannon", () => {
@@ -124,9 +124,6 @@ describe("webhook cannon", () => {
   });
 
   beforeAll(async () => {
-    db = new DB();
-    await db.start({ postgresUrl: server.postgresUrl });
-
     webhookServer = express();
     return new Promise<void>((resolve, reject) => {
       listener = webhookServer.listen(30000, function (err) {
@@ -142,10 +139,14 @@ describe("webhook cannon", () => {
   });
 
   afterAll(async () => {
-    listener.close();
+    await new Promise<void>((resolve, reject) => {
+      listener.close(() => {
+        resolve();
+      });
+    });
     server.webhook.stop();
     webhookServer.close();
-    await db.close();
+    // await db.close();
   });
 
   // afterEach(() => {
@@ -196,18 +197,19 @@ describe("webhook cannon", () => {
 
     // test endpoint
     let resp;
+    webhookServer.use(bodyParser.json());
     webhookServer.post("/webhook", (req, res) => {
       console.log("WEBHOOK WORKS , body", req.body);
       resp = 200;
-      res.end(req.body);
+      res.end();
     });
 
-    await db.queue.emit({
+    await server.db.queue.emit({
       id: "webhook_test_12",
       time: Date.now(),
       channel: "test.channel",
       event: "streamStarted",
-      streamId: "asdf",
+      streamId: resJson.id,
       userId: nonAdminUser.id,
       isConsumed: false,
     });
