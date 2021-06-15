@@ -17,7 +17,7 @@ import {
   Session,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
-import StreamTable from "./stream-table";
+import StreamTable, { DBStreamFields } from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import PushTargetTable from "./push-target-table";
@@ -31,6 +31,8 @@ export interface PostgresParams {
   postgresReplicaUrl?: string;
   appName?: string;
 }
+
+type DBSession = WithID<Session> & DBStreamFields;
 
 type Table<T> = BaseTable<WithID<T>>;
 
@@ -49,7 +51,7 @@ export class DB {
   webhookResponse: Table<WebhookResponse>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
-  session: Table<Session>;
+  session: Table<DBSession>;
 
   postgresUrl: String;
   replicaUrl: String;

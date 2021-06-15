@@ -14,7 +14,7 @@ interface UsageData {
   streamCount: number;
 }
 
-interface dbUsageData extends QueryResultRow {
+interface DBUsageData extends QueryResultRow {
   sourcesegments: string;
   transcodedsegments: string;
   sourcesegmentsduration: number;
@@ -22,7 +22,7 @@ interface dbUsageData extends QueryResultRow {
   streamCount: number;
 }
 
-interface dbUsageHistoryData extends QueryResultRow {
+interface DBUsageHistoryData extends QueryResultRow {
   id: string;
   date: number;
   sourcesegments: string;
@@ -32,7 +32,24 @@ interface dbUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export default class StreamTable extends Table<WithID<Stream>> {
+export interface StreamStats {
+  sourceBytes?: number;
+  transcodedBytes?: number;
+  sourceSegments?: number;
+  transcodedSegments?: number;
+  sourceSegmentsDuration?: number;
+  transcodedSegmentsDuration?: number;
+}
+
+export interface DBStreamFields extends StreamStats {
+  previousStats?: StreamStats;
+  lastSessionId?: string;
+  userSessionCreatedAt?: number;
+}
+
+export type DBStream = WithID<Stream> & DBStreamFields;
+
+export default class StreamTable extends Table<DBStream> {
   async cachedUsageHistory(
     fromTime: number,
     toTime: number,
@@ -53,7 +70,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
       ORDER BY date
     `;
 
-    let res: QueryResult<dbUsageData>;
+    let res: QueryResult<DBUsageData>;
     res = await this.db.queryWithOpts(q1, opts);
 
     if (res.rowCount > 0) {
@@ -91,7 +108,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
 
     let usage = [];
 
-    let res: QueryResult<dbUsageHistoryData>;
+    let res: QueryResult<DBUsageHistoryData>;
     res = await this.db.queryWithOpts(q1, opts);
 
     let knownDays = {};
@@ -184,7 +201,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
       streamCount: 0,
     };
 
-    let res: QueryResult<dbUsageData>;
+    let res: QueryResult<DBUsageData>;
     res = await this.db.queryWithOpts(q1, opts);
     if (res.rowCount > 0) {
       const dbUsage = res.rows[0];

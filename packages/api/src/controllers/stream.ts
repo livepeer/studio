@@ -1,7 +1,7 @@
 import { parse as parseUrl } from "url";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
+import { Router } from "express";
 import logger from "../logger";
 import uuid from "uuid/v4";
 import wowzaHydrate from "./wowza-hydrate";
@@ -21,14 +21,18 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { BadRequestError, NotFoundError } from "../store/errors";
+import { BadRequestError } from "../store/errors";
+import { Request } from "express";
+import { DBStream, StreamStats } from "../store/stream-table";
+import { Session, StreamPatchPayload } from "../schema/types";
+import { WithID } from "../store/types";
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
 
 const app = Router();
-const hackMistSettings = (req, profiles) => {
+const hackMistSettings = (req: Request, profiles) => {
   if (
     !req.headers["user-agent"] ||
     !req.headers["user-agent"].toLowerCase().includes("mistserver")
@@ -76,7 +80,7 @@ async function validatePushTarget(userId, profileNames, pushTargetRef) {
   return { profile, id: created.id };
 }
 
-function validatePushTargets(userId, profiles, pushTargets) {
+function validatePushTargets(userId: string, profiles, pushTargets) {
   const profileNames = new Set();
   for (const { name } of profiles) {
     if (!name) {
@@ -155,6 +159,14 @@ const fieldsMap = {
   },
 };
 
+function toStringValues(obj: Record<string, any>): Record<string, string> {
+  const strObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
 app.get("/", authMiddleware({}), async (req, res) => {
   let {
     limit,
@@ -168,7 +180,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     filters,
     userId,
     count,
-  } = req.query;
+  } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -256,7 +268,7 @@ function setRecordingStatus(req, ingest, session, forceUrl) {
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
   const { record, forceUrl } = req.query;
-  let { limit, cursor } = req.query;
+  let { limit, cursor } = toStringValues(req.query);
   const raw = req.query.raw && req.user.admin;
 
   const ingests = await req.getIngest(req);
@@ -331,7 +343,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
 app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
-  const { limit, cursor } = req.query;
+  const { limit, cursor } = toStringValues(req.query);
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
@@ -344,26 +356,26 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
-  const { data: streams, cursor: cursorOut } = await req.store.queryObjects({
+  const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
     query: { parentId },
     cursor,
     limit,
   });
   res.status(200);
-  if (streams.length > 0 && cursorOut) {
-    res.links({ next: makeNextHREF(req, cursorOut) });
+  if (data.length > 0 && nextCursor) {
+    res.links({ next: makeNextHREF(req, nextCursor) });
   }
   res.json(
     db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(streams, req.user.admin)
+      db.stream.removePrivateFieldsMany(data, req.user.admin)
     )
   );
 });
 
 app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   const { userId } = req.params;
-  let { limit, cursor, streamsonly, sessionsonly } = req.query;
+  let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
@@ -452,7 +464,7 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
   console.log(`headers:`, req.headers);
   const {
     data: [stream],
-  } = await req.store.queryObjects({
+  } = await req.store.queryObjects<DBStream>({
     kind: "stream",
     query: { playbackId: req.params.playbackId },
   });
@@ -654,7 +666,7 @@ app.post(
 
     if (firstSession) {
       // create 'session' object in 'session table
-      const session = {
+      const session: WithID<Session> = {
         id,
         parentId: stream.id,
         playbackId: stream.playbackId,
@@ -911,7 +923,7 @@ app.patch(
     }
 
     let { record, suspended, pushTargets } = req.body;
-    let patch = {};
+    let patch: StreamPatchPayload = {};
     if (typeof record === "boolean") {
       patch = { ...patch, record };
     }
@@ -1366,7 +1378,7 @@ const statsFields = [
   "transcodedSegmentsDuration",
 ];
 
-export function getCombinedStats(stream1, stream2) {
+export function getCombinedStats(stream1: StreamStats, stream2: StreamStats) {
   const res = {};
   for (const fn of statsFields) {
     res[fn] = (stream1[fn] || 0) + (stream2[fn] || 0);

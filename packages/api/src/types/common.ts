@@ -45,7 +45,7 @@ export interface IStoreQueryObjectsArgs {
   kind: string;
   query: object;
   cursor?: any;
-  limit?: number;
+  limit?: number | string;
   cleanWriteOnly?: boolean;
   filter?: (obj: StoredObject) => boolean;
 }
@@ -56,9 +56,9 @@ export interface IStore {
   get<T extends StoredObject>(id: string, cleanWriteOnly?: boolean): Promise<T>;
   close(): Promise<void>;
   replace(data: StoredObject): Promise<void>;
-  list(
+  list<T = StoredObject>(
     args: IStoreListArgs
-  ): Promise<{ data: Array<StoredObject>; cursor: string }>;
+  ): Promise<{ data: Array<T>; cursor: string }>;
   listKeys(
     prefix: string,
     cursor?: string,
@@ -67,9 +67,9 @@ export interface IStore {
   query(
     args: IStoreQueryArgs
   ): Promise<{ data: Promise<Array<string>>; cursor: string }>;
-  queryObjects(
+  queryObjects<T = StoredObject>(
     args: IStoreQueryObjectsArgs
-  ): Promise<{ data: Array<StoredObject>; cursor: string }>;
+  ): Promise<{ data: Array<T>; cursor: string }>;
   deleteKey(key: string): Promise<void>;
   delete(id: string): Promise<void>;
   create(data: StoredObject): Promise<StoredObject>;
