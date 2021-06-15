@@ -132,7 +132,11 @@ export default class WebhookCannon {
 
       try {
         logger.info(`webhook ${webhook.id} firing`);
-        let resp = await fetchWithTimeoutAndSleep(webhook.url, params, 0);
+        let resp = await fetchWithTimeoutAndSleep(
+          webhook.url,
+          params,
+          event.lastInterval
+        );
         if (resp.status >= 200 && resp.status < 300) {
           // 2xx requests are cool.
           // all is good
@@ -229,13 +233,7 @@ export default class WebhookCannon {
       const responses = await Promise.all(
         webhooksList.map(async (webhook, key) => {
           try {
-            if (event.lastInterval && event.lastInterval > 0) {
-              setTimeout(async () => {
-                await this._fireHook(event, webhook, sanitized, user, false);
-              }, event.lastInterval);
-            } else {
-              await this._fireHook(event, webhook, sanitized, user, false);
-            }
+            await this._fireHook(event, webhook, sanitized, user, false);
           } catch (error) {
             console.log("_fireHook Error", error);
           }
