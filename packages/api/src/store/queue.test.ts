@@ -6,7 +6,7 @@ import QueueTable from "./queue";
 import schema from "../schema/schema.json";
 import { Queue } from "../schema/types";
 
-// jest.setTimeout(15000);
+jest.setTimeout(15000);
 
 async function processEvent(doc: Queue) {
   console.log("processing doc id: ", doc.id);
