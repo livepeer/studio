@@ -1,3 +1,4 @@
+// TODO: add types to this file
 import { json as bodyParserJson } from "body-parser";
 import uuid from "uuid/v4";
 
@@ -749,7 +750,7 @@ describe("controllers/stream", () => {
         });
       }
 
-      const sadCases = [
+      const sadCases: [number, string][] = [
         [422, `rtmp://localhost/live/foo/bar/extra`],
         [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
         [422, "nonsense://localhost/live"],

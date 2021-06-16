@@ -1,3 +1,4 @@
+// TODO: Make this typescript as well
 import Router from "express/lib/router";
 import sql from "sql-template-strings";
 
