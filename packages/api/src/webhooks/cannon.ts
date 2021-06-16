@@ -37,29 +37,24 @@ export default class WebhookCannon {
 
   async start() {
     console.log("WEBHOOK CANNON STARTED");
-
     await this.queue.consume(this.handleQueueMsg.bind(this));
-
-    // if (this.running) {
-    //   await this.db.queue.setMsgHandler(this.processEvent.bind(this));
-    // }
   }
 
   async handleQueueMsg(data: any) {
     let message = JSON.parse(data.content.toString());
-    console.log("subscriber: got message", message);
+    console.log("webhookCannon: got message", message);
     await this.onTrigger(message);
     this.queue.ack(data);
   }
 
-  async processEvent(msg: Notification) {
-    console.log("EVENT TRIGGERED ON THE WEBHOOK");
-    let event = await this.db.queue.pop(this.onTrigger.bind(this));
-    console.log("event: ", event);
-  }
+  // async processEvent(msg: Notification) {
+  //   console.log("EVENT TRIGGERED ON THE WEBHOOK");
+  //   let event = await this.db.queue.pop(this.onTrigger.bind(this));
+  //   console.log("event: ", event);
+  // }
 
   stop() {
-    this.db.queue.unsetMsgHandler();
+    // this.db.queue.unsetMsgHandler();
     this.running = false;
   }
 
@@ -83,7 +78,6 @@ export default class WebhookCannon {
     event.status = "pending";
     event.retries = event.retries ? event.retries + 1 : 1;
     this.queue.delayedEmit(event, event.lastInterval);
-    // this.db.queue.updateMsg(event);
   }
 
   async _fireHook(
