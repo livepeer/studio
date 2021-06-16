@@ -1,7 +1,9 @@
+import { URL } from "url";
+import * as uuid from "uuid";
+
 import { PushTarget } from "../schema/types";
 import Table from "./table";
 import { GetOptions, WithID } from "./types";
-import * as uuid from "uuid";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
 type DBPushTarget = WithID<PushTarget>;

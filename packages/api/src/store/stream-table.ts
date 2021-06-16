@@ -281,7 +281,11 @@ export default class StreamTable extends Table<DBStream> {
     return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
-  async setActiveToFalse(stream: DBStream): Promise<{ rowCount: number }> {
+  async setActiveToFalse(stream: {
+    id: string;
+    lastSeen?: number;
+    name?: string;
+  }): Promise<{ rowCount: number }> {
     let upRes;
     try {
       upRes = await this.update(

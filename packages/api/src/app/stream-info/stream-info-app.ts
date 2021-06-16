@@ -340,16 +340,17 @@ export default async function makeApp(params) {
   let listenPort;
 
   if (listen) {
-    await new Promise((resolve, reject) => {
-      listener = app.listen(port, (err) => {
-        if (err) {
+    await new Promise<void>((resolve, reject) => {
+      listener = app
+        .listen(port, () => {
+          listenPort = listener.address().port;
+          logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
+          resolve();
+        })
+        .on("error", (err) => {
           logger.error("Error starting server", err);
-          return reject(err);
-        }
-        listenPort = listener.address().port;
-        logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
-        resolve();
-      });
+          reject(err);
+        });
     });
   }
 
