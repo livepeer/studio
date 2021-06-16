@@ -1,5 +1,5 @@
-export const timeout = (ms, fn) => {
-  return new Promise((resolve, reject) => {
+export const timeout = <T>(ms: number, fn: () => Promise<T>) => {
+  return new Promise<T>((resolve, reject) => {
     const handle = setTimeout(() => {
       reject(Error("timed out"));
     }, ms);
@@ -41,17 +41,20 @@ export const semaphore = () => {
 /**
  * Returns the input array, shuffled.
  */
-export const shuffle = (arr) => {
+export const shuffle = <T>(arr: T[]) => {
   const randos = arr.map(() => Math.random());
   return Object.keys(arr)
     .sort((idx1, idx2) => {
       return randos[idx1] - randos[idx2];
     })
-    .map((idx) => arr[idx]);
+    .map<T>((idx) => arr[idx]);
 };
 
-export const fetchWithTimeout = (url, options) =>
-  new Promise((resolve, reject) => {
+export const fetchWithTimeout = (
+  url: string,
+  options: RequestInit & { timeout?: number }
+) =>
+  new Promise<Response>((resolve, reject) => {
     let timeout = setTimeout(() => {
       timeout = null;
       reject("timeout");
@@ -77,7 +80,7 @@ export const fetchWithTimeout = (url, options) =>
   });
 
 // turns foo-bar-baz into fooBarBaz
-export const kebabToCamel = (str) => {
+export const kebabToCamel = (str: string) => {
   let out = "";
   let upper = false;
   for (let i = 0; i < str.length; i += 1) {
