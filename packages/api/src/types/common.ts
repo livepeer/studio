@@ -16,6 +16,8 @@ declare global {
       config?: any;
       store?: IStore;
       queue?: MessageQueue;
+      frontendDomain: string;
+
       user?: User;
       authTokenType?: AuthTokenType;
       isUIAdmin?: boolean;
@@ -73,7 +75,7 @@ export interface IStore {
   ): Promise<[Array<string>, string]>;
   query(
     args: IStoreQueryArgs
-  ): Promise<{ data: Promise<Array<string>>; cursor: string }>;
+  ): Promise<{ data: Array<string>; cursor: string }>;
   queryObjects<T = StoredObject>(
     args: IStoreQueryObjectsArgs
   ): Promise<{ data: Array<T>; cursor: string }>;

@@ -1,4 +1,7 @@
+import dns from "dns";
+const { Resolver } = dns.promises;
 import { Router, Request } from "express";
+import isLocalIP from "is-local-ip";
 import fetch from "isomorphic-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
@@ -9,12 +12,17 @@ import logger from "../logger";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
-import { DetectionWebhookPayload, StreamPatchPayload } from "../schema/types";
+import {
+  DetectionWebhookPayload,
+  StreamPatchPayload,
+  User,
+} from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/db";
 import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
+import { IStore } from "../types/common";
 import { fetchWithTimeout } from "../util";
 import { WebhookMessage } from "../webhooks/cannon";
 import { getBroadcasterHandler } from "./broadcaster";
@@ -30,14 +38,14 @@ import {
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 
-type Profile = DBStream["profiles"][0];
-type PushTargetRef = DBStream["pushTargets"][0];
+type Profile = DBStream["profiles"][number];
+type PushTargetRef = DBStream["pushTargets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
 const app = Router();
-const hackMistSettings = (req: Request, profiles: Profile[]) => {
+const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   if (
     !req.headers["user-agent"] ||
     !req.headers["user-agent"].toLowerCase().includes("mistserver")
@@ -63,7 +71,7 @@ async function validatePushTarget(
   userId: string,
   profileNames: Set<string>,
   pushTargetRef: PushTargetRef
-) {
+): Promise<Omit<PushTargetRef, "spec">> {
   const { profile, id, spec } = pushTargetRef;
   if (!profileNames.has(profile) && profile !== "source") {
     throw new BadRequestError(
@@ -105,7 +113,7 @@ function validatePushTargets(
   }
 
   if (!pushTargets) {
-    return Promise.resolve([]);
+    return Promise.resolve([] as PushTargetRef[]);
   }
   return Promise.all(
     pushTargets.map((p) => validatePushTarget(userId, profileNames, p))
@@ -122,7 +130,7 @@ export function getRecordingUrl(
     `recordings`,
     session.lastSessionId ? session.lastSessionId : session.id,
     mp4 ? `source.mp4` : `index.m3u8`
-  );
+  ) as string;
 }
 
 function isActuallyNotActive(stream: DBStream) {
@@ -143,7 +151,7 @@ function activeCleanupOne(stream: DBStream) {
 }
 
 function activeCleanup(streams: DBStream[], activeOnly = false) {
-  let hasStreamsToClean;
+  let hasStreamsToClean: boolean;
   for (const stream of streams) {
     hasStreamsToClean = activeCleanupOne(stream);
   }
@@ -176,8 +184,8 @@ const fieldsMap = {
   },
 };
 
-function toStringValues(obj: Record<string, any>): Record<string, string> {
-  const strObj = {};
+function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
   for (const [key, value] of Object.entries(obj)) {
     strObj[key] = value.toString();
   }
@@ -232,6 +240,13 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   order = parseOrder(fieldsMap, order);
 
+  type ResultRow = {
+    id: string;
+    data: DBStream;
+    usersId: string;
+    usersdata: WithID<User>;
+    count?: number;
+  };
   let fields =
     " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
   if (count) {
@@ -244,9 +259,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata, count: c }) => {
+    process: ({ data, usersdata, count: c }: ResultRow) => {
       if (count) {
-        res.set("X-Total-Count", c);
+        res.set("X-Total-Count", c.toString());
       }
       return req.user.admin
         ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
@@ -534,9 +549,9 @@ app.get(
   getBroadcasterHandler
 );
 
-async function generateUniqueStreamKey(store, otherKeys) {
+async function generateUniqueStreamKey(store: IStore, otherKeys: string[]) {
   while (true) {
-    const streamKey = await generateStreamKey();
+    const streamKey: string = await generateStreamKey();
     const qres = await store.query({
       kind: "stream",
       query: { streamKey },
@@ -559,7 +574,7 @@ app.post(
       });
     }
     const start = Date.now();
-    let stream;
+    let stream: DBStream;
     let useParentProfiles = false;
     if (req.config.baseStreamName === req.params.streamId) {
       if (!req.body.name.includes("+")) {
@@ -595,7 +610,9 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    let previousSessions, previousStats, userSessionCreatedAt;
+    let previousSessions: string[],
+      previousStats: StreamStats,
+      userSessionCreatedAt: number;
     let firstSession = true;
     if (stream.record && req.config.recordObjectStoreId) {
       // find previous sessions to form 'user' session
@@ -662,7 +679,7 @@ app.post(
       region = req.config.ownRegion;
     }
 
-    const doc = wowzaHydrate({
+    const doc: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
       userId: stream.userId,
@@ -785,7 +802,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     }
   }
 
-  const doc = wowzaHydrate({
+  const doc: DBStream = wowzaHydrate({
     ...req.body,
     kind: "stream",
     userId: req.user.id,
@@ -935,6 +952,8 @@ app.patch(
   validatePost("stream-patch-payload"),
   async (req, res) => {
     const { id } = req.params;
+    const payload = req.body as StreamPatchPayload;
+
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
@@ -948,7 +967,7 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, pushTargets } = req.body;
+    let { record, suspended, pushTargets } = payload;
     let patch: StreamPatchPayload = {};
     if (typeof record === "boolean") {
       patch = { ...patch, record };
@@ -1145,7 +1164,10 @@ app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
   return res.json({ result, errors });
 });
 
-async function terminateStreamReq(req, stream: DBStream) {
+async function terminateStreamReq(
+  req: Request,
+  stream: DBStream
+): Promise<{ status: number; errors?: string[]; result?: boolean | any }> {
   if (!stream.isActive) {
     return { status: 410, errors: ["not active"] };
   }
@@ -1178,7 +1200,7 @@ async function terminateStreamReq(req, stream: DBStream) {
     const { result, errors } = body;
     return { status: redRes.status, result, errors };
   }
-  const streams = await listActiveStreams(
+  const streams: string[] = await listActiveStreams(
     mistHost,
     mistPort,
     mistUsername,
@@ -1189,7 +1211,7 @@ async function terminateStreamReq(req, stream: DBStream) {
     return { status: 200, result: false, errors: ["not found on Mist"] };
   }
 
-  const nukeRes = await terminateStream(
+  const nukeRes: boolean = await terminateStream(
     mistHost,
     mistPort,
     mistStreamName,
@@ -1277,9 +1299,9 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  let objectStore,
-    recordObjectStore = undefined,
-    recordObjectStoreUrl;
+  let objectStore: string,
+    recordObjectStore: string,
+    recordObjectStoreUrl: string;
   if (stream.objectStoreId) {
     const os = await db.objectStore.get(stream.objectStoreId);
     if (!os) {
@@ -1396,7 +1418,7 @@ app.post(
   }
 );
 
-const statsFields = [
+const statsFields: (keyof StreamStats)[] = [
   "sourceBytes",
   "transcodedBytes",
   "sourceSegments",
@@ -1406,7 +1428,7 @@ const statsFields = [
 ];
 
 export function getCombinedStats(stream1: StreamStats, stream2: StreamStats) {
-  const res = {};
+  const res: StreamStats = {};
   for (const fn of statsFields) {
     res[fn] = (stream1[fn] || 0) + (stream2[fn] || 0);
   }
