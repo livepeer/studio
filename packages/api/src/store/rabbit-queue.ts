@@ -29,6 +29,10 @@ export default class Queue {
       setup: async function (channel: Channel) {
         await Promise.all([
           channel.assertQueue(QUEUE_NAME),
+          // channel.assertQueue("delayedQueue", {
+          //   messageTtl: 5000,
+          //   deadLetterExchange: EXCHANGE_NAME
+          // }),
           channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
           channel.prefetch(1),
           channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "#"),
@@ -71,6 +75,25 @@ export default class Queue {
   public async emit(msg: Object): Promise<void> {
     console.log("emitting ", msg);
     this.channel.sendToQueue(QUEUE_NAME, msg);
+    // .then(function() {
+    //     return console.log("Message was sent");
+    // }).catch(function(err: Error) {
+    //     return console.log("Message was rejected");
+    // });
+  }
+
+  public async delayedEmit(msg: Object, delay: number): Promise<void> {
+    await this.channel.addSetup((channel: Channel) => {
+      return Promise.all([
+        channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
+          messageTtl: delay,
+          deadLetterExchange: EXCHANGE_NAME,
+          expires: delay + 15000,
+        }),
+      ]);
+    });
+    console.log("emitting ", msg);
+    this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
     // .then(function() {
     //     return console.log("Message was sent");
     // }).catch(function(err: Error) {
