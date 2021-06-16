@@ -1,0 +1,34 @@
+---
+title: "`GET` retrieve a stream"
+description: Livepeer.com API Reference | GET retrieve a stream
+---
+
+# `GET` retrieve a stream
+
+You can retrieve a stream with its ID.
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream/{id}"
+
+```
+
+200 OK
+
+```bash
+{
+    "name":"test_stream",
+    "id":"ijkl61f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "createdAt":1596081229373,
+    "streamKey":"abcd-uimq-jtgy-x98v",
+    "playbackId":"efghb2mxupongp5k",
+    "isActive":"false",
+    "lastSeen":1596119750455",
+    "record":"true",
+    "sourceSegments":1360,
+    "transcodedSegments":5480,
+    "sourceSegmentsDuration":2630.53200000000004,
+    "transcodedSegmentsDuration":10620.1280000000004,
+    {other asset object keys, like profiles and parentId}
+}
+```

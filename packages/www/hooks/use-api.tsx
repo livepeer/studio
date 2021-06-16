@@ -574,6 +574,20 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor];
     },
 
+    async getStreamSessionsByUserId(
+      userId,
+      cursor?: string,
+      limit: number = 20
+    ): Promise<[Array<Stream>, string]> {
+      const uri = `/session?${qs.stringify({ limit, cursor, userId })}`;
+      const [res, streams] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new Error(streams);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor];
+    },
+
     async suspendStream(id: string, suspended: boolean): Promise<void> {
       const [res, body] = await context.fetch(`/stream/${id}/suspended`, {
         method: "PATCH",

@@ -53,6 +53,15 @@ const hackMistSettings = (req, profiles) => {
   });
 };
 
+export function getRecordingUrl(ingest, session, mp4 = false) {
+  return pathJoin(
+    ingest,
+    `recordings`,
+    session.lastSessionId ? session.lastSessionId : session.id,
+    mp4 ? `source.mp4` : `index.m3u8`
+  );
+}
+
 function isActuallyNotActive(stream) {
   return (
     stream.isActive &&
@@ -185,21 +194,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
 function setRecordingStatus(req, ingest, session, forceUrl) {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
-    const isReady = session.lastSeen < olderThen;
+    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady || (req.user.admin && forceUrl)) {
-      session.recordingUrl = pathJoin(
-        ingest,
-        `recordings`,
-        session.id,
-        `index.m3u8`
-      );
-      session.mp4Url = pathJoin(
-        ingest,
-        `recordings`,
-        session.id,
-        `source.mp4`
-      );
+      session.recordingUrl = getRecordingUrl(ingest, session);
+      session.mp4Url = getRecordingUrl(ingest, session, true);
     }
   }
 }
@@ -631,6 +630,7 @@ app.post(
       if (session.record) {
         session.recordingStatus = "waiting";
         session.recordingUrl = "";
+        session.mp4Url = "";
       }
       await db.session.create(session);
     }

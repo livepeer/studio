@@ -33,9 +33,9 @@ export const Promo = styled(DEFAULT_TAG, {
       loContrast: {
         backgroundColor: "$loContrast",
       },
-      gray: {
-        backgroundColor: "$slate2",
-        boxShadow: "0 0 0 1px $colors$slate6",
+      mauve: {
+        backgroundColor: "$mauve2",
+        boxShadow: "0 0 0 1px $colors$mauve6",
       },
       blue: {
         backgroundColor: "$blue2",
@@ -72,9 +72,9 @@ export const Promo = styled(DEFAULT_TAG, {
   compoundVariants: [
     {
       border: "true",
-      variant: "gray",
+      variant: "mauve",
       css: {
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
       },
     },
     {
@@ -102,12 +102,12 @@ export const Promo = styled(DEFAULT_TAG, {
       border: "true",
       variant: "loContrast",
       css: {
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
       },
     },
   ],
   defaultVariants: {
     size: "1",
-    variant: "gray",
+    variant: "mauve",
   },
 });
