@@ -119,7 +119,7 @@ describe("controllers/push-target", () => {
       }
       const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual([userPushTarget]);
+      expect(await res.json()).toEqual([{ ...userPushTarget, url: undefined }]);
     });
 
     it("should throw 403 error if JWT is not verified", async () => {
@@ -196,6 +196,7 @@ describe("controllers/push-target", () => {
 
         const pageItems = (await res.json()) as PushTarget[];
         expect(pageItems.length).toBe(page < 3 ? 5 : 3);
+        pageItems.forEach((pt) => expect(pt.url).toBeUndefined());
         listedIDs.push(...pageItems.map((t) => t.id));
       }
       expect(listedIDs.length).toEqual(13);

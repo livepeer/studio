@@ -66,12 +66,16 @@ app.use(authMiddleware({}));
 
 app.use(
   mung.json(function cleanWriteOnlyResponses(data, req) {
-    if (req.user.admin || !data || !("id" in data)) {
+    if (req.user.admin) {
       return data;
     }
-    return Array.isArray(data)
-      ? db.pushTarget.cleanWriteOnlyResponses(data)
-      : db.pushTarget.cleanWriteOnlyResponse(data);
+    if (Array.isArray(data)) {
+      return db.pushTarget.cleanWriteOnlyResponses(data);
+    }
+    if ("id" in data) {
+      return db.pushTarget.cleanWriteOnlyResponse(data);
+    }
+    return data;
   })
 );
 

@@ -295,21 +295,24 @@ export default class Table<T extends DBObject> {
 
   cleanWriteOnlyResponses(docs: Array<T>): Array<T> {
     // obfuscate writeOnly fields in objects returned
-    const writeOnlyFields = {};
+    const writeOnlyFields = [];
     if (this.schema.properties) {
       for (const [fieldName, fieldArray] of Object.entries(
         this.schema.properties
       )) {
         if (fieldArray.writeOnly) {
-          writeOnlyFields[fieldName] = null;
+          writeOnlyFields.push(fieldName);
         }
       }
     }
 
-    return docs.map((x) => ({
-      ...x,
-      ...writeOnlyFields,
-    }));
+    return docs.map((doc) => {
+      const cleaned = { ...doc };
+      for (const field of writeOnlyFields) {
+        delete cleaned[field];
+      }
+      return cleaned;
+    });
   }
 
   // on startup: auto-create table if it doesn't exist

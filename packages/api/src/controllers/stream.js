@@ -92,7 +92,7 @@ function validatePushTargets(userId, profiles, pushTargets) {
   }
 
   if (!pushTargets) {
-    return Promise.resolve(null);
+    return Promise.resolve([]);
   }
   return Promise.all(
     pushTargets.map((p) => validatePushTarget(userId, profileNames, p))
