@@ -152,7 +152,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
               Created by stream <b>{stream.parentStream.name}</b>
             </>
           ) : null,
-          href: `/dashboard/streams/${stream.id}`,
+          href: `/dashboard/streams/${stream.parentId}`,
         },
         recordingUrl: {
           id: stream.id,
