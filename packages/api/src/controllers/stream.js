@@ -749,6 +749,22 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
+    // -------------------------------
+    // new webhookCannon
+    req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.started",
+      streamId: id,
+      userId: user.id,
+    });
+
+    return res.end();
+    // Everything under this should be removed since we moved
+    // away from blocking webhooks
+    // -------------------------------
+
     // basic sanitization.
     let sanitized = { ...stream };
     delete sanitized.streamKey;

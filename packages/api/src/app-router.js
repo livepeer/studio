@@ -90,6 +90,7 @@ export default async function makeApp(params) {
   await webhookCannon.start();
 
   process.on("beforeExit", (code) => {
+    queue.close();
     webhookCannon.stop();
   });
   // Logging, JSON parsing, store injection
@@ -106,6 +107,7 @@ export default async function makeApp(params) {
     req.store = store;
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
+    req.queue = queue;
     next();
   });
   if (insecureTestToken) {
