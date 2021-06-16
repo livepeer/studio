@@ -210,7 +210,7 @@ export default class WebhookCannon {
   }
 
   async onTrigger(event: Queue) {
-    console.log("ON TRIGGER triggered");
+    console.log("ON TRIGGER triggered", event);
     if (!event) {
       // throw new Error('onTrigger requires a Queue event!')
       // this is fine because pop could return a null if some other client raced and picked the task
@@ -232,7 +232,7 @@ export default class WebhookCannon {
     let user = await this.db.user.get(event.userId);
     if (!user) {
       // if user isn't found. don't fire the webhook, log an error
-      throw new Error(
+      return console.error(
         `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
       );
     }

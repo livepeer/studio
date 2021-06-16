@@ -5,6 +5,7 @@ import schema from "./schema/schema.json";
  * Clear the entire database! Not to be used outside of tests
  */
 export async function clearDatabase(server) {
+  await server.queue.close();
   const tables = Object.values(schema.components.schemas)
     .filter((x) => x.table)
     .map((x) => x.table);

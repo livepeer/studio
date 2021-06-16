@@ -759,7 +759,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
       streamId: id,
       userId: user.id,
     });
-
+    res.status(204);
     return res.end();
     // Everything under this should be removed since we moved
     // away from blocking webhooks
