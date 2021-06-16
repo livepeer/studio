@@ -1,5 +1,6 @@
 import { Router, Request } from "express";
 import fetch from "isomorphic-fetch";
+import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
@@ -8,12 +9,14 @@ import logger from "../logger";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
-import { Session, StreamPatchPayload } from "../schema/types";
+import { DetectionWebhookPayload, StreamPatchPayload } from "../schema/types";
 import { db } from "../store";
+import { DBSession } from "../store/db";
 import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { fetchWithTimeout } from "../util";
+import { WebhookMessage } from "../webhooks/cannon";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
 import {
@@ -27,12 +30,14 @@ import {
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 
+type Profile = DBStream["profiles"][0];
+type PushTargetRef = DBStream["pushTargets"][0];
+
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
-
 const app = Router();
-const hackMistSettings = (req: Request, profiles) => {
+const hackMistSettings = (req: Request, profiles: Profile[]) => {
   if (
     !req.headers["user-agent"] ||
     !req.headers["user-agent"].toLowerCase().includes("mistserver")
@@ -54,7 +59,11 @@ const hackMistSettings = (req: Request, profiles) => {
   });
 };
 
-async function validatePushTarget(userId, profileNames, pushTargetRef) {
+async function validatePushTarget(
+  userId: string,
+  profileNames: Set<string>,
+  pushTargetRef: PushTargetRef
+) {
   const { profile, id, spec } = pushTargetRef;
   if (!profileNames.has(profile) && profile !== "source") {
     throw new BadRequestError(
@@ -80,8 +89,12 @@ async function validatePushTarget(userId, profileNames, pushTargetRef) {
   return { profile, id: created.id };
 }
 
-function validatePushTargets(userId: string, profiles, pushTargets) {
-  const profileNames = new Set();
+function validatePushTargets(
+  userId: string,
+  profiles: Profile[],
+  pushTargets: PushTargetRef[]
+) {
+  const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
       continue;
@@ -99,7 +112,11 @@ function validatePushTargets(userId: string, profiles, pushTargets) {
   );
 }
 
-export function getRecordingUrl(ingest, session, mp4 = false) {
+export function getRecordingUrl(
+  ingest: string,
+  session: DBSession,
+  mp4 = false
+) {
   return pathJoin(
     ingest,
     `recordings`,
@@ -108,7 +125,7 @@ export function getRecordingUrl(ingest, session, mp4 = false) {
   );
 }
 
-function isActuallyNotActive(stream) {
+function isActuallyNotActive(stream: DBStream) {
   return (
     stream.isActive &&
     !isNaN(stream.lastSeen) &&
@@ -116,7 +133,7 @@ function isActuallyNotActive(stream) {
   );
 }
 
-function activeCleanupOne(stream) {
+function activeCleanupOne(stream: DBStream) {
   if (isActuallyNotActive(stream)) {
     db.stream.setActiveToFalse(stream);
     stream.isActive = false;
@@ -125,7 +142,7 @@ function activeCleanupOne(stream) {
   return false;
 }
 
-function activeCleanup(streams, activeOnly = false) {
+function activeCleanup(streams: DBStream[], activeOnly = false) {
   let hasStreamsToClean;
   for (const stream of streams) {
     hasStreamsToClean = activeCleanupOne(stream);
@@ -252,7 +269,12 @@ app.get("/", authMiddleware({}), async (req, res) => {
   );
 });
 
-function setRecordingStatus(req, ingest, session, forceUrl) {
+function setRecordingStatus(
+  req: Request,
+  ingest: string,
+  session: DBSession,
+  forceUrl: boolean
+) {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
     const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
@@ -312,7 +334,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   sessions = sessions.map((session) => {
-    setRecordingStatus(req, ingest, session, forceUrl);
+    setRecordingStatus(req, ingest, session, !!forceUrl);
     if (!raw) {
       if (session.previousSessions && session.previousSessions.length) {
         session.id = session.previousSessions[0]; // return id of the first session object so
@@ -666,7 +688,7 @@ app.post(
 
     if (firstSession) {
       // create 'session' object in 'session table
-      const session: WithID<Session> = {
+      const session: DBSession = {
         id,
         parentId: stream.id,
         playbackId: stream.playbackId,
@@ -804,77 +826,81 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 });
 
-app.put("/:id/setactive", authMiddleware({ anyAdmin: true }), async (req, res) => {
-  const { id } = req.params;
-  // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
-  const useReplica = !req.body.active;
-  const stream = await db.stream.get(id, { useReplica });
-  if (!stream || (stream.deleted && !req.user.admin)) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+app.put(
+  "/:id/setactive",
+  authMiddleware({ anyAdmin: true }),
+  async (req, res) => {
+    const { id } = req.params;
+    // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
+    const useReplica = !req.body.active;
+    const stream = await db.stream.get(id, { useReplica });
+    if (!stream || (stream.deleted && !req.user.admin)) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  if (stream.suspended) {
-    res.status(403);
-    return res.json({ errors: ["stream is suspended"] });
-  }
+    if (stream.suspended) {
+      res.status(403);
+      return res.json({ errors: ["stream is suspended"] });
+    }
 
-  const user = await db.user.get(stream.userId);
-  if (!user) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+    const user = await db.user.get(stream.userId);
+    if (!user) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  if (user.suspended) {
-    res.status(403);
-    return res.json({ errors: ["user is suspended"] });
-  }
+    if (user.suspended) {
+      res.status(403);
+      return res.json({ errors: ["user is suspended"] });
+    }
 
-  if (req.body.active) {
-    // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-    // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+    if (req.body.active) {
+      // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+      // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
-    // -------------------------------
-    // new webhookCannon
-    req.queue.emit({
-      id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event: "stream.started",
-      streamId: id,
-      userId: user.id,
-    });
-  }
-
-  stream.isActive = !!req.body.active;
-  stream.lastSeen = +new Date();
-  const { ownRegion: region } = req.config;
-  const { hostName: mistHost } = req.body;
-  await db.stream.update(stream.id, {
-    isActive: stream.isActive,
-    lastSeen: stream.lastSeen,
-    mistHost,
-    region,
-  });
-
-  db.user.update(stream.userId, {
-    lastStreamedAt: Date.now(),
-  });
-
-  if (stream.parentId) {
-    const pStream = await db.stream.get(stream.parentId);
-    if (pStream && !pStream.deleted) {
-      await db.stream.update(pStream.id, {
-        isActive: stream.isActive,
-        lastSeen: stream.lastSeen,
-        region,
+      // -------------------------------
+      // new webhookCannon
+      req.queue.emit({
+        id: uuid(),
+        createdAt: Date.now(),
+        channel: "webhooks",
+        event: "stream.started",
+        streamId: id,
+        userId: user.id,
       });
     }
-  }
 
-  res.status(204);
-  res.end();
-});
+    stream.isActive = !!req.body.active;
+    stream.lastSeen = +new Date();
+    const { ownRegion: region } = req.config;
+    const { hostName: mistHost } = req.body;
+    await db.stream.update(stream.id, {
+      isActive: stream.isActive,
+      lastSeen: stream.lastSeen,
+      mistHost,
+      region,
+    });
+
+    db.user.update(stream.userId, {
+      lastStreamedAt: Date.now(),
+    });
+
+    if (stream.parentId) {
+      const pStream = await db.stream.get(stream.parentId);
+      if (pStream && !pStream.deleted) {
+        await db.stream.update(pStream.id, {
+          isActive: stream.isActive,
+          lastSeen: stream.lastSeen,
+          region,
+        });
+      }
+    }
+
+    res.status(204);
+    res.end();
+  }
+);
 
 // sets 'isActive' field to false for many objects at once
 app.patch(
@@ -882,7 +908,7 @@ app.patch(
   authMiddleware({ anyAdmin: true }),
   validatePost("deactivate-many-payload"),
   async (req, res) => {
-    let upRes;
+    let upRes: QueryResult;
     try {
       upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
 
@@ -895,7 +921,7 @@ app.patch(
       console.error(
         `error setting stream active to false ids=${req.body.ids} err=${e}`
       );
-      upRes = { rowCount: 0 };
+      upRes = { rowCount: 0 } as QueryResult;
     }
 
     res.status(200);
@@ -1119,7 +1145,7 @@ app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
   return res.json({ result, errors });
 });
 
-async function terminateStreamReq(req, stream) {
+async function terminateStreamReq(req, stream: DBStream) {
   if (!stream.isActive) {
     return { status: 410, errors: ["not active"] };
   }
@@ -1174,8 +1200,6 @@ async function terminateStreamReq(req, stream) {
 }
 
 // Hooks
-
-const streamDetectionEvent = "stream.detection";
 
 app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
   if (!req.body || !req.body.url) {
@@ -1313,7 +1337,7 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
 
   const { data: webhooks } = await db.webhook.listSubscribed(
     user.id,
-    streamDetectionEvent
+    "stream.detection"
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {
@@ -1346,25 +1370,28 @@ app.post(
   authMiddleware({ anyAdmin: true }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
-    const { manifestID, seqNo, sceneClassification } = req.body;
+    const {
+      manifestID,
+      seqNo,
+      sceneClassification,
+    }: DetectionWebhookPayload = req.body;
     const stream = await db.stream.getByIdOrPlaybackId(manifestID);
     if (!stream) {
       return res.status(404).json({ errors: ["stream not found"] });
     }
     console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
 
-    await req.queue.emit({
+    const msg: WebhookMessage = {
       id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event: streamDetectionEvent,
+      event: "stream.detection",
       streamId: stream.id,
       userId: stream.userId,
       payload: {
         seqNo,
         sceneClassification,
       },
-    });
+    };
+    await req.queue.emit(msg);
     return res.status(204).end();
   }
 );

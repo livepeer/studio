@@ -3,9 +3,11 @@ import sql from "sql-template-strings";
 import { Webhook } from "../schema/types";
 import Table from "./table";
 
+export type EventKey = Webhook["events"][0];
+
 export type DBWebhook = Omit<Webhook, "event"> & {
   id: string;
-  events: Webhook["events"];
+  events: EventKey[];
   /**
   @deprecated: This is to make DBWebhook type unassignable to Webhook and avoid
   programming mistakes. Always use DBWebhook unless in the API controller where
@@ -17,7 +19,7 @@ export type DBWebhook = Omit<Webhook, "event"> & {
 export default class WebhookTable extends Table<DBWebhook> {
   async listSubscribed(
     userId: string,
-    event: string,
+    event: EventKey,
     limit = 100,
     cursor?: string,
     includeDeleted = false

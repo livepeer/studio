@@ -3,7 +3,7 @@ import { User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 // import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
-import { DBWebhook } from "../store/webhook-table";
+import { DBWebhook, EventKey } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 
@@ -21,8 +21,8 @@ const MAX_RETRIES = 20;
 
 export interface WebhookMessage {
   id: string;
-  event: DBWebhook["events"][0];
-  createdAt: number,
+  event: EventKey;
+  createdAt: number;
   userId: string;
   streamId: string;
   payload?: Object;
@@ -170,7 +170,7 @@ export default class WebhookCannon {
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({
           id: event.id, // this will allow receiver to check if it is already received same hook
-                        // (possible when retrying)
+          // (possible when retrying)
           webhookId: webhook.id,
           createdAt: event.createdAt, // that way receiver will know how long ago event was emitted
           timestamp,

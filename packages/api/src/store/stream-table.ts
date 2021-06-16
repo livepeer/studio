@@ -248,40 +248,40 @@ export default class StreamTable extends Table<DBStream> {
   async getByStreamKey(
     streamKey: string,
     opts?: QueryOptions
-  ): Promise<Stream> {
+  ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'streamKey'=${streamKey}`.setName(
         `${this.name}_by_streamKey`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
   async getByPlaybackId(
     playbackId: string,
     opts?: QueryOptions
-  ): Promise<Stream> {
+  ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'playbackId'=${playbackId}`.setName(
         `${this.name}_by_playbackid`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
-  async getLastSession(id: string, opts?: QueryOptions): Promise<Stream> {
+  async getLastSession(id: string, opts?: QueryOptions): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->'createdAt' DESC LIMIT 1`.setName(
         `${this.name}_by_parentid_last_session`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
-  async setActiveToFalse(stream): Promise<{ rowCount: number }> {
+  async setActiveToFalse(stream: DBStream): Promise<{ rowCount: number }> {
     let upRes;
     try {
       upRes = await this.update(
@@ -289,7 +289,7 @@ export default class StreamTable extends Table<DBStream> {
           sql`id = ${stream.id}`,
           sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
         ],
-        { isActive: false } as Stream,
+        { isActive: false },
         { throwIfEmpty: false }
       );
       if (upRes.rowCount) {
@@ -310,7 +310,8 @@ export default class StreamTable extends Table<DBStream> {
 
   async markIsActiveFalseMany(ids: Array<string>) {
     const res = await this.db.query(
-      `UPDATE ${this.name
+      `UPDATE ${
+        this.name
       } SET data = jsonb_set(data, '{isActive}', 'false'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
@@ -319,11 +320,11 @@ export default class StreamTable extends Table<DBStream> {
     return res;
   }
 
-  addDefaultFieldsMany(objs: Array<Stream>): Array<Stream> {
+  addDefaultFieldsMany(objs: Array<DBStream>): Array<DBStream> {
     return objs.map(this.addDefaultFields);
   }
 
-  addDefaultFields(obj: Stream): Stream {
+  addDefaultFields(obj: DBStream): DBStream {
     return {
       lastSeen: 0,
       isActive: false,
@@ -339,7 +340,8 @@ export default class StreamTable extends Table<DBStream> {
     };
   }
 
-  removePrivateFields(obj: Stream, isAdmin: boolean = false): Stream {
+  removePrivateFields(obj: DBStream, isAdmin: boolean = false): DBStream {
+    // Maybe create a copy to avoid input mutation
     for (const fn of privateFields) {
       delete obj[fn];
     }
@@ -352,9 +354,9 @@ export default class StreamTable extends Table<DBStream> {
   }
 
   removePrivateFieldsMany(
-    objs: Array<Stream>,
+    objs: Array<DBStream>,
     isAdmin: boolean = false
-  ): Array<Stream> {
+  ): Array<DBStream> {
     return objs.map((o) => this.removePrivateFields(o, isAdmin));
   }
 }
