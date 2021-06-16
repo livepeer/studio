@@ -756,7 +756,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     const { data: webhooksList } = await getWebhooks(
       req.store,
       stream.userId,
-      "streamStarted"
+      "stream.started"
     );
     try {
       const responses = await Promise.all(

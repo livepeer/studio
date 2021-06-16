@@ -119,7 +119,9 @@ components:
         event:
           type: string
           enum:
-            - streamStarted
+            - stream.started
+            - stream.idle
+            - recording.ready
         url:
           type: string
         deleted:

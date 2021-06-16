@@ -108,7 +108,7 @@ describe("webhook cannon", () => {
       name: "test webhook 1",
       kind: "webhook",
       createdAt: Date.now(),
-      event: "streamStarted",
+      event: "stream.started",
       url: "http://localhost:30000/webhook",
       // url: 'https://livepeer.com/'
     };
@@ -209,7 +209,7 @@ describe("webhook cannon", () => {
       id: "webhook_test_12",
       time: Date.now(),
       channel: "test.channel",
-      event: "streamStarted",
+      event: "stream.started",
       streamId: resJson.id,
       userId: nonAdminUser.id,
       isConsumed: false,
