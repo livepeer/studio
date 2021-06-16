@@ -17,7 +17,7 @@ describe("Queue", () => {
     } catch (e) {
       console.log(e);
     }
-    await queue.connect();
+    await queue.connect("amqp://localhost:5672/livepeer");
     // await sleep(2000);
     // await queue.consume()
   });

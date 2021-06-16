@@ -59,6 +59,7 @@ export default async function makeApp(params) {
     insecureTestToken,
     firestoreCredentials,
     firestoreCollection,
+    amqpUrl,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -79,7 +80,7 @@ export default async function makeApp(params) {
 
   // RabbitMQ
   const queue = new MessageQueue();
-  await queue.connect();
+  await queue.connect(amqpUrl);
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({
     db,

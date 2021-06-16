@@ -34,6 +34,7 @@ export default async function makeApp(params) {
     s3Secret,
     upstreamBroadcaster,
     insecureTestToken,
+    amqpUrl,
   } = params;
   // Storage init
 

@@ -39,7 +39,7 @@ params.postgresUrl = `postgresql://postgres@127.0.0.1/test_${Date.now()}`;
 params.recordObjectStoreId = "mock_store";
 params.ingest =
   '[{"ingest": "rtmp://test/live","playback": "https://test/hls","base": "https://test"}]';
-
+params.amqpUrl = "amqp://localhost:5672/livepeer";
 if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
