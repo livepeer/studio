@@ -5,7 +5,7 @@ import { Channel, ConsumeMessage, Options } from "amqplib";
 const QUEUE_NAME = "webhook_default_queue";
 const EXCHANGE_NAME = "webhook_default_exchange";
 
-export default class Queue {
+export default class MessageQueue {
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
 

@@ -1,4 +1,4 @@
-import Queue from "./rabbit-queue";
+import MessageQueue from "./rabbit-queue";
 
 jest.setTimeout(15000);
 async function sleep(duration) {
@@ -10,10 +10,10 @@ async function sleep(duration) {
 }
 
 describe("Queue", () => {
-  let queue: Queue;
+  let queue: MessageQueue;
   beforeEach(async () => {
     try {
-      queue = new Queue();
+      queue = new MessageQueue();
     } catch (e) {
       console.log(e);
     }
