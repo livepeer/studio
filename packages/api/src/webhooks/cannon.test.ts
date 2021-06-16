@@ -144,6 +144,7 @@ describe("webhook cannon", () => {
         resolve();
       });
     });
+    server.queue.close();
     server.webhook.stop();
     webhookServer.close();
     // await db.close();
@@ -204,7 +205,7 @@ describe("webhook cannon", () => {
       res.end();
     });
 
-    await server.db.queue.emit({
+    await server.queue.emit({
       id: "webhook_test_12",
       time: Date.now(),
       channel: "test.channel",

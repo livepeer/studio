@@ -16,6 +16,7 @@ import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
+import MessageQueue from "./store/rabbit-queue";
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -76,8 +77,16 @@ export default async function makeApp(params) {
     schema,
   });
 
+  // RabbitMQ
+  const queue = new MessageQueue();
+  await queue.connect();
   // Webhooks Cannon
-  const webhookCannon = new WebhookCannon({ db, store, verifyUrls: true });
+  const webhookCannon = new WebhookCannon({
+    db,
+    store,
+    verifyUrls: true,
+    queue,
+  });
   await webhookCannon.start();
 
   process.on("beforeExit", (code) => {
@@ -173,5 +182,6 @@ export default async function makeApp(params) {
     webhookCannon,
     store,
     db,
+    queue,
   };
 }

@@ -44,6 +44,9 @@ export default class MessageQueue {
   }
 
   public async close(): Promise<void> {
+    await this.connection.removeAllListeners("connect");
+    await this.connection.removeAllListeners("disconnect");
+    await this.connection.removeAllListeners("error");
     await this.connection.close();
   }
 

@@ -1,6 +1,7 @@
 import sql, { SQLStatement } from "sql-template-strings";
 import { DB } from "../store/db";
 import { Queue, Webhook, User, Stream } from "../schema/types";
+import MessageQueue from "../store/rabbit-queue";
 // import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
 import { fetchWithTimeout, fetchWithTimeoutAndSleep } from "../util";
@@ -23,20 +24,32 @@ export default class WebhookCannon {
   running: boolean;
   verifyUrls: boolean;
   resolver: any;
-  constructor({ db, store, verifyUrls }) {
+  queue: MessageQueue;
+  constructor({ db, store, verifyUrls, queue }) {
     this.db = db;
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
     this.resolver = new Resolver();
+    this.queue = queue;
     // this.start();
   }
 
   async start() {
     console.log("WEBHOOK CANNON STARTED");
-    if (this.running) {
-      await this.db.queue.setMsgHandler(this.processEvent.bind(this));
-    }
+
+    await this.queue.consume(this.handleQueueMsg.bind(this));
+
+    // if (this.running) {
+    //   await this.db.queue.setMsgHandler(this.processEvent.bind(this));
+    // }
+  }
+
+  async handleQueueMsg(data: any) {
+    let message = JSON.parse(data.content.toString());
+    console.log("subscriber: got message", message);
+    await this.onTrigger(message);
+    this.queue.ack(data);
   }
 
   async processEvent(msg: Notification) {
@@ -69,7 +82,8 @@ export default class WebhookCannon {
     event.lastInterval = this.calcBackoff(event.lastInterval);
     event.status = "pending";
     event.retries = event.retries ? event.retries + 1 : 1;
-    this.db.queue.updateMsg(event);
+    this.queue.delayedEmit(event, event.lastInterval);
+    // this.db.queue.updateMsg(event);
   }
 
   async _fireHook(

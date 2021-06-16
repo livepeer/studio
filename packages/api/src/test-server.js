@@ -92,6 +92,7 @@ export default Promise.resolve().then(async () => {
       await server.close();
     },
     db: server.db,
+    queue: server.queue,
   };
 });
 
