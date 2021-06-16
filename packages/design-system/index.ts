@@ -1,3 +1,5 @@
+import { HoverCard } from "./components/HoverCard";
+
 export {
   Alert,
   Avatar,
@@ -121,6 +123,7 @@ export {
 } from "./components/DropdownMenu";
 export { SnackbarProvider, useSnackbar } from "./components/Snackbar";
 export { Switch } from "./components/Switch";
+export * as HoverCard from "./components/HoverCard";
 
 // Stitches
 export {
