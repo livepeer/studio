@@ -1,4 +1,5 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
+import { NodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 
@@ -21,8 +22,8 @@ declare global {
       tokenName?: string;
       tokenId?: string;
 
-      getBroadcasters?: () => Promise<any[]>;
-      getOrchestrators?: () => Promise<any[]>;
+      getBroadcasters?: () => Promise<NodeAddress[]>;
+      getOrchestrators?: () => Promise<NodeAddress[]>;
       getIngest?: () => Promise<Ingest[]>;
       getPrices?: () => Promise<Price[]>;
     }
