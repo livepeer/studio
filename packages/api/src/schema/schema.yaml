@@ -200,6 +200,24 @@ components:
           properties:
             body:
               type: string
+
+    detection-webhook-payload:
+      type: object
+      properties:
+        manifestID:
+          type: string
+        seqNo:
+          type: number
+        sceneClassification:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              probability:
+                type: number
+
     stream:
       type: object
       table: stream
