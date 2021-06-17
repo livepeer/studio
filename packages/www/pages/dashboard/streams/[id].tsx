@@ -431,7 +431,7 @@ const ID = () => {
                     <Cell>
                       <ClipBut text={stream.id}></ClipBut>
                     </Cell>
-                    <Cell>Stream key</Cell>
+                    <Cell>Stream key lets see</Cell>
                     <Cell>
                       {keyRevealed ? (
                         <Flex>
