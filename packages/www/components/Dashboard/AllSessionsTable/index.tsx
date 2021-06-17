@@ -27,7 +27,7 @@ import {
   Button,
   Link as A,
 } from "@livepeer.com/design-system";
-import Delete from "./Delete";
+import Delete from "components/Dashboard/DeleteSessions";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -121,7 +121,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     }, 10000);
     return () => clearInterval(interval);
   }, [isVisible]);
-  console.log(sessions);
+
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
       {
@@ -254,12 +254,12 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                 } else if (selectedSessions.length > 1) {
                   await deleteStreams(selectedSessions.map((s) => s.id));
                 }
-                // const streamSessions = await getStreamSessionsByUserId(
-                //   user.id,
-                //   undefined,
-                //   0
-                // );
-                // setSessions(streamSessions);
+                const streamSessions = await getStreamSessionsByUserId(
+                  user.id,
+                  undefined,
+                  0
+                );
+                setSessions(streamSessions);
               }}
             />
           )}
