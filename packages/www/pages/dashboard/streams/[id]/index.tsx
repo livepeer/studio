@@ -17,12 +17,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@livepeer.com/design-system";
-import Layout from "../../../layouts/dashboard";
-import useLoggedIn from "../../../hooks/use-logged-in";
+import Layout from "../../../../layouts/dashboard";
+import useLoggedIn from "../../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
-import { useApi, usePageVisibility } from "../../../hooks";
+import { useApi, usePageVisibility } from "../../../../hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
 import {
@@ -30,7 +30,7 @@ import {
   isStaging,
   isDevelopment,
   formatNumber,
-} from "../../../lib/utils";
+} from "../../../../lib/utils";
 import { RenditionsDetails } from "components/StreamsTable";
 import { RelativeTime } from "components/CommonAdminTable";
 import {
