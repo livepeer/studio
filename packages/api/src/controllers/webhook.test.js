@@ -269,7 +269,7 @@ describe("controllers/webhook", () => {
       const webhookRes = await client.post("/webhook", { ...localWebhook });
       let webhookResJson = await webhookRes.json();
       console.log("webhook created: ", webhookResJson);
-      expect(webhookRes.status).toBe(406);
+      expect(webhookRes.status).toBe(422);
     });
   });
 });
