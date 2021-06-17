@@ -13,9 +13,7 @@ import Router from "next/router";
 import GradientBackgroundBox from "../components/GradientBackgroundBox";
 import { Reset, ThemeProvider } from "../lib/theme";
 import MarkdownProvider from "../lib/markdown-provider";
-// import "../css/reset.css";
-// import "../css/markdown.css";
-// import "keen-slider/keen-slider.min.css";
+import Head from "next/head";
 
 interface Props {
   title?: string;
@@ -86,6 +84,10 @@ const Layout = ({
 
   return (
     <IdProvider>
+      <Head>
+        <link rel="stylesheet" href="/reset.css" />
+        <link rel="stylesheet" href="/markdown.css" />
+      </Head>
       <ThemeProvider>
         <MarkdownProvider>
           <Reset />
