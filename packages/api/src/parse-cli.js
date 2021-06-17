@@ -45,6 +45,11 @@ export default function parseCli(argv) {
           describe: "url of a postgres read replica database",
           type: "string",
         },
+        "amqp-url": {
+          describe: "the RabbitMQ Url",
+          type: "string",
+          default: "amqp://localhost:5672/livepeer",
+        },
         "client-id": {
           describe: "google auth ID",
           type: "string",

@@ -13,9 +13,7 @@ export default class MessageQueue {
 
   public async connect(url: string): Promise<void> {
     // Create a new connection manager
-    this.connection = await amqp.connect([
-      url || process.env.CLOUDAMQP_MQTT_URL,
-    ]);
+    this.connection = await amqp.connect([url]);
     this.connection.on("connect", () => console.log("AMQP Connected!"));
     this.connection.on("disconnect", (err: Error) =>
       console.log("AMQP Disconnected.", err)
