@@ -301,6 +301,8 @@ const StreamsTable = ({
                 } else if (selectedStreams.length > 1) {
                   await deleteStreams(selectedStreams.map((s) => s.id));
                 }
+                const streams = await getStreams(userId);
+                setStreams(streams);
               }}
             />
           )}
