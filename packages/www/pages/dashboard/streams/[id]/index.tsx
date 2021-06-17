@@ -44,6 +44,7 @@ import Record from "@components/Dashboard/StreamDetails/Record";
 import Terminate from "@components/Dashboard/StreamDetails/Terminate";
 import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
+import Link from "next/link";
 
 type TimedAlertProps = {
   text: string;
@@ -431,7 +432,7 @@ const ID = () => {
                     <Cell>
                       <ClipBut text={stream.id}></ClipBut>
                     </Cell>
-                    <Cell>Stream key lets see</Cell>
+                    <Cell>Stream key</Cell>
                     <Cell>
                       {keyRevealed ? (
                         <Flex>
@@ -937,13 +938,14 @@ const ID = () => {
                     </Badge>
                   </Box>
                 )}
-
-                <Button
-                  size="3"
-                  variant="violet"
-                  css={{ mt: "$3", width: "100%" }}>
-                  View Stream Health
-                </Button>
+                <Link href={`/dashboard/streams/${stream?.id}/health`}>
+                  <Button
+                    size="3"
+                    variant="violet"
+                    css={{ mt: "$3", width: "100%" }}>
+                    View Stream Health
+                  </Button>
+                </Link>
               </Box>
             </Grid>
 
