@@ -92,7 +92,6 @@ const Sidebar = ({ id }) => {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-
         <ThemeSwitch />
       </Flex>
       <Grid css={{ px: "$4" }} gap="3">
@@ -171,23 +170,50 @@ const Sidebar = ({ id }) => {
             </Text>
           </NavLink>
         </Link>
-        <Link href="/dashboard/billing" passHref>
-          <NavLink>
-            <BillingIcon active={id === "billing"} />
-            <Text
-              gradient={id === "billing"}
-              variant={id === "billing" ? "violet" : null}
-              css={{
-                display: "flex",
-                fontWeight: id === "billing" ? 700 : 400,
-                WebkitBackgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
-              }}>
-              Billing
-            </Text>
-          </NavLink>
-        </Link>
+        <Box>
+          <Link href="/dashboard/billing" passHref>
+            <NavLink>
+              <BillingIcon active={id === "billing"} />
+              <Text
+                gradient={id === "billing"}
+                variant={id === "billing" ? "violet" : null}
+                css={{
+                  display: "flex",
+                  fontWeight: id === "billing" ? 700 : 400,
+                  WebkitBackgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                }}>
+                Billing
+              </Text>
+            </NavLink>
+          </Link>
+          <Box
+            css={{
+              ":first-child": {
+                mt: "$1",
+              },
+            }}>
+            {id?.split("/")[0] === "billing" && (
+              <Link href="/dashboard/billing/plans" passHref>
+                <NavLink>
+                  <Text
+                    gradient={id === "billing/plans"}
+                    variant={id === "billing/plans" ? "violet" : null}
+                    css={{
+                      fontWeight: id === "billing/plans" ? 700 : 400,
+                      WebkitBackgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Plans
+                  </Text>
+                </NavLink>
+              </Link>
+            )}
+          </Box>
+        </Box>
       </Grid>
     </Box>
   );
