@@ -83,7 +83,10 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
             parentStream: stream,
             user: db.user.cleanWriteOnlyResponse(usersdata),
           }
-        : { ...data };
+        : {
+            ...data,
+            parentStream: stream,
+          };
     },
   });
 

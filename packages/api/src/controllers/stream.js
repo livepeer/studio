@@ -21,6 +21,7 @@ import { geolocateMiddleware } from "../middleware";
 import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { BadRequestError, NotFoundError } from "../store/errors";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -52,6 +53,51 @@ const hackMistSettings = (req, profiles) => {
     return profile;
   });
 };
+
+async function validatePushTarget(userId, profileNames, pushTargetRef) {
+  const { profile, id, spec } = pushTargetRef;
+  if (!profileNames.has(profile) && profile !== "source") {
+    throw new BadRequestError(
+      `push target must reference existing profile. not found: "${profile}"`
+    );
+  }
+  if (!!spec === !!id) {
+    throw new BadRequestError(
+      `push target must have either an "id" or a "spec"`
+    );
+  }
+  if (id) {
+    if (!(await db.pushTarget.hasAccess(id, userId))) {
+      throw new BadRequestError(`push target not found: "${id}"`);
+    }
+    return pushTargetRef;
+  }
+  const created = await db.pushTarget.fillAndCreate({
+    name: spec.name,
+    url: spec.url,
+    userId,
+  });
+  return { profile, id: created.id };
+}
+
+function validatePushTargets(userId, profiles, pushTargets) {
+  const profileNames = new Set();
+  for (const { name } of profiles) {
+    if (!name) {
+      continue;
+    } else if (name === "source") {
+      throw new BadRequestError(`profile cannot be named "source"`);
+    }
+    profileNames.add(name);
+  }
+
+  if (!pushTargets) {
+    return Promise.resolve([]);
+  }
+  return Promise.all(
+    pushTargets.map((p) => validatePushTarget(userId, profileNames, p))
+  );
+}
 
 export function getRecordingUrl(ingest, session, mp4 = false) {
   return pathJoin(
@@ -719,6 +765,11 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   });
 
   doc.profiles = hackMistSettings(req, doc.profiles);
+  doc.pushTargets = await validatePushTargets(
+    req.user.id,
+    doc.profiles,
+    doc.pushTargets
+  );
 
   await Promise.all([
     req.store.create(doc),
@@ -891,6 +942,56 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.patch(
+  "/:id",
+  authMiddleware({}),
+  validatePost("stream-patch-payload"),
+  async (req, res) => {
+    const { id } = req.params;
+    const stream = await db.stream.get(id);
+
+    const exists = stream && !stream.deleted;
+    const hasAccess = stream?.userId === req.user.id || req.isUIAdmin;
+    if (!exists || !hasAccess) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+    if (stream.parentId) {
+      res.status(400);
+      return res.json({ errors: ["can't patch stream session"] });
+    }
+
+    let { record, suspended, pushTargets } = req.body;
+    let patch = {};
+    if (typeof record === "boolean") {
+      patch = { ...patch, record };
+    }
+    if (typeof suspended === "boolean") {
+      patch = { ...patch, suspended };
+    }
+    if (pushTargets) {
+      pushTargets = await validatePushTargets(
+        req.user.id,
+        stream.profiles,
+        pushTargets
+      );
+      patch = { ...patch, pushTargets };
+    }
+    if (Object.keys(patch).length === 0) {
+      return res.status(204).end();
+    }
+
+    await db.stream.update(stream.id, patch);
+    if (patch.suspended) {
+      // kill live stream
+      await terminateStreamReq(req, stream);
+    }
+
+    res.status(204);
+    res.end();
+  }
+);
 
 app.patch("/:id/record", authMiddleware({}), async (req, res) => {
   const { id } = req.params;

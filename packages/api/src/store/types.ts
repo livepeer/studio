@@ -1,5 +1,11 @@
+export interface FieldSpec {
+  [key: string]: any;
+  writeOnly?: boolean;
+}
+
 export interface TableSchema {
   table: string;
+  properties: Record<string, FieldSpec>;
 }
 
 export interface DBObject {
@@ -9,6 +15,8 @@ export interface DBObject {
 export interface DBLegacyObject extends DBObject {
   data: Object;
 }
+
+export type WithID<T> = T & { id: string };
 
 export interface FindQuery {
   [key: string]: any;

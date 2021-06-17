@@ -16,11 +16,17 @@ import {
 
 const DEFAULT_SORT = "id ASC";
 
+export interface TableOptions {
+  db: DB;
+  schema: TableSchema;
+}
+
 export default class Table<T extends DBObject> {
   db: DB;
   schema: TableSchema;
   name: string;
-  constructor({ db, schema }) {
+
+  constructor({ db, schema }: TableOptions) {
     this.db = db;
     this.schema = schema;
     this.name = schema.table;
@@ -189,7 +195,7 @@ export default class Table<T extends DBObject> {
 
   async update(
     query: string | Array<SQLStatement>,
-    doc: T,
+    doc: Partial<T>,
     opts: UpdateOptions = {}
   ) {
     const { throwIfEmpty = true } = opts;
@@ -217,7 +223,7 @@ export default class Table<T extends DBObject> {
   }
 
   // Takes in an object of {"field": number} and increases all the fields by the specified amounts
-  async add(id: string, doc: T) {
+  async add(id: string, doc: Partial<T>) {
     const q = sql`UPDATE `.append(this.name).append(sql`
       SET data = data || jsonb_build_object(`);
     Object.keys(doc).forEach((k, i) => {
@@ -232,11 +238,11 @@ export default class Table<T extends DBObject> {
     const res = await this.db.query(q);
 
     if (res.rowCount < 1) {
-      throw new NotFoundError(`${this.name} id=${doc.id} not found`);
+      throw new NotFoundError(`${this.name} id=${id} not found`);
     }
   }
 
-  async delete(id) {
+  async delete(id: string) {
     const res = await this.db.query(`DELETE FROM ${this.name} WHERE id = $1`, [
       id,
     ]);
@@ -289,21 +295,24 @@ export default class Table<T extends DBObject> {
 
   cleanWriteOnlyResponses(docs: Array<T>): Array<T> {
     // obfuscate writeOnly fields in objects returned
-    const writeOnlyFields = {};
+    const writeOnlyFields = [];
     if (this.schema.properties) {
       for (const [fieldName, fieldArray] of Object.entries(
         this.schema.properties
       )) {
         if (fieldArray.writeOnly) {
-          writeOnlyFields[fieldName] = null;
+          writeOnlyFields.push(fieldName);
         }
       }
     }
 
-    return docs.map((x) => ({
-      ...x,
-      ...writeOnlyFields,
-    }));
+    return docs.map((doc) => {
+      const cleaned = { ...doc };
+      for (const field of writeOnlyFields) {
+        delete cleaned[field];
+      }
+      return cleaned;
+    });
   }
 
   // on startup: auto-create table if it doesn't exist
