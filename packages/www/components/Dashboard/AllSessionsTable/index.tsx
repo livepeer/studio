@@ -125,7 +125,6 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       return {
         nextCursor,
         rows: streams.map((stream: any) => {
-          console.log(stream);
           return {
             id: stream.id,
             parentStream: {
