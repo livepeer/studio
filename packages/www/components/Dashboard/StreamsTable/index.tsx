@@ -270,6 +270,7 @@ const StreamsTable = ({
   return (
     <>
       <Table
+        tableId="streams"
         columns={columns}
         fetcher={fetcher}
         state={state}

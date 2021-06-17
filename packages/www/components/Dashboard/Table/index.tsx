@@ -77,6 +77,7 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
+  tableId: string;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -93,9 +94,10 @@ const TableComponent = <T extends Record<string, unknown>>({
   fetcher,
   selectAction,
   createAction,
+  tableId,
 }: Props<T>) => {
   const { data, isValidating, revalidate } = useSWR(
-    [state.cursor, state.order, state.stringifiedFilters],
+    [tableId, state.cursor, state.order, state.stringifiedFilters],
     () => fetcher(state)
   );
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);

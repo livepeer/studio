@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
-import Table from "components/Dashboard/Table";
+import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
@@ -20,6 +20,7 @@ import {
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
 import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import { useCallback } from "react";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -36,6 +37,8 @@ export type RecordingUrlCellProps = {
   profiles?: Array<Profile>;
   showMP4: boolean;
 };
+
+const pageSize = 50;
 
 const RecordingUrlCell = <D extends TableData>({
   cell,
@@ -76,36 +79,8 @@ type SessionsTableData = {
 };
 
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
-  const [streamsSessions, setStreamsSessions] = useState([]);
   const { user, getStreamSessionsByUserId } = useApi();
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  useEffect(() => {
-    getStreamSessionsByUserId(user.id, undefined, 0)
-      .then(([streams, nextCursor]) => {
-        setStreamsSessions(streams);
-      })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [user.id]);
-
-  const isVisible = usePageVisibility();
-
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      if (!sessionsLoading) {
-        setSessionsLoading(true);
-        getStreamSessionsByUserId(user.id, undefined, 0)
-          .then(([streams, nextCursor]) => {
-            setStreamsSessions(streams);
-          })
-          .catch((err) => console.error(err)) // todo: surface this
-          .finally(() => setSessionsLoading(false));
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [isVisible]);
+  const tableProps = useTableState();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -140,62 +115,81 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     []
   );
 
-  const data: SessionsTableData[] = useMemo(() => {
-    return streamsSessions.map((stream) => {
+  const fetcher: Fetcher<SessionsTableData> = useCallback(
+    async (state) => {
+      const [streams, nextCursor] = await getStreamSessionsByUserId(
+        user.id,
+        state.cursor,
+        pageSize
+      );
       return {
-        id: stream.id,
-        parentStream: {
-          id: stream.parentId,
-          children: stream.parentStream.name,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by stream <b>{stream.parentStream.name}</b>
-            </>
-          ) : null,
-          href: `/dashboard/streams/${stream.id}`,
-        },
-        recordingUrl: {
-          id: stream.id,
-          showMP4: user?.admin || isStaging() || isDevelopment(),
-          profiles:
-            stream.recordingUrl &&
-            stream.recordingStatus === "ready" &&
-            stream.profiles?.length
-              ? [{ name: "source" }, ...stream.profiles]
-              : undefined,
-          children:
-            stream.recordingUrl && stream.recordingStatus === "ready" ? (
-              stream.recordingUrl
-            ) : (
-              <Box css={{ color: "$mauve8" }}>—</Box>
-            ),
-          href: stream.recordingUrl ? stream.recordingUrl : undefined,
-        },
-        duration: {
-          duration: stream.sourceSegmentsDuration || 0,
-          status: stream.recordingStatus,
-        },
-        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        nextCursor,
+        rows: streams.map((stream: any) => {
+          console.log(stream);
+          return {
+            id: stream.id,
+            parentStream: {
+              id: stream.parentId,
+              children: stream.parentStream.name,
+              tooltipChildren: stream.createdByTokenName ? (
+                <>
+                  Created by stream <b>{stream.parentStream.name}</b>
+                </>
+              ) : null,
+              href: `/dashboard/streams/${stream.id}`,
+            },
+            recordingUrl: {
+              id: stream.id,
+              showMP4: user?.admin || isStaging() || isDevelopment(),
+              profiles:
+                stream.recordingUrl &&
+                stream.recordingStatus === "ready" &&
+                stream.profiles?.length
+                  ? [{ name: "source" }, ...stream.profiles]
+                  : undefined,
+              children:
+                stream.recordingUrl && stream.recordingStatus === "ready" ? (
+                  stream.recordingUrl
+                ) : (
+                  <Box css={{ color: "$mauve8" }}>—</Box>
+                ),
+              href: stream.recordingUrl ? stream.recordingUrl : undefined,
+            },
+            duration: {
+              duration: stream.sourceSegmentsDuration || 0,
+              status: stream.recordingStatus,
+            },
+            created: {
+              date: new Date(stream.createdAt),
+              fallback: <i>unseen</i>,
+            },
+          };
+        }),
       };
-    });
-  }, [streamsSessions]);
+    },
+    [getStreamSessionsByUserId, user.id]
+  );
 
-  return streamsSessions.length ? (
-    <Box>
-      <Heading size="2" css={{ fontWeight: 600, mb: "$4" }}>
-        {title}
-      </Heading>
-      <Table
-        columns={columns}
-        data={data}
-        pageSize={50}
-        rowSelection={null}
-        initialSortBy={[{ id: "created", desc: true }]}
-        showOverflow={true}
-        cursor="pointer"
-      />
-    </Box>
-  ) : null;
+  return (
+    <Table
+      {...tableProps}
+      tableId="sessions"
+      columns={columns}
+      fetcher={fetcher}
+      pageSize={pageSize}
+      rowSelection={null}
+      initialSortBy={[{ id: "created", desc: true }]}
+      showOverflow={true}
+      cursor="pointer"
+      header={
+        <>
+          <Heading size="2" css={{ fontWeight: 600 }}>
+            {title}
+          </Heading>
+        </>
+      }
+    />
+  );
 };
 
 export default AllSessionsTable;
