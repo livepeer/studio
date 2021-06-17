@@ -1,21 +1,12 @@
+import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
 import {
-  Column,
-  Row,
-  useFilters,
-  usePagination,
-  useRowSelect,
-  useSortBy,
-  useTable,
-} from "react-table";
-import { useEffect, useMemo, useCallback } from "react";
-import Paginator from "./paginator";
-import {
-  CheckboxFilter,
-  CheckboxFilterProps,
-  InputFilterProps,
-  TextFilter,
-} from "./filters/fields/index";
-import { QuestionMarkIcon } from "@radix-ui/react-icons";
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   Table,
   Thead,
@@ -26,55 +17,100 @@ import {
   Box,
   Flex,
   Checkbox,
-  styled,
+  Text,
+  Button,
 } from "@livepeer.com/design-system";
-
-type FilterItem<Table extends Record<string, unknown>> =
-  | { type: "text"; props: InputFilterProps<Table> }
-  | { type: "checkbox"; props: CheckboxFilterProps<Table> };
+import TableFilter, {
+  FilterItem,
+  Filter as TFilter,
+  formatFiltersForApiRequest,
+} from "./filters";
+import useSWR from "swr";
+import { ButtonProps } from "@components/Button";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
-type Filter<T extends Record<string, unknown>> = { id: keyof T; value: any };
-export type FetchDataF<T extends Record<string, unknown>> = (
-  filters: Filter<T>[],
-  sortBy: Sort<T>[],
-  lastRow: Row<T> | null
-) => void;
+
+type StateSetter<T extends Record<string, unknown>> = {
+  setOrder: Dispatch<SetStateAction<string>>;
+  setCursor: Dispatch<SetStateAction<string>>;
+  setPrevCursors: Dispatch<SetStateAction<string[]>>;
+  setNextCursor: Dispatch<SetStateAction<string>>;
+  setFilters: Dispatch<SetStateAction<TFilter[]>>;
+  setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
+  setSwrState: Dispatch<SetStateAction<SwrState>>;
+};
+
+type State<T extends Record<string, unknown>> = {
+  order: string;
+  cursor: string;
+  prevCursors: string[];
+  nextCursor: string;
+  filters: TFilter[];
+  stringifiedFilters: string;
+  selectedRows: Row<T>[];
+  swrState: SwrState;
+};
+
+export type Fetcher<T extends Record<string, unknown>> = (
+  state: State<T>
+) => Promise<{ rows: T[]; nextCursor: string }>;
+
+type Action = ButtonProps;
+
+type SwrState = {
+  isValidating: boolean;
+  revalidate: () => Promise<boolean>;
+};
 
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
-  data: T[];
-  header?: React.ReactNode;
+  header: React.ReactNode;
   rowSelection?: "individual" | "all" | null;
   pageSize?: number;
-  onRowSelectionChange?: (rows: Row<T>[]) => void;
   initialSortBy?: Sort<T>[];
-  filters?: FilterItem<T>[];
+  filterItems?: FilterItem[];
   showOverflow?: boolean;
-  setOnUnselect?: any;
   cursor?: string;
+  selectAction?: Action;
+  createAction?: Action;
+
+  stateSetter: StateSetter<T>;
+  state: State<T>;
+  fetcher: Fetcher<T>;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
   columns,
-  data,
   header,
   pageSize = 100,
   rowSelection,
-  onRowSelectionChange,
   initialSortBy,
-  filters,
+  filterItems,
   showOverflow,
-  setOnUnselect,
   cursor = "default",
+  stateSetter,
+  state,
+  fetcher,
+  selectAction,
+  createAction,
 }: Props<T>) => {
+  const { data, isValidating, revalidate } = useSWR(
+    [state.cursor, state.order, state.stringifiedFilters],
+    () => fetcher(state)
+  );
+  const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
+
+  useEffect(() => {
+    stateSetter.setSwrState({ isValidating, revalidate });
+  }, [isValidating, revalidate]);
+
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
     // @ts-ignore
     return columns.some((column) => !column.disableSortBy);
   }, [columns]);
 
-  const getRowId = useCallback((row, relativeIndex, parent) => {
+  const getRowId = useCallback((row, relativeIndex) => {
     return row?.id ? row.id : relativeIndex;
   }, []);
 
@@ -83,32 +119,19 @@ const TableComponent = <T extends Record<string, unknown>>({
     getTableBodyProps,
     prepareRow,
     headerGroups,
-    // @ts-ignore
-    page,
-    // @ts-ignore
-    nextPage,
-    // @ts-ignore
-    previousPage,
-    // @ts-ignore
-    canPreviousPage,
-    // @ts-ignore
-    canNextPage,
+    rows,
     // @ts-ignore
     toggleAllRowsSelected,
     // @ts-ignore
-    toggleAllPageRowsSelected,
-    // @ts-ignore
     selectedFlatRows,
     // @ts-ignore
-    setFilter,
-    // @ts-ignore
-    state: { filters: currentFilters },
+    state: { sortBy },
   } = useTable(
     {
       // @ts-ignore
       columns,
-      data,
       getRowId,
+      data: dataMemo,
       initialState: {
         // @ts-ignore
         pageSize,
@@ -121,9 +144,7 @@ const TableComponent = <T extends Record<string, unknown>>({
       autoResetPage: false,
       autoResetSelectedRows: false,
     },
-    useFilters,
     useSortBy,
-    usePagination,
     useRowSelect,
     (hooks) => {
       if (rowSelection) {
@@ -136,16 +157,17 @@ const TableComponent = <T extends Record<string, unknown>>({
             // to render a checkbox
             Header: ({
               // @ts-ignore
-              getToggleAllPageRowsSelectedProps,
+              getToggleAllRowsSelectedProps,
               // @ts-ignore
               isAllRowsSelected,
             }) => {
-              const props = getToggleAllPageRowsSelectedProps();
-              return isIndividualSelection ? null : (
+              if (isIndividualSelection) return null;
+              const props = getToggleAllRowsSelectedProps();
+              return (
                 <Checkbox
                   css={{ display: "flex" }}
                   onClick={props.onChange}
-                  value={props.checked}
+                  value="toggle-all"
                   checked={isAllRowsSelected ? true : false}
                 />
               );
@@ -176,72 +198,94 @@ const TableComponent = <T extends Record<string, unknown>>({
   );
 
   useEffect(() => {
-    if (setOnUnselect) {
-      const onUnSelect = () => {
-        toggleAllPageRowsSelected(false);
-      };
-
-      setOnUnselect(() => onUnSelect);
-    }
-  }, [toggleAllPageRowsSelected]);
+    stateSetter.setSelectedRows(selectedFlatRows);
+  }, [selectedFlatRows, stateSetter.setSelectedRows]);
 
   useEffect(() => {
-    onRowSelectionChange?.(selectedFlatRows);
-  }, [selectedFlatRows, onRowSelectionChange]);
+    const order = sortBy?.map((o) => `${o.id}-${o.desc}`).join(",") ?? "";
+    stateSetter.setOrder(order);
+  }, [sortBy, stateSetter.setOrder]);
+
+  const handlePreviousPage = useCallback(() => {
+    stateSetter.setNextCursor(state.cursor); // current cursor will be next
+    const prevCursorsClone = [...state.prevCursors];
+    const newCursor = prevCursorsClone.pop();
+    stateSetter.setCursor(newCursor);
+    stateSetter.setPrevCursors([...prevCursorsClone]);
+  }, [
+    stateSetter.setNextCursor,
+    stateSetter.setCursor,
+    stateSetter.setPrevCursors,
+    state.prevCursors,
+    state.cursor,
+  ]);
+
+  const handleNextPage = useCallback(() => {
+    stateSetter.setPrevCursors((p) => [...p, state.cursor]);
+    stateSetter.setCursor(state.nextCursor);
+    stateSetter.setNextCursor("");
+  }, [
+    stateSetter.setPrevCursors,
+    stateSetter.setCursor,
+    stateSetter.setNextCursor,
+    state.nextCursor,
+    state.cursor,
+  ]);
 
   return (
     <Box>
-      {header || filters ? (
-        <Flex
-          align="center"
-          justify="between"
-          css={{
-            mb: "$3",
-          }}>
-          <Box>{header}</Box>
-          {filters ? (
-            <Flex
-              align="center"
-              justify="end"
-              css={{
-                flex: "1",
-              }}>
-              {filters.map((f) => {
-                let filter: JSX.Element;
-                switch (f.type) {
-                  case "text":
-                    filter = (
-                      <TextFilter
-                        {...f.props}
-                        setFilter={setFilter}
-                        currentFilters={currentFilters}
-                      />
-                    );
-                    break;
-                  case "checkbox":
-                    filter = (
-                      <CheckboxFilter
-                        {...f.props}
-                        setFilter={setFilter}
-                        currentFilters={currentFilters}
-                      />
-                    );
-                    break;
-                  default:
-                    return null;
-                }
-                return (
-                  <Box
-                    key={`${f.type}-${f.props.columnId}`}
-                    css={{ ":not(:last-of-type)": { mr: "$3" } }}>
-                    {filter}
-                  </Box>
-                );
-              })}
+      <Flex align="end" justify="between" css={{ mb: "$5" }}>
+        <Box>{header}</Box>
+
+        <Flex css={{ alignItems: "center" }}>
+          {state.selectedRows.length ? (
+            <Flex css={{ ai: "center" }}>
+              <Flex css={{ ai: "center", mr: "$3" }}>
+                <Box css={{ fontSize: "$2", color: "$mauve9" }}>
+                  {state.selectedRows.length} selected
+                </Box>
+                <Box
+                  css={{ height: 18, width: "1px", bc: "$mauve7", mx: "$3" }}
+                />
+                <Box
+                  css={{
+                    cursor: "pointer",
+                    fontSize: "$2",
+                    color: "$violet11",
+                  }}
+                  onClick={() => toggleAllRowsSelected(false)}>
+                  Deselect
+                </Box>
+              </Flex>
+              {selectAction && (
+                <Button
+                  size="2"
+                  // @ts-ignore
+                  css={{ display: "flex", alignItems: "center" }}
+                  {...selectAction}
+                />
+              )}
             </Flex>
-          ) : null}
+          ) : (
+            <>
+              {filterItems && (
+                <TableFilter
+                  items={filterItems}
+                  onDone={stateSetter.setFilters}
+                />
+              )}
+              {createAction && (
+                <Button
+                  size="2"
+                  // @ts-ignore
+                  css={{ display: "flex", alignItems: "center" }}
+                  {...createAction}
+                />
+              )}
+            </>
+          )}
         </Flex>
-      ) : null}
+      </Flex>
       <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
         <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
           <Table
@@ -297,7 +341,7 @@ const TableComponent = <T extends Record<string, unknown>>({
               ))}
             </Thead>
             <Tbody {...getTableBodyProps()}>
-              {page.map((row: Row<object>) => {
+              {rows.map((row: Row<object>) => {
                 prepareRow(row);
                 return (
                   <Tr
@@ -322,15 +366,81 @@ const TableComponent = <T extends Record<string, unknown>>({
             </Tbody>
           </Table>
         </Box>
-        <Paginator
-          canPreviousPage={canPreviousPage}
-          canNextPage={canNextPage}
-          onPreviousPage={previousPage}
-          onNextPage={nextPage}
-        />
+        <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
+          <Text>
+            <b>{dataMemo.length}</b> results
+          </Text>
+          <Flex>
+            <Button
+              css={{ marginRight: "6px" }}
+              onClick={handlePreviousPage}
+              // disabled={pageNumber <= 0}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={handleNextPage}
+              // disabled={(pageNumber + 1) * pageSize >= data?.length}
+            >
+              Next
+            </Button>
+          </Flex>
+        </Flex>
       </Box>
     </Box>
   );
+};
+
+export const useTableState = <T extends Record<string, unknown>>() => {
+  const [order, setOrder] = useState("");
+  const [cursor, setCursor] = useState("");
+  const [prevCursors, setPrevCursors] = useState<string[]>([]);
+  const [nextCursor, setNextCursor] = useState("");
+  const [filters, setFilters] = useState<TFilter[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
+  const [swrState, setSwrState] = useState<SwrState>();
+
+  const stringifiedFilters = useMemo(() => {
+    const formatted = formatFiltersForApiRequest(filters);
+    return JSON.stringify(formatted);
+  }, [filters]);
+
+  const stateSetter: StateSetter<T> = useMemo(
+    () => ({
+      setOrder,
+      setCursor,
+      setPrevCursors,
+      setNextCursor,
+      setFilters,
+      setSelectedRows,
+      setSwrState,
+    }),
+    []
+  );
+
+  const state: State<T> = useMemo(
+    () => ({
+      order,
+      cursor,
+      prevCursors,
+      nextCursor,
+      filters,
+      stringifiedFilters,
+      selectedRows,
+      swrState,
+    }),
+    [
+      order,
+      cursor,
+      prevCursors,
+      nextCursor,
+      filters,
+      stringifiedFilters,
+      selectedRows,
+    ]
+  );
+
+  return { state, stateSetter };
 };
 
 export default TableComponent;

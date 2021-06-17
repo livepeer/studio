@@ -2,40 +2,35 @@ import {
   Heading,
   Box,
   Flex,
-  Link as A,
-  Badge,
-  styled,
-  Text,
   Button,
+  Badge,
+  Text,
+  styled,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  useSnackbar,
 } from "@livepeer.com/design-system";
-import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
-import DeleteStreamModal from "../DeleteStreamModal";
-import Table from "components/Dashboard/Table";
-import TableFilter, {
+import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
+import {
   FilterItem,
-  useTableFilters,
+  formatFiltersForApiRequest,
 } from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { Column, Row } from "react-table";
+import { Column } from "react-table";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
-import {
-  RenditionDetailsCellProps,
-  RenditionsDetailsCell,
-} from "components/Dashboard/Table/cells/streams-table";
+import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import useSWR from "swr";
-import CreateStream from "components/Dashboard/CreateStream";
-import Delete from "./Delete";
-import {
-  QuestionMarkIcon,
-  PlusIcon,
-  ArrowRightIcon,
-} from "@radix-ui/react-icons";
+import { QuestionMarkIcon, Cross1Icon } from "@radix-ui/react-icons";
+import Spinner from "@components/Dashboard/Spinner";
 
 type ProfileProps = {
   id: string;
@@ -52,10 +47,10 @@ type Rendition = {
 };
 
 const filterItems: FilterItem[] = [
-  { label: "Stream name", type: "text" },
-  { label: "Created date", type: "date" },
-  { label: "Last active", type: "date" },
-  { label: "Lifetime duration", type: "text" },
+  { label: "Stream name", id: "name", type: "text" },
+  // { label: "Created date", type: "date" },
+  // { label: "Last active", type: "date" },
+  // { label: "Lifetime duration", type: "text" },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
@@ -159,7 +154,7 @@ type StreamsTableData = {
   status: string;
 };
 
-const pageSize = 3;
+const pageSize = 30;
 
 const StreamsTable = ({
   title = "Streams",
@@ -168,16 +163,13 @@ const StreamsTable = ({
   title: string;
   userId: string;
 }) => {
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedStreams, setSelectedStreams] = useState([]);
-  const [streams, setStreams] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
-  const [onUnselect, setOnUnselect] = useState();
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
-  const { onDone, stringifiedFilters } = useTableFilters();
+  const [openSnackbar] = useSnackbar();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
 
-  const close = useCallback(() => {
-    setDeleteModal(false);
+  const closeDeleteDialog = useCallback(() => {
+    setOpenDeleteDialog(false);
   }, []);
 
   const columns: Column<StreamsTableData>[] = useMemo(
@@ -218,172 +210,164 @@ const StreamsTable = ({
     []
   );
 
-  const { data } = useSWR([pageNumber, stringifiedFilters], async () => {
-    const streams = await getStreams(userId, {
-      pageSize,
-      page: pageNumber,
-      filters: stringifiedFilters,
-    });
-    return streams.map((stream) => {
-      return {
-        id: stream.id,
-        name: {
-          id: stream.id,
-          children: stream.name,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by token <b>{stream.createdByTokenName}</b>
-            </>
-          ) : null,
-          href: `/dashboard/streams/${stream.id}`,
-        },
-        details: { stream },
-        created: {
-          date: new Date(stream.createdAt),
-          fallback: <i>unseen</i>,
-        },
-        lastActive: {
-          date: new Date(stream.lastSeen),
-          fallback: <i>unseen</i>,
-        },
-        status: stream.isActive ? "Active" : "Idle",
-      };
-    });
-  });
+  const { state, stateSetter } = useTableState<StreamsTableData>();
 
-  const handleRowSelectionChange = useCallback(
-    (rows: Row<StreamsTableData>[]) => {
-      setSelectedStreams(
-        rows.map((r) => (data ?? []).find((s) => s.id === r.original.id))
-      );
+  const fetcher: Fetcher<StreamsTableData> = useCallback(
+    async (state) => {
+      const [streams, nextCursor] = await getStreams(userId, {
+        filters: formatFiltersForApiRequest(state.filters),
+        limit: pageSize.toString(),
+        cursor: state.cursor,
+        order: state.order,
+      });
+      const rows = streams.map((stream) => {
+        return {
+          id: stream.id,
+          name: {
+            id: stream.id,
+            children: stream.name,
+            tooltipChildren: stream.createdByTokenName ? (
+              <>
+                Created by token <b>{stream.createdByTokenName}</b>
+              </>
+            ) : null,
+            href: `/dashboard/streams/${stream.id}`,
+          },
+          details: { stream },
+          created: {
+            date: new Date(stream.createdAt),
+            fallback: <i>unseen</i>,
+          },
+          lastActive: {
+            date: new Date(stream.lastSeen),
+            fallback: <i>unseen</i>,
+          },
+          status: stream.isActive ? "Active" : "Idle",
+        };
+      });
+      return { rows, nextCursor };
     },
-    [data]
+    [userId]
   );
 
-  const slicedData = useMemo(() => {
-    if (!data) return;
-    return data
-      .slice(pageNumber * pageSize, (pageNumber + 1) * pageSize)
-      .map((data) => data);
-  }, [pageNumber, data]);
-
-  const handleNextPage = useCallback(() => {
-    setPageNumber((prev) => prev + 1);
-  }, []);
-
-  const handlePreviousPage = useCallback(() => {
-    setPageNumber((prev) => prev - 1);
-  }, []);
+  const onDeleteStreams = useCallback(async () => {
+    if (state.selectedRows.length === 1) {
+      await deleteStream(state.selectedRows[0].id);
+      await state.swrState?.revalidate();
+      closeDeleteDialog();
+    } else if (state.selectedRows.length > 1) {
+      await deleteStreams(state.selectedRows.map((s) => s.id));
+      await state.swrState?.revalidate();
+      closeDeleteDialog();
+    }
+  }, [
+    deleteStream,
+    closeDeleteDialog,
+    state.selectedRows.length,
+    state.swrState?.revalidate,
+  ]);
 
   return (
-    <Box
-      css={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}>
-      <Flex
-        align="end"
-        justify="between"
-        css={{
-          mb: "$5",
-        }}>
-        <Heading size="2">
-          <Flex>
-            <Box
-              css={{
-                mr: "$3",
-                fontWeight: 600,
-                letterSpacing: 0,
-              }}>
-              {title}
-            </Box>
-            <Badge
-              size="1"
-              variant="violet"
-              css={{ letterSpacing: 0, mt: "7px" }}>
-              1 active right now
-            </Badge>
-          </Flex>
-        </Heading>
-
-        <Flex css={{ alignItems: "center" }}>
-          {/* <Box>
-              <Button
-                aria-label="Delete Stream button"
-                disabled={!selectedStreams.length}
-                onClick={() => selectedStreams.length && setDeleteModal(true)}>
-                Delete
-              </Button>
-              <Box
-                css={{
-                  ml: "1.4em",
-                  display: "inline-block",
-                }}>
-                <b>New beta feature</b>: Record your live streams. Send feedback
-                to help@livepeer.com.
-                <a
-                  target="_blank"
-                  href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
-                  css={{
-                    display: "inline-block",
-                    ml: "0.2em",
-                    textDecoration: "none",
-                    color: "primary",
-                    cursor: "pointer",
-                    ":hover": { textDecoration: "underline" },
-                  }}>
-                  <b>Read more ⬈</b>
-                </a>
+    <>
+      <Table
+        columns={columns}
+        fetcher={fetcher}
+        state={state}
+        stateSetter={stateSetter}
+        rowSelection="all"
+        filterItems={filterItems}
+        pageSize={pageSize}
+        header={
+          <Heading size="2">
+            <Flex>
+              <Box css={{ mr: "$3", fontWeight: 600, letterSpacing: 0 }}>
+                {title}
               </Box>
-            </Box> */}
+              <Badge
+                size="1"
+                variant="violet"
+                css={{ letterSpacing: 0, mt: "7px" }}>
+                1 active right now
+              </Badge>
+            </Flex>
+          </Heading>
+        }
+        initialSortBy={[{ id: "created", desc: true }]}
+        selectAction={{
+          onClick: () => setOpenDeleteDialog(true),
+          children: (
+            <>
+              <Cross1Icon />{" "}
+              <Box css={{ ml: "$2" }} as="span">
+                Delete
+              </Box>
+            </>
+          ),
+        }}
+      />
 
-          <TableFilter items={filterItems} onDone={onDone} />
-          <CreateStream />
-        </Flex>
-      </Flex>
-      {deleteModal && selectedStreams.length && (
-        <DeleteStreamModal
-          numStreamsToDelete={selectedStreams.length}
-          streamName={selectedStreams[0].name}
-          onClose={close}
-          onDelete={() => {
-            if (selectedStreams.length === 1) {
-              deleteStream(selectedStreams[0].id).then(close);
-            } else if (selectedStreams.length > 1) {
-              deleteStreams(selectedStreams.map((s) => s.id)).then(close);
-            }
-          }}
-        />
-      )}
-      <Box css={{ mb: "$5" }}>
-        <Table
-          columns={columns}
-          data={slicedData}
-          rowSelection="all"
-          onRowSelectionChange={handleRowSelectionChange}
-          initialSortBy={[{ id: "created", desc: true }]}
-        />
-      </Box>
-      <Flex justify="between" align="center">
-        <Text>
-          <b>{data.length}</b> results
-        </Text>
-        <Flex>
-          <Button
-            css={{ marginRight: "6px" }}
-            onClick={handlePreviousPage}
-            disabled={pageNumber <= 0}>
-            Previous
-          </Button>
-          <Button
-            onClick={handleNextPage}
-            disabled={(pageNumber + 1) * pageSize >= data.length}>
-            Next
-          </Button>
-        </Flex>
-      </Flex>
-    </Box>
+      {/* Delete streams dialog */}
+      <AlertDialog open={openDeleteDialog}>
+        <AlertDialogContent
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          <AlertDialogTitle as={Heading} size="1">
+            Delete {state.selectedRows.length} stream
+            {state.selectedRows.length > 1 && "s"}?
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            as={Text}
+            size="3"
+            variant="gray"
+            css={{ mt: "$2", lineHeight: "22px" }}>
+            This will permanently remove the stream
+            {state.selectedRows.length > 1 && "s"}. This action cannot be
+            undone.
+          </AlertDialogDescription>
+
+          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+            <AlertDialogCancel
+              size="2"
+              onClick={() => setOpenDeleteDialog(false)}
+              as={Button}
+              ghost>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              as={Button}
+              size="2"
+              disabled={savingDeleteDialog}
+              onClick={async () => {
+                try {
+                  setSavingDeleteDialog(true);
+                  await onDeleteStreams();
+                  openSnackbar(
+                    `${state.selectedRows.length} stream${
+                      state.selectedRows.length > 1 ? "s" : ""
+                    } deleted.`
+                  );
+                  setSavingDeleteDialog(false);
+                  setOpenDeleteDialog(false);
+                } catch (e) {
+                  setSavingDeleteDialog(false);
+                }
+              }}
+              variant="red">
+              {savingDeleteDialog && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Delete
+            </AlertDialogAction>
+          </Flex>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

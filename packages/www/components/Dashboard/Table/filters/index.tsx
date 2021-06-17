@@ -1,17 +1,16 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
-import { useMemo } from "react";
 
 export type Condition =
   | { type: "contains"; value: string }
-  | { type: "textEqual"; value: string }
+  // | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
   | { type: "dateBetween"; value: [string, string] }
@@ -31,6 +30,7 @@ export type Filter = FilterItem &
 
 export type FilterItem = {
   label: string;
+  id: string;
   type: FilterType;
 };
 
@@ -49,7 +49,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
-      p.map((f) => ({ label: f.label, type: f.type, isOpen: false }))
+      p.map((f) => ({ label: f.label, type: f.type, id: f.id, isOpen: false }))
     );
   }, []);
 
@@ -116,6 +116,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                           isOpen: false as false,
                           label: f.label,
                           type: f.type,
+                          id: f.id,
                         };
                       } else {
                         let defaultCondition: Condition;
@@ -143,6 +144,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                           isOpen: true as true,
                           label: f.label,
                           type: f.type,
+                          id: f.id,
                           condition: defaultCondition,
                         };
                       }
@@ -161,6 +163,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                         isOpen: true,
                         label: f.label,
                         type: f.type,
+                        id: f.id,
                         condition: condition,
                       };
                     }),
@@ -214,18 +217,22 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
   );
 };
 
-export const useTableFilters = () => {
-  const [filters, setFilters] = useState<Filter[]>([]);
-
-  const onDone: ApplyFilterHandler = useCallback((f) => {
-    setFilters(f);
-  }, []);
-
-  const stringifiedFilters = useMemo(() => {
-    return JSON.stringify(filters);
-  }, [filters]);
-
-  return { onDone, filters, stringifiedFilters };
+export const formatFiltersForApiRequest = (filters: Filter[]) => {
+  const normalized: { id: string; value: string }[] = [];
+  filters.forEach((filter) => {
+    if (!filter.isOpen) return;
+    switch (filter.type) {
+      case "text":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
+      default:
+        break;
+    }
+  });
+  return normalized;
 };
 
 export default TableFilter;

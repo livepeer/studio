@@ -532,17 +532,28 @@ const makeContext = (state: ApiState, setState) => {
 
     async getStreams(
       userId: string,
-      opts?: { filters: string; page: number; pageSize: number }
-    ): Promise<Array<Stream>> {
+      opts?: {
+        filters: Array<{ id: string; value: string }>;
+        limit: string;
+        cursor: string;
+        order: string;
+      }
+    ): Promise<[Stream[], string]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, streams] = await context.fetch(
-        `/stream?userId=${userId}&streamsonly=1&limit=${
-          opts?.pageSize
-        }&cursor=${opts.page * opts.pageSize}&filters=${opts?.filters}`
+        `/stream?${qs.stringify({
+          userId,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+        })}`
       );
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams;
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor];
     },
 
     async createStream(params): Promise<Stream> {

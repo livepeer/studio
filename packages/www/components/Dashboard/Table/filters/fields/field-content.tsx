@@ -72,7 +72,7 @@ type Option = {
 
 const options: Record<FilterType, Option[]> = {
   text: [
-    { label: "is equal to", value: "textEqual" },
+    // { label: "is equal to", value: "textEqual" },
     { label: "contains", value: "contains" },
   ],
   date: [
@@ -180,40 +180,40 @@ const ConditionValue = ({
           />
         </Box>
       );
-    case "textEqual":
-      return (
-        <Box
-          as="label"
-          htmlFor={label}
-          css={{
-            height: "26px",
-            width: "100%",
-            maxWidth: "100%",
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            margin: "0px",
-          }}>
-          {/* @ts-ignore */}
-          <TextField
-            id={label}
-            onChange={(e) =>
-              onChange({ type: condition.type, value: e.target.value })
-            }
-            value={condition.value}
-            css={{
-              height: "100%",
-              width: "100%",
-              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
-              position: "absolute",
-              maxWidth: type === "date" ? "100px" : "",
-              left: 0,
-              top: 0,
-            }}
-          />
-        </Box>
-      );
+    // case "textEqual":
+    //   return (
+    //     <Box
+    //       as="label"
+    //       htmlFor={label}
+    //       css={{
+    //         height: "26px",
+    //         width: "100%",
+    //         maxWidth: "100%",
+    //         position: "relative",
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "flex-start",
+    //         margin: "0px",
+    //       }}>
+    //       {/* @ts-ignore */}
+    //       <TextField
+    //         id={label}
+    //         onChange={(e) =>
+    //           onChange({ type: condition.type, value: e.target.value })
+    //         }
+    //         value={condition.value}
+    //         css={{
+    //           height: "100%",
+    //           width: "100%",
+    //           padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+    //           position: "absolute",
+    //           maxWidth: type === "date" ? "100px" : "",
+    //           left: 0,
+    //           top: 0,
+    //         }}
+    //       />
+    //     </Box>
+    //   );
     case "dateEqual":
       return (
         <Box
@@ -451,9 +451,7 @@ const FieldContent = ({
   const handleSelect = useCallback((conditionType: ConditionType) => {
     switch (conditionType) {
       case "contains":
-        onConditionChange({ type: conditionType, value: "" });
-        break;
-      case "textEqual":
+        // case "textEqual":
         onConditionChange({ type: conditionType, value: "" });
         break;
       case "dateEqual":
