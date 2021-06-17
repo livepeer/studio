@@ -55,6 +55,7 @@ const Health = () => {
   ]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [videoExists, setVideoExists] = useState<boolean>(false);
 
   const { getStream, getStreamInfo } = useApi();
   const router = useRouter();
@@ -126,7 +127,13 @@ const Health = () => {
   const playbackUrl = `https://cdn.livepeer.monster/hls/${stream?.playbackId}/index.m3u8`;
 
   if (!stream) {
-    return <></>;
+    return (
+      <Layout
+        id="streams"
+        breadcrumbs={[
+          { title: "Streams", href: "/dashboard/streams" },
+        ]}></Layout>
+    );
   }
 
   return (
@@ -160,6 +167,7 @@ const Health = () => {
             manifestUrl={playbackUrl}
             title="Your source stream only"
             description="Only the source is streaming."
+            setVideo={setVideoExists}
           />
           <Arrow active />
           <VideoContainer
@@ -167,6 +175,7 @@ const Health = () => {
             title="Source stream + Livepeer.com transcoded renditions"
             description="Adaptive bitrate streaming"
             withOverflow
+            setVideo={setVideoExists}
           />
         </Box>
         <Box css={{ marginTop: "70px" }}>
