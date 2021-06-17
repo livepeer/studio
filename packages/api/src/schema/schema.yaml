@@ -127,6 +127,8 @@ components:
             - recording.ready
         url:
           type: string
+          format: uri
+          pattern: ^http(s)?://
         deleted:
           type: boolean
           default: false

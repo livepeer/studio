@@ -90,14 +90,6 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
     return res.end();
   }
 
-  if (
-    !urlObj.protocol ||
-    (urlObj.protocol !== "http:" && urlObj.protocol !== "https:")
-  ) {
-    res.status(406);
-    return res.json({ errors: ["url provided should be http or https only"] });
-  }
-
   const doc = {
     id,
     userId: req.user.id,
