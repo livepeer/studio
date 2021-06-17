@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
 import Table from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -13,13 +13,21 @@ import {
 } from "components/Dashboard/Table/sorts";
 import Link from "next/link";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { Column } from "react-table";
+import { Column, Row } from "react-table";
 import {
   CellComponentProps,
   TableData,
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
-import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Button,
+  Link as A,
+} from "@livepeer.com/design-system";
+import Delete from "./Delete";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -75,14 +83,21 @@ type SessionsTableData = {
   duration: DurationCellProps;
 };
 
+const pageSize = 14;
+
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
-  const [streamsSessions, setStreamsSessions] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [selectedSessions, setSelectedSessions] = useState([]);
   const { user, getStreamSessionsByUserId } = useApi();
   const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [pageNumber, setPageNumber] = useState(0);
+  const { deleteStream, deleteStreams } = useApi();
+  const [onUnselect, setOnUnselect] = useState();
+
   useEffect(() => {
     getStreamSessionsByUserId(user.id, undefined, 0)
       .then(([streams, nextCursor]) => {
-        setStreamsSessions(streams);
+        setSessions(streams);
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [user.id]);
@@ -98,7 +113,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         setSessionsLoading(true);
         getStreamSessionsByUserId(user.id, undefined, 0)
           .then(([streams, nextCursor]) => {
-            setStreamsSessions(streams);
+            setSessions(streams);
           })
           .catch((err) => console.error(err)) // todo: surface this
           .finally(() => setSessionsLoading(false));
@@ -106,7 +121,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     }, 10000);
     return () => clearInterval(interval);
   }, [isVisible]);
-
+  console.log(sessions);
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
       {
@@ -141,15 +156,15 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   );
 
   const data: SessionsTableData[] = useMemo(() => {
-    return streamsSessions.map((stream) => {
+    return sessions.map((stream) => {
       return {
         id: stream.id,
         parentStream: {
           id: stream.parentId,
-          children: stream.parentStream.name,
+          children: stream?.parentStream?.name,
           tooltipChildren: stream.createdByTokenName ? (
             <>
-              Created by stream <b>{stream.parentStream.name}</b>
+              Created by stream <b>{stream?.parentStream?.name}</b>
             </>
           ) : null,
           href: `/dashboard/streams/${stream.parentId}`,
@@ -178,23 +193,108 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
       };
     });
-  }, [streamsSessions]);
+  }, [sessions]);
 
-  return streamsSessions.length ? (
-    <Box>
-      <Heading size="2" css={{ fontWeight: 600, mb: "$4" }}>
-        {title}
-      </Heading>
-      <Table
-        columns={columns}
-        data={data}
-        pageSize={50}
-        rowSelection={null}
-        initialSortBy={[{ id: "created", desc: true }]}
-        showOverflow={true}
-        cursor="pointer"
-      />
-    </Box>
+  const handleRowSelectionChange = useCallback(
+    (rows: Row<SessionsTableData>[]) => {
+      setSelectedSessions(
+        rows.map((r) => sessions.find((s) => s.id === r.original.id))
+      );
+    },
+    [sessions]
+  );
+
+  const slicedData = useMemo(() => {
+    if (!data) return;
+    return data
+      .slice(pageNumber * pageSize, (pageNumber + 1) * pageSize)
+      .map((data) => data);
+  }, [pageNumber, data]);
+
+  const handleNextPage = useCallback(() => {
+    setPageNumber((prev) => prev + 1);
+  }, []);
+
+  const handlePreviousPage = useCallback(() => {
+    setPageNumber((prev) => prev - 1);
+  }, []);
+
+  return sessions.length ? (
+    <Flex
+      css={{
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}>
+      <Flex
+        align="end"
+        justify="between"
+        css={{
+          mb: "$5",
+        }}>
+        <Heading size="2">
+          <Flex>
+            <Box
+              css={{
+                mr: "$3",
+                fontWeight: 600,
+                letterSpacing: 0,
+              }}>
+              {title}
+            </Box>
+          </Flex>
+        </Heading>
+        <Flex css={{ ai: "center" }}>
+          {!!selectedSessions.length && (
+            <Delete
+              onUnselect={onUnselect}
+              total={selectedSessions.length}
+              onDelete={async () => {
+                if (selectedSessions.length === 1) {
+                  await deleteStream(selectedSessions[0].id);
+                } else if (selectedSessions.length > 1) {
+                  await deleteStreams(selectedSessions.map((s) => s.id));
+                }
+                // const streamSessions = await getStreamSessionsByUserId(
+                //   user.id,
+                //   undefined,
+                //   0
+                // );
+                // setSessions(streamSessions);
+              }}
+            />
+          )}
+        </Flex>
+      </Flex>
+      <Box css={{ mb: "$5" }}>
+        <Table
+          setOnUnselect={setOnUnselect}
+          columns={columns}
+          data={slicedData}
+          rowSelection="all"
+          onRowSelectionChange={handleRowSelectionChange}
+          initialSortBy={[{ id: "created", desc: true }]}
+          cursor="pointer"
+        />
+      </Box>
+      <Flex justify="between" align="center">
+        <Text>
+          <b>{data.length}</b> results
+        </Text>
+        <Flex>
+          <Button
+            css={{ marginRight: "6px" }}
+            onClick={handlePreviousPage}
+            disabled={pageNumber <= 0}>
+            Previous
+          </Button>
+          <Button
+            onClick={handleNextPage}
+            disabled={(pageNumber + 1) * pageSize >= data.length}>
+            Next
+          </Button>
+        </Flex>
+      </Flex>
+    </Flex>
   ) : null;
 };
 
