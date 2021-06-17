@@ -11,6 +11,14 @@ export class BadRequestError extends APIError {
   }
 }
 
+export class UnprocessableEntityError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "UnprocessableEntityError";
+    this.status = 422;
+  }
+}
+
 export class NotFoundError extends APIError {
   constructor(message) {
     super(message);
@@ -22,9 +30,8 @@ export class NotFoundError extends APIError {
 export class ForbiddenError extends APIError {
   constructor(message) {
     super(message);
-    this.type = "NotFoundError";
+    this.type = "ForbiddenError";
     this.status = 403;
-    this.message = message;
   }
 }
 
@@ -33,6 +40,5 @@ export class InternalServerError extends APIError {
     super(message);
     this.type = "InternalServerError";
     this.status = 500;
-    this.message = message;
   }
 }
