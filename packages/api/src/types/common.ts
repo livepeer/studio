@@ -1,4 +1,5 @@
 import { Stream, User, ApiToken } from "../schema/types";
+import MessageQueue from "../store/rabbit-queue";
 
 export enum AuthTokenType {
   JWT = "JWT",
@@ -11,6 +12,7 @@ declare global {
     export interface Request {
       config?: any;
       store?: IStore;
+      queue?: MessageQueue;
       user?: User;
       authTokenType?: AuthTokenType;
       isUIAdmin?: boolean;
