@@ -24,14 +24,14 @@ const Arrow = ({ active }: Props) => {
       <circle cx="24" cy="24" r="23.5" fill="transparent" stroke="#E6E6E6" />
       <path
         d="M17 24H31"
-        stroke={active ? "#943CFF" : "#CCCCCC"}
+        stroke={active ? "#6E56CF" : "#CCCCCC"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M24 17L31 24L24 31"
-        stroke={active ? "#943CFF" : "#CCCCCC"}
+        stroke={active ? "#6E56CF" : "#CCCCCC"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
