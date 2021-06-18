@@ -1,13 +1,12 @@
 import React, { useCallback } from "react";
-import { Box, Flex, Link, Text } from "@livepeer.com/design-system";
+import { Box, Flex, Heading, Text } from "@livepeer.com/design-system";
 import Layout from "../../../../layouts/dashboard";
 import { useRouter } from "next/router";
 import { useApi } from "../../../../hooks";
 import { useEffect, useState } from "react";
-
-import Chart from "@components/Chart";
-import VideoContainer from "@components/TestPlayer/videoContainer";
 import { StreamInfo } from "hooks/use-api";
+import Chart from "@components/Dashboard/Chart";
+import Player from "@components/Dashboard/Player";
 
 const Arrow = ({ active }: Props) => {
   return (
@@ -22,7 +21,7 @@ const Arrow = ({ active }: Props) => {
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="23.5" fill="white" stroke="#E6E6E6" />
+      <circle cx="24" cy="24" r="23.5" fill="transparent" stroke="#E6E6E6" />
       <path
         d="M17 24H31"
         stroke={active ? "#943CFF" : "#CCCCCC"}
@@ -141,11 +140,11 @@ const Health = () => {
         { title: stream?.name, href: `/dashboard/streams/${id}` },
         { title: "Stream Health" },
       ]}>
-      <Box css={{ padding: "48px 34px" }}>
+      <Box css={{ padding: "$6 $5" }}>
         <Flex
           css={{
-            borderBottom: "1px solid rgba(0, 0, 0, 0.15)",
-            paddingBottom: "22px",
+            borderBottom: "1px solid $colors$mauve6",
+            paddingBottom: "$4",
           }}>
           <Text size="7" as="h1" css={{ fontWeight: "bolder" }}>
             Stream Health
@@ -160,36 +159,99 @@ const Health = () => {
             gap: "24px",
             marginTop: "34px",
           }}>
-          <VideoContainer
+          {/* <VideoContainer
             smallDescription
             manifestUrl={playbackUrl}
             title="Your source stream only"
             description="Only the source is streaming."
             setVideo={setVideoExists}
-          />
+          /> */}
+          <Box>
+            <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
+              Source Stream
+            </Heading>
+            <Text
+              as="p"
+              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}>
+              Only the source is streaming.
+            </Text>
+            <Box
+              css={{
+                borderRadius: "$3",
+                overflow: "hidden",
+              }}>
+              <Player
+                setVideo={setVideoExists}
+                src={playbackUrl}
+                config={{
+                  controlPanelElements: [
+                    "time_and_duration",
+                    "play_pause",
+                    "rewind",
+                    "fast_forward",
+                    "mute",
+                    "volume",
+                    "spacer",
+                    "fullscreen",
+                    "overflow_menu",
+                  ],
+                  overflowMenuButtons: ["quality"],
+                }}
+              />
+            </Box>
+          </Box>
           <Arrow active />
-          <VideoContainer
+          <Box>
+            <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
+              Source + Transcoded Renditions
+            </Heading>
+            <Text
+              as="p"
+              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}>
+              Adaptive bitrate streaming
+            </Text>
+            <Box
+              css={{
+                borderRadius: "$3",
+                overflow: "hidden",
+              }}>
+              <Player
+                setVideo={setVideoExists}
+                src={playbackUrl}
+                config={{
+                  controlPanelElements: [
+                    "time_and_duration",
+                    "play_pause",
+                    "rewind",
+                    "fast_forward",
+                    "mute",
+                    "volume",
+                    "spacer",
+                    "fullscreen",
+                    "overflow_menu",
+                  ],
+                  overflowMenuButtons: ["quality"],
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* <VideoContainer
             smallDescription
             manifestUrl={playbackUrl}
             title="Source stream + Livepeer.com transcoded renditions"
             description="Adaptive bitrate streaming"
             withOverflow
             setVideo={setVideoExists}
-          />
+          /> */}
         </Box>
-        <Box css={{ marginTop: "70px" }}>
-          <Text
-            as="h2"
-            css={{
-              fontWeight: "bolder",
-              fontSize: "20px",
-              marginBottom: "12px",
-            }}>
+        <Box css={{ my: "$8" }}>
+          <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
             Session ingest rate
-          </Text>
+          </Heading>
           <Text
             as="p"
-            css={{ color: "$gray9", fontSize: "14px", marginBottom: "42px" }}>
+            css={{ color: "$gray9", fontSize: "$3", marginBottom: "$7" }}>
             After the stream loads, ingest rate updates every 10 seconds.
           </Text>
           <Chart data={dataChart} />
