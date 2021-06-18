@@ -11,7 +11,11 @@ declare global {
     export interface Request {
       config?: any;
       store?: IStore;
+      user?: User;
       authTokenType?: AuthTokenType;
+      isUIAdmin?: boolean;
+      tokenName?: string;
+      tokenId?: string;
     }
   }
 }

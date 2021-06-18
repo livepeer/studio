@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Text } from "@theme-ui/components";
 import { SxStyleProp } from "theme-ui";
 

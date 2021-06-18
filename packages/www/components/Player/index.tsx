@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import React, { useEffect, useRef } from "react";
 
 // Use compiled versions of these libraries so they work with ad blockers

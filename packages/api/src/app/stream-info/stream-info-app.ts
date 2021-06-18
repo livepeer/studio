@@ -325,7 +325,7 @@ class statusPoller {
 export default async function makeApp(params) {
   const { port, postgresUrl, ownRegion, listen = true, broadcaster } = params;
   // Storage init
-  await db.start({ postgresUrl, postgresReplicaUrl: undefined });
+  await db.start({ postgresUrl, appName: "stream-info" });
 
   const { router } = await makeRouter(params);
   const app = express();

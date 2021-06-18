@@ -1,5 +1,7 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Heading, Container } from "@theme-ui/components";
-import Layout from "../components/Layout";
+import Layout from "../layouts";
 
 const Usage = () => {
   return (

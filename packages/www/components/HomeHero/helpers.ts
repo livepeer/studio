@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { phoneFrameMaxWidth, phoneFrameMaxHeight } from "./PhoneSvg";
 
 const phonePadding = 48;

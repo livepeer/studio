@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import BlockContent from "@sanity/block-content-to-react";
 import Serializers from "../Serializers";
 

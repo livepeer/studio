@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link, { LinkProps } from "../Link";
 
 export type LinksListProps = {

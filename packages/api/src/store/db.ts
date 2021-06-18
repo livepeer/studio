@@ -1,27 +1,27 @@
 import { Pool } from "pg";
 import logger from "../logger";
-import { timeout } from "../util";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import { IStore } from "../types/common";
 import schema from "../schema/schema.json";
-import { QueryArrayResult, QueryResult, QueryConfig } from "pg";
+import { QueryResult, QueryConfig } from "pg";
+import { hostname } from "os";
 import {
-  Stream,
   ObjectStore,
   ApiToken,
   User,
   Webhook,
   PasswordResetToken,
+  PushTarget,
   Usage,
   Region,
   WebhookResponse,
   Session,
 } from "../schema/types";
-import Table from "./table";
+import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
 import QueueTable from "./queue";
 import { kebabToCamel } from "../util";
-import { QueryOptions } from "./types";
+import { QueryOptions, WithID } from "./types";
+import PushTargetTable from "./push-target-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -29,12 +29,19 @@ const CONNECT_TIMEOUT = 5000;
 interface PostgresParams {
   postgresUrl: string;
   postgresReplicaUrl?: string;
+  appName?: string;
 }
+
+type Table<T> = BaseTable<WithID<T>>;
+
+const makeTable = <T>(opts: TableOptions) =>
+  new BaseTable<WithID<T>>(opts) as Table<T>;
 
 export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
+  pushTarget: PushTargetTable;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -43,6 +50,7 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   queue: QueueTable;
+  session: Table<Session>;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -55,7 +63,11 @@ export class DB {
     // constructor logic has moved to start({}).
   }
 
-  async start({ postgresUrl, postgresReplicaUrl }: PostgresParams) {
+  async start({
+    postgresUrl,
+    postgresReplicaUrl,
+    appName = "api",
+  }: PostgresParams) {
     this.postgresUrl = postgresUrl;
     if (!postgresUrl) {
       throw new Error("no postgres url provided");
@@ -69,6 +81,7 @@ export class DB {
     this.pool = new Pool({
       connectionTimeoutMillis: CONNECT_TIMEOUT,
       connectionString: postgresUrl,
+      application_name: `${appName}-${hostname()}`,
     });
 
     if (postgresReplicaUrl) {
@@ -103,33 +116,37 @@ export class DB {
   async makeTables() {
     const schemas = schema.components.schemas;
     this.stream = new StreamTable({ db: this, schema: schemas["stream"] });
-    this.objectStore = new Table<ObjectStore>({
+    this.objectStore = makeTable<ObjectStore>({
       db: this,
       schema: schemas["object-store"],
     });
-    this.apiToken = new Table<ApiToken>({
+    this.pushTarget = new PushTargetTable({
+      db: this,
+      schema: schemas["push-target"],
+    });
+    this.apiToken = makeTable<ApiToken>({
       db: this,
       schema: schemas["api-token"],
     });
-    this.user = new Table<User>({ db: this, schema: schemas["user"] });
-    this.usage = new Table<Usage>({ db: this, schema: schemas["usage"] });
-    this.webhook = new Table<Webhook>({ db: this, schema: schemas["webhook"] });
-    this.passwordResetToken = new Table<PasswordResetToken>({
+    this.user = makeTable<User>({ db: this, schema: schemas["user"] });
+    this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
+    this.webhook = makeTable<Webhook>({ db: this, schema: schemas["webhook"] });
+    this.passwordResetToken = makeTable<PasswordResetToken>({
       db: this,
       schema: schemas["password-reset-token"],
     });
 
-    this.region = new Table<Region>({ db: this, schema: schemas["region"] });
-    this.webhookResponse = new Table<WebhookResponse>({
+    this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
+    this.webhookResponse = makeTable<WebhookResponse>({
       db: this,
       schema: schemas["webhook-response"],
     });
     this.queue = new QueueTable({ db: this, schema: schemas["queue"] });
     await this.queue.start();
-    this.session = new Table<Session>({ db: this, schema: schemas["session"] });
+    this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
-      ([name, schema]) => !!schema.table
+      ([name, schema]) => "table" in schema
     );
     await Promise.all(
       tables.map(([name, schema]) => {

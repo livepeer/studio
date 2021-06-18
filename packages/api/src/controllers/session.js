@@ -2,8 +2,12 @@ import Router from "express/lib/router";
 import sql from "sql-template-strings";
 import { authMiddleware } from "../middleware";
 import { db } from "../store";
-import { USER_SESSION_TIMEOUT, getCombinedStats } from "./stream";
-import { makeNextHREF, parseFilters, parseOrder, pathJoin } from "./helpers";
+import {
+  USER_SESSION_TIMEOUT,
+  getCombinedStats,
+  getRecordingUrl,
+} from "./stream";
+import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 
 const app = Router();
 
@@ -36,15 +40,6 @@ const fieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
-function getRecordingUrl(ingest, session) {
-  return pathJoin(
-    ingest,
-    `recordings`,
-    session.lastSessionId ? session.lastSessionId : session.id,
-    `index.m3u8`
-  );
-}
-
 app.get("/", authMiddleware({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId } = req.query;
   const { forceUrl } = req.query;
@@ -72,18 +67,26 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   order = parseOrder(fieldsMap, order);
 
   const fields =
-    " session.id as id, session.data as data, users.id as usersId, users.data as usersdata";
-  const from = `session left join users on session.data->>'userId' = users.id`;
+    "session.id as id, session.data as data, users.id as usersId, users.data as usersdata, stream.data as stream";
+  const from = `session left join users on session.data->>'userId' = users.id
+  left join stream on session.data->>'parentId' = stream.id`;
   const [output, newCursor] = await db.session.find(query, {
     limit,
     cursor,
     fields,
     from,
     order,
-    process: ({ data, usersdata }) => {
+    process: ({ data, usersdata, stream }) => {
       return req.user.admin
-        ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
-        : { ...data };
+        ? {
+            ...data,
+            parentStream: stream,
+            user: db.user.cleanWriteOnlyResponse(usersdata),
+          }
+        : {
+            ...data,
+            parentStream: stream,
+          };
     },
   });
 
@@ -102,10 +105,11 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   let sessions = output.map((session) => {
     if (session.record && session.recordObjectStoreId) {
-      const isReady = session.lastSeen < olderThen;
+      const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
       if (isReady || (req.user.admin && forceUrl)) {
         session.recordingUrl = getRecordingUrl(ingest, session);
+        session.mp4Url = getRecordingUrl(ingest, session, true);
       }
     }
   });
@@ -174,7 +178,7 @@ app.get(
       // sending progress should prevent request timing out
       res.write(".");
       for (const stream of docs) {
-        const isReady = stream.lastSeen < olderThen;
+        const isReady = stream.lastSeen > 0 && stream.lastSeen < olderThen;
         if (!isReady) {
           continue;
         }
@@ -229,10 +233,11 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   const ingest = ingests && ingests.length ? ingests[0].base : "";
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId) {
-    const isReady = session.lastSeen < olderThen;
+    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
     if (isReady) {
       session.recordingUrl = getRecordingUrl(ingest, session);
+      session.mp4Url = getRecordingUrl(ingest, session, true);
     }
   }
   if (!req.user.admin) {

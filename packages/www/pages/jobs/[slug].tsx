@@ -1,10 +1,12 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Container, Grid } from "@theme-ui/components";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
 import Button from "../../components/Button";
-import Layout from "../../components/Layout";
+import Layout from "../../layouts";
 import Prefooter from "../../components/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
 import Code from "../../components/renderers/Code";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box } from "@theme-ui/components";
 import Slider from "../Slider";
 import { SxStyleProp } from "theme-ui";

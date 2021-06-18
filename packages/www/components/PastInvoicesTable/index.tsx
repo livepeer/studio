@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Box, Link as A } from "@theme-ui/components";
 import { Table, TableRow, TableRowVariant } from "../Table";
 import { products } from "@livepeer.com/api/src/config";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import {
   Box,
   Flex,
@@ -148,7 +150,7 @@ const NavigationBase = ({
                   </Link>
                 )}
                 {isDashboard && (
-                  <Link href="/docs" variant="nav">
+                  <Link href="/docs/guides" variant="nav">
                     Docs
                   </Link>
                 )}

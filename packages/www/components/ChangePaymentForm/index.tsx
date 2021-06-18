@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useState } from "react";
 import { Flex, Box, Grid, Heading } from "@theme-ui/components";
 import Button from "../Button";

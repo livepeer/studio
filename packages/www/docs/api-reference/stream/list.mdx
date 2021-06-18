@@ -1,0 +1,29 @@
+---
+title: "`GET` list of all streams"
+description: Livepeer.com API Reference | GET list of all streams
+---
+
+# `GET` list of all streams
+
+`GET /stream` to retrieve all `stream` objects with the same `userId`. The
+response will include both parent `stream` objects and the historic `stream`
+objects with a `parentId` (stream objects representing a single live stream
+session). This historic type of "child-session" stream object will be deprecated
+in an upcoming version of the API in favor of the `session` object.
+
+`GET /stream?streamsonly=1` to retrieve all `stream` objects with the same
+`userId` and exclude the historic `stream` objects with a `parentId` (`stream`
+objects representing a single live stream session).
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/stream?streamsonly=1"
+```
+
+## Quick filters
+
+| Filter                                      | Example                                                                 | Description                                                                                                                                                                                                                                                                   |
+| ------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All `stream` objects with the same `userId` | `/api/stream?streamsonly=1`                                             | excludes the historic `stream` objects with a `parentId` (`stream` objects representing a single live stream session)                                                                                                                                                         |
+| All active `stream` objects                 | `/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}`] | `true` returns active `stream` objects. `false` returns idle `stream` objects. The default value for new `stream` objects is `false`. This example shows a decoded JSON object. But, remember that anything passed as a parameter in a `GET` request URL must be URL encoded. |
+| All `stream` objects with recording on      | `/api/stream?streamsonly=1&filters=[{"id": "record", "value": true}]`   | `true` returns `stream` objects with `record` turned on. The default value for new stream objects is `false`. This example shows a decoded JSON object. But, remember that anything passed as a parameter in a `GET` request URL must be URL encoded.                         |

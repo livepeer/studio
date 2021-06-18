@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import EmbedHtml from "../EmbedHtml";
 import Figure from "../Figure";
 

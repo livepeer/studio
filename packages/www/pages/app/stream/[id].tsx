@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import {
@@ -13,7 +15,7 @@ import {
   Alert,
   Close,
 } from "@theme-ui/components";
-import Layout from "../../../components/Layout";
+import Layout from "../../../layouts";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -898,7 +900,7 @@ const ID = () => {
                 Delete
               </Button>
             </Flex>
-            <StreamSessionsTable streamId={stream.id} />
+            <StreamSessionsTable streamId={stream.id} streamName={stream.name} />
           </>
         ) : notFound ? (
           <Box>Not found</Box>

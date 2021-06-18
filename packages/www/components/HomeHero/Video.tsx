@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Text } from "@theme-ui/components";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";

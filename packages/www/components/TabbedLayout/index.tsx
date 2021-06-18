@@ -1,4 +1,6 @@
-import Layout from "../../components/Layout";
+/** @jsx jsx */
+import { jsx } from "theme-ui";
+import Layout from "../../layouts";
 import { Flex } from "@theme-ui/components";
 import Tabs, { TabType } from "../../components/Tabs";
 import { FunctionComponent } from "react";

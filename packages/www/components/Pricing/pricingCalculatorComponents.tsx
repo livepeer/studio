@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "next/link";
 import { parse } from "graphql";
 import { ReactNode, useCallback, useEffect } from "react";

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Flex, Heading, Container } from "@theme-ui/components";
 import Link from "next/link";
 

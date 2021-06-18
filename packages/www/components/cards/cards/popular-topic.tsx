@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import Link from "next/link";
 import { Link as A } from "@theme-ui/components";
 import { useRef, useState, useCallback, useEffect } from "react";

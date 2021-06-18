@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { Container, Box } from "@theme-ui/components";
 import Logo from "../Logo";
 import { Text } from "@theme-ui/components";
@@ -24,7 +26,7 @@ const linksLists: LinksListProps[] = [
   {
     heading: "Resources",
     links: [
-      { children: "Documentation", href: "/docs" },
+      { children: "Documentation", href: "/docs/guides" },
       { children: "Status Page", href: "https://livepeer.statuspage.io/" },
       { children: "Blog", href: "/blog" },
       { children: "Privacy Policy", href: "/privacy-policy" },

@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
 import { useEffect, useRef, useState, useCallback } from "react";
 import readingTime from "reading-time";
 import { blocksToText, getMaxLines } from "../../lib/utils";
