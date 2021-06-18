@@ -188,28 +188,6 @@ export default class WebhookCannon {
     });
   }
 
-  async getWebhooks(
-    userId,
-    event,
-    limit = 100,
-    cursor = undefined,
-    includeDeleted = false
-  ) {
-    const query = [sql`data->>'userId' = ${userId}`];
-    if (event) {
-      query.push(sql`data->>'event' = ${event}`);
-    }
-    if (!includeDeleted) {
-      query.push(sql`data->>'deleted' IS NULL`);
-    }
-    const [webhooks, nextCursor] = await this.db.webhook.find(query, {
-      limit,
-      cursor,
-    });
-
-    return { data: webhooks, cursor: nextCursor };
-  }
-
   async onTrigger(event: Queue) {
     console.log("ON TRIGGER triggered", event);
     if (!event) {
@@ -219,7 +197,7 @@ export default class WebhookCannon {
       return;
     }
 
-    const { data: webhooksList } = await this.getWebhooks(
+    const { data: webhooksList } = await this.db.webhook.listSubscribed(
       event.userId,
       event.event
     );
