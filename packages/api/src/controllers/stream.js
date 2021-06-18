@@ -22,6 +22,7 @@ import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { BadRequestError, NotFoundError } from "../store/errors";
+import { streamDetectionEvent } from "./detection";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -1363,29 +1364,25 @@ app.post("/hook", async (req, res) => {
     manifestID = parent.playbackId;
   }
 
-  // TODO: Replace this example detection config
-  const detection = {
-    // Run detection on 1 / freq segments
-    freq: 4,
-    sceneClassificationProfile: {
-      // Run scene classification on 1 / sampleRate frames of a segment
-      sampleRate: 10,
-      // Classify content into the following classes
-      classes: [
-        {
-          id: 0,
-          name: "adult"
-        },
-        {
-          id: 1,
-          name: "soccer"
-        }
-      ]
+  const { data: webhooks } = await db.webhook.listSubscribed(
+    req.user.id,
+    streamDetectionEvent
+  );
+  let detection = undefined;
+  if (webhooks.length > 0 || stream.detection) {
+    // TODO: Validate if these are the best default configs
+    detection = {
+      freq: 4, // Segment sample rate. Process 1 / freq segments
+      sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+      sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+    };
+    if (stream.detection?.sceneClassification) {
+      detection.sceneClassification = stream.detection?.sceneClassification;
     }
   }
 
   res.json({
-    manifestID: manifestID,
+    manifestID,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,

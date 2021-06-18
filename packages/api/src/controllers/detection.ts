@@ -5,6 +5,8 @@ import { validatePost } from "../middleware";
 import { DetectionWebhookPayload, Queue } from "../schema/types";
 import { db } from "../store";
 
+export const streamDetectionEvent = "stream.detection";
+
 const app = Router();
 
 app.post(
@@ -21,7 +23,7 @@ app.post(
       id: uuid(),
       createdAt: Date.now(),
       channel: "webhooks",
-      event: "stream.detection",
+      event: streamDetectionEvent,
       streamId: stream.id,
       userId: stream.userId,
       payload: {
