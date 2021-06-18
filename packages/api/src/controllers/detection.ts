@@ -9,6 +9,7 @@ export const streamDetectionEvent = "stream.detection";
 
 const app = Router();
 
+// TODO: create some tests for this
 app.post(
   "/hook",
   validatePost("detection-webhook-payload"),
