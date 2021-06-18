@@ -1365,7 +1365,7 @@ app.post("/hook", async (req, res) => {
   }
 
   const { data: webhooks } = await db.webhook.listSubscribed(
-    req.user.id,
+    user.id,
     streamDetectionEvent
   );
   let detection = undefined;
