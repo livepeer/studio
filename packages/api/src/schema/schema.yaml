@@ -142,28 +142,6 @@ components:
           description:
             If true, returning non 2xx value from webhook will prevent stream
             from starting
-        detection:
-          type: object
-          description:
-            Configuration for audio/video detection algorithms to be run on the
-            streams subscribed by this webhook.
-          required: [sceneClassification]
-          properties:
-            sceneClassification:
-              type: array
-              items:
-                type: object
-                description:
-                  Scene classification options. Must contain name property with
-                  one of the well-defined classes supported by detection models.
-                additionalProperties: false
-                required: [name]
-                properties:
-                  name:
-                    type: string
-                    enum:
-                      - soccer
-                      - adult
 
     webhook-response:
       type: object
@@ -464,6 +442,34 @@ components:
           type: object
           additionalProperties:
             type: string
+        detection:
+          type: object
+          description:
+            Custom configuration for audio/video detection algorithms to be run
+            on the stream. If no config is provided and a webhook is subscribed
+            to the stream.detection event, a default config will be used.
+          default:
+            sceneClassification:
+              - name: "soccer"
+              - name: "adult"
+          required: [sceneClassification]
+          additionalProperties: false
+          properties:
+            sceneClassification:
+              type: array
+              items:
+                type: object
+                description:
+                  Scene classification options. Must contain name property with
+                  one of the well-defined classes supported by detection models.
+                additionalProperties: false
+                required: [name]
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - soccer
+                      - adult
         region:
           type: string
           example: fra
