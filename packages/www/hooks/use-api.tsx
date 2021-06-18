@@ -547,6 +547,7 @@ const makeContext = (state: ApiState, setState) => {
           order: opts?.order,
           limit: opts?.limit,
           cursor: opts?.cursor,
+          streamsonly: 1,
         })}`
       );
       if (res.status !== 200) {
