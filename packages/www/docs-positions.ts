@@ -14,6 +14,7 @@ export const docsPositions = [
   "docs/guides/start-live-streaming/reducing-latency.mdx",
   "docs/guides/start-live-streaming/handling-disconnects.mdx",
   "docs/guides/start-live-streaming/debug-live-stream-issues.mdx",
+  "docs/guides/start-live-streaming/create-paywall.mdx",
   "docs/guides/start-live-streaming/support-matrix.mdx",
   "docs/guides/api.mdx",
   "docs/guides/using-livepeer-in-your-app/index.mdx",
