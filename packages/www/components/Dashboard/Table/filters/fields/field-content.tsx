@@ -1,7 +1,7 @@
 import { Box, Flex, TextField, styled } from "@livepeer.com/design-system";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
 import { useCallback, useMemo, useState } from "react";
-import { FilterType } from "./new";
+import { FilterType } from "..";
 import { ConditionType, Condition } from "..";
 import { format } from "date-fns";
 

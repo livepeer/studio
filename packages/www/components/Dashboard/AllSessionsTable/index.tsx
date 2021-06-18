@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useApi, usePageVisibility } from "../../../hooks";
+import { useMemo } from "react";
+import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
@@ -19,8 +19,25 @@ import {
   TableData,
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
-import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import {
+  Box,
+  Flex,
+  Heading,
+  Link as A,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Button,
+  Text,
+  useSnackbar,
+} from "@livepeer.com/design-system";
 import { useCallback } from "react";
+import { useToggleState } from "hooks/use-toggle-state";
+import { Cross1Icon } from "@radix-ui/react-icons";
+import Spinner from "@components/Dashboard/Spinner";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -37,8 +54,6 @@ export type RecordingUrlCellProps = {
   profiles?: Array<Profile>;
   showMP4: boolean;
 };
-
-const pageSize = 50;
 
 const RecordingUrlCell = <D extends TableData>({
   cell,
@@ -79,8 +94,12 @@ type SessionsTableData = {
 };
 
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
-  const { user, getStreamSessionsByUserId } = useApi();
-  const tableProps = useTableState();
+  const { user, getStreamSessionsByUserId, deleteStream, deleteStreams } =
+    useApi();
+  const tableProps = useTableState({ pageSize: 50 });
+  const deleteDialogState = useToggleState();
+  const savingState = useToggleState();
+  const [openSnackbar] = useSnackbar();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -120,7 +139,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       const [streams, nextCursor] = await getStreamSessionsByUserId(
         user.id,
         state.cursor,
-        pageSize
+        state.pageSize
       );
       return {
         nextCursor,
@@ -169,25 +188,116 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     [getStreamSessionsByUserId, user.id]
   );
 
+  const onDeleteStreams = useCallback(async () => {
+    if (tableProps.state.selectedRows.length === 1) {
+      await deleteStream(tableProps.state.selectedRows[0].id);
+      await tableProps.state.swrState?.revalidate();
+      deleteDialogState.onOff();
+    } else if (tableProps.state.selectedRows.length > 1) {
+      await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
+      await tableProps.state.swrState?.revalidate();
+      deleteDialogState.onOff();
+    }
+  }, [
+    deleteStream,
+    deleteStreams,
+    deleteDialogState.onOff,
+    tableProps.state.selectedRows.length,
+    tableProps.state.swrState?.revalidate,
+  ]);
+
   return (
-    <Table
-      {...tableProps}
-      tableId="sessions"
-      columns={columns}
-      fetcher={fetcher}
-      pageSize={pageSize}
-      rowSelection={null}
-      initialSortBy={[{ id: "created", desc: true }]}
-      showOverflow={true}
-      cursor="pointer"
-      header={
-        <>
-          <Heading size="2" css={{ fontWeight: 600 }}>
-            {title}
-          </Heading>
-        </>
-      }
-    />
+    <>
+      <Table
+        {...tableProps}
+        tableId="sessions"
+        columns={columns}
+        fetcher={fetcher}
+        initialSortBy={[{ id: "created", desc: true }]}
+        showOverflow={true}
+        cursor="pointer"
+        rowSelection="all"
+        header={
+          <>
+            <Heading size="2" css={{ fontWeight: 600 }}>
+              {title}
+            </Heading>
+          </>
+        }
+        selectAction={{
+          onClick: deleteDialogState.onOn,
+          children: (
+            <>
+              <Cross1Icon />{" "}
+              <Box css={{ ml: "$2" }} as="span">
+                Delete
+              </Box>
+            </>
+          ),
+        }}
+      />
+
+      <AlertDialog open={deleteDialogState.on}>
+        <AlertDialogContent
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          <AlertDialogTitle as={Heading} size="1">
+            Delete {tableProps.state.selectedRows.length} session
+            {tableProps.state.selectedRows.length > 1 && "s"}?
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            as={Text}
+            size="3"
+            variant="gray"
+            css={{ mt: "$2", lineHeight: "22px" }}>
+            This will permanently remove the session
+            {tableProps.state.selectedRows.length > 1 && "s"}. This action
+            cannot be undone.
+          </AlertDialogDescription>
+
+          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+            <AlertDialogCancel
+              size="2"
+              onClick={deleteDialogState.onOff}
+              as={Button}
+              ghost>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              as={Button}
+              size="2"
+              disabled={savingState.on}
+              onClick={async () => {
+                try {
+                  savingState.onOn();
+                  await onDeleteStreams();
+                  openSnackbar(
+                    `${tableProps.state.selectedRows.length} session${
+                      tableProps.state.selectedRows.length > 1 ? "s" : ""
+                    } deleted.`
+                  );
+                  savingState.onOff();
+                  deleteDialogState.onOff();
+                } catch (e) {
+                  savingState.onOff();
+                }
+              }}
+              variant="red">
+              {savingState.on && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Delete
+            </AlertDialogAction>
+          </Flex>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

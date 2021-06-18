@@ -49,6 +49,7 @@ type State<T extends Record<string, unknown>> = {
   stringifiedFilters: string;
   selectedRows: Row<T>[];
   swrState: SwrState;
+  pageSize: number;
 };
 
 export type Fetcher<T extends Record<string, unknown>> = (
@@ -66,7 +67,6 @@ type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
   header: React.ReactNode;
   rowSelection?: "individual" | "all" | null;
-  pageSize?: number;
   initialSortBy?: Sort<T>[];
   filterItems?: FilterItem[];
   showOverflow?: boolean;
@@ -83,7 +83,6 @@ type Props<T extends Record<string, unknown>> = {
 const TableComponent = <T extends Record<string, unknown>>({
   columns,
   header,
-  pageSize = 100,
   rowSelection,
   initialSortBy,
   filterItems,
@@ -136,7 +135,7 @@ const TableComponent = <T extends Record<string, unknown>>({
       data: dataMemo,
       initialState: {
         // @ts-ignore
-        pageSize,
+        pageSize: state.pageSize,
         pageIndex: 0,
         ...(initialSortBy ? { sortBy: initialSortBy } : undefined),
       },
@@ -376,14 +375,10 @@ const TableComponent = <T extends Record<string, unknown>>({
             <Button
               css={{ marginRight: "6px" }}
               onClick={handlePreviousPage}
-              // disabled={pageNumber <= 0}
-            >
+              disabled={state.prevCursors.length <= 0}>
               Previous
             </Button>
-            <Button
-              onClick={handleNextPage}
-              // disabled={(pageNumber + 1) * pageSize >= data?.length}
-            >
+            <Button onClick={handleNextPage} disabled={state.nextCursor === ""}>
               Next
             </Button>
           </Flex>
@@ -393,7 +388,11 @@ const TableComponent = <T extends Record<string, unknown>>({
   );
 };
 
-export const useTableState = <T extends Record<string, unknown>>() => {
+export const useTableState = <T extends Record<string, unknown>>({
+  pageSize = 100,
+}: {
+  pageSize?: number;
+}) => {
   const [order, setOrder] = useState("");
   const [cursor, setCursor] = useState("");
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
@@ -430,6 +429,7 @@ export const useTableState = <T extends Record<string, unknown>>() => {
       stringifiedFilters,
       selectedRows,
       swrState,
+      pageSize,
     }),
     [
       order,
@@ -439,6 +439,7 @@ export const useTableState = <T extends Record<string, unknown>>() => {
       filters,
       stringifiedFilters,
       selectedRows,
+      pageSize,
     ]
   );
 

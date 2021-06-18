@@ -70,8 +70,6 @@ type SessionsTableData = {
   duration: DurationCellProps;
 };
 
-const pageSize = 50;
-
 const StreamSessionsTable = ({
   title = "Sessions",
   streamId,
@@ -81,7 +79,7 @@ const StreamSessionsTable = ({
   mt?: string | number;
 }) => {
   const { user, getStreamSessions } = useApi();
-  const tableProps = useTableState();
+  const tableProps = useTableState({ pageSize: 50 });
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -114,7 +112,7 @@ const StreamSessionsTable = ({
       const [streams, nextCursor] = await getStreamSessions(
         streamId,
         state.cursor,
-        pageSize
+        state.pageSize
       );
       return {
         nextCursor,
@@ -165,7 +163,6 @@ const StreamSessionsTable = ({
         tableId={`stream-sessions-${streamId}`}
         columns={columns}
         fetcher={fetcher}
-        pageSize={pageSize}
         rowSelection={null}
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}

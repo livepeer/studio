@@ -3,10 +3,11 @@ import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
 import { useCallback, useState } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
-import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
+
+export type FilterType = "text" | "number" | "boolean" | "date";
 
 export type Condition =
   | { type: "contains"; value: string }

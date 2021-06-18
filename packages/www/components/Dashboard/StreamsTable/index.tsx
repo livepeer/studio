@@ -13,6 +13,10 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
   useSnackbar,
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogTrigger,
 } from "@livepeer.com/design-system";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useMemo, useState } from "react";
@@ -29,8 +33,11 @@ import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { QuestionMarkIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { QuestionMarkIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";
+import { useToggleState } from "hooks/use-toggle-state";
+import CreateStreamDialog from "./CreateStreamDialog";
+import { useRouter } from "next/router";
 
 type ProfileProps = {
   id: string;
@@ -154,8 +161,6 @@ type StreamsTableData = {
   status: string;
 };
 
-const pageSize = 30;
-
 const StreamsTable = ({
   title = "Streams",
   userId,
@@ -163,14 +168,15 @@ const StreamsTable = ({
   title: string;
   userId: string;
 }) => {
-  const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
+  const router = useRouter();
+  const { getStreams, deleteStream, deleteStreams, createStream } = useApi();
   const [openSnackbar] = useSnackbar();
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
-
-  const closeDeleteDialog = useCallback(() => {
-    setOpenDeleteDialog(false);
-  }, []);
+  const deleteDialogState = useToggleState();
+  const createDialogState = useToggleState();
+  const { state, stateSetter } = useTableState<StreamsTableData>({
+    pageSize: 30,
+  });
 
   const columns: Column<StreamsTableData>[] = useMemo(
     () => [
@@ -210,13 +216,11 @@ const StreamsTable = ({
     []
   );
 
-  const { state, stateSetter } = useTableState<StreamsTableData>();
-
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) => {
       const [streams, nextCursor] = await getStreams(userId, {
         filters: formatFiltersForApiRequest(state.filters),
-        limit: pageSize.toString(),
+        limit: state.pageSize.toString(),
         cursor: state.cursor,
         order: state.order,
       });
@@ -254,15 +258,16 @@ const StreamsTable = ({
     if (state.selectedRows.length === 1) {
       await deleteStream(state.selectedRows[0].id);
       await state.swrState?.revalidate();
-      closeDeleteDialog();
+      deleteDialogState.onOff();
     } else if (state.selectedRows.length > 1) {
       await deleteStreams(state.selectedRows.map((s) => s.id));
       await state.swrState?.revalidate();
-      closeDeleteDialog();
+      deleteDialogState.onOff();
     }
   }, [
     deleteStream,
-    closeDeleteDialog,
+    deleteStreams,
+    deleteDialogState.onOff,
     state.selectedRows.length,
     state.swrState?.revalidate,
   ]);
@@ -277,7 +282,6 @@ const StreamsTable = ({
         stateSetter={stateSetter}
         rowSelection="all"
         filterItems={filterItems}
-        pageSize={pageSize}
         header={
           <Heading size="2">
             <Flex>
@@ -295,7 +299,7 @@ const StreamsTable = ({
         }
         initialSortBy={[{ id: "created", desc: true }]}
         selectAction={{
-          onClick: () => setOpenDeleteDialog(true),
+          onClick: deleteDialogState.onOn,
           children: (
             <>
               <Cross1Icon />{" "}
@@ -305,10 +309,23 @@ const StreamsTable = ({
             </>
           ),
         }}
+        createAction={{
+          onClick: createDialogState.onOn,
+          variant: "violet",
+          css: { display: "flex", alignItems: "center" },
+          children: (
+            <>
+              <PlusIcon />{" "}
+              <Box as="span" css={{ ml: "$2" }}>
+                Create stream
+              </Box>
+            </>
+          ),
+        }}
       />
 
       {/* Delete streams dialog */}
-      <AlertDialog open={openDeleteDialog}>
+      <AlertDialog open={deleteDialogState.on}>
         <AlertDialogContent
           css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle as={Heading} size="1">
@@ -328,7 +345,7 @@ const StreamsTable = ({
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
             <AlertDialogCancel
               size="2"
-              onClick={() => setOpenDeleteDialog(false)}
+              onClick={deleteDialogState.onOff}
               as={Button}
               ghost>
               Cancel
@@ -347,7 +364,7 @@ const StreamsTable = ({
                     } deleted.`
                   );
                   setSavingDeleteDialog(false);
-                  setOpenDeleteDialog(false);
+                  deleteDialogState.onOff();
                 } catch (e) {
                   setSavingDeleteDialog(false);
                 }
@@ -368,6 +385,53 @@ const StreamsTable = ({
           </Flex>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create stream dialog */}
+      <CreateStreamDialog
+        isOpen={createDialogState.on}
+        onOpenChange={createDialogState.onToggle}
+        onCreate={async (streamName) => {
+          const newStream = await createStream({
+            name: streamName,
+            profiles: [
+              {
+                name: "240p0",
+                fps: 0,
+                bitrate: 250000,
+                width: 426,
+                height: 240,
+              },
+              {
+                name: "360p0",
+                fps: 0,
+                bitrate: 800000,
+                width: 640,
+                height: 360,
+              },
+              {
+                name: "480p0",
+                fps: 0,
+                bitrate: 1600000,
+                width: 854,
+                height: 480,
+              },
+              {
+                name: "720p0",
+                fps: 0,
+                bitrate: 3000000,
+                width: 1280,
+                height: 720,
+              },
+            ],
+          });
+          await state.swrState.revalidate();
+          const query = router.query.admin === "true" ? { admin: true } : {};
+          await router.push({
+            pathname: `/dashboard/streams/${newStream.id}`,
+            query,
+          });
+        }}
+      />
     </>
   );
 };
