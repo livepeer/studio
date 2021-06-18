@@ -135,6 +135,7 @@ export default class WebhookCannon {
           id: webhook.id,
           event: webhook.event,
           stream: sanitized,
+          payload: event.payload,
         }),
       };
 

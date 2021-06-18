@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuid } from "uuid";
 
 import { validatePost } from "../middleware";
-import { DetectionWebhookPayload } from "../schema/types";
+import { DetectionWebhookPayload, Queue } from "../schema/types";
 import { db } from "../store";
 
 const app = Router();
@@ -29,7 +29,7 @@ app.post(
         seqNo: payload.seqNo,
         sceneClassifications: payload.sceneClassification,
       },
-    });
+    } as Queue);
     return res.status(204);
   }
 );

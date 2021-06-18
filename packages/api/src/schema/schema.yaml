@@ -70,6 +70,10 @@ components:
           type: string
           readOnly: true
           index: true
+        payload:
+          type: object
+          readOnly: true
+          example: { "terminationError": "connection closed" }
         isConsumed:
           type: boolean
           default: false
