@@ -1,11 +1,13 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
+import { useRouter } from "next/router";
+import { makeQuery, QueryParams } from "@lib/utils/router";
 
 export type FilterType = "text" | "number" | "boolean" | "date";
 
@@ -37,16 +39,24 @@ export type FilterItem = {
 
 export type ApplyFilterHandler = (filters: Filter[]) => void;
 
+function getActiveFiltersCount(filters: Filter[]) {
+  return filters.reduce((count, f) => {
+    if (f.isOpen) return count + 1;
+  }, 0);
+}
+
 type TableFilterProps = {
   items: FilterItem[];
   onDone: ApplyFilterHandler;
 };
 
 const TableFilter = ({ items, onDone }: TableFilterProps) => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Filter[]>(
     items.map((i) => ({ ...i, isOpen: false }))
   );
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
@@ -54,10 +64,31 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     );
   }, []);
 
-  const handleDone = useCallback(() => {
+  const handleDone = useCallback(async () => {
     setIsOpen(false);
     onDone(filters);
-  }, [filters]);
+    setActiveFiltersCount(getActiveFiltersCount(filters));
+    const formatted = formatFiltersForApiRequest(filters);
+    const queryParams: QueryParams = {};
+    filters.forEach((filter) => {
+      const formattedFilter = formatted.find((f) => f.id === filter.id);
+      queryParams[filter.id] = formattedFilter?.value ?? null;
+    });
+    await makeQuery(router, queryParams);
+  }, [filters, router]);
+
+  // Initialize filters from queryParams
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const itemsFromQueryParams: Filter[] = items.map((item) => {
+      const searchParamValue = searchParams.get(item.id);
+      if (!searchParamValue) return { ...item, isOpen: false };
+      return formatFilterItemFromQueryParam(item, searchParamValue);
+    });
+    onDone(itemsFromQueryParams);
+    setFilters(itemsFromQueryParams);
+    setActiveFiltersCount(getActiveFiltersCount(itemsFromQueryParams));
+  }, [items]);
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -70,6 +101,22 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
           <FilterIcon />
         </Flex>
         Filter
+        {activeFiltersCount > 0 && (
+          <>
+            <Box
+              as="span"
+              css={{
+                mx: "$2",
+                height: "18px",
+                width: "1px",
+                background: "$blackA5",
+              }}
+            />
+            <Box as="span" css={{ color: "$violet11" }}>
+              {activeFiltersCount}
+            </Box>
+          </>
+        )}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content align="end" sideOffset={5}>
         <Box
@@ -229,11 +276,42 @@ export const formatFiltersForApiRequest = (filters: Filter[]) => {
           value: filter.condition.value.toString(),
         });
         break;
+      case "boolean":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
       default:
         break;
     }
   });
   return normalized;
+};
+
+export const formatFilterItemFromQueryParam = (
+  filter: FilterItem,
+  queryParamValue: string
+): Filter => {
+  switch (filter.type) {
+    case "text":
+      return {
+        ...filter,
+        isOpen: true,
+        condition: {
+          type: "contains",
+          value: queryParamValue,
+        },
+      };
+    case "boolean":
+      return {
+        ...filter,
+        isOpen: true,
+        condition: { type: "boolean", value: queryParamValue === "true" },
+      };
+    default:
+      return { ...filter, isOpen: false };
+  }
 };
 
 export default TableFilter;

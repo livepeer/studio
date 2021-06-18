@@ -37,7 +37,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setNextCursor: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
-  setSwrState: Dispatch<SetStateAction<SwrState>>;
+  setSwrState: Dispatch<SetStateAction<SwrState | undefined>>;
 };
 
 type State<T extends Record<string, unknown>> = {
@@ -48,7 +48,7 @@ type State<T extends Record<string, unknown>> = {
   filters: TFilter[];
   stringifiedFilters: string;
   selectedRows: Row<T>[];
-  swrState: SwrState;
+  swrState: SwrState | undefined;
   pageSize: number;
 };
 
@@ -399,7 +399,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [nextCursor, setNextCursor] = useState("");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
-  const [swrState, setSwrState] = useState<SwrState>();
+  const [swrState, setSwrState] = useState<SwrState | undefined>();
 
   const stringifiedFilters = useMemo(() => {
     const formatted = formatFiltersForApiRequest(filters);
