@@ -69,7 +69,13 @@ function DashboardLayout({ id, children, breadcrumbs }: Props) {
       <Sidebar id={id} />
       <Box css={{ pl: 270, width: "100%" }}>
         <Header breadcrumbs={breadcrumbs} />
-        {children}
+        <Box
+          css={{
+            margin: "0 auto",
+            maxWidth: "1520px",
+          }}>
+          {children}
+        </Box>
       </Box>
     </ContextProviders>
   );
