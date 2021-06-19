@@ -9,6 +9,8 @@ import {
 } from "@livepeer.com/design-system";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
+import { Elements } from "@stripe/react-stripe-js";
+import { getStripe } from "../lib/utils";
 
 const globalStyles = global({
   body: {
@@ -49,15 +51,17 @@ interface Props {
 
 function ContextProviders({ children }) {
   return (
-    <DesignSystemProvider>
-      <ThemeProvider
-        disableTransitionOnChange
-        attribute="class"
-        defaultTheme="dark"
-        value={{ dark: darkTheme.className, light: lightTheme.className }}>
-        <SnackbarProvider>{children}</SnackbarProvider>
-      </ThemeProvider>
-    </DesignSystemProvider>
+    <Elements stripe={getStripe()}>
+      <DesignSystemProvider>
+        <ThemeProvider
+          disableTransitionOnChange
+          attribute="class"
+          defaultTheme="dark"
+          value={{ dark: darkTheme.className, light: lightTheme.className }}>
+          <SnackbarProvider>{children}</SnackbarProvider>
+        </ThemeProvider>
+      </DesignSystemProvider>
+    </Elements>
   );
 }
 

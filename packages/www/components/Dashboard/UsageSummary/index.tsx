@@ -170,7 +170,7 @@ const UsageSummary = () => {
           <StyledUpcomingIcon />
           Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
         </Flex>
-        <Link href="/" passHref>
+        <Link href="/dashboard/billing" passHref>
           <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>

@@ -14,10 +14,7 @@ import StreamsTable from "@components/Dashboard/StreamsTable";
 import { useLoggedIn, useApi } from "hooks";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import InfoIcon from "../../public/img/icons/info.svg";
-
-const StyledCross1Icon = styled(Cross1Icon, {
-  color: "$hiContrast",
-});
+import Link from "next/link";
 
 const StyledInfoIcon = styled(InfoIcon, {
   color: "$mauve9",
@@ -51,7 +48,11 @@ const Dashboard = () => {
             </Box>
           </Flex>
           <Flex align="center" justify="end">
-            <Button size="2">Upgrade to Pro</Button>
+            <Link href="/dashboard/billing/plans" passHref>
+              <Button as="a" size="2" css={{ cursor: "default" }}>
+                Upgrade to Pro
+              </Button>
+            </Link>
           </Flex>
         </Promo>
         <Box css={{ mb: "$8" }}>
