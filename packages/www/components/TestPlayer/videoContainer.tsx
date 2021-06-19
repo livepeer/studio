@@ -11,6 +11,7 @@ type Props = {
   manifestUrl: string;
   withOverflow?: boolean;
   setVideo?: React.Dispatch<React.SetStateAction<boolean>>;
+  smallDescription?: boolean;
 };
 
 const VideoContainer = ({
@@ -19,6 +20,7 @@ const VideoContainer = ({
   manifestUrl,
   withOverflow,
   setVideo,
+  smallDescription,
 }: Props) => {
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
@@ -34,7 +36,13 @@ const VideoContainer = ({
         <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
           {title}
         </h1>
-        <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "32px" }}>
+        <p
+          sx={{
+            fontSize: smallDescription ? "14px" : "16px",
+            color: smallDescription ? "#8F8F8F" : "offBlack",
+            marginTop: smallDescription ? '4px' : '',
+            marginBottom: "32px",
+          }}>
           {description}
         </p>
       </div>
