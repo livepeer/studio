@@ -23,36 +23,43 @@ const StyledQuestionMarkIcon = styled(QuestionIcon, {
 
 const Header = ({ breadcrumbs = [] }) => {
   return (
-    <Flex
-      align="center"
-      justify="between"
+    <Box
       css={{
-        px: "$6",
-        height: 60,
         width: "100%",
         borderBottom: "1px solid",
         borderColor: "$mauve6",
       }}>
-      <Breadcrumbs aria-label="breadcrumb">
-        {breadcrumbs.map((breadcrumb, i) => {
-          if (breadcrumb?.href) {
-            return (
-              <Link key={i} href={breadcrumb.href} passHref>
-                <A variant="violet">{breadcrumb.title}</A>
-              </Link>
-            );
-          }
-          return <Text key={i}>{breadcrumb.title}</Text>;
-        })}
-      </Breadcrumbs>
-      <Flex align="center" css={{ fontSize: "$3" }}>
-        <Flex align="center" css={{ cursor: "pointer", mr: "$4" }}>
-          <StyledHornIcon />
-          <Box css={{ color: "$hiContrast" }}>Feedback</Box>
+      <Flex
+        align="center"
+        justify="between"
+        css={{
+          px: "$6",
+          height: 60,
+          width: "100%",
+          margin: "0 auto",
+          maxWidth: "1520px",
+        }}>
+        <Breadcrumbs aria-label="breadcrumb">
+          {breadcrumbs.map((breadcrumb, i) => {
+            if (breadcrumb?.href) {
+              return (
+                <Link key={i} href={breadcrumb.href} passHref>
+                  <A variant="violet">{breadcrumb.title}</A>
+                </Link>
+              );
+            }
+            return <Text key={i}>{breadcrumb.title}</Text>;
+          })}
+        </Breadcrumbs>
+        <Flex align="center" css={{ fontSize: "$3" }}>
+          <Flex align="center" css={{ cursor: "pointer", mr: "$4" }}>
+            <StyledHornIcon />
+            <Box css={{ color: "$hiContrast" }}>Feedback</Box>
+          </Flex>
+          <StyledQuestionMarkIcon />
         </Flex>
-        <StyledQuestionMarkIcon />
       </Flex>
-    </Flex>
+    </Box>
   );
 };
 
