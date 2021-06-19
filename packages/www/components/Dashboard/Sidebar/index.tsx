@@ -159,10 +159,10 @@ const Sidebar = ({ id }) => {
         <Box>
           <Link href="/dashboard/developers/api-keys" passHref>
             <NavLink>
-              <TerminalIcon active={id === "developers"} />
+              <TerminalIcon active={id?.split("/")[0] === "developers"} />
               <Text
                 css={{
-                  fontWeight: id === "developers" ? 700 : 400,
+                  fontWeight: id?.split("/")[0] === "developers" ? 500 : 400,
                   WebkitBackgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
