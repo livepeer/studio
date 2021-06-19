@@ -89,10 +89,7 @@ const NavigationBase = ({
               display: "flex",
               alignItems: "center",
             }}>
-            <NavigationBreadcrumb
-              breadcrumb={breadcrumb}
-              withLogoType={!isDashboard}
-            />
+            <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType />
           </div>
           {!isDashboard && (
             <Flex
