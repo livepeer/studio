@@ -128,13 +128,14 @@ const Sidebar = ({ id }) => {
               </Text>
             </NavLink>
           </Link>
-          <Box
-            css={{
-              ":first-child": {
-                mt: "$1",
-              },
-            }}>
-            {id?.split("/")[0] === "streams" && (
+
+          {id?.split("/")[0] === "streams" && (
+            <Box
+              css={{
+                "> :first-child": {
+                  mt: "$1",
+                },
+              }}>
               <Link href="/dashboard/sessions" passHref>
                 <NavLink>
                   <Text
@@ -151,25 +152,70 @@ const Sidebar = ({ id }) => {
                   </Text>
                 </NavLink>
               </Link>
-            )}
-          </Box>
+            </Box>
+          )}
         </Box>
-        <Link href="/dashboard/developers/api-keys" passHref>
-          <NavLink>
-            <TerminalIcon active={id === "developers"} />
-            <Text
-              gradient={id === "developers"}
-              variant={id === "developers" ? "violet" : null}
+
+        <Box>
+          <Link href="/dashboard/developers/api-keys" passHref>
+            <NavLink>
+              <TerminalIcon active={id === "developers"} />
+              <Text
+                css={{
+                  fontWeight: id === "developers" ? 700 : 400,
+                  WebkitBackgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                }}>
+                Developers
+              </Text>
+            </NavLink>
+          </Link>
+
+          {id?.split("/")[0] === "developers" && (
+            <Box
               css={{
-                fontWeight: id === "developers" ? 700 : 400,
-                WebkitBackgroundClip: "text",
-                ml: "$2",
-                lineHeight: 1.2,
+                "> :first-child": {
+                  mt: "$1",
+                },
               }}>
-              Developers
-            </Text>
-          </NavLink>
-        </Link>
+              <Link href="/dashboard/developers/api-keys" passHref>
+                <NavLink>
+                  <Text
+                    gradient={id === "developers"}
+                    variant={id === "developers" ? "violet" : null}
+                    css={{
+                      fontWeight: id === "developers" ? 700 : 400,
+                      WebkitBackgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      mb: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    API Keys
+                  </Text>
+                </NavLink>
+              </Link>
+              <Link href="/dashboard/developers/webhooks" passHref>
+                <NavLink>
+                  <Text
+                    gradient={id === "developers/webhooks"}
+                    variant={id === "developers/webhooks" ? "violet" : null}
+                    css={{
+                      fontWeight: id === "developers/webhooks" ? 700 : 400,
+                      WebkitBackgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Webhooks
+                  </Text>
+                </NavLink>
+              </Link>
+            </Box>
+          )}
+        </Box>
+
         <Box>
           <Link href="/dashboard/billing" passHref>
             <NavLink>
@@ -188,13 +234,14 @@ const Sidebar = ({ id }) => {
               </Text>
             </NavLink>
           </Link>
-          <Box
-            css={{
-              ":first-child": {
-                mt: "$1",
-              },
-            }}>
-            {id?.split("/")[0] === "billing" && (
+
+          {id?.split("/")[0] === "billing" && (
+            <Box
+              css={{
+                "> :first-child": {
+                  mt: "$1",
+                },
+              }}>
               <Link href="/dashboard/billing/plans" passHref>
                 <NavLink>
                   <Text
@@ -211,8 +258,8 @@ const Sidebar = ({ id }) => {
                   </Text>
                 </NavLink>
               </Link>
-            )}
-          </Box>
+            </Box>
+          )}
         </Box>
       </Grid>
     </Box>
