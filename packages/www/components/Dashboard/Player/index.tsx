@@ -50,7 +50,7 @@ const Player = ({
   }, [src]);
 
   return (
-    <Box className="shadow-lg mx-auto max-w-full" ref={videoContainer}>
+    <Box className="shadow-lg mx-auto max-w-ful" ref={videoContainer}>
       <video
         onEmptied={() => {
           setVideo ? setVideo(false) : null;
