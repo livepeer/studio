@@ -431,6 +431,25 @@ const makeContext = (state: ApiState, setState) => {
       return [res, invoice];
     },
 
+    async getPaymentMethod(
+      stripePaymentMethodId: string
+    ): Promise<[Response, PaymentMethodData | ApiError]> {
+      let [res, paymentMethod] = await context.fetch(
+        `/user/retrieve-payment-method`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripePaymentMethodId,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+
+      return [res, paymentMethod];
+    },
+
     async updateCustomerPaymentMethod({
       stripeCustomerId,
       stripeCustomerPaymentMethodId,
