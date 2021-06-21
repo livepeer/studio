@@ -533,7 +533,7 @@ const makeContext = (state: ApiState, setState) => {
     async getStreams(
       userId: string,
       opts?: {
-        filters: Array<{ id: string; value: string }>;
+        filters: Array<{ id: string; value: string | object }>;
         limit: string;
         cursor: string;
         order: string;
@@ -738,7 +738,7 @@ const makeContext = (state: ApiState, setState) => {
       allUsers: boolean,
       all: boolean,
       order?: string,
-      filters?: Array<{ id: string; value: string }>,
+      filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<Webhook> | ApiError, string, Response]> {
@@ -784,7 +784,7 @@ const makeContext = (state: ApiState, setState) => {
     async getApiTokens(
       userId?: string,
       order?: string,
-      filters?: Array<{ id: string; value: string }>,
+      filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<ApiToken> | ApiError, string, Response]> {
