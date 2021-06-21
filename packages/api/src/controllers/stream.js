@@ -1417,7 +1417,6 @@ app.post(
       streamId: stream.id,
       userId: stream.userId,
       payload: {
-        streamId: stream.id,
         seqNo,
         sceneClassification,
       },
