@@ -24,9 +24,72 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
+  - name: queue
+    description: Webhooks msg queue
+  - name: webhook-response
+    description: webhook client responses
 
 components:
   schemas:
+    queue:
+      type: object
+      table: queue
+      required:
+        - createdAt
+        - channel
+        - event
+        - userId
+        - streamId
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: 256d47d4-d59b-4fd5-a87d-d98a68ac27ef
+        kind:
+          type: string
+          readOnly: true
+          example: queue
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds)
+          example: 1587667174725
+        channel:
+          type: string
+          readOnly: true
+          example: webhook_recording_started
+        event:
+          type: string
+          readOnly: true
+          example: stream.started
+        userId:
+          type: string
+          readOnly: true
+          index: true
+        streamId:
+          type: string
+          readOnly: true
+          index: true
+        isConsumed:
+          type: boolean
+          default: false
+          index: true
+        retries:
+          type: number
+          default: 0
+        lastInterval:
+          type: number
+          default: 1
+        status:
+          type: string
+          default: pending
+          index: true
+        modifiedAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds)
+          example: 1587667174725
+
     webhook:
       type: object
       table: webhook
@@ -58,7 +121,9 @@ components:
         event:
           type: string
           enum:
-            - streamStarted
+            - stream.started
+            - stream.idle
+            - recording.ready
         url:
           type: string
         deleted:
@@ -71,6 +136,45 @@ components:
             If true, returning non 2xx value from webhook will prevent stream
             from starting
 
+    webhook-response:
+      type: object
+      table: webhook_response
+      required:
+        - webhookId
+        - eventId
+        - statusCode
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          example: webhookResponse
+        webhookId:
+          type: string
+          readOnly: true
+          index: true
+        eventId:
+          type: string
+          readOnly: true
+          index: true
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+        statusCode:
+          type: number
+          default: 0
+        responseObject:
+          type: object
+          additionalProperties: true
+          properties:
+            body:
+              type: string
     stream:
       type: object
       table: stream

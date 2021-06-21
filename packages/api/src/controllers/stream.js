@@ -29,7 +29,6 @@ const ACTIVE_TIMEOUT = 90 * 1000;
 
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
-const resolver = new Resolver();
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
@@ -819,6 +818,22 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
+    // -------------------------------
+    // new webhookCannon
+    req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.started",
+      streamId: id,
+      userId: user.id,
+    });
+    res.status(204);
+    return res.end();
+    // Everything under this should be removed since we moved
+    // away from blocking webhooks
+    // -------------------------------
+
     // basic sanitization.
     let sanitized = { ...stream };
     delete sanitized.streamKey;
@@ -826,7 +841,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     const { data: webhooksList } = await getWebhooks(
       req.store,
       stream.userId,
-      "streamStarted"
+      "stream.started"
     );
     try {
       const responses = await Promise.all(
@@ -837,6 +852,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
           try {
             urlObj = parseUrl(webhook.url);
             if (urlObj.host) {
+              const resolver = new Resolver();
               ips = await resolver.resolve4(urlObj.hostname);
             }
           } catch (e) {

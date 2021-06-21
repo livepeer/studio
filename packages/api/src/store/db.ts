@@ -13,10 +13,12 @@ import {
   PushTarget,
   Usage,
   Region,
+  WebhookResponse,
   Session,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable from "./stream-table";
+import QueueTable from "./queue";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import PushTargetTable from "./push-target-table";
@@ -44,8 +46,10 @@ export class DB {
   user: Table<User>;
   usage: Table<Usage>;
   webhook: Table<Webhook>;
+  webhookResponse: Table<WebhookResponse>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
+  queue: QueueTable;
   session: Table<Session>;
 
   postgresUrl: String;
@@ -99,6 +103,13 @@ export class DB {
     if (!this.pool) {
       return;
     }
+    try {
+      if (this.queue) {
+        await this.queue.stop();
+      }
+    } catch (error) {
+      console.log("stopping queue error", error);
+    }
     await this.pool.end();
   }
 
@@ -126,6 +137,12 @@ export class DB {
     });
 
     this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
+    this.webhookResponse = makeTable<WebhookResponse>({
+      db: this,
+      schema: schemas["webhook-response"],
+    });
+    this.queue = new QueueTable({ db: this, schema: schemas["queue"] });
+    await this.queue.start();
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(

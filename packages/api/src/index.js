@@ -34,6 +34,7 @@ export default async function makeApp(params) {
     s3Secret,
     upstreamBroadcaster,
     insecureTestToken,
+    amqpUrl,
   } = params;
   // Storage init
 
@@ -62,11 +63,15 @@ export default async function makeApp(params) {
   let router;
   let store;
   let db;
+  let webhook;
+  let queue;
   try {
     const appRoute = await appRouter(params);
     router = appRoute.router;
     store = appRoute.store;
     db = appRoute.db;
+    webhook = appRoute.webhookCannon;
+    queue = appRoute.queue;
   } catch (e) {
     console.error("Error on startup");
     console.error(e);
@@ -135,6 +140,8 @@ export default async function makeApp(params) {
     close,
     store,
     db,
+    webhook,
+    queue,
   };
 }
 
