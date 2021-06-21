@@ -251,6 +251,10 @@ export function parseOrder(fieldsMap, val) {
 }
 
 export function parseFilters(fieldsMap, val) {
+  const isObject = function (a) {
+    return !!a && a.constructor === Object;
+  };
+
   const q = [];
   if (!val) {
     return q;
@@ -283,9 +287,40 @@ export function parseFilters(fieldsMap, val) {
             )
           );
         } else {
-          q.push(
-            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
-          );
+          // if value is a dictionary
+          if (isObject(filter.value)) {
+            Object.keys(filter.value).map(function (key, _index) {
+              let comparison = "";
+              switch (key) {
+                case "gt":
+                  comparison = ">";
+                  break;
+                case "gte":
+                  comparison = ">=";
+                  break;
+                case "lt":
+                  comparison = "<";
+                  break;
+                case "lte":
+                  comparison = "<=";
+                  break;
+                default:
+                  comparison = "=";
+              }
+              q.push(
+                sql``
+                  .append(fv.val)
+                  .append(comparison)
+                  .append(sql` ${filter.value[key]}`)
+              );
+            });
+          } else {
+            q.push(
+              sql``
+                .append(fv.val)
+                .append(sql` LIKE ${"%" + filter.value + "%"}`)
+            );
+          }
         }
       }
     }
