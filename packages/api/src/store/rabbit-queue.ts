@@ -54,8 +54,7 @@ export default class MessageQueue {
 
   public async consume(func: (msg: ConsumeMessage) => void): Promise<void> {
     if (!func) {
-      console.log("func is undefined");
-      func = this.handleMessage.bind(this);
+      throw new Error("RabbitMQ | consume | func is undefined");
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
@@ -70,7 +69,7 @@ export default class MessageQueue {
   public handleMessage(data: any) {
     var message = JSON.parse(data.content.toString());
     console.log("subscriber: got message", message);
-    this.channel.ack(data);
+    this.ack(data);
   }
 
   public async emit(msg: Object): Promise<void> {

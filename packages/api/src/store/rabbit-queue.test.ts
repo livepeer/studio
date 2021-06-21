@@ -27,7 +27,7 @@ describe("Queue", () => {
   });
 
   it("should be able to emit events and catch it via default consumer", async () => {
-    await queue.consume();
+    await queue.consume(queue.handleMessage.bind(queue));
     await queue.emit({
       id: "abc123",
       createdAt: Date.now(),
@@ -93,9 +93,7 @@ describe("Queue", () => {
     await sleep(7000);
     let duration = consumedAt - emittedAt;
     console.log("duration: ", duration);
-    if (duration < 5000) {
-      throw new Error("the 5s delayed queue failed");
-    }
+    expect(duration).toBeGreaterThanOrEqual(5000);
     expect(resp.id).toBe("delayedMsg");
   });
 
@@ -127,9 +125,7 @@ describe("Queue", () => {
     await sleep(5000);
     let duration = consumedAt - emittedAt;
     console.log("duration: ", duration);
-    if (duration < 3000) {
-      throw new Error("the 3s delayed queue failed");
-    }
+    expect(duration).toBeGreaterThanOrEqual(3000);
     expect(resp.id).toBe("delayedMsg2");
   });
 });
