@@ -15,7 +15,7 @@ app.post(
   validatePost("detection-webhook-payload"),
   async (req, res) => {
     const payload = req.body as DetectionWebhookPayload;
-    const stream = await db.stream.get(payload.manifestID);
+    const stream = await db.stream.getByPlaybackId(payload.manifestID);
     if (!stream) {
       return res.status(404).json({ errors: ["stream not found"] });
     }
