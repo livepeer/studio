@@ -90,14 +90,6 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
     return res.end();
   }
 
-  if (
-    !urlObj.protocol ||
-    (urlObj.protocol !== "http:" && urlObj.protocol !== "https:")
-  ) {
-    res.status(406);
-    return res.json({ errors: ["url provided should be http or https only"] });
-  }
-
   const doc = {
     id,
     userId: req.user.id,
@@ -107,7 +99,20 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
     event: req.body.event,
     url: req.body.url,
     blocking: req.body.blocking === undefined ? true : !!req.body.blocking,
+    detection: req.body.detection,
   };
+
+  const isDetection = doc.event === "stream.detection";
+  const hasDetectionConfig = !!doc.detection;
+  if (!isDetection && hasDetectionConfig) {
+    return res.status(400).json({
+      errors: [`"detection" field is only allowed in "stream.detection" event`],
+    });
+  } else if (isDetection && !hasDetectionConfig) {
+    return res.status(400).json({
+      errors: [`"stream.detection" event must have "detection" config field`],
+    });
+  }
 
   try {
     await req.store.create(doc);

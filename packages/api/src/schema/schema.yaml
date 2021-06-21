@@ -70,6 +70,10 @@ components:
           type: string
           readOnly: true
           index: true
+        payload:
+          type: object
+          readOnly: true
+          example: { "terminationError": "connection closed" }
         isConsumed:
           type: boolean
           default: false
@@ -122,10 +126,13 @@ components:
           type: string
           enum:
             - stream.started
+            - stream.detection
             - stream.idle
             - recording.ready
         url:
           type: string
+          format: uri
+          pattern: ^http(s)?://
         deleted:
           type: boolean
           default: false
@@ -175,6 +182,24 @@ components:
           properties:
             body:
               type: string
+
+    detection-webhook-payload:
+      type: object
+      properties:
+        manifestID:
+          type: string
+        seqNo:
+          type: number
+        sceneClassification:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              probability:
+                type: number
+
     stream:
       type: object
       table: stream
@@ -417,6 +442,34 @@ components:
           type: object
           additionalProperties:
             type: string
+        detection:
+          type: object
+          description:
+            Custom configuration for audio/video detection algorithms to be run
+            on the stream. If no config is provided and a webhook is subscribed
+            to the stream.detection event, a default config will be used.
+          default:
+            sceneClassification:
+              - name: "soccer"
+              - name: "adult"
+          required: [sceneClassification]
+          additionalProperties: false
+          properties:
+            sceneClassification:
+              type: array
+              items:
+                type: object
+                description:
+                  Scene classification options. Must contain name property with
+                  one of the well-defined classes supported by detection models.
+                additionalProperties: false
+                required: [name]
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - soccer
+                      - adult
         region:
           type: string
           example: fra

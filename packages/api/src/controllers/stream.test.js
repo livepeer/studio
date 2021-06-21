@@ -680,6 +680,7 @@ describe("controllers/stream", () => {
       it(`should succeed for ${url}`, async () => {
         url = url.replace("STREAM_ID", stream.id);
         res = await client.post("/stream/hook", { url });
+        expect(res.status).toBe(200);
         data = await res.json();
         expect(data.presets).toEqual(stream.presets);
         expect(data.objectStore).toEqual(mockStore.url);
@@ -708,6 +709,82 @@ describe("controllers/stream", () => {
     it("should reject missing urls", async () => {
       res = await client.post("/stream/hook", {});
       expect(res.status).toBe(422);
+    });
+
+    describe("detection config", async () => {
+      const url = (id) => happyCases[0].replace("STREAM_ID", id);
+
+      it("should not include detection field by default", async () => {
+        res = await client.post("/stream/hook", { url: url(stream.id) });
+        expect(res.status).toBe(200);
+        data = await res.json();
+        expect(data.detection).toBeUndefined();
+      });
+
+      it("should return default detection if subscribed webhook exists", async () => {
+        await server.db.webhook.create({
+          id: uuid(),
+          kind: "webhook",
+          event: "stream.detection",
+          userId: stream.userId,
+          createdAt: Date.now(),
+          url: "https://zoo.tv/abuse/hook",
+        });
+
+        res = await client.post("/stream/hook", { url: url(stream.id) });
+        expect(res.status).toBe(200);
+        data = await res.json();
+        expect(data.detection).toEqual({
+          freq: 4,
+          sampleRate: 10,
+          sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+        });
+      });
+
+      it("should return default detection if stream includes it", async () => {
+        const id = uuid();
+        await server.store.create({ ...stream, id, detection: {} });
+
+        res = await client.post("/stream/hook", { url: url(id) });
+        expect(res.status).toBe(200);
+        data = await res.json();
+        expect(data.detection).toEqual({
+          freq: 4,
+          sampleRate: 10,
+          sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+        });
+      });
+
+      it("should return stream scene classification config", async () => {
+        const id = uuid();
+        await server.store.create({
+          ...stream,
+          id,
+          detection: { sceneClassification: [{ name: "adult" }] },
+        });
+
+        res = await client.post("/stream/hook", { url: url(id) });
+        expect(res.status).toBe(200);
+        data = await res.json();
+        expect(data.detection?.sceneClassification).toEqual([
+          { name: "adult" },
+        ]);
+      });
+
+      it("should disallow configuring sample rates", async () => {
+        const id = uuid();
+        await server.store.create({
+          ...stream,
+          id,
+          detection: { freq: 1, sampleRate: 9 },
+        });
+
+        res = await client.post("/stream/hook", { url: url(id) });
+        expect(res.status).toBe(200);
+        data = await res.json();
+        expect(data.detection?.freq).toEqual(4);
+        expect(data.detection?.sampleRate).toEqual(10);
+      });
     });
   });
 
