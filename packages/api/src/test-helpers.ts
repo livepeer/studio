@@ -1,3 +1,4 @@
+import express, { Express } from "express";
 import isoFetch from "isomorphic-fetch";
 
 import schema from "./schema/schema.json";
@@ -11,6 +12,38 @@ export async function clearDatabase(server: TestServer) {
     .map((s) => ("table" in s ? s.table : null))
     .filter((t) => !!t);
   await Promise.all(tables.map((t) => server.db.query(`TRUNCATE TABLE ${t}`)));
+}
+
+export interface AuxTestServer {
+  app: Express;
+  port: number;
+  close: () => Promise<void>;
+}
+
+export function startAuxTestServer(port?: number) {
+  const app = express();
+  const listener = port ? app.listen(port) : app.listen();
+  const close = () =>
+    new Promise<void>((resolve, reject) => {
+      listener.close((err) => {
+        return err ? reject(err) : resolve();
+      });
+    });
+
+  return new Promise<AuxTestServer>((resolve, reject) => {
+    listener.on("error", reject);
+    listener.on("listening", () => {
+      const addr = listener.address();
+      if (!addr || typeof addr === "string") {
+        listener.close();
+        return reject(new Error("Unexpected non-AddressInfo listener address"));
+      }
+      const { port } = addr;
+      console.log("Aux test server listening at http://localhost:%s", port);
+
+      resolve({ app, close, port });
+    });
+  });
 }
 
 export class TestClient {
