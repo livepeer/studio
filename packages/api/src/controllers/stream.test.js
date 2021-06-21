@@ -1,6 +1,8 @@
+import uuid from "uuid/v4";
+
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
-import uuid from "uuid/v4";
+import { sleep } from "../util";
 
 let server;
 let mockStore;
@@ -1094,9 +1096,3 @@ const smallStream = {
     },
   ],
 };
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

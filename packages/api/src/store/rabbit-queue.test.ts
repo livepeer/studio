@@ -1,28 +1,7 @@
+import { semaphore, sleep } from "../util";
 import MessageQueue from "./rabbit-queue";
 
 jest.setTimeout(10000);
-
-async function sleep(duration) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true);
-    }, duration);
-  });
-}
-
-function semaphore() {
-  let release: () => void;
-  const promise = new Promise<void>((resolve) => {
-    release = () => resolve();
-  });
-  return {
-    release,
-    wait: (timeoutMs?: number) => {
-      if (!timeoutMs) return promise;
-      return Promise.race([promise, sleep(timeoutMs)]);
-    },
-  };
-}
 
 describe("Queue", () => {
   let queue: MessageQueue;
