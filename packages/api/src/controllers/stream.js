@@ -1379,6 +1379,7 @@ app.post("/hook", async (req, res) => {
     if (stream.detection?.sceneClassification) {
       detection.sceneClassification = stream.detection?.sceneClassification;
     }
+    console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
   }
 
   res.json({

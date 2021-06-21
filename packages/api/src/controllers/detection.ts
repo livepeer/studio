@@ -19,6 +19,7 @@ app.post(
     if (!stream) {
       return res.status(404).json({ errors: ["stream not found"] });
     }
+    console.log(`DetectionWebhookPayload: ${JSON.stringify(payload)}`);
 
     await req.queue.emit({
       id: uuid(),
