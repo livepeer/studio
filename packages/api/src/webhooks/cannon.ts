@@ -4,7 +4,7 @@ import { Queue, Webhook, User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 // import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
-import { fetchWithTimeout, fetchWithTimeoutAndSleep } from "../util";
+import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 import uuid from "uuid/v4";
 
@@ -43,7 +43,12 @@ export default class WebhookCannon {
   async handleQueueMsg(data: any) {
     let message = JSON.parse(data.content.toString());
     console.log("webhookCannon: got message", message);
-    await this.onTrigger(message);
+    try {
+      await this.onTrigger(message);
+    } catch (err) {
+      return this.queue.nack(data);
+    }
+
     this.queue.ack(data);
   }
 
@@ -74,9 +79,12 @@ export default class WebhookCannon {
   }
 
   retry(event) {
-    event.lastInterval = this.calcBackoff(event.lastInterval);
-    event.status = "pending";
-    event.retries = event.retries ? event.retries + 1 : 1;
+    event = {
+      ...event,
+      lastInterval: this.calcBackoff(event.lastInterval),
+      status: "pending",
+      retries: event.retries ? event.retries + 1 : 1,
+    };
     this.queue.delayedEmit(event, event.lastInterval);
   }
 
@@ -140,11 +148,7 @@ export default class WebhookCannon {
 
       try {
         logger.info(`webhook ${webhook.id} firing`);
-        let resp = await fetchWithTimeoutAndSleep(
-          webhook.url,
-          params,
-          event.lastInterval
-        );
+        let resp = await fetchWithTimeout(webhook.url, params);
         if (resp.status >= 200 && resp.status < 300) {
           // 2xx requests are cool.
           // all is good

@@ -52,10 +52,13 @@ export default class MessageQueue {
     this.channel.ack(data);
   }
 
+  public nack(data: any): void {
+    this.channel.nack(data);
+  }
+
   public async consume(func: (msg: ConsumeMessage) => void): Promise<void> {
     if (!func) {
-      console.log("func is undefined");
-      func = this.handleMessage.bind(this);
+      throw new Error("RabbitMQ | consume | func is undefined");
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
@@ -70,17 +73,12 @@ export default class MessageQueue {
   public handleMessage(data: any) {
     var message = JSON.parse(data.content.toString());
     console.log("subscriber: got message", message);
-    this.channel.ack(data);
+    this.ack(data);
   }
 
   public async emit(msg: Object): Promise<void> {
     console.log("emitting ", msg);
-    this.channel.sendToQueue(QUEUE_NAME, msg);
-    // .then(function() {
-    //     return console.log("Message was sent");
-    // }).catch(function(err: Error) {
-    //     return console.log("Message was rejected");
-    // });
+    await this.channel.sendToQueue(QUEUE_NAME, msg);
   }
 
   public async delayedEmit(msg: Object, delay: number): Promise<void> {
@@ -94,11 +92,6 @@ export default class MessageQueue {
       ]);
     });
     console.log("emitting ", msg);
-    this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
-    // .then(function() {
-    //     return console.log("Message was sent");
-    // }).catch(function(err: Error) {
-    //     return console.log("Message was rejected");
-    // });
+    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
   }
 }
