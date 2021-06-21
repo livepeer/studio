@@ -175,7 +175,7 @@ const StreamsTable = ({
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<StreamsTableData>({
-    pageSize: 30,
+    pageSize: 20,
   });
 
   const columns: Column<StreamsTableData>[] = useMemo(
