@@ -1,4 +1,3 @@
-import sql, { SQLStatement } from "sql-template-strings";
 import { DB } from "../store/db";
 import { Queue, Webhook, User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
