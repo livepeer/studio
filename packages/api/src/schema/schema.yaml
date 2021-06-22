@@ -24,76 +24,11 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
-  - name: queue
-    description: Webhooks msg queue
   - name: webhook-response
     description: webhook client responses
 
 components:
   schemas:
-    queue:
-      type: object
-      table: queue
-      required:
-        - createdAt
-        - channel
-        - event
-        - userId
-        - streamId
-      properties:
-        id:
-          type: string
-          readOnly: true
-          example: 256d47d4-d59b-4fd5-a87d-d98a68ac27ef
-        kind:
-          type: string
-          readOnly: true
-          example: queue
-        createdAt:
-          type: number
-          readOnly: true
-          description: Timestamp (in milliseconds)
-          example: 1587667174725
-        channel:
-          type: string
-          readOnly: true
-          example: webhook_recording_started
-        event:
-          type: string
-          readOnly: true
-          example: stream.started
-        userId:
-          type: string
-          readOnly: true
-          index: true
-        streamId:
-          type: string
-          readOnly: true
-          index: true
-        payload:
-          type: object
-          readOnly: true
-          example: { "terminationError": "connection closed" }
-        isConsumed:
-          type: boolean
-          default: false
-          index: true
-        retries:
-          type: number
-          default: 0
-        lastInterval:
-          type: number
-          default: 1
-        status:
-          type: string
-          default: pending
-          index: true
-        modifiedAt:
-          type: number
-          readOnly: true
-          description: Timestamp (in milliseconds)
-          example: 1587667174725
-
     webhook:
       type: object
       table: webhook
