@@ -16,6 +16,28 @@ export const timeout = (ms, fn) => {
   });
 };
 
+export const sleep = (duration) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
+};
+
+export const semaphore = () => {
+  let resolvePromise;
+  const promise = new Promise((resolve) => {
+    resolvePromise = resolve;
+  });
+  return {
+    release: () => {
+      resolvePromise();
+    },
+    wait: (timeoutMs) => {
+      if (!timeoutMs) return promise;
+      return Promise.race([promise, sleep(timeoutMs)]);
+    },
+  };
+};
+
 /**
  * Returns the input array, shuffled.
  */

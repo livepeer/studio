@@ -24,6 +24,8 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
+  - name: webhook-response
+    description: webhook client responses
 
 components:
   schemas:
@@ -58,9 +60,14 @@ components:
         event:
           type: string
           enum:
-            - streamStarted
+            - stream.started
+            - stream.detection
+            - stream.idle
+            - recording.ready
         url:
           type: string
+          format: uri
+          pattern: ^http(s)?://
         deleted:
           type: boolean
           default: false
@@ -70,6 +77,63 @@ components:
           description:
             If true, returning non 2xx value from webhook will prevent stream
             from starting
+
+    webhook-response:
+      type: object
+      table: webhook_response
+      required:
+        - webhookId
+        - eventId
+        - statusCode
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          example: webhookResponse
+        webhookId:
+          type: string
+          readOnly: true
+          index: true
+        eventId:
+          type: string
+          readOnly: true
+          index: true
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+        statusCode:
+          type: number
+          default: 0
+        responseObject:
+          type: object
+          additionalProperties: true
+          properties:
+            body:
+              type: string
+
+    detection-webhook-payload:
+      type: object
+      properties:
+        manifestID:
+          type: string
+        seqNo:
+          type: number
+        sceneClassification:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              probability:
+                type: number
 
     stream:
       type: object
@@ -313,6 +377,35 @@ components:
           type: object
           additionalProperties:
             type: string
+        detection:
+          type: object
+          description:
+            Custom configuration for audio/video detection algorithms to be run
+            on the stream. If no config is provided and a webhook is subscribed
+            to the stream.detection event, a default config will be used.
+          default:
+            sceneClassification:
+              - name: "soccer"
+              - name: "adult"
+          required: [sceneClassification]
+          additionalProperties: false
+          properties:
+            sceneClassification:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                description:
+                  Scene classification options. Must contain name property with
+                  one of the well-defined classes supported by detection models.
+                additionalProperties: false
+                required: [name]
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - soccer
+                      - adult
         region:
           type: string
           example: fra

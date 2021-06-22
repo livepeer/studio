@@ -29,7 +29,6 @@ const ACTIVE_TIMEOUT = 90 * 1000;
 
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
-const resolver = new Resolver();
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
@@ -819,6 +818,22 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
+    // -------------------------------
+    // new webhookCannon
+    req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.started",
+      streamId: id,
+      userId: user.id,
+    });
+    res.status(204);
+    return res.end();
+    // Everything under this should be removed since we moved
+    // away from blocking webhooks
+    // -------------------------------
+
     // basic sanitization.
     let sanitized = { ...stream };
     delete sanitized.streamKey;
@@ -826,7 +841,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     const { data: webhooksList } = await getWebhooks(
       req.store,
       stream.userId,
-      "streamStarted"
+      "stream.started"
     );
     try {
       const responses = await Promise.all(
@@ -837,6 +852,7 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
           try {
             urlObj = parseUrl(webhook.url);
             if (urlObj.host) {
+              const resolver = new Resolver();
               ips = await resolver.resolve4(urlObj.hostname);
             }
           } catch (e) {
@@ -1213,6 +1229,10 @@ async function terminateStreamReq(req, stream) {
   return { status: 200, result: nukeRes };
 }
 
+// Hooks
+
+const streamDetectionEvent = "stream.detection";
+
 app.post("/hook", async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422);
@@ -1347,16 +1367,63 @@ app.post("/hook", async (req, res) => {
     manifestID = parent.playbackId;
   }
 
+  const { data: webhooks } = await db.webhook.listSubscribed(
+    user.id,
+    streamDetectionEvent
+  );
+  let detection = undefined;
+  if (webhooks.length > 0 || stream.detection) {
+    // TODO: Validate if these are the best default configs
+    detection = {
+      freq: 4, // Segment sample rate. Process 1 / freq segments
+      sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+      sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+    };
+    if (stream.detection?.sceneClassification) {
+      detection.sceneClassification = stream.detection?.sceneClassification;
+    }
+    console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
+  }
+
   res.json({
-    manifestID: manifestID,
+    manifestID,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
     recordObjectStore,
     recordObjectStoreUrl,
     previousSessions: stream.previousSessions,
+    detection,
   });
 });
+
+// TODO: create some tests for this
+app.post(
+  "/hook/detection",
+  validatePost("detection-webhook-payload"),
+  async (req, res) => {
+    const { manifestID, seqNo, sceneClassification } = req.body;
+    const stream = await db.stream.getByPlaybackId(manifestID);
+    if (!stream) {
+      return res.status(404).json({ errors: ["stream not found"] });
+    }
+    console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
+
+    await req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: streamDetectionEvent,
+      streamId: stream.id,
+      userId: stream.userId,
+      payload: {
+        seqNo,
+        sceneClassification,
+      },
+    });
+    return res.status(204);
+  }
+);
 
 const statsFields = [
   "sourceBytes",

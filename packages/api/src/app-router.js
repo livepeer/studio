@@ -15,6 +15,8 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
+import WebhookCannon from "./webhooks/cannon";
+import MessageQueue from "./store/rabbit-queue";
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -57,6 +59,7 @@ export default async function makeApp(params) {
     insecureTestToken,
     firestoreCredentials,
     firestoreCollection,
+    amqpUrl,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -75,6 +78,22 @@ export default async function makeApp(params) {
     schema,
   });
 
+  // RabbitMQ
+  const queue = new MessageQueue();
+  await queue.connect(amqpUrl);
+  // Webhooks Cannon
+  const webhookCannon = new WebhookCannon({
+    db,
+    store,
+    verifyUrls: true,
+    queue,
+  });
+  await webhookCannon.start();
+
+  process.on("beforeExit", (code) => {
+    queue.close();
+    webhookCannon.stop();
+  });
   // Logging, JSON parsing, store injection
 
   const app = Router();
@@ -89,6 +108,7 @@ export default async function makeApp(params) {
     req.store = store;
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
+    req.queue = queue;
     next();
   });
   if (insecureTestToken) {
@@ -162,7 +182,9 @@ export default async function makeApp(params) {
 
   return {
     router: app,
+    webhookCannon,
     store,
     db,
+    queue,
   };
 }
