@@ -7,7 +7,6 @@ import {
 } from "@livepeer.com/design-system";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
-import Table from "components/Dashboard/Table";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Column, Row } from "react-table";
@@ -191,13 +190,14 @@ const TokenTable = ({
       </Flex>
 
       <Box css={{ mb: "$5" }}>
-        <Table
+        {/* TODO fix this before merging! @julianbenegas */}
+        {/* <Table
           setOnUnselect={setOnUnselect}
           columns={columns}
           data={data}
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
-        />
+        /> */}
       </Box>
     </Box>
   );

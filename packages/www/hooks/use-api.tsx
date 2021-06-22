@@ -530,14 +530,31 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res];
     },
 
-    async getStreams(userId): Promise<Array<Stream>> {
+    async getStreams(
+      userId: string,
+      opts?: {
+        filters: Array<{ id: string; value: string | object }>;
+        limit: string;
+        cursor: string;
+        order: string;
+      }
+    ): Promise<[Stream[], string]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, streams] = await context.fetch(
-        `/stream?userId=${userId}&streamsonly=1`
+        `/stream?${qs.stringify({
+          userId,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          streamsonly: 1,
+        })}`
       );
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams;
+      const nextCursor = getCursor(res.headers.get("link"));
+      return [streams, nextCursor];
     },
 
     async createStream(params): Promise<Stream> {
@@ -721,7 +738,7 @@ const makeContext = (state: ApiState, setState) => {
       allUsers: boolean,
       all: boolean,
       order?: string,
-      filters?: Array<{ id: string; value: string }>,
+      filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<Webhook> | ApiError, string, Response]> {
@@ -767,7 +784,7 @@ const makeContext = (state: ApiState, setState) => {
     async getApiTokens(
       userId?: string,
       order?: string,
-      filters?: Array<{ id: string; value: string }>,
+      filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
       cursor?: string
     ): Promise<[Array<ApiToken> | ApiError, string, Response]> {

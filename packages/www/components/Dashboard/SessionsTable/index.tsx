@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "../../../hooks";
-import Table from "components/Dashboard/Table";
+import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
@@ -78,34 +78,8 @@ const StreamSessionsTable = ({
   streamId: string;
   mt?: string | number;
 }) => {
-  const [streamsSessions, setStreamsSessions] = useState([]);
   const { user, getStreamSessions } = useApi();
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  useEffect(() => {
-    getStreamSessions(streamId, undefined, 0)
-      .then(([streams, nextCursor]) => {
-        setStreamsSessions(streams);
-      })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [streamId]);
-  const isVisible = usePageVisibility();
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      if (!sessionsLoading) {
-        setSessionsLoading(true);
-        getStreamSessions(streamId, undefined, 0)
-          .then(([streams, nextCursor]) => {
-            setStreamsSessions(streams);
-          })
-          .catch((err) => console.error(err)) // todo: surface this
-          .finally(() => setSessionsLoading(false));
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [streamId, isVisible]);
+  const tableProps = useTableState({ pageSize: 50 });
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -133,50 +107,69 @@ const StreamSessionsTable = ({
     []
   );
 
-  const data: SessionsTableData[] = useMemo(() => {
-    return streamsSessions.map((stream) => {
+  const fetcher: Fetcher<SessionsTableData> = useCallback(
+    async (state) => {
+      const [streams, nextCursor] = await getStreamSessions(
+        streamId,
+        state.cursor,
+        state.pageSize
+      );
       return {
-        id: stream.id,
-        recordingUrl: {
-          id: stream.id,
-          showMP4: user?.admin || isStaging() || isDevelopment(),
-          profiles:
-            stream.recordingUrl &&
-            stream.recordingStatus === "ready" &&
-            stream.profiles?.length
-              ? [{ name: "source" }, ...stream.profiles]
-              : undefined,
-          children:
-            stream.recordingUrl && stream.recordingStatus === "ready" ? (
-              stream.recordingUrl
-            ) : (
-              <Box css={{ color: "$mauve8" }}>—</Box>
-            ),
-          href: stream.recordingUrl ? stream.recordingUrl : undefined,
-        },
-        duration: {
-          duration: stream.sourceSegmentsDuration || 0,
-          status: stream.recordingStatus,
-        },
-        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        nextCursor,
+        rows: streams.map((stream: any) => {
+          return {
+            id: stream.id,
+            recordingUrl: {
+              id: stream.id,
+              showMP4: user?.admin || isStaging() || isDevelopment(),
+              profiles:
+                stream.recordingUrl &&
+                stream.recordingStatus === "ready" &&
+                stream.profiles?.length
+                  ? [{ name: "source" }, ...stream.profiles]
+                  : undefined,
+              children:
+                stream.recordingUrl && stream.recordingStatus === "ready" ? (
+                  stream.recordingUrl
+                ) : (
+                  <Box css={{ color: "$mauve8" }}>—</Box>
+                ),
+              href: stream.recordingUrl ? stream.recordingUrl : undefined,
+            },
+            duration: {
+              duration: stream.sourceSegmentsDuration || 0,
+              status: stream.recordingStatus,
+            },
+            created: {
+              date: new Date(stream.createdAt),
+              fallback: <i>unseen</i>,
+            },
+          };
+        }),
       };
-    });
-  }, [streamsSessions]);
+    },
+    [getStreamSessions, user.id]
+  );
 
-  return streamsSessions.length ? (
+  return (
     <Box>
-      <Heading css={{ mb: "$4" }}>{title}</Heading>
       <Table
+        {...tableProps}
+        header={
+          <>
+            <Heading>{title}</Heading>
+          </>
+        }
+        tableId={`stream-sessions-${streamId}`}
         columns={columns}
-        data={data}
-        pageSize={50}
+        fetcher={fetcher}
         rowSelection={null}
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
         cursor="pointer"
       />
     </Box>
-  ) : null;
+  );
 };
 
 export default StreamSessionsTable;

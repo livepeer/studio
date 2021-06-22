@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { useApi, usePageVisibility } from "../../../hooks";
-import Table from "components/Dashboard/Table";
+import { useMemo } from "react";
+import { useApi } from "../../../hooks";
+import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
@@ -19,7 +19,25 @@ import {
   TableData,
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
-import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import {
+  Box,
+  Flex,
+  Heading,
+  Link as A,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Button,
+  Text,
+  useSnackbar,
+} from "@livepeer.com/design-system";
+import { useCallback } from "react";
+import { useToggleState } from "hooks/use-toggle-state";
+import { Cross1Icon } from "@radix-ui/react-icons";
+import Spinner from "@components/Dashboard/Spinner";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -76,36 +94,12 @@ type SessionsTableData = {
 };
 
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
-  const [streamsSessions, setStreamsSessions] = useState([]);
-  const { user, getStreamSessionsByUserId } = useApi();
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  useEffect(() => {
-    getStreamSessionsByUserId(user.id, undefined, 0)
-      .then(([streams, nextCursor]) => {
-        setStreamsSessions(streams);
-      })
-      .catch((err) => console.error(err)); // todo: surface this
-  }, [user.id]);
-
-  const isVisible = usePageVisibility();
-
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-    const interval = setInterval(() => {
-      if (!sessionsLoading) {
-        setSessionsLoading(true);
-        getStreamSessionsByUserId(user.id, undefined, 0)
-          .then(([streams, nextCursor]) => {
-            setStreamsSessions(streams);
-          })
-          .catch((err) => console.error(err)) // todo: surface this
-          .finally(() => setSessionsLoading(false));
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [isVisible]);
+  const { user, getStreamSessionsByUserId, deleteStream, deleteStreams } =
+    useApi();
+  const tableProps = useTableState({ pageSize: 50 });
+  const deleteDialogState = useToggleState();
+  const savingState = useToggleState();
+  const [openSnackbar] = useSnackbar();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -140,62 +134,171 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     []
   );
 
-  const data: SessionsTableData[] = useMemo(() => {
-    return streamsSessions.map((stream) => {
+  const fetcher: Fetcher<SessionsTableData> = useCallback(
+    async (state) => {
+      const [streams, nextCursor] = await getStreamSessionsByUserId(
+        user.id,
+        state.cursor,
+        state.pageSize
+      );
       return {
-        id: stream.id,
-        parentStream: {
-          id: stream.parentId,
-          children: stream.parentStream.name,
-          tooltipChildren: stream.createdByTokenName ? (
-            <>
-              Created by stream <b>{stream.parentStream.name}</b>
-            </>
-          ) : null,
-          href: `/dashboard/streams/${stream.id}`,
-        },
-        recordingUrl: {
-          id: stream.id,
-          showMP4: user?.admin || isStaging() || isDevelopment(),
-          profiles:
-            stream.recordingUrl &&
-            stream.recordingStatus === "ready" &&
-            stream.profiles?.length
-              ? [{ name: "source" }, ...stream.profiles]
-              : undefined,
-          children:
-            stream.recordingUrl && stream.recordingStatus === "ready" ? (
-              stream.recordingUrl
-            ) : (
-              <Box css={{ color: "$mauve8" }}>—</Box>
-            ),
-          href: stream.recordingUrl ? stream.recordingUrl : undefined,
-        },
-        duration: {
-          duration: stream.sourceSegmentsDuration || 0,
-          status: stream.recordingStatus,
-        },
-        created: { date: new Date(stream.createdAt), fallback: <i>unseen</i> },
+        nextCursor,
+        rows: streams.map((stream: any) => {
+          return {
+            id: stream.id,
+            parentStream: {
+              id: stream.parentId,
+              children: stream.parentStream.name,
+              tooltipChildren: stream.createdByTokenName ? (
+                <>
+                  Created by stream <b>{stream.parentStream.name}</b>
+                </>
+              ) : null,
+              href: `/dashboard/streams/${stream.id}`,
+            },
+            recordingUrl: {
+              id: stream.id,
+              showMP4: user?.admin || isStaging() || isDevelopment(),
+              profiles:
+                stream.recordingUrl &&
+                stream.recordingStatus === "ready" &&
+                stream.profiles?.length
+                  ? [{ name: "source" }, ...stream.profiles]
+                  : undefined,
+              children:
+                stream.recordingUrl && stream.recordingStatus === "ready" ? (
+                  stream.recordingUrl
+                ) : (
+                  <Box css={{ color: "$mauve8" }}>—</Box>
+                ),
+              href: stream.recordingUrl ? stream.recordingUrl : undefined,
+            },
+            duration: {
+              duration: stream.sourceSegmentsDuration || 0,
+              status: stream.recordingStatus,
+            },
+            created: {
+              date: new Date(stream.createdAt),
+              fallback: <i>unseen</i>,
+            },
+          };
+        }),
       };
-    });
-  }, [streamsSessions]);
+    },
+    [getStreamSessionsByUserId, user.id]
+  );
 
-  return streamsSessions.length ? (
-    <Box>
-      <Heading size="2" css={{ fontWeight: 600, mb: "$4" }}>
-        {title}
-      </Heading>
+  const onDeleteStreams = useCallback(async () => {
+    if (tableProps.state.selectedRows.length === 1) {
+      await deleteStream(tableProps.state.selectedRows[0].id);
+      await tableProps.state.swrState?.revalidate();
+      deleteDialogState.onOff();
+    } else if (tableProps.state.selectedRows.length > 1) {
+      await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
+      await tableProps.state.swrState?.revalidate();
+      deleteDialogState.onOff();
+    }
+  }, [
+    deleteStream,
+    deleteStreams,
+    deleteDialogState.onOff,
+    tableProps.state.selectedRows.length,
+    tableProps.state.swrState?.revalidate,
+  ]);
+
+  return (
+    <>
       <Table
+        {...tableProps}
+        tableId="sessions"
         columns={columns}
-        data={data}
-        pageSize={50}
-        rowSelection={null}
+        fetcher={fetcher}
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
         cursor="pointer"
+        rowSelection="all"
+        header={
+          <>
+            <Heading size="2" css={{ fontWeight: 600 }}>
+              {title}
+            </Heading>
+          </>
+        }
+        selectAction={{
+          onClick: deleteDialogState.onOn,
+          children: (
+            <>
+              <Cross1Icon />{" "}
+              <Box css={{ ml: "$2" }} as="span">
+                Delete
+              </Box>
+            </>
+          ),
+        }}
       />
-    </Box>
-  ) : null;
+
+      <AlertDialog open={deleteDialogState.on}>
+        <AlertDialogContent
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          <AlertDialogTitle as={Heading} size="1">
+            Delete {tableProps.state.selectedRows.length} session
+            {tableProps.state.selectedRows.length > 1 && "s"}?
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            as={Text}
+            size="3"
+            variant="gray"
+            css={{ mt: "$2", lineHeight: "22px" }}>
+            This will permanently remove the session
+            {tableProps.state.selectedRows.length > 1 && "s"}. This action
+            cannot be undone.
+          </AlertDialogDescription>
+
+          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+            <AlertDialogCancel
+              size="2"
+              onClick={deleteDialogState.onOff}
+              as={Button}
+              ghost>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              as={Button}
+              size="2"
+              disabled={savingState.on}
+              onClick={async () => {
+                try {
+                  savingState.onOn();
+                  await onDeleteStreams();
+                  openSnackbar(
+                    `${tableProps.state.selectedRows.length} session${
+                      tableProps.state.selectedRows.length > 1 ? "s" : ""
+                    } deleted.`
+                  );
+                  savingState.onOff();
+                  deleteDialogState.onOff();
+                } catch (e) {
+                  savingState.onOff();
+                }
+              }}
+              variant="red">
+              {savingState.on && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Delete
+            </AlertDialogAction>
+          </Flex>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 };
 
 export default AllSessionsTable;

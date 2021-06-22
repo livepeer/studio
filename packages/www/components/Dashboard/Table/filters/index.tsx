@@ -1,16 +1,19 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { FilterIcon, StyledAccordion } from "./helpers";
 import TableFilterTextField from "./fields/text";
-import { FilterType } from "./fields/new";
 import TableFilterDateField from "./fields/date";
 import TableFilterNumberField from "./fields/number";
 import { format } from "date-fns";
+import { useRouter } from "next/router";
+import { makeQuery, QueryParams } from "@lib/utils/router";
+
+export type FilterType = "text" | "number" | "boolean" | "date";
 
 export type Condition =
   | { type: "contains"; value: string }
-  | { type: "textEqual"; value: string }
+  // | { type: "textEqual"; value: string }
   | { type: "boolean"; value: boolean }
   | { type: "dateEqual"; value: string }
   | { type: "dateBetween"; value: [string, string] }
@@ -19,7 +22,7 @@ export type Condition =
 export type ConditionType = Condition["type"];
 export type ConditionValue = Condition["value"];
 
-type Filter = FilterItem &
+export type Filter = FilterItem &
   (
     | {
         isOpen: true;
@@ -30,10 +33,17 @@ type Filter = FilterItem &
 
 export type FilterItem = {
   label: string;
+  id: string;
   type: FilterType;
 };
 
 export type ApplyFilterHandler = (filters: Filter[]) => void;
+
+function getActiveFiltersCount(filters: Filter[]) {
+  return filters.reduce((count, f) => {
+    if (f.isOpen) return count + 1;
+  }, 0);
+}
 
 type TableFilterProps = {
   items: FilterItem[];
@@ -41,34 +51,72 @@ type TableFilterProps = {
 };
 
 const TableFilter = ({ items, onDone }: TableFilterProps) => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<Filter[]>(
     items.map((i) => ({ ...i, isOpen: false }))
   );
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
-      p.map((f) => ({ label: f.label, type: f.type, isOpen: false }))
+      p.map((f) => ({ label: f.label, type: f.type, id: f.id, isOpen: false }))
     );
   }, []);
 
-  const handleDone = useCallback(() => {
+  const handleDone = useCallback(async () => {
     setIsOpen(false);
     onDone(filters);
-  }, [filters]);
+    setActiveFiltersCount(getActiveFiltersCount(filters));
+    const formatted = formatFiltersForApiRequest(filters);
+    const queryParams: QueryParams = {};
+    filters.forEach((filter) => {
+      const formattedFilter = formatted.find((f) => f.id === filter.id);
+      queryParams[filter.id] = formattedFilter?.value ?? null;
+    });
+    await makeQuery(router, queryParams);
+  }, [filters, router]);
+
+  // Initialize filters from queryParams
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const itemsFromQueryParams: Filter[] = items.map((item) => {
+      const searchParamValue = searchParams.get(item.id);
+      if (!searchParamValue) return { ...item, isOpen: false };
+      return formatFilterItemFromQueryParam(item, searchParamValue);
+    });
+    onDone(itemsFromQueryParams);
+    setFilters(itemsFromQueryParams);
+    setActiveFiltersCount(getActiveFiltersCount(itemsFromQueryParams));
+  }, [items]);
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenu.Trigger as="div">
-        <Button
-          css={{ display: "flex", ai: "center", marginRight: "6px" }}
-          size="2"
-          variant="gray">
-          <Flex css={{ marginRight: "5px" }}>
-            <FilterIcon />
-          </Flex>
-          Filter
-        </Button>
+      <DropdownMenu.Trigger
+        as={Button}
+        css={{ display: "flex", ai: "center", marginRight: "6px" }}
+        size="2"
+        variant="gray">
+        <Flex css={{ marginRight: "5px" }}>
+          <FilterIcon />
+        </Flex>
+        Filter
+        {activeFiltersCount > 0 && (
+          <>
+            <Box
+              as="span"
+              css={{
+                mx: "$2",
+                height: "18px",
+                width: "1px",
+                background: "$blackA5",
+              }}
+            />
+            <Box as="span" css={{ color: "$violet11" }}>
+              {activeFiltersCount}
+            </Box>
+          </>
+        )}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content align="end" sideOffset={5}>
         <Box
@@ -116,6 +164,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                           isOpen: false as false,
                           label: f.label,
                           type: f.type,
+                          id: f.id,
                         };
                       } else {
                         let defaultCondition: Condition;
@@ -143,6 +192,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                           isOpen: true as true,
                           label: f.label,
                           type: f.type,
+                          id: f.id,
                           condition: defaultCondition,
                         };
                       }
@@ -161,6 +211,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                         isOpen: true,
                         label: f.label,
                         type: f.type,
+                        id: f.id,
                         condition: condition,
                       };
                     }),
@@ -212,6 +263,55 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );
+};
+
+export const formatFiltersForApiRequest = (filters: Filter[]) => {
+  const normalized: { id: string; value: string }[] = [];
+  filters.forEach((filter) => {
+    if (!filter.isOpen) return;
+    switch (filter.type) {
+      case "text":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
+      case "boolean":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
+      default:
+        break;
+    }
+  });
+  return normalized;
+};
+
+export const formatFilterItemFromQueryParam = (
+  filter: FilterItem,
+  queryParamValue: string
+): Filter => {
+  switch (filter.type) {
+    case "text":
+      return {
+        ...filter,
+        isOpen: true,
+        condition: {
+          type: "contains",
+          value: queryParamValue,
+        },
+      };
+    case "boolean":
+      return {
+        ...filter,
+        isOpen: true,
+        condition: { type: "boolean", value: queryParamValue === "true" },
+      };
+    default:
+      return { ...filter, isOpen: false };
+  }
 };
 
 export default TableFilter;

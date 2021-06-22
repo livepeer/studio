@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogClose,
   TextField,
@@ -12,30 +11,22 @@ import {
   styled,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
-import { useApi } from "../../../hooks";
-import { useRouter } from "next/router";
-import { PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";
 
-const StyledPlusIcon = styled(PlusIcon, {
-  mr: "$1",
-});
-
-const CreateStream = () => {
+const CreateStreamDialog = ({
+  isOpen,
+  onOpenChange,
+  onCreate,
+}: {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  onCreate: (streamName: string) => Promise<void>;
+}) => {
   const [creating, setCreating] = useState(false);
-  const router = useRouter();
   const [streamName, setStreamName] = useState("");
-  const { user, createStream } = useApi();
 
   return (
-    <Dialog>
-      <DialogTrigger
-        as={Button}
-        variant="violet"
-        size="2"
-        css={{ display: "flex", alignItems: "center" }}>
-        <StyledPlusIcon /> Create stream
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent css={{ p: 0 }}>
         <Box
           css={{
@@ -51,56 +42,19 @@ const CreateStream = () => {
 
         <Box
           as="form"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             if (creating) {
               return;
             }
             setCreating(true);
-            createStream({
-              name: streamName,
-              profiles: [
-                {
-                  name: "240p0",
-                  fps: 0,
-                  bitrate: 250000,
-                  width: 426,
-                  height: 240,
-                },
-                {
-                  name: "360p0",
-                  fps: 0,
-                  bitrate: 800000,
-                  width: 640,
-                  height: 360,
-                },
-                {
-                  name: "480p0",
-                  fps: 0,
-                  bitrate: 1600000,
-                  width: 854,
-                  height: 480,
-                },
-                {
-                  name: "720p0",
-                  fps: 0,
-                  bitrate: 3000000,
-                  width: 1280,
-                  height: 720,
-                },
-              ],
-            })
-              .then((newStream) => {
-                const query =
-                  router.query.admin === "true" ? { admin: true } : {};
-                router.push({
-                  pathname: `/dashboard/streams/${newStream.id}`,
-                  query,
-                });
-              })
-              .catch((e) => {
-                setCreating(false);
-              });
+            try {
+              await onCreate(streamName);
+            } catch (error) {
+              console.error(error);
+            } finally {
+              setCreating(false);
+            }
           }}>
           <Box
             css={{
@@ -165,4 +119,4 @@ const CreateStream = () => {
   );
 };
 
-export default CreateStream;
+export default CreateStreamDialog;
