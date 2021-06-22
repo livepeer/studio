@@ -17,6 +17,7 @@ const { Resolver } = require("dns").promises;
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;
 const BACKOFF_COEF = 1.2;
+const MAX_RETRIES = 20;
 
 export default class WebhookCannon {
   db: DB;
@@ -79,6 +80,13 @@ export default class WebhookCannon {
   }
 
   retry(event) {
+    if (event && event.retries && event.retries >= MAX_RETRIES) {
+      console.log(
+        `Webhook Cannon| Max Retries Reached, id: ${event.id}, streamId: ${event.streamId}`
+      );
+      return;
+    }
+
     event = {
       ...event,
       lastInterval: this.calcBackoff(event.lastInterval),
