@@ -1421,7 +1421,7 @@ app.post(
         sceneClassification,
       },
     });
-    return res.status(204);
+    return res.status(204).end();
   }
 );
 
