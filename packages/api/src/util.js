@@ -23,12 +23,14 @@ export const sleep = (duration) => {
 };
 
 export const semaphore = () => {
-  let release = () => {}; // reset below, init val just for typing
+  let resolvePromise;
   const promise = new Promise((resolve) => {
-    release = () => resolve();
+    resolvePromise = resolve;
   });
   return {
-    release,
+    release: () => {
+      resolvePromise();
+    },
     wait: (timeoutMs) => {
       if (!timeoutMs) return promise;
       return Promise.race([promise, sleep(timeoutMs)]);
