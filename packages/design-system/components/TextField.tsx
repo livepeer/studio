@@ -23,7 +23,7 @@ const StyledTextField = styled(DEFAULT_TAG, {
 
   // Custom
   backgroundColor: "$loContrast",
-  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  boxShadow: "inset 0 0 0 1px $colors$mauve7",
   color: "$hiContrast",
   fontVariantNumeric: "tabular-nums",
 
@@ -46,21 +46,21 @@ const StyledTextField = styled(DEFAULT_TAG, {
     },
   },
   "&::placeholder": {
-    color: "$slate9",
+    color: "$mauve9",
   },
   "&:disabled": {
     pointerEvents: "none",
-    backgroundColor: "$slate2",
-    color: "$slate8",
+    backgroundColor: "$mauve2",
+    color: "$mauve8",
     cursor: "not-allowed",
     "&::placeholder": {
-      color: "$slate7",
+      color: "$mauve7",
     },
   },
   "&:read-only": {
-    backgroundColor: "$slate2",
+    backgroundColor: "$mauve2",
     "&:focus": {
-      boxShadow: "inset 0px 0px 0px 1px $colors$slate7",
+      boxShadow: "inset 0px 0px 0px 1px $colors$mauve7",
     },
   },
 
@@ -91,7 +91,7 @@ const StyledTextField = styled(DEFAULT_TAG, {
         backgroundColor: "transparent",
         "@hover": {
           "&:hover": {
-            boxShadow: "inset 0 0 0 1px $colors$slateA7",
+            boxShadow: "inset 0 0 0 1px $colors$mauveA7",
           },
         },
         "&:focus": {
