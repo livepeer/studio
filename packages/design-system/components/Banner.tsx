@@ -29,7 +29,7 @@ export const Banner = styled(DEFAULT_TAG, {
         backgroundColor: "$loContrast",
       },
       gray: {
-        backgroundColor: "$slate3",
+        backgroundColor: "$mauve3",
       },
       blue: {
         backgroundColor: "$blue3",
@@ -63,7 +63,7 @@ export const Banner = styled(DEFAULT_TAG, {
       border: "true",
       variant: "gray",
       css: {
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
       },
     },
     {
@@ -91,7 +91,7 @@ export const Banner = styled(DEFAULT_TAG, {
       border: "true",
       variant: "loContrast",
       css: {
-        borderColor: "$slate6",
+        borderColor: "$mauve6",
       },
     },
   ],
