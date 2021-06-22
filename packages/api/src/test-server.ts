@@ -98,7 +98,9 @@ async function setupServer() {
 
 afterAll(async () => {
   if (server) {
+    await server.queue.close();
     await server.close();
+    server = null;
   }
   fs.removeSync(dbPath);
 });
