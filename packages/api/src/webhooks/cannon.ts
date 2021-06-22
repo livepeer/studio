@@ -234,6 +234,12 @@ export default class WebhookCannon {
 
     console.log("webhooks : ", webhooksList);
     let stream = await this.db.stream.get(event.streamId);
+    if (!stream) {
+      // if stream isn't found. don't fire the webhook, log an error
+      return console.error(
+        `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+      );
+    }
     // basic sanitization.
     let sanitized = this.db.stream.addDefaultFields(
       this.db.stream.removePrivateFields({ ...stream })
