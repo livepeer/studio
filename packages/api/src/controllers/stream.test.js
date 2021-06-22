@@ -1039,6 +1039,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
         const data = await res.json();
         expect(data.profiles).toEqual(testStream.profiles);
+        client.jwtAuth = adminToken.token;
         const hookRes = await client.post("/stream/hook", {
           url: `https://example.com/live/${data.id}/0.ts`,
         });
