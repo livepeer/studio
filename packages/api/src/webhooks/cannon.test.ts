@@ -6,6 +6,7 @@ import WebhookCannon from "./cannon";
 import makeStore from "../store";
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
+import { semaphore } from "../util";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
@@ -197,12 +198,14 @@ describe("webhook cannon", () => {
     client.jwtAuth = adminToken["token"];
 
     // test endpoint
-    let resp;
+    const sem = semaphore();
+    let resp: number;
     webhookServer.use(bodyParser.json());
     webhookServer.post("/webhook", (req, res) => {
       console.log("WEBHOOK WORKS , body", req.body);
       resp = 200;
       res.end();
+      sem.release();
     });
 
     await server.queue.emit({
@@ -215,15 +218,7 @@ describe("webhook cannon", () => {
       isConsumed: false,
     });
 
-    await sleep(3000);
+    await sem.wait(3000);
     expect(resp).toBe(200);
   });
 });
-
-async function sleep(duration) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true);
-    }, duration);
-  });
-}

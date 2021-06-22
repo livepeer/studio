@@ -16,6 +16,28 @@ export const timeout = (ms, fn) => {
   });
 };
 
+export const sleep = (duration) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
+};
+
+export const semaphore = () => {
+  let resolvePromise;
+  const promise = new Promise((resolve) => {
+    resolvePromise = resolve;
+  });
+  return {
+    release: () => {
+      resolvePromise();
+    },
+    wait: (timeoutMs) => {
+      if (!timeoutMs) return promise;
+      return Promise.race([promise, sleep(timeoutMs)]);
+    },
+  };
+};
+
 /**
  * Returns the input array, shuffled.
  */
@@ -54,13 +76,6 @@ export const fetchWithTimeout = (url, options) =>
     );
   });
 
-export const fetchWithTimeoutAndSleep = (url, options, sleep) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      fetchWithTimeout(url, options).then(resolve).catch(reject);
-    }, sleep);
-  });
-};
 // turns foo-bar-baz into fooBarBaz
 export const kebabToCamel = (str) => {
   let out = "";

@@ -22,7 +22,6 @@ import { getBroadcasterHandler } from "./broadcaster";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { BadRequestError, NotFoundError } from "../store/errors";
-import { streamDetectionEvent } from "./detection";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -1230,6 +1229,10 @@ async function terminateStreamReq(req, stream) {
   return { status: 200, result: nukeRes };
 }
 
+// Hooks
+
+const streamDetectionEvent = "stream.detection";
+
 app.post("/hook", async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422);
@@ -1393,6 +1396,34 @@ app.post("/hook", async (req, res) => {
     detection,
   });
 });
+
+// TODO: create some tests for this
+app.post(
+  "/hook/detection",
+  validatePost("detection-webhook-payload"),
+  async (req, res) => {
+    const { manifestID, seqNo, sceneClassification } = req.body;
+    const stream = await db.stream.getByPlaybackId(manifestID);
+    if (!stream) {
+      return res.status(404).json({ errors: ["stream not found"] });
+    }
+    console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
+
+    await req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: streamDetectionEvent,
+      streamId: stream.id,
+      userId: stream.userId,
+      payload: {
+        seqNo,
+        sceneClassification,
+      },
+    });
+    return res.status(204);
+  }
+);
 
 const statsFields = [
   "sourceBytes",
