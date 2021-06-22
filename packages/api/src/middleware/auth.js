@@ -3,6 +3,12 @@ import jwt from "jsonwebtoken";
 import tracking from "./tracking";
 import { db } from "../store";
 
+function parseAuthToken(authToken) {
+  const match = authToken?.match(/^(\w+) +(.+)$/);
+  if (!match) return {};
+  return { tokenType: match[1], tokenValue: match[2] };
+}
+
 /**
  * creates an authentication middleware that can be customized.
  * @param {Object} params auth middleware params, to be defined later
@@ -11,24 +17,24 @@ function authFactory(params) {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
+    const { tokenType, tokenValue } = parseAuthToken(authToken);
     let user;
     let tokenObject;
     let userId;
 
-    if (!authToken) {
-      throw new ForbiddenError(`no token object ${authToken} found`);
-    } else if (authToken.startsWith("Bearer")) {
+    if (!tokenType) {
+      throw new ForbiddenError(`no authorization header provided`);
+    } else if (tokenType === "Bearer") {
       tokenObject = await req.store.get(`api-token/${req.token}`);
       if (!tokenObject) {
-        throw new ForbiddenError(`no token object ${authToken} found`);
+        throw new ForbiddenError(`no token object ${tokenValue} found`);
       }
       userId = tokenObject.userId;
       // track last seen
       tracking.recordToken(db, tokenObject);
-    } else if (authToken.startsWith("JWT")) {
-      const jwtToken = authToken.substr(4);
+    } else if (tokenType === "JWT") {
       try {
-        const verified = jwt.verify(jwtToken, req.config.jwtSecret, {
+        const verified = jwt.verify(tokenValue, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
         });
         userId = verified.sub;
@@ -36,6 +42,8 @@ function authFactory(params) {
       } catch (err) {
         throw new ForbiddenError(err.message);
       }
+    } else {
+      throw new ForbiddenError(`unsupported authorization type ${tokenType}`);
     }
 
     user = await req.store.get(`user/${userId}`);
@@ -55,8 +63,8 @@ function authFactory(params) {
     }
 
     req.user = user;
-    req.authTokenType = authToken.startsWith("Bearer") ? "Bearer" : "JWT";
-    req.isUIAdmin = req.user.admin && req.authTokenType == "JWT";
+    req.authTokenType = tokenType;
+    req.isUIAdmin = req.user.admin && tokenType === "JWT";
     if (tokenObject && tokenObject.name) {
       req.tokenName = tokenObject.name;
     }
@@ -67,8 +75,8 @@ function authFactory(params) {
     if (params.admin) {
       // admins must have a JWT
       if (
-        (authToken.startsWith("JWT") && user.admin !== true) ||
-        authToken.startsWith("Bearer")
+        (tokenType === "JWT" && user.admin !== true) ||
+        tokenType === "Bearer"
       ) {
         throw new ForbiddenError(`user does not have admin priviledges`);
       }
