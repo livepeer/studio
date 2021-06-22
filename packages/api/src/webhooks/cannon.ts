@@ -227,7 +227,9 @@ export default class WebhookCannon {
     console.log("webhooks : ", webhooksList);
     let stream = await this.db.stream.get(event.streamId);
     // basic sanitization.
-    let sanitized = { ...stream };
+    let sanitized = this.db.stream.addDefaultFields(
+      this.db.stream.removePrivateFields({ ...stream })
+    );
     delete sanitized.streamKey;
 
     let user = await this.db.user.get(event.userId);

@@ -1,8 +1,11 @@
+import { json as bodyParserJson } from "body-parser";
 import uuid from "uuid/v4";
 
 import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
-import { sleep } from "../util";
+import { TestClient, clearDatabase, startAuxTestServer } from "../test-helpers";
+import { semaphore, sleep } from "../util";
+
+const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
 let server;
 let mockStore;
@@ -857,6 +860,76 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(422);
         data = await res.json();
         expect(data.errors[0]).toContain(`\"type\"`);
+      });
+
+      describe("emitted event", () => {
+        let webhookServer;
+        let hookSem;
+        let hookPayload;
+        let genMockWebhook;
+
+        beforeAll(async () => {
+          webhookServer = await startAuxTestServer();
+          webhookServer.app.use(bodyParserJson());
+          webhookServer.app.post(
+            "/captain/hook",
+            bodyParserJson(),
+            (req, res) => {
+              hookPayload = req.body;
+              hookSem.release();
+              res.status(204).end();
+            }
+          );
+          genMockWebhook = () => ({
+            id: uuid(),
+            userId: nonAdminUser.id,
+            name: "detection-webhook",
+            kind: "webhook",
+            createdAt: Date.now(),
+            event: "stream.detection",
+            url: `http://localhost:${webhookServer.port}/captain/hook`,
+          });
+        });
+
+        afterAll(() => webhookServer.close());
+
+        beforeEach(async () => {
+          hookSem = semaphore();
+          hookPayload = undefined;
+
+          client.jwtAuth = nonAdminToken.token;
+          const res = await client.post("/stream", postMockStream);
+          expect(res.status).toBe(201);
+          stream = await res.json();
+        });
+
+        it("should return success if no webhook registered", async () => {
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+          });
+          expect(res.status).toBe(204);
+        });
+
+        it("should propagate event to registered webhook", async () => {
+          const sceneClassification = [
+            { name: "soccer", probability: 0.7 },
+            { name: "adult", probability: 0.68 },
+          ];
+          await server.db.webhook.create(genMockWebhook());
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+            sceneClassification,
+          });
+          expect(res.status).toBe(204);
+
+          await hookSem.wait(1000);
+          expect(hookPayload).toEqual({
+            id: expect.stringMatching(uuidRegex),
+            event: "stream.detection",
+            stream: { ...stream, streamKey: undefined },
+            payload: { sceneClassification },
+          });
+        });
       });
     });
   });
