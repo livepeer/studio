@@ -56,6 +56,7 @@
     "analytics-node": "^3.4.0-beta.1",
     "any-base": "^1.1.0",
     "aws-serverless-express": "^3.3.6",
+    "basic-auth": "^2.0.1",
     "body-parser": "^1.19.0",
     "browser-process-hrtime": "^1.0.0",
     "camelcase": "^5.3.1",

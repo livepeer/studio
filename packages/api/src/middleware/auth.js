@@ -1,7 +1,9 @@
-import { InternalServerError, ForbiddenError } from "../store/errors";
+import basicAuth from "basic-auth";
 import jwt from "jsonwebtoken";
-import tracking from "./tracking";
+
 import { db } from "../store";
+import { InternalServerError, ForbiddenError } from "../store/errors";
+import tracking from "./tracking";
 
 function parseAuthToken(authToken) {
   const match = authToken?.match(/^(\w+) +(.+)$/);
@@ -18,17 +20,23 @@ function authFactory(params) {
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
     const { tokenType, tokenValue } = parseAuthToken(authToken);
+    const basicUser = basicAuth.parse(authToken);
     let user;
     let tokenObject;
     let userId;
 
     if (!tokenType) {
       throw new ForbiddenError(`no authorization header provided`);
-    } else if (tokenType === "Bearer") {
-      tokenObject = await req.store.get(`api-token/${req.token}`);
-      if (!tokenObject) {
+    } else if (["Bearer", "Basic"].includes(tokenType)) {
+      const isBasic = tokenType === "Basic";
+      tokenObject = await req.store.get(
+        `api-token/${isBasic ? basicUser.pass : req.token}`
+      );
+      const matchesBasicUser = tokenObject?.userId === basicUser?.name;
+      if (!tokenObject || (isBasic && !matchesBasicUser)) {
         throw new ForbiddenError(`no token object ${tokenValue} found`);
       }
+
       userId = tokenObject.userId;
       // track last seen
       tracking.recordToken(db, tokenObject);
