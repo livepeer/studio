@@ -29,9 +29,7 @@ function authFactory(params) {
       throw new ForbiddenError(`no authorization header provided`);
     } else if (["Bearer", "Basic"].includes(tokenType)) {
       const isBasic = tokenType === "Basic";
-      tokenObject = await req.store.get(
-        `api-token/${isBasic ? basicUser.pass : req.token}`
-      );
+      tokenObject = await db.apiToken.get(isBasic ? basicUser.pass : req.token);
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
         throw new ForbiddenError(`no token object ${tokenValue} found`);
