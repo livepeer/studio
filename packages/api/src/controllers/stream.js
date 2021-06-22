@@ -1397,7 +1397,6 @@ app.post("/hook", async (req, res) => {
   });
 });
 
-// TODO: create some tests for this
 app.post(
   "/hook/detection",
   validatePost("detection-webhook-payload"),
