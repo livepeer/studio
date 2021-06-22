@@ -52,8 +52,15 @@ export default class WebhookCannon {
   }
 
   async handleQueueMsg(data: ConsumeMessage) {
-    let message = JSON.parse(data.content.toString());
-    console.log("webhookCannon: got message", message);
+    let message;
+    try {
+      message = JSON.parse(data.content.toString());
+      console.log("webhookCannon: got message", message);
+    } catch (err) {
+      console.log("webhookCannon: error parsing message", err);
+      this.queue.ack(data);
+      return;
+    }
     try {
       await this.onTrigger(message);
     } catch (err) {
