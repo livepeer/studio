@@ -86,7 +86,8 @@ export default class WebhookCannon {
     if (newInterval > MAX_BACKOFF) {
       return lastInterval;
     }
-    return newInterval;
+    // RabbitMQ expects integer
+    return newInterval | 0;
   }
 
   retry(event: WebhookMessage) {
