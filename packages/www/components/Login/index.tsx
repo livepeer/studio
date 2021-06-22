@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import Textfield from "../../components/Textfield";
 import { Button, Grid, Box, Container } from "@theme-ui/components";
 import { useEffect, useState } from "react";
-import hash from "@livepeer.com/api/dist/hash";
+import hash from "../../lib/utils/hash"
 import { useRouter } from "next/router";
 
 // The frontend salts are all the same. This could be configurable someday.
@@ -43,7 +43,7 @@ const Login = ({
           if (!showPassword) {
             return onSubmit({ email });
           }
-          const [hashedPassword] = await hash(password, FRONTEND_SALT);
+          const hashedPassword = await hash(password, FRONTEND_SALT);
           // hash password, then
           onSubmit({
             email,
