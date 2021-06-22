@@ -9,7 +9,7 @@ export const Link = styled(DEFAULT_TAG, {
   outline: "none",
   textDecorationLine: "none",
   textUnderlineOffset: "3px",
-  textDecorationColor: "$slate4",
+  textDecorationColor: "$mauve4",
   WebkitTapHighlightColor: "rgba(0,0,0,0)",
   lineHeight: "inherit",
   "@hover": {
@@ -50,23 +50,23 @@ export const Link = styled(DEFAULT_TAG, {
         },
       },
       subtle: {
-        color: "$slate11",
-        textDecorationColor: "$slate4",
+        color: "$mauve11",
+        textDecorationColor: "$mauve4",
         "&:focus": {
-          outlineColor: "$slate8",
+          outlineColor: "$mauve8",
         },
       },
       contrast: {
         color: "$hiContrast",
         textDecoration: "underline",
-        textDecorationColor: "$slate4",
+        textDecorationColor: "$mauve4",
         "@hover": {
           "&:hover": {
-            textDecorationColor: "$slate7",
+            textDecorationColor: "$mauve7",
           },
         },
         "&:focus": {
-          outlineColor: "$slate8",
+          outlineColor: "$mauve8",
         },
       },
     },
