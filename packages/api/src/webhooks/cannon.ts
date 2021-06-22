@@ -64,7 +64,7 @@ export default class WebhookCannon {
     try {
       await this.onTrigger(message);
     } catch (err) {
-      return this.queue.nack(data);
+      this.retry(message);
     }
 
     this.queue.ack(data);
