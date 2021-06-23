@@ -91,14 +91,8 @@ app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
-  const {
-    email,
-    password,
-    firstName,
-    lastName,
-    organization,
-    phone,
-  } = req.body;
+  const { email, password, firstName, lastName, organization, phone } =
+    req.body;
   const { selectedPlan } = req.query;
   const emailValid = validator.validate(email);
   if (!emailValid) {
@@ -747,6 +741,15 @@ app.post("/retrieve-invoices", async (req, res) => {
   });
   res.status(200);
   res.json(invoices);
+});
+
+app.post("/retrieve-payment-method", async (req, res) => {
+  let { stripePaymentMethodId } = req.body;
+  const paymentMethod = await stripe.paymentMethods.retrieve(
+    stripePaymentMethodId
+  );
+  res.status(200);
+  res.json(paymentMethod);
 });
 
 export default app;
