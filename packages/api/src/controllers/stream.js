@@ -1141,181 +1141,179 @@ async function terminateStreamReq(req, stream) {
 
 const streamDetectionEvent = "stream.detection";
 
-app.post("/hook", authMiddleware({}), async (req, res) => {
-  if (!req.user.admin && !req.user.access?.broadcasterHooks) {
-    return res.status(403).json({ errors: ["restricted api"] });
-  }
-  if (!req.body || !req.body.url) {
-    res.status(422);
-    return res.json({
-      errors: ["missing url"],
-    });
-  }
-  // logger.info(`got webhook: ${JSON.stringify(req.body)}`)
-  // These are of the form /live/:manifestId/:segmentNum.ts
-  let { pathname, protocol } = parseUrl(req.body.url);
-  // Protocol is sometimes undefined, due to https://github.com/livepeer/go-livepeer/issues/1006
-  if (!protocol) {
-    protocol = "http:";
-  }
-  if (protocol === "https:") {
-    protocol = "http:";
-  }
-  if (protocol !== "http:" && protocol !== "rtmp:") {
-    res.status(422);
-    return res.json({ errors: [`unknown protocol: ${protocol}`] });
-  }
+app.post(
+  "/hook",
+  authMiddleware({ access: { broadcasterHooks: true } }),
+  async (req, res) => {
+    if (!req.body || !req.body.url) {
+      res.status(422);
+      return res.json({
+        errors: ["missing url"],
+      });
+    }
+    // logger.info(`got webhook: ${JSON.stringify(req.body)}`)
+    // These are of the form /live/:manifestId/:segmentNum.ts
+    let { pathname, protocol } = parseUrl(req.body.url);
+    // Protocol is sometimes undefined, due to https://github.com/livepeer/go-livepeer/issues/1006
+    if (!protocol) {
+      protocol = "http:";
+    }
+    if (protocol === "https:") {
+      protocol = "http:";
+    }
+    if (protocol !== "http:" && protocol !== "rtmp:") {
+      res.status(422);
+      return res.json({ errors: [`unknown protocol: ${protocol}`] });
+    }
 
-  // Allowed patterns, for now:
-  // http(s)://broadcaster.example.com/live/:streamId/:segNum.ts
-  // rtmp://broadcaster.example.com/live/:streamId
-  const [live, streamId, ...rest] = pathname.split("/").filter((x) => !!x);
-  // logger.info(`live=${live} streamId=${streamId} rest=${rest}`)
+    // Allowed patterns, for now:
+    // http(s)://broadcaster.example.com/live/:streamId/:segNum.ts
+    // rtmp://broadcaster.example.com/live/:streamId
+    const [live, streamId, ...rest] = pathname.split("/").filter((x) => !!x);
+    // logger.info(`live=${live} streamId=${streamId} rest=${rest}`)
 
-  if (!streamId) {
-    res.status(401);
-    return res.json({ errors: ["stream key is required"] });
-  }
-  if (protocol === "rtmp:" && rest.length > 0) {
-    res.status(422);
-    return res.json({
-      errors: [
-        "RTMP address should be rtmp://example.com/live. Stream key should be a UUID.",
-      ],
-    });
-  }
-  if (protocol === "http:" && rest.length > 3) {
-    res.status(422);
-    return res.json({
-      errors: [
-        "acceptable URL format: http://example.com/live/:streamId/:number.ts",
-      ],
-    });
-  }
-
-  if (live !== "live" && live !== "recordings") {
-    res.status(404);
-    return res.json({ errors: ["ingest url must start with /live/"] });
-  }
-
-  let stream = await db.stream.get(streamId);
-  if (!stream) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
-  if (stream.suspended) {
-    res.status(403);
-    return res.json({ errors: ["stream is suspended"] });
-  }
-
-  const user = await db.user.get(stream.userId);
-  if (!user) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
-  if (user.suspended) {
-    res.status(403);
-    return res.json({ errors: ["user is suspended"] });
-  }
-
-  let objectStore,
-    recordObjectStore = undefined,
-    recordObjectStoreUrl;
-  if (stream.objectStoreId) {
-    const os = await db.objectStore.get(stream.objectStoreId);
-    if (!os) {
-      res.status(500);
+    if (!streamId) {
+      res.status(401);
+      return res.json({ errors: ["stream key is required"] });
+    }
+    if (protocol === "rtmp:" && rest.length > 0) {
+      res.status(422);
       return res.json({
         errors: [
-          `data integity error: object store ${stream.objectStoreId} not found`,
+          "RTMP address should be rtmp://example.com/live. Stream key should be a UUID.",
         ],
       });
     }
-    objectStore = os.url;
-  }
-  const isLive = live === "live";
-  if (
-    isLive &&
-    stream.record &&
-    req.config.recordObjectStoreId &&
-    !stream.recordObjectStoreId
-  ) {
-    const ros = await db.objectStore.get(req.config.recordObjectStoreId);
-    if (ros && !ros.disabled) {
-      await db.stream.update(stream.id, {
-        recordObjectStoreId: req.config.recordObjectStoreId,
+    if (protocol === "http:" && rest.length > 3) {
+      res.status(422);
+      return res.json({
+        errors: [
+          "acceptable URL format: http://example.com/live/:streamId/:number.ts",
+        ],
       });
-      stream.recordObjectStoreId = req.config.recordObjectStoreId;
-      if (stream.parentId && !stream.previousSessions) {
-        await db.session.update(stream.id, {
-          recordObjectStoreId: req.config.recordObjectStoreId,
+    }
+
+    if (live !== "live" && live !== "recordings") {
+      res.status(404);
+      return res.json({ errors: ["ingest url must start with /live/"] });
+    }
+
+    let stream = await db.stream.get(streamId);
+    if (!stream) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    if (stream.suspended) {
+      res.status(403);
+      return res.json({ errors: ["stream is suspended"] });
+    }
+
+    const user = await db.user.get(stream.userId);
+    if (!user) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    if (user.suspended) {
+      res.status(403);
+      return res.json({ errors: ["user is suspended"] });
+    }
+
+    let objectStore,
+      recordObjectStore = undefined,
+      recordObjectStoreUrl;
+    if (stream.objectStoreId) {
+      const os = await db.objectStore.get(stream.objectStoreId);
+      if (!os) {
+        res.status(500);
+        return res.json({
+          errors: [
+            `data integity error: object store ${stream.objectStoreId} not found`,
+          ],
         });
       }
+      objectStore = os.url;
     }
-  }
-  if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
-    const ros = await db.objectStore.get(stream.recordObjectStoreId);
-    if (!ros) {
-      res.status(500);
-      return res.json({
-        errors: [
-          `data integity error: record object store ${stream.recordObjectStoreId} not found`,
-        ],
-      });
+    const isLive = live === "live";
+    if (
+      isLive &&
+      stream.record &&
+      req.config.recordObjectStoreId &&
+      !stream.recordObjectStoreId
+    ) {
+      const ros = await db.objectStore.get(req.config.recordObjectStoreId);
+      if (ros && !ros.disabled) {
+        await db.stream.update(stream.id, {
+          recordObjectStoreId: req.config.recordObjectStoreId,
+        });
+        stream.recordObjectStoreId = req.config.recordObjectStoreId;
+        if (stream.parentId && !stream.previousSessions) {
+          await db.session.update(stream.id, {
+            recordObjectStoreId: req.config.recordObjectStoreId,
+          });
+        }
+      }
     }
-    recordObjectStore = ros.url;
-    if (ros.publicUrl) {
-      recordObjectStoreUrl = ros.publicUrl;
+    if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
+      const ros = await db.objectStore.get(stream.recordObjectStoreId);
+      if (!ros) {
+        res.status(500);
+        return res.json({
+          errors: [
+            `data integity error: record object store ${stream.recordObjectStoreId} not found`,
+          ],
+        });
+      }
+      recordObjectStore = ros.url;
+      if (ros.publicUrl) {
+        recordObjectStoreUrl = ros.publicUrl;
+      }
     }
-  }
 
-  // Use our parents' playbackId for sharded playback
-  let manifestID = streamId;
-  if (stream.parentId) {
-    const parent = await db.stream.get(stream.parentId);
-    manifestID = parent.playbackId;
-  }
-
-  const { data: webhooks } = await db.webhook.listSubscribed(
-    user.id,
-    streamDetectionEvent
-  );
-  let detection = undefined;
-  if (webhooks.length > 0 || stream.detection) {
-    // TODO: Validate if these are the best default configs
-    detection = {
-      freq: 4, // Segment sample rate. Process 1 / freq segments
-      sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
-      sceneClassification: [{ name: "soccer" }, { name: "adult" }],
-    };
-    if (stream.detection?.sceneClassification) {
-      detection.sceneClassification = stream.detection?.sceneClassification;
+    // Use our parents' playbackId for sharded playback
+    let manifestID = streamId;
+    if (stream.parentId) {
+      const parent = await db.stream.get(stream.parentId);
+      manifestID = parent.playbackId;
     }
-    console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
-  }
 
-  res.json({
-    manifestID,
-    presets: stream.presets,
-    profiles: stream.profiles,
-    objectStore,
-    recordObjectStore,
-    recordObjectStoreUrl,
-    previousSessions: stream.previousSessions,
-    detection,
-  });
-});
+    const { data: webhooks } = await db.webhook.listSubscribed(
+      user.id,
+      streamDetectionEvent
+    );
+    let detection = undefined;
+    if (webhooks.length > 0 || stream.detection) {
+      // TODO: Validate if these are the best default configs
+      detection = {
+        freq: 4, // Segment sample rate. Process 1 / freq segments
+        sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+        sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+      };
+      if (stream.detection?.sceneClassification) {
+        detection.sceneClassification = stream.detection?.sceneClassification;
+      }
+      console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
+    }
+
+    res.json({
+      manifestID,
+      presets: stream.presets,
+      profiles: stream.profiles,
+      objectStore,
+      recordObjectStore,
+      recordObjectStoreUrl,
+      previousSessions: stream.previousSessions,
+      detection,
+    });
+  }
+);
 
 app.post(
   "/hook/detection",
-  authMiddleware({}),
+  authMiddleware({ access: { broadcasterHooks: true } }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
-    if (!req.user.admin && !req.user.access?.broadcasterHooks) {
-      return res.status(403).json({ errors: ["restricted api"] });
-    }
     const { manifestID, seqNo, sceneClassification } = req.body;
     const stream = await db.stream.getByIdOrPlaybackId(manifestID);
     if (!stream) {

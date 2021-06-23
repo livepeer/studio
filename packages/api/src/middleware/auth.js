@@ -73,6 +73,13 @@ function authFactory(params) {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
+    if (params.access && !user.admin) {
+      for (const [key, required] of Object.entries(params.access)) {
+        if (required && !user.access?.[key]) {
+          throw new ForbiddenError(`user does not have required priviledges`);
+        }
+      }
+    }
 
     req.user = user;
     req.authTokenType = tokenType;
