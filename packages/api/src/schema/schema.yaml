@@ -120,6 +120,7 @@ components:
 
     detection-webhook-payload:
       type: object
+      required: [manifestID]
       properties:
         manifestID:
           type: string

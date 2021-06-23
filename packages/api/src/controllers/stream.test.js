@@ -1,8 +1,11 @@
+import { json as bodyParserJson } from "body-parser";
 import uuid from "uuid/v4";
 
 import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
-import { sleep } from "../util";
+import { TestClient, clearDatabase, startAuxTestServer } from "../test-helpers";
+import { semaphore, sleep } from "../util";
+
+const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
 let server;
 let mockStore;
@@ -709,118 +712,224 @@ describe("controllers/stream", () => {
       await server.store.create(stream);
     });
 
-    const happyCases = [
-      `rtmp://56.13.68.32/live/STREAM_ID`,
-      `http://localhost/live/STREAM_ID/12354.ts`,
-      `https://example.com/live/STREAM_ID/0.ts`,
-      `/live/STREAM_ID/99912938429430820984294083.ts`,
-    ];
+    describe("auth webhook", () => {
+      const happyCases = [
+        `rtmp://56.13.68.32/live/STREAM_ID`,
+        `http://localhost/live/STREAM_ID/12354.ts`,
+        `https://example.com/live/STREAM_ID/0.ts`,
+        `/live/STREAM_ID/99912938429430820984294083.ts`,
+      ];
 
-    for (let url of happyCases) {
-      it(`should succeed for ${url}`, async () => {
-        url = url.replace("STREAM_ID", stream.id);
-        res = await client.post("/stream/hook", { url });
-        expect(res.status).toBe(200);
-        data = await res.json();
-        expect(data.presets).toEqual(stream.presets);
-        expect(data.objectStore).toEqual(mockStore.url);
+      for (let url of happyCases) {
+        it(`should succeed for ${url}`, async () => {
+          url = url.replace("STREAM_ID", stream.id);
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.presets).toEqual(stream.presets);
+          expect(data.objectStore).toEqual(mockStore.url);
+        });
+      }
+
+      const sadCases = [
+        [422, `rtmp://localhost/live/foo/bar/extra`],
+        [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
+        [422, "nonsense://localhost/live"],
+        [401, `https://localhost/live`],
+        [404, `https://localhost/notlive/STREAM_ID/1324.ts`],
+        [404, `rtmp://localhost/notlive/STREAM_ID`],
+        [404, `rtmp://localhost/live/nonexists`],
+        [404, `https://localhost/live/notexists/1324.ts`],
+      ];
+
+      for (let [status, url] of sadCases) {
+        it(`should return ${status} for ${url}`, async () => {
+          url = url.replace("STREAM_ID", stream.id);
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(status);
+        });
+      }
+
+      it("should reject missing urls", async () => {
+        res = await client.post("/stream/hook", {});
+        expect(res.status).toBe(422);
       });
-    }
 
-    const sadCases = [
-      [422, `rtmp://localhost/live/foo/bar/extra`],
-      [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
-      [422, "nonsense://localhost/live"],
-      [401, `https://localhost/live`],
-      [404, `https://localhost/notlive/STREAM_ID/1324.ts`],
-      [404, `rtmp://localhost/notlive/STREAM_ID`],
-      [404, `rtmp://localhost/live/nonexists`],
-      [404, `https://localhost/live/notexists/1324.ts`],
-    ];
+      describe("detection config", async () => {
+        const url = (id) => happyCases[0].replace("STREAM_ID", id);
+        const defaultDetection = {
+          freq: 4,
+          sampleRate: 10,
+          sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+        };
 
-    for (let [status, url] of sadCases) {
-      it(`should return ${status} for ${url}`, async () => {
-        url = url.replace("STREAM_ID", stream.id);
-        res = await client.post("/stream/hook", { url });
-        expect(res.status).toBe(status);
+        it("should not include detection field by default", async () => {
+          res = await client.post("/stream/hook", { url: url(stream.id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toBeUndefined();
+        });
+
+        it("should return default detection if subscribed webhook exists", async () => {
+          await server.db.webhook.create({
+            id: uuid(),
+            kind: "webhook",
+            event: "stream.detection",
+            userId: stream.userId,
+            createdAt: Date.now(),
+            url: "https://zoo.tv/abuse/hook",
+          });
+
+          res = await client.post("/stream/hook", { url: url(stream.id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
+
+        it("should return default detection if stream includes it", async () => {
+          const id = uuid();
+          await server.store.create({ ...stream, id, detection: {} });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
+
+        it("should return stream scene classification config", async () => {
+          const id = uuid();
+          await server.store.create({
+            ...stream,
+            id,
+            detection: { sceneClassification: [{ name: "adult" }] },
+          });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual({
+            ...defaultDetection,
+            sceneClassification: [{ name: "adult" }],
+          });
+        });
+
+        it("should disallow configuring sample rates", async () => {
+          const id = uuid();
+          await server.store.create({
+            ...stream,
+            id,
+            detection: { freq: 1, sampleRate: 9 },
+          });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
       });
-    }
-
-    it("should reject missing urls", async () => {
-      res = await client.post("/stream/hook", {});
-      expect(res.status).toBe(422);
     });
 
-    describe("detection config", async () => {
-      const url = (id) => happyCases[0].replace("STREAM_ID", id);
-      const defaultDetection = {
-        freq: 4,
-        sampleRate: 10,
-        sceneClassification: [{ name: "soccer" }, { name: "adult" }],
-      };
-
-      it("should not include detection field by default", async () => {
-        res = await client.post("/stream/hook", { url: url(stream.id) });
-        expect(res.status).toBe(200);
+    describe("detection webhook", () => {
+      it("should return an error if no manifest ID provided", async () => {
+        res = await client.post("/stream/hook/detection", {});
+        expect(res.status).toBe(422);
         data = await res.json();
-        expect(data.detection).toBeUndefined();
+        expect(data.errors[0]).toContain(`\"required\"`);
       });
 
-      it("should return default detection if subscribed webhook exists", async () => {
-        await server.db.webhook.create({
-          id: uuid(),
-          kind: "webhook",
-          event: "stream.detection",
-          userId: stream.userId,
-          createdAt: Date.now(),
-          url: "https://zoo.tv/abuse/hook",
-        });
-
-        res = await client.post("/stream/hook", { url: url(stream.id) });
-        expect(res.status).toBe(200);
-        data = await res.json();
-        expect(data.detection).toEqual(defaultDetection);
-      });
-
-      it("should return default detection if stream includes it", async () => {
+      it("should return an error if stream doesn't exist", async () => {
         const id = uuid();
-        await server.store.create({ ...stream, id, detection: {} });
-
-        res = await client.post("/stream/hook", { url: url(id) });
-        expect(res.status).toBe(200);
+        res = await client.post("/stream/hook/detection", { manifestID: id });
+        expect(res.status).toBe(404);
         data = await res.json();
-        expect(data.detection).toEqual(defaultDetection);
+        expect(data.errors[0]).toEqual("stream not found");
+
+        res = await client.post("/stream/hook/detection", {
+          manifestID: stream.id,
+        });
+        expect(res.status).toBe(404);
+        data = await res.json();
+        expect(data.errors[0]).toEqual("stream not found");
       });
 
-      it("should return stream scene classification config", async () => {
-        const id = uuid();
-        await server.store.create({
-          ...stream,
-          id,
-          detection: { sceneClassification: [{ name: "adult" }] },
+      it("should only accept a scene classification array", async () => {
+        res = await client.post("/stream/hook/detection", {
+          manifestID: "-",
+          sceneClassification: { shouldBe: "array" },
         });
-
-        res = await client.post("/stream/hook", { url: url(id) });
-        expect(res.status).toBe(200);
+        expect(res.status).toBe(422);
         data = await res.json();
-        expect(data.detection).toEqual({
-          ...defaultDetection,
-          sceneClassification: [{ name: "adult" }],
-        });
+        expect(data.errors[0]).toContain(`\"type\"`);
       });
 
-      it("should disallow configuring sample rates", async () => {
-        const id = uuid();
-        await server.store.create({
-          ...stream,
-          id,
-          detection: { freq: 1, sampleRate: 9 },
+      describe("emitted event", () => {
+        let webhookServer;
+        let hookSem;
+        let hookPayload;
+        let genMockWebhook;
+
+        beforeAll(async () => {
+          webhookServer = await startAuxTestServer();
+          webhookServer.app.use(bodyParserJson());
+          webhookServer.app.post(
+            "/captain/hook",
+            bodyParserJson(),
+            (req, res) => {
+              hookPayload = req.body;
+              hookSem.release();
+              res.status(204).end();
+            }
+          );
+          genMockWebhook = () => ({
+            id: uuid(),
+            userId: nonAdminUser.id,
+            name: "detection-webhook",
+            kind: "webhook",
+            createdAt: Date.now(),
+            event: "stream.detection",
+            url: `http://localhost:${webhookServer.port}/captain/hook`,
+          });
         });
 
-        res = await client.post("/stream/hook", { url: url(id) });
-        expect(res.status).toBe(200);
-        data = await res.json();
-        expect(data.detection).toEqual(defaultDetection);
+        afterAll(() => webhookServer.close());
+
+        beforeEach(async () => {
+          hookSem = semaphore();
+          hookPayload = undefined;
+
+          client.jwtAuth = nonAdminToken.token;
+          const res = await client.post("/stream", postMockStream);
+          expect(res.status).toBe(201);
+          stream = await res.json();
+        });
+
+        it("should return success if no webhook registered", async () => {
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+          });
+          expect(res.status).toBe(204);
+        });
+
+        it("should propagate event to registered webhook", async () => {
+          const sceneClassification = [
+            { name: "soccer", probability: 0.7 },
+            { name: "adult", probability: 0.68 },
+          ];
+          await server.db.webhook.create(genMockWebhook());
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+            sceneClassification,
+          });
+          expect(res.status).toBe(204);
+
+          await hookSem.wait(1000);
+          expect(hookPayload).toEqual({
+            id: expect.stringMatching(uuidRegex),
+            event: "stream.detection",
+            stream: { ...stream, streamKey: undefined },
+            payload: { sceneClassification },
+          });
+        });
       });
     });
   });

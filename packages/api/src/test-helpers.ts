@@ -1,18 +1,63 @@
+import express, { Express } from "express";
 import isoFetch from "isomorphic-fetch";
+
 import schema from "./schema/schema.json";
+import { TestServer } from "./test-server";
 
 /**
  * Clear the entire database! Not to be used outside of tests
  */
-export async function clearDatabase(server) {
+export async function clearDatabase(server: TestServer) {
   const tables = Object.values(schema.components.schemas)
-    .filter((x) => x.table)
-    .map((x) => x.table);
+    .map((s) => ("table" in s ? s.table : null))
+    .filter((t) => !!t);
   await Promise.all(tables.map((t) => server.db.query(`TRUNCATE TABLE ${t}`)));
 }
 
+export interface AuxTestServer {
+  app: Express;
+  port: number;
+  close: () => Promise<void>;
+}
+
+export function startAuxTestServer(port?: number) {
+  const app = express();
+  const listener = port ? app.listen(port) : app.listen();
+  const close = () =>
+    new Promise<void>((resolve, reject) => {
+      listener.close((err) => {
+        return err ? reject(err) : resolve();
+      });
+    });
+
+  return new Promise<AuxTestServer>((resolve, reject) => {
+    listener.on("error", reject);
+    listener.on("listening", () => {
+      const addr = listener.address();
+      if (!addr || typeof addr === "string") {
+        listener.close();
+        return reject(new Error("Unexpected non-AddressInfo listener address"));
+      }
+      const { port } = addr;
+      console.log("Aux test server listening at http://localhost:%s", port);
+
+      resolve({ app, close, port });
+    });
+  });
+}
+
 export class TestClient {
-  constructor(opts) {
+  server: TestServer;
+  apiKey: string;
+  jwtAuth: string;
+  googleAuthorization: string;
+
+  constructor(opts: {
+    server: TestServer;
+    apiKey?: string;
+    jwtAuth?: string;
+    googleAuthorization?: string;
+  }) {
     if (!opts.server) {
       throw new Error("TestClient missing server");
     }
@@ -22,14 +67,15 @@ export class TestClient {
     if (opts.apiKey) {
       this.apiKey = opts.apiKey;
     }
-    this.jwtAuth = "";
-
+    if (opts.jwtAuth) {
+      this.jwtAuth = opts.jwtAuth;
+    }
     if (opts.googleAuthorization) {
       this.googleAuthorization = opts.googleAuthorization;
     }
   }
 
-  async fetch(path, args = {}) {
+  async fetch(path, args: RequestInit = {}) {
     let headers = args.headers || {};
     if (this.apiKey) {
       headers = {
@@ -53,19 +99,19 @@ export class TestClient {
     return res;
   }
 
-  async get(path) {
+  async get(path: string) {
     return await this.fetch(path, { method: "GET" });
   }
 
-  async delete(path) {
+  async delete(path: string) {
     const params = {
       method: "DELETE",
     };
     return await this.fetch(path, params);
   }
 
-  async post(path, data) {
-    const params = {
+  async post(path: string, data: any) {
+    const params: RequestInit = {
       method: "POST",
     };
     if (data) {
@@ -77,8 +123,8 @@ export class TestClient {
     return await this.fetch(path, params);
   }
 
-  async put(path, data) {
-    const params = {
+  async put(path: string, data: any) {
+    const params: RequestInit = {
       method: "PUT",
     };
     if (data) {
@@ -90,8 +136,8 @@ export class TestClient {
     return await this.fetch(path, params);
   }
 
-  async patch(path, data) {
-    const params = {
+  async patch(path: string, data: any) {
+    const params: RequestInit = {
       method: "PATCH",
     };
     if (data) {

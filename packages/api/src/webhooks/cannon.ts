@@ -1,14 +1,14 @@
 import { DB } from "../store/db";
-import { Queue, Webhook, User, Stream } from "../schema/types";
+import { Webhook, User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 // import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
-import uuid from "uuid/v4";
 
+import uuid from "uuid/v4";
 import { parse as parseUrl } from "url";
-import bytesToUuid from "uuid/lib/bytesToUuid";
+import { ConsumeMessage } from "amqplib";
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
 // const resolver = new Resolver();
@@ -17,6 +17,17 @@ const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;
 const BACKOFF_COEF = 1.2;
 const MAX_RETRIES = 20;
+
+export interface WebhookMessage {
+  id: string;
+  event: Webhook["event"];
+  userId: string;
+  streamId: string;
+  payload?: Object;
+  retries?: number;
+  lastInterval?: number;
+  status?: string;
+}
 
 export default class WebhookCannon {
   db: DB;
@@ -40,7 +51,7 @@ export default class WebhookCannon {
     await this.queue.consume(this.handleQueueMsg.bind(this));
   }
 
-  async handleQueueMsg(data: any) {
+  async handleQueueMsg(data: ConsumeMessage) {
     let message = JSON.parse(data.content.toString());
     console.log("webhookCannon: got message", message);
     try {
@@ -78,7 +89,7 @@ export default class WebhookCannon {
     return newInterval;
   }
 
-  retry(event) {
+  retry(event: WebhookMessage) {
     if (event && event.retries && event.retries >= MAX_RETRIES) {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${event.id}, streamId: ${event.streamId}`
@@ -96,7 +107,7 @@ export default class WebhookCannon {
   }
 
   async _fireHook(
-    event: Queue,
+    event: WebhookMessage,
     webhook: Webhook,
     sanitized: Stream,
     user: User,
@@ -186,7 +197,7 @@ export default class WebhookCannon {
 
   async storeResponse(
     webhook: Webhook,
-    event: Queue,
+    event: WebhookMessage,
     resp: Response,
     duration = 0
   ) {
@@ -199,7 +210,7 @@ export default class WebhookCannon {
     });
   }
 
-  async onTrigger(event: Queue) {
+  async onTrigger(event: WebhookMessage) {
     console.log("ON TRIGGER triggered", event);
     if (!event) {
       // throw new Error('onTrigger requires a Queue event!')
@@ -216,7 +227,9 @@ export default class WebhookCannon {
     console.log("webhooks : ", webhooksList);
     let stream = await this.db.stream.get(event.streamId);
     // basic sanitization.
-    let sanitized = { ...stream };
+    let sanitized = this.db.stream.addDefaultFields(
+      this.db.stream.removePrivateFields({ ...stream })
+    );
     delete sanitized.streamKey;
 
     let user = await this.db.user.get(event.userId);

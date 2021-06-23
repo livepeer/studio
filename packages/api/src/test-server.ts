@@ -48,7 +48,7 @@ let server;
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
-export default Promise.resolve().then(async () => {
+async function setupServer() {
   if (params.storage === "firestore") {
     server = {
       ...params,
@@ -76,7 +76,7 @@ export default Promise.resolve().then(async () => {
     if (result.status !== 200) {
       const text = await result.text();
       const errorArgs = args.map((x) => JSON.stringify(x)).join(", ");
-      const err = new Error(
+      const err: Error & { status?: number } = new Error(
         `error while attempting req.store.${action}(${errorArgs}): ${result.status} ${text}`
       );
       err.status = result.status;
@@ -94,11 +94,19 @@ export default Promise.resolve().then(async () => {
     db: server.db,
     queue: server.queue,
   };
-});
+}
 
 afterAll(async () => {
   if (server) {
+    await server.queue.close();
     await server.close();
+    server = null;
   }
   fs.removeSync(dbPath);
 });
+
+type UnboxPromise<T> = T extends Promise<infer U> ? U : T;
+
+export type TestServer = UnboxPromise<ReturnType<typeof setupServer>> &
+  Record<string, unknown>; // necessary for kebab=>camel case properties
+export default Promise.resolve().then(setupServer);

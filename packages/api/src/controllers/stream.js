@@ -1397,7 +1397,6 @@ app.post("/hook", async (req, res) => {
   });
 });
 
-// TODO: create some tests for this
 app.post(
   "/hook/detection",
   validatePost("detection-webhook-payload"),
@@ -1421,7 +1420,7 @@ app.post(
         sceneClassification,
       },
     });
-    return res.status(204);
+    return res.status(204).end();
   }
 );
 

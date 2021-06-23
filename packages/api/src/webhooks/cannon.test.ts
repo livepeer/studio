@@ -4,17 +4,21 @@ import { DB } from "../store/db";
 import schema from "../schema/schema.json";
 import WebhookCannon from "./cannon";
 import makeStore from "../store";
-import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
+import {
+  TestClient,
+  clearDatabase,
+  startAuxTestServer,
+  AuxTestServer,
+} from "../test-helpers";
 import { semaphore } from "../util";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
 
 describe("webhook cannon", () => {
-  let server;
-  let webhookServer;
-  let listener;
+  let server: TestServer;
+  let webhookServer: AuxTestServer;
   let testHost;
   let db;
 
@@ -125,29 +129,13 @@ describe("webhook cannon", () => {
   });
 
   beforeAll(async () => {
-    webhookServer = express();
-    return new Promise<void>((resolve, reject) => {
-      listener = webhookServer.listen(30000, function (err) {
-        if (err) {
-          return reject(err);
-        }
-        const port = listener.address().port;
-        testHost = `http://localhost:${port}`;
-        console.log("Example app listening at http://%s", testHost);
-        resolve();
-      });
-    });
+    webhookServer = await startAuxTestServer(30000);
+    testHost = `http://localhost:${webhookServer.port}`;
   });
 
   afterAll(async () => {
-    await new Promise<void>((resolve, reject) => {
-      listener.close(() => {
-        resolve();
-      });
-    });
+    await webhookServer.close();
     server.queue.close();
-    server.webhook.stop();
-    webhookServer.close();
     // await db.close();
   });
 
@@ -157,7 +145,7 @@ describe("webhook cannon", () => {
 
   it("should have a test server", async () => {
     // webhookServer.use(bodyParser);
-    webhookServer.get("/self-test", (req, res) => {
+    webhookServer.app.get("/self-test", (req, res) => {
       res.end("self test was good");
     });
     const res = await fetch(`${testHost}/self-test`);
@@ -200,8 +188,8 @@ describe("webhook cannon", () => {
     // test endpoint
     const sem = semaphore();
     let resp: number;
-    webhookServer.use(bodyParser.json());
-    webhookServer.post("/webhook", (req, res) => {
+    webhookServer.app.use(bodyParser.json());
+    webhookServer.app.post("/webhook", (req, res) => {
       console.log("WEBHOOK WORKS , body", req.body);
       resp = 200;
       res.end();
