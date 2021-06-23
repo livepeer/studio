@@ -230,6 +230,7 @@ describe("controllers/api-token", () => {
     });
   });
 
+  /*
   describe("user endpoint with api key", () => {
     let client;
     const adminApiKey = uuid();
@@ -281,4 +282,5 @@ describe("controllers/api-token", () => {
     //   expect(res.status).toBe(403)
     // })
   });
+  */
 });
