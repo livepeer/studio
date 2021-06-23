@@ -150,6 +150,7 @@ app.post(
         userId: userId,
         kind: "api-token",
         name: req.body.name,
+        access: req.body.access,
         createdAt: Date.now(),
       }),
       trackAction(

@@ -682,6 +682,19 @@ components:
         name:
           type: string
           example: Example Token
+        access:
+          type: object
+          additionalProperties: false
+          default: { "all": true }
+          properties:
+            all:
+              type: boolean
+            list:
+              type: array
+              items:
+                type: string
+                enum:
+                  - broadcasterHooks
         lastSeen:
           type: number
           example: 1587667174725
@@ -741,8 +754,6 @@ components:
         admin:
           type: boolean
           example: true
-        access:
-          $ref: "#/components/schemas/user/properties/access"
 
     create-customer:
       type: object
@@ -913,13 +924,6 @@ components:
         admin:
           type: boolean
           example: true
-        access:
-          type: object
-          additionalProperties: false
-          properties:
-            broadcasterHooks:
-              type: boolean
-              example: false
         kind:
           type: string
           readOnly: true

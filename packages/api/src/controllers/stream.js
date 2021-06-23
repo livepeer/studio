@@ -1143,7 +1143,7 @@ const streamDetectionEvent = "stream.detection";
 
 app.post(
   "/hook",
-  authMiddleware({ access: { broadcasterHooks: true } }),
+  authMiddleware({ anyAdmin: true, access: { list: ["broadcasterHooks"] } }),
   async (req, res) => {
     if (!req.body || !req.body.url) {
       res.status(422);
@@ -1311,7 +1311,7 @@ app.post(
 
 app.post(
   "/hook/detection",
-  authMiddleware({ access: { broadcasterHooks: true } }),
+  authMiddleware({ anyAdmin: true, access: { list: ["broadcasterHooks"] } }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
     const { manifestID, seqNo, sceneClassification } = req.body;

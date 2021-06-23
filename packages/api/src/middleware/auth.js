@@ -11,6 +11,14 @@ function parseAuthToken(authToken) {
   return { tokenType: match[1], tokenValue: match[2] };
 }
 
+function isAuthorized(required, possessed) {
+  if (required.all) return possessed.all;
+  if (possessed.all) return true;
+
+  const reqList = required.list ?? [];
+  return reqList.every((a) => possessed.list?.includes(a));
+}
+
 /**
  * creates an authentication middleware that can be customized.
  * @param {Object} params auth middleware params, to be defined later
@@ -73,11 +81,11 @@ function authFactory(params) {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    if (params.access && !user.admin) {
-      for (const [key, required] of Object.entries(params.access)) {
-        if (required && !user.access?.[key]) {
-          throw new ForbiddenError(`user does not have required priviledges`);
-        }
+    if (params.access || tokenObject?.access) {
+      const required = params.access ?? { all: true };
+      const possessed = tokenObject?.access ?? { all: true };
+      if (!isAuthorized(required, possessed)) {
+        throw new ForbiddenError(`credential has insufficent privileges`);
       }
     }
 
