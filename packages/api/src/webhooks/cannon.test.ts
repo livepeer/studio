@@ -139,9 +139,6 @@ describe("webhook cannon", () => {
     // await db.close();
   });
 
-  // afterEach(() => {
-  //   listener.close();
-  // });
 
   it("should have a test server", async () => {
     // webhookServer.use(bodyParser);
@@ -154,6 +151,9 @@ describe("webhook cannon", () => {
   });
 
   it("should be able to receive the webhook event", async () => {
+
+    await server.store.create({ id: "streamid", userId: nonAdminUser.id, kind: "stream"});
+
     // create the webhook
     let res = await client.post("/webhook", { ...mockWebhook });
     let resJson = await res.json();
@@ -187,7 +187,7 @@ describe("webhook cannon", () => {
 
     // test endpoint
     const sem = semaphore();
-    let resp: number;
+    let resp: number = -1;
     webhookServer.app.use(bodyParser.json());
     webhookServer.app.post("/webhook", (req, res) => {
       console.log("WEBHOOK WORKS , body", req.body);
@@ -201,12 +201,20 @@ describe("webhook cannon", () => {
       time: Date.now(),
       channel: "test.channel",
       event: "stream.started",
-      streamId: resJson.id,
+      streamId: "streamid",
       userId: nonAdminUser.id,
       isConsumed: false,
     });
 
     await sem.wait(3000);
     expect(resp).toBe(200);
+    // need to wait until cannon will write webhook response to db
+    await sleep(2000)
   });
 });
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
