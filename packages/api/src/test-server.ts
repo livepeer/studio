@@ -49,41 +49,9 @@ let server;
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
 async function setupServer() {
-  if (params.storage === "firestore") {
-    server = {
-      ...params,
-      host: "https://livepeer-test.livepeer.workers.dev",
-      close: () => {},
-    };
-  } else {
-    server = await makeApp(params);
-    server.host = `http://127.0.0.1:${server.port}`;
-  }
-  // Make an RPC call to the server to have it do this store thing
-  const doStore = (action) => async (...args) => {
-    args = args.map((x) => (x === undefined ? "UNDEFINED" : x));
-    // console.log(`client: ${action} ${JSON.stringify(args)}`)
-    const result = await fetch(`${server.host}/${params.insecureTestToken}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ action, args }),
-    });
-    if (result.status === 204) {
-      return null;
-    }
-    if (result.status !== 200) {
-      const text = await result.text();
-      const errorArgs = args.map((x) => JSON.stringify(x)).join(", ");
-      const err: Error & { status?: number } = new Error(
-        `error while attempting req.store.${action}(${errorArgs}): ${result.status} ${text}`
-      );
-      err.status = result.status;
-      throw err;
-    }
-    return await result.json();
-  };
+  server = await makeApp(params);
+
+  server.host = `http://127.0.0.1:${server.port}`;
   return {
     ...params,
     host: server.host,
@@ -93,11 +61,13 @@ async function setupServer() {
     },
     db: server.db,
     queue: server.queue,
+    webhook: server.webhook,
   };
 }
 
 afterAll(async () => {
   if (server) {
+    await server.webhook.stop();
     await server.queue.close();
     await server.close();
     server = null;
