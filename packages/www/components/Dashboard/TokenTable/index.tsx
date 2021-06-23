@@ -7,6 +7,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
+import Table from "components/Dashboard/Table";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Column, Row } from "react-table";

@@ -1,6 +1,10 @@
 import winston from "winston";
 
+const isSilentTest =
+  process.env.NODE_ENV === "test" && process.argv.indexOf("--silent") > 0;
+
 export default winston.createLogger({
+  silent: isSilentTest,
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),

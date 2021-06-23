@@ -1,4 +1,10 @@
-import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  Column,
+  Row,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
 import {
   useEffect,
   useMemo,

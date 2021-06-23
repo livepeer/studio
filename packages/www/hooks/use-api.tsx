@@ -107,7 +107,8 @@ const getCursor = (link?: string): string => {
   if (!match) {
     return "";
   }
-  return qs.parse(match[1]).cursor;
+  const { cursor } = qs.parse(match[1]);
+  return cursor?.toString() ?? "";
 };
 
 const makeContext = (state: ApiState, setState) => {
@@ -428,6 +429,25 @@ const makeContext = (state: ApiState, setState) => {
       });
 
       return [res, invoice];
+    },
+
+    async getPaymentMethod(
+      stripePaymentMethodId: string
+    ): Promise<[Response, PaymentMethodData | ApiError]> {
+      let [res, paymentMethod] = await context.fetch(
+        `/user/retrieve-payment-method`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripePaymentMethodId,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+
+      return [res, paymentMethod];
     },
 
     async updateCustomerPaymentMethod({

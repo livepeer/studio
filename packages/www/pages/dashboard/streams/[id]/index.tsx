@@ -17,12 +17,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@livepeer.com/design-system";
-import Layout from "../../../layouts/dashboard";
-import useLoggedIn from "../../../hooks/use-logged-in";
+import Layout from "../../../../layouts/dashboard";
+import useLoggedIn from "../../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
-import { useApi, usePageVisibility } from "../../../hooks";
+import { useApi, usePageVisibility } from "../../../../hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
 import {
@@ -30,7 +30,7 @@ import {
   isStaging,
   isDevelopment,
   formatNumber,
-} from "../../../lib/utils";
+} from "../../../../lib/utils";
 import { RenditionsDetails } from "components/StreamsTable";
 import { RelativeTime } from "components/CommonAdminTable";
 import {
@@ -44,6 +44,7 @@ import Record from "@components/Dashboard/StreamDetails/Record";
 import Terminate from "@components/Dashboard/StreamDetails/Terminate";
 import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
+import Link from "next/link";
 
 type TimedAlertProps = {
   text: string;
@@ -228,6 +229,7 @@ const ID = () => {
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
+
   useEffect(() => {
     if (!id) {
       return;
@@ -541,6 +543,7 @@ const ID = () => {
                             </A>
                           </Link>
                         </Box>
+
                         {ingest.map((_, i) => {
                           return (
                             <>
@@ -935,13 +938,15 @@ const ID = () => {
                     </Badge>
                   </Box>
                 )}
-
-                <Button
-                  size="3"
-                  variant="violet"
-                  css={{ mt: "$3", width: "100%" }}>
-                  View Stream Health
-                </Button>
+                <Link href={`/dashboard/streams/${stream?.id}/health`} passHref>
+                  <Button
+                    as="a"
+                    size="3"
+                    variant="violet"
+                    css={{ mt: "$3", width: "100%", cursor: "pointer" }}>
+                    View Stream Health
+                  </Button>
+                </Link>
               </Box>
             </Grid>
 

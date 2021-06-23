@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -34,7 +34,6 @@ import {
   Text,
   useSnackbar,
 } from "@livepeer.com/design-system";
-import { useCallback } from "react";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";

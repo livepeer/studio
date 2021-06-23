@@ -1,8 +1,9 @@
 import Layout from "../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
+import Plans from "components/Dashboard/Plans";
 
-const Plans = () => {
+const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
@@ -11,13 +12,13 @@ const Plans = () => {
   }
   return (
     <Layout
-      id="plans"
+      id="billing/plans"
       breadcrumbs={[
-        { title: "Billing", href: "/dashboard/billing" },
+        { title: "Billing", href: "/dashboard/billing/plans" },
         { title: "Plans" },
       ]}>
       <Box css={{ p: "$6" }}>
-        <Box css={{ mb: "$8" }}>
+        <Box css={{ mb: "$6" }}>
           <Flex
             justify="between"
             align="end"
@@ -42,9 +43,15 @@ const Plans = () => {
             </Heading>
           </Flex>
         </Box>
+        <Plans
+          dashboard={true}
+          stripeProductId={
+            user?.stripeProductId ? user.stripeProductId : "prod_0"
+          }
+        />
       </Box>
     </Layout>
   );
 };
 
-export default Plans;
+export default PlansPage;

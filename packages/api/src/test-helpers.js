@@ -22,6 +22,7 @@ export class TestClient {
     if (opts.apiKey) {
       this.apiKey = opts.apiKey;
     }
+    this.jwtAuth = "";
 
     if (opts.googleAuthorization) {
       this.googleAuthorization = opts.googleAuthorization;
@@ -79,6 +80,19 @@ export class TestClient {
   async put(path, data) {
     const params = {
       method: "PUT",
+    };
+    if (data) {
+      params.headers = {
+        "content-type": "application/json",
+      };
+      params.body = JSON.stringify(data);
+    }
+    return await this.fetch(path, params);
+  }
+
+  async patch(path, data) {
+    const params = {
+      method: "PATCH",
     };
     if (data) {
       params.headers = {

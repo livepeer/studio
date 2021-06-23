@@ -88,9 +88,14 @@ export default async function makeApp(params) {
       credentials: true,
     })
   );
+  const isSilentTest =
+    process.env.NODE_ENV === "test" && process.argv.indexOf("--silent") > 0;
   app.use(
     morgan("dev", {
       skip: (req, res) => {
+        if (isSilentTest) {
+          return true;
+        }
         if (req.path.startsWith("/_next")) {
           return true;
         }

@@ -24,16 +24,10 @@ const Logo = ({ logoType = true, isDark, withoutBeta }: Props) => (
           textDecoration: "none",
         },
       }}>
-      <LogoSvg
-        sx={{
-          color: isDark ? "background" : "text",
-        }}
-      />
       {logoType && (
         <Flex
           sx={{
             alignItems: "center",
-            ml: "12px",
             fontWeight: 700,
             fontSize: "22px",
           }}>
