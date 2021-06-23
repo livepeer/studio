@@ -1142,7 +1142,7 @@ async function terminateStreamReq(req, stream) {
 const streamDetectionEvent = "stream.detection";
 
 app.post("/hook", authMiddleware({}), async (req, res) => {
-  if (!req.user.admin && !req.user.broadcaster) {
+  if (!req.user.admin && !req.user.access?.broadcasterHooks) {
     return res.status(403).json({ errors: ["restricted api"] });
   }
   if (!req.body || !req.body.url) {
@@ -1313,7 +1313,7 @@ app.post(
   authMiddleware({}),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
-    if (!req.user.admin && !req.user.broadcaster) {
+    if (!req.user.admin && !req.user.access?.broadcasterHooks) {
       return res.status(403).json({ errors: ["restricted api"] });
     }
     const { manifestID, seqNo, sceneClassification } = req.body;

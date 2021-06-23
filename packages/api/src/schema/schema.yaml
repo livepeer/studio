@@ -741,9 +741,8 @@ components:
         admin:
           type: boolean
           example: true
-        broadcaster:
-          type: boolean
-          example: false
+        access:
+          $ref: "#/components/schemas/user/properties/access"
 
     create-customer:
       type: object
@@ -914,9 +913,13 @@ components:
         admin:
           type: boolean
           example: true
-        broadcaster:
-          type: boolean
-          example: false
+        access:
+          type: object
+          additionalProperties: false
+          properties:
+            broadcasterHooks:
+              type: boolean
+              example: false
         kind:
           type: string
           readOnly: true

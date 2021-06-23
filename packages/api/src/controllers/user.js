@@ -468,13 +468,13 @@ app.post(
 
     let user = await req.store.get(`user/${userIds[0]}`, false);
     if (user) {
-      let { admin, broadcaster } = req.body;
-      broadcaster ??= user.broadcaster; // optional request field
-      user = { ...user, admin, broadcaster };
+      let { admin, access } = req.body;
+      access ??= user.access; // optional request field
+      user = { ...user, admin, access };
 
       await req.store.replace(user);
       res.status(201);
-      res.json({ email: user.email, admin, broadcaster });
+      res.json({ email: user.email, admin, access });
     } else {
       res.status(403);
       res.json({ errors: ["user not made an admin"] });
