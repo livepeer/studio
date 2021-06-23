@@ -8,6 +8,7 @@ import "shaka-player/dist/controls.css"; /* Shaka player CSS import */
 import "../css/shaka.css";
 import "../css/algolia-docsearch.css";
 import "keen-slider/keen-slider.min.css";
+
 export default class MyApp extends App {
   render() {
     const { Component, pageProps }: any = this.props;
