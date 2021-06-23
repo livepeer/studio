@@ -741,6 +741,9 @@ components:
         admin:
           type: boolean
           example: true
+        broadcaster:
+          type: boolean
+          example: false
 
     create-customer:
       type: object
@@ -911,6 +914,9 @@ components:
         admin:
           type: boolean
           example: true
+        broadcaster:
+          type: boolean
+          example: false
         kind:
           type: string
           readOnly: true
