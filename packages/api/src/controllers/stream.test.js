@@ -839,13 +839,19 @@ describe("controllers/stream", () => {
 
       it("should return an error if stream doesn't exist", async () => {
         const id = uuid();
-        res = await client.post("/stream/hook/detection", { manifestID: id });
+        res = await client.post("/stream/hook/detection", {
+          manifestID: id,
+          seqNo: 1,
+          sceneClassification: [],
+        });
         expect(res.status).toBe(404);
         data = await res.json();
         expect(data.errors[0]).toEqual("stream not found");
 
         res = await client.post("/stream/hook/detection", {
           manifestID: stream.id,
+          seqNo: 1,
+          sceneClassification: [],
         });
         expect(res.status).toBe(404);
         data = await res.json();
@@ -855,6 +861,7 @@ describe("controllers/stream", () => {
       it("should only accept a scene classification array", async () => {
         res = await client.post("/stream/hook/detection", {
           manifestID: "-",
+          seqNo: 1,
           sceneClassification: { shouldBe: "array" },
         });
         expect(res.status).toBe(422);
@@ -906,6 +913,8 @@ describe("controllers/stream", () => {
         it("should return success if no webhook registered", async () => {
           res = await client.post("/stream/hook/detection", {
             manifestID: stream.playbackId,
+            seqNo: 1,
+            sceneClassification: [],
           });
           expect(res.status).toBe(204);
         });
@@ -918,6 +927,7 @@ describe("controllers/stream", () => {
           await server.db.webhook.create(genMockWebhook());
           res = await client.post("/stream/hook/detection", {
             manifestID: stream.playbackId,
+            seqNo: 1,
             sceneClassification,
           });
           expect(res.status).toBe(204);
@@ -927,7 +937,7 @@ describe("controllers/stream", () => {
             id: expect.stringMatching(uuidRegex),
             event: "stream.detection",
             stream: { ...stream, streamKey: undefined },
-            payload: { sceneClassification },
+            payload: { sceneClassification, seqNo: 1 },
           });
         });
       });
