@@ -755,7 +755,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(422);
       });
 
-      describe("detection config", async () => {
+      describe("detection config", () => {
         const url = (id) => happyCases[0].replace("STREAM_ID", id);
         const defaultDetection = {
           freq: 4,
