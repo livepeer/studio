@@ -15,21 +15,27 @@ function parseAuthToken(authToken: string) {
   return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-type Access = ApiToken["access"];
+type ApiTokenAccess = ApiToken["access"];
 
-function isAuthorized(required: Access, possessed: Access) {
+interface RequiredAccess {
+  // TODO: `all` could alternatively be an array
+  all?: boolean;
+  any?: ApiTokenAccess["list"];
+}
+
+function isAuthorized(required: RequiredAccess, possessed: ApiTokenAccess) {
   if (required.all) return possessed.all;
   if (possessed.all) return true;
 
-  const reqList = required.list ?? [];
-  return reqList.every((a) => possessed.list?.includes(a));
+  const requireAny = required.any ?? [];
+  return requireAny.some((a) => possessed.list?.includes(a));
 }
 
 interface AuthParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
-  access?: Access;
+  access?: RequiredAccess;
 }
 
 /**
