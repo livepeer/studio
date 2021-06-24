@@ -1,11 +1,17 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
 import { useCallback, useState, useEffect } from "react";
-import { FilterIcon, StyledAccordion } from "./helpers";
-import TableFilterTextField from "./fields/text";
-import TableFilterDateField from "./fields/date";
-import TableFilterNumberField from "./fields/number";
-import { format } from "date-fns";
+import {
+  FilterIcon,
+  StyledAccordion,
+  CheckIcon,
+  StyledHeader,
+  StyledButton,
+  StyledItem,
+  StyledPanel,
+} from "./helpers";
+import FieldContent from "./fields";
+import { format, addDays } from "date-fns";
 import { useRouter } from "next/router";
 import { makeQuery, QueryParams } from "@lib/utils/router";
 
@@ -57,6 +63,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     items.map((i) => ({ ...i, isOpen: false }))
   );
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+  const [previousFilters, setPreviousFilters] = useState<Filter[]>([]);
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
@@ -68,7 +75,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     setIsOpen(false);
     onDone(filters);
     setActiveFiltersCount(getActiveFiltersCount(filters));
-    const formatted = formatFiltersForApiRequest(filters);
+    const formatted = formatFiltersForQueryParam(filters);
     const queryParams: QueryParams = {};
     filters.forEach((filter) => {
       const formattedFilter = formatted.find((f) => f.id === filter.id);
@@ -82,7 +89,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     const searchParams = new URLSearchParams(window.location.search);
     const itemsFromQueryParams: Filter[] = items.map((item) => {
       const searchParamValue = searchParams.get(item.id);
-      if (!searchParamValue) return { ...item, isOpen: false };
+      if (searchParamValue === null) return { ...item, isOpen: false };
       return formatFilterItemFromQueryParam(item, searchParamValue);
     });
     onDone(itemsFromQueryParams);
@@ -90,8 +97,21 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     setActiveFiltersCount(getActiveFiltersCount(itemsFromQueryParams));
   }, [items]);
 
+  const handleOpenChange = useCallback(
+    (isNowOpen) => {
+      if (isNowOpen) {
+        setIsOpen(true);
+        setPreviousFilters(filters);
+      } else {
+        setIsOpen(false);
+        setFilters(previousFilters);
+      }
+    },
+    [filters, previousFilters]
+  );
+
   return (
-    <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenu.Trigger
         as={Button}
         css={{ display: "flex", ai: "center", marginRight: "6px" }}
@@ -184,6 +204,12 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                               value: 0,
                             };
                             break;
+                          case "boolean":
+                            defaultCondition = {
+                              type: "boolean",
+                              value: false,
+                            };
+                            break;
                           default:
                             break;
                         }
@@ -208,11 +234,11 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                     ...p.map((f) => {
                       if (filter.label !== f.label) return f;
                       return {
+                        condition,
                         isOpen: true,
                         label: f.label,
                         type: f.type,
                         id: f.id,
-                        condition: condition,
                       };
                     }),
                   ];
@@ -220,43 +246,45 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                 });
               };
 
-              switch (filter.type) {
-                case "text":
-                  return (
-                    <TableFilterTextField
-                      label={filter.label}
-                      key={i}
-                      isOpen={filter.isOpen}
-                      onToggleOpen={onToggleOpen}
-                      condition={filter.isOpen ? filter.condition : null}
-                      onConditionChange={onConditionChange}
-                    />
-                  );
-                case "date":
-                  return (
-                    <TableFilterDateField
-                      label={filter.label}
-                      key={i}
-                      isOpen={filter.isOpen}
-                      onToggleOpen={onToggleOpen}
-                      condition={filter.isOpen ? filter.condition : null}
-                      onConditionChange={onConditionChange}
-                    />
-                  );
-                case "number":
-                  return (
-                    <TableFilterNumberField
-                      label={filter.label}
-                      key={i}
-                      isOpen={filter.isOpen}
-                      onToggleOpen={onToggleOpen}
-                      condition={filter.isOpen ? filter.condition : null}
-                      onConditionChange={onConditionChange}
-                    />
-                  );
-                default:
-                  return null;
-              }
+              return (
+                <StyledItem value={filter.label} key={i}>
+                  <StyledHeader>
+                    <StyledButton onClick={onToggleOpen}>
+                      <Box
+                        css={{
+                          minWidth: "13px",
+                          minHeight: "13px",
+                          borderRadius: "4px",
+                          boxShadow: "0px 0px 2px #000000",
+                          margin: "0px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          backgroundColor: filter.isOpen
+                            ? "darkgray"
+                            : "transparent",
+                        }}>
+                        {filter.isOpen && <CheckIcon />}
+                      </Box>
+                      <Text
+                        size="2"
+                        css={{ marginLeft: "$2", fontWeight: "bolder" }}>
+                        {filter.label}
+                      </Text>
+                    </StyledButton>
+                  </StyledHeader>
+                  <StyledPanel>
+                    {filter.isOpen && (
+                      <FieldContent
+                        label={filter.label}
+                        type={filter.type}
+                        condition={filter.isOpen ? filter.condition : null}
+                        onConditionChange={onConditionChange}
+                      />
+                    )}
+                  </StyledPanel>
+                </StyledItem>
+              );
             })}
           </StyledAccordion>
         </Box>
@@ -266,11 +294,11 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 };
 
 export const formatFiltersForApiRequest = (filters: Filter[]) => {
-  const normalized: { id: string; value: string }[] = [];
+  const normalized: { id: string; value: any }[] = [];
   filters.forEach((filter) => {
     if (!filter.isOpen) return;
-    switch (filter.type) {
-      case "text":
+    switch (filter.condition.type) {
+      case "contains":
         normalized.push({
           id: filter.id,
           value: filter.condition.value.toString(),
@@ -280,6 +308,62 @@ export const formatFiltersForApiRequest = (filters: Filter[]) => {
         normalized.push({
           id: filter.id,
           value: filter.condition.value.toString(),
+        });
+        break;
+      case "dateEqual":
+        normalized.push({
+          id: filter.id,
+          value: {
+            gte: new Date(filter.condition.value).getTime(),
+            lte: addDays(new Date(filter.condition.value), 1).getTime(),
+          },
+        });
+        break;
+      case "dateBetween":
+        normalized.push({
+          id: filter.id,
+          value: {
+            gte: new Date(filter.condition.value[0]).getTime(),
+            lte: addDays(new Date(filter.condition.value[1]), 1).getTime(),
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  });
+  return normalized;
+};
+
+export const formatFiltersForQueryParam = (filters: Filter[]) => {
+  const normalized: { id: string; value: string }[] = [];
+  filters.forEach((filter) => {
+    if (!filter.isOpen) return;
+    switch (filter.condition.type) {
+      case "contains":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
+      case "boolean":
+        normalized.push({
+          id: filter.id,
+          value: filter.condition.value.toString(),
+        });
+        break;
+      case "dateEqual":
+        normalized.push({
+          id: filter.id,
+          value: `${new Date(filter.condition.value).getTime()}`,
+        });
+        break;
+      case "dateBetween":
+        normalized.push({
+          id: filter.id,
+          value: `${new Date(filter.condition.value[0]).getTime()},${new Date(
+            filter.condition.value[1]
+          ).getTime()}`,
         });
         break;
       default:
@@ -293,6 +377,7 @@ export const formatFilterItemFromQueryParam = (
   filter: FilterItem,
   queryParamValue: string
 ): Filter => {
+  const decodedValue = decodeURIComponent(queryParamValue);
   switch (filter.type) {
     case "text":
       return {
@@ -300,14 +385,30 @@ export const formatFilterItemFromQueryParam = (
         isOpen: true,
         condition: {
           type: "contains",
-          value: queryParamValue,
+          value: decodedValue,
         },
       };
     case "boolean":
       return {
         ...filter,
         isOpen: true,
-        condition: { type: "boolean", value: queryParamValue === "true" },
+        condition: { type: "boolean", value: decodedValue === "true" },
+      };
+    case "date":
+      const splitted = decodedValue.split(",");
+      const isDateBetween = splitted.length > 1;
+      return {
+        ...filter,
+        isOpen: true,
+        // @ts-ignore
+        condition: {
+          type: isDateBetween ? "dateBetween" : "dateEqual",
+          value: isDateBetween
+            ? (splitted.map((s) =>
+                format(new Date(parseInt(s)), "yyyy-MM-dd")
+              ) as [string, string])
+            : format(new Date(parseInt(splitted[0])), "yyyy-MM-dd"),
+        },
       };
     default:
       return { ...filter, isOpen: false };

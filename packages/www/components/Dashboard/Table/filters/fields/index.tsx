@@ -1,80 +1,518 @@
-import { Box, Flex, TextField, Checkbox } from "@livepeer.com/design-system";
+import {
+  Box,
+  Flex,
+  TextField,
+  styled,
+  Checkbox,
+} from "@livepeer.com/design-system";
+import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
 import { useCallback } from "react";
+import { FilterType } from "..";
+import { ConditionType, Condition } from "..";
+import { format } from "date-fns";
 
-type AnyFilterValue = string;
-
-type BaseFilterProps<
-  Table extends Record<string, unknown>,
-  Value extends AnyFilterValue = string
-> = {
-  currentFilters: { id: keyof Table; value: Value }[] | undefined;
-  setFilter: (columnId: keyof Table, newValue: Value) => void;
-};
-
-export type InputFilterProps<Table extends Record<string, unknown>> = {
-  placeholder: string;
-  columnId: keyof Table;
-};
-
-const TextFilter = <Table extends Record<string, unknown>>({
-  currentFilters,
-  setFilter,
-  placeholder,
-  columnId,
-}: BaseFilterProps<Table> & InputFilterProps<Table>) => {
-  const value = currentFilters?.find((f) => f.id === columnId)?.value ?? "";
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilter(columnId, e.target.value);
+const Select = styled("select", {
+  WebkitAppearance: "none",
+  width: "100%",
+  height: "100%",
+  position: "absolute",
+  left: 0,
+  top: 0,
+  padding: "0px 11px",
+  fontSize: "12px",
+  lineHeight: "1",
+  borderRadius: "4px",
+  background: "$loContrast",
+  border: "none",
+  outline: "none",
+  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  "&:focus": {
+    border: "none",
+    outline: "none",
+    boxShadow:
+      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+    "&:-webkit-autofill": {
+      boxShadow:
+        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
     },
-    [setFilter]
-  );
+  },
+});
 
-  return (
-    <TextField
-      css={{ width: "100%", maxWidth: "300px" }}
-      value={value}
-      onChange={handleChange}
-      placeholder={placeholder}
-    />
-  );
-};
+const DateInput = styled("input", {
+  WebkitAppearance: "none",
+  height: "100%",
+  maxWidth: "88px",
+  position: "absolute",
+  paddingLeft: "30px",
+  fontSize: "12px",
+  fontFamily: "$untitled",
+  left: 0,
+  top: 0,
+  borderRadius: "4px",
+  background: "$loContrast",
+  border: "none",
+  outline: "none",
+  boxShadow: "inset 0 0 0 1px $colors$slate7",
+  "&::-webkit-calendar-picker-indicator": {
+    position: "absolute",
+    left: -18,
+    zIndex: 1,
+    opacity: "0",
+  },
+  "&:focus": {
+    border: "none",
+    outline: "none",
+    boxShadow:
+      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+    "&:-webkit-autofill": {
+      boxShadow:
+        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+    },
+  },
+});
 
-export type CheckboxFilterProps<Table extends Record<string, unknown>> = {
-  columnId: keyof Table;
+type Option = {
   label: string;
-  valueIfTrue: string;
-  valueIfFalse: string;
+  value: ConditionType;
 };
 
-const CheckboxFilter = <Table extends Record<string, unknown>>({
-  currentFilters,
-  setFilter,
-  label,
-  columnId,
-  valueIfTrue,
-  valueIfFalse,
-}: BaseFilterProps<Table> & CheckboxFilterProps<Table>) => {
-  const value = currentFilters?.find((f) => f.id === columnId)?.value ?? false;
+const options: Record<FilterType, Option[]> = {
+  text: [
+    // { label: "is equal to", value: "textEqual" },
+    { label: "contains", value: "contains" },
+  ],
+  date: [
+    { label: "is equal to", value: "dateEqual" },
+    { label: "is between", value: "dateBetween" },
+  ],
+  number: [
+    { label: "is equal to", value: "numberEqual" },
+    { label: "is between", value: "numberBetween" },
+  ],
+  boolean: [{ label: "is true", value: "boolean" }],
+};
 
-  const handleClick = useCallback(() => {
-    setFilter(columnId, value === valueIfTrue ? valueIfFalse : valueIfTrue);
-  }, [value, columnId, setFilter, valueIfTrue, valueIfFalse]);
+type ConditionSelectProps = {
+  type: FilterType;
+  condition: Condition;
+  onSelect: (conditionType: ConditionType) => void;
+};
+
+const ConditionSelect = ({
+  type,
+  onSelect,
+  condition,
+}: ConditionSelectProps) => {
+  const handleChange = useCallback((e) => {
+    const value = e.target.value;
+    onSelect(value);
+  }, []);
 
   return (
-    <Flex
-      css={{ display: "inline-flex", alignItems: "baseline" }}
-      onClick={handleClick}>
-      <Checkbox
-        value={value === valueIfTrue ? valueIfTrue : valueIfFalse}
-        onClick={() => undefined}
-      />
-      <Box css={{ ml: "0.5rem", userSelect: "none", cursor: "default" }}>
-        {label}
-      </Box>
-    </Flex>
+    <Box
+      css={{
+        height: "26px",
+        width: "100%",
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        margin: "0px",
+        background: "$loContrast",
+      }}>
+      <Select onChange={handleChange} value={condition.type}>
+        {options[type].map((option, i) => {
+          return (
+            <option value={option.value} key={i}>
+              {option.label}
+            </option>
+          );
+        })}
+      </Select>
+      <Flex css={{ zIndex: 1, marginRight: "11px" }}>
+        <SelectIcon />
+      </Flex>
+    </Box>
   );
 };
 
-export { TextFilter, CheckboxFilter };
+type ConditionValueProps = {
+  type: FilterType;
+  label: string;
+  condition: Condition;
+  onChange: (newCondition: Condition) => void;
+};
+
+const ConditionValue = ({
+  type,
+  label,
+  condition,
+  onChange,
+}: ConditionValueProps) => {
+  switch (condition.type) {
+    case "contains":
+      // case "textEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          {/* @ts-ignore */}
+          <TextField
+            id={label}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+            value={condition.value}
+            css={{
+              height: "100%",
+              width: "100%",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              position: "absolute",
+              maxWidth: type === "date" ? "100px" : "",
+              left: 0,
+              top: 0,
+            }}
+          />
+        </Box>
+      );
+    case "dateEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+            <CalendarIcon />
+          </Box>
+          <DateInput
+            type="date"
+            id={label}
+            value={condition.value}
+            onChange={(e) =>
+              onChange({ type: condition.type, value: e.target.value })
+            }
+          />
+        </Box>
+      );
+    case "dateBetween":
+      return (
+        <div
+          style={{
+            marginTop: "",
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+          }}>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              width: "100%",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+              <CalendarIcon />
+            </Box>
+            <DateInput
+              type="date"
+              id={label}
+              value={condition.value[0]}
+              onChange={(e) => {
+                const value = e.target.value;
+                onChange({
+                  type: condition.type,
+                  value: [value, condition.value[1]],
+                });
+              }}
+            />
+          </Box>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              width: "100%",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
+              <CalendarIcon />
+            </Box>
+            <DateInput
+              type="date"
+              id={label}
+              value={condition.value[1]}
+              onChange={(e) => {
+                const value = e.target.value;
+                onChange({
+                  type: condition.type,
+                  value: [condition.value[0], value],
+                });
+              }}
+            />
+          </Box>
+        </div>
+      );
+    case "numberEqual":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          {/* @ts-ignore */}
+          <TextField
+            type="number"
+            id={label}
+            onChange={(e) =>
+              onChange({
+                type: condition.type,
+                value: parseInt(e.target.value),
+              })
+            }
+            value={condition.value}
+            css={{
+              height: "100%",
+              width: "100%",
+              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              position: "absolute",
+              maxWidth: type === "date" ? "100px" : "",
+              left: 0,
+              top: 0,
+            }}
+          />
+        </Box>
+      );
+    case "numberBetween":
+      return (
+        <div
+          style={{
+            marginTop: "",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "2px",
+          }}>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            {/* @ts-ignore */}
+            <TextField
+              id={label}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                onChange({
+                  type: condition.type,
+                  value: [parseInt(value), condition.value[1]],
+                });
+              }}
+              value={condition.value[0]}
+              css={{
+                height: "100%",
+                width: "100%",
+                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                position: "absolute",
+                maxWidth: type === "date" ? "100px" : "",
+                left: 0,
+                top: 0,
+              }}
+            />
+          </Box>
+          <Box
+            as="label"
+            htmlFor={label}
+            css={{
+              height: "26px",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              margin: "0px",
+            }}>
+            {/* @ts-ignore */}
+            <TextField
+              id={label}
+              type="number"
+              onChange={(e) => {
+                const value = e.target.value;
+                onChange({
+                  type: condition.type,
+                  value: [condition.value[0], parseInt(value)],
+                });
+              }}
+              value={condition.value[1]}
+              css={{
+                height: "100%",
+                width: "100%",
+                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                position: "absolute",
+                maxWidth: type === "date" ? "100px" : "",
+                left: 0,
+                top: 0,
+              }}
+            />
+          </Box>
+        </div>
+      );
+    case "boolean":
+      return (
+        <Box
+          as="label"
+          htmlFor={label}
+          css={{
+            height: "26px",
+            width: "100%",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            margin: "0px",
+          }}>
+          <Checkbox
+            checked={condition.value}
+            onClick={() => {
+              onChange({ type: condition.type, value: !condition.value });
+            }}
+          />
+        </Box>
+      );
+
+    default:
+      return null;
+  }
+};
+
+type FieldContentProps = {
+  label: string;
+  type: FilterType;
+  condition: Condition;
+  onConditionChange: (condition: Condition) => void;
+};
+
+const FieldContent = ({
+  label,
+  type,
+  condition,
+  onConditionChange,
+}: FieldContentProps) => {
+  const handleSelect = useCallback((conditionType: ConditionType) => {
+    switch (conditionType) {
+      case "contains":
+        // case "textEqual":
+        onConditionChange({ type: conditionType, value: "" });
+        break;
+      case "dateEqual":
+        onConditionChange({
+          type: conditionType,
+          value: format(new Date(), "yyyy-MM-dd"),
+        });
+        break;
+      case "dateBetween":
+        onConditionChange({
+          type: conditionType,
+          value: [
+            format(new Date(), "yyyy-MM-dd"),
+            format(new Date(), "yyyy-MM-dd"),
+          ],
+        });
+        break;
+      case "numberEqual":
+        onConditionChange({
+          type: conditionType,
+          value: 0,
+        });
+        break;
+      case "numberBetween":
+        onConditionChange({
+          type: conditionType,
+          value: [0, 0],
+        });
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const handleChange = useCallback((condition: Condition) => {
+    onConditionChange(condition);
+  }, []);
+
+  const shouldNotRenderSelect = type === "boolean";
+
+  return (
+    <>
+      {!shouldNotRenderSelect && (
+        <ConditionSelect
+          type={type}
+          condition={condition}
+          onSelect={handleSelect}
+        />
+      )}
+      <Flex
+        as="label"
+        htmlFor={label}
+        css={{
+          marginTop: shouldNotRenderSelect ? "0" : "10px",
+        }}>
+        <Flex css={{ marginTop: "8px" }}>
+          <NextIcon />
+        </Flex>
+        <Box
+          css={{
+            margin: "0px 0px 0px 11px",
+            width: "100%",
+          }}>
+          <ConditionValue
+            type={type}
+            label={label}
+            condition={condition}
+            onChange={handleChange}
+          />
+        </Box>
+      </Flex>
+    </>
+  );
+};
+
+export default FieldContent;

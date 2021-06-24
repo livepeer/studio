@@ -13,10 +13,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
   useSnackbar,
-  Dialog,
-  DialogContent,
-  DialogClose,
-  DialogTrigger,
 } from "@livepeer.com/design-system";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useMemo, useState } from "react";
@@ -55,9 +51,9 @@ type Rendition = {
 
 const filterItems: FilterItem[] = [
   { label: "Stream name", id: "name", type: "text" },
-  // { label: "Created date", type: "date" },
-  // { label: "Last active", type: "date" },
-  // { label: "Lifetime duration", type: "text" },
+  { label: "Created date", id: "createdAt", type: "date" },
+  { label: "Last active", id: "lastSeen", type: "date" },
+  { label: "Is active", id: "isActive", type: "boolean" },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
@@ -218,8 +214,17 @@ const StreamsTable = ({
 
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) => {
+      let active: string | undefined;
+      const filteredFilters = state.filters.filter((f) => {
+        if (f.id === "isActive" && f.isOpen) {
+          active = f.condition.value as string;
+          return false;
+        }
+        return true;
+      });
       const [streams, nextCursor] = await getStreams(userId, {
-        filters: formatFiltersForApiRequest(state.filters),
+        active,
+        filters: formatFiltersForApiRequest(filteredFilters),
         limit: state.pageSize.toString(),
         cursor: state.cursor,
         order: state.order,
