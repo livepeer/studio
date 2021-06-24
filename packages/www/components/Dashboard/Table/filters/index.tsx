@@ -393,6 +393,17 @@ export const formatFiltersForQueryParam = (filters: Filter[]) => {
             filter.condition.value[1]
           ).getTime()}`,
         });
+      case "numberEqual":
+        normalized.push({
+          id: filter.id,
+          value: `${filter.condition.value}`,
+        });
+        break;
+      case "numberBetween":
+        normalized.push({
+          id: filter.id,
+          value: `${filter.condition.value[0]},${filter.condition.value[1]}`,
+        });
         break;
       default:
         break;
@@ -422,7 +433,7 @@ export const formatFilterItemFromQueryParam = (
         isOpen: true,
         condition: { type: "boolean", value: decodedValue === "true" },
       };
-    case "date":
+    case "date": {
       const splitted = decodedValue.split(",");
       const isDateBetween = splitted.length > 1;
       const timezoneOffset = new Date().getTimezoneOffset();
@@ -445,6 +456,22 @@ export const formatFilterItemFromQueryParam = (
               ),
         },
       };
+    }
+    case "number": {
+      const splitted1 = decodedValue.split(",");
+      const isNumberBetween = splitted1.length > 1;
+      return {
+        ...filter,
+        isOpen: true,
+        // @ts-ignore
+        condition: {
+          type: isNumberBetween ? "numberBetween" : "numberEqual",
+          value: isNumberBetween
+            ? (splitted1.map((s) => parseInt(s)) as [number, number])
+            : parseInt(splitted1[0]),
+        },
+      };
+    }
     default:
       return { ...filter, isOpen: false };
   }

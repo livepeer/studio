@@ -93,7 +93,6 @@ const filterItems: FilterItem[] = [
     id: "sourceSegmentsDuration",
     type: "number",
   },
-  { label: "Is Active", id: "isActive", type: "boolean" },
 ];
 
 type SessionsTableData = {
@@ -152,7 +151,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         state.cursor,
         state.pageSize,
         formatFiltersForApiRequest(state.filters, {
-          parseNumber: (n) => n * 60 * 60,
+          parseNumber: (n) => n * 60,
         })
       );
       return {
