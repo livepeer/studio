@@ -7,6 +7,7 @@ import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthTokenType } from "../types/common";
+import { ProcessedPolicies } from "./authPolicies";
 import tracking from "./tracking";
 
 function parseAuthToken(authToken: string) {
@@ -15,31 +16,23 @@ function parseAuthToken(authToken: string) {
   return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-type ApiTokenAccess = ApiToken["access"];
-
-type ACL = ApiTokenAccess["list"][0] | { all: ACL[] } | { any: ACL[] };
-
-const allAccess: ApiTokenAccess = { all: true };
-const allAccessOnly: ACL = "never" as ACL;
-
-function isAuthorized(required: ACL, possessed: ApiTokenAccess) {
-  if (possessed.all) {
-    return true;
+function isAuthorized(method: string, path: string, policies: string[]) {
+  for (const policyName of policies) {
+    const policy = ProcessedPolicies[policyName];
+    if (!policy) {
+      throw new InternalServerError("bad policy configured");
+    }
+    if (policy.allows(method, path)) {
+      return true;
+    }
   }
-  if (typeof required === "string") {
-    return possessed.list?.includes(required) ?? false;
-  }
-  if ("any" in required) {
-    return required.any.some((a) => isAuthorized(a, possessed));
-  }
-  return required.all.every((a) => isAuthorized(a, possessed));
+  return false;
 }
 
 interface AuthParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
-  acl?: ACL;
 }
 
 /**
@@ -104,12 +97,11 @@ function authFactory(params: AuthParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    if (params.acl || tokenObject?.access) {
-      const required = params.acl ?? allAccessOnly;
-      const possessed = tokenObject?.access ?? allAccess;
-      if (!isAuthorized(required, possessed)) {
-        throw new ForbiddenError(`credential has insufficent privileges`);
-      }
+    // TODO: Avoid calling isAuthorized if there are no policies in the token
+    // since the default will always authorize any action.
+    const accessPolicies = tokenObject?.access?.policies ?? ["fullAccess"];
+    if (!isAuthorized(req.method, req.path, accessPolicies)) {
+      throw new ForbiddenError(`credential has insufficent privileges`);
     }
 
     req.user = user;

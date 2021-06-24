@@ -685,15 +685,14 @@ components:
         access:
           type: object
           additionalProperties: false
-          default: { "all": true }
+          default: { policies: ["fullAccess"] }
           properties:
-            all:
-              type: boolean
-            list:
+            policies:
               type: array
               items:
                 type: string
                 enum:
+                  - fullAccess
                   - broadcasterHooks
         lastSeen:
           type: number
