@@ -687,13 +687,24 @@ components:
           additionalProperties: false
           default: { policies: ["fullAccess"] }
           properties:
-            policies:
+            rules:
               type: array
               items:
-                type: string
-                enum:
-                  - fullAccess
-                  - broadcasterHooks
+                type: object
+                additionalProperties: false
+                required: [resources]
+                properties:
+                  resources:
+                    type: array
+                    items:
+                      type: string
+                  methods:
+                    type: array
+                    default: ["*"]
+                    items:
+                      type: string
+                      enum: [post, get, put, patch, delete, head, option, "*"]
+
         lastSeen:
           type: number
           example: 1587667174725

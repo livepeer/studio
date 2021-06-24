@@ -144,6 +144,7 @@ app.post(
     const userId =
       req.body.userId && req.user.admin ? req.body.userId : req.user.id;
 
+    // TODO: check if access rules are valid
     await Promise.all([
       req.store.create({
         id: id,

@@ -7,7 +7,7 @@ import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthTokenType } from "../types/common";
-import { ProcessedPolicies } from "./authPolicies";
+import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
 function parseAuthToken(authToken: string) {
@@ -16,17 +16,11 @@ function parseAuthToken(authToken: string) {
   return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-function isAuthorized(method: string, path: string, policies: string[]) {
-  for (const policyName of policies) {
-    const policy = ProcessedPolicies[policyName];
-    if (!policy) {
-      throw new InternalServerError("bad policy configured");
-    }
-    if (policy.allows(method, path)) {
-      return true;
-    }
-  }
-  return false;
+function isAuthorized(method: string, path: string, rules: AuthRule[]) {
+  // TODO: Handle possible errors parsing bad rules here
+  const policy = new AuthPolicy(rules);
+  // TODO: Remove path prefixes like /api from this match
+  return policy.allows(method, path);
 }
 
 interface AuthParams {
@@ -97,9 +91,9 @@ function authFactory(params: AuthParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const accessPolicies = tokenObject?.access?.policies;
-    if (accessPolicies) {
-      if (!isAuthorized(req.method, req.path, accessPolicies)) {
+    const accessRules = tokenObject?.access?.rules;
+    if (accessRules) {
+      if (!isAuthorized(req.method, req.path, accessRules)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
     }
