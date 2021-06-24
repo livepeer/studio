@@ -97,11 +97,11 @@ function authFactory(params: AuthParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    // TODO: Avoid calling isAuthorized if there are no policies in the token
-    // since the default will always authorize any action.
-    const accessPolicies = tokenObject?.access?.policies ?? ["fullAccess"];
-    if (!isAuthorized(req.method, req.path, accessPolicies)) {
-      throw new ForbiddenError(`credential has insufficent privileges`);
+    const accessPolicies = tokenObject?.access?.policies;
+    if (accessPolicies) {
+      if (!isAuthorized(req.method, req.path, accessPolicies)) {
+        throw new ForbiddenError(`credential has insufficent privileges`);
+      }
     }
 
     req.user = user;
