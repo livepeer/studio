@@ -293,8 +293,18 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
   );
 };
 
-export const formatFiltersForApiRequest = (filters: Filter[]) => {
+type Parsers = {
+  parseNumber: (value: number) => number;
+};
+
+export const formatFiltersForApiRequest = (
+  filters: Filter[],
+  parsers?: Partial<Parsers>
+) => {
   const normalized: { id: string; value: any }[] = [];
+  const typedParsers: Parsers = {
+    parseNumber: parsers?.parseNumber ?? ((n) => n),
+  };
   filters.forEach((filter) => {
     if (!filter.isOpen) return;
     switch (filter.condition.type) {
@@ -325,6 +335,24 @@ export const formatFiltersForApiRequest = (filters: Filter[]) => {
           value: {
             gte: new Date(filter.condition.value[0]).getTime(),
             lte: addDays(new Date(filter.condition.value[1]), 1).getTime(),
+          },
+        });
+        break;
+      case "numberEqual":
+        normalized.push({
+          id: filter.id,
+          value: {
+            gte: typedParsers.parseNumber(filter.condition.value),
+            lte: typedParsers.parseNumber(filter.condition.value),
+          },
+        });
+        break;
+      case "numberBetween":
+        normalized.push({
+          id: filter.id,
+          value: {
+            gte: typedParsers.parseNumber(filter.condition.value[0]),
+            lte: typedParsers.parseNumber(filter.condition.value[1]),
           },
         });
         break;

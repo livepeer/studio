@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
@@ -84,6 +85,17 @@ const RecordingUrlCell = <D extends TableData>({
   );
 };
 
+const filterItems: FilterItem[] = [
+  { label: "Session Name", id: "name", type: "text" },
+  { label: "Created Date", id: "createdAt", type: "date" },
+  {
+    label: "Duration (in minutes)",
+    id: "sourceSegmentsDuration",
+    type: "number",
+  },
+  { label: "Is Active", id: "isActive", type: "boolean" },
+];
+
 type SessionsTableData = {
   id: string;
   parentStream: TextCellProps;
@@ -138,7 +150,10 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       const [streams, nextCursor] = await getStreamSessionsByUserId(
         user.id,
         state.cursor,
-        state.pageSize
+        state.pageSize,
+        formatFiltersForApiRequest(state.filters, {
+          parseNumber: (n) => n * 60 * 60,
+        })
       );
       return {
         nextCursor,
@@ -216,6 +231,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         showOverflow={true}
         cursor="pointer"
         rowSelection="all"
+        filterItems={filterItems}
         header={
           <>
             <Heading size="2" css={{ fontWeight: 600 }}>

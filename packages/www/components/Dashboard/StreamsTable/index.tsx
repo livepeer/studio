@@ -50,10 +50,10 @@ type Rendition = {
 };
 
 const filterItems: FilterItem[] = [
-  { label: "Stream name", id: "name", type: "text" },
-  { label: "Created date", id: "createdAt", type: "date" },
-  { label: "Last active", id: "lastSeen", type: "date" },
-  { label: "Is active", id: "isActive", type: "boolean" },
+  { label: "Stream Name", id: "name", type: "text" },
+  { label: "Created Date", id: "createdAt", type: "date" },
+  { label: "Last Active", id: "lastSeen", type: "date" },
+  { label: "Is Active", id: "isActive", type: "boolean" },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
