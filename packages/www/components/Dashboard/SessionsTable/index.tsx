@@ -16,6 +16,7 @@ import {
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
 import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -62,6 +63,16 @@ const RecordingUrlCell = <D extends TableData>({
     </Box>
   );
 };
+
+const filterItems: FilterItem[] = [
+  { label: "Session Name", id: "name", type: "text" },
+  { label: "Created Date", id: "createdAt", type: "date" },
+  {
+    label: "Duration (in minutes)",
+    id: "sourceSegmentsDuration",
+    type: "number",
+  },
+];
 
 type SessionsTableData = {
   id: string;
@@ -112,7 +123,10 @@ const StreamSessionsTable = ({
       const [streams, nextCursor] = await getStreamSessions(
         streamId,
         state.cursor,
-        state.pageSize
+        state.pageSize,
+        formatFiltersForApiRequest(state.filters, {
+          parseNumber: (n) => n * 60,
+        })
       );
       return {
         nextCursor,
@@ -160,6 +174,7 @@ const StreamSessionsTable = ({
             <Heading>{title}</Heading>
           </>
         }
+        filterItems={filterItems}
         tableId={`stream-sessions-${streamId}`}
         columns={columns}
         fetcher={fetcher}

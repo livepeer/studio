@@ -597,9 +597,16 @@ const makeContext = (state: ApiState, setState) => {
     async getStreamSessions(
       id,
       cursor?: string,
-      limit: number = 20
+      limit: number = 20,
+      filters?: Array<{ id: string; value: string | object }>
     ): Promise<[Array<Stream>, string]> {
-      const uri = `/session?${qs.stringify({ limit, cursor, parentId: id })}`;
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/session?${qs.stringify({
+        limit,
+        cursor,
+        parentId: id,
+        filters: stringifiedFilters,
+      })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
