@@ -11,7 +11,7 @@ import {
   StyledPanel,
 } from "./helpers";
 import FieldContent from "./fields";
-import { format, addDays } from "date-fns";
+import { format, addDays, addMinutes } from "date-fns";
 import { useRouter } from "next/router";
 import { makeQuery, QueryParams } from "@lib/utils/router";
 
@@ -397,6 +397,7 @@ export const formatFilterItemFromQueryParam = (
     case "date":
       const splitted = decodedValue.split(",");
       const isDateBetween = splitted.length > 1;
+      const timezoneOffset = new Date().getTimezoneOffset();
       return {
         ...filter,
         isOpen: true,
@@ -405,9 +406,15 @@ export const formatFilterItemFromQueryParam = (
           type: isDateBetween ? "dateBetween" : "dateEqual",
           value: isDateBetween
             ? (splitted.map((s) =>
-                format(new Date(parseInt(s)), "yyyy-MM-dd")
+                format(
+                  addMinutes(new Date(parseInt(s)), timezoneOffset),
+                  "yyyy-MM-dd"
+                )
               ) as [string, string])
-            : format(new Date(parseInt(splitted[0])), "yyyy-MM-dd"),
+            : format(
+                addMinutes(new Date(parseInt(splitted[0])), timezoneOffset),
+                "yyyy-MM-dd"
+              ),
         },
       };
     default:
