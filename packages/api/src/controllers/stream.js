@@ -1143,7 +1143,7 @@ const streamDetectionEvent = "stream.detection";
 
 app.post(
   "/hook",
-  authMiddleware({ anyAdmin: true, acl: "broadcasterHooks" }),
+  authMiddleware({ acl: { all: ["admin", "broadcasterHooks"] } }),
   async (req, res) => {
     if (!req.body || !req.body.url) {
       res.status(422);
@@ -1311,7 +1311,7 @@ app.post(
 
 app.post(
   "/hook/detection",
-  authMiddleware({ anyAdmin: true, acl: "broadcasterHooks" }),
+  authMiddleware({ acl: { all: ["admin", "broadcasterHooks"] } }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
     const { manifestID, seqNo, sceneClassification } = req.body;

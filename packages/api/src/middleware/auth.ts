@@ -15,9 +15,13 @@ function parseAuthToken(authToken: string) {
   return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-type ApiTokenAccess = ApiToken["access"];
+type AccessItem = ApiToken["access"]["list"][0] | "admin";
 
-type ACL = ApiTokenAccess["list"][0] | { all: ACL[] } | { any: ACL[] };
+interface ApiTokenAccess {
+  all?: boolean;
+  list?: AccessItem[];
+}
+type ACL = AccessItem | { all: ACL[] } | { any: ACL[] };
 
 const allAccess: ApiTokenAccess = { all: true };
 const allAccessOnly: ACL = "never" as ACL;
@@ -106,7 +110,13 @@ function authFactory(params: AuthParams): RequestHandler {
     }
     if (params.acl || tokenObject?.access) {
       const required = params.acl ?? allAccessOnly;
-      const possessed = tokenObject?.access ?? allAccess;
+      let possessed: ApiTokenAccess = tokenObject?.access ?? allAccess;
+      if (user.admin) {
+        possessed = {
+          ...possessed,
+          list: [...(possessed.list ?? []), "admin"],
+        };
+      }
       if (!isAuthorized(required, possessed)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
