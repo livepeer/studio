@@ -1,17 +1,23 @@
 import basicAuth from "basic-auth";
+import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 
+import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
+import { WithID } from "../store/types";
+import { AuthTokenType } from "../types/common";
 import tracking from "./tracking";
 
-function parseAuthToken(authToken) {
+function parseAuthToken(authToken: string) {
   const match = authToken?.match(/^(\w+) +(.+)$/);
   if (!match) return {};
-  return { tokenType: match[1], tokenValue: match[2] };
+  return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-function isAuthorized(required, possessed) {
+type Access = ApiToken["access"];
+
+function isAuthorized(required: Access, possessed: Access) {
   if (required.all) return possessed.all;
   if (possessed.all) return true;
 
@@ -19,19 +25,26 @@ function isAuthorized(required, possessed) {
   return reqList.every((a) => possessed.list?.includes(a));
 }
 
+interface AuthParams {
+  allowUnverified?: boolean;
+  admin?: boolean;
+  anyAdmin?: boolean;
+  access?: Access;
+}
+
 /**
  * creates an authentication middleware that can be customized.
  * @param {Object} params auth middleware params, to be defined later
  */
-function authFactory(params) {
+function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
     const { tokenType, tokenValue } = parseAuthToken(authToken);
     const basicUser = basicAuth.parse(authToken);
-    let user;
-    let tokenObject;
-    let userId;
+    let user: User;
+    let tokenObject: WithID<ApiToken>;
+    let userId: string;
 
     if (!tokenType) {
       throw new ForbiddenError(`no authorization header provided`);
