@@ -17,25 +17,29 @@ function parseAuthToken(authToken: string) {
 
 type ApiTokenAccess = ApiToken["access"];
 
-interface RequiredAccess {
-  // TODO: `all` could alternatively be an array
-  all?: boolean;
-  any?: ApiTokenAccess["list"];
-}
+type ACL = ApiTokenAccess["list"][0] | { all: ACL[] } | { any: ACL[] };
 
-function isAuthorized(required: RequiredAccess, possessed: ApiTokenAccess) {
-  if (required.all) return possessed.all;
-  if (possessed.all) return true;
+const allAccess: ApiTokenAccess = { all: true };
+const allAccessOnly: ACL = "never" as ACL;
 
-  const requireAny = required.any ?? [];
-  return requireAny.some((a) => possessed.list?.includes(a));
+function isAuthorized(required: ACL, possessed: ApiTokenAccess) {
+  if (possessed.all) {
+    return true;
+  }
+  if (typeof required === "string") {
+    return possessed.list?.includes(required) ?? false;
+  }
+  if ("any" in required) {
+    return required.any.some((a) => isAuthorized(a, possessed));
+  }
+  return required.all.every((a) => isAuthorized(a, possessed));
 }
 
 interface AuthParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
-  access?: RequiredAccess;
+  acl?: ACL;
 }
 
 /**
@@ -100,9 +104,9 @@ function authFactory(params: AuthParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    if (params.access || tokenObject?.access) {
-      const required = params.access ?? { all: true };
-      const possessed = tokenObject?.access ?? { all: true };
+    if (params.acl || tokenObject?.access) {
+      const required = params.acl ?? allAccessOnly;
+      const possessed = tokenObject?.access ?? allAccess;
       if (!isAuthorized(required, possessed)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
