@@ -161,7 +161,6 @@ const TokenTable = ({
 
   return (
     <>
-      {/* TODO fix this before merging! @julianbenegas */}
       <Table
         {...tableProps}
         tableId="api-tokens"
