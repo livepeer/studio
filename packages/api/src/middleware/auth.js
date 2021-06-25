@@ -57,45 +57,31 @@ function authFactory(params) {
     }
 
     user = await req.store.get(`user/${userId}`);
-
     if (!user) {
       throw new InternalServerError(`no user found for token ${authToken}`);
     }
-
     if (user.suspended) {
       throw new ForbiddenError(`user is suspended`);
     }
-
     if (!params.allowUnverified && user.emailValid === false) {
       throw new ForbiddenError(
         `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
       );
     }
+    // UI admins must have a JWT
+    const isUIAdmin = user.admin && tokenType === "JWT";
+    if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
+      throw new ForbiddenError(`user does not have admin priviledges`);
+    }
 
     req.user = user;
     req.authTokenType = tokenType;
-    req.isUIAdmin = req.user.admin && tokenType === "JWT";
+    req.isUIAdmin = isUIAdmin;
     if (tokenObject && tokenObject.name) {
       req.tokenName = tokenObject.name;
     }
     if (tokenObject && tokenObject.id) {
       req.tokenId = tokenObject.id;
-    }
-
-    if (params.admin) {
-      // admins must have a JWT
-      if (
-        (tokenType === "JWT" && user.admin !== true) ||
-        tokenType === "Bearer"
-      ) {
-        throw new ForbiddenError(`user does not have admin priviledges`);
-      }
-    }
-
-    if (params.anyAdmin) {
-      if (user.admin !== true) {
-        throw new ForbiddenError(`user does not have admin priviledges`);
-      }
     }
     return next();
   };
