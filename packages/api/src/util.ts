@@ -1,10 +1,3 @@
-import * as nodeFetch from "node-fetch";
-
-declare const fetch: typeof nodeFetch.default;
-type Request = nodeFetch.Request;
-type RequestInit = nodeFetch.RequestInit;
-type Response = nodeFetch.Response;
-
 export const timeout = <T>(ms: number, fn: () => Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
     const handle = setTimeout(() => {

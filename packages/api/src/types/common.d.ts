@@ -2,11 +2,20 @@ import { Ingest, Price } from "../middleware/hardcoded-nodes";
 import { NodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
+import * as nodeFetch from "node-fetch";
 
 export enum AuthTokenType {
   JWT = "JWT",
   Bearer = "Bearer",
   Basic = "Basic",
+}
+
+// isomorphic-fetch type hack. to consider switching to node-fetch completely.
+declare global {
+  const fetch: typeof nodeFetch.default;
+  type Request = nodeFetch.Request;
+  type RequestInit = nodeFetch.RequestInit;
+  type Response = nodeFetch.Response;
 }
 
 declare global {
