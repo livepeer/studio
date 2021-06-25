@@ -4,10 +4,12 @@ import {
   TextField,
   styled,
   Checkbox,
+  RadioGroup,
+  Radio,
 } from "@livepeer.com/design-system";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
 import { useCallback } from "react";
-import { FilterType } from "..";
+import { Filter, FilterType } from "..";
 import { ConditionType, Condition } from "..";
 import { format } from "date-fns";
 
@@ -137,15 +139,13 @@ const ConditionSelect = ({
 };
 
 type ConditionValueProps = {
-  type: FilterType;
-  label: string;
+  filter: Filter;
   condition: Condition;
   onChange: (newCondition: Condition) => void;
 };
 
 const ConditionValue = ({
-  type,
-  label,
+  filter,
   condition,
   onChange,
 }: ConditionValueProps) => {
@@ -155,7 +155,7 @@ const ConditionValue = ({
       return (
         <Box
           as="label"
-          htmlFor={label}
+          htmlFor={filter.label}
           css={{
             height: "26px",
             width: "100%",
@@ -167,7 +167,7 @@ const ConditionValue = ({
           }}>
           {/* @ts-ignore */}
           <TextField
-            id={label}
+            id={filter.label}
             onChange={(e) =>
               onChange({ type: condition.type, value: e.target.value })
             }
@@ -175,9 +175,10 @@ const ConditionValue = ({
             css={{
               height: "100%",
               width: "100%",
-              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              padding:
+                filter.type === "date" ? "0px 11px 0px 32px" : "0px 11px",
               position: "absolute",
-              maxWidth: type === "date" ? "100px" : "",
+              maxWidth: filter.type === "date" ? "100px" : "",
               left: 0,
               top: 0,
             }}
@@ -188,7 +189,7 @@ const ConditionValue = ({
       return (
         <Box
           as="label"
-          htmlFor={label}
+          htmlFor={filter.label}
           css={{
             height: "26px",
             width: "100%",
@@ -203,7 +204,7 @@ const ConditionValue = ({
           </Box>
           <DateInput
             type="date"
-            id={label}
+            id={filter.label}
             value={condition.value}
             onChange={(e) =>
               onChange({ type: condition.type, value: e.target.value })
@@ -222,7 +223,7 @@ const ConditionValue = ({
           }}>
           <Box
             as="label"
-            htmlFor={label}
+            htmlFor={filter.label}
             css={{
               height: "26px",
               width: "100%",
@@ -237,7 +238,7 @@ const ConditionValue = ({
             </Box>
             <DateInput
               type="date"
-              id={label}
+              id={filter.label}
               value={condition.value[0]}
               onChange={(e) => {
                 const value = e.target.value;
@@ -250,7 +251,7 @@ const ConditionValue = ({
           </Box>
           <Box
             as="label"
-            htmlFor={label}
+            htmlFor={filter.label}
             css={{
               height: "26px",
               width: "100%",
@@ -265,7 +266,7 @@ const ConditionValue = ({
             </Box>
             <DateInput
               type="date"
-              id={label}
+              id={filter.label}
               value={condition.value[1]}
               onChange={(e) => {
                 const value = e.target.value;
@@ -282,7 +283,7 @@ const ConditionValue = ({
       return (
         <Box
           as="label"
-          htmlFor={label}
+          htmlFor={filter.label}
           css={{
             height: "26px",
             width: "100%",
@@ -295,7 +296,7 @@ const ConditionValue = ({
           {/* @ts-ignore */}
           <TextField
             type="number"
-            id={label}
+            id={filter.label}
             onChange={(e) =>
               onChange({
                 type: condition.type,
@@ -306,9 +307,10 @@ const ConditionValue = ({
             css={{
               height: "100%",
               width: "100%",
-              padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+              padding:
+                filter.type === "date" ? "0px 11px 0px 32px" : "0px 11px",
               position: "absolute",
-              maxWidth: type === "date" ? "100px" : "",
+              maxWidth: filter.type === "date" ? "100px" : "",
               left: 0,
               top: 0,
             }}
@@ -327,7 +329,7 @@ const ConditionValue = ({
           }}>
           <Box
             as="label"
-            htmlFor={label}
+            htmlFor={filter.label}
             css={{
               height: "26px",
               position: "relative",
@@ -338,7 +340,7 @@ const ConditionValue = ({
             }}>
             {/* @ts-ignore */}
             <TextField
-              id={label}
+              id={filter.label}
               type="number"
               onChange={(e) => {
                 const value = e.target.value;
@@ -351,9 +353,10 @@ const ConditionValue = ({
               css={{
                 height: "100%",
                 width: "100%",
-                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                padding:
+                  filter.type === "date" ? "0px 11px 0px 32px" : "0px 11px",
                 position: "absolute",
-                maxWidth: type === "date" ? "100px" : "",
+                maxWidth: filter.type === "date" ? "100px" : "",
                 left: 0,
                 top: 0,
               }}
@@ -361,7 +364,7 @@ const ConditionValue = ({
           </Box>
           <Box
             as="label"
-            htmlFor={label}
+            htmlFor={filter.label}
             css={{
               height: "26px",
               position: "relative",
@@ -372,7 +375,7 @@ const ConditionValue = ({
             }}>
             {/* @ts-ignore */}
             <TextField
-              id={label}
+              id={filter.label}
               type="number"
               onChange={(e) => {
                 const value = e.target.value;
@@ -385,9 +388,10 @@ const ConditionValue = ({
               css={{
                 height: "100%",
                 width: "100%",
-                padding: type === "date" ? "0px 11px 0px 32px" : "0px 11px",
+                padding:
+                  filter.type === "date" ? "0px 11px 0px 32px" : "0px 11px",
                 position: "absolute",
-                maxWidth: type === "date" ? "100px" : "",
+                maxWidth: filter.type === "date" ? "100px" : "",
                 left: 0,
                 top: 0,
               }}
@@ -398,8 +402,6 @@ const ConditionValue = ({
     case "boolean":
       return (
         <Box
-          as="label"
-          htmlFor={label}
           css={{
             height: "26px",
             width: "100%",
@@ -409,12 +411,33 @@ const ConditionValue = ({
             justifyContent: "flex-start",
             margin: "0px",
           }}>
-          <Checkbox
-            checked={condition.value}
-            onClick={() => {
+          <RadioGroup
+            onValueChange={() => {
               onChange({ type: condition.type, value: !condition.value });
-            }}
-          />
+            }}>
+            <Radio
+              value="on"
+              id={`${filter.label}-on`}
+              checked={condition.value === true}
+            />
+            <Box
+              as="label"
+              css={{ pl: "$2", fontSize: "12px", fontWeight: 500, mr: "$4" }}
+              htmlFor={`${filter.label}-on`}>
+              {filter.type === "boolean" && filter.labelOn}
+            </Box>
+            <Radio
+              value="off"
+              id={`${filter.label}-off`}
+              checked={condition.value === false}
+            />
+            <Box
+              as="label"
+              css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
+              htmlFor={`${filter.label}-off`}>
+              {filter.type === "boolean" && filter.labelOff}
+            </Box>
+          </RadioGroup>
         </Box>
       );
 
@@ -424,18 +447,11 @@ const ConditionValue = ({
 };
 
 type FieldContentProps = {
-  label: string;
-  type: FilterType;
-  condition: Condition;
+  filter: Filter;
   onConditionChange: (condition: Condition) => void;
 };
 
-const FieldContent = ({
-  label,
-  type,
-  condition,
-  onConditionChange,
-}: FieldContentProps) => {
+const FieldContent = ({ filter, onConditionChange }: FieldContentProps) => {
   const handleSelect = useCallback((conditionType: ConditionType) => {
     switch (conditionType) {
       case "contains":
@@ -478,20 +494,21 @@ const FieldContent = ({
     onConditionChange(condition);
   }, []);
 
-  const shouldNotRenderSelect = type === "boolean";
+  const shouldNotRenderSelect = filter.type === "boolean";
 
+  if (!filter.isOpen) return null;
   return (
     <>
       {!shouldNotRenderSelect && (
         <ConditionSelect
-          type={type}
-          condition={condition}
+          type={filter.type}
+          condition={filter.condition}
           onSelect={handleSelect}
         />
       )}
       <Flex
         as="label"
-        htmlFor={label}
+        htmlFor={filter.label}
         css={{
           marginTop: shouldNotRenderSelect ? "0" : "10px",
         }}>
@@ -504,9 +521,8 @@ const FieldContent = ({
             width: "100%",
           }}>
           <ConditionValue
-            type={type}
-            label={label}
-            condition={condition}
+            filter={filter}
+            condition={filter.condition}
             onChange={handleChange}
           />
         </Box>

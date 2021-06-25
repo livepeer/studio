@@ -15,8 +15,6 @@ import { format, addDays, addMinutes } from "date-fns";
 import { useRouter } from "next/router";
 import { makeQuery, QueryParams } from "@lib/utils/router";
 
-export type FilterType = "text" | "number" | "boolean" | "date";
-
 export type Condition =
   | { type: "contains"; value: string }
   // | { type: "textEqual"; value: string }
@@ -37,11 +35,12 @@ export type Filter = FilterItem &
     | { isOpen: false }
   );
 
-export type FilterItem = {
-  label: string;
-  id: string;
-  type: FilterType;
-};
+export type FilterItem = { id: string; label: string } & (
+  | { type: "text" | "number" | "date" }
+  | { type: "boolean"; labelOn: string; labelOff: string }
+);
+
+export type FilterType = FilterItem["type"];
 
 export type ApplyFilterHandler = (filters: Filter[]) => void;
 
@@ -67,7 +66,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 
   const handleClear = useCallback(() => {
     setFilters((p) =>
-      p.map((f) => ({ label: f.label, type: f.type, id: f.id, isOpen: false }))
+      p.map((f) => ({ ...f, isOpen: false, condition: undefined }))
     );
   }, []);
 
@@ -180,12 +179,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                     ...p.map((f) => {
                       if (filter.label !== f.label) return f;
                       if (f.isOpen) {
-                        return {
-                          isOpen: false as false,
-                          label: f.label,
-                          type: f.type,
-                          id: f.id,
-                        };
+                        return { ...f, isOpen: false as false };
                       } else {
                         let defaultCondition: Condition;
                         switch (f.type) {
@@ -215,10 +209,8 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                         }
 
                         return {
+                          ...f,
                           isOpen: true as true,
-                          label: f.label,
-                          type: f.type,
-                          id: f.id,
                           condition: defaultCondition,
                         };
                       }
@@ -233,13 +225,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                   const newFilters: Filter[] = [
                     ...p.map((f) => {
                       if (filter.label !== f.label) return f;
-                      return {
-                        condition,
-                        isOpen: true,
-                        label: f.label,
-                        type: f.type,
-                        id: f.id,
-                      };
+                      return { ...f, condition, isOpen: true };
                     }),
                   ];
                   return newFilters;
@@ -274,14 +260,10 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                     </StyledButton>
                   </StyledHeader>
                   <StyledPanel>
-                    {filter.isOpen && (
-                      <FieldContent
-                        label={filter.label}
-                        type={filter.type}
-                        condition={filter.isOpen ? filter.condition : null}
-                        onConditionChange={onConditionChange}
-                      />
-                    )}
+                    <FieldContent
+                      filter={filter}
+                      onConditionChange={onConditionChange}
+                    />
                   </StyledPanel>
                 </StyledItem>
               );
@@ -473,7 +455,7 @@ export const formatFilterItemFromQueryParam = (
       };
     }
     default:
-      return { ...filter, isOpen: false };
+      break;
   }
 };
 

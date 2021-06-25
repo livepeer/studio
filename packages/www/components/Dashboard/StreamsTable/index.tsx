@@ -53,7 +53,13 @@ const filterItems: FilterItem[] = [
   { label: "Stream Name", id: "name", type: "text" },
   { label: "Created Date", id: "createdAt", type: "date" },
   { label: "Last Active", id: "lastSeen", type: "date" },
-  { label: "Is Active", id: "isActive", type: "boolean" },
+  {
+    label: "Status",
+    id: "isActive",
+    type: "boolean",
+    labelOn: "Active",
+    labelOff: "Inactive",
+  },
 ];
 
 const StyledQuestionMarkIcon = styled(QuestionMarkIcon, {
