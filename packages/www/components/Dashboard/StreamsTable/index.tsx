@@ -58,7 +58,7 @@ const filterItems: FilterItem[] = [
     id: "isActive",
     type: "boolean",
     labelOn: "Active",
-    labelOff: "Inactive",
+    labelOff: "Idle",
   },
 ];
 

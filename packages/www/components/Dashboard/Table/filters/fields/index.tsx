@@ -403,7 +403,6 @@ const ConditionValue = ({
       return (
         <Box
           css={{
-            height: "26px",
             width: "100%",
             position: "relative",
             display: "flex",
@@ -415,27 +414,33 @@ const ConditionValue = ({
             onValueChange={() => {
               onChange({ type: condition.type, value: !condition.value });
             }}>
-            <Radio
-              value="on"
-              id={`${filter.label}-on`}
-              checked={condition.value === true}
-            />
-            <Box
-              as="label"
-              css={{ pl: "$2", fontSize: "12px", fontWeight: 500, mr: "$4" }}
-              htmlFor={`${filter.label}-on`}>
-              {filter.type === "boolean" && filter.labelOn}
-            </Box>
-            <Radio
-              value="off"
-              id={`${filter.label}-off`}
-              checked={condition.value === false}
-            />
-            <Box
-              as="label"
-              css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
-              htmlFor={`${filter.label}-off`}>
-              {filter.type === "boolean" && filter.labelOff}
+            <Box css={{ display: "flex", flexDirection: "column" }}>
+              <Box css={{ display: "flex", mb: "$2" }}>
+                <Radio
+                  value="on"
+                  id={`${filter.label}-on`}
+                  checked={condition.value === true}
+                />
+                <Box
+                  as="label"
+                  css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
+                  htmlFor={`${filter.label}-on`}>
+                  {filter.type === "boolean" && filter.labelOn}
+                </Box>
+              </Box>
+              <Box css={{ display: "flex" }}>
+                <Radio
+                  value="off"
+                  id={`${filter.label}-off`}
+                  checked={condition.value === false}
+                />
+                <Box
+                  as="label"
+                  css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
+                  htmlFor={`${filter.label}-off`}>
+                  {filter.type === "boolean" && filter.labelOff}
+                </Box>
+              </Box>
             </Box>
           </RadioGroup>
         </Box>
@@ -495,6 +500,7 @@ const FieldContent = ({ filter, onConditionChange }: FieldContentProps) => {
   }, []);
 
   const shouldNotRenderSelect = filter.type === "boolean";
+  const shouldNotRenderNextIcon = filter.type === "boolean";
 
   if (!filter.isOpen) return null;
   return (
@@ -512,12 +518,14 @@ const FieldContent = ({ filter, onConditionChange }: FieldContentProps) => {
         css={{
           marginTop: shouldNotRenderSelect ? "0" : "10px",
         }}>
-        <Flex css={{ marginTop: "8px" }}>
-          <NextIcon />
-        </Flex>
+        {!shouldNotRenderNextIcon && (
+          <Flex css={{ marginTop: "8px" }}>
+            <NextIcon />
+          </Flex>
+        )}
         <Box
           css={{
-            margin: "0px 0px 0px 11px",
+            marginLeft: shouldNotRenderNextIcon ? 0 : "11px",
             width: "100%",
           }}>
           <ConditionValue
