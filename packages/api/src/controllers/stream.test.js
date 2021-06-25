@@ -690,7 +690,13 @@ describe("controllers/stream", () => {
     let stream;
     let data;
     let res;
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
+    let client,
+      adminUser,
+      adminToken,
+      adminApiKey,
+      nonAdminUser,
+      nonAdminToken,
+      nonAdminApiKey;
 
     beforeEach(async () => {
       ({
@@ -700,6 +706,18 @@ describe("controllers/stream", () => {
         nonAdminUser,
         nonAdminToken,
       } = await setupUsers(server));
+      adminApiKey = uuid();
+      await server.store.create({
+        id: adminApiKey,
+        kind: "api-token",
+        userId: adminUser.id,
+      });
+      nonAdminApiKey = uuid();
+      await server.store.create({
+        id: nonAdminApiKey,
+        kind: "api-token",
+        userId: nonAdminUser.id,
+      });
 
       await server.store.create(mockStore);
       stream = {
@@ -825,6 +843,57 @@ describe("controllers/stream", () => {
           expect(res.status).toBe(200);
           data = await res.json();
           expect(data.detection).toEqual(defaultDetection);
+        });
+      });
+
+      describe("authorization", () => {
+        let url;
+
+        beforeEach(() => {
+          url = happyCases[0].replace("STREAM_ID", stream.id);
+        });
+
+        it("should not accept non-admin users", async () => {
+          client.jwtAuth = nonAdminToken.token;
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(403);
+          data = await res.json();
+          expect(data.errors[0]).toContain("admin");
+        });
+
+        const testBasic = async (userPassword, statusCode, error) => {
+          client.jwtAuth = undefined;
+          client.basicAuth = userPassword;
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(statusCode);
+          if (error) {
+            data = await res.json();
+            expect(data.errors[0]).toEqual(error);
+          }
+        };
+
+        it("should parse basic auth", async () => {
+          await testBasic("hey:basic", 403, "no token basic found");
+        });
+
+        it("should accept valid token in basic auth", async () => {
+          await testBasic(`${adminUser.id}:${adminApiKey}`, 200);
+        });
+
+        it("should only accept token with corresponding user id", async () => {
+          await testBasic(
+            `${nonAdminUser.id}:${adminApiKey}`,
+            403,
+            expect.stringMatching(/no token .+ found/)
+          );
+        });
+
+        it("should still only accept admin users", async () => {
+          await testBasic(
+            `${nonAdminUser.id}:${nonAdminApiKey}`,
+            403,
+            expect.stringContaining("admin")
+          );
         });
       });
     });

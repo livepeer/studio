@@ -478,6 +478,28 @@ describe("controllers/user", () => {
       resJson = await res.json();
       expect(res.status).toBe(403);
       expect(resJson.errors[0]).toBe("user does not have admin priviledges");
+
+      // adding emailValid true to admin user
+      const adminUserRes = await server.store.get(
+        `user/${adminUser.id}`,
+        false
+      );
+      adminUser = { ...adminUserRes, emailValid: true };
+      await server.store.replace(adminUser);
+
+      // only jwt auth should be allowed access to this list API
+      client.apiKey = adminApiKey;
+      res = await client.get("/user");
+      resJson = await res.json();
+      expect(res.status).toBe(403);
+      expect(resJson.errors[0]).toBe("user does not have admin priviledges");
+
+      client.apiKey = undefined;
+      client.basicAuth = `${adminUser.id}:${adminApiKey}`;
+      res = await client.get("/user");
+      resJson = await res.json();
+      expect(res.status).toBe(403);
+      expect(resJson.errors[0]).toBe("user does not have admin priviledges");
     });
 
     it("should return verified user", async () => {

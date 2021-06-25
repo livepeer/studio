@@ -36,7 +36,7 @@ function authFactory(params) {
       tokenObject = await db.apiToken.get(tokenId);
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
-        throw new ForbiddenError(`no token object ${tokenValue} found`);
+        throw new ForbiddenError(`no token ${tokenId} found`);
       }
 
       userId = tokenObject.userId;

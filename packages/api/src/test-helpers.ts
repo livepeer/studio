@@ -50,12 +50,14 @@ export class TestClient {
   server: TestServer;
   apiKey: string;
   jwtAuth: string;
+  basicAuth: string;
   googleAuthorization: string;
 
   constructor(opts: {
     server: TestServer;
     apiKey?: string;
     jwtAuth?: string;
+    basicAuth?: string;
     googleAuthorization?: string;
   }) {
     if (!opts.server) {
@@ -69,6 +71,9 @@ export class TestClient {
     }
     if (opts.jwtAuth) {
       this.jwtAuth = opts.jwtAuth;
+    }
+    if (opts.basicAuth) {
+      this.basicAuth = opts.basicAuth;
     }
     if (opts.googleAuthorization) {
       this.googleAuthorization = opts.googleAuthorization;
@@ -87,6 +92,13 @@ export class TestClient {
       headers = {
         ...headers,
         authorization: `JWT ${this.jwtAuth}`,
+      };
+    }
+    if (this.basicAuth) {
+      const basic64 = Buffer.from(this.basicAuth).toString("base64");
+      headers = {
+        ...headers,
+        authorization: `Basic ${basic64}`,
       };
     }
     const res = await isoFetch(
