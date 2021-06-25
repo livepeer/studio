@@ -56,7 +56,7 @@ function authFactory(params) {
       throw new ForbiddenError(`unsupported authorization type ${tokenType}`);
     }
 
-    user = await req.store.get(`user/${userId}`);
+    user = await db.user.get(userId);
     if (!user) {
       throw new InternalServerError(`no user found for token ${authToken}`);
     }

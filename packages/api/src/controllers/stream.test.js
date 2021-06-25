@@ -901,6 +901,8 @@ describe("controllers/stream", () => {
           const res = await client.post("/stream", postMockStream);
           expect(res.status).toBe(201);
           stream = await res.json();
+          // Hooks can only be called by admin users
+          client.jwtAuth = adminToken.token;
         });
 
         it("should return success if no webhook registered", async () => {
