@@ -3,9 +3,7 @@ import {
   Button,
   Flex,
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
-  AlertDialogAction,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogCancel,
@@ -16,21 +14,28 @@ import {
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useApi } from "../../../hooks";
-import { PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { CopyIcon as Copy } from "@radix-ui/react-icons";
+import { ApiToken } from "../../../../api/src/schema/types";
 
-const StyledPlusIcon = styled(PlusIcon, {
-  mr: "$1",
-});
+type Props = {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  onCreateSuccess: undefined | (() => void);
+  onClose: () => void;
+};
 
-const Create = ({ newToken, setNewToken }) => {
+const CreateTokenDialog = ({
+  isOpen,
+  onOpenChange,
+  onCreateSuccess,
+  onClose,
+}: Props) => {
   const [creating, setCreating] = useState(false);
   const [tokenName, setTokenName] = useState("");
-  const [open, setOpen] = useState(false);
   const { createApiToken } = useApi();
   const [isCopied, setCopied] = useState(0);
+  const [newToken, setNewToken] = useState<ApiToken | null>(null);
 
   useEffect(() => {
     if (isCopied) {
@@ -42,14 +47,7 @@ const Create = ({ newToken, setNewToken }) => {
   }, [isCopied]);
 
   return (
-    <AlertDialog open={open}>
-      <Button
-        onClick={() => setOpen(true)}
-        variant="violet"
-        size="2"
-        css={{ display: "flex", alignItems: "center" }}>
-        <StyledPlusIcon /> Create key
-      </Button>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         {!newToken && (
           <>
@@ -65,10 +63,10 @@ const Create = ({ newToken, setNewToken }) => {
                 }
                 setCreating(true);
                 try {
-                  const newToken = await createApiToken({ name: tokenName });
-                  setNewToken(newToken);
-                  setCreating(false);
-                } catch (e) {
+                  const _newToken = await createApiToken({ name: tokenName });
+                  setNewToken(_newToken);
+                  onCreateSuccess?.();
+                } finally {
                   setCreating(false);
                 }
               }}>
@@ -148,7 +146,7 @@ const Create = ({ newToken, setNewToken }) => {
                 onClick={() => {
                   setNewToken(null);
                   setTokenName("");
-                  setOpen(false);
+                  onClose();
                 }}
                 size="2">
                 Close
@@ -161,4 +159,4 @@ const Create = ({ newToken, setNewToken }) => {
   );
 };
 
-export default Create;
+export default CreateTokenDialog;
