@@ -1,6 +1,7 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "../../../../layouts/dashboard";
 import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
+import WebhooksTable from "components/Dashboard/WebhooksTable";
 
 const ApiKeys = () => {
   useLoggedIn();
@@ -17,7 +18,9 @@ const ApiKeys = () => {
         { title: "Webhooks" },
       ]}>
       <Box css={{ p: "$6" }}>
-        <Box css={{ mb: "$8" }}></Box>
+        <Box css={{ mb: "$8" }}>
+          <WebhooksTable />
+        </Box>
       </Box>
     </Layout>
   );
