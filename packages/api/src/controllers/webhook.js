@@ -28,7 +28,8 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters } = req.query;
+  let { limit, cursor, all, event, allUsers, order, filters, count } =
+    req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -39,8 +40,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
       query.push(sql`webhook.data->>'deleted' IS NULL`);
     }
 
-    const fields =
+    let fields =
       " webhook.id as id, webhook.data as data, users.id as usersId, users.data as usersdata";
+    if (count) {
+      fields = fields + ", count(*) OVER() AS count";
+    }
     const from = `webhook left join users on webhook.data->>'userId' = users.id`;
     const [output, newCursor] = await db.webhook.find(query, {
       limit,
@@ -48,7 +52,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
       fields,
       from,
       order: parseOrder(fieldsMap, order),
-      process: ({ data, usersdata }) => {
+      process: ({ data, usersdata, count: c }) => {
+        if (count) {
+          res.set("X-Total-Count", c);
+        }
         return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
       },
     });

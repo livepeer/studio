@@ -170,6 +170,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     order,
     filters,
     userId,
+    count,
   } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -205,8 +206,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   order = parseOrder(fieldsMap, order);
 
-  const fields =
+  let fields =
     " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
   const from = `stream left join users on stream.data->>'userId' = users.id`;
   const [output, newCursor] = await db.stream.find(query, {
     limit,
@@ -214,7 +218,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata }) => {
+    process: ({ data, usersdata, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
       return req.user.admin
         ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
         : { ...data };
