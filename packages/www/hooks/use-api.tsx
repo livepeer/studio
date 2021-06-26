@@ -557,6 +557,7 @@ const makeContext = (state: ApiState, setState) => {
         limit: string;
         cursor: string;
         order: string;
+        active?: string;
       }
     ): Promise<[Stream[], string]> {
       const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
@@ -564,6 +565,7 @@ const makeContext = (state: ApiState, setState) => {
         `/stream?${qs.stringify({
           userId,
           filters,
+          active: opts?.active,
           order: opts?.order,
           limit: opts?.limit,
           cursor: opts?.cursor,
@@ -595,9 +597,16 @@ const makeContext = (state: ApiState, setState) => {
     async getStreamSessions(
       id,
       cursor?: string,
-      limit: number = 20
+      limit: number = 20,
+      filters?: Array<{ id: string; value: string | object }>
     ): Promise<[Array<Stream>, string]> {
-      const uri = `/session?${qs.stringify({ limit, cursor, parentId: id })}`;
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/session?${qs.stringify({
+        limit,
+        cursor,
+        parentId: id,
+        filters: stringifiedFilters,
+      })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
@@ -609,9 +618,16 @@ const makeContext = (state: ApiState, setState) => {
     async getStreamSessionsByUserId(
       userId,
       cursor?: string,
-      limit: number = 20
+      limit: number = 20,
+      filters?: Array<{ id: string; value: string | object }>
     ): Promise<[Array<Stream>, string]> {
-      const uri = `/session?${qs.stringify({ limit, cursor, userId })}`;
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/session?${qs.stringify({
+        limit,
+        cursor,
+        userId,
+        filters: stringifiedFilters,
+      })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
