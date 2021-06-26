@@ -27,13 +27,7 @@ const TextCell = <D extends TableData>({
         </ReactTooltip>
       ) : null}
       <Box data-tip data-for={pid}>
-        {cell.value.href ? (
-          <Link href={cell.value.href}>
-            <A variant="violet">{cell.value.children}</A>
-          </Link>
-        ) : (
-          cell.value.children
-        )}
+        {cell.value.children}
       </Box>
     </Box>
   );

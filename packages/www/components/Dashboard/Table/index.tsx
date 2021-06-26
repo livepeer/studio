@@ -1,10 +1,4 @@
-import {
-  Column,
-  Row,
-  useRowSelect,
-  useSortBy,
-  useTable,
-} from "react-table";
+import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
 import {
   useEffect,
   useMemo,
@@ -25,6 +19,7 @@ import {
   Checkbox,
   Text,
   Button,
+  Link as A,
 } from "@livepeer.com/design-system";
 import TableFilter, {
   FilterItem,
@@ -33,6 +28,7 @@ import TableFilter, {
 } from "./filters";
 import useSWR from "swr";
 import { ButtonProps } from "@components/Button";
+import Link from "next/link";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -362,9 +358,23 @@ const TableComponent = <T extends Record<string, unknown>>({
                     {row.cells.map((cell, i) => (
                       <Td
                         as={i === 0 ? Th : Td}
-                        css={{ pl: i === 0 ? "$1" : 0 }}
+                        css={{ py: "$2", ...cell.value?.css }}
                         {...cell.getCellProps()}>
-                        {cell.render("Cell")}
+                        {cell.value?.href ? (
+                          <Link href={cell.value.href} passHref>
+                            <A
+                              css={{
+                                pl: i === 0 ? "$1" : 0,
+                                display: "block",
+                              }}>
+                              {cell.render("Cell")}
+                            </A>
+                          </Link>
+                        ) : (
+                          <Box css={{ pl: i === 0 ? "$1" : 0 }}>
+                            {cell.render("Cell")}
+                          </Box>
+                        )}
                       </Td>
                     ))}
                   </Tr>
