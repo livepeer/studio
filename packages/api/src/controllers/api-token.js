@@ -53,7 +53,7 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { userId, cursor, limit, order, filters } = req.query;
+  let { userId, cursor, limit, order, filters, count } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -68,8 +68,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
   if (!userId) {
     const query = parseFilters(fieldsMap, filters);
 
-    const fields =
+    let fields =
       " api_token.id as id, api_token.data as data, users.id as usersId, users.data as usersdata";
+    if (count) {
+      fields = fields + ", count(*) OVER() AS count";
+    }
     const from = `api_token left join users on api_token.data->>'userId' = users.id`;
     const [output, newCursor] = await db.apiToken.find(query, {
       limit,
@@ -77,7 +80,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
       fields,
       from,
       order: parseOrder(fieldsMap, order),
-      process: ({ data, usersdata }) => {
+      process: ({ data, usersdata, count: c }) => {
+        if (count) {
+          res.set("X-Total-Count", c);
+        }
         return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
       },
     });
