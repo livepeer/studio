@@ -130,13 +130,17 @@ const TokenTable = ({
   };
 
   const fetcher: Fetcher<TokenTableData> = useCallback(async () => {
-    const [tokens, nextCursor, resp] = await getApiTokens(userId);
+    const [tokens, nextCursor, resp, count] = await getApiTokens(userId, {
+      count: true,
+    });
+
     if (!resp.ok || !Array.isArray(tokens)) {
       throw resp;
     }
 
     return {
       nextCursor,
+      count,
       rows: tokens.map((token) => {
         return {
           id: token.id,
