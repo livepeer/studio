@@ -7,7 +7,6 @@ import {
   ApiToken,
   Stream,
   Webhook,
-  ObjectStore,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment } from "../lib/utils";
@@ -558,8 +557,9 @@ const makeContext = (state: ApiState, setState) => {
         cursor: string;
         order: string;
         active?: string;
+        count?: boolean;
       }
-    ): Promise<[Stream[], string]> {
+    ): Promise<[Stream[], string, number]> {
       const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, streams] = await context.fetch(
         `/stream?${qs.stringify({
@@ -569,6 +569,7 @@ const makeContext = (state: ApiState, setState) => {
           order: opts?.order,
           limit: opts?.limit,
           cursor: opts?.cursor,
+          count: opts?.count,
           streamsonly: 1,
         })}`
       );
@@ -576,7 +577,8 @@ const makeContext = (state: ApiState, setState) => {
         throw new Error(streams);
       }
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor];
+      const count = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, count];
     },
 
     async createStream(params): Promise<Stream> {
@@ -598,42 +600,48 @@ const makeContext = (state: ApiState, setState) => {
       id,
       cursor?: string,
       limit: number = 20,
-      filters?: Array<{ id: string; value: string | object }>
-    ): Promise<[Array<Stream>, string]> {
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Stream>, string, number]> {
       const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
       const uri = `/session?${qs.stringify({
         limit,
         cursor,
         parentId: id,
         filters: stringifiedFilters,
+        count,
       })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
       }
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor];
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, c];
     },
 
     async getStreamSessionsByUserId(
       userId,
       cursor?: string,
       limit: number = 20,
-      filters?: Array<{ id: string; value: string | object }>
-    ): Promise<[Array<Stream>, string]> {
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Stream>, string, number]> {
       const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
       const uri = `/session?${qs.stringify({
         limit,
         cursor,
         userId,
         filters: stringifiedFilters,
+        count,
       })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
       }
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor];
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, c];
     },
 
     async suspendStream(id: string, suspended: boolean): Promise<void> {
@@ -776,8 +784,9 @@ const makeContext = (state: ApiState, setState) => {
       order?: string,
       filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
-      cursor?: string
-    ): Promise<[Array<Webhook> | ApiError, string, Response]> {
+      cursor?: string,
+      count?: boolean
+    ): Promise<[Array<Webhook> | ApiError, string, Response, number]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const [res, streams] = await context.fetch(
         `/webhook?${qs.stringify({
@@ -787,10 +796,12 @@ const makeContext = (state: ApiState, setState) => {
           limit,
           cursor,
           filters: f,
+          count,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor, res];
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, res, c];
     },
 
     async createWebhook(params): Promise<Webhook> {
@@ -819,23 +830,28 @@ const makeContext = (state: ApiState, setState) => {
 
     async getApiTokens(
       userId?: string,
-      order?: string,
-      filters?: Array<{ id: string; value: string | object }>,
-      limit?: number,
-      cursor?: string
-    ): Promise<[Array<ApiToken> | ApiError, string, Response]> {
-      const f = filters ? JSON.stringify(filters) : undefined;
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number;
+        cursor?: string;
+        order?: string;
+        count?: boolean;
+      }
+    ): Promise<[Array<ApiToken> | ApiError, string, Response, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, tokens] = await context.fetch(
         `/api-token?${qs.stringify({
           userId,
-          order,
-          limit,
-          cursor,
-          filters: f,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
-      return [tokens, nextCursor, res];
+      const count = res.headers.get("X-Total-Count");
+      return [tokens, nextCursor, res, count];
     },
 
     async createApiToken(params): Promise<ApiToken> {

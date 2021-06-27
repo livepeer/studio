@@ -1,12 +1,10 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Box, Button, Flex, Text } from "@livepeer.com/design-system";
+import { Box, Button, Flex, Text, Checkbox } from "@livepeer.com/design-system";
 import { useCallback, useState, useEffect } from "react";
 import {
   FilterIcon,
   StyledAccordion,
-  CheckIcon,
   StyledHeader,
-  StyledButton,
   StyledItem,
   StyledPanel,
 } from "./helpers";
@@ -145,11 +143,11 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
             maxWidth: "284px",
             display: "flex",
             flexDirection: "column",
+            border: "1px solid $colors$mauve5",
             marginRight: "6px",
             borderRadius: "4px",
             overflow: "hidden",
-            boxShadow:
-              "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0px 5px 15px -5px hsl(206deg 22% 7% / 15%)",
           }}>
           <Flex
             css={{
@@ -234,30 +232,21 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 
               return (
                 <StyledItem value={filter.label} key={i}>
-                  <StyledHeader>
-                    <StyledButton onClick={onToggleOpen}>
-                      <Box
-                        css={{
-                          minWidth: "13px",
-                          minHeight: "13px",
-                          borderRadius: "4px",
-                          boxShadow: "0px 0px 2px #000000",
-                          margin: "0px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          backgroundColor: filter.isOpen
-                            ? "darkgray"
-                            : "transparent",
-                        }}>
-                        {filter.isOpen && <CheckIcon />}
-                      </Box>
-                      <Text
-                        size="2"
-                        css={{ marginLeft: "$2", fontWeight: "bolder" }}>
-                        {filter.label}
-                      </Text>
-                    </StyledButton>
+                  <StyledHeader onClick={onToggleOpen}>
+                    <Checkbox
+                      checked={filter.isOpen}
+                      onCheckedChange={onToggleOpen}
+                    />
+
+                    <Text
+                      size="2"
+                      css={{
+                        cursor: "default",
+                        marginLeft: "$2",
+                        fontWeight: 500,
+                      }}>
+                      {filter.label}
+                    </Text>
                   </StyledHeader>
                   <StyledPanel>
                     <FieldContent

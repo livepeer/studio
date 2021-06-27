@@ -120,16 +120,18 @@ const StreamSessionsTable = ({
 
   const fetcher: Fetcher<SessionsTableData> = useCallback(
     async (state) => {
-      const [streams, nextCursor] = await getStreamSessions(
+      const [streams, nextCursor, count] = await getStreamSessions(
         streamId,
         state.cursor,
         state.pageSize,
         formatFiltersForApiRequest(state.filters, {
           parseNumber: (n) => n * 60,
-        })
+        }),
+        true
       );
       return {
         nextCursor,
+        count,
         rows: streams.map((stream: any) => {
           return {
             id: stream.id,
@@ -156,7 +158,7 @@ const StreamSessionsTable = ({
             },
             created: {
               date: new Date(stream.createdAt),
-              fallback: <i>unseen</i>,
+              fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
             },
           };
         }),

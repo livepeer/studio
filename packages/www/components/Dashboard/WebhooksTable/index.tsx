@@ -40,7 +40,6 @@ type WebhooksTableData = {
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
   const { user, getWebhooks, deleteWebhook, createWebhook } = useApi();
-  const tableProps = useTableState({ pageSize: 50 });
   const deleteDialogState = useToggleState();
   const savingState = useToggleState();
   const [openSnackbar] = useSnackbar();
@@ -78,16 +77,18 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
 
   const fetcher: Fetcher<WebhooksTableData> = useCallback(
     async (state) => {
-      const [webhooks, nextCursor] = await getWebhooks(
+      const [webhooks, nextCursor, _res, count] = await getWebhooks(
         false,
         true,
         state.order,
         null,
         state.pageSize,
-        state.cursor
+        state.cursor,
+        true
       );
       return {
         nextCursor,
+        count,
         rows: webhooks.map((webhook: any) => {
           return {
             name: {
@@ -120,27 +121,26 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   );
 
   // const onDeleteStreams = useCallback(async () => {
-  //   if (tableProps.state.selectedRows.length === 1) {
-  //     await deleteStream(tableProps.state.selectedRows[0].id);
-  //     await tableProps.state.swrState?.revalidate();
+  //   if (state.selectedRows.length === 1) {
+  //     await deleteStream(state.selectedRows[0].id);
+  //     await state.swrState?.revalidate();
   //     deleteDialogState.onOff();
-  //   } else if (tableProps.state.selectedRows.length > 1) {
-  //     await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
-  //     await tableProps.state.swrState?.revalidate();
+  //   } else if (state.selectedRows.length > 1) {
+  //     await deleteStreams(state.selectedRows.map((s) => s.id));
+  //     await state.swrState?.revalidate();
   //     deleteDialogState.onOff();
   //   }
   // }, [
   //   deleteStream,
   //   deleteStreams,
   //   deleteDialogState.onOff,
-  //   tableProps.state.selectedRows.length,
-  //   tableProps.state.swrState?.revalidate,
+  //   state.selectedRows.length,
+  //   state.swrState?.revalidate,
   // ]);
 
   return (
     <>
       <Table
-        {...tableProps}
         tableId="webhooks"
         columns={columns}
         fetcher={fetcher}
@@ -184,8 +184,10 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         <AlertDialogContent
           css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle as={Heading} size="1">
-            Delete {tableProps.state.selectedRows.length} webhook
-            {tableProps.state.selectedRows.length > 1 && "s"}?
+            Delete{" "}
+            {state.selectedRows.length > 1 ? state.selectedRows.length : ""}{" "}
+            webhook
+            {state.selectedRows.length > 1 && "s"}?
           </AlertDialogTitle>
           <AlertDialogDescription
             as={Text}
@@ -193,8 +195,8 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             variant="gray"
             css={{ mt: "$2", lineHeight: "22px" }}>
             This will permanently remove the webhook
-            {tableProps.state.selectedRows.length > 1 && "s"}. This action
-            cannot be undone.
+            {state.selectedRows.length > 1 && "s"}. This action cannot be
+            undone.
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
@@ -214,8 +216,8 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
                   savingState.onOn();
                   //await onDeleteStreams();
                   openSnackbar(
-                    `${tableProps.state.selectedRows.length} webhooks${
-                      tableProps.state.selectedRows.length > 1 ? "s" : ""
+                    `${state.selectedRows.length} webhooks${
+                      state.selectedRows.length > 1 ? "s" : ""
                     } deleted.`
                   );
                   savingState.onOff();

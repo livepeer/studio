@@ -16,6 +16,8 @@ const StyledHeader = styled(Accordion.Header, {
   borderTop: "1px solid",
   borderColor: "$slate6",
   alignItems: "center",
+  padding: "11px",
+  width: "100%",
 });
 
 const StyledButton = styled(Accordion.Button, {

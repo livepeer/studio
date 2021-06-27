@@ -50,9 +50,9 @@ type Rendition = {
 };
 
 const filterItems: FilterItem[] = [
-  { label: "Stream Name", id: "name", type: "text" },
-  { label: "Created Date", id: "createdAt", type: "date" },
-  { label: "Last Active", id: "lastSeen", type: "date" },
+  { label: "Name", id: "name", type: "text" },
+  { label: "Created", id: "createdAt", type: "date" },
+  { label: "Last seen", id: "lastSeen", type: "date" },
   {
     label: "Status",
     id: "isActive",
@@ -160,14 +160,16 @@ type StreamsTableData = {
   details: RenditionDetailsCellProps;
   created: DateCellProps;
   lastActive: DateCellProps;
-  status: string;
+  status: TextCellProps;
 };
 
 const StreamsTable = ({
   title = "Streams",
+  pageSize = 20,
   userId,
 }: {
   title: string;
+  pageSize: number;
   userId: string;
 }) => {
   const router = useRouter();
@@ -177,7 +179,7 @@ const StreamsTable = ({
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<StreamsTableData>({
-    pageSize: 20,
+    pageSize,
   });
 
   const columns: Column<StreamsTableData>[] = useMemo(
@@ -189,12 +191,6 @@ const StreamsTable = ({
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.name.children", ...params),
       },
-      // {
-      //   Header: "Details",
-      //   accessor: "details",
-      //   Cell: RenditionsDetailsCell,
-      //   disableSortBy: true,
-      // },
       {
         Header: "Created",
         accessor: "created",
@@ -203,7 +199,7 @@ const StreamsTable = ({
           dateSort("original.created.date", ...params),
       },
       {
-        Header: "Last Active",
+        Header: "Last seen",
         accessor: "lastActive",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
@@ -212,6 +208,7 @@ const StreamsTable = ({
       {
         Header: "Status",
         accessor: "status",
+        Cell: TextCell,
         disableSortBy: true,
       },
     ],
@@ -228,12 +225,13 @@ const StreamsTable = ({
         }
         return true;
       });
-      const [streams, nextCursor] = await getStreams(userId, {
+      const [streams, nextCursor, count] = await getStreams(userId, {
         active,
         filters: formatFiltersForApiRequest(filteredFilters),
         limit: state.pageSize.toString(),
         cursor: state.cursor,
         order: state.order,
+        count: true,
       });
       const rows = streams.map((stream) => {
         return {
@@ -251,16 +249,21 @@ const StreamsTable = ({
           details: { stream },
           created: {
             date: new Date(stream.createdAt),
-            fallback: <i>unseen</i>,
+            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            href: `/dashboard/streams/${stream.id}`,
           },
           lastActive: {
-            date: new Date(stream.lastSeen),
-            fallback: <i>unseen</i>,
+            date: stream.lastSeen ? new Date(stream.lastSeen) : null,
+            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            href: `/dashboard/streams/${stream.id}`,
           },
-          status: stream.isActive ? "Active" : "Idle",
+          status: {
+            children: stream.isActive ? "Active" : "Idle",
+            href: `/dashboard/streams/${stream.id}`,
+          },
         };
       });
-      return { rows, nextCursor };
+      return { rows, nextCursor, count };
     },
     [userId]
   );
