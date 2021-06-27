@@ -51,13 +51,13 @@ const Header = ({ breadcrumbs = [] }) => {
             return <Text key={i}>{breadcrumb.title}</Text>;
           })}
         </Breadcrumbs>
-        <Flex align="center" css={{ fontSize: "$3" }}>
+        {/* <Flex align="center" css={{ fontSize: "$3" }}>
           <Flex align="center" css={{ cursor: "pointer", mr: "$4" }}>
             <StyledHornIcon />
             <Box css={{ color: "$hiContrast" }}>Feedback</Box>
           </Flex>
           <StyledQuestionMarkIcon />
-        </Flex>
+        </Flex> */}
       </Flex>
     </Box>
   );

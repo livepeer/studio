@@ -13,7 +13,7 @@ const GettingStarted = ({ firstName = "" }) => {
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
         Get started with Livepeer.com{firstName && `, ${firstName}`}
       </Heading>
-      <Accordion type="single">
+      <Accordion type="single" defaultValue="accordion-one">
         <AccordionItem value="accordion-one">
           <AccordionButton css={{ color: "$mauve12" }}>
             <Text size="3" css={{ color: "inherit" }}>

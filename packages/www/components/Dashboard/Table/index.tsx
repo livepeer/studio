@@ -56,7 +56,7 @@ type State<T extends Record<string, unknown>> = {
 
 export type Fetcher<T extends Record<string, unknown>> = (
   state: State<T>
-) => Promise<{ rows: T[]; nextCursor: string }>;
+) => Promise<{ rows: T[]; nextCursor: string; count: number }>;
 
 type Action = ButtonProps;
 
@@ -75,7 +75,6 @@ type Props<T extends Record<string, unknown>> = {
   cursor?: string;
   selectAction?: Action;
   createAction?: Action;
-
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
@@ -294,10 +293,10 @@ const TableComponent = <T extends Record<string, unknown>>({
           <Table
             {...getTableProps()}
             css={{
+              width: "100%",
               minWidth: "100%",
-              borderCollapse: "separate",
+              borderCollapse: "collapse",
               borderSpacing: 0,
-              tableLayout: "initial",
             }}>
             <Thead>
               {headerGroups.map((headerGroup) => (
@@ -311,6 +310,8 @@ const TableComponent = <T extends Record<string, unknown>>({
                         scope="col"
                         css={{
                           pl: i === 0 ? "$1" : 0,
+                          width:
+                            i === 0 && rowSelection === "all" ? "30px" : "auto",
                         }}
                         {...column.getHeaderProps(
                           // @ts-ignore
@@ -321,7 +322,7 @@ const TableComponent = <T extends Record<string, unknown>>({
                             ai: "center",
                             mr: withHelpTooltip ? "$3" : 0,
                           }}>
-                          <Box css={{ whiteSpace: "nowrap" }}>
+                          <Box css={{ fontSize: "$2", whiteSpace: "nowrap" }}>
                             {column.render("Header")}
                           </Box>
                           {/*@ts-ignore */}
@@ -358,20 +359,30 @@ const TableComponent = <T extends Record<string, unknown>>({
                     {row.cells.map((cell, i) => (
                       <Td
                         as={i === 0 ? Th : Td}
-                        css={{ py: "$2", ...cell.value?.css }}
+                        css={{
+                          py: 0,
+                          width:
+                            i === 0 && rowSelection === "all" ? "30px" : "auto",
+                          ...cell.value?.css,
+                        }}
                         {...cell.getCellProps()}>
                         {cell.value?.href ? (
                           <Link href={cell.value.href} passHref>
                             <A
                               css={{
+                                textDecoration: "none",
+                                py: "$2",
                                 pl: i === 0 ? "$1" : 0,
                                 display: "block",
+                                "&:hover": {
+                                  textDecoration: "none",
+                                },
                               }}>
                               {cell.render("Cell")}
                             </A>
                           </Link>
                         ) : (
-                          <Box css={{ pl: i === 0 ? "$1" : 0 }}>
+                          <Box css={{ py: "$2", pl: i === 0 ? "$1" : 0 }}>
                             {cell.render("Cell")}
                           </Box>
                         )}
@@ -385,7 +396,7 @@ const TableComponent = <T extends Record<string, unknown>>({
         </Box>
         <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
           <Text>
-            <b>{dataMemo.length}</b> results
+            <b>{data?.count}</b> results
           </Text>
           <Flex>
             <Button

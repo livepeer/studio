@@ -146,7 +146,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
 
   const fetcher: Fetcher<SessionsTableData> = useCallback(
     async (state) => {
-      const [streams, nextCursor] = await getStreamSessionsByUserId(
+      const [streams, nextCursor, count] = await getStreamSessionsByUserId(
         user.id,
         state.cursor,
         state.pageSize,
@@ -156,6 +156,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       );
       return {
         nextCursor,
+        count,
         rows: streams.map((stream: any) => {
           return {
             id: stream.id,
@@ -180,7 +181,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                   : undefined,
               children:
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
-                  stream.recordingUrl
+                  <Box>{stream.recordingUrl}</Box>
                 ) : (
                   <Box css={{ color: "$mauve8" }}>—</Box>
                 ),
@@ -229,7 +230,6 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
         cursor="pointer"
-        rowSelection="all"
         filterItems={filterItems}
         header={
           <>

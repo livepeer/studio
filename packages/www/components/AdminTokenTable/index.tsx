@@ -96,7 +96,12 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
       setLastFilters(filters);
       setLastOrder(order);
     }
-    getApiTokens(null, order, filters, ROWS_PER_PAGE, cursor)
+    getApiTokens(null, {
+      order,
+      filters,
+      limit: ROWS_PER_PAGE,
+      cursor,
+    })
       .then((result) => {
         const [tokens, nextCursor, resp] = result;
         if (resp.ok && Array.isArray(tokens)) {
