@@ -5,6 +5,7 @@ import { trackAction, makeNextHREF, parseOrder, parseFilters } from "./helpers";
 import logger from "../logger";
 import uuid from "uuid/v4";
 import { db } from "../store";
+import sql from "sql-template-strings";
 
 const app = Router();
 
@@ -104,12 +105,34 @@ app.get("/", authMiddleware({}), async (req, res) => {
     });
   }
 
-  const { data: userTokens } = await req.store.queryObjects({
-    kind: "api-token",
-    query: { userId: userId },
+  const query = parseFilters(fieldsMap, filters);
+  query.push(sql`api_token.data->>'userId' = ${userId}`);
+
+  let fields = " api_token.id as id, api_token.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  const from = `api_token`;
+  const [output, newCursor] = await db.apiToken.find(query, {
+    limit,
+    cursor,
+    fields,
+    from,
+    order: parseOrder(fieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return { ...data };
+    },
   });
+
   res.status(200);
-  res.json(userTokens);
+
+  if (output.length > 0 && newCursor) {
+    res.links({ next: makeNextHREF(req, newCursor) });
+  }
+  res.json(output);
 });
 
 app.post(

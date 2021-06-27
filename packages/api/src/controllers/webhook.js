@@ -68,20 +68,39 @@ app.get("/", authMiddleware({}), async (req, res) => {
     return res.json(output);
   }
 
-  let output = await getWebhooks(
-    req.store,
-    req.user.id,
-    event,
+  const query = parseFilters(fieldsMap, filters);
+  query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
+
+  if (!all || all === "false") {
+    query.push(sql`webhook.data->>'deleted' IS NULL`);
+  }
+
+  let fields = " webhook.id as id, webhook.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  const from = `webhook`;
+  const [output, newCursor] = await db.webhook.find(query, {
     limit,
     cursor,
-    all
-  );
+    fields,
+    from,
+    order: parseOrder(fieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return { ...data };
+    },
+  });
+
   res.status(200);
 
-  if (output.data.length > 0) {
-    res.links({ next: makeNextHREF(req, output.cursor) });
+  if (output.length > 0) {
+    res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(output.data);
+
+  return res.json(output);
 });
 
 app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
