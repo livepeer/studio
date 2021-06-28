@@ -169,7 +169,7 @@ const StreamsTable = ({
   userId,
 }: {
   title: string;
-  pageSize: number;
+  pageSize?: number;
   userId: string;
 }) => {
   const router = useRouter();
