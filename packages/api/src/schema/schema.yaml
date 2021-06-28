@@ -685,10 +685,10 @@ components:
         access:
           type: object
           additionalProperties: false
-          default: { policies: ["fullAccess"] }
           properties:
             rules:
               type: array
+              default: [{ resources: ["*"] }]
               items:
                 type: object
                 additionalProperties: false
@@ -703,7 +703,7 @@ components:
                     default: ["*"]
                     items:
                       type: string
-                      enum: [post, get, put, patch, delete, head, option, "*"]
+                      enum: [post, get, put, patch, delete, head, options, "*"]
 
         lastSeen:
           type: number

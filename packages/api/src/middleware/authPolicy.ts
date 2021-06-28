@@ -24,6 +24,6 @@ export class AuthPolicy {
     const match = this.allowRouter.get(path);
     const methods = match.handler;
     if (!methods) return false;
-    return methods.includes(method) || methods.includes("*");
+    return methods.includes(method.toLowerCase()) || methods.includes("*");
   }
 }
