@@ -31,7 +31,6 @@ import {
   isDevelopment,
   formatNumber,
 } from "../../../../lib/utils";
-import { RenditionsDetails } from "components/StreamsTable";
 import { RelativeTime } from "components/CommonAdminTable";
 import {
   CopyIcon as Copy,
@@ -270,27 +269,6 @@ const ID = () => {
     return <Layout />;
   }
 
-  const getIngestURL = (
-    stream: Stream,
-    showKey: boolean,
-    i: number
-  ): string => {
-    const key = showKey ? stream.streamKey : "";
-    return i < ingest.length ? pathJoin(ingest[i].ingest, key) : key || "";
-  };
-  const getPlaybackURL = (stream: Stream, i: number): string => {
-    return i < ingest.length
-      ? pathJoin(ingest[i].base, "hls", `${stream.playbackId}/index.m3u8`)
-      : stream.playbackId || "";
-  };
-  const doSetRecord = async (stream: Stream, record: boolean) => {
-    console.log(`do set record ${stream.id} record ${record}`);
-    //setStream(null); // shows 'loading wheel' immediately
-    await setRecord(stream.id, record);
-
-    //setStream(null); // make sure that we will load updated stream
-  };
-
   const isAdmin = query.admin === "true";
   const _stream = stream || {};
   let { broadcasterHost, region } = _stream;
@@ -302,8 +280,7 @@ const ID = () => {
   }
   let broadcasterPlaybackUrl;
   const playbackId = (stream || {}).playbackId || "";
-  //const domain = isStaging() ? "monster" : "com";
-  const domain = "monster";
+  const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
 
@@ -483,103 +460,6 @@ const ID = () => {
                     <Cell css={{ cursor: "pointer" }}>
                       <ShowURL text="" url={globalPlaybackUrl} anchor={false} />
                     </Cell>
-                    {/* <Box
-                      css={{
-                        mt: "$1",
-                        mb: "0",
-                        gridColumn: "1/-1",
-                      }}>
-                      <Box
-                        onClick={() =>
-                          setRegionalUrlsVisible(!regionalUrlsVisible)
-                        }
-                        css={{
-                          cursor: "pointer",
-                          display: "inline-block",
-                          transform: regionalUrlsVisible
-                            ? "rotate(90deg)"
-                            : "rotate(0deg)",
-                          transition: "transform 0.4s ease",
-                        }}>
-                        ▶
-                      </Box>{" "}
-                      Regional ingest and playback URL pairs
-                    </Box>
-                    <Box
-                      css={{
-                        gridColumn: "1/-1",
-                        position: "relative",
-                        overflow: "hidden",
-                        mb: "0.8em",
-                      }}>
-                      <Box
-                        css={{
-                          position: "relative",
-                          overflow: "hidden",
-                          transition: "margin-bottom .4s ease",
-                          mb: regionalUrlsVisible ? "0" : "-100%",
-                          display: "grid",
-                          alignItems: "center",
-                          gridTemplateColumns: "10em auto",
-                        }}>
-                        <Box
-                          css={{
-                            mx: "$2",
-                            mt: "$3",
-                            gridColumn: "1/-1",
-                          }}>
-                          The global RTMP ingest and playback URL pair above
-                          auto detects livestreamer and viewer locations to
-                          provide the optimal Livepeer.com experience.
-                          <Link
-                            href="/docs/guides/dashboard/ingest-playback-url-pair"
-                            passHref>
-                            <A target="_blank">
-                              <i>
-                                Learn more about forgoing the global ingest and
-                                playback URLs before selecting a regional URL
-                                pair.
-                              </i>
-                            </A>
-                          </Link>
-                        </Box>
-
-                        {ingest.map((_, i) => {
-                          return (
-                            <>
-                              <Cell>RTMP ingest URL {i + 1}</Cell>
-                              <Cell>
-                                <ShowURL
-                                  text=""
-                                  url={getIngestURL(stream, false, i)}
-                                  urlToCopy={getIngestURL(stream, false, i)}
-                                  anchor={false}
-                                />
-                              </Cell>
-                              <Box
-                                css={{
-                                  m: "0.4em",
-                                  mb: "1.4em",
-                                }}>
-                                Playback URL {i + 1}
-                              </Box>
-                              <Box
-                                css={{
-                                  m: "0.4em",
-                                  mb: "1.4em",
-                                }}>
-                                <ShowURL
-                                  text=""
-                                  url={getPlaybackURL(stream, i)}
-                                  anchor={true}
-                                />
-                              </Box>
-                            </>
-                          );
-                        })}
-                      </Box>
-                    </Box> */}
-
                     <Cell>Record sessions</Cell>
                     <Cell>
                       <Flex css={{ position: "relative", top: "2px" }}>
@@ -601,98 +481,6 @@ const ID = () => {
                         </Tooltip>
                       </Flex>
                     </Cell>
-
-                    {/* <Cell>Suspend and block</Cell>
-                    <Box
-                      css={{
-                        m: "0.4em",
-                        justifySelf: "flex-start",
-                        cursor: "pointer",
-                      }}>
-                       <Flex
-                        css={{
-                          alignItems: "flex-start",
-                          justifyItems: "center",
-                        }}>
-                        <Switch
-                          checked={!!stream.record}
-                          name="suspend-mode"
-                          value={`${!!stream.suspended}`}
-                          onCheckedChange={() => {
-                            if (!stream.suspended) {
-                              setSuspendModal(true);
-                            }
-                          }}
-                        />
-                        <Label
-                      onClick={() => {
-                        if (!stream.suspended) {
-                          setSuspendModal(true);
-                        }
-                      }}>
-                      <Radio
-                        autocomplete="off"
-                        name="suspend-mode"
-                        value={`${!!stream.suspended}`}
-                        checked={!!stream.suspended}
-                      />
-                      <Flex css={{ alignItems: "center" }}>On</Flex>
-                    </Label>
-                    <Label css={{ ml: "0.5em" }}>
-                      <Radio
-                        autocomplete="off"
-                        name="suspend-mode"
-                        value={`${!stream.suspended}`}
-                        checked={!stream.suspended}
-                        onClick={(e) => {
-                          if (stream.suspended) {
-                            setSuspendModal(true);
-                          }
-                        }}
-                      />
-                      <Flex css={{ alignItems: "center" }}>Off</Flex>
-                    </Label>
-                        <Flex
-                          css={{
-                            ml: "0.5em",
-                            minWidth: "24px",
-                            height: "24px",
-                            alignItems: "center",
-                          }}>
-                          <Help
-                            data-tip
-                            data-for={`tooltip-suspend-${stream.id}`}
-                            css={{
-                              color: "muted",
-                              cursor: "pointer",
-                              ml: 1,
-                              width: "18px",
-                              height: "18px",
-                            }}
-                          />
-                        </Flex>
-                      </Flex>
-                      <ReactTooltip
-                        id={`tooltip-suspend-${stream.id}`}
-                        className="tooltip"
-                        place="top"
-                        type="dark"
-                        effect="solid">
-                        <p>
-                          When turned on, any active stream sessions will
-                          immediately end.
-                          <br />
-                          New sessions will be prevented from starting until
-                          turned off.
-                        </p>
-                      </ReactTooltip>
-                    </Box>
-                     */}
-
-                    {/* <Cell>Renditions</Cell>
-                    <Cell>
-                      <RenditionsDetails stream={stream} />
-                    </Cell> */}
                     <Cell>Created at</Cell>
                     <Cell>
                       <RelativeTime
