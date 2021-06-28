@@ -1,7 +1,8 @@
 import basicAuth from "basic-auth";
 import { RequestHandler } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
+import { trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
@@ -16,11 +17,22 @@ function parseAuthToken(authToken: string) {
   return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
 }
 
-function isAuthorized(method: string, path: string, rules: AuthRule[]) {
-  // TODO: Handle possible errors parsing bad rules here
-  const policy = new AuthPolicy(rules);
-  // TODO: Remove path prefixes like /api from this match
-  return policy.allows(method, path);
+function isAuthorized(
+  method: string,
+  path: string,
+  rules: AuthRule[],
+  httpPrefix?: string
+) {
+  try {
+    const policy = new AuthPolicy(rules);
+    if (httpPrefix) {
+      path = trimPathPrefix(httpPrefix, path);
+    }
+    return policy.allows(method, path);
+  } catch (err) {
+    console.error(`error authorizing ${method} ${path}: ${err}`);
+    return false;
+  }
 }
 
 interface AuthParams {
@@ -64,7 +76,7 @@ function authFactory(params: AuthParams): RequestHandler {
       try {
         const verified = jwt.verify(tokenValue, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
-        });
+        }) as JwtPayload;
         userId = verified.sub;
         tracking.recordUser(db, userId);
       } catch (err) {
@@ -93,7 +105,8 @@ function authFactory(params: AuthParams): RequestHandler {
     }
     const accessRules = tokenObject?.access?.rules;
     if (accessRules) {
-      if (!isAuthorized(req.method, req.path, accessRules)) {
+      const { httpPrefix } = req.config;
+      if (!isAuthorized(req.method, req.path, accessRules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
     }

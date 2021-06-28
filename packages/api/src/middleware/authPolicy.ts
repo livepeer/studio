@@ -10,7 +10,11 @@ export class AuthPolicy {
     const allowRouter = new HttpHash();
     for (const rule of rules) {
       for (const resource of rule.resources) {
-        allowRouter.set(resource, rule.methods ?? ["*"]);
+        try {
+          allowRouter.set(resource, rule.methods ?? ["*"]);
+        } catch (err) {
+          throw new Error(`Bad route ${resource}: ${err}`);
+        }
       }
     }
     this.allowRouter = allowRouter;

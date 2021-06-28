@@ -344,3 +344,17 @@ export function pathJoin2(p1, p2) {
 export function pathJoin(...items) {
   return items.reduce(pathJoin2, "");
 }
+
+export function trimPathPrefix(prefix, path) {
+  if (prefix === path) {
+    return "/";
+  }
+  const prefixIdx = path.indexOf(`${prefix}/`);
+  if (prefixIdx === 0) {
+    return path.substr(prefix.length);
+  }
+  if (prefixIdx === 1 && path[0] === "/") {
+    return path.substr(prefix.length + 1);
+  }
+  return path;
+}

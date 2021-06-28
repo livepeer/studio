@@ -1,11 +1,11 @@
-import { authMiddleware } from "../middleware";
-import { validatePost } from "../middleware";
 import Router from "express/lib/router";
-import { trackAction, makeNextHREF, parseOrder, parseFilters } from "./helpers";
-import logger from "../logger";
 import uuid from "uuid/v4";
-import { db } from "../store";
 import sql from "sql-template-strings";
+
+import { trackAction, makeNextHREF, parseOrder, parseFilters } from "./helpers";
+import { authMiddleware, validatePost } from "../middleware";
+import { AuthPolicy } from "../middleware/authPolicy";
+import { db } from "../store";
 
 const app = Router();
 
@@ -144,7 +144,14 @@ app.post(
     const userId =
       req.body.userId && req.user.admin ? req.body.userId : req.user.id;
 
-    // TODO: check if access rules are valid
+    if (req.body.access?.rules) {
+      try {
+        new AuthPolicy(req.body.access.rules);
+      } catch (err) {
+        res.status(422);
+        return res.json({ errors: [`Bad access rules: ${err}`] });
+      }
+    }
     await Promise.all([
       req.store.create({
         id: id,
