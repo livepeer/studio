@@ -1,4 +1,4 @@
-import React from "react";
+import { useCallback } from "react";
 import {
   Alert,
   Box,
@@ -44,6 +44,7 @@ import Terminate from "@components/Dashboard/StreamDetails/Terminate";
 import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
+import useSWR from "swr";
 
 type TimedAlertProps = {
   text: string;
@@ -177,7 +178,6 @@ const ID = () => {
   const router = useRouter();
   const { query } = router;
   const id = query.id;
-  const [stream, setStream] = useState(null);
   const [ingest, setIngest] = useState([]);
   const [notFound, setNotFound] = useState(false);
   const [isCopied, setCopied] = useState(0);
@@ -188,6 +188,13 @@ const ID = () => {
   const [resultText, setResultText] = useState("");
   const [alertText, setAlertText] = useState("");
   const [videoExists, setVideoExists] = useState<boolean>(false);
+
+  const fetcher = useCallback(async () => {
+    const stream = await getStream(id);
+    return stream;
+  }, [id]);
+
+  const { data: stream, revalidate } = useSWR([id], () => fetcher());
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -230,22 +237,6 @@ const ID = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!id) {
-      return;
-    }
-    getStream(id)
-      .then((stream) => setStream(stream))
-      .catch((err) => {
-        if (err && err.status === 404) {
-          setNotFound(true);
-        }
-        console.error(err);
-      }); // todo: surface this
-  }, [id]);
-
-  const isVisible = usePageVisibility();
-
-  useEffect(() => {
     if (stream?.isActive) {
       setVideoExists(true);
     } else {
@@ -253,23 +244,10 @@ const ID = () => {
     }
   }, [stream?.isActive]);
 
-  useEffect(() => {
-    if (!isVisible || !id || notFound) {
-      return;
-    }
-    const interval = setInterval(() => {
-      getStream(id)
-        .then((stream) => setStream(stream))
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [id, isVisible]);
-
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
 
-  const isAdmin = query.admin === "true";
   const _stream = stream || {};
   let { broadcasterHost, region } = _stream;
   if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
@@ -366,17 +344,17 @@ const ID = () => {
                   <DropdownMenuGroup>
                     <Record
                       stream={stream}
-                      setStream={setStream}
+                      revalidate={revalidate}
                       isSwitch={false}
                     />
-                    <Suspend stream={stream} setStream={setStream} />
-                    <Delete stream={stream} setStream={setStream} />
+                    <Suspend stream={stream} revalidate={revalidate} />
+                    <Delete stream={stream} revalidate={revalidate} />
 
                     {userIsAdmin && stream.isActive && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Admin only</DropdownMenuLabel>
-                        <Terminate stream={stream} setStream={setStream} />
+                        <Terminate stream={stream} revalidate={revalidate} />
                       </>
                     )}
                   </DropdownMenuGroup>
@@ -464,7 +442,7 @@ const ID = () => {
                     <Cell>
                       <Flex css={{ position: "relative", top: "2px" }}>
                         <Box css={{ mr: "$2" }}>
-                          <Record stream={stream} setStream={setStream} />
+                          <Record stream={stream} revalidate={revalidate} />
                         </Box>
                         <Tooltip
                           multiline
