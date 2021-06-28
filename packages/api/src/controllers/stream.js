@@ -1141,7 +1141,7 @@ async function terminateStreamReq(req, stream) {
 
 const streamDetectionEvent = "stream.detection";
 
-app.post("/hook", async (req, res) => {
+app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422);
     return res.json({
@@ -1307,6 +1307,7 @@ app.post("/hook", async (req, res) => {
 
 app.post(
   "/hook/detection",
+  authMiddleware({ anyAdmin: true }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
     const { manifestID, seqNo, sceneClassification } = req.body;
