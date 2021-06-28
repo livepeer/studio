@@ -77,6 +77,7 @@ const Footer = () => {
     url: "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158",
   });
 
+  // @ts-ignore
   const { data: mailchimpResponseData } = mailchimp;
 
   useEffect(() => {
@@ -87,6 +88,7 @@ const Footer = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // @ts-ignore
     subscribe({ EMAIL: email });
   };
 
