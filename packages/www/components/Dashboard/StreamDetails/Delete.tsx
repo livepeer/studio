@@ -17,7 +17,7 @@ import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 import Router from "next/router";
 
-const Delete = ({ stream, setStream, ...props }) => {
+const Delete = ({ stream, revalidate, ...props }) => {
   const { deleteStream } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
@@ -64,7 +64,7 @@ const Delete = ({ stream, setStream, ...props }) => {
                 setSaving(true);
                 await deleteStream(stream.id);
                 Router.replace("/dashboard");
-                setStream({ ...stream });
+                revalidate();
                 setSaving(false);
                 setOpen(false);
               } catch (e) {

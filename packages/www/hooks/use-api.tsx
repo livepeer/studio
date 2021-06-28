@@ -804,6 +804,16 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res, c];
     },
 
+    async getWebhook(webhookId): Promise<Webhook> {
+      const [res, webhook] = await context.fetch(`/webhook/${webhookId}`);
+      if (res.status !== 200) {
+        throw webhook && typeof webhook === "object"
+          ? { ...webhook, status: res.status }
+          : new Error(webhook);
+      }
+      return webhook;
+    },
+
     async createWebhook(params): Promise<Webhook> {
       const [res, webhook] = await context.fetch(`/webhook`, {
         method: "POST",

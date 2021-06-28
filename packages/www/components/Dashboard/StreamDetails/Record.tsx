@@ -18,7 +18,7 @@ import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 
-const Record = ({ stream, setStream, isSwitch = true }) => {
+const Record = ({ stream, revalidate, isSwitch = true }) => {
   const { setRecord } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
@@ -34,7 +34,7 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
           onCheckedChange={async () => {
             if (!stream.record) {
               await setRecord(stream.id, true);
-              setStream({ ...stream, record: true });
+              revalidate();
               openSnackbar("Recording has been turned on.");
             } else {
               setOpen(true);
@@ -48,7 +48,7 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
             e.preventDefault();
             if (!stream.record) {
               await setRecord(stream.id, true);
-              setStream({ ...stream, record: true });
+              revalidate();
               openSnackbar("Recording has been turned on.");
             } else {
               setOpen(true);
@@ -87,7 +87,7 @@ const Record = ({ stream, setStream, isSwitch = true }) => {
             onClick={async () => {
               setSaving(true);
               await setRecord(stream.id, !stream.record);
-              setStream({ ...stream, record: !stream.record });
+              revalidate();
               openSnackbar("Recording has been turned off.");
               setSaving(false);
               setOpen(false);
