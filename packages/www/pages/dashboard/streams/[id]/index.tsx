@@ -190,7 +190,7 @@ const ID = () => {
   const [videoExists, setVideoExists] = useState<boolean>(false);
 
   const fetcher = useCallback(async () => {
-    const stream = await getStream(id);
+    const stream: Stream = await getStream(id);
     return stream;
   }, [id]);
 
@@ -248,8 +248,7 @@ const ID = () => {
     return <Layout />;
   }
 
-  const _stream = stream || {};
-  let { broadcasterHost, region } = _stream;
+  let { broadcasterHost, region } = stream || {};
   if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
     broadcasterHost = lastSession.broadcasterHost;
   }
