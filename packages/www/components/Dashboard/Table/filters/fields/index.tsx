@@ -410,39 +410,38 @@ const ConditionValue = ({
             justifyContent: "flex-start",
             margin: "0px",
           }}>
-          <RadioGroup
-            onValueChange={() => {
-              onChange({ type: condition.type, value: !condition.value });
-            }}>
-            <Box css={{ display: "flex", flexDirection: "column" }}>
-              <Box css={{ display: "flex", mb: "$2" }}>
-                <Radio
-                  value="on"
-                  id={`${filter.label}-on`}
-                  checked={condition.value === true}
-                />
-                <Box
-                  as="label"
-                  css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
-                  htmlFor={`${filter.label}-on`}>
-                  {filter.type === "boolean" && filter.labelOn}
-                </Box>
-              </Box>
-              <Box css={{ display: "flex" }}>
-                <Radio
-                  value="off"
-                  id={`${filter.label}-off`}
-                  checked={condition.value === false}
-                />
-                <Box
-                  as="label"
-                  css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
-                  htmlFor={`${filter.label}-off`}>
-                  {filter.type === "boolean" && filter.labelOff}
-                </Box>
+          <Box css={{ display: "flex", flexDirection: "column" }}>
+            <Box css={{ display: "flex", mb: "$2" }}>
+              <Checkbox
+                id={`${filter.label}-on`}
+                checked={condition.value === true}
+                onClick={() =>
+                  onChange({ type: condition.type, value: !condition.value })
+                }
+              />
+              <Box
+                as="label"
+                css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
+                htmlFor={`${filter.label}-on`}>
+                {filter.type === "boolean" && filter.labelOn}
               </Box>
             </Box>
-          </RadioGroup>
+            <Box css={{ display: "flex" }}>
+              <Checkbox
+                id={`${filter.label}-off`}
+                checked={condition.value === false}
+                onClick={() =>
+                  onChange({ type: condition.type, value: !condition.value })
+                }
+              />
+              <Box
+                as="label"
+                css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
+                htmlFor={`${filter.label}-off`}>
+                {filter.type === "boolean" && filter.labelOff}
+              </Box>
+            </Box>
+          </Box>
         </Box>
       );
 
