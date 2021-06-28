@@ -1,7 +1,9 @@
 import express, { Express } from "express";
 import isoFetch from "isomorphic-fetch";
+import { v4 as uuid } from "uuid";
 
 import schema from "./schema/schema.json";
+import { User } from "./schema/types";
 import { TestServer } from "./test-server";
 
 /**
@@ -160,4 +162,58 @@ export class TestClient {
     }
     return await this.fetch(path, params);
   }
+}
+
+export async function createUser(
+  server: TestServer,
+  client: TestClient,
+  userData: User,
+  admin: boolean
+) {
+  const userRes = await client.post(`/user`, userData);
+  let user = await userRes.json();
+
+  const tokenRes = await client.post(`/user/token`, userData);
+  const tokenJson = await tokenRes.json();
+  const token = tokenJson.token;
+
+  const storedUser = await server.store.get(`user/${user.id}`, false);
+  user = { ...storedUser, admin, emailValid: true };
+  await server.store.replace(user);
+
+  const apiKey = uuid();
+  await server.store.create({
+    id: apiKey,
+    kind: "api-token",
+    userId: user.id,
+  });
+  return { user, token, apiKey };
+}
+
+export async function setupUsers(
+  server: TestServer,
+  admin: User,
+  nonAdmin: User
+) {
+  const client = new TestClient({ server });
+  const {
+    user: adminUser,
+    token: adminToken,
+    apiKey: adminApiKey,
+  } = await createUser(server, client, admin, true);
+  const {
+    user: nonAdminUser,
+    token: nonAdminToken,
+    apiKey: nonAdminApiKey,
+  } = await createUser(server, client, nonAdmin, false);
+
+  return {
+    client,
+    adminUser,
+    adminToken,
+    adminApiKey,
+    nonAdminUser,
+    nonAdminToken,
+    nonAdminApiKey,
+  };
 }
