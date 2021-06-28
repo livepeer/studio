@@ -69,7 +69,7 @@ type Action = ButtonProps;
 
 type QueryState = {
   isLoading: boolean;
-  invalidate: () => void;
+  invalidate: () => Promise<void>;
 };
 
 type Props<T extends Record<string, unknown>> = {
@@ -116,9 +116,9 @@ const TableComponent = <T extends Record<string, unknown>>({
   useEffect(() => {
     stateSetter.setQueryState({
       isLoading,
-      invalidate: () => queryClient.invalidateQueries(queryKey),
+      invalidate: () => queryClient.invalidateQueries(tableId),
     });
-  }, [isLoading, queryKey, queryClient]);
+  }, [isLoading, tableId, queryClient]);
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
