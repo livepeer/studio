@@ -786,7 +786,7 @@ const makeContext = (state: ApiState, setState) => {
       limit?: number,
       cursor?: string,
       count?: boolean
-    ): Promise<[Array<Webhook> | ApiError, string, Response, number]> {
+    ): Promise<[Webhook[], string, Response, number]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const [res, streams] = await context.fetch(
         `/webhook?${qs.stringify({
