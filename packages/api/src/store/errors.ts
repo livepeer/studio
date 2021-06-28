@@ -7,7 +7,8 @@ export function isAPIError(err: any): err is APIError {
   if (typeof err?.status !== "number") {
     return false;
   }
-  return err.status >= 400 && err.status <= 599;
+  const st = err.status;
+  return st % 1 === 0 && st >= 400 && st < 600;
 }
 
 export class BadRequestError extends APIError {
