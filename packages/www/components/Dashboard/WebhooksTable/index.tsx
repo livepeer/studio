@@ -30,6 +30,7 @@ import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import CreateWebhookDialog from "components/Dashboard/WebhooksTable/CreateWebhookDialog";
 import { useRouter } from "next/router";
+import { Webhook } from "@livepeer.com/api";
 
 type WebhooksTableData = {
   name: TextCellProps;
@@ -89,7 +90,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
       return {
         nextCursor,
         count,
-        rows: webhooks.map((webhook: any) => {
+        rows: webhooks.map((webhook: Webhook) => {
           return {
             name: {
               children: webhook.name,

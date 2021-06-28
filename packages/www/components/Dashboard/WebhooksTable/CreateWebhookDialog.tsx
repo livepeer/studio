@@ -20,7 +20,15 @@ const CreateWebhookDialog = ({
 }: {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onCreate: ({ event: string, name: string, url: string }) => Promise<void>;
+  onCreate: ({
+    event,
+    name,
+    url,
+  }: {
+    event: string;
+    name: string;
+    url: string;
+  }) => Promise<void>;
 }) => {
   const [creating, setCreating] = useState(false);
   const [webhookName, setWebhookName] = useState("");
