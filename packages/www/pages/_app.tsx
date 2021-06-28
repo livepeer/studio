@@ -8,7 +8,9 @@ import "shaka-player/dist/controls.css"; /* Shaka player CSS import */
 import "../css/shaka.css";
 import "../css/algolia-docsearch.css";
 import "keen-slider/keen-slider.min.css";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
+const queryClient = new QueryClient();
 export default class MyApp extends App {
   render() {
     const { Component, pageProps }: any = this.props;
@@ -30,10 +32,12 @@ export default class MyApp extends App {
             rel="stylesheet"
           />
         </Head>
-        <ApiProvider>
-          <DefaultSeo {...SEO} />
-          <Component {...pageProps} />
-        </ApiProvider>
+        <QueryClientProvider client={queryClient}>
+          <ApiProvider>
+            <DefaultSeo {...SEO} />
+            <Component {...pageProps} />
+          </ApiProvider>
+        </QueryClientProvider>
       </>
     );
   }

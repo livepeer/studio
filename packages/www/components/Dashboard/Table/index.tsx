@@ -1,5 +1,12 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
 import {
+  QueryClient,
+  QueryClientProvider,
+  QueryKey,
+  useQuery,
+  useQueryClient,
+} from "react-query";
+import {
   useEffect,
   useMemo,
   useCallback,
@@ -39,7 +46,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setNextCursor: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
-  setSwrState: Dispatch<SetStateAction<SwrState | undefined>>;
+  setQueryState: Dispatch<SetStateAction<QueryState | undefined>>;
 };
 
 type State<T extends Record<string, unknown>> = {
@@ -50,7 +57,7 @@ type State<T extends Record<string, unknown>> = {
   filters: TFilter[];
   stringifiedFilters: string;
   selectedRows: Row<T>[];
-  swrState: SwrState | undefined;
+  queryState: QueryState | undefined;
   pageSize: number;
 };
 
@@ -60,9 +67,9 @@ export type Fetcher<T extends Record<string, unknown>> = (
 
 type Action = ButtonProps;
 
-type SwrState = {
-  isValidating: boolean;
-  revalidate: () => Promise<boolean>;
+type QueryState = {
+  isLoading: boolean;
+  invalidate: () => void;
 };
 
 type Props<T extends Record<string, unknown>> = {
@@ -96,15 +103,22 @@ const TableComponent = <T extends Record<string, unknown>>({
   createAction,
   tableId,
 }: Props<T>) => {
-  const { data, isValidating, revalidate } = useSWR(
-    [tableId, state.cursor, state.order, state.stringifiedFilters],
-    () => fetcher(state)
-  );
+  const queryClient = useQueryClient();
+
+  const queryKey = useMemo(() => {
+    return [tableId, state.cursor, state.order, state.stringifiedFilters];
+  }, [tableId, state.cursor, state.order, state.stringifiedFilters]);
+
+  const { isLoading, error, data } = useQuery(queryKey, () => fetcher(state));
+
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 
   useEffect(() => {
-    stateSetter.setSwrState({ isValidating, revalidate });
-  }, [isValidating, revalidate]);
+    stateSetter.setQueryState({
+      isLoading,
+      invalidate: () => queryClient.invalidateQueries(queryKey),
+    });
+  }, [isLoading, queryKey, queryClient]);
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -426,7 +440,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [nextCursor, setNextCursor] = useState("");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
-  const [swrState, setSwrState] = useState<SwrState | undefined>();
+  const [queryState, setQueryState] = useState<QueryState | undefined>();
 
   const stringifiedFilters = useMemo(() => {
     const formatted = formatFiltersForApiRequest(filters);
@@ -441,7 +455,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       setNextCursor,
       setFilters,
       setSelectedRows,
-      setSwrState,
+      setQueryState,
     }),
     []
   );
@@ -455,7 +469,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       filters,
       stringifiedFilters,
       selectedRows,
-      swrState,
+      queryState,
       pageSize,
     }),
     [
@@ -467,6 +481,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       stringifiedFilters,
       selectedRows,
       pageSize,
+      queryState,
     ]
   );
 

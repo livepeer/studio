@@ -271,11 +271,11 @@ const StreamsTable = ({
   const onDeleteStreams = useCallback(async () => {
     if (state.selectedRows.length === 1) {
       await deleteStream(state.selectedRows[0].id);
-      await state.swrState?.revalidate();
+      await state.queryState?.invalidate();
       deleteDialogState.onOff();
     } else if (state.selectedRows.length > 1) {
       await deleteStreams(state.selectedRows.map((s) => s.id));
-      await state.swrState?.revalidate();
+      await state.queryState?.invalidate();
       deleteDialogState.onOff();
     }
   }, [

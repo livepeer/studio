@@ -243,7 +243,7 @@ const TokenTable = ({
                     }
                   );
                   await Promise.all(promises);
-                  await tableProps.state.swrState?.revalidate();
+                  await tableProps.state.queryState?.invalidate();
                   openSnackbar(
                     `${tableProps.state.selectedRows.length} stream${
                       tableProps.state.selectedRows.length > 1 ? "s" : ""
