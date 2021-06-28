@@ -3,6 +3,13 @@ class APIError extends Error {
   status: number;
 }
 
+export function isAPIError(err: any): err is APIError {
+  if (typeof err?.status !== "number") {
+    return false;
+  }
+  return err.status >= 400 && err.status <= 599;
+}
+
 export class BadRequestError extends APIError {
   constructor(message) {
     super(message);

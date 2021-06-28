@@ -3,6 +3,7 @@ import Router from "express/lib/router";
 import bearerToken from "express-bearer-token";
 import makeStore from "./store";
 import {
+  errorHandler,
   healthCheck,
   kubernetes,
   hardcodedNodes,
@@ -168,17 +169,7 @@ export default async function makeApp(params) {
   if (fallbackProxy) {
     app.use(proxy({ target: fallbackProxy, changeOrigin: true }));
   }
-
-  // If we throw any errors with numerical statuses, use them.
-  app.use(async (err, req, res, next) => {
-    if (typeof err.status === "number") {
-      res.status(err.status);
-      return res.json({ errors: [err.message] });
-    }
-    res.status(500);
-    console.error(err);
-    return res.json({ errors: [err.stack] });
-  });
+  app.use(errorHandler());
 
   return {
     router: app,
