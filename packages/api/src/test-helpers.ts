@@ -19,6 +19,7 @@ export async function clearDatabase(server: TestServer) {
 export interface AuxTestServer {
   app: Express;
   port: number;
+  host: string;
   close: () => Promise<void>;
 }
 
@@ -41,22 +42,23 @@ export function startAuxTestServer(port?: number) {
         return reject(new Error("Unexpected non-AddressInfo listener address"));
       }
       const { port } = addr;
-      console.log("Aux test server listening at http://localhost:%s", port);
+      const host = `http://127.0.0.1:${port}`;
+      console.log(`Aux test server listening at ${host}`);
 
-      resolve({ app, close, port });
+      resolve({ app, host, port, close });
     });
   });
 }
 
 export class TestClient {
-  server: TestServer;
+  server: { host: string; httpPrefix: string };
   apiKey: string;
   jwtAuth: string;
   basicAuth: string;
   googleAuthorization: string;
 
   constructor(opts: {
-    server: TestServer;
+    server: TestServer | { host: string; httpPrefix?: string };
     apiKey?: string;
     jwtAuth?: string;
     basicAuth?: string;
@@ -66,7 +68,10 @@ export class TestClient {
       throw new Error("TestClient missing server");
     }
 
-    this.server = opts.server;
+    this.server = {
+      host: opts.server.host,
+      httpPrefix: (opts.server.httpPrefix as string) ?? "",
+    };
 
     if (opts.apiKey) {
       this.apiKey = opts.apiKey;
