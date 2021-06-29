@@ -28,7 +28,7 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
-import CreateWebhookDialog from "components/Dashboard/WebhooksTable/CreateWebhookDialog";
+import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
 import { useRouter } from "next/router";
 import { Webhook } from "@livepeer.com/api";
 
@@ -87,6 +87,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         state.cursor,
         true
       );
+
       return {
         nextCursor,
         count,
@@ -168,7 +169,6 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         }}
         createAction={{
           onClick: createDialogState.onOn,
-          variant: "violet",
           css: { display: "flex", alignItems: "center" },
           children: (
             <>
@@ -245,10 +245,11 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
       </AlertDialog>
 
       {/* Create stream dialog */}
-      <CreateWebhookDialog
+      <WebhookDialog
+        action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onCreate={async ({ event, name, url }) => {
+        onSubmit={async ({ event, name, url }) => {
           const newWebhook = await createWebhook({
             event,
             name,
