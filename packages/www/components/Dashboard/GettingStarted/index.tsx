@@ -5,7 +5,11 @@ import {
   AccordionItem,
   AccordionPanel,
   Text,
+  Button,
+  Box,
 } from "@livepeer.com/design-system";
+import Link from "next/link";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 const GettingStarted = ({ firstName = "" }) => {
   return (
@@ -21,12 +25,26 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ lineHeight: "23px" }}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas
-              debitis unde nihil, aspernatur maxime est eos at natus ipsum
-              repellat sapiente, error accusantium exercitationem? Placeat
-              aspernatur aperiam quod repellendus culpa?
+            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+              Learn how to create a unique stream object, broadcast live video
+              content and playback your live stream with Livepeer.com.
             </Text>
+            <Link href="/docs/guides/start-live-streaming/tutorial" passHref>
+              <Button
+                as="a"
+                target="_blank"
+                rel="noopener noreferrer"
+                css={{
+                  display: "inline-flex",
+                  cursor: "default",
+                  ai: "center",
+                }}
+                size="2"
+                variant="violet">
+                <Box css={{ mr: "$1" }}>Explore docs</Box>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-two">
@@ -36,12 +54,25 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ lineHeight: "23px" }}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas
-              debitis unde nihil, aspernatur maxime est eos at natus ipsum
-              repellat sapiente, error accusantium exercitationem? Placeat
-              aspernatur aperiam quod repellendus culpa?
+            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+              Learn how to work with Livepeer.com's API through http requests.
             </Text>
+            <Link href="/docs/guides/api" passHref>
+              <Button
+                as="a"
+                target="_blank"
+                rel="noopener noreferrer"
+                css={{
+                  display: "inline-flex",
+                  cursor: "default",
+                  ai: "center",
+                }}
+                size="2"
+                variant="violet">
+                <Box css={{ mr: "$1" }}>Explore API</Box>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-three">
@@ -51,12 +82,28 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ lineHeight: "23px" }}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas
-              debitis unde nihil, aspernatur maxime est eos at natus ipsum
-              repellat sapiente, error accusantium exercitationem? Placeat
-              aspernatur aperiam quod repellendus culpa?
+            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+              Learn how to use the Livepeer.com API by viewing and forking
+              example applications.
             </Text>
+            <Link
+              href="/docs/guides/using-livepeer-in-your-app/example-app"
+              passHref>
+              <Button
+                as="a"
+                target="_blank"
+                rel="noopener noreferrer"
+                css={{
+                  cursor: "default",
+                  display: "inline-flex",
+                  ai: "center",
+                }}
+                size="2"
+                variant="violet">
+                <Box css={{ mr: "$1" }}>Explore examples</Box>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
