@@ -220,6 +220,14 @@ export default class StreamTable extends Table<WithID<Stream>> {
     return usage;
   }
 
+  async getByIdOrPlaybackId(id: string, opts?: QueryOptions) {
+    const [s1, s2] = await Promise.all([
+      this.get(id, opts),
+      this.getByPlaybackId(id, opts),
+    ]);
+    return s1 || s2;
+  }
+
   async getByStreamKey(
     streamKey: string,
     opts?: QueryOptions
