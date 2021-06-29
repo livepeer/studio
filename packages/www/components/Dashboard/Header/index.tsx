@@ -29,7 +29,7 @@ const StyledHornIcon = styled(HornIcon, {
 });
 
 const StyledPolygonIcon = styled(PolygonIcon, {
-  color: "$loContrast",
+  color: "$panel",
 });
 
 const StyledCheckedIcon = styled(CheckedIcon, {
@@ -62,6 +62,7 @@ const Header = ({ breadcrumbs = [] }) => {
     feedback: "",
   });
   const [formSent, setFormSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
@@ -121,7 +122,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 mt: "$4",
                 boxShadow:
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
-                background: "$loContrast",
+                background: "$panel",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -131,16 +132,39 @@ const Header = ({ breadcrumbs = [] }) => {
               </Box>
               {!formSent ? (
                 <>
-                  <Text size="2" css={{ mb: "$3" }}>
+                  <Text
+                    size="2"
+                    css={{
+                      mb: "$3",
+                      display: "flex",
+                      ai: "center",
+                      jc: "space-between",
+                    }}>
                     Feedback
+                    {errorMessage && (
+                      <Text variant="red" size="2">
+                        {errorMessage}
+                      </Text>
+                    )}
                   </Text>
-                  <form>
+                  <Box
+                    as="form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (!form.reaction) {
+                        setErrorMessage("Select an emoji :)");
+                        return;
+                      }
+                      setFormSent(true);
+                      handleSubmit;
+                    }}>
                     <TextArea
                       size="2"
+                      required
                       name="feedback"
                       id="feedback"
                       placeholder="Your feedback"
-                      css={{ width: "calc(100% - 40px)" }}
+                      css={{ px: "$2", width: "100%", boxSizing: "border-box" }}
                       onChange={(e) => {
                         const value = e.target.value;
                         setForm((prev) => ({ ...prev, feedback: value }));
@@ -151,12 +175,13 @@ const Header = ({ breadcrumbs = [] }) => {
                         {reactions.map((reaction, idx) => (
                           <Box
                             key={idx}
-                            onClick={() =>
+                            onClick={() => {
+                              setErrorMessage("");
                               setForm((prev) => ({
                                 ...prev,
                                 reaction: reaction,
-                              }))
-                            }
+                              }));
+                            }}
                             css={{
                               width: "36px",
                               height: "36px",
@@ -164,7 +189,7 @@ const Header = ({ breadcrumbs = [] }) => {
                               border:
                                 reaction === form.reaction
                                   ? "1px solid $violet9"
-                                  : "1px solid $panel",
+                                  : "1px solid $mauve7",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -195,29 +220,19 @@ const Header = ({ breadcrumbs = [] }) => {
                         <input
                           name="email"
                           id="email"
+                          type="hidden"
                           onChange={(e) => {
                             const value = e.target.value;
                             setForm((prev) => ({ ...prev, email: value }));
                           }}
                           value={form.email}
-                          style={{
-                            visibility: "hidden",
-                            width: "0px",
-                            height: "0px",
-                          }}
                         />
                       </Flex>
-                      <Button
-                        onClick={() => {
-                          setFormSent(true);
-                          handleSubmit();
-                        }}
-                        disabled={formSent}
-                        type="submit">
+                      <Button disabled={formSent} type="submit">
                         Send
                       </Button>
                     </Flex>
-                  </form>
+                  </Box>
                 </>
               ) : (
                 <Flex
@@ -251,7 +266,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 mt: "$4",
                 boxShadow:
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
-                background: "$loContrast",
+                background: "$panel",
               }}>
               <Box css={{ position: "absolute", right: "4px", top: "-12px" }}>
                 <StyledPolygonIcon />
@@ -259,15 +274,23 @@ const Header = ({ breadcrumbs = [] }) => {
               <Text size="2" css={{ mb: "$3", color: "$mauve9" }}>
                 HELP
               </Text>
-              <Flex align="center" css={{ mb: "$3", cursor: "pointer" }}>
-                <StyledDocumentationIcon />
-                <Text css={{ margin: "0 $2" }}>Documentation</Text>
-                <StyledHyperlinkIcon />
-              </Flex>
-              <Flex align="center" css={{ cursor: "pointer" }}>
-                <StyledSupportIcon />
-                <Text css={{ margin: "0 $2" }}>Contact Support</Text>
-              </Flex>
+              <Link href="/docs" passHref>
+                <A>
+                  <Flex align="center" css={{ mb: "$3", cursor: "pointer" }}>
+                    <StyledDocumentationIcon />
+                    <Text css={{ margin: "0 $2" }}>Documentation</Text>
+                    <StyledHyperlinkIcon />
+                  </Flex>
+                </A>
+              </Link>
+              <Link href="/contact" passHref>
+                <A>
+                  <Flex align="center" css={{ cursor: "pointer" }}>
+                    <StyledSupportIcon />
+                    <Text css={{ margin: "0 $2" }}>Contact Support</Text>
+                  </Flex>
+                </A>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
         </Flex>
