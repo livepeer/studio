@@ -829,6 +829,21 @@ const makeContext = (state: ApiState, setState) => {
       return webhook;
     },
 
+    async updateWebhook(id, params): Promise<Webhook> {
+      const [res, webhook] = await context.fetch(`/webhook/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 200) {
+        throw new Error(webhook.errors.join(", "));
+      }
+      return webhook;
+    },
+
     async deleteWebhook(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/webhook/${id}`, {
         method: "DELETE",

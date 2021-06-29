@@ -325,7 +325,6 @@ const StreamsTable = ({
         }}
         createAction={{
           onClick: createDialogState.onOn,
-          variant: "violet",
           css: { display: "flex", alignItems: "center" },
           children: (
             <>
