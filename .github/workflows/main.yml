@@ -40,9 +40,9 @@ jobs:
         run: |
           yarn install --frozen-lockfile
 
-      - name: yarn test
-        run: |
-          yarn test
+      # - name: yarn test
+      #   run: |
+      #     yarn test
 
       - name: docker build
         env:
