@@ -17,6 +17,7 @@ import SupportIcon from "../../../public/img/icons/support.svg";
 import DocumentationIcon from "../../../public/img/icons/documentation.svg";
 import HyperlinkIcon from "../../../public/img/icons/hyperlink.svg";
 import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.svg";
+import CheckedIcon from "../../../public/img/icons/checked.svg";
 import { TextArea } from "@modulz/design-system";
 import { useState } from "react";
 import { useForm } from "react-hubspot";
@@ -28,7 +29,11 @@ const StyledHornIcon = styled(HornIcon, {
 });
 
 const StyledPolygonIcon = styled(PolygonIcon, {
-  color: "$hiContrast",
+  color: "$loContrast",
+});
+
+const StyledCheckedIcon = styled(CheckedIcon, {
+  color: "$violet9",
 });
 
 const StyledDocumentationIcon = styled(DocumentationIcon, {
@@ -56,9 +61,10 @@ const Header = ({ breadcrumbs = [] }) => {
     reaction: "",
     feedback: "",
   });
+  const [formSent, setFormSent] = useState(false);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
 
   return (
@@ -110,91 +116,121 @@ const Header = ({ breadcrumbs = [] }) => {
               css={{
                 padding: "18px 20px 12px",
                 position: "relative",
+                width: "313px",
+                minHeight: "180px",
                 mt: "$4",
                 boxShadow:
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
-                background: "#fff",
+                background: "$loContrast",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
               }}>
               <Box css={{ position: "absolute", right: "12px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
-              <Text size="2" css={{ mb: "$3" }}>
-                Feedback
-              </Text>
-              <form onSubmit={handleSubmit}>
-                <TextArea
-                  size="2"
-                  name="feedback"
-                  id="feedback"
-                  placeholder="Your feedback"
-                  css={{ width: "275px" }}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setForm((prev) => ({ ...prev, feedback: value }));
-                  }}
-                />
-                <Flex align="center" justify="between" css={{ mt: "$3" }}>
-                  <Flex>
-                    {reactions.map((reaction, idx) => (
-                      <Box
-                        key={idx}
-                        onClick={() =>
-                          setForm((prev) => ({ ...prev, reaction: reaction }))
-                        }
-                        css={{
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "50%",
-                          border: "1px solid rgba(0, 0, 0, 0.12)",
-                          boxShadow:
-                            reaction === form.reaction
-                              ? "1px 1px 10px rgba(0, 0, 0, 0.2)"
-                              : "",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "20px",
-                          marginRight: "$1",
-                          cursor: "pointer",
-                          ":last-of-type": {
-                            marginRight: "0px",
-                          },
-                        }}>
-                        {reaction}
-                      </Box>
-                    ))}
-                    <input
-                      name="emoji-input"
-                      id="emoji-input"
+              {!formSent ? (
+                <>
+                  <Text size="2" css={{ mb: "$3" }}>
+                    Feedback
+                  </Text>
+                  <form>
+                    <TextArea
+                      size="2"
+                      name="feedback"
+                      id="feedback"
+                      placeholder="Your feedback"
+                      css={{ width: "calc(100% - 40px)" }}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setForm((prev) => ({ ...prev, reaction: value }));
-                      }}
-                      value={form.reaction}
-                      style={{
-                        visibility: "hidden",
-                        width: "0px",
-                        height: "0px",
+                        setForm((prev) => ({ ...prev, feedback: value }));
                       }}
                     />
-                    <input
-                      name="email"
-                      id="email"
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setForm((prev) => ({ ...prev, email: value }));
-                      }}
-                      value={form.email}
-                      style={{
-                        visibility: "hidden",
-                        width: "0px",
-                        height: "0px",
-                      }}
-                    />
-                  </Flex>
-                  <Button type="submit">Send</Button>
+                    <Flex align="center" justify="between" css={{ mt: "$3" }}>
+                      <Flex>
+                        {reactions.map((reaction, idx) => (
+                          <Box
+                            key={idx}
+                            onClick={() =>
+                              setForm((prev) => ({
+                                ...prev,
+                                reaction: reaction,
+                              }))
+                            }
+                            css={{
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              border:
+                                reaction === form.reaction
+                                  ? "1px solid $violet9"
+                                  : "1px solid $panel",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "20px",
+                              marginRight: "$1",
+                              cursor: "pointer",
+                              ":last-of-type": {
+                                marginRight: "0px",
+                              },
+                            }}>
+                            {reaction}
+                          </Box>
+                        ))}
+                        <input
+                          name="emoji-input"
+                          id="emoji-input"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setForm((prev) => ({ ...prev, reaction: value }));
+                          }}
+                          value={form.reaction}
+                          style={{
+                            visibility: "hidden",
+                            width: "0px",
+                            height: "0px",
+                          }}
+                        />
+                        <input
+                          name="email"
+                          id="email"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setForm((prev) => ({ ...prev, email: value }));
+                          }}
+                          value={form.email}
+                          style={{
+                            visibility: "hidden",
+                            width: "0px",
+                            height: "0px",
+                          }}
+                        />
+                      </Flex>
+                      <Button
+                        onClick={() => {
+                          setFormSent(true);
+                          handleSubmit();
+                        }}
+                        disabled={formSent}
+                        type="submit">
+                        Send
+                      </Button>
+                    </Flex>
+                  </form>
+                </>
+              ) : (
+                <Flex
+                  align="center"
+                  justify="center"
+                  css={{ flexDirection: "column" }}>
+                  <StyledCheckedIcon />
+                  <Text css={{ textALign: "center", margin: "$3 0 $2" }}>
+                    Your feedback has been received!
+                  </Text>
+                  <Text> Thank you for your help.</Text>
                 </Flex>
-              </form>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
@@ -215,7 +251,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 mt: "$4",
                 boxShadow:
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
-                background: "#fff",
+                background: "$loContrast",
               }}>
               <Box css={{ position: "absolute", right: "4px", top: "-12px" }}>
                 <StyledPolygonIcon />
