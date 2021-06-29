@@ -37,7 +37,7 @@ beforeAll(async () => {
   const { app } = (testServer = await startAuxTestServer());
   app.use(bearerToken());
   app.use((req, res, next) => {
-    req.config = { httpPrefix };
+    req.config = { httpPrefix } as any;
     next();
   });
 

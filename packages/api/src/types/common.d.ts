@@ -3,6 +3,7 @@ import { NodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 import * as nodeFetch from "node-fetch";
+import { CliArgs } from "../parse-cli";
 
 export enum AuthTokenType {
   JWT = "JWT",
@@ -22,7 +23,7 @@ declare global {
   namespace Express {
     // add custom properties to Request object
     export interface Request {
-      config?: any;
+      config?: CliArgs;
       store?: IStore;
       queue?: MessageQueue;
       frontendDomain: string;
@@ -110,3 +111,13 @@ export interface IStoreBackend {
   replace(key: string, data: StoredObject): Promise<void>;
   delete(id: string): Promise<void>;
 }
+
+// Type utilities
+
+type Camel<T extends string> = T extends `${infer Left}-${infer Right}`
+  ? Camel<`${Left}${Capitalize<Right>}`>
+  : T;
+
+export type CamelKeys<T> = { [K in keyof T as K extends string ? Camel<K> : K]: T[K] };
+
+export type UnboxPromise<T> = T extends Promise<infer U> ? U : T;
