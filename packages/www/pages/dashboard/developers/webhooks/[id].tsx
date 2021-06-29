@@ -5,6 +5,13 @@ import {
   Heading,
   Text,
   Flex,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogTrigger,
   styled,
 } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
@@ -14,6 +21,8 @@ import useSWR from "swr";
 import WebhookDialog, { Action } from "@components/Dashboard/WebhookDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
+import Spinner from "@components/Dashboard/Spinner";
+import { useState } from "react";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -34,7 +43,9 @@ const StyledCross = styled(Cross1Icon, {
 
 const ApiKeys = () => {
   useLoggedIn();
-  const { user, getWebhook, updateWebhook } = useApi();
+  const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
   const dialogState = useToggleState();
   const { id } = router.query;
@@ -70,17 +81,65 @@ const ApiKeys = () => {
                   ai: "center",
                   jc: "space-between",
                 }}>
-                <Heading size="2" css={{}}>
-                  {data.url}
-                </Heading>
+                <Heading size="2">{data.url}</Heading>
                 <Flex css={{ ai: "center" }}>
-                  <Button
-                    size="2"
-                    css={{ mr: "$2", display: "flex", ai: "center" }}
-                    variant="red">
-                    <StyledCross />
-                    Delete
-                  </Button>
+                  <AlertDialog open={deleteDialogOpen}>
+                    <Button
+                      onClick={() => {
+                        setDeleteDialogOpen(true);
+                      }}
+                      size="2"
+                      css={{ mr: "$2", display: "flex", ai: "center" }}
+                      variant="red">
+                      <StyledCross />
+                      Delete
+                    </Button>
+                    <AlertDialogContent
+                      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+                      <AlertDialogTitle as={Heading} size="1">
+                        Delete Webhook
+                      </AlertDialogTitle>
+                      <AlertDialogDescription
+                        as={Text}
+                        size="3"
+                        variant="gray"
+                        css={{ mt: "$2", lineHeight: "22px" }}>
+                        Are you sure you want to delete this webhook?
+                      </AlertDialogDescription>
+                      <Flex css={{ jc: "flex-end", gap: "$2", mt: "$5" }}>
+                        <Button
+                          onClick={() => setDeleteDialogOpen(false)}
+                          size="2"
+                          ghost>
+                          Cancel
+                        </Button>
+                        <AlertDialogAction
+                          size="2"
+                          as={Button}
+                          disabled={deleting}
+                          onClick={async () => {
+                            setDeleting(true);
+                            await deleteWebhook(data.id);
+                            setDeleting(false);
+                            revalidate();
+                            setDeleteDialogOpen(false);
+                            router.push("/dashboard/developers/webhooks");
+                          }}
+                          variant="red">
+                          {deleting && (
+                            <Spinner
+                              css={{
+                                width: 16,
+                                height: 16,
+                                mr: "$2",
+                              }}
+                            />
+                          )}
+                          Delete
+                        </AlertDialogAction>
+                      </Flex>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   <WebhookDialog
                     button={
                       <Button

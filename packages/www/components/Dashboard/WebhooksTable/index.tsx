@@ -80,7 +80,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     async (state) => {
       const [webhooks, nextCursor, _res, count] = await getWebhooks(
         false,
-        true,
+        false,
         state.order,
         null,
         state.pageSize,
