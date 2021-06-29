@@ -9,11 +9,9 @@ import { db } from "../store";
 
 const app = Router();
 
-async function sleep(millis) {
-  return new Promise((resolve) => setTimeout(resolve, millis));
-}
+app.use(authMiddleware({ noApiToken: true }));
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", async (req, res) => {
   const { id } = req.params;
   const apiToken = await req.store.get(`api-token/${id}`);
   if (!apiToken) {
@@ -29,7 +27,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(apiToken);
 });
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+app.delete("/:id", async (req, res) => {
   const { id } = req.params;
   const apiToken = await req.store.get(`api-token/${id}`);
   if (!apiToken) {
@@ -53,7 +51,7 @@ const fieldsMap = {
   "user.email": `users.data->>'email'`,
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.get("/", async (req, res) => {
   let { userId, cursor, limit, order, filters, count } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -135,50 +133,45 @@ app.get("/", authMiddleware({}), async (req, res) => {
   res.json(output);
 });
 
-app.post(
-  "/",
-  authMiddleware({}),
-  validatePost("api-token"),
-  async (req, res) => {
-    const id = uuid();
-    const userId =
-      req.body.userId && req.user.admin ? req.body.userId : req.user.id;
+app.post("/", validatePost("api-token"), async (req, res) => {
+  const id = uuid();
+  const userId =
+    req.body.userId && req.user.admin ? req.body.userId : req.user.id;
 
-    if (req.body.access?.rules) {
-      try {
-        new AuthPolicy(req.body.access.rules);
-      } catch (err) {
-        res.status(422);
-        return res.json({ errors: [`Bad access rules: ${err}`] });
-      }
-    }
-    await Promise.all([
-      req.store.create({
-        id: id,
-        userId: userId,
-        kind: "api-token",
-        name: req.body.name,
-        access: req.body.access,
-        createdAt: Date.now(),
-      }),
-      trackAction(
-        userId,
-        req.user.email,
-        { name: "Api Token Created" },
-        req.config.segmentApiKey
-      ),
-    ]);
-
-    const apiToken = await req.store.get(`api-token/${id}`);
-
-    if (apiToken) {
-      res.status(201);
-      res.json(apiToken);
-    } else {
-      res.status(403);
-      res.json({});
+  if (req.body.access?.rules) {
+    try {
+      new AuthPolicy(req.body.access.rules);
+    } catch (err) {
+      res.status(422);
+      return res.json({ errors: [`Bad access rules: ${err}`] });
     }
   }
-);
+  await Promise.all([
+    req.store.create({
+      id: id,
+      userId: userId,
+      kind: "api-token",
+      name: req.body.name,
+      access: req.body.access,
+      createdAt: Date.now(),
+    }),
+    trackAction(
+      userId,
+      req.user.email,
+      { name: "Api Token Created" },
+      req.config.segmentApiKey
+    ),
+  ]);
+
+  const apiToken = await req.store.get(`api-token/${id}`);
+
+  if (apiToken) {
+    res.status(201);
+    res.json(apiToken);
+  } else {
+    res.status(403);
+    res.json({});
+  }
+});
 
 export default app;

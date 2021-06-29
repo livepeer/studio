@@ -39,6 +39,7 @@ interface AuthParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
+  noApiToken?: boolean;
 }
 
 /**
@@ -57,7 +58,7 @@ function authFactory(params: AuthParams): RequestHandler {
 
     if (!tokenType) {
       throw new ForbiddenError(`no authorization header provided`);
-    } else if (["Bearer", "Basic"].includes(tokenType)) {
+    } else if (["Bearer", "Basic"].includes(tokenType) && !params.noApiToken) {
       const isBasic = tokenType === "Basic";
       const tokenId = isBasic ? basicUser?.pass : req.token;
       if (!tokenId) {

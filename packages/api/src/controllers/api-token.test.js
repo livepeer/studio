@@ -281,6 +281,41 @@ describe("controllers/api-token", () => {
       res = await client.get(`/api-token?userId=${adminUser.id}`);
       expect(res.status).toBe(403);
     });
+
+    it("should disallow meta access with api-token", async () => {
+      const expect403 = async (method, path) => {
+        const res = await client.fetch(path, { method });
+        expect(res.status).toBe(403);
+        const body = await res.json();
+        expect(body.errors[0]).toEqual("no authorization header provided");
+      };
+      const expectAll403s = async () => {
+        await expect403("post", `/api-token`);
+        await expect403("get", `/api-token`);
+        await expect403("get", `/api-token?userId=${nonAdminUser.id}`);
+        await expect403("get", `/api-token/${nonAdminToken}`);
+        await expect403("delete", `/api-token/${nonAdminToken}`);
+      };
+      client.jwtAuth = undefined;
+
+      const nonAdminToken = uuid();
+      await server.store.create({
+        userId: nonAdminUser.id,
+        id: nonAdminToken,
+        kind: "api-token",
+      });
+      client.apiToken = nonAdminToken;
+      await expectAll403s();
+
+      const adminToken = uuid();
+      await server.store.create({
+        userId: adminUser.id,
+        id: adminToken,
+        kind: "api-token",
+      });
+      client.apiToken = adminToken;
+      await expectAll403s();
+    });
   });
 
   /*
