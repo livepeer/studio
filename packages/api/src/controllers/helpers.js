@@ -346,14 +346,17 @@ export function pathJoin(...items) {
 }
 
 export function trimPathPrefix(prefix, path) {
-  if (prefix === path) {
-    return "/";
+  const prefixIdx = path.indexOf(prefix);
+  if (prefix[prefix.length - 1] !== "/") {
+    const nextCharIdx = prefixIdx + prefix.length;
+    if (nextCharIdx < path.length && path[nextCharIdx] !== "/") {
+      return path;
+    }
   }
-  const prefixIdx = path.indexOf(`${prefix}/`);
   if (prefixIdx === 0) {
     return path.substr(prefix.length);
   }
-  if (prefixIdx === 1 && path[0] === "/") {
+  if (prefixIdx === 1 && path[0] === "/" && prefix[0] !== "/") {
     return path.substr(prefix.length + 1);
   }
   return path;

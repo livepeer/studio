@@ -188,16 +188,41 @@ describe("auth middleware", () => {
       });
     });
 
-    it("should trim http prefix when authorizing", async () => {
-      httpPrefix = "/livepeer/api";
-      await setAccess(nonAdminApiKey, [{ resources: ["goo"] }]);
+    describe("http prefix", () => {
+      it("should trim http prefix when authorizing", async () => {
+        httpPrefix = "/livepeer/api";
+        await setAccess(nonAdminApiKey, [{ resources: ["goo"] }]);
 
-      await expectStatus("head", "/zoo").toBe(403);
-      await expectStatus("put", "/api/goo").toBe(403);
-      await expectStatus("post", "/livepeer/api/goo/blah").toBe(403);
+        await expectStatus("head", "/zoo").toBe(403);
+        await expectStatus("put", "/api/goo").toBe(403);
+        await expectStatus("post", "/livepeer/api/goo/blah").toBe(403);
 
-      await expectStatus("get", "/goo").toBe(204);
-      await expectStatus("post", "/livepeer/api/goo").toBe(204);
+        await expectStatus("get", "/goo").toBe(204);
+        await expectStatus("post", "/livepeer/api/goo").toBe(204);
+      });
+
+      it("should handle leading and trailing slashes gracefully", async () => {
+        await setAccess(nonAdminApiKey, [{ resources: ["far"] }]);
+
+        for (const prefix of ["api", "/api", "/api/", "api/"]) {
+          httpPrefix = prefix;
+          await expectStatus("post", "/api/far").toBe(204);
+          await expectStatus("post", "/far").toBe(204);
+          await expectStatus("post", "/far/api").toBe(403);
+        }
+      });
+
+      it("should handle corner cases", async () => {
+        await setAccess(nonAdminApiKey, [{ resources: ["/"] }]);
+        httpPrefix = "/api";
+        await expectStatus("head", "/api").toBe(204);
+        await expectStatus("head", "/api/").toBe(204);
+        await expectStatus("head", "/api-not").toBe(403);
+        await expectStatus("head", "//api").toBe(403);
+
+        await setAccess(nonAdminApiKey, [{ resources: ["/api-key"] }]);
+        await expectStatus("head", "/api-key").toBe(204);
+      });
     });
 
     it("should block access on bad rules", async () => {
