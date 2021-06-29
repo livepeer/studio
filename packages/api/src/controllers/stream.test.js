@@ -916,15 +916,15 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(404);
         data = await res.json();
         expect(data.errors[0]).toEqual("stream not found");
+      });
 
+      it("should allow for content detection on ids instead of playbackIds", async () => {
         res = await client.post("/stream/hook/detection", {
           manifestID: stream.id,
           seqNo: 1,
           sceneClassification: [],
         });
-        expect(res.status).toBe(404);
-        data = await res.json();
-        expect(data.errors[0]).toEqual("stream not found");
+        expect(res.status).toBe(204);
       });
 
       it("should only accept a scene classification array", async () => {
