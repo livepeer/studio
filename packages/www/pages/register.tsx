@@ -17,7 +17,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (user) {
-      router.replace("/app/user");
+      router.replace("/dashboard");
     }
   }, [user]);
 
