@@ -83,8 +83,8 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionButton>
           <AccordionPanel>
             <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
-              Learn how to use the Livepeer.com API by viewing and forking
-              example applications.
+              Learn how to create livestreaming apps by viewing and forking
+              example apps.
             </Text>
             <Link
               href="/docs/guides/using-livepeer-in-your-app/example-app"
