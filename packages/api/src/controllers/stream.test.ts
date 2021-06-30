@@ -1,20 +1,35 @@
-// TODO: add types to this file
 import { json as bodyParserJson } from "body-parser";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 
-import serverPromise from "../test-server";
-import { TestClient, clearDatabase, startAuxTestServer } from "../test-helpers";
+import {
+  ObjectStore,
+  PushTarget,
+  Stream,
+  StreamPatchPayload,
+  User,
+  Webhook,
+} from "../schema/types";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
+import {
+  TestClient,
+  clearDatabase,
+  startAuxTestServer,
+  setupUsers,
+  AuxTestServer,
+} from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
 import { semaphore, sleep } from "../util";
 
 const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
-let server;
-let mockStore;
-let mockPushTarget;
-let mockUser;
-let mockAdminUser;
-let mockNonAdminUser;
-let postMockStream;
+let server: TestServer;
+let mockStore: ObjectStore & { kind: string };
+let mockPushTarget: PushTarget;
+let mockUser: User;
+let mockAdminUser: User;
+let mockNonAdminUser: User;
+let postMockStream: Stream;
 // jest.setTimeout(70000)
 
 beforeAll(async () => {
@@ -73,51 +88,29 @@ afterEach(async () => {
   await clearDatabase(server);
 });
 
-async function setupUsers(server) {
-  const client = new TestClient({
-    server,
-  });
-  // setting up admin user and token
-  const userRes = await client.post(`/user/`, { ...mockAdminUser });
-  let adminUser = await userRes.json();
-
-  let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
-  const adminToken = await tokenRes.json();
-  client.jwtAuth = adminToken["token"];
-
-  const user = await server.store.get(`user/${adminUser.id}`, false);
-  adminUser = { ...user, admin: true, emailValid: true };
-  await server.store.replace(adminUser);
-
-  const resNonAdmin = await client.post(`/user/`, { ...mockNonAdminUser });
-  let nonAdminUser = await resNonAdmin.json();
-
-  tokenRes = await client.post(`/user/token`, { ...mockNonAdminUser });
-  const nonAdminToken = await tokenRes.json();
-
-  const nonAdminUserRes = await server.store.get(
-    `user/${nonAdminUser.id}`,
-    false
-  );
-  nonAdminUser = { ...nonAdminUserRes, emailValid: true };
-  await server.store.replace(nonAdminUser);
-  return { client, adminUser, adminToken, nonAdminUser, nonAdminToken };
-}
-
 describe("controllers/stream", () => {
+  let client: TestClient;
+  let adminUser: User;
+  let adminToken: string;
+  let adminApiKey: string;
+  let nonAdminUser: User;
+  let nonAdminToken: string;
+  let nonAdminApiKey: string;
+
+  beforeEach(async () => {
+    ({
+      client,
+      adminUser,
+      adminToken,
+      adminApiKey,
+      nonAdminUser,
+      nonAdminToken,
+      nonAdminApiKey,
+    } = await setupUsers(server, mockAdminUser, mockNonAdminUser));
+    client.jwtAuth = adminToken;
+  });
+
   describe("basic CRUD with JWT authorization", () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
-
-    beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-    });
-
     it("should not get all streams without admin authorization", async () => {
       client.jwtAuth = "";
       for (let i = 0; i < 10; i += 1) {
@@ -139,7 +132,7 @@ describe("controllers/stream", () => {
           id: uuid(),
           kind: "stream",
           deleted: i > 3 ? true : undefined,
-        };
+        } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
@@ -163,7 +156,7 @@ describe("controllers/stream", () => {
           id: i + uuid(), // object should be sorted for this test to work as intended
           kind: "stream",
           deleted: i < 3 ? true : undefined,
-        };
+        } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
@@ -186,7 +179,7 @@ describe("controllers/stream", () => {
         const document = {
           id: uuid(),
           kind: "stream",
-        };
+        } as DBStream;
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
         const stream = await res.json();
@@ -194,8 +187,8 @@ describe("controllers/stream", () => {
       }
       const res = await client.get(`/stream?limit=11`);
       const streams = await res.json();
-      expect(res.headers._headers.link).toBeDefined();
-      expect(res.headers._headers.link.length).toBe(1);
+      expect(res.headers.raw().link).toBeDefined();
+      expect(res.headers.raw().link.length).toBe(1);
       expect(streams.length).toEqual(11);
     });
 
@@ -205,7 +198,7 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation validation", () => {
-      let pushTarget;
+      let pushTarget: PushTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
@@ -277,7 +270,7 @@ describe("controllers/stream", () => {
       });
 
       it("should reject references to other users push targets", async () => {
-        client.jwtAuth = nonAdminToken["token"];
+        client.jwtAuth = nonAdminToken;
         const res = await client.post("/stream", {
           ...postMockStream,
           pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
@@ -338,7 +331,7 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation", () => {
-      let pushTarget;
+      let pushTarget: PushTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
@@ -426,9 +419,9 @@ describe("controllers/stream", () => {
     });
 
     describe("stream patch", () => {
-      let pushTarget;
-      let stream;
-      let patchPath;
+      let pushTarget: PushTarget;
+      let stream: Stream;
+      let patchPath: string;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
@@ -442,13 +435,13 @@ describe("controllers/stream", () => {
       });
 
       it("should disallow patching other users streams", async () => {
-        client.jwtAuth = nonAdminToken["token"];
-        const res = await client.patch(patchPath);
+        client.jwtAuth = nonAdminToken;
+        const res = await client.patch(patchPath, {});
         expect(res.status).toBe(404);
       });
 
       it("should allow an empty patch", async () => {
-        let res = await client.patch(patchPath);
+        let res = await client.patch(patchPath, {});
         expect(res.status).toBe(204);
 
         res = await client.patch(patchPath, {});
@@ -465,7 +458,7 @@ describe("controllers/stream", () => {
       });
 
       it("should validate field types", async () => {
-        const testTypeErr = async (payload) => {
+        const testTypeErr = async (payload: any) => {
           let res = await client.patch(patchPath, payload);
           expect(res.status).toBe(422);
           const json = await res.json();
@@ -505,7 +498,7 @@ describe("controllers/stream", () => {
         expect(json.errors[0]).toContain(`push target not found`);
       });
 
-      const testPatchField = async (patch) => {
+      const testPatchField = async (patch: StreamPatchPayload) => {
         const res = await client.patch(patchPath, patch);
         expect(res.status).toBe(204);
 
@@ -559,7 +552,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(200);
         source.push(await res.json());
       }
-      client.jwtAuth = nonAdminToken["token"];
+      client.jwtAuth = nonAdminToken;
 
       const res = await client.get(`/stream/user/${nonAdminUser.id}?limit=3`);
       expect(res.status).toBe(200);
@@ -567,9 +560,9 @@ describe("controllers/stream", () => {
       expect(streams.length).toEqual(3);
       expect(streams[0]).toEqual(source[3]);
       expect(streams[0].userId).toEqual(nonAdminUser.id);
-      expect(res.headers._headers.link).toBeDefined();
-      expect(res.headers._headers.link.length).toBe(1);
-      const [nextLink] = res.headers._headers.link[0].split(">");
+      expect(res.headers.raw().link).toBeDefined();
+      expect(res.headers.raw().link.length).toBe(1);
+      const [nextLink] = res.headers.raw().link[0].split(">");
       const si = nextLink.indexOf(`/stream/user/`);
       const nextRes = await client.get(nextLink.slice(si));
       expect(nextRes.status).toBe(200);
@@ -590,7 +583,7 @@ describe("controllers/stream", () => {
         const res = await client.get(`/stream/${document.id}`);
         expect(res.status).toBe(200);
       }
-      client.jwtAuth = nonAdminToken["token"];
+      client.jwtAuth = nonAdminToken;
 
       const res = await client.get(`/stream`);
       expect(res.status).toBe(200);
@@ -601,7 +594,7 @@ describe("controllers/stream", () => {
     });
 
     it("should not accept empty body for creating a stream", async () => {
-      const res = await client.post("/stream");
+      const res = await client.post("/stream", null);
       expect(res.status).toBe(422);
     });
 
@@ -616,31 +609,7 @@ describe("controllers/stream", () => {
   });
 
   describe("stream endpoint with api key", () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
-    const adminApiKey = uuid();
-    const nonAdminApiKey = uuid();
-
     beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-
-      await server.store.create({
-        id: adminApiKey,
-        kind: "api-token",
-        userId: adminUser.id,
-      });
-
-      await server.store.create({
-        id: nonAdminApiKey,
-        kind: "api-token",
-        userId: nonAdminUser.id,
-      });
-
       for (let i = 0; i < 5; i += 1) {
         const document = {
           id: uuid(),
@@ -688,42 +657,16 @@ describe("controllers/stream", () => {
   });
 
   describe("webhooks", () => {
-    let stream;
+    let stream: Stream;
     let data;
     let res;
-    let client,
-      adminUser,
-      adminToken,
-      adminApiKey,
-      nonAdminUser,
-      nonAdminToken,
-      nonAdminApiKey;
 
     beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-      adminApiKey = uuid();
-      await server.store.create({
-        id: adminApiKey,
-        kind: "api-token",
-        userId: adminUser.id,
-      });
-      nonAdminApiKey = uuid();
-      await server.store.create({
-        id: nonAdminApiKey,
-        kind: "api-token",
-        userId: nonAdminUser.id,
-      });
-
       await server.store.create(mockStore);
       stream = {
         id: uuid(),
         kind: "stream",
+        name: "the-stream",
         userId: nonAdminUser.id,
         presets: ["P720p30fps16x9", "P360p30fps4x3", "P144p30fps16x9"],
         objectStoreId: mockStore.id,
@@ -775,7 +718,7 @@ describe("controllers/stream", () => {
       });
 
       describe("detection config", () => {
-        const url = (id) => happyCases[0].replace("STREAM_ID", id);
+        const url = (id: string) => happyCases[0].replace("STREAM_ID", id);
         const defaultDetection = {
           freq: 4,
           sampleRate: 10,
@@ -793,6 +736,7 @@ describe("controllers/stream", () => {
           await server.db.webhook.create({
             id: uuid(),
             kind: "webhook",
+            name: "zoo.tv",
             events: ["stream.detection"],
             userId: stream.userId,
             createdAt: Date.now(),
@@ -848,21 +792,25 @@ describe("controllers/stream", () => {
       });
 
       describe("authorization", () => {
-        let url;
+        let url: string;
 
         beforeEach(() => {
           url = happyCases[0].replace("STREAM_ID", stream.id);
         });
 
         it("should not accept non-admin users", async () => {
-          client.jwtAuth = nonAdminToken.token;
+          client.jwtAuth = nonAdminToken;
           res = await client.post("/stream/hook", { url });
           expect(res.status).toBe(403);
           data = await res.json();
           expect(data.errors[0]).toContain("admin");
         });
 
-        const testBasic = async (userPassword, statusCode, error) => {
+        const testBasic = async (
+          userPassword: string,
+          statusCode: number,
+          error?: string
+        ) => {
           client.jwtAuth = undefined;
           client.basicAuth = userPassword;
           res = await client.post("/stream/hook", { url });
@@ -940,10 +888,10 @@ describe("controllers/stream", () => {
       });
 
       describe("emitted event", () => {
-        let webhookServer;
-        let hookSem;
-        let hookPayload;
-        let genMockWebhook;
+        let webhookServer: AuxTestServer;
+        let hookSem: ReturnType<typeof semaphore>;
+        let hookPayload: any;
+        let genMockWebhook: () => WithID<Webhook>;
 
         beforeAll(async () => {
           webhookServer = await startAuxTestServer();
@@ -974,12 +922,12 @@ describe("controllers/stream", () => {
           hookSem = semaphore();
           hookPayload = undefined;
 
-          client.jwtAuth = nonAdminToken.token;
+          client.jwtAuth = nonAdminToken;
           const res = await client.post("/stream", postMockStream);
           expect(res.status).toBe(201);
           stream = await res.json();
           // Hooks can only be called by admin users
-          client.jwtAuth = adminToken.token;
+          client.jwtAuth = adminToken;
         });
 
         it("should return success if no webhook registered", async () => {
@@ -1023,20 +971,13 @@ describe("controllers/stream", () => {
   });
 
   describe("profiles", () => {
-    let stream;
-    let fractionalStream;
-    let gopStream;
-    let profileStream;
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
+    let stream: Stream;
+    let fractionalStream: Stream;
+    let gopStream: Stream;
+    let profileStream: Stream;
+
     beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-      client.jwtAuth = nonAdminToken["token"];
+      client.jwtAuth = nonAdminToken;
 
       await server.store.create(mockStore);
       stream = {
@@ -1127,7 +1068,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
         const data = await res.json();
         expect(data.profiles).toEqual(testStream.profiles);
-        client.jwtAuth = adminToken.token;
+        client.jwtAuth = adminToken;
         const hookRes = await client.post("/stream/hook", {
           url: `https://example.com/live/${data.id}/0.ts`,
         });
@@ -1144,7 +1085,7 @@ describe("controllers/stream", () => {
       };
       badStream.profiles[0] = {
         ...profileStream.profiles[0],
-        profile: "VP8OrSomethingIDK",
+        profile: "VP8OrSomethingIDK" as any,
       };
       const res = await client.post("/stream", badStream);
       expect(res.status).toBe(422);
@@ -1152,18 +1093,6 @@ describe("controllers/stream", () => {
   });
 
   describe("user sessions", () => {
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
-
-    beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
-    });
-
     it("should join sessions", async () => {
       await server.store.create(mockStore);
       // create parent stream
