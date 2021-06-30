@@ -1,9 +1,12 @@
-// TODO: Make this typescript as well
-import Router from "express/lib/router";
+import { Router } from "express";
 import sql from "sql-template-strings";
 
 import { authMiddleware } from "../middleware";
+import { User } from "../schema/types";
 import { db } from "../store";
+import { DBSession } from "../store/db";
+import { DBStream } from "../store/stream-table";
+import { WithID } from "../store/types";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import {
   USER_SESSION_TIMEOUT,
@@ -42,9 +45,25 @@ const fieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
+function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
 app.get("/", authMiddleware({}), async (req, res, next) => {
-  let { limit, cursor, all, order, filters, userId, parentId, count } =
-    req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    order,
+    filters,
+    userId,
+    parentId,
+    count,
+  } = toStringValues(req.query);
   const { forceUrl } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -69,6 +88,14 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   }
   order = parseOrder(fieldsMap, order);
 
+  type ResultRow = {
+    id: string;
+    data: DBSession;
+    stream: DBStream;
+    usersId: string;
+    usersdata: WithID<User>;
+    count?: number;
+  };
   let fields =
     "session.id as id, session.data as data, users.id as usersId, users.data as usersdata, stream.data as stream";
   if (count) {
@@ -82,9 +109,9 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata, stream, count: c }) => {
+    process: ({ data, usersdata, stream, count: c }: ResultRow) => {
       if (count) {
-        res.set("X-Total-Count", c);
+        res.set("X-Total-Count", c.toString());
       }
       return req.user.admin
         ? {
@@ -101,7 +128,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
 
   res.status(200);
 
-  const ingests = await req.getIngest(req);
+  const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
     return res.json({ errors: ["Ingest not configured"] });
@@ -112,7 +139,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  let sessions = output.map((session) => {
+  output.forEach((session) => {
     if (session.record && session.recordObjectStoreId) {
       const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
       session.recordingStatus = isReady ? "ready" : "waiting";
@@ -122,7 +149,7 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
       }
     }
   });
-  sessions = req.user.admin
+  const sessions = req.user.admin
     ? output
     : removePrivateFieldsMany(output, req.user.admin);
   res.json(sessions);
@@ -204,7 +231,7 @@ app.get(
           stream,
           stream.previousStats || {}
         );
-        const newSession = {
+        const newSession: DBSession & DBStream = {
           ...stream,
           ...combinedStats,
           createdAt: stream.userSessionCreatedAt || stream.createdAt,
@@ -238,7 +265,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  const ingests = await req.getIngest(req);
+  const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId) {
@@ -255,7 +282,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(session);
 });
 
-function removePrivateFields(obj, isAdmin = false) {
+function removePrivateFields(obj: DBSession, isAdmin = false) {
   for (const fn of privateFields) {
     delete obj[fn];
   }
@@ -267,12 +294,12 @@ function removePrivateFields(obj, isAdmin = false) {
   return obj;
 }
 
-function removePrivateFieldsMany(objs, isAdmin = false) {
+function removePrivateFieldsMany(objs: DBSession[], isAdmin = false) {
   return objs.map((o) => removePrivateFields(o, isAdmin));
 }
 
-const adminOnlyFields = ["deleted", "broadcasterHost"];
+const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
 
-const privateFields = ["recordObjectStoreId"];
+const privateFields: (keyof DBSession)[] = ["recordObjectStoreId"];
 
 export default app;

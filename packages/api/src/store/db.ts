@@ -32,7 +32,10 @@ export interface PostgresParams {
   appName?: string;
 }
 
-export type DBSession = WithID<Session> & DBStreamFields;
+export type DBSession = WithID<Session> &
+  DBStreamFields & {
+    broadcasterHost?: string;
+  };
 
 type Table<T> = BaseTable<WithID<T>>;
 

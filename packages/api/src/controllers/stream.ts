@@ -1,7 +1,6 @@
 import dns from "dns";
 const { Resolver } = dns.promises;
 import { Router, Request } from "express";
-import isLocalIP from "is-local-ip";
 import fetch from "isomorphic-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
