@@ -13,6 +13,12 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+      rabbitmq:
+        image: rabbitmq
+        env:
+          RABBITMQ_DEFAULT_VHOST: "livepeer"
+        ports:
+          - 5672:5672
     steps:
       - name: checkout
         uses: actions/checkout@v2

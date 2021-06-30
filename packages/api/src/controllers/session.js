@@ -41,7 +41,16 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res, next) => {
-  let { limit, cursor, all, order, filters, userId, parentId } = req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    order,
+    filters,
+    userId,
+    parentId,
+    count,
+  } = req.query;
   const { forceUrl } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -66,8 +75,11 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   }
   order = parseOrder(fieldsMap, order);
 
-  const fields =
+  let fields =
     "session.id as id, session.data as data, users.id as usersId, users.data as usersdata, stream.data as stream";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
   const from = `session left join users on session.data->>'userId' = users.id
   left join stream on session.data->>'parentId' = stream.id`;
   const [output, newCursor] = await db.session.find(query, {
@@ -76,7 +88,10 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata, stream }) => {
+    process: ({ data, usersdata, stream, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
       return req.user.admin
         ? {
             ...data,

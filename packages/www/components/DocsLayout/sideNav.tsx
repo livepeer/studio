@@ -18,6 +18,7 @@ type Child = {
   title: string;
   description: string;
   slug: string;
+  hide: boolean;
   children: {
     title: string;
     description: string;
@@ -164,43 +165,45 @@ const Menu = ({ menu }: MenuProps) => {
         route.children.length > 0 ? (
           <CollapsibleMenuItem route={route} key={idx} />
         ) : (
-          <Link href={`/${route.slug}`} key={idx} passHref>
-            <a
-              sx={{
-                fontSize: "14px",
-                letterSpacing: "-0.02em",
-                color: "#3C3C3C",
-                mt: "16px !important",
-                cursor: "pointer",
-                position: "relative",
-                fontWeight: currentPath === `/${route.slug}` ? "600" : "400",
-                pl: "24px",
-              }}>
-              <div
+          !route.hide && (
+            <Link href={`/${route.slug}`} key={idx} passHref>
+              <a
                 sx={{
-                  position: "absolute",
-                  left: "0",
-                  width: "4px",
-                  height: "100%",
-                  transition: "all 0.2s",
-                  background:
-                    currentPath === `/${route.slug}`
-                      ? "#943CFF"
-                      : "transparent",
-                  borderRadius: " 0 2px 2px 0",
-                }}
-              />
-              <span
-                sx={{
+                  fontSize: "14px",
+                  letterSpacing: "-0.02em",
                   color: "#3C3C3C",
-                  ":hover": {
-                    color: "#000000",
-                  },
+                  mt: "16px !important",
+                  cursor: "pointer",
+                  position: "relative",
+                  fontWeight: currentPath === `/${route.slug}` ? "600" : "400",
+                  pl: "24px",
                 }}>
-                <Marked>{route.title}</Marked>
-              </span>
-            </a>
-          </Link>
+                <div
+                  sx={{
+                    position: "absolute",
+                    left: "0",
+                    width: "4px",
+                    height: "100%",
+                    transition: "all 0.2s",
+                    background:
+                      currentPath === `/${route.slug}`
+                        ? "#943CFF"
+                        : "transparent",
+                    borderRadius: " 0 2px 2px 0",
+                  }}
+                />
+                <span
+                  sx={{
+                    color: "#3C3C3C",
+                    ":hover": {
+                      color: "#000000",
+                    },
+                  }}>
+                  <Marked>{route.title}</Marked>
+                </span>
+              </a>
+            </Link>
+          )
         )
       )}
     </div>

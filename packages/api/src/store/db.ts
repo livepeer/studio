@@ -13,6 +13,7 @@ import {
   PushTarget,
   Usage,
   Region,
+  WebhookResponse,
   Session,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
@@ -20,6 +21,7 @@ import StreamTable from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import PushTargetTable from "./push-target-table";
+import WebhookTable from "./webhook-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -43,7 +45,8 @@ export class DB {
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
-  webhook: Table<Webhook>;
+  webhook: WebhookTable;
+  webhookResponse: Table<WebhookResponse>;
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: Table<Session>;
@@ -119,13 +122,17 @@ export class DB {
     });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
-    this.webhook = makeTable<Webhook>({ db: this, schema: schemas["webhook"] });
+    this.webhook = new WebhookTable({ db: this, schema: schemas["webhook"] });
     this.passwordResetToken = makeTable<PasswordResetToken>({
       db: this,
       schema: schemas["password-reset-token"],
     });
 
     this.region = makeTable<Region>({ db: this, schema: schemas["region"] });
+    this.webhookResponse = makeTable<WebhookResponse>({
+      db: this,
+      schema: schemas["webhook-response"],
+    });
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(

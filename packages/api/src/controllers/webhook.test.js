@@ -47,7 +47,7 @@ beforeAll(async () => {
     name: "test webhook 1",
     kind: "webhook",
     createdAt: Date.now(),
-    event: "streamStarted",
+    event: "stream.started",
     url: "https://winter-darkness-88ea.livepeer.workers.dev/",
     // url: 'https://livepeer.com/'
   };
@@ -269,7 +269,7 @@ describe("controllers/webhook", () => {
       const webhookRes = await client.post("/webhook", { ...localWebhook });
       let webhookResJson = await webhookRes.json();
       console.log("webhook created: ", webhookResJson);
-      expect(webhookRes.status).toBe(406);
+      expect(webhookRes.status).toBe(422);
     });
   });
 });

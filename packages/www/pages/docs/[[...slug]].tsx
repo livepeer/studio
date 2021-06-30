@@ -269,6 +269,7 @@ export const getStaticProps = async (context: GetStaticPathsContext) => {
       slug: `docs${each.slug !== "" ? `/${each.slug}` : ""}`,
       title: each.frontMatter.title,
       description: each.frontMatter.description,
+      hide: each.frontMatter?.hide ? true : false,
     };
   });
 
@@ -286,6 +287,7 @@ export const getStaticProps = async (context: GetStaticPathsContext) => {
       slug: each.slug,
       title: each.title,
       description: each.description,
+      hide: each.hide,
       children: sorted
         .filter(
           (child) =>
@@ -299,6 +301,7 @@ export const getStaticProps = async (context: GetStaticPathsContext) => {
             slug: eachChild.slug,
             title: eachChild.title,
             description: eachChild.description,
+            hide: eachChild.hide,
             children: sorted.filter(
               (secondChild) =>
                 secondChild.slug.split("/")[2] ===

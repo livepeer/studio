@@ -29,7 +29,6 @@ const ACTIVE_TIMEOUT = 90 * 1000;
 
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
-const resolver = new Resolver();
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
@@ -171,6 +170,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     order,
     filters,
     userId,
+    count,
   } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -206,8 +206,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   order = parseOrder(fieldsMap, order);
 
-  const fields =
+  let fields =
     " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
   const from = `stream left join users on stream.data->>'userId' = users.id`;
   const [output, newCursor] = await db.stream.find(query, {
     limit,
@@ -215,7 +218,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata }) => {
+    process: ({ data, usersdata, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
       return req.user.admin
         ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
         : { ...data };
@@ -819,98 +825,16 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
-    // basic sanitization.
-    let sanitized = { ...stream };
-    delete sanitized.streamKey;
-
-    const { data: webhooksList } = await getWebhooks(
-      req.store,
-      stream.userId,
-      "streamStarted"
-    );
-    try {
-      const responses = await Promise.all(
-        webhooksList.map(async (webhook, key) => {
-          // console.log('webhook: ', webhook)
-          console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
-          let ips, urlObj, isLocal;
-          try {
-            urlObj = parseUrl(webhook.url);
-            if (urlObj.host) {
-              ips = await resolver.resolve4(urlObj.hostname);
-            }
-          } catch (e) {
-            console.error("error: ", e);
-            throw e;
-          }
-
-          // This is mainly useful for local testing
-          if (req.user.admin) {
-            isLocal = false;
-          } else {
-            try {
-              if (ips && ips.length) {
-                isLocal = isLocalIP(ips[0]);
-              } else {
-                isLocal = true;
-              }
-            } catch (e) {
-              console.error("isLocal Error", isLocal, e);
-              throw e;
-            }
-          }
-          if (isLocal) {
-            // don't fire this webhook.
-            console.log(
-              `webhook ${webhook.id} resolved to a localIP, url: ${webhook.url}, resolved IP: ${ips}`
-            );
-          } else {
-            console.log("preparing to fire webhook ", webhook.url);
-            // go ahead
-            let params = {
-              method: "POST",
-              headers: {
-                "content-type": "application/json",
-                "user-agent": "livepeer.com",
-              },
-              timeout: WEBHOOK_TIMEOUT,
-              body: JSON.stringify({
-                id: webhook.id,
-                event: webhook.event,
-                stream: sanitized,
-              }),
-            };
-
-            try {
-              logger.info(`webhook ${webhook.id} firing`);
-              let resp = await fetchWithTimeout(webhook.url, params);
-              if (resp.status >= 200 && resp.status < 300) {
-                // 2xx requests are cool.
-                // all is good
-                logger.info(`webhook ${webhook.id} fired successfully`);
-                return true;
-              }
-              console.error(
-                `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
-              );
-              return !webhook.blocking;
-            } catch (e) {
-              console.log("firing error", e);
-              return !webhook.blocking;
-            }
-          }
-        })
-      );
-      if (responses.some((o) => !o)) {
-        // at least one of responses is false, blocking this stream
-        res.status(403);
-        return res.end();
-      }
-    } catch (e) {
-      console.error("webhook loop error", e);
-      res.status(400);
-      return res.end();
-    }
+    // -------------------------------
+    // new webhookCannon
+    req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.started",
+      streamId: id,
+      userId: user.id,
+    });
   }
 
   stream.isActive = !!req.body.active;
@@ -1213,7 +1137,11 @@ async function terminateStreamReq(req, stream) {
   return { status: 200, result: nukeRes };
 }
 
-app.post("/hook", async (req, res) => {
+// Hooks
+
+const streamDetectionEvent = "stream.detection";
+
+app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422);
     return res.json({
@@ -1347,16 +1275,63 @@ app.post("/hook", async (req, res) => {
     manifestID = parent.playbackId;
   }
 
+  const { data: webhooks } = await db.webhook.listSubscribed(
+    user.id,
+    streamDetectionEvent
+  );
+  let detection = undefined;
+  if (webhooks.length > 0 || stream.detection) {
+    // TODO: Validate if these are the best default configs
+    detection = {
+      freq: 4, // Segment sample rate. Process 1 / freq segments
+      sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+      sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+    };
+    if (stream.detection?.sceneClassification) {
+      detection.sceneClassification = stream.detection?.sceneClassification;
+    }
+    console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
+  }
+
   res.json({
-    manifestID: manifestID,
+    manifestID,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
     recordObjectStore,
     recordObjectStoreUrl,
     previousSessions: stream.previousSessions,
+    detection,
   });
 });
+
+app.post(
+  "/hook/detection",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("detection-webhook-payload"),
+  async (req, res) => {
+    const { manifestID, seqNo, sceneClassification } = req.body;
+    const stream = await db.stream.getByIdOrPlaybackId(manifestID);
+    if (!stream) {
+      return res.status(404).json({ errors: ["stream not found"] });
+    }
+    console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
+
+    await req.queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: streamDetectionEvent,
+      streamId: stream.id,
+      userId: stream.userId,
+      payload: {
+        seqNo,
+        sceneClassification,
+      },
+    });
+    return res.status(204).end();
+  }
+);
 
 const statsFields = [
   "sourceBytes",

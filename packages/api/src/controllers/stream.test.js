@@ -1,6 +1,11 @@
-import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
+import { json as bodyParserJson } from "body-parser";
 import uuid from "uuid/v4";
+
+import serverPromise from "../test-server";
+import { TestClient, clearDatabase, startAuxTestServer } from "../test-helpers";
+import { semaphore, sleep } from "../util";
+
+const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
 let server;
 let mockStore;
@@ -198,7 +203,7 @@ describe("controllers/stream", () => {
       expect(res.status).toBe(400);
     });
 
-    describe("stream push targets validation", () => {
+    describe("stream creation validation", () => {
       let pushTarget;
 
       beforeEach(async () => {
@@ -299,6 +304,36 @@ describe("controllers/stream", () => {
         const json = await res.json();
         expect(json.errors[0]).toBe(`profile cannot be named "source"`);
       });
+
+      it("should reject streams with scene classification empty array", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          detection: { sceneClassification: [] },
+        });
+        expect(res.status).toBe(422);
+        const data = await res.json();
+        expect(data.errors[0]).toContain(`\"minItems\"`);
+      });
+
+      it("should reject streams with scene classification empty object", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          detection: { sceneClassification: [{}] },
+        });
+        expect(res.status).toBe(422);
+        const data = await res.json();
+        expect(data.errors[0]).toContain(`\"required\"`);
+      });
+
+      it("should reject streams with inexistent scene classification", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          detection: { sceneClassification: [{ name: "animal" }] },
+        });
+        expect(res.status).toBe(422);
+        const data = await res.json();
+        expect(data.errors[0]).toContain(`\"enum\"`);
+      });
     });
 
     describe("stream creation", () => {
@@ -329,6 +364,14 @@ describe("controllers/stream", () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+        });
+        expect(res.status).toBe(201);
+      });
+
+      it("should create stream with valid detection config", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          detection: { sceneClassification: [{ name: "soccer" }] },
         });
         expect(res.status).toBe(201);
       });
@@ -647,7 +690,13 @@ describe("controllers/stream", () => {
     let stream;
     let data;
     let res;
-    let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
+    let client,
+      adminUser,
+      adminToken,
+      adminApiKey,
+      nonAdminUser,
+      nonAdminToken,
+      nonAdminApiKey;
 
     beforeEach(async () => {
       ({
@@ -657,6 +706,18 @@ describe("controllers/stream", () => {
         nonAdminUser,
         nonAdminToken,
       } = await setupUsers(server));
+      adminApiKey = uuid();
+      await server.store.create({
+        id: adminApiKey,
+        kind: "api-token",
+        userId: adminUser.id,
+      });
+      nonAdminApiKey = uuid();
+      await server.store.create({
+        id: nonAdminApiKey,
+        kind: "api-token",
+        userId: nonAdminUser.id,
+      });
 
       await server.store.create(mockStore);
       stream = {
@@ -669,45 +730,288 @@ describe("controllers/stream", () => {
       await server.store.create(stream);
     });
 
-    const happyCases = [
-      `rtmp://56.13.68.32/live/STREAM_ID`,
-      `http://localhost/live/STREAM_ID/12354.ts`,
-      `https://example.com/live/STREAM_ID/0.ts`,
-      `/live/STREAM_ID/99912938429430820984294083.ts`,
-    ];
+    describe("auth webhook", () => {
+      const happyCases = [
+        `rtmp://56.13.68.32/live/STREAM_ID`,
+        `http://localhost/live/STREAM_ID/12354.ts`,
+        `https://example.com/live/STREAM_ID/0.ts`,
+        `/live/STREAM_ID/99912938429430820984294083.ts`,
+      ];
 
-    for (let url of happyCases) {
-      it(`should succeed for ${url}`, async () => {
-        url = url.replace("STREAM_ID", stream.id);
-        res = await client.post("/stream/hook", { url });
+      for (let url of happyCases) {
+        it(`should succeed for ${url}`, async () => {
+          url = url.replace("STREAM_ID", stream.id);
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.presets).toEqual(stream.presets);
+          expect(data.objectStore).toEqual(mockStore.url);
+        });
+      }
+
+      const sadCases = [
+        [422, `rtmp://localhost/live/foo/bar/extra`],
+        [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
+        [422, "nonsense://localhost/live"],
+        [401, `https://localhost/live`],
+        [404, `https://localhost/notlive/STREAM_ID/1324.ts`],
+        [404, `rtmp://localhost/notlive/STREAM_ID`],
+        [404, `rtmp://localhost/live/nonexists`],
+        [404, `https://localhost/live/notexists/1324.ts`],
+      ];
+
+      for (let [status, url] of sadCases) {
+        it(`should return ${status} for ${url}`, async () => {
+          url = url.replace("STREAM_ID", stream.id);
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(status);
+        });
+      }
+
+      it("should reject missing urls", async () => {
+        res = await client.post("/stream/hook", {});
+        expect(res.status).toBe(422);
+      });
+
+      describe("detection config", () => {
+        const url = (id) => happyCases[0].replace("STREAM_ID", id);
+        const defaultDetection = {
+          freq: 4,
+          sampleRate: 10,
+          sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+        };
+
+        it("should not include detection field by default", async () => {
+          res = await client.post("/stream/hook", { url: url(stream.id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toBeUndefined();
+        });
+
+        it("should return default detection if subscribed webhook exists", async () => {
+          await server.db.webhook.create({
+            id: uuid(),
+            kind: "webhook",
+            event: "stream.detection",
+            userId: stream.userId,
+            createdAt: Date.now(),
+            url: "https://zoo.tv/abuse/hook",
+          });
+
+          res = await client.post("/stream/hook", { url: url(stream.id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
+
+        it("should return default detection if stream includes it", async () => {
+          const id = uuid();
+          await server.store.create({ ...stream, id, detection: {} });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
+
+        it("should return stream scene classification config", async () => {
+          const id = uuid();
+          await server.store.create({
+            ...stream,
+            id,
+            detection: { sceneClassification: [{ name: "adult" }] },
+          });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual({
+            ...defaultDetection,
+            sceneClassification: [{ name: "adult" }],
+          });
+        });
+
+        it("should disallow configuring sample rates", async () => {
+          const id = uuid();
+          await server.store.create({
+            ...stream,
+            id,
+            detection: { freq: 1, sampleRate: 9 },
+          });
+
+          res = await client.post("/stream/hook", { url: url(id) });
+          expect(res.status).toBe(200);
+          data = await res.json();
+          expect(data.detection).toEqual(defaultDetection);
+        });
+      });
+
+      describe("authorization", () => {
+        let url;
+
+        beforeEach(() => {
+          url = happyCases[0].replace("STREAM_ID", stream.id);
+        });
+
+        it("should not accept non-admin users", async () => {
+          client.jwtAuth = nonAdminToken.token;
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(403);
+          data = await res.json();
+          expect(data.errors[0]).toContain("admin");
+        });
+
+        const testBasic = async (userPassword, statusCode, error) => {
+          client.jwtAuth = undefined;
+          client.basicAuth = userPassword;
+          res = await client.post("/stream/hook", { url });
+          expect(res.status).toBe(statusCode);
+          if (error) {
+            data = await res.json();
+            expect(data.errors[0]).toEqual(error);
+          }
+        };
+
+        it("should parse basic auth", async () => {
+          await testBasic("hey:basic", 403, "no token basic found");
+        });
+
+        it("should accept valid token in basic auth", async () => {
+          await testBasic(`${adminUser.id}:${adminApiKey}`, 200);
+        });
+
+        it("should only accept token with corresponding user id", async () => {
+          await testBasic(
+            `${nonAdminUser.id}:${adminApiKey}`,
+            403,
+            expect.stringMatching(/no token .+ found/)
+          );
+        });
+
+        it("should still only accept admin users", async () => {
+          await testBasic(
+            `${nonAdminUser.id}:${nonAdminApiKey}`,
+            403,
+            expect.stringContaining("admin")
+          );
+        });
+      });
+    });
+
+    describe("detection webhook", () => {
+      it("should return an error if no manifest ID provided", async () => {
+        res = await client.post("/stream/hook/detection", {});
+        expect(res.status).toBe(422);
         data = await res.json();
-        expect(data.presets).toEqual(stream.presets);
-        expect(data.objectStore).toEqual(mockStore.url);
+        expect(data.errors[0]).toContain(`\"required\"`);
       });
-    }
 
-    const sadCases = [
-      [422, `rtmp://localhost/live/foo/bar/extra`],
-      [422, `http://localhost/live/foo/bar/extra/extra2/13984.ts`],
-      [422, "nonsense://localhost/live"],
-      [401, `https://localhost/live`],
-      [404, `https://localhost/notlive/STREAM_ID/1324.ts`],
-      [404, `rtmp://localhost/notlive/STREAM_ID`],
-      [404, `rtmp://localhost/live/nonexists`],
-      [404, `https://localhost/live/notexists/1324.ts`],
-    ];
-
-    for (let [status, url] of sadCases) {
-      it(`should return ${status} for ${url}`, async () => {
-        url = url.replace("STREAM_ID", stream.id);
-        res = await client.post("/stream/hook", { url });
-        expect(res.status).toBe(status);
+      it("should return an error if stream doesn't exist", async () => {
+        const id = uuid();
+        res = await client.post("/stream/hook/detection", {
+          manifestID: id,
+          seqNo: 1,
+          sceneClassification: [],
+        });
+        expect(res.status).toBe(404);
+        data = await res.json();
+        expect(data.errors[0]).toEqual("stream not found");
       });
-    }
 
-    it("should reject missing urls", async () => {
-      res = await client.post("/stream/hook", {});
-      expect(res.status).toBe(422);
+      it("should allow for content detection on ids instead of playbackIds", async () => {
+        res = await client.post("/stream/hook/detection", {
+          manifestID: stream.id,
+          seqNo: 1,
+          sceneClassification: [],
+        });
+        expect(res.status).toBe(204);
+      });
+
+      it("should only accept a scene classification array", async () => {
+        res = await client.post("/stream/hook/detection", {
+          manifestID: "-",
+          seqNo: 1,
+          sceneClassification: { shouldBe: "array" },
+        });
+        expect(res.status).toBe(422);
+        data = await res.json();
+        expect(data.errors[0]).toContain(`\"type\"`);
+      });
+
+      describe("emitted event", () => {
+        let webhookServer;
+        let hookSem;
+        let hookPayload;
+        let genMockWebhook;
+
+        beforeAll(async () => {
+          webhookServer = await startAuxTestServer();
+          webhookServer.app.use(bodyParserJson());
+          webhookServer.app.post(
+            "/captain/hook",
+            bodyParserJson(),
+            (req, res) => {
+              hookPayload = req.body;
+              hookSem.release();
+              res.status(204).end();
+            }
+          );
+          genMockWebhook = () => ({
+            id: uuid(),
+            userId: nonAdminUser.id,
+            name: "detection-webhook",
+            kind: "webhook",
+            createdAt: Date.now(),
+            event: "stream.detection",
+            url: `http://localhost:${webhookServer.port}/captain/hook`,
+          });
+        });
+
+        afterAll(() => webhookServer.close());
+
+        beforeEach(async () => {
+          hookSem = semaphore();
+          hookPayload = undefined;
+
+          client.jwtAuth = nonAdminToken.token;
+          const res = await client.post("/stream", postMockStream);
+          expect(res.status).toBe(201);
+          stream = await res.json();
+          // Hooks can only be called by admin users
+          client.jwtAuth = adminToken.token;
+        });
+
+        it("should return success if no webhook registered", async () => {
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+            seqNo: 1,
+            sceneClassification: [],
+          });
+          expect(res.status).toBe(204);
+        });
+
+        it("should propagate event to registered webhook", async () => {
+          const sceneClassification = [
+            { name: "soccer", probability: 0.7 },
+            { name: "adult", probability: 0.68 },
+          ];
+          await server.db.webhook.create(genMockWebhook());
+          res = await client.post("/stream/hook/detection", {
+            manifestID: stream.playbackId,
+            seqNo: 1,
+            sceneClassification,
+          });
+          expect(res.status).toBe(204);
+
+          await hookSem.wait(1000);
+          expect(hookPayload).toEqual({
+            id: expect.stringMatching(uuidRegex),
+            event: "stream.detection",
+            stream: { ...stream, streamKey: undefined },
+            payload: { sceneClassification, seqNo: 1 },
+          });
+        });
+      });
     });
   });
 
@@ -816,6 +1120,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
         const data = await res.json();
         expect(data.profiles).toEqual(testStream.profiles);
+        client.jwtAuth = adminToken.token;
         const hookRes = await client.post("/stream/hook", {
           url: `https://example.com/live/${data.id}/0.ts`,
         });
@@ -982,9 +1287,3 @@ const smallStream = {
     },
   ],
 };
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

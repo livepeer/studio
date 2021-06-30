@@ -28,7 +28,16 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters } = req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    event,
+    allUsers,
+    order,
+    filters,
+    count,
+  } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -39,8 +48,11 @@ app.get("/", authMiddleware({}), async (req, res) => {
       query.push(sql`webhook.data->>'deleted' IS NULL`);
     }
 
-    const fields =
+    let fields =
       " webhook.id as id, webhook.data as data, users.id as usersId, users.data as usersdata";
+    if (count) {
+      fields = fields + ", count(*) OVER() AS count";
+    }
     const from = `webhook left join users on webhook.data->>'userId' = users.id`;
     const [output, newCursor] = await db.webhook.find(query, {
       limit,
@@ -48,7 +60,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
       fields,
       from,
       order: parseOrder(fieldsMap, order),
-      process: ({ data, usersdata }) => {
+      process: ({ data, usersdata, count: c }) => {
+        if (count) {
+          res.set("X-Total-Count", c);
+        }
         return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
       },
     });
@@ -61,20 +76,39 @@ app.get("/", authMiddleware({}), async (req, res) => {
     return res.json(output);
   }
 
-  let output = await getWebhooks(
-    req.store,
-    req.user.id,
-    event,
+  const query = parseFilters(fieldsMap, filters);
+  query.push(sql`webhook.data->>'userId' = ${req.user.id}`);
+
+  if (!all || all === "false") {
+    query.push(sql`webhook.data->>'deleted' IS NULL`);
+  }
+
+  let fields = " webhook.id as id, webhook.data as data";
+  if (count) {
+    fields = fields + ", count(*) OVER() AS count";
+  }
+  const from = `webhook`;
+  const [output, newCursor] = await db.webhook.find(query, {
     limit,
     cursor,
-    all
-  );
+    fields,
+    from,
+    order: parseOrder(fieldsMap, order),
+    process: ({ data, count: c }) => {
+      if (count) {
+        res.set("X-Total-Count", c);
+      }
+      return { ...data };
+    },
+  });
+
   res.status(200);
 
-  if (output.data.length > 0) {
-    res.links({ next: makeNextHREF(req, output.cursor) });
+  if (output.length > 0) {
+    res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(output.data);
+
+  return res.json(output);
 });
 
 app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
@@ -88,14 +122,6 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
     console.error(`couldn't parse the url provided ${req.body.url}`);
     res.status(400);
     return res.end();
-  }
-
-  if (
-    !urlObj.protocol ||
-    (urlObj.protocol !== "http:" && urlObj.protocol !== "https:")
-  ) {
-    res.status(406);
-    return res.json({ errors: ["url provided should be http or https only"] });
   }
 
   const doc = {

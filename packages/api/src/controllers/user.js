@@ -760,4 +760,13 @@ app.post("/retrieve-invoices", async (req, res) => {
   res.json(invoices);
 });
 
+app.post("/retrieve-payment-method", async (req, res) => {
+  let { stripePaymentMethodId } = req.body;
+  const paymentMethod = await stripe.paymentMethods.retrieve(
+    stripePaymentMethodId
+  );
+  res.status(200);
+  res.json(paymentMethod);
+});
+
 export default app;
