@@ -6,9 +6,9 @@ import Table from "./table";
 import { GetOptions, WithID } from "./types";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
-type DBPushTarget = WithID<PushTarget>;
+export type DBPushTarget = WithID<PushTarget>;
 
-interface PushTargetInput {
+export interface PushTargetInput {
   name?: string;
   url: string;
   disabled?: boolean;

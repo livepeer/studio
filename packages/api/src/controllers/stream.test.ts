@@ -7,10 +7,9 @@ import {
   Stream,
   StreamPatchPayload,
   User,
-  Webhook,
 } from "../schema/types";
 import { DBStream } from "../store/stream-table";
-import { WithID } from "../store/types";
+import { DBWebhook } from "../store/webhook-table";
 import {
   TestClient,
   clearDatabase,
@@ -891,7 +890,7 @@ describe("controllers/stream", () => {
         let webhookServer: AuxTestServer;
         let hookSem: ReturnType<typeof semaphore>;
         let hookPayload: any;
-        let genMockWebhook: () => WithID<Webhook>;
+        let genMockWebhook: () => DBWebhook;
 
         beforeAll(async () => {
           webhookServer = await startAuxTestServer();
