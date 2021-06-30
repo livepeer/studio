@@ -33,7 +33,7 @@ const DocsNav = ({
   const [selectOpen, setSelectOpen] = useState(false);
   const [closeSelect, setCloseSelect] = useState(false);
   const { token, logout } = useApi();
-  const isDashboard = pathname.includes("/app/");
+  const isDashboard = pathname.includes("/dashboard/");
   const router = useRouter();
   const currentPath = router.asPath
     .split("/")
@@ -101,16 +101,12 @@ const DocsNav = ({
               }}>
               <div sx={{ display: "flex", alignItems: "center" }}>
                 <Logo logoType={false} withoutBeta />
-                <span sx={{ fontSize: "16px", fontWeight: "600", mx: "12px" }}>
-                  /
-                </span>
                 <p
                   sx={{
                     fontSize: "16px",
                     fontWeight: "600",
-                    letterSpacing: "-0.06em",
                   }}>
-                  docs
+                  Docs
                 </p>
               </div>
               <button
@@ -168,17 +164,11 @@ const DocsNav = ({
               )}
               {loggedIn && (
                 <>
-                  <A
-                    variant="nav"
-                    sx={{ mr: 3, cursor: "pointer" }}
-                    onClick={() => logout()}>
-                    Log Out
-                  </A>
                   {!isDashboard && (
                     <Button
                       sx={{ py: "6px", ml: 3 }}
                       isLink
-                      href="/app/user"
+                      href="/dashboard"
                       variant="buttons.primarySmall">
                       Dashboard
                     </Button>
