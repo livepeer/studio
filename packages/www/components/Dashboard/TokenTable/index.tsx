@@ -276,6 +276,7 @@ const TokenTable = ({
         isOpen={createDialogState.on}
         onClose={createDialogState.onOff}
         onOpenChange={createDialogState.onToggle}
+        // @ts-ignore
         onCreateSuccess={tableProps.state.queryState?.invalidate()}
       />
     </>
