@@ -11,6 +11,25 @@ import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
+import ReactGA from "react-ga";
+import Router from "next/router";
+import { useEffect } from "react";
+
+if (process.env.NODE_ENV === "production") {
+  ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
+} else {
+  ReactGA.initialize("test", { testMode: true });
+}
+
+// Track client-side page views with Segment & HubSpot
+if (process.env.NODE_ENV === "production") {
+  Router.events.on("routeChangeComplete", (url) => {
+    window.analytics.page();
+    var _hsq = (window["hsq"] = window["hsq"] || []);
+    _hsq.push(["setPath", url]);
+    _hsq.push(["trackPageView"]);
+  });
+}
 
 const globalStyles = global({
   body: {
@@ -66,6 +85,10 @@ function ContextProviders({ children }) {
 }
 
 function DashboardLayout({ id, children, breadcrumbs }: Props) {
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, []);
+
   globalStyles();
 
   return (
