@@ -141,7 +141,7 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   const verificationUrl = `${protocol}://${
     req.frontendDomain
-  }/app/user/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
+  }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
 
   if (!validUser && user) {

@@ -79,7 +79,7 @@ const Menu = ({
           <hr sx={{ my: 3, visibility: "hidden" }} />
           {!!token ? (
             <>
-              <Button href="/app/user" isLink>
+              <Button href="/dashboard" isLink>
                 Dashboard
               </Button>
               {user && user.admin && (
