@@ -148,6 +148,9 @@ describe("controllers/api-token", () => {
           { resources: [":even/:separate"] },
           { resources: [":also/:duplicate"] },
         ]);
+        await testError(`Bad route /path?query=error`, [
+          { resources: ["/path?query=error"] },
+        ]);
       });
 
       it("should accept valid access rules", async () => {

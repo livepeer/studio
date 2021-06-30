@@ -1,5 +1,5 @@
+import { Router } from "express";
 import bearerToken from "express-bearer-token";
-import HttpHash from "http-hash";
 import { authMiddleware } from ".";
 
 import { ApiToken, User } from "../schema/types";
@@ -40,9 +40,15 @@ beforeAll(async () => {
     req.config = { httpPrefix };
     next();
   });
+
   app.all("/admin/*", authMiddleware({ anyAdmin: true }), (_req, res) =>
     res.status(202).end()
   );
+
+  const router = Router();
+  router.all("/*", authMiddleware({}), (_req, res) => res.status(203).end());
+  app.use("/router", router);
+
   app.all("/*", authMiddleware({}), (_req, res) => res.status(204).end());
   app.use(errorHandler());
 });
@@ -191,14 +197,17 @@ describe("auth middleware", () => {
     describe("http prefix", () => {
       it("should trim http prefix when authorizing", async () => {
         httpPrefix = "/livepeer/api";
-        await setAccess(nonAdminApiKey, [{ resources: ["goo"] }]);
+        await setAccess(nonAdminApiKey, [{ resources: ["goo", "router/baz"] }]);
 
         await expectStatus("head", "/zoo").toBe(403);
         await expectStatus("put", "/api/goo").toBe(403);
         await expectStatus("post", "/livepeer/api/goo/blah").toBe(403);
+        await expectStatus("post", "/livepeer/api/baz").toBe(403);
 
         await expectStatus("get", "/goo").toBe(204);
+        await expectStatus("post", "/router/baz").toBe(203);
         await expectStatus("post", "/livepeer/api/goo").toBe(204);
+        await expectStatus("post", "/livepeer/api/router/baz").toBe(204);
       });
 
       it("should handle leading and trailing slashes gracefully", async () => {
@@ -239,6 +248,25 @@ describe("auth middleware", () => {
         { resources: ["zzz/:param", "zzz/*confict"] },
       ]);
       await expectStatus("delete", "/zzz/abc").toBe(403);
+
+      await setAccess(nonAdminApiKey, [{ resources: ["gfb?path=only"] }]);
+      await expectStatus("get", "/gfb?path=only").toBe(403);
+      await expectStatus("get", "/gfb").toBe(403);
+    });
+
+    it("should support nested routers", async () => {
+      await setAccess(nonAdminApiKey, [{ resources: ["router/foo", "bar"] }]);
+      await expectStatus("get", "/router/bar").toBe(403);
+      await expectStatus("get", "/router/router/foo").toBe(403);
+      await expectStatus("post", "/foo").toBe(403);
+
+      await expectStatus("post", "/router/foo").toBe(203);
+      await expectStatus("post", "/bar").toBe(204);
+    });
+
+    it("should handle query strings fine", async () => {
+      await setAccess(nonAdminApiKey, [{ resources: ["foo"] }]);
+      await expectStatus("post", "/foo?hello=query").toBe(204);
     });
 
     it("should authorize admin independently", async () => {

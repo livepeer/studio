@@ -10,6 +10,9 @@ export class AuthPolicy {
     const allowRouter = new HttpHash();
     for (const rule of rules) {
       for (const resource of rule.resources) {
+        if (resource.includes("?")) {
+          throw new Error(`Bad route ${resource}: cannot have query string`);
+        }
         try {
           allowRouter.set(resource, rule.methods ?? ["*"]);
         } catch (err) {

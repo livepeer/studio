@@ -106,8 +106,9 @@ function authFactory(params: AuthParams): RequestHandler {
     }
     const accessRules = tokenObject?.access?.rules;
     if (accessRules) {
+      const fullPath = req.originalUrl.split("?", 2)[0];
       const { httpPrefix } = req.config;
-      if (!isAuthorized(req.method, req.path, accessRules, httpPrefix)) {
+      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
     }
