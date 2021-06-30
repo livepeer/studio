@@ -4,14 +4,12 @@ import {
   Flex,
   Heading,
   Button,
+  Text,
   styled,
 } from "@livepeer.com/design-system";
-import { MdCheck, MdClose, MdCreditCard } from "react-icons/md";
-import { CheckIcon, Cross2Icon, IdCardIcon } from "@radix-ui/react-icons";
+import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "../PlanForm";
 import { products } from "@livepeer.com/api/src/config";
-import useApi from "hooks/use-api";
-import PaymentMethodDialog from "@components/Dashboard/PaymentMethodDialog";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -22,7 +20,25 @@ const Tour: any = dynamic(() => import("reactour"), { ssr: false });
 const steps = [
   {
     selector: ".upgrade-card",
-    content: `Welcome to Livepeer.com! You're currently subscribed to the free plan. Click "Upgrade" to enter your credit card information and switch over to the pay-as-you-go plan for unlimited transcoding minutes.`,
+    style: {
+      padding: 0,
+      backgroundColor: "transparent",
+    },
+    content: (
+      <Text
+        size="2"
+        css={{
+          backgroundColor: "$panel",
+          padding: "$4",
+          borderRadius: 6,
+          color: "$hiContrast",
+          lineHeight: 1.5,
+        }}>
+        Welcome to Livepeer.com! You're currently subscribed to the free plan.
+        Click "Upgrade" to enter your credit card information and switch over to
+        the pay-as-you-go plan for unlimited transcoding minutes.
+      </Text>
+    ),
   },
 ];
 
@@ -102,71 +118,6 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
         onRequestClose={() => setIsTourOpen(false)}
       />
 
-      {/* {dashboard && (
-        <Box css={{ width: "100%", pb: "$4", borderColor: "$mauve5" }}>
-          <Box css={{ width: "100%" }}>
-            <Box css={{ mb: "$4", color: "$hiContrast" }}>
-              You are currently on the{" "}
-              <span
-                css={{
-                  textTransform: "uppercase",
-                  fontSize: "$2",
-                  borderRadius: 1000,
-                  py: 0,
-                  px: 2,
-                  color: "black",
-                  border: "1px solid",
-                  borderColor: "$mauve5",
-                  bg: "rgba(0,0,0,.05)",
-                }}>
-                {user?.stripeProductId
-                  ? products[user.stripeProductId].name
-                  : products["prod_0"].name}
-              </span>{" "}
-              plan.
-            </Box>
-          </Box>
-          {user?.stripeCustomerPaymentMethodId && (
-            <Box
-              css={{
-                px: "$3",
-                py: "12px",
-                borderRadius: 6,
-                bg: "rgba(0,0,0,.02)",
-                border: "1px solid",
-                borderColor: "$mauve5",
-              }}>
-              <Flex
-                css={{
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}>
-                <Flex css={{ color: "text", alignItems: "center", mr: "$4" }}>
-                  <MdCreditCard css={{ mr: "$3", fontSize: "$4" }} />{" "}
-                  <Box css={{ fontSize: "$2", mr: "$3" }}>Credit Card: </Box>
-                  <Box
-                    css={{
-                      textTransform: "capitalize",
-                      mr: "$4",
-                      fontSize: "$2",
-                    }}>
-                    {user.ccBrand} •••• {user.ccLast4}
-                  </Box>
-                </Flex>
-
-                <Button
-                  variant="violet"
-                  onClick={() => {
-                    setUpdatePaymentModal(true);
-                  }}>
-                  Change
-                </Button>
-              </Flex>
-            </Box>
-          )}
-        </Box>
-      )} */}
       <Box
         css={{
           borderRadius: 16,
