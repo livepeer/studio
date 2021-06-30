@@ -276,7 +276,7 @@ const TokenTable = ({
         isOpen={createDialogState.on}
         onClose={createDialogState.onOff}
         onOpenChange={createDialogState.onToggle}
-        onCreateSuccess={tableProps.state.swrState?.revalidate}
+        onCreateSuccess={tableProps.state.queryState?.invalidate()}
       />
     </>
   );
