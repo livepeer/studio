@@ -14,7 +14,7 @@ const Streams = () => {
   return (
     <Layout id="streams" breadcrumbs={[{ title: "Streams" }]}>
       <Box css={{ p: "$6" }}>
-        <StreamsTable title="Streams" userId={user.id} />
+        <StreamsTable title="Streams" userId={user.id} pageSize={20} />
       </Box>
     </Layout>
   );
