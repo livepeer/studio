@@ -1,8 +1,14 @@
 import React, { useCallback } from "react";
-import { Box, Flex, Heading, Text } from "@livepeer.com/design-system";
-import Layout from "../../../../layouts/dashboard";
-import { useRouter } from "next/router";
-import { useApi } from "../../../../hooks";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  TextField,
+  Label,
+} from "@livepeer.com/design-system";
+import Layout from "../../layouts/dashboard";
+import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api";
 import Chart from "@components/Dashboard/Chart";
@@ -56,24 +62,20 @@ const interval = 10000;
 const maxItems = 6;
 
 const Health = () => {
-  const [stream, setStream] = useState(null);
   const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
     { name: 0, kbps: 0 },
   ]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const [videoExists, setVideoExists] = useState<boolean>(false);
-
-  const { getStream, getStreamInfo } = useApi();
-  const router = useRouter();
-  const { query } = router;
-  const id = query.id;
+  const [playbackUrl, setPlaybackUrl] = useState<string>("");
+  const { getStreamInfo } = useApi();
 
   const doGetInfo = useCallback(
     async (id: string) => {
       setInfo(null);
-      const [, rinfo] = await getStreamInfo(id);
+      const playbackId = id.split("/")[4];
+      const [, rinfo] = await getStreamInfo(playbackId);
       if (!rinfo || rinfo.isSession === undefined) {
-        return;
       } else if (rinfo.stream) {
         const info = rinfo as StreamInfo;
         setInfo(info);
@@ -84,7 +86,8 @@ const Health = () => {
 
   const getIngestRate = useCallback(
     async (id: string) => {
-      const [, rinfo] = await getStreamInfo(id);
+      const playbackId = id.split("/")[4];
+      const [, rinfo] = await getStreamInfo(playbackId);
       if (!rinfo) {
         return;
       } else if (rinfo.stream) {
@@ -105,21 +108,9 @@ const Health = () => {
   );
 
   useEffect(() => {
-    if (!id) {
-      return;
-    }
-    getStream(id)
-      .then((stream) => setStream(stream))
-      .catch((err) => {
-        console.error(err);
-      }); // todo: surface this
-    doGetInfo(typeof id === "string" ? id : null);
-  }, [doGetInfo]);
-
-  useEffect(() => {
     const intervalId = window.setInterval(() => {
       if (info) {
-        getIngestRate(typeof id === "string" ? id : null);
+        getIngestRate(playbackUrl);
       } else return null;
     }, interval);
 
@@ -128,26 +119,8 @@ const Health = () => {
     };
   }, [getIngestRate, info]);
 
-  const playbackUrl = `https://cdn.livepeer.monster/hls/${stream?.playbackId}/index.m3u8`;
-
-  if (!stream) {
-    return (
-      <Layout
-        id="streams"
-        breadcrumbs={[
-          { title: "Streams", href: "/dashboard/streams" },
-        ]}></Layout>
-    );
-  }
-
   return (
-    <Layout
-      id="streams"
-      breadcrumbs={[
-        { title: "Streams", href: "/dashboard/streams" },
-        { title: stream?.name, href: `/dashboard/streams/${id}` },
-        { title: "Stream Health" },
-      ]}>
+    <Layout id="testPlayer" breadcrumbs={[{ title: "Test Player" }]}>
       <Box css={{ padding: "$6 $5" }}>
         <Flex
           css={{
@@ -158,6 +131,21 @@ const Health = () => {
             Stream Health
           </Text>
         </Flex>
+        <Label
+          css={{ display: "block", mt: "$4", mb: "$2" }}
+          htmlFor="playbackUrl">
+          Playback URL
+        </Label>
+        <TextField
+          id="playbackUrl"
+          type="url"
+          onChange={(e) => {
+            doGetInfo(e.target.value);
+            setPlaybackUrl(e.target.value);
+          }}
+          size="2"
+          placeholder="ie. https://cdn.livepeer.com/hls/123456abcdef7890/index.m3u8"
+        />
         <Box
           css={{
             display: "grid",
@@ -236,15 +224,6 @@ const Health = () => {
               />
             </Box>
           </Box>
-
-          {/* <VideoContainer
-            smallDescription
-            manifestUrl={playbackUrl}
-            title="Source stream + Livepeer.com transcoded renditions"
-            description="Adaptive bitrate streaming"
-            withOverflow
-            setVideo={setVideoExists}
-          /> */}
         </Box>
         <Box css={{ my: "$8" }}>
           <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
