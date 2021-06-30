@@ -148,7 +148,7 @@ const Health = () => {
         { title: stream?.name, href: `/dashboard/streams/${id}` },
         { title: "Stream Health" },
       ]}>
-      <Box css={{ padding: "$6 $5" }}>
+      <Box css={{ padding: "$6" }}>
         <Flex
           css={{
             borderBottom: "1px solid $colors$mauve6",
