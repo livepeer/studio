@@ -121,7 +121,7 @@ const Health = () => {
 
   return (
     <Layout id="streamHealth" breadcrumbs={[{ title: "Stream Health" }]}>
-      <Box css={{ padding: "$6 $5" }}>
+      <Box css={{ padding: "$6" }}>
         <Flex
           css={{
             borderBottom: "1px solid $colors$mauve6",
