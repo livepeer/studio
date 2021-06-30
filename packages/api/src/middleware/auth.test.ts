@@ -46,6 +46,10 @@ beforeAll(async () => {
   );
 
   const router = Router();
+  router.use(
+    "/nested",
+    Router().all("/*", authMiddleware({}), (_req, res) => res.status(203).end())
+  );
   router.all("/*", authMiddleware({}), (_req, res) => res.status(203).end());
   app.use("/router", router);
 
@@ -255,11 +259,16 @@ describe("auth middleware", () => {
     });
 
     it("should support nested routers", async () => {
-      await setAccess(nonAdminApiKey, [{ resources: ["router/foo", "bar"] }]);
+      await setAccess(nonAdminApiKey, [
+        { resources: ["router/nested/zaz", "router/foo", "bar"] },
+      ]);
+      await expectStatus("get", "/zaz").toBe(403);
       await expectStatus("get", "/router/bar").toBe(403);
+      await expectStatus("get", "/router/nested/bar").toBe(403);
       await expectStatus("get", "/router/router/foo").toBe(403);
       await expectStatus("post", "/foo").toBe(403);
 
+      await expectStatus("post", "/router/nested/zaz").toBe(203);
       await expectStatus("post", "/router/foo").toBe(203);
       await expectStatus("post", "/bar").toBe(204);
     });
