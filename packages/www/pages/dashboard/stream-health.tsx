@@ -120,7 +120,7 @@ const Health = () => {
   }, [getIngestRate, info]);
 
   return (
-    <Layout id="testPlayer" breadcrumbs={[{ title: "Test Player" }]}>
+    <Layout id="streamHealth" breadcrumbs={[{ title: "Stream Health" }]}>
       <Box css={{ padding: "$6 $5" }}>
         <Flex
           css={{
