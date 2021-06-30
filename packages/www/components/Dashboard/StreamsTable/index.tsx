@@ -283,7 +283,7 @@ const StreamsTable = ({
     deleteStreams,
     deleteDialogState.onOff,
     state.selectedRows.length,
-    state.swrState?.revalidate,
+    state.queryState?.invalidate()
   ]);
 
   return (
@@ -438,7 +438,7 @@ const StreamsTable = ({
               },
             ],
           });
-          await state.swrState.revalidate();
+          await state.queryState?.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
           await router.push({
             pathname: `/dashboard/streams/${newStream.id}`,

@@ -217,7 +217,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     deleteStreams,
     deleteDialogState.onOff,
     tableProps.state.selectedRows.length,
-    tableProps.state.swrState?.revalidate,
+    tableProps.state.queryState?.invalidate()
   ]);
 
   return (
