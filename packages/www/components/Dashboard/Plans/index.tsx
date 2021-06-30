@@ -104,7 +104,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
         steps={steps}
         disableDotsNavigation={false}
         showButtons={false}
-        rounded={6}
+        rounded={16}
         showNumber={false}
         showNavigation={false}
         isOpen={isTourOpen}
