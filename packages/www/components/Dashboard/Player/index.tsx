@@ -4,7 +4,7 @@ import muxjs from "mux.js/dist/mux.js";
 
 const Player = ({
   src,
-  posterUrl = "https://i.vimeocdn.com/video/499134794_1280x720.jpg",
+  posterUrl = "https://via.placeholder.com/160x90/1e1e21/1e1e21",
   config = {},
   setVideo,
 }) => {

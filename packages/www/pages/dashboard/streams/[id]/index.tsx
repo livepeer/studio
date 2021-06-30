@@ -657,7 +657,6 @@ const ID = () => {
                         Idle
                       </Badge>
                     )}
-                    {/* <Player1 /> */}
                     <Player
                       setVideo={setVideoExists}
                       src={globalPlaybackUrl}
