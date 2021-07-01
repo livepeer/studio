@@ -15,7 +15,7 @@ export default (shouldBeLoggedIn = true) => {
       if (!token) {
         router.replace("/login");
       } else if (user && user.emailValid === false) {
-        router.replace("/app/user/verify");
+        router.replace("/dashboard/verify");
       }
     }
     // Check for user rather than token so we don't redirect until we've checked
