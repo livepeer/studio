@@ -422,8 +422,8 @@ const TableComponent = <T extends Record<string, unknown>>({
             <Button
               onClick={handleNextPage}
               disabled={
-                // @ts-ignore
                 state.nextCursor === "" ||
+                // @ts-ignore
                 state.pageSize >= parseFloat(data?.count)
               }>
               Next
