@@ -43,9 +43,7 @@ export type FilterType = FilterItem["type"];
 export type ApplyFilterHandler = (filters: Filter[]) => void;
 
 function getActiveFiltersCount(filters: Filter[]) {
-  return filters.reduce((count, f) => {
-    if (f.isOpen) return count + 1;
-  }, 0);
+  return filters.filter((item) => item.isOpen).length;
 }
 
 type TableFilterProps = {
@@ -118,7 +116,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
           <FilterIcon />
         </Flex>
         Filter
-        {activeFiltersCount > 0 && (
+        {getActiveFiltersCount(filters) > 0 && (
           <>
             <Box
               as="span"
@@ -130,7 +128,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
               }}
             />
             <Box as="span" css={{ color: "$violet11" }}>
-              {activeFiltersCount}
+              {getActiveFiltersCount(filters)}
             </Box>
           </>
         )}

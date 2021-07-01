@@ -274,7 +274,10 @@ const TableComponent = <T extends Record<string, unknown>>({
                 <Button
                   size="2"
                   // @ts-ignore
-                  css={{ display: "flex", alignItems: "center" }}
+                  css={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                   {...selectAction}
                 />
               )}
