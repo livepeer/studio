@@ -304,8 +304,10 @@ const StreamsTable = ({
         Create a unique stream object, broadcast live video content and playback
         your live stream with Livepeer.com.
       </Text>
-      <Link href="/docs">
-        <A css={{ mb: "$5", display: "block" }}>Learn more</A>
+      <Link href="/docs" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
       </Link>
       <Button
         onClick={() => createDialogState.onOn()}

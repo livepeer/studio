@@ -178,8 +178,10 @@ const TokenTable = ({
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         API keys allow you to authenticate API requests in your app
       </Text>
-      <Link href="/docs/guides/api">
-        <A css={{ mb: "$5", display: "block" }}>Learn more</A>
+      <Link href="/docs/guides/api" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
       </Link>
       <Button
         onClick={() => createDialogState.onOn()}
