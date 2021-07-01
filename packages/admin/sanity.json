@@ -21,7 +21,8 @@
     "media",
     "markdown",
     "@sanity/code-input",
-    "mux-input"
+    "mux-input",
+    "seo-tools"
   ],
   "parts": [
     {
