@@ -237,6 +237,8 @@ const TableComponent = <T extends Record<string, unknown>>({
     state.cursor,
   ]);
 
+  const dataCount = parseFloat(data?.count);
+
   return (
     <Box>
       <Flex align="end" justify="between" css={{ mb: "$5" }}>
@@ -436,7 +438,9 @@ const TableComponent = <T extends Record<string, unknown>>({
               </Button>
               <Button
                 onClick={handleNextPage}
-                disabled={state.nextCursor === ""}>
+                disabled={
+                  state.nextCursor === "" || state.pageSize >= dataCount
+                }>
                 Next
               </Button>
             </Flex>
@@ -455,7 +459,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [order, setOrder] = useState("");
   const [cursor, setCursor] = useState("");
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState("");
+  const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
   const [swrState, setSwrState] = useState<SwrState | undefined>();
