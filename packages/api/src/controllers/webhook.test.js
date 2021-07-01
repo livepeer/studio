@@ -175,12 +175,30 @@ describe("controllers/webhook", () => {
     });
 
     it("update a webhook", async () => {
-      let modifiedHook = { ...generatedWebhook };
-      modifiedHook.name = "modified_name";
-      const res = await client.put(`/webhook/${modifiedHook.id}`, modifiedHook);
+      const { id } = generatedWebhook;
+      const modifiedHook = { ...generatedWebhook, name: "modified_name" };
+
+      const res = await client.put(`/webhook/${id}`, modifiedHook);
       const resJson = await res.json();
       expect(res.status).toBe(200);
-      expect(resJson.id).toEqual(generatedWebhook.id);
+      expect(resJson.id).toEqual(id);
+
+      const updated = await client.get(`/webhook/${id}`).then((r) => r.json());
+      expect(updated.userId).toEqual(adminUser.id);
+      expect(updated.name).toEqual("modified_name");
+    });
+
+    it("disallows setting webhook for another user", async () => {
+      const { id } = generatedWebhook;
+      const modifiedHook = { ...generatedWebhook, userId: nonAdminUser.id };
+
+      const res = await client.put(`/webhook/${id}`, modifiedHook);
+      const resJson = await res.json();
+      expect(res.status).toBe(200);
+      expect(resJson.id).toEqual(id);
+
+      const updated = await client.get(`/webhook/${id}`).then((r) => r.json());
+      expect(updated.userId).toEqual(adminUser.id);
     });
 
     it("delete a webhook", async () => {
