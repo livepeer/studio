@@ -34,8 +34,8 @@ components:
       table: webhook
       required:
         - name
-        - event
         - url
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -58,12 +58,18 @@ components:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         event:
-          type: string
-          enum:
-            - stream.started
-            - stream.detection
-            - stream.idle
-            - recording.ready
+          index: true
+          writeOnly: true
+          $ref: "#/components/schemas/webhook/properties/events/items"
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - stream.started
+              - stream.detection
+              - stream.idle
+              - recording.ready
         url:
           type: string
           format: uri

@@ -1,8 +1,9 @@
 import { DB } from "../store/db";
-import { Webhook, User, Stream } from "../schema/types";
+import { User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 // import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
+import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 
@@ -20,7 +21,7 @@ const MAX_RETRIES = 20;
 
 export interface WebhookMessage {
   id: string;
-  event: Webhook["event"];
+  event: DBWebhook["events"][0];
   userId: string;
   streamId: string;
   payload?: Object;
@@ -116,7 +117,7 @@ export default class WebhookCannon {
 
   async _fireHook(
     event: WebhookMessage,
-    webhook: Webhook,
+    webhook: DBWebhook,
     sanitized: Stream,
     user: User,
     verifyUrl = true
@@ -167,7 +168,7 @@ export default class WebhookCannon {
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({
           id: webhook.id,
-          event: webhook.event,
+          event: event.event,
           stream: sanitized,
           payload: event.payload,
         }),
@@ -204,7 +205,7 @@ export default class WebhookCannon {
   }
 
   async storeResponse(
-    webhook: Webhook,
+    webhook: DBWebhook,
     event: WebhookMessage,
     resp: Response,
     duration = 0
