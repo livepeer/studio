@@ -52,7 +52,7 @@ const TokenTable = ({
   userId: string;
 }) => {
   const { getApiTokens, deleteApiToken } = useApi();
-  const tableProps = useTableState({ pageSize: 30 });
+  const tableProps = useTableState({ tableId: "TokenTable", pageSize: 30 });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
@@ -276,7 +276,7 @@ const TokenTable = ({
                     }
                   );
                   await Promise.all(promises);
-                  await tableProps.state.queryState?.invalidate();
+                  await tableProps.state.invalidate();
                   openSnackbar(
                     `${tableProps.state.selectedRows.length} stream${
                       tableProps.state.selectedRows.length > 1 ? "s" : ""
@@ -309,8 +309,7 @@ const TokenTable = ({
         isOpen={createDialogState.on}
         onClose={createDialogState.onOff}
         onOpenChange={createDialogState.onToggle}
-        // @ts-ignore
-        onCreateSuccess={tableProps.state.queryState?.invalidate()}
+        onCreateSuccess={tableProps.state.invalidate}
       />
     </>
   );

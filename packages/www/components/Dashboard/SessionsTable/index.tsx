@@ -96,7 +96,10 @@ const StreamSessionsTable = ({
   mt?: string | number;
 }) => {
   const { user, getStreamSessions } = useApi();
-  const tableProps = useTableState({ pageSize: 50 });
+  const tableProps = useTableState({
+    pageSize: 50,
+    tableId: "Streams Sessions Table",
+  });
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -204,7 +207,6 @@ const StreamSessionsTable = ({
           </>
         }
         filterItems={filterItems}
-        tableId={`stream-sessions-${streamId}`}
         columns={columns}
         fetcher={fetcher}
         rowSelection={null}

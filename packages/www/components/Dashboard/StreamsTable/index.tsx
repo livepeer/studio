@@ -184,6 +184,7 @@ const StreamsTable = ({
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<StreamsTableData>({
     pageSize,
+    tableId,
   });
 
   const columns: Column<StreamsTableData>[] = useMemo(
@@ -275,11 +276,11 @@ const StreamsTable = ({
   const onDeleteStreams = useCallback(async () => {
     if (state.selectedRows.length === 1) {
       await deleteStream(state.selectedRows[0].id);
-      await state.queryState?.invalidate();
+      await state.invalidate();
       deleteDialogState.onOff();
     } else if (state.selectedRows.length > 1) {
       await deleteStreams(state.selectedRows.map((s) => s.id));
-      await state.queryState?.invalidate();
+      await state.invalidate();
       deleteDialogState.onOff();
     }
   }, [
@@ -287,7 +288,7 @@ const StreamsTable = ({
     deleteStreams,
     deleteDialogState.onOff,
     state.selectedRows.length,
-    state.queryState?.invalidate()
+    state.invalidate(),
   ]);
 
   const emptyState = (
@@ -327,7 +328,6 @@ const StreamsTable = ({
   return (
     <>
       <Table
-        tableId={tableId}
         columns={columns}
         fetcher={fetcher}
         state={state}
@@ -476,7 +476,7 @@ const StreamsTable = ({
               },
             ],
           });
-          await state.queryState?.invalidate();
+          await state.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
           await router.push({
             pathname: `/dashboard/streams/${newStream.id}`,

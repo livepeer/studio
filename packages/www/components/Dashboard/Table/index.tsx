@@ -41,7 +41,6 @@ type StateSetter<T extends Record<string, unknown>> = {
   setNextCursor: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
-  setQueryState: Dispatch<SetStateAction<QueryState | undefined>>;
 };
 
 type State<T extends Record<string, unknown>> = {
@@ -52,8 +51,8 @@ type State<T extends Record<string, unknown>> = {
   filters: TFilter[];
   stringifiedFilters: string;
   selectedRows: Row<T>[];
-  queryState: QueryState | undefined;
   pageSize: number;
+  invalidate: () => Promise<void>;
 };
 
 export type Fetcher<T extends Record<string, unknown>> = (
@@ -61,11 +60,6 @@ export type Fetcher<T extends Record<string, unknown>> = (
 ) => Promise<{ rows: T[]; nextCursor: string; count: number }>;
 
 type Action = ButtonProps;
-
-type QueryState = {
-  isLoading: boolean;
-  invalidate: () => Promise<void>;
-};
 
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
@@ -80,7 +74,6 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
-  tableId: string;
   emptyState?: React.ReactNode;
 };
 
@@ -97,25 +90,15 @@ const TableComponent = <T extends Record<string, unknown>>({
   fetcher,
   selectAction,
   createAction,
-  tableId,
   emptyState,
 }: Props<T>) => {
-  const queryClient = useQueryClient();
-
   const queryKey = useMemo(() => {
-    return [tableId, state.cursor, state.order, state.stringifiedFilters];
-  }, [tableId, state.cursor, state.order, state.stringifiedFilters]);
+    return [state.cursor, state.order, state.stringifiedFilters];
+  }, [state.cursor, state.order, state.stringifiedFilters]);
 
-  const { isLoading, error, data } = useQuery(queryKey, () => fetcher(state));
+  const { isLoading, data } = useQuery(queryKey, () => fetcher(state));
 
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
-
-  useEffect(() => {
-    stateSetter.setQueryState({
-      isLoading,
-      invalidate: () => queryClient.invalidateQueries(tableId),
-    });
-  }, [isLoading, tableId, queryClient]);
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -126,7 +109,6 @@ const TableComponent = <T extends Record<string, unknown>>({
   const getRowId = useCallback((row, relativeIndex) => {
     return row?.id ? row.id : relativeIndex;
   }, []);
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -470,8 +452,10 @@ const TableComponent = <T extends Record<string, unknown>>({
 };
 
 export const useTableState = <T extends Record<string, unknown>>({
+  tableId,
   pageSize = 100,
 }: {
+  tableId: string;
   pageSize?: number;
 }) => {
   const [order, setOrder] = useState("");
@@ -480,7 +464,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
-  const [queryState, setQueryState] = useState<QueryState | undefined>();
+  const queryClient = useQueryClient();
 
   const stringifiedFilters = useMemo(() => {
     const formatted = formatFiltersForApiRequest(filters);
@@ -495,7 +479,6 @@ export const useTableState = <T extends Record<string, unknown>>({
       setNextCursor,
       setFilters,
       setSelectedRows,
-      setQueryState,
     }),
     []
   );
@@ -509,8 +492,8 @@ export const useTableState = <T extends Record<string, unknown>>({
       filters,
       stringifiedFilters,
       selectedRows,
-      queryState,
       pageSize,
+      invalidate: () => queryClient.invalidateQueries(tableId),
     }),
     [
       order,
@@ -521,7 +504,8 @@ export const useTableState = <T extends Record<string, unknown>>({
       stringifiedFilters,
       selectedRows,
       pageSize,
-      queryState,
+      queryClient,
+      tableId,
     ]
   );
 
