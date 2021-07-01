@@ -10,6 +10,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogAction,
+  Link as A,
   useSnackbar,
   Text,
 } from "@livepeer.com/design-system";
@@ -27,6 +28,7 @@ import CreateTokenDialog from "./CreateTokenDialog";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
+import Link from "next/link";
 
 type TokenTableData = {
   id: string;
@@ -163,6 +165,37 @@ const TokenTable = ({
     };
   }, [userId]);
 
+  const emptyState = (
+    <Flex
+      direction="column"
+      justify="center"
+      css={{
+        margin: "0 auto",
+        height: "calc(100vh - 400px)",
+        maxWidth: 450,
+      }}>
+      <Heading css={{ fontWeight: 500, mb: "$3" }}>Create an API key</Heading>
+      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+        API keys allow you to authenticate API requests in your app
+      </Text>
+      <Link href="/docs/guides/api" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
+      </Link>
+      <Button
+        onClick={() => createDialogState.onOn()}
+        css={{ alignSelf: "flex-start" }}
+        size="2"
+        variant="violet">
+        <PlusIcon />{" "}
+        <Box as="span" css={{ ml: "$2" }}>
+          Create API key
+        </Box>
+      </Button>
+    </Flex>
+  );
+
   return (
     <>
       <Table
@@ -178,6 +211,7 @@ const TokenTable = ({
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
+        emptyState={emptyState}
         selectAction={{
           onClick: deleteDialogState.onOn,
           children: (
@@ -191,7 +225,6 @@ const TokenTable = ({
         }}
         createAction={{
           onClick: createDialogState.onOn,
-          variant: "violet",
           css: { display: "flex", alignItems: "center" },
           children: (
             <>

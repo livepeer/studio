@@ -6,7 +6,7 @@ description: Start live streaming with Livepeer.com
 # Start live streaming with Livepeer.com
 
 There are multiple ways to livestream with Livepeer.com. The only prerequisite
-for using livepeer.com is to be able to create an RTMP stream.
+for using Livepeer.com is to be able to create an RTMP stream.
 
 You can integrate your streaming application directly with the Livepeer.com API.
 Or you can use the Livepeer.com Dashboard to live stream without writing any
@@ -40,8 +40,8 @@ broadcast live video content and playback your live stream with Livepeer.com.
 
 ## Step 1: Create a stream
 
-Login to the Livepeer.com Dashboard, and navigate to the streams list page,
-[livepeer.com/app/user](/app/user). Click on the Create button. When you name
+Login to the Livepeer.com Dashboard, and navigate to the Streams page,
+[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), located in the left-hand menu. Click on the "+ Create stream" button on the top right corner. When you name
 your stream, pick a unique name and include URL compatible characters only.
 
 Then you’ll be redirected to a detailed page with information about your new
@@ -67,13 +67,10 @@ Next, let’s configure OBS to point to Livepeer.com’s RTMP ingest data center
 1. In the Setting sidebar menu, select Stream.
 2. At the top, select Custom from the Service dropdown menu.
 3. Input `rtmp://rtmp.livepeer.com/live` in the Server text field.
-4. Navigate to the stream detail page, click the “Show secret stream key”
-   button, and copy the stream key
-
-   ![Livepeer.com Dashboard secret stream key button](/img/docs/secret-stream-key.png)
-
+4. Navigate to the stream detail page, click the “Reveal stream key”
+   button, and copy the stream key.
 5. Navigate back to OBS, and paste your stream key into the Stream Key text
-   field
+   field.
 6. Confirm the Use Authentication checkbox is unchecked.
 7. Click OK in the lower right corner to save your updated server and keyframe
    interval settings.
@@ -113,7 +110,7 @@ To use Restream.io studio with Livepeer:
 ## Step 3: Playback your live stream
 
 Navigate to your stream detail page in the Livepeer.com Dashboard, and copy the
-Playback URL, `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`. The
+Playback URL. The
 playback URL is an M3U8 file, the basis for the HTTP Live Streaming (HLS)
 format.
 

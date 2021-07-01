@@ -159,7 +159,7 @@ export default async function makeApp(params) {
   app.use("/stream", streamProxy);
 
   // fix for bad links
-  app.get("/app/user/verify", (req, res) => {
+  app.get("/verify", (req, res) => {
     res.redirect(301, `${req.protocol}://${req.frontendDomain}${req.url}`);
   });
 

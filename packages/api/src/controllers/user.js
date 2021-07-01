@@ -141,7 +141,7 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   const verificationUrl = `${protocol}://${
     req.frontendDomain
-  }/app/user/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
+  }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
 
   if (!validUser && user) {
@@ -153,13 +153,13 @@ app.post("/", validatePost("user"), async (req, res) => {
         supportAddr,
         sendgridTemplateId,
         sendgridApiKey,
-        subject: "Verify your Livepeer Email",
-        preheader: "Welcome to Livepeer!",
+        subject: "Verify your Livepeer.com Email",
+        preheader: "Welcome to Livepeer.com!",
         buttonText: "Verify Email",
         buttonUrl: verificationUrl,
         unsubscribe: unsubscribeUrl,
         text: [
-          "Let's verify your email so you can start using the Livepeer API.",
+          "Let's verify your email so you can start using the Livepeer.com API.",
           "Your link is active for 48 hours. After that, you will need to resend the verification email.",
         ].join("\n\n"),
       });

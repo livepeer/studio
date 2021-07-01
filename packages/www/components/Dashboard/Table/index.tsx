@@ -1,11 +1,5 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
-import {
-  QueryClient,
-  QueryClientProvider,
-  QueryKey,
-  useQuery,
-  useQueryClient,
-} from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import {
   useEffect,
   useMemo,
@@ -26,6 +20,7 @@ import {
   Checkbox,
   Text,
   Button,
+  Heading,
   Link as A,
 } from "@livepeer.com/design-system";
 import TableFilter, {
@@ -33,7 +28,6 @@ import TableFilter, {
   Filter as TFilter,
   formatFiltersForApiRequest,
 } from "./filters";
-import useSWR from "swr";
 import { ButtonProps } from "@components/Button";
 import Link from "next/link";
 
@@ -86,6 +80,7 @@ type Props<T extends Record<string, unknown>> = {
   state: State<T>;
   fetcher: Fetcher<T>;
   tableId: string;
+  emptyState?: React.ReactNode;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -102,6 +97,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   selectAction,
   createAction,
   tableId,
+  emptyState,
 }: Props<T>) => {
   const queryClient = useQueryClient();
 
@@ -302,135 +298,162 @@ const TableComponent = <T extends Record<string, unknown>>({
           )}
         </Flex>
       </Flex>
-      <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
-        <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
-          <Table
-            {...getTableProps()}
+      {!data?.count ? (
+        !JSON.parse(state.stringifiedFilters).length ? (
+          emptyState
+        ) : (
+          <Flex
+            direction="column"
+            justify="center"
             css={{
-              width: "100%",
-              minWidth: "100%",
-              borderCollapse: "collapse",
-              borderSpacing: 0,
+              margin: "0 auto",
+              height: "calc(100vh - 400px)",
+              maxWidth: 450,
             }}>
-            <Thead>
-              {headerGroups.map((headerGroup) => (
-                <Tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column, i) => {
-                    const withHelpTooltip =
-                      someColumnCanSort && i === headerGroup.headers.length - 1;
-                    return (
-                      <Td
-                        as={i === 0 ? Th : Td}
-                        scope="col"
-                        css={{
-                          pl: i === 0 ? "$1" : 0,
-                          width:
-                            i === 0 && rowSelection === "all" ? "30px" : "auto",
-                        }}
-                        {...column.getHeaderProps(
-                          // @ts-ignore
-                          column.getSortByToggleProps()
-                        )}>
-                        <Flex
+            <Heading css={{ fontWeight: 500, mb: "$3" }}>
+              No results found
+            </Heading>
+            <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+              There aren't any results for that query.
+            </Text>
+          </Flex>
+        )
+      ) : (
+        <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
+          <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
+            <Table
+              {...getTableProps()}
+              css={{
+                width: "100%",
+                minWidth: "100%",
+                borderCollapse: "collapse",
+                borderSpacing: 0,
+              }}>
+              <Thead>
+                {headerGroups.map((headerGroup) => (
+                  <Tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column, i) => {
+                      const withHelpTooltip =
+                        someColumnCanSort &&
+                        i === headerGroup.headers.length - 1;
+                      return (
+                        <Td
+                          as={i === 0 ? Th : Td}
+                          scope="col"
                           css={{
-                            ai: "center",
-                            mr: withHelpTooltip ? "$3" : 0,
-                          }}>
-                          <Box css={{ fontSize: "$2", whiteSpace: "nowrap" }}>
-                            {column.render("Header")}
-                          </Box>
-                          {/*@ts-ignore */}
-                          {column.canSort && (
-                            <Box css={{ ml: "$2" }}>
-                              {/* @ts-ignore */}
-                              {column.isSorted
-                                ? // @ts-ignore
-                                  column.isSortedDesc
-                                  ? " ⭣"
-                                  : " ⭡"
-                                : " ⭥"}
+                            pl: i === 0 ? "$1" : 0,
+                            width:
+                              i === 0 && rowSelection === "all"
+                                ? "30px"
+                                : "auto",
+                          }}
+                          {...column.getHeaderProps(
+                            // @ts-ignore
+                            column.getSortByToggleProps()
+                          )}>
+                          <Flex
+                            css={{
+                              ai: "center",
+                              mr: withHelpTooltip ? "$3" : 0,
+                            }}>
+                            <Box css={{ fontSize: "$2", whiteSpace: "nowrap" }}>
+                              {column.render("Header")}
+                            </Box>
+                            {/*@ts-ignore */}
+                            {column.canSort && (
+                              <Box css={{ ml: "$2" }}>
+                                {/* @ts-ignore */}
+                                {column.isSorted
+                                  ? // @ts-ignore
+                                    column.isSortedDesc
+                                    ? " ⭣"
+                                    : " ⭡"
+                                  : " ⭥"}
+                              </Box>
+                            )}
+                          </Flex>
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                ))}
+              </Thead>
+              <Tbody {...getTableBodyProps()}>
+                {rows.map((row: Row<object>) => {
+                  prepareRow(row);
+                  return (
+                    <Tr
+                      css={{
+                        "&:hover": {
+                          backgroundColor: "$mauve2",
+                          cursor,
+                        },
+                      }}
+                      {...row.getRowProps()}>
+                      {row.cells.map((cell, i) => (
+                        <Td
+                          as={i === 0 ? Th : Td}
+                          css={{
+                            py: 0,
+                            width:
+                              i === 0 && rowSelection === "all"
+                                ? "30px"
+                                : "auto",
+                            ...cell.value?.css,
+                          }}
+                          {...cell.getCellProps()}>
+                          {cell.value?.href ? (
+                            <Link href={cell.value.href} passHref>
+                              <A
+                                css={{
+                                  textDecoration: "none",
+                                  py: "$2",
+                                  pl: i === 0 ? "$1" : 0,
+                                  display: "block",
+                                  "&:hover": {
+                                    textDecoration: "none",
+                                  },
+                                }}>
+                                {cell.render("Cell")}
+                              </A>
+                            </Link>
+                          ) : (
+                            <Box css={{ py: "$2", pl: i === 0 ? "$1" : 0 }}>
+                              {cell.render("Cell")}
                             </Box>
                           )}
-                        </Flex>
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              ))}
-            </Thead>
-            <Tbody {...getTableBodyProps()}>
-              {rows.map((row: Row<object>) => {
-                prepareRow(row);
-                return (
-                  <Tr
-                    css={{
-                      "&:hover": {
-                        backgroundColor: "$mauve2",
-                        cursor,
-                      },
-                    }}
-                    {...row.getRowProps()}>
-                    {row.cells.map((cell, i) => (
-                      <Td
-                        as={i === 0 ? Th : Td}
-                        css={{
-                          py: 0,
-                          width:
-                            i === 0 && rowSelection === "all" ? "30px" : "auto",
-                          ...cell.value?.css,
-                        }}
-                        {...cell.getCellProps()}>
-                        {cell.value?.href ? (
-                          <Link href={cell.value.href} passHref>
-                            <A
-                              css={{
-                                textDecoration: "none",
-                                py: "$2",
-                                pl: i === 0 ? "$1" : 0,
-                                display: "block",
-                                "&:hover": {
-                                  textDecoration: "none",
-                                },
-                              }}>
-                              {cell.render("Cell")}
-                            </A>
-                          </Link>
-                        ) : (
-                          <Box css={{ py: "$2", pl: i === 0 ? "$1" : 0 }}>
-                            {cell.render("Cell")}
-                          </Box>
-                        )}
-                      </Td>
-                    ))}
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </Box>
-        <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
-          <Text>
-            <b>{data?.count}</b> results
-          </Text>
-          <Flex>
-            <Button
-              css={{ marginRight: "6px" }}
-              onClick={handlePreviousPage}
-              disabled={state.prevCursors.length <= 0}>
-              Previous
-            </Button>
-            <Button
-              onClick={handleNextPage}
-              disabled={
-                state.nextCursor === "" ||
-                // @ts-ignore
-                state.pageSize >= parseFloat(data?.count)
-              }>
-              Next
-            </Button>
+                        </Td>
+                      ))}
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </Box>
+          <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
+            <Text>
+              <b>{data?.count}</b> results
+            </Text>
+            <Flex>
+              <Button
+                css={{ marginRight: "6px" }}
+                onClick={handlePreviousPage}
+                disabled={state.prevCursors.length <= 0}>
+                Previous
+              </Button>
+              <Button
+                onClick={handleNextPage}
+                disabled={
+                  state.nextCursor === "" ||
+                  // @ts-ignore
+                  state.pageSize >= parseFloat(data?.count)
+                }>
+                Next
+              </Button>
+            </Flex>
           </Flex>
-        </Flex>
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -15,7 +15,13 @@ import {
   TableData,
 } from "components/Dashboard/Table/types";
 import { isStaging, isDevelopment } from "../../../lib/utils";
-import { Box, Flex, Heading, Link as A } from "@livepeer.com/design-system";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Link as A,
+} from "@livepeer.com/design-system";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
@@ -167,6 +173,27 @@ const StreamSessionsTable = ({
     [getStreamSessions, user.id]
   );
 
+  const emptyState = (
+    <Flex
+      direction="column"
+      justify="center"
+      css={{
+        margin: "0 auto",
+        height: "calc(100vh - 400px)",
+        maxWidth: 450,
+      }}>
+      <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
+      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+        Sessions belong to a single parent stream.
+      </Text>
+      <Link href="/docs/api-reference/session/session" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
+      </Link>
+    </Flex>
+  );
+
   return (
     <Box>
       <Table
@@ -184,6 +211,7 @@ const StreamSessionsTable = ({
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
         cursor="pointer"
+        emptyState={emptyState}
       />
     </Box>
   );

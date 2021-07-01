@@ -135,9 +135,11 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
   const { getStreams, deleteStream, deleteStreams, getBroadcasters } = useApi();
 
   useEffect(() => {
-    getStreams(userId)
-      .then((streams) => setStreams(streams))
-      .catch((err) => console.error(err)); // todo: surface this
+    async function init() {
+      const [streams] = await getStreams(userId);
+      setStreams(streams);
+    }
+    init();
   }, [userId, deleteModal]);
 
   const close = useCallback(() => {
@@ -150,10 +152,9 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
     if (!isVisible) {
       return;
     }
-    const interval = setInterval(() => {
-      getStreams(userId)
-        .then((streams) => setStreams(streams))
-        .catch((err) => console.error(err)); // todo: surface this
+    const interval = setInterval(async () => {
+      const [streams] = await getStreams(userId);
+      setStreams(streams);
     }, 5000);
     return () => clearInterval(interval);
   }, [userId, isVisible]);

@@ -15459,7 +15459,7 @@ jsonfile@^4.0.0:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsonp@0.2.1:
+jsonp@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/jsonp/-/jsonp-0.2.1.tgz#a65b4fa0f10bda719a05441ea7b94c55f3e15bae"
   integrity sha1-pltPoPEL2nGaBUQep7lMVfPhW64=
@@ -17574,14 +17574,6 @@ next-tick@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
-
-next-transpile-modules@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/next-transpile-modules/-/next-transpile-modules-4.1.0.tgz#b2d4bd29f3d4179014f7615720f360fdeec67ff7"
-  integrity sha512-brb9S2Dq7l01fV0fdZw1pO2cWMu7fFTclIV2nccmX2Jzwtz1c9iScPMqGyWP6/wglOPOColoJlHzOrSG6cnEIQ==
-  dependencies:
-    micromatch "^4.0.2"
-    slash "^3.0.0"
 
 next@^10.2.2:
   version "10.2.3"
@@ -21244,14 +21236,6 @@ react-transition-group@4.4.2:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-use-mailchimp@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/react-use-mailchimp/-/react-use-mailchimp-0.4.0.tgz#2ca980560c784a11ceee43e65db3286207ba3326"
-  integrity sha512-1AMujJdS28Bzl/TN0RTB/Td2aPNdXRFm+vN0+ha47bxmimecoogQg9Z9sBjmQWNHtFHP4tDK1KeYwE2nkI5zbw==
-  dependencies:
-    jsonp "0.2.1"
-    to-querystring "1.1.0"
-
 react-use@^12.4.0:
   version "12.13.0"
   resolved "https://registry.yarnpkg.com/react-use/-/react-use-12.13.0.tgz#dfefd8145552841f1c2213c2e79966b505a264ba"
@@ -24287,11 +24271,6 @@ to-object-path@^0.3.0:
   integrity sha1-KXWIt7Dn4KwI4E5nL4XB9JmeF68=
   dependencies:
     kind-of "^3.0.2"
-
-to-querystring@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/to-querystring/-/to-querystring-1.1.0.tgz#31efbcebb332bcb2522de36129b4234179399fbd"
-  integrity sha512-nlYTDlLrE9+JJlEcoqEvOytgReSG4z8+hdHeSO8+WF4VLzF7sY5KFyIGvCEWJc0bROdMJsyhOnbPEb5R2LOI8A==
 
 to-readable-stream@^1.0.0:
   version "1.0.0"

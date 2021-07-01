@@ -220,6 +220,27 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     tableProps.state.queryState?.invalidate()
   ]);
 
+  const emptyState = (
+    <Flex
+      direction="column"
+      justify="center"
+      css={{
+        margin: "0 auto",
+        height: "calc(100vh - 400px)",
+        maxWidth: 450,
+      }}>
+      <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
+      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+        Sessions belong to a single parent stream.
+      </Text>
+      <Link href="/docs/api-reference/session/session" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
+      </Link>
+    </Flex>
+  );
+
   return (
     <>
       <Table
@@ -231,6 +252,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         showOverflow={true}
         cursor="pointer"
         filterItems={filterItems}
+        emptyState={emptyState}
         header={
           <>
             <Heading size="2" css={{ fontWeight: 600 }}>

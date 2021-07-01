@@ -14,7 +14,7 @@ const PlansPage = () => {
     <Layout
       id="billing/plans"
       breadcrumbs={[
-        { title: "Billing", href: "/dashboard/billing/plans" },
+        { title: "Billing", href: "/dashboard/billing" },
         { title: "Plans" },
       ]}>
       <Box css={{ p: "$6" }}>
