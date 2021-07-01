@@ -122,14 +122,12 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
               as="span"
               css={{
                 mx: "$2",
-                height: "18px",
+                height: "16px",
                 width: "1px",
-                background: "$blackA5",
+                background: "$mauve6",
               }}
             />
-            <Box as="span" css={{ color: "$violet11" }}>
-              {getActiveFiltersCount(filters)}
-            </Box>
+            <Box as="span">{getActiveFiltersCount(filters)}</Box>
           </>
         )}
       </DropdownMenu.Trigger>
