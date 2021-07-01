@@ -419,7 +419,13 @@ const TableComponent = <T extends Record<string, unknown>>({
               disabled={state.prevCursors.length <= 0}>
               Previous
             </Button>
-            <Button onClick={handleNextPage} disabled={state.nextCursor === ""}>
+            <Button
+              onClick={handleNextPage}
+              disabled={
+                // @ts-ignore
+                state.nextCursor === "" ||
+                state.pageSize >= parseFloat(data?.count)
+              }>
               Next
             </Button>
           </Flex>
@@ -437,7 +443,7 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [order, setOrder] = useState("");
   const [cursor, setCursor] = useState("");
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState("");
+  const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
   const [queryState, setQueryState] = useState<QueryState | undefined>();
