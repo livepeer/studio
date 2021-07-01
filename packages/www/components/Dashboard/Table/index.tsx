@@ -237,8 +237,6 @@ const TableComponent = <T extends Record<string, unknown>>({
     state.cursor,
   ]);
 
-  const dataCount = parseFloat(data?.count);
-
   return (
     <Box>
       <Flex align="end" justify="between" css={{ mb: "$5" }}>
@@ -439,7 +437,7 @@ const TableComponent = <T extends Record<string, unknown>>({
               <Button
                 onClick={handleNextPage}
                 disabled={
-                  state.nextCursor === "" || state.pageSize >= dataCount
+                  state.nextCursor === "" || state.pageSize >= data?.rows.length
                 }>
                 Next
               </Button>
