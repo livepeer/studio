@@ -153,15 +153,11 @@ export default class Table<T extends DBObject> {
     }
     let newCursor;
     if (limit && docs.length == limit) {
-      if (order !== DEFAULT_SORT) {
-        let curSkip = 0;
-        if (cursor && cursor.includes("skip")) {
-          curSkip = Number(cursor.replace("skip", ""));
-        }
-        newCursor = `skip${curSkip + Number(limit)}`;
-      } else {
-        newCursor = docs[docs.length - 1].id;
+      let curSkip = 0;
+      if (cursor && cursor.includes("skip")) {
+        curSkip = Number(cursor.replace("skip", ""));
       }
+      newCursor = `skip${curSkip + Number(limit)}`;
     }
 
     return [docs, newCursor];
@@ -265,8 +261,7 @@ export default class Table<T extends DBObject> {
 
   async markDeletedMany(ids: Array<string>) {
     const res = await this.db.query(
-      `UPDATE ${
-        this.name
+      `UPDATE ${this.name
       } SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
