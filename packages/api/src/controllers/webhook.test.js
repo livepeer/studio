@@ -43,13 +43,10 @@ beforeAll(async () => {
   };
 
   mockWebhook = {
-    id: "mock_webhook",
     name: "test webhook 1",
     kind: "webhook",
-    createdAt: Date.now(),
-    event: "stream.started",
+    events: ["stream.started"],
     url: "https://winter-darkness-88ea.livepeer.workers.dev/",
-    // url: 'https://livepeer.com/'
   };
 });
 
@@ -92,8 +89,7 @@ describe("controllers/webhook", () => {
       nonAdminUser,
       nonAdminToken,
       generatedWebhook,
-      generatedWebhook2,
-      generatedWebhookNonAdmin;
+      generatedWebhookIds;
 
     beforeAll(async () => {
       ({
@@ -103,6 +99,7 @@ describe("controllers/webhook", () => {
         nonAdminUser,
         nonAdminToken,
       } = await setupUsers(server));
+      generatedWebhookIds = [];
     });
 
     afterAll(async () => {
@@ -117,6 +114,7 @@ describe("controllers/webhook", () => {
       expect(res.status).toBe(201);
       expect(resJson.blocking).toBe(true);
       generatedWebhook = resJson;
+      generatedWebhookIds.push(resJson.id);
       res = await client.post("/webhook", {
         ...mockWebhook,
         name: "test 2",
@@ -127,7 +125,7 @@ describe("controllers/webhook", () => {
       console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test 2");
-      generatedWebhook2 = resJson;
+      generatedWebhookIds.push(resJson.id);
 
       client.jwtAuth = nonAdminToken["token"];
       res = await client.post("/webhook", {
@@ -138,8 +136,28 @@ describe("controllers/webhook", () => {
       console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test non admin");
-      generatedWebhookNonAdmin = resJson;
+      generatedWebhookIds.push(resJson.id);
       client.jwtAuth = adminToken["token"];
+    });
+
+    it("supports creation with legacy event field", async () => {
+      const res = await client.post("/webhook", {
+        ...mockWebhook,
+        event: mockWebhook.events[0],
+        events: undefined,
+      });
+      expect(res.status).toBe(201);
+      const resJson = await res.json();
+      expect(resJson).toMatchObject(mockWebhook);
+      generatedWebhookIds.push(resJson.id);
+
+      const fromGet = await client
+        .get(`/webhook/${resJson.id}`)
+        .then((r) => r.json());
+      expect(fromGet).toMatchObject(mockWebhook);
+
+      const fromDb = await server.db.webhook.get(resJson.id);
+      expect(fromDb).toMatchObject(mockWebhook);
     });
 
     it("get webhook info", async () => {
@@ -159,19 +177,15 @@ describe("controllers/webhook", () => {
       );
       expect(resJson).toHaveLength(1);
       expect(resJson[0].userId).toEqual(generatedWebhook.userId);
-      expect(
-        [generatedWebhook2.id, generatedWebhook.id].includes(resJson[0].id)
-      ).toBe(true);
+      expect(generatedWebhookIds).toContain(resJson[0].id);
     });
 
     it("get webhooks list all", async () => {
       const res = await client.get(`/webhook?allUsers=1`);
       const resJson = await res.json();
       expect(res.status).toBe(200);
-      expect(resJson).toHaveLength(3);
-      expect(resJson.map((wh) => wh.name).includes("test non admin")).toBe(
-        true
-      );
+      expect(resJson).toHaveLength(generatedWebhookIds.length);
+      expect(resJson.map((wh) => wh.name)).toContain("test non admin");
     });
 
     it("update a webhook", async () => {

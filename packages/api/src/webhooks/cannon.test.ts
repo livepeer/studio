@@ -113,7 +113,7 @@ describe("webhook cannon", () => {
       name: "test webhook 1",
       kind: "webhook",
       createdAt: Date.now(),
-      event: "stream.started",
+      events: ["stream.started"],
       url: "http://localhost:30000/webhook",
       // url: 'https://livepeer.com/'
     };
@@ -139,7 +139,6 @@ describe("webhook cannon", () => {
     // await db.close();
   });
 
-
   it("should have a test server", async () => {
     // webhookServer.use(bodyParser);
     webhookServer.app.get("/self-test", (req, res) => {
@@ -151,8 +150,11 @@ describe("webhook cannon", () => {
   });
 
   it("should be able to receive the webhook event", async () => {
-
-    await server.store.create({ id: "streamid", userId: nonAdminUser.id, kind: "stream"});
+    await server.store.create({
+      id: "streamid",
+      userId: nonAdminUser.id,
+      kind: "stream",
+    });
 
     // create the webhook
     let res = await client.post("/webhook", { ...mockWebhook });
@@ -209,7 +211,7 @@ describe("webhook cannon", () => {
     await sem.wait(3000);
     expect(resp).toBe(200);
     // need to wait until cannon will write webhook response to db
-    await sleep(2000)
+    await sleep(2000);
   });
 });
 
