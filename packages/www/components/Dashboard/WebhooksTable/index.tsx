@@ -31,6 +31,7 @@ import Spinner from "components/Dashboard/Spinner";
 import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
 import { useRouter } from "next/router";
 import { Webhook } from "@livepeer.com/api";
+import Link from "next/link";
 
 type WebhooksTableData = {
   name: TextCellProps;
@@ -140,6 +141,38 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   //   state.swrState?.revalidate,
   // ]);
 
+  const emptyState = (
+    <Flex
+      direction="column"
+      justify="center"
+      css={{
+        margin: "0 auto",
+        height: "calc(100vh - 400px)",
+        maxWidth: 450,
+      }}>
+      <Heading css={{ fontWeight: 500, mb: "$3" }}>
+        Create your first webhook
+      </Heading>
+      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+        Listen for events on your Livpeeer.com account so your integration can
+        automatically trigger reactions.
+      </Text>
+      <Link href="/docs">
+        <A css={{ mb: "$5", display: "block" }}>Learn more</A>
+      </Link>
+      <Button
+        onClick={() => createDialogState.onOn()}
+        css={{ alignSelf: "flex-start" }}
+        size="2"
+        variant="violet">
+        <PlusIcon />{" "}
+        <Box as="span" css={{ ml: "$2" }}>
+          Create webhook
+        </Box>
+      </Button>
+    </Flex>
+  );
+
   return (
     <>
       <Table
@@ -149,6 +182,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
+        emptyState={emptyState}
         header={
           <>
             <Heading size="2" css={{ fontWeight: 600 }}>
