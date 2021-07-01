@@ -30,6 +30,7 @@ import TableFilter, {
 } from "./filters";
 import { ButtonProps } from "@components/Button";
 import Link from "next/link";
+import Spinner from "@components/Dashboard/Spinner";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -298,7 +299,14 @@ const TableComponent = <T extends Record<string, unknown>>({
           )}
         </Flex>
       </Flex>
-      {!data?.count ? (
+      {isLoading ? (
+        <Flex
+          align="center"
+          justify="center"
+          css={{ height: "calc(100vh - 400px)" }}>
+          <Spinner />
+        </Flex>
+      ) : !data?.count ? (
         !JSON.parse(state.stringifiedFilters).length ? (
           emptyState
         ) : (
