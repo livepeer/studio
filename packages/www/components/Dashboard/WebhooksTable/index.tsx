@@ -157,8 +157,10 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         Listen for events on your Livpeeer.com account so your integration can
         automatically trigger reactions.
       </Text>
-      <Link href="/docs">
-        <A css={{ mb: "$5", display: "block" }}>Learn more</A>
+      <Link href="/docs" passHref>
+        <A variant="violet" css={{ mb: "$5", display: "block" }}>
+          Learn more
+        </A>
       </Link>
       <Button
         onClick={() => createDialogState.onOn()}
