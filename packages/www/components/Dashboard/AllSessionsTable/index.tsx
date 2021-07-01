@@ -205,11 +205,11 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const onDeleteStreams = useCallback(async () => {
     if (tableProps.state.selectedRows.length === 1) {
       await deleteStream(tableProps.state.selectedRows[0].id);
-      await tableProps.state.swrState?.revalidate();
+      await tableProps.state.queryState?.invalidate();
       deleteDialogState.onOff();
     } else if (tableProps.state.selectedRows.length > 1) {
       await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
-      await tableProps.state.swrState?.revalidate();
+      await tableProps.state.queryState?.invalidate();
       deleteDialogState.onOff();
     }
   }, [
@@ -217,7 +217,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     deleteStreams,
     deleteDialogState.onOff,
     tableProps.state.selectedRows.length,
-    tableProps.state.swrState?.revalidate,
+    tableProps.state.queryState?.invalidate()
   ]);
 
   const emptyState = (

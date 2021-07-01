@@ -168,11 +168,13 @@ type StreamsTableData = {
 const StreamsTable = ({
   title = "Streams",
   pageSize = 20,
+  tableId,
   userId,
 }: {
   title: string;
   pageSize?: number;
   userId: string;
+  tableId: string;
 }) => {
   const router = useRouter();
   const { getStreams, deleteStream, deleteStreams, createStream } = useApi();
@@ -273,11 +275,11 @@ const StreamsTable = ({
   const onDeleteStreams = useCallback(async () => {
     if (state.selectedRows.length === 1) {
       await deleteStream(state.selectedRows[0].id);
-      await state.swrState?.revalidate();
+      await state.queryState?.invalidate();
       deleteDialogState.onOff();
     } else if (state.selectedRows.length > 1) {
       await deleteStreams(state.selectedRows.map((s) => s.id));
-      await state.swrState?.revalidate();
+      await state.queryState?.invalidate();
       deleteDialogState.onOff();
     }
   }, [
@@ -285,7 +287,7 @@ const StreamsTable = ({
     deleteStreams,
     deleteDialogState.onOff,
     state.selectedRows.length,
-    state.swrState?.revalidate,
+    state.queryState?.invalidate()
   ]);
 
   const emptyState = (
@@ -325,7 +327,7 @@ const StreamsTable = ({
   return (
     <>
       <Table
-        tableId="streams"
+        tableId={tableId}
         columns={columns}
         fetcher={fetcher}
         state={state}
@@ -474,7 +476,7 @@ const StreamsTable = ({
               },
             ],
           });
-          await state.swrState.revalidate();
+          await state.queryState?.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
           await router.push({
             pathname: `/dashboard/streams/${newStream.id}`,
