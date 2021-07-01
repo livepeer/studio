@@ -166,11 +166,13 @@ type StreamsTableData = {
 const StreamsTable = ({
   title = "Streams",
   pageSize = 20,
+  tableId,
   userId,
 }: {
   title: string;
   pageSize?: number;
   userId: string;
+  tableId: string;
 }) => {
   const router = useRouter();
   const { getStreams, deleteStream, deleteStreams, createStream } = useApi();
@@ -289,7 +291,7 @@ const StreamsTable = ({
   return (
     <>
       <Table
-        tableId="streams"
+        tableId={tableId}
         columns={columns}
         fetcher={fetcher}
         state={state}
