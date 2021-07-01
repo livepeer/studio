@@ -28,8 +28,16 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    event,
+    allUsers,
+    order,
+    filters,
+    count,
+  } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -116,13 +124,19 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
     return res.end();
   }
 
+  if (!req.body.events && !req.body.event) {
+    return res
+      .status(422)
+      .json({ errors: [`must provide "events" field with subscriptions`] });
+  }
+
   const doc = {
     id,
     userId: req.user.id,
     kind: "webhook",
     name: req.body.name,
     createdAt: createdAt,
-    event: req.body.event,
+    events: req.body.events ?? [req.body.event],
     url: req.body.url,
     blocking: req.body.blocking === undefined ? true : !!req.body.blocking,
   };
@@ -185,14 +199,10 @@ app.put(
       return res.end();
     }
 
-    if (
-      !urlObj.protocol ||
-      (urlObj.protocol !== "http:" && urlObj.protocol !== "https:")
-    ) {
-      res.status(406);
-      return res.json({
-        errors: ["url provided should be http or https only"],
-      });
+    if (!req.body.events && !req.body.event) {
+      return res
+        .status(422)
+        .json({ errors: [`must provide "events" field with subscriptions`] });
     }
 
     try {
