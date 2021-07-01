@@ -4,9 +4,10 @@ import { Webhook } from "../schema/types";
 import Table from "./table";
 import { WithID } from "./types";
 
-export type DBWebhook = WithID<
-  Omit<Webhook, "event"> & { events: Webhook["events"] }
->;
+export type DBWebhook = Omit<Webhook, "event"> & {
+  id: string;
+  events: Webhook["events"];
+};
 
 export default class WebhookTable extends Table<DBWebhook> {
   async listSubscribed(
