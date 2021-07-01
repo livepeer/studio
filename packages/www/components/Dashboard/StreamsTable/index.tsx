@@ -12,6 +12,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogAction,
+  Link as A,
   useSnackbar,
 } from "@livepeer.com/design-system";
 import ReactTooltip from "react-tooltip";
@@ -34,6 +35,7 @@ import Spinner from "@components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 type ProfileProps = {
   id: string;
@@ -286,6 +288,38 @@ const StreamsTable = ({
     state.swrState?.revalidate,
   ]);
 
+  const emptyState = (
+    <Flex
+      direction="column"
+      justify="center"
+      css={{
+        margin: "0 auto",
+        height: "calc(100vh - 400px)",
+        maxWidth: 450,
+      }}>
+      <Heading css={{ fontWeight: 500, mb: "$3" }}>
+        Create your first stream
+      </Heading>
+      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+        Create a unique stream object, broadcast live video content and playback
+        your live stream with Livepeer.com.
+      </Text>
+      <Link href="/docs">
+        <A css={{ mb: "$5", display: "block" }}>Learn more</A>
+      </Link>
+      <Button
+        onClick={() => createDialogState.onOn()}
+        css={{ alignSelf: "flex-start" }}
+        size="2"
+        variant="violet">
+        <PlusIcon />{" "}
+        <Box as="span" css={{ ml: "$2" }}>
+          Create stream
+        </Box>
+      </Button>
+    </Flex>
+  );
+
   return (
     <>
       <Table
@@ -296,6 +330,7 @@ const StreamsTable = ({
         stateSetter={stateSetter}
         rowSelection="all"
         filterItems={filterItems}
+        emptyState={emptyState}
         header={
           <Heading size="2">
             <Flex>
