@@ -5,7 +5,6 @@ const withMDX = require("@next/mdx")({
     remarkPlugins: [emoji],
   },
 });
-const withTM = require("next-transpile-modules")(["react-use-mailchimp"]);
 
 const config = {
   async redirects() {
@@ -176,7 +175,6 @@ module.exports = withPlugins(
         },
       },
     ],
-    withTM,
   ],
   config
 );
