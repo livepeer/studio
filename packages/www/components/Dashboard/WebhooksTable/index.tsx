@@ -47,8 +47,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
-    pageSize: 20,
-    tableId: "webhooks",
+    tableId: "webhooksTable",
   });
 
   const columns: Column<WebhooksTableData>[] = useMemo(
@@ -179,7 +178,6 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   return (
     <>
       <Table
-        queryKey="webhooksTable"
         columns={columns}
         fetcher={fetcher}
         state={state}

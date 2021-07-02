@@ -106,7 +106,9 @@ type SessionsTableData = {
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId, deleteStream, deleteStreams } =
     useApi();
-  const tableProps = useTableState({ pageSize: 50, tableId: "sessions" });
+  const tableProps = useTableState({
+    tableId: "allSessionsTable",
+  });
   const deleteDialogState = useToggleState();
   const savingState = useToggleState();
   const [openSnackbar] = useSnackbar();
@@ -247,7 +249,6 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     <>
       <Table
         {...tableProps}
-        queryKey="allSessionsTable"
         columns={columns}
         fetcher={fetcher}
         initialSortBy={[{ id: "created", desc: true }]}

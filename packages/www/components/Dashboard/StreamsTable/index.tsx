@@ -328,7 +328,6 @@ const StreamsTable = ({
   return (
     <>
       <Table
-        queryKey="streamsTable"
         columns={columns}
         fetcher={fetcher}
         state={state}

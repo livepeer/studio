@@ -97,8 +97,7 @@ const StreamSessionsTable = ({
 }) => {
   const { user, getStreamSessions } = useApi();
   const tableProps = useTableState({
-    pageSize: 50,
-    tableId: "Streams Sessions Table",
+    tableId: "streamSessionsTable",
   });
 
   const columns: Column<SessionsTableData>[] = useMemo(
@@ -201,7 +200,6 @@ const StreamSessionsTable = ({
     <Box>
       <Table
         {...tableProps}
-        queryKey="sessionsTable"
         header={
           <>
             <Heading>{title}</Heading>

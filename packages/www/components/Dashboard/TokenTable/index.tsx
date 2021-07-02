@@ -52,7 +52,7 @@ const TokenTable = ({
   userId: string;
 }) => {
   const { getApiTokens, deleteApiToken } = useApi();
-  const tableProps = useTableState({ tableId: "TokenTable", pageSize: 30 });
+  const tableProps = useTableState({ tableId: "tokenTable" });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
@@ -200,7 +200,6 @@ const TokenTable = ({
     <>
       <Table
         {...tableProps}
-        queryKey="tokenTable"
         header={
           <>
             <Heading size="2" css={{ fontWeight: 600 }}>

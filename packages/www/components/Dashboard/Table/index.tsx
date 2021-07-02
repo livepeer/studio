@@ -44,6 +44,7 @@ type StateSetter<T extends Record<string, unknown>> = {
 };
 
 type State<T extends Record<string, unknown>> = {
+  tableId: string;
   order: string;
   cursor: string;
   prevCursors: string[];
@@ -75,7 +76,6 @@ type Props<T extends Record<string, unknown>> = {
   state: State<T>;
   fetcher: Fetcher<T>;
   emptyState?: React.ReactNode;
-  queryKey: string;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -92,13 +92,12 @@ const TableComponent = <T extends Record<string, unknown>>({
   selectAction,
   createAction,
   emptyState,
-  queryKey,
 }: Props<T>) => {
-  const key = useMemo(() => {
-    return [queryKey, state.cursor, state.order, state.stringifiedFilters];
-  }, [state.cursor, state.order, state.stringifiedFilters]);
+  const queryKey = useMemo(() => {
+    return [state.tableId, state.cursor, state.order, state.stringifiedFilters];
+  }, [state.tableId, state.cursor, state.order, state.stringifiedFilters]);
 
-  const { isLoading, data } = useQuery(key, () => fetcher(state));
+  const { isLoading, data } = useQuery(queryKey, () => fetcher(state));
 
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 
@@ -459,7 +458,7 @@ const TableComponent = <T extends Record<string, unknown>>({
 
 export const useTableState = <T extends Record<string, unknown>>({
   tableId,
-  pageSize = 100,
+  pageSize = 20,
 }: {
   tableId: string;
   pageSize?: number;
@@ -491,6 +490,7 @@ export const useTableState = <T extends Record<string, unknown>>({
 
   const state: State<T> = useMemo(
     () => ({
+      tableId,
       order,
       cursor,
       prevCursors,

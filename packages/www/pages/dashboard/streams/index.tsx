@@ -18,7 +18,7 @@ const Streams = () => {
           title="Streams"
           userId={user.id}
           pageSize={20}
-          tableId="Streams Table"
+          tableId="streamsTable"
         />
       </Box>
     </Layout>
