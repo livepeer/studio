@@ -2,11 +2,16 @@ import sql from "sql-template-strings";
 
 import { Webhook } from "../schema/types";
 import Table from "./table";
-import { WithID } from "./types";
 
 export type DBWebhook = Omit<Webhook, "event"> & {
   id: string;
   events: Webhook["events"];
+  /**
+  @deprecated: This is to make DBWebhook type unassignable to Webhook and avoid
+  programming mistakes. Always use DBWebhook unless in the API controller where
+  the conversion of field .event to .events will take place.
+  **/
+  event?: "deprecated";
 };
 
 export default class WebhookTable extends Table<DBWebhook> {

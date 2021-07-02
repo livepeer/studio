@@ -58,8 +58,10 @@ components:
             Timestamp (in milliseconds) at which stream object was created
           example: 1587667174725
         event:
-          index: true
           writeOnly: true
+          deprecated: true
+          description:
+            "@deprecated Non-persisted field. To be used on creation API only."
           $ref: "#/components/schemas/webhook/properties/events/items"
         events:
           type: array
