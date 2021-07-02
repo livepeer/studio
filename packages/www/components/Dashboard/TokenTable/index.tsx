@@ -200,7 +200,7 @@ const TokenTable = ({
     <>
       <Table
         {...tableProps}
-        tableId="api-tokens"
+        queryKey="tokenTable"
         header={
           <>
             <Heading size="2" css={{ fontWeight: 600 }}>

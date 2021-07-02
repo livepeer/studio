@@ -75,6 +75,7 @@ type Props<T extends Record<string, unknown>> = {
   state: State<T>;
   fetcher: Fetcher<T>;
   emptyState?: React.ReactNode;
+  queryKey: string;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -91,12 +92,13 @@ const TableComponent = <T extends Record<string, unknown>>({
   selectAction,
   createAction,
   emptyState,
+  queryKey,
 }: Props<T>) => {
-  const queryKey = useMemo(() => {
-    return [state.cursor, state.order, state.stringifiedFilters];
+  const key = useMemo(() => {
+    return [queryKey, state.cursor, state.order, state.stringifiedFilters];
   }, [state.cursor, state.order, state.stringifiedFilters]);
 
-  const { isLoading, data } = useQuery(queryKey, () => fetcher(state));
+  const { isLoading, data } = useQuery(key, () => fetcher(state));
 
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 

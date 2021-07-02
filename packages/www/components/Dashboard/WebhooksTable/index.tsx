@@ -179,6 +179,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   return (
     <>
       <Table
+        queryKey="webhooksTable"
         columns={columns}
         fetcher={fetcher}
         state={state}

@@ -201,6 +201,7 @@ const StreamSessionsTable = ({
     <Box>
       <Table
         {...tableProps}
+        queryKey="sessionsTable"
         header={
           <>
             <Heading>{title}</Heading>

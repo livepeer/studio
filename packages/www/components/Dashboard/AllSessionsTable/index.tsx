@@ -247,6 +247,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     <>
       <Table
         {...tableProps}
+        queryKey="allSessionsTable"
         columns={columns}
         fetcher={fetcher}
         initialSortBy={[{ id: "created", desc: true }]}
