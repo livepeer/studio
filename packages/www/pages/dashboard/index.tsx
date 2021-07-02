@@ -59,7 +59,12 @@ const Dashboard = () => {
           <UsageSummary />
         </Box>
         <Box css={{ mb: "$8" }}>
-          <StreamsTable title="Streams" userId={user.id} pageSize={5} />
+          <StreamsTable
+            title="Streams"
+            userId={user.id}
+            pageSize={5}
+            tableId="Dashboard Streams Table"
+          />
         </Box>
       </Box>
     </Layout>
