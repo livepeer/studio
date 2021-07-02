@@ -1,4 +1,4 @@
-import ReactTooltip from "react-tooltip";
+import React from "react";
 import {
   Alert,
   Box,
@@ -14,12 +14,9 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@livepeer.com/design-system";
 import Layout from "../../../layouts/dashboard";
@@ -27,13 +24,10 @@ import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
-import Router from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
-import DeleteStreamModal from "components/DeleteStreamModal";
 import ConfirmationModal from "components/ConfirmationModal";
-import Modal from "components/Modal";
 import {
   pathJoin,
   isStaging,
@@ -49,9 +43,9 @@ import {
 } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import Player from "components/Dashboard/Player";
-import React from "react";
 import Record from "@components/Dashboard/StreamDetails/Record";
 import Terminate from "@components/Dashboard/StreamDetails/Terminate";
+import Delete from "@components/Dashboard/StreamDetails/Delete";
 
 type TimedAlertProps = {
   text: string;
@@ -125,14 +119,21 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
         </Flex>
       </CopyToClipboard>
       {!!isCopied && (
-        <Box css={{ fontSize: 12, color: "$hiContrast" }}>Copied</Box>
+        <Box
+          css={{
+            ml: "$1",
+            fontSize: "$2",
+            color: "$hiContrast",
+          }}>
+          Copied
+        </Box>
       )}
     </Flex>
   );
 };
 
-const Cell = ({ children }) => {
-  return <Box css={{ mb: "$3" }}>{children}</Box>;
+const Cell = ({ children, css = {} }) => {
+  return <Box css={{ mb: "$3", ...css }}>{children}</Box>;
 };
 
 const ClipBut = ({ text }) => {
@@ -258,6 +259,14 @@ const ID = () => {
   const isVisible = usePageVisibility();
 
   useEffect(() => {
+    if (stream?.isActive) {
+      setVideoExists(true);
+    } else {
+      setVideoExists(false);
+    }
+  }, [stream?.isActive]);
+
+  useEffect(() => {
     if (!isVisible || !id || notFound) {
       return;
     }
@@ -313,7 +322,8 @@ const ID = () => {
   }
   let broadcasterPlaybackUrl;
   const playbackId = (stream || {}).playbackId || "";
-  const domain = isStaging() ? "monster" : "com";
+  //const domain = isStaging() ? "monster" : "com";
+  const domain = "monster";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
 
@@ -353,44 +363,6 @@ const ID = () => {
             New sessions will be prevented from starting until unchecked.`
               : `Are you sure you want to allow new stream sessions again?`}
           </ConfirmationModal>
-        )}
-
-        {deleteModal && stream && (
-          <DeleteStreamModal
-            streamName={stream.name}
-            onClose={close}
-            onDelete={() => {
-              deleteStream(stream.id).then(() => Router.replace("/app/user"));
-            }}
-          />
-        )}
-        {recordOffModal && stream && (
-          <Modal onClose={close}>
-            <h3>Are you sure you want to turn off recoding?</h3>
-            <p>
-              Future stream sessions will not be recorded. In progress stream
-              sessions will be recorded. Past sessions recordings will still be
-              available.
-            </p>
-            <Flex css={{ justifyContent: "flex-end" }}>
-              <Button
-                type="button"
-                variant="violet"
-                onClick={close}
-                css={{ mr: 2 }}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="violet"
-                onClick={() => {
-                  close();
-                  doSetRecord(stream, false);
-                }}>
-                Turn off recording
-              </Button>
-            </Flex>
-          </Modal>
         )}
 
         {stream ? (
@@ -440,30 +412,26 @@ const ID = () => {
                 <DropdownMenuTrigger as={Button}>Actions</DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuGroup>
-                    <DropdownMenuCheckboxItem checked={!!stream?.record}>
-                      Record sessions
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Suspend</DropdownMenuCheckboxItem>
-                    <DropdownMenuItem>
-                      <Box css={{ color: "$red9" }}>Delete</Box>
-                    </DropdownMenuItem>
+                    <Record
+                      stream={stream}
+                      setStream={setStream}
+                      isSwitch={false}
+                    />
+                    <DropdownMenuItem>Suspend stream</DropdownMenuItem>
+                    <Delete stream={stream} setStream={setStream} />
+
                     {userIsAdmin && stream.isActive && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Admin only</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                          }}>
-                          <Terminate stream={stream} setStream={setStream} />
-                        </DropdownMenuItem>
+                        <Terminate stream={stream} setStream={setStream} />
                       </>
                     )}
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </Flex>
-            <Grid gap="8" columns="2">
+            <Grid gap="8" columns="2" css={{ pb: "$9" }}>
               <Box>
                 <Heading size="1" css={{ fontWeight: 600, mb: "$3" }}>
                   Details
@@ -501,11 +469,10 @@ const ID = () => {
                               css={{
                                 alignItems: "center",
                                 cursor: "pointer",
-                                ml: 1,
+                                ml: "$1",
                               }}>
                               <Copy
                                 css={{
-                                  mr: 1,
                                   width: 14,
                                   height: 14,
                                   color: "$hiContrast",
@@ -513,7 +480,11 @@ const ID = () => {
                               />
                               {!!isCopied && (
                                 <Box
-                                  css={{ fontSize: 12, color: "$hiContrast" }}>
+                                  css={{
+                                    ml: "$2",
+                                    fontSize: "$2",
+                                    color: "$hiContrast",
+                                  }}>
                                   Copied
                                 </Box>
                               )}
@@ -524,18 +495,17 @@ const ID = () => {
                         <Button
                           type="button"
                           variant="violet"
-                          onClick={() => setKeyRevealed(true)}
-                          css={{ mr: 0, py: "4px" }}>
+                          onClick={() => setKeyRevealed(true)}>
                           Reveal secret stream key
                         </Button>
                       )}
                     </Cell>
                     <Cell>RTMP ingest URL</Cell>
-                    <Cell>
+                    <Cell css={{ cursor: "pointer" }}>
                       <ShowURL text="" url={globalIngestUrl} anchor={false} />
                     </Cell>
                     <Cell>Playback URL</Cell>
-                    <Cell>
+                    <Cell css={{ cursor: "pointer" }}>
                       <ShowURL text="" url={globalPlaybackUrl} anchor={false} />
                     </Cell>
                     {/* <Box
@@ -637,8 +607,8 @@ const ID = () => {
 
                     <Cell>Record sessions</Cell>
                     <Cell>
-                      <Flex css={{ alignItems: "center" }}>
-                        <Box css={{ mr: "$1" }}>
+                      <Flex css={{ position: "relative", top: "2px" }}>
+                        <Box css={{ mr: "$2" }}>
                           <Record stream={stream} setStream={setStream} />
                         </Box>
                         <Tooltip
@@ -744,10 +714,10 @@ const ID = () => {
                     </Box>
                      */}
 
-                    <Cell>Renditions</Cell>
+                    {/* <Cell>Renditions</Cell>
                     <Cell>
                       <RenditionsDetails stream={stream} />
-                    </Cell>
+                    </Cell> */}
                     <Cell>Created at</Cell>
                     <Cell>
                       <RelativeTime
@@ -895,20 +865,13 @@ const ID = () => {
                   close={() => setAlertText("")}
                   variant="attention"
                 />
-                <Flex
-                  css={{
-                    justifyContent: "flex-end",
-                    mb: 3,
-                  }}>
-                  <Button
-                    type="button"
-                    variant="violet"
-                    onClick={() => setDeleteModal(true)}>
-                    Delete
-                  </Button>
-                </Flex>
               </Box>
-              <Box>
+              <Box
+                css={{
+                  maxWidth: "470px",
+                  justifySelf: "flex-end",
+                  width: "100%",
+                }}>
                 <Heading size="1" css={{ fontWeight: 600, mb: "$3" }}>
                   Current Stream
                 </Heading>
@@ -954,11 +917,11 @@ const ID = () => {
                         Idle
                       </Badge>
                     )}
+                    {/* <Player1 /> */}
                     <Player
                       setVideo={setVideoExists}
                       src={globalPlaybackUrl}
                       config={{
-                        abr: { enabled: false },
                         controlPanelElements: [
                           "time_and_duration",
                           "play_pause",
@@ -1009,6 +972,7 @@ const ID = () => {
                 </Button>
               </Box>
             </Grid>
+
             <StreamSessionsTable streamId={stream.id} />
           </>
         ) : notFound ? (
