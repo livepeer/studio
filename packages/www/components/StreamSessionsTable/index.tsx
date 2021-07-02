@@ -19,12 +19,23 @@ import { Column } from "react-table";
 import { CellComponentProps, TableData } from "components/Table-v2/types";
 import { isStaging, isDevelopment } from "../../lib/utils";
 
-function makeMP4Url(hlsUrl: string, profileName: string, streamName: string, createdAt: number): string {
-  const sanitizedName = filenamify.default(streamName, { replacement: "_" }).replace(/ /g, "_")
-  const timestamp = moment.unix(createdAt / 1000.0).format("YYYY_MM_DD_hh_mm_ss");
+function makeMP4Url(
+  hlsUrl: string,
+  profileName: string,
+  streamName: string,
+  createdAt: number
+): string {
+  const sanitizedName = filenamify
+    .default(streamName, { replacement: "_" })
+    .replace(/ /g, "_");
+  const timestamp = moment
+    .unix(createdAt / 1000.0)
+    .format("YYYY_MM_DD_hh_mm_ss");
   const pp = hlsUrl.split("/");
   pp.pop();
-  return `${pp.join("/")}/${profileName}/${sanitizedName}-${timestamp}-${profileName}.mp4`;
+  return `${pp.join(
+    "/"
+  )}/${profileName}/${sanitizedName}-${timestamp}-${profileName}.mp4`;
 }
 
 type Profile = { name: string; width: number; height: number };
@@ -69,7 +80,12 @@ const RecordingUrlCell = <D extends TableData>({
               <A
                 variant="downloadOutline"
                 download
-                href={makeMP4Url(cell.value.href, "source", cell.value.streamName, cell.value.createdAt)}
+                href={makeMP4Url(
+                  cell.value.href,
+                  "source",
+                  cell.value.streamName,
+                  cell.value.createdAt
+                )}
                 sx={{ p: 1 }}>
                 Download&nbsp;mp4&nbsp;beta
               </A>
