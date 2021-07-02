@@ -47,7 +47,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
-    pageSize: 20,
+    tableId: "webhooksTable",
   });
 
   const columns: Column<WebhooksTableData>[] = useMemo(
@@ -178,7 +178,6 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   return (
     <>
       <Table
-        tableId="webhooks"
         columns={columns}
         fetcher={fetcher}
         state={state}
@@ -291,7 +290,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             name,
             url,
           });
-          await state.queryState?.invalidate();
+          await state.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
           await router.push({
             pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,

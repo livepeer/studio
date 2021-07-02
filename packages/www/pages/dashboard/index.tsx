@@ -63,7 +63,7 @@ const Dashboard = () => {
             title="Streams"
             userId={user.id}
             pageSize={5}
-            tableId="Dashboard Streams Table"
+            tableId="dashboardStreamsTable"
           />
         </Box>
       </Box>
