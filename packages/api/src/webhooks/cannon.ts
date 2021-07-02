@@ -179,9 +179,16 @@ export default class WebhookCannon {
           event: event.event,
           stream: sanitized,
           payload: event.payload,
-          signature: (webhook.sharedSecret)? sign(event.payload, webhook.sharedSecret) : null,
         }),
       };
+
+      // sign payload if there is a webhook secret
+      if (webhook.sharedSecret) {
+        let signature = sign(event.payload, webhook.sharedSecret);
+        params.headers['Livepeer-Signature'] = `t=${Date.now()},v1=${signature}`
+        params.body['signature'] = signature
+        params.body['signed_payload'] = event.payload
+      }
 
       try {
         logger.info(`webhook ${webhook.id} firing`);
