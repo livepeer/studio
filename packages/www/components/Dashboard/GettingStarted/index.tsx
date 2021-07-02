@@ -26,8 +26,8 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionButton>
           <AccordionPanel>
             <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
-              Learn how to create a unique stream object, broadcast live video
-              content and playback your live stream with Livepeer.com.
+              Learn how to create a stream, broadcast live video content and
+              playback your live stream with Livepeer.com. No code required.
             </Text>
             <Link href="/docs/guides/start-live-streaming/tutorial" passHref>
               <Button
@@ -55,7 +55,10 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionButton>
           <AccordionPanel>
             <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
-              Learn how to work with Livepeer.com's API through http requests.
+              The Livepeer.com API is easy to use and customizable. The only
+              prerequisite for using the API is creating an RTMP stream using
+              open broadcaster software (OBS) such as OpenOBS, React Native Node
+              Media Client, streamlabs or ffmpeg.
             </Text>
             <Link href="/docs/guides/api" passHref>
               <Button
@@ -69,7 +72,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore API</Box>
+                <Box css={{ mr: "$1" }}>Explore API Docs</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
@@ -83,8 +86,8 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionButton>
           <AccordionPanel>
             <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
-              Learn how to create livestreaming apps by viewing and forking
-              example apps.
+              The quickest and easiest way to create your first app using
+              Livepeer.com is to create a fork of our examples apps.
             </Text>
             <Link
               href="/docs/guides/using-livepeer-in-your-app/example-app"
@@ -100,7 +103,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore examples</Box>
+                <Box css={{ mr: "$1" }}>Explore examples apps</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
