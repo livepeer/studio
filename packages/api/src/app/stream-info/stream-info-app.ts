@@ -85,6 +85,7 @@ function countSegments(si: streamInfo, mpl: MasterPlaylist) {
 
 interface streamInfo {
   lastSeen: Date;
+  lastSeenSavedToDb: Date;
   lastUpdated: Date;
   sourceSegments: number;
   transcodedSegments: number;
@@ -105,9 +106,11 @@ interface streamInfo {
 }
 
 function newStreamInfo(): streamInfo {
+  const now = new Date();
   return {
-    lastSeen: new Date(),
-    lastUpdated: new Date(),
+    lastSeen: now,
+    lastSeenSavedToDb: now,
+    lastUpdated: now,
     sourceSegments: 0,
     transcodedSegments: 0,
     sourceSegmentsDuration: 0.0,
@@ -227,6 +230,7 @@ class statusPoller {
         // console.log(`---> si:`, si)
         if (storedInfo) {
           si.objectId = storedInfo.id;
+          si.lastSeenSavedToDb = si.lastSeen;
           const setObj = {
             lastSeen: si.lastSeen.valueOf(),
             ingestRate: si.ingestRate,
@@ -299,7 +303,7 @@ class statusPoller {
               // this is not a session created by our Mist, so manage isActive field for this stream
               await db.stream.setActiveToFalse({
                 id: storedInfo.id,
-                lastSeen: si.lastSeen.valueOf(),
+                lastSeen: si.lastSeenSavedToDb.valueOf(),
               });
             }
           }
