@@ -106,7 +106,9 @@ type SessionsTableData = {
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId, deleteStream, deleteStreams } =
     useApi();
-  const tableProps = useTableState({ pageSize: 50 });
+  const tableProps = useTableState({
+    tableId: "allSessionsTable",
+  });
   const deleteDialogState = useToggleState();
   const savingState = useToggleState();
   const [openSnackbar] = useSnackbar();
@@ -118,7 +120,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         accessor: "parentStream",
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
-          stringSort("original.parentStream.name", ...params),
+          stringSort("original.parentStream.children", ...params),
       },
       {
         Header: "Created at",
@@ -152,8 +154,10 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         state.pageSize,
         formatFiltersForApiRequest(state.filters, {
           parseNumber: (n) => n * 60,
-        })
+        }),
+        true
       );
+
       return {
         nextCursor,
         count,
@@ -205,11 +209,11 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const onDeleteStreams = useCallback(async () => {
     if (tableProps.state.selectedRows.length === 1) {
       await deleteStream(tableProps.state.selectedRows[0].id);
-      await tableProps.state.queryState?.invalidate();
+      await tableProps.state.invalidate();
       deleteDialogState.onOff();
     } else if (tableProps.state.selectedRows.length > 1) {
       await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
-      await tableProps.state.queryState?.invalidate();
+      await tableProps.state.invalidate();
       deleteDialogState.onOff();
     }
   }, [
@@ -217,7 +221,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     deleteStreams,
     deleteDialogState.onOff,
     tableProps.state.selectedRows.length,
-    tableProps.state.queryState?.invalidate()
+    tableProps.state.invalidate(),
   ]);
 
   const emptyState = (
@@ -245,7 +249,6 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     <>
       <Table
         {...tableProps}
-        tableId="sessions"
         columns={columns}
         fetcher={fetcher}
         initialSortBy={[{ id: "created", desc: true }]}

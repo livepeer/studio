@@ -43,9 +43,7 @@ export type FilterType = FilterItem["type"];
 export type ApplyFilterHandler = (filters: Filter[]) => void;
 
 function getActiveFiltersCount(filters: Filter[]) {
-  return filters.reduce((count, f) => {
-    if (f.isOpen) return count + 1;
-  }, 0);
+  return filters.filter((item) => item.isOpen).length;
 }
 
 type TableFilterProps = {
@@ -118,20 +116,18 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
           <FilterIcon />
         </Flex>
         Filter
-        {activeFiltersCount > 0 && (
+        {getActiveFiltersCount(filters) > 0 && (
           <>
             <Box
               as="span"
               css={{
                 mx: "$2",
-                height: "18px",
+                height: "16px",
                 width: "1px",
-                background: "$blackA5",
+                background: "$mauve6",
               }}
             />
-            <Box as="span" css={{ color: "$violet11" }}>
-              {activeFiltersCount}
-            </Box>
+            <Box as="span">{getActiveFiltersCount(filters)}</Box>
           </>
         )}
       </DropdownMenu.Trigger>
