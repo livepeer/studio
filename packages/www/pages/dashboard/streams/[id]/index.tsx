@@ -45,6 +45,7 @@ import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
 import useSWR from "swr";
+import { useQuery, useQueryClient } from "react-query";
 
 type TimedAlertProps = {
   text: string;
@@ -194,7 +195,8 @@ const ID = () => {
     return stream;
   }, [id]);
 
-  const { data: stream, revalidate } = useSWR([id], () => fetcher());
+  const { data: stream } = useQuery([id], () => fetcher());
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -343,17 +345,26 @@ const ID = () => {
                   <DropdownMenuGroup>
                     <Record
                       stream={stream}
-                      revalidate={revalidate}
+                      revalidate={queryClient.invalidateQueries()}
                       isSwitch={false}
                     />
-                    <Suspend stream={stream} revalidate={revalidate} />
-                    <Delete stream={stream} revalidate={revalidate} />
+                    <Suspend
+                      stream={stream}
+                      revalidate={queryClient.invalidateQueries()}
+                    />
+                    <Delete
+                      stream={stream}
+                      revalidate={queryClient.invalidateQueries()}
+                    />
 
                     {userIsAdmin && stream.isActive && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Admin only</DropdownMenuLabel>
-                        <Terminate stream={stream} revalidate={revalidate} />
+                        <Terminate
+                          stream={stream}
+                          revalidate={queryClient.invalidateQueries()}
+                        />
                       </>
                     )}
                   </DropdownMenuGroup>
@@ -441,7 +452,10 @@ const ID = () => {
                     <Cell>
                       <Flex css={{ position: "relative", top: "2px" }}>
                         <Box css={{ mr: "$2" }}>
-                          <Record stream={stream} revalidate={revalidate} />
+                          <Record
+                            stream={stream}
+                            revalidate={queryClient.invalidateQueries()}
+                          />
                         </Box>
                         <Tooltip
                           multiline
