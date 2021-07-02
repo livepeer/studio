@@ -25,7 +25,10 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+            <Text
+              variant="gray"
+              size="3"
+              css={{ mb: "$3", lineHeight: "23px" }}>
               Learn how to create a stream, broadcast live video content and
               playback your live stream with Livepeer.com. No code required.
             </Text>
@@ -54,7 +57,10 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+            <Text
+              variant="gray"
+              size="3"
+              css={{ mb: "$3", lineHeight: "23px" }}>
               The Livepeer.com API is easy to use and customizable. The only
               prerequisite for using the API is creating an RTMP stream using
               open broadcaster software (OBS) such as OpenOBS, React Native Node
@@ -85,9 +91,12 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text size="3" css={{ mb: "$2", lineHeight: "23px" }}>
+            <Text
+              variant="gray"
+              size="3"
+              css={{ mb: "$3", lineHeight: "23px" }}>
               The quickest and easiest way to create your first app using
-              Livepeer.com is to create a fork of our examples apps.
+              Livepeer.com is to fork an example app.
             </Text>
             <Link
               href="/docs/guides/using-livepeer-in-your-app/example-app"

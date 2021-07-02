@@ -5,9 +5,9 @@ import {
   Flex,
   Grid,
   Link as A,
+  Text,
   styled,
   Skeleton,
-  Text,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
@@ -18,7 +18,7 @@ import { products } from "@livepeer.com/api/src/config";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",
-  color: "$hiContrast",
+  color: "$gray",
 });
 
 const UsageCard = ({ title, usage, limit, loading = false }) => {
@@ -166,10 +166,10 @@ const UsageSummary = () => {
         justify="between"
         align="center"
         css={{ fontSize: "$3", color: "$hiContrast" }}>
-        <Flex align="center">
+        <Text variant="gray" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
-        </Flex>
+        </Text>
         <Link href="/dashboard/billing" passHref>
           <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />

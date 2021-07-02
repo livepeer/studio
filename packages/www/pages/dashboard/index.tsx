@@ -37,7 +37,7 @@ const Dashboard = () => {
                   css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
                   Upgrade to Pro
                 </Text>
-                <Text size="2" css={{ lineHeight: 1.4 }}>
+                <Text variant="gray" size="2" css={{ lineHeight: 1.4 }}>
                   Upgrade to the Pro plan and enjoy unlimited transcoding and
                   streaming minutes.
                 </Text>
