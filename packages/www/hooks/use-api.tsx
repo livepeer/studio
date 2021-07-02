@@ -552,11 +552,11 @@ const makeContext = (state: ApiState, setState) => {
     async getStreams(
       userId: string,
       opts?: {
-        filters: Array<{ id: string; value: string | object }>;
-        limit: string;
-        cursor: string;
-        order: string;
-        active?: string;
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
         count?: boolean;
       }
     ): Promise<[Stream[], string, number]> {

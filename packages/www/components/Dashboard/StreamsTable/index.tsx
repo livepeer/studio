@@ -36,6 +36,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import ActiveStreamsBadge from "@components/ActiveStreamsBadge";
 
 type ProfileProps = {
   id: string;
@@ -170,11 +171,13 @@ const StreamsTable = ({
   pageSize = 20,
   tableId,
   userId,
+  viewAll,
 }: {
   title: string;
   pageSize?: number;
   userId: string;
   tableId: string;
+  viewAll?: string;
 }) => {
   const router = useRouter();
   const { getStreams, deleteStream, deleteStreams, createStream } = useApi();
@@ -222,10 +225,10 @@ const StreamsTable = ({
 
   const fetcher: Fetcher<StreamsTableData> = useCallback(
     async (state) => {
-      let active: string | undefined;
+      let active: boolean;
       const filteredFilters = state.filters.filter((f) => {
         if (f.id === "isActive" && f.isOpen) {
-          active = f.condition.value as string;
+          active = f.condition.value as boolean;
           return false;
         }
         return true;
@@ -333,7 +336,7 @@ const StreamsTable = ({
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
-        filterItems={filterItems}
+        filterItems={!viewAll && filterItems}
         emptyState={emptyState}
         header={
           <Heading size="2">
@@ -341,12 +344,7 @@ const StreamsTable = ({
               <Box css={{ mr: "$3", fontWeight: 600, letterSpacing: 0 }}>
                 {title}
               </Box>
-              <Badge
-                size="1"
-                variant="violet"
-                css={{ letterSpacing: 0, mt: "7px" }}>
-                1 active right now
-              </Badge>
+              <ActiveStreamsBadge />
             </Flex>
           </Heading>
         }
