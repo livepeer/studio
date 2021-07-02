@@ -201,6 +201,10 @@ const TableComponent = <T extends Record<string, unknown>>({
     stateSetter.setOrder(order);
   }, [sortBy, stateSetter.setOrder]);
 
+  useEffect(() => {
+    stateSetter.setNextCursor(data?.nextCursor);
+  }, [data?.nextCursor, stateSetter.setNextCursor]);
+
   const handlePreviousPage = useCallback(() => {
     stateSetter.setNextCursor(state.cursor); // current cursor will be next
     const prevCursorsClone = [...state.prevCursors];
