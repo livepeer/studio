@@ -1,18 +1,39 @@
-import { parse as parseUrl } from "url";
+import { URL } from "url";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import {
-  makeNextHREF,
-  trackAction,
-  getWebhooks,
-  parseFilters,
-  parseOrder,
-} from "./helpers";
+import { makeNextHREF, trackAction, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { UnprocessableEntityError } from "../store/errors";
+
+function validateWebhookPayload(id, userId, createdAt, payload) {
+  try {
+    new URL(payload.url);
+  } catch (e) {
+    console.error(`couldn't parse the provided url: ${payload.url}`);
+    throw new UnprocessableEntityError(`bad url: ${url}`);
+  }
+
+  if (!payload.events && !payload.event) {
+    throw new UnprocessableEntityError(
+      `must provide "events" field with subscriptions`
+    );
+  }
+
+  return {
+    id,
+    userId,
+    createdAt,
+    kind: "webhook",
+    name: payload.name,
+    events: payload.events ?? [payload.event],
+    url: payload.url,
+    blocking: payload.blocking ?? true,
+  };
+}
 
 const app = Router();
 
@@ -28,8 +49,16 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    event,
+    allUsers,
+    order,
+    filters,
+    count,
+  } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -105,28 +134,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 
 app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
-  const createdAt = Date.now();
-
-  let urlObj;
-  try {
-    urlObj = parseUrl(req.body.url);
-  } catch (e) {
-    console.error(`couldn't parse the url provided ${req.body.url}`);
-    res.status(400);
-    return res.end();
-  }
-
-  const doc = {
-    id,
-    userId: req.user.id,
-    kind: "webhook",
-    name: req.body.name,
-    createdAt: createdAt,
-    event: req.body.event,
-    url: req.body.url,
-    blocking: req.body.blocking === undefined ? true : !!req.body.blocking,
-  };
-
+  const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
   try {
     await req.store.create(doc);
     trackAction(
@@ -176,27 +184,10 @@ app.put(
       return res.json({ errors: ["not found"] });
     }
 
-    let urlObj;
+    const { id, userId, createdAt } = webhook;
+    const doc = validateWebhookPayload(id, userId, createdAt, req.body);
     try {
-      urlObj = parseUrl(req.body.url);
-    } catch (e) {
-      console.error(`couldn't parse the url provided ${req.body.url}`);
-      res.status(400);
-      return res.end();
-    }
-
-    if (
-      !urlObj.protocol ||
-      (urlObj.protocol !== "http:" && urlObj.protocol !== "https:")
-    ) {
-      res.status(406);
-      return res.json({
-        errors: ["url provided should be http or https only"],
-      });
-    }
-
-    try {
-      await req.store.replace(req.body);
+      await req.store.replace(doc);
     } catch (e) {
       console.error(e);
       throw e;

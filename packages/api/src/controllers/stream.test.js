@@ -792,7 +792,7 @@ describe("controllers/stream", () => {
           await server.db.webhook.create({
             id: uuid(),
             kind: "webhook",
-            event: "stream.detection",
+            events: ["stream.detection"],
             userId: stream.userId,
             createdAt: Date.now(),
             url: "https://zoo.tv/abuse/hook",
@@ -962,7 +962,7 @@ describe("controllers/stream", () => {
             name: "detection-webhook",
             kind: "webhook",
             createdAt: Date.now(),
-            event: "stream.detection",
+            events: ["stream.detection"],
             url: `http://localhost:${webhookServer.port}/captain/hook`,
           });
         });

@@ -1,6 +1,5 @@
 import express from "express";
 import fetch from "isomorphic-fetch";
-import { DB } from "../store/db";
 import schema from "../schema/schema.json";
 import WebhookCannon from "./cannon";
 import makeStore from "../store";
@@ -11,7 +10,7 @@ import {
   startAuxTestServer,
   AuxTestServer,
 } from "../test-helpers";
-import { semaphore } from "../util";
+import { semaphore, sleep } from "../util";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
@@ -20,20 +19,12 @@ describe("webhook cannon", () => {
   let server: TestServer;
   let webhookServer: AuxTestServer;
   let testHost;
-  let db;
 
   let mockAdminUser;
   let mockNonAdminUser;
   let postMockStream;
   let mockWebhook;
-  let client,
-    adminUser,
-    adminToken,
-    nonAdminUser,
-    nonAdminToken,
-    generatedWebhook,
-    generatedWebhook2,
-    generatedWebhookNonAdmin;
+  let client, adminUser, adminToken, nonAdminUser, nonAdminToken;
 
   async function setupUsers(server) {
     const client = new TestClient({
@@ -113,11 +104,21 @@ describe("webhook cannon", () => {
       name: "test webhook 1",
       kind: "webhook",
       createdAt: Date.now(),
-      event: "stream.started",
+      events: ["stream.started"],
       url: "http://localhost:30000/webhook",
       // url: 'https://livepeer.com/'
     };
 
+    webhookServer = await startAuxTestServer(30000);
+    testHost = `http://localhost:${webhookServer.port}`;
+    console.log("beforeALL done");
+  });
+
+  afterAll(async () => {
+    await webhookServer.close();
+  });
+
+  beforeEach(async () => {
     ({
       client,
       adminUser,
@@ -125,20 +126,13 @@ describe("webhook cannon", () => {
       nonAdminUser,
       nonAdminToken,
     } = await setupUsers(server));
-    console.log("beforeALL done");
   });
 
-  beforeAll(async () => {
-    webhookServer = await startAuxTestServer(30000);
-    testHost = `http://localhost:${webhookServer.port}`;
+  afterEach(async () => {
+    // need to wait until cannon writes webhook responses to db
+    await sleep(200);
+    await clearDatabase(server);
   });
-
-  afterAll(async () => {
-    await webhookServer.close();
-    server.queue.close();
-    // await db.close();
-  });
-
 
   it("should have a test server", async () => {
     // webhookServer.use(bodyParser);
@@ -150,17 +144,13 @@ describe("webhook cannon", () => {
     expect(text).toEqual("self test was good");
   });
 
-  it("should be able to receive the webhook event", async () => {
-
-    await server.store.create({ id: "streamid", userId: nonAdminUser.id, kind: "stream"});
-
+  it("should be able to create webhooks", async () => {
     // create the webhook
     let res = await client.post("/webhook", { ...mockWebhook });
     let resJson = await res.json();
     console.log("webhook body: ", resJson);
     expect(res.status).toBe(201);
     expect(resJson.blocking).toBe(true);
-    generatedWebhook = resJson;
     res = await client.post("/webhook", {
       ...mockWebhook,
       name: "test 2",
@@ -171,50 +161,155 @@ describe("webhook cannon", () => {
     console.log("webhook body: ", resJson);
     expect(res.status).toBe(201);
     expect(resJson.name).toBe("test 2");
-    generatedWebhook2 = resJson;
+  });
 
-    client.jwtAuth = nonAdminToken["token"];
-    res = await client.post("/webhook", {
-      ...mockWebhook,
-      name: "test non admin",
-    });
-    resJson = await res.json();
-    console.log("webhook body: ", resJson);
-    expect(res.status).toBe(201);
-    expect(resJson.name).toBe("test non admin");
-    generatedWebhookNonAdmin = resJson;
-    client.jwtAuth = adminToken["token"];
+  describe("receiving events", () => {
+    let webhookCallback: (body: any) => void;
 
-    // test endpoint
-    const sem = semaphore();
-    let resp: number = -1;
-    webhookServer.app.use(bodyParser.json());
-    webhookServer.app.post("/webhook", (req, res) => {
-      console.log("WEBHOOK WORKS , body", req.body);
-      resp = 200;
-      res.end();
-      sem.release();
+    beforeAll(() => {
+      webhookServer.app.use(bodyParser.json());
+      webhookServer.app.post("/webhook", (req, res) => {
+        console.log("WEBHOOK WORKS , body", req.body);
+        webhookCallback(req.body);
+        res.status(204).end();
+      });
     });
 
-    await server.queue.emit({
-      id: "webhook_test_12",
-      time: Date.now(),
-      channel: "test.channel",
-      event: "stream.started",
-      streamId: "streamid",
-      userId: nonAdminUser.id,
-      isConsumed: false,
+    beforeEach(async () => {
+      webhookCallback = () => {};
+
+      await server.store.create({
+        id: "streamid",
+        userId: nonAdminUser.id,
+        kind: "stream",
+      });
+      client.jwtAuth = nonAdminToken["token"];
     });
 
-    await sem.wait(3000);
-    expect(resp).toBe(200);
-    // need to wait until cannon will write webhook response to db
-    await sleep(2000)
+    it("should be able to receive the webhook event", async () => {
+      const res = await client.post("/webhook", {
+        ...mockWebhook,
+        name: "test non admin",
+      });
+      const resJson = await res.json();
+      console.log("webhook body: ", resJson);
+      expect(res.status).toBe(201);
+      expect(resJson.name).toBe("test non admin");
+
+      const sem = semaphore();
+      let called = false;
+      webhookCallback = () => {
+        called = true;
+        sem.release();
+      };
+
+      await server.queue.emit({
+        id: "webhook_test_12",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.started",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+
+      await sem.wait(3000);
+      expect(called).toBe(true);
+    });
+
+    it("should call multiple webhooks", async () => {
+      let res = await client.post("/webhook", {
+        ...mockWebhook,
+        name: "test-1",
+      });
+      expect(res.status).toBe(201);
+      res = await client.post("/webhook", {
+        ...mockWebhook,
+        name: "test-2",
+      });
+      expect(res.status).toBe(201);
+
+      const sem = semaphore();
+      let callCount = 0;
+      webhookCallback = () => {
+        callCount++;
+        if (callCount === 2) sem.release();
+      };
+
+      await server.queue.emit({
+        id: "webhook_test_12",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.started",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+
+      await sem.wait(3000);
+      expect(callCount).toBe(2);
+    });
+
+    it("should send multiple events to same webhook", async () => {
+      const res = await client.post("/webhook", {
+        ...mockWebhook,
+        name: "test-multi",
+        events: ["stream.started", "stream.idle"],
+      });
+      expect(res.status).toBe(201);
+
+      let callCount = 0;
+      let receivedEvent: string;
+      let sem = semaphore();
+      webhookCallback = (body) => {
+        receivedEvent = body.event;
+        callCount++;
+        sem.release();
+      };
+
+      await server.queue.emit({
+        id: "webhook_test_12",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.started",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+
+      await sem.wait(3000);
+      expect(callCount).toBe(1);
+      expect(receivedEvent).toBe("stream.started");
+
+      sem = semaphore();
+      await server.queue.emit({
+        id: "webhook_test_42",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.idle",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+
+      await sem.wait(3000);
+      expect(callCount).toBe(2);
+      expect(receivedEvent).toBe("stream.idle");
+
+      // does not receive some random event
+      sem = semaphore();
+      await server.queue.emit({
+        id: "webhook_test_93",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.unknown",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+
+      await sem.wait(1000);
+      expect(callCount).toBe(2);
+    });
   });
 });
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

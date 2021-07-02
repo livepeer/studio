@@ -2,9 +2,19 @@ import sql from "sql-template-strings";
 
 import { Webhook } from "../schema/types";
 import Table from "./table";
-import { WithID } from "./types";
 
-export default class WebhookTable extends Table<WithID<Webhook>> {
+export type DBWebhook = Omit<Webhook, "event"> & {
+  id: string;
+  events: Webhook["events"];
+  /**
+  @deprecated: This is to make DBWebhook type unassignable to Webhook and avoid
+  programming mistakes. Always use DBWebhook unless in the API controller where
+  the conversion of field .event to .events will take place.
+  **/
+  event?: "deprecated";
+};
+
+export default class WebhookTable extends Table<DBWebhook> {
   async listSubscribed(
     userId: string,
     event: string,
@@ -14,12 +24,13 @@ export default class WebhookTable extends Table<WithID<Webhook>> {
   ) {
     const query = [sql`data->>'userId' = ${userId}`];
     if (event) {
-      query.push(sql`data->>'event' = ${event}`);
+      const jsonEvent = JSON.stringify(event);
+      query.push(sql`data->'events' @> ${jsonEvent}`);
     }
     if (!includeDeleted) {
       query.push(sql`data->>'deleted' IS NULL`);
     }
-    const [webhooks, nextCursor] = await this.db.webhook.find(query, {
+    const [webhooks, nextCursor] = await this.find(query, {
       limit,
       cursor,
     });
