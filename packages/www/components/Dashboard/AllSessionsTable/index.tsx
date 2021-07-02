@@ -152,8 +152,10 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         state.pageSize,
         formatFiltersForApiRequest(state.filters, {
           parseNumber: (n) => n * 60,
-        })
+        }),
+        true
       );
+
       return {
         nextCursor,
         count,
