@@ -85,6 +85,9 @@ components:
           description:
             If true, returning non 2xx value from webhook will prevent stream
             from starting
+        sharedSecret:
+          type: string
+          description: shared secret used to sign the webhook payload
 
     webhook-response:
       type: object

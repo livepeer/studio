@@ -6,6 +6,7 @@ import Model from "../store/model";
 import { DBWebhook, EventKey } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
+import { sign } from "../controllers/helpers";
 
 import uuid from "uuid/v4";
 import { parse as parseUrl } from "url";
@@ -178,6 +179,7 @@ export default class WebhookCannon {
           event: event.event,
           stream: sanitized,
           payload: event.payload,
+          signature: (webhook.sharedSecret)? sign(event.payload, webhook.sharedSecret) : null,
         }),
       };
 
