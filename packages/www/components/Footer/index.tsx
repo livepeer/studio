@@ -7,11 +7,10 @@ import { Grid } from "@theme-ui/components";
 import LinksList, { LinksListProps } from "./LinksList";
 import Link from "../Link";
 import Textfield from "../Textfield";
-import { useMailchimp } from "react-use-mailchimp";
 import { useState, useEffect } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import { IconButton } from "@theme-ui/components";
-import { useApi } from "../../hooks";
+import { useApi, useMailchimp } from "../../hooks";
 
 const linksLists: LinksListProps[] = [
   {
