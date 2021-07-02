@@ -344,3 +344,20 @@ export function pathJoin2(p1, p2) {
 export function pathJoin(...items) {
   return items.reduce(pathJoin2, "");
 }
+
+export function trimPathPrefix(prefix, path) {
+  const prefixIdx = path.indexOf(prefix);
+  if (prefix[prefix.length - 1] !== "/") {
+    const nextCharIdx = prefixIdx + prefix.length;
+    if (nextCharIdx < path.length && path[nextCharIdx] !== "/") {
+      return path;
+    }
+  }
+  if (prefixIdx === 0) {
+    return path.substr(prefix.length);
+  }
+  if (prefixIdx === 1 && path[0] === "/" && prefix[0] !== "/") {
+    return path.substr(prefix.length + 1);
+  }
+  return path;
+}

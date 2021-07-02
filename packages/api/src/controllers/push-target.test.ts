@@ -1,13 +1,12 @@
-import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
+import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
 import { PushTarget, User } from "../schema/types";
-import Model from "../store/model";
 import { db } from "../store";
 
 // includes auth file tests
 
-let server: { store: Model };
+let server: TestServer;
 let mockPushTargetInput: PushTarget;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
@@ -32,51 +31,6 @@ beforeAll(async () => {
   };
 });
 
-async function createUser(client: TestClient, userData: User, admin: boolean) {
-  const userRes = await client.post(`/user`, userData);
-  let user = await userRes.json();
-
-  const tokenRes = await client.post(`/user/token`, userData);
-  const tokenJson = await tokenRes.json();
-  const token = tokenJson.token;
-
-  const storedUser = await server.store.get(`user/${user.id}`, false);
-  user = { ...storedUser, admin, emailValid: true };
-  await server.store.replace(user);
-
-  const apiKey = uuid();
-  await server.store.create({
-    id: apiKey,
-    kind: "api-token",
-    userId: user.id,
-  });
-  return { user, token, apiKey };
-}
-
-async function setupUsers(server: { store: Model }) {
-  const client = new TestClient({ server });
-  const {
-    user: adminUser,
-    token: adminToken,
-    apiKey: adminApiKey,
-  } = await createUser(client, mockAdminUserInput, true);
-  const {
-    user: nonAdminUser,
-    token: nonAdminToken,
-    apiKey: nonAdminApiKey,
-  } = await createUser(client, mockNonAdminUserInput, false);
-
-  return {
-    client,
-    adminUser,
-    adminToken,
-    adminApiKey,
-    nonAdminUser,
-    nonAdminToken,
-    nonAdminApiKey,
-  };
-}
-
 afterEach(async () => {
   await clearDatabase(server);
 });
@@ -96,7 +50,7 @@ describe("controllers/push-target", () => {
         adminToken,
         nonAdminUser,
         nonAdminToken,
-      } = await setupUsers(server));
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       client.jwtAuth = nonAdminToken;
     });
 
@@ -372,7 +326,7 @@ describe("controllers/push-target", () => {
         adminApiKey,
         nonAdminUser,
         nonAdminApiKey,
-      } = await setupUsers(server));
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       // set a default invalid api key on the client
       client.apiKey = uuid();
     });

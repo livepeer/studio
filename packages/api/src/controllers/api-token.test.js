@@ -123,6 +123,62 @@ describe("controllers/api-token", () => {
       expect(apiToken.id).toBeUndefined();
     });
 
+    describe("access rules", () => {
+      const testError = async (expectErr, rules) => {
+        const res = await client.post("/api-token", { access: { rules } });
+        expect(res.status).toBe(422);
+        const body = await res.json();
+        expect(body.errors[0]).toContain(expectErr);
+      };
+
+      it("should not accept invalid access rules", async () => {
+        await testError(`"type"`, {});
+        await testError(`"required"`, [{}]);
+        await testError(`"minItems"`, [{ resources: [] }]);
+        await testError(`"minItems"`, [{ resources: ["*"], methods: [] }]);
+        await testError(`"enum"`, [
+          { resources: ["*"], methods: ["not a method"] },
+        ]);
+        await testError(`"enum"`, [{ resources: ["*"], methods: ["GET"] }]); // methods are lowercase
+        await testError(`Bad route /*path`, [
+          { resources: ["this/is/fine", "/*path"] },
+        ]);
+        await testError(`Bad route dup`, [{ resources: ["dup", "dup"] }]);
+        await testError(`Bad route :also/:duplicate`, [
+          { resources: [":even/:separate"] },
+          { resources: [":also/:duplicate"] },
+        ]);
+        await testError(`Bad route /path?query=error`, [
+          { resources: ["/path?query=error"] },
+        ]);
+      });
+
+      it("should accept valid access rules", async () => {
+        let res = await client.post("/api-token", { access: { rules: [] } });
+        expect(res.status).toBe(201);
+
+        // e.g. read-only api token
+        res = await client.post("/api-token", {
+          access: { rules: [{ resources: ["*"], methods: ["get"] }] },
+        });
+        expect(res.status).toBe(201);
+
+        // e.g. go-livepeer + infra api token
+        res = await client.post("/api-token", {
+          access: {
+            rules: [
+              {
+                resources: ["stream/hook/*", "usage/update"],
+                methods: ["post"],
+              },
+              { resources: ["region/:id"], methods: ["put"] },
+            ],
+          },
+        });
+        expect(res.status).toBe(201);
+      });
+    });
+
     it("should create an apiToken, delete it, and error when attempting additional detele or replace", async () => {
       const res = await client.post("/api-token");
       expect(res.status).toBe(201);
@@ -227,6 +283,41 @@ describe("controllers/api-token", () => {
       // should not return all apiTokens that belong to admin user as nonAdmin user
       res = await client.get(`/api-token?userId=${adminUser.id}`);
       expect(res.status).toBe(403);
+    });
+
+    it("should disallow meta access with api-token", async () => {
+      const expect403 = async (method, path) => {
+        const res = await client.fetch(path, { method });
+        expect(res.status).toBe(403);
+        const body = await res.json();
+        expect(body.errors[0]).toEqual("no authorization header provided");
+      };
+      const expectAll403s = async () => {
+        await expect403("post", `/api-token`);
+        await expect403("get", `/api-token`);
+        await expect403("get", `/api-token?userId=${nonAdminUser.id}`);
+        await expect403("get", `/api-token/${nonAdminToken}`);
+        await expect403("delete", `/api-token/${nonAdminToken}`);
+      };
+      client.jwtAuth = undefined;
+
+      const nonAdminToken = uuid();
+      await server.store.create({
+        userId: nonAdminUser.id,
+        id: nonAdminToken,
+        kind: "api-token",
+      });
+      client.apiToken = nonAdminToken;
+      await expectAll403s();
+
+      const adminToken = uuid();
+      await server.store.create({
+        userId: adminUser.id,
+        id: adminToken,
+        kind: "api-token",
+      });
+      client.apiToken = adminToken;
+      await expectAll403s();
     });
   });
 

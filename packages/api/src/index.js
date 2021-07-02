@@ -60,24 +60,14 @@ export default async function makeApp(params) {
   };
   process.on("unhandledRejection", unhandledRejection);
 
-  let router;
-  let store;
-  let db;
-  let webhook;
-  let queue;
-  try {
-    const appRoute = await appRouter(params);
-    router = appRoute.router;
-    store = appRoute.store;
-    db = appRoute.db;
-    webhook = appRoute.webhookCannon;
-    queue = appRoute.queue;
-  } catch (e) {
+  const appRoute = await appRouter(params).catch((e) => {
     console.error("Error on startup");
     console.error(e);
     throw e;
     // process.exit(1)
-  }
+  });
+  const { db, queue, router, store, webhookCannon: webhook } = appRoute;
+
   const app = express();
   const whitelist = [
     "https://livepeer.com",

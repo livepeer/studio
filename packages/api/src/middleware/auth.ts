@@ -1,33 +1,64 @@
 import basicAuth from "basic-auth";
-import jwt from "jsonwebtoken";
+import { RequestHandler } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
+import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
+import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
+import { WithID } from "../store/types";
+import { AuthTokenType } from "../types/common";
+import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
-function parseAuthToken(authToken) {
+function parseAuthToken(authToken: string) {
   const match = authToken?.match(/^(\w+) +(.+)$/);
   if (!match) return {};
-  return { tokenType: match[1], tokenValue: match[2] };
+  return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
+}
+
+function isAuthorized(
+  method: string,
+  path: string,
+  rules: AuthRule[],
+  httpPrefix?: string
+) {
+  try {
+    const policy = new AuthPolicy(rules);
+    if (httpPrefix) {
+      path = trimPathPrefix(httpPrefix, path);
+    }
+    return policy.allows(method, path);
+  } catch (err) {
+    console.error(`error authorizing ${method} ${path}: ${err}`);
+    return false;
+  }
+}
+
+interface AuthParams {
+  allowUnverified?: boolean;
+  admin?: boolean;
+  anyAdmin?: boolean;
+  noApiToken?: boolean;
 }
 
 /**
  * creates an authentication middleware that can be customized.
  * @param {Object} params auth middleware params, to be defined later
  */
-function authFactory(params) {
+function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
     const { tokenType, tokenValue } = parseAuthToken(authToken);
     const basicUser = basicAuth.parse(authToken);
-    let user;
-    let tokenObject;
-    let userId;
+    let user: User;
+    let tokenObject: WithID<ApiToken>;
+    let userId: string;
 
     if (!tokenType) {
       throw new ForbiddenError(`no authorization header provided`);
-    } else if (["Bearer", "Basic"].includes(tokenType)) {
+    } else if (["Bearer", "Basic"].includes(tokenType) && !params.noApiToken) {
       const isBasic = tokenType === "Basic";
       const tokenId = isBasic ? basicUser?.pass : req.token;
       if (!tokenId) {
@@ -46,7 +77,7 @@ function authFactory(params) {
       try {
         const verified = jwt.verify(tokenValue, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
-        });
+        }) as JwtPayload;
         userId = verified.sub;
         tracking.recordUser(db, userId);
       } catch (err) {
@@ -72,6 +103,14 @@ function authFactory(params) {
     const isUIAdmin = user.admin && tokenType === "JWT";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
+    }
+    const accessRules = tokenObject?.access?.rules;
+    if (accessRules) {
+      const fullPath = pathJoin2(req.baseUrl, req.path);
+      const { httpPrefix } = req.config;
+      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
+        throw new ForbiddenError(`credential has insufficent privileges`);
+      }
     }
 
     req.user = user;

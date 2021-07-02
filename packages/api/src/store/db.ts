@@ -26,7 +26,7 @@ import WebhookTable from "./webhook-table";
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
 
-interface PostgresParams {
+export interface PostgresParams {
   postgresUrl: string;
   postgresReplicaUrl?: string;
   appName?: string;

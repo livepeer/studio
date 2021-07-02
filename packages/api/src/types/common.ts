@@ -4,6 +4,7 @@ import MessageQueue from "../store/rabbit-queue";
 export enum AuthTokenType {
   JWT = "JWT",
   Bearer = "Bearer",
+  Basic = "Basic",
 }
 
 declare global {

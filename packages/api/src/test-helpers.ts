@@ -1,7 +1,9 @@
 import express, { Express } from "express";
 import isoFetch from "isomorphic-fetch";
+import { v4 as uuid } from "uuid";
 
 import schema from "./schema/schema.json";
+import { User } from "./schema/types";
 import { TestServer } from "./test-server";
 
 /**
@@ -17,6 +19,7 @@ export async function clearDatabase(server: TestServer) {
 export interface AuxTestServer {
   app: Express;
   port: number;
+  host: string;
   close: () => Promise<void>;
 }
 
@@ -39,22 +42,23 @@ export function startAuxTestServer(port?: number) {
         return reject(new Error("Unexpected non-AddressInfo listener address"));
       }
       const { port } = addr;
-      console.log("Aux test server listening at http://localhost:%s", port);
+      const host = `http://127.0.0.1:${port}`;
+      console.log(`Aux test server listening at ${host}`);
 
-      resolve({ app, close, port });
+      resolve({ app, host, port, close });
     });
   });
 }
 
 export class TestClient {
-  server: TestServer;
+  server: { host: string; httpPrefix: string };
   apiKey: string;
   jwtAuth: string;
   basicAuth: string;
   googleAuthorization: string;
 
   constructor(opts: {
-    server: TestServer;
+    server: TestServer | { host: string; httpPrefix?: string };
     apiKey?: string;
     jwtAuth?: string;
     basicAuth?: string;
@@ -64,7 +68,10 @@ export class TestClient {
       throw new Error("TestClient missing server");
     }
 
-    this.server = opts.server;
+    this.server = {
+      host: opts.server.host,
+      httpPrefix: (opts.server.httpPrefix as string) ?? "",
+    };
 
     if (opts.apiKey) {
       this.apiKey = opts.apiKey;
@@ -160,4 +167,58 @@ export class TestClient {
     }
     return await this.fetch(path, params);
   }
+}
+
+export async function createUser(
+  server: TestServer,
+  client: TestClient,
+  userData: User,
+  admin: boolean
+) {
+  const userRes = await client.post(`/user`, userData);
+  let user = await userRes.json();
+
+  const tokenRes = await client.post(`/user/token`, userData);
+  const tokenJson = await tokenRes.json();
+  const token = tokenJson.token;
+
+  const storedUser = await server.store.get(`user/${user.id}`, false);
+  user = { ...storedUser, admin, emailValid: true };
+  await server.store.replace(user);
+
+  const apiKey = uuid();
+  await server.store.create({
+    id: apiKey,
+    kind: "api-token",
+    userId: user.id,
+  });
+  return { user, token, apiKey };
+}
+
+export async function setupUsers(
+  server: TestServer,
+  admin: User,
+  nonAdmin: User
+) {
+  const client = new TestClient({ server });
+  const {
+    user: adminUser,
+    token: adminToken,
+    apiKey: adminApiKey,
+  } = await createUser(server, client, admin, true);
+  const {
+    user: nonAdminUser,
+    token: nonAdminToken,
+    apiKey: nonAdminApiKey,
+  } = await createUser(server, client, nonAdmin, false);
+
+  return {
+    client,
+    adminUser,
+    adminToken,
+    adminApiKey,
+    nonAdminUser,
+    nonAdminToken,
+    nonAdminApiKey,
+  };
 }

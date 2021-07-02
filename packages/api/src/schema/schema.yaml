@@ -690,6 +690,31 @@ components:
         name:
           type: string
           example: Example Token
+        access:
+          type: object
+          additionalProperties: false
+          properties:
+            rules:
+              type: array
+              default: [{ resources: ["*"] }]
+              items:
+                type: object
+                additionalProperties: false
+                required: [resources]
+                properties:
+                  resources:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  methods:
+                    type: array
+                    minItems: 1
+                    default: ["*"]
+                    items:
+                      type: string
+                      enum: [post, get, put, patch, delete, head, options, "*"]
+
         lastSeen:
           type: number
           example: 1587667174725
