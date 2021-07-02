@@ -1,4 +1,5 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
+import { useQuery, useQueryClient } from "react-query";
 import {
   useEffect,
   useMemo,
@@ -17,9 +18,9 @@ import {
   Box,
   Flex,
   Checkbox,
-  Heading,
   Text,
   Button,
+  Heading,
   Link as A,
 } from "@livepeer.com/design-system";
 import TableFilter, {
@@ -27,7 +28,6 @@ import TableFilter, {
   Filter as TFilter,
   formatFiltersForApiRequest,
 } from "./filters";
-import useSWR from "swr";
 import { ButtonProps } from "@components/Button";
 import Link from "next/link";
 
@@ -40,7 +40,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setNextCursor: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<TFilter[]>>;
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
-  setSwrState: Dispatch<SetStateAction<SwrState | undefined>>;
+  setQueryState: Dispatch<SetStateAction<QueryState | undefined>>;
 };
 
 type State<T extends Record<string, unknown>> = {
@@ -51,7 +51,7 @@ type State<T extends Record<string, unknown>> = {
   filters: TFilter[];
   stringifiedFilters: string;
   selectedRows: Row<T>[];
-  swrState: SwrState | undefined;
+  queryState: QueryState | undefined;
   pageSize: number;
 };
 
@@ -61,9 +61,9 @@ export type Fetcher<T extends Record<string, unknown>> = (
 
 type Action = ButtonProps;
 
-type SwrState = {
-  isValidating: boolean;
-  revalidate: () => Promise<boolean>;
+type QueryState = {
+  isLoading: boolean;
+  invalidate: () => Promise<void>;
 };
 
 type Props<T extends Record<string, unknown>> = {
@@ -99,15 +99,22 @@ const TableComponent = <T extends Record<string, unknown>>({
   tableId,
   emptyState,
 }: Props<T>) => {
-  const { data, isValidating, revalidate } = useSWR(
-    [tableId, state.cursor, state.order, state.stringifiedFilters],
-    () => fetcher(state)
-  );
+  const queryClient = useQueryClient();
+
+  const queryKey = useMemo(() => {
+    return [tableId, state.cursor, state.order, state.stringifiedFilters];
+  }, [tableId, state.cursor, state.order, state.stringifiedFilters]);
+
+  const { isLoading, error, data } = useQuery(queryKey, () => fetcher(state));
+
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 
   useEffect(() => {
-    stateSetter.setSwrState({ isValidating, revalidate });
-  }, [isValidating, revalidate]);
+    stateSetter.setQueryState({
+      isLoading,
+      invalidate: () => queryClient.invalidateQueries(tableId),
+    });
+  }, [isLoading, tableId, queryClient]);
 
   const someColumnCanSort = useMemo(() => {
     // To see if we show the sort help tooltip or not
@@ -436,7 +443,11 @@ const TableComponent = <T extends Record<string, unknown>>({
               </Button>
               <Button
                 onClick={handleNextPage}
-                disabled={state.nextCursor === ""}>
+                disabled={
+                  state.nextCursor === "" ||
+                  // @ts-ignore
+                  state.pageSize >= parseFloat(data?.count)
+                }>
                 Next
               </Button>
             </Flex>
@@ -455,10 +466,10 @@ export const useTableState = <T extends Record<string, unknown>>({
   const [order, setOrder] = useState("");
   const [cursor, setCursor] = useState("");
   const [prevCursors, setPrevCursors] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState("");
+  const [nextCursor, setNextCursor] = useState("default");
   const [filters, setFilters] = useState<TFilter[]>([]);
   const [selectedRows, setSelectedRows] = useState<Row<T>[]>([]);
-  const [swrState, setSwrState] = useState<SwrState | undefined>();
+  const [queryState, setQueryState] = useState<QueryState | undefined>();
 
   const stringifiedFilters = useMemo(() => {
     const formatted = formatFiltersForApiRequest(filters);
@@ -473,7 +484,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       setNextCursor,
       setFilters,
       setSelectedRows,
-      setSwrState,
+      setQueryState,
     }),
     []
   );
@@ -487,7 +498,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       filters,
       stringifiedFilters,
       selectedRows,
-      swrState,
+      queryState,
       pageSize,
     }),
     [
@@ -499,6 +510,7 @@ export const useTableState = <T extends Record<string, unknown>>({
       stringifiedFilters,
       selectedRows,
       pageSize,
+      queryState,
     ]
   );
 

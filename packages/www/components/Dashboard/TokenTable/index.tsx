@@ -276,7 +276,7 @@ const TokenTable = ({
                     }
                   );
                   await Promise.all(promises);
-                  await tableProps.state.swrState?.revalidate();
+                  await tableProps.state.queryState?.invalidate();
                   openSnackbar(
                     `${tableProps.state.selectedRows.length} stream${
                       tableProps.state.selectedRows.length > 1 ? "s" : ""
@@ -309,7 +309,8 @@ const TokenTable = ({
         isOpen={createDialogState.on}
         onClose={createDialogState.onOff}
         onOpenChange={createDialogState.onToggle}
-        onCreateSuccess={tableProps.state.swrState?.revalidate}
+        // @ts-ignore
+        onCreateSuccess={tableProps.state.queryState?.invalidate()}
       />
     </>
   );
