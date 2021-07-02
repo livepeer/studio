@@ -221,7 +221,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     deleteStreams,
     deleteDialogState.onOff,
     tableProps.state.selectedRows.length,
-    tableProps.state.invalidate(),
+    tableProps.state.invalidate,
   ]);
 
   const emptyState = (

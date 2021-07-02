@@ -288,7 +288,7 @@ const StreamsTable = ({
     deleteStreams,
     deleteDialogState.onOff,
     state.selectedRows.length,
-    state.invalidate(),
+    state.invalidate,
   ]);
 
   const emptyState = (
