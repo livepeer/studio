@@ -864,6 +864,33 @@ app.put("/:id/setactive", authMiddleware({ anyAdmin: true }), async (req, res) =
   res.end();
 });
 
+// sets 'isActive' field to false for many objects at once
+app.patch(
+  "/deactivate-many",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("deactivate-many-payload"),
+  async (req, res) => {
+    let upRes;
+    try {
+      upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
+
+      if (upRes.rowCount) {
+        console.log(
+          `set isActive=false for ids=${req.body.ids} rowCount=${upRes.rowCount}`
+        );
+      }
+    } catch (e) {
+      console.error(
+        `error setting stream active to false ids=${req.body.ids} err=${e}`
+      );
+      upRes = { rowCount: 0 };
+    }
+
+    res.status(200);
+    return res.json({ rowCount: upRes?.rowCount ?? 0 });
+  }
+);
+
 app.patch(
   "/:id",
   authMiddleware({}),
