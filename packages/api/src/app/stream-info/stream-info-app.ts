@@ -359,6 +359,7 @@ export default async function makeApp(params) {
   const close = async () => {
     clearInterval(pid);
     process.off("SIGTERM", sigterm);
+    process.off("SIGINT", sigterm);
     process.off("unhandledRejection", unhandledRejection);
     listener.close();
     await db.close();
@@ -368,11 +369,12 @@ export default async function makeApp(params) {
   const sigterm = handleSigterm(close);
 
   process.on("SIGTERM", sigterm);
+  process.on("SIGINT", sigterm);
 
   const unhandledRejection = (err) => {
     logger.error("fatal, unhandled promise rejection: ", err);
     err.stack && logger.error(err.stack);
-    sigterm();
+    sigterm("REJECT");
   };
   process.on("unhandledRejection", unhandledRejection);
 
@@ -385,13 +387,13 @@ export default async function makeApp(params) {
   };
 }
 
-const handleSigterm = (close) => async () => {
+const handleSigterm = (close) => async (signal) => {
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
-  logger.info("Got SIGTERM. Graceful shutdown start");
+  logger.info(`Got ${signal}. Graceful shutdown start`);
   let timeout = setTimeout(() => {
-    logger.warn("Didn't gracefully exit in 5s, forcing");
+    logger.warn("Didn't gracefully exit in 15s, forcing");
     process.exit(1);
-  }, 5000);
+  }, 15000);
   try {
     await close();
   } catch (err) {
