@@ -10,7 +10,6 @@ const ActiveStreamsBadge = () => {
       count: true,
       active: true,
     });
-    console.log(count);
     return { count };
   }, [user.id]);
 

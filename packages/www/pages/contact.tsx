@@ -13,7 +13,6 @@ import { useRouter } from "next/router";
 
 const ContactPage = () => {
   const { query } = useRouter();
-  console.log(query);
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
