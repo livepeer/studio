@@ -23,12 +23,9 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import { BadRequestError, NotFoundError } from "../store/errors";
 
-const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
-const isLocalIP = require("is-local-ip");
-const { Resolver } = require("dns").promises;
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
