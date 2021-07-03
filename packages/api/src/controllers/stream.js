@@ -792,7 +792,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 });
 
-app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
+app.put("/:id/setactive", authMiddleware({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
   const useReplica = !req.body.active;
