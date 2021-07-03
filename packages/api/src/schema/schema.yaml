@@ -435,6 +435,16 @@ components:
           type: boolean
           description: If currently suspended
 
+    deactivate-many-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+
     stream-patch-payload:
       type: object
       additionalProperties: false

@@ -291,6 +291,17 @@ export default class StreamTable extends Table<WithID<Stream>> {
     return upRes;
   }
 
+  async markIsActiveFalseMany(ids: Array<string>) {
+    const res = await this.db.query(
+      `UPDATE ${this.name
+      } SET data = jsonb_set(data, '{isActive}', 'false'::jsonb) WHERE id IN (${ids
+        .map((_, i) => "$" + (i + 1))
+        .join(",")})`,
+      ids
+    );
+    return res;
+  }
+
   addDefaultFieldsMany(objs: Array<Stream>): Array<Stream> {
     return objs.map(this.addDefaultFields);
   }

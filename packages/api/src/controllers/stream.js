@@ -23,12 +23,9 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import { BadRequestError, NotFoundError } from "../store/errors";
 
-const WEBHOOK_TIMEOUT = 5 * 1000;
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
-const isLocalIP = require("is-local-ip");
-const { Resolver } = require("dns").promises;
 
 const app = Router();
 const hackMistSettings = (req, profiles) => {
@@ -795,7 +792,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 });
 
-app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
+app.put("/:id/setactive", authMiddleware({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
   const useReplica = !req.body.active;
@@ -866,6 +863,33 @@ app.put("/:id/setactive", authMiddleware({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+// sets 'isActive' field to false for many objects at once
+app.patch(
+  "/deactivate-many",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("deactivate-many-payload"),
+  async (req, res) => {
+    let upRes;
+    try {
+      upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
+
+      if (upRes.rowCount) {
+        console.log(
+          `set isActive=false for ids=${req.body.ids} rowCount=${upRes.rowCount}`
+        );
+      }
+    } catch (e) {
+      console.error(
+        `error setting stream active to false ids=${req.body.ids} err=${e}`
+      );
+      upRes = { rowCount: 0 };
+    }
+
+    res.status(200);
+    return res.json({ rowCount: upRes?.rowCount ?? 0 });
+  }
+);
 
 app.patch(
   "/:id",
