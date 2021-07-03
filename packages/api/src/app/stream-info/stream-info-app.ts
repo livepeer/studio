@@ -2,11 +2,10 @@ import express, { Router } from "express";
 import "express-async-errors"; // it monkeypatches, i guess
 import morgan from "morgan";
 import { db } from "../../store";
-import { DB } from "../../store/db";
 import { healthCheck } from "../../middleware";
 import logger from "../../logger";
 import { Stream } from "../../schema/types";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { hostname } from "os";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";

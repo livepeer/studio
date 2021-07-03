@@ -1,5 +1,5 @@
 import Router from "express/lib/router";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { authMiddleware, geolocateMiddleware } from "../middleware";
 import { shuffle } from "../util";
 

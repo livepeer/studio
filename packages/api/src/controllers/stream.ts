@@ -1,7 +1,5 @@
-import dns from "dns";
-const { Resolver } = dns.promises;
 import { Router, Request } from "express";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
@@ -22,14 +20,12 @@ import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { IStore } from "../types/common";
-import { fetchWithTimeout } from "../util";
 import { WebhookMessage } from "../webhooks/cannon";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
 import {
   makeNextHREF,
   trackAction,
-  getWebhooks,
   parseFilters,
   parseOrder,
   pathJoin,

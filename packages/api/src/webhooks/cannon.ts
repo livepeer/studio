@@ -10,6 +10,7 @@ import logger from "../logger";
 import uuid from "uuid/v4";
 import { parse as parseUrl } from "url";
 import { ConsumeMessage } from "amqplib";
+import { Response } from "node-fetch";
 const isLocalIP = require("is-local-ip");
 const { Resolver } = require("dns").promises;
 // const resolver = new Resolver();

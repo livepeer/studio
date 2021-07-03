@@ -1,3 +1,5 @@
+import fetch, { RequestInit, Response } from "node-fetch";
+
 export const timeout = <T>(ms: number, fn: () => Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
     const handle = setTimeout(() => {

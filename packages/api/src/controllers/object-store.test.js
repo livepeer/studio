@@ -143,8 +143,8 @@ describe("controllers/object-stores", () => {
         `/object-store?userId=${store.userId}&limit=11`
       );
       const objStores = await res.json();
-      expect(res.headers._headers.link).toBeDefined();
-      expect(res.headers._headers.link.length).toBe(1);
+      expect(res.headers.raw().link).toBeDefined();
+      expect(res.headers.raw().link.length).toBe(1);
       expect(objStores.length).toEqual(11);
     });
 

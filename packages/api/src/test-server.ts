@@ -5,7 +5,6 @@ import fs from "fs-extra";
 import { v4 as uuid } from "uuid";
 import path from "path";
 import os from "os";
-import "isomorphic-fetch";
 
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
