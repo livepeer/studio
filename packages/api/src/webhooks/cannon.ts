@@ -22,6 +22,7 @@ const MAX_RETRIES = 20;
 export interface WebhookMessage {
   id: string;
   event: DBWebhook["events"][0];
+  createdAt: number,
   userId: string;
   streamId: string;
   payload?: Object;
@@ -158,6 +159,7 @@ export default class WebhookCannon {
       );
     } else {
       console.log("preparing to fire webhook ", webhook.url);
+      const timestamp = Date.now();
       // go ahead
       let params = {
         method: "POST",
@@ -167,7 +169,11 @@ export default class WebhookCannon {
         },
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({
-          id: webhook.id,
+          id: event.id, // this will allow receiver to check if it is already received same hook
+                        // (possible when retrying)
+          webhookId: webhook.id,
+          createdAt: event.createdAt, // that way receiver will know how long ago event was emitted
+          timestamp,
           event: event.event,
           stream: sanitized,
           payload: event.payload,

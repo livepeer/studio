@@ -995,7 +995,8 @@ describe("controllers/stream", () => {
             { name: "soccer", probability: 0.7 },
             { name: "adult", probability: 0.68 },
           ];
-          await server.db.webhook.create(genMockWebhook());
+          const webhookObj = await server.db.webhook.create(genMockWebhook());
+          const now = Date.now();
           res = await client.post("/stream/hook/detection", {
             manifestID: stream.playbackId,
             seqNo: 1,
@@ -1004,8 +1005,13 @@ describe("controllers/stream", () => {
           expect(res.status).toBe(204);
 
           await hookSem.wait(1000);
+          expect(hookPayload.createdAt).toBeGreaterThanOrEqual(now);
+          expect(hookPayload.timestamp).toBeGreaterThanOrEqual(now);
+          delete hookPayload.createdAt;
+          delete hookPayload.timestamp;
           expect(hookPayload).toEqual({
             id: expect.stringMatching(uuidRegex),
+            webhookId: webhookObj.id,
             event: "stream.detection",
             stream: { ...stream, streamKey: undefined },
             payload: { sceneClassification, seqNo: 1 },
