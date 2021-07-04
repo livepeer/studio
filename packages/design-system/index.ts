@@ -1,5 +1,3 @@
-import { HoverCard } from "./components/HoverCard";
-
 export {
   Alert,
   Avatar,
@@ -82,7 +80,6 @@ export {
   TabsList,
   TabsPanel,
   TabsTab,
-  Text,
   TextArea,
   Tooltip,
   TreeItem,
@@ -116,6 +113,7 @@ export { Link } from "./components/Link";
 export { Banner } from "./components/Banner";
 export { Promo } from "./components/Promo";
 export { Label } from "./components/Label";
+export { Text } from "./components/Text";
 export { TextField } from "./components/TextField";
 export {
   DropdownMenuItem,
@@ -123,7 +121,11 @@ export {
 } from "./components/DropdownMenu";
 export { SnackbarProvider, useSnackbar } from "./components/Snackbar";
 export { Switch } from "./components/Switch";
-export * as HoverCard from "./components/HoverCard";
+export {
+  Root as HoverCardRoot,
+  Trigger as HoverCardTrigger,
+  Content as HoverCardContent,
+} from "@radix-ui/react-hover-card";
 
 // Stitches
 export {

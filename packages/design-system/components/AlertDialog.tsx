@@ -2,8 +2,6 @@ import { Root, Overlay, Content } from "@radix-ui/react-alert-dialog";
 import { keyframes, styled } from "../stitches.config";
 import React from "react";
 
-import type * as Polymorphic from "@radix-ui/react-polymorphic";
-
 type AlertDialogProps = React.ComponentProps<typeof Root> & {
   children: React.ReactNode;
 };
@@ -107,9 +105,9 @@ export const AlertDialogContent = ({
 );
 
 export {
-  Trigger as AlertDialogTrigger,
-  Title as AlertDialogTitle,
-  Description as AlertDialogDescription,
-  Action as AlertDialogAction,
-  Cancel as AlertDialogCancel,
+  AlertDialogTrigger,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
 } from "@radix-ui/react-alert-dialog";
