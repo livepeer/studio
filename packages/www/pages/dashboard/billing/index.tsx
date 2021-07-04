@@ -5,6 +5,7 @@ import {
   Heading,
   Badge,
   Flex,
+  Text,
   Link as A,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
@@ -135,7 +136,7 @@ const Billing = () => {
             justify="between"
             align="center"
             css={{ fontSize: "$3", color: "$hiContrast" }}>
-            <Box>
+            <Text variant="gray">
               You are currently on the
               <Badge
                 size="1"
@@ -146,7 +147,7 @@ const Billing = () => {
                   : products["prod_0"].name}
               </Badge>
               plan.
-            </Box>
+            </Text>
             <Link href="/dashboard/billing/plans" passHref>
               <A
                 variant="violet"
@@ -222,16 +223,16 @@ const Billing = () => {
             </Heading>
           </Flex>
           {!products[user.stripeProductId].order ? (
-            <Box
-              sx={{
+            <Text
+              variant="gray"
+              css={{
                 maxWidth: 600,
                 mx: "auto",
                 textAlign: "center",
-                color: "offBlack",
               }}>
               The Personal plan is free of charge up to 1000 minutes per month
               and limited to 10 concurrent viewers per account
-            </Box>
+            </Text>
           ) : (
             subscription && (
               <UpcomingInvoiceTable

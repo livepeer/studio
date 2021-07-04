@@ -66,7 +66,7 @@ const Sidebar = ({ id }) => {
               alt={user?.firstName}
               fallback={user?.firstName.charAt(0)}
             />
-            <Text size="$3" css={{ ml: "$2", fontSize: "$3", mr: "$1" }}>
+            <Text size="3" css={{ ml: "$2", fontSize: "$3", mr: "$1" }}>
               {user?.firstName}
             </Text>
             <ChevronDownIcon width={20} height={20} />

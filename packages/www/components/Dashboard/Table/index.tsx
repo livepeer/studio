@@ -325,7 +325,7 @@ const TableComponent = <T extends Record<string, unknown>>({
                 width: "100%",
                 minWidth: "100%",
                 borderCollapse: "collapse",
-                borderSpacing: 0,
+                borderSpacing: "$3",
               }}>
               <Thead>
                 {headerGroups.map((headerGroup) => (

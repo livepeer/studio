@@ -6,6 +6,7 @@ import {
   Heading,
   TextField,
   Label,
+  Text,
   Button,
   AlertDialog,
   AlertDialogTitle,
@@ -393,7 +394,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   </Box>
                 </Box>
               ) : (
-                <Box>
+                <Text variant="gray">
                   You are currently using the{" "}
                   {products[user.stripeProductId].name} plan. Do you want to{" "}
                   {products[stripeProductId].order <
@@ -401,7 +402,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     ? "downgrade"
                     : "upgrade"}{" "}
                   to the {products[stripeProductId].name} plan?
-                </Box>
+                </Text>
               )}
             </AlertDialogDescription>
 
@@ -427,7 +428,6 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 {status === "processing" && (
                   <Spinner
                     css={{
-                      color: "$hiContrast",
                       width: 16,
                       height: 16,
                       mr: "$2",

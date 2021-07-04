@@ -11,6 +11,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
   Link as A,
+  HoverCardRoot,
+  HoverCardContent,
+  HoverCardTrigger,
   useSnackbar,
   Text,
 } from "@livepeer.com/design-system";
@@ -97,31 +100,41 @@ const TokenTable = ({
     const [keyRevealed, setKeyRevealed] = useState(false);
 
     return (
-      <Box css={{ minWidth: 300 }}>
+      <Box>
         {keyRevealed ? (
-          <Flex css={{ height: 25, ai: "center" }}>
-            {token.id}
-            <CopyToClipboard text={token.id} onCopy={() => setCopied(2000)}>
-              <Flex
-                css={{
-                  alignItems: "center",
-                  cursor: "pointer",
-                  ml: "$1",
-                }}>
-                <Copy />
-                {!!isCopied && (
+          <HoverCardRoot openDelay={200}>
+            <HoverCardTrigger>
+              <Flex css={{ height: 25, ai: "center" }}>
+                <CopyToClipboard
+                  text={token.id}
+                  onCopy={() => openSnackbar("Copied to clipboard")}>
                   <Box
                     css={{
-                      ml: "$2",
-                      fontSize: "$2",
-                      color: "$hiContrast",
+                      fontFamily: "monospace",
+                      cursor: "pointer",
+                      fontSize: "$1",
                     }}>
-                    Copied
+                    {token.id}
                   </Box>
-                )}
+                </CopyToClipboard>
               </Flex>
-            </CopyToClipboard>
-          </Flex>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <Text
+                variant="gray"
+                css={{
+                  backgroundColor: "$panel",
+                  borderRadius: 6,
+                  px: "$3",
+                  py: "$1",
+                  fontSize: "$1",
+                  display: "flex",
+                  ai: "center",
+                }}>
+                <CopyIcon /> <Box css={{ ml: "$2" }}>Click to copy</Box>
+              </Text>
+            </HoverCardContent>
+          </HoverCardRoot>
         ) : (
           <Button size="1" type="button" onClick={() => setKeyRevealed(true)}>
             Reveal key

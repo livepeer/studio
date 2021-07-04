@@ -8,13 +8,47 @@ import {
   AlertDialogCancel,
   TextField,
   Label,
+  Text,
   Select,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuCheckboxItem,
   Heading,
+  styled,
   useSnackbar,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import Spinner from "@components/Dashboard/Spinner";
 import { Webhook } from "@livepeer.com/api";
+import { Cross1Icon } from "@radix-ui/react-icons";
+
+const StyledCrossIcon = styled(Cross1Icon, {
+  cursor: "pointer",
+});
+
+const StyledContent = styled(DropdownMenuContent, {
+  minWidth: 400,
+  top: -15,
+  position: "relative",
+  borderLeft: "1px solid $colors$slate7",
+  borderRight: "1px solid $colors$slate7",
+  borderBottom: "1px solid $colors$slate7",
+  backgroundColor: "$loContrast",
+  borderBottomLeftRadius: 6,
+  borderBottomRightRadius: 6,
+  borderTopRightRadius: 0,
+  borderTopLeftRadius: 0,
+  boxShadow: "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
+});
+
+const eventOptions = [
+  { value: "stream.started", label: "stream.started" },
+  { value: "stream.ended", label: "stream.idle" },
+  { value: "stream.detection", label: "stream.detection" },
+  { value: "recording.ready", label: "recording.ready" },
+];
 
 export enum Action {
   Create = "Create",
@@ -48,7 +82,8 @@ const WebhookDialog = ({
   const [webhookName, setWebhookName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [openSnackbar] = useSnackbar();
-
+  const [events, setEvents] = useState([]);
+  console.log(events);
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
@@ -61,6 +96,12 @@ const WebhookDialog = ({
 
         <Box
           as="form"
+          css={{
+            "[data-radix-popper-wrapper]": {
+              transform: "none !important",
+              zIndex: 2,
+            },
+          }}
           onSubmit={async (e) => {
             e.preventDefault();
             if (saving) {
@@ -91,7 +132,7 @@ const WebhookDialog = ({
               autoFocus={true}
               defaultValue={Action.Update ? webhook?.name : ""}
               onChange={(e) => setWebhookName(e.target.value)}
-              placeholder="My Webhook"
+              placeholder="A name to identify your webhook"
             />
 
             <Label htmlFor="url">URL</Label>
@@ -105,10 +146,94 @@ const WebhookDialog = ({
               onChange={(e) => setWebhookUrl(e.target.value)}
             />
             <Label htmlFor="events">Event types</Label>
-            <Select css={{ p: "$1" }} id="events" name="events">
-              <Box as="option">stream.started</Box>
-              <Box as="option">stream.ended</Box>
-            </Select>
+
+            <DropdownMenu
+              css={{
+                width: "100%",
+                top: 50,
+              }}>
+              <DropdownMenuTrigger as={Box}>
+                <Select disabled css={{ fontSize: "$3", p: "$1" }}>
+                  <Box as="option" value="" disabled selected>
+                    Select events...
+                  </Box>
+                </Select>
+              </DropdownMenuTrigger>
+              <Box css={{ position: "relative" }}>
+                <StyledContent
+                  disableOutsidePointerEvents={false}
+                  css={{ transform: "none" }}
+                  portalled={false}>
+                  <DropdownMenuGroup>
+                    {eventOptions.map((option, i) => (
+                      <DropdownMenuCheckboxItem
+                        key={i}
+                        checked={events.includes(option.value)}
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          if (events.includes(option.value)) {
+                            setEvents(
+                              events.filter((item) => item !== option.value)
+                            );
+                          } else {
+                            setEvents([...events, option.value]);
+                          }
+                          return;
+                        }}>
+                        {option.label}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </StyledContent>
+              </Box>
+            </DropdownMenu>
+
+            <Flex
+              align="center"
+              direction="column"
+              justify={events.length > 0 ? "start" : "center"}
+              css={{
+                width: "100%",
+                borderRadius: 6,
+                height: 200,
+                border: "1px solid $colors$mauve7",
+                backgroundColor: "$mauve2",
+                mt: "-3px",
+                zIndex: 1,
+              }}>
+              {events.length > 0 ? (
+                events.map((event, i) => (
+                  <Flex
+                    key={i}
+                    justify="between"
+                    align="center"
+                    css={{
+                      width: "100%",
+                      borderBottom: "1px solid $colors$mauve5",
+                      p: "$2",
+                      fontSize: "$2",
+                      color: "$hiContrast",
+                    }}>
+                    {event}
+                    <StyledCrossIcon
+                      onClick={() => {
+                        setEvents(events.filter((item) => item !== event));
+                      }}
+                    />
+                  </Flex>
+                ))
+              ) : (
+                <Flex
+                  direction="column"
+                  css={{ just: "center" }}
+                  align="center">
+                  <Text css={{ fontWeight: 600 }}>No events selected</Text>
+                  <Text variant="gray">
+                    Search for events with the dropdown above.
+                  </Text>
+                </Flex>
+              )}
+            </Flex>
           </Flex>
           <Box>
             <Flex css={{ ai: "center", jc: "flex-end" }}>

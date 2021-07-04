@@ -235,7 +235,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       }}>
       <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-        Sessions belong to a single parent stream.
+        Stream sessions belong to parent streams.
       </Text>
       <Link href="/docs/api-reference/session/session" passHref>
         <A variant="violet" css={{ mb: "$5", display: "block" }}>
