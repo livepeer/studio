@@ -31,12 +31,12 @@ import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/stre
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { QuestionMarkIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import ActiveStreamsBadge from "@components/ActiveStreamsBadge";
+import ActiveStreamsBadge from "components/Dashboard/ActiveStreamsBadge";
 
 type ProfileProps = {
   id: string;

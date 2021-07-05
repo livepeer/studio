@@ -12,10 +12,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { products } from "@livepeer.com/api/src/config";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import PaymentMethodDialog from "@components/Dashboard/PaymentMethodDialog";
-import PaymentMethod from "@components/Dashboard/PaymentMethod";
-import UpcomingInvoiceTable from "@components/Dashboard/UpcomingInvoiceTable";
-import PastInvoicesTable from "@components/Dashboard/PastInvoicesTable";
+import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
+import PaymentMethod from "components/Dashboard/PaymentMethod";
+import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
+import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
 
 const Billing = () => {
   useLoggedIn();

@@ -29,7 +29,7 @@ import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { CopyIcon } from "@radix-ui/react-icons";
 import CreateTokenDialog from "./CreateTokenDialog";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
 import Link from "next/link";
 

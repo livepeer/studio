@@ -16,10 +16,10 @@ import {
 import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
-import WebhookDialog, { Action } from "@components/Dashboard/WebhookDialog";
+import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 

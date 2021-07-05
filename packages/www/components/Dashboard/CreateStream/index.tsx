@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useApi } from "../../../hooks";
 import { useRouter } from "next/router";
 import { PlusIcon } from "@radix-ui/react-icons";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 const StyledPlusIcon = styled(PlusIcon, {
   mr: "$1",

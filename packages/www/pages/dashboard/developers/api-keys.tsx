@@ -1,7 +1,7 @@
 import Layout from "../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import TokenTable from "@components/Dashboard/TokenTable";
+import TokenTable from "components/Dashboard/TokenTable";
 
 const ApiKeys = () => {
   useLoggedIn();

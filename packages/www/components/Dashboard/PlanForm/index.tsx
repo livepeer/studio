@@ -20,7 +20,7 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi } from "hooks";
 import { products } from "@livepeer.com/api/src/config";
 import { useForm } from "react-hook-form";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { useTheme } from "next-themes";
 
 const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {

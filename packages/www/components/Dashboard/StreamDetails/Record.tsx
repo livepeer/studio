@@ -16,7 +16,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { setRecord } = useApi();

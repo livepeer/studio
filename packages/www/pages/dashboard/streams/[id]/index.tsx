@@ -34,10 +34,10 @@ import {
 } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import Player from "components/Dashboard/Player";
-import Record from "@components/Dashboard/StreamDetails/Record";
-import Terminate from "@components/Dashboard/StreamDetails/Terminate";
-import Suspend from "@components/Dashboard/StreamDetails/Suspend";
-import Delete from "@components/Dashboard/StreamDetails/Delete";
+import Record from "components/Dashboard/StreamDetails/Record";
+import Terminate from "components/Dashboard/StreamDetails/Terminate";
+import Suspend from "components/Dashboard/StreamDetails/Suspend";
+import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "react-query";
 

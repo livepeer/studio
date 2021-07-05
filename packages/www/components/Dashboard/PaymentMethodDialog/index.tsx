@@ -15,7 +15,7 @@ import {
   AlertDialogAction,
   useSnackbar,
 } from "@livepeer.com/design-system";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi } from "hooks";
 import { useForm } from "react-hook-form";

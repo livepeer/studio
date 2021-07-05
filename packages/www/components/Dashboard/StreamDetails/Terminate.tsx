@@ -14,7 +14,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 const Terminate = ({ stream, invalidate, ...props }) => {
   const initialMessage = `Are you sure you want to terminate (stop running live) stream

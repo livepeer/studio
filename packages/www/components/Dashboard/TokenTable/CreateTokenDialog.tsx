@@ -14,7 +14,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useApi } from "../../../hooks";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ApiToken } from "../../../../api/src/schema/types";
 

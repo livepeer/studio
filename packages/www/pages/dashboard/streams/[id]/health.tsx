@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import { useApi } from "../../../../hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api";
-import Chart from "@components/Dashboard/Chart";
-import Player from "@components/Dashboard/Player";
+import Chart from "components/Dashboard/Chart";
+import Player from "components/Dashboard/Player";
 
 const Arrow = ({ active }: Props) => {
   return (

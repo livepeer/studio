@@ -37,7 +37,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon } from "@radix-ui/react-icons";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");

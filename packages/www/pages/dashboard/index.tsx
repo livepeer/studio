@@ -7,9 +7,9 @@ import {
   Text,
   Promo,
 } from "@livepeer.com/design-system";
-import GettingStarted from "@components/Dashboard/GettingStarted";
-import UsageSummary from "@components/Dashboard/UsageSummary";
-import StreamsTable from "@components/Dashboard/StreamsTable";
+import GettingStarted from "components/Dashboard/GettingStarted";
+import UsageSummary from "components/Dashboard/UsageSummary";
+import StreamsTable from "components/Dashboard/StreamsTable";
 import { useLoggedIn, useApi } from "hooks";
 import InfoIcon from "../../public/img/icons/info.svg";
 import Link from "next/link";

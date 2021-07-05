@@ -28,9 +28,9 @@ import TableFilter, {
   Filter as TFilter,
   formatFiltersForApiRequest,
 } from "./filters";
-import { ButtonProps } from "@components/Button";
+import { ButtonProps } from "components/Button";
 import Link from "next/link";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 

@@ -13,7 +13,7 @@ import {
   Box,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
 const Delete = ({ total, onUnselect, onDelete }) => {

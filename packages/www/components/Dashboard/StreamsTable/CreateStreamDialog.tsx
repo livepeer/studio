@@ -13,7 +13,7 @@ import {
   Label,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
-import Spinner from "@components/Dashboard/Spinner";
+import Spinner from "components/Dashboard/Spinner";
 
 const CreateStreamDialog = ({
   isOpen,
