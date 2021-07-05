@@ -19,7 +19,7 @@ import {
   styled,
   useSnackbar,
 } from "@livepeer.com/design-system";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Spinner from "@components/Dashboard/Spinner";
 import { Webhook } from "@livepeer.com/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
@@ -44,10 +44,10 @@ const StyledContent = styled(DropdownMenuContent, {
 });
 
 const eventOptions = [
-  { value: "stream.started", label: "stream.started" },
-  { value: "stream.ended", label: "stream.idle" },
-  { value: "stream.detection", label: "stream.detection" },
-  { value: "recording.ready", label: "recording.ready" },
+  "stream.started",
+  "stream.idle",
+  "stream.detection",
+  "recording.ready",
 ];
 
 export enum Action {
@@ -69,11 +69,11 @@ const WebhookDialog = ({
   webhook?: Webhook;
   onOpenChange: (isOpen: boolean) => void;
   onSubmit: ({
-    event,
+    events,
     name,
     url,
   }: {
-    event: string;
+    events: string[];
     name: string;
     url: string;
   }) => Promise<void>;
@@ -83,7 +83,13 @@ const WebhookDialog = ({
   const [webhookUrl, setWebhookUrl] = useState("");
   const [openSnackbar] = useSnackbar();
   const [events, setEvents] = useState([]);
-  console.log(events);
+  console.log("wat", events);
+  useEffect(() => {
+    if (webhook) {
+      setEvents(webhook.events);
+    }
+  }, [webhook]);
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
@@ -110,7 +116,7 @@ const WebhookDialog = ({
             setSaving(true);
             try {
               await onSubmit({
-                event: "stream.started",
+                events,
                 name: webhookName,
                 url: webhookUrl,
               });
@@ -165,22 +171,20 @@ const WebhookDialog = ({
                   css={{ transform: "none" }}
                   portalled={false}>
                   <DropdownMenuGroup>
-                    {eventOptions.map((option, i) => (
+                    {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
                         key={i}
-                        checked={events.includes(option.value)}
+                        checked={events.includes(event)}
                         onSelect={(e) => {
                           e.preventDefault();
-                          if (events.includes(option.value)) {
-                            setEvents(
-                              events.filter((item) => item !== option.value)
-                            );
+                          if (events.includes(event)) {
+                            setEvents(events.filter((item) => item !== event));
                           } else {
-                            setEvents([...events, option.value]);
+                            setEvents([...events, event]);
                           }
                           return;
                         }}>
-                        {option.label}
+                        {event}
                       </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuGroup>
@@ -217,7 +221,7 @@ const WebhookDialog = ({
                     {event}
                     <StyledCrossIcon
                       onClick={() => {
-                        setEvents(events.filter((item) => item !== event));
+                        setEvents(events.filter((e) => e !== event));
                       }}
                     />
                   </Flex>

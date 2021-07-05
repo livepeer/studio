@@ -284,9 +284,9 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onSubmit={async ({ event, name, url }) => {
+        onSubmit={async ({ events, name, url }) => {
           const newWebhook = await createWebhook({
-            event,
+            events,
             name,
             url,
           });

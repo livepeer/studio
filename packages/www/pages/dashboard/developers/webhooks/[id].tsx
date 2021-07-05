@@ -10,6 +10,7 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogAction,
+  Badge,
   styled,
 } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
@@ -157,10 +158,11 @@ const ApiKeys = () => {
                     action={Action.Update}
                     isOpen={dialogState.on}
                     onOpenChange={dialogState.onToggle}
-                    onSubmit={async ({ event, name, url }) => {
+                    onSubmit={async ({ events, name, url }) => {
+                      delete data.event; // remove deprecated field before updating
                       await updateWebhook(data.id, {
                         ...data,
-                        event: event ? event : data.event,
+                        events: events ? events : data.events,
                         name: name ? name : data.name,
                         url: url ? url : data.url,
                       });
@@ -190,7 +192,16 @@ const ApiKeys = () => {
                 <Cell variant="gray">Created</Cell>
                 <Cell>{data.createdAt}</Cell>
                 <Cell variant="gray">Event types</Cell>
-                <Cell css={{ fontFamily: "monospace" }}>{data.event}</Cell>
+                <Cell css={{ display: "flex", fontFamily: "monospace" }}>
+                  {data.events.map((e) => (
+                    <Badge
+                      size="1"
+                      variant="violet"
+                      css={{ fontWeight: 600, mr: "$1" }}>
+                      {e}
+                    </Badge>
+                  ))}
+                </Cell>
               </Box>
             </Box>
           )}
