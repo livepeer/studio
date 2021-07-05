@@ -17,9 +17,7 @@ import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 import Router from "next/router";
 
-const queryKey = "streamsIdQueryKey";
-
-const Delete = ({ stream, revalidate, ...props }) => {
+const Delete = ({ stream, revalidate, queryKey, ...props }) => {
   const { deleteStream } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);

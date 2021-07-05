@@ -39,8 +39,6 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const queryKey = "webhooksApiKeys";
-
 const ApiKeys = () => {
   useLoggedIn();
   const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
@@ -123,7 +121,7 @@ const ApiKeys = () => {
                             setDeleting(true);
                             await deleteWebhook(data.id);
                             setDeleting(false);
-                            await queryClient.invalidateQueries(queryKey);
+                            await queryClient.invalidateQueries(id);
                             setDeleteDialogOpen(false);
                             router.push("/dashboard/developers/webhooks");
                           }}
@@ -163,7 +161,7 @@ const ApiKeys = () => {
                         name: name ? name : data.name,
                         url: url ? url : data.url,
                       });
-                      await queryClient.invalidateQueries(queryKey);
+                      await queryClient.invalidateQueries(id);
                     }}
                   />
                 </Flex>

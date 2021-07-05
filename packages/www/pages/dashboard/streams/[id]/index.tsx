@@ -347,14 +347,17 @@ const ID = () => {
                       stream={stream}
                       revalidate={queryClient.invalidateQueries}
                       isSwitch={false}
+                      queryKey={id}
                     />
                     <Suspend
                       stream={stream}
                       revalidate={queryClient.invalidateQueries}
+                      queryKey={id}
                     />
                     <Delete
                       stream={stream}
                       revalidate={queryClient.invalidateQueries}
+                      queryKey={id}
                     />
 
                     {userIsAdmin && stream.isActive && (
@@ -455,6 +458,7 @@ const ID = () => {
                           <Record
                             stream={stream}
                             revalidate={queryClient.invalidateQueries}
+                            queryKey={id}
                           />
                         </Box>
                         <Tooltip

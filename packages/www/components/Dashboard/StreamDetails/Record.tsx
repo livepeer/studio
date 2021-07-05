@@ -18,9 +18,7 @@ import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 
-const queryKey = "streamsIdQueryKey";
-
-const Record = ({ stream, revalidate, isSwitch = true }) => {
+const Record = ({ stream, revalidate, queryKey, isSwitch = true }) => {
   const { setRecord } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
