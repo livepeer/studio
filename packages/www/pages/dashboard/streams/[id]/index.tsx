@@ -22,15 +22,10 @@ import useLoggedIn from "../../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
-import { useApi, usePageVisibility } from "../../../../hooks";
+import { useApi } from "../../../../hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
-import {
-  pathJoin,
-  isStaging,
-  isDevelopment,
-  formatNumber,
-} from "../../../../lib/utils";
+import { isStaging } from "../../../../lib/utils";
 import { RelativeTime } from "components/CommonAdminTable";
 import {
   CopyIcon as Copy,
@@ -44,7 +39,6 @@ import Terminate from "@components/Dashboard/StreamDetails/Terminate";
 import Suspend from "@components/Dashboard/StreamDetails/Suspend";
 import Delete from "@components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
-import useSWR from "swr";
 import { useQuery, useQueryClient } from "react-query";
 
 type TimedAlertProps = {
@@ -198,6 +192,10 @@ const ID = () => {
   const { data: stream } = useQuery([id], () => fetcher());
   const queryClient = useQueryClient();
 
+  const invalidateQuery = useCallback(() => {
+    return queryClient.invalidateQueries(id);
+  }, [queryClient, id]);
+
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
       setLastSessionLoading(true);
@@ -345,20 +343,11 @@ const ID = () => {
                   <DropdownMenuGroup>
                     <Record
                       stream={stream}
-                      revalidate={queryClient.invalidateQueries}
+                      invalidate={invalidateQuery}
                       isSwitch={false}
-                      queryKey={id}
                     />
-                    <Suspend
-                      stream={stream}
-                      revalidate={queryClient.invalidateQueries}
-                      queryKey={id}
-                    />
-                    <Delete
-                      stream={stream}
-                      revalidate={queryClient.invalidateQueries}
-                      queryKey={id}
-                    />
+                    <Suspend stream={stream} invalidate={invalidateQuery} />
+                    <Delete stream={stream} invalidate={invalidateQuery} />
 
                     {userIsAdmin && stream.isActive && (
                       <>
@@ -366,7 +355,7 @@ const ID = () => {
                         <DropdownMenuLabel>Admin only</DropdownMenuLabel>
                         <Terminate
                           stream={stream}
-                          revalidate={queryClient.invalidateQueries}
+                          invalidate={invalidateQuery}
                         />
                       </>
                     )}
@@ -457,8 +446,7 @@ const ID = () => {
                         <Box css={{ mr: "$2" }}>
                           <Record
                             stream={stream}
-                            revalidate={queryClient.invalidateQueries}
-                            queryKey={id}
+                            invalidate={invalidateQuery}
                           />
                         </Box>
                         <Tooltip

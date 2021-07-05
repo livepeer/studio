@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 
-const Terminate = ({ stream, revalidate, ...props }) => {
+const Terminate = ({ stream, invalidate, ...props }) => {
   const initialMessage = `Are you sure you want to terminate (stop running live) stream
     ${stream.name}? Terminating a stream will break RTMPconnection.`;
 
@@ -67,7 +67,7 @@ const Terminate = ({ stream, revalidate, ...props }) => {
               try {
                 setSaving(true);
                 await terminateStream(stream.id);
-                revalidate();
+                await invalidate();
                 setSaving(false);
                 setOpen(false);
               } catch (e) {

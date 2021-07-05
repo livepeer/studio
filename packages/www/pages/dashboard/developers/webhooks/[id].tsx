@@ -54,8 +54,11 @@ const ApiKeys = () => {
   }, [id]);
 
   const { data } = useQuery([id], () => fetcher());
-
   const queryClient = useQueryClient();
+
+  const invalidateQuery = useCallback(() => {
+    return queryClient.invalidateQueries(id);
+  }, [queryClient, id]);
 
   return !user || user.emailValid === false ? null : (
     <Layout
@@ -120,8 +123,8 @@ const ApiKeys = () => {
                           onClick={async () => {
                             setDeleting(true);
                             await deleteWebhook(data.id);
+                            await invalidateQuery();
                             setDeleting(false);
-                            await queryClient.invalidateQueries(id);
                             setDeleteDialogOpen(false);
                             router.push("/dashboard/developers/webhooks");
                           }}
@@ -161,7 +164,7 @@ const ApiKeys = () => {
                         name: name ? name : data.name,
                         url: url ? url : data.url,
                       });
-                      await queryClient.invalidateQueries(id);
+                      await invalidateQuery();
                     }}
                   />
                 </Flex>
