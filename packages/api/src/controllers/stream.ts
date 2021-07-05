@@ -1401,6 +1401,7 @@ app.post(
     const msg: WebhookMessage = {
       id: uuid(),
       event: "stream.detection",
+      createdAt: Date.now(),
       streamId: stream.id,
       userId: stream.userId,
       payload: {
