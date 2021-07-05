@@ -66,7 +66,7 @@ const Suspend = ({ stream, revalidate }) => {
               setSaving(true);
               const newValue = !stream.suspended;
               await suspendStream(stream.id, newValue);
-              revalidate(queryKey ?? "");
+              revalidate(queryKey);
               setSaving(false);
               setOpen(false);
             }}>

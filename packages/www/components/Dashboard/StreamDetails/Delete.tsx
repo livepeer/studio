@@ -66,7 +66,7 @@ const Delete = ({ stream, revalidate, ...props }) => {
                 setSaving(true);
                 await deleteStream(stream.id);
                 Router.replace("/dashboard");
-                revalidate(queryKey ?? "");
+                revalidate(queryKey);
                 setSaving(false);
                 setOpen(false);
               } catch (e) {

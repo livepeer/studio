@@ -36,7 +36,7 @@ const Record = ({ stream, revalidate, isSwitch = true }) => {
           onCheckedChange={async () => {
             if (!stream.record) {
               await setRecord(stream.id, true);
-              revalidate(queryKey ?? "");
+              revalidate(queryKey);
               openSnackbar("Recording has been turned on.");
             } else {
               setOpen(true);
@@ -50,7 +50,7 @@ const Record = ({ stream, revalidate, isSwitch = true }) => {
             e.preventDefault();
             if (!stream.record) {
               await setRecord(stream.id, true);
-              revalidate(queryKey ?? "");
+              revalidate(queryKey);
               openSnackbar("Recording has been turned on.");
             } else {
               setOpen(true);
@@ -89,7 +89,7 @@ const Record = ({ stream, revalidate, isSwitch = true }) => {
             onClick={async () => {
               setSaving(true);
               await setRecord(stream.id, !stream.record);
-              revalidate(queryKey ?? "");
+              revalidate(queryKey);
               openSnackbar("Recording has been turned off.");
               setSaving(false);
               setOpen(false);
