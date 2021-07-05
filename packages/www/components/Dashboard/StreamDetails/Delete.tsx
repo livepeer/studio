@@ -17,6 +17,8 @@ import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
 import Router from "next/router";
 
+const queryKey = "streamsIdQueryKey";
+
 const Delete = ({ stream, revalidate, ...props }) => {
   const { deleteStream } = useApi();
   const [saving, setSaving] = useState(false);
@@ -64,7 +66,7 @@ const Delete = ({ stream, revalidate, ...props }) => {
                 setSaving(true);
                 await deleteStream(stream.id);
                 Router.replace("/dashboard");
-                revalidate();
+                revalidate(queryKey ?? "");
                 setSaving(false);
                 setOpen(false);
               } catch (e) {

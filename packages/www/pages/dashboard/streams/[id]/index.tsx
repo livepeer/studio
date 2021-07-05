@@ -345,16 +345,16 @@ const ID = () => {
                   <DropdownMenuGroup>
                     <Record
                       stream={stream}
-                      revalidate={queryClient.invalidateQueries()}
+                      revalidate={queryClient.invalidateQueries}
                       isSwitch={false}
                     />
                     <Suspend
                       stream={stream}
-                      revalidate={queryClient.invalidateQueries()}
+                      revalidate={queryClient.invalidateQueries}
                     />
                     <Delete
                       stream={stream}
-                      revalidate={queryClient.invalidateQueries()}
+                      revalidate={queryClient.invalidateQueries}
                     />
 
                     {userIsAdmin && stream.isActive && (
@@ -363,7 +363,7 @@ const ID = () => {
                         <DropdownMenuLabel>Admin only</DropdownMenuLabel>
                         <Terminate
                           stream={stream}
-                          revalidate={queryClient.invalidateQueries()}
+                          revalidate={queryClient.invalidateQueries}
                         />
                       </>
                     )}
@@ -454,7 +454,7 @@ const ID = () => {
                         <Box css={{ mr: "$2" }}>
                           <Record
                             stream={stream}
-                            revalidate={queryClient.invalidateQueries()}
+                            revalidate={queryClient.invalidateQueries}
                           />
                         </Box>
                         <Tooltip
