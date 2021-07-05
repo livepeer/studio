@@ -10,19 +10,17 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogTrigger,
   styled,
 } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
-import useSWR from "swr";
 import WebhookDialog, { Action } from "@components/Dashboard/WebhookDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
 import Spinner from "@components/Dashboard/Spinner";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "react-query";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -55,8 +53,13 @@ const ApiKeys = () => {
     return webhook;
   }, [id]);
 
-  const { data, revalidate } = useSWR([id], () => fetcher());
-  console.log(data);
+  const { data } = useQuery([id], () => fetcher());
+  const queryClient = useQueryClient();
+
+  const invalidateQuery = useCallback(() => {
+    return queryClient.invalidateQueries(id);
+  }, [queryClient, id]);
+
   return !user || user.emailValid === false ? null : (
     <Layout
       id="developers/webhooks"
@@ -120,8 +123,8 @@ const ApiKeys = () => {
                           onClick={async () => {
                             setDeleting(true);
                             await deleteWebhook(data.id);
+                            await invalidateQuery();
                             setDeleting(false);
-                            revalidate();
                             setDeleteDialogOpen(false);
                             router.push("/dashboard/developers/webhooks");
                           }}
@@ -161,7 +164,7 @@ const ApiKeys = () => {
                         name: name ? name : data.name,
                         url: url ? url : data.url,
                       });
-                      await revalidate();
+                      await invalidateQuery();
                     }}
                   />
                 </Flex>
