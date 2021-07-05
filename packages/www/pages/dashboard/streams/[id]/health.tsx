@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api";
 import Chart from "components/Dashboard/Chart";
 import Player from "components/Dashboard/Player";
+import { isStaging } from "../../../../lib/utils";
 
 const Arrow = ({ active }: Props) => {
   return (
@@ -67,6 +68,7 @@ const Health = () => {
   const router = useRouter();
   const { query } = router;
   const id = query.id;
+  const domain = isStaging() ? "monster" : "com";
 
   const doGetInfo = useCallback(
     async (id: string) => {
@@ -128,7 +130,7 @@ const Health = () => {
     };
   }, [getIngestRate, info]);
 
-  const playbackUrl = `https://cdn.livepeer.monster/hls/${stream?.playbackId}/index.m3u8`;
+  const playbackUrl = `https://cdn.livepeer.${domain}/hls/${stream?.playbackId}/index.m3u8`;
 
   if (!stream) {
     return (
