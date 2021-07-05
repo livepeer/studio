@@ -31,6 +31,7 @@ import TableFilter, {
 import { ButtonProps } from "components/Button";
 import Link from "next/link";
 import Spinner from "components/Dashboard/Spinner";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -76,6 +77,7 @@ type Props<T extends Record<string, unknown>> = {
   state: State<T>;
   fetcher: Fetcher<T>;
   emptyState?: React.ReactNode;
+  viewAll?: string;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -92,6 +94,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   selectAction,
   createAction,
   emptyState,
+  viewAll,
 }: Props<T>) => {
   const queryKey = useMemo(() => {
     return [state.tableId, state.cursor, state.order, state.stringifiedFilters];
@@ -134,6 +137,7 @@ const TableComponent = <T extends Record<string, unknown>>({
         pageIndex: 0,
         ...(initialSortBy ? { sortBy: initialSortBy } : undefined),
       },
+      disableSortBy: !!viewAll,
       manualSortBy: false,
       autoResetFilters: false,
       autoResetSortBy: false,
@@ -271,7 +275,7 @@ const TableComponent = <T extends Record<string, unknown>>({
             </Flex>
           ) : (
             <>
-              {filterItems && (
+              {!viewAll && filterItems && (
                 <TableFilter
                   items={filterItems}
                   onDone={stateSetter.setFilters}
@@ -432,23 +436,31 @@ const TableComponent = <T extends Record<string, unknown>>({
             <Text>
               <b>{data?.count}</b> results
             </Text>
-            <Flex>
-              <Button
-                css={{ marginRight: "6px" }}
-                onClick={handlePreviousPage}
-                disabled={state.prevCursors.length <= 0}>
-                Previous
-              </Button>
-              <Button
-                onClick={handleNextPage}
-                disabled={
-                  state.nextCursor === "" ||
-                  // @ts-ignore
-                  state.pageSize >= parseFloat(data?.count)
-                }>
-                Next
-              </Button>
-            </Flex>
+            {viewAll ? (
+              <Link href={viewAll} passHref>
+                <A variant="violet" css={{ display: "flex", ai: "center" }}>
+                  <Box>View all</Box> <ArrowRightIcon />
+                </A>
+              </Link>
+            ) : (
+              <Flex>
+                <Button
+                  css={{ marginRight: "6px" }}
+                  onClick={handlePreviousPage}
+                  disabled={state.prevCursors.length <= 0}>
+                  Previous
+                </Button>
+                <Button
+                  onClick={handleNextPage}
+                  disabled={
+                    state.nextCursor === "" ||
+                    // @ts-ignore
+                    state.pageSize >= parseFloat(data?.count)
+                  }>
+                  Next
+                </Button>
+              </Flex>
+            )}
           </Flex>
         </Box>
       )}

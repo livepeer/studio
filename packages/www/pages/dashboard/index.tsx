@@ -64,6 +64,7 @@ const Dashboard = () => {
             userId={user.id}
             pageSize={5}
             tableId="dashboardStreamsTable"
+            viewAll="/dashboard/streams"
           />
         </Box>
       </Box>

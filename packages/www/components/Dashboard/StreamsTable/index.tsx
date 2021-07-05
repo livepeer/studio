@@ -338,6 +338,7 @@ const StreamsTable = ({
         rowSelection="all"
         filterItems={!viewAll && filterItems}
         emptyState={emptyState}
+        viewAll={viewAll}
         header={
           <Heading size="2">
             <Flex>
