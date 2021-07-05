@@ -54,6 +54,7 @@ const CreateStreamDialog = ({
           <Flex direction="column" gap="2">
             <Label htmlFor="firstName">Stream name</Label>
             <TextField
+              required
               size="2"
               type="text"
               id="firstName"
