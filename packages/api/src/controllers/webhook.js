@@ -222,7 +222,6 @@ app.delete("/", authMiddleware({}), async (req, res) => {
       errors: ["missing ids"],
     });
   }
-  const ids = req.body.ids;
 
   if (!req.user.admin) {
     const webhooks = await db.webhook.getMany(ids);
