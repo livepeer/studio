@@ -120,6 +120,22 @@ export function getRecordingUrl(
   session: DBSession,
   mp4 = false
 ) {
+async function triggerManyIdleStreamsWebhook (ids, queue) {
+  return Promise.all(ids.map(async (id) => {
+    const stream = await db.stream.get(id);
+    const user = await db.user.get(stream.userId);
+    queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.idle",
+      streamId: stream.id,
+      userId: user.id,
+    });
+  }));
+}
+
+export function getRecordingUrl(ingest, session, mp4 = false) {
   return pathJoin(
     ingest,
     `recordings`,
@@ -921,6 +937,13 @@ app.patch(
     let upRes: QueryResult;
     try {
       upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
+      
+      // trigger the webhooks
+      try {
+        await triggerManyIdleStreamsWebhook(req.body.ids, req.queue);
+      } catch (err) {
+        console.error(`error while triggering the many idle webhooks`, err)
+      }
 
       if (upRes.rowCount) {
         console.log(
