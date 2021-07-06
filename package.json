@@ -19,7 +19,8 @@
     "coverage": "lerna run coverage --ignore @livepeer.com/www --ignore @livepeer.com/admin && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
     "depcheck": "lerna exec --no-sort --concurrency=1 --stream 'depcheck --specials=bin --ignores='babel-*' .'",
     "docs": "lerna run docs && lerna run copy-docs && cp README.md docs/README.md",
-    "prepare": "lerna run prepare --stream --ignore @livepeer.com/www --ignore @livepeer.com/admin && lerna run build --stream",
+    "prepare": "run-s prettier:check prepare:lerna",
+    "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.com/www --ignore @livepeer.com/admin && lerna run build --stream",
     "lerna-run": "lerna run --stream",
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
@@ -35,7 +36,9 @@
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "postinstall": "lerna run --stream postinstall",
-    "prettier": "prettier --write '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'"
+    "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
+    "prettier": "yarn run prettier:base --write",
+    "prettier:check": "yarn run prettier:base --check"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
