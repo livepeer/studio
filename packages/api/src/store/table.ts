@@ -67,7 +67,7 @@ export default class Table<T extends DBObject> {
     }
     let res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       {
-        name: `${this.name}_by_ids`,
+        name: `${this.name}_by_ids_${ids.length}`,
         text: `SELECT data FROM ${this.name}  WHERE id IN (${ids
           .map((_, i) => "$" + (i + 1))
           .join(",")})`,
@@ -261,7 +261,8 @@ export default class Table<T extends DBObject> {
 
   async markDeletedMany(ids: Array<string>) {
     const res = await this.db.query(
-      `UPDATE ${this.name
+      `UPDATE ${
+        this.name
       } SET data = jsonb_set(data, '{deleted}', 'true'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
