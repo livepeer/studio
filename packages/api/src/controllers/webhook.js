@@ -49,16 +49,8 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let {
-    limit,
-    cursor,
-    all,
-    event,
-    allUsers,
-    order,
-    filters,
-    count,
-  } = req.query;
+  let { limit, cursor, all, event, allUsers, order, filters, count } =
+    req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -218,6 +210,31 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
     console.error(e);
     throw e;
   }
+  res.status(204);
+  res.end();
+});
+
+app.delete("/", authMiddleware({}), async (req, res) => {
+  if (!req.body || !req.body.ids || !req.body.ids.length) {
+    res.status(422);
+    return res.json({
+      errors: ["missing ids"],
+    });
+  }
+  const ids = req.body.ids;
+
+  if (!req.user.admin) {
+    const webhooks = await db.webhook.getMany(ids);
+    if (
+      webhooks.length !== ids.length ||
+      webhooks.some((s) => s.userId !== req.user.id)
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+  }
+  await db.webhook.markDeletedMany(ids);
+
   res.status(204);
   res.end();
 });
