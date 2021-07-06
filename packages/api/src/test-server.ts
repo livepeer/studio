@@ -1,14 +1,14 @@
 /**
  * This file is imported from all the integration tests. It boots up a server based on the provided argv.
  */
-
-import argParser from "./parse-cli";
-import makeApp from "./index";
 import fs from "fs-extra";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import path from "path";
 import os from "os";
-import fetch from "isomorphic-fetch";
+
+import makeApp, { AppServer } from "./index";
+import argParser from "./parse-cli";
+import { UnboxPromise } from "./types/common";
 
 const dbPath = path.resolve(os.tmpdir(), "livepeer", uuid());
 const clientId = "EXPECTED_AUDIENCE";
@@ -44,7 +44,7 @@ if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
 params.listen = true;
-let server;
+let server: AppServer & { host?: string };
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
@@ -75,8 +75,5 @@ afterAll(async () => {
   fs.removeSync(dbPath);
 });
 
-type UnboxPromise<T> = T extends Promise<infer U> ? U : T;
-
-export type TestServer = UnboxPromise<ReturnType<typeof setupServer>> &
-  Record<string, unknown>; // necessary for kebab=>camel case properties
+export type TestServer = UnboxPromise<ReturnType<typeof setupServer>>;
 export default Promise.resolve().then(setupServer);

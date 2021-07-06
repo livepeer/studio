@@ -2,11 +2,10 @@ import express, { Router } from "express";
 import "express-async-errors"; // it monkeypatches, i guess
 import morgan from "morgan";
 import { db } from "../../store";
-import { DB } from "../../store/db";
 import { healthCheck } from "../../middleware";
 import logger from "../../logger";
 import { Stream } from "../../schema/types";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { hostname } from "os";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";
@@ -340,16 +339,17 @@ export default async function makeApp(params) {
   let listenPort;
 
   if (listen) {
-    await new Promise((resolve, reject) => {
-      listener = app.listen(port, (err) => {
-        if (err) {
+    await new Promise<void>((resolve, reject) => {
+      listener = app
+        .listen(port, () => {
+          listenPort = listener.address().port;
+          logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
+          resolve();
+        })
+        .on("error", (err) => {
           logger.error("Error starting server", err);
-          return reject(err);
-        }
-        listenPort = listener.address().port;
-        logger.info(`API server listening on http://0.0.0.0:${listenPort}`);
-        resolve();
-      });
+          reject(err);
+        });
     });
   }
 

@@ -4,7 +4,7 @@
  * disparate broadcasters.
  */
 
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { Parser } from "m3u8-parser";
 import { basename, resolve } from "path";
 

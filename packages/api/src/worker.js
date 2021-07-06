@@ -11,6 +11,7 @@ self.window = self;
 import "express-async-errors"; // it monkeypatches, i guess
 import parseCli from "./parse-cli.js";
 import { getAssetFromKV } from "@cloudflare/kv-asset-handler";
+import fetch from "node-fetch";
 import composeM3U8 from "./controllers/compose-m3u8";
 
 // Populate process.env from CF environment variables

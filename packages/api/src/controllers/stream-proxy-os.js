@@ -1,5 +1,5 @@
 import router from "express/lib/router";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { Parser } from "m3u8-parser";
 import composeM3U8 from "./compose-m3u8";
 import minioClient from "./minio-client";

@@ -1,6 +1,6 @@
 import crypto from "isomorphic-webcrypto";
 import util from "util";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import { db } from "../store";
 import sql from "sql-template-strings";

@@ -532,6 +532,19 @@ components:
             customization, create and configure an object store.
           type: boolean
           example: false
+        recordingStatus:
+          type: string
+          readonly: true
+          description: Status of the recording process of this stream session.
+          enum: [waiting, ready]
+        recordingUrl:
+          type: string
+          readonly: true
+          description: URL for accessing the recording of this stream session.
+        mp4Url:
+          type: string
+          readonly: true
+          description: URL for the stream session recording packaged in an mp4.
         recordObjectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65

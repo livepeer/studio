@@ -1,34 +1,46 @@
+import { Router, Request } from "express";
+import fetch from "node-fetch";
+import { QueryResult } from "pg";
+import sql from "sql-template-strings";
 import { parse as parseUrl } from "url";
+import { v4 as uuid } from "uuid";
+
+import logger from "../logger";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import logger from "../logger";
-import uuid from "uuid/v4";
-import wowzaHydrate from "./wowza-hydrate";
-import { fetchWithTimeout } from "../util";
-import fetch from "isomorphic-fetch";
+import { geolocateMiddleware } from "../middleware";
+import {
+  DetectionWebhookPayload,
+  StreamPatchPayload,
+  User,
+} from "../schema/types";
+import { db } from "../store";
+import { DBSession } from "../store/db";
+import { BadRequestError } from "../store/errors";
+import { DBStream, StreamStats } from "../store/stream-table";
+import { WithID } from "../store/types";
+import { IStore } from "../types/common";
+import { WebhookMessage } from "../webhooks/cannon";
+import { getBroadcasterHandler } from "./broadcaster";
+import { generateStreamKey } from "./generate-stream-key";
 import {
   makeNextHREF,
   trackAction,
-  getWebhooks,
   parseFilters,
   parseOrder,
   pathJoin,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
-import { generateStreamKey } from "./generate-stream-key";
-import { geolocateMiddleware } from "../middleware";
-import { getBroadcasterHandler } from "./broadcaster";
-import { db } from "../store";
-import sql from "sql-template-strings";
-import { BadRequestError, NotFoundError } from "../store/errors";
+import wowzaHydrate from "./wowza-hydrate";
+
+type Profile = DBStream["profiles"][number];
+type PushTargetRef = DBStream["pushTargets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const ACTIVE_TIMEOUT = 90 * 1000;
 
-
 const app = Router();
-const hackMistSettings = (req, profiles) => {
+const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   if (
     !req.headers["user-agent"] ||
     !req.headers["user-agent"].toLowerCase().includes("mistserver")
@@ -50,7 +62,11 @@ const hackMistSettings = (req, profiles) => {
   });
 };
 
-async function validatePushTarget(userId, profileNames, pushTargetRef) {
+async function validatePushTarget(
+  userId: string,
+  profileNames: Set<string>,
+  pushTargetRef: PushTargetRef
+): Promise<Omit<PushTargetRef, "spec">> {
   const { profile, id, spec } = pushTargetRef;
   if (!profileNames.has(profile) && profile !== "source") {
     throw new BadRequestError(
@@ -76,8 +92,12 @@ async function validatePushTarget(userId, profileNames, pushTargetRef) {
   return { profile, id: created.id };
 }
 
-function validatePushTargets(userId, profiles, pushTargets) {
-  const profileNames = new Set();
+function validatePushTargets(
+  userId: string,
+  profiles: Profile[],
+  pushTargets: PushTargetRef[]
+) {
+  const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
       continue;
@@ -88,23 +108,27 @@ function validatePushTargets(userId, profiles, pushTargets) {
   }
 
   if (!pushTargets) {
-    return Promise.resolve([]);
+    return Promise.resolve([] as PushTargetRef[]);
   }
   return Promise.all(
     pushTargets.map((p) => validatePushTarget(userId, profileNames, p))
   );
 }
 
-export function getRecordingUrl(ingest, session, mp4 = false) {
+export function getRecordingUrl(
+  ingest: string,
+  session: DBSession,
+  mp4 = false
+) {
   return pathJoin(
     ingest,
     `recordings`,
     session.lastSessionId ? session.lastSessionId : session.id,
     mp4 ? `source.mp4` : `index.m3u8`
-  );
+  ) as string;
 }
 
-function isActuallyNotActive(stream) {
+function isActuallyNotActive(stream: DBStream) {
   return (
     stream.isActive &&
     !isNaN(stream.lastSeen) &&
@@ -112,7 +136,7 @@ function isActuallyNotActive(stream) {
   );
 }
 
-function activeCleanupOne(stream) {
+function activeCleanupOne(stream: DBStream) {
   if (isActuallyNotActive(stream)) {
     db.stream.setActiveToFalse(stream);
     stream.isActive = false;
@@ -121,8 +145,8 @@ function activeCleanupOne(stream) {
   return false;
 }
 
-function activeCleanup(streams, activeOnly = false) {
-  let hasStreamsToClean;
+function activeCleanup(streams: DBStream[], activeOnly = false) {
+  let hasStreamsToClean: boolean;
   for (const stream of streams) {
     hasStreamsToClean = activeCleanupOne(stream);
   }
@@ -155,6 +179,14 @@ const fieldsMap = {
   },
 };
 
+function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
 app.get("/", authMiddleware({}), async (req, res) => {
   let {
     limit,
@@ -168,7 +200,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
     filters,
     userId,
     count,
-  } = req.query;
+  } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -203,6 +235,13 @@ app.get("/", authMiddleware({}), async (req, res) => {
   }
   order = parseOrder(fieldsMap, order);
 
+  type ResultRow = {
+    id: string;
+    data: DBStream;
+    usersId: string;
+    usersdata: WithID<User>;
+    count?: number;
+  };
   let fields =
     " stream.id as id, stream.data as data, users.id as usersId, users.data as usersdata";
   if (count) {
@@ -215,9 +254,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
     fields,
     from,
     order,
-    process: ({ data, usersdata, count: c }) => {
+    process: ({ data, usersdata, count: c }: ResultRow) => {
       if (count) {
-        res.set("X-Total-Count", c);
+        res.set("X-Total-Count", c.toString());
       }
       return req.user.admin
         ? { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) }
@@ -240,7 +279,12 @@ app.get("/", authMiddleware({}), async (req, res) => {
   );
 });
 
-function setRecordingStatus(req, ingest, session, forceUrl) {
+function setRecordingStatus(
+  req: Request,
+  ingest: string,
+  session: DBSession,
+  forceUrl: boolean
+) {
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
     const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
@@ -256,10 +300,10 @@ function setRecordingStatus(req, ingest, session, forceUrl) {
 app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
   const { record, forceUrl } = req.query;
-  let { limit, cursor } = req.query;
+  let { limit, cursor } = toStringValues(req.query);
   const raw = req.query.raw && req.user.admin;
 
-  const ingests = await req.getIngest(req);
+  const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
     return res.json({ errors: ["Ingest not configured"] });
@@ -300,7 +344,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
   const olderThen = Date.now() - USER_SESSION_TIMEOUT;
   sessions = sessions.map((session) => {
-    setRecordingStatus(req, ingest, session, forceUrl);
+    setRecordingStatus(req, ingest, session, !!forceUrl);
     if (!raw) {
       if (session.previousSessions && session.previousSessions.length) {
         session.id = session.previousSessions[0]; // return id of the first session object so
@@ -331,7 +375,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
 
 app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   const { parentId } = req.params;
-  const { limit, cursor } = req.query;
+  const { limit, cursor } = toStringValues(req.query);
   logger.info(`cursor params ${cursor}, limit ${limit}`);
 
   const stream = await db.stream.get(parentId);
@@ -344,26 +388,26 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
 
-  const { data: streams, cursor: cursorOut } = await req.store.queryObjects({
+  const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
     kind: "stream",
     query: { parentId },
     cursor,
     limit,
   });
   res.status(200);
-  if (streams.length > 0 && cursorOut) {
-    res.links({ next: makeNextHREF(req, cursorOut) });
+  if (data.length > 0 && nextCursor) {
+    res.links({ next: makeNextHREF(req, nextCursor) });
   }
   res.json(
     db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(streams, req.user.admin)
+      db.stream.removePrivateFieldsMany(data, req.user.admin)
     )
   );
 });
 
 app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   const { userId } = req.params;
-  let { limit, cursor, streamsonly, sessionsonly } = req.query;
+  let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
   if (req.user.admin !== true && req.user.id !== req.params.userId) {
     res.status(403);
@@ -434,7 +478,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     };
   }
   if (stream.record) {
-    const ingests = await req.getIngest(req);
+    const ingests = await req.getIngest();
     if (ingests.length) {
       const ingest = ingests[0].base;
       setRecordingStatus(req, ingest, stream, false);
@@ -452,7 +496,7 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
   console.log(`headers:`, req.headers);
   const {
     data: [stream],
-  } = await req.store.queryObjects({
+  } = await req.store.queryObjects<DBStream>({
     kind: "stream",
     query: { playbackId: req.params.playbackId },
   });
@@ -500,9 +544,9 @@ app.get(
   getBroadcasterHandler
 );
 
-async function generateUniqueStreamKey(store, otherKeys) {
+async function generateUniqueStreamKey(store: IStore, otherKeys: string[]) {
   while (true) {
-    const streamKey = await generateStreamKey();
+    const streamKey: string = await generateStreamKey();
     const qres = await store.query({
       kind: "stream",
       query: { streamKey },
@@ -525,7 +569,7 @@ app.post(
       });
     }
     const start = Date.now();
-    let stream;
+    let stream: DBStream;
     let useParentProfiles = false;
     if (req.config.baseStreamName === req.params.streamId) {
       if (!req.body.name.includes("+")) {
@@ -561,7 +605,9 @@ app.post(
     const id = stream.playbackId.slice(0, 4) + uuid().slice(4);
     const createdAt = Date.now();
 
-    let previousSessions, previousStats, userSessionCreatedAt;
+    let previousSessions: string[],
+      previousStats: StreamStats,
+      userSessionCreatedAt: number;
     let firstSession = true;
     if (stream.record && req.config.recordObjectStoreId) {
       // find previous sessions to form 'user' session
@@ -628,7 +674,7 @@ app.post(
       region = req.config.ownRegion;
     }
 
-    const doc = wowzaHydrate({
+    const doc: DBStream = wowzaHydrate({
       ...req.body,
       kind: "stream",
       userId: stream.userId,
@@ -654,7 +700,7 @@ app.post(
 
     if (firstSession) {
       // create 'session' object in 'session table
-      const session = {
+      const session: DBSession = {
         id,
         parentId: stream.id,
         playbackId: stream.playbackId,
@@ -751,7 +797,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     }
   }
 
-  const doc = wowzaHydrate({
+  const doc: DBStream = wowzaHydrate({
     ...req.body,
     kind: "stream",
     userId: req.user.id,
@@ -792,77 +838,81 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 });
 
-app.put("/:id/setactive", authMiddleware({ anyAdmin: true }), async (req, res) => {
-  const { id } = req.params;
-  // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
-  const useReplica = !req.body.active;
-  const stream = await db.stream.get(id, { useReplica });
-  if (!stream || (stream.deleted && !req.user.admin)) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+app.put(
+  "/:id/setactive",
+  authMiddleware({ anyAdmin: true }),
+  async (req, res) => {
+    const { id } = req.params;
+    // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
+    const useReplica = !req.body.active;
+    const stream = await db.stream.get(id, { useReplica });
+    if (!stream || (stream.deleted && !req.user.admin)) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  if (stream.suspended) {
-    res.status(403);
-    return res.json({ errors: ["stream is suspended"] });
-  }
+    if (stream.suspended) {
+      res.status(403);
+      return res.json({ errors: ["stream is suspended"] });
+    }
 
-  const user = await db.user.get(stream.userId);
-  if (!user) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
+    const user = await db.user.get(stream.userId);
+    if (!user) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  if (user.suspended) {
-    res.status(403);
-    return res.json({ errors: ["user is suspended"] });
-  }
+    if (user.suspended) {
+      res.status(403);
+      return res.json({ errors: ["user is suspended"] });
+    }
 
-  if (req.body.active) {
-    // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-    // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+    if (req.body.active) {
+      // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+      // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
-    // -------------------------------
-    // new webhookCannon
-    req.queue.emit({
-      id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event: "stream.started",
-      streamId: id,
-      userId: user.id,
-    });
-  }
-
-  stream.isActive = !!req.body.active;
-  stream.lastSeen = +new Date();
-  const { ownRegion: region } = req.config;
-  const { hostName: mistHost } = req.body;
-  await db.stream.update(stream.id, {
-    isActive: stream.isActive,
-    lastSeen: stream.lastSeen,
-    mistHost,
-    region,
-  });
-
-  db.user.update(stream.userId, {
-    lastStreamedAt: Date.now(),
-  });
-
-  if (stream.parentId) {
-    const pStream = await db.stream.get(stream.parentId);
-    if (pStream && !pStream.deleted) {
-      await db.stream.update(pStream.id, {
-        isActive: stream.isActive,
-        lastSeen: stream.lastSeen,
-        region,
+      // -------------------------------
+      // new webhookCannon
+      req.queue.emit({
+        id: uuid(),
+        createdAt: Date.now(),
+        channel: "webhooks",
+        event: "stream.started",
+        streamId: id,
+        userId: user.id,
       });
     }
-  }
 
-  res.status(204);
-  res.end();
-});
+    stream.isActive = !!req.body.active;
+    stream.lastSeen = +new Date();
+    const { ownRegion: region } = req.config;
+    const { hostName: mistHost } = req.body;
+    await db.stream.update(stream.id, {
+      isActive: stream.isActive,
+      lastSeen: stream.lastSeen,
+      mistHost,
+      region,
+    });
+
+    db.user.update(stream.userId, {
+      lastStreamedAt: Date.now(),
+    });
+
+    if (stream.parentId) {
+      const pStream = await db.stream.get(stream.parentId);
+      if (pStream && !pStream.deleted) {
+        await db.stream.update(pStream.id, {
+          isActive: stream.isActive,
+          lastSeen: stream.lastSeen,
+          region,
+        });
+      }
+    }
+
+    res.status(204);
+    res.end();
+  }
+);
 
 // sets 'isActive' field to false for many objects at once
 app.patch(
@@ -870,7 +920,7 @@ app.patch(
   authMiddleware({ anyAdmin: true }),
   validatePost("deactivate-many-payload"),
   async (req, res) => {
-    let upRes;
+    let upRes: QueryResult;
     try {
       upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
 
@@ -883,7 +933,7 @@ app.patch(
       console.error(
         `error setting stream active to false ids=${req.body.ids} err=${e}`
       );
-      upRes = { rowCount: 0 };
+      upRes = { rowCount: 0 } as QueryResult;
     }
 
     res.status(200);
@@ -897,6 +947,8 @@ app.patch(
   validatePost("stream-patch-payload"),
   async (req, res) => {
     const { id } = req.params;
+    const payload = req.body as StreamPatchPayload;
+
     const stream = await db.stream.get(id);
 
     const exists = stream && !stream.deleted;
@@ -910,8 +962,8 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, pushTargets } = req.body;
-    let patch = {};
+    let { record, suspended, pushTargets } = payload;
+    let patch: StreamPatchPayload = {};
     if (typeof record === "boolean") {
       patch = { ...patch, record };
     }
@@ -1107,7 +1159,10 @@ app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
   return res.json({ result, errors });
 });
 
-async function terminateStreamReq(req, stream) {
+async function terminateStreamReq(
+  req: Request,
+  stream: DBStream
+): Promise<{ status: number; errors?: string[]; result?: boolean | any }> {
   if (!stream.isActive) {
     return { status: 410, errors: ["not active"] };
   }
@@ -1140,7 +1195,7 @@ async function terminateStreamReq(req, stream) {
     const { result, errors } = body;
     return { status: redRes.status, result, errors };
   }
-  const streams = await listActiveStreams(
+  const streams: string[] = await listActiveStreams(
     mistHost,
     mistPort,
     mistUsername,
@@ -1151,7 +1206,7 @@ async function terminateStreamReq(req, stream) {
     return { status: 200, result: false, errors: ["not found on Mist"] };
   }
 
-  const nukeRes = await terminateStream(
+  const nukeRes: boolean = await terminateStream(
     mistHost,
     mistPort,
     mistStreamName,
@@ -1162,8 +1217,6 @@ async function terminateStreamReq(req, stream) {
 }
 
 // Hooks
-
-const streamDetectionEvent = "stream.detection";
 
 app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
   if (!req.body || !req.body.url) {
@@ -1241,9 +1294,9 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     return res.json({ errors: ["user is suspended"] });
   }
 
-  let objectStore,
-    recordObjectStore = undefined,
-    recordObjectStoreUrl;
+  let objectStore: string,
+    recordObjectStore: string,
+    recordObjectStoreUrl: string;
   if (stream.objectStoreId) {
     const os = await db.objectStore.get(stream.objectStoreId);
     if (!os) {
@@ -1301,7 +1354,7 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
 
   const { data: webhooks } = await db.webhook.listSubscribed(
     user.id,
-    streamDetectionEvent
+    "stream.detection"
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {
@@ -1334,30 +1387,34 @@ app.post(
   authMiddleware({ anyAdmin: true }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
-    const { manifestID, seqNo, sceneClassification } = req.body;
+    const {
+      manifestID,
+      seqNo,
+      sceneClassification,
+    }: DetectionWebhookPayload = req.body;
     const stream = await db.stream.getByIdOrPlaybackId(manifestID);
     if (!stream) {
       return res.status(404).json({ errors: ["stream not found"] });
     }
     console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
 
-    await req.queue.emit({
+    const msg: WebhookMessage = {
       id: uuid(),
+      event: "stream.detection",
       createdAt: Date.now(),
-      channel: "webhooks",
-      event: streamDetectionEvent,
       streamId: stream.id,
       userId: stream.userId,
       payload: {
         seqNo,
         sceneClassification,
       },
-    });
+    };
+    await req.queue.emit(msg);
     return res.status(204).end();
   }
 );
 
-const statsFields = [
+const statsFields: (keyof StreamStats)[] = [
   "sourceBytes",
   "transcodedBytes",
   "sourceSegments",
@@ -1366,8 +1423,8 @@ const statsFields = [
   "transcodedSegmentsDuration",
 ];
 
-export function getCombinedStats(stream1, stream2) {
-  const res = {};
+export function getCombinedStats(stream1: StreamStats, stream2: StreamStats) {
+  const res: StreamStats = {};
   for (const fn of statsFields) {
     res[fn] = (stream1[fn] || 0) + (stream2[fn] || 0);
   }

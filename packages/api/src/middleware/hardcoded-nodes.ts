@@ -3,12 +3,29 @@
  * --broadcaster and --orchestrator CLI parameters. This implements those.
  */
 
+import { RequestHandler } from "express";
+import { NodeAddress } from "./kubernetes";
+
+export interface Ingest {
+  base?: string;
+  ingest: string;
+  playback: string;
+}
+
+export interface Price {
+  address: string;
+  priceInfo: {
+    pricePerUnit: string;
+    pixelsPerUnit: string;
+  };
+}
+
 export default function hardcodedNodes({
   broadcasters,
   orchestrators,
   ingest,
   prices,
-}) {
+}): RequestHandler {
   try {
     broadcasters = JSON.parse(broadcasters);
     orchestrators = JSON.parse(orchestrators);
@@ -22,17 +39,17 @@ export default function hardcodedNodes({
   }
   return (req, res, next) => {
     if (!req.getBroadcasters) {
-      req.getBroadcasters = async () => broadcasters;
+      req.getBroadcasters = async () => broadcasters as NodeAddress[];
     }
     if (!req.getOrchestrators) {
-      req.getOrchestrators = async () => orchestrators;
+      req.getOrchestrators = async () => orchestrators as NodeAddress[];
     }
     if (!req.getIngest) {
-      req.getIngest = async () => ingest;
+      req.getIngest = async () => ingest as Ingest[];
     }
-    if (!req.prices) {
-      req.getPrices = async () => prices;
+    if (!req.getPrices) {
+      req.getPrices = async () => prices as Price[];
     }
-    next();
+    return next();
   };
 }

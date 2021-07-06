@@ -1,5 +1,4 @@
-import { setMock, clearMocks } from "isomorphic-fetch";
-import { Response } from "node-fetch";
+import { setMock, clearMocks, Response } from "node-fetch";
 import * as testData from "./compose-m3u8.test-data";
 import composeM3U8 from "./compose-m3u8";
 

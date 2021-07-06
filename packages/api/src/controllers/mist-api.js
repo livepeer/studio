@@ -1,5 +1,5 @@
 import logger from "../logger";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import crypto from "crypto";
 import querystring from "querystring";
 
@@ -97,7 +97,13 @@ export async function terminateStream(
     const authStatus = ((body || {}).authorize || {}).status;
     if (authStatus === "CHALL") {
       hashChallenge(((body || {}).authorize || {}).challenge, password);
-      return await nukeStream(mistHost, mistPort, streamName, login, password);
+      return await terminateStream(
+        mistHost,
+        mistPort,
+        streamName,
+        login,
+        password
+      );
     } else if (authStatus !== "OK") {
       logger.error(`Unexpected authorize status=${authStatus}`);
       return false;

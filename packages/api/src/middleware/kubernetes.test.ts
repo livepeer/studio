@@ -1,20 +1,22 @@
 import kubernetes from "./kubernetes";
-import * as k8s from "@kubernetes/client-node";
+import { Request, RequestHandler, Response } from "express";
 
 /**
  * See also the mock implementation of @kubernetes/client-node in __mocks__
  */
+// @ts-ignore
+import { testOpts } from "@kubernetes/client-node";
 
 describe("kubernetes middleware", () => {
-  let middleware;
-  let req;
+  let middleware: RequestHandler;
+  let req: Request;
   beforeEach(async () => {
-    k8s.testOpts.fail = false;
+    testOpts.fail = false;
   });
 
   describe("success cases", () => {
     beforeEach(async () => {
-      req = {};
+      req = {} as Request;
       middleware = kubernetes({
         kubeNamespace: "default",
         kubeBroadcasterService: "broadcaster",
@@ -23,7 +25,7 @@ describe("kubernetes middleware", () => {
         kubeOrchestratorTemplate: "https://{{ip}}:8935",
       });
       await new Promise((resolve) => {
-        middleware(req, {}, resolve);
+        middleware(req, {} as Response, resolve);
       });
     });
 
@@ -64,7 +66,7 @@ describe("kubernetes middleware", () => {
     });
 
     it("should survive failure of the control pane", async () => {
-      k8s.testOpts.fail = true;
+      testOpts.fail = true;
       let error;
       try {
         await req.getBroadcasters();
@@ -72,9 +74,9 @@ describe("kubernetes middleware", () => {
         error = e;
       }
       expect(error).toEqual(new Error("intentional test failure"));
-      k8s.testOpts.fail = false;
+      testOpts.fail = false;
       const firstResponse = await req.getBroadcasters();
-      k8s.testOpts.fail = true;
+      testOpts.fail = true;
       const secondResponse = await req.getBroadcasters();
       expect(firstResponse).toEqual(secondResponse);
     });
@@ -82,7 +84,7 @@ describe("kubernetes middleware", () => {
 
   describe("success cases", () => {
     beforeEach(async () => {
-      req = {};
+      req = {} as Request;
       middleware = kubernetes({
         kubeNamespace: "default",
         kubeBroadcasterService: "broadcaster-noaddress",
@@ -91,7 +93,7 @@ describe("kubernetes middleware", () => {
         kubeOrchestratorTemplate: "https://{{ip}}:8935",
       });
       await new Promise((resolve) => {
-        middleware(req, {}, resolve);
+        middleware(req, {} as Response, resolve);
       });
     });
 

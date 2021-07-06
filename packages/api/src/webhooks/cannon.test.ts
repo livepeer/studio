@@ -1,8 +1,4 @@
-import express from "express";
-import fetch from "isomorphic-fetch";
-import schema from "../schema/schema.json";
-import WebhookCannon from "./cannon";
-import makeStore from "../store";
+import fetch from "node-fetch";
 import serverPromise, { TestServer } from "../test-server";
 import {
   TestClient,

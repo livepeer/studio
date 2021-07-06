@@ -1,4 +1,6 @@
-import realFetch from "isomorphic-fetch";
+export * from "node-fetch";
+
+import realFetch from "node-fetch";
 
 let mocks = {};
 
@@ -9,9 +11,9 @@ export const clearMocks = () => {
   mocks = {};
 };
 
-export default async (url, params) => {
+export default async function fetch(url, params) {
   if (mocks[url]) {
     return mocks[url]();
   }
   return realFetch(url, params);
-};
+}

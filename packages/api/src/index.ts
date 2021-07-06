@@ -1,12 +1,19 @@
 import express from "express";
 import "express-async-errors"; // it monkeypatches, i guess
+import { Server } from "http";
 import morgan from "morgan";
-import logger from "./logger";
-import appRouter from "./app-router";
+import { AddressInfo } from "net";
 import "source-map-support/register";
 import cors from "cors";
 
-export default async function makeApp(params) {
+import appRouter from "./app-router";
+import logger from "./logger";
+import { CliArgs } from "./parse-cli";
+import { UnboxPromise } from "./types/common";
+
+export type AppServer = UnboxPromise<ReturnType<typeof makeApp>>;
+
+export default async function makeApp(params: CliArgs) {
   const {
     storage,
     dbPath,
@@ -38,8 +45,8 @@ export default async function makeApp(params) {
   } = params;
   // Storage init
 
-  let listener;
-  let listenPort;
+  let listener: Server;
+  let listenPort: number;
 
   const close = async () => {
     process.off("SIGTERM", sigterm);
@@ -107,17 +114,18 @@ export default async function makeApp(params) {
   app.use(router);
 
   if (listen) {
-    await new Promise((resolve, reject) => {
-      listener = app.listen(port, (err) => {
-        if (err) {
-          logger.error("Error starting server", err);
-          return reject(err);
-        }
-        listenPort = listener.address().port;
+    await new Promise<void>((resolve, reject) => {
+      listener = app.listen(port, () => {
+        const address = listener.address() as AddressInfo;
+        listenPort = address.port;
         logger.info(
           `API server listening on http://0.0.0.0:${listenPort}${httpPrefix}`
         );
         resolve();
+      });
+      listener.on("error", (err) => {
+        logger.error("Error starting server", err);
+        reject(err);
       });
     });
   }

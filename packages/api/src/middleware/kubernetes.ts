@@ -2,9 +2,16 @@
  * Injects getOrchestrators() and getBroadcasters() from the local k8s environment
  */
 
+import { RequestHandler } from "express";
 import { render } from "mustache";
 import * as k8s from "@kubernetes/client-node";
+
 import { timeout } from "../util";
+
+export interface NodeAddress {
+  address: string;
+  cliAddress: string;
+}
 
 export default function kubernetesMiddleware({
   kubeNamespace,
@@ -12,23 +19,26 @@ export default function kubernetesMiddleware({
   kubeOrchestratorService,
   kubeBroadcasterTemplate,
   kubeOrchestratorTemplate,
-}) {
-  const cache = {};
+}): RequestHandler {
+  const cache: Record<string, k8s.V1Endpoints> = {};
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
 
   const kubeApi = kc.makeApiClient(k8s.CoreV1Api);
 
   // Try to read namespaced endpoints, return most recent data if we can't
-  const cachedReadNamespacedEndpoints = async (kubeService, kubeNamespace) => {
+  const cachedReadNamespacedEndpoints = async (
+    kubeService: string,
+    kubeNamespace: string
+  ) => {
     // % isn't allowed in k8s names, so it's a suitable delimiter
     const cacheKey = `${kubeService}%${kubeNamespace}`;
     try {
       const endpoints = await timeout(5000, () =>
         kubeApi.readNamespacedEndpoints(kubeService, kubeNamespace)
       );
-      cache[cacheKey] = endpoints;
-      return endpoints;
+      cache[cacheKey] = endpoints.body;
+      return endpoints.body;
     } catch (e) {
       if (cache[cacheKey]) {
         console.error(
@@ -49,9 +59,9 @@ export default function kubernetesMiddleware({
       kubeBroadcasterService,
       kubeNamespace
     );
-    const ret = [];
-    if (endpoints.body && endpoints.body.subsets) {
-      for (const subset of endpoints.body.subsets) {
+    const ret: NodeAddress[] = [];
+    if (endpoints && endpoints.subsets) {
+      for (const subset of endpoints.subsets) {
         if (!subset.addresses) {
           continue;
         }
@@ -74,9 +84,9 @@ export default function kubernetesMiddleware({
       kubeOrchestratorService,
       kubeNamespace
     );
-    const ret = [];
-    if (endpoints.body && endpoints.body.subsets) {
-      for (const subset of endpoints.body.subsets) {
+    const ret: NodeAddress[] = [];
+    if (endpoints && endpoints.subsets) {
+      for (const subset of endpoints.subsets) {
         if (!subset.addresses) {
           continue;
         }

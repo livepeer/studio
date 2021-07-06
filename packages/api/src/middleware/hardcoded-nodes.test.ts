@@ -1,12 +1,14 @@
-import hardcodedNodes from "./hardcoded-nodes";
+import { Request, RequestHandler, Response } from "express";
+
+import hardcodedNodes, { Ingest, Price } from "./hardcoded-nodes";
 
 /**
  * See also the mock implementation of @kubernetes/client-node in __mocks__
  */
 
 describe("kubernetes middleware", () => {
-  let middleware;
-  let req;
+  let middleware: RequestHandler;
+  let req: Request;
 
   const broadcasters = [
     {
@@ -38,14 +40,14 @@ describe("kubernetes middleware", () => {
     },
   ];
 
-  const ingest = [
+  const ingest: Ingest[] = [
     {
       ingest: "https://gke-ams-prod-cpu-efde94aa-2k9f.example.com",
       playback: "http://10.40.0.46:7935",
     },
   ];
 
-  const prices = [
+  const prices: Price[] = [
     {
       address: "0xfoo",
       priceInfo: {
@@ -56,7 +58,7 @@ describe("kubernetes middleware", () => {
   ];
 
   beforeEach(async () => {
-    req = {};
+    req = {} as Request;
     middleware = hardcodedNodes({
       broadcasters: JSON.stringify(broadcasters),
       orchestrators: JSON.stringify(orchestrators),
@@ -64,7 +66,7 @@ describe("kubernetes middleware", () => {
       prices: JSON.stringify(prices),
     });
     await new Promise((resolve) => {
-      middleware(req, {}, resolve);
+      middleware(req, {} as Response, resolve);
     });
   });
 

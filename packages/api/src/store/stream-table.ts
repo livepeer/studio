@@ -14,7 +14,7 @@ interface UsageData {
   streamCount: number;
 }
 
-interface dbUsageData extends QueryResultRow {
+interface DBUsageData extends QueryResultRow {
   sourcesegments: string;
   transcodedsegments: string;
   sourcesegmentsduration: number;
@@ -22,7 +22,7 @@ interface dbUsageData extends QueryResultRow {
   streamCount: number;
 }
 
-interface dbUsageHistoryData extends QueryResultRow {
+interface DBUsageHistoryData extends QueryResultRow {
   id: string;
   date: number;
   sourcesegments: string;
@@ -32,7 +32,24 @@ interface dbUsageHistoryData extends QueryResultRow {
   streamCount: number;
 }
 
-export default class StreamTable extends Table<WithID<Stream>> {
+export interface StreamStats {
+  sourceBytes?: number;
+  transcodedBytes?: number;
+  sourceSegments?: number;
+  transcodedSegments?: number;
+  sourceSegmentsDuration?: number;
+  transcodedSegmentsDuration?: number;
+}
+
+export interface DBStreamFields extends StreamStats {
+  previousStats?: StreamStats;
+  lastSessionId?: string;
+  userSessionCreatedAt?: number;
+}
+
+export type DBStream = WithID<Stream> & DBStreamFields;
+
+export default class StreamTable extends Table<DBStream> {
   async cachedUsageHistory(
     fromTime: number,
     toTime: number,
@@ -53,7 +70,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
       ORDER BY date
     `;
 
-    let res: QueryResult<dbUsageData>;
+    let res: QueryResult<DBUsageData>;
     res = await this.db.queryWithOpts(q1, opts);
 
     if (res.rowCount > 0) {
@@ -91,7 +108,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
 
     let usage = [];
 
-    let res: QueryResult<dbUsageHistoryData>;
+    let res: QueryResult<DBUsageHistoryData>;
     res = await this.db.queryWithOpts(q1, opts);
 
     let knownDays = {};
@@ -184,7 +201,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
       streamCount: 0,
     };
 
-    let res: QueryResult<dbUsageData>;
+    let res: QueryResult<DBUsageData>;
     res = await this.db.queryWithOpts(q1, opts);
     if (res.rowCount > 0) {
       const dbUsage = res.rows[0];
@@ -231,40 +248,44 @@ export default class StreamTable extends Table<WithID<Stream>> {
   async getByStreamKey(
     streamKey: string,
     opts?: QueryOptions
-  ): Promise<Stream> {
+  ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'streamKey'=${streamKey}`.setName(
         `${this.name}_by_streamKey`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
   async getByPlaybackId(
     playbackId: string,
     opts?: QueryOptions
-  ): Promise<Stream> {
+  ): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'playbackId'=${playbackId}`.setName(
         `${this.name}_by_playbackid`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
-  async getLastSession(id: string, opts?: QueryOptions): Promise<Stream> {
+  async getLastSession(id: string, opts?: QueryOptions): Promise<DBStream> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
       sql`SELECT data FROM stream  WHERE data->>'parentId'=${id} ORDER BY data->'createdAt' DESC LIMIT 1`.setName(
         `${this.name}_by_parentid_last_session`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as Stream);
+    return res.rowCount < 1 ? null : (res.rows[0].data as DBStream);
   }
 
-  async setActiveToFalse(stream): Promise<{ rowCount: number }> {
+  async setActiveToFalse(stream: {
+    id: string;
+    lastSeen?: number;
+    name?: string;
+  }): Promise<{ rowCount: number }> {
     let upRes;
     try {
       upRes = await this.update(
@@ -272,7 +293,7 @@ export default class StreamTable extends Table<WithID<Stream>> {
           sql`id = ${stream.id}`,
           sql`(data->>'lastSeen')::bigint = ${stream.lastSeen}`,
         ],
-        { isActive: false } as Stream,
+        { isActive: false },
         { throwIfEmpty: false }
       );
       if (upRes.rowCount) {
@@ -293,7 +314,8 @@ export default class StreamTable extends Table<WithID<Stream>> {
 
   async markIsActiveFalseMany(ids: Array<string>) {
     const res = await this.db.query(
-      `UPDATE ${this.name
+      `UPDATE ${
+        this.name
       } SET data = jsonb_set(data, '{isActive}', 'false'::jsonb) WHERE id IN (${ids
         .map((_, i) => "$" + (i + 1))
         .join(",")})`,
@@ -302,11 +324,11 @@ export default class StreamTable extends Table<WithID<Stream>> {
     return res;
   }
 
-  addDefaultFieldsMany(objs: Array<Stream>): Array<Stream> {
+  addDefaultFieldsMany(objs: Array<DBStream>): Array<DBStream> {
     return objs.map(this.addDefaultFields);
   }
 
-  addDefaultFields(obj: Stream): Stream {
+  addDefaultFields(obj: DBStream): DBStream {
     return {
       lastSeen: 0,
       isActive: false,
@@ -322,7 +344,8 @@ export default class StreamTable extends Table<WithID<Stream>> {
     };
   }
 
-  removePrivateFields(obj: Stream, isAdmin: boolean = false): Stream {
+  removePrivateFields(obj: DBStream, isAdmin: boolean = false): DBStream {
+    // Maybe create a copy to avoid input mutation
     for (const fn of privateFields) {
       delete obj[fn];
     }
@@ -335,9 +358,9 @@ export default class StreamTable extends Table<WithID<Stream>> {
   }
 
   removePrivateFieldsMany(
-    objs: Array<Stream>,
+    objs: Array<DBStream>,
     isAdmin: boolean = false
-  ): Array<Stream> {
+  ): Array<DBStream> {
     return objs.map((o) => this.removePrivateFields(o, isAdmin));
   }
 }

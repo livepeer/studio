@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import isoFetch from "isomorphic-fetch";
+import fetch, { RequestInit } from "node-fetch";
 import { v4 as uuid } from "uuid";
 
 import schema from "./schema/schema.json";
@@ -108,7 +108,7 @@ export class TestClient {
         authorization: `Basic ${basic64}`,
       };
     }
-    const res = await isoFetch(
+    const res = await fetch(
       `${this.server.host}${this.server.httpPrefix}${path}`,
       {
         ...args,

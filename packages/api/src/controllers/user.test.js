@@ -108,8 +108,8 @@ describe("controllers/user", () => {
       }
       const res = await client.get(`/user?limit=11`);
       const users = await res.json();
-      expect(res.headers._headers.link).toBeDefined();
-      expect(res.headers._headers.link.length).toBe(1);
+      expect(res.headers.raw().link).toBeDefined();
+      expect(res.headers.raw().link.length).toBe(1);
       expect(users.length).toEqual(11);
     });
 

@@ -1,6 +1,4 @@
-import logger from "../logger";
-import fetch from "isomorphic-fetch";
-import { parse as parseUrl, format as stringifyUrl } from "url";
+import fetch from "node-fetch";
 import querystring from "querystring";
 import { NotFoundError } from "./errors";
 

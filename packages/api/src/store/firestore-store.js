@@ -1,4 +1,4 @@
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import { generateJWT, prepareConfig } from "./firestore-helpers";
 import * as qs from "query-string";
 

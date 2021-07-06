@@ -1,5 +1,6 @@
 "use strict";
 
+import fetch from "node-fetch";
 // This is a spec but it doesn't look like it's very well supported, so
 import promiseAny from "promise.any";
 

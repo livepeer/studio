@@ -4,7 +4,7 @@
 
 import Router from "express/lib/router";
 import geolocateMiddleware from "../middleware/geolocate";
-import fetch from "isomorphic-fetch";
+import fetch from "node-fetch";
 import qs from "qs";
 
 const app = Router();
