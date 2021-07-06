@@ -853,6 +853,19 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async deleteWebhooks(ids: Array<string>): Promise<void> {
+      const [res, body] = await context.fetch(`/webhook`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
+    },
+
     async getApiTokens(
       userId?: string,
       opts?: {

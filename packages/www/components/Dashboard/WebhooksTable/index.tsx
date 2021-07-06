@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -41,9 +41,10 @@ type WebhooksTableData = {
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
-  const { user, getWebhooks, deleteWebhook, createWebhook } = useApi();
+  const { user, getWebhooks, deleteWebhook, deleteWebhooks, createWebhook } =
+    useApi();
   const deleteDialogState = useToggleState();
-  const savingState = useToggleState();
+  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
@@ -94,6 +95,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         count,
         rows: webhooks.map((webhook: Webhook) => {
           return {
+            id: webhook.id,
             name: {
               children: webhook.name,
               href: `/dashboard/developers/webhooks/${webhook.id}`,
@@ -123,23 +125,23 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     [getWebhooks, user.id]
   );
 
-  // const onDeleteStreams = useCallback(async () => {
-  //   if (state.selectedRows.length === 1) {
-  //     await deleteStream(state.selectedRows[0].id);
-  //     await state.queryState?.invalidate();
-  //     deleteDialogState.onOff();
-  //   } else if (state.selectedRows.length > 1) {
-  //     await deleteStreams(state.selectedRows.map((s) => s.id));
-  //     await state.queryState?.invalidate();
-  //     deleteDialogState.onOff();
-  //   }
-  // }, [
-  //   deleteStream,
-  //   deleteStreams,
-  //   deleteDialogState.onOff,
-  //   state.selectedRows.length,
-  //   state.swrState?.revalidate,
-  // ]);
+  const onDeleteWebhooks = useCallback(async () => {
+    if (state.selectedRows.length === 1) {
+      await deleteWebhook(state.selectedRows[0].id);
+      await state.invalidate();
+      deleteDialogState.onOff();
+    } else if (state.selectedRows.length > 1) {
+      await deleteWebhooks(state.selectedRows.map((s) => s.id));
+      await state.invalidate();
+      deleteDialogState.onOff();
+    }
+  }, [
+    deleteWebhook,
+    deleteWebhooks,
+    deleteDialogState.onOff,
+    state.selectedRows.length,
+    state.invalidate,
+  ]);
 
   const emptyState = (
     <Flex
@@ -246,24 +248,24 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             <AlertDialogAction
               as={Button}
               size="2"
-              disabled={savingState.on}
+              disabled={savingDeleteDialog}
               onClick={async () => {
                 try {
-                  savingState.onOn();
-                  //await onDeleteStreams();
+                  setSavingDeleteDialog(true);
+                  await onDeleteWebhooks();
                   openSnackbar(
-                    `${state.selectedRows.length} webhooks${
+                    `${state.selectedRows.length} webhook${
                       state.selectedRows.length > 1 ? "s" : ""
                     } deleted.`
                   );
-                  savingState.onOff();
+                  setSavingDeleteDialog(false);
                   deleteDialogState.onOff();
                 } catch (e) {
-                  savingState.onOff();
+                  setSavingDeleteDialog(false);
                 }
               }}
               variant="red">
-              {savingState.on && (
+              {savingDeleteDialog && (
                 <Spinner
                   css={{
                     color: "$hiContrast",
@@ -279,7 +281,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Create stream dialog */}
+      {/* Create webhook dialog */}
       <WebhookDialog
         action={Action.Create}
         isOpen={createDialogState.on}

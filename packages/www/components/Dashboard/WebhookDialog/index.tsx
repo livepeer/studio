@@ -83,7 +83,7 @@ const WebhookDialog = ({
   const [webhookUrl, setWebhookUrl] = useState("");
   const [openSnackbar] = useSnackbar();
   const [events, setEvents] = useState([]);
-  console.log("wat", events);
+
   useEffect(() => {
     if (webhook) {
       setEvents(webhook.events);
