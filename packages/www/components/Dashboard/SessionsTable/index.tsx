@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import DurationCell, {
   DurationCellProps,
 } from "components/Dashboard/Table/cells/duration";
+import { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { dateSort, numberSort } from "components/Dashboard/Table/sorts";
 import Link from "next/link";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
@@ -14,7 +14,7 @@ import {
   CellComponentProps,
   TableData,
 } from "components/Dashboard/Table/types";
-import { isStaging, isDevelopment } from "../../../lib/utils";
+import { truncate } from "../../../lib/utils";
 import {
   Box,
   Flex,
@@ -34,7 +34,7 @@ type Profile = { name: string; width: number; height: number };
 export type RecordingUrlCellProps = {
   children?: React.ReactNode;
   tooltipChildren?: React.ReactNode;
-  href?: string;
+  mp4Url?: string;
   id?: string;
   profiles?: Array<Profile>;
   showMP4: boolean;
@@ -47,24 +47,23 @@ const RecordingUrlCell = <D extends TableData>({
 
   return (
     <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
-      {cell.value.href ? (
+      {cell.value.mp4Url ? (
         <Flex css={{ justifyContent: "space-between" }}>
-          <Link href={cell.value.href} passHref>
-            <A variant="violet">{cell.value.children}</A>
-          </Link>
+          {truncate(cell.value.children, 20)}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
               <A
+                css={{}}
                 variant="violet"
                 target="_blank"
-                href={makeMP4Url(cell.value.href, "source")}>
+                href={makeMP4Url(cell.value.mp4Url, "source")}>
                 Download mp4
               </A>
             </Box>
           ) : null}
         </Flex>
       ) : (
-        cell.value.children
+        truncate(cell.value.children, 20)
       )}
     </Box>
   );
@@ -145,7 +144,7 @@ const StreamSessionsTable = ({
             id: stream.id,
             recordingUrl: {
               id: stream.id,
-              showMP4: user?.admin || isStaging() || isDevelopment(),
+              showMP4: true,
               profiles:
                 stream.recordingUrl &&
                 stream.recordingStatus === "ready" &&
@@ -154,11 +153,13 @@ const StreamSessionsTable = ({
                   : undefined,
               children:
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
-                  stream.recordingUrl
+                  <Box>{truncate(stream.recordingUrl, 20)}</Box>
                 ) : (
                   <Box css={{ color: "$mauve8" }}>—</Box>
                 ),
-              href: stream.recordingUrl ? stream.recordingUrl : undefined,
+              mp4Url: stream.recordingUrl
+                ? truncate(stream.recordingUrl, 20)
+                : undefined,
             },
             duration: {
               duration: stream.sourceSegmentsDuration || 0,
@@ -211,7 +212,6 @@ const StreamSessionsTable = ({
         rowSelection={null}
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
-        cursor="pointer"
         emptyState={emptyState}
       />
     </Box>

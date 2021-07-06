@@ -257,3 +257,7 @@ export function isStaging(): boolean {
 export function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
 }
+
+export function truncate(str, n) {
+  return str.length > n ? str.substr(0, n - 1) + "…" : str;
+}
