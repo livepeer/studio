@@ -215,7 +215,8 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
 });
 
 app.delete("/", authMiddleware({}), async (req, res) => {
-  if (!req.body || !req.body.ids || !req.body.ids.length) {
+  const ids = req.body?.ids;
+  if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
     res.status(422);
     return res.json({
       errors: ["missing ids"],
