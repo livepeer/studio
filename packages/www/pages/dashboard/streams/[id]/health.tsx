@@ -68,7 +68,6 @@ const Health = () => {
   const router = useRouter();
   const { query } = router;
   const id = query.id;
-  const domain = isStaging() ? "monster" : "com";
 
   const doGetInfo = useCallback(
     async (id: string) => {
@@ -130,7 +129,10 @@ const Health = () => {
     };
   }, [getIngestRate, info]);
 
-  const playbackUrl = `https://cdn.livepeer.${domain}/hls/${stream?.playbackId}/index.m3u8`;
+  const getPlaybackURL = useCallback(() => {
+    const domain = isStaging() ? "monster" : "com";
+    return `https://cdn.livepeer.${domain}/hls/${stream?.playbackId}/index.m3u8`;
+  }, [stream]);
 
   if (!stream) {
     return (
@@ -185,7 +187,7 @@ const Health = () => {
               }}>
               <Player
                 setVideo={setVideoExists}
-                src={playbackUrl}
+                src={getPlaybackURL()}
                 config={{
                   controlPanelElements: [
                     "time_and_duration",
@@ -220,7 +222,7 @@ const Health = () => {
               }}>
               <Player
                 setVideo={setVideoExists}
-                src={playbackUrl}
+                src={getPlaybackURL()}
                 config={{
                   controlPanelElements: [
                     "time_and_duration",
