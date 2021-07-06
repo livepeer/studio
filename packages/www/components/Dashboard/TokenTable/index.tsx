@@ -191,13 +191,14 @@ const TokenTable = ({
       </Flex>
 
       <Box css={{ mb: "$5" }}>
-        <Table
+        {/* TODO fix this before merging! @julianbenegas */}
+        {/* <Table
           setOnUnselect={setOnUnselect}
           columns={columns}
           data={data}
           rowSelection="all"
           onRowSelectionChange={handleRowSelectionChange}
-        />
+        /> */}
       </Box>
     </Box>
   );

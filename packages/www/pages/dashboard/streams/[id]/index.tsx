@@ -938,11 +938,12 @@ const ID = () => {
                     </Badge>
                   </Box>
                 )}
-                <Link href={`/dashboard/streams/${stream?.id}/health`}>
+                <Link href={`/dashboard/streams/${stream?.id}/health`} passHref>
                   <Button
+                    as="a"
                     size="3"
                     variant="violet"
-                    css={{ mt: "$3", width: "100%" }}>
+                    css={{ mt: "$3", width: "100%", cursor: "pointer" }}>
                     View Stream Health
                   </Button>
                 </Link>
