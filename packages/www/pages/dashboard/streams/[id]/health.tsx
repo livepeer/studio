@@ -86,21 +86,20 @@ const Health = () => {
   const getIngestRate = useCallback(
     async (id: string) => {
       const [, rinfo] = await getStreamInfo(id);
-      if (!rinfo) {
+      if (!rinfo?.session) {
         return;
-      } else if (rinfo.stream) {
-        const newInfo = rinfo as StreamInfo;
-        setDataChart((prev) => {
-          const lastItem = prev[prev.length - 1];
-          return [
-            ...prev,
-            {
-              name: lastItem ? lastItem.name + interval / 1000 : 0,
-              kbps: Math.round(newInfo.session.ingestRate / 1000),
-            },
-          ].slice(Math.max(prev.length - maxItems, 0));
-        });
       }
+      const newInfo = rinfo as StreamInfo;
+      setDataChart((prev) => {
+        const lastItem = prev[prev.length - 1];
+        return [
+          ...prev,
+          {
+            name: lastItem ? lastItem.name + interval / 1000 : 0,
+            kbps: Math.round(newInfo.session.ingestRate / 1000),
+          },
+        ].slice(Math.max(prev.length - maxItems, 0));
+      });
     },
     [getStreamInfo]
   );
