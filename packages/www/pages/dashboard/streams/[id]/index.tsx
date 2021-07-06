@@ -31,6 +31,7 @@ import {
   CopyIcon as Copy,
   QuestionMarkCircledIcon as Help,
   PauseIcon,
+  ChevronDownIcon,
 } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import Player from "components/Dashboard/Player";
@@ -338,7 +339,13 @@ const ID = () => {
                 </Flex>
               </Heading>
               <DropdownMenu>
-                <DropdownMenuTrigger as={Button}>Actions</DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  as={Button}
+                  variant="violet"
+                  size="2"
+                  css={{ display: "flex", ai: "center" }}>
+                  <Box css={{ mr: "$1" }}>Actions</Box> <ChevronDownIcon />
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuGroup>
                     <Record
