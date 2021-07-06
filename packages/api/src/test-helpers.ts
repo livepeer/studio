@@ -122,10 +122,16 @@ export class TestClient {
     return await this.fetch(path, { method: "GET" });
   }
 
-  async delete(path: string) {
-    const params = {
+  async delete(path: string, data?: any) {
+    const params: RequestInit = {
       method: "DELETE",
     };
+    if (data) {
+      params.headers = {
+        "content-type": "application/json",
+      };
+      params.body = JSON.stringify(data);
+    }
     return await this.fetch(path, params);
   }
 

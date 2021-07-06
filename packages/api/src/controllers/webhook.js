@@ -49,8 +49,16 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+  let {
+    limit,
+    cursor,
+    all,
+    event,
+    allUsers,
+    order,
+    filters,
+    count,
+  } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -203,9 +211,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   }
 
   try {
-    await db.webhook.update(webhook.id, {
-      deleted: true,
-    });
+    await db.webhook.markDeleted(webhook.id);
   } catch (e) {
     console.error(e);
     throw e;
@@ -227,7 +233,7 @@ app.delete("/", authMiddleware({}), async (req, res) => {
     const webhooks = await db.webhook.getMany(ids);
     if (
       webhooks.length !== ids.length ||
-      webhooks.some((s) => s.userId !== req.user.id)
+      webhooks.some((s) => s.deleted || s.userId !== req.user.id)
     ) {
       res.status(404);
       return res.json({ errors: ["not found"] });
