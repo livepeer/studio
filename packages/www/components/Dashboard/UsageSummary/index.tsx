@@ -63,6 +63,8 @@ const UsageSummary = () => {
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
+  const prices = products[user.stripeProductId].usage;
+  const transcodingPrice = prices[0].price;
 
   useEffect(() => {
     const doGetInvoices = async (stripeCustomerId) => {
@@ -168,7 +170,14 @@ const UsageSummary = () => {
         css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Text variant="gray" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
-          Upcoming invoice: <Box css={{ ml: "$1", fontWeight: 600 }}>$0.00</Box>
+          Upcoming invoice:{" "}
+          <Box css={{ ml: "$1", fontWeight: 600 }}>
+            {usage &&
+              `$${(
+                (usage.sourceSegmentsDuration / 60) *
+                transcodingPrice
+              ).toFixed(2)}`}
+          </Box>
         </Text>
         <Link href="/dashboard/billing" passHref>
           <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
