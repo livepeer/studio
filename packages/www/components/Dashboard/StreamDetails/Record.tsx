@@ -4,35 +4,56 @@ import {
   Flex,
   Dialog,
   DialogContent,
-  DialogClose,
+  DropdownMenuItem,
   Text,
   Switch,
+  useSnackbar,
 } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "@components/Dashboard/Spinner";
-import { Stream } from "@livepeer.com/api";
 
-const Record = ({ stream, setStream }) => {
+const Record = ({ stream, setStream, isSwitch = true }) => {
   const { setRecord } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openSnackbar] = useSnackbar();
 
   return (
     <Dialog open={open}>
-      <Switch
-        checked={!!stream.record}
-        name="record-mode"
-        value={`${!!stream.record}`}
-        onCheckedChange={async () => {
-          if (!stream.record) {
-            await setRecord(stream.id, true);
-            setStream({ ...stream, record: true });
-          } else {
-            setOpen(true);
-          }
-        }}
-      />
+      {isSwitch ? (
+        <Switch
+          checked={!!stream.record}
+          name="record-mode"
+          value={`${!!stream.record}`}
+          onCheckedChange={async () => {
+            if (!stream.record) {
+              await setRecord(stream.id, true);
+              setStream({ ...stream, record: true });
+              openSnackbar("Recording has been turned on.");
+            } else {
+              setOpen(true);
+            }
+          }}
+        />
+      ) : (
+        <Box
+          as={DropdownMenuItem}
+          onSelect={async (e) => {
+            e.preventDefault();
+            if (!stream.record) {
+              await setRecord(stream.id, true);
+              setStream({ ...stream, record: true });
+              openSnackbar("Recording has been turned on.");
+            } else {
+              setOpen(true);
+            }
+          }}>
+          <Box>
+            {!stream.record ? "Turn on recording" : "Turn off recording"}
+          </Box>
+        </Box>
+      )}
 
       <DialogContent css={{ p: 0 }}>
         <Box
@@ -75,8 +96,9 @@ const Record = ({ stream, setStream }) => {
               disabled={saving}
               onClick={async () => {
                 setSaving(true);
-                await setRecord(stream.id, false);
-                setStream({ ...stream, record: false });
+                await setRecord(stream.id, !stream.record);
+                setStream({ ...stream, record: !stream.record });
+                openSnackbar("Recording has been turned off.");
                 setSaving(false);
                 setOpen(false);
               }}
@@ -84,7 +106,6 @@ const Record = ({ stream, setStream }) => {
               {saving && (
                 <Spinner
                   css={{
-                    color: "$hiContrast",
                     width: 16,
                     height: 16,
                     mr: "$2",

@@ -5,6 +5,7 @@ import {
   lightTheme,
   DesignSystemProvider,
   Box,
+  SnackbarProvider,
 } from "@livepeer.com/design-system";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
@@ -46,9 +47,7 @@ interface Props {
   id?: string;
 }
 
-function DashboardLayout({ id, children, breadcrumbs }: Props) {
-  globalStyles();
-
+function ContextProviders({ children }) {
   return (
     <DesignSystemProvider>
       <ThemeProvider
@@ -56,13 +55,23 @@ function DashboardLayout({ id, children, breadcrumbs }: Props) {
         attribute="class"
         defaultTheme="dark"
         value={{ dark: darkTheme.className, light: lightTheme.className }}>
-        <Sidebar id={id} />
-        <Box css={{ pl: 270, width: "100%" }}>
-          <Header breadcrumbs={breadcrumbs} />
-          {children}
-        </Box>
+        <SnackbarProvider>{children}</SnackbarProvider>
       </ThemeProvider>
     </DesignSystemProvider>
+  );
+}
+
+function DashboardLayout({ id, children, breadcrumbs }: Props) {
+  globalStyles();
+
+  return (
+    <ContextProviders>
+      <Sidebar id={id} />
+      <Box css={{ pl: 270, width: "100%" }}>
+        <Header breadcrumbs={breadcrumbs} />
+        {children}
+      </Box>
+    </ContextProviders>
   );
 }
 
