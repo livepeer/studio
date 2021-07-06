@@ -225,6 +225,30 @@ describe("controllers/webhook", () => {
 
       expect(res2.status).toBe(404);
     });
+
+    it("delete multiple webhooks", async () => {
+      let ids = [];
+      for (let i = 0; i < 5; i++) {
+        const res = await client.post("/webhook", mockWebhook);
+        expect(res.status).toBe(201);
+        ids.push(await res.json().then((json) => json.id));
+      }
+      let res = await client.delete(`/webhook`, { ids });
+      expect(res.status).toBe(204);
+
+      res = await client.delete(`/webhook`, { ids });
+      expect(res.status).toBe(404);
+
+      for (const id of ids) {
+        res = await client.get(`/webhook/${ids[2]}`);
+        expect(res.status).toBe(404);
+        res = await client.delete(`/webhook`, {
+          ids: [generatedWebhookIds[2], id],
+        });
+        const json = await res.json();
+        expect(res.status).toBe(404);
+      }
+    });
   });
 
   describe("webhook trigger", () => {
