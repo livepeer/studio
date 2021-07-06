@@ -290,7 +290,7 @@ describe("controllers/api-token", () => {
         const res = await client.fetch(path, { method });
         expect(res.status).toBe(403);
         const body = await res.json();
-        expect(body.errors[0]).toEqual("no authorization header provided");
+        expect(body.errors[0]).toEqual("unsupported authorization type Bearer");
       };
       const expectAll403s = async () => {
         await expect403("post", `/api-token`);
@@ -307,7 +307,7 @@ describe("controllers/api-token", () => {
         id: nonAdminToken,
         kind: "api-token",
       });
-      client.apiToken = nonAdminToken;
+      client.apiKey = nonAdminToken;
       await expectAll403s();
 
       const adminToken = uuid();
@@ -316,7 +316,7 @@ describe("controllers/api-token", () => {
         id: adminToken,
         kind: "api-token",
       });
-      client.apiToken = adminToken;
+      client.apiKey = adminToken;
       await expectAll403s();
     });
   });
