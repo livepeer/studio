@@ -36,7 +36,9 @@ export default () => {
           flexGrow: 1,
           flexDirection: "column",
         }}>
-        <h3 sx={{ mb: [3, 3] }}>Reset your password</h3>
+        <Box as="h3" sx={{ mb: [3, 3] }}>
+          Reset your password
+        </Box>
         <Login
           id="reset-password"
           showEmail={false}

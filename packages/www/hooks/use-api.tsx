@@ -1,5 +1,4 @@
 import { useState, useContext, createContext, useEffect } from "react";
-import fetch from "isomorphic-fetch";
 import jwt from "jsonwebtoken";
 import {
   User,

@@ -54,16 +54,18 @@ const BlogIndex = ({ categories, posts }) => {
       url={`https://livepeer.com${asPath}`}
       withGradientBackground>
       <Container variant="hero">
-        <h1 sx={{ variant: "text.heading.hero" }}>Blog</h1>
-        <p sx={{ variant: "text.heroDescription" }}>
+        <Box as="h1" sx={{ variant: "text.heading.hero" }}>
+          Blog
+        </Box>
+        <Box as="p" sx={{ variant: "text.heroDescription" }}>
           Welcome to the Livepeer.com blog.
-        </p>
+        </Box>
       </Container>
       <Container>
         {featuredPost && (
-          <div sx={{ mb: "80px", display: ["none", null, "block"] }}>
+          <Box sx={{ mb: "80px", display: ["none", null, "block"] }}>
             <FeaturedBlogPostCard post={featuredPost} />
-          </div>
+          </Box>
         )}
         <Flex
           sx={{
@@ -138,9 +140,7 @@ export async function getStaticProps({ params }) {
     print(allCategories)
   );
   categories.push({ title: "All", slug: { current: "" } });
-  const {
-    allPost: posts,
-  } = await request(
+  const { allPost: posts } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
     { where: {} }

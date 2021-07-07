@@ -111,13 +111,16 @@ const Post = ({
             </Box>
           </Link>
         </Flex>
-        <h1 sx={{ fontSize: [32, null, 40], my: 3 }}>{title}</h1>
+        <Box as="h1" sx={{ fontSize: [32, null, 40], my: 3 }}>
+          {title}
+        </Box>
         <Flex sx={{ alignItems: "center" }}>
           <Box>
             <Flex sx={{ alignItems: "center", fontSize: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 By{" "}
-                <img
+                <Box
+                  as="img"
                   alt={author.image?.alt}
                   width={40}
                   height={40}
@@ -132,7 +135,8 @@ const Post = ({
                   className="lazyload"
                   data-src={builder.image(author.image).url()}
                 />
-                <span
+                <Box
+                  as="span"
                   sx={{
                     fontWeight: 600,
                     textOverflow: "ellipsis",
@@ -140,7 +144,7 @@ const Post = ({
                     whiteSpace: "nowrap",
                   }}>
                   {author.name}
-                </span>
+                </Box>
               </Box>
               <Box sx={{ mx: 2, width: "1px", height: 16, bg: "grey" }} />
               <Box
@@ -170,8 +174,10 @@ const Post = ({
         </div>
         {!!furtherReading && (
           <>
-            <hr sx={{ my: [5, 6] }} />
-            <h3 sx={{ mb: 40 }}>Articles you may be interested in</h3>
+            <Box as="hr" sx={{ my: [5, 6] }} />
+            <Box as="h3" sx={{ mb: 40 }}>
+              Articles you may be interested in
+            </Box>
             <Grid columns={[1, null, 2]} mb={5} gap={4}>
               {furtherReading.map((p, i) => (
                 <BlogPostCard post={p} key={`post-${i}`} />

@@ -95,16 +95,19 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
       <CopyToClipboard text={ccurl} onCopy={() => setCopied(2000)}>
         <Flex sx={{ alignItems: "center" }}>
           {anchor ? (
-            <a
+            <Box
+              as="a"
               sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}
               href={url}
               target="_blank">
               {url}
-            </a>
+            </Box>
           ) : (
-            <span sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}>
+            <Box
+              as="span"
+              sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}>
               {url}
-            </span>
+            </Box>
           )}
           <Copy
             sx={{
@@ -820,30 +823,33 @@ const ID = () => {
                     </Cell>
                     <Cell>Papertrail to stream key</Cell>
                     <Cell>
-                      <a
+                      <Box
+                        as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.streamKey}`}
                         sx={{ userSelect: "all" }}>
                         {stream.streamKey}
-                      </a>
+                      </Box>
                     </Cell>
                     <Cell>Papertrail to playback id</Cell>
                     <Cell>
-                      <a
+                      <Box
+                        as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.playbackId}`}
                         sx={{ userSelect: "all" }}>
                         {stream.playbackId}
-                      </a>
+                      </Box>
                     </Cell>
                     <Cell>Papertrail to stream id</Cell>
                     <Cell>
-                      <a
+                      <Box
+                        as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
                         sx={{ userSelect: "all" }}>
                         {stream.id}
-                      </a>
+                      </Box>
                     </Cell>
                     <Cell>Region/Broadcaster</Cell>
                     <Cell>
@@ -854,12 +860,13 @@ const ID = () => {
                       <>
                         <Cell>Broadcaster playback</Cell>
                         <Cell>
-                          <a
+                          <Box
+                            as="a"
                             target="_blank"
                             href={broadcasterPlaybackUrl}
                             sx={{ userSelect: "all" }}>
                             {broadcasterPlaybackUrl}
-                          </a>
+                          </Box>
                         </Cell>
                       </>
                     ) : null}
@@ -910,7 +917,7 @@ const ID = () => {
         ) : (
           <Flex sx={{ justifyContent: "center", alignItems: "center" }}>
             <Spinner sx={{ mr: "1em" }} />
-            <div sx={{ color: "text" }}>Loading</div>
+            <Box sx={{ color: "text" }}>Loading</Box>
           </Flex>
         )}
       </Container>

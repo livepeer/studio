@@ -95,7 +95,7 @@ const Layout = ({
             <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
               <NextSeo {...seo} />
               {withGradientBackground && (
-                <div
+                <Box
                   sx={{
                     position: "absolute",
                     top: 0,
@@ -109,7 +109,7 @@ const Layout = ({
                     sx={{ height: "1000px" }}
                     slide
                   />
-                </div>
+                </Box>
               )}
               <Flex
                 sx={{

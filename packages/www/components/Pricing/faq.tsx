@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import { useState } from "react";
 import Collapsible from "react-collapsible";
+import { Box } from "@theme-ui/components";
 
 type TriggerProps = {
   question: string;
@@ -74,7 +75,7 @@ const PlusIcon = () => {
 
 const Trigger = ({ question, isOpen }: TriggerProps) => {
   return (
-    <div
+    <Box
       sx={{
         width: "100%",
         display: "flex",
@@ -83,22 +84,25 @@ const Trigger = ({ question, isOpen }: TriggerProps) => {
         cursor: "pointer",
         padding: "24px",
       }}>
-      <p sx={{ fontSize: "20px", fontWeight: "600" }}>{question}</p>
-      <i
+      <Box as="p" sx={{ fontSize: "20px", fontWeight: "600" }}>
+        {question}
+      </Box>
+      <Box
+        as="i"
         sx={{
           transform: isOpen ? "rotate(-45deg)" : "",
           transition: "all 0.2s",
         }}>
         <PlusIcon />
-      </i>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
 const PricingFaq = () => {
   const [questionOpen, setQuestionOpen] = useState(null);
   return (
-    <div
+    <Box
       sx={{
         alignSelf: "center",
         display: "flex",
@@ -109,7 +113,8 @@ const PricingFaq = () => {
         mt: "144px",
         mb: "112px",
       }}>
-      <h1
+      <Box
+        as="h1"
         sx={{
           fontSize: [5, 5, 6],
           mb: ["42px", "64px"],
@@ -117,7 +122,7 @@ const PricingFaq = () => {
           letterSpacing: "-0.04em",
         }}>
         Frequently asked questions
-      </h1>
+      </Box>
       {faq.map((question, idx) => (
         <Collapsible
           key={idx}
@@ -132,7 +137,8 @@ const PricingFaq = () => {
               isOpen={questionOpen === idx}
             />
           }>
-          <p
+          <Box
+            as="p"
             sx={{
               pb: "24px",
               px: "24px",
@@ -141,10 +147,10 @@ const PricingFaq = () => {
               lineHeight: "1.6",
             }}>
             {question.answer}
-          </p>
+          </Box>
         </Collapsible>
       ))}
-    </div>
+    </Box>
   );
 };
 

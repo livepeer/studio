@@ -4,11 +4,13 @@ import { MDXProvider } from "@mdx-js/react";
 import { Styled } from "theme-ui";
 import Link from "next/link";
 import Code from "../components/renderers/Code";
+import { Box } from "@theme-ui/components";
 
 const StyledA = ({ href, children }) => {
   const isInternal = href.startsWith("/");
   const internalA = (
-    <a
+    <Box
+      as="a"
       href={href}
       target={isInternal ? undefined : "_blank"}
       sx={{
@@ -23,7 +25,7 @@ const StyledA = ({ href, children }) => {
         },
       }}>
       {children}
-    </a>
+    </Box>
   );
 
   if (!isInternal) {

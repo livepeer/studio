@@ -4,6 +4,7 @@ import PricingCard, { PricingCardContent } from "./pricingCard";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import { useState } from "react";
+import { Box } from "@theme-ui/components";
 
 const slides = [0, 1, 2];
 
@@ -31,14 +32,14 @@ const MobileContainer = () => {
   });
 
   return (
-    <div
+    <Box
       sx={{
         display: ["flex", null, null, "none"],
         flexDirection: "column",
         mt: "72px",
         width: "100%",
       }}>
-      <div
+      <Box
         className="keen-slider"
         ref={sliderRef}
         sx={{
@@ -57,70 +58,77 @@ const MobileContainer = () => {
             color: "white",
             bg: "#943CFF",
           }}>
-          <div sx={{ mt: "20px" }}>
+          <Box sx={{ mt: "20px" }}>
             <PricingCardContent>
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Transcoding
-              </p>
-              <h1
+              </Box>
+              <Box
+                as="h1"
                 sx={{
                   fontSize: "32px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 1000
-              </h1>
-              <p
+              </Box>
+              <Box
+                as="p"
                 sx={{
                   fontSize: "16px",
                   lineHeight: "24px",
                   letterSpacing: "-0.04em",
                 }}>
                 minutes/month
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent comingSoon>
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Recording Storage
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent>
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Stream Delivery via CDN*
-              </p>
-              <h1
+              </Box>
+              <Box
+                as="h1"
                 sx={{
                   fontSize: "32px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 10
-              </h1>
-              <p
+              </Box>
+              <Box
+                as="p"
                 sx={{
                   fontSize: "16px",
                   lineHeight: "24px",
                   letterSpacing: "-0.04em",
                 }}>
                 current viewers
-              </p>
+              </Box>
             </PricingCardContent>
-          </div>
+          </Box>
         </PricingCard>
         <PricingCard
           className="keen-slider__slide"
@@ -131,24 +139,27 @@ const MobileContainer = () => {
             display: "Sign up",
             href: "/register?selectedPlan=1",
           }}>
-          <div sx={{ mt: "20px" }}>
+          <Box sx={{ mt: "20px" }}>
             <PricingCardContent color="white">
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Transcoding
-              </p>
-              <h1
+              </Box>
+              <Box
+                as="h1"
                 sx={{
                   fontSize: "32px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 $0.005
-                <span
+                <Box
+                  as="span"
                   sx={{
                     fontSize: "16px",
                     letterSpacing: "-0.04em",
@@ -156,44 +167,48 @@ const MobileContainer = () => {
                     ml: "4px",
                   }}>
                   USD
-                </span>
-              </h1>
-              <p
+                </Box>
+              </Box>
+              <Box
+                as="p"
                 sx={{
                   fontSize: "16px",
                   lineHeight: "24px",
                   letterSpacing: "-0.04em",
                 }}>
                 / min video ingested
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent comingSoon color="white">
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Recording Storage
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent color="white">
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Stream Delivery via CDN*
-              </p>
-              <h1
+              </Box>
+              <Box
+                as="h1"
                 sx={{
                   fontSize: "32px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 $0.01
-                <span
+                <Box
                   sx={{
                     fontSize: "16px",
                     letterSpacing: "-0.04em",
@@ -201,17 +216,19 @@ const MobileContainer = () => {
                     ml: "4px",
                   }}>
                   USD
-                </span>
-              </h1>
-              <p
+                </Box>
+              </Box>
+              <Box
+                as="p"
                 sx={{
                   fontSize: "16px",
                   lineHeight: "24px",
                   letterSpacing: "-0.04em",
                 }}>
                 / GB video streamed
-              </p>
-              <p
+              </Box>
+              <Box
+                as="p"
                 sx={{
                   fontSize: "16px",
                   lineHeight: "24px",
@@ -219,9 +236,9 @@ const MobileContainer = () => {
                   mt: "10px",
                 }}>
                 * coming soon
-              </p>
+              </Box>
             </PricingCardContent>
-          </div>
+          </Box>
         </PricingCard>
         <PricingCard
           className="keen-slider__slide"
@@ -234,41 +251,44 @@ const MobileContainer = () => {
             color: "white",
             bg: "#943CFF",
           }}>
-          <div sx={{ mt: "20px" }}>
+          <Box sx={{ mt: "20px" }}>
             <PricingCardContent color="white" customPricing>
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Transcoding
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent comingSoon color="white">
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Recording Storage
-              </p>
+              </Box>
             </PricingCardContent>
             <PricingCardContent color="white" customPricing>
-              <p
+              <Box
+                as="p"
                 sx={{
                   fontSize: "20px",
                   fontWeight: "600",
                   letterSpacing: "-0.04em",
                 }}>
                 Stream Delivery via CDN*
-              </p>
+              </Box>
             </PricingCardContent>
-          </div>
+          </Box>
         </PricingCard>
-      </div>
-      <div
+      </Box>
+      <Box
         sx={{
           display: "flex",
           alignItems: "center",
@@ -276,7 +296,7 @@ const MobileContainer = () => {
           alignSelf: "center",
         }}>
         {slides.map((slide) => (
-          <div
+          <Box
             key={slide}
             onClick={() => {
               slider.moveToSlide(slide);
@@ -294,14 +314,14 @@ const MobileContainer = () => {
             }}
           />
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
 const DesktopContainer = () => {
   return (
-    <div
+    <Box
       sx={{
         display: ["none", null, null, "grid"],
         gridTemplateColumns: ["repeat(3, 1fr)", null, null, "repeat(4, 1fr)"],
@@ -309,15 +329,18 @@ const DesktopContainer = () => {
         gap: ["32px", "16px", "20px", "32px"],
         width: "100%",
       }}>
-      <div
+      <Box
         sx={{
           alignSelf: "flex-end",
           display: ["none", null, null, "flex"],
           flexDirection: "column",
         }}>
-        <p sx={{ color: "#525252", fontSize: "16px", mb: "16px" }}>Usage</p>
+        <Box as="p" sx={{ color: "#525252", fontSize: "16px", mb: "16px" }}>
+          Usage
+        </Box>
         <PricingCardContent>
-          <h1
+          <Box
+            as="h1"
             sx={{
               fontSize: "20px",
               fontWeight: "600",
@@ -325,8 +348,9 @@ const DesktopContainer = () => {
               letterSpacing: "-0.04em",
             }}>
             Transcoding
-          </h1>
-          <p
+          </Box>
+          <Box
+            as="p"
             sx={{
               fontSize: "12px",
               lineHeight: "18px",
@@ -335,10 +359,11 @@ const DesktopContainer = () => {
             }}>
             Livepeer.com creates multiple versions of your source livestream for
             different devices in real time.
-          </p>
+          </Box>
         </PricingCardContent>
         <PricingCardContent>
-          <h1
+          <Box
+            as="h1"
             sx={{
               fontSize: "20px",
               fontWeight: "600",
@@ -346,8 +371,9 @@ const DesktopContainer = () => {
               letterSpacing: "-0.04em",
             }}>
             Recording Storage
-          </h1>
-          <p
+          </Box>
+          <Box
+            as="p"
             sx={{
               fontSize: "12px",
               lineHeight: "18px",
@@ -356,10 +382,11 @@ const DesktopContainer = () => {
             }}>
             Livepeer.com can automatically store your transcoded renditions for
             VoD playback.
-          </p>
+          </Box>
         </PricingCardContent>
         <PricingCardContent>
-          <h1
+          <Box
+            as="h1"
             sx={{
               fontSize: "20px",
               fontWeight: "600",
@@ -367,8 +394,9 @@ const DesktopContainer = () => {
               letterSpacing: "-0.04em",
             }}>
             Stream Delivery via CDN*
-          </h1>
-          <p
+          </Box>
+          <Box
+            as="p"
             sx={{
               fontSize: "12px",
               lineHeight: "18px",
@@ -377,9 +405,9 @@ const DesktopContainer = () => {
             }}>
             Livepeer.com optimizes playback for your viewers across the globe
             via a CDN.
-          </p>
+          </Box>
         </PricingCardContent>
-      </div>
+      </Box>
       <PricingCard
         pricingTitle="Personal"
         pricingDescription="Free"
@@ -391,45 +419,49 @@ const DesktopContainer = () => {
           color: "white",
           bg: "#943CFF",
         }}>
-        <div sx={{ mt: "20px" }}>
+        <Box sx={{ mt: "20px" }}>
           <PricingCardContent>
-            <h1
+            <Box
+              as="h1"
               sx={{
                 fontSize: "32px",
                 fontWeight: "600",
                 letterSpacing: "-0.04em",
               }}>
               1000
-            </h1>
-            <p
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "16px",
                 lineHeight: "24px",
                 letterSpacing: "-0.04em",
               }}>
               minutes/month
-            </p>
+            </Box>
           </PricingCardContent>
           <PricingCardContent comingSoon />
           <PricingCardContent>
-            <h1
+            <Box
+              as="h1"
               sx={{
                 fontSize: "32px",
                 fontWeight: "600",
                 letterSpacing: "-0.04em",
               }}>
               10
-            </h1>
-            <p
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "16px",
                 lineHeight: "24px",
                 letterSpacing: "-0.04em",
               }}>
               current viewers
-            </p>
+            </Box>
           </PricingCardContent>
-        </div>
+        </Box>
       </PricingCard>
       <PricingCard
         pricingTitle="Pro"
@@ -439,16 +471,18 @@ const DesktopContainer = () => {
           display: "Sign up",
           href: "",
         }}>
-        <div sx={{ mt: "20px" }}>
+        <Box sx={{ mt: "20px" }}>
           <PricingCardContent color="white">
-            <h1
+            <Box
+              as="h1"
               sx={{
                 fontSize: "32px",
                 fontWeight: "600",
                 letterSpacing: "-0.04em",
               }}>
               $0.005
-              <span
+              <Box
+                as="span"
                 sx={{
                   fontSize: "16px",
                   letterSpacing: "-0.04em",
@@ -456,27 +490,30 @@ const DesktopContainer = () => {
                   ml: "4px",
                 }}>
                 USD
-              </span>
-            </h1>
-            <p
+              </Box>
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "16px",
                 lineHeight: "24px",
                 letterSpacing: "-0.04em",
               }}>
               / min video ingested
-            </p>
+            </Box>
           </PricingCardContent>
           <PricingCardContent comingSoon color="white" />
           <PricingCardContent color="white">
-            <h1
+            <Box
+              as="h1"
               sx={{
                 fontSize: "32px",
                 fontWeight: "600",
                 letterSpacing: "-0.04em",
               }}>
               $0.01
-              <span
+              <Box
+                as="span"
                 sx={{
                   fontSize: "16px",
                   letterSpacing: "-0.04em",
@@ -484,17 +521,19 @@ const DesktopContainer = () => {
                   ml: "4px",
                 }}>
                 USD
-              </span>
-            </h1>
-            <p
+              </Box>
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "16px",
                 lineHeight: "24px",
                 letterSpacing: "-0.04em",
               }}>
               / GB video streamed
-            </p>
-            <p
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "16px",
                 lineHeight: "24px",
@@ -502,9 +541,9 @@ const DesktopContainer = () => {
                 mt: "10px",
               }}>
               * coming soon
-            </p>
+            </Box>
           </PricingCardContent>
-        </div>
+        </Box>
       </PricingCard>
       <PricingCard
         pricingTitle="Business"
@@ -512,27 +551,27 @@ const DesktopContainer = () => {
         cardBg="#3B375A"
         btn={{
           display: "Contact us",
-          href:
-            "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
+          href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
           color: "white",
           bg: "#943CFF",
         }}>
-        <div sx={{ mt: "20px" }}>
+        <Box sx={{ mt: "20px" }}>
           <PricingCardContent color="white" customPricing />
           <PricingCardContent comingSoon color="white" />
           <PricingCardContent color="white" customPricing />
-        </div>
+        </Box>
       </PricingCard>
-    </div>
+    </Box>
   );
 };
 
 const PricingCardsContainer = () => {
   return (
-    <div sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
       <DesktopContainer />
       <MobileContainer />
-      <p
+      <Box
+        as="p"
         sx={{
           color: "#525252",
           fontSize: "12px",
@@ -545,8 +584,8 @@ const PricingCardsContainer = () => {
         Currently, we are not charging for Stream Delivery via CDN. We’ll be
         sure to reach out before we start to do so. <br /> Thanks for streaming
         with Livepeer.com.
-      </p>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

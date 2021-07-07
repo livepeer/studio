@@ -1,25 +1,21 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import { Text } from "@theme-ui/components";
+import { Text, Box, IconButton } from "@theme-ui/components";
 import { FiEye, FiHeart } from "react-icons/fi";
-import { IconButton } from "@theme-ui/components";
 import { forwardRef, useRef, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 const videos = [
   {
-    src:
-      "https://cdn.sanity.io/files/dp4k3mpw/production/637be3e2106acb746559af41d5f57fae1edb535d.mp4",
+    src: "https://cdn.sanity.io/files/dp4k3mpw/production/637be3e2106acb746559af41d5f57fae1edb535d.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
   {
-    src:
-      "https://cdn.sanity.io/files/dp4k3mpw/production/24a650d65020ffb01beaa6c06bb79427ec5431b5.mp4",
+    src: "https://cdn.sanity.io/files/dp4k3mpw/production/24a650d65020ffb01beaa6c06bb79427ec5431b5.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
   {
-    src:
-      "https://cdn.sanity.io/files/dp4k3mpw/production/bc7f603cf9e28c8545ce6394a6d1118e88293211.mp4",
+    src: "https://cdn.sanity.io/files/dp4k3mpw/production/bc7f603cf9e28c8545ce6394a6d1118e88293211.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
 ];
@@ -52,7 +48,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
   );
 
   return (
-    <div
+    <Box
       ref={ref}
       sx={{
         width: "100%",
@@ -60,8 +56,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
         overflow: "hidden",
         borderRadius: ["4vw", null, null, "36px"],
       }}>
-      <figure sx={{ width: "100%", position: "relative" }}>
-        <div
+      <Box as="figure" sx={{ width: "100%", position: "relative" }}>
+        <Box
           sx={{
             position: "absolute",
             top: 0,
@@ -77,9 +73,10 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             src="/hero-videos/poster.png"
             alt="video poster"
           />
-        </div>
+        </Box>
         {videos.map(({ src }, i) => (
-          <video
+          <Box
+            as="video"
             onEnded={() => onVideoEnded(i)}
             key={`video-swapper-item-${i}`}
             ref={(el) => (videosRef.current[i] = el)}
@@ -100,7 +97,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             playsInline
           />
         ))}
-        <div
+        <Box
           sx={{
             position: "absolute",
             top: 3,
@@ -133,13 +130,13 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               color: "background",
               bg: "rgba(0,0,0,0.5)",
             }}>
-            <i sx={{ display: "flex", alignItems: "center", mr: 1 }}>
+            <Box as="i" sx={{ display: "flex", alignItems: "center", mr: 1 }}>
               <FiEye />
-            </i>
+            </Box>
             {currentVideo !== undefined ? videos[currentVideo].views : "..."}
           </Text>
-        </div>
-        <div
+        </Box>
+        <Box
           sx={{
             position: "absolute",
             bottom: 3,
@@ -148,7 +145,8 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             display: "flex",
             alignItems: "center",
           }}>
-          <input
+          <Box
+            as="input"
             placeholder="Write a comment..."
             sx={{
               borderRadius: 24,
@@ -183,9 +181,9 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             }}>
             <FiHeart />
           </IconButton>
-        </div>
-      </figure>
-      <div
+        </Box>
+      </Box>
+      <Box
         id="background-gradient"
         sx={{
           width: "100%",
@@ -197,7 +195,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           pointerEvents: "none",
         }}
       />
-    </div>
+    </Box>
   );
 });
 

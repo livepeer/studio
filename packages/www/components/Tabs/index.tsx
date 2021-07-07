@@ -31,7 +31,8 @@ const Tabs = ({ tabs }: TabsProps) => {
       <Container>
         {tabs.map((tab: TabType, i: number) => (
           <Link key={i} href={tab.href} as={tab.as} passHref>
-            <a
+            <Box
+              as="a"
               sx={{
                 color: tab.isActive ? "black" : "rgba(0,0,0,.6)",
                 mr: "22px",
@@ -42,7 +43,7 @@ const Tabs = ({ tabs }: TabsProps) => {
                 borderColor: tab.isActive ? "primary" : "transparent",
               }}>
               {tab.name}
-            </a>
+            </Box>
           </Link>
         ))}
       </Container>

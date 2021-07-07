@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
 import Layout from "../layouts";
-import { Container } from "@theme-ui/components";
+import { Container, Box } from "@theme-ui/components";
 import Prefooter from "../components/Prefooter";
 import TeamSection from "../components/TeamSection";
 import { GraphQLClient } from "graphql-request";
@@ -21,17 +21,17 @@ const TeamPage = ({ content }) => {
       canonical={`https://livepeer.com/team`}
       withGradientBackground>
       <Container variant="hero">
-        <h1 sx={{ variant: "text.heading.hero" }}>
+        <Box as="h1" sx={{ variant: "text.heading.hero" }}>
           We’re building the future of video infrastructure services.
-        </h1>
-        <p sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
+        </Box>
+        <Box as="p" sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
           We're comprised of team members dedicated to building an affordable,
           scalable and reliable video platform that focuses on what
           user-generated content applications need.
-        </p>
+        </Box>
       </Container>
       <TeamSection teamMembers={teamMembers} />
-      <hr sx={{ visibility: "hidden", my: 5 }} />
+      <Box as="hr" sx={{ visibility: "hidden", my: 5 }} />
       <Fade key={0}>
         <Prefooter />
       </Fade>

@@ -24,7 +24,9 @@ const Pricing = () => {
               fontWeight: 800,
               lineHeight: ["50px", "50px", "50px", "88px"],
             }}>
-            <span sx={{ fontWeight: "normal" }}>Start free.</span>
+            <Box as="span" sx={{ fontWeight: "normal" }}>
+              Start free.
+            </Box>
             <br />
             Then pay as you grow.
           </Heading>
@@ -36,7 +38,7 @@ const Pricing = () => {
         </Box>
         <PricingCardsContainer />
         <PricingCalculator />
-        <div style={{ marginTop: "156px" }} />
+        <Box sx={{ marginTop: "156px" }} />
         {/* <PricingFaq /> */}
       </Container>
       <Prefooter />

@@ -83,14 +83,14 @@ const NavigationBase = ({
             justifyContent: "space-between",
             alignItems: "center",
           }}>
-          <div
+          <Box
             sx={{
               minWidth: sidesWidth,
               display: "flex",
               alignItems: "center",
             }}>
             <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType />
-          </div>
+          </Box>
           {!isDashboard && (
             <Flex
               sx={{

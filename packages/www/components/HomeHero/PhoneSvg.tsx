@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import { getAspectRatio } from "../../lib/utils";
 import { forwardRef } from "react";
+import { Box } from "@theme-ui/components";
 
 export const phoneFrameMaxWidth = 788;
 export const phoneFrameMaxHeight = 394;
@@ -13,7 +14,8 @@ export const phoneAspectRatio = getAspectRatio(
 export const notchZIndex = 10;
 
 const Notch = () => (
-  <svg
+  <Box
+    as="svg"
     width="27"
     viewBox="0 0 27 201"
     fill="none"
@@ -192,11 +194,12 @@ const Notch = () => (
         />
       </g>
     </g>
-  </svg>
+  </Box>
 );
 
 const Frame = () => (
-  <svg
+  <Box
+    as="svg"
     width={phoneFrameMaxWidth}
     viewBox={`0 0 ${phoneFrameMaxWidth} ${phoneFrameMaxHeight}`}
     fill="none"
@@ -251,18 +254,18 @@ const Frame = () => (
         <stop offset="1" stopColor="white" stopOpacity="0" />
       </linearGradient>
     </defs>
-  </svg>
+  </Box>
 );
 
 const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
-  <div
+  <Box
     ref={ref}
     sx={{
       width: "100%",
       maxWidth: phoneFrameMaxWidth,
       mx: "auto",
     }}>
-    <div
+    <Box
       sx={{
         position: "relative",
         height: 0,
@@ -272,8 +275,8 @@ const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
       }}>
       <Notch />
       <Frame />
-    </div>
-  </div>
+    </Box>
+  </Box>
 ));
 export default PhoneSvg;
 export { Notch, Frame };

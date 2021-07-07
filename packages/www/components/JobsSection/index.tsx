@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import { Flex, Heading, Container } from "@theme-ui/components";
+import { Flex, Heading, Container, Box } from "@theme-ui/components";
 import Link from "next/link";
 
 export default ({ jobs }) => {
@@ -21,7 +21,8 @@ export default ({ jobs }) => {
             },
           }}>
           <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
-            <a
+            <Box
+              as="a"
               sx={{
                 textDecoration: "none",
                 ":hover": { textDecoration: "underline" },
@@ -31,17 +32,18 @@ export default ({ jobs }) => {
                 sx={{ fontWeight: 600, fontSize: 3, color: "black" }}>
                 {j.title}
               </Heading>
-            </a>
+            </Box>
           </Link>
           <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
-            <a
+            <Box
+              as="a"
               sx={{
                 textDecoration: "none",
                 ":hover": { textDecoration: "underline" },
                 color: "primary",
               }}>
               Apply
-            </a>
+            </Box>
           </Link>
         </Flex>
       ))}

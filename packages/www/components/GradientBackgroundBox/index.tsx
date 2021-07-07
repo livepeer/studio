@@ -26,9 +26,13 @@ const GradientBackgroundBox = ({
   ...moreProps
 }: Props) => {
   const gradientMarkup = (
-    <div sx={{ width: 2766, minWidth: "100vw", ...gradientSx }}>
-      <img src={`/img/gradient-${gradient}.svg`} sx={{ width: "100%" }} />
-    </div>
+    <Box sx={{ width: 2766, minWidth: "100vw", ...gradientSx }}>
+      <Box
+        as="img"
+        src={`/img/gradient-${gradient}.svg`}
+        sx={{ width: "100%" }}
+      />
+    </Box>
   );
 
   return (
@@ -39,7 +43,7 @@ const GradientBackgroundBox = ({
         <>
           {/* TODO: Improve the performance of the Slider */}
           {false ? (
-            <div
+            <Box
               sx={{
                 position: "absolute",
                 left: "50%",
@@ -48,9 +52,9 @@ const GradientBackgroundBox = ({
                 top: 0,
               }}>
               <Slider duration={4}>{gradientMarkup}</Slider>
-            </div>
+            </Box>
           ) : (
-            <div
+            <Box
               sx={{
                 position: "absolute",
                 left: "50%",
@@ -58,14 +62,14 @@ const GradientBackgroundBox = ({
                 pointerEvents: "none",
                 top: 0,
               }}>
-              <div
+              <Box
                 sx={{
                   position: "relative",
                   width: "100vw",
                 }}>
                 {gradientMarkup}
-              </div>
-            </div>
+              </Box>
+            </Box>
           )}
         </>
       )}

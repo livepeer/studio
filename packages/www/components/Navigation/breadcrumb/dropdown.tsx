@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import { useEffect } from "react";
 import { SxStyleProp } from "theme-ui";
+import { Box } from "@theme-ui/components";
 
 type Props = {
   children: React.ReactNode;
@@ -26,7 +27,7 @@ const BreadcrumbDropdown = ({ children, isOpen, close, id, tipSx }: Props) => {
 
   if (!isOpen) return null;
   return (
-    <div
+    <Box
       id={`dropdown-${id}`}
       sx={{
         position: "absolute",
@@ -40,7 +41,7 @@ const BreadcrumbDropdown = ({ children, isOpen, close, id, tipSx }: Props) => {
         p: 3,
         border: "1px solid #EAEAEA",
       }}>
-      <div sx={{ position: "absolute", right: "15px", top: "-8px", ...tipSx }}>
+      <Box sx={{ position: "absolute", right: "15px", top: "-8px", ...tipSx }}>
         <svg
           width="20"
           height="10"
@@ -54,9 +55,9 @@ const BreadcrumbDropdown = ({ children, isOpen, close, id, tipSx }: Props) => {
           />
           <rect y="8" width="20" height="2" fill="white" />
         </svg>
-      </div>
+      </Box>
       {children}
-    </div>
+    </Box>
   );
 };
 

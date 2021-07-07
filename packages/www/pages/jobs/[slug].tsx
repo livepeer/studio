@@ -26,14 +26,15 @@ const Page = ({ title, slug, body, noindex = false, preview }) => {
           ul: { mb: 4 },
           p: { mb: 4 },
         }}>
-        <h1
+        <Box
+          as="h1"
           sx={{
             lineHeight: ["42px", "72px"],
             my: 5,
             fontSize: ["32px", "56px"],
           }}>
           {title}
-        </h1>
+        </Box>
         <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
           <ReactMarkdown className="markdown-body" renderers={{ code: Code }}>
             {body}
@@ -62,11 +63,13 @@ const Page = ({ title, slug, body, noindex = false, preview }) => {
                   "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
               },
             }}>
-            <p sx={{ fontSize: 20, mb: 0 }}>How to Apply</p>
-            <p sx={{ color: "gray" }}>
+            <Box as="p" sx={{ fontSize: 20, mb: 0 }}>
+              How to Apply
+            </Box>
+            <Box as="p" sx={{ color: "gray" }}>
               If you are interested in applying for this position, please send
               an email containing your Github profile and/or LinkedIn.
-            </p>
+            </Box>
             <Button
               isExternal
               isLink

@@ -20,6 +20,7 @@ import {
   InputFilterProps,
   TextFilter,
 } from "./filters";
+import { Box } from "@theme-ui/components";
 
 type FilterItem<Table extends Record<string, unknown>> =
   | { type: "text"; props: InputFilterProps<Table> }
@@ -156,7 +157,7 @@ const Table = <T extends Record<string, unknown>>({
   return (
     <div>
       {header || filters ? (
-        <div
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
@@ -165,7 +166,7 @@ const Table = <T extends Record<string, unknown>>({
           }}>
           <div>{header}</div>
           {filters ? (
-            <div
+            <Box
               sx={{
                 flex: "1",
                 display: "flex",
@@ -197,20 +198,21 @@ const Table = <T extends Record<string, unknown>>({
                     return null;
                 }
                 return (
-                  <div
+                  <Box
                     key={`${f.type}-${f.props.columnId}`}
                     sx={{ ":not(:last-of-type)": { mr: 3 } }}>
                     {filter}
-                  </div>
+                  </Box>
                 );
               })}
-            </div>
+            </Box>
           ) : null}
-        </div>
+        </Box>
       ) : null}
-      <div sx={{ overflow: showOverflow ? "visible" : "hidden" }}>
-        <div sx={{ overflowX: showOverflow ? "visible" : "auto" }}>
-          <table
+      <Box sx={{ overflow: showOverflow ? "visible" : "hidden" }}>
+        <Box sx={{ overflowX: showOverflow ? "visible" : "auto" }}>
+          <Box
+            as="table"
             {...getTableProps()}
             sx={{
               minWidth: "100%",
@@ -219,14 +221,16 @@ const Table = <T extends Record<string, unknown>>({
             }}>
             <thead>
               {headerGroups.map((headerGroup) => (
-                <tr
+                <Box
+                  as="tr"
                   {...headerGroup.getHeaderGroupProps()}
                   sx={{ borderRadius: "8px" }}>
                   {headerGroup.headers.map((column, i) => {
                     const withHelpTooltip =
                       someColumnCanSort && i === headerGroup.headers.length - 1;
                     return (
-                      <th
+                      <Box
+                        as="th"
                         scope="col"
                         {...column.getHeaderProps(
                           // @ts-ignore
@@ -258,18 +262,18 @@ const Table = <T extends Record<string, unknown>>({
                             borderBottomRightRadius: 6,
                           },
                         }}>
-                        <div
+                        <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
                             mr: withHelpTooltip ? 3 : 0,
                           }}>
-                          <span sx={{ whiteSpace: "nowrap" }}>
+                          <Box as="span" sx={{ whiteSpace: "nowrap" }}>
                             {column.render("Header")}
-                          </span>
+                          </Box>
                           {/*@ts-ignore */}
                           {column.canSort && (
-                            <span sx={{ ml: 2 }}>
+                            <Box as="span" sx={{ ml: 2 }}>
                               {/* @ts-ignore */}
                               {column.isSorted
                                 ? // @ts-ignore
@@ -277,11 +281,11 @@ const Table = <T extends Record<string, unknown>>({
                                   ? " ⭣"
                                   : " ⭡"
                                 : " ⭥"}
-                            </span>
+                            </Box>
                           )}
-                        </div>
+                        </Box>
                         {withHelpTooltip && (
-                          <div
+                          <Box
                             sx={{
                               alignItems: "center",
                               display: "flex",
@@ -307,12 +311,12 @@ const Table = <T extends Record<string, unknown>>({
                                 ml: 1,
                               }}
                             />
-                          </div>
+                          </Box>
                         )}
-                      </th>
+                      </Box>
                     );
                   })}
-                </tr>
+                </Box>
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
@@ -321,7 +325,8 @@ const Table = <T extends Record<string, unknown>>({
                 return (
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => (
-                      <td
+                      <Box
+                        as="td"
                         {...cell.getCellProps()}
                         sx={{
                           px: 4,
@@ -333,21 +338,21 @@ const Table = <T extends Record<string, unknown>>({
                           fontSize: 1,
                         }}>
                         {cell.render("Cell")}
-                      </td>
+                      </Box>
                     ))}
                   </tr>
                 );
               })}
             </tbody>
-          </table>
-        </div>
+          </Box>
+        </Box>
         <Paginator
           canPreviousPage={canPreviousPage}
           canNextPage={canNextPage}
           onPreviousPage={previousPage}
           onNextPage={nextPage}
         />
-      </div>
+      </Box>
     </div>
   );
 };

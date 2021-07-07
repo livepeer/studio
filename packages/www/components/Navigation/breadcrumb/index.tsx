@@ -20,7 +20,8 @@ type Props = {
 };
 
 const Divider = () => (
-  <span
+  <Box
+    as="span"
     sx={{
       ml: "12px",
       mr: "6px",
@@ -29,7 +30,7 @@ const Divider = () => (
       color: "text",
     }}>
     /
-  </span>
+  </Box>
 );
 
 const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
@@ -46,7 +47,8 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
         <Logo logoType={false} />
         {breadcrumb.map((item) => (
           <span key={`breadcrumb-${item.href}`}>
-            <span
+            <Box
+              as="span"
               sx={{
                 position: "relative",
                 display: "inline-flex",
@@ -64,9 +66,10 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                 }}>
                 {slugify(item.children.toString())}
               </Box>
-            </span>
+            </Box>
             {item.mobileDropdownLinks && (
-              <span
+              <Box
+                as="span"
                 sx={{
                   position: "relative",
                   display: ["inline-flex", null, "none"],
@@ -125,7 +128,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
                       />
                     ))}
                 </BreadcrumbDropdown>
-              </span>
+              </Box>
             )}
           </span>
         ))}

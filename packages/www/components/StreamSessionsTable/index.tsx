@@ -69,7 +69,7 @@ const RecordingUrlCell = <D extends TableData>({
   const id = cell.value.id;
 
   return (
-    <div id={`mp4-link-dropdown-${id}`} sx={{ position: "relative" }}>
+    <Box id={`mp4-link-dropdown-${id}`} sx={{ position: "relative" }}>
       {cell.value.href ? (
         <Flex sx={{ justifyContent: "space-between" }}>
           <Link href={cell.value.href}>
@@ -95,7 +95,7 @@ const RecordingUrlCell = <D extends TableData>({
       ) : (
         cell.value.children
       )}
-    </div>
+    </Box>
   );
 };
 
@@ -202,7 +202,9 @@ const StreamSessionsTable = ({
 
   return streamsSessions.length ? (
     <Box sx={{ mb: "0.5em", mt: "2em" }}>
-      <h4 sx={{ mb: "0.5em" }}>Stream Sessions</h4>
+      <Box as="h4" sx={{ mb: "0.5em" }}>
+        Stream Sessions
+      </Box>
       <TableV2
         columns={columns}
         data={data}

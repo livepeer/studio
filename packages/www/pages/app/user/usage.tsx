@@ -129,7 +129,9 @@ const Usage = () => {
                 }}>
                 /
                 {!products[user.stripeProductId].order ? (
-                  <span sx={{ mt: "3px", ml: 2 }}>1,000 min</span>
+                  <Box as="span" sx={{ mt: "3px", ml: 2 }}>
+                    1,000 min
+                  </Box>
                 ) : (
                   <MdAllInclusive sx={{ mt: "3px", ml: 2 }} />
                 )}

@@ -268,7 +268,8 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             }}>
             <b>New beta feature</b>: Record your live streams. Send feedback to
             help@livepeer.com.
-            <a
+            <Box
+              as="a"
               target="_blank"
               href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
               sx={{
@@ -280,7 +281,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
                 ":hover": { textDecoration: "underline" },
               }}>
               <b>Read more ⬈</b>
-            </a>
+            </Box>
           </Box>
         </Box>
       </Flex>

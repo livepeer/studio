@@ -50,9 +50,9 @@ const Menu = ({
           py: 3,
           bg: "background",
         }}>
-        <div sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType={!token} />
-        </div>
+        </Box>
         <IconButton
           sx={{ fontSize: 6 }}
           onClick={() => setMobileMenuIsOpen(false)}>
@@ -76,7 +76,7 @@ const Menu = ({
               variant="mobileNav"
             />
           ))}
-          <hr sx={{ my: 3, visibility: "hidden" }} />
+          <Box as="hr" sx={{ my: 3, visibility: "hidden" }} />
           {!!token ? (
             <>
               <Button href="/dashboard" isLink>

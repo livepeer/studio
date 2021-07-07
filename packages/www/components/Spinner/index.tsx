@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { keyframes } from "@emotion/core";
+import { Box } from "@theme-ui/components";
 
 const rotate = keyframes`
   100% {
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export default ({ loading, ...props }: Props) => (
-  <div
+  <Box
     {...props}
     sx={{
       border: "3px solid",
@@ -24,5 +25,6 @@ export default ({ loading, ...props }: Props) => (
       height: 26,
       animation: `${rotate} 1s linear`,
       animationIterationCount: "infinite",
-    }}></div>
+    }}
+  />
 );

@@ -23,7 +23,8 @@ export default ({ heading, image, values }) => (
       pb: [60, 60, 170],
       position: "relative",
     }}>
-    <img
+    <Box
+      as="img"
       alt={image.alt}
       width={356}
       height={356}
@@ -55,7 +56,8 @@ export default ({ heading, image, values }) => (
             gridArea: ["auto", "auto", "auto", gridAreas[i]],
             mb: 4,
           }}>
-          <img
+          <Box
+            as="img"
             alt={value.image.alt}
             width={70}
             height={70}

@@ -159,7 +159,7 @@ const DocsIndex = ({ doc, menu }) => {
           <link rel="stylesheet" href="/markdown.css" />
         </Head>
         <NextSeo {...resolvedSEO} />
-        <div
+        <Box
           onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
           sx={{
             display: ["flex", "flex", "none", "none"],
@@ -180,7 +180,7 @@ const DocsIndex = ({ doc, menu }) => {
           ) : (
             <FiList color="white" size={24} />
           )}
-        </div>
+        </Box>
         <Box
           sx={{
             display: ["flex", "flex", "grid", "grid"],
@@ -217,7 +217,7 @@ const DocsIndex = ({ doc, menu }) => {
               justifyContent: "center",
               alignItems: "flex-start",
             }}>
-            <div
+            <Box
               className={styles.markdown}
               sx={{
                 display: "flex",
@@ -226,7 +226,7 @@ const DocsIndex = ({ doc, menu }) => {
                 maxWidth: "768px",
                 paddingBottom: "80px",
               }}>
-              <div
+              <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -242,9 +242,9 @@ const DocsIndex = ({ doc, menu }) => {
                     {idx < breadCrumb.length - 3 && <> / </>}
                   </Fragment>
                 ))}
-              </div>
+              </Box>
               <main>{content}</main>
-            </div>
+            </Box>
           </Container>
         </Box>
       </ThemeProvider>

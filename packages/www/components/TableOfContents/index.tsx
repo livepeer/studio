@@ -35,7 +35,8 @@ const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
   children,
   pushSx,
 }) => (
-  <i
+  <Box
+    as="i"
     sx={{
       display: "inline-flex",
       alignItems: "center",
@@ -47,7 +48,7 @@ const IconContainer: React.FC<{ pushSx?: SxStyleProp }> = ({
       ...pushSx,
     }}>
     {children}
-  </i>
+  </Box>
 );
 
 const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
@@ -93,7 +94,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
     };
     return (
       <Link href={heading.slug} passHref>
-        <a
+        <Box
+          as="a"
           onClick={onClose}
           sx={{
             fontSize: "16px",
@@ -137,7 +139,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             }}>
             {heading.content}
           </Box>
-        </a>
+        </Box>
       </Link>
     );
   }

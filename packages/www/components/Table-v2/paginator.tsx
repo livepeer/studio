@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import Button from "components/Button";
+import { Box } from "@theme-ui/components";
 
 interface Props {
   canPreviousPage: boolean;
@@ -16,7 +17,8 @@ const Paginator = ({
   onNextPage,
 }: Props) =>
   canPreviousPage || canNextPage ? (
-    <nav
+    <Box
+      as="nav"
       aria-label="Pagination"
       sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
       <Button
@@ -32,7 +34,7 @@ const Paginator = ({
         disabled={!canNextPage}>
         Next page
       </Button>
-    </nav>
+    </Box>
   ) : null;
 
 export default Paginator;

@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import LogoSvg from "../../public/img/logo.svg";
-import { Flex, Link as A } from "@theme-ui/components";
+import { Flex, Box, Link as A } from "@theme-ui/components";
 
 type Props = {
   logoType?: boolean;
@@ -35,7 +35,8 @@ const Logo = ({ logoType = true, isDark, withoutBeta }: Props) => (
         </Flex>
       )}
       {!withoutBeta && (
-        <span
+        <Box
+          as="span"
           sx={{
             mt: "2px",
             ml: logoType ? "6px" : "10px",
@@ -48,7 +49,7 @@ const Logo = ({ logoType = true, isDark, withoutBeta }: Props) => (
             bg: "rgb(148, 60, 255, .1)",
           }}>
           beta
-        </span>
+        </Box>
       )}
     </A>
   </Link>

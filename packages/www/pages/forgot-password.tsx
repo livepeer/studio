@@ -49,7 +49,9 @@ const ForgotPasswordPage = () => {
           flexDirection: "column",
           py: 6,
         }}>
-        <h3 sx={{ mb: 4 }}>Reset your password</h3>
+        <Box as="h3" sx={{ mb: 4 }}>
+          Reset your password
+        </Box>
         <Login
           id="forgot-password"
           showEmail={true}
