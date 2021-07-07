@@ -883,19 +883,19 @@ app.put(
       return res.json({ errors: ["user is suspended"] });
     }
 
-      // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-      // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+  // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+  // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
-    // -------------------------------
-    // new webhookCannon
-    req.queue.emit({
-      id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event: req.body.active === true ? "stream.started" : "stream.idle",
-      streamId: id,
-      userId: user.id,
-    });
+  // -------------------------------
+  // new webhookCannon
+  req.queue.emit({
+    id: uuid(),
+    createdAt: Date.now(),
+    channel: "webhooks",
+    event:  req.body.active === true ? "stream.started" : "stream.idle",
+    streamId: id,
+    userId: user.id,
+  });
 
     stream.isActive = !!req.body.active;
     stream.lastSeen = +new Date();
