@@ -178,7 +178,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
 
   return (
     <>
-      <AlertDialog open={open}>
+      <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
         <Flex css={{ ai: "center" }}>
           <Button
             size="3"

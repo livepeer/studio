@@ -102,7 +102,7 @@ const PaymentMethodDialog = ({}) => {
   };
 
   return (
-    <AlertDialog open={open}>
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <Flex css={{ ai: "center" }}>
         <Button
           size="2"

@@ -382,7 +382,9 @@ const StreamsTable = ({
       />
 
       {/* Delete streams dialog */}
-      <AlertDialog open={deleteDialogState.on}>
+      <AlertDialog
+        open={deleteDialogState.on}
+        onOpenChange={deleteDialogState.onOff}>
         <AlertDialogContent
           css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle as={Heading} size="1">
