@@ -36,7 +36,7 @@
     "now:staging": "cp -Rv .now-staging .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "now:production": "cp -Rv .now-production .vercel && vercel deploy --token=$ZEIT_KEY --prod",
     "postinstall": "lerna run --stream postinstall",
-    "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
+    "prettier:base": "prettier '**/*.{ts,js,css,html,tsx,yaml,yml}'",
     "prettier": "yarn run prettier:base --write",
     "prettier:check": "yarn run prettier:base --check"
   },
