@@ -168,6 +168,7 @@ const ClipBut = ({ text }) => {
 };
 
 const ID = () => {
+  useLoggedIn();
   const { user, getStream, getIngest, setRecord, getAdminStreams } = useApi();
   const userIsAdmin = user && user.admin;
   const router = useRouter();
