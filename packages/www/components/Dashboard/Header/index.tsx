@@ -19,9 +19,10 @@ import HyperlinkIcon from "../../../public/img/icons/hyperlink.svg";
 import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../../public/img/icons/checked.svg";
 import { TextArea } from "@modulz/design-system";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hubspot";
 import { useApi } from "hooks";
+import { useRouter } from "next/router";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -55,6 +56,7 @@ const StyledQuestionMarkIcon = styled(QuestionIcon, {
 const reactions: string[] = ["🤩", "😀", "😕", "😭"];
 
 const Header = ({ breadcrumbs = [] }) => {
+  const formEl = useRef(null);
   const { user } = useApi();
   const [form, setForm] = useState({
     email: user?.email,
@@ -67,6 +69,19 @@ const Header = ({ breadcrumbs = [] }) => {
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
+
+  useEffect(() => {
+    if (data) {
+      setFormSent(true);
+      formEl.current.reset();
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (user) {
+      setForm({ ...form, email: user.email });
+    }
+  }, [user]);
 
   return (
     <Box
@@ -147,17 +162,7 @@ const Header = ({ breadcrumbs = [] }) => {
                       </Text>
                     )}
                   </Text>
-                  <Box
-                    as="form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      if (!form.reaction) {
-                        setErrorMessage("Select an emoji :)");
-                        return;
-                      }
-                      setFormSent(true);
-                      handleSubmit;
-                    }}>
+                  <Box ref={formEl} as="form" onSubmit={handleSubmit}>
                     <TextArea
                       size="2"
                       required
@@ -204,8 +209,8 @@ const Header = ({ breadcrumbs = [] }) => {
                           </Box>
                         ))}
                         <input
-                          name="emoji-input"
-                          id="emoji-input"
+                          name="emoji"
+                          id="emoji"
                           onChange={(e) => {
                             const value = e.target.value;
                             setForm((prev) => ({ ...prev, reaction: value }));
@@ -217,16 +222,7 @@ const Header = ({ breadcrumbs = [] }) => {
                             height: "0px",
                           }}
                         />
-                        <input
-                          name="email"
-                          id="email"
-                          type="hidden"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setForm((prev) => ({ ...prev, email: value }));
-                          }}
-                          value={form.email}
-                        />
+                        <input name="email" type="hidden" value={form.email} />
                       </Flex>
                       <Button disabled={formSent} type="submit">
                         Send
