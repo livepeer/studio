@@ -96,7 +96,6 @@ const TokenTable = ({
   );
 
   const Key = ({ token }) => {
-    const [isCopied, setCopied] = useState(0);
     const [keyRevealed, setKeyRevealed] = useState(false);
 
     return (
