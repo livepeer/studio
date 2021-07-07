@@ -10,14 +10,14 @@ const StyledAccordion = styled(AccordionPrimitive.Root, {
   borderRadius: "$1",
 });
 
-const StyledPanel = styled(AccordionPrimitive.Panel, {
+const StyledPanel = styled(AccordionPrimitive.Content, {
   pt: "$0",
   pb: "$5",
   px: "$7",
   backgroundColor: "$mauve2",
 });
 
-const StyledButton = styled(AccordionPrimitive.Button, {
+const StyledButton = styled(AccordionPrimitive.Trigger, {
   all: "unset",
   boxSizing: "border-box",
   userSelect: "none",
@@ -91,13 +91,13 @@ const StyledHeader = styled(AccordionPrimitive.Header, {
 });
 
 type AccordionButtonOwnProps = Polymorphic.OwnProps<
-  typeof AccordionPrimitive.Button
+  typeof AccordionPrimitive.Trigger
 > & {
   css?: any;
 };
 
 type AccordionButtonComponent = Polymorphic.ForwardRefComponent<
-  Polymorphic.IntrinsicElement<typeof AccordionPrimitive.Button>,
+  Polymorphic.IntrinsicElement<typeof AccordionPrimitive.Trigger>,
   AccordionButtonOwnProps
 >;
 
