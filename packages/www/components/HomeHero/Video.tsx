@@ -7,15 +7,18 @@ import Image from "next/image";
 
 const videos = [
   {
-    src: "https://cdn.sanity.io/files/dp4k3mpw/production/637be3e2106acb746559af41d5f57fae1edb535d.mp4",
+    src:
+      "https://cdn.sanity.io/files/dp4k3mpw/production/637be3e2106acb746559af41d5f57fae1edb535d.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
   {
-    src: "https://cdn.sanity.io/files/dp4k3mpw/production/24a650d65020ffb01beaa6c06bb79427ec5431b5.mp4",
+    src:
+      "https://cdn.sanity.io/files/dp4k3mpw/production/24a650d65020ffb01beaa6c06bb79427ec5431b5.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
   {
-    src: "https://cdn.sanity.io/files/dp4k3mpw/production/bc7f603cf9e28c8545ce6394a6d1118e88293211.mp4",
+    src:
+      "https://cdn.sanity.io/files/dp4k3mpw/production/bc7f603cf9e28c8545ce6394a6d1118e88293211.mp4",
     views: Math.round(100 + Math.random() * 500),
   },
 ];

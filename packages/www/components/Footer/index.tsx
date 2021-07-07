@@ -72,7 +72,8 @@ const Footer = () => {
   const { user, getVersion } = useApi();
   const [email, setEmail] = useState("");
   const [mailchimp, subscribe] = useMailchimp({
-    url: "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158",
+    url:
+      "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158",
   });
 
   // @ts-ignore

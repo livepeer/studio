@@ -5,7 +5,8 @@ import { useThemeUI, ThemeProvider as TP, Styled } from "theme-ui";
 export const theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
   fonts: {
-    body: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
+    body:
+      'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
     heading: "inherit",
     monospace: "'Fira Code', Menlo, monospace",
   },

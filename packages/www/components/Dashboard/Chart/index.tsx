@@ -51,7 +51,7 @@ const Chart = ({ data }) => {
           color: "#666666",
           fontSize: "12px",
           position: "absolute",
-          bottom: '-30px',
+          bottom: "-30px",
           left: "50px",
         }}>
         Seconds since stream loaded in test player
