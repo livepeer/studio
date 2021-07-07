@@ -26,7 +26,7 @@ import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { CopyIcon } from "@radix-ui/react-icons";
+import { CopyIcon, ArrowRightIcon } from "@radix-ui/react-icons";
 import CreateTokenDialog from "./CreateTokenDialog";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
@@ -192,8 +192,9 @@ const TokenTable = ({
         API keys allow you to authenticate API requests in your app
       </Text>
       <Link href="/docs/guides/api" passHref>
-        <A variant="violet" css={{ mb: "$5", display: "block" }}>
-          Learn more
+        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+          <Box>Learn more</Box>
+          <ArrowRightIcon />
         </A>
       </Link>
       <Button

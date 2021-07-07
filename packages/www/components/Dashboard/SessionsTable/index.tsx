@@ -23,6 +23,7 @@ import {
   Link as A,
 } from "@livepeer.com/design-system";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -190,8 +191,9 @@ const StreamSessionsTable = ({
         Sessions belong to parent streams.
       </Text>
       <Link href="/docs/api-reference/session/session" passHref>
-        <A variant="violet" css={{ mb: "$5", display: "block" }}>
-          Learn more
+        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+          <Box>Learn more</Box>
+          <ArrowRightIcon />
         </A>
       </Link>
     </Flex>

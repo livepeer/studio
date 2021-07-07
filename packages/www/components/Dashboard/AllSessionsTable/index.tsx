@@ -36,7 +36,7 @@ import {
   useSnackbar,
 } from "@livepeer.com/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { Cross1Icon, ArrowRightIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
@@ -242,8 +242,9 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         Stream sessions belong to parent streams.
       </Text>
       <Link href="/docs/api-reference/session/session" passHref>
-        <A variant="violet" css={{ mb: "$5", display: "block" }}>
-          Learn more
+        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+          <Box>Learn more</Box>
+          <ArrowRightIcon />
         </A>
       </Link>
     </Flex>

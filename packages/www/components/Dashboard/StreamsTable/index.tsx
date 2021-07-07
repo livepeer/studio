@@ -30,7 +30,12 @@ import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { QuestionMarkIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
+import {
+  QuestionMarkIcon,
+  Cross1Icon,
+  PlusIcon,
+  ArrowRightIcon,
+} from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
@@ -311,8 +316,9 @@ const StreamsTable = ({
         your live stream with Livepeer.com.
       </Text>
       <Link href="/docs" passHref>
-        <A variant="violet" css={{ mb: "$5", display: "block" }}>
-          Learn more
+        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+          <Box>Learn more</Box>
+          <ArrowRightIcon />
         </A>
       </Link>
       <Button
