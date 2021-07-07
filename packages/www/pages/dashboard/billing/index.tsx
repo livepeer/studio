@@ -223,15 +223,9 @@ const Billing = () => {
             </Heading>
           </Flex>
           {!products[user.stripeProductId].order ? (
-            <Text
-              variant="gray"
-              css={{
-                maxWidth: 600,
-                mx: "auto",
-                textAlign: "center",
-              }}>
+            <Text variant="gray">
               The Personal plan is free of charge up to 1000 minutes per month
-              and limited to 10 concurrent viewers per account
+              and limited to 10 concurrent viewers per account.
             </Text>
           ) : (
             subscription && (
