@@ -26,7 +26,7 @@ const Terminate = ({ stream, invalidate, ...props }) => {
   const [message, setMessage] = useState(initialMessage);
 
   return (
-    <AlertDialog open={open} {...props}>
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)} {...props}>
       <Box
         as={DropdownMenuItem}
         color="red"

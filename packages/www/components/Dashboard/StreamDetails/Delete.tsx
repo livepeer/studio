@@ -23,7 +23,7 @@ const Delete = ({ stream, invalidate, ...props }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <AlertDialog open={open} {...props}>
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)} {...props}>
       <Box
         as={DropdownMenuItem}
         onSelect={(e) => {

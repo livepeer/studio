@@ -25,7 +25,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
   const [openSnackbar] = useSnackbar();
 
   return (
-    <AlertDialog open={open}>
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       {isSwitch ? (
         <Switch
           checked={!!stream.record}

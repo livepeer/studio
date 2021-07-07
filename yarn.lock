@@ -3128,6 +3128,21 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
+"@radix-ui/react-accordion@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-accordion/-/react-accordion-0.0.17.tgz#378b6512c7a8b029950f651ed6007f410e9b438e"
+  integrity sha512-Rf4RJBDTNCbeLP1NB1UKGdy/+vLAAv+GSbN4gEgNa8MOBkZtD0nq4qwXbYdJPcS0ljWara6OBCG0cr2f1SvSPg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.0.5"
+    "@radix-ui/react-collapsible" "0.0.16"
+    "@radix-ui/react-compose-refs" "0.0.5"
+    "@radix-ui/react-context" "0.0.5"
+    "@radix-ui/react-id" "0.0.6"
+    "@radix-ui/react-polymorphic" "0.0.12"
+    "@radix-ui/react-primitive" "0.0.14"
+    "@radix-ui/react-use-controllable-state" "0.0.6"
+
 "@radix-ui/react-accordion@0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-accordion/-/react-accordion-0.0.7.tgz#cc2601bab4876909802ed07c3169267fab8b812e"
@@ -3219,6 +3234,22 @@
     "@radix-ui/react-presence" "0.0.7"
     "@radix-ui/react-primitive" "0.0.6"
     "@radix-ui/react-use-controllable-state" "0.0.1"
+
+"@radix-ui/react-collapsible@0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-collapsible/-/react-collapsible-0.0.16.tgz#6a99068f70bb85a60f8cbd43f093bd3053ab61cc"
+  integrity sha512-kY9wojEbrpTge6sz3BZl1oXer2Szhi+MW60TSDf14mL6l8+e4ugp5y2ItGDjcW5B7AzL00dsMtqlxuAkhFjWxQ==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.0.5"
+    "@radix-ui/react-compose-refs" "0.0.5"
+    "@radix-ui/react-context" "0.0.5"
+    "@radix-ui/react-id" "0.0.6"
+    "@radix-ui/react-polymorphic" "0.0.12"
+    "@radix-ui/react-presence" "0.0.14"
+    "@radix-ui/react-primitive" "0.0.14"
+    "@radix-ui/react-use-controllable-state" "0.0.6"
+    "@radix-ui/react-use-layout-effect" "0.0.5"
 
 "@radix-ui/react-collapsible@0.0.7":
   version "0.0.7"

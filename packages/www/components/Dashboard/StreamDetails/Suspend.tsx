@@ -22,15 +22,14 @@ const Suspend = ({ stream, invalidate }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <AlertDialog open={open}>
-      <Box
-        as={DropdownMenuItem}
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
+      <DropdownMenuItem
         onSelect={(e) => {
           e.preventDefault();
           setOpen(true);
         }}>
         {!stream.suspended ? "Suspend stream" : "Unsuspend stream"}
-      </Box>
+      </DropdownMenuItem>
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
