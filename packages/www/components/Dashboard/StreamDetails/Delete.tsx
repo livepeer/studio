@@ -59,8 +59,9 @@ const Delete = ({ stream, invalidate, ...props }) => {
             as={Button}
             size="2"
             disabled={saving}
-            onClick={async () => {
+            onClick={async (e) => {
               try {
+                e.preventDefault();
                 setSaving(true);
                 await deleteStream(stream.id);
                 Router.replace("/dashboard");

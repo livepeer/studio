@@ -84,7 +84,8 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
             size="2"
             as={Button}
             disabled={saving}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               setSaving(true);
               await setRecord(stream.id, !stream.record);
               await invalidate();

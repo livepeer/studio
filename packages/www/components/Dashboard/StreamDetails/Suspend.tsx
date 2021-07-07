@@ -59,7 +59,8 @@ const Suspend = ({ stream, invalidate }) => {
             as={Button}
             variant={stream.suspended ? "violet" : "red"}
             disabled={saving}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               setSaving(true);
               const newValue = !stream.suspended;
               await suspendStream(stream.id, newValue);

@@ -25,19 +25,9 @@ import {
   Flex,
   Heading,
   Link as A,
-  AlertDialog,
-  AlertDialogTitle,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-  Button,
   Text,
-  useSnackbar,
 } from "@livepeer.com/design-system";
-import { useToggleState } from "hooks/use-toggle-state";
-import { Cross1Icon, ArrowRightIcon } from "@radix-ui/react-icons";
-import Spinner from "components/Dashboard/Spinner";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -102,14 +92,10 @@ type SessionsTableData = {
 };
 
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
-  const { user, getStreamSessionsByUserId, deleteStream, deleteStreams } =
-    useApi();
+  const { user, getStreamSessionsByUserId } = useApi();
   const tableProps = useTableState({
     tableId: "allSessionsTable",
   });
-  const deleteDialogState = useToggleState();
-  const savingState = useToggleState();
-  const [openSnackbar] = useSnackbar();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -211,24 +197,6 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
     [getStreamSessionsByUserId, user.id]
   );
 
-  const onDeleteStreams = useCallback(async () => {
-    if (tableProps.state.selectedRows.length === 1) {
-      await deleteStream(tableProps.state.selectedRows[0].id);
-      await tableProps.state.invalidate();
-      deleteDialogState.onOff();
-    } else if (tableProps.state.selectedRows.length > 1) {
-      await deleteStreams(tableProps.state.selectedRows.map((s) => s.id));
-      await tableProps.state.invalidate();
-      deleteDialogState.onOff();
-    }
-  }, [
-    deleteStream,
-    deleteStreams,
-    deleteDialogState.onOff,
-    tableProps.state.selectedRows.length,
-    tableProps.state.invalidate,
-  ]);
-
   const emptyState = (
     <Flex
       direction="column"
@@ -268,79 +236,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
             </Heading>
           </>
         }
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon />{" "}
-              <Box css={{ ml: "$2" }} as="span">
-                Delete
-              </Box>
-            </>
-          ),
-        }}
       />
-
-      <AlertDialog open={deleteDialogState.on}>
-        <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-          <AlertDialogTitle as={Heading} size="1">
-            Delete {tableProps.state.selectedRows.length} session
-            {tableProps.state.selectedRows.length > 1 && "s"}?
-          </AlertDialogTitle>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the session
-            {tableProps.state.selectedRows.length > 1 && "s"}. This action
-            cannot be undone.
-          </AlertDialogDescription>
-
-          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={deleteDialogState.onOff}
-              as={Button}
-              ghost>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              as={Button}
-              size="2"
-              disabled={savingState.on}
-              onClick={async () => {
-                try {
-                  savingState.onOn();
-                  await onDeleteStreams();
-                  openSnackbar(
-                    `${tableProps.state.selectedRows.length} session${
-                      tableProps.state.selectedRows.length > 1 ? "s" : ""
-                    } deleted.`
-                  );
-                  savingState.onOff();
-                  deleteDialogState.onOff();
-                } catch (e) {
-                  savingState.onOff();
-                }
-              }}
-              variant="red">
-              {savingState.on && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Delete
-            </AlertDialogAction>
-          </Flex>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

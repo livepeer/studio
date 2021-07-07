@@ -252,8 +252,9 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
               as={Button}
               size="2"
               disabled={savingDeleteDialog}
-              onClick={async () => {
+              onClick={async (e) => {
                 try {
+                  e.preventDefault();
                   setSavingDeleteDialog(true);
                   await onDeleteWebhooks();
                   openSnackbar(

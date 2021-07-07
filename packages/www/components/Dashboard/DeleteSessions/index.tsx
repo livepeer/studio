@@ -68,7 +68,8 @@ const Delete = ({ total, onUnselect, onDelete }) => {
             as={Button}
             size="2"
             disabled={saving}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               try {
                 setSaving(true);
                 await onDelete();

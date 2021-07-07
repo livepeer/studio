@@ -63,7 +63,8 @@ const Terminate = ({ stream, invalidate, ...props }) => {
             size="2"
             as={Button}
             disabled={saving}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               try {
                 setSaving(true);
                 await terminateStream(stream.id);

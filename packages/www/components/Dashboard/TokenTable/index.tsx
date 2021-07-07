@@ -250,7 +250,9 @@ const TokenTable = ({
       />
 
       {/* Delete dialog */}
-      <AlertDialog open={deleteDialogState.on}>
+      <AlertDialog
+        open={deleteDialogState.on}
+        onOpenChange={deleteDialogState.onOff}>
         <AlertDialogContent
           css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle as={Heading} size="1">
@@ -279,8 +281,9 @@ const TokenTable = ({
               as={Button}
               size="2"
               disabled={savingDeleteDialog}
-              onClick={async () => {
+              onClick={async (e) => {
                 try {
+                  e.preventDefault();
                   setSavingDeleteDialog(true);
                   const promises = tableProps.state.selectedRows.map(
                     async (row) => {
