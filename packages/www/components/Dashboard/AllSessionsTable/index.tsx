@@ -118,7 +118,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         accessor: "parentStream",
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
-          stringSort("original.parentStream.children", ...params),
+          stringSort("original.parentStream.name", ...params),
       },
       {
         Header: "Created at",
@@ -164,6 +164,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
             id: stream.id,
             parentStream: {
               id: stream.parentId,
+              name: stream.parentStream.name,
               children: (
                 <A variant="violet" as={Box}>
                   {stream.parentStream.name}

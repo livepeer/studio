@@ -89,7 +89,7 @@ const TokenTable = ({
         accessor: "createdAt",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          stringSort("original.createdAt.date", ...params),
+          dateSort("original.createdAt.date", ...params),
       },
     ],
     []
