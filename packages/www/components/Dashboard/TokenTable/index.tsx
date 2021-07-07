@@ -89,14 +89,13 @@ const TokenTable = ({
         accessor: "createdAt",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          stringSort("original.createdAt.date", ...params),
+          dateSort("original.createdAt.date", ...params),
       },
     ],
     []
   );
 
   const Key = ({ token }) => {
-    const [isCopied, setCopied] = useState(0);
     const [keyRevealed, setKeyRevealed] = useState(false);
 
     return (
