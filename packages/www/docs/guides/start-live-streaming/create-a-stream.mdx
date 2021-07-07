@@ -7,30 +7,58 @@ description: Create a Livepeer.com stream
 
 ## The `stream` object
 
-Live streaming with Livepeer.com is easy. The first step is understanding the `stream` object. It is the core building block of the Livepeer.com platform.
+Live streaming with Livepeer.com is easy. The first step is understanding the
+`stream` object. It is the core building block of the Livepeer.com platform.
 
-A Livepeer.com `stream` is a unique object with configuration data and metadata about all live stream sessions associated with it. Historically, a `stream` object with a `parentId` represents a single live stream session. This type of “child-session” stream object will be deprecated in an upcoming version of the API in favor of the `session` object.
+A Livepeer.com `stream` is a unique object with configuration data and metadata
+about all live stream sessions associated with it. Historically, a `stream`
+object with a `parentId` represents a single live stream session. This type of
+“child-session” stream object will be deprecated in an upcoming version of the
+API in favor of the `session` object.
 
 There are two ways to create a stream object:
 
 <DocsGrid cols={3}>
-    <NavigationCard href='/docs/guides/start-live-streaming/create-a-stream#no-code-stream-creation-with-the-livepeer-com-dashboard' title='No code stream creation in the Livepeer.com Dashboard' label='Jump to section' />
-    <NavigationCard href='/docs/guides/start-live-streaming/create-a-stream#create-a-stream-object-with-a-post-request-to-the-api' title='Create a stream object with a POST request to the API' label='Jump to section' />
+  <NavigationCard
+    href="/docs/guides/start-live-streaming/create-a-stream#no-code-stream-creation-with-the-livepeer-com-dashboard"
+    title="No code stream creation in the Livepeer.com Dashboard"
+    label="Jump to section"
+  />
+  <NavigationCard
+    href="/docs/guides/start-live-streaming/create-a-stream#create-a-stream-object-with-a-post-request-to-the-api"
+    title="Create a stream object with a POST request to the API"
+    label="Jump to section"
+  />
 </DocsGrid>
 
 ### No code stream creation with the Livepeer.com Dashboard
-Login to the Livepeer.com Dashboard, and navigate to the Streams page, [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams). On this page you can create a new stream and delete streams. When you name your stream, pick a unique name and include URL compatible characters only.
 
-On the Stream page ([livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams)), you can also click on a stream to find out configuration and usage information.
+Login to the Livepeer.com Dashboard, and navigate to the Streams page,
+[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams). On
+this page you can create a new stream and delete streams. When you name your
+stream, pick a unique name and include URL compatible characters only.
+
+On the Stream page
+([livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams)), you
+can also click on a stream to find out configuration and usage information.
 
 ### Create a stream object with a POST request to the API
-Send a `POST` request to `https://livepeer.com/api/stream`. This creates a new Livepeer.com `stream` object.
 
-Use a Livepeer.com API key as a part of the authorization header, and use a JSON body to specify the configuration for the stream. The only parameter you are required to set is the `name` of your stream, but we also highly recommend that you define the `profiles` parameter with 720p, 480p and 360p renditions.
+Send a `POST` request to `https://livepeer.com/api/stream`. This creates a new
+Livepeer.com `stream` object.
 
-If you do not define transcoding rendition `profiles` when creating the `stream`, no transcoding will happen. Your playback video will have the attributes of the source stream only, will not take advantage of adaptive bitrate streaming and will likely buffer.
+Use a Livepeer.com API key as a part of the authorization header, and use a JSON
+body to specify the configuration for the stream. The only parameter you are
+required to set is the `name` of your stream, but we also highly recommend that
+you define the `profiles` parameter with 720p, 480p and 360p renditions.
+
+If you do not define transcoding rendition `profiles` when creating the
+`stream`, no transcoding will happen. Your playback video will have the
+attributes of the source stream only, will not take advantage of adaptive
+bitrate streaming and will likely buffer.
 
 Here is an example request:
+
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
@@ -64,7 +92,11 @@ curl -X POST \
 https://livepeer.com/api/stream
 ```
 
-This is an example response to the request above. `streamKey`, `playbackId`, and `id` are unique to the `stream` object. You will need the `streamKey` to broadcast live video and the `playbackId` to configure the playback URL to watch the live stream.
+This is an example response to the request above. `streamKey`, `playbackId`, and
+`id` are unique to the `stream` object. You will need the `streamKey` to
+broadcast live video and the `playbackId` to configure the playback URL to watch
+the live stream.
+
 ```json
 {
     "name":"test_stream",

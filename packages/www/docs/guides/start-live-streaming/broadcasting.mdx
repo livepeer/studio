@@ -5,24 +5,38 @@ description: Configure broadcast software to stream with Livepeer.com
 
 # Configure broadcast software
 
-You or your application users need to be able to push an RTMP stream. To broadcast a live stream, you’ll need a stream key.
+You or your application users need to be able to push an RTMP stream. To
+broadcast a live stream, you’ll need a stream key.
 
 Here are several ways to find your stream key:
 
-- Login to the Livepeer.com Dashboard, navigate to the streams list page, [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and click on a stream name. Reveal and copy your secret stream key.
-- When you create a `stream` object with a `POST` request to `https://livepeer.com/api/stream`, note the value of the `streamKey` in the response.
-- Make a `GET` request to `https://livepeer.com/api/stream/{id}`, and note the value of the `streamKey` in the response 
+- Login to the Livepeer.com Dashboard, navigate to the streams list page,
+  [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
+  click on a stream name. Reveal and copy your secret stream key.
+- When you create a `stream` object with a `POST` request to
+  `https://livepeer.com/api/stream`, note the value of the `streamKey` in the
+  response.
+- Make a `GET` request to `https://livepeer.com/api/stream/{id}`, and note the
+  value of the `streamKey` in the response
 
-When configuring broadcast software to push streams, use the secret `streamKey` and the Livepeer.com RTMP ingest URL, `rtmp://rtmp.livepeer.com/live`.
+When configuring broadcast software to push streams, use the secret `streamKey`
+and the Livepeer.com RTMP ingest URL, `rtmp://rtmp.livepeer.com/live`.
 
-Depending on the software used to push your RTMP stream, you’ll be prompted for the following:
+Depending on the software used to push your RTMP stream, you’ll be prompted for
+the following:
 
-- Stream Key: In some cases, this is called a "Stream Name." Input your Livepeer.com `streamKey` not the name of your stream.
+- Stream Key: In some cases, this is called a "Stream Name." Input your
+  Livepeer.com `streamKey` not the name of your stream.
 - Server URL: Input the RTMP ingest URL, `rtmp://rtmp.livepeer.com/live`.
-- Location or URL: Input the ingest url with the `streamKey` appended. For example, `rtmp://rtmp.livepeer.com/live/{streamKey}`.
+- Location or URL: Input the ingest url with the `streamKey` appended. For
+  example, `rtmp://rtmp.livepeer.com/live/{streamKey}`.
 
 ## Optimization: Set keyframe intervals
 
-Livepeer works best with consistent, short keyframe intervals, ideally 2 seconds.
+Livepeer works best with consistent, short keyframe intervals, ideally 2
+seconds.
 
-You should set or encourage your users to set this in their broadcasting software. In [OBS](https://obsproject.com/), you can set this by going to "Settings" --> "Output", change the "Output Mode" from "Simple" to "Advanced" and set the "Keyframe interval" to 2.
+You should set or encourage your users to set this in their broadcasting
+software. In [OBS](https://obsproject.com/), you can set this by going to
+"Settings" --> "Output", change the "Output Mode" from "Simple" to "Advanced"
+and set the "Keyframe interval" to 2.

@@ -5,21 +5,33 @@ description: Verify your Livepeer.com stream is active
 
 # Verify a live stream is active
 
-The easiest way to confirm a live stream is active is to login to the Livepeer.com Dashboard, navigate to the Streams page, [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and click on a stream name. Look at the Status row to see if the stream is Active or Idle. If the status Idle, that means that Livepeer.com is not ingesting any video with that stream’s `streamKey`.
+The easiest way to confirm a live stream is active is to login to the
+Livepeer.com Dashboard, navigate to the Streams page,
+[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
+click on a stream name. Look at the Status row to see if the stream is Active or
+Idle. If the status Idle, that means that Livepeer.com is not ingesting any
+video with that stream’s `streamKey`.
 
 ## Verify stream status with the Livepeer.com API
 
-Make a `GET` request to `https://livepeer.com/api/stream/{id}`, and note the value of `isActive` in the response. `true` means the `stream` is active, and Livepeer.com is ingesting video with that stream’s `streamKey`. `false` means that Livepeer.com is not ingesting any video with that `streamKey`.
+Make a `GET` request to `https://livepeer.com/api/stream/{id}`, and note the
+value of `isActive` in the response. `true` means the `stream` is active, and
+Livepeer.com is ingesting video with that stream’s `streamKey`. `false` means
+that Livepeer.com is not ingesting any video with that `streamKey`.
 
-`lastSeen` represents when the stream was last observed by the monitoring system. The time is reported in Unix epoch time. If the stream is running, the epoch will be close to the current time.
+`lastSeen` represents when the stream was last observed by the monitoring
+system. The time is reported in Unix epoch time. If the stream is running, the
+epoch will be close to the current time.
 
 Here is an example request:
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{id}"
 ```
 
 This is an example response:
+
 ```bash
 {
     "name":"test_stream",
@@ -39,7 +51,9 @@ This is an example response:
 
 ## Return all active live streams
 
-This example shows a decoded JSON object. But, remember that anything passed as a parameter in a `GET` request URL must be URL encoded.
+This example shows a decoded JSON object. But, remember that anything passed as
+a parameter in a `GET` request URL must be URL encoded.
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]"
@@ -47,7 +61,9 @@ curl -H 'authorization: Bearer {api-key}' \
 
 ## Return all idle live streams
 
-This example shows a decoded JSON object. Remember that anything passed as a parameter in a `GET` request URL must be URL encoded.
+This example shows a decoded JSON object. Remember that anything passed as a
+parameter in a `GET` request URL must be URL encoded.
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"

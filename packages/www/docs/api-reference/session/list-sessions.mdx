@@ -5,19 +5,24 @@ description: Livepeer.com API Reference | GET a list of sessions
 
 # `GET` a list of sessions
 
-Use `/session` to a return list of sessions with the same `userId`. This will return a list of sessions created by the same Livepeer.com user.
+Use `/session` to a return list of sessions with the same `userId`. This will
+return a list of sessions created by the same Livepeer.com user.
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/session"
 ```
 
-Use `/stream/{parentId}/sessions` to a return list of sessions with the same `parentId`
+Use `/stream/{parentId}/sessions` to a return list of sessions with the same
+`parentId`
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{parentId}/sessions"
 ```
 
 200 OK
+
 ```bash
 [
   {

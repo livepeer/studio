@@ -5,24 +5,37 @@ description: Livepeer.com API requests documentation
 
 # API Requests
 
-The Livepeer.com API is a video live streaming API. With the Livepeer.com API, you or the client can configure details for live broadcasting software, generate a playback URL for stream viewers, get usage data about your stream sessions and more. Explore the [Livepeer.com API reference](/docs/api-reference) for more information.
+The Livepeer.com API is a video live streaming API. With the Livepeer.com API,
+you or the client can configure details for live broadcasting software, generate
+a playback URL for stream viewers, get usage data about your stream sessions and
+more. Explore the [Livepeer.com API reference](/docs/api-reference) for more
+information.
 
-The Livepeer.com API base url is `https://livepeer.com/api/`. As you make requests, the Livepeer.com API returns JSON responses.
+The Livepeer.com API base url is `https://livepeer.com/api/`. As you make
+requests, the Livepeer.com API returns JSON responses.
 
 ## Authentication
-The Livepeer.com API uses API keys to authenticate most requests, including all requests associated with creating and retrieving a stream or session object.
 
-The Livepeer.com API uses Bearer authentication. You or the client must send an API key in the Authorization header when making requests to protected information:
+The Livepeer.com API uses API keys to authenticate most requests, including all
+requests associated with creating and retrieving a stream or session object.
+
+The Livepeer.com API uses Bearer authentication. You or the client must send an
+API key in the Authorization header when making requests to protected
+information:
+
 ```bash
 Authorization: Bearer <api-key>
 ```
-All API requests must be made over HTTPS. API requests without proper authentication will fail.
+
+All API requests must be made over HTTPS. API requests without proper
+authentication will fail.
 
 ## Errors
+
 The Livepeer.com API uses conventional HTTP status codes.
 
 `2XX` = success
 
 `4XX` = client error, problem with information provided
 
-`5XX` = internal server error, problem with Livepeer servers 
+`5XX` = internal server error, problem with Livepeer servers

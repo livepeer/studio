@@ -5,22 +5,49 @@ description: Tips for reducing latency with Livepeer.com
 
 # Tips for reducing latency
 
-Livepeer.com routes your live streams to the nearest available datacenter to ensure your streamers and live stream viewers have a consistent, high quality experience with the minimum latency Livepeer.com can provide. 
+Livepeer.com routes your live streams to the nearest available datacenter to
+ensure your streamers and live stream viewers have a consistent, high quality
+experience with the minimum latency Livepeer.com can provide.
 
-These globally-optimized URLs are the best option for nearly all Livepeer.com users.
+These globally-optimized URLs are the best option for nearly all Livepeer.com
+users.
+
 - Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
 - Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
 
-Also, If you created your stream via the Livepeer.com API, confirm your profile bitrate settings are [reasonable](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices). 
+Also, If you created your stream via the Livepeer.com API, confirm your profile
+bitrate settings are
+[reasonable](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices).
 
-Lastly, sometimes, the source stream is causing poor playback performance even though you are using the globally-optimized URLs above and good bitrate settings. The source stream is the stream sent from your broadcast software. Livepeer serves the source stream with the transcoded renditions via the playback URL.
+Lastly, sometimes, the source stream is causing poor playback performance even
+though you are using the globally-optimized URLs above and good bitrate
+settings. The source stream is the stream sent from your broadcast software.
+Livepeer serves the source stream with the transcoded renditions via the
+playback URL.
 
-One way to test if the source stream is causing problems is by inputting the playback URL in the Livepeer.com [Test Player](/app/test-player). The Test Player is only available to logged in users.
+One way to test if the source stream is causing problems is by inputting the
+playback URL in the Livepeer.com [Test Player](/app/test-player). The Test
+Player is only available to logged in users.
 
-First take a look at the Session Ingest Rate graph at the bottom of the page. If the chart shows a lot of sharp peaks and valleys, this indicates your broadcasting workflow is unstable. The RTMP stream hitting Livepeer's ingest server has problems. Try ensuring a stronger internet connection at the source via a wired ethernet connection or by broadcasting on a more reliable network.
+First take a look at the Session Ingest Rate graph at the bottom of the page. If
+the chart shows a lot of sharp peaks and valleys, this indicates your
+broadcasting workflow is unstable. The RTMP stream hitting Livepeer's ingest
+server has problems. Try ensuring a stronger internet connection at the source
+via a wired ethernet connection or by broadcasting on a more reliable network.
 
-Next, take a look at the left player which shows your source stream, as served by the Livepeer.com CDN. This player is configured to only playback the highest resolution available. Except for rare occasions, the highest resolution is the non-transcoded source stream.
+Next, take a look at the left player which shows your source stream, as served
+by the Livepeer.com CDN. This player is configured to only playback the highest
+resolution available. Except for rare occasions, the highest resolution is the
+non-transcoded source stream.
 
-Compare the source in the left player with the transcoded renditions in the player on the right (ABR). You can manually switch between transcoded renditions by clicking on the ⋮ symbol in the lower right corner of the player. 
+Compare the source in the left player with the transcoded renditions in the
+player on the right (ABR). You can manually switch between transcoded renditions
+by clicking on the ⋮ symbol in the lower right corner of the player.
 
-If the problems in the source-only stream are also present in the transcoded renditions, there is something wrong with your source stream. If you can, instruct the streamer to set the keyframe interval to 2 in their broadcasting software; this can help. In general, make sure your broadcasting workflow is stable. If the RTMP stream hitting Livepeer's ingest server has problems, try ensuring a stronger internet connection at the source via a wired ethernet connection or by broadcasting on a more reliable network.
+If the problems in the source-only stream are also present in the transcoded
+renditions, there is something wrong with your source stream. If you can,
+instruct the streamer to set the keyframe interval to 2 in their broadcasting
+software; this can help. In general, make sure your broadcasting workflow is
+stable. If the RTMP stream hitting Livepeer's ingest server has problems, try
+ensuring a stronger internet connection at the source via a wired ethernet
+connection or by broadcasting on a more reliable network.

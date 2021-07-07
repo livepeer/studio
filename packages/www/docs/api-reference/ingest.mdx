@@ -9,19 +9,22 @@ The Livepeer.com API `ingest` endpoint references stream ingest data centers on
 the Livepeer network. In the JSON response, each data center region is three
 letters, the airport code of the server location.
 
-Use `/ingest` to discover which ingest data center is closest. Ingest and playback URLs for each livestream session must be
-from the same region.
+Use `/ingest` to discover which ingest data center is closest. Ingest and
+playback URLs for each livestream session must be from the same region.
+
 ```bash
 curl "https://livepeer.com/api/ingest"`
 ```
 
 Use `/ingest` with `?first=false` appended to discover all available ingest and
-playback URL pairs. 
+playback URL pairs.
+
 ```bash
 `curl "https://livepeer.com/api/ingest?first=false"`
 ```
 
 200 OK
+
 ```bash
 [
   {
@@ -35,7 +38,7 @@ playback URL pairs.
 ## Attributes
 
 | JSON parameter | Type   | Description                                                                                       |
-| ---------- | ------ | ------------------------------------------------------------------------------------------------- |
-| `base`     | string | Base URL for the playback URL.                                                                    |
-| `ingest`   | string | Base URL used to to configure the broadcast software. Pair it with a `stream` object `streamKey`. |
-| `playback` | string | Base URL for HLS playback. Append a `stream` object `playbackId` to create the full playback URL. |
+| -------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| `base`         | string | Base URL for the playback URL.                                                                    |
+| `ingest`       | string | Base URL used to to configure the broadcast software. Pair it with a `stream` object `streamKey`. |
+| `playback`     | string | Base URL for HLS playback. Append a `stream` object `playbackId` to create the full playback URL. |

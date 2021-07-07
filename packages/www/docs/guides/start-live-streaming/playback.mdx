@@ -5,28 +5,43 @@ description: Playback a Livepeer.com live stream
 
 # Playback a live stream
 
-This is how a Livepeer.com playback URL is formatted: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+This is how a Livepeer.com playback URL is formatted:
+`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
 
 All sessions for a stream have the same playback URL.
 
-The easiest way to the stream playback URL is to login to the Livepeer.com Dashboard, navigate to the Streams page, [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and click on a stream name. The playback URL is listed on the page.
+The easiest way to the stream playback URL is to login to the Livepeer.com
+Dashboard, navigate to the Streams page,
+[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
+click on a stream name. The playback URL is listed on the page.
 
-You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and note the value of `playbackId` in the response. The playback URL is `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
+note the value of `playbackId` in the response. The playback URL is
+`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
 
 ## Video player
 
-Users can view the live stream with any HLS video player (for example [video.js](https://videojs.com/) or [JW Player](https://www.jwplayer.com/)).
+Users can view the live stream with any HLS video player (for example
+[video.js](https://videojs.com/) or [JW Player](https://www.jwplayer.com/)).
 
 ## Stream delivery via CDN
 
-Playback for all Pro plan streams is delivered via a content delivery network (CDN). The transcoded video stream automatically switches between the transcoded renditions based on the viewers’ available bandwidth, device performance, and network conditions.
+Playback for all Pro plan streams is delivered via a content delivery network
+(CDN). The transcoded video stream automatically switches between the transcoded
+renditions based on the viewers’ available bandwidth, device performance, and
+network conditions.
 
 Non-CDN delivery for free tier users is limited to 10 viewers per account.
 
 ## What if playback isn’t working?
 
-Look at the `lastSeen` and `isActive` (Status row on the Livepeer.com Dashboard) values. If ingest was properly configured for playback, `lastSeen` will show the current date and time and `isActive` will be `true` (Status row on the Livepeer.com Dashboard will be Active).
+Look at the `lastSeen` and `isActive` (Status row on the Livepeer.com Dashboard)
+values. If ingest was properly configured for playback, `lastSeen` will show the
+current date and time and `isActive` will be `true` (Status row on the
+Livepeer.com Dashboard will be Active).
 
-If this isn't the case, confirm the `streamKey` and RTMP ingest URL, `rtmp://rtmp.livepeer.com/live`, are configured correctly in your broadcast software.
+If this isn't the case, confirm the `streamKey` and RTMP ingest URL,
+`rtmp://rtmp.livepeer.com/live`, are configured correctly in your broadcast
+software.
 
 Lastly, check that your playback URL is correct.
