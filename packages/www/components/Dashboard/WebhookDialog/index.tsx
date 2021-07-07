@@ -45,9 +45,9 @@ const StyledContent = styled(DropdownMenuContent, {
 
 const eventOptions = [
   "stream.started",
-  "stream.idle",
   "stream.detection",
-  "recording.ready",
+  // "stream.idle",
+  // "recording.ready",
 ];
 
 export enum Action {
