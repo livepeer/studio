@@ -48,10 +48,6 @@ const globalStyles = global({
 
   "pre, code": { margin: 0, fontFamily: "$mono" },
 
-  "::selection": {
-    backgroundColor: "$violet4",
-  },
-
   "#__next": {
     position: "relative",
     zIndex: 0,
