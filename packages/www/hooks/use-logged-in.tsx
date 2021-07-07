@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 export default (shouldBeLoggedIn = true) => {
   const { user, token } = useApi();
   const router = useRouter();
+  const { next } = router.query;
 
   useEffect(() => {
     if (shouldBeLoggedIn === true) {
@@ -23,8 +24,8 @@ export default (shouldBeLoggedIn = true) => {
       if (user.emailValid === false) {
         router.replace("/verify");
       } else {
-        router.replace("/dashboard");
+        router.replace(next ? next.toString() : "/dashboard");
       }
     }
-  }, [user, token]);
+  }, [user, token, next]);
 };

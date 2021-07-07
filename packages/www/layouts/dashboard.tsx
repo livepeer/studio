@@ -14,6 +14,7 @@ import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
+import { DashboardRedirect } from "hooks/use-api";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -66,6 +67,7 @@ interface Props {
   children?: JSX.Element[] | JSX.Element;
   breadcrumbs?: Breadcrumb[];
   id?: string;
+  requireLoggedIn?: boolean;
 }
 
 function ContextProviders({ children }) {
@@ -84,7 +86,12 @@ function ContextProviders({ children }) {
   );
 }
 
-function DashboardLayout({ id, children, breadcrumbs }: Props) {
+function DashboardLayout({
+  id,
+  children,
+  breadcrumbs,
+  requireLoggedIn = true,
+}: Props) {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
@@ -92,19 +99,22 @@ function DashboardLayout({ id, children, breadcrumbs }: Props) {
   globalStyles();
 
   return (
-    <ContextProviders>
-      <Sidebar id={id} />
-      <Box css={{ pl: 270, width: "100%" }}>
-        <Header breadcrumbs={breadcrumbs} />
-        <Box
-          css={{
-            margin: "0 auto",
-            maxWidth: "1520px",
-          }}>
-          {children}
+    <>
+      {requireLoggedIn && <DashboardRedirect />}
+      <ContextProviders>
+        <Sidebar id={id} />
+        <Box css={{ pl: 270, width: "100%" }}>
+          <Header breadcrumbs={breadcrumbs} />
+          <Box
+            css={{
+              margin: "0 auto",
+              maxWidth: "1520px",
+            }}>
+            {children}
+          </Box>
         </Box>
-      </Box>
-    </ContextProviders>
+      </ContextProviders>
+    </>
   );
 }
 

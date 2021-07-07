@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
 } from "@livepeer.com/design-system";
 import Layout from "../../../../layouts/dashboard";
-import useLoggedIn from "../../../../hooks/use-logged-in";
+import { useLoggedIn } from "../../../../hooks";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
@@ -168,7 +168,6 @@ const ClipBut = ({ text }) => {
 };
 
 const ID = () => {
-  useLoggedIn();
   const { user, getStream, getIngest, setRecord, getAdminStreams } = useApi();
   const userIsAdmin = user && user.admin;
   const router = useRouter();

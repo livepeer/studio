@@ -9,6 +9,7 @@ import {
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment } from "../lib/utils";
+import Head from "next/head";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -85,6 +86,24 @@ const getStoredToken = () => {
     console.error(`Error retrieving persistent token: ${err.message}.`);
     return null;
   }
+};
+
+export const DashboardRedirect = () => {
+  return (
+    <Head>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+  if (!window.localStorage || !window.localStorage.getItem('${PERSISTENT_TOKEN}')) {
+      location.replace('/login?next=' + encodeURIComponent(
+        location.pathname + location.search
+      ))
+  }
+  `,
+        }}
+      />
+    </Head>
+  );
 };
 
 const clearToken = () => {
