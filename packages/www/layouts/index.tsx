@@ -71,8 +71,10 @@ const Layout = ({
       url: url ? url : "https://livepeer.com",
       images: [
         {
-          url: image ? image.url : "https://livepeer.com/img/share-icon.png",
+          url: image ? image.url : "https://livepeer.com/img/OG.png",
           alt: image ? image.alt : "Livepeer.com",
+          width: 1200,
+          height: 642,
         },
       ],
     },

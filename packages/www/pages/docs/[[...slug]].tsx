@@ -104,8 +104,10 @@ const defaultSEO: NextSeoProps = {
     url: "https://livepeer.com/docs",
     images: [
       {
-        url: "https://livepeer.com/img/share-icon.png",
+        url: "https://livepeer.com/img/OG.png",
         alt: "Livepeer.com",
+        width: 1200,
+        height: 642,
       },
     ],
   },
