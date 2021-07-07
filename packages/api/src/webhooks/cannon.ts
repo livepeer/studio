@@ -163,6 +163,7 @@ export default class WebhookCannon {
       console.log("preparing to fire webhook ", webhook.url);
       const timestamp = Date.now();
       // go ahead
+      let timestamp = Date.now();
       let params = {
         method: "POST",
         headers: {
@@ -184,10 +185,8 @@ export default class WebhookCannon {
 
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
-        let signature = sign(event.payload, webhook.sharedSecret);
-        params.headers['Livepeer-Signature'] = `t=${Date.now()},v1=${signature}`
-        params.body['signature'] = signature
-        params.body['signed_payload'] = event.payload
+        let signature = sign(params.body, webhook.sharedSecret);
+        params.headers['Livepeer-Signature'] = `t=${timestamp},v1=${signature}`
       }
 
       try {
