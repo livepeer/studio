@@ -192,11 +192,11 @@ const ApiKeys = () => {
                 <Cell variant="gray">Created</Cell>
                 <Cell>{data.createdAt}</Cell>
                 <Cell variant="gray">Event types</Cell>
-                <Cell css={{ display: "flex", fontFamily: "monospace" }}>
+                <Cell css={{ display: "flex" }}>
                   {data.events.map((e) => (
                     <Badge
-                      size="1"
                       variant="violet"
+                      size="2"
                       css={{ fontWeight: 600, mr: "$1" }}>
                       {e}
                     </Badge>
