@@ -120,6 +120,22 @@ export function getRecordingUrl(
   session: DBSession,
   mp4 = false
 ) {
+async function triggerManyIdleStreamsWebhook (ids, queue) {
+  return Promise.all(ids.map(async (id) => {
+    const stream = await db.stream.get(id);
+    const user = await db.user.get(stream.userId);
+    queue.emit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event: "stream.idle",
+      streamId: stream.id,
+      userId: user.id,
+    });
+  }));
+}
+
+export function getRecordingUrl(ingest, session, mp4 = false) {
   return pathJoin(
     ingest,
     `recordings`,
@@ -867,21 +883,19 @@ app.put(
       return res.json({ errors: ["user is suspended"] });
     }
 
-    if (req.body.active) {
-      // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-      // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+  // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+  // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
 
-      // -------------------------------
-      // new webhookCannon
-      req.queue.emit({
-        id: uuid(),
-        createdAt: Date.now(),
-        channel: "webhooks",
-        event: "stream.started",
-        streamId: id,
-        userId: user.id,
-      });
-    }
+  // -------------------------------
+  // new webhookCannon
+  req.queue.emit({
+    id: uuid(),
+    createdAt: Date.now(),
+    channel: "webhooks",
+    event:  req.body.active === true ? "stream.started" : "stream.idle",
+    streamId: id,
+    userId: user.id,
+  });
 
     stream.isActive = !!req.body.active;
     stream.lastSeen = +new Date();
@@ -923,6 +937,13 @@ app.patch(
     let upRes: QueryResult;
     try {
       upRes = await db.stream.markIsActiveFalseMany(req.body.ids);
+      
+      // trigger the webhooks
+      try {
+        await triggerManyIdleStreamsWebhook(req.body.ids, req.queue);
+      } catch (err) {
+        console.error(`error while triggering the many idle webhooks`, err)
+      }
 
       if (upRes.rowCount) {
         console.log(
