@@ -75,24 +75,25 @@ const Sidebar = ({ id }) => {
             </Text>
             <ChevronDownIcon width={20} height={20} />
           </Flex>
-          <DropdownMenuContent>
+          <DropdownMenuContent css={{ border: "1px solid $colors$mauve6" }}>
             <DropdownMenuGroup>
-              <Box
-                as={DropdownMenuItem}
+              <DropdownMenuItem
+                key="billing-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
                   Router.push("/dashboard/billing");
                 }}>
                 Billing
-              </Box>
-              <Box
-                as={DropdownMenuItem}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                key="logout-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
+                  console.log("wtf");
                   logout();
                 }}>
                 Logout
-              </Box>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
