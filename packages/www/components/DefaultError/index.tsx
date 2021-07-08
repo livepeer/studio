@@ -7,7 +7,8 @@ import { Container, Heading, Box, Text } from "@theme-ui/components";
 const DefaultError = () => {
   return (
     <Layout>
-      <img
+      <Box
+        as="img"
         src="img/404.png"
         alt=""
         sx={{

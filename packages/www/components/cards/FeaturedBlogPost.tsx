@@ -69,7 +69,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           },
         }}>
         {post.mainImage && (
-          <img
+          <Box
+            as="img"
             alt={post.mainImage?.alt}
             width={150}
             height={200}
@@ -90,7 +91,7 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             justifyContent: "space-between",
             height: cardContentHeight,
           }}>
-          <div>
+          <Box>
             <Box
               sx={{
                 color: "text",
@@ -110,7 +111,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 pb: 24,
                 height: authorHeight,
               }}>
-              <img
+              <Box
+                as="img"
                 alt={post.author.image?.alt}
                 width={30}
                 height={30}
@@ -144,7 +146,8 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 {stats.text}
               </Box>
             </Flex>
-            <h2
+            <Box
+              as="h2"
               ref={titleRef}
               sx={{
                 fontSize: "32px",
@@ -155,7 +158,7 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 transition: "color .3s",
               }}>
               {post.title}
-            </h2>
+            </Box>
             <Box
               sx={{
                 mb: 3,
@@ -169,7 +172,7 @@ const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               ref={excerptRef}>
               {post.excerpt}
             </Box>
-          </div>
+          </Box>
           <A as="p" sx={{ fontWeight: 600, margin: 0 }}>
             Read more
           </A>

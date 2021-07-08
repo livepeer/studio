@@ -3,6 +3,7 @@ import { jsx } from "theme-ui";
 import { SxStyleProp } from "theme-ui";
 import { keyframes } from "@emotion/core";
 import { useCallback, useEffect, useRef } from "react";
+import { Box } from "@theme-ui/components";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -47,7 +48,7 @@ const Slider: React.FC<Props> = ({
   }, [isFullScreen, containerRef]);
 
   return (
-    <div
+    <Box
       ref={containerRef}
       sx={{
         overflow: "hidden",
@@ -56,7 +57,7 @@ const Slider: React.FC<Props> = ({
         width: isFullScreen ? "100vw" : "100%",
         ...pushSx,
       }}>
-      <div
+      <Box
         sx={{
           display: "inline-block",
           whiteSpace: "nowrap",
@@ -64,17 +65,17 @@ const Slider: React.FC<Props> = ({
           animation: `${slide} ${duration * 2}s linear infinite`,
         }}>
         {Array.from({ length: numberOfCopies }, (_, i) => i + 1).map((n) => (
-          <div
+          <Box
             key={`auto-slider-copy-${n}`}
             sx={{
               display: "inline-flex",
               "& > div": { display: "inline-block" },
             }}>
             {getChild(n)}
-          </div>
+          </Box>
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { Box } from "@theme-ui/components";
 
 const Player = dynamic(import("../../components/Player"), { ssr: false });
 
@@ -11,6 +12,7 @@ type Props = {
   manifestUrl: string;
   withOverflow?: boolean;
   setVideo?: React.Dispatch<React.SetStateAction<boolean>>;
+  smallDescription?: boolean;
 };
 
 const VideoContainer = ({
@@ -19,11 +21,12 @@ const VideoContainer = ({
   manifestUrl,
   withOverflow,
   setVideo,
+  smallDescription,
 }: Props) => {
   const videoThumbnail = "https://i.vimeocdn.com/video/499134794_1280x720.jpg";
 
   return (
-    <div
+    <Box
       sx={{
         height: "100%",
         display: "flex",
@@ -31,15 +34,24 @@ const VideoContainer = ({
         justifyContent: "space-between",
       }}>
       <div>
-        <h1 sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
+        <Box
+          as="h1"
+          sx={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>
           {title}
-        </h1>
-        <p sx={{ fontSize: "16px", color: "offBlack", marginBottom: "32px" }}>
+        </Box>
+        <Box
+          as="p"
+          sx={{
+            fontSize: smallDescription ? "14px" : "16px",
+            color: smallDescription ? "#8F8F8F" : "offBlack",
+            marginTop: smallDescription ? "4px" : "",
+            marginBottom: "32px",
+          }}>
           {description}
-        </p>
+        </Box>
       </div>
       {manifestUrl ? (
-        <div sx={{ borderRadius: "8px", overflow: "hidden" }}>
+        <Box sx={{ borderRadius: "8px", overflow: "hidden" }}>
           <Player
             setVideo={setVideo}
             src={manifestUrl}
@@ -60,9 +72,9 @@ const VideoContainer = ({
               overflowMenuButtons: [withOverflow && "quality"],
             }}
           />
-        </div>
+        </Box>
       ) : (
-        <div
+        <Box
           sx={{
             background: "#FBFBFB",
             border: "1px solid #CCCCCC",
@@ -72,7 +84,7 @@ const VideoContainer = ({
           }}
         />
       )}
-    </div>
+    </Box>
   );
 };
 

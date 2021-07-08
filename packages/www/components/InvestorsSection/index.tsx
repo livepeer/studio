@@ -38,7 +38,8 @@ const InvestorsSection = () => {
           gap={[5]}
           columns={[1, 3, 5]}>
           {investorIds.map((id) => (
-            <img
+            <Box
+              as="img"
               key={id}
               src={`/img/investors/${id}.svg`}
               alt={`${id} logo`}

@@ -13,6 +13,7 @@ import Router from "next/router";
 import GradientBackgroundBox from "../components/GradientBackgroundBox";
 import { Reset, ThemeProvider } from "../lib/theme";
 import MarkdownProvider from "../lib/markdown-provider";
+import Head from "next/head";
 
 interface Props {
   title?: string;
@@ -70,8 +71,10 @@ const Layout = ({
       url: url ? url : "https://livepeer.com",
       images: [
         {
-          url: image ? image.url : "https://livepeer.com/img/share-icon.png",
+          url: image ? image.url : "https://livepeer.com/img/OG.png",
           alt: image ? image.alt : "Livepeer.com",
+          width: 1200,
+          height: 642,
         },
       ],
     },
@@ -83,6 +86,10 @@ const Layout = ({
 
   return (
     <IdProvider>
+      <Head>
+        <link rel="stylesheet" href="/reset.css" />
+        <link rel="stylesheet" href="/markdown.css" />
+      </Head>
       <ThemeProvider>
         <MarkdownProvider>
           <Reset />
@@ -90,7 +97,7 @@ const Layout = ({
             <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
               <NextSeo {...seo} />
               {withGradientBackground && (
-                <div
+                <Box
                   sx={{
                     position: "absolute",
                     top: 0,
@@ -104,7 +111,7 @@ const Layout = ({
                     sx={{ height: "1000px" }}
                     slide
                   />
-                </div>
+                </Box>
               )}
               <Flex
                 sx={{

@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import { Box } from "@theme-ui/components";
 import {
   AreaChart,
   Area,
@@ -13,20 +14,21 @@ import {
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload) {
     return (
-      <div
+      <Box
         sx={{
           background: "rgba(0, 0, 0, 0.9)",
           padding: "8px",
           borderRadius: "4px",
         }}>
-        <p
+        <Box
+          as="p"
           sx={{
             fontSize: "12px",
             color: "white",
           }}>
           Rate: <b>{payload[0].value} kbps</b>
-        </p>
-      </div>
+        </Box>
+      </Box>
     );
   }
 
@@ -35,8 +37,9 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const Chart = ({ data }) => {
   return (
-    <div sx={{ width: "100%", position: "relative" }}>
-      <p
+    <Box sx={{ width: "100%", position: "relative" }}>
+      <Box
+        as="p"
         sx={{
           color: "#666666",
           fontSize: "12px",
@@ -46,8 +49,9 @@ const Chart = ({ data }) => {
           bottom: "70px",
         }}>
         kbps (multiplied by 1000)
-      </p>
-      <p
+      </Box>
+      <Box
+        as="p"
         sx={{
           color: "#666666",
           fontSize: "12px",
@@ -56,7 +60,7 @@ const Chart = ({ data }) => {
           left: "50px",
         }}>
         Seconds since stream loaded in test player
-      </p>
+      </Box>
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart data={data}>
           <defs>
@@ -79,7 +83,7 @@ const Chart = ({ data }) => {
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Box>
   );
 };
 

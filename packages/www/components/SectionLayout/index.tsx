@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import { Heading, Text, Flex, Container } from "@theme-ui/components";
+import { Heading, Box, Text, Flex, Container } from "@theme-ui/components";
 import GradientBackgroundBox, { Gradient } from "../GradientBackgroundBox";
 import Button, { ButtonProps } from "../Button";
 import slugify from "@sindresorhus/slugify";
@@ -21,7 +21,7 @@ const SectionLayout = ({ children, heading, gradient }: Props) => (
     gradient={gradient ?? null}
     slide>
     <Container variant="content" sx={{ pt: gradient ? [6, 7] : undefined }}>
-      <div>
+      <Box>
         <Text
           sx={{
             textTransform: "uppercase",
@@ -48,8 +48,8 @@ const SectionLayout = ({ children, heading, gradient }: Props) => (
             />
           )}
         </Flex>
-      </div>
-      <div sx={{ mt: 5 }}>{children}</div>
+      </Box>
+      <Box sx={{ mt: 5 }}>{children}</Box>
     </Container>
   </GradientBackgroundBox>
 );

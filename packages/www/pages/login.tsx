@@ -34,7 +34,9 @@ const LoginPage = () => {
           mx: [3, 0],
           py: 6,
         }}>
-        <h3 sx={{ mb: 4 }}>Log in</h3>
+        <Box as="h3" sx={{ mb: 4 }}>
+          Log in
+        </Box>
         <Login
           id="login"
           onSubmit={onSubmit}

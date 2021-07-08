@@ -37,7 +37,7 @@ const NavigationBase = ({
   const [mobileMenuIsOpen, setMobileMenuIsOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const { token, user, logout } = useApi();
-  const isDashboard = pathname.includes("/app/");
+  const isDashboard = pathname.includes("/dashboard/");
 
   const handleScroll = useCallback(() => {
     const { scrollTop } = document.documentElement;
@@ -83,17 +83,14 @@ const NavigationBase = ({
             justifyContent: "space-between",
             alignItems: "center",
           }}>
-          <div
+          <Box
             sx={{
               minWidth: sidesWidth,
               display: "flex",
               alignItems: "center",
             }}>
-            <NavigationBreadcrumb
-              breadcrumb={breadcrumb}
-              withLogoType={!isDashboard}
-            />
-          </div>
+            <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType />
+          </Box>
           {!isDashboard && (
             <Flex
               sx={{
@@ -133,17 +130,6 @@ const NavigationBase = ({
             )}
             {loggedIn && (
               <>
-                {isDashboard &&
-                  user?.stripeProductId === "prod_0" &&
-                  user?.emailValid !== false && (
-                    <Button
-                      sx={{ mr: 4, py: "6px" }}
-                      isLink
-                      href="/app/user/plans"
-                      variant="buttons.gradientOutlineSmall">
-                      Upgrade
-                    </Button>
-                  )}
                 {user && user.admin && !isDashboard && (
                   <Link sx={{ mr: 3 }} href="/app/admin" variant="nav">
                     Admin
@@ -169,7 +155,7 @@ const NavigationBase = ({
                   <Button
                     sx={{ py: "6px" }}
                     isLink
-                    href="/app/user"
+                    href="/dashboard"
                     variant="buttons.primarySmall">
                     Dashboard
                   </Button>

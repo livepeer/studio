@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import { ReactNode } from "react";
+import { Box } from "@theme-ui/components";
 
 export type PricingCard = {
   pricingTitle: string;
@@ -46,7 +47,7 @@ export const PricingCardContent = ({
   customPricing,
 }: PricingCardContentProps) => {
   return (
-    <div
+    <Box
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -60,18 +61,20 @@ export const PricingCardContent = ({
       }}>
       {children}
       {comingSoon ? (
-        <p
+        <Box
+          as="p"
           sx={{
             fontSize: "20px",
             letterSpacing: "-0.04em",
             color: color ?? "#525252",
           }}>
           Coming soon
-        </p>
+        </Box>
       ) : customPricing ? (
-        <div sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <CheckIcon />
-          <p
+          <Box
+            as="p"
             sx={{
               ml: "8px",
               fontSize: "16px",
@@ -79,10 +82,10 @@ export const PricingCardContent = ({
               color: color ?? "black",
             }}>
             Custom pricing available
-          </p>
-        </div>
+          </Box>
+        </Box>
       ) : null}
-    </div>
+    </Box>
   );
 };
 
@@ -96,7 +99,7 @@ const PricingCard = ({
   className,
 }: PricingCard) => {
   return (
-    <div
+    <Box
       className={className}
       sx={{
         display: "flex",
@@ -108,8 +111,9 @@ const PricingCard = ({
         background: cardBg,
         maxWidth: "280px",
       }}>
-      <div sx={{ display: "flex", flexDirection: "column" }}>
-        <h1
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Box
+          as="h1"
           sx={{
             fontSize: "32px",
             lineHeight: "40px",
@@ -119,8 +123,9 @@ const PricingCard = ({
             color: titleColor ?? "white",
           }}>
           {pricingTitle}
-        </h1>
-        <p
+        </Box>
+        <Box
+          as="p"
           sx={{
             fontSize: "16px",
             mb: "16px",
@@ -128,9 +133,10 @@ const PricingCard = ({
             color: titleColor ?? "white",
           }}>
           {pricingDescription}
-        </p>
+        </Box>
         <Link href={btn.href} passHref>
-          <a
+          <Box
+            as="a"
             sx={{
               width: "100%",
               height: "48px",
@@ -149,11 +155,11 @@ const PricingCard = ({
               },
             }}>
             {btn.display}
-          </a>
+          </Box>
         </Link>
-      </div>
-      <div sx={{ display: "flex", flexDirection: "column" }}>{children}</div>
-    </div>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>{children}</Box>
+    </Box>
   );
 };
 

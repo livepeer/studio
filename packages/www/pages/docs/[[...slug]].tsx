@@ -26,6 +26,7 @@ import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
 import { IdProvider } from "@radix-ui/react-id";
+import Head from "next/head";
 
 const mobileCategories = [
   {
@@ -103,8 +104,10 @@ const defaultSEO: NextSeoProps = {
     url: "https://livepeer.com/docs",
     images: [
       {
-        url: "https://livepeer.com/img/share-icon.png",
+        url: "https://livepeer.com/img/OG.png",
         alt: "Livepeer.com",
+        width: 1200,
+        height: 642,
       },
     ],
   },
@@ -151,101 +154,103 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <>
-      <IdProvider>
-        <ThemeProvider>
-          <NextSeo {...resolvedSEO} />
-          <div
-            onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
+    <IdProvider>
+      <ThemeProvider>
+        <Head>
+          <link rel="stylesheet" href="/reset.css" />
+          <link rel="stylesheet" href="/markdown.css" />
+        </Head>
+        <NextSeo {...resolvedSEO} />
+        <Box
+          onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
+          sx={{
+            display: ["flex", "flex", "none", "none"],
+            position: "fixed",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 200,
+            right: "16px",
+            bottom: "50px",
+            background: "black",
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            cursor: "pointer",
+          }}>
+          {mobileSideNavOpen ? (
+            <CgClose color="white" size={24} />
+          ) : (
+            <FiList color="white" size={24} />
+          )}
+        </Box>
+        <Box
+          sx={{
+            display: ["flex", "flex", "grid", "grid"],
+            flexDirection: "column",
+            gridTemplateColumns: ["min-content 1fr"],
+            gridTemplateRows: "auto auto",
+          }}>
+          <DocsNav
+            hideTopNav={hideTopNav}
+            setHideTopNav={setHideTopNav}
+            categories={categories}
+            mobileCategories={mobileCategories}
+          />
+          <SideNav
+            menu={currentMenu}
+            hideTopNav={hideTopNav}
+            hideSideBar={hideSideBar}
+            setHideSideBar={setHideSideBar}
+          />
+          <MobileSideNav
+            isOpen={mobileSideNavOpen}
+            menu={currentMenu}
+            setIsOpen={setMobileSideNavOpen}
+          />
+          <Container
             sx={{
-              display: ["flex", "flex", "none", "none"],
-              position: "fixed",
-              alignItems: "center",
+              mt: hideTopNav ? "-12px" : "48px",
+              gridColumn: "1fr",
+              justifyItems: "center",
+              mx: 0,
+              transition: "all 0.2s",
+              display: "flex",
+              minWidth: "100%",
               justifyContent: "center",
-              zIndex: 200,
-              right: "16px",
-              bottom: "50px",
-              background: "black",
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              cursor: "pointer",
+              alignItems: "flex-start",
             }}>
-            {mobileSideNavOpen ? (
-              <CgClose color="white" size={24} />
-            ) : (
-              <FiList color="white" size={24} />
-            )}
-          </div>
-          <Box
-            sx={{
-              display: ["flex", "flex", "grid", "grid"],
-              flexDirection: "column",
-              gridTemplateColumns: ["min-content 1fr"],
-              gridTemplateRows: "auto auto",
-            }}>
-            <DocsNav
-              hideTopNav={hideTopNav}
-              setHideTopNav={setHideTopNav}
-              categories={categories}
-              mobileCategories={mobileCategories}
-            />
-            <SideNav
-              menu={currentMenu}
-              hideTopNav={hideTopNav}
-              hideSideBar={hideSideBar}
-              setHideSideBar={setHideSideBar}
-            />
-            <MobileSideNav
-              isOpen={mobileSideNavOpen}
-              menu={currentMenu}
-              setIsOpen={setMobileSideNavOpen}
-            />
-            <Container
+            <Box
+              className={styles.markdown}
               sx={{
-                mt: hideTopNav ? "-12px" : "48px",
-                gridColumn: "1fr",
-                justifyItems: "center",
-                mx: 0,
-                transition: "all 0.2s",
                 display: "flex",
-                minWidth: "100%",
-                justifyContent: "center",
-                alignItems: "flex-start",
+                flexDirection: "column",
+                width: "100%",
+                maxWidth: "768px",
+                paddingBottom: "80px",
               }}>
-              <div
-                className={styles.markdown}
+              <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  width: "100%",
-                  maxWidth: "768px",
-                  paddingBottom: "80px",
-                }}>
-                <div
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    color: "#202020",
-                    fontSize: "12px",
-                    letterSpacing: "-0.02em",
-                    mb: "16px",
-                  }}
-                  className="breadcrumb">
-                  {breadCrumb.slice(2, 5).map((a, idx) => (
-                    <Fragment key={idx}>
-                      {title(a.split("-").join(" "))}
-                      {idx < breadCrumb.length - 3 && <> / </>}
-                    </Fragment>
-                  ))}
-                </div>
-                <main>{content}</main>
-              </div>
-            </Container>
-          </Box>
-        </ThemeProvider>
-      </IdProvider>
-    </>
+                  alignItems: "center",
+                  color: "#202020",
+                  fontSize: "12px",
+                  letterSpacing: "-0.02em",
+                  mb: "16px",
+                }}
+                className="breadcrumb">
+                {breadCrumb.slice(2, 5).map((a, idx) => (
+                  <Fragment key={idx}>
+                    {title(a.split("-").join(" "))}
+                    {idx < breadCrumb.length - 3 && <> / </>}
+                  </Fragment>
+                ))}
+              </Box>
+              <main>{content}</main>
+            </Box>
+          </Container>
+        </Box>
+      </ThemeProvider>
+    </IdProvider>
   );
 };
 

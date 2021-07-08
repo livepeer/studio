@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@components/*": ["components/*"],
+      "@lib/*": ["lib/*"]
+    },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -16,6 +20,6 @@
     "jsx": "preserve",
     "baseUrl": "."
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", ".next"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

@@ -1,7 +1,10 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import { Box } from "@theme-ui/components";
+
 const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
-  <span
+  <Box
+    as="span"
     sx={{
       position: "relative",
       width: "100vw",
@@ -14,7 +17,8 @@ const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
       my: 4,
       ...pushSx,
     }}>
-    <img
+    <Box
+      as="img"
       {...imageProps}
       sx={{
         borderStyle: "none",
@@ -32,7 +36,7 @@ const BlogPostImage = ({ pushSx, ...imageProps }: any) => (
         },
       }}
     />
-  </span>
+  </Box>
 );
 
 export default BlogPostImage;

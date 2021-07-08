@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { useMemo } from "react";
+import { Box } from "@theme-ui/components";
 
 /**
  * Hat tip to PumBaa80 http://stackoverflow.com/questions/4810841/json-pretty-print-using-javascript
@@ -44,7 +45,8 @@ const JSONHighlighter = ({ json, className }: Props) => {
   }, [json]);
 
   return (
-    <pre
+    <Box
+      as="pre"
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: html }}
       className={className}

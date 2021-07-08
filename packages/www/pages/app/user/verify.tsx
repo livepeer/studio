@@ -93,7 +93,10 @@ export default () => {
           <Box>We've sent you a link to verify your email.</Box>
           <Box>
             Please check your inbox at
-            <span sx={{ fontWeight: 600 }}> {user?.email}.</span>
+            <Box as="span" sx={{ fontWeight: 600 }}>
+              {" "}
+              {user?.email}.
+            </Box>
           </Box>
         </Box>
       </Flex>

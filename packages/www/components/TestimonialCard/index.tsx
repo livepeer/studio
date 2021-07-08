@@ -51,7 +51,8 @@ const TestimonialCard = ({
         marginTop: "auto",
         height: [75, 90],
       }}>
-      <img
+      <Box
+        as="img"
         alt={`${author.name} avatar`}
         src={`/img/testimonials/${id}/avatar.png`}
         className="lazyload"

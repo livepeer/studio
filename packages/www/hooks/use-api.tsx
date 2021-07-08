@@ -1,5 +1,4 @@
 import { useState, useContext, createContext, useEffect } from "react";
-import fetch from "isomorphic-fetch";
 import jwt from "jsonwebtoken";
 import {
   User,
@@ -7,10 +6,10 @@ import {
   ApiToken,
   Stream,
   Webhook,
-  ObjectStore,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment } from "../lib/utils";
+import Head from "next/head";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -87,6 +86,24 @@ const getStoredToken = () => {
     console.error(`Error retrieving persistent token: ${err.message}.`);
     return null;
   }
+};
+
+export const DashboardRedirect = () => {
+  return (
+    <Head>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+  if (!window.localStorage || !window.localStorage.getItem('${PERSISTENT_TOKEN}')) {
+      location.replace('/login?next=' + encodeURIComponent(
+        location.pathname + location.search
+      ))
+  }
+  `,
+        }}
+      />
+    </Head>
+  );
 };
 
 const clearToken = () => {
@@ -431,6 +448,25 @@ const makeContext = (state: ApiState, setState) => {
       return [res, invoice];
     },
 
+    async getPaymentMethod(
+      stripePaymentMethodId: string
+    ): Promise<[Response, PaymentMethodData | ApiError]> {
+      let [res, paymentMethod] = await context.fetch(
+        `/user/retrieve-payment-method`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            stripePaymentMethodId,
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+
+      return [res, paymentMethod];
+    },
+
     async updateCustomerPaymentMethod({
       stripeCustomerId,
       stripeCustomerPaymentMethodId,
@@ -531,14 +567,36 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res];
     },
 
-    async getStreams(userId): Promise<Array<Stream>> {
+    async getStreams(
+      userId: string,
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
+        count?: boolean;
+      }
+    ): Promise<[Stream[], string, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, streams] = await context.fetch(
-        `/stream?userId=${userId}&streamsonly=1`
+        `/stream?${qs.stringify({
+          userId,
+          filters,
+          active: opts?.active,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
+          streamsonly: 1,
+        })}`
       );
       if (res.status !== 200) {
         throw new Error(streams);
       }
-      return streams;
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, count];
     },
 
     async createStream(params): Promise<Stream> {
@@ -559,15 +617,49 @@ const makeContext = (state: ApiState, setState) => {
     async getStreamSessions(
       id,
       cursor?: string,
-      limit: number = 20
-    ): Promise<[Array<Stream>, string]> {
-      const uri = `/session?${qs.stringify({ limit, cursor, parentId: id })}`;
+      limit: number = 20,
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Stream>, string, number]> {
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/session?${qs.stringify({
+        limit,
+        cursor,
+        parentId: id,
+        filters: stringifiedFilters,
+        count,
+      })}`;
       const [res, streams] = await context.fetch(uri);
       if (res.status !== 200) {
         throw new Error(streams);
       }
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor];
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, c];
+    },
+
+    async getStreamSessionsByUserId(
+      userId,
+      cursor?: string,
+      limit: number = 20,
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Stream>, string, number]> {
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/session?${qs.stringify({
+        limit,
+        cursor,
+        userId,
+        filters: stringifiedFilters,
+        count,
+      })}`;
+      const [res, streams] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new Error(streams);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, c];
     },
 
     async suspendStream(id: string, suspended: boolean): Promise<void> {
@@ -708,10 +800,11 @@ const makeContext = (state: ApiState, setState) => {
       allUsers: boolean,
       all: boolean,
       order?: string,
-      filters?: Array<{ id: string; value: string }>,
+      filters?: Array<{ id: string; value: string | object }>,
       limit?: number,
-      cursor?: string
-    ): Promise<[Array<Webhook> | ApiError, string, Response]> {
+      cursor?: string,
+      count?: boolean
+    ): Promise<[Webhook[], string, Response, number]> {
       const f = filters ? JSON.stringify(filters) : undefined;
       const [res, streams] = await context.fetch(
         `/webhook?${qs.stringify({
@@ -721,10 +814,22 @@ const makeContext = (state: ApiState, setState) => {
           limit,
           cursor,
           filters: f,
+          count,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
-      return [streams, nextCursor, res];
+      const c = res.headers.get("X-Total-Count");
+      return [streams, nextCursor, res, c];
+    },
+
+    async getWebhook(webhookId): Promise<Webhook> {
+      const [res, webhook] = await context.fetch(`/webhook/${webhookId}`);
+      if (res.status !== 200) {
+        throw webhook && typeof webhook === "object"
+          ? { ...webhook, status: res.status }
+          : new Error(webhook);
+      }
+      return webhook;
     },
 
     async createWebhook(params): Promise<Webhook> {
@@ -742,6 +847,21 @@ const makeContext = (state: ApiState, setState) => {
       return webhook;
     },
 
+    async updateWebhook(id, params): Promise<Webhook> {
+      const [res, webhook] = await context.fetch(`/webhook/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 200) {
+        throw new Error(webhook.errors.join(", "));
+      }
+      return webhook;
+    },
+
     async deleteWebhook(id: string): Promise<void> {
       const [res, body] = await context.fetch(`/webhook/${id}`, {
         method: "DELETE",
@@ -751,25 +871,43 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async deleteWebhooks(ids: Array<string>): Promise<void> {
+      const [res, body] = await context.fetch(`/webhook`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
+    },
+
     async getApiTokens(
       userId?: string,
-      order?: string,
-      filters?: Array<{ id: string; value: string }>,
-      limit?: number,
-      cursor?: string
-    ): Promise<[Array<ApiToken> | ApiError, string, Response]> {
-      const f = filters ? JSON.stringify(filters) : undefined;
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number;
+        cursor?: string;
+        order?: string;
+        count?: boolean;
+      }
+    ): Promise<[Array<ApiToken> | ApiError, string, Response, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
       const [res, tokens] = await context.fetch(
         `/api-token?${qs.stringify({
           userId,
-          order,
-          limit,
-          cursor,
-          filters: f,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
         })}`
       );
       const nextCursor = getCursor(res.headers.get("link"));
-      return [tokens, nextCursor, res];
+      const count = res.headers.get("X-Total-Count");
+      return [tokens, nextCursor, res, count];
     },
 
     async createApiToken(params): Promise<ApiToken> {

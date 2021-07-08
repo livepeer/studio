@@ -51,7 +51,8 @@ const ContactSection = () => {
           .
         </Box>
       </Box>
-      <form
+      <Box
+        as="form"
         ref={formEl}
         onSubmit={handleSubmit}
         sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}>
@@ -114,7 +115,7 @@ const ContactSection = () => {
             Thanks for reaching out! We'll get back to you shortly.
           </Box>
         </Fade>
-      </form>
+      </Box>
     </Container>
   );
 };

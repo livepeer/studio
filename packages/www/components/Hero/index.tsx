@@ -95,7 +95,8 @@ const Hero = ({
             )}
           </Box>
           {image && (
-            <img
+            <Box
+              as="img"
               alt={image.alt}
               width={525}
               height={846}

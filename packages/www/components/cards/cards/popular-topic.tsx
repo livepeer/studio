@@ -55,7 +55,8 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
             textDecoration: "none",
           },
         }}>
-        <h4
+        <Box
+          as="h4"
           ref={titleRef}
           sx={{
             color: "text",
@@ -66,7 +67,7 @@ const DocsPopularTopicCard = ({ href, asPath, title, excerpt }: Props) => {
             pb: 2,
           }}>
           {title}
-        </h4>
+        </Box>
         <Box
           as="p"
           sx={{

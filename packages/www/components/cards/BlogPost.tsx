@@ -56,7 +56,7 @@ const BlogPostCard = ({
   }, [getExcerptMaxLines]);
 
   return (
-    <div sx={pushSx}>
+    <Box sx={pushSx}>
       <Link href="/blog/[slug]" as={`/blog/${post.slug.current}`} passHref>
         <A
           sx={{
@@ -79,7 +79,8 @@ const BlogPostCard = ({
             },
           }}>
           {post.mainImage && (
-            <img
+            <Box
+              as="img"
               alt={post.mainImage?.alt}
               width={150}
               height={200}
@@ -99,7 +100,7 @@ const BlogPostCard = ({
               justifyContent: "space-between",
               height: cardContentHeight,
             }}>
-            <div>
+            <Box>
               <Box
                 sx={{
                   color: "text",
@@ -119,7 +120,8 @@ const BlogPostCard = ({
                   pb: 24,
                   height: authorHeight,
                 }}>
-                <img
+                <Box
+                  as="img"
                   alt={post.author.image?.alt}
                   width={30}
                   height={30}
@@ -153,7 +155,8 @@ const BlogPostCard = ({
                   {stats.text}
                 </Box>
               </Flex>
-              <h2
+              <Box
+                as="h2"
                 ref={titleRef}
                 sx={{
                   fontSize: "20px",
@@ -164,7 +167,7 @@ const BlogPostCard = ({
                   transition: "color .3s",
                 }}>
                 {post.title}
-              </h2>
+              </Box>
               <Box
                 sx={{
                   mb: 3,
@@ -179,14 +182,14 @@ const BlogPostCard = ({
                 as="p">
                 {post.excerpt}
               </Box>
-            </div>
+            </Box>
             <A as="p" sx={{ fontWeight: 600, margin: 0 }}>
               Read more
             </A>
           </Flex>
         </A>
       </Link>
-    </div>
+    </Box>
   );
 };
 

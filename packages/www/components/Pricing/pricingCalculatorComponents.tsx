@@ -4,6 +4,7 @@ import Link from "next/link";
 import { parse } from "graphql";
 import { ReactNode, useCallback, useEffect } from "react";
 import { useApi } from "hooks";
+import { Box } from "@theme-ui/components";
 
 type PreviewItemProps = {
   title: string;
@@ -74,7 +75,7 @@ const CalculatorItem = ({
   );
 
   return (
-    <div
+    <Box
       sx={{
         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
         py: "32px",
@@ -83,7 +84,8 @@ const CalculatorItem = ({
         flexDirection: "column",
         justifyContent: "center",
       }}>
-      <h1
+      <Box
+        as="h1"
         sx={{
           mb: "24px",
           fontSize: "20px",
@@ -92,8 +94,8 @@ const CalculatorItem = ({
           fontWeight: "400",
         }}>
         {title}
-      </h1>
-      <div
+      </Box>
+      <Box
         sx={{
           display: "grid",
           gridTemplateColumns: ["1fr", "1fr", "56% 38%", "56% 38%"],
@@ -101,7 +103,8 @@ const CalculatorItem = ({
           gap: ["20px", "20px", "6%", "6%"],
         }}>
         {children}
-        <input
+        <Box
+          as="input"
           className="pricing__range__input"
           min={min}
           max={max}
@@ -127,8 +130,8 @@ const CalculatorItem = ({
             },
           }}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
@@ -145,7 +148,8 @@ const ScaleCalculator = ({
     }
   };
   return (
-    <button
+    <Box
+      as="button"
       aria-label={`${value} Percentage Watched`}
       onClick={handleClick}
       sx={{
@@ -169,7 +173,8 @@ const ScaleCalculator = ({
           borderColor: "primary",
         },
       }}>
-      <p
+      <Box
+        as="p"
         sx={{
           fontSize: "14px",
           letterSpacing: "-0.04em",
@@ -177,8 +182,8 @@ const ScaleCalculator = ({
           fontWeight: percentageWatched === value ? "600" : "400",
         }}>
         {value}%
-      </p>
-    </button>
+      </Box>
+    </Box>
   );
 };
 
@@ -230,14 +235,15 @@ const Calculator = ({
   );
 
   return (
-    <div
+    <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         pt: "32px",
         width: "100%",
       }}>
-      <p
+      <Box
+        as="p"
         sx={{
           fontSize: "16px",
           lineHeight: "16px",
@@ -246,7 +252,7 @@ const Calculator = ({
           mb: "16px",
         }}>
         Usage
-      </p>
+      </Box>
       <CalculatorItem
         title="Average length of stream"
         marginTop="-26px"
@@ -255,8 +261,8 @@ const Calculator = ({
         max={43200}
         step={900}
         value={streamLength}>
-        <div sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-          <div
+        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+          <Box
             sx={{
               height: "48px",
               width: "100%",
@@ -277,7 +283,8 @@ const Calculator = ({
                 borderColor: "primary",
               },
             }}>
-            <input
+            <Box
+              as="input"
               maxLength={2}
               name="hours"
               onChange={handleChange}
@@ -296,8 +303,11 @@ const Calculator = ({
                 },
               }}
             />
-            <p sx={{ color: "#7D7D7D" }}>:</p>
-            <input
+            <Box as="p" sx={{ color: "#7D7D7D" }}>
+              :
+            </Box>
+            <Box
+              as="input"
               maxLength={2}
               name="minutes"
               onChange={handleChange}
@@ -316,8 +326,11 @@ const Calculator = ({
                 },
               }}
             />
-            <p sx={{ color: "#7D7D7D" }}>:</p>
-            <input
+            <Box as="p" sx={{ color: "#7D7D7D" }}>
+              :
+            </Box>
+            <Box
+              as="input"
               maxLength={2}
               name="seconds"
               onChange={handleChange}
@@ -336,40 +349,43 @@ const Calculator = ({
                 },
               }}
             />
-          </div>
-          <div
+          </Box>
+          <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               mt: "8px",
               px: "16px",
             }}>
-            <p
+            <Box
+              as="p"
               sx={{
                 fontSize: "12px",
                 letterSpacing: "-0.04em",
                 color: "#525252",
               }}>
               hours
-            </p>
-            <p
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "12px",
                 letterSpacing: "-0.04em",
                 color: "#525252",
               }}>
               minutes
-            </p>
-            <p
+            </Box>
+            <Box
+              as="p"
               sx={{
                 fontSize: "12px",
                 letterSpacing: "-0.04em",
                 color: "#525252",
               }}>
               seconds
-            </p>
-          </div>
-        </div>
+            </Box>
+          </Box>
+        </Box>
       </CalculatorItem>
       <CalculatorItem
         title="Monthly live streams"
@@ -378,7 +394,8 @@ const Calculator = ({
         max={10000}
         step={50}
         value={monthlyStreams}>
-        <input
+        <Box
+          as="input"
           value={monthlyStreams}
           maxLength={6}
           onChange={(e) => {
@@ -413,7 +430,8 @@ const Calculator = ({
         max={10000}
         step={50}
         value={viewCount}>
-        <input
+        <Box
+          as="input"
           value={viewCount}
           placeholder="0"
           maxLength={8}
@@ -442,7 +460,7 @@ const Calculator = ({
           }}
         />
       </CalculatorItem>
-      <div
+      <Box
         sx={{
           borderTop: "1px solid rgba(0, 0, 0, 0.08)",
           pt: "32px",
@@ -451,7 +469,8 @@ const Calculator = ({
           flexDirection: "column",
           justifyContent: "center",
         }}>
-        <h1
+        <Box
+          as="h1"
           sx={{
             mb: "24px",
             fontSize: "20px",
@@ -460,8 +479,8 @@ const Calculator = ({
             fontWeight: "400",
           }}>
           What percentage of the stream does the average viewer watch?
-        </h1>
-        <div
+        </Box>
+        <Box
           sx={{
             display: ["grid", "flex"],
             gap: ["12px", "16px"],
@@ -475,9 +494,9 @@ const Calculator = ({
               setPercentageWatched={setPercentageWatched}
             />
           ))}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
@@ -490,7 +509,7 @@ const PreviewItem = ({
   color,
 }: PreviewItemProps) => {
   return (
-    <div
+    <Box
       sx={{
         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
         minHeight: ["104px", "136px"],
@@ -502,7 +521,7 @@ const PreviewItem = ({
         alignItems: ["flex-start", "flex-start", "center"],
         justifyContent: "space-between",
       }}>
-      <div
+      <Box
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -511,8 +530,9 @@ const PreviewItem = ({
           mr: ["0", "0", "15px"],
           mb: ["8px", "8px", "0"],
         }}>
-        <div sx={{ display: "flex", flexDirection: "column", mb: "8px" }}>
-          <h1
+        <Box sx={{ display: "flex", flexDirection: "column", mb: "8px" }}>
+          <Box
+            as="h1"
             sx={{
               fontSize: "20px",
               minWidth: "fit-content",
@@ -521,10 +541,11 @@ const PreviewItem = ({
               fontWeight: "600",
             }}>
             {title}
-          </h1>
+          </Box>
           {children}
-        </div>
-        <p
+        </Box>
+        <Box
+          as="p"
           sx={{
             color: "#525252",
             fontSize: "12px",
@@ -532,16 +553,17 @@ const PreviewItem = ({
             letterSpacing: "-0.04em",
           }}>
           {description}
-        </p>
-      </div>
-      <div
+        </Box>
+      </Box>
+      <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
           alignItems: ["flex-start", "flex-start", "flex-end", "flex-end"],
         }}>
-        <h1
+        <Box
+          as="h1"
           sx={{
             fontSize: ["24px", "24px", "26px", "32px"],
             lineHeight: "40px",
@@ -551,8 +573,9 @@ const PreviewItem = ({
             color: color ?? "black",
           }}>
           {value}
-        </h1>
-        <p
+        </Box>
+        <Box
+          as="p"
           sx={{
             fontSize: "16px",
             lineHeight: "24px",
@@ -561,9 +584,9 @@ const PreviewItem = ({
             textAlign: "right",
           }}>
           {valueClarification}
-        </p>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
@@ -572,7 +595,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
   const { token } = useApi();
 
   return (
-    <div
+    <Box
       sx={{
         background: "linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)",
         border: "1px solid #EAEAEA",
@@ -583,14 +606,15 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         padding: "32px",
         width: "100%",
       }}>
-      <div
+      <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
           pb: "16px",
         }}>
-        <p
+        <Box
+          as="p"
           sx={{
             fontSize: "16px",
             lineHeight: "16px",
@@ -598,8 +622,9 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             color: "#525252",
           }}>
           Monthly cost
-        </p>
-        <p
+        </Box>
+        <Box
+          as="p"
           sx={{
             fontSize: "12px",
             letterSpacing: "-0.04em",
@@ -607,8 +632,8 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             fontStyle: "italic",
           }}>
           Prices listed in USD
-        </p>
-      </div>
+        </Box>
+      </Box>
       <PreviewItem
         title="Transcoding"
         description="Livepeer.com creates multiple versions of your source livestream for different devices in real time."
@@ -639,7 +664,8 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         }
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}>
         {transcoding + streaming > 500 && (
-          <p
+          <Box
+            as="p"
             sx={{
               background: "#00A55F",
               borderRadius: "4px",
@@ -654,11 +680,12 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             {totalValue > 3000
               ? "Contact us For High Volume Discounts"
               : "High Volume Discounts Available"}
-          </p>
+          </Box>
         )}
       </PreviewItem>
-      <Link href={token ? "/app/user/plans" : "/register"}>
-        <button
+      <Link href={token ? "/dashboard/billing/plans" : "/register"}>
+        <Box
+          as="button"
           disabled={streaming + transcoding === 0}
           sx={{
             width: "100%",
@@ -681,9 +708,9 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             },
           }}>
           {totalValue > 3000 ? "Contact us" : "Get Started"}
-        </button>
+        </Box>
       </Link>
-    </div>
+    </Box>
   );
 };
 

@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
+import { Box } from "@theme-ui/components";
 
 const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(600);
@@ -18,8 +19,9 @@ const PricingCalculator = () => {
     0.01;
 
   return (
-    <div sx={{ display: "flex", flexDirection: "column", mt: "144px" }}>
-      <h1
+    <Box sx={{ display: "flex", flexDirection: "column", mt: "144px" }}>
+      <Box
+        as="h1"
         sx={{
           fontSize: [5, 5, 6],
           mb: "16px",
@@ -27,8 +29,9 @@ const PricingCalculator = () => {
           letterSpacing: "-0.04em",
         }}>
         Estimate your monthly costs
-      </h1>
-      <p
+      </Box>
+      <Box
+        as="p"
         sx={{
           mb: "64px",
           fontSize: ["20px", "24px"],
@@ -38,8 +41,8 @@ const PricingCalculator = () => {
           textAlign: "center",
         }}>
         Add details about your content and audience
-      </p>
-      <div
+      </Box>
+      <Box
         sx={{
           display: "grid",
           gridTemplateColumns: ["1fr", "40% 48%"],
@@ -57,8 +60,8 @@ const PricingCalculator = () => {
           setPercentageWatched={setPercentageWatched}
         />
         <Preview transcoding={transcoding} streaming={streaming} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

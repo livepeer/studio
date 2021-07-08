@@ -144,7 +144,7 @@ export function blocksToText(blocks, opts = {}) {
 let stripePromise: Promise<Stripe | null>;
 export const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   }
   return stripePromise;
 };
@@ -256,4 +256,8 @@ export function isStaging(): boolean {
 
 export function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
+}
+
+export function truncate(str, n) {
+  return str.length > n ? str.substr(0, n - 1) + "…" : str;
 }

@@ -17,7 +17,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (user) {
-      router.replace("/app/user");
+      router.replace("/dashboard");
     }
   }, [user]);
 
@@ -56,7 +56,9 @@ const RegisterPage = () => {
           flexDirection: "column",
           py: 5,
         }}>
-        <h3 sx={{ mb: 4 }}>Create an Account</h3>
+        <Box as="h3" sx={{ mb: 4 }}>
+          Create an Account
+        </Box>
         <Box
           sx={{
             mb: 4,

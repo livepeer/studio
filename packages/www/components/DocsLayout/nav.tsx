@@ -1,8 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import { Flex } from "@theme-ui/components";
 import Button from "components/Button";
-import { Box, Link as A } from "@theme-ui/components";
+import { Box, Flex, Link as A } from "@theme-ui/components";
 import Logo from "components/Logo";
 import { useApi } from "hooks";
 import Link from "../Link";
@@ -33,7 +32,7 @@ const DocsNav = ({
   const [selectOpen, setSelectOpen] = useState(false);
   const [closeSelect, setCloseSelect] = useState(false);
   const { token, logout } = useApi();
-  const isDashboard = pathname.includes("/app/");
+  const isDashboard = pathname.includes("/dashboard/");
   const router = useRouter();
   const currentPath = router.asPath
     .split("/")
@@ -59,7 +58,7 @@ const DocsNav = ({
 
   return (
     <>
-      <div
+      <Box
         onClick={() => setCloseSelect(false)}
         sx={{
           display: ["flex", "none", "none"],
@@ -94,26 +93,24 @@ const DocsNav = ({
               justifyContent: "space-between",
               alignItems: "center",
             }}>
-            <div
+            <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
               }}>
-              <div sx={{ display: "flex", alignItems: "center" }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Logo logoType={false} withoutBeta />
-                <span sx={{ fontSize: "16px", fontWeight: "600", mx: "12px" }}>
-                  /
-                </span>
-                <p
+                <Box
+                  as="p"
                   sx={{
                     fontSize: "16px",
                     fontWeight: "600",
-                    letterSpacing: "-0.06em",
                   }}>
-                  docs
-                </p>
-              </div>
-              <button
+                  Docs
+                </Box>
+              </Box>
+              <Box
+                as="button"
                 onClick={onSearchOpen}
                 ref={searchButtonRef}
                 sx={{
@@ -129,20 +126,24 @@ const DocsNav = ({
                 }}>
                 <Flex sx={{ alignItems: "center" }}>
                   <BiSearch size={14} />
-                  <p sx={{ fontSize: "12px", color: "#525252", ml: "6px" }}>
+                  <Box
+                    as="p"
+                    sx={{ fontSize: "12px", color: "#525252", ml: "6px" }}>
                     Search
-                  </p>
+                  </Box>
                 </Flex>
-                <div
+                <Box
                   sx={{
                     border: "1px solid #E6E6E6",
                     borderRadius: "4px",
                     padding: "4px",
                   }}>
-                  <p sx={{ fontSize: "10px" }}>⌘ K</p>
-                </div>
-              </button>
-            </div>
+                  <Box as="p" sx={{ fontSize: "10px" }}>
+                    ⌘ K
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
             <Flex
               sx={{
                 display: "flex",
@@ -168,17 +169,11 @@ const DocsNav = ({
               )}
               {loggedIn && (
                 <>
-                  <A
-                    variant="nav"
-                    sx={{ mr: 3, cursor: "pointer" }}
-                    onClick={() => logout()}>
-                    Log Out
-                  </A>
                   {!isDashboard && (
                     <Button
                       sx={{ py: "6px", ml: 3 }}
                       isLink
-                      href="/app/user"
+                      href="/dashboard"
                       variant="buttons.primarySmall">
                       Dashboard
                     </Button>
@@ -204,7 +199,8 @@ const DocsNav = ({
             {categories.map((each, idx) => {
               return (
                 <NextLink href={each?.slug} key={idx} passHref>
-                  <a
+                  <Box
+                    as="a"
                     sx={{
                       cursor: "pointer",
                       display: "flex",
@@ -212,7 +208,8 @@ const DocsNav = ({
                       mr: "32px",
                     }}>
                     <i>{each?.icon}</i>
-                    <span
+                    <Box
+                      as="span"
                       sx={{
                         fontSize: "14px",
                         fontWeight: "500",
@@ -225,13 +222,14 @@ const DocsNav = ({
                         color: each?.slug === currentPath ? "black" : "#828282",
                       }}>
                       {each.name}
-                    </span>
-                  </a>
+                    </Box>
+                  </Box>
                 </NextLink>
               );
             })}
           </Flex>
-          <i
+          <Box
+            as="i"
             onClick={() => setHideTopNav(!hideTopNav)}
             onMouseOver={() => setIconHover(true)}
             onMouseOut={() => setIconHover(false)}
@@ -241,7 +239,7 @@ const DocsNav = ({
               transform: hideTopNav ? "rotate(-180deg)" : "rotate(0deg)",
             }}>
             <Download hovered={iconHover} />
-          </i>
+          </Box>
         </Box>
         <Box
           sx={{
@@ -249,7 +247,7 @@ const DocsNav = ({
             mt: "8px",
           }}>
           <DropdownMenu.Root onOpenChange={handleClick}>
-            <div
+            <Box
               sx={{
                 width: "100%",
                 display: ["flex", "none", "none"],
@@ -265,7 +263,7 @@ const DocsNav = ({
                     outline: "none",
                   },
                 }}>
-                <div
+                <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -276,7 +274,8 @@ const DocsNav = ({
                         ?.icon
                     }
                   </i>
-                  <p
+                  <Box
+                    as="p"
                     sx={{
                       fontSize: "14px",
                       fontWeight: "500",
@@ -286,8 +285,8 @@ const DocsNav = ({
                       mobileCategories.filter((a) => a.slug === currentPath)[0]
                         ?.name
                     }
-                  </p>
-                </div>
+                  </Box>
+                </Box>
                 <GoTriangleDown />
               </DropdownMenu.Trigger>
               <DropdownMenu.Content
@@ -316,7 +315,8 @@ const DocsNav = ({
                         },
                       }}>
                       <i>{each?.icon}</i>
-                      <p
+                      <Box
+                        as="p"
                         sx={{
                           fontSize: "14px",
                           fontWeight: "500",
@@ -324,11 +324,11 @@ const DocsNav = ({
                           color: "#828282",
                         }}>
                         {each?.name}
-                      </p>
+                      </Box>
                     </DropdownMenu.Item>
                   ))}
               </DropdownMenu.Content>
-            </div>
+            </Box>
           </DropdownMenu.Root>
         </Box>
       </Box>

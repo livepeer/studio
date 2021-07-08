@@ -13,7 +13,6 @@ import { useRouter } from "next/router";
 
 const ContactPage = () => {
   const { query } = useRouter();
-  console.log(query);
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -43,7 +42,9 @@ const ContactPage = () => {
       withGradientBackground>
       <Container variant="hero">
         <Box sx={{ mb: 80 }}>
-          <h1 sx={{ variant: "text.heading.hero" }}>Get in touch with us</h1>
+          <Box as="h1" sx={{ variant: "text.heading.hero" }}>
+            Get in touch with us
+          </Box>
           <Box sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
             If you’d like to learn more about Livepeer.com’s innovative UGC
             focused video platform drop us a note and we’ll get right back to
@@ -57,7 +58,8 @@ const ContactPage = () => {
             .
           </Box>
         </Box>
-        <form
+        <Box
+          as="form"
           ref={formEl}
           onSubmit={handleSubmit}
           sx={{ textAlign: "center", maxWidth: 958, margin: "0 auto" }}>
@@ -126,7 +128,7 @@ const ContactPage = () => {
               Thanks for reaching out! We'll get back to you shortly.
             </Box>
           </Fade>
-        </form>
+        </Box>
       </Container>
       <Fade key={0}>
         <Prefooter />

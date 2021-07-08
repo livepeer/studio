@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { TiArrowSortedDown } from "react-icons/ti";
 import Link from "next/link";
 import Marked from "./Marked";
+import { Box } from "@theme-ui/components";
 
 type SideNavProps = {
   hideTopNav: boolean;
@@ -48,7 +49,7 @@ type TriggerProps = {
 
 const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
   return (
-    <div
+    <Box
       sx={{
         display: "flex",
         alignItems: "flex-start",
@@ -58,7 +59,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
         pl: "24px",
         position: "relative",
       }}>
-      <div
+      <Box
         sx={{
           position: "absolute",
           left: "0",
@@ -69,7 +70,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           borderRadius: " 0 2px 2px 0",
         }}
       />
-      <div
+      <Box
         sx={{
           fontWeight: isSelected ? "600" : "400",
           transition: "all 0.2s",
@@ -82,16 +83,17 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           },
         }}>
         <Marked>{label}</Marked>
-      </div>
-      <i
+      </Box>
+      <Box
+        as="i"
         sx={{
           transform: isOpen ? "rotate(-90deg)" : "",
           transition: "all 0.1s",
           mt: "6px",
         }}>
         <TiArrowSortedDown color="#AFAFAF" size={12} />
-      </i>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
@@ -125,7 +127,8 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
       }>
       {route.children.map((child, idx2) => (
         <Link href={`/${child.slug}`} key={idx2} passHref>
-          <a
+          <Box
+            as="a"
             sx={{
               fontSize: "14px",
               letterSpacing: "-0.02em",
@@ -139,7 +142,7 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
               },
             }}>
             <Marked>{child.title}</Marked>
-          </a>
+          </Box>
         </Link>
       ))}
     </Collapsible>
@@ -155,7 +158,7 @@ const Menu = ({ menu }: MenuProps) => {
     .join("/");
 
   return (
-    <div
+    <Box
       sx={{
         mt: "8px",
         display: "flex",
@@ -167,7 +170,8 @@ const Menu = ({ menu }: MenuProps) => {
         ) : (
           !route.hide && (
             <Link href={`/${route.slug}`} key={idx} passHref>
-              <a
+              <Box
+                as="a"
                 sx={{
                   fontSize: "14px",
                   letterSpacing: "-0.02em",
@@ -178,7 +182,7 @@ const Menu = ({ menu }: MenuProps) => {
                   fontWeight: currentPath === `/${route.slug}` ? "600" : "400",
                   pl: "24px",
                 }}>
-                <div
+                <Box
                   sx={{
                     position: "absolute",
                     left: "0",
@@ -192,7 +196,8 @@ const Menu = ({ menu }: MenuProps) => {
                     borderRadius: " 0 2px 2px 0",
                   }}
                 />
-                <span
+                <Box
+                  as="span"
                   sx={{
                     color: "#3C3C3C",
                     ":hover": {
@@ -200,13 +205,13 @@ const Menu = ({ menu }: MenuProps) => {
                     },
                   }}>
                   <Marked>{route.title}</Marked>
-                </span>
-              </a>
+                </Box>
+              </Box>
             </Link>
           )
         )
       )}
-    </div>
+    </Box>
   );
 };
 
@@ -218,7 +223,7 @@ const SideNav = ({
 }: SideNavProps & MenuProps) => {
   const [iconHover, setIconHover] = useState(false);
   return (
-    <div
+    <Box
       sx={{
         height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
         overflowY: "auto",
@@ -231,14 +236,15 @@ const SideNav = ({
         background: "white",
         top: hideTopNav ? 76 : 136,
       }}>
-      <div
+      <Box
         sx={{
           width: "233px",
           minWidth: "233px",
           maxWidth: "233px",
           padding: "24px 0",
         }}>
-        <p
+        <Box
+          as="p"
           sx={{
             fontSize: "10px",
             color: "#4F4F4F",
@@ -248,10 +254,10 @@ const SideNav = ({
             mt: "8px",
           }}>
           CONTENT
-        </p>
+        </Box>
         <Menu menu={menu} />
-      </div>
-      <div
+      </Box>
+      <Box
         sx={{
           borderRight: "1px solid #E6E6E6",
           height: "100%",
@@ -262,7 +268,8 @@ const SideNav = ({
           display: "flex",
           justifyContent: "center",
         }}>
-        <i
+        <Box
+          as="i"
           onClick={() => setHideSideBar(!hideSideBar)}
           onMouseOver={() => setIconHover(true)}
           onMouseOut={() => setIconHover(false)}
@@ -278,9 +285,9 @@ const SideNav = ({
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
           <Download hovered={iconHover} />
-        </i>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
@@ -298,7 +305,7 @@ export const MobileSideNav = ({
   }, [isOpen]);
 
   return (
-    <div
+    <Box
       sx={{
         display: ["flex", "flex", "none", "none"],
         height: "100vh",
@@ -310,7 +317,7 @@ export const MobileSideNav = ({
         top: 0,
         left: 0,
       }}>
-      <div
+      <Box
         onClick={() => setIsOpen(false)}
         sx={{
           position: "fixed",
@@ -325,7 +332,7 @@ export const MobileSideNav = ({
           visibility: isOpen ? "visible" : "hidden",
         }}
       />
-      <div
+      <Box
         sx={{
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
@@ -334,7 +341,8 @@ export const MobileSideNav = ({
           overflow: "auto",
           zIndex: 100,
         }}>
-        <p
+        <Box
+          as="p"
           sx={{
             fontSize: "10px",
             color: "#4F4F4F",
@@ -344,10 +352,10 @@ export const MobileSideNav = ({
             mt: "8px",
           }}>
           CONTENT
-        </p>
+        </Box>
         <Menu menu={menu} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import { Box } from "@theme-ui/components";
 
 type IconProps = {
   id?: string;
@@ -137,7 +138,8 @@ const Download = ({ hovered }: CollapseIconProps) => {
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
-      <path
+      <Box
+        as="path"
         d="M4.16732 2.5L15.834 2.5M14.1673 11.6667L10.0007 7.5M10.0007 7.5L5.83398 11.6667M10.0007 7.5L10.0006 17.5"
         sx={{
           stroke: hovered ? "#000" : "#828282",

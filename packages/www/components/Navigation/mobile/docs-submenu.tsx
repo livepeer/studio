@@ -28,7 +28,7 @@ const DocsMobileSubMenu = ({
 
   return (
     <>
-      <div
+      <Box
         sx={{
           position: "sticky",
           top: 64,

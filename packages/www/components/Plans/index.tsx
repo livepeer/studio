@@ -150,7 +150,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               </Heading>
               <Box sx={{ mb: 3, color: "offBlack" }}>
                 You are currently on the{" "}
-                <span
+                <Box
+                  as="span"
                   sx={{
                     fontFamily: "monospace",
                     textTransform: "uppercase",
@@ -166,7 +167,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                   {user?.stripeProductId
                     ? products[user.stripeProductId].name
                     : products["prod_0"].name}
-                </span>{" "}
+                </Box>{" "}
                 plan.
               </Box>
             </Box>
@@ -289,10 +290,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 }}
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
-                    </span>{" "}
+                    </Box>{" "}
                     1000 minutes / month
                   </span>
                 }
@@ -300,10 +302,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
-                    </span>{" "}
+                    </Box>{" "}
                     None
                   </span>
                 }
@@ -313,10 +316,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
-                    </span>{" "}
+                    </Box>{" "}
                     10 concurrent viewers / account
                   </span>
                 }
@@ -366,10 +370,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
-                    </span>{" "}
+                    </Box>{" "}
                     $0.005 USD / min video ingested
                   </span>
                 }
@@ -379,10 +384,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
-                    </span>{" "}
+                    </Box>{" "}
                     Coming soon
                   </span>
                 }
@@ -392,10 +398,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 styles={{ borderColor: "rgba(255, 255, 255, .3)" }}
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
-                    </span>{" "}
+                    </Box>{" "}
                     $0.01 USD / gb video streamed
                   </span>
                 }
@@ -436,10 +443,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Transcoding:
-                    </span>{" "}
+                    </Box>{" "}
                     Custom pricing available
                   </span>
                 }
@@ -448,10 +456,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Storage:
-                    </span>{" "}
+                    </Box>{" "}
                     Coming soon
                   </span>
                 }
@@ -460,10 +469,11 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item
                 title={
                   <span>
-                    <span
+                    <Box
+                      as="span"
                       sx={{ display: ["inline", "inline", "inline", "none"] }}>
                       Streaming:
-                    </span>{" "}
+                    </Box>{" "}
                     Custom pricing available
                   </span>
                 }

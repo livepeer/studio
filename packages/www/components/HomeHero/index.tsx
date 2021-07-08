@@ -119,13 +119,16 @@ const HomeHero = () => {
             mx: "auto",
             textAlign: "center",
           }}>
-          <div sx={{ zIndex: notchZIndex + 1, position: "relative" }}>
+          <Box sx={{ zIndex: notchZIndex + 1, position: "relative" }}>
             <Styled.h1 sx={{ fontSize: [40, 56, 64, 72] }}>
-              <span sx={{ fontWeight: 400 }}>The platform built to power</span>
+              <Box as="span" sx={{ fontWeight: 400 }}>
+                The platform built to power
+              </Box>
               <br />
               video-centric UGC applications at scale.
             </Styled.h1>
-            <form
+            <Box
+              as="form"
               onSubmit={(e) => {
                 e.preventDefault();
                 router.push(`/register?email=${encodeURIComponent(email)}`);
@@ -160,9 +163,9 @@ const HomeHero = () => {
                   Get Started
                 </Button>
               </Flex>
-            </form>
-          </div>
-          <div
+            </Box>
+          </Box>
+          <Box
             sx={{
               mb: 6,
               mt: [-6, 4, null, 6],
@@ -173,7 +176,7 @@ const HomeHero = () => {
               alignItems: "center",
               justifyContent: "flex-end",
             }}>
-            <div
+            <Box
               ref={videoContainerRef}
               sx={{
                 display: "flex",
@@ -183,10 +186,10 @@ const HomeHero = () => {
                 zIndex: notchZIndex - 1,
               }}>
               <HeroVideo ref={videoRef} />
-            </div>
+            </Box>
             <PhoneSvg ref={phoneRef} />
-          </div>
-          <div sx={{ my: 6 }}>
+          </Box>
+          <Box sx={{ my: 6 }}>
             <Heading variant="heading.section" sx={{ mb: 4, lineHeight: 1.3 }}>
               Reliable, affordable, high-quality streaming for all of your video
               content.
@@ -199,7 +202,7 @@ const HomeHero = () => {
               powerful APIs and features that are essential for a seamless
               creator experience.
             </Text>
-          </div>
+          </Box>
         </Box>
       </Container>
     </Box>

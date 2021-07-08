@@ -5,7 +5,6 @@ const withMDX = require("@next/mdx")({
     remarkPlugins: [emoji],
   },
 });
-const withTM = require("next-transpile-modules")(["react-use-mailchimp"]);
 
 const config = {
   async redirects() {
@@ -152,6 +151,31 @@ const config = {
         destination: "/docs/guides/start-live-streaming/api-key",
         permanent: false,
       },
+      {
+        source: "/app/user",
+        destination: "/dashboard",
+        permanent: false,
+      },
+      {
+        source: "/app/user/keys",
+        destination: "/dashboard/developers/api-keys",
+        permanent: false,
+      },
+      {
+        source: "/app/user/usage",
+        destination: "/dashboard/billing",
+        permanent: false,
+      },
+      {
+        source: "/app/user/plans",
+        destination: "/dashboard/billing/plans",
+        permanent: false,
+      },
+      {
+        source: "/app/test-player",
+        destination: "/dashboard/stream-health",
+        permanent: false,
+      },
     ];
   },
 };
@@ -176,7 +200,6 @@ module.exports = withPlugins(
         },
       },
     ],
-    withTM,
   ],
   config
 );

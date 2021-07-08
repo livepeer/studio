@@ -80,7 +80,8 @@ const AdminTools = ({ id }: { id: string }) => {
         mt: 2,
       }}>
       <Box sx={{ mt: "2em" }}>{message}</Box>
-      <form
+      <Box
+        as="form"
         sx={{
           display: "flex",
           justifyContent: "flex-start",
@@ -108,7 +109,7 @@ const AdminTools = ({ id }: { id: string }) => {
           sx={{ ml: "1em" }}>
           Get info
         </Button>
-      </form>
+      </Box>
       <Box>{desc}</Box>
       {ginfo && ginfo.stream && (
         <>

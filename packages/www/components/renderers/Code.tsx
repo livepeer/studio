@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Box } from "@theme-ui/components";
 
 const Code = ({
   language,
@@ -143,7 +144,8 @@ const Code = ({
       // @ts-ignore
       theme={theme}>
       {({ tokens, getLineProps, getTokenProps }) => (
-        <pre
+        <Box
+          as="pre"
           className="codeblock-pre-container"
           sx={{
             background: custom ? "#3B375A" : "",
@@ -156,12 +158,12 @@ const Code = ({
             padding: custom ? "24px 16px 60px 24px" : "",
             position: "relative",
           }}>
-          <div sx={{ maxWidth: "100%", overflowX: 'auto' }}>
+          <Box sx={{ maxWidth: "100%", overflowX: "auto" }}>
             {tokens.map((line, i) => {
               // Workaround for MDX rendering trailing lines on everything
               const lastLine = i === tokens.length - 1;
               return (
-                <div key={i} {...getLineProps({ line, key: i })}>
+                <Box key={i} {...getLineProps({ line, key: i })}>
                   {line.map((token, key) => {
                     if (lastLine && token.empty) {
                       return null;
@@ -170,12 +172,13 @@ const Code = ({
                       <span key={key} {...getTokenProps({ token, key })} />
                     );
                   })}
-                </div>
+                </Box>
               );
             })}
-          </div>
+          </Box>
           {custom && (
-            <button
+            <Box
+              as="button"
               onClick={handleCopy}
               sx={{
                 position: "absolute",
@@ -200,9 +203,9 @@ const Code = ({
                 },
               }}>
               {copied ? "Copied" : "Copy"}
-            </button>
+            </Box>
           )}
-        </pre>
+        </Box>
       )}
     </Highlight>
   );

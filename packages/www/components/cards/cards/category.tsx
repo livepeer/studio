@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import Link from "next/link";
-import { Link as A } from "@theme-ui/components";
+import { Link as A, Box } from "@theme-ui/components";
 import { SxStyleProp } from "theme-ui";
 
 type Props = {
@@ -39,7 +39,7 @@ const DocsCategoryCard = ({
             "0px 24px 40px rgba(0, 0, 0, 0.24), 0px 30px 30px rgba(0, 0, 0, 0.02)",
         },
       }}>
-      <div
+      <Box
         sx={{
           width: "100%",
           height: "156px",
@@ -48,9 +48,10 @@ const DocsCategoryCard = ({
           justifyContent: "center",
           p: 3,
         }}>
-        <img {...img} sx={{ ...img.sx }} />
-      </div>
-      <h3
+        <Box as="img" {...img} sx={{ ...img.sx }} />
+      </Box>
+      <Box
+        as="h3"
         sx={{
           color: "background",
           fontSize: "20px",
@@ -60,9 +61,10 @@ const DocsCategoryCard = ({
           letterSpacing: "-0.03em",
         }}>
         {title}
-      </h3>
+      </Box>
       {description && (
-        <p
+        <Box
+          as="p"
           sx={{
             color: "#A5A5A5",
             fontSize: "18px",
@@ -70,7 +72,7 @@ const DocsCategoryCard = ({
             letterSpacing: "-0.03em",
           }}>
           {description}
-        </p>
+        </Box>
       )}
     </A>
   </Link>

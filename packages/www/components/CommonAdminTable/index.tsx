@@ -392,7 +392,8 @@ const CommonAdminTable = ({
       </Flex>
       {err && <Box>{err}</Box>}
       <Box>
-        <table
+        <Box
+          as="table"
           sx={{
             display: "table",
             width: "100%",
@@ -401,11 +402,12 @@ const CommonAdminTable = ({
             border: 0,
           }}
           {...getTableProps()}>
-          <thead sx={{ position: "relative" }}>
+          <Box as="thead" sx={{ position: "relative" }}>
             {headerGroups.map((headerGroup, i) => (
-              <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+              <Box as="tr" key={i} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column: any, i) => (
-                  <th
+                  <Box
+                    as="th"
                     sx={{
                       userSelect: "none",
                       fontWeight: "normal",
@@ -472,12 +474,13 @@ const CommonAdminTable = ({
                         </Flex>
                       )}
                     </Flex>
-                  </th>
+                  </Box>
                 ))}
-              </tr>
+              </Box>
             ))}
             {loading && (
-              <tr
+              <Box
+                as="tr"
                 sx={{
                   height: "0px",
                   border: 0,
@@ -485,43 +488,46 @@ const CommonAdminTable = ({
                   margin: 0,
                   padding: 0,
                 }}>
-                <th
+                <Box
+                  as="th"
                   sx={{ border: 0, bg: "transparent", margin: 0, padding: 0 }}
                   colSpan={1000}>
-                  <div sx={{ width: "100%", position: "relative" }}>
-                    <div
+                  <Box sx={{ width: "100%", position: "relative" }}>
+                    <Box
                       sx={{
                         position: "absolute",
                         top: "-1px",
                         left: "6px",
                         right: "0px",
                       }}>
-                      <div
+                      <Box
                         sx={{
                           backgroundColor: "dodgerblue",
                           height: "1px",
                           animation: `${loadingAnim} 3s ease-in-out infinite`,
                         }}
                       />
-                    </div>
-                  </div>
-                </th>
-              </tr>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
             )}
-          </thead>
+          </Box>
 
           <tbody {...getTableBodyProps()}>
             {rows.map((row: any, rowIndex) => {
               prepareRow(row);
               return (
-                <tr
+                <Box
+                  as="tr"
                   sx={{
                     bg: "transparent !important",
                   }}
                   {...row.getRowProps()}>
                   {row.cells.map((cell) => {
                     return (
-                      <td
+                      <Box
+                        as="td"
                         sx={{
                           fontSize: 1,
                           borderBottomColor: "muted",
@@ -533,14 +539,14 @@ const CommonAdminTable = ({
                         }}
                         {...cell.getCellProps()}>
                         {renderCell(cell)}
-                      </td>
+                      </Box>
                     );
                   })}
-                </tr>
+                </Box>
               );
             })}
           </tbody>
-        </table>
+        </Box>
       </Box>
     </Box>
   );

@@ -37,7 +37,8 @@ const Login = ({
 
   return (
     <Container>
-      <form
+      <Box
+        as="form"
         onSubmit={async (e) => {
           e.preventDefault();
           if (!showPassword) {
@@ -158,7 +159,7 @@ const Login = ({
         <Button sx={{ mt: 3, px: 5 }} variant="primary">
           {loading ? "Loading..." : buttonText}
         </Button>
-      </form>
+      </Box>
     </Container>
   );
 };
