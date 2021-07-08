@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import {
-  Alert,
   Box,
   Button,
   Flex,
@@ -10,12 +9,17 @@ import {
   Status,
   Badge,
   Tooltip,
+  Text,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  HoverCardRoot,
+  HoverCardContent,
+  HoverCardTrigger,
+  useSnackbar,
 } from "@livepeer.com/design-system";
 import Layout from "../../../../layouts/dashboard";
 import { useLoggedIn } from "../../../../hooks";
@@ -42,41 +46,16 @@ import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "react-query";
 
-type TimedAlertProps = {
-  text: string;
-  close: Function;
-  variant?: string;
-};
-
-const TimedAlert = ({ text, variant, close }: TimedAlertProps) => {
-  const isShown = !!text;
-  const closeVariant = variant ? `close-${variant}` : "close";
-  useEffect(() => {
-    if (isShown) {
-      const interval = setTimeout(() => {
-        close();
-      }, 3000);
-      return () => clearTimeout(interval);
-    }
-  }, [text]);
-  return isShown ? (
-    <Alert css={{ m: 2 }}>{text}</Alert>
-  ) : // <Alert variant={variant} css={{ m: 2 }}>
-  //   {text}
-  //   <Close variant={closeVariant} ml="auto" mr={-2} onClick={() => close()} />
-  // </Alert>
-  null;
-};
-
 type ShowURLProps = {
-  text: string;
   url: string;
   anchor?: boolean;
   urlToCopy?: string;
 };
 
-const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
+const ShowURL = ({ url, urlToCopy, anchor = false }: ShowURLProps) => {
   const [isCopied, setCopied] = useState(0);
+  const [openSnackbar] = useSnackbar();
+
   useEffect(() => {
     if (isCopied) {
       const interval = setTimeout(() => {
@@ -87,43 +66,60 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
   }, [isCopied]);
   const ccurl = urlToCopy ? urlToCopy : url;
   return (
-    <Flex css={{ justifyContent: "flex-start", alignItems: "center" }}>
-      {text ? (
-        <Box css={{ minWidth: 125, fontSize: 12, paddingRight: "1em" }}>
-          {text}:
-        </Box>
-      ) : null}
-      <CopyToClipboard text={ccurl} onCopy={() => setCopied(2000)}>
-        <Flex css={{ alignItems: "center" }}>
-          {anchor ? (
-            <A css={{ fontSize: "$2", mr: "$1" }} href={url} target="_blank">
-              {url}
-            </A>
-          ) : (
-            <Box css={{ fontSize: "$2", mr: "$1" }}>{url}</Box>
-          )}
-          <Copy
-            css={{
-              mr: "$1",
-              cursor: "pointer",
-              width: 14,
-              height: 14,
-              color: "$hiContrast",
-            }}
-          />
+    <HoverCardRoot openDelay={200}>
+      <HoverCardTrigger>
+        <Flex css={{ height: 25, ai: "center" }}>
+          <CopyToClipboard
+            text={ccurl}
+            onCopy={() => {
+              openSnackbar("Copied to clipboard");
+              setCopied(2000);
+            }}>
+            <Flex
+              css={{
+                alignItems: "center",
+                cursor: "pointer",
+                ml: 0,
+                mr: 0,
+              }}>
+              {anchor ? (
+                <A
+                  css={{ fontSize: "$2", mr: "$1" }}
+                  href={url}
+                  target="_blank">
+                  {url}
+                </A>
+              ) : (
+                <Box css={{ fontSize: "$2", mr: "$1" }}>{url}</Box>
+              )}
+              <Copy
+                css={{
+                  mr: "$2",
+                  width: 14,
+                  height: 14,
+                  color: "$hiContrast",
+                }}
+              />
+            </Flex>
+          </CopyToClipboard>
         </Flex>
-      </CopyToClipboard>
-      {!!isCopied && (
-        <Box
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <Text
+          variant="gray"
           css={{
-            ml: "$1",
-            fontSize: "$2",
-            color: "$hiContrast",
+            backgroundColor: "$panel",
+            borderRadius: 6,
+            px: "$3",
+            py: "$1",
+            fontSize: "$1",
+            display: "flex",
+            ai: "center",
           }}>
-          Copied
-        </Box>
-      )}
-    </Flex>
+          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
+        </Text>
+      </HoverCardContent>
+    </HoverCardRoot>
   );
 };
 
@@ -133,6 +129,8 @@ const Cell = ({ children, css = {} }) => {
 
 const ClipBut = ({ text }) => {
   const [isCopied, setCopied] = useState(0);
+  const [openSnackbar] = useSnackbar();
+
   useEffect(() => {
     if (isCopied) {
       const timeout = setTimeout(() => {
@@ -141,29 +139,53 @@ const ClipBut = ({ text }) => {
       return () => clearTimeout(timeout);
     }
   }, [isCopied]);
+
   return (
-    <CopyToClipboard text={text} onCopy={() => setCopied(2000)}>
-      <Flex
-        css={{
-          alignItems: "center",
-          cursor: "pointer",
-          ml: 0,
-          mr: 0,
-        }}>
-        <Box css={{ mr: "$1" }}>{text}</Box>
-        <Copy
+    <HoverCardRoot openDelay={200}>
+      <HoverCardTrigger>
+        <Flex css={{ height: 25, ai: "center" }}>
+          <CopyToClipboard
+            text={text}
+            onCopy={() => {
+              openSnackbar("Copied to clipboard");
+              setCopied(2000);
+            }}>
+            <Flex
+              css={{
+                alignItems: "center",
+                cursor: "pointer",
+                ml: 0,
+                mr: 0,
+              }}>
+              <Box css={{ mr: "$1" }}>{text}</Box>
+              <Copy
+                css={{
+                  mr: "$2",
+                  width: 14,
+                  height: 14,
+                  color: "$hiContrast",
+                }}
+              />
+            </Flex>
+          </CopyToClipboard>
+        </Flex>
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <Text
+          variant="gray"
           css={{
-            mr: "$2",
-            width: 14,
-            height: 14,
-            color: "$hiContrast",
-          }}
-        />
-        {!!isCopied && (
-          <Box css={{ fontSize: "$2", color: "$hiContrast" }}>Copied</Box>
-        )}
-      </Flex>
-    </CopyToClipboard>
+            backgroundColor: "$panel",
+            borderRadius: 6,
+            px: "$3",
+            py: "$1",
+            fontSize: "$1",
+            display: "flex",
+            ai: "center",
+          }}>
+          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
+        </Text>
+      </HoverCardContent>
+    </HoverCardRoot>
   );
 };
 
@@ -394,41 +416,13 @@ const ID = () => {
                     <Cell>{stream.name}</Cell>
                     <Cell>Stream ID</Cell>
                     <Cell>
-                      <ClipBut text={stream.id}></ClipBut>
+                      <ClipBut text={stream.id} />
                     </Cell>
                     <Cell>Stream key</Cell>
                     <Cell>
                       {keyRevealed ? (
                         <Flex>
-                          {stream.streamKey}
-                          <CopyToClipboard
-                            text={stream.streamKey}
-                            onCopy={() => setCopied(2000)}>
-                            <Flex
-                              css={{
-                                alignItems: "center",
-                                cursor: "pointer",
-                                ml: "$1",
-                              }}>
-                              <Copy
-                                css={{
-                                  width: 14,
-                                  height: 14,
-                                  color: "$hiContrast",
-                                }}
-                              />
-                              {!!isCopied && (
-                                <Box
-                                  css={{
-                                    ml: "$2",
-                                    fontSize: "$2",
-                                    color: "$hiContrast",
-                                  }}>
-                                  Copied
-                                </Box>
-                              )}
-                            </Flex>
-                          </CopyToClipboard>
+                          <ClipBut text={stream.streamKey} />
                         </Flex>
                       ) : (
                         <Button
@@ -441,11 +435,11 @@ const ID = () => {
                     </Cell>
                     <Cell>RTMP ingest URL</Cell>
                     <Cell css={{ cursor: "pointer" }}>
-                      <ShowURL text="" url={globalIngestUrl} anchor={false} />
+                      <ShowURL url={globalIngestUrl} anchor={false} />
                     </Cell>
                     <Cell>Playback URL</Cell>
                     <Cell css={{ cursor: "pointer" }}>
-                      <ShowURL text="" url={globalPlaybackUrl} anchor={false} />
+                      <ShowURL url={globalPlaybackUrl} anchor={false} />
                     </Cell>
                     <Cell>Record sessions</Cell>
                     <Cell>
@@ -608,16 +602,6 @@ const ID = () => {
                     ) : null} */}
                   </Box>
                 </Flex>
-                <TimedAlert
-                  text={resultText}
-                  close={() => setResultText("")}
-                  variant="info"
-                />
-                <TimedAlert
-                  text={alertText}
-                  close={() => setAlertText("")}
-                  variant="attention"
-                />
               </Box>
               <Box
                 css={{
