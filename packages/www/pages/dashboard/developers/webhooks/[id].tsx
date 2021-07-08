@@ -41,7 +41,7 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const ApiKeys = () => {
+const WebhookDetail = () => {
   useLoggedIn();
   const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
@@ -212,4 +212,4 @@ const ApiKeys = () => {
   );
 };
 
-export default ApiKeys;
+export default WebhookDetail;
