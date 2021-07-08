@@ -22,6 +22,7 @@ import { Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
+import { format } from "date-fns";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -40,7 +41,7 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const ApiKeys = () => {
+const WebhookDetail = () => {
   useLoggedIn();
   const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
@@ -190,7 +191,7 @@ const ApiKeys = () => {
                 <Cell variant="gray">Name</Cell>
                 <Cell>{data.name}</Cell>
                 <Cell variant="gray">Created</Cell>
-                <Cell>{data.createdAt}</Cell>
+                <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
                 <Cell variant="gray">Event types</Cell>
                 <Cell css={{ display: "flex" }}>
                   {data.events.map((e) => (
@@ -211,4 +212,4 @@ const ApiKeys = () => {
   );
 };
 
-export default ApiKeys;
+export default WebhookDetail;
