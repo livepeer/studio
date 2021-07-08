@@ -115,11 +115,6 @@ function validatePushTargets(
   );
 }
 
-export function getRecordingUrl(
-  ingest: string,
-  session: DBSession,
-  mp4 = false
-) {
 async function triggerManyIdleStreamsWebhook (ids, queue) {
   return Promise.all(ids.map(async (id) => {
     const stream = await db.stream.get(id);
