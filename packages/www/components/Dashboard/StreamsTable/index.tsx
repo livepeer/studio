@@ -251,7 +251,11 @@ const StreamsTable = ({
           id: stream.id,
           name: {
             id: stream.id,
-            children: stream.name,
+            children: (
+              <A as="div" variant="violet">
+                {stream.name}
+              </A>
+            ),
             tooltipChildren: stream.createdByTokenName ? (
               <>
                 Created by token <b>{stream.createdByTokenName}</b>

@@ -104,7 +104,11 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
               },
             },
             url: {
-              children: webhook.url,
+              children: (
+                <A as="div" variant="violet">
+                  {webhook.url}
+                </A>
+              ),
               href: `/dashboard/developers/webhooks/${webhook.id}`,
               css: {
                 cursor: "pointer",

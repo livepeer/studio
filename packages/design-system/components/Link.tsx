@@ -18,9 +18,7 @@ export const Link = styled(DEFAULT_TAG, {
     },
   },
   "&:focus": {
-    outlineWidth: "2px",
-    outlineStyle: "solid",
-    outlineOffset: "2px",
+    outline: "none",
     textDecorationLine: "none",
   },
   [`& ${Text}`]: {
