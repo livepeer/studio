@@ -163,7 +163,6 @@ export default class WebhookCannon {
       console.log("preparing to fire webhook ", webhook.url);
       const timestamp = Date.now();
       // go ahead
-      let timestamp = Date.now();
       let params = {
         method: "POST",
         headers: {
