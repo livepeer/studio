@@ -41,13 +41,8 @@ type WebhooksTableData = {
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
-  const {
-    user,
-    getWebhooks,
-    deleteWebhook,
-    deleteWebhooks,
-    createWebhook,
-  } = useApi();
+  const { user, getWebhooks, deleteWebhook, deleteWebhooks, createWebhook } =
+    useApi();
   const deleteDialogState = useToggleState();
   const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const [openSnackbar] = useSnackbar();

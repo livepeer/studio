@@ -54,16 +54,8 @@ function toStringValues(obj: Record<string, any>) {
 }
 
 app.get("/", authMiddleware({}), async (req, res, next) => {
-  let {
-    limit,
-    cursor,
-    all,
-    order,
-    filters,
-    userId,
-    parentId,
-    count,
-  } = toStringValues(req.query);
+  let { limit, cursor, all, order, filters, userId, parentId, count } =
+    toStringValues(req.query);
   const { forceUrl } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;

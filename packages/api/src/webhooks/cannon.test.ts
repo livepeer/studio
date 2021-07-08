@@ -63,8 +63,8 @@ describe("webhook cannon", () => {
     } catch (error) {
       console.log("caught server error ", error);
     }
-    postMockStream = require("../controllers/wowza-hydrate.test-data.json")
-      .stream;
+    postMockStream =
+      require("../controllers/wowza-hydrate.test-data.json").stream;
     delete postMockStream.id;
     delete postMockStream.kind;
     postMockStream.presets = ["P360p30fps16x9", "P144p30fps16x9"];
@@ -116,13 +116,8 @@ describe("webhook cannon", () => {
   });
 
   beforeEach(async () => {
-    ({
-      client,
-      adminUser,
-      adminToken,
-      nonAdminUser,
-      nonAdminToken,
-    } = await setupUsers(server));
+    ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+      await setupUsers(server));
   });
 
   afterEach(async () => {

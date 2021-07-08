@@ -14,11 +14,8 @@ export default (stream) => {
   if (!stream.name || !stream.id) {
     throw new Error("missing required fields: id, name");
   }
-  const {
-    transcoderAppConfig,
-    transcoderTemplateAppConfig,
-    sourceInfo,
-  } = stream.wowza;
+  const { transcoderAppConfig, transcoderTemplateAppConfig, sourceInfo } =
+    stream.wowza;
   const templatesInUse = transcoderAppConfig.templatesInUse.split(",");
   let template;
   for (let tmpl of templatesInUse) {
@@ -41,14 +38,8 @@ export default (stream) => {
   const aspectRatio = sourceInfo.width / sourceInfo.height;
   var i;
   for (i = 0; i < enabledEncodes.length; i++) {
-    let {
-      width,
-      height,
-      name,
-      streamName,
-      videoCodec,
-      videoBitrate,
-    } = enabledEncodes[i];
+    let { width, height, name, streamName, videoCodec, videoBitrate } =
+      enabledEncodes[i];
     if (width === 0 && height === 0 && name != "source") {
       enabledEncodes.splice(i, 1);
       continue;

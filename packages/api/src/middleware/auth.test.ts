@@ -83,12 +83,8 @@ describe("auth middleware", () => {
       expect(fetchStatus(method, path)).resolves;
 
     beforeEach(async () => {
-      ({
-        adminUser,
-        adminApiKey,
-        nonAdminUser,
-        nonAdminApiKey,
-      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      ({ adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
+        await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
 
       httpPrefix = "";
       client = new TestClient({ server: testServer });

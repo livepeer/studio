@@ -44,13 +44,8 @@ describe("controllers/push-target", () => {
     let nonAdminToken: string;
 
     beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+        await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       client.jwtAuth = nonAdminToken;
     });
 
@@ -320,13 +315,8 @@ describe("controllers/push-target", () => {
     let nonAdminApiKey: string;
 
     beforeEach(async () => {
-      ({
-        client,
-        adminUser,
-        adminApiKey,
-        nonAdminUser,
-        nonAdminApiKey,
-      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
+        await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       // set a default invalid api key on the client
       client.apiKey = uuid();
     });

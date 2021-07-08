@@ -82,9 +82,10 @@ const Debugger = () => {
   ]);
   const [videoExists, setVideoExists] = useState<boolean>(false);
 
-  const myJson = useMemo(() => JSON.stringify(info?.session?.profiles), [
-    info?.session?.profiles,
-  ]);
+  const myJson = useMemo(
+    () => JSON.stringify(info?.session?.profiles),
+    [info?.session?.profiles]
+  );
 
   const doGetInfo = useCallback(
     async (id: string) => {

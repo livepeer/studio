@@ -91,14 +91,8 @@ app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
-  const {
-    email,
-    password,
-    firstName,
-    lastName,
-    organization,
-    phone,
-  } = req.body;
+  const { email, password, firstName, lastName, organization, phone } =
+    req.body;
   const { selectedPlan } = req.query;
   const emailValid = validator.validate(email);
   if (!emailValid) {

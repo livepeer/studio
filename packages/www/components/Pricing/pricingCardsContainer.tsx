@@ -551,8 +551,7 @@ const DesktopContainer = () => {
         cardBg="#3B375A"
         btn={{
           display: "Contact us",
-          href:
-            "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
+          href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
           color: "white",
           bg: "#943CFF",
         }}>

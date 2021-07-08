@@ -86,10 +86,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$mauve8, 0 0 0 1px $colors$mauve8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$mauve4",
-          boxShadow: "inset 0 0 0 1px $colors$mauve8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$mauve4",
+            boxShadow: "inset 0 0 0 1px $colors$mauve8",
+          },
       },
       blue: {
         backgroundColor: "$blue2",
@@ -107,10 +108,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$blue8, 0 0 0 1px $colors$blue8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$blue4",
-          boxShadow: "inset 0 0 0 1px $colors$blue8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$blue4",
+            boxShadow: "inset 0 0 0 1px $colors$blue8",
+          },
       },
       indigo: {
         backgroundColor: "$indigo2",
@@ -129,10 +131,11 @@ export const Button = styled(DEFAULT_TAG, {
           boxShadow:
             "inset 0 0 0 1px $colors$indigo8, 0 0 0 1px $colors$indigo8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$indigo4",
-          boxShadow: "inset 0 0 0 1px $colors$blue8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$indigo4",
+            boxShadow: "inset 0 0 0 1px $colors$blue8",
+          },
       },
       violet: {
         backgroundColor: "$violet2",
@@ -151,10 +154,11 @@ export const Button = styled(DEFAULT_TAG, {
           boxShadow:
             "inset 0 0 0 1px $colors$violet8, 0 0 0 1px $colors$violet8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$violet4",
-          boxShadow: "inset 0 0 0 1px $colors$violet8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$violet4",
+            boxShadow: "inset 0 0 0 1px $colors$violet8",
+          },
       },
       green: {
         backgroundColor: "$green2",
@@ -172,10 +176,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$green8, 0 0 0 1px $colors$green8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$green4",
-          boxShadow: "inset 0 0 0 1px $colors$green8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$green4",
+            boxShadow: "inset 0 0 0 1px $colors$green8",
+          },
       },
       red: {
         backgroundColor: "$loContrast",
@@ -193,10 +198,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$red8, 0 0 0 1px $colors$red8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$red4",
-          boxShadow: "inset 0 0 0 1px $colors$red8",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$red4",
+            boxShadow: "inset 0 0 0 1px $colors$red8",
+          },
       },
       transparentWhite: {
         backgroundColor: "hsla(0,100%,100%,.2)",
@@ -294,10 +300,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$mauve8, 0 0 0 1px $colors$mauve8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$mauve4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$mauve4",
+            boxShadow: "none",
+          },
       },
     },
     {
@@ -317,10 +324,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$blue8, 0 0 0 1px $colors$blue8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$blue4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$blue4",
+            boxShadow: "none",
+          },
       },
     },
     {
@@ -341,10 +349,11 @@ export const Button = styled(DEFAULT_TAG, {
           boxShadow:
             "inset 0 0 0 1px $colors$indigo8, 0 0 0 1px $colors$indigo8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$indigo4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$indigo4",
+            boxShadow: "none",
+          },
       },
     },
     {
@@ -365,10 +374,11 @@ export const Button = styled(DEFAULT_TAG, {
           boxShadow:
             "inset 0 0 0 1px $colors$violet8, 0 0 0 1px $colors$violet8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$violet4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$violet4",
+            boxShadow: "none",
+          },
       },
     },
     {
@@ -388,10 +398,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$green8, 0 0 0 1px $colors$green8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$green4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$green4",
+            boxShadow: "none",
+          },
       },
     },
     {
@@ -411,10 +422,11 @@ export const Button = styled(DEFAULT_TAG, {
         "&:focus": {
           boxShadow: "inset 0 0 0 1px $colors$red8, 0 0 0 1px $colors$red8",
         },
-        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]': {
-          backgroundColor: "$red4",
-          boxShadow: "none",
-        },
+        '&[data-radix-popover-trigger][data-state="open"], &[data-radix-dropdown-menu-trigger][data-state="open"]':
+          {
+            backgroundColor: "$red4",
+            boxShadow: "none",
+          },
       },
     },
   ],

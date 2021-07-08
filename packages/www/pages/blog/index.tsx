@@ -140,9 +140,7 @@ export async function getStaticProps({ params }) {
     print(allCategories)
   );
   categories.push({ title: "All", slug: { current: "" } });
-  const {
-    allPost: posts,
-  } = await request(
+  const { allPost: posts } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
     { where: {} }
