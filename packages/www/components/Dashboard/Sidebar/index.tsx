@@ -64,7 +64,11 @@ const Sidebar = ({ id }) => {
             <Avatar
               size="3"
               alt={user?.firstName}
-              fallback={user?.firstName.charAt(0)}
+              fallback={
+                user?.firstName
+                  ? user?.firstName?.charAt(0)
+                  : user?.email.charAt(0)
+              }
             />
             <Text size="3" css={{ ml: "$2", fontSize: "$3", mr: "$1" }}>
               {user?.firstName}
