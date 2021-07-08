@@ -21,9 +21,14 @@ import {
   Heading,
   Text,
   Link as A,
+  HoverCardRoot,
+  HoverCardContent,
+  HoverCardTrigger,
+  useSnackbar,
 } from "@livepeer.com/design-system";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -49,7 +54,7 @@ const RecordingUrlCell = <D extends TableData>({
   return (
     <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
       {cell.value.mp4Url ? (
-        <Flex css={{ justifyContent: "space-between" }}>
+        <Flex css={{ justifyContent: "space-between", ai: "center" }}>
           {truncate(cell.value.children, 20)}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
@@ -99,6 +104,7 @@ const StreamSessionsTable = ({
   const tableProps = useTableState({
     tableId: "streamSessionsTable",
   });
+  const [openSnackbar] = useSnackbar();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -154,13 +160,46 @@ const StreamSessionsTable = ({
                   : undefined,
               children:
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
-                  <Box>{truncate(stream.recordingUrl, 20)}</Box>
+                  <HoverCardRoot openDelay={200}>
+                    <HoverCardTrigger>
+                      <Flex css={{ height: 25, ai: "center" }}>
+                        <CopyToClipboard
+                          text={stream.recordingUrl}
+                          onCopy={() => openSnackbar("Copied to clipboard")}>
+                          <Flex
+                            css={{
+                              cursor: "pointer",
+                              fontSize: "$1",
+                              ai: "center",
+                            }}>
+                            <Box css={{ mr: "$1" }}>
+                              {truncate(stream.recordingUrl, 24)}
+                            </Box>
+                            <CopyIcon />
+                          </Flex>
+                        </CopyToClipboard>
+                      </Flex>
+                    </HoverCardTrigger>
+                    <HoverCardContent>
+                      <Text
+                        variant="gray"
+                        css={{
+                          backgroundColor: "$panel",
+                          borderRadius: 6,
+                          px: "$3",
+                          py: "$1",
+                          fontSize: "$1",
+                          display: "flex",
+                          ai: "center",
+                        }}>
+                        <Box css={{ ml: "$2" }}>{stream.recordingUrl}</Box>
+                      </Text>
+                    </HoverCardContent>
+                  </HoverCardRoot>
                 ) : (
                   <Box css={{ color: "$mauve8" }}>—</Box>
                 ),
-              mp4Url: stream.recordingUrl
-                ? truncate(stream.recordingUrl, 20)
-                : undefined,
+              mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
             duration: {
               duration: stream.sourceSegmentsDuration || 0,

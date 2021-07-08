@@ -26,8 +26,13 @@ import {
   Heading,
   Link as A,
   Text,
+  HoverCardRoot,
+  HoverCardContent,
+  HoverCardTrigger,
+  useSnackbar,
 } from "@livepeer.com/design-system";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
   const pp = hlsUrl.split("/");
@@ -52,18 +57,15 @@ const RecordingUrlCell = <D extends TableData>({
   return (
     <Box id={`mp4-link-dropdown-${id}`} css={{ position: "relative" }}>
       {cell.value.mp4Url ? (
-        <Flex css={{ justifyContent: "space-between" }}>
-          {truncate(cell.value.children, 20)}
+        <Flex css={{ ai: "center", justifyContent: "space-between" }}>
+          {cell.value.children}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
-            <Box>
-              <A
-                css={{}}
-                variant="violet"
-                target="_blank"
-                href={makeMP4Url(cell.value.mp4Url, "source")}>
-                Download mp4
-              </A>
-            </Box>
+            <A
+              variant="violet"
+              target="_blank"
+              href={makeMP4Url(cell.value.mp4Url, "source")}>
+              Download mp4
+            </A>
           ) : null}
         </Flex>
       ) : (
@@ -96,6 +98,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const tableProps = useTableState({
     tableId: "allSessionsTable",
   });
+  const [openSnackbar] = useSnackbar();
 
   const columns: Column<SessionsTableData>[] = useMemo(
     () => [
@@ -174,13 +177,46 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                   : undefined,
               children:
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
-                  <Box>{truncate(stream.recordingUrl, 20)}</Box>
+                  <HoverCardRoot openDelay={200}>
+                    <HoverCardTrigger>
+                      <Flex css={{ height: 25, ai: "center" }}>
+                        <CopyToClipboard
+                          text={stream.recordingUrl}
+                          onCopy={() => openSnackbar("Copied to clipboard")}>
+                          <Flex
+                            css={{
+                              cursor: "pointer",
+                              fontSize: "$1",
+                              ai: "center",
+                            }}>
+                            <Box css={{ mr: "$1" }}>
+                              {truncate(stream.recordingUrl, 24)}
+                            </Box>
+                            <CopyIcon />
+                          </Flex>
+                        </CopyToClipboard>
+                      </Flex>
+                    </HoverCardTrigger>
+                    <HoverCardContent>
+                      <Text
+                        variant="gray"
+                        css={{
+                          backgroundColor: "$panel",
+                          borderRadius: 6,
+                          px: "$3",
+                          py: "$1",
+                          fontSize: "$1",
+                          display: "flex",
+                          ai: "center",
+                        }}>
+                        <Box css={{ ml: "$2" }}>{stream.recordingUrl}</Box>
+                      </Text>
+                    </HoverCardContent>
+                  </HoverCardRoot>
                 ) : (
                   <Box css={{ color: "$mauve8" }}>—</Box>
                 ),
-              mp4Url: stream.recordingUrl
-                ? truncate(stream.recordingUrl, 20)
-                : undefined,
+              mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
             duration: {
               duration: stream.sourceSegmentsDuration || 0,
