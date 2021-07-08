@@ -112,16 +112,13 @@ describe("controllers/webhook", () => {
       let resJson = await res.json();
       console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
-      expect(resJson.blocking).toBe(true);
       generatedWebhook = resJson;
       generatedWebhookIds.push(resJson.id);
       res = await client.post("/webhook", {
         ...mockWebhook,
         name: "test 2",
-        blocking: false,
       });
       resJson = await res.json();
-      expect(resJson.blocking).toBe(false);
       console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test 2");
@@ -191,7 +188,6 @@ describe("controllers/webhook", () => {
     it("update a webhook", async () => {
       const { id } = generatedWebhook;
       const modifiedHook = { ...generatedWebhook, name: "modified_name" };
-
       const res = await client.put(`/webhook/${id}`, modifiedHook);
       const resJson = await res.json();
       expect(res.status).toBe(200);

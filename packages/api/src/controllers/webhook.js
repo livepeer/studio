@@ -31,7 +31,6 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
     name: payload.name,
     events: payload.events ?? [payload.event],
     url: payload.url,
-    blocking: payload.blocking ?? true,
   };
 }
 
