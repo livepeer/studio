@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { createHmac } from "crypto";
 
 let Encoder;
 if (typeof TextEncoder === "undefined") {
@@ -13,6 +14,12 @@ if (typeof TextEncoder === "undefined") {
 }
 
 const ITERATIONS = 10000;
+
+export async function sign (data, secret) {
+  const hmac = createHmac('sha256', secret);
+  hmac.update(Buffer.from(data));
+  return hmac.digest('hex');
+}
 
 export async function hash(password, salt) {
   let saltBuffer;

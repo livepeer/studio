@@ -6,6 +6,7 @@ import Model from "../store/model";
 import { DBWebhook, EventKey } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
+import { sign } from "../controllers/helpers";
 
 import uuid from "uuid/v4";
 import { parse as parseUrl } from "url";
@@ -180,6 +181,12 @@ export default class WebhookCannon {
           payload: event.payload,
         }),
       };
+
+      // sign payload if there is a webhook secret
+      if (webhook.sharedSecret) {
+        let signature = sign(params.body, webhook.sharedSecret);
+        params.headers['Livepeer-Signature'] = `t=${timestamp},v1=${signature}`
+      }
 
       try {
         logger.info(`webhook ${webhook.id} firing`);

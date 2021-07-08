@@ -146,14 +146,11 @@ describe("webhook cannon", () => {
     let resJson = await res.json();
     console.log("webhook body: ", resJson);
     expect(res.status).toBe(201);
-    expect(resJson.blocking).toBe(true);
     res = await client.post("/webhook", {
       ...mockWebhook,
       name: "test 2",
-      blocking: false,
     });
     resJson = await res.json();
-    expect(resJson.blocking).toBe(false);
     console.log("webhook body: ", resJson);
     expect(res.status).toBe(201);
     expect(resJson.name).toBe("test 2");

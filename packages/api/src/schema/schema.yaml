@@ -79,12 +79,10 @@ components:
         deleted:
           type: boolean
           default: false
-        blocking:
-          type: boolean
-          default: true
-          description:
-            If true, returning non 2xx value from webhook will prevent stream
-            from starting
+        sharedSecret:
+          type: string
+          writeOnly: true
+          description: shared secret used to sign the webhook payload
 
     webhook-response:
       type: object
