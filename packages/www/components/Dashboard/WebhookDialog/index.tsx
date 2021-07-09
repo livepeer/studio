@@ -45,7 +45,7 @@ const StyledContent = styled(DropdownMenuContent, {
 
 const eventOptions = [
   "stream.started",
-  "stream.detection",
+  // "stream.detection", // not yet...
   "stream.idle",
   // "recording.ready",
 ];
