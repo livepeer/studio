@@ -27,7 +27,7 @@ const Dashboard = () => {
   return (
     <Layout id="home" breadcrumbs={[{ title: "Home" }]}>
       <Box css={{ p: "$6" }}>
-        {true && (
+        {showPromo && (
           <Promo size="2" css={{ mb: "$7" }}>
             <Flex>
               {/* <StyledInfoIcon /> */}
