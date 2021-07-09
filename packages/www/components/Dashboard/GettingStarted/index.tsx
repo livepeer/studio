@@ -112,7 +112,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore examples apps</Box>
+                <Box css={{ mr: "$1" }}>Explore example apps</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
