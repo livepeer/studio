@@ -13,7 +13,6 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogCancel,
-  AlertDialogAction,
   useSnackbar,
 } from "@livepeer.com/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -416,8 +415,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 ghost>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction
-                as={Button}
+              <Button
                 size="2"
                 className="elements-style-background"
                 type="submit"
@@ -435,7 +433,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   />
                 )}
                 Continue
-              </AlertDialogAction>
+              </Button>
             </Flex>
           </Box>
         </AlertDialogContent>

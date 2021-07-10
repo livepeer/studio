@@ -89,7 +89,6 @@ const Sidebar = ({ id }) => {
                 key="logout-dropdown-item"
                 onSelect={(e) => {
                   e.preventDefault();
-                  console.log("wtf");
                   logout();
                 }}>
                 Logout
