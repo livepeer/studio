@@ -463,7 +463,6 @@ const makeContext = (state: ApiState, setState) => {
           },
         }
       );
-
       return [res, paymentMethod];
     },
 
@@ -484,6 +483,8 @@ const makeContext = (state: ApiState, setState) => {
           },
         }
       );
+
+      setState({ ...state, userRefresh: Date.now() });
 
       if (res.status !== 201) {
         return body;

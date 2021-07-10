@@ -9,20 +9,43 @@ import {
   Link as A,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { products } from "@livepeer.com/api/src/config";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
 import PaymentMethod from "components/Dashboard/PaymentMethod";
 import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
+import { useQuery, useQueryClient } from "react-query";
 
 const Billing = () => {
   useLoggedIn();
-  const { user, getUsage, getSubscription, getInvoices } = useApi();
+  const { user, getUsage, getSubscription, getInvoices, getPaymentMethod } =
+    useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
+
+  const fetcher = useCallback(async () => {
+    if (user?.stripeCustomerPaymentMethodId) {
+      const [_res, paymentMethod] = await getPaymentMethod(
+        user.stripeCustomerPaymentMethodId
+      );
+      return paymentMethod;
+    }
+  }, [user?.stripeCustomerPaymentMethodId]);
+
+  const queryKey = useMemo(() => {
+    return [user?.stripeCustomerPaymentMethodId];
+  }, [user?.stripeCustomerPaymentMethodId]);
+
+  const { data, isLoading } = useQuery([queryKey], () => fetcher());
+
+  const queryClient = useQueryClient();
+
+  const invalidateQuery = useCallback(() => {
+    return queryClient.invalidateQueries(queryKey);
+  }, [queryClient, queryKey]);
 
   useEffect(() => {
     const doGetInvoices = async (stripeCustomerId) => {
@@ -180,7 +203,7 @@ const Billing = () => {
                 </Box>
               </Flex>
             </Heading>
-            <PaymentMethodDialog />
+            <PaymentMethodDialog invalidateQuery={invalidateQuery} />
           </Flex>
           <Flex
             css={{
@@ -194,7 +217,7 @@ const Billing = () => {
             }}>
             {user?.stripeCustomerPaymentMethodId ? (
               <>
-                <PaymentMethod />
+                <PaymentMethod data={data} />
               </>
             ) : (
               "No payment method on file."

@@ -12,7 +12,6 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogCancel,
-  AlertDialogAction,
   useSnackbar,
 } from "@livepeer.com/design-system";
 import Spinner from "components/Dashboard/Spinner";
@@ -22,7 +21,7 @@ import { useForm } from "react-hook-form";
 import { MdCreditCard } from "react-icons/md";
 import { useTheme } from "next-themes";
 
-const PaymentMethodDialog = ({}) => {
+const PaymentMethodDialog = ({ invalidateQuery }) => {
   const { user, updateCustomerPaymentMethod } = useApi();
   const [status, setStatus] = useState("initial");
   const stripe = useStripe();
@@ -30,7 +29,7 @@ const PaymentMethodDialog = ({}) => {
   const elements = useElements();
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
 
   function createPaymentMethod({
     cardElement,
@@ -72,6 +71,7 @@ const PaymentMethodDialog = ({}) => {
 
   async function onPaymentChangeComplete() {
     setStatus("succeeded");
+    await invalidateQuery();
     setOpen(false);
   }
 
@@ -317,8 +317,7 @@ const PaymentMethodDialog = ({}) => {
               ghost>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              as={Button}
+            <Button
               size="2"
               className="elements-style-background"
               type="submit"
@@ -337,7 +336,7 @@ const PaymentMethodDialog = ({}) => {
                 />
               )}
               Continue
-            </AlertDialogAction>
+            </Button>
           </Flex>
         </Box>
       </AlertDialogContent>
