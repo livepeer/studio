@@ -270,7 +270,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Text size="2" css={{ mb: "$3", color: "$mauve9" }}>
                 HELP
               </Text>
-              <Link href="/docs" passHref>
+              <Link href="/docs/guides" passHref>
                 <A>
                   <Flex align="center" css={{ mb: "$3", cursor: "pointer" }}>
                     <StyledDocumentationIcon />
