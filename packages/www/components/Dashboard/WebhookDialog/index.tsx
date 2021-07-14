@@ -72,15 +72,18 @@ const WebhookDialog = ({
     events,
     name,
     url,
+    sharedSecret,
   }: {
     events: string[];
     name: string;
     url: string;
+    sharedSecret: string;
   }) => Promise<void>;
 }) => {
   const [saving, setSaving] = useState(false);
   const [webhookName, setWebhookName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookSecret, setWebhookSecret] = useState("");
   const [openSnackbar] = useSnackbar();
   const [events, setEvents] = useState([]);
 
@@ -119,6 +122,7 @@ const WebhookDialog = ({
                 events,
                 name: webhookName,
                 url: webhookUrl,
+                sharedSecret: webhookSecret,
               });
               openSnackbar(`Webhook updated.`);
               onOpenChange(false);
@@ -150,6 +154,16 @@ const WebhookDialog = ({
               defaultValue={Action.Update ? webhook?.url : ""}
               placeholder="https://"
               onChange={(e) => setWebhookUrl(e.target.value)}
+            />
+
+            <Label htmlFor="sharedSecret">Secret</Label>
+            <TextField
+              size="2"
+              type="url"
+              id="url"
+              defaultValue={Action.Update ? webhook?.sharedSecret : ""}
+              placeholder="secret used to sign the webhook requests"
+              onChange={(e) => setWebhookSecret(e.target.value)}
             />
             <Label htmlFor="events">Event types</Label>
 
