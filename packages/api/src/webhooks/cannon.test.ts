@@ -103,7 +103,6 @@ describe("webhook cannon", () => {
       events: ["stream.started"],
       url: "http://localhost:30000/webhook",
       sharedSecret: "keyboardCat",
-      // url: 'https://livepeer.com/'
     };
 
     webhookServer = await startAuxTestServer(30000);
