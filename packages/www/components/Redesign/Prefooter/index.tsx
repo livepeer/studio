@@ -24,7 +24,7 @@ const Prefooter = () => (
           borderRadius: 24,
           color: "white",
           background:
-            "linear-gradient(90deg, $colors$violet11 0%, $colors$violet12 50%, $colors$indigo12 100%);",
+            "linear-gradient(90deg, $colors$blue9 0%, $colors$violet10 33%,  $colors$violet11 66%, $colors$violet11 100%);",
           backgroundSize: "cover",
         }}>
         <Heading

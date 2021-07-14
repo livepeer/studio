@@ -50,7 +50,7 @@ const Why = () => {
                 css={{
                   maxWidth: 600,
                   lineHeight: 1.4,
-                  fontWeight: 600,
+                  fontWeight: 700,
                   mb: "$6",
                   "@bp2": { lineHeight: 1.4, letterSpacing: 0 },
                 }}>

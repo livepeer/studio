@@ -62,7 +62,7 @@ function ContextProviders({ children }) {
       <ThemeProvider
         disableTransitionOnChange
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="system"
         value={{ dark: darkTheme.className, light: lightTheme.className }}>
         <SnackbarProvider>{children}</SnackbarProvider>
       </ThemeProvider>
