@@ -34,6 +34,7 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
           # docker login
+          docker version
           docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       - name: yarn install
@@ -51,6 +52,7 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_BUILDKIT: 1
         run: |
           export DOCKER_TAG=$(echo $BRANCH | tr -cd '[:alnum:]_')
           yarn run lerna-run docker:build
