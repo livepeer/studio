@@ -159,8 +159,8 @@ const WebhookDialog = ({
             <Label htmlFor="sharedSecret">Secret</Label>
             <TextField
               size="2"
-              type="url"
-              id="url"
+              type="text"
+              id="sharedSecret"
               defaultValue={Action.Update ? webhook?.sharedSecret : ""}
               placeholder="secret used to sign the webhook requests"
               onChange={(e) => setWebhookSecret(e.target.value)}
