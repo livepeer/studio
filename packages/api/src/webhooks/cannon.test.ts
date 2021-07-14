@@ -102,6 +102,7 @@ describe("webhook cannon", () => {
       createdAt: Date.now(),
       events: ["stream.started"],
       url: "http://localhost:30000/webhook",
+      sharedSecret: "keyboardCat",
       // url: 'https://livepeer.com/'
     };
 
@@ -163,6 +164,7 @@ describe("webhook cannon", () => {
       webhookServer.app.use(bodyParser.json());
       webhookServer.app.post("/webhook", (req, res) => {
         console.log("WEBHOOK WORKS , body", req.body);
+        expect(req.headers['livepeer-signature']).not.toBe(undefined);
         webhookCallback(req.body);
         res.status(204).end();
       });

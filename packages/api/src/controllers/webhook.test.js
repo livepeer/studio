@@ -108,10 +108,10 @@ describe("controllers/webhook", () => {
     });
 
     it("create a webhook", async () => {
-      // console.log('mockWebhook: ', mockWebhook)
+      // // console.log('mockWebhook: ', mockWebhook)
       let res = await client.post("/webhook", { ...mockWebhook });
       let resJson = await res.json();
-      console.log("webhook body: ", resJson);
+      // console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       generatedWebhook = resJson;
       generatedWebhookIds.push(resJson.id);
@@ -120,7 +120,7 @@ describe("controllers/webhook", () => {
         name: "test 2",
       });
       resJson = await res.json();
-      console.log("webhook body: ", resJson);
+      // console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test 2");
       generatedWebhookIds.push(resJson.id);
@@ -131,7 +131,7 @@ describe("controllers/webhook", () => {
         name: "test non admin",
       });
       resJson = await res.json();
-      console.log("webhook body: ", resJson);
+      // console.log("webhook body: ", resJson);
       expect(res.status).toBe(201);
       expect(resJson.name).toBe("test non admin");
       generatedWebhookIds.push(resJson.id);
@@ -146,7 +146,7 @@ describe("controllers/webhook", () => {
       });
       expect(res.status).toBe(201);
       const resJson = await res.json();
-      console.log('jsonRes: ', resJson);
+      // console.log('jsonRes: ', resJson);
       expect(resJson).toMatchObject(mockWebhook);
       generatedWebhookIds.push(resJson.id);
 
@@ -318,11 +318,11 @@ describe("controllers/webhook", () => {
 
       let localWebhook = { ...mockWebhook };
       localWebhook.url = "192.168.1.1";
-      console.log("localwebhook: ", localWebhook);
+      // // console.log("localwebhook: ", localWebhook);
       // create webhook
       const webhookRes = await client.post("/webhook", { ...localWebhook });
       let webhookResJson = await webhookRes.json();
-      console.log("webhook created: ", webhookResJson);
+      // // console.log("webhook created: ", webhookResJson);
       expect(webhookRes.status).toBe(422);
     });
   });
