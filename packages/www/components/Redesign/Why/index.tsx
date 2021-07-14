@@ -34,7 +34,7 @@ const data = [
 const Why = () => {
   return (
     <Box>
-      <Guides backgroundColor="white" />
+      <Guides backgroundColor="$panel" />
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ p: 0, width: "100%" }}>
           <Flex align="center" css={{ width: "100%", mb: "$8" }}>
@@ -50,9 +50,9 @@ const Why = () => {
                 css={{
                   maxWidth: 600,
                   lineHeight: 1.4,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   mb: "$6",
-                  "@bp2": { lineHeight: 1.4, letterSpacing: "-1px" },
+                  "@bp2": { lineHeight: 1.4, letterSpacing: 0 },
                 }}>
                 A video API uniquely tailored <br />
                 to address the needs of today’s shopping platforms.

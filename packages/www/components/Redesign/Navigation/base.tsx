@@ -55,7 +55,7 @@ const NavigationBase = ({
 
   return (
     <Box>
-      <Guides />
+      <Guides backgroundColor="$loContrast" />
       <Box
         css={{
           position: "relative",
@@ -69,7 +69,7 @@ const NavigationBase = ({
             margin: "0",
             border: "none",
             background:
-              "linear-gradient(90deg,#E8EAF5,#E8EAF5 50%,transparent 0,transparent)",
+              "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)",
             backgroundSize: "8px 1px",
             content: '""',
           },

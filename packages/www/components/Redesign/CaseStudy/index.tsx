@@ -27,7 +27,7 @@ const data = [
 const CaseStudy = () => {
   return (
     <Box>
-      <Guides />
+      <Guides backgroundColor="$loContrast" />
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ p: 0, width: "100%" }}>
           <Grid
@@ -50,9 +50,9 @@ const CaseStudy = () => {
                   css={{
                     maxWidth: 600,
                     lineHeight: 1.4,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     mb: "$7",
-                    "@bp2": { lineHeight: 1.4, letterSpacing: "-1px" },
+                    "@bp2": { lineHeight: 1.4, letterSpacing: 0 },
                   }}>
                   Livepeer.com helps Korkuma bring immersive commerce to the
                   masses

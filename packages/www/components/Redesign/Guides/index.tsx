@@ -40,7 +40,7 @@ const Guides = ({ backgroundColor = "$panel" }) => {
             <Box
               css={{
                 width: "1px",
-                background: "#E8EAF5",
+                background: "$mauve4",
                 backgroundSize: "1px 8px",
               }}
             />
@@ -48,7 +48,7 @@ const Guides = ({ backgroundColor = "$panel" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
               }}
             />
@@ -56,7 +56,7 @@ const Guides = ({ backgroundColor = "$panel" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
               }}
             />
@@ -64,14 +64,14 @@ const Guides = ({ backgroundColor = "$panel" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
               }}
             />
             <Box
               css={{
                 width: "1px",
-                background: "#E8EAF5",
+                background: "$mauve4",
                 backgroundSize: "1px 8px",
                 position: "absolute",
                 top: "0",

@@ -12,7 +12,7 @@ import Link from "next/link";
 
 const Prefooter = () => (
   <Box>
-    <Guides backgroundColor="white" />
+    <Guides backgroundColor="$panel" />
     <Container size="3" css={{ px: "$4", py: 120, width: "100%" }}>
       <Box
         css={{
@@ -23,7 +23,8 @@ const Prefooter = () => (
           overflow: "hidden",
           borderRadius: 24,
           color: "white",
-          backgroundImage: "url(/img/prefooter-background.svg)",
+          background:
+            "linear-gradient(90deg, $colors$violet11 0%, $colors$violet12 50%, $colors$indigo12 100%);",
           backgroundSize: "cover",
         }}>
         <Heading

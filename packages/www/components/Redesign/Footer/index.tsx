@@ -97,8 +97,8 @@ const Footer = () => {
   };
 
   return (
-    <Box css={{ color: "$hiContrast" }}>
-      <Guides />
+    <Box>
+      <Guides backgroundColor="$loContrast" />
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ px: "$4", width: "100%" }}>
           <Grid

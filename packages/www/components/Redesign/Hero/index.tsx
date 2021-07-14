@@ -10,13 +10,12 @@ import {
 import Guides from "components/Redesign/Guides";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRightIcon } from "@radix-ui/react-icons";
 import Button from "components/Redesign/Button";
 
 const Hero = () => {
   return (
     <Box>
-      <Guides />
+      <Guides backgroundColor="$loContrast" />
       <Box css={{ position: "relative" }}>
         <Container size="3" css={{ px: "$4", width: "100%" }}>
           <Flex
@@ -108,19 +107,29 @@ const Hero = () => {
                 </Link>
               </Flex>
             </Flex>
-            <Box css={{ position: "relative" }}>
+            <Box css={{ mt: 40, position: "relative", mr: -120 }}>
               <Box
                 css={{
-                  mr: -60,
-                  width: 445,
-                  height: 445,
-                  minWidth: 445,
-                  minHeight: 445,
+                  position: "absolute",
+                  transform: "translate(-50%)",
+                  left: "50%",
+                }}>
+                <Image
+                  src="/img/korkuma-iphone.png"
+                  width={542 / 2}
+                  height={1096 / 2}
+                />
+              </Box>
+              <Box
+                css={{
+                  width: 545,
+                  height: 545,
+                  minWidth: 545,
+                  minHeight: 545,
                   borderRadius: 1000,
                   background:
                     "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
-                }}
-              />
+                }}></Box>
             </Box>
           </Flex>
         </Container>

@@ -11,14 +11,14 @@ const Button = ({ arrow = false, children, css = {}, ...props }) => {
         borderRadius: 1000,
         color: "white",
         background:
-          "linear-gradient(to right, $colors$violet11, $colors$indigo11)",
+          "linear-gradient(to right, $colors$violet9, $colors$indigo10)",
         boxShadow: "none",
         cursor: "pointer",
         textDecoration: "none",
         "&:hover": {
           textDecoration: "none",
           background:
-            "linear-gradient(to right, $colors$indigo11, $colors$violet11)",
+            "linear-gradient(to right, $colors$indigo9, $colors$violet10)",
           color: "white",
           boxShadow: "none",
         },
