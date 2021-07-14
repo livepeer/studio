@@ -1,0 +1,89 @@
+import { Box } from "@livepeer.com/design-system";
+
+const Guides = ({ backgroundColor = "$panel" }) => {
+  return (
+    <Box
+      css={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+      }}>
+      <Box
+        css={{
+          position: "relative",
+          height: "100%",
+          width: "100%",
+          top: "0",
+          left: "0",
+          overflow: "hidden",
+          backgroundColor,
+        }}>
+        <Box
+          css={{
+            position: "absolute",
+            height: "100%",
+            width: "100%",
+            top: "0",
+            left: "0",
+            px: "$4",
+            pointerEvents: "none",
+          }}>
+          <Box
+            css={{
+              display: "grid",
+              grid: "1fr/repeat(4,1fr)",
+              position: "relative",
+              maxWidth: "1145px",
+              height: "100%",
+              margin: "0 auto",
+            }}>
+            <Box
+              css={{
+                width: "1px",
+                background: "#E8EAF5",
+                backgroundSize: "1px 8px",
+              }}
+            />
+            <Box
+              css={{
+                width: "1px",
+                background:
+                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                backgroundSize: "1px 8px",
+              }}
+            />
+            <Box
+              css={{
+                width: "1px",
+                background:
+                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                backgroundSize: "1px 8px",
+              }}
+            />
+            <Box
+              css={{
+                width: "1px",
+                background:
+                  "linear-gradient(180deg, #E8EAF5, #E8EAF5 50%,transparent 0,transparent)",
+                backgroundSize: "1px 8px",
+              }}
+            />
+            <Box
+              css={{
+                width: "1px",
+                background: "#E8EAF5",
+                backgroundSize: "1px 8px",
+                position: "absolute",
+                top: "0",
+                right: "0",
+                height: "100%",
+              }}
+            />
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default Guides;
