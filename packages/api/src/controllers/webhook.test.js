@@ -47,6 +47,7 @@ beforeAll(async () => {
     kind: "webhook",
     events: ["stream.started"],
     url: "https://winter-darkness-88ea.livepeer.workers.dev/",
+    sharedSecret: "keyboardcat",
   };
 });
 
@@ -145,6 +146,7 @@ describe("controllers/webhook", () => {
       });
       expect(res.status).toBe(201);
       const resJson = await res.json();
+      console.log('jsonRes: ', resJson);
       expect(resJson).toMatchObject(mockWebhook);
       generatedWebhookIds.push(resJson.id);
 
