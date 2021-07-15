@@ -50,4 +50,9 @@ export default () =>
         .icon(MdWork)
         .schemaType("job")
         .child(S.documentTypeList("job").title("Jobs")),
+      S.listItem()
+        .title("Use Cases")
+        .icon(MdDescription)
+        .schemaType("useCase")
+        .child(S.documentTypeList("useCase").title("Use Cases")),
     ]);

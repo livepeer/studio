@@ -10,6 +10,7 @@ import job from "./documents/job";
 import post from "./documents/post";
 import author from "./documents/author";
 import category from "./documents/category";
+import useCase from "./documents/useCase";
 import route from "./documents/route";
 import siteConfig from "./documents/siteConfig";
 
@@ -38,6 +39,9 @@ import ctaSection from "./objects/ctaSection";
 import textSection from "./objects/textSection";
 import teamSection from "./objects/teamSection";
 import jobsSection from "./objects/jobsSection";
+import why from "./objects/why";
+import caseStudy from "./objects/caseStudy";
+import reason from "./objects/reason";
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -74,5 +78,9 @@ export default createSchema({
     post,
     author,
     category,
+    useCase,
+    why,
+    caseStudy,
+    reason,
   ]),
 });
