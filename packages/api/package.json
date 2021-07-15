@@ -17,7 +17,7 @@
     "docker": "run-s docker:build docker:push",
     "postgres:start": "docker run --rm -d --name postgres -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -v \"$(pwd)/data/postgres:/var/lib/postgresql/data\" postgres",
     "postgres:stop": "docker rm -f postgres",
-    "rabbitmq:start": "docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 --mount \"type=bind,src=${PWD}/rabbitmq.conf,dst=/etc/rabbitmq/rabbitmq.conf\" rabbitmq:3.9-rc-management",
+    "rabbitmq:start": "docker run -d --name rabbitmq -p 5552:5552 -p 5672:5672 -p 15672:15672 --mount \"type=bind,src=${PWD}/rabbitmq.conf,dst=/etc/rabbitmq/rabbitmq.conf\" rabbitmq:3.9-rc-management",
     "rabbitmq:stop": "docker rm -f rabbitmq",
     "prepare:babel": "babel --extensions '.ts,.js' --ignore '**/*.test.js,**/*.test-data.js' --out-dir=dist --source-maps=true src",
     "prepare:redoc": "redoc-cli bundle --cdn -o docs/index.html src/schema/schema.yaml",
