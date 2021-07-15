@@ -7,6 +7,7 @@ import {
   AuxTestServer,
 } from "../test-helpers";
 import { semaphore, sleep } from "../util";
+import { sign } from "../controllers/helpers";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
@@ -163,7 +164,9 @@ describe("webhook cannon", () => {
       webhookServer.app.use(bodyParser.json());
       webhookServer.app.post("/webhook", (req, res) => {
         console.log("WEBHOOK WORKS , body", req.body);
-        expect(req.headers['livepeer-signature']).not.toBe(undefined);
+        const signatureHeader = req.headers['livepeer-signature']
+        const signature = signatureHeader.split(',')[1].split('=')[1]
+        expect(signature).toEqual(sign(JSON.stringify(req.body), mockWebhook.sharedSecret));
         webhookCallback(req.body);
         res.status(204).end();
       });

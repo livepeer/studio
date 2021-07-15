@@ -23,6 +23,8 @@ import { useState, useEffect } from "react";
 import Spinner from "components/Dashboard/Spinner";
 import { Webhook } from "@livepeer.com/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
+import urlBuilder from "@sanity/image-url";
+import uuid from "uuid/v4";
 
 const StyledCrossIcon = styled(Cross1Icon, {
   cursor: "pointer",
@@ -161,7 +163,7 @@ const WebhookDialog = ({
               size="2"
               type="text"
               id="sharedSecret"
-              defaultValue={Action.Update ? webhook?.sharedSecret : ""}
+              defaultValue={Action.Update ? webhook?.sharedSecret : uuid()}
               placeholder="secret used to sign the webhook requests"
               onChange={(e) => setWebhookSecret(e.target.value)}
             />

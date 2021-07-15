@@ -31,7 +31,7 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
     name: payload.name,
     events: payload.events ?? [payload.event],
     url: payload.url,
-    sharedSecret: payload.sharedSecret?? payload.sharedSecret,
+    sharedSecret: payload.sharedSecret,
   };
 }
 
