@@ -31,7 +31,8 @@ const data = [
       "Our multicast and watermarking features allow you to simultaneously stream into multiple destinations such as Youtube Live or Facebook Live with different branding to maximize the viewer experience and conversion rate.",
   },
 ];
-const Why = () => {
+
+const Why = ({ heading, reasons }) => {
   return (
     <Box>
       <Guides backgroundColor="$panel" />
@@ -54,8 +55,7 @@ const Why = () => {
                   mb: "$6",
                   "@bp2": { lineHeight: 1.4, letterSpacing: 0 },
                 }}>
-                A video API uniquely tailored <br />
-                to address the needs of today’s shopping platforms.
+                {heading}
               </Heading>
             </Flex>
             <Link href="/register" passHref>
@@ -71,7 +71,7 @@ const Why = () => {
               position: "relative",
               height: "100%",
             }}>
-            {data.map((item, i) => (
+            {reasons.map((reason, i) => (
               <Box key={i} css={{ pl: "$4", pr: "$6", width: "100%" }}>
                 <Box
                   css={{
@@ -100,10 +100,10 @@ const Why = () => {
                       content: '""',
                     },
                   }}>
-                  {item.heading}
+                  {reason.title}
                 </Text>
                 <Text variant="gray" css={{ lineHeight: 1.6 }}>
-                  {item.description}
+                  {reason.description}
                 </Text>
               </Box>
             ))}

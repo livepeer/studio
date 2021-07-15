@@ -5,26 +5,13 @@ import {
   Text,
   Grid,
   Heading,
+  Link as A,
 } from "@livepeer.com/design-system";
 import Guides from "components/Redesign/Guides";
-import Button from "components/Redesign/Button";
 import Link from "next/link";
 import Image from "next/image";
 
-const data = [
-  {
-    heading: "Problem",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi repellendus pariatur, est temporibus earum, assumenda voluptates dignissimos, ut sit dolores eveniet! Tempore, hic ducimus in totam minima magni repellendus soluta.",
-  },
-  {
-    heading: "Solution",
-    description:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi repellendus pariatur, est temporibus earum, assumenda voluptates dignissimos, ut sit dolores eveniet! Tempore, hic ducimus in totam minima magni repellendus soluta.",
-  },
-];
-
-const CaseStudy = () => {
+const CaseStudy = ({ heading, about, problem, solution, internalLink }) => {
   return (
     <Box>
       <Guides backgroundColor="$loContrast" />
@@ -54,8 +41,7 @@ const CaseStudy = () => {
                     mb: "$7",
                     "@bp2": { lineHeight: 1.4, letterSpacing: 0 },
                   }}>
-                  Livepeer.com helps Korkuma bring immersive commerce to the
-                  masses
+                  {heading}
                 </Heading>
               </Box>
               <Box
@@ -66,38 +52,60 @@ const CaseStudy = () => {
                   height: "100%",
                   maxWidth: 475,
                 }}>
-                {data.map((item, i) => (
-                  <Box
-                    key={i}
-                    css={{ mb: "$6", pl: "$4", pr: "$6", width: "100%" }}>
-                    <Text
-                      css={{
-                        position: "relative",
-                        fontWeight: 500,
-                        mb: "$2",
-                        "&:before": {
-                          position: "absolute",
-                          top: "4px",
-                          left: "-20px",
-                          width: "1px",
-                          height: "$3",
-                          backgroundColor: "$violet9",
-                          content: '""',
-                        },
-                      }}>
-                      {item.heading}
-                    </Text>
-                    <Text variant="gray" css={{ lineHeight: 1.6 }}>
-                      {item.description}
-                    </Text>
-                  </Box>
-                ))}
+                <Box css={{ mb: "$6", pl: "$4", pr: "$6", width: "100%" }}>
+                  <Text
+                    css={{
+                      position: "relative",
+                      fontWeight: 500,
+                      mb: "$2",
+                      "&:before": {
+                        position: "absolute",
+                        top: "4px",
+                        left: "-20px",
+                        width: "1px",
+                        height: "$3",
+                        backgroundColor: "$violet9",
+                        content: '""',
+                      },
+                    }}>
+                    Problem
+                  </Text>
+                  <Text variant="gray" css={{ lineHeight: 1.6 }}>
+                    {problem}
+                  </Text>
+                </Box>
+                <Box css={{ mb: "$6", pl: "$4", pr: "$6", width: "100%" }}>
+                  <Text
+                    css={{
+                      position: "relative",
+                      fontWeight: 500,
+                      mb: "$2",
+                      "&:before": {
+                        position: "absolute",
+                        top: "4px",
+                        left: "-20px",
+                        width: "1px",
+                        height: "$3",
+                        backgroundColor: "$violet9",
+                        content: '""',
+                      },
+                    }}>
+                    Solution
+                  </Text>
+                  <Text variant="gray" css={{ lineHeight: 1.6, mb: "$3" }}>
+                    {solution}
+                  </Text>
+                  <Link href={`/blog/${internalLink.slug.current}`} passHref>
+                    <A css={{ fontSize: "$3" }} variant="violet">
+                      Read the full story
+                    </A>
+                  </Link>
+                </Box>
               </Box>
             </Flex>
             <Box css={{ pt: "$7" }}>
               <Text variant="gray" size="5" css={{ mb: "$7" }}>
-                Korkuma provides tools and resources for organizing, running and
-                analysing shared shopping experiences.
+                {about}
               </Text>
               <Box
                 css={{

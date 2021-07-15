@@ -5,6 +5,7 @@ import {
   lightTheme,
   DesignSystemProvider,
   Flex,
+  Box,
   SnackbarProvider,
 } from "@livepeer.com/design-system";
 import { DefaultNav } from "components/Redesign/Navigation";
@@ -54,6 +55,7 @@ const globalStyles = global({
 
 interface Props {
   children?: JSX.Element[] | JSX.Element;
+  preview?: boolean;
 }
 
 function ContextProviders({ children }) {
@@ -70,7 +72,7 @@ function ContextProviders({ children }) {
   );
 }
 
-function Layout({ children }: Props) {
+function Layout({ children, preview }: Props) {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
@@ -88,6 +90,22 @@ function Layout({ children }: Props) {
           position: "relative",
           overflow: "hidden",
         }}>
+        {preview && (
+          <Box
+            css={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 24,
+              fontSize: 12,
+              fontWeight: 500,
+              backgroundColor: "$violet9",
+              color: "white",
+              lineHeight: "32px",
+            }}>
+            Preview Mode
+          </Box>
+        )}
         <DefaultNav />
         {children}
         <Footer />

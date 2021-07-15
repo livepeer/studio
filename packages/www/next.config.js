@@ -7,6 +7,9 @@ const withMDX = require("@next/mdx")({
 });
 
 const config = {
+  images: {
+    domains: ["cdn.sanity.io"],
+  },
   async redirects() {
     return [
       {

@@ -1,0 +1,42 @@
+query allUseCase($where: UseCaseFilter) {
+  allUseCase(where: $where) {
+    _id
+    title
+    description
+    slug {
+      current
+    }
+    hero {
+      heading
+      description
+      image {
+        asset {
+          url
+        }
+      }
+    }
+    why {
+      heading
+      reasons {
+        title
+        description
+      }
+    }
+    caseStudy {
+      heading
+      about
+      problem
+      solution
+      internalLink {
+        slug {
+          current
+        }
+      }
+      image {
+        asset {
+          url
+        }
+      }
+    }
+  }
+}
