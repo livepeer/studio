@@ -1,9 +1,11 @@
 import { Box, Button as ButtonBase } from "@livepeer.com/design-system";
+import React from "react";
 
 // TODO: move this component into design system package as a button variant
-const Button = ({ arrow = false, children, css = {}, ...props }) => {
-  return (
+export const Button = React.forwardRef(
+  ({ arrow = false, children, css = {}, ...props }: any, forwardedRef) => (
     <ButtonBase
+      ref={forwardedRef}
       variant="violet"
       css={{
         display: "flex",
@@ -72,7 +74,7 @@ const Button = ({ arrow = false, children, css = {}, ...props }) => {
         )}
       </Box>
     </ButtonBase>
-  );
-};
+  )
+);
 
 export default Button;

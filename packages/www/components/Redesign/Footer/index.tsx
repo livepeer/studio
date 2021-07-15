@@ -114,8 +114,7 @@ const Footer = () => {
               onSubmit={handleSubmit}
               css={{ position: "relative" }}>
               <Logo isDark />
-              <Label
-                htmlFor="email"
+              <Box
                 css={{
                   pb: "$3",
                   display: "block",
@@ -125,7 +124,7 @@ const Footer = () => {
                 }}>
                 Join our newsletter to stay up to date on features and new
                 releases.
-              </Label>
+              </Box>
               <Box
                 css={{
                   position: "relative",
@@ -185,7 +184,7 @@ const Footer = () => {
                 </Link>
               </Box>
               <Box>
-                <Link href="https://www.linkedin.com/company/livepeer" passHref>
+                <Link href="https://www.linkedin.com/company/livepeer">
                   <a>
                     <Box
                       as="svg"
@@ -206,7 +205,7 @@ const Footer = () => {
                     </Box>
                   </a>
                 </Link>
-                <Link href="https://twitter.com/livepeerorg" passHref>
+                <Link href="https://twitter.com/livepeerorg">
                   <a>
                     <Box
                       as="svg"

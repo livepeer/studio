@@ -95,11 +95,13 @@ const CaseStudy = ({ heading, about, problem, solution, internalLink }) => {
                   <Text variant="gray" css={{ lineHeight: 1.6, mb: "$3" }}>
                     {solution}
                   </Text>
-                  <Link href={`/blog/${internalLink.slug.current}`} passHref>
-                    <A css={{ fontSize: "$3" }} variant="violet">
-                      Read the full story
-                    </A>
-                  </Link>
+                  {internalLink && (
+                    <Link href={`/blog/${internalLink.slug.current}`} passHref>
+                      <A css={{ fontSize: "$3" }} variant="violet">
+                        Read the full story
+                      </A>
+                    </Link>
+                  )}
                 </Box>
               </Box>
             </Flex>
