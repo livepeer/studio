@@ -31,6 +31,7 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
     name: payload.name,
     events: payload.events ?? [payload.event],
     url: payload.url,
+    sharedSecret: payload.sharedSecret,
   };
 }
 
@@ -45,6 +46,7 @@ const fieldsMap = {
   createdAt: `webhook.data->'createdAt'`,
   userId: `webhook.data->>'userId'`,
   "user.email": `users.data->>'email'`,
+  sharedSecret: `webhook.data->>'sharedSecret'`,
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
@@ -154,7 +156,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   // get a specific webhook
   logger.info(`webhook params ${req.params.id}`);
 
-  const webhook = await req.store.get(`webhook/${req.params.id}`);
+  const webhook = await db.webhook.get(req.params.id);
   if (
     !webhook ||
     ((webhook.deleted || webhook.userId !== req.user.id) && !req.user.admin)
@@ -198,8 +200,7 @@ app.put(
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
   // delete a specific webhook
-  const webhook = await req.store.get(`webhook/${req.params.id}`);
-
+  const webhook = await db.webhook.get(req.params.id);
   if (
     !webhook ||
     ((webhook.deleted || webhook.userId !== req.user.id) && !req.isUIAdmin)

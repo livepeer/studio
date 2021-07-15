@@ -23,6 +23,8 @@ import { useState, useEffect } from "react";
 import Spinner from "components/Dashboard/Spinner";
 import { Webhook } from "@livepeer.com/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
+import urlBuilder from "@sanity/image-url";
+import uuid from "uuid/v4";
 
 const StyledCrossIcon = styled(Cross1Icon, {
   cursor: "pointer",
@@ -72,15 +74,18 @@ const WebhookDialog = ({
     events,
     name,
     url,
+    sharedSecret,
   }: {
     events: string[];
     name: string;
     url: string;
+    sharedSecret: string;
   }) => Promise<void>;
 }) => {
   const [saving, setSaving] = useState(false);
   const [webhookName, setWebhookName] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookSecret, setWebhookSecret] = useState("");
   const [openSnackbar] = useSnackbar();
   const [events, setEvents] = useState([]);
 
@@ -119,6 +124,7 @@ const WebhookDialog = ({
                 events,
                 name: webhookName,
                 url: webhookUrl,
+                sharedSecret: webhookSecret,
               });
               openSnackbar(`Webhook updated.`);
               onOpenChange(false);
@@ -150,6 +156,16 @@ const WebhookDialog = ({
               defaultValue={Action.Update ? webhook?.url : ""}
               placeholder="https://"
               onChange={(e) => setWebhookUrl(e.target.value)}
+            />
+
+            <Label htmlFor="sharedSecret">Secret</Label>
+            <TextField
+              size="2"
+              type="text"
+              id="sharedSecret"
+              defaultValue={Action.Update ? webhook?.sharedSecret : uuid()}
+              placeholder="secret used to sign the webhook requests"
+              onChange={(e) => setWebhookSecret(e.target.value)}
             />
             <Label htmlFor="events">Event types</Label>
 

@@ -159,13 +159,14 @@ const WebhookDetail = () => {
                     action={Action.Update}
                     isOpen={dialogState.on}
                     onOpenChange={dialogState.onToggle}
-                    onSubmit={async ({ events, name, url }) => {
+                    onSubmit={async ({ events, name, url, sharedSecret }) => {
                       delete data.event; // remove deprecated field before updating
                       await updateWebhook(data.id, {
                         ...data,
                         events: events ? events : data.events,
                         name: name ? name : data.name,
                         url: url ? url : data.url,
+                        sharedSecret: sharedSecret? sharedSecret: data.sharedSecret,
                       });
                       await invalidateQuery();
                     }}
@@ -190,6 +191,8 @@ const WebhookDetail = () => {
                 <Cell>{data.url}</Cell>
                 <Cell variant="gray">Name</Cell>
                 <Cell>{data.name}</Cell>
+                <Cell variant="gray">Secret</Cell>
+                <Cell>{data.sharedSecret}</Cell>
                 <Cell variant="gray">Created</Cell>
                 <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
                 <Cell variant="gray">Event types</Cell>

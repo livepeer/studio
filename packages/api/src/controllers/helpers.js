@@ -15,7 +15,7 @@ if (typeof TextEncoder === "undefined") {
 
 const ITERATIONS = 10000;
 
-export async function sign (data, secret) {
+export function sign (data, secret) {
   const hmac = createHmac('sha256', secret);
   hmac.update(Buffer.from(data));
   return hmac.digest('hex');
