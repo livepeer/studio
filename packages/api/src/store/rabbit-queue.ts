@@ -77,7 +77,7 @@ export default class MessageQueue {
   }
 
   public async emit(msg: Object): Promise<void> {
-    console.log("emitting ", msg);
+    console.log("emitting ", JSON.stringify(msg));
     await this.channel.sendToQueue(QUEUE_NAME, msg);
   }
 
@@ -91,7 +91,7 @@ export default class MessageQueue {
         }),
       ]);
     });
-    console.log("emitting ", msg);
+    console.log("emitting ", JSON.stringify(msg));
     await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
   }
 }

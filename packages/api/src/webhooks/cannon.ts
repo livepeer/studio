@@ -102,7 +102,7 @@ export default class WebhookCannon {
   }
 
   retry(event: WebhookMessage) {
-    if (event && event.retries && event.retries >= MAX_RETRIES) {
+    if (true || (event && event.retries && event.retries >= MAX_RETRIES)) {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${event.id}, streamId: ${event.streamId}`
       );
@@ -185,7 +185,7 @@ export default class WebhookCannon {
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
         let signature = sign(params.body, webhook.sharedSecret);
-        params.headers['Livepeer-Signature'] = `t=${timestamp},v1=${signature}`
+        params.headers["Livepeer-Signature"] = `t=${timestamp},v1=${signature}`;
       }
 
       try {
