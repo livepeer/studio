@@ -216,5 +216,5 @@ export default function parseCli(argv?: string | readonly string[]) {
     })
     .help()
     .parse(argv);
-  return (parsed as any) as CamelKeys<typeof parsed>;
+  return parsed as any as CamelKeys<typeof parsed>;
 }

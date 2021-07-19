@@ -185,7 +185,7 @@ export default class WebhookCannon {
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
         let signature = sign(params.body, webhook.sharedSecret);
-        params.headers['Livepeer-Signature'] = `t=${timestamp},v1=${signature}`
+        params.headers["Livepeer-Signature"] = `t=${timestamp},v1=${signature}`;
       }
 
       try {

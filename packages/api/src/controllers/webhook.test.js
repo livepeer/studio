@@ -93,13 +93,8 @@ describe("controllers/webhook", () => {
       generatedWebhookIds;
 
     beforeAll(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
+      ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+        await setupUsers(server));
       generatedWebhookIds = [];
     });
 
@@ -253,13 +248,8 @@ describe("controllers/webhook", () => {
       generatedWebhook;
 
     beforeAll(async () => {
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
+      ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+        await setupUsers(server));
     });
 
     afterAll(async () => {
@@ -303,13 +293,8 @@ describe("controllers/webhook", () => {
 
     it("trigger webhook with localIP", async () => {
       await clearDatabase(server);
-      ({
-        client,
-        adminUser,
-        adminToken,
-        nonAdminUser,
-        nonAdminToken,
-      } = await setupUsers(server));
+      ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+        await setupUsers(server));
 
       let localWebhook = { ...mockWebhook };
       localWebhook.url = "192.168.1.1";

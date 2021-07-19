@@ -15,10 +15,10 @@ if (typeof TextEncoder === "undefined") {
 
 const ITERATIONS = 10000;
 
-export function sign (data, secret) {
-  const hmac = createHmac('sha256', secret);
+export function sign(data, secret) {
+  const hmac = createHmac("sha256", secret);
   hmac.update(Buffer.from(data));
-  return hmac.digest('hex');
+  return hmac.digest("hex");
 }
 
 export async function hash(password, salt) {

@@ -3,7 +3,7 @@ title: Supported codecs and workflows
 description: Codecs and workflows supported by Livepeer.com
 ---
 
-# Supported codecs and workflows 
+# Supported codecs and workflows
 
 **Ingest Support**
 
@@ -37,20 +37,20 @@ description: Codecs and workflows supported by Livepeer.com
 
 **Video Workflow Support**
 
-| Field                       | Notes                                                                                                                                                       |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Latency**                 | 10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player                                                         |
-| **Live Output Format**      | HLS playback URL (m3u8)                                                                                                                                     |                                                                                                                                  |
-| **Video Players**           | **Supported tested**: video.js, hls.js, safari/ios native player, Theoplayer                                                                                |
-|                             | **Supported untested**: JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove                                                                          |
-| **Video Delivery Location** | **Supported tested**: EU, US                                                                                                                                |
-|                             | **Supported untested**: Asia, South America, Australia, Africa                                                                                              |
+| Field                       | Notes                                                                                                                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **Latency**                 | 10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player                                                                                                |
+| **Live Output Format**      | HLS playback URL (m3u8)                                                                                                                                                                            |     |
+| **Video Players**           | **Supported tested**: video.js, hls.js, safari/ios native player, Theoplayer                                                                                                                       |
+|                             | **Supported untested**: JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove                                                                                                                 |
+| **Video Delivery Location** | **Supported tested**: EU, US                                                                                                                                                                       |
+|                             | **Supported untested**: Asia, South America, Australia, Africa                                                                                                                                     |
 | **Live stream recording**   | ONLY available for paying users. HLS playback URL (m3u8) available 5 minutes after session ends. Livepeer.com stores recording and serves playback via CDN. There is no limit on recording length. |
-| **Recording Output Format** | HLS playback URL (m3u8)   
-| **CDN Delivery**            | CDN delivery is ONLY available for paying users                                                                                                             |
-| **Non-CDN Delivery**        | Non-CDN delivery for free tier users is limited to 10 viewers per account                                                                                |
-|                             | Free tier users will have transcoding limited to 240p after 30 free minutes                                                                                 |
-| **Custom CDN**              | Only for custom pricing tier users                                                                                                                          |
-| **Stream Status**           | `active` or `inactive`                                                                                                                                      |
-| **Stream Length**           | We can support streams up to 12 hours in length. Please reach out to hello@livepeer.com if you’re looking to run longer uninterrupted streams through Livepeer.                                                                                                                                               |
-| **Scalability**             | 1000 concurrent streams across all users. Please contact us at hello@livepeer.com for additional capacity                                                           |
+| **Recording Output Format** | HLS playback URL (m3u8)                                                                                                                                                                            |
+| **CDN Delivery**            | CDN delivery is ONLY available for paying users                                                                                                                                                    |
+| **Non-CDN Delivery**        | Non-CDN delivery for free tier users is limited to 10 viewers per account                                                                                                                          |
+|                             | Free tier users will have transcoding limited to 240p after 30 free minutes                                                                                                                        |
+| **Custom CDN**              | Only for custom pricing tier users                                                                                                                                                                 |
+| **Stream Status**           | `active` or `inactive`                                                                                                                                                                             |
+| **Stream Length**           | We can support streams up to 12 hours in length. Please reach out to hello@livepeer.com if you’re looking to run longer uninterrupted streams through Livepeer.                                    |
+| **Scalability**             | 1000 concurrent streams across all users. Please contact us at hello@livepeer.com for additional capacity                                                                                          |

@@ -5,37 +5,69 @@ description: Back-up transcoding with Livepeer.com
 
 # Redundant back-up transcoding
 
-Livepeer.com routes your live streams to the nearest available datacenter to ensure your streamers and live stream viewers have a consistent, high quality experience with the minimum latency Livepeer.com can provide. 
+Livepeer.com routes your live streams to the nearest available datacenter to
+ensure your streamers and live stream viewers have a consistent, high quality
+experience with the minimum latency Livepeer.com can provide.
 
-These globally-optimized URLs are the best option for nearly all Livepeer.com users.
+These globally-optimized URLs are the best option for nearly all Livepeer.com
+users.
+
 - Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
 - Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
 
 ## Back-up transcoding with regional ingest and playback URLs
 
-To leverage back-up transcoding, you will need to create two streams, each with a unique `streamKey`. Then instead of streaming into the global ingest URL above, you’ll point one stream towards a specific region’s ingest datacenter and the other stream towards a different region’s ingest data center.
+To leverage back-up transcoding, you will need to create two streams, each with
+a unique `streamKey`. Then instead of streaming into the global ingest URL
+above, you’ll point one stream towards a specific region’s ingest datacenter and
+the other stream towards a different region’s ingest data center.
 
-While more control can be helpful, there are downsides to forgoing the global ingest and playback URLs and selecting a regional URL pair.
+While more control can be helpful, there are downsides to forgoing the global
+ingest and playback URLs and selecting a regional URL pair.
 
-- **Increased latency**: If you stream into a regional ingest URL, Livepeer.com routes the stream to that region's datacenter for ingest. Playback also originates in that datacenter. If the livestreamer is far away from that datacenter region, this will introduce latency that could have been avoided if they streamed into the global ingest URL, `rtmp://rtmp.livepeer.com/live/`. Additionally, very distant livestream viewers will have a more latent experience than if the stream was ingested via the global ingest URL.
-- **Riskier during unforseen outages**: On the rare occasional that a Livepeer.com ingest data center goes completely offline, all active live streams into that datacenter region will need to restart their streams using a different regional ingest URL ... and send all their livestream viewers a different regional playback URL. This could be a bad user experience for your stream viewers. the stream was ingested via the global ingest URL, `rtmp://rtmp.livepeer.com/live/`, the playback URL would stay the same even if the livestream had to reconnect.
+- **Increased latency**: If you stream into a regional ingest URL, Livepeer.com
+  routes the stream to that region's datacenter for ingest. Playback also
+  originates in that datacenter. If the livestreamer is far away from that
+  datacenter region, this will introduce latency that could have been avoided if
+  they streamed into the global ingest URL, `rtmp://rtmp.livepeer.com/live/`.
+  Additionally, very distant livestream viewers will have a more latent
+  experience than if the stream was ingested via the global ingest URL.
+- **Riskier during unforseen outages**: On the rare occasional that a
+  Livepeer.com ingest data center goes completely offline, all active live
+  streams into that datacenter region will need to restart their streams using a
+  different regional ingest URL ... and send all their livestream viewers a
+  different regional playback URL. This could be a bad user experience for your
+  stream viewers. the stream was ingested via the global ingest URL,
+  `rtmp://rtmp.livepeer.com/live/`, the playback URL would stay the same even if
+  the livestream had to reconnect.
 
-If you decide to opt out of the global ingest and playback URLs and use regional URL pairs, here's what you need to know.
+If you decide to opt out of the global ingest and playback URLs and use regional
+URL pairs, here's what you need to know.
 
-1. You can not use the same stream key to connect to multiple regional ingest URLs simultaneously. For simultaneous, back-up stream transcoding, create multiple unique stream keys.
+1. You can not use the same stream key to connect to multiple regional ingest
+   URLs simultaneously. For simultaneous, back-up stream transcoding, create
+   multiple unique stream keys.
 2. Stream into: `rtmp://{region-X}-rtmp.livepeer.com/live/{stream-key}`.
-3. Playback from: `https://{region-X}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+3. Playback from:
+   `https://{region-X}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
 
-An RTMP ingest and playback URL pair references hardware in different parts of the world. Each region is three letters, the airport code of the server location. Use the ingest and playback URL pair in the region closest to your broadcaster. For any stream session, you must **use the RTMP ingest URL and playback URL pair from the same region.**
+An RTMP ingest and playback URL pair references hardware in different parts of
+the world. Each region is three letters, the airport code of the server
+location. Use the ingest and playback URL pair in the region closest to your
+broadcaster. For any stream session, you must **use the RTMP ingest URL and
+playback URL pair from the same region.**
 
 ### Find the closest ingest data center
 
-You can get the base URL pair for the regional ingest point nearest to you by calling `https://livepeer.com/api/ingest`. For example:
+You can get the base URL pair for the regional ingest point nearest to you by
+calling `https://livepeer.com/api/ingest`. For example:
+
 ```bash
 curl "https://livepeer.com/api/ingest"
 ```
 
 And you should get results like this:
+
 ```bash
 [
   {
@@ -47,12 +79,16 @@ And you should get results like this:
 
 ### Return a list of all regional base URL pairs
 
-At times, you will want to use a base URL pair of a region different from the one closest to you. You can get a list of all base URL pairs by calling `https://livepeer.com/api/ingest?first=false`. For example:
+At times, you will want to use a base URL pair of a region different from the
+one closest to you. You can get a list of all base URL pairs by calling
+`https://livepeer.com/api/ingest?first=false`. For example:
+
 ```bash
 curl "https://livepeer.com/api/ingest?first=false"
 ```
 
 And you should get a result similar to this:
+
 ```bash
 [
    {
