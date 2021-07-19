@@ -166,7 +166,7 @@ const WebhookDetail = () => {
                         events: events ? events : data.events,
                         name: name ? name : data.name,
                         url: url ? url : data.url,
-                        sharedSecret: sharedSecret? sharedSecret: data.sharedSecret,
+                        sharedSecret: sharedSecret ?? data.sharedSecret,
                       });
                       await invalidateQuery();
                     }}

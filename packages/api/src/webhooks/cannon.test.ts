@@ -159,9 +159,11 @@ describe("webhook cannon", () => {
       webhookServer.app.use(bodyParser.json());
       webhookServer.app.post("/webhook", (req, res) => {
         console.log("WEBHOOK WORKS , body", req.body);
-        const signatureHeader = String(req.headers['livepeer-signature'])
-        const signature : string= signatureHeader.split(',')[1].split('=')[1]
-        expect(signature).toEqual(sign(JSON.stringify(req.body), mockWebhook.sharedSecret));
+        const signatureHeader = String(req.headers["livepeer-signature"]);
+        const signature: string = signatureHeader.split(",")[1].split("=")[1];
+        expect(signature).toEqual(
+          sign(JSON.stringify(req.body), mockWebhook.sharedSecret)
+        );
         webhookCallback(req.body);
         res.status(204).end();
       });
