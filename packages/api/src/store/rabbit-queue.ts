@@ -4,12 +4,21 @@ import { Channel, ConsumeMessage, Options } from "amqplib";
 
 const QUEUE_NAME = "webhook_default_queue";
 const EXCHANGE_NAME = "webhook_default_exchange";
+const WEBHOOK_CANNON_SINGLE_URL = "webhook_cannon_single_url";
+
+
 
 export default class MessageQueue {
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
+  private queues: Record<string, string>;
 
-  constructor() {}
+  constructor() {
+    this.queues = {
+      events: "webhook_default_queue",
+      webhooks: "webhook_cannon_single_url",
+    }
+  }
 
   public async connect(url: string): Promise<void> {
     // Create a new connection manager
@@ -24,16 +33,18 @@ export default class MessageQueue {
 
     this.channel = await this.connection.createChannel({
       json: true,
-      setup: async function (channel: Channel) {
+      setup: async (channel: Channel) => {
         await Promise.all([
-          channel.assertQueue(QUEUE_NAME),
+          channel.assertQueue(this.queues.events),
           // channel.assertQueue("delayedQueue", {
           //   messageTtl: 5000,
           //   deadLetterExchange: EXCHANGE_NAME
           // }),
+          channel.assertQueue(this.queues.webhooks),
           channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
+          channel.bindQueue(this.queues.events, EXCHANGE_NAME, "events.#"),
+          channel.bindQueue(this.queues.webhooks, EXCHANGE_NAME, "webhooks.#"),
           channel.prefetch(1),
-          channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "#"),
           // channel.consume(QUEUE_NAME, handleMessage)
         ]);
         // return channel.assertQueue('rxQueueName', {durable: true});
@@ -56,16 +67,14 @@ export default class MessageQueue {
     this.channel.nack(data);
   }
 
-  public async consume(func: (msg: ConsumeMessage) => void): Promise<void> {
+  public async consume(queueName: string, func: (msg: ConsumeMessage) => void): Promise<void> {
     if (!func) {
       throw new Error("RabbitMQ | consume | func is undefined");
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
       return Promise.all([
-        channel.assertQueue(QUEUE_NAME),
-        channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "#"),
-        channel.consume(QUEUE_NAME, func),
+        channel.consume(this.queues[queueName], func),
       ]);
     });
   }
@@ -81,6 +90,11 @@ export default class MessageQueue {
     await this.channel.sendToQueue(QUEUE_NAME, msg);
   }
 
+  public async publish (route: string, msg: object): Promise<void> {
+    console.log(`publishing to ${route} : ${JSON.stringify(msg)}`);
+    await this.channel.publish(EXCHANGE_NAME, route, msg);
+  }
+
   public async delayedEmit(msg: Object, delay: number): Promise<void> {
     console.log(`delayed emitting delay=${delay / 1000}s`, msg);
     await this.channel.addSetup((channel: Channel) => {
@@ -88,6 +102,7 @@ export default class MessageQueue {
         channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
           messageTtl: delay,
           deadLetterExchange: EXCHANGE_NAME,
+          deadLetterRoutingKey: "webhooks.delayedEmits",
           expires: delay + 15000,
         }),
       ]);

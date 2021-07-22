@@ -197,7 +197,7 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.emit({
+      await server.queue.publish("events.stream",{
         id: "webhook_test_12",
         time: Date.now(),
         channel: "test.channel",
@@ -230,7 +230,7 @@ describe("webhook cannon", () => {
         if (callCount === 2) sem.release();
       };
 
-      await server.queue.emit({
+      await server.queue.publish("events.stream",{
         id: "webhook_test_12",
         time: Date.now(),
         channel: "test.channel",
@@ -261,7 +261,7 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.emit({
+      await server.queue.publish("events.stream",{
         id: "webhook_test_12",
         time: Date.now(),
         channel: "test.channel",
@@ -276,7 +276,7 @@ describe("webhook cannon", () => {
       expect(receivedEvent).toBe("stream.started");
 
       sem = semaphore();
-      await server.queue.emit({
+      await server.queue.publish("events.stream",{
         id: "webhook_test_42",
         time: Date.now(),
         channel: "test.channel",
@@ -292,7 +292,7 @@ describe("webhook cannon", () => {
 
       // does not receive some random event
       sem = semaphore();
-      await server.queue.emit({
+      await server.queue.publish("events.stream",{
         id: "webhook_test_93",
         time: Date.now(),
         channel: "test.channel",

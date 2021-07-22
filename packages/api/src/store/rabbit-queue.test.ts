@@ -21,7 +21,7 @@ describe("Queue", () => {
   });
 
   it("should be able to emit events and catch it via default consumer", async () => {
-    await queue.consume(queue.handleMessage.bind(queue));
+    await queue.consume("events", queue.handleMessage.bind(queue));
     await queue.emit({
       id: "abc123",
       createdAt: Date.now(),
@@ -46,7 +46,7 @@ describe("Queue", () => {
       sem.release();
     }
 
-    await queue.consume(onMsg);
+    await queue.consume("events", onMsg);
 
     await queue.emit({
       id: "custom_msg",
@@ -73,7 +73,7 @@ describe("Queue", () => {
       sem.release();
     }
 
-    await queue.consume(onMsg);
+    await queue.consume("events", onMsg);
 
     await queue.delayedEmit(
       {
@@ -107,7 +107,7 @@ describe("Queue", () => {
       sem.release();
     }
 
-    await queue.consume(onMsg);
+    await queue.consume("events", onMsg);
 
     await queue.delayedEmit(
       {
