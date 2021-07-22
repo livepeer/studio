@@ -904,6 +904,17 @@ app.put(
       userId: user.id,
     });
 
+  if (req.body.active === false && stream.record === true) {
+    // emit recording.started
+    req.queue.delayedEmit({
+      id: uuid(),
+      createdAt: Date.now(),
+      channel: "webhooks",
+      event:  "recording.ready",
+      streamId: id,
+      userId: user.id,
+    }, USER_SESSION_TIMEOUT)
+  }
     stream.isActive = !!req.body.active;
     stream.lastSeen = +new Date();
     const { ownRegion: region } = req.config;
