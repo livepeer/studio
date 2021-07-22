@@ -1,0 +1,46 @@
+---
+title: Check webhook signatures
+description:
+  Use webhook signatures to ensure incoming webhook requests are coming from
+  Livepeer
+---
+
+# Webhook Signatures
+
+You can verify webhook requests that Livepeer sends to your endpoints, using the
+request header signature included by Livepeer. This signature will help you
+verify the incoming request comes from Livepeer and not a third part.
+
+Livepeer.com will include a signature in each event’s `Livepeer-Signature`
+header. The timestamp is prefixed by `t=` and the signature is prefixed by a
+scheme. Schemes start with `v`, followed by an integer. Currently, the only
+valid signature scheme is v1. Livepeer generates signatures using HMAC with
+SHA2-256.
+
+`Livepeer-Signature: t=36285904404,v1=88f3ff0fds9sf8a98vb0b096e81507cfd5c932fc17cf63a4a55566fd38da3a2d3d2`
+
+To validate the signature, take the following steps:
+
+### Step 1: Extract the timestamp and signatures from the header
+
+Split the header, using the `,` character as the separator, to get a list of
+elements. Then split each element, using the `=` character as the separator, to
+get a prefix and value pair. The value for the prefix `t` corresponds to the
+timestamp, and `v1` corresponds to the signature (or signatures). You can
+discard all other elements.
+
+### Step 2: Prepare the signed_payload string
+
+The `signed_payload` string is created by concatenating:
+
+The `timestamp` (as a string) The character `.` The actual JSON payload (i.e.,
+the request body)
+
+### Step 3: Determine the expected signature
+
+Compare the signature (or signatures) in the header to the expected signature.
+For an equality match, compute the difference between the current timestamp and
+the received timestamp, then decide if the difference is within your tolerance.
+
+To protect against timing attacks, use a constant-time string comparison to
+compare the expected signature to each of the received signatures.
