@@ -485,6 +485,9 @@ const Reset = () => (
         opacity: 1,
         transition: "opacity .3s",
       },
+      "#hubspot-messages-iframe-container iframe": {
+        colorScheme: "auto",
+      },
     }}
   />
 );
