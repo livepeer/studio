@@ -9,7 +9,7 @@ description:
 
 You can verify webhook requests that Livepeer sends to your endpoints, using the
 request header signature included by Livepeer. This signature will help you
-verify the incoming request comes from Livepeer and not a third part.
+verify the incoming request comes from Livepeer and not a third party.
 
 Livepeer.com will include a signature in each event’s `Livepeer-Signature`
 header. The timestamp is prefixed by `t=` and the signature is prefixed by a
@@ -31,10 +31,9 @@ discard all other elements.
 
 ### Step 2: Prepare the signed_payload string
 
-The `signed_payload` string is created by concatenating:
-
-The `timestamp` (as a string) The character `.` The actual JSON payload (i.e.,
-the request body)
+The `signed_payload` is the raw request payload. Note that the JSON in the
+request payload includes the same `timestamp` from the signature header to
+protect against replay attacks.
 
 ### Step 3: Determine the expected signature
 
