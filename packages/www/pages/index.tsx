@@ -2,8 +2,6 @@
 import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
 import Layout from "../layouts";
-import SectionLayout from "../components/SectionLayout";
-import IconListItem, { IconListItemProps } from "../components/IconListItem";
 import { Grid } from "@theme-ui/components";
 import {
   FiUserCheck,
@@ -15,11 +13,13 @@ import {
   FiCheckSquare,
   FiGlobe,
 } from "react-icons/fi";
-import Prefooter from "../components/Prefooter";
-import Hero from "../components/HomeHero";
-import InvestorsSection from "../components/InvestorsSection";
-import TestimonialsSection from "../components/TestimonialsSection";
-import ContactSection from "../components/ContactSection";
+import SectionLayout from "components/SectionLayout";
+import IconListItem, { IconListItemProps } from "components/IconListItem";
+import Prefooter from "components/Redesign/Prefooter";
+import Hero from "components/HomeHero";
+import InvestorsSection from "components/InvestorsSection";
+import TestimonialsSection from "components/TestimonialsSection";
+import ContactSection from "components/ContactSection";
 
 const benefitsListItems: IconListItemProps[] = [
   {

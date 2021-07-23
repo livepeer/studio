@@ -1,8 +1,8 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
-import { DefaultNav } from "../components/Navigation";
-import Footer from "../components/Footer";
+import { DefaultNav } from "components/Redesign/Navigation";
+import Footer from "components/Redesign/Footer";
 import { IdProvider } from "@radix-ui/react-id";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
@@ -10,11 +10,16 @@ import ReactGA from "react-ga";
 import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router from "next/router";
-import GradientBackgroundBox from "../components/GradientBackgroundBox";
 import { Reset, ThemeProvider } from "../lib/theme";
 import MarkdownProvider from "../lib/markdown-provider";
 import Head from "next/head";
-
+import { ThemeProvider as StitchesThemeProvider } from "next-themes";
+import {
+  darkTheme,
+  lightTheme,
+  DesignSystemProvider,
+  SnackbarProvider,
+} from "@livepeer.com/design-system";
 interface Props {
   title?: string;
   children?: JSX.Element[] | JSX.Element;
@@ -84,69 +89,69 @@ const Layout = ({
     seo["canonical"] = canonical;
   }
 
+  function ContextProviders({ children }) {
+    return (
+      <DesignSystemProvider>
+        <StitchesThemeProvider
+          disableTransitionOnChange
+          attribute="class"
+          defaultTheme="light"
+          value={{ dark: darkTheme.className, light: lightTheme.className }}>
+          <SnackbarProvider>{children}</SnackbarProvider>
+        </StitchesThemeProvider>
+      </DesignSystemProvider>
+    );
+  }
+
   return (
-    <IdProvider>
-      <Head>
-        <link rel="stylesheet" href="/reset.css" />
-        <link rel="stylesheet" href="/markdown.css" />
-      </Head>
-      <ThemeProvider>
-        <MarkdownProvider>
-          <Reset />
-          <Box sx={{ minHeight: "100vh" }}>
-            <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-              <NextSeo {...seo} />
-              {withGradientBackground && (
-                <Box
+    <ContextProviders>
+      <IdProvider>
+        <Head>
+          <link rel="stylesheet" href="/reset.css" />
+          <link rel="stylesheet" href="/markdown.css" />
+        </Head>
+        <ThemeProvider>
+          <MarkdownProvider>
+            <Reset />
+            <Box sx={{ minHeight: "100vh" }}>
+              <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
+                <NextSeo {...seo} />
+
+                <Flex
                   sx={{
-                    position: "absolute",
-                    top: 0,
-                    width: "100%",
-                    pointerEvents: "none",
-                    zIndex: 0,
+                    flexGrow: 1,
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                    zIndex: 1,
+                    position: "relative",
                   }}>
-                  <GradientBackgroundBox
-                    id="layout"
-                    gradient="violet"
-                    sx={{ height: "1000px" }}
-                    slide
-                  />
-                </Box>
-              )}
-              <Flex
-                sx={{
-                  flexGrow: 1,
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  zIndex: 1,
-                  position: "relative",
-                }}>
-                {preview && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      textDecoration: "none",
-                      justifyContent: "center",
-                      height: 24,
-                      fontSize: 12,
-                      fontWeight: "500",
-                      bg: "primary",
-                      color: "white",
-                      lineHeight: "32px",
-                    }}>
-                    Preview Mode
-                  </Box>
-                )}
-                {customNav ? customNav : <DefaultNav />}
-                {children}
+                  {preview && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        textDecoration: "none",
+                        justifyContent: "center",
+                        height: 24,
+                        fontSize: 12,
+                        fontWeight: "500",
+                        bg: "primary",
+                        color: "white",
+                        lineHeight: "32px",
+                      }}>
+                      Preview Mode
+                    </Box>
+                  )}
+                  {customNav ? customNav : <DefaultNav hideGuides />}
+                  <Box css={{ position: "relative" }}>{children}</Box>
+                </Flex>
+                <Footer hideGuides />
               </Flex>
-              <Footer />
-            </Flex>
-          </Box>
-        </MarkdownProvider>
-      </ThemeProvider>
-    </IdProvider>
+            </Box>
+          </MarkdownProvider>
+        </ThemeProvider>
+      </IdProvider>
+    </ContextProviders>
   );
 };
 

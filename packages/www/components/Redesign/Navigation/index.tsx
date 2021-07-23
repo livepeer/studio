@@ -134,7 +134,9 @@ const defaultNavProps: NavProps = {
   ],
 };
 
-const DefaultNav = () => <NavigationBase {...defaultNavProps} />;
+const DefaultNav = ({ hideGuides = false }) => (
+  <NavigationBase hideGuides={hideGuides} {...defaultNavProps} />
+);
 
 type DocsNavProps = {
   tree?: Tree[];

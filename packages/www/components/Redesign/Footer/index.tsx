@@ -73,7 +73,7 @@ const MailchimpResponse = ({
   );
 };
 
-const Footer = () => {
+const Footer = ({ hideGuides = false }) => {
   const [version, setVersion] = useState({ tag: "", commit: "" });
   const { user, getVersion } = useApi();
   const [email, setEmail] = useState("");
@@ -97,8 +97,8 @@ const Footer = () => {
   };
 
   return (
-    <Box>
-      <Guides backgroundColor="$loContrast" />
+    <Box css={{ position: "relative" }}>
+      {!hideGuides && <Guides backgroundColor="$loContrast" />}
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ px: "$4", width: "100%" }}>
           <Grid

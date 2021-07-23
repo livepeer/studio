@@ -15,6 +15,7 @@ type Props = {
   links: React.ComponentProps<typeof Link>[];
   breadcrumb?: BreadcrumbItem[];
   withShadow?: boolean;
+  hideGuides?: boolean;
   css?: any;
 };
 
@@ -22,6 +23,7 @@ const NavigationBase = ({
   links,
   breadcrumb,
   withShadow = true,
+  hideGuides = false,
   css,
 }: Props) => {
   const { pathname } = useRouter();
@@ -56,7 +58,7 @@ const NavigationBase = ({
 
   return (
     <Box>
-      <Guides backgroundColor="$loContrast" />
+      {!hideGuides && <Guides backgroundColor="$loContrast" />}
       <Box
         css={{
           position: "relative",
