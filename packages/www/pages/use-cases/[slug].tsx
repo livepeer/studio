@@ -40,7 +40,8 @@ const UseCase = ({ hero, why, caseStudy, preview }) => {
         about={caseStudy.about}
         problem={caseStudy.problem}
         solution={caseStudy.solution}
-        image={caseStudy.image.asset.url}
+        image={caseStudy.image?.asset.url}
+        testimonial={caseStudy?.testimonial}
         internalLink={caseStudy.internalLink}
       />
       <Prefooter />

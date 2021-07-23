@@ -125,6 +125,7 @@ export {
   Root as HoverCardRoot,
   Trigger as HoverCardTrigger,
   Content as HoverCardContent,
+  Arrow as HoverCardArrow,
 } from "@radix-ui/react-hover-card";
 
 // Stitches

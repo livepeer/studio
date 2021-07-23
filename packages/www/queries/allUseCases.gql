@@ -37,6 +37,17 @@ query allUseCase($where: UseCaseFilter) {
           url
         }
       }
+      testimonial {
+        quote
+        name
+        company
+        role
+        image {
+          asset {
+            url
+          }
+        }
+      }
     }
   }
 }

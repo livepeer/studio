@@ -14,6 +14,7 @@ const CaseStudy = ({
   heading,
   about,
   image,
+  testimonial,
   problem,
   solution,
   internalLink,

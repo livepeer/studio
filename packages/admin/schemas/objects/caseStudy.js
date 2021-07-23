@@ -43,6 +43,11 @@ export default {
       rows: 3,
     },
     {
+      name: "testimonial",
+      type: "testimonial",
+      title: "Testimonial",
+    },
+    {
       title: "Link",
       description: "Use this to link the case study article",
       name: "internalLink",

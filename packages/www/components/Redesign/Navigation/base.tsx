@@ -112,19 +112,24 @@ const NavigationBase = ({
                   display: "flex",
                 },
               }}>
-              {links.map((link) => (
-                <Link href={link.href} key={`nav-link-${link.href}`} passHref>
-                  <A
-                    css={{
-                      fontSize: "$3",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      mx: "$3",
-                    }}>
-                    {link.children}
-                  </A>
-                </Link>
-              ))}
+              {links.map((link, i) => {
+                if (link.href === "/use-cases") {
+                  return <Box key={`nav-link-${i}`}>{link.children}</Box>;
+                }
+                return (
+                  <Link href={link.href} key={`nav-link-${i}`} passHref>
+                    <A
+                      css={{
+                        fontSize: "$3",
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        mx: "$3",
+                      }}>
+                      {link.children}
+                    </A>
+                  </Link>
+                );
+              })}
             </Flex>
             <Flex
               css={{
