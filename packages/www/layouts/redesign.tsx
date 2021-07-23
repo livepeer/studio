@@ -51,6 +51,10 @@ const globalStyles = global({
     position: "relative",
     zIndex: 0,
   },
+
+  "#hubspot-messages-iframe-container iframe": {
+    colorScheme: "auto",
+  },
 });
 
 interface Props {
