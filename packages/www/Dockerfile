@@ -4,8 +4,9 @@ FROM node:12
 
 WORKDIR /app
 ADD package.json package.json
+ADD yarn.lock yarn.lock
 ADD lerna.json lerna.json
 ADD . .
-RUN yarn install
+RUN yarn install --frozen-lockfile
 WORKDIR /app/packages/www
 CMD yarn run start

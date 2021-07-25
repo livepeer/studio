@@ -23,4 +23,4 @@ packages/*
 */*/out
 
 # So you can change this without forcing a rebuild
-Dockerfile
+**/Dockerfile
