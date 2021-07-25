@@ -1,6 +1,7 @@
 **/.nyc_output
 **/build
 **/.next
+**/out
 **/coverage
 **/dist
 **/public

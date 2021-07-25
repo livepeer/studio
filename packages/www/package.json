@@ -6,10 +6,12 @@
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3012",
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
-    "docs-positions": "node ./generate-docs-positions.js"
+    "docs-positions": "node ./generate-docs-positions.js",
+    "docker:build": "cd ../.. && DOCKER_BUILDKIT=1 docker build -t livepeerci/www:${DOCKER_TAG:-master} -f packages/www/Dockerfile .",
+    "docker:push": "docker push livepeerci/www:${DOCKER_TAG:-master}"
   },
   "license": "MIT",
   "dependencies": {
