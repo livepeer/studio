@@ -8,7 +8,9 @@ export type LinksListProps = {
 
 const LinksList = ({ heading, links }: LinksListProps) => (
   <Box>
-    <Box css={{ fontWeight: 600, mb: "$3" }}>{heading}</Box>
+    <Box css={{ fontWeight: 600, mb: "$3", color: "$hiContrast" }}>
+      {heading}
+    </Box>
     {links.map((link, i) => (
       <Box
         key={`link-${link.href}-${i}`}

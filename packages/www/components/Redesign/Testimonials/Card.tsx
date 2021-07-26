@@ -14,7 +14,8 @@ const Card = ({ id, quote, author }: CardProps) => (
   <Box
     css={{
       position: "relative",
-      backgroundColor: "white",
+      backgroundColor: "$panel",
+      border: "1px solid $mauve4",
       py: 32,
       px: 24,
       borderRadius: 24,
@@ -29,12 +30,18 @@ const Card = ({ id, quote, author }: CardProps) => (
         minHeight: 380,
       },
     }}>
-    <img
+    <Box
+      as="img"
       alt={`${id} logo`}
       className="lazyload"
       src={`/img/testimonials/${id}/logo.svg`}
+      css={{
+        filter: "grayscale(1)",
+      }}
     />
-    <Box css={{ fontWeight: 400, my: "$5", fontSize: "$4" }}>"{quote}"</Box>
+    <Text variant="gray" css={{ fontWeight: 400, my: "$5" }}>
+      "{quote}"
+    </Text>
     <Flex
       css={{
         fontWeight: 500,
@@ -69,8 +76,10 @@ const Card = ({ id, quote, author }: CardProps) => (
         }}
       />
       <Box>
-        <Text css={{ fontWeight: 600 }}>{author.name}</Text>
-        <Text css={{ fontWeight: 400 }}>
+        <Text variant="gray" css={{ fontWeight: 600 }}>
+          {author.name}
+        </Text>
+        <Text variant="gray" css={{ fontWeight: 400 }}>
           {author.role}, {author.company}
         </Text>
       </Box>

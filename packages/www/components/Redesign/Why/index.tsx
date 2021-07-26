@@ -8,6 +8,25 @@ import {
 import Guides from "components/Redesign/Guides";
 import Button from "components/Redesign/Button";
 import Link from "next/link";
+import * as Hi from "react-icons/hi";
+import * as Fa from "react-icons/fa";
+import * as Fi from "react-icons/fi";
+import * as Md from "react-icons/md";
+
+const getIconProvider = (provider) => {
+  if (provider === "hi") {
+    return Hi;
+  }
+  if (provider === "fa") {
+    return Fa;
+  }
+  if (provider === "fi") {
+    return Fi;
+  }
+  if (provider === "mdi") {
+    return Md;
+  }
+};
 
 const Why = ({ backgroundColor = "$panel", title, heading, reasons }) => {
   return (
@@ -51,46 +70,53 @@ const Why = ({ backgroundColor = "$panel", title, heading, reasons }) => {
                 grid: "1fr/repeat(4,1fr)",
               },
             }}>
-            {reasons.map((reason, i) => (
-              <Box key={i} css={{ pl: "$4", pr: "$6", width: "100%" }}>
-                <Box
-                  css={{
-                    mb: "$3",
-                    width: 44,
-                    height: 44,
-                    minWidth: 44,
-                    minHeight: 44,
-                    borderRadius: 1000,
-                    display: "flex",
-                    ai: "center",
-                    jc: "center",
-                    background:
-                      "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
-                  }}>
-                  {reason.icon}
+            {reasons.map((reason, i) => {
+              return (
+                <Box key={i} css={{ pl: "$4", pr: "$6", width: "100%" }}>
+                  {reason?.icon?.provider && (
+                    <Box
+                      css={{
+                        mb: "$3",
+                        width: 44,
+                        height: 44,
+                        minWidth: 44,
+                        minHeight: 44,
+                        borderRadius: 1000,
+                        display: "flex",
+                        ai: "center",
+                        color: "$hiContrast",
+                        jc: "center",
+                        background:
+                          "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
+                      }}>
+                      {getIconProvider(reason.icon.provider)[
+                        reason.icon.name
+                      ]()}
+                    </Box>
+                  )}
+                  <Text
+                    css={{
+                      position: "relative",
+                      fontWeight: 500,
+                      mb: "$2",
+                      "&:before": {
+                        position: "absolute",
+                        top: "4px",
+                        left: "-20px",
+                        width: "1px",
+                        height: "$3",
+                        backgroundColor: "$violet9",
+                        content: '""',
+                      },
+                    }}>
+                    {reason.title}
+                  </Text>
+                  <Text variant="gray" css={{ lineHeight: 1.6 }}>
+                    {reason.description}
+                  </Text>
                 </Box>
-                <Text
-                  css={{
-                    position: "relative",
-                    fontWeight: 500,
-                    mb: "$2",
-                    "&:before": {
-                      position: "absolute",
-                      top: "4px",
-                      left: "-20px",
-                      width: "1px",
-                      height: "$3",
-                      backgroundColor: "$violet9",
-                      content: '""',
-                    },
-                  }}>
-                  {reason.title}
-                </Text>
-                <Text variant="gray" css={{ lineHeight: 1.6 }}>
-                  {reason.description}
-                </Text>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         </Container>
       </Box>

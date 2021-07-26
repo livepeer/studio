@@ -116,7 +116,6 @@ const Layout = ({
             <Box sx={{ minHeight: "100vh" }}>
               <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
                 <NextSeo {...seo} />
-
                 <Flex
                   sx={{
                     flexGrow: 1,

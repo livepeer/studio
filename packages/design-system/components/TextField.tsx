@@ -115,6 +115,38 @@ const StyledTextField = styled(DEFAULT_TAG, {
           backgroundColor: "transparent",
         },
       },
+      white: {
+        boxShadow: "none",
+        backgroundColor: "white",
+        "@hover": {
+          "&:hover": {
+            boxShadow: "inset 0 0 0 1px $colors$mauveA7",
+          },
+        },
+        "&:focus": {
+          backgroundColor: "$white",
+          boxShadow:
+            "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+        },
+        "&::placeholder": {
+          color: "$mauve9",
+        },
+        "&:disabled": {
+          pointerEvents: "none",
+          backgroundColor: "$mauve2",
+          color: "$mauve8",
+          cursor: "not-allowed",
+          "&::placeholder": {
+            color: "$mauve7",
+          },
+        },
+        "&:read-only": {
+          backgroundColor: "$mauve2",
+          "&:focus": {
+            boxShadow: "inset 0px 0px 0px 1px $colors$mauve7",
+          },
+        },
+      },
     },
     state: {
       invalid: {

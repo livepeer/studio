@@ -12,21 +12,22 @@ import Link from "next/link";
 
 const Prefooter = () => (
   <Box css={{ position: "relative" }}>
-    <Guides backgroundColor="$panel" />
+    <Guides backgroundColor="$loContrast" />
     <Container
       size="3"
       css={{
         px: "$6",
-        py: 120,
+        py: 70,
         width: "100%",
         "@bp3": {
           px: "$3",
+          py: 120,
         },
       }}>
       <Box
         css={{
-          px: 40,
-          py: 80,
+          px: 32,
+          py: 60,
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
@@ -66,10 +67,23 @@ const Prefooter = () => (
           css={{
             ai: "center",
             justifyContent: "center",
-            flexDirection: "row",
+            flexDirection: "column",
+            "@bp2": {
+              flexDirection: "row",
+            },
           }}>
           <Link href="/register" passHref>
-            <Button size="4" as="a" arrow css={{ mr: "$4" }}>
+            <Button
+              size="4"
+              as="a"
+              arrow
+              css={{
+                mr: "$4",
+                mb: "$3",
+                "@bp2": {
+                  mb: 0,
+                },
+              }}>
               Sign up for free
             </Button>
           </Link>

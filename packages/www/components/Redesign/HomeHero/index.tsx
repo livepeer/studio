@@ -102,7 +102,7 @@ const HomeHero = () => {
         position: "relative",
         overflow: "hidden",
       }}>
-      <Guides backgroundColor="white" />
+      <Guides backgroundColor="$loContrast" />
       <Container>
         <Box
           css={{
@@ -120,6 +120,7 @@ const HomeHero = () => {
             <Box
               as="h2"
               css={{
+                color: "$hiContrast",
                 fontSize: 40,
                 lineHeight: 1.2,
                 mb: "$7",
@@ -158,6 +159,7 @@ const HomeHero = () => {
                   },
                 }}>
                 <TextField
+                  variant="white"
                   required
                   type="email"
                   value={email}
@@ -236,6 +238,7 @@ const HomeHero = () => {
                 fontWeight: 700,
                 fontSize: 32,
                 mb: "$5",
+                color: "$hiContrast",
                 "@bp2": {
                   fontSize: 48,
                 },

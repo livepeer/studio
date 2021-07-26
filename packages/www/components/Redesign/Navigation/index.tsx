@@ -5,14 +5,10 @@ import DocsMobileSubMenu from "./mobile/docs-submenu";
 import { Tree } from "components/TableOfContents";
 import { isMobile } from "react-device-detect";
 import NavDropdown from "components/Redesign/NavDropdown";
-import { Box, Text, Flex, styled } from "@livepeer.com/design-system";
-import Link from "next/link";
+import { Box, Text, Flex } from "@livepeer.com/design-system";
 import ArrowLink from "../ArrowLink";
-import { CubeIcon, VideoIcon } from "@radix-ui/react-icons";
 
 type NavProps = React.ComponentProps<typeof NavigationBase>;
-
-const StyledVideoIcon = styled(VideoIcon, {});
 
 const StyledEcommerceIcon = ({ active = false, ...props }) => {
   return (
@@ -62,13 +58,16 @@ const defaultNavProps: NavProps = {
                 textDecoration: "none",
                 mx: "$3",
                 cursor: "pointer",
+                color: "$hiContrast",
               }}>
               Use Cases
             </Box>
           }>
           <Box css={{ mb: "$3" }}>
             <Flex>
-              <StyledPlatformsIcon css={{ mt: "4px", mr: "$3" }} />
+              <StyledPlatformsIcon
+                css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
+              />
               <Box>
                 <Text css={{ fontWeight: 600, mb: "$2" }}>
                   Streaming Platforms
@@ -77,12 +76,15 @@ const defaultNavProps: NavProps = {
                   <ArrowLink
                     hideArrow
                     color="$mauve9"
-                    href="/use-cases/creators">
+                    href="/use-cases/creator-platforms">
                     <Text variant="gray" css={{ py: "$1" }}>
                       For Creators
                     </Text>
                   </ArrowLink>
-                  <ArrowLink hideArrow color="$mauve9" href="/use-cases/gamers">
+                  <ArrowLink
+                    hideArrow
+                    color="$mauve9"
+                    href="/use-cases/game-streaming-platforms">
                     <Text variant="gray" css={{ py: "$1" }}>
                       For Gamers
                     </Text>
@@ -90,7 +92,7 @@ const defaultNavProps: NavProps = {
                   <ArrowLink
                     hideArrow
                     color="$mauve9"
-                    href="/use-cases/musicians">
+                    href="/use-cases/music-streaming-platforms">
                     <Text variant="gray" css={{ py: "$1" }}>
                       For Musicians
                     </Text>
@@ -102,7 +104,13 @@ const defaultNavProps: NavProps = {
           <Box>
             <Flex>
               <StyledEcommerceIcon
-                css={{ mt: "1px", mr: "$3", width: 14, height: 14 }}
+                css={{
+                  color: "$hiContrast",
+                  mt: "1px",
+                  mr: "$3",
+                  width: 14,
+                  height: 14,
+                }}
               />
               <ArrowLink
                 hideArrow

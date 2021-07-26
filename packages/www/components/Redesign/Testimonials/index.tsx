@@ -37,8 +37,17 @@ const testimonials: CardProps[] = [
 
 const Testimonials = () => (
   <Box css={{ position: "relative" }}>
-    <Guides backgroundColor="$panel" />
-    <Container size="3" css={{ px: 0, width: "100%", py: 140 }}>
+    <Guides backgroundColor="$loContrast" />
+    <Container
+      size="3"
+      css={{
+        px: 0,
+        width: "100%",
+        py: 72,
+        "@bp2": {
+          py: 140,
+        },
+      }}>
       <Box
         css={{
           px: "$6",

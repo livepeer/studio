@@ -36,16 +36,21 @@ const Contact = () => {
 
   return (
     <Box css={{ position: "relative" }}>
-      <Guides backgroundColor="white" />
+      <Guides backgroundColor="$panel" />
       <Container
         size="3"
         css={{ py: 88, px: 0, width: "100%", position: "relative" }}>
         <Box
           css={{
-            px: "$3",
+            px: "$6",
+            "@bp2": {
+              px: "$3",
+            },
           }}>
           <Box css={{ mb: 48, textAlign: "center" }}>
-            <Box as="h2" css={{ fontSize: "$8", mb: "$4" }}>
+            <Box
+              as="h2"
+              css={{ color: "$hiContrast", fontSize: "$8", mb: "$4" }}>
               Get in touch with us
             </Box>
             <Text
@@ -68,7 +73,7 @@ const Contact = () => {
             as="form"
             ref={formEl}
             onSubmit={handleSubmit}
-            css={{ textAlign: "center" }}>
+            css={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
             <Grid
               css={{
                 mb: "$4",

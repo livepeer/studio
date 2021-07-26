@@ -120,6 +120,7 @@ const NavigationBase = ({
                   <Link href={link.href} key={`nav-link-${i}`} passHref>
                     <A
                       css={{
+                        display: "block",
                         fontSize: "$3",
                         fontWeight: 600,
                         textDecoration: "none",

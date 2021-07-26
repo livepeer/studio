@@ -70,8 +70,8 @@ const ContactPage = () => {
                 size="4"
                 variant="gray"
                 css={{ maxWidth: 512, margin: "0 auto" }}>
-                If you’d like to learn more about Livepeer.com's innovative UGC
-                focused video platform drop us a note and we’ll get right back
+                If you’d like to learn more about Livepeer.com's innovative
+                video developer platform drop us a note and we’ll get right back
                 to you!
                 <br />
                 <br />
@@ -86,7 +86,7 @@ const ContactPage = () => {
               as="form"
               ref={formEl}
               onSubmit={handleSubmit}
-              css={{ textAlign: "center" }}>
+              css={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
               <Grid
                 css={{
                   mb: "$4",

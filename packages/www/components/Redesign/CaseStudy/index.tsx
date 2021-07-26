@@ -197,14 +197,11 @@ const CaseStudy = ({
                       transform: "translateX(2px)",
                     },
                   }}>
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                  Neque error rem aliquam beatae impedit facilis ipsum nesciunt
-                  natus voluptate iusto. Aliquid et ipsam omnis laborum unde
-                  vitae ut at quos.
+                  {testimonial.quote}
                 </Text>
                 <Flex css={{ ai: "center" }}>
-                  <Text css={{ fontWeight: 600 }}>Author</Text>
-                  <Text>, role</Text>
+                  <Text css={{ fontWeight: 600 }}>{testimonial.name}</Text>
+                  <Text>, {testimonial.role}</Text>
                 </Flex>
               </Flex>
             </Box>
