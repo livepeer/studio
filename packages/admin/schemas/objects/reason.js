@@ -14,5 +14,13 @@ export default {
       title: "Description",
       rows: 3,
     },
+    {
+      title: "Icon",
+      name: "icon",
+      type: "iconPicker",
+      options: {
+        outputFormat: "react",
+      },
+    },
   ],
 };
