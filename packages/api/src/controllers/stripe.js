@@ -89,6 +89,7 @@ app.post("/migrate-users", async (req, res) => {
   const [users] = await db.user.find(
     [sql`users.data->>'stripeCustomerId' IS NULL`],
     {
+      limit: 9999999999,
       useReplica: false,
     }
   );
