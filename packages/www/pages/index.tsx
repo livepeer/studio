@@ -1,8 +1,4 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Fade from "react-reveal/Fade";
 import Layout from "../layouts";
-import { Grid } from "@theme-ui/components";
 import {
   FiUserCheck,
   FiPlay,
@@ -13,15 +9,14 @@ import {
   FiCheckSquare,
   FiGlobe,
 } from "react-icons/fi";
-import SectionLayout from "components/SectionLayout";
-import IconListItem, { IconListItemProps } from "components/IconListItem";
 import Prefooter from "components/Redesign/Prefooter";
-import Hero from "components/HomeHero";
-import InvestorsSection from "components/InvestorsSection";
-import TestimonialsSection from "components/TestimonialsSection";
-import ContactSection from "components/ContactSection";
+import Hero from "components/Redesign/HomeHero";
+import Investors from "components/Redesign/Investors";
+import Testimonials from "components/Redesign/Testimonials";
+import Contact from "components/Redesign/Contact";
+import Why from "@components/Redesign/Why";
 
-const benefitsListItems: IconListItemProps[] = [
+const benefitsListItems = [
   {
     icon: <FiUserCheck />,
     title: "Easy to use",
@@ -48,7 +43,7 @@ const benefitsListItems: IconListItemProps[] = [
   },
 ];
 
-const featuresListItems: IconListItemProps[] = [
+const featuresListItems = [
   {
     icon: <FiCode />,
     title: "Transcoding",
@@ -82,65 +77,23 @@ const HomePage = () => {
       description={`The platform built to power video-centric UGC applications at scale.`}
       url={`https://livepeer.com`}
       withGradientBackground>
-      {/* Do not wrap the <Hero /> in <Fade />. It completely breaks in Safari */}
       <Hero />
-      <Fade key={1} fraction={0.05}>
-        <SectionLayout
-          heading={{
-            title:
-              "A platform uniquely tailored to address the needs of today’s video-centric UGC platforms",
-            tag: "Benefits",
-            cta: {
-              isLink: true,
-              href: "/register",
-              children: "Sign up for free",
-            },
-          }}
-          gradient="colorful">
-          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-            {benefitsListItems.map((item) => (
-              <IconListItem
-                key={`benefits-list-item-${item.title}`}
-                {...item}
-              />
-            ))}
-          </Grid>
-        </SectionLayout>
-      </Fade>
-      <Fade key={2} fraction={0.05}>
-        <SectionLayout
-          heading={{
-            title:
-              "Feature-rich, high quality streaming and on-demand video for your project",
-            tag: "Features",
-            cta: {
-              isLink: true,
-              href: "/register",
-              children: "Sign up for free",
-            },
-          }}>
-          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-            {featuresListItems.map((item) => (
-              <IconListItem
-                key={`features-list-item-${item.title}`}
-                {...item}
-              />
-            ))}
-          </Grid>
-        </SectionLayout>
-      </Fade>
-      <Fade key={3} fraction={0.05}>
-        <InvestorsSection />
-      </Fade>
-      <Fade key={4} fraction={0.05}>
-        <TestimonialsSection />
-      </Fade>
-      <Fade key={5} fraction={0.05}>
-        <ContactSection />
-      </Fade>
-      <Fade key={6} fraction={0.05}>
-        <Prefooter />
-      </Fade>
+      <Why
+        title="Benefits"
+        heading="A platform uniquely tailored to address the needs of today’s streaming platforms."
+        reasons={benefitsListItems}
+      />
+      <Why
+        title="Features"
+        backgroundColor="$loContrast"
+        heading="Feature-rich, high quality streaming and on-demand video for your project."
+        reasons={featuresListItems}
+      />
+
+      <Investors />
+      <Testimonials />
+      <Contact />
+      <Prefooter />
     </Layout>
   );
 };

@@ -38,7 +38,7 @@ const JSONHighlighter = ({ json, className }: Props) => {
           cls = "null";
         }
         return `<span style="color: ${
-          cls === "number" ? "#943CFF" : "black"
+          cls === "number" ? "#6e56cf" : "black"
         }" >${match}</span>`;
       }
     );

@@ -1,6 +1,4 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import { Text, Box, IconButton } from "@theme-ui/components";
+import { Text, Box } from "@livepeer.com/design-system";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { forwardRef, useRef, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
@@ -50,15 +48,18 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
   return (
     <Box
       ref={ref}
-      sx={{
+      css={{
         width: "100%",
         mx: "auto",
         overflow: "hidden",
-        borderRadius: ["4vw", null, null, "36px"],
+        borderRadius: "4vw",
+        "@bp3": {
+          borderRadius: "36px",
+        },
       }}>
-      <Box as="figure" sx={{ width: "100%", position: "relative" }}>
+      <Box as="figure" css={{ width: "100%", position: "relative" }}>
         <Box
-          sx={{
+          css={{
             position: "absolute",
             top: 0,
             left: 0,
@@ -80,7 +81,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             onEnded={() => onVideoEnded(i)}
             key={`video-swapper-item-${i}`}
             ref={(el) => (videosRef.current[i] = el)}
-            sx={{
+            css={{
               position: "absolute",
               top: 0,
               left: 0,
@@ -98,64 +99,64 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           />
         ))}
         <Box
-          sx={{
+          css={{
             position: "absolute",
-            top: 3,
-            left: 3,
+            top: "$3",
+            left: "$3",
             display: "flex",
             alignItems: "center",
             width: "fit-content",
           }}>
           <Text
-            sx={{
-              bg: "primary",
+            css={{
+              backgroundColor: "$violet9",
               borderRadius: 24,
               textTransform: "uppercase",
               fontWeight: "bold",
-              color: "background",
-              px: 2,
-              py: 1,
-              mr: 2,
+              color: "$loContrast",
+              px: "$2",
+              py: "$1",
+              mr: "$2",
             }}>
             Live
           </Text>
           <Text
-            sx={{
+            css={{
               display: "flex",
               alignItems: "center",
               fontWeight: "bold",
               borderRadius: 24,
-              px: 2,
-              py: 1,
-              color: "background",
+              px: "$2",
+              py: "$1",
+              color: "$panel",
               bg: "rgba(0,0,0,0.5)",
             }}>
-            <Box as="i" sx={{ display: "flex", alignItems: "center", mr: 1 }}>
+            <Box as="i" css={{ display: "flex", alignItems: "center", mr: 1 }}>
               <FiEye />
             </Box>
             {currentVideo !== undefined ? videos[currentVideo].views : "..."}
           </Text>
         </Box>
         <Box
-          sx={{
+          css={{
             position: "absolute",
-            bottom: 3,
-            left: 3,
-            right: 3,
+            bottom: "$3",
+            left: "$3",
+            right: "$3",
             display: "flex",
             alignItems: "center",
           }}>
           <Box
             as="input"
             placeholder="Write a comment..."
-            sx={{
+            css={{
               borderRadius: 24,
               width: "100%",
-              bg: "rgba(0,0,0,0.5)",
-              mr: 3,
-              px: 3,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              mr: "$5",
+              px: "$5",
               height: "42px",
-              color: "background",
+              color: "$panel",
               fontSize: "14px",
               "&:placeholder": {
                 color: "#CDCDCD",
@@ -163,15 +164,15 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               "&:focus": {
                 outline: "none",
                 boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                borderColor: "primary",
+                borderColor: "$violet9",
               },
             }}
           />
-          <IconButton
-            sx={{
+          <Box
+            css={{
               background: "linear-gradient(180deg, #BD90F2 0%, #6e56cf 100%)",
               borderRadius: "50%",
-              color: "background",
+              color: "$mauve7",
               height: "42px",
               width: "42px",
               minWidth: "42px",
@@ -180,12 +181,12 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               justifyContent: "center",
             }}>
             <FiHeart />
-          </IconButton>
+          </Box>
         </Box>
       </Box>
       <Box
         id="background-gradient"
-        sx={{
+        css={{
           width: "100%",
           position: "absolute",
           background:

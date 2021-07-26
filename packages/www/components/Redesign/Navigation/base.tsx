@@ -57,7 +57,7 @@ const NavigationBase = ({
   }, [token]);
 
   return (
-    <Box>
+    <Box css={{ position: "relative" }}>
       {!hideGuides && <Guides backgroundColor="$loContrast" />}
       <Box
         css={{
@@ -107,9 +107,7 @@ const NavigationBase = ({
                 width: "100%",
                 justifyContent: "center",
                 ai: "center",
-                "@bp1": {
-                  display: "none",
-                },
+                display: "none",
                 "@bp2": {
                   display: "flex",
                 },
@@ -135,9 +133,7 @@ const NavigationBase = ({
             </Flex>
             <Flex
               css={{
-                "@bp1": {
-                  display: "none",
-                },
+                display: "none",
                 "@bp2": {
                   display: "flex",
                 },

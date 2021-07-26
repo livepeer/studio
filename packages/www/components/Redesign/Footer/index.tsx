@@ -97,17 +97,41 @@ const Footer = ({ hideGuides = false }) => {
   };
 
   return (
-    <Box css={{ position: "relative" }}>
+    <Box
+      css={{
+        position: "relative",
+        "&:after": {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "1px",
+          margin: 0,
+          border: "none",
+          background:
+            "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)",
+          backgroundSize: "8px 1px",
+          content: '""',
+        },
+      }}>
       {!hideGuides && <Guides backgroundColor="$loContrast" />}
       <Box css={{ position: "relative", py: 120 }}>
-        <Container size="3" css={{ px: "$4", width: "100%" }}>
+        <Container size="3" css={{ px: 0, width: "100%" }}>
           <Grid
             gap={6}
             css={{
-              grid: "1fr/repeat(4,1fr)",
+              px: "$6",
               ai: "flex-start",
               justifyContent: "center",
               textAlign: "left",
+              gridTemplateColumns: "repeat(1,1fr)",
+              "@bp1": {
+                gridTemplateColumns: "repeat(2,1fr)",
+              },
+              "@bp3": {
+                px: "$3",
+                gridTemplateColumns: "repeat(4,1fr)",
+              },
             }}>
             <Box
               as="form"

@@ -84,6 +84,15 @@ const StyledTextField = styled(DEFAULT_TAG, {
           fontSize: "$3",
         },
       },
+      "3": {
+        borderRadius: "$2",
+        height: "$7",
+        fontSize: "$3",
+        px: "$2",
+        "&:-webkit-autofill::first-line": {
+          fontSize: "$3",
+        },
+      },
     },
     variant: {
       ghost: {

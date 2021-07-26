@@ -34,7 +34,11 @@ const UseCase = ({ hero, why, caseStudy, preview }) => {
         description={hero.description}
         image={hero.image.asset.url}
       />
-      <Why heading={why.heading} reasons={why.reasons} />
+      <Why
+        title="Why Livepeer.com"
+        heading={why.heading}
+        reasons={why.reasons}
+      />
       <CaseStudy
         heading={caseStudy.heading}
         about={caseStudy.about}

@@ -56,7 +56,7 @@ const MobileContainer = () => {
             display: "Sign up",
             href: "",
             color: "white",
-            bg: "#943CFF",
+            bg: "#6e56cf",
           }}>
           <Box sx={{ mt: "20px" }}>
             <PricingCardContent>
@@ -134,7 +134,7 @@ const MobileContainer = () => {
           className="keen-slider__slide"
           pricingTitle="Pro"
           pricingDescription="Pay as you go"
-          cardBg="#943CFF"
+          cardBg="#6e56cf"
           btn={{
             display: "Sign up",
             href: "/register?selectedPlan=1",
@@ -249,7 +249,7 @@ const MobileContainer = () => {
             display: "Contact us",
             href: "",
             color: "white",
-            bg: "#943CFF",
+            bg: "#6e56cf",
           }}>
           <Box sx={{ mt: "20px" }}>
             <PricingCardContent color="white" customPricing>
@@ -306,7 +306,7 @@ const MobileContainer = () => {
               width: "12px",
               height: "12px",
               borderRadius: "50%",
-              background: currentSlide === slide ? "#943CFF" : "#CCCCCC",
+              background: currentSlide === slide ? "#6e56cf" : "#CCCCCC",
               mr: "15px",
               ":last-child": {
                 mr: "0",
@@ -417,7 +417,7 @@ const DesktopContainer = () => {
           display: "Sign up",
           href: "/register",
           color: "white",
-          bg: "#943CFF",
+          bg: "#6e56cf",
         }}>
         <Box sx={{ mt: "20px" }}>
           <PricingCardContent>
@@ -466,7 +466,7 @@ const DesktopContainer = () => {
       <PricingCard
         pricingTitle="Pro"
         pricingDescription="Pay as you go"
-        cardBg="#943CFF"
+        cardBg="#6e56cf"
         btn={{
           display: "Sign up",
           href: "",
@@ -553,7 +553,7 @@ const DesktopContainer = () => {
           display: "Contact us",
           href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
           color: "white",
-          bg: "#943CFF",
+          bg: "#6e56cf",
         }}>
         <Box sx={{ mt: "20px" }}>
           <PricingCardContent color="white" customPricing />

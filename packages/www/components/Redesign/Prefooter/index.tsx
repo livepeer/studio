@@ -11,9 +11,18 @@ import Guides from "components/Redesign/Guides";
 import Link from "next/link";
 
 const Prefooter = () => (
-  <Box>
+  <Box css={{ position: "relative" }}>
     <Guides backgroundColor="$panel" />
-    <Container size="3" css={{ px: "$4", py: 120, width: "100%" }}>
+    <Container
+      size="3"
+      css={{
+        px: "$6",
+        py: 120,
+        width: "100%",
+        "@bp3": {
+          px: "$3",
+        },
+      }}>
       <Box
         css={{
           px: 40,

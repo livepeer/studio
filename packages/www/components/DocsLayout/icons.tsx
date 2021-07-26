@@ -41,7 +41,7 @@ const IconHouse = ({ id }: IconProps) => {
           x2="24"
           y2="0"
           gradientUnits="userSpaceOnUse">
-          <stop stopColor="#943CFF" />
+          <stop stopColor="#6e56cf" />
           <stop offset="1" stopColor="#C57CFF" />
         </linearGradient>
       </defs>

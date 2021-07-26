@@ -142,10 +142,10 @@ const Layout = ({
                       Preview Mode
                     </Box>
                   )}
-                  {customNav ? customNav : <DefaultNav hideGuides />}
+                  {customNav ? customNav : <DefaultNav />}
                   <Box css={{ position: "relative" }}>{children}</Box>
                 </Flex>
-                <Footer hideGuides />
+                <Footer />
               </Flex>
             </Box>
           </MarkdownProvider>

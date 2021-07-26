@@ -69,7 +69,7 @@ const CalculatorItem = ({
     (e) => {
       const { value, min, max } = e.target;
       const realValue = ((value - min) / (max - min)) * 100;
-      e.target.style.background = `linear-gradient(to right, #943CFF ${realValue}%, #E1E1E1 0%)`;
+      e.target.style.background = `linear-gradient(to right, #6e56cf ${realValue}%, #E1E1E1 0%)`;
     },
     [value, min, max]
   );
@@ -125,7 +125,7 @@ const CalculatorItem = ({
               width: ["16px", "12px"],
               height: ["16px", "12px"],
               borderRadius: "12px",
-              background: "#943CFF",
+              background: "#6e56cf",
               cursor: "grabbing",
             },
           }}
@@ -161,7 +161,7 @@ const ScaleCalculator = ({
         justifyContent: "center",
         border: "1px solid #E6E6E6",
         boxSizing: "border-box",
-        background: percentageWatched === value ? "#943CFF" : "#FBFBFB",
+        background: percentageWatched === value ? "#6e56cf" : "#FBFBFB",
         cursor: "pointer",
         transition: "all 0.2s",
         "&:hover": {
@@ -698,7 +698,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             letterSpacing: "-0.03em",
             height: "56px",
             cursor: streaming + transcoding === 0 ? "not-allowed" : "pointer",
-            background: streaming + transcoding === 0 ? "#CCCCCC" : "#943CFF",
+            background: streaming + transcoding === 0 ? "#CCCCCC" : "#6e56cf",
             borderRadius: "6px",
             mt: "10px",
             transition: "all 0.2s",
