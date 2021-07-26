@@ -124,7 +124,7 @@ const StyledTextField = styled(DEFAULT_TAG, {
           },
         },
         "&:focus": {
-          backgroundColor: "$white",
+          backgroundColor: "white",
           boxShadow:
             "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
         },

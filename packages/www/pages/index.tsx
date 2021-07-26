@@ -51,14 +51,23 @@ const featuresListItems = [
       provider: "fi",
       name: "FiCode",
     },
-    title: "Transcoding",
+    title: "Easy-to-use API",
+    description:
+      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
+  },
+  {
+    icon: {
+      provider: "fa",
+      name: "FaVideo",
+    },
+    title: "Affordable transcoding",
     description:
       "High quality, reliable transcoding at a cost that makes running a video centric UGC platform with millions of content creators viable.",
   },
   {
     icon: {
-      provider: "fi",
-      name: "FiPlayCircle",
+      provider: "fa",
+      name: "FaRobot",
     },
     title: "Smart video",
     description:
@@ -72,15 +81,6 @@ const featuresListItems = [
     title: "Interactivity",
     description:
       "Key features to enable interactive use cases that drive engagement on UGC platforms including low latency and object detection.",
-  },
-  {
-    icon: {
-      provider: "fi",
-      name: "FiGlobe",
-    },
-    title: "Integration API",
-    description:
-      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
   },
 ];
 
