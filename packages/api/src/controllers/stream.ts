@@ -1388,6 +1388,12 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
   }
 
+  console.log(
+    `StreamHookResponse id=${manifestID} profiles=${JSON.stringify(
+      stream.profiles
+    )}`
+  );
+
   res.json({
     manifestID,
     presets: stream.presets,
