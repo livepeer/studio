@@ -51,7 +51,10 @@ const ContactPage = () => {
           css={{ py: 88, px: 0, width: "100%", position: "relative" }}>
           <Box
             css={{
-              px: "$3",
+              px: "$6",
+              "@bp3": {
+                px: "$3",
+              },
             }}>
             <Box css={{ mb: 48, textAlign: "center" }}>
               <Box
