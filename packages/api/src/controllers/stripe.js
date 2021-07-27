@@ -2,6 +2,7 @@ import Router from "express/lib/router";
 import { db } from "../store";
 import Stripe from "stripe";
 import { products } from "../config";
+import sql from "sql-template-strings";
 
 const app = Router();
 const endpointSecret = process.env.LP_STRIPE_WEBHOOK_SECRET;
@@ -86,8 +87,11 @@ app.post("/migrate-users", async (req, res) => {
   }
 
   const [users] = await db.user.find(
-    {},
-    { limit: 9999999999, useReplica: false }
+    [sql`users.data->>'stripeCustomerId' IS NULL`],
+    {
+      limit: 9999999999,
+      useReplica: false,
+    }
   );
 
   for (let index = 0; index < users.length; index++) {
@@ -127,6 +131,7 @@ app.post("/migrate-users", async (req, res) => {
       await sleep(200);
     }
   }
+
   res.json(users);
 });
 
