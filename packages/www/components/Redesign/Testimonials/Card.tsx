@@ -35,9 +35,6 @@ const Card = ({ id, quote, author }: CardProps) => (
       alt={`${id} logo`}
       className="lazyload"
       src={`/img/testimonials/${id}/logo.svg`}
-      css={{
-        filter: "grayscale(1)",
-      }}
     />
     <Text variant="gray" css={{ fontWeight: 400, my: "$5" }}>
       "{quote}"

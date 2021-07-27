@@ -19,7 +19,7 @@ const benefitsListItems = [
   {
     icon: {
       provider: "fi",
-      name: "FiPlay",
+      name: "FiSmile",
     },
     title: "Reliable",
     description:
@@ -28,7 +28,7 @@ const benefitsListItems = [
   {
     icon: {
       provider: "fi",
-      name: "FiMaximize2",
+      name: "FiMove",
     },
     title: "Scalable",
     description:
@@ -36,8 +36,8 @@ const benefitsListItems = [
   },
   {
     icon: {
-      provider: "fi",
-      name: "FiZap",
+      provider: "mdi",
+      name: "MdMoneyOff",
     },
     title: "Affordable",
     description:
@@ -58,7 +58,7 @@ const featuresListItems = [
   {
     icon: {
       provider: "fa",
-      name: "FaVideo",
+      name: "FaPhotoVideo",
     },
     title: "Affordable transcoding",
     description:
@@ -75,8 +75,8 @@ const featuresListItems = [
   },
   {
     icon: {
-      provider: "fi",
-      name: "FiCheckSquare",
+      provider: "mdi",
+      name: "MdLocationSearching",
     },
     title: "Interactivity",
     description:
