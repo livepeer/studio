@@ -16,6 +16,7 @@ import Router from "next/router";
 import { useEffect } from "react";
 import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
+import Head from "next/head";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -106,6 +107,9 @@ function DashboardLayout({
     <>
       {requireLoggedIn && <DashboardRedirect />}
       <ContextProviders>
+        <Head>
+          <meta name="viewport" content="width=1023" />
+        </Head>
         <Sidebar id={id} />
         <Box css={{ pl: 270, width: "100%" }}>
           <Header breadcrumbs={breadcrumbs} />
