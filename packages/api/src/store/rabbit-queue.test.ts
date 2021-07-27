@@ -22,7 +22,7 @@ describe("Queue", () => {
 
   it("should be able to emit events and catch it via default consumer", async () => {
     await queue.consume("events", queue.handleMessage.bind(queue));
-    await queue.emit({
+    await queue.publish("events.test",{
       id: "abc123",
       createdAt: Date.now(),
       channel: "test.channel",
@@ -48,7 +48,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.emit({
+    await queue.publish("events.test", {
       id: "custom_msg",
       createdAt: Date.now(),
       channel: "test.channel",
@@ -75,7 +75,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedEmit(
+    await queue.delayedPublish("events.recording",
       {
         id: "delayedMsg",
         createdAt: Date.now(),
@@ -109,7 +109,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedEmit(
+    await queue.delayedPublish("events.recording",
       {
         id: "delayedMsg2",
         createdAt: Date.now(),

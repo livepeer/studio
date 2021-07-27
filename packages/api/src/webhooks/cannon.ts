@@ -55,7 +55,7 @@ export default class WebhookCannon {
 
   async start() {
     console.log("WEBHOOK CANNON STARTED");
-    await this.queue.consume("webhooks", this.handleQueueMsg.bind(this));
+    await this.queue.consume("webhooks", this.handleWebhookQueue.bind(this));
     await this.queue.consume("events", this.handleEventsQueue.bind(this));
   }
 
@@ -92,9 +92,9 @@ export default class WebhookCannon {
       delete sanitized.streamKey;
   
       let user = await this.db.user.get(event.userId);
-      if (!user) {
+      if (!user || user.suspended) {
         // if user isn't found. don't fire the webhook, log an error
-        return console.error(
+        throw new Error(
           `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
         );
       }
@@ -121,7 +121,7 @@ export default class WebhookCannon {
     this.queue.ack(data);
   }
 
-  async handleQueueMsg(data: ConsumeMessage) {
+  async handleWebhookQueue(data: ConsumeMessage) {
     let message;
     try {
       message = JSON.parse(data.content.toString());
@@ -182,7 +182,7 @@ export default class WebhookCannon {
       status: "pending",
       retries: event.retries ? event.retries + 1 : 1,
     };
-    this.queue.delayedEmit(event, event.lastInterval);
+    this.queue.delayedPublish("webhooks.delayedEmits", event, event.lastInterval);
   }
 
   async _fireHook(

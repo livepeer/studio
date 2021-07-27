@@ -35,19 +35,13 @@ export default class MessageQueue {
       json: true,
       setup: async (channel: Channel) => {
         await Promise.all([
-          channel.assertQueue(this.queues.events),
-          // channel.assertQueue("delayedQueue", {
-          //   messageTtl: 5000,
-          //   deadLetterExchange: EXCHANGE_NAME
-          // }),
-          channel.assertQueue(this.queues.webhooks),
+          channel.assertQueue(this.queues.events, {durable: true}),
+          channel.assertQueue(this.queues.webhooks, {durable: true}),
           channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
           channel.bindQueue(this.queues.events, EXCHANGE_NAME, "events.#"),
           channel.bindQueue(this.queues.webhooks, EXCHANGE_NAME, "webhooks.#"),
           channel.prefetch(1),
-          // channel.consume(QUEUE_NAME, handleMessage)
         ]);
-        // return channel.assertQueue('rxQueueName', {durable: true});
       },
     });
   }
@@ -85,7 +79,7 @@ export default class MessageQueue {
     this.ack(data);
   }
 
-  public async emit(msg: Object): Promise<void> {
+  public async sendToQueue(msg: Object): Promise<void> {
     console.log("emitting ", msg);
     await this.channel.sendToQueue(QUEUE_NAME, msg);
   }
@@ -95,14 +89,13 @@ export default class MessageQueue {
     await this.channel.publish(EXCHANGE_NAME, route, msg);
   }
 
-  public async delayedEmit(msg: Object, delay: number): Promise<void> {
-    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
+  public async delayedPublish(routingKey: string, msg: Object, delay: number): Promise<void> {
     await this.channel.addSetup((channel: Channel) => {
       return Promise.all([
         channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
           messageTtl: delay,
           deadLetterExchange: EXCHANGE_NAME,
-          deadLetterRoutingKey: "webhooks.delayedEmits",
+          deadLetterRoutingKey: routingKey,
           expires: delay + 15000,
         }),
       ]);
