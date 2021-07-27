@@ -73,7 +73,7 @@ const Menu = ({
         position: "fixed",
         top: "$3",
         left: "$3",
-        height: mobileMenuIsOpen ? "100vh" : 0,
+        height: mobileMenuIsOpen ? "auto" : 0,
         transition: "height .2s",
         borderRadius: "$3",
         overflow: "hidden",
@@ -97,7 +97,6 @@ const Menu = ({
           pt: "$6",
           display: "flex",
           flexDirection: "column",
-          height: `calc(100vh -70px)`,
           backgroundColor: "$panel",
         }}>
         <Flex css={{ flexDirection: "column" }}>
