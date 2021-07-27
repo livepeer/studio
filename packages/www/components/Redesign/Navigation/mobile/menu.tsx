@@ -80,6 +80,12 @@ const Menu = ({
         width: "calc(100% - $space$3 * 2)",
         zIndex: 1,
         visibility: mobileMenuIsOpen ? "visible" : "hidden",
+        background: mobileMenuIsOpen
+          ? "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)"
+          : "transparent",
+        boxShadow: mobileMenuIsOpen
+          ? "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.14)"
+          : "none",
       }}
       onClick={handleClick}>
       <Box

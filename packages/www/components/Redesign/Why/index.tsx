@@ -32,7 +32,14 @@ const Why = ({ backgroundColor = "$panel", title, heading, reasons }) => {
   return (
     <Box css={{ position: "relative" }}>
       <Guides backgroundColor={backgroundColor} />
-      <Box css={{ position: "relative", py: 120 }}>
+      <Box
+        css={{
+          position: "relative",
+          py: 60,
+          "@bp2": {
+            py: 120,
+          },
+        }}>
         <Container
           size="3"
           css={{

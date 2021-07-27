@@ -116,7 +116,7 @@ const StyledTextField = styled(DEFAULT_TAG, {
         },
       },
       white: {
-        boxShadow: "none",
+        boxShadow: "inset 0 0 0 1px $colors$mauve7",
         backgroundColor: "white",
         "@hover": {
           "&:hover": {

@@ -32,8 +32,11 @@ const Hero = ({ heading, description, image }) => {
             align="center"
             css={{
               mb: 100,
-              height: "calc(100vh - 180px)",
               width: "100%",
+              pt: 50,
+              "@bp2": {
+                height: "calc(100vh - 180px)",
+              },
             }}
             justify="between">
             <Flex direction="column" css={{ maxWidth: 700 }}>
@@ -48,6 +51,7 @@ const Hero = ({ heading, description, image }) => {
                   fontWeight: 700,
                   fontSize: "$8",
                   lineHeight: 1.3,
+                  color: "$hiContrast",
                   mb: "$6",
                   "@bp2": {
                     fontSize: "$9",
@@ -64,12 +68,12 @@ const Hero = ({ heading, description, image }) => {
                 {description}
               </Text>
               <Flex align="center">
-                <Link href="/dashboard" passHref>
+                <Link href="/contact" passHref>
                   <Button as="a" arrow css={{ mr: "$4" }}>
                     Get in touch
                   </Button>
                 </Link>
-                <ArrowLink href="/dashboard">Start now</ArrowLink>
+                <ArrowLink href="/register">Start now</ArrowLink>
               </Flex>
             </Flex>
             <Box

@@ -70,7 +70,13 @@ const Investors = () => {
                 src={`/img/investors/${id}.svg`}
                 alt={`${id} logo`}
                 className="lazyload"
-                css={{ justifySelf: "center" }}
+                css={{
+                  justifySelf: "center",
+                  mb: "$5",
+                  "@bp1": {
+                    mb: 0,
+                  },
+                }}
               />
             ))}
           </Grid>
