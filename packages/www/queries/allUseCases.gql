@@ -6,6 +6,12 @@ query allUseCase($where: UseCaseFilter) {
     slug {
       current
     }
+    openGraphImage {
+      asset {
+        altText
+        url
+      }
+    }
     hero {
       heading
       description

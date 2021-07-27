@@ -14,6 +14,7 @@ import imageUrlBuilder from "@sanity/image-url";
 const UseCase = ({
   title,
   description,
+  openGraphImage,
   hero,
   noindex = false,
   why,
@@ -44,7 +45,14 @@ const UseCase = ({
       title={`${title}`}
       description={description ? description : hero.description}
       noindex={noindex}
-      image={{ url: builder.image(hero.image).url(), alt: hero.image?.alt }}
+      image={
+        openGraphImage
+          ? {
+              url: builder.image(openGraphImage).url(),
+              alt: openGraphImage?.asset?.altText,
+            }
+          : null
+      }
       url={`https://livepeer.com${asPath}`}
       preview={preview}>
       <Hero
