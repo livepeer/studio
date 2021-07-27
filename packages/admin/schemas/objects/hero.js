@@ -9,9 +9,16 @@ export default {
       title: "Heading",
     },
     {
+      name: "description",
+      type: "text",
+      title: "Description",
+      rows: 3,
+    },
+    {
       name: "tagline",
       type: "string",
       title: "Tagline",
+      hidden: true,
     },
     {
       name: "centered",

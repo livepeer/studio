@@ -77,7 +77,7 @@ const Chart = ({ data }) => {
             cursor="pointer"
             type="monotone"
             dataKey="kbps"
-            stroke="#943CFF"
+            stroke="#6e56cf"
             strokeWidth="2px"
             fill="url(#colorKbps)"
           />

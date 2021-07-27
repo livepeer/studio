@@ -66,7 +66,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           width: "4px",
           height: "100%",
           transition: "all 0.2s",
-          background: isSelected ? "#943CFF" : "transparent",
+          background: isSelected ? "#6e56cf" : "transparent",
           borderRadius: " 0 2px 2px 0",
         }}
       />
@@ -132,7 +132,7 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
             sx={{
               fontSize: "14px",
               letterSpacing: "-0.02em",
-              color: currentPath === `/${child.slug}` ? "#943CFF" : "#777777",
+              color: currentPath === `/${child.slug}` ? "#6e56cf" : "#777777",
               ml: "48px !important",
               mt: "16px !important",
               transition: "all 0.2s",
@@ -191,7 +191,7 @@ const Menu = ({ menu }: MenuProps) => {
                     transition: "all 0.2s",
                     background:
                       currentPath === `/${route.slug}`
-                        ? "#943CFF"
+                        ? "#6e56cf"
                         : "transparent",
                     borderRadius: " 0 2px 2px 0",
                   }}

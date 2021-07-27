@@ -169,7 +169,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           />
           <IconButton
             sx={{
-              background: "linear-gradient(180deg, #BD90F2 0%, #943CFF 100%)",
+              background: "linear-gradient(180deg, #BD90F2 0%, #6e56cf 100%)",
               borderRadius: "50%",
               color: "background",
               height: "42px",

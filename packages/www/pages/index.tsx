@@ -1,77 +1,86 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Fade from "react-reveal/Fade";
 import Layout from "../layouts";
-import SectionLayout from "../components/SectionLayout";
-import IconListItem, { IconListItemProps } from "../components/IconListItem";
-import { Grid } from "@theme-ui/components";
-import {
-  FiUserCheck,
-  FiPlay,
-  FiZap,
-  FiMaximize2,
-  FiCode,
-  FiPlayCircle,
-  FiCheckSquare,
-  FiGlobe,
-} from "react-icons/fi";
-import Prefooter from "../components/Prefooter";
-import Hero from "../components/HomeHero";
-import InvestorsSection from "../components/InvestorsSection";
-import TestimonialsSection from "../components/TestimonialsSection";
-import ContactSection from "../components/ContactSection";
+import Prefooter from "components/Redesign/Prefooter";
+import Hero from "components/Redesign/HomeHero";
+import Investors from "components/Redesign/Investors";
+import Testimonials from "components/Redesign/Testimonials";
+import Contact from "components/Redesign/Contact";
+import Why from "components/Redesign/Why";
 
-const benefitsListItems: IconListItemProps[] = [
+const benefitsListItems = [
   {
-    icon: <FiUserCheck />,
+    icon: {
+      provider: "fi",
+      name: "FiUserCheck",
+    },
     title: "Easy to use",
     description:
       "Our straight forward API’s make integrating Livepeer.com into your UGC platform a quick and easy task.",
   },
   {
-    icon: <FiPlay />,
+    icon: {
+      provider: "fi",
+      name: "FiSmile",
+    },
     title: "Reliable",
     description:
       "Ensure content creator audiences remain engaged by delivering high quality streams with 99.99% reliability.",
   },
   {
-    icon: <FiMaximize2 />,
+    icon: {
+      provider: "fi",
+      name: "FiMove",
+    },
     title: "Scalable",
     description:
       "Freedom to scale up or down so you can manage content creator demand without over investing in infrastructure.",
   },
   {
-    icon: <FiZap />,
+    icon: {
+      provider: "mdi",
+      name: "MdMoneyOff",
+    },
     title: "Affordable",
     description:
       "Live Streaming at a fraction of the cost of comparable services.",
   },
 ];
 
-const featuresListItems: IconListItemProps[] = [
+const featuresListItems = [
   {
-    icon: <FiCode />,
-    title: "Transcoding",
+    icon: {
+      provider: "fi",
+      name: "FiCode",
+    },
+    title: "Easy-to-use API",
+    description:
+      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
+  },
+  {
+    icon: {
+      provider: "fa",
+      name: "FaPhotoVideo",
+    },
+    title: "Affordable transcoding",
     description:
       "High quality, reliable transcoding at a cost that makes running a video centric UGC platform with millions of content creators viable.",
   },
   {
-    icon: <FiPlayCircle />,
+    icon: {
+      provider: "fa",
+      name: "FaRobot",
+    },
     title: "Smart video",
     description:
       "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running UGC platforms.",
   },
   {
-    icon: <FiCheckSquare />,
+    icon: {
+      provider: "mdi",
+      name: "MdLocationSearching",
+    },
     title: "Interactivity",
     description:
       "Key features to enable interactive use cases that drive engagement on UGC platforms including low latency and object detection.",
-  },
-  {
-    icon: <FiGlobe />,
-    title: "Integration API",
-    description:
-      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
   },
 ];
 
@@ -80,67 +89,24 @@ const HomePage = () => {
     <Layout
       title={`Home - Livepeer.com`}
       description={`The platform built to power video-centric UGC applications at scale.`}
-      url={`https://livepeer.com`}
-      withGradientBackground>
-      {/* Do not wrap the <Hero /> in <Fade />. It completely breaks in Safari */}
+      url={`https://livepeer.com`}>
       <Hero />
-      <Fade key={1} fraction={0.05}>
-        <SectionLayout
-          heading={{
-            title:
-              "A platform uniquely tailored to address the needs of today’s video-centric UGC platforms",
-            tag: "Benefits",
-            cta: {
-              isLink: true,
-              href: "/register",
-              children: "Sign up for free",
-            },
-          }}
-          gradient="colorful">
-          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-            {benefitsListItems.map((item) => (
-              <IconListItem
-                key={`benefits-list-item-${item.title}`}
-                {...item}
-              />
-            ))}
-          </Grid>
-        </SectionLayout>
-      </Fade>
-      <Fade key={2} fraction={0.05}>
-        <SectionLayout
-          heading={{
-            title:
-              "Feature-rich, high quality streaming and on-demand video for your project",
-            tag: "Features",
-            cta: {
-              isLink: true,
-              href: "/register",
-              children: "Sign up for free",
-            },
-          }}>
-          <Grid columns={[1, 2]} sx={{ columnGap: 4, rowGap: 5 }}>
-            {featuresListItems.map((item) => (
-              <IconListItem
-                key={`features-list-item-${item.title}`}
-                {...item}
-              />
-            ))}
-          </Grid>
-        </SectionLayout>
-      </Fade>
-      <Fade key={3} fraction={0.05}>
-        <InvestorsSection />
-      </Fade>
-      <Fade key={4} fraction={0.05}>
-        <TestimonialsSection />
-      </Fade>
-      <Fade key={5} fraction={0.05}>
-        <ContactSection />
-      </Fade>
-      <Fade key={6} fraction={0.05}>
-        <Prefooter />
-      </Fade>
+      <Why
+        title="Benefits"
+        heading="A platform uniquely tailored to address the needs of today’s streaming platforms."
+        reasons={benefitsListItems}
+      />
+      <Why
+        title="Features"
+        backgroundColor="$loContrast"
+        heading="Feature-rich, high quality streaming and on-demand video for your project."
+        reasons={featuresListItems}
+      />
+
+      <Investors />
+      <Testimonials />
+      <Contact />
+      <Prefooter />
     </Layout>
   );
 };

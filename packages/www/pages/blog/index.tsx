@@ -9,10 +9,10 @@ import allPosts from "../../queries/allPosts.gql";
 import { Container, Flex, Box, Link as A, Spinner } from "@theme-ui/components";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import BlogPostCard from "../../components/cards/BlogPost";
+import BlogPostCard from "components/cards/BlogPost";
 import { Grid } from "@theme-ui/components";
-import Prefooter from "../../components/Prefooter";
-import FeaturedBlogPostCard from "../../components/cards/FeaturedBlogPost";
+import Prefooter from "components/Redesign/Prefooter";
+import FeaturedBlogPostCard from "components/cards/FeaturedBlogPost";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -51,8 +51,7 @@ const BlogIndex = ({ categories, posts }) => {
         slug ? capitalizeFirstLetter(slug) + " Category - " : ""
       }Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
-      url={`https://livepeer.com${asPath}`}
-      withGradientBackground>
+      url={`https://livepeer.com${asPath}`}>
       <Container variant="hero">
         <Box as="h1" sx={{ variant: "text.heading.hero" }}>
           Blog

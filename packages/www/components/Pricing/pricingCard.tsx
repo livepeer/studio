@@ -31,7 +31,7 @@ const CheckIcon = () => {
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M20 6L9 17L4 12"
-        stroke="#943CFF"
+        stroke="#6e56cf"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

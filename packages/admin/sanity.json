@@ -22,7 +22,8 @@
     "markdown",
     "@sanity/code-input",
     "mux-input",
-    "seo-tools"
+    "seo-tools",
+    "icon-picker"
   ],
   "parts": [
     {

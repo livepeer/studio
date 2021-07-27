@@ -22,7 +22,6 @@ import { TextArea } from "@modulz/design-system";
 import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hubspot";
 import { useApi } from "hooks";
-import { useRouter } from "next/router";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",

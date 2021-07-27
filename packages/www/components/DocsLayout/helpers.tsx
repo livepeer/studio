@@ -62,7 +62,7 @@ const NavigationCard = ({ title, href, label }: CardProps) => {
           <span className={s.navigationCardLinkLabel}>
             {label ?? "Read guide"}
           </span>
-          <BsArrowRightShort color="#943CFF" size={22} />
+          <BsArrowRightShort color="#6e56cf" size={22} />
         </div>
       </a>
     </Link>
