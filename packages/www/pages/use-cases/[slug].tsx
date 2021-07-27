@@ -57,15 +57,17 @@ const UseCase = ({
         heading={why.heading}
         reasons={why.reasons}
       />
-      <CaseStudy
-        heading={caseStudy.heading}
-        about={caseStudy.about}
-        problem={caseStudy.problem}
-        solution={caseStudy.solution}
-        image={caseStudy.image?.asset.url}
-        testimonial={caseStudy?.testimonial}
-        internalLink={caseStudy.internalLink}
-      />
+      {caseStudy.heading && (
+        <CaseStudy
+          heading={caseStudy.heading}
+          about={caseStudy.about}
+          problem={caseStudy.problem}
+          solution={caseStudy.solution}
+          image={caseStudy.image?.asset.url}
+          testimonial={caseStudy?.testimonial}
+          internalLink={caseStudy.internalLink}
+        />
+      )}
       <Prefooter />
     </Layout>
   );
