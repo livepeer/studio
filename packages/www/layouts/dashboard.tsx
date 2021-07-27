@@ -94,8 +94,10 @@ function DashboardLayout({
   requireLoggedIn = true,
 }: Props) {
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname + window.location.search);
-    hotjar.initialize(2525106, 6);
+    if (process.env.NODE_ENV === "production") {
+      ReactGA.pageview(window.location.pathname + window.location.search);
+      hotjar.initialize(2525106, 6);
+    }
   }, []);
 
   globalStyles();
