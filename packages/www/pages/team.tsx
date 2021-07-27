@@ -18,8 +18,7 @@ const TeamPage = ({ content }) => {
       title={`Team - Livepeer.com`}
       description={`We’re building the future of video infrastructure services.`}
       url={`https://livepeer.com/team`}
-      canonical={`https://livepeer.com/team`}
-      withGradientBackground>
+      canonical={`https://livepeer.com/team`}>
       <Container variant="hero">
         <Box as="h1" sx={{ variant: "text.heading.hero" }}>
           We’re building the future of video infrastructure services.

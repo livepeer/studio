@@ -13,6 +13,7 @@ import Footer from "components/Redesign/Footer";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
+import { NextSeo } from "next-seo";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -58,7 +59,13 @@ const globalStyles = global({
 });
 
 interface Props {
+  title?: string;
   children?: JSX.Element[] | JSX.Element;
+  description?: string;
+  image?: any;
+  url?: string;
+  canonical?: string;
+  noindex?: boolean;
   preview?: boolean;
 }
 
@@ -76,12 +83,46 @@ function ContextProviders({ children }) {
   );
 }
 
-function Layout({ children, preview }: Props) {
+function Layout({
+  title,
+  description,
+  children,
+  image,
+  url,
+  canonical,
+  noindex = false,
+  preview = false,
+}: Props) {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
 
   globalStyles();
+
+  let seo = {
+    title: title,
+    description: description,
+    noindex: noindex,
+    openGraph: {
+      title: title ? title : "Livepeer.com",
+      description: description
+        ? description
+        : "The platform built to power video-centric UGC applications at scale.",
+      url: url ? url : "https://livepeer.com",
+      images: [
+        {
+          url: image ? image.url : "https://livepeer.com/img/OG.png",
+          alt: image ? image.alt : "Livepeer.com",
+          width: 1200,
+          height: 642,
+        },
+      ],
+    },
+  };
+
+  if (canonical) {
+    seo["canonical"] = canonical;
+  }
 
   return (
     <ContextProviders>
@@ -94,6 +135,7 @@ function Layout({ children, preview }: Props) {
           position: "relative",
           overflow: "hidden",
         }}>
+        <NextSeo {...seo} />
         {preview && (
           <Box
             css={{

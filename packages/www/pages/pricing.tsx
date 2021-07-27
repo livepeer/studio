@@ -11,8 +11,7 @@ const Pricing = () => {
     <Layout
       title={`Pricing - Livepeer.com`}
       description={`Flexible pricing for projects of all sizes.`}
-      url={`https://livepeer.com`}
-      withGradientBackground>
+      url={`https://livepeer.com`}>
       <Container sx={{ display: "flex", flexDirection: "column" }}>
         <Box sx={{ pt: 5, pb: [0, 0, 0, 5], textAlign: "center" }}>
           <Heading

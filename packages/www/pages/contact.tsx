@@ -43,8 +43,7 @@ const ContactPage = () => {
     <Layout
       title={`Contact - Livepeer.com`}
       description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com/contact`}
-      withGradientBackground>
+      url={`https://livepeer.com/contact`}>
       <Box css={{ position: "relative" }}>
         <Guides backgroundColor="white" />
         <Container

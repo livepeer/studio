@@ -21,7 +21,7 @@ const Tabs = ({ tabs }: TabsProps) => {
         display: "flex",
         alignItems: "center",
         width: "100%",
-        mt: 2,
+        mt: 4,
         mx: "auto",
         position: "relative",
         borderBottom: "1px solid",

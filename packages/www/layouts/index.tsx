@@ -29,7 +29,6 @@ interface Props {
   canonical?: string;
   noindex?: boolean;
   preview?: boolean;
-  withGradientBackground?: boolean;
   customNav?: React.ReactNode;
 }
 
@@ -58,7 +57,6 @@ const Layout = ({
   canonical,
   noindex = false,
   preview = false,
-  withGradientBackground,
   customNav,
 }: Props) => {
   useEffect(() => {

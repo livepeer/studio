@@ -12,15 +12,15 @@ import readingTime from "reading-time";
 import { useRouter } from "next/router";
 import { Spinner } from "@theme-ui/components";
 import React from "react";
-import BlogPostImage from "../../components/renderers/BlogPostImage";
+import BlogPostImage from "components/renderers/BlogPostImage";
 import { Grid } from "@theme-ui/components";
-import BlogPostCard from "../../components/cards/BlogPost";
-import Prefooter from "../../components/Prefooter";
+import BlogPostCard from "components/cards/BlogPost";
+import Prefooter from "components/Redesign/Prefooter";
 import Link from "next/link";
 import BlockContent from "@sanity/block-content-to-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { blocksToText } from "../../lib/utils";
-import Player from "../../components/BlogVideoPlayer";
+import Player from "components/BlogVideoPlayer";
 
 const serializers = {
   types: {

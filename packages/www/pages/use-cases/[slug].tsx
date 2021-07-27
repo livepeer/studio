@@ -8,10 +8,22 @@ import { print } from "graphql/language/printer";
 import allUseCases from "../../queries/allUseCases.gql";
 import { useRouter } from "next/router";
 import { Box } from "@livepeer.com/design-system";
+import client from "../../lib/client";
+import imageUrlBuilder from "@sanity/image-url";
 
-const UseCase = ({ hero, why, caseStudy, preview }) => {
-  const router = useRouter();
-  if (router.isFallback) {
+const UseCase = ({
+  title,
+  description,
+  hero,
+  noindex = false,
+  why,
+  caseStudy,
+  preview,
+}) => {
+  const { isFallback, asPath } = useRouter();
+  const builder = imageUrlBuilder(client);
+
+  if (isFallback) {
     return (
       <Layout>
         <Box
@@ -28,7 +40,13 @@ const UseCase = ({ hero, why, caseStudy, preview }) => {
   }
 
   return (
-    <Layout preview={preview}>
+    <Layout
+      title={`${title}`}
+      description={description ? description : hero.description}
+      noindex={noindex}
+      image={{ url: builder.image(hero.image).url(), alt: hero.image?.alt }}
+      url={`https://livepeer.com${asPath}`}
+      preview={preview}>
       <Hero
         heading={hero.heading}
         description={hero.description}

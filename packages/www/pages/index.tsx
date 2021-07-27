@@ -89,8 +89,7 @@ const HomePage = () => {
     <Layout
       title={`Home - Livepeer.com`}
       description={`The platform built to power video-centric UGC applications at scale.`}
-      url={`https://livepeer.com`}
-      withGradientBackground>
+      url={`https://livepeer.com`}>
       <Hero />
       <Why
         title="Benefits"
