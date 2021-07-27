@@ -6,6 +6,7 @@ const ArrowLink = ({
   hideArrow = false,
   color = "$hiContrast",
   children,
+  css = {},
 }) => {
   return (
     <Link href={href} passHref>
@@ -46,6 +47,7 @@ const ArrowLink = ({
               transform: "translateX(3px)",
             },
           },
+          ...css,
         }}>
         <Box>{children}</Box>
         <svg
