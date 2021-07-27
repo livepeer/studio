@@ -14,6 +14,7 @@ import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
 import { NextSeo } from "next-seo";
+import { hotjar } from "react-hotjar";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -95,6 +96,7 @@ function Layout({
 }: Props) {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    hotjar.initialize(2525106, 6);
   }, []);
 
   globalStyles();

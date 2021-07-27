@@ -20,6 +20,8 @@ import {
   DesignSystemProvider,
   SnackbarProvider,
 } from "@livepeer.com/design-system";
+import { hotjar } from "react-hotjar";
+
 interface Props {
   title?: string;
   children?: JSX.Element[] | JSX.Element;
@@ -61,7 +63,9 @@ const Layout = ({
 }: Props) => {
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    hotjar.initialize(2525106, 6);
   }, []);
+
   let seo = {
     title: title,
     description: description,
