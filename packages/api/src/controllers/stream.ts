@@ -306,6 +306,26 @@ function setRecordingStatus(
       session.recordingUrl = getRecordingUrl(ingest, session);
       session.mp4Url = getRecordingUrl(ingest, session, true);
     }
+
+    if (isReady) {
+      req.queue.emit({
+        id: uuid(),
+        createdAt: Date.now(),
+        channel: "webhooks",
+        event:  "recording.ready",
+        streamId: session.parentId,
+        userId: req.user.id,
+      })
+    } else {
+      req.queue.emit({
+        id: uuid(),
+        createdAt: Date.now(),
+        channel: "webhooks",
+        event:  "recording.waiting",
+        streamId: session.parentId,
+        userId: req.user.id,
+      })
+    }
   }
 }
 
@@ -894,26 +914,26 @@ app.put(
       userId: user.id,
     });
 
-  if (req.body.active === false && stream.record === true) {
-    // emit recording.started
-    req.queue.delayedEmit({
-      id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event:  "recording.ready",
-      streamId: id,
-      userId: user.id,
-    }, USER_SESSION_TIMEOUT)
-  } else if (req.body.active === true && stream.record === true) {
-    req.queue.emit({
-      id: uuid(),
-      createdAt: Date.now(),
-      channel: "webhooks",
-      event:  "recording.started",
-      streamId: id,
-      userId: user.id,
-    })
-  }
+  // if (req.body.active === false && stream.record === true) {
+  //   // emit recording.started
+  //   req.queue.delayedEmit({
+  //     id: uuid(),
+  //     createdAt: Date.now(),
+  //     channel: "webhooks",
+  //     event:  "recording.ready",
+  //     streamId: id,
+  //     userId: user.id,
+  //   }, USER_SESSION_TIMEOUT)
+  // } else if (req.body.active === true && stream.record === true) {
+  //   req.queue.emit({
+  //     id: uuid(),
+  //     createdAt: Date.now(),
+  //     channel: "webhooks",
+  //     event:  "recording.started",
+  //     streamId: id,
+  //     userId: user.id,
+  //   })
+  // }
     stream.isActive = !!req.body.active;
     stream.lastSeen = +new Date();
     const { ownRegion: region } = req.config;
