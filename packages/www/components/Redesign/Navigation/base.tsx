@@ -117,8 +117,6 @@ const NavigationBase = ({
             background:
               "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)",
             backgroundSize: "8px 1px",
-            boxShadow:
-              "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
             content: '""',
           },
           ...css,
