@@ -70,11 +70,11 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
               <Heading
                 size="3"
                 css={{
-                  maxWidth: 600,
+                  maxWidth: 520,
                   lineHeight: 1.4,
                   fontWeight: 700,
                   mb: "$6",
-                  mr: "$4",
+                  mr: "$6",
                   "@bp2": { lineHeight: 1.4, letterSpacing: "-1px" },
                 }}>
                 {heading}

@@ -5,6 +5,7 @@ import {
   Grid,
   Container,
   TextField,
+  Heading,
   TextArea,
   Link as A,
 } from "@livepeer.com/design-system";
@@ -48,18 +49,21 @@ const Contact = () => {
             },
           }}>
           <Box css={{ mb: 48, textAlign: "center" }}>
-            <Box
-              as="h2"
-              css={{ color: "$hiContrast", fontSize: "$8", mb: "$4" }}>
+            <Heading
+              css={{
+                fontWeight: 700,
+                color: "$hiContrast",
+                fontSize: "$8",
+                mb: "$5",
+              }}>
               Get in touch with us
-            </Box>
+            </Heading>
             <Text
               size="4"
               variant="gray"
               css={{ maxWidth: 512, margin: "0 auto" }}>
-              If you’d like to learn more about Livepeer.com's innovative UGC
-              focused video platform drop us a note and we’ll get right back to
-              you!
+              If you’d like to learn more about Livepeer.com's innovative video
+              streaming API drop us a note and we’ll get right back to you!
               <br />
               <br />
               or email us at{" "}
@@ -130,15 +134,13 @@ const Contact = () => {
             <TextArea
               size="3"
               id="message"
-              css={{ width: "100%" }}
+              css={{ width: "100%", boxSizing: "border-box" }}
               name="message"
               placeholder="Message*"
               required
             />
             <Box css={{ textAlign: "center" }}>
-              <Button
-                arrow
-                css={{ mx: "auto", mt: "$4", px: "$4", fontWeight: 700 }}>
+              <Button arrow css={{ mx: "auto", mt: "$4", px: "$4" }}>
                 Submit
               </Button>
 

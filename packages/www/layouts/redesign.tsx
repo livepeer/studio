@@ -70,13 +70,13 @@ interface Props {
   preview?: boolean;
 }
 
-function ContextProviders({ children }) {
+function ContextProviders({ theme, children }) {
   return (
     <DesignSystemProvider>
       <ThemeProvider
         disableTransitionOnChange
         attribute="class"
-        defaultTheme="dark"
+        defaultTheme={theme}
         value={{ dark: darkTheme.className, light: lightTheme.className }}>
         <SnackbarProvider>{children}</SnackbarProvider>
       </ThemeProvider>
@@ -129,7 +129,7 @@ function Layout({
   }
 
   return (
-    <ContextProviders>
+    <ContextProviders theme="dark">
       <Flex
         css={{
           flexGrow: 1,

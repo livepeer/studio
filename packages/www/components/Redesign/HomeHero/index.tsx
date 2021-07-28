@@ -1,5 +1,5 @@
 import {
-  TextField,
+  Link as A,
   Text,
   Flex,
   Container,
@@ -21,6 +21,9 @@ import {
 } from "./helpers";
 import { notchZIndex } from "./PhoneSvg";
 import Guides from "components/Redesign/Guides";
+import Link from "next/link";
+import ArrowLink from "components/Redesign/ArrowLink";
+import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 
 const HomeHero = ({ backgroundColor = "$loContrast" }) => {
   const router = useRouter();
@@ -108,94 +111,90 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
           css={{
             width: "100%",
             mb: "$4",
-            maxWidth: 1000,
+            maxWidth: 800,
             mx: "auto",
             pt: 48,
             textAlign: "center",
             "@bp2": {
-              pt: 100,
+              pt: 90,
             },
           }}>
-          <Box css={{ zIndex: notchZIndex + 1, position: "relative" }}>
+          <Box
+            css={{
+              zIndex: notchZIndex + 1,
+              position: "relative",
+            }}>
             <Box
               as="h2"
               css={{
                 color: "$hiContrast",
                 fontSize: 40,
-                lineHeight: 1.2,
-                mb: "$7",
+                lineHeight: 1.1,
+                mb: "$6",
+                mt: 0,
+                mx: "auto",
+                maxWidth: 600,
+                fontWeight: 700,
                 "@bp1": {
                   fontSize: 52,
-                  lineHeight: 1.2,
+                  lineHeight: 1.1,
                 },
                 "@bp2": {
-                  fontSize: 72,
-                  lineHeight: 1.2,
+                  fontSize: 64,
+                  lineHeight: 1.1,
                 },
               }}>
-              <Box>
-                <Box as="span" css={{ fontWeight: 400 }}>
-                  The platform built to power
-                </Box>
-                <br />
-                video-centric UGC applications at scale.
-              </Box>
+              Video development made easy.
             </Box>
-            <Box
-              as="form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                router.push(`/register?email=${encodeURIComponent(email)}`);
-              }}
-              css={{ mt: 5, px: "$3" }}>
-              <Flex
+            <Text
+              size="5"
+              css={{
+                lineHeight: 1.6,
+                mb: "$7",
+                maxWidth: 640,
+                mx: "auto",
+              }}>
+              Livepeer.com provides quick and reliable access to{" "}
+              <Box
+                href="https://livepeer.org"
+                target="_blank"
+                as={A}
                 css={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  width: "100%",
+                  display: "inline-flex",
                   alignItems: "center",
-                  "@bp2": {
-                    flexDirection: "row",
+                  textDecoration: "none !important",
+                  position: "relative",
+                  "&:after": {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    zIndex: -1,
+                    opacity: 0.5,
+                    backgroundClip: "text",
+                    background:
+                      "linear-gradient(to right, $colors$green11, $colors$green6)",
+                    width: "100%",
+                    height: " 100%",
                   },
                 }}>
-                <TextField
-                  variant="white"
-                  required
-                  type="email"
-                  value={email}
-                  placeholder="Enter your email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  css={{
-                    fontSize: "$3",
-                    py: "$5",
-                    px: "$4",
-                    borderRadius: 10,
-                    width: "100%",
-                    mb: "$3",
-                    "@bp2": {
-                      mb: 0,
-                      width: "320px",
-                    },
-                  }}
-                />
-                <Button
-                  arrow
-                  type="submit"
-                  css={{
-                    height: "48px",
-                    fontWeight: 600,
-                    ml: 0,
-                    px: "$4",
-                    width: "100%",
-                    "@bp2": {
-                      ml: "$3",
-                      width: "unset",
-                    },
-                  }}>
-                  Get started
+                <Text size="5" css={{ lineHeight: 1.2 }}>
+                  Livepeer
+                </Text>
+                <ArrowTopRightIcon />
+              </Box>
+              , the world's open video infrastructure, allowing you to focus on
+              building and scaling next generation video streaming platforms and
+              services through a low cost, powerful, and easy-to-use video
+              streaming API.
+            </Text>
+            <Flex align="center" css={{ justifyContent: "center" }}>
+              <Link href="/register" passHref>
+                <Button as="a" arrow css={{ mr: "$4" }}>
+                  Start now
                 </Button>
-              </Flex>
-            </Box>
+              </Link>
+              <ArrowLink href="/contact">Get in touch</ArrowLink>
+            </Flex>
           </Box>
           <Box
             css={{
@@ -247,12 +246,12 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               content.
             </Box>
             <Text variant="gray" size="4" css={{ lineHeight: 1.7 }}>
-              By leveraging decentralized infrastructure, Livepeer.com delivers
-              a video platform that focuses on what user-generated content (UGC)
-              applications need. Affordable, scalable, and reliable, the
-              Livepeer.com platform combines high-quality transcoding with
-              powerful APIs and features that are essential for a seamless
-              creator experience.
+              By leveraging the decentralized Livepeer network, Livepeer.com
+              delivers a video streaming API that focuses on what user-generated
+              content (UGC) applications need. Highly affordable, scalable, and
+              reliable, the Livepeer.com API combines high-quality transcoding
+              with features essential for building streaming platform
+              experiences.
             </Text>
           </Box>
         </Box>

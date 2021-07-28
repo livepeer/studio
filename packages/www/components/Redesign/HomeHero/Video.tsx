@@ -57,7 +57,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           borderRadius: "36px",
         },
       }}>
-      <Box as="figure" css={{ width: "100%", position: "relative" }}>
+      <Box as="figure" css={{ margin: 0, width: "100%", position: "relative" }}>
         <Box
           css={{
             position: "absolute",
@@ -134,6 +134,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             css={{
               borderRadius: 24,
               width: "100%",
+              border: 0,
               backgroundColor: "rgba(0,0,0,0.5)",
               mr: "$5",
               px: "$5",
@@ -172,7 +173,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           width: "100%",
           position: "absolute",
           background:
-            "linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
+            "linear-gradient(180deg, $colors$loContrast 0%, rgba(255, 255, 255, 0) 100%)",
           height: "100%",
           top: 0,
           pointerEvents: "none",

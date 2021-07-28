@@ -1,4 +1,4 @@
-import Layout from "../layouts";
+import Layout from "../layouts/redesign";
 import Prefooter from "components/Redesign/Prefooter";
 import Hero from "components/Redesign/HomeHero";
 import Investors from "components/Redesign/Investors";
@@ -14,7 +14,7 @@ const benefitsListItems = [
     },
     title: "Easy to use",
     description:
-      "Our straight forward API’s make integrating Livepeer.com into your UGC platform a quick and easy task.",
+      "Our straight forward API’s make integrating Livepeer.com into your streaming platform a quick and easy task.",
   },
   {
     icon: {
@@ -53,7 +53,7 @@ const featuresListItems = [
     },
     title: "Easy-to-use API",
     description:
-      "Simple and easy to implement API’s that support seamless integration with your UGC platform.",
+      "Simple and easy to implement API’s that support seamless integration with your streaming platform.",
   },
   {
     icon: {
@@ -62,7 +62,7 @@ const featuresListItems = [
     },
     title: "Affordable transcoding",
     description:
-      "High quality, reliable transcoding at a cost that makes running a video centric UGC platform with millions of content creators viable.",
+      "High quality, reliable transcoding at a cost that makes running a video centric streaming platform with millions of content creators viable.",
   },
   {
     icon: {
@@ -71,7 +71,7 @@ const featuresListItems = [
     },
     title: "Smart video",
     description:
-      "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running UGC platforms.",
+      "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running streaming platforms.",
   },
   {
     icon: {
@@ -80,7 +80,7 @@ const featuresListItems = [
     },
     title: "Interactivity",
     description:
-      "Key features to enable interactive use cases that drive engagement on UGC platforms including low latency and object detection.",
+      "Key features to enable interactive use cases that drive engagement on streaming platforms including low latency and object detection.",
   },
 ];
 
@@ -88,23 +88,22 @@ const HomePage = () => {
   return (
     <Layout
       title={`Home - Livepeer.com`}
-      description={`The platform built to power video-centric UGC applications at scale.`}
-      url={`https://livepeer.com`}
-      backgroundColor="$panel">
-      <Hero backgroundColor="$panel" />
+      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      url={`https://livepeer.com`}>
+      <Hero />
       <Why
+        backgroundColor="$panel"
         title="Benefits"
-        heading="A platform uniquely tailored to address the needs of today’s streaming platforms."
+        heading="An API uniquely tailored to address the needs of today’s streaming platforms."
         reasons={benefitsListItems}
       />
       <Why
-        backgroundColor="$panel"
         title="Features"
-        heading="Feature-rich, high quality streaming and on-demand video for your project."
+        heading="Feature-rich, high quality streaming for your project."
         reasons={featuresListItems}
       />
 
-      <Investors />
+      <Investors backgroundColor="$panel" />
       <Testimonials />
       <Contact />
       <Prefooter />

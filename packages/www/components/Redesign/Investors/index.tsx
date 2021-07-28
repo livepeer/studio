@@ -14,14 +14,14 @@ const investorIds = [
   "collaborative-fund",
   "notation",
 ];
-const Investors = () => {
+const Investors = ({ backgroundColor }) => {
   const { colors }: any = darkTheme;
 
   return (
     <Box
       css={{
         position: "relative",
-        backgroundColor: "$hiContrast",
+        backgroundColor,
       }}>
       <Container
         size="3"
