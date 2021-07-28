@@ -62,7 +62,7 @@ const Layout = ({
   customNav,
 }: Props) => {
   useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
+    if (window.location.hostname === "livepeer.com") {
       ReactGA.pageview(window.location.pathname + window.location.search);
       hotjar.initialize(2525106, 6);
     }
