@@ -89,16 +89,17 @@ const HomePage = () => {
     <Layout
       title={`Home - Livepeer.com`}
       description={`The platform built to power video-centric UGC applications at scale.`}
-      url={`https://livepeer.com`}>
-      <Hero />
+      url={`https://livepeer.com`}
+      backgroundColor="$panel">
+      <Hero backgroundColor="$panel" />
       <Why
         title="Benefits"
         heading="A platform uniquely tailored to address the needs of today’s streaming platforms."
         reasons={benefitsListItems}
       />
       <Why
+        backgroundColor="$panel"
         title="Features"
-        backgroundColor="$loContrast"
         heading="Feature-rich, high quality streaming and on-demand video for your project."
         reasons={featuresListItems}
       />

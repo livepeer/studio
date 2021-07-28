@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  Container,
-  Heading,
-  Text,
-  Link as A,
-  styled,
-} from "@livepeer.com/design-system";
+import { Box, Flex, Container, Text } from "@livepeer.com/design-system";
 import Guides from "components/Redesign/Guides";
 import Image from "next/image";
 import Link from "next/link";

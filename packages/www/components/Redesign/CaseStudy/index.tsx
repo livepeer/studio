@@ -18,10 +18,11 @@ const CaseStudy = ({
   problem,
   solution,
   internalLink,
+  backgroundColor = "$loContrast",
 }) => {
   return (
     <Box>
-      <Guides backgroundColor="$loContrast" />
+      <Guides backgroundColor={backgroundColor} />
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ p: 0 }}>
           <Box

@@ -61,6 +61,7 @@ const UseCase = ({
         image={hero.image.asset.url}
       />
       <Why
+        backgroundColor="$panel"
         title="Why Livepeer.com"
         heading={why.heading}
         reasons={why.reasons}

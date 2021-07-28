@@ -58,6 +58,7 @@ type Props = {
   links: React.ComponentProps<typeof Link>[];
   breadcrumb?: BreadcrumbItem[];
   withShadow?: boolean;
+  backgroundColor?: string;
   hideGuides?: boolean;
   css?: any;
 };
@@ -65,6 +66,7 @@ type Props = {
 const NavigationBase = ({
   links,
   breadcrumb,
+  backgroundColor = "$loContrast",
   withShadow = true,
   hideGuides = false,
   css,
@@ -101,7 +103,7 @@ const NavigationBase = ({
 
   return (
     <Box css={{ position: "relative" }}>
-      {!hideGuides && <Guides backgroundColor="$loContrast" />}
+      {!hideGuides && <Guides backgroundColor={backgroundColor} />}
       <Box
         css={{
           position: "relative",

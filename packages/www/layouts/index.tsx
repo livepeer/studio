@@ -31,6 +31,7 @@ interface Props {
   canonical?: string;
   noindex?: boolean;
   preview?: boolean;
+  backgroundColor?: string;
   customNav?: React.ReactNode;
 }
 
@@ -59,6 +60,7 @@ const Layout = ({
   canonical,
   noindex = false,
   preview = false,
+  backgroundColor = "$loContrast",
   customNav,
 }: Props) => {
   useEffect(() => {
@@ -145,7 +147,11 @@ const Layout = ({
                       Preview Mode
                     </Box>
                   )}
-                  {customNav ? customNav : <DefaultNav />}
+                  {customNav ? (
+                    customNav
+                  ) : (
+                    <DefaultNav backgroundColor={backgroundColor} />
+                  )}
                   <Box css={{ position: "relative" }}>{children}</Box>
                 </Flex>
                 <Footer />

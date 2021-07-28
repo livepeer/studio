@@ -1,6 +1,6 @@
 import { Box } from "@livepeer.com/design-system";
 
-const Guides = ({ backgroundColor = "$panel" }) => {
+const Guides = ({ backgroundColor = "$loContrast" }) => {
   return (
     <Box
       css={{

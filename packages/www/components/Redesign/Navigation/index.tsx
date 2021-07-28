@@ -28,8 +28,15 @@ const defaultNavProps: NavProps = {
   ],
 };
 
-const DefaultNav = ({ hideGuides = false }) => (
-  <NavigationBase hideGuides={hideGuides} {...defaultNavProps} />
+const DefaultNav = ({
+  backgroundColor = "$loContrast",
+  hideGuides = false,
+}) => (
+  <NavigationBase
+    backgroundColor={backgroundColor}
+    hideGuides={hideGuides}
+    {...defaultNavProps}
+  />
 );
 
 type DocsNavProps = {

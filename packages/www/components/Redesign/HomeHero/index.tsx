@@ -22,7 +22,7 @@ import {
 import { notchZIndex } from "./PhoneSvg";
 import Guides from "components/Redesign/Guides";
 
-const HomeHero = () => {
+const HomeHero = ({ backgroundColor = "$loContrast" }) => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -102,7 +102,7 @@ const HomeHero = () => {
         position: "relative",
         overflow: "hidden",
       }}>
-      <Guides backgroundColor="$loContrast" />
+      <Guides backgroundColor={backgroundColor} />
       <Container>
         <Box
           css={{
