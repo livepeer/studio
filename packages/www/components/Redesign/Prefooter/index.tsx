@@ -10,9 +10,9 @@ import Button from "components/Redesign/Button";
 import Guides from "components/Redesign/Guides";
 import Link from "next/link";
 
-const Prefooter = () => (
+const Prefooter = ({ backgroundColor = "$loContrast" }) => (
   <Box css={{ position: "relative" }}>
-    <Guides backgroundColor="$loContrast" />
+    <Guides backgroundColor={backgroundColor} />
     <Container
       size="3"
       css={{

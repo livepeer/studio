@@ -28,7 +28,7 @@ const getIconProvider = (provider) => {
   }
 };
 
-const Why = ({ backgroundColor = "$panel", title, heading, reasons }) => {
+const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
   return (
     <Box css={{ position: "relative" }}>
       <Guides backgroundColor={backgroundColor} />
