@@ -107,7 +107,7 @@ const Sidebar = ({ id }) => {
               variant={id === "home" ? "violet" : null}
               css={{
                 fontWeight: id === "home" ? 700 : 400,
-                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
                 ml: "$2",
                 lineHeight: 1.2,
               }}>
@@ -124,7 +124,7 @@ const Sidebar = ({ id }) => {
                 variant={id === "streams" ? "violet" : null}
                 css={{
                   fontWeight: id === "streams" ? 700 : 400,
-                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
                 }}>
@@ -147,7 +147,7 @@ const Sidebar = ({ id }) => {
                     variant={id === "streams/sessions" ? "violet" : null}
                     css={{
                       fontWeight: id === "streams/sessions" ? 700 : 400,
-                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
@@ -167,7 +167,7 @@ const Sidebar = ({ id }) => {
               <Text
                 css={{
                   fontWeight: id?.split("/")[0] === "developers" ? 500 : 400,
-                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
                 }}>
@@ -190,7 +190,7 @@ const Sidebar = ({ id }) => {
                     variant={id === "developers" ? "violet" : null}
                     css={{
                       fontWeight: id === "developers" ? 700 : 400,
-                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
                       ml: 31,
                       mt: "$1",
                       mb: "$1",
@@ -207,7 +207,7 @@ const Sidebar = ({ id }) => {
                     variant={id === "developers/webhooks" ? "violet" : null}
                     css={{
                       fontWeight: id === "developers/webhooks" ? 700 : 400,
-                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
@@ -230,7 +230,8 @@ const Sidebar = ({ id }) => {
                 css={{
                   display: "flex",
                   fontWeight: id === "billing" ? 700 : 400,
-                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  WebkitTextFillColor: "initial",
                   ml: "$2",
                   lineHeight: 1.2,
                 }}>
@@ -253,7 +254,7 @@ const Sidebar = ({ id }) => {
                     variant={id === "billing/plans" ? "violet" : null}
                     css={{
                       fontWeight: id === "billing/plans" ? 700 : 400,
-                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
