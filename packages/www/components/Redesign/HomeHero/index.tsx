@@ -135,6 +135,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 mx: "auto",
                 maxWidth: 700,
                 fontWeight: 700,
+                letterSpacing: "-1px",
                 "@bp1": {
                   fontSize: 52,
                   lineHeight: 1.1,

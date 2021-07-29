@@ -104,7 +104,7 @@ const HomePage = () => {
         reasons={featuresListItems}
       />
 
-      <Investors backgroundColor="hsl(260 25% 11%)" />
+      <Investors backgroundColor="rgb(30 30 33)" />
       <Testimonials />
       <Contact />
       <Prefooter />

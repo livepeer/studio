@@ -1,10 +1,4 @@
-import {
-  Box,
-  Grid,
-  Text,
-  Container,
-  darkTheme,
-} from "@livepeer.com/design-system";
+import { Box, Grid, Text, Container } from "@livepeer.com/design-system";
 import Guides from "components/Redesign/Guides";
 
 const investorIds = [
@@ -15,8 +9,6 @@ const investorIds = [
   "notation",
 ];
 const Investors = ({ backgroundColor }) => {
-  const { colors }: any = darkTheme;
-
   return (
     <Box
       css={{

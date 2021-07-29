@@ -1,12 +1,16 @@
 import { Box, Grid, Container } from "@livepeer.com/design-system";
 import Card, { CardProps } from "./Card";
 import Guides from "components/Redesign/Guides";
+import CBSIcon from "../../../public/img/testimonials/cbs-interactive/logo.svg";
+import HousePartyIcon from "../../../public/img/testimonials/houseparty/logo.svg";
+import PlayDJIcon from "../../../public/img/testimonials/playdj-tv/logo.svg";
 
 const testimonials: CardProps[] = [
   {
     quote:
       "Livepeer.com is an exciting video infrastructure solution that’s highly reliable and price disruptive.",
     id: "cbs-interactive",
+    logo: <CBSIcon css={{ color: "$hiContrast" }} />,
     author: {
       name: "Flávio Ribeiro",
       role: "Director of Engineering",
@@ -17,6 +21,7 @@ const testimonials: CardProps[] = [
     quote:
       "Livepeer.com is an incredible team building the future of video infrastructure services.",
     id: "houseparty",
+    logo: <HousePartyIcon css={{ color: "$hiContrast" }} />,
     author: {
       name: "Ben Rubin",
       role: "CEO",
@@ -27,6 +32,7 @@ const testimonials: CardProps[] = [
     quote:
       "Partnering with Livepeer.com has allowed PlayDJ.tv to get ahead of our competitors through innovation and new technology.",
     id: "playdj-tv",
+    logo: <PlayDJIcon css={{ color: "$hiContrast" }} />,
     author: {
       name: "Tom Burman",
       role: "Co-founder",
