@@ -169,12 +169,13 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                     position: "absolute",
                     left: 0,
                     zIndex: -1,
-                    opacity: 0.5,
+                    opacity: 1,
                     backgroundClip: "text",
                     background:
-                      "linear-gradient(to right, $colors$green11, $colors$green6)",
+                      "linear-gradient(to right, $colors$green8, $colors$green4)",
                     width: "100%",
-                    height: 19,
+                    height: "100%",
+                    transform: "sk",
                   },
                 }}>
                 <Text size="5" css={{ lineHeight: 1.2 }}>
