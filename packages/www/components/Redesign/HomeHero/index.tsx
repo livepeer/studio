@@ -214,7 +214,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
           </svg>
           <Box
             css={{
-              mb: "$6",
+              mb: 120,
               mt: -40,
               position: "relative",
               height: maxScroll,
@@ -245,30 +245,6 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               <HeroVideo ref={videoRef} />
             </Box>
             <PhoneSvg ref={phoneRef} />
-          </Box>
-          <Box css={{ px: "$3", position: "relative", mt: 100, mb: 120 }}>
-            <Box
-              as="h3"
-              css={{
-                fontWeight: 700,
-                fontSize: 32,
-                mb: "$5",
-                color: "$hiContrast",
-                "@bp2": {
-                  fontSize: 48,
-                },
-              }}>
-              Reliable, affordable, high-quality streaming for all of your video
-              content.
-            </Box>
-            <Text variant="gray" size="4" css={{ lineHeight: 1.7 }}>
-              By leveraging the decentralized Livepeer network, Livepeer.com
-              delivers a video streaming API that focuses on what user-generated
-              content (UGC) applications need. Highly affordable, scalable, and
-              reliable, the Livepeer.com API combines high-quality transcoding
-              with features essential for building streaming platform
-              experiences.
-            </Text>
           </Box>
         </Box>
       </Container>
