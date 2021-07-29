@@ -159,24 +159,20 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 href="https://livepeer.org"
                 target="_blank"
                 as={A}
+                className="realistic-marker-highlight"
                 css={{
                   display: "inline-flex",
                   alignItems: "center",
                   textDecoration: "none !important",
                   position: "relative",
-                  "&:after": {
-                    content: '""',
-                    position: "absolute",
-                    left: 0,
-                    zIndex: -1,
-                    opacity: 1,
-                    backgroundClip: "text",
-                    background:
-                      "linear-gradient(to right, $colors$green8, $colors$green4)",
-                    width: "100%",
-                    height: "100%",
-                    transform: "sk",
-                  },
+                  transition: "0.5s",
+                  padding: "0 0.4em",
+                  borderRadius: "0.8em 0.3em",
+                  background: "transparent",
+                  backgroundImage:
+                    "linear-gradient(to right, $colors$green4, $colors$green9 4%, $colors$green5)",
+                  WebkitBoxDecorationBreak: "clone",
+                  boxDecorationBreak: "clone",
                 }}>
                 <Text size="5" css={{ lineHeight: 1.2 }}>
                   Livepeer
@@ -197,6 +193,25 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               <ArrowLink href="/contact">Get in touch</ArrowLink>
             </Flex>
           </Box>
+          <svg className="svg-filters">
+            <defs>
+              <filter id="marker-shape">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0 0.15"
+                  numOctaves="1"
+                  result="warp"
+                />
+                <feDisplacementMap
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                  scale="30"
+                  in="SourceGraphic"
+                  in2="warp"
+                />
+              </filter>
+            </defs>
+          </svg>
           <Box
             css={{
               mb: "$6",
