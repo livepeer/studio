@@ -133,14 +133,14 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 mb: "$6",
                 mt: 0,
                 mx: "auto",
-                maxWidth: 600,
+                maxWidth: 700,
                 fontWeight: 700,
                 "@bp1": {
                   fontSize: 52,
                   lineHeight: 1.1,
                 },
                 "@bp2": {
-                  fontSize: 64,
+                  fontSize: 72,
                   lineHeight: 1.1,
                 },
               }}>
@@ -174,7 +174,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                     background:
                       "linear-gradient(to right, $colors$green11, $colors$green6)",
                     width: "100%",
-                    height: " 100%",
+                    height: 19,
                   },
                 }}>
                 <Text size="5" css={{ lineHeight: 1.2 }}>
