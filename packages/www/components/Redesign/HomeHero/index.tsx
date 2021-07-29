@@ -151,7 +151,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 lineHeight: 1.6,
                 mb: "$7",
-                maxWidth: 640,
+                maxWidth: 710,
                 mx: "auto",
               }}>
               Livepeer.com provides quick and reliable access to{" "}
