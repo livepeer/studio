@@ -82,6 +82,7 @@ export default class MessageQueue {
   }
 
   public async delayedEmit(msg: Object, delay: number): Promise<void> {
+    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
     await this.channel.addSetup((channel: Channel) => {
       return Promise.all([
         channel.assertQueue(`delayedQueue_${delay / 1000}s`, {

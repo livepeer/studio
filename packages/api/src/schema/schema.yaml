@@ -72,6 +72,8 @@ components:
               - stream.detection
               - stream.idle
               - recording.ready
+              - recording.started
+              - recording.waiting
         url:
           type: string
           format: uri
