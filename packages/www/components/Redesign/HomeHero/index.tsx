@@ -170,7 +170,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                   borderRadius: "0.8em 0.3em",
                   background: "transparent",
                   backgroundImage:
-                    "linear-gradient(to right, $colors$green4, $colors$green9 4%, $colors$green5)",
+                    "linear-gradient(to right, $colors$green9, $colors$green9 4%, $colors$green5)",
                   WebkitBoxDecorationBreak: "clone",
                   boxDecorationBreak: "clone",
                 }}>

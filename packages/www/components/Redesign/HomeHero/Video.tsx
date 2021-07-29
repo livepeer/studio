@@ -173,7 +173,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           width: "100%",
           position: "absolute",
           background:
-            "linear-gradient(180deg, $colors$loContrast 0%, rgba(255, 255, 255, 0) 100%)",
+            "linear-gradient(180deg, $colors$loContrast 20%, rgba(255, 255, 255, 0) 160%)",
           height: "100%",
           top: 0,
           pointerEvents: "none",

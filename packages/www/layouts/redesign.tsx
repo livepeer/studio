@@ -68,9 +68,10 @@ interface Props {
   canonical?: string;
   noindex?: boolean;
   preview?: boolean;
+  theme?: string;
 }
 
-function ContextProviders({ theme, children }) {
+function ContextProviders({ theme = "dark", children }) {
   return (
     <DesignSystemProvider>
       <ThemeProvider
@@ -91,6 +92,7 @@ function Layout({
   image,
   url,
   canonical,
+  theme = "dark",
   noindex = false,
   preview = false,
 }: Props) {
@@ -129,7 +131,7 @@ function Layout({
   }
 
   return (
-    <ContextProviders theme="dark">
+    <ContextProviders theme={theme}>
       <Flex
         css={{
           flexGrow: 1,

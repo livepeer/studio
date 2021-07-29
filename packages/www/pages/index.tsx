@@ -89,7 +89,8 @@ const HomePage = () => {
     <Layout
       title={`Home - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com`}>
+      url={`https://livepeer.com`}
+      theme="dark">
       <Hero />
       <Why
         backgroundColor="$panel"
@@ -103,7 +104,7 @@ const HomePage = () => {
         reasons={featuresListItems}
       />
 
-      <Investors backgroundColor="$panel" />
+      <Investors backgroundColor="hsl(260 25% 11%)" />
       <Testimonials />
       <Contact />
       <Prefooter />
