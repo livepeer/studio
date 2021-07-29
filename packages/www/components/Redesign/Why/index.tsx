@@ -54,8 +54,9 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
               ai: "flex-start",
               flexDirection: "column",
               width: "100%",
-              mb: "$8",
+              mb: "$7",
               "@bp2": {
+                mb: "$2",
                 ai: "center",
                 flexDirection: "row",
               },
