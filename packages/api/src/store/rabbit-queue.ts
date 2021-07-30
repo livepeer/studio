@@ -86,7 +86,7 @@ export default class MessageQueue {
 
   public async publish (route: string, msg: object): Promise<void> {
     console.log(`publishing to ${route} : ${JSON.stringify(msg)}`);
-    await this.channel.publish(EXCHANGE_NAME, route, msg);
+    await this.channel.publish(EXCHANGE_NAME, route, msg, { persistent: true });
   }
 
   public async delayedPublish(routingKey: string, msg: Object, delay: number): Promise<void> {
@@ -101,6 +101,6 @@ export default class MessageQueue {
       ]);
     });
     console.log("emitting ", msg);
-    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
+    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg, { persistent: true });
   }
 }
