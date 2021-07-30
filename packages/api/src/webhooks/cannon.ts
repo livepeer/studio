@@ -81,7 +81,7 @@ export default class WebhookCannon {
       let stream = await this.db.stream.get(event.streamId);
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
-        return console.error(
+        throw new Error(
           `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
         );
       }
