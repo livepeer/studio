@@ -59,7 +59,7 @@ export default class WebhookCannon {
     await this.queue.consume("events", this.handleEventsQueue.bind(this));
   }
 
-  async handleEventsQueue (data: ConsumeMessage) {
+  async handleEventsQueue(data: ConsumeMessage) {
     let message;
     try {
       message = JSON.parse(data.content.toString());
@@ -76,7 +76,7 @@ export default class WebhookCannon {
         event.userId,
         event.event
       );
-  
+
       console.log("webhooks : ", webhooksList);
       let stream = await this.db.stream.get(event.streamId);
       if (!stream) {
@@ -90,7 +90,7 @@ export default class WebhookCannon {
         this.db.stream.removePrivateFields({ ...stream })
       );
       delete sanitized.streamKey;
-  
+
       let user = await this.db.user.get(event.userId);
       if (!user || user.suspended) {
         // if user isn't found. don't fire the webhook, log an error
@@ -107,12 +107,12 @@ export default class WebhookCannon {
               event: event,
               stream: sanitized,
               user,
-              webhook
-            })
+              webhook,
+            });
           } catch (error) {
             console.log("Error firing single url webhook trigger", error);
             setTimeout(() => this.queue.nack(data), 1000);
-            return
+            return;
           }
         })
       );
@@ -135,7 +135,13 @@ export default class WebhookCannon {
     }
     try {
       // TODO Activate URL Verification
-      await this._fireHook(message.event, message.webhook, message.stream, message.user, false);
+      await this._fireHook(
+        message.event,
+        message.webhook,
+        message.stream,
+        message.user,
+        false
+      );
     } catch (err) {
       this.retry(message);
     }
@@ -184,7 +190,11 @@ export default class WebhookCannon {
       status: "pending",
       retries: event.retries ? event.retries + 1 : 1,
     };
-    this.queue.delayedPublish("webhooks.delayedEmits", event, event.lastInterval);
+    this.queue.delayedPublish(
+      "webhooks.delayedEmits",
+      event,
+      event.lastInterval
+    );
   }
 
   async _fireHook(
