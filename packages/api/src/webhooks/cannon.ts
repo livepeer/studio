@@ -21,13 +21,16 @@ const MAX_BACKOFF = 10 * 60 * 1000;
 const BACKOFF_COEF = 1.2;
 const MAX_RETRIES = 20;
 
+export interface TPayload {
+  [key: string]: any;
+}
 export interface WebhookMessage {
   id: string;
   event: EventKey;
   createdAt: number;
   userId: string;
   streamId: string;
-  payload?: Object;
+  payload?: TPayload;
   retries?: number;
   lastInterval?: number;
   status?: string;
@@ -240,6 +243,24 @@ export default class WebhookCannon {
       // this is fine because pop could return a null if some other client raced and picked the task
       // faster when it got the NOTIFY call.
       return;
+    }
+    const since = Date.now() - event.createdAt;
+
+    if (event.event === "recording.ready") {
+      if (!event.payload.sessionId) {
+        return;
+      }
+      const session = await this.db.stream.get(event.payload.sessionId, {
+        useReplica: false,
+      });
+      if (!session) {
+        return;
+      }
+      if (session.partialSession) {
+        // new session was started, so recording is not ready yet
+        return;
+      }
+      delete event.payload.sessionId;
     }
 
     const { data: webhooksList } = await this.db.webhook.listSubscribed(
