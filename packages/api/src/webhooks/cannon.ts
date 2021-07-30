@@ -111,6 +111,8 @@ export default class WebhookCannon {
             })
           } catch (error) {
             console.log("Error firing single url webhook trigger", error);
+            setTimeout(() => this.queue.nack(data), 1000);
+            return
           }
         })
       );
