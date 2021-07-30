@@ -182,8 +182,8 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               </Box>
               , the world's open video infrastructure, allowing you to focus on
               building and scaling next generation video streaming platforms and
-              services through a low cost, powerful, and easy-to-use video
-              streaming API.
+              services at an industry-shattering price through a powerful and
+              easy-to-use video streaming API.
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
               <Link href="/register" passHref>
