@@ -76,14 +76,13 @@ const DocsNav = ({
       />
       <Box
         sx={{
-          borderBottom: "1px solid #E6E6E6",
+          borderBottom: "1px solid $colors$mauve4",
           gridColumn: "1 / 16",
           position: "sticky",
           paddingBottom: "24px",
           transition: "all 0.2s",
           transform: hideTopNav ? "translateY(-60px)" : "",
           top: 0,
-          background: "white",
           zIndex: 100,
         }}>
         <Box sx={{ padding: "0 24px" }}>
@@ -292,7 +291,6 @@ const DocsNav = ({
               <DropdownMenu.Content
                 sx={{
                   width: "100vw",
-                  background: "white",
                   alignSelf: "flex-start",
                   px: "24px",
                 }}>

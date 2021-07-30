@@ -127,6 +127,7 @@ export {
   Content as HoverCardContent,
   Arrow as HoverCardArrow,
 } from "@radix-ui/react-hover-card";
+export { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 
 // Stitches
 export {

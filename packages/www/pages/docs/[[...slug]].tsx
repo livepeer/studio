@@ -1,5 +1,5 @@
-import { Container, Box } from "@livepeer.com/design-system";
-import DocsNav from "components/DocsLayout/nav";
+import { Container, Grid, Box, global } from "@livepeer.com/design-system";
+import DocsNav from "@components/Redesign/Navigation/docs";
 import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
@@ -60,6 +60,33 @@ const defaultSEO: NextSeoProps = {
   },
 };
 
+const globalStyles = global({
+  body: {
+    margin: 0,
+    backgroundColor: "$loContrast",
+    fontFamily: "$untitled",
+  },
+
+  "h1, h2, h3, h4, h5": { fontWeight: 500 },
+
+  "body, button": {
+    fontFamily: "$untitled",
+  },
+
+  svg: { display: "block" },
+
+  "pre, code": { margin: 0, fontFamily: "$mono" },
+
+  "#__next": {
+    position: "relative",
+    zIndex: 0,
+  },
+
+  "#hubspot-messages-iframe-container iframe": {
+    colorScheme: "auto",
+  },
+});
+
 const DocsIndex = ({ doc, menu }) => {
   const [hideTopNav, setHideTopNav] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(false);
@@ -79,6 +106,8 @@ const DocsIndex = ({ doc, menu }) => {
   const breadCrumb = useMemo(() => {
     return router.asPath.split("#")[0].split("/");
   }, [router.asPath]);
+
+  globalStyles();
 
   const resolvedSEO: NextSeoProps = useMemo(() => {
     const title = doc.frontMatter.title
@@ -101,7 +130,7 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <ContextProviders>
+    <ContextProviders theme="dark">
       <NextSeo {...resolvedSEO} />
       <Box
         onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
@@ -155,46 +184,46 @@ const DocsIndex = ({ doc, menu }) => {
           menu={currentMenu}
           setIsOpen={setMobileSideNavOpen}
         />
-        <Container
-          size="3"
-          css={{
-            mt: hideTopNav ? "-12px" : "48px",
-            gridColumn: "1fr",
-            justifyItems: "center",
-            mx: 0,
-            transition: "all 0.2s",
-            display: "flex",
-            minWidth: "100%",
-            justifyContent: "center",
-            alignItems: "flex-start",
-          }}>
-          <Box
+        <Container size="3">
+          <Grid
             css={{
-              display: "flex",
-              flexDirection: "column",
-              width: "100%",
-              maxWidth: "768px",
-              paddingBottom: "80px",
+              pt: "$7",
+              gridColumn: "1fr",
+              justifyItems: "center",
+              mx: 0,
+              transition: "all 0.2s",
+              minWidth: "100%",
+              justifyContent: "center",
+              alignItems: "flex-start",
             }}>
             <Box
               css={{
                 display: "flex",
-                alignItems: "center",
-                color: "$hiContrast",
-                fontSize: "12px",
-                letterSpacing: "-0.02em",
-                mb: "16px",
-              }}
-              className="breadcrumb">
-              {breadCrumb.slice(2, 5).map((a, idx) => (
-                <Fragment key={idx}>
-                  {title(a.split("-").join(" "))}
-                  {idx < breadCrumb.length - 3 && <> / </>}
-                </Fragment>
-              ))}
+                flexDirection: "column",
+                width: "100%",
+                maxWidth: "768px",
+                paddingBottom: "80px",
+              }}>
+              <Box
+                css={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "$hiContrast",
+                  fontSize: "12px",
+                  letterSpacing: "-0.02em",
+                  mb: "16px",
+                }}
+                className="breadcrumb">
+                {breadCrumb.slice(2, 5).map((a, idx) => (
+                  <Fragment key={idx}>
+                    {title(a.split("-").join(" "))}
+                    {idx < breadCrumb.length - 3 && <> / </>}
+                  </Fragment>
+                ))}
+              </Box>
+              <Box className="markdown-body">{content}</Box>
             </Box>
-            <Box className="markdown-body">{content}</Box>
-          </Box>
+          </Grid>
         </Container>
       </Box>
     </ContextProviders>

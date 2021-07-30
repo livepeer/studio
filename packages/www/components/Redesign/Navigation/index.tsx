@@ -70,11 +70,7 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
       links: [
         {
           href: "/docs/guides",
-          children: "Overview",
-        },
-        {
-          href: "/docs/guides",
-          children: "Guides",
+          children: "Docs",
         },
         {
           href: "/docs/api-reference",
@@ -87,13 +83,8 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
           href: "/docs/guides",
           mobileDropdownLinks: [
             {
-              children: "Overview",
+              children: "Docs",
               href: "/docs/guides",
-              isSelected: pathname === "/docs",
-            },
-            {
-              children: "Guides",
-              href: "/docs/vide-guides",
               isSelected: pathname === "/docs/guides",
             },
             {

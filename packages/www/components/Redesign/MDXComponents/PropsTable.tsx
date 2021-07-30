@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  AccessibleIcon,
   Box,
   IconButton,
   Text,
@@ -9,7 +10,6 @@ import {
   PopoverContent,
 } from "@livepeer.com/design-system";
 import { InfoCircledIcon, DividerHorizontalIcon } from "@radix-ui/react-icons";
-import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import RegionTable from "./RegionTable";
 
 type PropDef = {

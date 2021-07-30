@@ -10,7 +10,7 @@ export function PackageRelease({
   version: string;
 }) {
   return (
-    <Paragraph css={{ fontWeight: "500" }}>
+    <Paragraph css={{ fontWeight: 500 }}>
       {name}{" "}
       <Badge size="1" variant="blue" css={{ ml: "$1", fontFamily: "$mono" }}>
         {version}
