@@ -24,6 +24,7 @@ import Guides from "components/Redesign/Guides";
 import Link from "next/link";
 import ArrowLink from "components/Redesign/ArrowLink";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
+import Typical from "react-typical";
 
 const HomeHero = ({ backgroundColor = "$loContrast" }) => {
   const router = useRouter();
@@ -145,7 +146,21 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                   lineHeight: 1.1,
                 },
               }}>
-              Video development made easy.
+              Video development made{" "}
+              <Typical
+                steps={[
+                  "easy",
+                  3500,
+                  "affordable",
+                  3500,
+                  "scalable",
+                  3500,
+                  "reliable",
+                  3500,
+                ]}
+                loop={Infinity}
+                wrapper="span"
+              />
             </Box>
             <Text
               size="5"

@@ -84,6 +84,7 @@
     "react-syntax-highlighter": "^15.4.3",
     "react-table": "^7.7.0",
     "react-tooltip": "^4.2.7",
+    "react-typical": "^0.1.3",
     "reactour": "^1.18.0",
     "reading-time": "^1.2.0",
     "recharts": "^2.0.7",
