@@ -2,8 +2,6 @@ import clsx from "clsx";
 import marked, { MarkedOptions } from "marked";
 import { useMemo } from "react";
 
-import s from "./marked.module.css";
-
 type Renderer = Partial<MarkedOptions["renderer"]>;
 
 type Props = {
@@ -25,7 +23,7 @@ const Marked = ({ children, className, noDefaultStyles, options }: Props) => {
 
   return (
     <div
-      className={clsx(className, { [s.markdown]: !noDefaultStyles })}
+      className={clsx(className, {})}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
