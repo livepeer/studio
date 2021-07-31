@@ -5,52 +5,247 @@ description: Codecs and workflows supported by Livepeer.com
 
 # Supported codecs and workflows
 
-**Ingest Support**
+## Ingest Support
 
-| Field                             | Notes                                                                                 |
-| --------------------------------- | ------------------------------------------------------------------------------------- |
-| **Location**                      | EU, US                                                                                |
-| **Ingest Format**                 | RTMP                                                                                  |
-| **Ingest Codec**                  | H264 + AAC                                                                            |
-| **Ingest Authentication**         | Webhook based                                                                         |
-| **Encoder Software**              | **Supported tested**: OBS 25.0.8, ffmpeg 4.3, Streamaxia                              |
-|                                   | **Supported untested**: Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders |
-|                                   | **Unsupported**: WebRTC and SRT encoders                                              |
-| **Resolution**                    | **Supported tested**: custom resolution up to 1080p                                   |
-|                                   | **Supported untested**: custom resolution up to 4k                                    |
-| **Framerate**                     | between 5fps and 60fps, passthrough or custom                                         |
-| **GOP Size (Keyframe Interval) ** | **Supported tested**: Constant GOP, Variable GOP of 0.5s to 8s                        |
-|                                   | **Supported untested**: Variable GOP not within 0.5s to 8s                            |
+<Table
+  data={[
+    {
+      attribute: "Location",
+      notes: "EU, US",
+    },
+    {
+      attribute: "Ingest Format",
+      notes: "RTMP",
+    },
+    {
+      attribute: "Ingest Codec",
+      notes: "H264 + AAC",
+    },
+    {
+      attribute: "Ingest Authentication",
+      notes: "Webhook based",
+    },
+    {
+      attribute: "Encoder Software",
+      notes: (
+        <Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            OBS 25.0.8, ffmpeg 4.3, Streamaxia
+          </Box>
+          <Box css={{ my: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Unsupported:
+            </Box>{" "}
+            WebRTC and SRT encoders
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Framerate",
+      notes: "Between 5fps and 60fps, passthrough or custom",
+    },
+    {
+      attribute: "GOP Size (Keyframe Interval)",
+      notes: (
+        <Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            Constant GOP, Variable GOP of 0.5s to 8s
+          </Box>
+          <Box css={{ my: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Unsupported:
+            </Box>{" "}
+            Variable GOP not within 0.5s to 8s
+          </Box>
+        </Box>
+      ),
+    },
+  ]}
+/>
 
-**Transcoding Support**
+## Transcoding Support
 
-| Field                         | Notes                                                                   |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| **Location**                  | EU, US                                                                  |
-| **Codec**                     | H264 + AAC                                                              |
-| **H264 Transcoding Profiles** | Baseline, Main, High                                                    |
-| **FPS**                       | **Supported tested**: 24, 25, 30, 60 fps, uniform across all renditions |
-|                               | **Supported untested**: custom fps, uniform across all renditions       |
-| **Resolution**                | **Supported tested**: custom resolution up to 1080p                     |
-|                               | **Supported untested**: custom resolution up to 4k                      |
-| **Pixel Format**              | YUV4:2:0                                                                |
+<Table
+  data={[
+    {
+      attribute: "Location",
+      notes: "EU, US",
+    },
+    {
+      attribute: "Codec",
+      notes: "H264 + AAC",
+    },
+    {
+      attribute: "H264 Transcoding Profiles",
+      notes: "Baseline, Main, High",
+    },
+    {
+      attribute: "FPS",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            24, 25, 30, 60 fps, uniform across all renditions
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            custom fps, uniform across all renditions
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Resolution",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            Custom resolution up to 1080p
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Custom resolution up to 4k
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Pixel format",
+      notes: "YUV4:2:0",
+    },
+  ]}
+/>
 
-**Video Workflow Support**
+## Video Workflow Support
 
-| Field                       | Notes                                                                                                                                                                                              |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **Latency**                 | 10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player                                                                                                |
-| **Live Output Format**      | HLS playback URL (m3u8)                                                                                                                                                                            |     |
-| **Video Players**           | **Supported tested**: video.js, hls.js, safari/ios native player, Theoplayer                                                                                                                       |
-|                             | **Supported untested**: JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove                                                                                                                 |
-| **Video Delivery Location** | **Supported tested**: EU, US                                                                                                                                                                       |
-|                             | **Supported untested**: Asia, South America, Australia, Africa                                                                                                                                     |
-| **Live stream recording**   | ONLY available for paying users. HLS playback URL (m3u8) available 5 minutes after session ends. Livepeer.com stores recording and serves playback via CDN. There is no limit on recording length. |
-| **Recording Output Format** | HLS playback URL (m3u8)                                                                                                                                                                            |
-| **CDN Delivery**            | CDN delivery is ONLY available for paying users                                                                                                                                                    |
-| **Non-CDN Delivery**        | Non-CDN delivery for free tier users is limited to 10 viewers per account                                                                                                                          |
-|                             | Free tier users will have transcoding limited to 240p after 30 free minutes                                                                                                                        |
-| **Custom CDN**              | Only for custom pricing tier users                                                                                                                                                                 |
-| **Stream Status**           | `active` or `inactive`                                                                                                                                                                             |
-| **Stream Length**           | We can support streams up to 12 hours in length. Please reach out to hello@livepeer.com if you’re looking to run longer uninterrupted streams through Livepeer.                                    |
-| **Scalability**             | 1000 concurrent streams across all users. Please contact us at hello@livepeer.com for additional capacity                                                                                          |
+<Table
+  data={[
+    {
+      attribute: "Latency",
+      notes:
+        "10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player",
+    },
+    {
+      attribute: "Live output format",
+      notes: "HLS playback URL (m3u8)",
+    },
+    {
+      attribute: "H264 Transcoding Profiles",
+      notes: "Baseline, Main, High",
+    },
+    {
+      attribute: "Video players",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            video.js, hls.js, safari/ios native player, Theoplayer
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Video Delivery Location",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            EU, US
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Asia, South America, Australia, Africa
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Live stream recording",
+      notes:
+        "Only available for paying users. HLS playback URL (m3u8) available 5 minutes after session ends. Livepeer.com stores recording and serves playback via CDN. There is no limit on recording length.",
+    },
+    {
+      attribute: "Recording output format",
+      notes: "HLS playback URL (m3u8)",
+    },
+    {
+      attribute: "CDN delivery",
+      notes: "CDN delivery is only available for paying users.",
+    },
+    {
+      attribute: "Non-CDN Delivery",
+      notes:
+        "Non-CDN delivery for free tier users is limited to 10 viewers per account. Free tier users will have transcoding limited to 240p after 30 free minutes.",
+    },
+    {
+      attribute: "Custom CDN",
+      notes: "Only for custom pricing tier users.",
+    },
+    {
+      attribute: "Stream Status",
+      notes: (
+        <Box>
+          <code>active</code> or <code>inactive</code>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Stream length",
+      notes: (
+        <Box>
+          We can support streams up to 12 hours in length. Please reach out to
+          hello@livepeer.com if you’re looking to run longer uninterrupted
+          streams through Livepeer.com.
+        </Box>
+      ),
+    },
+    {
+      attribute: "Scalability",
+      notes: (
+        <Box>
+          1000 concurrent streams across all users. Please contact us at
+          hello@livepeer.com for additional capacity
+        </Box>
+      ),
+    },
+  ]}
+/>

@@ -12,14 +12,14 @@ experience with the minimum latency Livepeer.com can provide.
 These globally-optimized URLs are the best option for nearly all Livepeer.com
 users.
 
-- Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
-- Playback from: `https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`
+- Stream into: `rtmp://rtmp.livepeer.com/live/[stream-key]`
+- Playback from: `https://cdn.livepeer.com/hls/[playbackId]/index.m3u8`
 
 ## Back-up transcoding with regional ingest and playback URLs
 
 To leverage back-up transcoding, you will need to create two streams, each with
 a unique `streamKey`. Then instead of streaming into the global ingest URL
-above, you’ll point one stream towards a specific region’s ingest datacenter and
+above, you’ll point one stream towards a specific region's ingest datacenter and
 the other stream towards a different region’s ingest data center.
 
 While more control can be helpful, there are downsides to forgoing the global
@@ -47,9 +47,9 @@ URL pairs, here's what you need to know.
 1. You can not use the same stream key to connect to multiple regional ingest
    URLs simultaneously. For simultaneous, back-up stream transcoding, create
    multiple unique stream keys.
-2. Stream into: `rtmp://{region-X}-rtmp.livepeer.com/live/{stream-key}`.
+2. Stream into: `rtmp://[region]-rtmp.livepeer.com/live/[stream-key]`.
 3. Playback from:
-   `https://{region-X}-cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+   `https://[region]-cdn.livepeer.com/hls/[playbackId]/index.m3u8`.
 
 An RTMP ingest and playback URL pair references hardware in different parts of
 the world. Each region is three letters, the airport code of the server

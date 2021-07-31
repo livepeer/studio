@@ -1,7 +1,6 @@
-import React from "react";
 import { Box } from "@livepeer.com/design-system";
 
-const RegionTable = ({
+const TableContainer = ({
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   ...props
@@ -25,4 +24,4 @@ const RegionTable = ({
   );
 };
 
-export default RegionTable;
+export default TableContainer;

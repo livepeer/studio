@@ -3,7 +3,7 @@ import NextLink from "next/link";
 import * as DS from "@livepeer.com/design-system";
 import { Link2Icon } from "@radix-ui/react-icons";
 import { IdProvider } from "@radix-ui/react-id";
-import PropsTable from "./PropsTable";
+import Table from "./Table";
 import KeyboardTable from "./KeyboardTable";
 import Preview from "./Preview";
 import DocCodeBlock from "./DocCodeBlock";
@@ -50,7 +50,7 @@ export const components = {
       {...props}
       as="h1"
       size="8"
-      css={{ fontWeight: 500, mb: "$2", lineHeight: "40px" }}
+      css={{ fontWeight: 500, mb: "$4", lineHeight: "40px" }}
     />
   ),
   Description: ({ children, ...props }) => {
@@ -69,7 +69,7 @@ export const components = {
     );
   },
   h2: ({ children, id, ...props }) => (
-    <LinkHeading id={id} css={{ mt: "$7", mb: "$2" }}>
+    <LinkHeading id={id} css={{ mt: "$7", mb: "$4" }}>
       <DS.Heading
         size="2"
         {...props}
@@ -82,7 +82,7 @@ export const components = {
     </LinkHeading>
   ),
   h3: ({ children, id, ...props }) => (
-    <LinkHeading id={id} css={{ mt: "$7", mb: "$1" }}>
+    <LinkHeading id={id} css={{ mt: "$7", mb: "$3" }}>
       <DS.Heading
         {...props}
         id={id}
@@ -103,11 +103,11 @@ export const components = {
   ),
   p: (props) => <DS.Paragraph {...props} css={{ mb: "$3" }} as="p" />,
   a: ({ href = "", ...props }) => {
-    if (href.startsWith("http")) {
+    if (href.startsWith("http") || href.startsWith("mailto")) {
       return (
         <DS.Link
           {...props}
-          variant="blue"
+          variant="violet"
           href={href}
           css={{ fontSize: "inherit" }}
           target="_blank"
@@ -168,6 +168,7 @@ export const components = {
     />
   ),
   pre: ({ children }) => <>{children}</>,
+  inlineCode: (props) => <DS.Code {...props} />,
   code: ({
     className,
     hero,
@@ -179,7 +180,7 @@ export const components = {
   }) => {
     const isInlineCode = !className;
     return isInlineCode ? (
-      <DS.Code {...props} css={{ whiteSpace: "break-spaces" }} />
+      <DS.Code {...props} />
     ) : (
       <DocCodeBlock
         variant="violet"
@@ -212,9 +213,9 @@ export const components = {
   ),
   Kbd: DS.Kbd,
   Code: DS.Code,
-  PropsTable: (props) => (
+  Table: (props) => (
     <DS.Box css={{ mb: "$5" }}>
-      <PropsTable {...props} />
+      <Table {...props} />
     </DS.Box>
   ),
   KeyboardTable: (props) => (

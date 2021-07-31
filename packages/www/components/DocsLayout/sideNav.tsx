@@ -3,8 +3,7 @@ import { Download } from "./icons";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Marked from "./Marked";
-import { Box, Text } from "@livepeer.com/design-system";
+import { Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 type SideNavProps = {
@@ -53,14 +52,15 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
         alignItems: "flex-start",
         cursor: "pointer",
         minHeight: "fit-content",
-        pl: "24px",
+        pl: "$4",
+        my: "$4",
         position: "relative",
       }}>
       <Box
         css={{
           position: "absolute",
-          left: "0",
-          width: "4px",
+          left: 0,
+          width: 4,
           height: "100%",
           transition: "all 0.2s",
           backgroundColor: isSelected ? "$violet9" : "transparent",
@@ -71,18 +71,17 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
         css={{
           fontWeight: isSelected ? 600 : 400,
           transition: "all 0.2s",
-          mr: "$3",
-          fontSize: "14px",
+          mr: "$2",
+          fontSize: "$3",
           letterSpacing: "-0.02em",
         }}>
-        <Marked>{label}</Marked>
+        {label}
       </Box>
       <Box
-        as="i"
         css={{
           transform: isOpen ? "rotate(-90deg)" : "",
           transition: "all 0.1s",
-          mt: "6px",
+          mt: "3px",
         }}>
         <ChevronDownIcon />
       </Box>
@@ -110,7 +109,6 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
       handleTriggerClick={() => setIsOpen((p) => !p)}
       open={isOpen}
       transitionTime={200}
-      css={{ background: "none", mt: "16px" }}
       trigger={
         <Trigger
           isOpen={isOpen}
@@ -118,24 +116,33 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
           isSelected={currentPathSection === `/${route.slug}`}
         />
       }>
-      {route.children.map((child, idx2) => (
-        <Link href={`/${child.slug}`} key={idx2} passHref>
-          <Box
-            as="a"
-            css={{
-              fontSize: "14px",
-              letterSpacing: "-0.02em",
-              color:
-                currentPath === `/${child.slug}` ? "$violet9" : "$hiContrast",
-              ml: "48px !important",
-              mt: "16px !important",
-              transition: "all 0.2s",
-              cursor: "pointer",
-            }}>
-            <Marked>{child.title}</Marked>
-          </Box>
-        </Link>
-      ))}
+      <Box css={{ pt: 0, pb: "$4", background: "none" }}>
+        {route.children.map((child, idx2) => (
+          <Link href={`/${child.slug}`} key={idx2} passHref>
+            <A
+              variant="subtle"
+              css={{
+                py: "$2",
+                textDecoration: "none",
+                display: "block",
+                fontSize: "$3",
+                letterSpacing: "-0.02em",
+                transition: "color .3s",
+                color:
+                  currentPath === `/${child.slug}` ? "$violet11" : "$mauve11",
+                ml: "$7",
+                cursor: "pointer",
+                "&:hover": {
+                  textDecoration: "none",
+                  color: "white",
+                  transition: "color .3s",
+                },
+              }}>
+              {child.title}
+            </A>
+          </Link>
+        ))}
+      </Box>
     </Collapsible>
   );
 };
@@ -149,11 +156,10 @@ const Menu = ({ menu }: MenuProps) => {
     .join("/");
 
   return (
-    <Box
+    <Flex
+      direction="column"
       css={{
-        mt: "8px",
-        display: "flex",
-        flexDirection: "column",
+        mt: "$4",
       }}>
       {menu[0]?.children.map((route, idx) =>
         route.children.length > 0 ? (
@@ -164,45 +170,39 @@ const Menu = ({ menu }: MenuProps) => {
               <Box
                 as="a"
                 css={{
-                  fontSize: "14px",
+                  display: "block",
+                  color:
+                    currentPath === `/${route.slug}`
+                      ? "$violet11"
+                      : "$hiContrast",
+                  textDecoration: "none",
+                  fontSize: "$3",
                   letterSpacing: "-0.02em",
-                  color: "#3C3C3C",
-                  mt: "16px !important",
                   cursor: "pointer",
                   position: "relative",
                   fontWeight: currentPath === `/${route.slug}` ? 600 : 400,
-                  pl: "24px",
+                  pl: "$4",
                 }}>
                 <Box
                   css={{
                     position: "absolute",
-                    left: "0",
-                    width: "4px",
+                    left: 0,
+                    width: 4,
                     height: "100%",
                     transition: "all 0.2s",
                     background:
                       currentPath === `/${route.slug}`
                         ? "$violet9"
                         : "transparent",
-                    borderRadius: " 0 2px 2px 0",
                   }}
                 />
-                <Box
-                  as="span"
-                  css={{
-                    color: "#3C3C3C",
-                    ":hover": {
-                      color: "#000000",
-                    },
-                  }}>
-                  <Marked>{route.title}</Marked>
-                </Box>
+                <Box>{route.title}</Box>
               </Box>
             </Link>
           )
         )
       )}
-    </Box>
+    </Flex>
   );
 };
 
@@ -216,12 +216,12 @@ const SideNav = ({
   return (
     <Box
       css={{
-        height: `calc(100vh - ${hideTopNav ? "76px" : "136px"})`,
+        height: `calc(100vh - 75px)`,
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
         marginTop: hideTopNav ? "-60px" : "",
-        marginLeft: hideSideBar ? "-233px" : "0px",
+        marginLeft: hideSideBar ? "-258px" : "0px",
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -231,10 +231,10 @@ const SideNav = ({
       }}>
       <Box
         css={{
-          width: "233px",
-          minWidth: "233px",
-          maxWidth: "233px",
-          padding: "24px 0",
+          width: 258,
+          minWidth: 258,
+          maxWidth: 258,
+          py: "$4",
         }}>
         <Text
           size="1"
@@ -242,8 +242,8 @@ const SideNav = ({
           css={{
             letterSpacing: "0.08em",
             fontWeight: "bold",
-            ml: "24px",
-            mt: "8px",
+            ml: "$4",
+            mt: "$3",
           }}>
           CONTENT
         </Text>
@@ -261,7 +261,6 @@ const SideNav = ({
           justifyContent: "center",
         }}>
         <Box
-          as="i"
           onClick={() => setHideSideBar(!hideSideBar)}
           onMouseOver={() => setIconHover(true)}
           onMouseOut={() => setIconHover(false)}
@@ -336,14 +335,12 @@ export const MobileSideNav = ({
           zIndex: 100,
         }}>
         <Box
-          as="p"
           css={{
-            fontSize: "10px",
-            color: "#4F4F4F",
-            letterSpacing: "0.08em",
+            fontSize: "$2",
+            letterSpacing: "-2px",
             fontWeight: "bold",
-            ml: "24px",
-            mt: "8px",
+            ml: "$4",
+            mt: "$4",
           }}>
           CONTENT
         </Box>

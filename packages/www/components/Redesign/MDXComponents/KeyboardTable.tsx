@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text, Kbd } from "@livepeer.com/design-system";
-import RegionTable from "./RegionTable";
+import TableContainer from "./TableContainer";
 
 type KeyboardDef = {
   keys: string[];
@@ -18,7 +18,7 @@ const KeyboardTable = ({
 }) => {
   const hasAriaLabel = !!(ariaLabel || ariaLabelledBy);
   return (
-    <RegionTable
+    <TableContainer
       css={{
         width: "100%",
         textAlign: "left",
@@ -70,7 +70,7 @@ const KeyboardTable = ({
           </tr>
         ))}
       </tbody>
-    </RegionTable>
+    </TableContainer>
   );
 };
 

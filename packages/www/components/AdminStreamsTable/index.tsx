@@ -187,7 +187,7 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
           <Checkbox value={nonLivepeerOnly} />
           <Box sx={{ ml: "0.5em" }}>
             {" "}
-            Exclude streams from a Livepeer email address
+            Exclude streams from a livepeer.com or livepeer.org email address
           </Box>
         </Flex>
       </CommonAdminTable>
