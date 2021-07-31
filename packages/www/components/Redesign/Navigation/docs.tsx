@@ -104,6 +104,7 @@ const DocsNav = ({
                 py: "8px",
                 width: "215px",
                 ml: "21px",
+                color: "$mauve11",
                 cursor: "pointer",
                 "@bp2": {
                   display: "flex",
@@ -120,6 +121,7 @@ const DocsNav = ({
                   border: "1px solid $colors$mauve7",
                   p: "$1",
                   borderRadius: "4px",
+                  color: "$mauve11",
                 }}>
                 <Box css={{ fontSize: "10px" }}>⌘ K</Box>
               </Box>

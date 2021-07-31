@@ -23,9 +23,22 @@
   --gray-500: #70717a;
   --gray-600: #4a5563;
   --text: #000;
-  --accent: #943cff;
+  --accent: #9e8cfc;
 
   color: var(--text);
+}
+
+.dark-theme .DocSearch-Container {
+  --background: #1d1e21;
+  --border: #3e3e3e;
+  --gray-100: #464749;
+  --gray-200: var(--border);
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #d3d3d3;
+  --gray-600: #d0d5db;
+  --text: white;
+  --accent: #9e8cfc;
 }
 
 @media (min-width: 640px) {
@@ -54,7 +67,7 @@
   display: none;
   width: 1.5rem;
   height: 1.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke-width='2' stroke='%23red' /%3E%3Cpath d='M3,12a9,9 0 1,0 18,0a9,9 0 1,0 -18,0' stroke-width='2' stroke='%23943cff' stroke-dasharray='56.5486677646' stroke-dashoffset='37.6991118431' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='9' stroke-width='2' stroke='%23red' /%3E%3Cpath d='M3,12a9,9 0 1,0 18,0a9,9 0 1,0 -18,0' stroke-width='2' stroke='%239e8cfc' stroke-dasharray='56.5486677646' stroke-dashoffset='37.6991118431' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-size: 100% 100%;
 }
 
@@ -104,7 +117,7 @@
   flex: none;
   width: 1.5rem;
   height: 1.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z' stroke='%23943cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z' stroke='%239e8cfc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
   background-size: 100%;
 }
 
@@ -127,6 +140,7 @@
   margin-right: 1rem;
   flex: auto;
   min-width: 0;
+  border: 0;
 }
 
 .DocSearch-Input:focus {

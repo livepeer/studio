@@ -73,6 +73,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           mr: "$2",
           fontSize: "$3",
           letterSpacing: "-0.02em",
+          color: "$hiContrast",
         }}>
         {label}
       </Box>
@@ -81,6 +82,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           transform: isOpen ? "rotate(-90deg)" : "",
           transition: "all 0.1s",
           mt: "3px",
+          color: "$hiContrast",
         }}>
         <ChevronDownIcon />
       </Box>
@@ -133,8 +135,7 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
                 cursor: "pointer",
                 "&:hover": {
                   textDecoration: "none",
-                  color: "white",
-                  transition: "color .3s",
+                  color: "$violet11",
                 },
               }}>
               {child.title}
@@ -219,7 +220,7 @@ const SideNav = ({
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
-        marginLeft: hideSideBar ? -258 : 0,
+        marginLeft: hideSideBar ? -215 : 0,
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -229,9 +230,9 @@ const SideNav = ({
       }}>
       <Box
         css={{
-          width: 258,
-          minWidth: 258,
-          maxWidth: 258,
+          width: 215,
+          minWidth: 215,
+          maxWidth: 215,
         }}>
         <Menu menu={menu} />
       </Box>
