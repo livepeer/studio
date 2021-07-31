@@ -1,0 +1,141 @@
+---
+title: Overview
+description: Livepeer.com API Reference | The session object
+---
+
+# The `session` object
+
+The `session` object is a single live streaming session. It is an especially
+important Livepeer.com API object if need to reference recorded live stream
+sessions.
+
+All `session` objects have a `stream` object parent. The session's `parentId` is
+the same string as its parent stream's `id`.
+
+All `session` objects are read-only. Many `session` parameter values are
+inherited directly from its `stream` parent, for example `profiles`, `record`,
+`streamKey` and `playbackId` (all sessions with the same `parentId` use the same
+`streamKey` and have the same .m3u8 playback URL).
+
+Other `session` parameter values are unique to it, for example `id`, ingested
+`sourceSegments`, duration data, and `recordingUrl` among others.
+
+## Attributes
+
+<Table
+  data={[
+    {
+      paramater: <code>createdAt</code>,
+      type: <code>number</code>,
+      description:
+        "Timestamp when the session was created. Reported in Unix epoch time.",
+    },
+    {
+      paramater: <code>createdByTokenName</code>,
+      type: <code>string</code>,
+      description:
+        "Livepeer.com user-assigned name for the API key that created the stream object.",
+    },
+    {
+      paramater: <code>id</code>,
+      type: <code>string</code>,
+      description: "Unique identifier for the session.",
+    },
+    {
+      paramater: <code>isActive</code>,
+      type: <code>boolean</code>,
+      description: (
+        <span>
+          <code>true</code> while the session is active and up to about five
+          minutes after it has ended. <code>false</code> after that."
+        </span>
+      ),
+    },
+    {
+      paramater: <code>kind</code>,
+      type: <code>string</code>,
+      description: "Livepeer.com API object type.",
+    },
+    {
+      paramater: <code>lastSeen</code>,
+      type: <code>number</code>,
+      description:
+        "Timestamp when video was last ingested for the session. Reported in Unix epoch time.",
+    },
+    {
+      paramater: <code>name</code>,
+      type: <code>string</code>,
+      description: "Additional identifier for the asset. Not customizable.",
+    },
+    {
+      paramater: <code>parentId</code>,
+      type: <code>string</code>,
+      description:
+        "Points to a parent stream object. The session's parentId is the same string as its parent stream's id.",
+    },
+    {
+      paramater: <code>playbackId</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier used to form the live stream playback URL. All sessions with the same parentId have the same .m3u8 playback URL.",
+    },
+    {
+      paramater: <code>profiles</code>,
+      type: <code>array</code>,
+      description:
+        "Transcoding rendition settings, inherited from the parent stream profiles. The source will be delivered with the renditions in the HLS and does not need to be redefined in the profiles parameter. If no profiles are defined, only the source will be delivered for playback.",
+    },
+    {
+      paramater: <code>record</code>,
+      type: <code>boolean</code>,
+      description:
+        "true means the session is being recorded or was recorded. false means the session is not being recorded or was not recorded. IMPORTANT: If you change the parent stream record value, the new setting will only apply to future sessions, but not the active session.",
+    },
+    {
+      paramater: <code>recordingStatus</code>,
+      type: <code>string</code>,
+      description:
+        "Appears only if record is true. It is either ready when the recorded live stream is available for playback or waiting while the livestream is still active or just recently completed.",
+    },
+    {
+      paramater: <code>recordingURL</code>,
+      type: <code>string</code>,
+      description:
+        "Appears only if record is true and when recordingStatus changes to ready. Its value is the .m3u8 URL to stream the recorded session.",
+    },
+    {
+      paramater: <code>sourceSegments</code>,
+      type: <code>number</code>,
+      description: "Number of source segments processed.",
+    },
+    {
+      paramater: <code>sourceSegmentsDuration</code>,
+      type: <code>number</code>,
+      description: "Duration in seconds of session source processed.",
+    },
+    {
+      paramater: <code>streamKey</code>,
+      type: <code>string</code>,
+      description:
+        "Unique secret key used to form the RTMP ingest URL. All sessions with the same parentId use the same streamKey.",
+    },
+    {
+      paramater: <code>transcodedSegments</code>,
+      type: <code>number</code>,
+      description:
+        "Number of transcoded rendition segments processed. Should be (sourceSegments * number of profiles).",
+    },
+    {
+      paramater: <code>transcodedSegmentsDuration</code>,
+      type: <code>number</code>,
+      description:
+        "Duration in seconds of transcoded renditions processed. Should be (sourceSegmentsDuration * number of profiles).",
+    },
+    {
+      paramater: <code>userId</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier for the Livepeer.com user account that created the parent stream object.",
+    },
+  ]}
+/>

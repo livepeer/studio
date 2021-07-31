@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Download } from "./icons";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -53,7 +52,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
         cursor: "pointer",
         minHeight: "fit-content",
         pl: "$4",
-        my: "$4",
+        my: "$2",
         position: "relative",
       }}>
       <Box
@@ -182,6 +181,7 @@ const Menu = ({ menu }: MenuProps) => {
                   position: "relative",
                   fontWeight: currentPath === `/${route.slug}` ? 600 : 400,
                   pl: "$4",
+                  my: "$2",
                 }}>
                 <Box
                   css={{
@@ -212,7 +212,6 @@ const SideNav = ({
   setHideSideBar,
   menu,
 }: SideNavProps & MenuProps) => {
-  const [iconHover, setIconHover] = useState(false);
   return (
     <Box
       css={{
@@ -234,26 +233,14 @@ const SideNav = ({
           width: 258,
           minWidth: 258,
           maxWidth: 258,
-          py: "$4",
         }}>
-        <Text
-          size="1"
-          variant="gray"
-          css={{
-            letterSpacing: "0.08em",
-            fontWeight: "bold",
-            ml: "$4",
-            mt: "$3",
-          }}>
-          CONTENT
-        </Text>
         <Menu menu={menu} />
       </Box>
       <Box
         css={{
           borderRight: "1px solid $colors$mauve5",
           height: "100%",
-          pt: "24px",
+          pt: "$5",
           transition: "all 0.2s",
           width: "60px",
           minWidth: "60px",
@@ -262,8 +249,6 @@ const SideNav = ({
         }}>
         <Box
           onClick={() => setHideSideBar(!hideSideBar)}
-          onMouseOver={() => setIconHover(true)}
-          onMouseOut={() => setIconHover(false)}
           css={{
             cursor: "pointer",
             transition: "all 0.2s",
@@ -275,7 +260,25 @@ const SideNav = ({
             width: "22px",
             transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
           }}>
-          <Download hovered={iconHover} />
+          <Box
+            as="svg"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <Box
+              as="path"
+              d="M4.16732 2.5L15.834 2.5M14.1673 11.6667L10.0007 7.5M10.0007 7.5L5.83398 11.6667M10.0007 7.5L10.0006 17.5"
+              css={{
+                stroke: "$hiContrast",
+                transition: "0.2s",
+              }}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -315,7 +318,7 @@ export const MobileSideNav = ({
         onClick={() => setIsOpen(false)}
         css={{
           position: "fixed",
-          background: "rgba(0, 0, 0, 0.32)",
+          bc: "$panel",
           height: "100vh",
           width: "100vw",
           transition: "all 0.2s",
@@ -328,22 +331,13 @@ export const MobileSideNav = ({
       />
       <Box
         css={{
+          bc: "$panel",
           padding: "24px 38px 24px 0",
           maxWidth: "100%",
           paddingBottom: "120px",
           overflow: "auto",
           zIndex: 100,
         }}>
-        <Box
-          css={{
-            fontSize: "$2",
-            letterSpacing: "-2px",
-            fontWeight: "bold",
-            ml: "$4",
-            mt: "$4",
-          }}>
-          CONTENT
-        </Box>
         <Menu menu={menu} />
       </Box>
     </Box>

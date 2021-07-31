@@ -50,7 +50,7 @@ export const components = {
       {...props}
       as="h1"
       size="8"
-      css={{ fontWeight: 500, mb: "$4", lineHeight: "40px" }}
+      css={{ fontWeight: 600, mb: "$4", lineHeight: "40px" }}
     />
   ),
   Description: ({ children, ...props }) => {

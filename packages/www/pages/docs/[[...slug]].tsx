@@ -6,7 +6,6 @@ import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
 import { docsPositions } from "docs-positions";
 import { useRouter } from "next/router";
-import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
 import { FiList } from "react-icons/fi";
 import { CgClose } from "react-icons/cg";
 import { NextSeo, NextSeoProps } from "next-seo";
@@ -18,12 +17,10 @@ import { ContextProviders } from "layouts/redesign";
 const mobileCategories = [
   {
     name: "Guides",
-    icon: <IconVideoGuides id="mobileVideoGuides" />,
     slug: "/docs/guides",
   },
   {
     name: "API Reference",
-    icon: <IconApiReference id="mobileApiReference" />,
     slug: "/docs/api-reference",
   },
 ];
@@ -31,12 +28,10 @@ const mobileCategories = [
 const categories = [
   {
     name: "Guides",
-    icon: <IconVideoGuides />,
     slug: "/docs/guides",
   },
   {
     name: "API Reference",
-    icon: <IconApiReference />,
     slug: "/docs/api-reference",
   },
 ];
