@@ -1,6 +1,8 @@
 import { Container, Grid, Box, global } from "@livepeer.com/design-system";
 import DocsNav from "@components/Redesign/Navigation/docs";
-import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
+import TableOfContents, {
+  MobileTableOfContents,
+} from "@components/Redesign/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
@@ -83,9 +85,9 @@ const globalStyles = global({
 });
 
 const DocsIndex = ({ doc, menu }) => {
-  const [hideTopNav, setHideTopNav] = useState(false);
-  const [hideSideBar, setHideSideBar] = useState(false);
-  const [mobileSideNavOpen, setMobileSideNavOpen] = useState(false);
+  const [hideTableOfContents, setHideTableOfContents] = useState(false);
+  const [mobileTableOfContentsOpen, setMobileTableOfContentsOpen] =
+    useState(false);
   const router = useRouter();
 
   const currentMenu = useMemo(() => {
@@ -128,7 +130,7 @@ const DocsIndex = ({ doc, menu }) => {
     <ContextProviders theme="dark">
       <NextSeo {...resolvedSEO} />
       <Box
-        onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
+        onClick={() => setMobileTableOfContentsOpen(!mobileTableOfContentsOpen)}
         css={{
           display: "flex",
           position: "fixed",
@@ -146,7 +148,7 @@ const DocsIndex = ({ doc, menu }) => {
             display: "none",
           },
         }}>
-        {mobileSideNavOpen ? (
+        {mobileTableOfContentsOpen ? (
           <CgClose color="white" size={24} />
         ) : (
           <FiList color="white" size={24} />
@@ -162,22 +164,16 @@ const DocsIndex = ({ doc, menu }) => {
             display: "grid",
           },
         }}>
-        <DocsNav
-          hideTopNav={hideTopNav}
-          setHideTopNav={setHideTopNav}
-          categories={categories}
-          mobileCategories={mobileCategories}
-        />
-        <SideNav
+        <DocsNav categories={categories} mobileCategories={mobileCategories} />
+        <TableOfContents
           menu={currentMenu}
-          hideTopNav={hideTopNav}
-          hideSideBar={hideSideBar}
-          setHideSideBar={setHideSideBar}
+          hideTableOfContents={hideTableOfContents}
+          setHideTableOfContents={setHideTableOfContents}
         />
-        <MobileSideNav
-          isOpen={mobileSideNavOpen}
+        <MobileTableOfContents
+          isOpen={mobileTableOfContentsOpen}
           menu={currentMenu}
-          setIsOpen={setMobileSideNavOpen}
+          setIsOpen={setMobileTableOfContentsOpen}
         />
         <Container size="3">
           <Grid

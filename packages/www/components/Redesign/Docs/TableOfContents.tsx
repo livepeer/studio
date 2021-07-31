@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Link as A } from "@livepeer.com/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 
-type SideNavProps = {
-  hideTopNav: boolean;
-  hideSideBar: boolean;
-  setHideSideBar: React.Dispatch<React.SetStateAction<boolean>>;
+type TableOfContentsProps = {
+  hideTableOfContents: boolean;
+  setHideTableOfContents: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type Child = {
@@ -32,7 +31,7 @@ type MenuProps = {
   }[];
 };
 
-type MobileSideNavProps = {
+type MobileTableOfContentsProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -207,12 +206,11 @@ const Menu = ({ menu }: MenuProps) => {
   );
 };
 
-const SideNav = ({
-  hideTopNav,
-  hideSideBar,
-  setHideSideBar,
+const TableOfContents = ({
+  hideTableOfContents,
+  setHideTableOfContents,
   menu,
-}: SideNavProps & MenuProps) => {
+}: TableOfContentsProps & MenuProps) => {
   return (
     <Box
       css={{
@@ -220,7 +218,7 @@ const SideNav = ({
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
-        marginLeft: hideSideBar ? -215 : 0,
+        marginLeft: hideTableOfContents ? -215 : 0,
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -248,7 +246,7 @@ const SideNav = ({
           justifyContent: "center",
         }}>
         <Box
-          onClick={() => setHideSideBar(!hideSideBar)}
+          onClick={() => setHideTableOfContents(!hideTableOfContents)}
           css={{
             cursor: "pointer",
             transition: "all 0.2s",
@@ -258,7 +256,9 @@ const SideNav = ({
             maxHeight: "22px",
             height: "22px",
             width: "22px",
-            transform: hideSideBar ? "rotate(-270deg)" : "rotate(-90deg)",
+            transform: hideTableOfContents
+              ? "rotate(-270deg)"
+              : "rotate(-90deg)",
           }}>
           <Box
             as="svg"
@@ -285,11 +285,11 @@ const SideNav = ({
   );
 };
 
-export const MobileSideNav = ({
+export const MobileTableOfContents = ({
   menu,
   isOpen,
   setIsOpen,
-}: MobileSideNavProps & MenuProps) => {
+}: MobileTableOfContentsProps & MenuProps) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -344,4 +344,4 @@ export const MobileSideNav = ({
   );
 };
 
-export default SideNav;
+export default TableOfContents;

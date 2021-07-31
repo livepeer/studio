@@ -76,7 +76,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                   fontWeight: 700,
                   mb: "$6",
                   mr: "$6",
-                  "@bp2": { lineHeight: 1.4, letterSpacing: "-1px" },
+                  "@bp2": { lineHeight: 1.4 },
                 }}>
                 {heading}
               </Heading>

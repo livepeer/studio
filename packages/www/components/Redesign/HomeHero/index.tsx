@@ -126,7 +126,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               position: "relative",
             }}>
             <Box
-              as="h2"
+              as="h1"
               css={{
                 color: "$hiContrast",
                 fontSize: 40,
@@ -136,7 +136,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 mx: "auto",
                 maxWidth: 700,
                 fontWeight: 700,
-                letterSpacing: "-1px",
+                letterSpacing: "-3px",
                 "@bp1": {
                   fontSize: 52,
                   lineHeight: 1.1,

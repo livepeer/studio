@@ -162,7 +162,7 @@ const NavigationBase = ({
                   <Box
                     css={{
                       fontSize: "$3",
-                      fontWeight: 600,
+                      fontWeight: 500,
                       textDecoration: "none",
                       mx: "$3",
                       cursor: "pointer",
@@ -177,7 +177,7 @@ const NavigationBase = ({
                       css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
                     />
                     <Box>
-                      <Text css={{ fontWeight: 600, mb: "$2" }}>
+                      <Text css={{ fontWeight: 500, mb: "$2" }}>
                         Streaming Platforms
                       </Text>
                       <Box css={{ color: "$mauve5" }}>
@@ -223,7 +223,7 @@ const NavigationBase = ({
                     <ArrowLink
                       hideArrow
                       href="/use-cases/ecommerce"
-                      css={{ fontWeight: 600, mb: "$2", fontSize: "$3" }}>
+                      css={{ fontWeight: 500, mb: "$2", fontSize: "$3" }}>
                       Ecommerce
                     </ArrowLink>
                   </Flex>
@@ -236,7 +236,7 @@ const NavigationBase = ({
                       css={{
                         display: "block",
                         fontSize: "$3",
-                        fontWeight: 600,
+                        fontWeight: 500,
                         textDecoration: "none",
                         mx: "$3",
                       }}>
@@ -262,7 +262,7 @@ const NavigationBase = ({
                     <A
                       css={{
                         fontSize: "$3",
-                        fontWeight: 600,
+                        fontWeight: 500,
                         textDecoration: "none",
                         mr: "$4",
                       }}>
@@ -283,7 +283,7 @@ const NavigationBase = ({
                       <A
                         css={{
                           fontSize: "$3",
-                          fontWeight: 600,
+                          fontWeight: 500,
                           textDecoration: "none",
                           mr: "$4",
                         }}>

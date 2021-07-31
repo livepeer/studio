@@ -1,5 +1,5 @@
 import Button from "components/Redesign/Button";
-import { Badge, Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
 import Logo from "components/Redesign/Logo";
 import { useApi } from "hooks";
 import NextLink from "next/link";
@@ -11,23 +11,16 @@ import ArrowLink from "components/Redesign/ArrowLink";
 import Link from "next/link";
 
 type DocsNavProps = {
-  hideTopNav: boolean;
-  setHideTopNav: React.Dispatch<React.SetStateAction<boolean>>;
   categories: { name: string; slug: string }[];
   mobileCategories: { name: string; slug: string }[];
 };
 
-const DocsNav = ({
-  hideTopNav,
-  setHideTopNav,
-  categories,
-  mobileCategories,
-}: DocsNavProps) => {
+const DocsNav = ({ categories, mobileCategories }: DocsNavProps) => {
   const { pathname } = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [closeSelect, setCloseSelect] = useState(false);
-  const { token, logout } = useApi();
+  const { token } = useApi();
   const isDashboard = pathname.includes("/dashboard/");
   const router = useRouter();
   const currentPath = router.asPath
@@ -80,7 +73,6 @@ const DocsNav = ({
           py: "$3",
           px: "$5",
           transition: "all 0.2s",
-          transform: hideTopNav ? "translateY(-60px)" : "none",
           top: 0,
           zIndex: 100,
           bc: "$loContrast",

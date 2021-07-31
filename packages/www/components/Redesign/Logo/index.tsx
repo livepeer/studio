@@ -16,8 +16,8 @@ const Logo = ({ logoType = true, withoutBeta }: Props) => (
         display: "flex",
         alignItems: "center",
         cursor: "pointer",
-        letterSpacing: "-.2px",
-        fontSize: "22px",
+        letterSpacing: "-.3px",
+        fontSize: "21px",
         fontWeight: 700,
         "&:hover": {
           textDecoration: "none",

@@ -48,7 +48,7 @@ const Hero = ({ heading, description, image }) => {
                   "@bp2": {
                     fontSize: "$9",
                     lineHeight: "68px",
-                    letterSpacing: "-1px",
+                    letterSpacing: "-3px",
                   },
                 }}>
                 {heading}
