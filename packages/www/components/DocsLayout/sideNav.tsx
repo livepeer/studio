@@ -215,12 +215,11 @@ const SideNav = ({
   return (
     <Box
       css={{
-        height: `calc(100vh - 75px)`,
+        height: "calc(100vh - 72px)",
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
-        marginTop: hideTopNav ? "-60px" : "",
-        marginLeft: hideSideBar ? "-258px" : "0px",
+        marginLeft: hideSideBar ? -258 : 0,
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -238,8 +237,8 @@ const SideNav = ({
       </Box>
       <Box
         css={{
+          height: "100vh",
           borderRight: "1px solid $colors$mauve5",
-          height: "100%",
           pt: "$5",
           transition: "all 0.2s",
           width: "60px",

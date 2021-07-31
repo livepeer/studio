@@ -196,15 +196,15 @@ const DocsIndex = ({ doc, menu }) => {
                 display: "flex",
                 flexDirection: "column",
                 width: "100%",
-                maxWidth: "768px",
-                paddingBottom: "80px",
+                maxWidth: 768,
+                paddingBottom: 80,
               }}>
               <Box
                 css={{
                   display: "flex",
                   alignItems: "center",
                   color: "$hiContrast",
-                  fontSize: "12px",
+                  fontSize: "$2",
                   letterSpacing: "-0.02em",
                   mb: "16px",
                 }}
