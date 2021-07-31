@@ -37,7 +37,7 @@ type Profile = DBStream["profiles"][number];
 type PushTargetRef = DBStream["pushTargets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
-const HTTP_PUSH_TIMEOUT = 10 * 1000; // value in the go-livepeer codebase
+const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
 const ACTIVE_TIMEOUT = 90 * 1000;
 
 const app = Router();
