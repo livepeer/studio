@@ -202,7 +202,7 @@ const DocsIndex = ({ doc, menu }) => {
                   color: "$hiContrast",
                   fontSize: "$2",
                   letterSpacing: "-0.02em",
-                  mb: "16px",
+                  mb: "$3",
                 }}
                 className="breadcrumb">
                 {breadCrumb.slice(2, 5).map((a, idx) => (

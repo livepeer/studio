@@ -46,11 +46,11 @@ export const components = {
   ),
 
   h1: (props) => (
-    <DS.Text
+    <DS.Heading
       {...props}
       as="h1"
-      size="8"
-      css={{ fontWeight: 600, mb: "$4", lineHeight: "40px" }}
+      size="3"
+      css={{ fontWeight: 600, mb: "$3", lineHeight: "40px" }}
     />
   ),
   Description: ({ children, ...props }) => {

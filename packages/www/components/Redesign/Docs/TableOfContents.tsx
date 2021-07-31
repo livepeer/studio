@@ -232,6 +232,18 @@ const TableOfContents = ({
           minWidth: 215,
           maxWidth: 215,
         }}>
+        <Box
+          css={{
+            pt: 30,
+            pl: "$4",
+            textTransform: "uppercase",
+            fontSize: "$1",
+            fontWeight: 700,
+            color: "$mauve9",
+            letterSpacing: "-.5px",
+          }}>
+          DOCUMENTATION
+        </Box>
         <Menu menu={menu} />
       </Box>
       <Box
