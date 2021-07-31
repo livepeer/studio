@@ -37,6 +37,7 @@ type Profile = DBStream["profiles"][number];
 type PushTargetRef = DBStream["pushTargets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
+const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
 const ACTIVE_TIMEOUT = 90 * 1000;
 
 const app = Router();
@@ -894,6 +895,64 @@ app.put(
       userId: user.id,
     });
 
+    if (!req.body.active && stream.record === true) {
+      // emit recording.ready
+      // find last session
+      const session = await db.stream.getLastSession(stream.id);
+      if (session) {
+        if (
+          (session.lastSeen ?? 0) <
+          (req.body.startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
+        ) {
+          // last session is too old, probably transcoding wasn't happening, and so there
+          // will be no recording
+        } else {
+          const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+          const recordingUrl = getRecordingUrl(ingest, session);
+          const mp4Url = getRecordingUrl(ingest, session, true);
+          req.queue.delayedEmit(
+            {
+              id: uuid(),
+              createdAt: Date.now(),
+              channel: "webhooks",
+              event: "recording.ready",
+              streamId: id,
+              userId: user.id,
+              payload: {
+                recordingUrl,
+                mp4Url,
+                // this info is for cannon
+                sessionId: session.id,
+              },
+            },
+            USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
+          );
+        }
+      }
+    }
+    if (req.body.active === true && stream.record === true) {
+      let shouldEmit = true;
+      const session = await db.stream.getLastSession(stream.id);
+      if (session) {
+        const now = Date.now();
+        const since = now - (session.lastSeen ?? 0);
+        if (now - (session.lastSeen ?? 0) < USER_SESSION_TIMEOUT) {
+          // there is recent session exits, so new one will be joined with last one
+          // not emitting "recording.started" because it will be same recorded session
+          shouldEmit = false;
+        }
+      }
+      if (shouldEmit) {
+        req.queue.emit({
+          id: uuid(),
+          createdAt: Date.now(),
+          channel: "webhooks",
+          event: "recording.started",
+          streamId: id,
+          userId: user.id,
+        });
+      }
+    }
     stream.isActive = !!req.body.active;
     stream.lastSeen = +new Date();
     const { ownRegion: region } = req.config;
