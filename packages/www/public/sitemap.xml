@@ -26,7 +26,7 @@
 <url><loc>https://livepeer.com/docs/guides/api</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/api-key</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/authentication</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app/example-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development/example-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/broadcasting</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/create-a-stream</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/debug-live-stream-issues</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
@@ -36,14 +36,14 @@
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/handling-disconnects</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/ingest</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app/live-streaming-from-your-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development/live-streaming-from-your-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app/per-stream-metrics</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development/per-stream-metrics</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/playback</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/record</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/back-up-transcoding</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app/video-playback-in-your-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development/video-playback-in-your-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/cdn</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/support-matrix</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
@@ -51,8 +51,8 @@
 <url><loc>https://livepeer.com/docs/api-reference/stream/stream</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/reducing-latency</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/usage-and-billing</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app/custom-domain</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
-<url><loc>https://livepeer.com/docs/guides/using-livepeer-in-your-app</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development/custom-domain</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
+<url><loc>https://livepeer.com/docs/guides/application-development</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/verify</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/session/list-recorded-sessions</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/session/list-sessions</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-06-07T19:42:45.481Z</lastmod></url>

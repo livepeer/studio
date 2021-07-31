@@ -194,6 +194,7 @@ const DocsIndex = ({ doc, menu }) => {
                 width: "100%",
                 maxWidth: 768,
                 paddingBottom: 80,
+                overflow: "hidden",
               }}>
               <Box
                 css={{

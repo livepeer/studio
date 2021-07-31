@@ -9,8 +9,8 @@ import Preview from "./Preview";
 import DocCodeBlock from "./DocCodeBlock";
 import { PackageRelease, PRLink } from "./releaseHelpers";
 import HeroContainer from "./HeroContainer";
-import Post from "./Post";
 import Card from "./Card";
+import Post from "./Post";
 
 export type Frontmatter = {
   metaTitle: string;
@@ -50,7 +50,7 @@ export const components = {
       {...props}
       as="h1"
       size="3"
-      css={{ fontWeight: 600, mb: "$3", lineHeight: "40px" }}
+      css={{ fontWeight: 600, mb: "$6", lineHeight: "40px" }}
     />
   ),
   Description: ({ children, ...props }) => {
@@ -75,7 +75,7 @@ export const components = {
         {...props}
         id={id}
         as={"h2" as any}
-        css={{ scrollMarginTop: "$8" }}
+        css={{ fontWeight: 600, scrollMarginTop: "$8" }}
         data-heading>
         {children}
       </DS.Heading>
@@ -87,7 +87,7 @@ export const components = {
         {...props}
         id={id}
         as={"h3" as any}
-        css={{ scrollMarginTop: "$8" }}
+        css={{ fontWeight: 600, scrollMarginTop: "$8" }}
         data-heading>
         {children}
       </DS.Heading>

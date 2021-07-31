@@ -19,10 +19,10 @@ ingested `sourceSegments` and duration data, among others.
 
 <Alert css={{ mt: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
-    Historically, a <code>stream</code> object with a <code>parentId</code>{" "}
-    represents a single live stream session. This type of "child-session" stream
-    object will be deprecated in an upcoming version of the API in favor of the{" "}
-    <code>session</code> object.
+    Note: historically, a <code>stream</code> object with a{" "}
+    <code>parentId</code> represented a single live stream session. This type of
+    "child-session" stream object will be deprecated in an upcoming version of
+    the API in favor of the <code>session</code> object.
   </Text>
 </Alert>
 
@@ -130,29 +130,29 @@ ingested `sourceSegments` and duration data, among others.
       description: "Number of asset source segments processed.",
     },
     {
-      paramater: <code>sourceSegmentsDuration</code>,
+      parameter: <code>sourceSegmentsDuration</code>,
       type: <code>number</code>,
       description: "Duration in seconds of asset source processed.",
     },
     {
-      paramater: <code>streamKey</code>,
+      parameter: <code>streamKey</code>,
       type: <code>string</code>,
       description: "Unique secret key used to form the RTMP ingest URL.",
     },
     {
-      paramater: <code>transcodedSegments</code>,
+      parameter: <code>transcodedSegments</code>,
       type: <code>number</code>,
       description:
         "Number of transcoded rendition segments processed. Should be (sourceSegments * number of profiles).",
     },
     {
-      paramater: <code>transcodedSegmentsDuration</code>,
+      parameter: <code>transcodedSegmentsDuration</code>,
       type: <code>number</code>,
       description:
         "Duration in seconds of transcoded renditions processed. Should be (sourceSegmentsDuration * number of profiles).",
     },
     {
-      paramater: <code>userId</code>,
+      parameter: <code>userId</code>,
       type: <code>string</code>,
       description:
         "Unique identifier for the Livepeer.com user account that created the stream object.",

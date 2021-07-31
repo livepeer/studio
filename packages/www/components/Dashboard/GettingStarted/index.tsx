@@ -99,7 +99,7 @@ const GettingStarted = ({ firstName = "" }) => {
               Livepeer.com is to fork an example app.
             </Text>
             <Link
-              href="/docs/guides/using-livepeer-in-your-app/example-app"
+              href="/docs/guides/application-development/example-app"
               passHref>
               <Button
                 as="a"

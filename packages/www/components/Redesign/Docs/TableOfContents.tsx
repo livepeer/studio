@@ -218,7 +218,7 @@ const TableOfContents = ({
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
-        marginLeft: hideTableOfContents ? -215 : 0,
+        marginLeft: hideTableOfContents ? -220 : 0,
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -228,9 +228,9 @@ const TableOfContents = ({
       }}>
       <Box
         css={{
-          width: 215,
-          minWidth: 215,
-          maxWidth: 215,
+          width: 220,
+          minWidth: 220,
+          maxWidth: 220,
         }}>
         <Box
           css={{

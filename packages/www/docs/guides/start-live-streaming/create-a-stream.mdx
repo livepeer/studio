@@ -11,14 +11,20 @@ Live streaming with Livepeer.com is easy. The first step is understanding the
 `stream` object. It is the core building block of the Livepeer.com platform.
 
 A Livepeer.com `stream` is a unique object with configuration data and metadata
-about all live stream sessions associated with it. Historically, a `stream`
-object with a `parentId` represents a single live stream session. This type of
-“child-session” stream object will be deprecated in an upcoming version of the
-API in favor of the `session` object.
+about all live stream sessions associated with it.
+
+<Alert css={{ mt: "$5", mb: "$6" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Node: historically, a <code>stream</code> object with a{" "}
+    <code>parentId</code> represented a single live stream session. This type of
+    "child-session" stream object will be deprecated in an upcoming version of
+    the API in favor of the <code>session</code> object.
+  </Text>
+</Alert>
 
 There are two ways to create a stream object:
 
-<Grid cols={3}>
+<Grid columns={2} gap={3}>
   <Card
     href="/docs/guides/start-live-streaming/create-a-stream#no-code-stream-creation-with-the-livepeer-com-dashboard"
     title="No code stream creation in the Livepeer.com Dashboard"
