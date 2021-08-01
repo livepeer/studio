@@ -68,7 +68,7 @@ const RegisterPage = () => {
             width: "100%",
             "@bp3": {
               py: "$8",
-              px: "$3",
+              px: "$4",
             },
           }}>
           <Flex

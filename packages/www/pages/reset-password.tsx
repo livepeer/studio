@@ -36,7 +36,7 @@ export default () => {
     <Layout
       title={`Reset Password - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/register`}
+      url={`https://livepeer.com/reset-password`}
       theme="dark">
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
@@ -48,7 +48,7 @@ export default () => {
             width: "100%",
             "@bp3": {
               py: "$8",
-              px: "$3",
+              px: "$4",
             },
           }}>
           <Flex

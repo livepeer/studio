@@ -55,7 +55,7 @@ const ContactPage = () => {
             width: "100%",
             "@bp3": {
               py: "$8",
-              px: "$3",
+              px: "$4",
             },
           }}>
           <Box css={{ mb: "$5", textAlign: "center" }}>

@@ -1,10 +1,16 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Link from "next/link";
-import { parse } from "graphql";
-import { ReactNode, useCallback, useEffect } from "react";
+import { ReactNode, useCallback } from "react";
 import { useApi } from "hooks";
-import { Box } from "@theme-ui/components";
+import {
+  Box,
+  Grid,
+  Flex,
+  Heading,
+  Text,
+  Badge,
+  TextField,
+} from "@livepeer.com/design-system";
+import Button from "components/Redesign/Button";
+import { useRouter } from "next/router";
 
 type PreviewItemProps = {
   title: string;
@@ -76,8 +82,8 @@ const CalculatorItem = ({
 
   return (
     <Box
-      sx={{
-        borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+      css={{
+        borderTop: "1px solid $colors$mauve5",
         py: "32px",
         width: "100%",
         display: "flex",
@@ -85,27 +91,22 @@ const CalculatorItem = ({
         justifyContent: "center",
       }}>
       <Box
-        as="h1"
-        sx={{
+        css={{
           mb: "24px",
           fontSize: "20px",
           lineHeight: "24px",
-          letterSpacing: "-0.04em",
-          fontWeight: "400",
         }}>
         {title}
       </Box>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: ["1fr", "1fr", "56% 38%", "56% 38%"],
+      <Grid
+        gap={4}
+        css={{
+          gridTemplateColumns: "repeat(2,1fr)",
           alignItems: "center",
-          gap: ["20px", "20px", "6%", "6%"],
         }}>
         {children}
         <Box
           as="input"
-          className="pricing__range__input"
           min={min}
           max={max}
           value={value}
@@ -113,24 +114,23 @@ const CalculatorItem = ({
           onChange={handleChange}
           type="range"
           step={step}
-          sx={{
+          css={{
             outline: "none",
-            height: "2px",
+            height: 2,
             width: "100%",
             appearance: "none",
-            background: "#E1E1E1",
-            mt: ["0", "0", `${marginTop ?? ""}`],
+            bc: "$hiContrast",
             "::-webkit-slider-thumb": {
               appearance: "none",
-              width: ["16px", "12px"],
-              height: ["16px", "12px"],
+              width: 16,
+              height: 16,
               borderRadius: "12px",
-              background: "#6e56cf",
+              bc: "$violet9",
               cursor: "grabbing",
             },
           }}
         />
-      </Box>
+      </Grid>
     </Box>
   );
 };
@@ -148,42 +148,38 @@ const ScaleCalculator = ({
     }
   };
   return (
-    <Box
+    <Flex
       as="button"
       aria-label={`${value} Percentage Watched`}
       onClick={handleClick}
-      sx={{
-        width: ["100%", "96px"],
+      css={{
+        width: 96,
         height: "56px",
         borderRadius: "8px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: "1px solid #E6E6E6",
-        boxSizing: "border-box",
-        background: percentageWatched === value ? "#6e56cf" : "#FBFBFB",
+        border: "1px solid $mauve5",
+        bc: "transparent",
+        borderColor: percentageWatched === value ? "$violet9" : "$mauve7",
         cursor: "pointer",
         transition: "all 0.2s",
         "&:hover": {
-          borderColor: "primary",
+          borderColor: "$violet9",
         },
-        "&:focus": {
-          outline: "none",
-          boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-          borderColor: "primary",
+        "@bp2": {
+          width: "100%",
         },
       }}>
       <Box
-        as="p"
-        sx={{
+        css={{
           fontSize: "14px",
-          letterSpacing: "-0.04em",
-          color: percentageWatched === value ? "white" : "black",
-          fontWeight: percentageWatched === value ? "600" : "400",
+          color: percentageWatched === value ? "$violet9" : "$mauve9",
+          fontWeight: percentageWatched === value ? 600 : 400,
         }}>
         {value}%
       </Box>
-    </Box>
+    </Flex>
   );
 };
 
@@ -236,23 +232,20 @@ const Calculator = ({
 
   return (
     <Box
-      sx={{
+      css={{
         display: "flex",
         flexDirection: "column",
         pt: "32px",
         width: "100%",
       }}>
-      <Box
-        as="p"
-        sx={{
-          fontSize: "16px",
-          lineHeight: "16px",
-          letterSpacing: "-0.04em",
-          color: "#525252",
-          mb: "16px",
+      <Text
+        variant="gray"
+        size="4"
+        css={{
+          mb: "$2",
         }}>
         Usage
-      </Box>
+      </Text>
       <CalculatorItem
         title="Average length of stream"
         marginTop="-26px"
@@ -261,129 +254,96 @@ const Calculator = ({
         max={43200}
         step={900}
         value={streamLength}>
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Box
+          css={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+          }}>
           <Box
-            sx={{
-              height: "48px",
+            css={{
+              height: 48,
               width: "100%",
-              maxWidth: ["100%", "100%", "276px"],
+              maxWidth: "100%",
               borderRadius: "6px",
-              border: "1px solid #E6E6E6",
+              border: "1px solid $colors$mauve5",
               fontSize: "20px",
               letterSpacing: "-0.02em",
               display: "flex",
+              bc: "$panel",
               justifyContent: "space-between",
               alignItems: "center",
               px: "16px",
               transition: "all 0.2s",
               "::placeholder": {
-                color: "#7D7D7D",
+                color: "$mauve9",
               },
-              "&:hover": {
-                borderColor: "primary",
+              "@bp2": {
+                width: 250,
               },
             }}>
-            <Box
-              as="input"
+            <TextField
               maxLength={2}
               name="hours"
               onChange={handleChange}
               value={streamLengthDividedTime.hours}
               placeholder="00"
-              sx={{
-                width: "36px",
+              css={{
+                width: 50,
                 display: "flex",
                 justifyContent: "center",
-                px: "6px",
-                transition: "all 0.2s",
+                px: "$2",
                 borderRadius: "6px",
-                "&:focus": {
-                  outline: "none",
-                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                },
               }}
             />
-            <Box as="p" sx={{ color: "#7D7D7D" }}>
-              :
-            </Box>
-            <Box
-              as="input"
+            <Box css={{ color: "$mauve9" }}>:</Box>
+            <TextField
               maxLength={2}
               name="minutes"
               onChange={handleChange}
               value={streamLengthDividedTime.minutes}
               placeholder="00"
-              sx={{
-                width: "36px",
+              css={{
+                width: 50,
                 display: "flex",
                 justifyContent: "center",
-                pl: "6px",
-                transition: "all 0.2s",
+                px: "$2",
                 borderRadius: "6px",
-                "&:focus": {
-                  outline: "none",
-                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                },
               }}
             />
-            <Box as="p" sx={{ color: "#7D7D7D" }}>
-              :
-            </Box>
-            <Box
-              as="input"
+            <Box css={{ color: "$mauve9" }}>:</Box>
+            <TextField
               maxLength={2}
               name="seconds"
               onChange={handleChange}
               value={streamLengthDividedTime.seconds}
               placeholder="00"
-              sx={{
-                width: "36px",
+              css={{
+                width: 50,
                 display: "flex",
                 justifyContent: "center",
-                px: "6px",
-                transition: "all 0.2s",
+                px: "$2",
                 borderRadius: "6px",
-                "&:focus": {
-                  outline: "none",
-                  boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                },
               }}
             />
           </Box>
           <Box
-            sx={{
+            css={{
               display: "flex",
               justifyContent: "space-between",
-              mt: "8px",
-              px: "16px",
+              mt: "$1",
+              px: "$4",
+              width: "100%",
             }}>
-            <Box
-              as="p"
-              sx={{
-                fontSize: "12px",
-                letterSpacing: "-0.04em",
-                color: "#525252",
-              }}>
+            <Text variant="gray" size="1">
               hours
-            </Box>
-            <Box
-              as="p"
-              sx={{
-                fontSize: "12px",
-                letterSpacing: "-0.04em",
-                color: "#525252",
-              }}>
+            </Text>
+            <Text variant="gray" size="1">
               minutes
-            </Box>
-            <Box
-              as="p"
-              sx={{
-                fontSize: "12px",
-                letterSpacing: "-0.04em",
-                color: "#525252",
-              }}>
+            </Text>
+            <Text variant="gray" size="1">
               seconds
-            </Box>
+            </Text>
           </Box>
         </Box>
       </CalculatorItem>
@@ -394,32 +354,13 @@ const Calculator = ({
         max={10000}
         step={50}
         value={monthlyStreams}>
-        <Box
-          as="input"
+        <TextField
+          size="3"
           value={monthlyStreams}
           maxLength={6}
           onChange={(e) => {
             const monthly = parseFloat(e.target.value);
             setMonthlyStreams(monthly > 0 ? monthly : 0);
-          }}
-          sx={{
-            height: "48px",
-            width: "100%",
-            borderRadius: "6px",
-            border: "1px solid #E6E6E6",
-            fontSize: "20px",
-            letterSpacing: "-0.02em",
-            px: "16px",
-            color: monthlyStreams == 0 ? "#7D7D7D" : "black",
-            transition: "all 0.2s",
-            "&:hover": {
-              borderColor: "primary",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-              borderColor: "primary",
-            },
           }}
         />
       </CalculatorItem>
@@ -430,8 +371,8 @@ const Calculator = ({
         max={10000}
         step={50}
         value={viewCount}>
-        <Box
-          as="input"
+        <TextField
+          size="3"
           value={viewCount}
           placeholder="0"
           maxLength={8}
@@ -439,52 +380,31 @@ const Calculator = ({
             const view = parseFloat(e.target.value);
             setViewCount(view > 0 ? view : 0);
           }}
-          sx={{
-            height: "48px",
-            width: "100%",
-            borderRadius: "6px",
-            border: "1px solid #E6E6E6",
-            fontSize: "20px",
-            letterSpacing: "-0.02em",
-            px: "16px",
-            color: viewCount == 0 ? "#7D7D7D" : "black",
-            transition: "all 0.2s",
-            "&:hover": {
-              borderColor: "primary",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-              borderColor: "primary",
-            },
-          }}
         />
       </CalculatorItem>
       <Box
-        sx={{
-          borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+        css={{
+          borderTop: "1px solid $colors$mauve5",
           pt: "32px",
           width: "100%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
         }}>
-        <Box
-          as="h1"
-          sx={{
+        <Text
+          size="5"
+          css={{
             mb: "24px",
-            fontSize: "20px",
-            lineHeight: "24px",
-            letterSpacing: "-0.04em",
-            fontWeight: "400",
           }}>
           What percentage of the stream does the average viewer watch?
-        </Box>
-        <Box
-          sx={{
-            display: ["grid", "flex"],
-            gap: ["12px", "16px"],
-            gridTemplateColumns: ["repeat(4, 1fr)", null],
+        </Text>
+        <Grid
+          gap={3}
+          css={{
+            gridTemplateColumns: "repeat(1, 1fr)",
+            "@bp2": {
+              gridTemplateColumns: "repeat(4, 1fr)",
+            },
           }}>
           {scaleCalculatorValues.map((each, idx) => (
             <ScaleCalculator
@@ -494,7 +414,7 @@ const Calculator = ({
               setPercentageWatched={setPercentageWatched}
             />
           ))}
-        </Box>
+        </Grid>
       </Box>
     </Box>
   );
@@ -510,80 +430,79 @@ const PreviewItem = ({
 }: PreviewItemProps) => {
   return (
     <Box
-      sx={{
-        borderTop: "1px solid rgba(0, 0, 0, 0.08)",
-        minHeight: ["104px", "136px"],
-        pt: ["24px", "48px"],
-        pb: ["8px", "32px"],
+      css={{
+        borderTop: "1px solid $colors$mauve5",
+        minHeight: 104,
+        pt: "$5",
+        pb: "$3",
         width: "100%",
         display: "flex",
-        flexDirection: ["column", "column", "row"],
-        alignItems: ["flex-start", "flex-start", "center"],
+        flexDirection: "column",
         justifyContent: "space-between",
+        "@bp2": {
+          pb: "$5",
+          pt: "$7",
+          minHeight: 136,
+          flexDirection: "row",
+          alignItems: "center",
+        },
       }}>
       <Box
-        sx={{
+        css={{
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
-          maxWidth: "244px",
-          mr: ["0", "0", "15px"],
-          mb: ["8px", "8px", "0"],
+          maxWidth: 244,
+          mb: "$4",
+          position: "relative",
+          "@bp2": {
+            mr: "$4",
+            mb: 0,
+          },
         }}>
-        <Box sx={{ display: "flex", flexDirection: "column", mb: "8px" }}>
+        <Box css={{ display: "flex", flexDirection: "column", mb: "$3" }}>
           <Box
-            as="h1"
-            sx={{
+            css={{
               fontSize: "20px",
               minWidth: "fit-content",
               lineHeight: "24px",
-              letterSpacing: "-0.04em",
-              fontWeight: "600",
+              fontWeight: 600,
             }}>
             {title}
           </Box>
-          {children}
         </Box>
-        <Box
-          as="p"
-          sx={{
-            color: "#525252",
-            fontSize: "12px",
-            lineHeight: "20px",
-            letterSpacing: "-0.04em",
-          }}>
+        <Text variant="gray" size="2">
           {description}
-        </Box>
+        </Text>
       </Box>
+
       <Box
-        sx={{
+        css={{
           display: "flex",
           justifyContent: "center",
           flexDirection: "column",
-          alignItems: ["flex-start", "flex-start", "flex-end", "flex-end"],
+          alignItems: "flex-start",
+          "@bp2": {
+            alignItems: "flex-end",
+          },
         }}>
-        <Box
-          as="h1"
-          sx={{
-            fontSize: ["24px", "24px", "26px", "32px"],
-            lineHeight: "40px",
-            letterSpacing: "-0.04em",
-            fontWeight: "600",
-            textAlign: ["left", "right", "right"],
-            color: color ?? "black",
+        <Text
+          size="7"
+          css={{
+            fontWeight: 600,
+            color: "$hiContrast",
           }}>
           {value}
-        </Box>
+        </Text>
         <Box
-          as="p"
-          sx={{
+          css={{
             fontSize: "16px",
             lineHeight: "24px",
-            letterSpacing: "-0.04em",
             alignSelf: "flex-end",
             textAlign: "right",
           }}>
           {valueClarification}
+          {children}
         </Box>
       </Box>
     </Box>
@@ -593,50 +512,37 @@ const PreviewItem = ({
 const Preview = ({ transcoding, streaming }: PreviewProps) => {
   const totalValue = parseFloat((transcoding + streaming).toFixed(2));
   const { token } = useApi();
+  const router = useRouter();
 
   return (
     <Box
-      sx={{
-        background: "linear-gradient(180deg, #FAFAFA 0%, #FAFAFA 100%)",
-        border: "1px solid #EAEAEA",
+      css={{
+        border: "1px solid $colors$mauve5",
         boxSizing: "border-box",
         borderRadius: "16px",
         display: "flex",
         flexDirection: "column",
         padding: "32px",
         width: "100%",
+        bc: "$loContrast",
       }}>
       <Box
-        sx={{
+        css={{
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
-          pb: "16px",
+          pb: "$2",
         }}>
-        <Box
-          as="p"
-          sx={{
-            fontSize: "16px",
-            lineHeight: "16px",
-            letterSpacing: "-0.04em",
-            color: "#525252",
-          }}>
+        <Text size="4" variant="gray">
           Monthly cost
-        </Box>
-        <Box
-          as="p"
-          sx={{
-            fontSize: "12px",
-            letterSpacing: "-0.04em",
-            color: "#525252",
-            fontStyle: "italic",
-          }}>
+        </Text>
+        <Text size="3" variant="gray" css={{ fontStyle: "italic" }}>
           Prices listed in USD
-        </Box>
+        </Text>
       </Box>
       <PreviewItem
         title="Transcoding"
-        description="Livepeer.com creates multiple versions of your source livestream for different devices in real time."
+        description="Livepeer.com creates multiple versions of your source stream for different devices in real time."
         value={totalValue > 3000 ? "Contact us" : `$${transcoding.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
@@ -662,54 +568,24 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
             ? ""
             : `$${transcoding.toFixed(2)} + $${streaming.toFixed(2)}`
         }
-        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}>
-        {transcoding + streaming > 500 && (
-          <Box
-            as="p"
-            sx={{
-              background: "#00A55F",
-              borderRadius: "4px",
-              padding: "6px 8px",
-              mt: "8px",
-              color: "white",
-              fontWeight: "600",
-              fontSize: "12px",
-              letterSpacing: "-0.03em",
-              minWidth: "fit-content",
-            }}>
-            {totalValue > 3000
-              ? "Contact us For High Volume Discounts"
-              : "High Volume Discounts Available"}
-          </Box>
-        )}
-      </PreviewItem>
-      <Link href={token ? "/dashboard/billing/plans" : "/register"}>
-        <Box
-          as="button"
-          disabled={streaming + transcoding === 0}
-          sx={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "600",
-            fontSize: "20px",
-            color: "white",
-            letterSpacing: "-0.03em",
-            height: "56px",
-            cursor: streaming + transcoding === 0 ? "not-allowed" : "pointer",
-            background: streaming + transcoding === 0 ? "#CCCCCC" : "#6e56cf",
-            borderRadius: "6px",
-            mt: "10px",
-            transition: "all 0.2s",
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-            },
-          }}>
-          {totalValue > 3000 ? "Contact us" : "Get Started"}
-        </Box>
-      </Link>
+        color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
+      />
+      {transcoding + streaming > 500 && (
+        <Text size="3" variant="green" css={{ mb: "$4" }}>
+          {totalValue > 3000
+            ? "Contact us For High Volume Discounts"
+            : "High Volume Discounts Available"}
+        </Text>
+      )}
+      <Button
+        arrow
+        size="4"
+        disabled={streaming + transcoding === 0}
+        onClick={() => {
+          router.push(token ? "/dashboard/billing/plans" : "/register");
+        }}>
+        {totalValue > 3000 ? "Contact us" : "Get Started"}
+      </Button>
     </Box>
   );
 };

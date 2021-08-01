@@ -13,7 +13,7 @@ import Logo from "components/Redesign/Logo";
 import { useApi } from "hooks";
 import { useRouter } from "next/router";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { useDocSearch } from "components/AlgoliaDocsSearch";
+import { useDocSearch } from "components/Redesign/AlgoliaDocsSearch";
 import { ListBulletIcon, Cross1Icon } from "@radix-ui/react-icons";
 import {
   MobileTableOfContents,

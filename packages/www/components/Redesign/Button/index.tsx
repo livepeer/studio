@@ -17,6 +17,7 @@ export const Button = React.forwardRef(
         boxShadow: "none",
         cursor: "pointer",
         textDecoration: "none",
+        p: 0,
         "&:hover": {
           textDecoration: "none",
           background:
@@ -24,15 +25,28 @@ export const Button = React.forwardRef(
           color: "white",
           boxShadow: "none",
         },
+        "&:disabled": {
+          background: "none",
+          color: "$mauve8",
+          pointerEvents: "none",
+          boxShadow: "inset 0 0 0 1px $colors$mauve7",
+          "&:hover": {
+            boxShadow: "inset 0 0 0 1px $colors$mauve7",
+            color: "$mauve8",
+            background: "none",
+          },
+        },
         ...css,
       }}
       size="3"
       {...props}>
       <Box
         css={{
+          px: "$3",
           display: "flex",
           ai: "center",
-          color: "white",
+          width: "100%",
+          justifyContent: "center",
           ".HoverArrow": {
             position: "relative",
             marginLeft: "8px",

@@ -1,8 +1,6 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
-import { Box } from "@theme-ui/components";
+import { Box, Grid, Heading, Text } from "@livepeer.com/design-system";
 
 const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(600);
@@ -19,34 +17,31 @@ const PricingCalculator = () => {
     0.01;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", mt: "144px" }}>
-      <Box
-        as="h1"
-        sx={{
-          fontSize: [5, 5, 6],
-          mb: "16px",
+    <Box css={{ display: "flex", flexDirection: "column", py: "$5" }}>
+      <Heading
+        size="3"
+        as="h2"
+        css={{
+          mb: "$5",
           textAlign: "center",
-          letterSpacing: "-0.04em",
         }}>
         Estimate your monthly costs
-      </Box>
-      <Box
-        as="p"
-        sx={{
+      </Heading>
+      <Text
+        variant="gray"
+        css={{
           mb: "64px",
-          fontSize: ["20px", "24px"],
-          lineHeight: "29px",
-          letterSpacing: "-0.02em",
+          fontSize: "$4",
           alignSelf: "center",
           textAlign: "center",
         }}>
         Add details about your content and audience
-      </Box>
-      <Box
-        sx={{
+      </Text>
+      <Grid
+        gap={8}
+        css={{
           display: "grid",
-          gridTemplateColumns: ["1fr", "40% 48%"],
-          gap: ["40px", "12%"],
+          gridTemplateColumns: "repeat(2,1fr)",
           maxWidth: "100%",
         }}>
         <Calculator
@@ -60,7 +55,7 @@ const PricingCalculator = () => {
           setPercentageWatched={setPercentageWatched}
         />
         <Preview transcoding={transcoding} streaming={streaming} />
-      </Box>
+      </Grid>
     </Box>
   );
 };

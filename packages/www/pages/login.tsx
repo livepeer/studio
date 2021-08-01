@@ -32,7 +32,7 @@ const LoginPage = () => {
     <Layout
       title={`Login - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/register`}
+      url={`https://livepeer.com/login`}
       theme="dark">
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
