@@ -3,6 +3,7 @@
 }
 
 .DocSearch-Container {
+  box-sizing: border-box;
   height: 100vh;
   left: 0;
   position: fixed;

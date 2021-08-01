@@ -130,31 +130,6 @@ const DocsIndex = ({ doc, menu }) => {
     <ContextProviders theme="dark">
       <NextSeo {...resolvedSEO} />
       <Box
-        onClick={() => setMobileTableOfContentsOpen(!mobileTableOfContentsOpen)}
-        css={{
-          display: "flex",
-          position: "fixed",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 200,
-          right: "16px",
-          bottom: "50px",
-          background: "black",
-          width: "64px",
-          height: "64px",
-          borderRadius: "50%",
-          cursor: "pointer",
-          "@bp2": {
-            display: "none",
-          },
-        }}>
-        {mobileTableOfContentsOpen ? (
-          <CgClose color="white" size={24} />
-        ) : (
-          <FiList color="white" size={24} />
-        )}
-      </Box>
-      <Box
         css={{
           display: "flex",
           flexDirection: "column",
@@ -164,28 +139,30 @@ const DocsIndex = ({ doc, menu }) => {
             display: "grid",
           },
         }}>
-        <DocsNav categories={categories} mobileCategories={mobileCategories} />
+        <DocsNav
+          menu={currentMenu}
+          categories={categories}
+          mobileCategories={mobileCategories}
+        />
         <TableOfContents
           menu={currentMenu}
           hideTableOfContents={hideTableOfContents}
           setHideTableOfContents={setHideTableOfContents}
-        />
-        <MobileTableOfContents
-          isOpen={mobileTableOfContentsOpen}
-          menu={currentMenu}
-          setIsOpen={setMobileTableOfContentsOpen}
         />
         <Container size="3">
           <Grid
             css={{
               pt: "$7",
               gridColumn: "1fr",
-              justifyItems: "center",
+              justifyItems: "flex-start",
               mx: 0,
               transition: "all 0.2s",
               minWidth: "100%",
               justifyContent: "center",
               alignItems: "flex-start",
+              "@bp2": {
+                justifyItems: "center",
+              },
             }}>
             <Box
               css={{

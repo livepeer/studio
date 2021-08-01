@@ -22,7 +22,7 @@ type Child = {
   }[];
 };
 
-type MenuProps = {
+export type MenuProps = {
   menu: {
     title: string;
     description: string;
@@ -31,7 +31,7 @@ type MenuProps = {
   }[];
 };
 
-type MobileTableOfContentsProps = {
+export type MobileTableOfContentsProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -155,11 +155,7 @@ const Menu = ({ menu }: MenuProps) => {
     .join("/");
 
   return (
-    <Flex
-      direction="column"
-      css={{
-        mt: "$4",
-      }}>
+    <Flex direction="column">
       {menu[0]?.children.map((route, idx) =>
         route.children.length > 0 ? (
           <CollapsibleMenuItem route={route} key={idx} />
@@ -241,6 +237,7 @@ const TableOfContents = ({
             fontWeight: 700,
             color: "$mauve9",
             letterSpacing: "-.5px",
+            mb: "$3",
           }}>
           DOCUMENTATION
         </Box>
@@ -297,61 +294,17 @@ const TableOfContents = ({
   );
 };
 
-export const MobileTableOfContents = ({
-  menu,
-  isOpen,
-  setIsOpen,
-}: MobileTableOfContentsProps & MenuProps) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.removeProperty("overflow");
-    }
-  }, [isOpen]);
-
+export const MobileTableOfContents = ({ menu }) => {
   return (
     <Box
       css={{
-        height: "100vh",
-        width: isOpen ? "100vw" : "0px",
-        overflowX: "hidden",
-        transition: "all 0.2s",
-        position: "fixed",
-        zIndex: 100,
-        top: 0,
-        left: 0,
         display: "flex",
-        "@bp2": {
-          display: "none",
-        },
+        flexDirection: "column",
+        borderRadius: 10,
+        width: "calc(100vw - 72px)",
+        overflow: "scroll",
       }}>
-      <Box
-        onClick={() => setIsOpen(false)}
-        css={{
-          position: "fixed",
-          bc: "$panel",
-          height: "100vh",
-          width: "100vw",
-          transition: "all 0.2s",
-          top: 0,
-          zIndex: 1,
-          right: 0,
-          opacity: isOpen ? "1" : "0",
-          visibility: isOpen ? "visible" : "hidden",
-        }}
-      />
-      <Box
-        css={{
-          bc: "$panel",
-          padding: "24px 38px 24px 0",
-          maxWidth: "100%",
-          paddingBottom: "120px",
-          overflow: "auto",
-          zIndex: 100,
-        }}>
-        <Menu menu={menu} />
-      </Box>
+      <Menu menu={menu} />
     </Box>
   );
 };
