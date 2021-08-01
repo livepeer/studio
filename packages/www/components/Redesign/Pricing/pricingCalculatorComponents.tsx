@@ -92,8 +92,11 @@ const CalculatorItem = ({
       <Grid
         gap={4}
         css={{
-          gridTemplateColumns: "repeat(2,1fr)",
+          gridTemplateColumns: "repeat(1,1fr)",
           alignItems: "center",
+          "@bp2": {
+            gridTemplateColumns: "repeat(2,1fr)",
+          },
         }}>
         {children}
         <Box
@@ -144,8 +147,7 @@ const ScaleCalculator = ({
       aria-label={`${value} Percentage Watched`}
       onClick={handleClick}
       css={{
-        width: 96,
-        height: "56px",
+        height: 56,
         borderRadius: "8px",
         display: "flex",
         alignItems: "center",
@@ -157,9 +159,6 @@ const ScaleCalculator = ({
         transition: "all 0.2s",
         "&:hover": {
           borderColor: "$violet9",
-        },
-        "@bp2": {
-          width: "100%",
         },
       }}>
       <Box
