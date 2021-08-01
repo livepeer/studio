@@ -1,10 +1,8 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Textfield from "../../components/Textfield";
-import { Button, Grid, Box, Container } from "@theme-ui/components";
+import { TextField, Grid, Box, Container } from "@livepeer.com/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
 import { useRouter } from "next/router";
+import Button from "components/Redesign/Button";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
@@ -36,7 +34,11 @@ const Login = ({
   }, [router?.query?.email]);
 
   return (
-    <Container>
+    <Box
+      css={{
+        position: "relative",
+        width: "100%",
+      }}>
       <Box
         as="form"
         onSubmit={async (e) => {
@@ -55,43 +57,44 @@ const Login = ({
             phone,
           });
         }}
-        sx={{
+        css={{
           textAlign: "center",
           width: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mb: 3,
-          maxWidth: 600,
+          mb: "$3",
           ml: "auto",
           mr: "auto",
+          maxWidth: 500,
         }}
         id={id}>
         {showName && (
           <Grid
-            sx={{
+            gap={3}
+            css={{
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
               alignItems: "center",
             }}>
-            <Textfield
-              htmlFor="firstName"
+            <TextField
+              size="3"
               id="firstName"
-              sx={{ width: ["100%"], mb: [3, 3] }}
+              css={{ width: "100%", mb: "$3" }}
               name="firstName"
               type="text"
-              label="First name"
+              placeholder="First name"
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
-            <Textfield
-              htmlFor="lastName"
+            <TextField
+              size="3"
               id="lastName"
-              sx={{ width: ["100%"], mb: [3, 3] }}
+              css={{ width: "100%", mb: "$3" }}
               name="lastName"
               type="text"
-              label="Last name"
+              placeholder="Last name"
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -100,54 +103,68 @@ const Login = ({
         )}
         {showOrganization && showPhone && (
           <Grid
-            sx={{
+            gap={3}
+            css={{
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
               alignItems: "center",
             }}>
-            <Textfield
-              htmlFor="organization"
+            <TextField
+              size="3"
               id="organization"
-              sx={{ width: ["100%"], mb: [3, 3] }}
+              css={{ width: "100%", mb: "$3" }}
               name="organization"
               type="organization"
-              label="Organization (optional)"
+              placeholder="Organization (optional)"
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
             />
-            <Textfield
-              htmlFor="phone"
+            <TextField
+              size="3"
               id="phone"
-              sx={{ width: ["100%"], mb: [3, 3] }}
+              css={{ width: "100%", mb: "$3" }}
               name="phone"
               type="phone"
-              label="Phone (optional)"
+              placeholder="Phone (optional)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </Grid>
         )}
         {showEmail && (
-          <Textfield
-            htmlFor="email"
+          <TextField
+            size="3"
             id="email"
-            sx={{ width: ["100%"], mb: [3, 3], mx: [1, 3] }}
+            css={{
+              width: "100%",
+              mb: "$3",
+              mx: "$2",
+              "@bp1": {
+                mx: "$4",
+              },
+            }}
             name="email"
             type="email"
-            label="Email"
+            placeholder="Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         )}
         {showPassword && (
-          <Textfield
-            htmlFor="password"
+          <TextField
+            size="3"
             id="password"
-            sx={{ width: ["100%"], mb: [3, 3], mx: [1, 3] }}
+            css={{
+              width: "100%",
+              mx: "$2",
+              "@bp1": {
+                mx: "$4",
+              },
+            }}
             name="password"
             type="password"
-            label="Password"
+            placeholder="Password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -156,11 +173,11 @@ const Login = ({
 
         <Box>{errors.join(", ")}&nbsp;</Box>
 
-        <Button sx={{ mt: 3, px: 5 }} variant="primary">
+        <Button css={{ mt: "$2", px: "$5" }}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

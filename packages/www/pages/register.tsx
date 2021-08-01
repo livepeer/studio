@@ -1,12 +1,18 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Layout from "../layouts";
-import Login from "../components/Login";
-import Link from "../components/Link";
-import { Flex, Box } from "@theme-ui/components";
+import Layout from "layouts/redesign";
+import Login from "../components/Redesign/Login";
+import {
+  Flex,
+  Box,
+  Heading,
+  Text,
+  Container,
+  Link as A,
+} from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import useApi from "../hooks/use-api";
+import Link from "next/link";
+import Guides from "@components/Redesign/Guides";
 
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
@@ -47,45 +53,69 @@ const RegisterPage = () => {
     }
   };
   return (
-    <Layout>
-      <Flex
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          flexGrow: 1,
-          flexDirection: "column",
-          py: 5,
-        }}>
-        <Box as="h3" sx={{ mb: 4 }}>
-          Create an Account
-        </Box>
-        <Box
-          sx={{
-            mb: 4,
-            textAlign: "center",
-            maxWidth: 630,
-            mx: "auto",
+    <Layout
+      title={`Register - Livepeer.com`}
+      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      url={`https://livepeer.com/register`}
+      theme="dark">
+      <Guides backgroundColor="$mauve2" />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            pt: "$6",
+            pb: "$7",
+            width: "100%",
+            "@bp3": {
+              pt: "$8",
+              pb: "$9",
+              px: "$3",
+            },
           }}>
-          Sign up to try Livepeer.com's video-centric UGC platform, and qualify
-          for 1,000 free transcoding input minutes per month.
-        </Box>
-        <Login
-          id="register"
-          onSubmit={onSubmit}
-          showName={true}
-          showOrganization={true}
-          showPhone={true}
-          showEmail={true}
-          showPassword={true}
-          buttonText="Continue"
-          loading={loading}
-          errors={errors}
-        />
-        <Box>
-          Already have an account?&nbsp;
-          <Link href="/login">Log in</Link>
-        </Box>
-      </Flex>
+          <Flex
+            css={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexGrow: 1,
+              flexDirection: "column",
+              py: "$5",
+            }}>
+            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+              Create an Account
+            </Heading>
+            <Text
+              size="4"
+              variant="gray"
+              css={{
+                mb: "$6",
+                textAlign: "center",
+                maxWidth: 630,
+                mx: "auto",
+              }}>
+              Sign up to try Livepeer.com's video streaming API.
+            </Text>
+            <Login
+              id="register"
+              onSubmit={onSubmit}
+              showName={true}
+              showOrganization={true}
+              showPhone={true}
+              showEmail={true}
+              showPassword={true}
+              buttonText="Register"
+              loading={loading}
+              errors={errors}
+            />
+            <Flex align="center" css={{ color: "$hiContrast" }}>
+              Already have an account?&nbsp;
+              <Link href="/login" passHref>
+                <A>Log in</A>
+              </Link>
+            </Flex>
+          </Flex>
+        </Container>
+      </Box>
     </Layout>
   );
 };

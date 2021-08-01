@@ -1,12 +1,17 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Layout from "../layouts";
-import Login from "../components/Login";
+import Layout from "layouts/redesign";
+import Login from "components/Redesign/Login";
 import Link from "next/link";
-import { Flex, Box } from "@theme-ui/components";
-import { useState, useEffect } from "react";
-import { useApi, useLoggedIn } from "../hooks";
+import {
+  Flex,
+  Box,
+  Container,
+  Heading,
+  Link as A,
+} from "@livepeer.com/design-system";
+import { useState } from "react";
+import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
+import Guides from "components/Redesign/Guides";
 
 export default () => {
   useLoggedIn(false);
@@ -28,33 +33,55 @@ export default () => {
   };
 
   return (
-    <Layout>
-      <Flex
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          flexGrow: 1,
-          flexDirection: "column",
-        }}>
-        <Box as="h3" sx={{ mb: [3, 3] }}>
-          Reset your password
-        </Box>
-        <Login
-          id="reset-password"
-          showEmail={false}
-          showPassword={true}
-          buttonText="Change password"
-          onSubmit={onSubmit}
-          errors={errors}
-          loading={loading}
-        />
-        <Box>
-          Nevermind!&nbsp;
-          <Link href="/login">
-            <a>Take me back to log in</a>
-          </Link>
-        </Box>
-      </Flex>
+    <Layout
+      title={`Reset Password - Livepeer.com`}
+      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      url={`https://livepeer.com/register`}
+      theme="dark">
+      <Guides backgroundColor="$mauve2" />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            pt: "$6",
+            pb: "$7",
+            width: "100%",
+            "@bp3": {
+              pt: "$8",
+              pb: "$9",
+              px: "$3",
+            },
+          }}>
+          <Flex
+            css={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexGrow: 1,
+              flexDirection: "column",
+              py: "$5",
+            }}>
+            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+              Reset your password
+            </Heading>
+            <Login
+              id="reset-password"
+              showEmail={false}
+              showPassword={true}
+              buttonText="Change password"
+              onSubmit={onSubmit}
+              errors={errors}
+              loading={loading}
+            />
+            <Box>
+              Nevermind!&nbsp;
+              <Link href="/login" passHref>
+                <A>Take me back to log in</A>
+              </Link>
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
     </Layout>
   );
 };
