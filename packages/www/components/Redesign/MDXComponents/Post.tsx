@@ -10,13 +10,13 @@ const Card = ({ description, title, image, href }) => {
           borderRadius: 16,
           border: "1px solid $colors$mauve5",
           textDecoration: "none",
-          boxShadow: "none",
           transition: ".3s all",
+          boxShadow:
+            "0px 30px 30px rgb(0 0 0 / 2%), 0px 0px 8px rgb(0 0 0 / 3%), 0px 1px 0px rgb(0 0 0 / 5%)",
           "&:hover": {
             textDecoration: "none",
             transition: ".3s all",
-            boxShadow:
-              "0px 2px 1px rgba(0, 0, 0, 0.3), 0px 16px 40px rgba(0, 0, 0, 0.3)",
+            boxShadow: "0px 8px 32px rgb(0 0 0 / 12%)",
           },
         }}>
         <Box

@@ -15,7 +15,14 @@ code.
 In this quick tutorial, you will learn how to create a unique stream object,
 broadcast live video content and playback your live stream with Livepeer.com.
 
-<Grid columns={3} gap={3}>
+<Grid
+  gap={3}
+  css={{
+    gridTemplateColumns: "repeat(1, 1fr)",
+    "@bp1": {
+      gridTemplateColumns: "repeat(3, 1fr)",
+    },
+  }}>
   <Card
     href="/docs/guides/start-live-streaming/tutorial#step-1-create-a-stream"
     title="Step 1: Create a stream"

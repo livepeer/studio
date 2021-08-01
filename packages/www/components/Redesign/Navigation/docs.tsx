@@ -98,6 +98,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
             <DialogTrigger as={Flex}>
               <Flex
                 css={{
+                  color: "$hiContrast",
                   backgroundColor: "$panel",
                   borderRadius: 20,
                   fontSize: 6,

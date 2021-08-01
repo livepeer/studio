@@ -67,7 +67,7 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
       />
       <Box
         css={{
-          fontWeight: isSelected ? 600 : 400,
+          fontWeight: 400,
           transition: "all 0.2s",
           mr: "$2",
           fontSize: "$3",

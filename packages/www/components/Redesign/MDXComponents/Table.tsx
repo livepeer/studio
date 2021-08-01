@@ -1,4 +1,4 @@
-import { Box, Text, Code } from "@livepeer.com/design-system";
+import { Box, Text } from "@livepeer.com/design-system";
 import TableContainer from "./TableContainer";
 
 type PropDef = {
@@ -23,11 +23,15 @@ const Table = ({
   const rows = [...new Set(data.flatMap((x) => Object.keys(x)))];
   return (
     <TableContainer
-      css={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}
+      css={{
+        width: "100%",
+        textAlign: "left",
+        borderCollapse: "collapse",
+      }}
       aria-label={hasAriaLabel ? ariaLabel : "Component Props"}
       aria-labelledby={ariaLabelledBy}>
-      <thead>
-        <tr>
+      <Box as="thead">
+        <Box as="tr">
           {rows.map((row, i) => (
             <Box
               key={`${row}-${i}`}
@@ -42,11 +46,11 @@ const Table = ({
               </Text>
             </Box>
           ))}
-        </tr>
-      </thead>
-      <tbody>
+        </Box>
+      </Box>
+      <Box as="tbody">
         {data.map((row, i) => (
-          <tr key={`-${i}`}>
+          <Box as="tr" key={`-${i}`}>
             {Object.entries(row).map(([, value], i) => (
               <Box
                 key={i}
@@ -59,9 +63,9 @@ const Table = ({
                 <Text>{value}</Text>
               </Box>
             ))}
-          </tr>
+          </Box>
         ))}
-      </tbody>
+      </Box>
     </TableContainer>
   );
 };

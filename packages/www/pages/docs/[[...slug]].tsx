@@ -147,7 +147,6 @@ const DocsIndex = ({ doc, menu }) => {
           <Grid
             css={{
               pt: "$7",
-              gridColumn: "1fr",
               justifyItems: "flex-start",
               mx: 0,
               transition: "all 0.2s",
@@ -160,12 +159,13 @@ const DocsIndex = ({ doc, menu }) => {
             }}>
             <Box
               css={{
-                display: "flex",
-                flexDirection: "column",
                 width: "100%",
                 maxWidth: 768,
                 paddingBottom: 80,
-                overflow: "hidden",
+                overflow: "auto",
+                "@bp2": {
+                  px: "$5",
+                },
               }}>
               <Box
                 css={{
@@ -184,7 +184,7 @@ const DocsIndex = ({ doc, menu }) => {
                   </Fragment>
                 ))}
               </Box>
-              <Box className="markdown-body">{content}</Box>
+              <Box>{content}</Box>
             </Box>
           </Grid>
         </Container>

@@ -24,7 +24,14 @@ about all live stream sessions associated with it.
 
 There are two ways to create a stream object:
 
-<Grid columns={2} gap={3}>
+<Grid
+  gap={3}
+  css={{
+    gridTemplateColumns: "repeat(1, 1fr)",
+    "@bp1": {
+      gridTemplateColumns: "repeat(2, 1fr)",
+    },
+  }}>
   <Card
     href="/docs/guides/start-live-streaming/create-a-stream#no-code-stream-creation-with-the-livepeer-com-dashboard"
     title="No code stream creation in the Livepeer.com Dashboard"
