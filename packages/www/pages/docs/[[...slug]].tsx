@@ -1,15 +1,11 @@
 import { Container, Grid, Box, global } from "@livepeer.com/design-system";
 import DocsNav from "@components/Redesign/Navigation/docs";
-import TableOfContents, {
-  MobileTableOfContents,
-} from "@components/Redesign/Docs/TableOfContents";
+import TableOfContents from "@components/Redesign/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
 import { docsPositions } from "docs-positions";
 import { useRouter } from "next/router";
-import { FiList } from "react-icons/fi";
-import { CgClose } from "react-icons/cg";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
@@ -86,8 +82,6 @@ const globalStyles = global({
 
 const DocsIndex = ({ doc, menu }) => {
   const [hideTableOfContents, setHideTableOfContents] = useState(false);
-  const [mobileTableOfContentsOpen, setMobileTableOfContentsOpen] =
-    useState(false);
   const router = useRouter();
 
   const currentMenu = useMemo(() => {

@@ -244,7 +244,6 @@ const LinkHeading = ({
     <DS.Box
       as="a"
       href={`#${id}`}
-      // data-id={id}
       css={{
         textDecoration: "none",
         color: "inherit",
@@ -273,10 +272,8 @@ export const FrontmatterContext = React.createContext<Frontmatter>({} as any);
 export function MDXProvider(props) {
   const { frontmatter, children } = props;
   return (
-    <IdProvider>
-      <FrontmatterContext.Provider value={frontmatter}>
-        {children}
-      </FrontmatterContext.Provider>
-    </IdProvider>
+    <FrontmatterContext.Provider value={frontmatter}>
+      {children}
+    </FrontmatterContext.Provider>
   );
 }
