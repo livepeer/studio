@@ -47,7 +47,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             color: "white",
             fontWeight: 700,
             mb: "$6",
-            letterSpacing: "-3px",
+            letterSpacing: "-2px",
           }}>
           Ready to get started?
         </Heading>

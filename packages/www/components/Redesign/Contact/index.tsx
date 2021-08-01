@@ -50,6 +50,7 @@ const Contact = () => {
           }}>
           <Box css={{ mb: 48, textAlign: "center" }}>
             <Heading
+              size="3"
               css={{
                 fontWeight: 700,
                 color: "$hiContrast",
