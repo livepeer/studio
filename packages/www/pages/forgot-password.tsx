@@ -56,12 +56,10 @@ const ForgotPasswordPage = () => {
           size="3"
           css={{
             px: "$6",
-            pt: "$7",
-            pb: "$7",
+            py: "$7",
             width: "100%",
             "@bp3": {
-              pt: "$8",
-              pb: "$9",
+              py: "$8",
               px: "$3",
             },
           }}>
@@ -71,7 +69,6 @@ const ForgotPasswordPage = () => {
             css={{
               flexGrow: 1,
               flexDirection: "column",
-              py: "$6",
             }}>
             <Heading size="3" as="h1" css={{ mb: "$5" }}>
               Reset your password

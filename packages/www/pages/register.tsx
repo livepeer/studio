@@ -64,12 +64,10 @@ const RegisterPage = () => {
           size="3"
           css={{
             px: "$6",
-            pt: "$7",
-            pb: "$7",
+            py: "$7",
             width: "100%",
             "@bp3": {
-              pt: "$8",
-              pb: "$9",
+              py: "$8",
               px: "$3",
             },
           }}>
@@ -81,7 +79,7 @@ const RegisterPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+            <Heading size="3" as="h1" css={{ mb: "$3" }}>
               Create an Account
             </Heading>
             <Text
