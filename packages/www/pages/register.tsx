@@ -64,7 +64,7 @@ const RegisterPage = () => {
           size="3"
           css={{
             px: "$6",
-            pt: "$6",
+            pt: "$7",
             pb: "$7",
             width: "100%",
             "@bp3": {
