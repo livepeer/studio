@@ -1,5 +1,5 @@
 import PricingCard, { PricingCardContent } from "./pricingCard";
-import { Box, Grid, Flex, Text } from "@livepeer.com/design-system";
+import { Box, Grid, Flex, Text, Badge } from "@livepeer.com/design-system";
 
 const PricingCardsContainer = () => {
   return (
@@ -18,14 +18,24 @@ const PricingCardsContainer = () => {
       <Grid
         css={{
           gap: "22px",
-          grid: "1fr/repeat(4,1fr)",
+          grid: "1fr/repeat(1,1fr)",
           position: "relative",
+          "@bp2": {
+            grid: "1fr/repeat(3,1fr)",
+          },
+          "@bp3": {
+            grid: "1fr/repeat(4,1fr)",
+          },
         }}>
         <Box
           css={{
             alignSelf: "flex-end",
             flexDirection: "column",
             px: "$2",
+            display: "none",
+            "@bp3": {
+              display: "block",
+            },
           }}>
           <Box css={{ fontSize: "16px", mb: "16px" }}>Usage</Box>
           <PricingCardContent>
@@ -82,6 +92,18 @@ const PricingCardsContainer = () => {
           }}>
           <Box css={{ mt: "20px" }}>
             <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Transcoding
+              </Badge>
               <Box
                 css={{
                   fontSize: "32px",
@@ -97,8 +119,39 @@ const PricingCardsContainer = () => {
                 minutes/month
               </Box>
             </PricingCardContent>
-            <PricingCardContent comingSoon />
             <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Recording storage
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Coming soon
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Stream delivery via CDN*
+              </Badge>
               <Box
                 css={{
                   fontSize: "32px",
@@ -127,7 +180,19 @@ const PricingCardsContainer = () => {
             bg: "$hiContrast",
           }}>
           <Box css={{ mt: "20px" }}>
-            <PricingCardContent color="white">
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Transcoding
+              </Badge>
               <Box
                 css={{
                   fontSize: "32px",
@@ -152,8 +217,39 @@ const PricingCardsContainer = () => {
                 / min video ingested
               </Box>
             </PricingCardContent>
-            <PricingCardContent comingSoon color="white" />
-            <PricingCardContent color="white">
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Recording storage
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Coming soon
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Stream delivery via CDN*
+              </Badge>
               <Box
                 css={{
                   fontSize: "32px",
@@ -191,9 +287,66 @@ const PricingCardsContainer = () => {
             bg: "$hiContrast",
           }}>
           <Box css={{ mt: "20px" }}>
-            <PricingCardContent color="white" customPricing />
-            <PricingCardContent comingSoon color="white" />
-            <PricingCardContent color="white" customPricing />
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="indigo"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Transcoding
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Custom pricing
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="indigo"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Recording storage
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Coming soon
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="indigo"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Stream delivery via CDN*
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Custom pricing
+              </Box>
+            </PricingCardContent>
           </Box>
         </PricingCard>
       </Grid>

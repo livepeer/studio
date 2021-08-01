@@ -25,11 +25,8 @@ const Pricing = () => {
               px: "$3",
             },
           }}>
-          <Box css={{ textAlign: "center" }}>
-            <Heading
-              as="h1"
-              size="4"
-              css={{ lineHeight: 1.7, fontWeight: 600, mb: "$5" }}>
+          <Box css={{ textAlign: "center", mb: "$5" }}>
+            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
               Start free.
               <Box css={{ fontWeight: 400 }}>Then pay as you grow.</Box>
             </Heading>

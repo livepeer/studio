@@ -1,14 +1,6 @@
 import { ReactNode, useCallback } from "react";
 import { useApi } from "hooks";
-import {
-  Box,
-  Grid,
-  Flex,
-  Heading,
-  Text,
-  Badge,
-  TextField,
-} from "@livepeer.com/design-system";
+import { Box, Grid, Flex, Text, TextField } from "@livepeer.com/design-system";
 import Button from "components/Redesign/Button";
 import { useRouter } from "next/router";
 
@@ -63,7 +55,6 @@ const CalculatorItem = ({
   min,
   value,
   setValue,
-  marginTop,
   step,
 }: CalculatorItemProps) => {
   const handleChange = (e) => {
@@ -90,14 +81,14 @@ const CalculatorItem = ({
         flexDirection: "column",
         justifyContent: "center",
       }}>
-      <Box
+      <Text
+        size="5"
         css={{
-          mb: "24px",
-          fontSize: "20px",
-          lineHeight: "24px",
+          color: "$hiContrast",
+          mb: "$4",
         }}>
         {title}
-      </Box>
+      </Text>
       <Grid
         gap={4}
         css={{
@@ -120,7 +111,7 @@ const CalculatorItem = ({
             width: "100%",
             appearance: "none",
             bc: "$hiContrast",
-            "::-webkit-slider-thumb": {
+            "&::-webkit-slider-thumb": {
               appearance: "none",
               width: 16,
               height: 16,
@@ -239,7 +230,6 @@ const Calculator = ({
         width: "100%",
       }}>
       <Text
-        variant="gray"
         size="4"
         css={{
           mb: "$2",
@@ -401,10 +391,7 @@ const Calculator = ({
         <Grid
           gap={3}
           css={{
-            gridTemplateColumns: "repeat(1, 1fr)",
-            "@bp2": {
-              gridTemplateColumns: "repeat(4, 1fr)",
-            },
+            gridTemplateColumns: "repeat(4, 1fr)",
           }}>
           {scaleCalculatorValues.map((each, idx) => (
             <ScaleCalculator
@@ -426,7 +413,6 @@ const PreviewItem = ({
   value,
   valueClarification,
   children,
-  color,
 }: PreviewItemProps) => {
   return (
     <Box
@@ -461,15 +447,14 @@ const PreviewItem = ({
           },
         }}>
         <Box css={{ display: "flex", flexDirection: "column", mb: "$3" }}>
-          <Box
+          <Text
+            size="5"
             css={{
-              fontSize: "20px",
               minWidth: "fit-content",
-              lineHeight: "24px",
-              fontWeight: 600,
+              color: "$hiContrast",
             }}>
             {title}
-          </Box>
+          </Text>
         </Box>
         <Text variant="gray" size="2">
           {description}
@@ -533,35 +518,33 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
           width: "100%",
           pb: "$2",
         }}>
-        <Text size="4" variant="gray">
-          Monthly cost
-        </Text>
+        <Text size="4">Monthly cost</Text>
         <Text size="3" variant="gray" css={{ fontStyle: "italic" }}>
           Prices listed in USD
         </Text>
       </Box>
       <PreviewItem
         title="Transcoding"
-        description="Livepeer.com creates multiple versions of your source stream for different devices in real time."
+        description="Create multiple versions of your source stream for different devices in real time."
         value={totalValue > 3000 ? "Contact us" : `$${transcoding.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Stream Delivery via CDN"
-        description="Livepeer.com optimizes playback for your viewers across the globe via a CDN. Delivery via CDN is currently free. We will charge for it in the future."
+        description="Optimize playback for your viewers across the globe via a CDN. Delivery via CDN is currently free. We will charge for it in the future."
         value={totalValue > 3000 ? "Contact us" : `$${streaming.toFixed(2)}`}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
-        valueClarification="* coming soon"
+        valueClarification="*coming soon"
       />
       <PreviewItem
         title="Recording Storage"
-        description="Livepeer.com can automatically store your transcoded renditions for VoD playback. Storage is currently free. We will charge for it in the future."
+        description="Automatically store your transcoded renditions for VoD playback. Storage is currently free. We will charge for it in the future."
         value={transcoding + streaming > 3000 ? "Contact us" : "Coming Soon"}
         color={totalValue > 3000 ? "rgba(0, 0, 0, 0.2)" : "black"}
       />
       <PreviewItem
         title="Total cost"
-        description="Transcoding + Streaming via CDN"
+        description="Transcoding + streaming via CDN + storage"
         value={totalValue > 3000 ? "Contact us" : `$${totalValue}`}
         valueClarification={
           totalValue > 3000

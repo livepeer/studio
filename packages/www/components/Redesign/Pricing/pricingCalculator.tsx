@@ -22,16 +22,16 @@ const PricingCalculator = () => {
         size="3"
         as="h2"
         css={{
-          mb: "$5",
+          mb: "$4",
           textAlign: "center",
         }}>
         Estimate your monthly costs
       </Heading>
       <Text
         variant="gray"
+        size="5"
         css={{
-          mb: "64px",
-          fontSize: "$4",
+          mb: "$9",
           alignSelf: "center",
           textAlign: "center",
         }}>
@@ -41,8 +41,11 @@ const PricingCalculator = () => {
         gap={8}
         css={{
           display: "grid",
-          gridTemplateColumns: "repeat(2,1fr)",
+          gridTemplateColumns: "repeat(1,1fr)",
           maxWidth: "100%",
+          "@bp3": {
+            gridTemplateColumns: "repeat(2,1fr)",
+          },
         }}>
         <Calculator
           streamLength={streamLength}
