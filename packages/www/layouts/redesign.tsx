@@ -16,6 +16,8 @@ import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
 
+const DEFAULT_THEME = "system";
+
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
 } else {
@@ -71,7 +73,7 @@ interface Props {
   theme?: string;
 }
 
-export function ContextProviders({ theme = "system", children }) {
+export function ContextProviders({ theme = DEFAULT_THEME, children }) {
   return (
     <DesignSystemProvider>
       <ThemeProvider
@@ -92,7 +94,7 @@ function Layout({
   image,
   url,
   canonical,
-  theme = "dark",
+  theme = DEFAULT_THEME,
   noindex = false,
   preview = false,
 }: Props) {

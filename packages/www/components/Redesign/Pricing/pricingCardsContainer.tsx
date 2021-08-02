@@ -279,7 +279,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Business"
           pricingDescription="Custom pricing"
-          cardBg="$indigo10"
+          cardBg="$indigo8"
           btn={{
             display: "Contact us",
             href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",

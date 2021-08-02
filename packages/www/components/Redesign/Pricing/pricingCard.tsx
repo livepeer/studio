@@ -12,6 +12,7 @@ export type PricingCard = {
   btn: { href: string; display: string; bg?: string; color?: string };
   children: ReactNode;
   className?: string;
+  color?: string;
 };
 
 export type PricingCardContentProps = {
@@ -26,6 +27,7 @@ export const PricingCardContent = ({
   children,
   comingSoon,
   customPricing,
+  color = "$hiContrast",
 }: PricingCardContentProps) => {
   return (
     <Box
@@ -37,7 +39,7 @@ export const PricingCardContent = ({
         justifyContent: "center",
         borderTop: `1px solid`,
         borderColor: "rgba(255,255,255, .15)",
-        color: "$hiContrast",
+        color,
       }}>
       {children}
       {comingSoon ? (
@@ -52,7 +54,7 @@ export const PricingCardContent = ({
           <Box
             css={{
               fontSize: "$5",
-              color: "$hiContrast",
+              color,
             }}>
             Custom pricing
           </Box>
@@ -69,6 +71,7 @@ const PricingCard = ({
   btn,
   children,
   className,
+  color = "$hiContrast",
 }: PricingCard) => {
   return (
     <Box
@@ -87,7 +90,7 @@ const PricingCard = ({
           size="7"
           css={{
             fontWeight: 600,
-            color: "$hiContrast",
+            color,
           }}>
           {pricingTitle}
         </Text>
@@ -95,6 +98,7 @@ const PricingCard = ({
           size="4"
           css={{
             mb: "$4",
+            color,
           }}>
           {pricingDescription}
         </Text>
