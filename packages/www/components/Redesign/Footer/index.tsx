@@ -4,7 +4,7 @@ import {
   Text,
   Box,
   Grid,
-  Label,
+  Flex,
   TextField,
   Button,
   Link as A,
@@ -15,6 +15,7 @@ import { useApi, useMailchimp } from "hooks";
 import Link from "next/link";
 import Guides from "components/Redesign/Guides";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import ThemeSwitch from "@components/Dashboard/ThemeSwitch";
 
 const linksLists: LinksListProps[] = [
   {
@@ -197,7 +198,10 @@ const Footer = ({ hideGuides = false }) => {
               <LinksList key={`links-list-${list.heading}`} {...list} />
             ))}
             <Box css={{ color: "$hiContrast" }}>
-              <Box css={{ fontWeight: 600, mb: "$3" }}>Livepeer, Inc.</Box>
+              <Flex align="center" css={{ mb: "$3" }}>
+                <Box css={{ fontWeight: 600, mr: "$4" }}>Livepeer, Inc.</Box>
+                <ThemeSwitch />
+              </Flex>
               <Box css={{ lineHeight: 1.5 }}>
                 223 Bedford Ave PMB 530
                 <br />
