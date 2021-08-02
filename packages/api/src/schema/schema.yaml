@@ -34,7 +34,6 @@ components:
       table: webhook
       required:
         - name
-        - url
       additionalProperties: false
       properties:
         id:
@@ -78,6 +77,9 @@ components:
           type: string
           format: uri
           pattern: ^http(s)?://
+        email:
+          type: string
+          format: email
         deleted:
           type: boolean
           default: false

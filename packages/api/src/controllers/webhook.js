@@ -7,14 +7,34 @@ import uuid from "uuid/v4";
 import { makeNextHREF, trackAction, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { UnprocessableEntityError } from "../store/errors";
+import { ForbiddenError, UnprocessableEntityError } from "../store/errors";
 
-function validateWebhookPayload(id, userId, createdAt, payload) {
-  try {
-    new URL(payload.url);
-  } catch (e) {
-    console.error(`couldn't parse the provided url: ${payload.url}`);
-    throw new UnprocessableEntityError(`bad url: ${url}`);
+async function validateWebhookPayload(id, userId, createdAt, payload) {
+  if (payload.url && payload.email) {
+    throw new UnprocessableEntityError(
+      "webhook cannot have both url and email"
+    );
+  } else if (payload.url) {
+    try {
+      new URL(payload.url);
+    } catch (e) {
+      console.error(`couldn't parse the provided url: ${payload.url}`);
+      throw new UnprocessableEntityError(`bad url: ${url}`);
+    }
+  } else if (payload.email) {
+    const user = await db.user.get(userId);
+    if (!user) {
+      throw new Error(`invalid code path: no user found for id=${userId}`);
+    }
+    if (payload.email !== user.email) {
+      throw new ForbiddenError(
+        `email webhooks may only be created with your verfied email (${user.email})`
+      );
+    }
+  } else {
+    throw new UnprocessableEntityError(
+      "webhook must have one of url and email"
+    );
   }
 
   if (!payload.events && !payload.event) {
@@ -31,6 +51,7 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
     name: payload.name,
     events: payload.events ?? [payload.event],
     url: payload.url,
+    email: payload.email,
     sharedSecret: payload.sharedSecret,
   };
 }
@@ -127,7 +148,12 @@ app.get("/", authMiddleware({}), async (req, res) => {
 
 app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
-  const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
+  const doc = await validateWebhookPayload(
+    id,
+    req.user.id,
+    Date.now(),
+    req.body
+  );
   try {
     await req.store.create(doc);
     trackAction(
@@ -178,7 +204,7 @@ app.put(
     }
 
     const { id, userId, createdAt } = webhook;
-    const doc = validateWebhookPayload(id, userId, createdAt, req.body);
+    const doc = await validateWebhookPayload(id, userId, createdAt, req.body);
     try {
       await req.store.replace(doc);
     } catch (e) {

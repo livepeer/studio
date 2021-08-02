@@ -129,6 +129,43 @@ describe("controllers/webhook", () => {
       client.jwtAuth = adminToken["token"];
     });
 
+    it("supports webhook creation with email", async () => {
+      const res = await client.post("/webhook", {
+        ...mockWebhook,
+        url: undefined,
+        email: mockAdminUser.email,
+      });
+      expect(res.status).toBe(201);
+      let resJson = await res.json();
+      expect(resJson.email).toBe(mockAdminUser.email);
+      generatedWebhookIds.push(resJson.id);
+    });
+
+    it("doesn't support webhook creation with bad emails", async () => {
+      let res;
+
+      // URL + email
+      res = await client.post("/webhook", {
+        ...mockWebhook,
+        email: mockAdminUser.email,
+      });
+      expect(res.status).toBe(422);
+
+      // email that doesn't match account
+      res = await client.post("/webhook", {
+        ...mockWebhook,
+        email: "user@example.com",
+      });
+      expect(res.status).toBe(422);
+
+      // no url or email
+      res = await client.post("/webhook", {
+        ...mockWebhook,
+        url: undefined,
+      });
+      expect(res.status).toBe(422);
+    });
+
     it("supports creation with legacy event field", async () => {
       const res = await client.post("/webhook", {
         ...mockWebhook,
