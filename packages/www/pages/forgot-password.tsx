@@ -48,8 +48,7 @@ const ForgotPasswordPage = () => {
     <Layout
       title={`Forgot Password - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/forgot-password`}
-      theme="dark">
+      url={`https://livepeer.com/forgot-password`}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container

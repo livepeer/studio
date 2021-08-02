@@ -89,8 +89,7 @@ const HomePage = () => {
     <Layout
       title={`Home - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com`}
-      theme="dark">
+      url={`https://livepeer.com`}>
       <Hero />
       <Why
         backgroundColor="$panel"

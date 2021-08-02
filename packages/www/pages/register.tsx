@@ -56,8 +56,7 @@ const RegisterPage = () => {
     <Layout
       title={`Register - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/register`}
-      theme="dark">
+      url={`https://livepeer.com/register`}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container

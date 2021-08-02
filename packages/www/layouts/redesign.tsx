@@ -71,7 +71,7 @@ interface Props {
   theme?: string;
 }
 
-export function ContextProviders({ theme = "dark", children }) {
+export function ContextProviders({ theme = "system", children }) {
   return (
     <DesignSystemProvider>
       <ThemeProvider

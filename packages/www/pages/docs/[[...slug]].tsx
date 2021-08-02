@@ -121,7 +121,7 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <ContextProviders theme="dark">
+    <ContextProviders>
       <NextSeo {...resolvedSEO} />
       <Box
         css={{

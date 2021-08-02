@@ -15,8 +15,7 @@ const TeamPage = ({ content }) => {
       title={`Team - Livepeer.com`}
       description={`We’re building the future of video infrastructure services.`}
       url={`https://livepeer.com/team`}
-      canonical={`https://livepeer.com/team`}
-      theme="dark">
+      canonical={`https://livepeer.com/team`}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
@@ -35,12 +34,10 @@ const TeamPage = ({ content }) => {
               We’re building the future of video infrastructure services.
             </Heading>
             <Text variant="gray" size="5">
-              We're comprised of team members dedicated to building an
-              affordable, scalable and reliable video platform that focuses on
-              what user-generated content applications need.
+              We're comprised of team members dedicated to building affordable,
+              scalable, reliable, and easy-to-use video infrastructure services.
             </Text>
           </Box>
-
           <Box css={{ pt: "$9" }}>
             <TeamSection teamMembers={teamMembers} />
           </Box>

@@ -10,8 +10,7 @@ const Pricing = () => {
     <Layout
       title={`Pricing - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/pricing`}
-      theme="dark">
+      url={`https://livepeer.com/pricing`}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
