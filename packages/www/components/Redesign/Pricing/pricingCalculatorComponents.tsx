@@ -543,7 +543,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
       />
       <PreviewItem
         title="Total cost"
-        description="Transcoding + streaming via CDN + storage"
+        description="Transcoding + streaming via CDN"
         value={totalValue > 3000 ? "Contact us" : `$${totalValue}`}
         valueClarification={
           totalValue > 3000
