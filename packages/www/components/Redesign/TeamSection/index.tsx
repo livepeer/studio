@@ -4,7 +4,7 @@ import TeamMember from "components/Redesign/TeamMember";
 const TeamSection = ({ teamMembers }) => {
   return (
     <Grid
-      gap={3}
+      gap={6}
       css={{
         gridTemplateColumns: "repeat(1,1fr)",
         "@bp1": {

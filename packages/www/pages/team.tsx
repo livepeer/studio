@@ -26,7 +26,7 @@ const TeamPage = ({ content }) => {
             py: "$8",
             width: "100%",
             "@bp3": {
-              py: "$8",
+              py: "$9",
               px: "$4",
             },
           }}>
