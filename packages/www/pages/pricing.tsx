@@ -35,20 +35,23 @@ const PricingPage = () => {
           </Box>
         </Container>
         <PricingCardsContainer />
-        <Box css={{ bc: "$mauve2" }}>
-          <Container
-            size="3"
-            css={{
-              px: "$6",
-              py: "$7",
-              width: "100%",
-              "@bp3": {
-                py: "$8",
-                px: "$4",
-              },
-            }}>
-            <PricingCalculator />
-          </Container>
+        <Box>
+          <Guides backgroundColor="$mauve2" />
+          <Box css={{ position: "relative" }}>
+            <Container
+              size="3"
+              css={{
+                px: "$6",
+                py: "$7",
+                width: "100%",
+                "@bp3": {
+                  py: "$8",
+                  px: "$4",
+                },
+              }}>
+              <PricingCalculator />
+            </Container>
+          </Box>
         </Box>
       </Box>
       <Prefooter />
