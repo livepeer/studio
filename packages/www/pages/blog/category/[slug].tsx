@@ -1,5 +1,3 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import { request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allCategories from "../../../queries/allCategories.gql";

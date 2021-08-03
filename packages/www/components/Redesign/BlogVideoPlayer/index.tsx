@@ -1,5 +1,3 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import { useEffect, useState } from "react";
 import SanityMuxPlayer from "sanity-mux-player";
 

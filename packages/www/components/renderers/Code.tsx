@@ -1,8 +1,6 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box } from "@theme-ui/components";
+import { Box } from "@livepeer.com/design-system";
 
 const Code = ({
   language,
@@ -147,8 +145,8 @@ const Code = ({
         <Box
           as="pre"
           className="codeblock-pre-container"
-          sx={{
-            background: custom ? "#3B375A" : "",
+          css={{
+            bc: custom ? "#3B375A" : "",
             borderRadius: custom ? "16px" : "",
             width: "100%",
             maxWidth: "calc(100vw - 64px)",
@@ -158,7 +156,7 @@ const Code = ({
             padding: custom ? "24px 16px 60px 24px" : "",
             position: "relative",
           }}>
-          <Box sx={{ maxWidth: "100%", overflowX: "auto" }}>
+          <Box css={{ maxWidth: "100%", overflowX: "auto" }}>
             {tokens.map((line, i) => {
               // Workaround for MDX rendering trailing lines on everything
               const lastLine = i === tokens.length - 1;
@@ -180,12 +178,12 @@ const Code = ({
             <Box
               as="button"
               onClick={handleCopy}
-              sx={{
+              css={{
                 position: "absolute",
                 alignSelf: "flex-end",
                 bottom: "16px",
                 right: "16px",
-                background: "#6e56cf",
+                bc: "$violet9",
                 borderRadius: "6px",
                 width: "60px",
                 height: "32px",
@@ -194,7 +192,7 @@ const Code = ({
                 justifyContent: "center",
                 color: "white",
                 fontSize: "14px",
-                fontWeight: "500",
+                fontWeight: 500,
                 letterSpacing: "-0.03em",
                 cursor: "pointer",
                 outline: "none",

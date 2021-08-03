@@ -1,18 +1,25 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Fade from "react-reveal/Fade";
-import Layout from "../../layouts";
-import { request } from "graphql-request";
+import {
+  Box,
+  Container,
+  Flex,
+  Grid,
+  Heading,
+  Link as A,
+  Text,
+} from "@livepeer.com/design-system";
 import { print } from "graphql/language/printer";
+import { request } from "graphql-request";
+import { useRouter } from "next/router";
 import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
-import { Container, Flex, Box, Link as A, Spinner } from "@theme-ui/components";
+import BlogPostCard, {
+  FeaturedBlogPostCard,
+} from "@components/Redesign/BlogPostCard";
+import Fade from "react-reveal/Fade";
+import Layout from "layouts/redesign";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import BlogPostCard from "components/cards/BlogPost";
-import { Grid } from "@theme-ui/components";
 import Prefooter from "components/Redesign/Prefooter";
-import FeaturedBlogPostCard from "components/cards/FeaturedBlogPost";
+import Guides from "components/Redesign/Guides";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -24,7 +31,7 @@ const BlogIndex = ({ categories, posts }) => {
   if (router.isFallback) {
     return (
       <Layout>
-        <Spinner />
+        <Box>Loading...</Box>
       </Layout>
     );
   }
@@ -52,83 +59,116 @@ const BlogIndex = ({ categories, posts }) => {
       }Livepeer.com`}
       description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
       url={`https://livepeer.com${asPath}`}>
-      <Container variant="hero">
-        <Box as="h1" sx={{ variant: "text.heading.hero" }}>
-          Blog
-        </Box>
-        <Box as="p" sx={{ variant: "text.heroDescription" }}>
-          Welcome to the Livepeer.com blog.
-        </Box>
-      </Container>
-      <Container>
-        {featuredPost && (
-          <Box sx={{ mb: "80px", display: ["none", null, "block"] }}>
-            <FeaturedBlogPostCard post={featuredPost} />
-          </Box>
-        )}
-        <Flex
-          sx={{
-            borderBottom: "1px solid rgba(55,54,77,.1)",
-            alignItems: "center",
-            mb: 4,
+      <Guides />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$3",
+            },
           }}>
-          {categories.map((c, i) => {
-            const isSelected =
-              slug === c.slug.current || (!slug && c.title === "All");
-            return (
-              <Link
-                key={i}
-                href={c.title === "All" ? "/blog" : `/blog/category/[slug]`}
-                as={
-                  c.title === "All"
-                    ? "/blog"
-                    : `/blog/category/${c.slug.current}`
-                }
-                passHref>
-                <A
-                  sx={{
-                    display: "block",
-                    color: "black",
-                    textDecoration: "none",
-                    ":hover": {
+          <Box css={{ textAlign: "center", mb: "$8" }}>
+            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
+              Blog
+            </Heading>
+            <Text as="h2" variant="gray" size="6">
+              Welcome to the Livepeer.com blog.
+            </Text>
+          </Box>
+
+          {featuredPost && (
+            <Box
+              css={{
+                mb: 80,
+                display: "none",
+                "@bp2": {
+                  display: "block",
+                },
+              }}>
+              <FeaturedBlogPostCard post={featuredPost} />
+            </Box>
+          )}
+          <Flex
+            css={{
+              borderBottom: "1px solid $colors$mauve5",
+              alignItems: "center",
+              mb: "$6",
+              overflow: "auto",
+            }}>
+            {categories.map((c, i) => {
+              const isSelected =
+                slug === c.slug.current || (!slug && c.title === "All");
+              return (
+                <Link
+                  key={i}
+                  href={c.title === "All" ? "/blog" : `/blog/category/[slug]`}
+                  as={
+                    c.title === "All"
+                      ? "/blog"
+                      : `/blog/category/${c.slug.current}`
+                  }
+                  passHref>
+                  <A
+                    css={{
+                      display: "block",
                       textDecoration: "none",
-                    },
-                  }}>
-                  <Box
-                    key={i + 1}
-                    sx={{
-                      borderBottom: "2px solid",
-                      borderColor: isSelected ? "primary" : "transparent",
-                      color: isSelected ? "primary" : "text",
-                      fontWeight: isSelected ? 600 : 500,
-                      pb: 3,
-                      mr: 4,
+                      ":hover": {
+                        textDecoration: "none",
+                      },
                     }}>
-                    {c.title}
-                  </Box>
-                </A>
-              </Link>
-            );
-          })}
-        </Flex>
-        <Grid columns={[1, null, 2, null, 3]} mb={5} gap={4}>
-          {posts.map((p, i) => (
-            <BlogPostCard
-              post={p}
-              pushSx={{
-                display:
-                  p._id === featuredPost._id
-                    ? ["block", null, "none"]
-                    : undefined,
-              }}
-              key={`post-${i}`}
-            />
-          ))}
-        </Grid>
-      </Container>
-      <Fade key={0}>
-        <Prefooter />
-      </Fade>
+                    <Box
+                      key={i + 1}
+                      css={{
+                        borderBottom: "2px solid",
+                        borderColor: isSelected ? "$violet9" : "transparent",
+                        color: isSelected ? "$violet9" : "$hiContrast",
+                        fontWeight: isSelected ? 600 : 500,
+                        pb: "$3",
+                        mr: "$6",
+                      }}>
+                      {c.title}
+                    </Box>
+                  </A>
+                </Link>
+              );
+            })}
+          </Flex>
+          <Grid
+            gap={4}
+            css={{
+              mb: "$5",
+              gridTemplateColumns: "repeat(1,1fr)",
+              "@bp2": {
+                gridTemplateColumns: "repeat(2,1fr)",
+              },
+              "@bp3": {
+                gridTemplateColumns: "repeat(3,1fr)",
+              },
+            }}>
+            {posts.map((p, i) => (
+              <BlogPostCard
+                post={p}
+                css={{
+                  display:
+                    p._id === featuredPost._id
+                      ? ["block", null, "none"]
+                      : undefined,
+                }}
+                key={`post-${i}`}
+              />
+            ))}
+          </Grid>
+
+          <Fade key={0}>
+            <Prefooter />
+          </Fade>
+        </Container>
+      </Box>
     </Layout>
   );
 };

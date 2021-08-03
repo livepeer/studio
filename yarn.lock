@@ -3091,11 +3091,6 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
   integrity sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q==
 
-"@radix-ui/colors@0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.5.tgz#0d207d44826ece6b5114e10f43cc36e4913f84e6"
-  integrity sha512-IaQLmE+vlp7FhkaiWENwUtBKPVEO8TzZHcyIK9iNa1hBEZW6jLESM1iTbv/sJP6CLHC742Cy2kHlUNskU7TYbA==
-
 "@radix-ui/colors@0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@radix-ui/colors/-/colors-0.1.7.tgz#055cdf104f92ae58a7d6a7f1c7327c635b90747f"
@@ -5707,10 +5702,15 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0", "@types/node@^10.12.0":
+"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0":
   version "14.6.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.4.tgz#a145cc0bb14ef9c4777361b7bbafa5cf8e3acb5a"
   integrity sha512-Wk7nG1JSaMfMpoMJDKUsWYugliB2Vy55pdjLpmLixeyMi7HizW2I/9QoxsPCkXl3dO+ZOVqPumKaDUv5zJu2uQ==
+
+"@types/node@^10.12.0":
+  version "10.17.60"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
+  integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -21899,6 +21899,13 @@ react-test-renderer@^16.12.0:
     prop-types "^15.6.2"
     react-is "^16.8.6"
     scheduler "^0.19.1"
+
+react-text-truncate@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/react-text-truncate/-/react-text-truncate-0.17.0.tgz#a820bfd9d084caf85d900a011fe2ab4216fc3821"
+  integrity sha512-EUL7s47XApOgbR//t/9X+fXg1feS47RcTywNXEQZAlNL0vrCIYGye1C+mpUgGIIXKTkabweid6z7s16AkTo5sA==
+  dependencies:
+    prop-types "^15.5.7"
 
 react-tiny-virtual-list@^2.0.5:
   version "2.2.0"
