@@ -5,7 +5,7 @@ import { Box } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
-import Help from "../../../public/img/help.svg";
+import Help from "../../../../public/img/help.svg";
 
 type ProfileProps = {
   id: string;

@@ -10,8 +10,7 @@ import HeroVideo from "./Video";
 import PhoneSvg from "./PhoneSvg";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useRef } from "react";
-import { useCallback } from "react";
+import { useRef, useCallback } from "react";
 import {
   getProportionalValue,
   breakpoints,
@@ -167,7 +166,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 lineHeight: 1.6,
                 mb: "$7",
-                maxWidth: 718,
+                maxWidth: 768,
                 mx: "auto",
               }}>
               Livepeer.com provides quick and reliable access to{" "}

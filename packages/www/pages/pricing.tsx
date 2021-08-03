@@ -5,7 +5,7 @@ import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
 import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
 import Guides from "@components/Marketing/Guides";
 
-const Pricing = () => {
+const PricingPage = () => {
   return (
     <Layout
       title={`Pricing - Livepeer.com`}
@@ -56,4 +56,4 @@ const Pricing = () => {
   );
 };
 
-export default Pricing;
+export default PricingPage;

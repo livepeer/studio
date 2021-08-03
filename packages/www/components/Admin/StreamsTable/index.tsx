@@ -7,7 +7,7 @@ import { useApi, usePageVisibility } from "hooks";
 import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import TableV2 from "@components/Admin/Table-v2";
-import Help from "../../public/img/help.svg";
+import Help from "../../../public/img/help.svg";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "@components/Admin/Table-v2/cells/text";
 import { Column, Row } from "react-table";

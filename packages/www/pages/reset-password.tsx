@@ -13,7 +13,7 @@ import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
 
-export default () => {
+const ResetPasswordPage = () => {
   useLoggedIn(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -82,3 +82,5 @@ export default () => {
     </Layout>
   );
 };
+
+export default ResetPasswordPage;

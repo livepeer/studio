@@ -12,7 +12,7 @@ import {
   useAsyncDebounce,
   useRowSelect,
 } from "react-table";
-import Help from "../../public/img/help.svg";
+import Help from "../../../public/img/help.svg";
 import ReactTooltip from "react-tooltip";
 import { User, Stream } from "@livepeer.com/api";
 
