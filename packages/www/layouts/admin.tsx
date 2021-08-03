@@ -77,7 +77,7 @@ const Layout = ({
       title: title ? title : "Livepeer.com",
       description: description
         ? description
-        : "The platform built to power video-centric UGC applications at scale.",
+        : "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.",
       url: url ? url : "https://livepeer.com",
       images: [
         {
