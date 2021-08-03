@@ -5,7 +5,15 @@ import Link from "next/link";
 import Button from "components/Redesign/Button";
 import ArrowLink from "components/Redesign/ArrowLink";
 
-const Hero = ({ heading, description, image }) => {
+const Hero = ({
+  heading,
+  tagline,
+  description,
+  centered = false,
+  skinny = false,
+  image,
+  ctas = [],
+}) => {
   return (
     <Box>
       <Guides backgroundColor="$loContrast" />
@@ -22,22 +30,25 @@ const Hero = ({ heading, description, image }) => {
           }}>
           <Flex
             align="center"
+            justify={centered ? "center" : "between"}
             css={{
-              mb: 100,
+              textAlign: centered ? "center" : "left",
+              mb: skinny ? 0 : 100,
               width: "100%",
               pt: 50,
               "@bp2": {
-                height: "calc(100vh - 180px)",
+                height: skinny ? 300 : "calc(100vh - 180px)",
               },
-            }}
-            justify="between">
+            }}>
             <Flex direction="column" css={{ maxWidth: 700 }}>
-              <Text
-                variant="violet"
-                size="5"
-                css={{ fontWeight: 600, mb: "$5" }}>
-                Use cases
-              </Text>
+              {tagline && (
+                <Text
+                  variant="violet"
+                  size="5"
+                  css={{ fontWeight: 600, mb: "$5" }}>
+                  {tagline}
+                </Text>
+              )}
               <Box
                 css={{
                   fontWeight: 700,
@@ -59,45 +70,49 @@ const Hero = ({ heading, description, image }) => {
                 css={{ mb: "$6", lineHeight: 1.6, maxWidth: 540 }}>
                 {description}
               </Text>
-              <Flex align="center">
-                <Link href="/contact" passHref>
-                  <Button as="a" arrow css={{ mr: "$4" }}>
-                    Get in touch
-                  </Button>
-                </Link>
-                <ArrowLink href="/register">Start now</ArrowLink>
-              </Flex>
+              {ctas?.length > 0 && (
+                <Flex align="center">
+                  <Link href="/contact" passHref>
+                    <Button as="a" arrow css={{ mr: "$4" }}>
+                      Get in touch
+                    </Button>
+                  </Link>
+                  <ArrowLink href="/register">Start now</ArrowLink>
+                </Flex>
+              )}
             </Flex>
-            <Box
-              css={{
-                mt: 40,
-                position: "relative",
-                mr: -120,
-                display: "none",
-                "@bp2": {
-                  display: "block",
-                },
-              }}>
+            {image && (
               <Box
                 css={{
-                  position: "absolute",
-                  transform: "translate(-50%)",
-                  left: "50%",
+                  mt: 40,
+                  position: "relative",
+                  mr: -120,
+                  display: "none",
+                  "@bp2": {
+                    display: "block",
+                  },
                 }}>
-                <Image src={image} width={542 / 2} height={1096 / 2} />
+                <Box
+                  css={{
+                    position: "absolute",
+                    transform: "translate(-50%)",
+                    left: "50%",
+                  }}>
+                  <Image src={image} width={542 / 2} height={1096 / 2} />
+                </Box>
+                <Box
+                  css={{
+                    width: 545,
+                    height: 545,
+                    minWidth: 545,
+                    minHeight: 545,
+                    borderRadius: 1000,
+                    background:
+                      "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
+                  }}
+                />
               </Box>
-              <Box
-                css={{
-                  width: 545,
-                  height: 545,
-                  minWidth: 545,
-                  minHeight: 545,
-                  borderRadius: 1000,
-                  background:
-                    "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
-                }}
-              />
-            </Box>
+            )}
           </Flex>
         </Container>
       </Box>

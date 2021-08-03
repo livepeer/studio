@@ -1,5 +1,5 @@
 import Layout from "layouts/redesign";
-import Hero from "components/Redesign/Hero";
+import Hero from "@components/Redesign/Hero";
 import Why from "components/Redesign/Why";
 import CaseStudy from "components/Redesign/CaseStudy";
 import Prefooter from "components/Redesign/Prefooter";
@@ -56,6 +56,7 @@ const UseCase = ({
       url={`https://livepeer.com${asPath}`}
       preview={preview}>
       <Hero
+        tagline="Use cases"
         heading={hero.heading}
         description={hero.description}
         image={hero.image.asset.url}

@@ -24,6 +24,7 @@ const PricingCalculator = () => {
         css={{
           mb: "$4",
           textAlign: "center",
+          fontWeight: 600,
         }}>
         Estimate your monthly costs
       </Heading>

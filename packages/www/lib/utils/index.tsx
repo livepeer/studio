@@ -6,8 +6,10 @@ import { theme } from "../theme";
 
 export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
+
   try {
-    const Component = require(`../../components/${componentName}`).default;
+    const Component = require(`components/Redesign/${componentName}`).default;
+
     return (
       <Element
         offset={-20}

@@ -1,49 +1,44 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import { Flex, Heading, Container, Box } from "@theme-ui/components";
+import {
+  Flex,
+  Heading,
+  Container,
+  Box,
+  Link as A,
+} from "@livepeer.com/design-system";
 import Link from "next/link";
 
 export default ({ jobs }) => {
   return (
-    <Container sx={{ maxWidth: 960, margin: "0 auto 80px" }}>
+    <Container css={{ maxWidth: 960, margin: "0 auto 80px" }}>
       {jobs.map((j, i) => (
         <Flex
           key={i}
-          sx={{
+          css={{
             justifyContent: "space-between",
             alignItems: "center",
             boxShadow: "0 -1px 0 0 #f7f7f7",
             padding: 35,
             transition: "all 200ms ease-in-out",
-            ":hover": {
+            "&:hover": {
               boxShadow: "0 0 30px 0 rgba(0,0,0,0.12)",
               borderRadius: "8px",
             },
           }}>
           <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
-            <Box
-              as="a"
-              sx={{
+            <A
+              css={{
                 textDecoration: "none",
-                ":hover": { textDecoration: "underline" },
+                "&:hover": {
+                  textDecoration: "none",
+                },
               }}>
-              <Heading
-                as="h2"
-                sx={{ fontWeight: 600, fontSize: 3, color: "black" }}>
+              <Heading as="h2" size="1">
                 {j.title}
               </Heading>
-            </Box>
+            </A>
           </Link>
           <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
-            <Box
-              as="a"
-              sx={{
-                textDecoration: "none",
-                ":hover": { textDecoration: "underline" },
-                color: "primary",
-              }}>
-              Apply
-            </Box>
+            <A variant="violet">Apply</A>
           </Link>
         </Flex>
       ))}
