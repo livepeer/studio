@@ -179,11 +179,6 @@ const config = {
         destination: "/dashboard/stream-health",
         permanent: false,
       },
-      {
-        source: "/app/stream/:id",
-        destination: "/dashboard/streams/:id",
-        permanent: false,
-      },
     ];
   },
 };

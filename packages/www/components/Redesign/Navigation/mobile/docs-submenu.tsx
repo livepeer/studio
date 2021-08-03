@@ -1,9 +1,8 @@
 import { Box, Container, Flex } from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { FiChevronDown } from "react-icons/fi";
 import _throttle from "lodash/throttle";
-import TableOfContents, { Tree } from "components/TableOfContents";
+import TableOfContents, { Tree } from "components/Redesign/TableOfContents";
 
 type Props = {
   tree: Tree[];

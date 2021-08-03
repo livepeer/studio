@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import { useState } from "react";
 import Link from "next/link";
-import useApi from "../../../hooks/use-api";
+import useApi from "hooks/use-api";
 import {
   Flex,
   Button,
@@ -12,8 +12,8 @@ import {
   Container,
   Heading,
 } from "@theme-ui/components";
-import Layout from "../../../layouts";
-import useLoggedIn from "../../../hooks/use-logged-in";
+import Layout from "layouts";
+import useLoggedIn from "hooks/use-logged-in";
 import { useRouter } from "next/router";
 
 const NewStream = () => {

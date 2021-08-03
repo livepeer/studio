@@ -1,6 +1,6 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/redesign";
-import DefaultError from "../components/DefaultError";
+import DefaultError from "components/Redesign/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
@@ -15,7 +15,7 @@ const Page = ({ title, description, content, noindex = false, preview }) => {
     return (
       <Layout>
         <Box
-          sx={{
+          css={{
             py: "$5",
             display: "flex",
             alignItems: "center",
