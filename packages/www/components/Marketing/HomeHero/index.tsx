@@ -8,8 +8,7 @@ import {
 import Button from "@components/Marketing/Button";
 import HeroVideo from "./Video";
 import PhoneSvg from "./PhoneSvg";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useRef, useCallback } from "react";
 import {
   getProportionalValue,
@@ -26,8 +25,6 @@ import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import Typical from "react-typical";
 
 const HomeHero = ({ backgroundColor = "$loContrast" }) => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);

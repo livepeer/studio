@@ -1,6 +1,6 @@
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
-import Hero from "@components/Marketing/HomeHero";
+import HomeHero from "@components/Marketing/HomeHero";
 import Investors from "@components/Marketing/Investors";
 import Testimonials from "@components/Marketing/Testimonials";
 import Contact from "@components/Marketing/Contact";
@@ -90,7 +90,7 @@ const HomePage = () => {
       title={`Home - Livepeer.com`}
       description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
       url={`https://livepeer.com`}>
-      <Hero />
+      <HomeHero />
       <Why
         backgroundColor="$panel"
         title="Benefits"
