@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import Layout from "layouts";
+import Layout from "layouts/admin";
 import { Flex } from "@theme-ui/components";
 import Tabs, { TabType } from "@components/Admin/Tabs";
 import { FunctionComponent } from "react";

@@ -1,4 +1,4 @@
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import { Box, Heading, Text, Container } from "@livepeer.com/design-system";
 import Prefooter from "@components/Marketing/Prefooter";
 import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";

@@ -1,5 +1,5 @@
 import Fade from "react-reveal/Fade";
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import DefaultError from "@components/Marketing/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";

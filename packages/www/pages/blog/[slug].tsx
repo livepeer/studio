@@ -18,7 +18,7 @@ import client from "lib/client";
 import Guides from "@components/Marketing/Guides";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Link from "next/link";
 import Player from "@components/Marketing/BlogVideoPlayer";
 import Prefooter from "@components/Marketing/Prefooter";

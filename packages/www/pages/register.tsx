@@ -1,4 +1,4 @@
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Login from "../components/Marketing/Login";
 import {
   Flex,

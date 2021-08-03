@@ -10,7 +10,7 @@ import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
 import Button from "@components/Marketing/Button";
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
 import Code from "@components/Marketing/Code";

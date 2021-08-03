@@ -1,4 +1,4 @@
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Button from "@components/Marketing/Button";
 import { Container, Heading, Box, Text } from "@livepeer.com/design-system";
 import Link from "next/link";

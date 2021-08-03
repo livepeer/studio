@@ -16,7 +16,7 @@ import BlogPostCard, {
   FeaturedBlogPostCard,
 } from "@components/Marketing/BlogPostCard";
 import Fade from "react-reveal/Fade";
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Link from "next/link";
 import Prefooter from "@components/Marketing/Prefooter";
 import Guides from "@components/Marketing/Guides";

@@ -1,5 +1,5 @@
 import Fade from "react-reveal/Fade";
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import { useRef, useState, useEffect } from "react";
 import {
   Box,

@@ -1,4 +1,4 @@
-import Layout from "layouts/redesign";
+import Layout from "layouts/main";
 import Hero from "@components/Marketing/Hero";
 import Why from "@components/Marketing/Why";
 import CaseStudy from "@components/Marketing/CaseStudy";

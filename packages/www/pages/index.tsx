@@ -1,4 +1,4 @@
-import Layout from "../layouts/redesign";
+import Layout from "../layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
 import Hero from "@components/Marketing/HomeHero";
 import Investors from "@components/Marketing/Investors";

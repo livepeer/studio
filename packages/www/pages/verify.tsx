@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "../layouts";
+import Layout from "../layouts/admin";
 import { useLoggedIn, useApi } from "hooks";
 
 const Container = ({ children }) => (

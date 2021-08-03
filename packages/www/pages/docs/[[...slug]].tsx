@@ -10,7 +10,7 @@ import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
 import { components } from "@components/Marketing/MDXComponents";
-import { ContextProviders } from "layouts/redesign";
+import { ContextProviders } from "layouts/main";
 
 const mobileCategories = [
   {
