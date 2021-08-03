@@ -43,7 +43,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
             <Box
               css={{
                 width: "1px",
-                background: "$mauve4",
+                background: "$mauve3",
                 backgroundSize: "1px 8px",
               }}
             />
@@ -86,7 +86,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
             <Box
               css={{
                 width: "1px",
-                background: "$mauve4",
+                background: "$mauve3",
                 backgroundSize: "1px 8px",
                 position: "absolute",
                 top: "0",
