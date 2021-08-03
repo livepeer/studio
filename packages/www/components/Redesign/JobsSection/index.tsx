@@ -7,7 +7,7 @@ import {
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 
-export default ({ jobs }) => {
+const JobsSection = ({ jobs }) => {
   return (
     <Container css={{ maxWidth: 960, margin: "0 auto 80px" }}>
       {jobs.map((j, i) => (
@@ -45,3 +45,5 @@ export default ({ jobs }) => {
     </Container>
   );
 };
+
+export default JobsSection;

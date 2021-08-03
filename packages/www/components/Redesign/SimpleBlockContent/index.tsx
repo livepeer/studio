@@ -2,7 +2,7 @@ import BlockContent from "@sanity/block-content-to-react";
 import Serializers from "components/Redesign/Serializers";
 import { Box } from "@livepeer.com/design-system";
 
-export default (props) => {
+const SimpleBlockContent = (props) => {
   const { blocks } = props;
 
   if (!blocks) {
@@ -41,3 +41,5 @@ export default (props) => {
     </Box>
   );
 };
+
+export default SimpleBlockContent;
