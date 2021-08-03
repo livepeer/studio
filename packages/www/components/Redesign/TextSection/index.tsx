@@ -2,7 +2,7 @@ import SimpleBlockContent from "../SimpleBlockContent";
 import { Container, Box } from "@livepeer.com/design-system";
 import Guides from "components/Redesign/Guides";
 
-export default ({ text }) => (
+const TextSection = ({ text }) => (
   <Box>
     <Guides backgroundColor="$loContrast" />
     <Box css={{ position: "relative" }}>
@@ -26,3 +26,5 @@ export default ({ text }) => (
     </Box>
   </Box>
 );
+
+export default TextSection;

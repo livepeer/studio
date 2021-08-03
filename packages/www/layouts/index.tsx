@@ -11,7 +11,6 @@ import "lazysizes";
 import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router from "next/router";
 import { Reset, ThemeProvider } from "../lib/theme";
-import MarkdownProvider from "../lib/markdown-provider";
 import Head from "next/head";
 import { ThemeProvider as StitchesThemeProvider } from "next-themes";
 import {
@@ -117,47 +116,45 @@ const Layout = ({
           <link rel="stylesheet" href="/markdown.css" />
         </Head>
         <ThemeProvider>
-          <MarkdownProvider>
-            <Reset />
-            <Box sx={{ minHeight: "100vh" }}>
-              <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-                <NextSeo {...seo} />
-                <Flex
-                  sx={{
-                    flexGrow: 1,
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    zIndex: 1,
-                    position: "relative",
-                  }}>
-                  {preview && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        textDecoration: "none",
-                        justifyContent: "center",
-                        height: 24,
-                        fontSize: 12,
-                        fontWeight: "500",
-                        bg: "primary",
-                        color: "white",
-                        lineHeight: "32px",
-                      }}>
-                      Preview Mode
-                    </Box>
-                  )}
-                  {customNav ? (
-                    customNav
-                  ) : (
-                    <DefaultNav backgroundColor={backgroundColor} />
-                  )}
-                  <Box css={{ position: "relative" }}>{children}</Box>
-                </Flex>
-                <Footer />
+          <Reset />
+          <Box sx={{ minHeight: "100vh" }}>
+            <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
+              <NextSeo {...seo} />
+              <Flex
+                sx={{
+                  flexGrow: 1,
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  zIndex: 1,
+                  position: "relative",
+                }}>
+                {preview && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      textDecoration: "none",
+                      justifyContent: "center",
+                      height: 24,
+                      fontSize: 12,
+                      fontWeight: "500",
+                      bg: "primary",
+                      color: "white",
+                      lineHeight: "32px",
+                    }}>
+                    Preview Mode
+                  </Box>
+                )}
+                {customNav ? (
+                  customNav
+                ) : (
+                  <DefaultNav backgroundColor={backgroundColor} />
+                )}
+                <Box css={{ position: "relative" }}>{children}</Box>
               </Flex>
-            </Box>
-          </MarkdownProvider>
+              <Footer />
+            </Flex>
+          </Box>
         </ThemeProvider>
       </IdProvider>
     </ContextProviders>

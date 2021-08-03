@@ -13,7 +13,7 @@ import Button from "components/Redesign/Button";
 import Layout from "layouts/redesign";
 import Prefooter from "components/Redesign/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
-import Code from "components/renderers/Code";
+import Code from "components/Redesign/Code";
 import Link from "next/link";
 import Guides from "components/Redesign/Guides";
 
