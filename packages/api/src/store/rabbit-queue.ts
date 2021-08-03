@@ -96,7 +96,7 @@ export default class MessageQueue {
     await this.channel.addSetup((channel: Channel) => {
       return Promise.all([
         channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
-          messageTtl: delay,
+          messageTtl: delay + 100,
           deadLetterExchange: EXCHANGE_NAME,
           deadLetterRoutingKey: routingKey,
           expires: delay + 15000,
