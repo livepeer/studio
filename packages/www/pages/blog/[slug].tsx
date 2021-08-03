@@ -196,7 +196,7 @@ const Post = ({
               css={{
                 "p, div, ul, li": {
                   lineHeight: 1.8,
-                  color: "$gray11",
+                  color: "$hiContrast",
                 },
                 "h1, h2, h3, h4, h5, h6": {
                   color: "$hiContrast",
