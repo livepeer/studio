@@ -1,3 +1,10 @@
+export const testData = {
+  emails: [],
+  clear() {
+    testData.emails = [];
+  },
+};
+
 export default {
   setApiKey(apiKey) {
     if (!apiKey) {
@@ -22,5 +29,6 @@ export default {
     if (!emailConfirmation.from["email"] || !emailConfirmation.from["name"]) {
       throw new Error("missing send from email or name");
     }
+    emails.push(emailConfirmation);
   },
 };

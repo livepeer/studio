@@ -8,6 +8,7 @@ import {
 } from "../test-helpers";
 import { semaphore, sleep } from "../util";
 import { sign } from "../controllers/helpers";
+import { testData as emailMock } from "../../__mocks__/@sendgrid/mail";
 
 const bodyParser = require("body-parser");
 jest.setTimeout(15000);
@@ -178,6 +179,7 @@ describe("webhook cannon", () => {
         kind: "stream",
       });
       client.jwtAuth = nonAdminToken["token"];
+      emailMock.clear();
     });
 
     it("should be able to receive the webhook event", async () => {
@@ -209,6 +211,27 @@ describe("webhook cannon", () => {
 
       await sem.wait(3000);
       expect(called).toBe(true);
+    });
+
+    it.only("should be able to send webhook emails", async () => {
+      const res = await client.post("/webhook", {
+        ...mockWebhook,
+        url: undefined,
+        email: mockNonAdminUser.email,
+      });
+      const resJson = await res.json();
+      console.log("webhook body: ", resJson);
+      await server.queue.emit({
+        id: "webhook_test_12",
+        time: Date.now(),
+        channel: "test.channel",
+        event: "stream.started",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+        isConsumed: false,
+      });
+      await sleep(3000);
+      expect(emailMock.emails.length).toEqual(1);
     });
 
     it("should call multiple webhooks", async () => {

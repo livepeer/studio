@@ -142,17 +142,12 @@ app.post("/", validatePost("user"), async (req, res) => {
   const verificationUrl = `${protocol}://${
     req.frontendDomain
   }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
-  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
 
   if (!validUser && user) {
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     try {
       // send email verification message to user using SendGrid
       await sendgridEmail({
         email,
-        supportAddr,
-        sendgridTemplateId,
-        sendgridApiKey,
         subject: "Verify your Livepeer.com Email",
         preheader: "Welcome to Livepeer.com!",
         buttonText: "Verify Email",
@@ -259,7 +254,6 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
   let user = await req.store.get(`user/${userIds[0]}`, false);
   if (user.emailValidToken === req.body.emailValidToken) {
     // alert sales of new verified user
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     const protocol =
       req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
     const buttonUrl = `${protocol}://${req.frontendDomain}/login`;
@@ -271,9 +265,6 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
         // send sales@livepeer.org user verification message using SendGrid
         await sendgridEmail({
           email: salesEmail,
-          supportAddr,
-          sendgridTemplateId,
-          sendgridApiKey,
           subject: `User ${user.email} signed up with Livepeer!`,
           preheader: "We have a new verified user",
           buttonText: "Log into livepeer",
@@ -408,7 +399,6 @@ app.post(
       expiration: Date.now() + ms("48 hours"),
     });
 
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     try {
       const protocol =
         req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
@@ -420,9 +410,6 @@ app.post(
 
       await sendgridEmail({
         email,
-        supportAddr,
-        sendgridTemplateId,
-        sendgridApiKey,
         subject: "Livepeer Password Reset",
         preheader: "Reset your Livepeer Password!",
         buttonText: "Reset Password",

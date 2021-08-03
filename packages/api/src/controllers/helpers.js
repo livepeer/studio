@@ -112,18 +112,42 @@ export function makeNextHREF(req, nextCursor) {
   return next.href;
 }
 
+let supportAddr;
+let sendgridTemplateId;
+let sendgridApiKey;
+let frontendDomain;
+let frontendProtocol;
+export function setSendgridConfig(params) {
+  ({
+    supportAddr,
+    sendgridTemplateId,
+    sendgridApiKey,
+    frontendDomain,
+    frontendProtocol,
+  } = params);
+}
+
 export async function sendgridEmail({
   email,
-  supportAddr,
-  sendgridTemplateId,
-  sendgridApiKey,
   subject,
   preheader,
   text,
   buttonText,
   buttonUrl,
-  unsubscribe,
 }) {
+  if (
+    !supportAddr ||
+    !sendgridTemplateId ||
+    !sendgridApiKey ||
+    !frontendDomain ||
+    !frontendProtocol
+  ) {
+    throw new Error(
+      "Sending email requires supportAddr, sendgridTemplateId, and sendgridApiKey"
+    );
+  }
+  const unsubscribeUrl = `${frontendProtocol}://${frontendDomain}/#contactSection`;
+  const fullButtonUrl = `${frontendProtocol}://${frontendDomain}${buttonUrl}`;
   const [supportName, supportEmail] = supportAddr;
   const msg = {
     personalizations: [
@@ -134,8 +158,8 @@ export async function sendgridEmail({
           preheader,
           text,
           buttonText,
-          buttonUrl,
-          unsubscribe,
+          buttonUrl: fullButtonUrl,
+          unsubscribeUrl,
         },
       },
     ],

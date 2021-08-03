@@ -6,7 +6,7 @@ import Model from "../store/model";
 import { DBWebhook, EventKey } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
-import { sign } from "../controllers/helpers";
+import { sign, sendgridEmail } from "../controllers/helpers";
 
 import uuid from "uuid/v4";
 import { parse as parseUrl } from "url";
@@ -221,6 +221,26 @@ export default class WebhookCannon {
     }
   }
 
+  async _fireHookEmail(
+    event: WebhookMessage,
+    webhook: DBWebhook,
+    sanitized: Stream,
+    user: User,
+    verifyUrl = true
+  ) {
+    await sendgridEmail({
+      email: webhook.email,
+      subject: `${event.event} - stream ${sanitized.name} - Livepeer.com`,
+      preheader: "Automated event email from Livepeer.com",
+      buttonText: "View Stream",
+      buttonUrl: `/dashboard/streams/${sanitized.id}`,
+      text: [
+        "Let's verify your email so you can start using the Livepeer.com API.",
+        "Your link is active for 48 hours. After that, you will need to resend the verification email.",
+      ].join("\n\n"),
+    });
+  }
+
   async storeResponse(
     webhook: DBWebhook,
     event: WebhookMessage,
@@ -237,7 +257,7 @@ export default class WebhookCannon {
   }
 
   async onTrigger(event: WebhookMessage) {
-    console.log("ON TRIGGER triggered", event);
+    console.log("ON TRIGGER triggered", JSON.stringify(event));
     if (!event) {
       // throw new Error('onTrigger requires a Queue event!')
       // this is fine because pop could return a null if some other client raced and picked the task
@@ -268,7 +288,7 @@ export default class WebhookCannon {
       event.event
     );
 
-    console.log("webhooks : ", webhooksList);
+    console.log("webhooks : ", JSON.stringify(webhooksList));
     let stream = await this.db.stream.get(event.streamId);
     if (!stream) {
       // if stream isn't found. don't fire the webhook, log an error

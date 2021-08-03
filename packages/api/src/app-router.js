@@ -18,6 +18,7 @@ import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
 import MessageQueue from "./store/rabbit-queue";
+import { setSendgridConfig } from "./controllers/helpers";
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -41,6 +42,7 @@ export default async function makeApp(params) {
     listen = true,
     clientId,
     frontendDomain = "livepeer.com",
+    frontendProtocol = "https",
     jwtSecret,
     jwtAudience,
     supportAddr,
@@ -69,6 +71,13 @@ export default async function makeApp(params) {
         `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
       );
     }
+    setSendgridConfig({
+      supportAddr,
+      sendgridTemplateId,
+      sendgridApiKey,
+      frontendDomain,
+      frontendProtocol,
+    });
   }
 
   // Storage init
