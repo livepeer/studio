@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import Button from "components/Admin/Button";
+import Button from "@components/Admin/Button";
 import { Box } from "@theme-ui/components";
 
 interface Props {

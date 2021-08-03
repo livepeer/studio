@@ -1,8 +1,8 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
-import { DefaultNav } from "components/Redesign/Navigation";
-import Footer from "components/Redesign/Footer";
+import { DefaultNav } from "@components/Marketing/Navigation";
+import Footer from "@components/Marketing/Footer";
 import { IdProvider } from "@radix-ui/react-id";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";

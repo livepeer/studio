@@ -24,11 +24,11 @@ import { useRouter } from "next/router";
 import Router from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
 import { useEffect, useState } from "react";
-import TabbedLayout from "components/Admin/TabbedLayout";
-import StreamSessionsTable from "components/Admin/StreamSessionsTable";
-import DeleteStreamModal from "components/Admin/DeleteStreamModal";
-import ConfirmationModal from "components/Admin/ConfirmationModal";
-import Modal from "components/Admin/Modal";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import StreamSessionsTable from "@components/Admin/StreamSessionsTable";
+import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
+import ConfirmationModal from "@components/Admin/ConfirmationModal";
+import Modal from "@components/Admin/Modal";
 import Help from "../../../public/img/help.svg";
 import {
   pathJoin,
@@ -36,8 +36,8 @@ import {
   isDevelopment,
   formatNumber,
 } from "../../../lib/utils";
-import { RenditionsDetails } from "components/Admin/StreamsTable";
-import { RelativeTime } from "components/Admin/CommonAdminTable";
+import { RenditionsDetails } from "@components/Admin/StreamsTable";
+import { RelativeTime } from "@components/Admin/CommonAdminTable";
 import { getTabs as getTabsAdmin } from "../admin";
 
 type TimedAlertProps = {

@@ -4,10 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useApi } from "hooks";
 import { Box, Button, Container, Flex } from "@theme-ui/components";
-import DeleteStreamModal from "components/Admin/DeleteStreamModal";
-import { Checkbox } from "components/Admin/Table";
-import CommonAdminTable from "components/Admin/CommonAdminTable";
-import { StreamName } from "components/Admin/CommonAdminTable";
+import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
+import { Checkbox } from "@components/Admin/Table";
+import CommonAdminTable from "@components/Admin/CommonAdminTable";
+import { StreamName } from "@components/Admin/CommonAdminTable";
 
 const ROWS_PER_PAGE = 20;
 

@@ -1,5 +1,5 @@
 import Layout from "layouts/redesign";
-import Login from "../components/Redesign/Login";
+import Login from "../components/Marketing/Login";
 import {
   Flex,
   Box,
@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import useApi from "../hooks/use-api";
 import Link from "next/link";
-import Guides from "@components/Redesign/Guides";
+import Guides from "@components/Marketing/Guides";
 
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);

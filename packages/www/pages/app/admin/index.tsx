@@ -3,9 +3,9 @@ import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
 import Layout from "layouts";
 import useLoggedIn from "hooks/use-logged-in";
-import UserTable from "components/Admin/UserTable";
-import TabbedLayout from "components/Admin/TabbedLayout";
-import { TabType } from "components/Admin/Tabs";
+import UserTable from "@components/Admin/UserTable";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import { TabType } from "@components/Admin/Tabs";
 
 export function getTabs(i: number): Array<TabType> {
   const tabs = [

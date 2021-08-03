@@ -8,8 +8,8 @@ import {
   Box,
   SnackbarProvider,
 } from "@livepeer.com/design-system";
-import { DefaultNav } from "components/Redesign/Navigation";
-import Footer from "components/Redesign/Footer";
+import { DefaultNav } from "@components/Marketing/Navigation";
+import Footer from "@components/Marketing/Footer";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";

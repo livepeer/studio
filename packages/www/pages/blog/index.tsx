@@ -14,12 +14,12 @@ import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
 import BlogPostCard, {
   FeaturedBlogPostCard,
-} from "@components/Redesign/BlogPostCard";
+} from "@components/Marketing/BlogPostCard";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/redesign";
 import Link from "next/link";
-import Prefooter from "components/Redesign/Prefooter";
-import Guides from "components/Redesign/Guides";
+import Prefooter from "@components/Marketing/Prefooter";
+import Guides from "@components/Marketing/Guides";
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();

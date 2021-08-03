@@ -1,6 +1,6 @@
 import { Container, Grid, Box, global } from "@livepeer.com/design-system";
-import DocsNav from "@components/Redesign/Navigation/docs";
-import TableOfContents from "@components/Redesign/Docs/TableOfContents";
+import DocsNav from "@components/Marketing/Navigation/docs";
+import TableOfContents from "@components/Marketing/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
-import { components } from "components/Redesign/MDXComponents";
+import { components } from "@components/Marketing/MDXComponents";
 import { ContextProviders } from "layouts/redesign";
 
 const mobileCategories = [

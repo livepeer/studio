@@ -10,14 +10,14 @@ import {
   Container,
   Heading,
 } from "@theme-ui/components";
-import Modal from "components/Admin/Modal";
+import Modal from "@components/Admin/Modal";
 import {
   Table,
   TableRow,
   Checkbox,
   TableRowVariant,
-} from "components/Admin/Table";
-import CopyBox from "components/Admin/CopyBox";
+} from "@components/Admin/Table";
+import CopyBox from "@components/Admin/CopyBox";
 
 type TokenTableProps = {
   userId: string;

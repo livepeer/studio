@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import Modal from "components/Admin/Modal";
+import Modal from "@components/Admin/Modal";
 import { Box, Button, Flex } from "@theme-ui/components";
 
 type DeleteStreamModalProps = {

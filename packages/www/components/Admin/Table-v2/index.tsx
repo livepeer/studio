@@ -13,7 +13,7 @@ import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
 import ReactTooltip from "react-tooltip";
 import Help from "../../public/img/help.svg";
-import Checkbox from "components/Admin/Checkbox";
+import Checkbox from "@components/Admin/Checkbox";
 import {
   CheckboxFilter,
   CheckboxFilterProps,

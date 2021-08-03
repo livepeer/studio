@@ -10,9 +10,9 @@ import {
   Input,
   Container,
 } from "@theme-ui/components";
-import Modal from "components/Admin/Modal";
-import CopyBox from "components/Admin/CopyBox";
-import CommonAdminTable from "components/Admin/CommonAdminTable";
+import Modal from "@components/Admin/Modal";
+import CopyBox from "@components/Admin/CopyBox";
+import CommonAdminTable from "@components/Admin/CommonAdminTable";
 
 const ROWS_PER_PAGE = 25;
 

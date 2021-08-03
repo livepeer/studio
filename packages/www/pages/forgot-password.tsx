@@ -1,5 +1,5 @@
 import Layout from "layouts/redesign";
-import Login from "components/Redesign/Login";
+import Login from "@components/Marketing/Login";
 import {
   Flex,
   Box,
@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
-import Guides from "components/Redesign/Guides";
+import Guides from "@components/Marketing/Guides";
 
 const ForgotPasswordPage = () => {
   useLoggedIn(false);

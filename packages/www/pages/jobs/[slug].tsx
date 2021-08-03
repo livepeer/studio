@@ -9,13 +9,13 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
-import Button from "components/Redesign/Button";
+import Button from "@components/Marketing/Button";
 import Layout from "layouts/redesign";
-import Prefooter from "components/Redesign/Prefooter";
+import Prefooter from "@components/Marketing/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
-import Code from "components/Redesign/Code";
+import Code from "@components/Marketing/Code";
 import Link from "next/link";
-import Guides from "components/Redesign/Guides";
+import Guides from "@components/Marketing/Guides";
 
 const Page = ({ title, slug, body, noindex = false, preview }) => {
   return (

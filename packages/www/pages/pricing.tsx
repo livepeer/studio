@@ -1,9 +1,9 @@
 import Layout from "layouts/redesign";
 import { Box, Heading, Text, Container } from "@livepeer.com/design-system";
-import Prefooter from "components/Redesign/Prefooter";
-import PricingCalculator from "components/Redesign/Pricing/pricingCalculator";
-import PricingCardsContainer from "components/Redesign/Pricing/pricingCardsContainer";
-import Guides from "components/Redesign/Guides";
+import Prefooter from "@components/Marketing/Prefooter";
+import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
+import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
+import Guides from "@components/Marketing/Guides";
 
 const Pricing = () => {
   return (

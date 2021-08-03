@@ -6,18 +6,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "hooks";
 import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
-import TableV2 from "components/Admin//Table-v2";
+import TableV2 from "@components/Admin/Table-v2";
 import Help from "../../public/img/help.svg";
 import { Stream } from "@livepeer.com/api";
-import TextCell, { TextCellProps } from "components/Admin/Table-v2/cells/text";
+import TextCell, { TextCellProps } from "@components/Admin/Table-v2/cells/text";
 import { Column, Row } from "react-table";
-import DateCell, { DateCellProps } from "components/Admin/Table-v2/cells/date";
+import DateCell, { DateCellProps } from "@components/Admin/Table-v2/cells/date";
 import {
   RenditionDetailsCellProps,
   RenditionsDetailsCell,
-} from "components/Admin/Table-v2/cells/streams-table";
-import { dateSort, stringSort } from "components/Admin/Table-v2/sorts";
-import { SortTypeArgs } from "components/Admin/Table-v2/types";
+} from "@components/Admin/Table-v2/cells/streams-table";
+import { dateSort, stringSort } from "@components/Admin/Table-v2/sorts";
+import { SortTypeArgs } from "@components/Admin/Table-v2/types";
 
 type ProfileProps = {
   id: string;

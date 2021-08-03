@@ -1,9 +1,9 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/redesign";
 import { Container, Box, Heading, Text } from "@livepeer.com/design-system";
-import Prefooter from "components/Redesign/Prefooter";
-import TeamSection from "../components/Redesign/TeamSection";
-import Guides from "components/Redesign/Guides";
+import Prefooter from "@components/Marketing/Prefooter";
+import TeamSection from "../components/Marketing/TeamSection";
+import Guides from "@components/Marketing/Guides";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";

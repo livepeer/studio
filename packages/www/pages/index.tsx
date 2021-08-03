@@ -1,10 +1,10 @@
 import Layout from "../layouts/redesign";
-import Prefooter from "components/Redesign/Prefooter";
-import Hero from "components/Redesign/HomeHero";
-import Investors from "components/Redesign/Investors";
-import Testimonials from "components/Redesign/Testimonials";
-import Contact from "components/Redesign/Contact";
-import Why from "components/Redesign/Why";
+import Prefooter from "@components/Marketing/Prefooter";
+import Hero from "@components/Marketing/HomeHero";
+import Investors from "@components/Marketing/Investors";
+import Testimonials from "@components/Marketing/Testimonials";
+import Contact from "@components/Marketing/Contact";
+import Why from "@components/Marketing/Why";
 
 const benefitsListItems = [
   {

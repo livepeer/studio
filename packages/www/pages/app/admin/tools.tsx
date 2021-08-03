@@ -3,8 +3,8 @@ import { jsx } from "theme-ui";
 import useApi from "../../../hooks/use-api";
 import Layout from "../../../layouts";
 import useLoggedIn from "../../../hooks/use-logged-in";
-import TabbedLayout from "components/Admin/TabbedLayout";
-import AdminTools from "components/Admin/AdminTools";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import AdminTools from "@components/Admin/AdminTools";
 import { getTabs } from "../admin";
 
 const ToolsPage = () => {

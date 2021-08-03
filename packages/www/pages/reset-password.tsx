@@ -1,5 +1,5 @@
 import Layout from "layouts/redesign";
-import Login from "components/Redesign/Login";
+import Login from "@components/Marketing/Login";
 import Link from "next/link";
 import {
   Flex,
@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
-import Guides from "components/Redesign/Guides";
+import Guides from "@components/Marketing/Guides";
 
 export default () => {
   useLoggedIn(false);

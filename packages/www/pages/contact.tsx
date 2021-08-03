@@ -12,10 +12,10 @@ import {
   Link as A,
 } from "@livepeer.com/design-system";
 import { useForm } from "react-hubspot";
-import Button from "components/Redesign/Button";
-import Prefooter from "components/Redesign/Prefooter";
+import Button from "@components/Marketing/Button";
+import Prefooter from "@components/Marketing/Prefooter";
 import { useRouter } from "next/router";
-import Guides from "components/Redesign/Guides";
+import Guides from "@components/Marketing/Guides";
 
 const ContactPage = () => {
   const { query } = useRouter();

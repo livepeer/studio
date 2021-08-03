@@ -3,8 +3,8 @@ import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
 import Layout from "layouts";
 import useLoggedIn from "hooks/use-logged-in";
-import TabbedLayout from "components/Admin/TabbedLayout";
-import AdminObjectStoreTable from "components/Admin/AdminObjectStoreTable";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import AdminObjectStoreTable from "@components/Admin/AdminObjectStoreTable";
 import { getTabs } from "../admin";
 
 const ObjectStore = () => {

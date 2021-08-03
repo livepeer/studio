@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { Box, Flex, Input } from "@theme-ui/components";
-import Checkbox from "components/Admin/Checkbox";
+import Checkbox from "@components/Admin/Checkbox";
 import { useCallback } from "react";
 
 type AnyFilterValue = string;

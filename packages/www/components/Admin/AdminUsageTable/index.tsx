@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import { Select, Container, Box, Button, Input } from "@theme-ui/components";
-import { Table, TableRow, TableRowVariant } from "components/Admin/Table";
+import { Table, TableRow, TableRowVariant } from "@components/Admin/Table";
 
 function dur2str(dur?: number) {
   if (!dur) {

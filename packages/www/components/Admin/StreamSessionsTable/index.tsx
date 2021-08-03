@@ -6,16 +6,19 @@ import { Box, Flex, Link as A } from "@theme-ui/components";
 import moment from "moment";
 import * as filenamify from "filenamify";
 import TableV2 from "../Table-v2";
-import TextCell, { TextCellProps } from "components/Admin/Table-v2/cells/text";
-import DateCell, { DateCellProps } from "components/Admin/Table-v2/cells/date";
+import TextCell, { TextCellProps } from "@components/Admin/Table-v2/cells/text";
+import DateCell, { DateCellProps } from "@components/Admin/Table-v2/cells/date";
 import DurationCell, {
   DurationCellProps,
-} from "components/Admin/Table-v2/cells/duration";
-import { dateSort, numberSort } from "components/Admin/Table-v2/sorts";
+} from "@components/Admin/Table-v2/cells/duration";
+import { dateSort, numberSort } from "@components/Admin/Table-v2/sorts";
 import Link from "next/link";
-import { SortTypeArgs } from "components/Admin/Table-v2/types";
+import { SortTypeArgs } from "@components/Admin/Table-v2/types";
 import { Column } from "react-table";
-import { CellComponentProps, TableData } from "components/Admin/Table-v2/types";
+import {
+  CellComponentProps,
+  TableData,
+} from "@components/Admin/Table-v2/types";
 
 function makeMP4Url(
   hlsUrl: string,
