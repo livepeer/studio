@@ -13,7 +13,7 @@ function dur2str(dur?: number) {
   return `${dur} sec (${min} min)`;
 }
 
-export default ({ id }: { id: string }) => {
+const Index = ({ id }: { id: string }) => {
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [fromTime, setFromTime] = useState("");
@@ -112,3 +112,5 @@ export default ({ id }: { id: string }) => {
     </Container>
   );
 };
+
+export default Index;

@@ -14,7 +14,7 @@ const Container = ({ children }) => (
   </Layout>
 );
 
-export default () => {
+const Verify = () => {
   useLoggedIn();
   const router = useRouter();
   const { verify, user } = useApi();
@@ -84,3 +84,5 @@ export default () => {
     </Container>
   );
 };
+
+export default Verify;

@@ -4,7 +4,7 @@ import { Input, Box } from "@theme-ui/components";
 import CopyBoxIcon from "./CopyBoxIcon";
 import { useRef, MutableRefObject } from "react";
 
-export default ({ copy, onCopy = () => {} }) => {
+const Index = ({ copy, onCopy = () => {} }) => {
   const inputRef: MutableRefObject<HTMLInputElement> = useRef();
   return (
     <Box
@@ -47,3 +47,5 @@ export default ({ copy, onCopy = () => {} }) => {
     </Box>
   );
 };
+
+export default Index;

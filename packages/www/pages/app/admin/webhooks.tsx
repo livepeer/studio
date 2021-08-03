@@ -7,7 +7,7 @@ import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminWebhooksTable from "@components/Admin/AdminWebhooksTable";
 import { getTabs } from "../admin";
 
-export default () => {
+const Webhooks = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
@@ -21,3 +21,5 @@ export default () => {
     </TabbedLayout>
   );
 };
+
+export default Webhooks;

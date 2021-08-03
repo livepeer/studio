@@ -3,7 +3,7 @@ import client from "lib/client";
 
 const builder = imageUrlBuilder(client as any);
 
-export default ({ node }) => {
+const Index = ({ node }) => {
   const { alt, caption, asset } = node;
   if (!asset) {
     return undefined;
@@ -23,3 +23,5 @@ export default ({ node }) => {
     </figure>
   );
 };
+
+export default Index;

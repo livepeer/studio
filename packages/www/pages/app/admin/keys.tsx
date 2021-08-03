@@ -7,7 +7,7 @@ import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminTokenTable from "@components/Admin/AdminTokenTable";
 import { getTabs } from "../admin";
 
-export default () => {
+const Keys = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
@@ -21,3 +21,5 @@ export default () => {
     </TabbedLayout>
   );
 };
+
+export default Keys;

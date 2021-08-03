@@ -24,7 +24,7 @@ type TokenTableProps = {
   id: string;
 };
 
-export default ({ userId, id }: TokenTableProps) => {
+const Index = ({ userId, id }: TokenTableProps) => {
   const [tokens, setTokens] = useState([]);
   const [tokenName, setTokenName] = useState("");
   const [createModal, setCreateModal] = useState(false);
@@ -215,3 +215,5 @@ export default ({ userId, id }: TokenTableProps) => {
     </Container>
   );
 };
+
+export default Index;
