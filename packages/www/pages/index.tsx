@@ -102,7 +102,6 @@ const HomePage = () => {
         heading="Feature-rich, high quality streaming for your project."
         reasons={featuresListItems}
       />
-
       <Investors backgroundColor="rgb(30 30 33)" />
       <Testimonials />
       <Contact />

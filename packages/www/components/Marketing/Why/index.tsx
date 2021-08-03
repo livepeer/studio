@@ -91,11 +91,14 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
         <Box
           css={{
             display: "grid",
-            grid: "1fr/repeat(2,1fr)",
+            grid: "1fr/repeat(1,1fr)",
             position: "relative",
             height: "100%",
             maxWidth: "1145px",
             margin: "0 auto",
+            "@bp1": {
+              grid: "1fr/repeat(2,1fr)",
+            },
             "@bp3": {
               grid: "1fr/repeat(4,1fr)",
             },
@@ -105,12 +108,15 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
               <Box
                 key={i}
                 css={{
-                  pl: "$3",
+                  pl: "$6",
                   pr: "$6",
                   width: "100%",
                   mb: "$7",
-                  "&:nth-child(odd)": {
-                    pl: "$6",
+                  "@bp1": {
+                    pl: "$3",
+                    "&:nth-child(odd)": {
+                      pl: "$6",
+                    },
                   },
                   "@bp3": {
                     "&:nth-child(odd)": {
