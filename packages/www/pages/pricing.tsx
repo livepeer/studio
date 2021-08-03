@@ -21,7 +21,7 @@ const PricingPage = () => {
             width: "100%",
             "@bp3": {
               py: "$8",
-              px: "$3",
+              px: "$4",
             },
           }}>
           <Box css={{ textAlign: "center", mb: "$5" }}>
