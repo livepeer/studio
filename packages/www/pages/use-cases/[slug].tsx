@@ -60,6 +60,16 @@ const UseCase = ({
         heading={hero.heading}
         description={hero.description}
         image={hero.image.asset.url}
+        ctas={[
+          {
+            href: "/register",
+            children: "Start now",
+          },
+          {
+            href: "/contact",
+            children: "Get in touch",
+          },
+        ]}
       />
       <Why
         backgroundColor="$panel"

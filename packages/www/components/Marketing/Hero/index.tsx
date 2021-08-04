@@ -72,12 +72,12 @@ const Hero = ({
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center">
-                  <Link href="/contact" passHref>
+                  <Link href={ctas[0].href} passHref>
                     <Button as="a" arrow css={{ mr: "$4" }}>
-                      Get in touch
+                      {ctas[0].children}
                     </Button>
                   </Link>
-                  <ArrowLink href="/register">Start now</ArrowLink>
+                  <ArrowLink href={ctas[1].href}>{ctas[1].children}</ArrowLink>
                 </Flex>
               )}
             </Flex>
