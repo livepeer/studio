@@ -64,8 +64,7 @@ const ContactPage = () => {
             </Heading>
             <Text size="4" variant="gray" css={{ maxWidth: 630, mx: "auto" }}>
               If you'd like to learn more about Livepeer.com's innovative video
-              video streaming API drop us a note and we'll get right back to
-              you!
+              streaming API drop us a note and we'll get right back to you!
               <br />
               <br />
               or email us at{" "}
