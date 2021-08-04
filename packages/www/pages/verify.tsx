@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "layouts/admin";
+import Layout from "layouts/main";
 import { useLoggedIn, useApi } from "hooks";
 import {
   Container,
