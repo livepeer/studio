@@ -16,11 +16,12 @@ const JobsSection = ({ jobs }) => {
           css={{
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: "0 -1px 0 0 #f7f7f7",
+            boxShadow: "0 -1px 0 0 $colors$mauve4",
             padding: 35,
             transition: "all 200ms ease-in-out",
             "&:hover": {
-              boxShadow: "0 0 30px 0 rgba(0,0,0,0.12)",
+              bc: "$loContrast",
+              boxShadow: "0 0 30px 0 $colors$mauve4",
               borderRadius: "8px",
             },
           }}>
@@ -28,9 +29,6 @@ const JobsSection = ({ jobs }) => {
             <A
               css={{
                 textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "none",
-                },
               }}>
               <Heading as="h2" size="1">
                 {j.title}
