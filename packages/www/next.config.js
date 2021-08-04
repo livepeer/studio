@@ -24,7 +24,7 @@ const config = {
       },
       {
         source: "/docs/api/stream",
-        destination: "/docs/api-reference/stream/stream",
+        destination: "/docs/api-reference/stream/overview",
         permanent: false,
       },
       {
