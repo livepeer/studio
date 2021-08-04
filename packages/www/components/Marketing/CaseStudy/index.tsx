@@ -21,7 +21,7 @@ const CaseStudy = ({
   backgroundColor = "$loContrast",
 }) => {
   return (
-    <Box>
+    <Box css={{ position: "relative" }}>
       <Guides backgroundColor={backgroundColor} />
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ p: 0 }}>
