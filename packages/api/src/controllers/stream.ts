@@ -81,12 +81,12 @@ async function validateMultistreamTarget(
     );
   }
   if (id) {
-    if (!(await db.pushTarget.hasAccess(id, userId))) {
+    if (!(await db.multistreamTarget.hasAccess(id, userId))) {
       throw new BadRequestError(`push target not found: "${id}"`);
     }
     return pushTargetRef;
   }
-  const created = await db.pushTarget.fillAndCreate({
+  const created = await db.multistreamTarget.fillAndCreate({
     name: spec.name,
     url: spec.url,
     userId,

@@ -201,7 +201,7 @@ describe("controllers/stream", () => {
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.pushTarget.fillAndCreate({
+        pushTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -334,7 +334,7 @@ describe("controllers/stream", () => {
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.pushTarget.fillAndCreate({
+        pushTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -382,7 +382,7 @@ describe("controllers/stream", () => {
         expect(resultPt.id).toBeDefined();
         expect(resultPt.id).not.toEqual(pushTarget.id);
 
-        const saved = await server.db.pushTarget.get(resultPt.id);
+        const saved = await server.db.multistreamTarget.get(resultPt.id);
         expect(saved).toBeDefined();
         expect(saved.userId).toEqual(adminUser.id);
       });
@@ -424,7 +424,7 @@ describe("controllers/stream", () => {
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.pushTarget.fillAndCreate({
+        pushTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -485,7 +485,7 @@ describe("controllers/stream", () => {
       });
 
       it("should reject references to other users push targets", async () => {
-        const nonAdminTarget = await server.db.pushTarget.fillAndCreate({
+        const nonAdminTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: nonAdminUser.id,
         });
@@ -532,7 +532,7 @@ describe("controllers/stream", () => {
           pushTargets: [{ profile: "test_stream_360p", id: createdPtId }],
         });
 
-        const savedPt = await server.db.pushTarget.get(createdPtId);
+        const savedPt = await server.db.multistreamTarget.get(createdPtId);
         expect(savedPt.userId).toEqual(adminUser.id);
       });
     });

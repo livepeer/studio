@@ -54,14 +54,14 @@ describe("controllers/push-target", () => {
         ...mockTargetInput,
         userId: nonAdminUser.id,
       };
-      const userMsTarget = await db.pushTarget.fillAndCreate(input);
+      const userMsTarget = await db.multistreamTarget.fillAndCreate(input);
 
       for (let i = 0; i < 10; i += 1) {
         const input = {
           ...mockTargetInput,
           userId: uuid(),
         };
-        const created = await db.pushTarget.fillAndCreate(input);
+        const created = await db.multistreamTarget.fillAndCreate(input);
 
         const res = await client.get(`/push-target/${created.id}`);
         expect(res.status).toBe(404);
@@ -77,7 +77,7 @@ describe("controllers/push-target", () => {
         ...mockTargetInput,
         userId: uuid(),
       };
-      const created = await db.pushTarget.fillAndCreate(input);
+      const created = await db.multistreamTarget.fillAndCreate(input);
 
       const res = await client.get(`/push-target/${created.id}`);
       expect(res.status).toBe(403);
@@ -94,7 +94,7 @@ describe("controllers/push-target", () => {
           ...mockTargetInput,
           userId: uuid(),
         };
-        const created = await db.pushTarget.fillAndCreate(input);
+        const created = await db.multistreamTarget.fillAndCreate(input);
 
         const res = await client.get(`/push-target/${created.id}`);
         expect(res.status).toBe(200);
@@ -122,7 +122,7 @@ describe("controllers/push-target", () => {
     it("should support pagination", async () => {
       const createdIds: string[] = [];
       for (let i = 0; i < 13; i += 1) {
-        const created = await db.pushTarget.fillAndCreate({
+        const created = await db.multistreamTarget.fillAndCreate({
           ...mockTargetInput,
           userId: nonAdminUser.id,
         });
@@ -152,7 +152,7 @@ describe("controllers/push-target", () => {
       createdIds.forEach(expect(listedIDs).toContain);
     });
 
-    it("should return a 404 if pushTarget not found", async () => {
+    it("should return a 404 if multistreamTarget not found", async () => {
       const id = uuid();
       const resp = await client.get(`/push-target/${id}`);
       expect(resp.status).toBe(404);
@@ -188,8 +188,8 @@ describe("controllers/push-target", () => {
         disabled: true,
       });
       expect(res.status).toBe(204);
-      const patched = db.pushTarget.cleanWriteOnlyResponse(
-        await db.pushTarget.get(created.id)
+      const patched = db.multistreamTarget.cleanWriteOnlyResponse(
+        await db.multistreamTarget.get(created.id)
       );
       expect(patched).not.toEqual(created);
       expect(patched).toEqual({ ...created, disabled: true });
@@ -289,7 +289,7 @@ describe("controllers/push-target", () => {
     });
 
     it("should not allow non-admin users to access another user's push targets", async () => {
-      const created = await db.pushTarget.fillAndCreate({
+      const created = await db.multistreamTarget.fillAndCreate({
         ...mockTargetInput,
         userId: adminUser.id,
       });

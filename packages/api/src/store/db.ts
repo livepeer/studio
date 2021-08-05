@@ -46,7 +46,7 @@ export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
-  pushTarget: MultistreamTargetTable;
+  multistreamTarget: MultistreamTargetTable;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -117,7 +117,7 @@ export class DB {
       db: this,
       schema: schemas["object-store"],
     });
-    this.pushTarget = new MultistreamTargetTable({
+    this.multistreamTarget = new MultistreamTargetTable({
       db: this,
       schema: schemas["push-target"],
     });

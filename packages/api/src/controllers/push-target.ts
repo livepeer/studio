@@ -71,10 +71,12 @@ app.use(
       return data;
     }
     if (Array.isArray(data)) {
-      return db.pushTarget.cleanWriteOnlyResponses(data);
+      return db.multistreamTarget.cleanWriteOnlyResponses(data);
     }
     if ("id" in data) {
-      return db.pushTarget.cleanWriteOnlyResponse(data as DBMultistreamTarget);
+      return db.multistreamTarget.cleanWriteOnlyResponse(
+        data as DBMultistreamTarget
+      );
     }
     return data;
   })
@@ -102,7 +104,7 @@ app.get("/", async (req, res) => {
     }
     [query, opts] = [{ userId }, { limit, cursor }];
   }
-  const [output, newCursor] = await db.pushTarget.find(query, opts);
+  const [output, newCursor] = await db.multistreamTarget.find(query, opts);
 
   res.status(200);
   if (output.length > 0 && newCursor) {
@@ -113,7 +115,7 @@ app.get("/", async (req, res) => {
 
 app.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
-  const data = await db.pushTarget.getAuthed(
+  const data = await db.multistreamTarget.getAuthed(
     req.params.id,
     req.user.id,
     isAdmin
@@ -126,7 +128,7 @@ app.get("/:id", async (req, res) => {
 
 app.post("/", validatePost("push-target"), async (req, res) => {
   const input = req.body as MultistreamTarget;
-  const data = await db.pushTarget.fillAndCreate({
+  const data = await db.multistreamTarget.fillAndCreate({
     name: input.name,
     url: input.url,
     disabled: input.disabled,
@@ -139,10 +141,10 @@ app.post("/", validatePost("push-target"), async (req, res) => {
 app.delete("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
+  if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
   }
-  await db.pushTarget.delete(id);
+  await db.multistreamTarget.delete(id);
 
   res.status(204);
   res.end();
@@ -151,14 +153,14 @@ app.delete("/:id", async (req, res) => {
 app.patch("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
+  if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
   }
   const disabledPatch = req.body.disabled;
   if (typeof disabledPatch !== "boolean") {
     return respondError(res, 422, "required boolean field: disabled");
   }
-  await db.pushTarget.update(id, { disabled: disabledPatch });
+  await db.multistreamTarget.update(id, { disabled: disabledPatch });
   res.status(204);
   res.end();
 });
