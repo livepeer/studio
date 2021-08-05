@@ -34,7 +34,8 @@ import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 
 type Profile = DBStream["profiles"][number];
-type PushTargetRef = DBStream["pushTargets"][number];
+type MultistreamRef = DBStream["multistream"];
+type MultistreamTargetRef = MultistreamRef["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
@@ -63,11 +64,11 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
   });
 };
 
-async function validatePushTarget(
+async function validateMultistreamTarget(
   userId: string,
   profileNames: Set<string>,
-  pushTargetRef: PushTargetRef
-): Promise<Omit<PushTargetRef, "spec">> {
+  pushTargetRef: MultistreamTargetRef
+): Promise<Omit<MultistreamTargetRef, "spec">> {
   const { profile, id, spec } = pushTargetRef;
   if (!profileNames.has(profile) && profile !== "source") {
     throw new BadRequestError(
@@ -93,11 +94,11 @@ async function validatePushTarget(
   return { profile, id: created.id };
 }
 
-function validatePushTargets(
+async function validateMultistreamOpts(
   userId: string,
   profiles: Profile[],
-  pushTargets: PushTargetRef[]
-) {
+  multistream: MultistreamRef
+): Promise<MultistreamRef> {
   const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
@@ -108,12 +109,16 @@ function validatePushTargets(
     profileNames.add(name);
   }
 
-  if (!pushTargets) {
-    return Promise.resolve([] as PushTargetRef[]);
+  if (!multistream?.targets) {
+    return { targets: [] };
   }
-  return Promise.all(
-    pushTargets.map((p) => validatePushTarget(userId, profileNames, p))
-  );
+  return {
+    targets: await Promise.all(
+      multistream.targets.map((t) =>
+        validateMultistreamTarget(userId, profileNames, t)
+      )
+    ),
+  };
 }
 
 async function triggerManyIdleStreamsWebhook(ids, queue) {
@@ -828,10 +833,10 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   });
 
   doc.profiles = hackMistSettings(req, doc.profiles);
-  doc.pushTargets = await validatePushTargets(
+  doc.multistream = await validateMultistreamOpts(
     req.user.id,
     doc.profiles,
-    doc.pushTargets
+    doc.multistream
   );
 
   await Promise.all([
@@ -1037,7 +1042,7 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, pushTargets } = payload;
+    let { record, suspended, multistream } = payload;
     let patch: StreamPatchPayload = {};
     if (typeof record === "boolean") {
       patch = { ...patch, record };
@@ -1045,13 +1050,13 @@ app.patch(
     if (typeof suspended === "boolean") {
       patch = { ...patch, suspended };
     }
-    if (pushTargets) {
-      pushTargets = await validatePushTargets(
+    if (multistream) {
+      multistream = await validateMultistreamOpts(
         req.user.id,
         stream.profiles,
-        pushTargets
+        multistream
       );
-      patch = { ...patch, pushTargets };
+      patch = { ...patch, multistream };
     }
     if (Object.keys(patch).length === 0) {
       return res.status(204).end();
