@@ -319,7 +319,7 @@ const StreamsTable = ({
         Create a unique stream object, broadcast live video content and playback
         your live stream with Livepeer.com.
       </Text>
-      <Link href="/docs" passHref>
+      <Link href="/docs/guides" passHref>
         <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
