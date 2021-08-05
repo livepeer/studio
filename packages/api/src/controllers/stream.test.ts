@@ -197,11 +197,11 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation validation", () => {
-      let pushTarget: MultistreamTarget;
+      let msTarget: MultistreamTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.multistreamTarget.fillAndCreate({
+        msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -210,7 +210,7 @@ describe("controllers/stream", () => {
       it("should reject push targets without a profile", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ id: pushTarget.id }],
+          multistream: { targets: [{ id: msTarget.id }] },
         });
         expect(res.status).toBe(422);
       });
@@ -218,7 +218,7 @@ describe("controllers/stream", () => {
       it("should reject push targets referencing an inexistent profile", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "hello", id: pushTarget.id }],
+          multistream: { targets: [{ profile: "hello", id: msTarget.id }] },
         });
         expect(res.status).toBe(400);
         const json = await res.json();
@@ -228,12 +228,14 @@ describe("controllers/stream", () => {
       it("should reject push targets with an invalid spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [
-            {
-              profile: "test_stream_360p",
-              spec: { name: "this actually needed a url" },
-            },
-          ],
+          multistream: {
+            targets: [
+              {
+                profile: "test_stream_360p",
+                spec: { name: "this actually needed a url" },
+              },
+            ],
+          },
         });
         expect(res.status).toBe(422);
       });
@@ -241,7 +243,7 @@ describe("controllers/stream", () => {
       it("should reject push targets without an id or spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "test_stream_360p" }],
+          multistream: { targets: [{ profile: "test_stream_360p" }] },
         });
         expect(res.status).toBe(400);
         const json = await res.json();
@@ -253,13 +255,15 @@ describe("controllers/stream", () => {
       it("should reject push targets with both an id and a spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [
-            {
-              profile: "test_stream_360p",
-              id: pushTarget.id,
-              spec: mockTarget,
-            },
-          ],
+          multistream: {
+            targets: [
+              {
+                profile: "test_stream_360p",
+                id: msTarget.id,
+                spec: mockTarget,
+              },
+            ],
+          },
         });
         expect(res.status).toBe(400);
         const json = await res.json();
@@ -272,7 +276,9 @@ describe("controllers/stream", () => {
         client.jwtAuth = nonAdminToken;
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", id: msTarget.id }],
+          },
         });
         expect(res.status).toBe(400);
         const json = await res.json();
@@ -330,11 +336,11 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation", () => {
-      let pushTarget: MultistreamTarget;
+      let msTarget: MultistreamTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.multistreamTarget.fillAndCreate({
+        msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -356,7 +362,9 @@ describe("controllers/stream", () => {
       it("should create stream with valid push target ID", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", id: msTarget.id }],
+          },
         });
         expect(res.status).toBe(201);
       });
@@ -372,15 +380,17 @@ describe("controllers/stream", () => {
       it("should create stream with inline push target", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "test_stream_360p", spec: mockTarget }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", spec: mockTarget }],
+          },
         });
         expect(res.status).toBe(201);
         const created = await res.json();
-        const resultPt = created.pushTargets[0];
+        const resultPt = created.msTargets[0];
         expect(resultPt.profile).toEqual("test_stream_360p");
         expect(resultPt.spec).toBeUndefined();
         expect(resultPt.id).toBeDefined();
-        expect(resultPt.id).not.toEqual(pushTarget.id);
+        expect(resultPt.id).not.toEqual(msTarget.id);
 
         const saved = await server.db.multistreamTarget.get(resultPt.id);
         expect(saved).toBeDefined();
@@ -418,13 +428,13 @@ describe("controllers/stream", () => {
     });
 
     describe("stream patch", () => {
-      let pushTarget: MultistreamTarget;
+      let msTarget: MultistreamTarget;
       let stream: Stream;
       let patchPath: string;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
-        pushTarget = await server.db.multistreamTarget.fillAndCreate({
+        msTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: adminUser.id,
         });
@@ -466,18 +476,22 @@ describe("controllers/stream", () => {
 
         await testTypeErr({ record: "true" });
         await testTypeErr({ suspended: "not even a boolean string" });
-        await testTypeErr({ pushTargets: { profile: "a", id: "b" } });
-        await testTypeErr({ pushTargets: [{ profile: 123 }] });
+        await testTypeErr({
+          multistream: { targets: { profile: "a", id: "b" } },
+        });
+        await testTypeErr({ multistream: { targets: [{ profile: 123 }] } });
       });
 
       it("should validate url format", async () => {
         let res = await client.patch(patchPath, {
-          pushTargets: [
-            {
-              profile: "test_stream_360p",
-              spec: { url: "rtmps://almost.url.but@" },
-            },
-          ],
+          multistream: {
+            targets: [
+              {
+                profile: "test_stream_360p",
+                spec: { url: "rtmps://almost.url.but@" },
+              },
+            ],
+          },
         });
         expect(res.status).toBe(422);
         const json = await res.json();
@@ -490,7 +504,9 @@ describe("controllers/stream", () => {
           userId: nonAdminUser.id,
         });
         const res = await client.patch(patchPath, {
-          pushTargets: [{ profile: "test_stream_360p", id: nonAdminTarget.id }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", id: nonAdminTarget.id }],
+          },
         });
         expect(res.status).toBe(400);
         const json = await res.json();
@@ -513,23 +529,29 @@ describe("controllers/stream", () => {
       it("should patch suspended field", async () => {
         await testPatchField({ suspended: true });
       });
-      it("should patch pushTargets", async () => {
+      it("should patch multistream targets", async () => {
         await testPatchField({
-          pushTargets: [{ profile: "test_stream_360p", id: pushTarget.id }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", id: msTarget.id }],
+          },
         });
       });
-      it("should also create inline pushTargets", async () => {
+      it("should also create inline msTargets", async () => {
         const res = await client.patch(patchPath, {
-          pushTargets: [{ profile: "test_stream_360p", spec: mockTarget }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", spec: mockTarget }],
+          },
         });
         expect(res.status).toBe(204);
 
         let patched = await server.db.stream.get(stream.id);
         patched = server.db.stream.addDefaultFields(patched);
-        const createdPtId = patched.pushTargets[0].id;
+        const createdPtId = patched.multistream.targets[0].id;
         expect(patched).toEqual({
           ...stream,
-          pushTargets: [{ profile: "test_stream_360p", id: createdPtId }],
+          multistream: {
+            targets: [{ profile: "test_stream_360p", id: createdPtId }],
+          },
         });
 
         const savedPt = await server.db.multistreamTarget.get(createdPtId);

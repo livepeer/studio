@@ -26,7 +26,7 @@ const parseUrl = (url: string) => {
 export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
   async fillAndCreate(input: MultistreamTargetInput) {
     const url = parseUrl(input.url);
-    const pushTarget: Required<MultistreamTarget> = {
+    const target: Required<MultistreamTarget> = {
       id: uuid.v4(),
       name: input.name || url.host,
       url: input.url,
@@ -34,9 +34,9 @@ export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
       userId: input.userId,
       createdAt: Date.now(),
     };
-    await super.create(pushTarget);
+    await super.create(target);
 
-    const created = await this.get(pushTarget.id, { useReplica: false });
+    const created = await this.get(target.id, { useReplica: false });
     if (!created) {
       throw new InternalServerError("error creating new push target");
     }
@@ -54,8 +54,8 @@ export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
     isAdmin: boolean,
     opts?: GetOptions
   ) {
-    const pushTarget = await super.get(id, opts);
-    return isAdmin || userId === pushTarget?.userId ? pushTarget : null;
+    const target = await super.get(id, opts);
+    return isAdmin || userId === target?.userId ? target : null;
   }
 
   async hasAccess(id: string, userId: string, isAdmin: boolean = false) {

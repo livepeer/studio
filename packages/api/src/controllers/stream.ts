@@ -67,7 +67,7 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
 async function validateMultistreamTarget(
   userId: string,
   profileNames: Set<string>,
-  pushTargetRef: MultistreamTargetRef
+  msTargetRef: MultistreamTargetRef
 ): Promise<Omit<MultistreamTargetRef, "spec">> {
   const { profile, id, spec } = pushTargetRef;
   if (!profileNames.has(profile) && profile !== "source") {
