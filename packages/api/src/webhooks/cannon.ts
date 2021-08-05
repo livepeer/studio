@@ -162,6 +162,7 @@ export default class WebhookCannon {
         false
       );
     } catch (err) {
+      console.log("_fireHook error", err);
       this.retry(message);
     }
 
@@ -223,6 +224,11 @@ export default class WebhookCannon {
     user: User,
     verifyUrl = true
   ) {
+    if (!event || !webhook || !sanitized || !user) {
+      throw new Error(
+        `_firehook Error: event, webhook, sanitized and user are required`
+      );
+    }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
     let ips, urlObj, isLocal;
     if (verifyUrl) {
