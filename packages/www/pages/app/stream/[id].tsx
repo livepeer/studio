@@ -15,7 +15,7 @@ import {
   Alert,
   Close,
 } from "@theme-ui/components";
-import Layout from "../../../layouts";
+import Layout from "../../../layouts/admin";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -24,12 +24,11 @@ import { useRouter } from "next/router";
 import Router from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
 import { useEffect, useState } from "react";
-import TabbedLayout from "../../../components/TabbedLayout";
-import { Checkbox } from "../../../components/Table";
-import StreamSessionsTable from "../../../components/StreamSessionsTable";
-import DeleteStreamModal from "../../../components/DeleteStreamModal";
-import ConfirmationModal from "../../../components/ConfirmationModal";
-import Modal from "../../../components/Modal";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import StreamSessionsTable from "@components/Admin/StreamSessionsTable";
+import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
+import ConfirmationModal from "@components/Admin/ConfirmationModal";
+import Modal from "@components/Admin/Modal";
 import Help from "../../../public/img/help.svg";
 import {
   pathJoin,
@@ -37,9 +36,8 @@ import {
   isDevelopment,
   formatNumber,
 } from "../../../lib/utils";
-import { RenditionsDetails } from "../../../components/StreamsTable";
-import { RelativeTime } from "../../../components/CommonAdminTable";
-import { getTabs } from "../user";
+import { RenditionsDetails } from "@components/Admin/StreamsTable";
+import { RelativeTime } from "@components/Admin/CommonAdminTable";
 import { getTabs as getTabsAdmin } from "../admin";
 
 type TimedAlertProps = {
@@ -293,7 +291,7 @@ const ID = () => {
   };
 
   const isAdmin = query.admin === "true";
-  const tabs = isAdmin ? getTabsAdmin(2) : getTabs(0);
+  const tabs = getTabsAdmin(2);
   const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
   const _stream = stream || {};
   let { broadcasterHost, region } = _stream;

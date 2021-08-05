@@ -1,15 +1,21 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import { Box, Container, Grid } from "@theme-ui/components";
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Grid,
+} from "@livepeer.com/design-system";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
-import Button from "../../components/Button";
-import Layout from "../../layouts";
-import Prefooter from "../../components/Prefooter";
+import Button from "@components/Marketing/Button";
+import Layout from "layouts/main";
+import Prefooter from "@components/Marketing/Prefooter";
 import allJobs from "../../queries/allJobs.gql";
-import Code from "../../components/renderers/Code";
+import Code from "@components/Marketing/Code";
+import Link from "next/link";
+import Guides from "@components/Marketing/Guides";
 
 const Page = ({ title, slug, body, noindex = false, preview }) => {
   return (
@@ -20,66 +26,104 @@ const Page = ({ title, slug, body, noindex = false, preview }) => {
       canonical={`https://livepeer.com/jobs/${slug}`}
       noindex={noindex}
       preview={preview}>
-      <Container
-        sx={{
-          pb: 5,
-          ul: { mb: 4 },
-          p: { mb: 4 },
-        }}>
-        <Box
-          as="h1"
-          sx={{
-            lineHeight: ["42px", "72px"],
-            my: 5,
-            fontSize: ["32px", "56px"],
+      <Guides />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$4",
+            },
           }}>
-          {title}
-        </Box>
-        <Grid columns={[1, 1, 2]} sx={{ maxWidth: 1200, margin: "0 auto" }}>
-          <ReactMarkdown className="markdown-body" renderers={{ code: Code }}>
-            {body}
-          </ReactMarkdown>
-          <Box
-            sx={{
-              position: "sticky",
-              top: "100px",
-              display: "block",
-              alignSelf: "start",
-              width: ["100%", null, "380px"],
-              ml: "auto",
-              p: 4,
-              textDecoration: "none",
-              color: "initial",
-              marginRight: "auto",
-              borderRadius: 24,
-              border: "1px solid",
-              borderColor: "#F0F0F0",
-              backgroundColor: "#FFF",
-              overflow: "hidden",
-              transition: "box-shadow .2s",
-              ":hover": {
-                textDecoration: "none",
-                boxShadow:
-                  "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+          <Heading
+            size="4"
+            as="h1"
+            css={{
+              my: "$5",
+              fontWeight: 600,
+            }}>
+            {title}
+          </Heading>
+          <Grid
+            css={{
+              maxWidth: 1200,
+              mx: "auto",
+              gridTemplateColumns: "repeat(1,1fr)",
+              "@bp2": {
+                gridTemplateColumns: "repeat(2,1fr)",
               },
             }}>
-            <Box as="p" sx={{ fontSize: 20, mb: 0 }}>
-              How to Apply
+            <Box
+              css={{
+                "p, div, ul, li": {
+                  lineHeight: 1.8,
+                  color: "$hiContrast",
+                },
+                "h1, h2, h3, h4, h5, h6": {
+                  color: "$hiContrast",
+                  lineHeight: 1.5,
+                },
+                strong: {
+                  color: "$hiContrast",
+                },
+                em: {
+                  color: "$hiContrast",
+                },
+                figure: {
+                  m: 0,
+                },
+                img: {
+                  width: "100%",
+                },
+                a: {
+                  color: "$violet9",
+                },
+              }}>
+              <ReactMarkdown renderers={{ code: Code }}>{body}</ReactMarkdown>
             </Box>
-            <Box as="p" sx={{ color: "gray" }}>
-              If you are interested in applying for this position, please send
-              an email containing your Github profile and/or LinkedIn.
+            <Box
+              css={{
+                position: "sticky",
+                top: "100px",
+                display: "block",
+                alignSelf: "start",
+                ml: "auto",
+                px: "$6",
+                py: "$5",
+                borderRadius: 24,
+                border: "1px solid",
+                borderColor: "$mauve5",
+                bc: "$mauve2",
+                transition: "box-shadow .2s",
+                "&:hover": {
+                  textDecoration: "none",
+                  boxShadow:
+                    "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+                },
+                "@bp2": {
+                  width: 380,
+                },
+              }}>
+              <Text size="5" css={{ mb: "$2" }}>
+                How to Apply
+              </Text>
+              <Text variant="gray" css={{ mb: "$4" }}>
+                If you are interested in applying for this position, please send
+                an email containing your Github profile and/or LinkedIn.
+              </Text>
+              <Link href="mailto:work@livepeer.com" passHref>
+                <Button size="4" as="a" arrow css={{ width: "100%" }}>
+                  Send email
+                </Button>
+              </Link>
             </Box>
-            <Button
-              isExternal
-              isLink
-              href="mailto:work@livepeer.com"
-              sx={{ width: "100%" }}>
-              Send email
-            </Button>
-          </Box>
-        </Grid>
-      </Container>
+          </Grid>
+        </Container>
+      </Box>
       <Fade key={0}>
         <Prefooter />
       </Fade>

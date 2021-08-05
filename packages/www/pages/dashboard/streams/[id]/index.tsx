@@ -21,16 +21,15 @@ import {
   HoverCardTrigger,
   useSnackbar,
 } from "@livepeer.com/design-system";
-import Layout from "../../../../layouts/dashboard";
-import { useLoggedIn } from "../../../../hooks";
+import Layout from "layouts/dashboard";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
-import { useApi } from "../../../../hooks";
+import { useApi, useLoggedIn } from "hooks";
 import { useEffect, useState } from "react";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
-import { isStaging } from "../../../../lib/utils";
-import { RelativeTime } from "components/CommonAdminTable";
+import { isStaging } from "lib/utils";
+import RelativeTime from "components/Dashboard/RelativeTime";
 import {
   CopyIcon as Copy,
   QuestionMarkCircledIcon as Help,

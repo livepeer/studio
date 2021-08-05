@@ -5,10 +5,11 @@ description: Use webhooks to listen for video lifecycle events
 
 # Using Webhooks
 
-Livepeer uses webhooks to communicate with your application asynchronously when
-events for your stream occur. For example, you may want to know when a stream
-has become active or idle, so that you can surface this information to viewers.
-When these events happen, we’ll make a `POST` request to a URL that you specify.
+Livepeer.com uses webhooks to communicate with your application asynchronously
+when events for your stream occur. For example, you may want to know when a
+stream has become active or idle, so that you can surface this information to
+viewers. When these events happen, we’ll make a `POST` request to a URL that you
+specify.
 
 ## How to configure endpoints
 
@@ -59,7 +60,8 @@ this account.
 
 ## Webhook events
 
-Livepeer currently have two webhooks events: `stream.started` and `stream.idle`.
+Livepeer.com currently have two webhooks events: `stream.started` and
+`stream.idle`.
 
 After you receive the `stream.started event`, the “parent” stream object’s
 `isActive` value should be marked as `true` and the .m3u8 HLS URL constructed

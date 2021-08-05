@@ -1,28 +1,27 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
-import Layout from "../layouts";
-import DefaultError from "../components/DefaultError";
+import Layout from "layouts/main";
+import DefaultError from "@components/Marketing/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
-import { getComponent } from "../lib/utils";
+import { getComponent } from "lib/utils";
 import { useRouter } from "next/router";
-import { Spinner, Box } from "@theme-ui/components";
+import { Box } from "@livepeer.com/design-system";
 
 const Page = ({ title, description, content, noindex = false, preview }) => {
   const router = useRouter();
+
   if (router.isFallback) {
     return (
       <Layout>
         <Box
-          sx={{
-            py: 5,
+          css={{
+            py: "$5",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}>
-          <Spinner />
+          Loading...
         </Box>
       </Layout>
     );

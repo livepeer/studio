@@ -9,6 +9,7 @@ import {
   SetStateAction,
 } from "react";
 import {
+  Button,
   Table,
   Thead,
   Tbody,
@@ -19,7 +20,6 @@ import {
   Flex,
   Checkbox,
   Text,
-  Button,
   Heading,
   Link as A,
 } from "@livepeer.com/design-system";
@@ -28,7 +28,6 @@ import TableFilter, {
   Filter as TFilter,
   formatFiltersForApiRequest,
 } from "./filters";
-import { ButtonProps } from "components/Button";
 import Link from "next/link";
 import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
@@ -61,8 +60,6 @@ export type Fetcher<T extends Record<string, unknown>> = (
   state: State<T>
 ) => Promise<{ rows: T[]; nextCursor: string; count: number }>;
 
-type Action = ButtonProps;
-
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
   header: React.ReactNode;
@@ -71,8 +68,8 @@ type Props<T extends Record<string, unknown>> = {
   filterItems?: FilterItem[];
   showOverflow?: boolean;
   cursor?: string;
-  selectAction?: Action;
-  createAction?: Action;
+  selectAction?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  createAction?: React.ButtonHTMLAttributes<HTMLButtonElement>;
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;

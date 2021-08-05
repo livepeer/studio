@@ -24,7 +24,7 @@ const config = {
       },
       {
         source: "/docs/api/stream",
-        destination: "/docs/api-reference/stream/stream",
+        destination: "/docs/api-reference/stream/overview",
         permanent: false,
       },
       {
@@ -177,11 +177,6 @@ const config = {
       {
         source: "/app/test-player",
         destination: "/dashboard/stream-health",
-        permanent: false,
-      },
-      {
-        source: "/app/stream/:id",
-        destination: "/dashboard/streams/:id",
         permanent: false,
       },
     ];

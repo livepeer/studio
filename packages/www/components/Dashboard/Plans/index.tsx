@@ -8,12 +8,11 @@ import {
   styled,
 } from "@livepeer.com/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
-import PlanForm from "../PlanForm";
+import PlanForm from "components/Dashboard/PlanForm";
 import { products } from "@livepeer.com/api/src/config";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import Modal from "components/Modal";
 import Link from "next/link";
 
 const Tour: any = dynamic(() => import("reactour"), { ssr: false });

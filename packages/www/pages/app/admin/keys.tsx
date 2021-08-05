@@ -1,13 +1,13 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
-import useApi from "../../../hooks/use-api";
-import Layout from "../../../layouts";
-import useLoggedIn from "../../../hooks/use-logged-in";
-import TabbedLayout from "../../../components/TabbedLayout";
-import AdminTokenTable from "../../../components/AdminTokenTable";
+import useApi from "hooks/use-api";
+import Layout from "layouts/admin";
+import useLoggedIn from "hooks/use-logged-in";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import AdminTokenTable from "@components/Admin/AdminTokenTable";
 import { getTabs } from "../admin";
 
-export default () => {
+const Keys = () => {
   useLoggedIn();
   const { user, logout } = useApi();
   if (!user || user.emailValid === false) {
@@ -21,3 +21,5 @@ export default () => {
     </TabbedLayout>
   );
 };
+
+export default Keys;

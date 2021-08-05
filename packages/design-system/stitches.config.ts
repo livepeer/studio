@@ -98,6 +98,10 @@ export const lightTheme = t("light-theme", {
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
   },
+  fonts: {
+    untitled: "Inter, -apple-system, system-ui, sans-serif",
+    mono: "menlo, monospace",
+  },
 });
 
 export const darkTheme = t("dark-theme", {
@@ -139,6 +143,10 @@ export const darkTheme = t("dark-theme", {
     transparentPanel: "hsl(0 100% 100% / 97%)",
     shadowLight: "hsl(206 22% 7% / 35%)",
     shadowDark: "hsl(206 22% 7% / 20%)",
+  },
+  fonts: {
+    untitled: "Inter, -apple-system, system-ui, sans-serif",
+    mono: "menlo, monospace",
   },
 });
 

@@ -1,48 +1,62 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import { Box, Heading, Container } from "@theme-ui/components";
-import Prefooter from "components/Redesign/Prefooter";
-import PricingCalculator from "components/Pricing/pricingCalculator";
-import PricingCardsContainer from "components/Pricing/pricingCardsContainer";
-import Layout from "../layouts";
+import Layout from "layouts/main";
+import { Box, Heading, Text, Container } from "@livepeer.com/design-system";
+import Prefooter from "@components/Marketing/Prefooter";
+import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
+import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
+import Guides from "@components/Marketing/Guides";
 
-const Pricing = () => {
+const PricingPage = () => {
   return (
     <Layout
       title={`Pricing - Livepeer.com`}
-      description={`Flexible pricing for projects of all sizes.`}
-      url={`https://livepeer.com`}>
-      <Container sx={{ display: "flex", flexDirection: "column" }}>
-        <Box sx={{ pt: 5, pb: [0, 0, 0, 5], textAlign: "center" }}>
-          <Heading
-            as="h1"
-            sx={{
-              letterSpacing: [0, 0, 0, "-5px"],
-              mb: [4, 4, 4, 5],
-              fontSize: [6, 6, 6, 9],
-              fontWeight: 800,
-              lineHeight: ["50px", "50px", "50px", "88px"],
-            }}>
-            <Box as="span" sx={{ fontWeight: "normal" }}>
+      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      url={`https://livepeer.com/pricing`}>
+      <Guides />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$4",
+            },
+          }}>
+          <Box css={{ textAlign: "center", mb: "$5" }}>
+            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
               Start free.
-            </Box>
-            <br />
-            Then pay as you grow.
-          </Heading>
-          <Heading
-            as="h2"
-            sx={{ fontSize: [3, 3, 3, 4], fontWeight: "normal" }}>
-            Flexible pricing for projects of all sizes.
-          </Heading>
-        </Box>
+              <Box css={{ fontWeight: 400 }}>Then pay as you grow.</Box>
+            </Heading>
+            <Text as="h2" variant="gray" size="6">
+              Flexible pricing for projects of all sizes.
+            </Text>
+          </Box>
+        </Container>
         <PricingCardsContainer />
-        <PricingCalculator />
-        <Box sx={{ marginTop: "156px" }} />
-        {/* <PricingFaq /> */}
-      </Container>
+        <Box>
+          <Guides backgroundColor="$mauve2" />
+          <Box css={{ position: "relative" }}>
+            <Container
+              size="3"
+              css={{
+                px: "$6",
+                py: "$7",
+                width: "100%",
+                "@bp3": {
+                  py: "$8",
+                  px: "$4",
+                },
+              }}>
+              <PricingCalculator />
+            </Container>
+          </Box>
+        </Box>
+      </Box>
       <Prefooter />
     </Layout>
   );
 };
 
-export default Pricing;
+export default PricingPage;

@@ -1,26 +1,30 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
-import { Container, Flex, Box } from "@theme-ui/components";
-import Layout from "../../layouts";
+import {
+  Container,
+  Flex,
+  Box,
+  Heading,
+  Grid,
+  Link as A,
+} from "@livepeer.com/design-system";
+import { blocksToText } from "lib/utils";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
-import allPosts from "../../queries/allPosts.gql";
-import imageUrlBuilder from "@sanity/image-url";
-import client from "../../lib/client";
-import readingTime from "reading-time";
 import { useRouter } from "next/router";
-import { Spinner } from "@theme-ui/components";
-import React from "react";
-import BlogPostImage from "components/renderers/BlogPostImage";
-import { Grid } from "@theme-ui/components";
-import BlogPostCard from "components/cards/BlogPost";
-import Prefooter from "components/Redesign/Prefooter";
-import Link from "next/link";
+import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
+import BlogPostCard from "@components/Marketing/BlogPostCard";
+import client from "lib/client";
+import Guides from "@components/Marketing/Guides";
+import Image from "next/image";
+import imageUrlBuilder from "@sanity/image-url";
+import Layout from "layouts/main";
+import Link from "next/link";
+import Player from "@components/Marketing/BlogVideoPlayer";
+import Prefooter from "@components/Marketing/Prefooter";
+import React from "react";
+import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { blocksToText } from "../../lib/utils";
-import Player from "components/BlogVideoPlayer";
 
 const serializers = {
   types: {
@@ -49,7 +53,7 @@ const Post = ({
   if (isFallback) {
     return (
       <Layout>
-        <Spinner />
+        <Box>Loading...</Box>
       </Layout>
     );
   }
@@ -64,80 +68,93 @@ const Post = ({
       image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
       url={`https://livepeer.com${asPath}`}
       preview={preview}>
-      <Container variant="blogPost" sx={{ my: 5 }}>
-        <Flex
-          sx={{
-            mb: 2,
-            alignItems: "center",
-            fontSize: 1,
-            justifyContent: "space-between",
+      <Guides backgroundColor="$mauve2" />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$3",
+            },
           }}>
-          <Box
-            sx={{
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              mr: 2,
-            }}>
-            {new Date(_createdAt).toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </Box>
-          <Link
-            href={category.title === "All" ? "/blog" : `/blog/category/[slug]`}
-            as={
-              category.title === "All"
-                ? "/blog"
-                : `/blog/category/${category.slug.current}`
-            }
-            passHref>
-            <Box
-              as="a"
-              sx={{
-                color: "text",
-                textTransform: "uppercase",
-                lineHeight: "15px",
-                fontSize: "12px",
-                letterSpacing: "-0.02em",
-                fontWeight: 600,
-                "&:hover": {
-                  textDecoration: "underline",
-                },
+          <Box css={{ maxWidth: 768, mx: "auto" }}>
+            <Flex
+              css={{
+                mb: "$2",
+                alignItems: "center",
+                fontSize: "$2",
+                justifyContent: "space-between",
               }}>
-              {category.title}
-            </Box>
-          </Link>
-        </Flex>
-        <Box as="h1" sx={{ fontSize: [32, null, 40], my: 3 }}>
-          {title}
-        </Box>
-        <Flex sx={{ alignItems: "center" }}>
-          <Box>
-            <Flex sx={{ alignItems: "center", fontSize: 2 }}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                By{" "}
+              <Box
+                css={{
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  mr: "$2",
+                }}>
+                {new Date(_createdAt).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Box>
+              <Link
+                href={
+                  category.title === "All" ? "/blog" : `/blog/category/[slug]`
+                }
+                as={
+                  category.title === "All"
+                    ? "/blog"
+                    : `/blog/category/${category.slug.current}`
+                }
+                passHref>
+                <A
+                  css={{
+                    color: "$hiContrast",
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                  }}>
+                  {category.title}
+                </A>
+              </Link>
+            </Flex>
+            <Heading
+              as="h1"
+              size="3"
+              css={{
+                mt: "$3",
+                mb: "$6",
+                fontWeight: 600,
+              }}>
+              {title}
+            </Heading>
+            <Flex align="center" css={{ fontSize: "$3", mb: "$6" }}>
+              <Flex align="center">
+                By
                 <Box
-                  as="img"
-                  alt={author.image?.alt}
-                  width={40}
-                  height={40}
-                  sx={{
-                    height: 32,
-                    width: 32,
+                  css={{
+                    ml: "$3",
+                    mr: "$2",
+                    position: "relative",
                     borderRadius: 1000,
-                    objectFit: "cover",
-                    ml: 3,
-                    mr: 2,
-                  }}
-                  className="lazyload"
-                  data-src={builder.image(author.image).url()}
-                />
+                    width: 32,
+                    height: 32,
+                  }}>
+                  <Image
+                    alt={author.image?.alt}
+                    layout="fill"
+                    objectFit="cover"
+                    src={builder.image(author.image).url()}
+                  />
+                </Box>
                 <Box
                   as="span"
-                  sx={{
+                  css={{
                     fontWeight: 600,
                     textOverflow: "ellipsis",
                     overflow: "hidden",
@@ -145,10 +162,12 @@ const Post = ({
                   }}>
                   {author.name}
                 </Box>
-              </Box>
-              <Box sx={{ mx: 2, width: "1px", height: 16, bg: "grey" }} />
+              </Flex>
               <Box
-                sx={{
+                css={{ mx: "$2", width: "1px", height: 16, bc: "$mauve2" }}
+              />
+              <Box
+                css={{
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
@@ -156,36 +175,86 @@ const Post = ({
                 {stats.text}
               </Box>
             </Flex>
-          </Box>
-        </Flex>
-        <BlogPostImage
-          alt={mainImage?.alt}
-          width={700}
-          height={400}
-          className="lazyload"
-          data-src={builder.image(mainImage).url()}
-        />
-        <div className="markdown-body">
-          <BlockContent
-            blocks={contentRaw}
-            serializers={serializers}
-            {...client.config()}
-          />
-        </div>
-        {!!furtherReading && (
-          <>
-            <Box as="hr" sx={{ my: [5, 6] }} />
-            <Box as="h3" sx={{ mb: 40 }}>
-              Articles you may be interested in
+            <Box
+              css={{
+                position: "relative",
+                maxHeight: 300,
+                height: 500,
+                width: 800,
+                borderRadius: 16,
+                overflow: "hidden",
+                mb: "$7",
+              }}>
+              <Image
+                alt={mainImage?.alt}
+                layout="fill"
+                objectFit="cover"
+                src={builder.image(mainImage).url()}
+              />
             </Box>
-            <Grid columns={[1, null, 2]} mb={5} gap={4}>
-              {furtherReading.map((p, i) => (
-                <BlogPostCard post={p} key={`post-${i}`} />
-              ))}
-            </Grid>
-          </>
-        )}
-      </Container>
+            <Box
+              css={{
+                "p, div, ul, li": {
+                  lineHeight: 1.8,
+                  color: "$hiContrast",
+                },
+                "h1, h2, h3, h4, h5, h6": {
+                  color: "$hiContrast",
+                  lineHeight: 1.5,
+                },
+                strong: {
+                  color: "$hiContrast",
+                },
+                em: {
+                  color: "$hiContrast",
+                },
+                figure: {
+                  m: 0,
+                },
+                img: {
+                  width: "100%",
+                },
+                a: {
+                  color: "$violet9",
+                },
+              }}>
+              <BlockContent
+                blocks={contentRaw}
+                serializers={serializers}
+                {...client.config()}
+              />
+            </Box>
+            {!!furtherReading && (
+              <>
+                <Box
+                  css={{
+                    bc: "$mauve5",
+                    height: "1px",
+                    width: "100%",
+                    my: "$8",
+                  }}
+                />
+                <Heading size="2" as="h3" css={{ mb: "$6" }}>
+                  Articles you may be interested in
+                </Heading>
+                <Grid
+                  gap={4}
+                  css={{
+                    mb: "$5",
+                    gridTemplateColumns: "repeat(1,1fr)",
+                    "@bp2": {
+                      gridTemplateColumns: "repeat(2,1fr)",
+                    },
+                  }}>
+                  {furtherReading.map((p, i) => (
+                    <BlogPostCard post={p} key={`post-${i}`} />
+                  ))}
+                </Grid>
+              </>
+            )}
+          </Box>
+        </Container>
+      </Box>
       <Fade key={0}>
         <Prefooter />
       </Fade>

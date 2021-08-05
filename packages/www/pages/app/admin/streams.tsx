@@ -1,10 +1,10 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "../../../hooks/use-api";
-import Layout from "../../../layouts";
+import Layout from "../../../layouts/admin";
 import useLoggedIn from "../../../hooks/use-logged-in";
-import TabbedLayout from "../../../components/TabbedLayout";
-import AdminStreamsTable from "../../../components/AdminStreamsTable";
+import TabbedLayout from "@components/Admin/TabbedLayout";
+import AdminStreamsTable from "@components/Admin/AdminStreamsTable";
 import { getTabs } from "../admin";
 
 const AdminStreamsPage = () => {

@@ -1,16 +1,13 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
 import Fade from "react-reveal/Fade";
-import Layout from "../layouts";
-import { Container, Box } from "@theme-ui/components";
-import Prefooter from "../components/Prefooter";
-import TeamSection from "../components/TeamSection";
+import Layout from "layouts/main";
+import { Container, Box, Heading, Text } from "@livepeer.com/design-system";
+import Prefooter from "@components/Marketing/Prefooter";
+import TeamSection from "../components/Marketing/TeamSection";
+import Guides from "@components/Marketing/Guides";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 
-// TODO this page is sort of a hybrid between sanity and hardcoded
-// Maybe we should update the sanity structure a bit and use it fully
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
   return (
@@ -19,21 +16,36 @@ const TeamPage = ({ content }) => {
       description={`We’re building the future of video infrastructure services.`}
       url={`https://livepeer.com/team`}
       canonical={`https://livepeer.com/team`}>
-      <Container variant="hero">
-        <Box as="h1" sx={{ variant: "text.heading.hero" }}>
-          We’re building the future of video infrastructure services.
-        </Box>
-        <Box as="p" sx={{ maxWidth: 728, variant: "text.heroDescription" }}>
-          We're comprised of team members dedicated to building an affordable,
-          scalable and reliable video platform that focuses on what
-          user-generated content applications need.
-        </Box>
-      </Container>
-      <TeamSection teamMembers={teamMembers} />
-      <Box as="hr" sx={{ visibility: "hidden", my: 5 }} />
-      <Fade key={0}>
-        <Prefooter />
-      </Fade>
+      <Guides />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$8",
+            width: "100%",
+            "@bp3": {
+              py: "$9",
+              px: "$4",
+            },
+          }}>
+          <Box css={{ maxWidth: 768, mx: "auto", textAlign: "center" }}>
+            <Heading size="4" css={{ fontWeight: 600, mb: "$4" }}>
+              We’re building the future of video infrastructure services.
+            </Heading>
+            <Text variant="gray" size="5">
+              We're comprised of team members dedicated to building affordable,
+              scalable, reliable, and easy-to-use video infrastructure services.
+            </Text>
+          </Box>
+          <Box css={{ pt: "$9" }}>
+            <TeamSection teamMembers={teamMembers} />
+          </Box>
+        </Container>
+        <Fade key={0}>
+          <Prefooter backgroundColor="$panel" />
+        </Fade>
+      </Box>
     </Layout>
   );
 };

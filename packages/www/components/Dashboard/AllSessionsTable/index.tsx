@@ -246,7 +246,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         Stream sessions belong to parent streams.
       </Text>
-      <Link href="/docs/api-reference/session/session" passHref>
+      <Link href="/docs/api-reference/session/overview" passHref>
         <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />

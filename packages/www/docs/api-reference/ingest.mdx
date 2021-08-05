@@ -37,8 +37,24 @@ playback URL pairs.
 
 ## Attributes
 
-| JSON parameter | Type   | Description                                                                                       |
-| -------------- | ------ | ------------------------------------------------------------------------------------------------- |
-| `base`         | string | Base URL for the playback URL.                                                                    |
-| `ingest`       | string | Base URL used to to configure the broadcast software. Pair it with a `stream` object `streamKey`. |
-| `playback`     | string | Base URL for HLS playback. Append a `stream` object `playbackId` to create the full playback URL. |
+<Table
+  data={[
+    {
+      parameter: <code>base</code>,
+      type: <code>string</code>,
+      description: "Base URL for the playback URL.",
+    },
+    {
+      parameter: <code>ingest</code>,
+      type: <code>string</code>,
+      description:
+        "Base URL used to to configure the broadcast software. Pair it with a stream object streamKey.",
+    },
+    {
+      parameter: <code>playback</code>,
+      type: <code>string</code>,
+      description:
+        "Base URL for HLS playback. Append a stream object playbackId to create the full playback URL.",
+    },
+  ]}
+/>

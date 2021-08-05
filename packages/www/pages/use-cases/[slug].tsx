@@ -1,8 +1,8 @@
-import Layout from "layouts/redesign";
-import Hero from "components/Redesign/Hero";
-import Why from "components/Redesign/Why";
-import CaseStudy from "components/Redesign/CaseStudy";
-import Prefooter from "components/Redesign/Prefooter";
+import Layout from "layouts/main";
+import Hero from "@components/Marketing/Hero";
+import Why from "@components/Marketing/Why";
+import CaseStudy from "@components/Marketing/CaseStudy";
+import Prefooter from "@components/Marketing/Prefooter";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allUseCases from "../../queries/allUseCases.gql";
@@ -56,9 +56,20 @@ const UseCase = ({
       url={`https://livepeer.com${asPath}`}
       preview={preview}>
       <Hero
+        tagline="Use cases"
         heading={hero.heading}
         description={hero.description}
         image={hero.image.asset.url}
+        ctas={[
+          {
+            href: "/register",
+            children: "Start now",
+          },
+          {
+            href: "/contact",
+            children: "Get in touch",
+          },
+        ]}
       />
       <Why
         backgroundColor="$panel"

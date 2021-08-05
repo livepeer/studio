@@ -1,10 +1,8 @@
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Root, Overlay, Content } from "@radix-ui/react-dialog";
 import { keyframes, styled } from "../stitches.config";
 import React from "react";
 
-import type * as Polymorphic from "@radix-ui/react-polymorphic";
-
-type DialogProps = React.ComponentProps<typeof DialogPrimitive.Root> & {
+type DialogProps = React.ComponentProps<typeof Root> & {
   children: React.ReactNode;
 };
 
@@ -23,7 +21,7 @@ const fadeout = keyframes({
   to: { opacity: 0 },
 });
 
-const StyledOverlay = styled(DialogPrimitive.Overlay, {
+const StyledOverlay = styled(Overlay, {
   position: "fixed",
   top: 0,
   right: 0,
@@ -49,19 +47,18 @@ const StyledOverlay = styled(DialogPrimitive.Overlay, {
 
 export function Dialog({ children, ...props }: DialogProps) {
   return (
-    <DialogPrimitive.Root {...props}>
+    <Root {...props}>
       <StyledOverlay animation />
       {children}
-    </DialogPrimitive.Root>
+    </Root>
   );
 }
 
-const StyledDialog = styled(DialogPrimitive.Content, {
+const StyledDialogContent = styled(Content, {
   position: "fixed",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  minWidth: 400,
   maxHeight: "85vh",
   padding: "$4",
   marginTop: "-5vh",
@@ -70,6 +67,10 @@ const StyledDialog = styled(DialogPrimitive.Content, {
   boxShadow:
     "$colors$shadowLight 0px 10px 38px -10px, $colors$shadowDark 0px 10px 20px -15px",
   color: "$black",
+
+  "&:focus": {
+    outline: "none",
+  },
 
   variants: {
     animation: {
@@ -87,34 +88,24 @@ const StyledDialog = styled(DialogPrimitive.Content, {
       },
     },
   },
-
-  "&:focus": {
-    outline: "none",
+  defaultVariants: {
+    animation: "scale",
   },
 });
 
-type DialogContentOwnProps = Polymorphic.OwnProps<
-  typeof DialogPrimitive.Content
-> & {
-  css?: any;
-};
+export const DialogContent = ({
+  children,
+  animation = "scale",
+  ...props
+}: any) => (
+  <StyledDialogContent animation={animation} {...props}>
+    {children}
+  </StyledDialogContent>
+);
 
-type DialogContentComponent = Polymorphic.ForwardRefComponent<
-  Polymorphic.IntrinsicElement<typeof DialogPrimitive.Content>,
-  DialogContentOwnProps
->;
-
-export const DialogContent = React.forwardRef(
-  ({ children, animation = "scale", ...props }: any, forwardedRef) => (
-    <DialogPrimitive.Content
-      as={StyledDialog}
-      animation={animation}
-      ref={forwardedRef}
-      {...props}>
-      {children}
-    </DialogPrimitive.Content>
-  )
-) as DialogContentComponent;
-
-export const DialogTrigger = DialogPrimitive.Trigger;
-export const DialogClose = DialogPrimitive.Close;
+export {
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@radix-ui/react-dialog";

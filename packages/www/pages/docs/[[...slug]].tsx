@@ -1,42 +1,24 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import { ThemeProvider } from "lib/theme";
-import { Container, Box } from "@theme-ui/components";
-import DocsNav from "components/DocsLayout/nav";
-import SideNav, { MobileSideNav } from "components/DocsLayout/sideNav";
+import { Container, Grid, Box, global } from "@livepeer.com/design-system";
+import DocsNav from "@components/Marketing/Navigation/docs";
+import TableOfContents from "@components/Marketing/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
 import { docsPositions } from "docs-positions";
-import styles from "./docs.module.css";
-import {
-  NavigationCard,
-  DocsPost,
-  SimpleCard,
-  DocsGrid,
-  Heading,
-} from "components/DocsLayout/helpers";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { IconApiReference, IconVideoGuides } from "components/DocsLayout/icons";
-import { FiList } from "react-icons/fi";
-import { CgClose } from "react-icons/cg";
-import Code from "components/renderers/Code";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
-import { IdProvider } from "@radix-ui/react-id";
-import Head from "next/head";
+import { components } from "@components/Marketing/MDXComponents";
+import { ContextProviders } from "layouts/main";
 
 const mobileCategories = [
   {
     name: "Guides",
-    icon: <IconVideoGuides id="mobileVideoGuides" />,
     slug: "/docs/guides",
   },
   {
     name: "API Reference",
-    icon: <IconApiReference id="mobileApiReference" />,
     slug: "/docs/api-reference",
   },
 ];
@@ -44,55 +26,13 @@ const mobileCategories = [
 const categories = [
   {
     name: "Guides",
-    icon: <IconVideoGuides />,
     slug: "/docs/guides",
   },
   {
     name: "API Reference",
-    icon: <IconApiReference />,
     slug: "/docs/api-reference",
   },
 ];
-
-const components = {
-  h1: ({ children }) => {
-    return <Heading as="h1">{children}</Heading>;
-  },
-  h2: ({ children }) => {
-    return <Heading as="h3">{children}</Heading>;
-  },
-  h3: ({ children }) => {
-    return <Heading as="h3">{children}</Heading>;
-  },
-  h4: ({ children }) => {
-    return <Heading as="h4">{children}</Heading>;
-  },
-  h5: ({ children }) => {
-    return <Heading as="h5">{children}</Heading>;
-  },
-  h6: ({ children }) => {
-    return <Heading as="h6">{children}</Heading>;
-  },
-  a: ({ children, href }) => {
-    return (
-      <Link href={href} passHref>
-        <a>{children}</a>
-      </Link>
-    );
-  },
-  table: (props) => {
-    return (
-      <div className={styles.tableContainer}>
-        <table {...props} />
-      </div>
-    );
-  },
-  code: Code,
-  NavigationCard,
-  DocsPost,
-  SimpleCard,
-  DocsGrid,
-};
 
 const defaultSEO: NextSeoProps = {
   title: "Docs - Livepeer.com",
@@ -100,7 +40,7 @@ const defaultSEO: NextSeoProps = {
   openGraph: {
     title: "Docs - Livepeer.com",
     description:
-      "The platform built to power video-centric UGC applications at scale.",
+      "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.",
     url: "https://livepeer.com/docs",
     images: [
       {
@@ -113,10 +53,35 @@ const defaultSEO: NextSeoProps = {
   },
 };
 
+const globalStyles = global({
+  body: {
+    margin: 0,
+    backgroundColor: "$loContrast",
+    fontFamily: "$untitled",
+  },
+
+  "h1, h2, h3, h4, h5": { fontWeight: 500 },
+
+  "body, button": {
+    fontFamily: "$untitled",
+  },
+
+  svg: { display: "block" },
+
+  "pre, code": { margin: 0, fontFamily: "$mono" },
+
+  "#__next": {
+    position: "relative",
+    zIndex: 0,
+  },
+
+  "#hubspot-messages-iframe-container iframe": {
+    colorScheme: "auto",
+  },
+});
+
 const DocsIndex = ({ doc, menu }) => {
-  const [hideTopNav, setHideTopNav] = useState(false);
-  const [hideSideBar, setHideSideBar] = useState(false);
-  const [mobileSideNavOpen, setMobileSideNavOpen] = useState(false);
+  const [hideTableOfContents, setHideTableOfContents] = useState(false);
   const router = useRouter();
 
   const currentMenu = useMemo(() => {
@@ -132,6 +97,8 @@ const DocsIndex = ({ doc, menu }) => {
   const breadCrumb = useMemo(() => {
     return router.asPath.split("#")[0].split("/");
   }, [router.asPath]);
+
+  globalStyles();
 
   const resolvedSEO: NextSeoProps = useMemo(() => {
     const title = doc.frontMatter.title
@@ -154,88 +121,60 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <IdProvider>
-      <ThemeProvider>
-        <Head>
-          <link rel="stylesheet" href="/reset.css" />
-          <link rel="stylesheet" href="/markdown.css" />
-        </Head>
-        <NextSeo {...resolvedSEO} />
-        <Box
-          onClick={() => setMobileSideNavOpen(!mobileSideNavOpen)}
-          sx={{
-            display: ["flex", "flex", "none", "none"],
-            position: "fixed",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 200,
-            right: "16px",
-            bottom: "50px",
-            background: "black",
-            width: "64px",
-            height: "64px",
-            borderRadius: "50%",
-            cursor: "pointer",
-          }}>
-          {mobileSideNavOpen ? (
-            <CgClose color="white" size={24} />
-          ) : (
-            <FiList color="white" size={24} />
-          )}
-        </Box>
-        <Box
-          sx={{
-            display: ["flex", "flex", "grid", "grid"],
-            flexDirection: "column",
-            gridTemplateColumns: ["min-content 1fr"],
-            gridTemplateRows: "auto auto",
-          }}>
-          <DocsNav
-            hideTopNav={hideTopNav}
-            setHideTopNav={setHideTopNav}
-            categories={categories}
-            mobileCategories={mobileCategories}
-          />
-          <SideNav
-            menu={currentMenu}
-            hideTopNav={hideTopNav}
-            hideSideBar={hideSideBar}
-            setHideSideBar={setHideSideBar}
-          />
-          <MobileSideNav
-            isOpen={mobileSideNavOpen}
-            menu={currentMenu}
-            setIsOpen={setMobileSideNavOpen}
-          />
-          <Container
-            sx={{
-              mt: hideTopNav ? "-12px" : "48px",
-              gridColumn: "1fr",
-              justifyItems: "center",
+    <ContextProviders>
+      <NextSeo {...resolvedSEO} />
+      <Box
+        css={{
+          display: "flex",
+          flexDirection: "column",
+          gridTemplateColumns: "min-content 1fr",
+          gridTemplateRows: "auto auto",
+          "@bp2": {
+            display: "grid",
+          },
+        }}>
+        <DocsNav
+          menu={currentMenu}
+          categories={categories}
+          mobileCategories={mobileCategories}
+        />
+        <TableOfContents
+          menu={currentMenu}
+          hideTableOfContents={hideTableOfContents}
+          setHideTableOfContents={setHideTableOfContents}
+        />
+        <Container size="3">
+          <Grid
+            css={{
+              pt: "$7",
+              justifyItems: "flex-start",
               mx: 0,
               transition: "all 0.2s",
-              display: "flex",
               minWidth: "100%",
               justifyContent: "center",
               alignItems: "flex-start",
+              "@bp2": {
+                justifyItems: "center",
+              },
             }}>
             <Box
-              className={styles.markdown}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
+              css={{
                 width: "100%",
-                maxWidth: "768px",
-                paddingBottom: "80px",
+                maxWidth: 768,
+                paddingBottom: 80,
+                overflow: "auto",
+                "@bp2": {
+                  px: "$5",
+                },
               }}>
               <Box
-                sx={{
+                css={{
                   display: "flex",
                   alignItems: "center",
-                  color: "#202020",
-                  fontSize: "12px",
+                  color: "$hiContrast",
+                  fontSize: "$2",
                   letterSpacing: "-0.02em",
-                  mb: "16px",
+                  mb: "$3",
                 }}
                 className="breadcrumb">
                 {breadCrumb.slice(2, 5).map((a, idx) => (
@@ -245,12 +184,12 @@ const DocsIndex = ({ doc, menu }) => {
                   </Fragment>
                 ))}
               </Box>
-              <main>{content}</main>
+              <Box>{content}</Box>
             </Box>
-          </Container>
-        </Box>
-      </ThemeProvider>
-    </IdProvider>
+          </Grid>
+        </Container>
+      </Box>
+    </ContextProviders>
   );
 };
 

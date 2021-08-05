@@ -15,28 +15,30 @@ code.
 In this quick tutorial, you will learn how to create a unique stream object,
 broadcast live video content and playback your live stream with Livepeer.com.
 
-<DocsGrid cols={3}>
-  <NavigationCard
+<Grid
+  gap={3}
+  css={{
+    gridTemplateColumns: "repeat(1, 1fr)",
+    "@bp1": {
+      gridTemplateColumns: "repeat(3, 1fr)",
+    },
+  }}>
+  <Card
     href="/docs/guides/start-live-streaming/tutorial#step-1-create-a-stream"
     title="Step 1: Create a stream"
     label="Jump to section"
   />
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/tutorial#step-2-option-1-go-live-using-obs"
-    title="Step 2 (option 1): Go live using OBS"
+    title="Step 2: Go live"
     label="Jump to section"
   />
-  <NavigationCard
-    href="/docs/guides/start-live-streaming/tutorial#step-2-option-2-go-live-using-in-browser-broadcaster"
-    title="Step 2 (option 2): Go live using in-browser broadcaster"
-    label="Jump to section"
-  />
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/tutorial#step-3-playback-your-live-stream"
     title="Step 3: Playback your live stream"
     label="Jump to section"
   />
-</DocsGrid>
+</Grid>
 
 ## Step 1: Create a stream
 
@@ -83,7 +85,7 @@ right corner of OBS.
 ## Step 2 (option 2): Go live using in-browser broadcaster
 
 If downloading OBS feels cumbersome, there are a few in-browser broadcaster
-options. Livepeer users have had success with
+options. Livepeer.com users have had success with
 [Streamyard](https://streamyard.com/) or
 [Restream Studio](https://restream.io/).
 
@@ -126,4 +128,4 @@ in the player.
 That’s it! Streaming with Livepeer.com is that simple. To get in touch, fill out
 a [contact form](/contact).
 
-_[Video Tutorial : Stream into Livepeer for the First Time](https://livepeer.com/blog/video-tutorial-stream-into-livepeer-for-the-first-time)_
+_[Video Tutorial : Stream into Livepeer.com for the First Time](https://livepeer.com/blog/video-tutorial-stream-into-livepeer-for-the-first-time)_

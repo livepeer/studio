@@ -5,51 +5,68 @@ description: Livepeer.com Video Guides Overview
 
 # Livepeer.com documentation
 
-## Explore guides, tutorials and sample code.
+<Text size="5" variant="gray" css={{ mt: "-$5", mb: "$7" }}>
+  Explore guides, tutorials and sample code.
+</Text>
 
-<DocsGrid cols={2}>
-  <DocsPost
+<Grid
+  gap={6}
+  css={{
+    mb: "$9",
+    gridTemplateColumns: "repeat(1, 1fr)",
+    "@bp1": {
+      gridTemplateColumns: "repeat(2, 1fr)",
+    },
+  }}>
+  <Post
     title="Start Live Streaming"
     description="Quickly get started with Livepeer.com"
     href="/docs/guides/start-live-streaming/tutorial"
-    image="/img/docs/thumbnail.png"
+    image="/img/docs/thumbnail.jpg"
   />
-  <DocsPost
+  <Post
     title="Supported Codecs and Workflows"
     description="Review the workflows Livepeer.com supports"
     href="/docs/guides/start-live-streaming/support-matrix"
-    image="/img/docs/thumbnail2.png"
+    image="/img/docs/thumbnail2.jpg"
   />
-</DocsGrid>
+</Grid>
 
-### Popular guides
+## Popular guides
 
-<DocsGrid cols={3}>
-  <NavigationCard
+<Grid
+  gap={3}
+  css={{
+    gridTemplateColumns: "repeat(1, 1fr)",
+    "@bp1": {
+      gridTemplateColumns: "repeat(2, 1fr)",
+    },
+    "@bp2": {
+      gridTemplateColumns: "repeat(3, 1fr)",
+    },
+  }}>
+  <Card
     href="/docs/guides/start-live-streaming/tutorial"
     title="Start live streaming with Livepeer.com"
   />
-  <NavigationCard
-    href="/docs/guides/using-livepeer-in-your-app/example-app"
+  <Card
+    href="/docs/guides/application-development/example-app"
     title="Clone an example application"
   />
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/playback"
     title="Playback a live stream"
   />
-</DocsGrid>
-
-<DocsGrid cols={3}>
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/broadcasting"
     title="Configure broadcast software"
   />
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/record"
     title="Record a live stream session"
   />
-  <NavigationCard
+  <Card
     href="/docs/guides/start-live-streaming/debug-live-stream-issues"
     title="Debug live stream issues"
   />
-</DocsGrid>
+</Grid>

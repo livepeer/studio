@@ -1,11 +1,16 @@
-/** @jsx jsx */
-import { jsx } from "theme-ui";
-import Layout from "../layouts";
-import Login from "../components/Login";
-import Link from "../components/Link";
-import { Flex, Box, Heading } from "@theme-ui/components";
+import Layout from "layouts/main";
+import Login from "@components/Marketing/Login";
+import {
+  Flex,
+  Box,
+  Heading,
+  Container,
+  Link as A,
+} from "@livepeer.com/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
+import Link from "next/link";
+import Guides from "@components/Marketing/Guides";
 
 const LoginPage = () => {
   useLoggedIn(false);
@@ -24,32 +29,50 @@ const LoginPage = () => {
     }
   };
   return (
-    <Layout>
-      <Flex
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-          flexGrow: 1,
-          flexDirection: "column",
-          mx: [3, 0],
-          py: 6,
-        }}>
-        <Box as="h3" sx={{ mb: 4 }}>
-          Log in
-        </Box>
-        <Login
-          id="login"
-          onSubmit={onSubmit}
-          showEmail={true}
-          showPassword={true}
-          buttonText="Continue"
-          errors={errors}
-          loading={loading}
-        />
-        <Box>
-          <Link href="/forgot-password">Forgot your password?</Link>
-        </Box>
-      </Flex>
+    <Layout
+      title={`Login - Livepeer.com`}
+      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      url={`https://livepeer.com/login`}>
+      <Guides backgroundColor="$mauve2" />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$4",
+            },
+          }}>
+          <Flex
+            css={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexGrow: 1,
+              flexDirection: "column",
+            }}>
+            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+              Log in
+            </Heading>
+            <Login
+              id="login"
+              onSubmit={onSubmit}
+              showEmail={true}
+              showPassword={true}
+              buttonText="Continue"
+              errors={errors}
+              loading={loading}
+            />
+            <Box>
+              <Link href="/forgot-password" passHref>
+                <A>Forgot your password?</A>
+              </Link>
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
     </Layout>
   );
 };
