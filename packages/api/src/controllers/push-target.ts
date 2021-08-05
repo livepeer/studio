@@ -8,7 +8,7 @@ import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import { MultistreamTarget } from "../schema/types";
-import { DBPushTarget } from "../store/push-target-table";
+import { DBMultistreamTarget } from "../store/push-target-table";
 
 const fieldsMap = {
   id: `push_target.ID`,
@@ -74,7 +74,7 @@ app.use(
       return db.pushTarget.cleanWriteOnlyResponses(data);
     }
     if ("id" in data) {
-      return db.pushTarget.cleanWriteOnlyResponse(data as DBPushTarget);
+      return db.pushTarget.cleanWriteOnlyResponse(data as DBMultistreamTarget);
     }
     return data;
   })

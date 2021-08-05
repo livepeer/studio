@@ -6,7 +6,7 @@ import Table from "./table";
 import { GetOptions, WithID } from "./types";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
-export type DBPushTarget = WithID<MultistreamTarget>;
+export type DBMultistreamTarget = WithID<MultistreamTarget>;
 
 export interface PushTargetInput {
   name?: string;
@@ -23,7 +23,7 @@ const parseUrl = (url: string) => {
   }
 };
 
-export default class PushTargetTable extends Table<DBPushTarget> {
+export default class PushTargetTable extends Table<DBMultistreamTarget> {
   async fillAndCreate(input: PushTargetInput) {
     const url = parseUrl(input.url);
     const pushTarget: Required<MultistreamTarget> = {
@@ -43,7 +43,7 @@ export default class PushTargetTable extends Table<DBPushTarget> {
     return created;
   }
 
-  async create(doc: DBPushTarget) {
+  async create(doc: DBMultistreamTarget) {
     throw new Error("Unimplemented API, use fillAndCreate instead");
     return doc;
   }
