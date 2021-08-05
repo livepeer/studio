@@ -1,12 +1,12 @@
 import { URL } from "url";
 import * as uuid from "uuid";
 
-import { PushTarget } from "../schema/types";
+import { MultistreamTarget } from "../schema/types";
 import Table from "./table";
 import { GetOptions, WithID } from "./types";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
-export type DBPushTarget = WithID<PushTarget>;
+export type DBPushTarget = WithID<MultistreamTarget>;
 
 export interface PushTargetInput {
   name?: string;
@@ -26,7 +26,7 @@ const parseUrl = (url: string) => {
 export default class PushTargetTable extends Table<DBPushTarget> {
   async fillAndCreate(input: PushTargetInput) {
     const url = parseUrl(input.url);
-    const pushTarget: Required<PushTarget> = {
+    const pushTarget: Required<MultistreamTarget> = {
       id: uuid.v4(),
       name: input.name || url.host,
       url: input.url,

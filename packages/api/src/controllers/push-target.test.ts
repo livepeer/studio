@@ -1,13 +1,13 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { PushTarget, User } from "../schema/types";
+import { MultistreamTarget, User } from "../schema/types";
 import { db } from "../store";
 
 // includes auth file tests
 
 let server: TestServer;
-let mockPushTargetInput: PushTarget;
+let mockPushTargetInput: MultistreamTarget;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 
@@ -104,7 +104,7 @@ describe("controllers/push-target", () => {
 
       const res = await client.get(`/push-target`);
       expect(res.status).toBe(200);
-      const listed: PushTarget[] = await res.json();
+      const listed: MultistreamTarget[] = await res.json();
       listed.sort((a, b) => a.createdAt - b.createdAt);
       expect(listed).toEqual(allTargets);
     });
@@ -143,7 +143,7 @@ describe("controllers/push-target", () => {
         );
         cursor = getNextCursor(link);
 
-        const pageItems = (await res.json()) as PushTarget[];
+        const pageItems = (await res.json()) as MultistreamTarget[];
         expect(pageItems.length).toBe(page < 3 ? 5 : 3);
         pageItems.forEach((pt) => expect(pt.url).toBeUndefined());
         listedIDs.push(...pageItems.map((t) => t.id));
@@ -162,7 +162,7 @@ describe("controllers/push-target", () => {
       const preCreationTime = Date.now();
       let res = await client.post("/push-target", mockPushTargetInput);
       expect(res.status).toBe(201);
-      const created = (await res.json()) as PushTarget;
+      const created = (await res.json()) as MultistreamTarget;
       expect(created.id).toBeDefined();
       expect(created.url).toBeUndefined();
       expect(created.name).toEqual(mockPushTargetInput.name);
@@ -177,7 +177,7 @@ describe("controllers/push-target", () => {
     it("should patch a push target", async () => {
       let res = await client.post("/push-target", mockPushTargetInput);
       expect(res.status).toBe(201);
-      const created = (await res.json()) as PushTarget;
+      const created = (await res.json()) as MultistreamTarget;
 
       res = await client.patch(`/push-target/${created.id}`, {
         disabled: "not a bool",

@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 
 import {
   ObjectStore,
-  PushTarget,
+  MultistreamTarget,
   Stream,
   StreamPatchPayload,
   User,
@@ -24,7 +24,7 @@ const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
 let server: TestServer;
 let mockStore: ObjectStore & { kind: string };
-let mockPushTarget: PushTarget;
+let mockPushTarget: MultistreamTarget;
 let mockUser: User;
 let mockAdminUser: User;
 let mockNonAdminUser: User;
@@ -197,7 +197,7 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation validation", () => {
-      let pushTarget: PushTarget;
+      let pushTarget: MultistreamTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
@@ -330,7 +330,7 @@ describe("controllers/stream", () => {
     });
 
     describe("stream creation", () => {
-      let pushTarget: PushTarget;
+      let pushTarget: MultistreamTarget;
 
       beforeEach(async () => {
         await server.store.create(mockStore);
@@ -418,7 +418,7 @@ describe("controllers/stream", () => {
     });
 
     describe("stream patch", () => {
-      let pushTarget: PushTarget;
+      let pushTarget: MultistreamTarget;
       let stream: Stream;
       let patchPath: string;
 

@@ -10,7 +10,7 @@ import {
   User,
   Webhook,
   PasswordResetToken,
-  PushTarget,
+  MultistreamTarget,
   Usage,
   Region,
   WebhookResponse,

@@ -7,7 +7,7 @@ import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
-import { PushTarget } from "../schema/types";
+import { MultistreamTarget } from "../schema/types";
 import { DBPushTarget } from "../store/push-target-table";
 
 const fieldsMap = {
@@ -125,7 +125,7 @@ app.get("/:id", async (req, res) => {
 });
 
 app.post("/", validatePost("push-target"), async (req, res) => {
-  const input = req.body as PushTarget;
+  const input = req.body as MultistreamTarget;
   const data = await db.pushTarget.fillAndCreate({
     name: input.name,
     url: input.url,
