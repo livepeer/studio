@@ -121,7 +121,7 @@ async function triggerManyIdleStreamsWebhook(ids, queue) {
     ids.map(async (id) => {
       const stream = await db.stream.get(id);
       const user = await db.user.get(stream.userId);
-      queue.publish("events.streams", {
+      await queue.publish("events.streams", {
         id: uuid(),
         createdAt: Date.now(),
         channel: "webhooks",
@@ -1488,7 +1488,7 @@ app.post(
       },
     };
 
-    await await req.queue.publish("events.streams", msg);
+    await req.queue.publish("events.streams", msg);
     return res.status(204).end();
   }
 );

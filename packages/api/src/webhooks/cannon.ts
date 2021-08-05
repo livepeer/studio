@@ -69,22 +69,23 @@ export default class WebhookCannon {
       this.queue.ack(data);
       return;
     }
-    let event = message;
-
-    const since = Date.now() - event.createdAt;
+    let event: WebhookMessage = message;
 
     if (event.event === "recording.ready") {
       if (!event.payload.sessionId) {
+        this.queue.ack(data);
         return;
       }
       const session = await this.db.stream.get(event.payload.sessionId, {
         useReplica: false,
       });
       if (!session) {
+        this.queue.ack(data);
         return;
       }
       if (session.partialSession) {
         // new session was started, so recording is not ready yet
+        this.queue.ack(data);
         return;
       }
       delete event.payload.sessionId;
@@ -154,13 +155,15 @@ export default class WebhookCannon {
     }
     try {
       // TODO Activate URL Verification
-      await this._fireHook(
-        message.event,
-        message.webhook,
-        message.stream,
-        message.user,
-        false
-      );
+      if (message.event && message.webhook && message.stream && message.user) {
+        await this._fireHook(
+          message.event,
+          message.webhook,
+          message.stream,
+          message.user,
+          false
+        );
+      }
     } catch (err) {
       console.log("_fireHook error", err);
       this.retry(message);
