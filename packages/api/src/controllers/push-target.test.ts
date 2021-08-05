@@ -54,7 +54,7 @@ describe("controllers/push-target", () => {
         ...mockTargetInput,
         userId: nonAdminUser.id,
       };
-      const userPushTarget = await db.pushTarget.fillAndCreate(input);
+      const userMsTarget = await db.pushTarget.fillAndCreate(input);
 
       for (let i = 0; i < 10; i += 1) {
         const input = {
@@ -68,7 +68,7 @@ describe("controllers/push-target", () => {
       }
       const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual([{ ...userPushTarget, url: undefined }]);
+      expect(await res.json()).toEqual([{ ...userMsTarget, url: undefined }]);
     });
 
     it("should throw 403 error if JWT is not verified", async () => {

@@ -20,7 +20,7 @@ import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
-import PushTargetTable from "./push-target-table";
+import MultistreamTargetTable from "./push-target-table";
 import WebhookTable from "./webhook-table";
 
 // Should be configurable, perhaps?
@@ -46,7 +46,7 @@ export class DB {
   // Table objects
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
-  pushTarget: PushTargetTable;
+  pushTarget: MultistreamTargetTable;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -117,7 +117,7 @@ export class DB {
       db: this,
       schema: schemas["object-store"],
     });
-    this.pushTarget = new PushTargetTable({
+    this.pushTarget = new MultistreamTargetTable({
       db: this,
       schema: schemas["push-target"],
     });

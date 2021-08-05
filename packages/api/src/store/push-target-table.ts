@@ -8,7 +8,7 @@ import { InternalServerError, UnprocessableEntityError } from "./errors";
 
 export type DBMultistreamTarget = WithID<MultistreamTarget>;
 
-export interface PushTargetInput {
+export interface MultistreamTargetInput {
   name?: string;
   url: string;
   disabled?: boolean;
@@ -23,8 +23,8 @@ const parseUrl = (url: string) => {
   }
 };
 
-export default class PushTargetTable extends Table<DBMultistreamTarget> {
-  async fillAndCreate(input: PushTargetInput) {
+export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
+  async fillAndCreate(input: MultistreamTargetInput) {
     const url = parseUrl(input.url);
     const pushTarget: Required<MultistreamTarget> = {
       id: uuid.v4(),
