@@ -38,7 +38,7 @@ export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
 
     const created = await this.get(target.id, { useReplica: false });
     if (!created) {
-      throw new InternalServerError("error creating new push target");
+      throw new InternalServerError("error creating new multistream target");
     }
     return created;
   }

@@ -119,7 +119,7 @@ export class DB {
     });
     this.multistreamTarget = new MultistreamTargetTable({
       db: this,
-      schema: schemas["push-target"],
+      schema: schemas["multistream-target"],
     });
     this.apiToken = makeTable<ApiToken>({
       db: this,

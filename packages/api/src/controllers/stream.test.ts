@@ -207,7 +207,7 @@ describe("controllers/stream", () => {
         });
       });
 
-      it("should reject push targets without a profile", async () => {
+      it("should reject multistream targets without a profile", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: { targets: [{ id: msTarget.id }] },
@@ -215,7 +215,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(422);
       });
 
-      it("should reject push targets referencing an inexistent profile", async () => {
+      it("should reject multistream targets referencing an inexistent profile", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: { targets: [{ profile: "hello", id: msTarget.id }] },
@@ -225,7 +225,7 @@ describe("controllers/stream", () => {
         expect(json.errors[0]).toContain("must reference existing profile");
       });
 
-      it("should reject push targets with an invalid spec", async () => {
+      it("should reject multistream targets with an invalid spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
@@ -240,7 +240,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(422);
       });
 
-      it("should reject push targets without an id or spec", async () => {
+      it("should reject multistream targets without an id or spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: { targets: [{ profile: "test_stream_360p" }] },
@@ -252,7 +252,7 @@ describe("controllers/stream", () => {
         );
       });
 
-      it("should reject push targets with both an id and a spec", async () => {
+      it("should reject multistream targets with both an id and a spec", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
@@ -272,7 +272,7 @@ describe("controllers/stream", () => {
         );
       });
 
-      it("should reject references to other users push targets", async () => {
+      it("should reject references to other users multistream targets", async () => {
         client.jwtAuth = nonAdminToken;
         const res = await client.post("/stream", {
           ...postMockStream,
@@ -282,7 +282,7 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(400);
         const json = await res.json();
-        expect(json.errors[0]).toContain(`push target not found`);
+        expect(json.errors[0]).toContain(`multistream target not found`);
       });
 
       it(`should reject streams with a "source" profile`, async () => {
@@ -359,7 +359,7 @@ describe("controllers/stream", () => {
         expect(server.db.stream.addDefaultFields(document)).toEqual(stream);
       });
 
-      it("should create stream with valid push target ID", async () => {
+      it("should create stream with valid multistream target ID", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
@@ -377,7 +377,7 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
       });
 
-      it("should create stream with inline push target", async () => {
+      it("should create stream with inline multistream target", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
@@ -498,7 +498,7 @@ describe("controllers/stream", () => {
         expect(json.errors[0]).toContain("Bad URL");
       });
 
-      it("should reject references to other users push targets", async () => {
+      it("should reject references to other users multistream targets", async () => {
         const nonAdminTarget = await server.db.multistreamTarget.fillAndCreate({
           ...mockTarget,
           userId: nonAdminUser.id,
@@ -510,7 +510,7 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(400);
         const json = await res.json();
-        expect(json.errors[0]).toContain(`push target not found`);
+        expect(json.errors[0]).toContain(`multistream target not found`);
       });
 
       const testPatchField = async (patch: StreamPatchPayload) => {

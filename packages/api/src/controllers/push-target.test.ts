@@ -35,7 +35,7 @@ afterEach(async () => {
   await clearDatabase(server);
 });
 
-describe("controllers/push-target", () => {
+describe("controllers/multistream-target", () => {
   describe("basic CRUD with JWT authorization", () => {
     let client: TestClient;
     let adminUser: User;
@@ -49,7 +49,7 @@ describe("controllers/push-target", () => {
       client.jwtAuth = nonAdminToken;
     });
 
-    it("should not get all push targets without admin authorization", async () => {
+    it("should not get all multistream targets without admin authorization", async () => {
       const input = {
         ...mockTargetInput,
         userId: nonAdminUser.id,
@@ -63,10 +63,12 @@ describe("controllers/push-target", () => {
         };
         const created = await db.multistreamTarget.fillAndCreate(input);
 
-        const res = await client.get(`/push-target/${created.id}`);
+        const res = await client.get(`/multistream/target/${created.id}`);
         expect(res.status).toBe(404);
       }
-      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      const res = await client.get(
+        `/multistream/target?userId=${nonAdminUser.id}`
+      );
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual([{ ...userMsTarget, url: undefined }]);
     });
@@ -79,13 +81,13 @@ describe("controllers/push-target", () => {
       };
       const created = await db.multistreamTarget.fillAndCreate(input);
 
-      const res = await client.get(`/push-target/${created.id}`);
+      const res = await client.get(`/multistream/target/${created.id}`);
       expect(res.status).toBe(403);
       const resJson = await res.json();
       expect(resJson.errors[0]).toBe("jwt malformed");
     });
 
-    it("should get all push targets with admin authorization", async () => {
+    it("should get all multistream targets with admin authorization", async () => {
       client.jwtAuth = adminToken;
 
       const allTargets = [];
@@ -96,13 +98,13 @@ describe("controllers/push-target", () => {
         };
         const created = await db.multistreamTarget.fillAndCreate(input);
 
-        const res = await client.get(`/push-target/${created.id}`);
+        const res = await client.get(`/multistream/target/${created.id}`);
         expect(res.status).toBe(200);
         expect(await res.json()).toEqual(created);
         allTargets.push({ ...created, user: {} });
       }
 
-      const res = await client.get(`/push-target`);
+      const res = await client.get(`/multistream/target`);
       expect(res.status).toBe(200);
       const listed: MultistreamTarget[] = await res.json();
       listed.sort((a, b) => a.createdAt - b.createdAt);
@@ -133,7 +135,7 @@ describe("controllers/push-target", () => {
       let cursor = "";
       for (let page = 1; page <= 3; page++) {
         const res = await client.get(
-          `/push-target?userId=${nonAdminUser.id}&limit=5&cursor=${cursor}`
+          `/multistream/target?userId=${nonAdminUser.id}&limit=5&cursor=${cursor}`
         );
         expect(res.status).toBe(200);
 
@@ -154,13 +156,13 @@ describe("controllers/push-target", () => {
 
     it("should return a 404 if multistreamTarget not found", async () => {
       const id = uuid();
-      const resp = await client.get(`/push-target/${id}`);
+      const resp = await client.get(`/multistream/target/${id}`);
       expect(resp.status).toBe(404);
     });
 
-    it("should create a push target", async () => {
+    it("should create a multistream target", async () => {
       const preCreationTime = Date.now();
-      let res = await client.post("/push-target", mockTargetInput);
+      let res = await client.post("/multistream/target", mockTargetInput);
       expect(res.status).toBe(201);
       const created = (await res.json()) as MultistreamTarget;
       expect(created.id).toBeDefined();
@@ -168,23 +170,23 @@ describe("controllers/push-target", () => {
       expect(created.name).toEqual(mockTargetInput.name);
       expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
 
-      res = await client.get(`/push-target/${created.id}`);
+      res = await client.get(`/multistream/target/${created.id}`);
       expect(res.status).toBe(200);
       const getResponse = await res.json();
       expect(getResponse).toEqual(created);
     });
 
-    it("should patch a push target", async () => {
-      let res = await client.post("/push-target", mockTargetInput);
+    it("should patch a multistream target", async () => {
+      let res = await client.post("/multistream/target", mockTargetInput);
       expect(res.status).toBe(201);
       const created = (await res.json()) as MultistreamTarget;
 
-      res = await client.patch(`/push-target/${created.id}`, {
+      res = await client.patch(`/multistream/target/${created.id}`, {
         disabled: "not a bool",
       });
       expect(res.status).toBe(422);
 
-      res = await client.patch(`/push-target/${created.id}`, {
+      res = await client.patch(`/multistream/target/${created.id}`, {
         disabled: true,
       });
       expect(res.status).toBe(204);
@@ -197,17 +199,17 @@ describe("controllers/push-target", () => {
 
     it("should support RTMP, RTMPS and SRT for URL", async () => {
       const baseUrl = mockTargetInput.url.split("://")[1];
-      let res = await client.post("/push-target", {
+      let res = await client.post("/multistream/target", {
         ...mockTargetInput,
         url: `rtmp://${baseUrl}`,
       });
       expect(res.status).toBe(201);
-      res = await client.post("/push-target", {
+      res = await client.post("/multistream/target", {
         ...mockTargetInput,
         url: `rtmps://${baseUrl}`,
       });
       expect(res.status).toBe(201);
-      res = await client.post("/push-target", {
+      res = await client.post("/multistream/target", {
         ...mockTargetInput,
         url: `srt://${baseUrl}`,
       });
@@ -215,7 +217,7 @@ describe("controllers/push-target", () => {
     });
 
     it("should use a default name with the URL host", async () => {
-      let res = await client.post("/push-target", {
+      let res = await client.post("/multistream/target", {
         ...mockTargetInput,
         name: undefined,
       });
@@ -224,9 +226,9 @@ describe("controllers/push-target", () => {
       expect(created.name).toEqual("live.zoo.tv");
     });
 
-    describe("should not accept invalid payloads for creating a push target", () => {
+    describe("should not accept invalid payloads for creating a multistream target", () => {
       const testJsonError = async (expectErr: string, payload?: any) => {
-        const res = await client.post("/push-target", payload);
+        const res = await client.post("/multistream/target", payload);
         expect(res.status).toBe(422);
 
         const body = await res.json();
@@ -278,7 +280,7 @@ describe("controllers/push-target", () => {
         });
       });
       test("bad url", async () => {
-        const res = await client.post("/push-target", {
+        const res = await client.post("/multistream/target", {
           ...mockTargetInput,
           url: "rtmps://!@#$%^&*()_+",
         });
@@ -288,20 +290,20 @@ describe("controllers/push-target", () => {
       });
     });
 
-    it("should not allow non-admin users to access another user's push targets", async () => {
+    it("should not allow non-admin users to access another user's multistream targets", async () => {
       const created = await db.multistreamTarget.fillAndCreate({
         ...mockTargetInput,
         userId: adminUser.id,
       });
 
-      let res = await client.get(`/push-target/${created.id}`);
+      let res = await client.get(`/multistream/target/${created.id}`);
       expect(res.status).toBe(404);
 
-      res = await client.get(`/push-target?userId=${created.userId}`);
+      res = await client.get(`/multistream/target?userId=${created.userId}`);
       expect(res.status).toBe(403);
 
       client.jwtAuth = adminToken;
-      res = await client.get(`/push-target/${created.id}`);
+      res = await client.get(`/multistream/target/${created.id}`);
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual(created);
     });
@@ -321,27 +323,31 @@ describe("controllers/push-target", () => {
       client.apiKey = uuid();
     });
 
-    it("should not get all push targets with non-admin API key", async () => {
+    it("should not get all multistream targets with non-admin API key", async () => {
       client.apiKey = nonAdminApiKey;
-      let res = await client.get(`/push-target?userId=${adminUser.id}`);
+      let res = await client.get(`/multistream/target?userId=${adminUser.id}`);
       expect(res.status).toBe(403);
 
-      res = await client.get(`/push-target`);
+      res = await client.get(`/multistream/target`);
       expect(res.status).toBe(400);
     });
 
-    it("should get all push targets for another user with admin API key", async () => {
+    it("should get all multistream targets for another user with admin API key", async () => {
       client.apiKey = adminApiKey;
-      let res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      let res = await client.get(
+        `/multistream/target?userId=${nonAdminUser.id}`
+      );
       expect(res.status).toBe(200);
 
-      res = await client.get(`/push-target`);
+      res = await client.get(`/multistream/target`);
       expect(res.status).toBe(200);
     });
 
     it("should throw forbidden error when using invalid API key", async () => {
       client.apiKey = "random_key";
-      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      const res = await client.get(
+        `/multistream/target?userId=${nonAdminUser.id}`
+      );
       expect(res.status).toBe(403);
     });
 
@@ -355,7 +361,9 @@ describe("controllers/push-target", () => {
       });
       client.apiKey = tokenId;
 
-      const res = await client.get(`/push-target?userId=${nonAdminUser.id}`);
+      const res = await client.get(
+        `/multistream/target?userId=${nonAdminUser.id}`
+      );
       expect(res.status).toBe(500);
       const errJson = await res.json();
       expect(errJson.errors[0]).toEqual(

@@ -67,24 +67,24 @@ const hackMistSettings = (req: Request, profiles: Profile[]): Profile[] => {
 async function validateMultistreamTarget(
   userId: string,
   profileNames: Set<string>,
-  msTargetRef: MultistreamTargetRef
+  target: MultistreamTargetRef
 ): Promise<Omit<MultistreamTargetRef, "spec">> {
-  const { profile, id, spec } = pushTargetRef;
+  const { profile, id, spec } = target;
   if (!profileNames.has(profile) && profile !== "source") {
     throw new BadRequestError(
-      `push target must reference existing profile. not found: "${profile}"`
+      `multistream target must reference existing profile. not found: "${profile}"`
     );
   }
   if (!!spec === !!id) {
     throw new BadRequestError(
-      `push target must have either an "id" or a "spec"`
+      `multistream target must have either an "id" or a "spec"`
     );
   }
   if (id) {
     if (!(await db.multistreamTarget.hasAccess(id, userId))) {
-      throw new BadRequestError(`push target not found: "${id}"`);
+      throw new BadRequestError(`multistream target not found: "${id}"`);
     }
-    return pushTargetRef;
+    return target;
   }
   const created = await db.multistreamTarget.fillAndCreate({
     name: spec.name,

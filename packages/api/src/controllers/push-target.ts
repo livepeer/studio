@@ -11,12 +11,12 @@ import { MultistreamTarget } from "../schema/types";
 import { DBMultistreamTarget } from "../store/push-target-table";
 
 const fieldsMap = {
-  id: `push_target.ID`,
-  name: `push_target.data->>'name'`,
-  url: `push_target.data->>'url'`,
-  disabled: { val: `push_target.data->'disabled'`, type: "boolean" },
-  createdAt: { val: `push_target.data->'createdAt'`, type: "int" },
-  userId: `push_target.data->>'userId'`,
+  id: `multistream_target.ID`,
+  name: `multistream_target.data->>'name'`,
+  url: `multistream_target.data->>'url'`,
+  disabled: { val: `multistream_target.data->'disabled'`, type: "boolean" },
+  createdAt: { val: `multistream_target.data->'createdAt'`, type: "int" },
+  userId: `multistream_target.data->>'userId'`,
   "user.email": `users.data->>'email'`,
 };
 
@@ -27,8 +27,8 @@ function adminListQuery(
   filters: string
 ): [SQLStatement[], FindOptions] {
   const fields =
-    " push_target.id as id, push_target.data as data, users.id as usersId, users.data as usersData";
-  const from = `push_target left join users on push_target.data->>'userId' = users.id`;
+    " multistream_target.id as id, multistream_target.data as data, users.id as usersId, users.data as usersData";
+  const from = `multistream_target left join users on multistream_target.data->>'userId' = users.id`;
   const order = parseOrder(fieldsMap, orderStr);
   const process = ({ data, usersData }) => {
     return { ...data, user: db.user.cleanWriteOnlyResponse(usersData) };
@@ -56,7 +56,7 @@ function respondError(res: Response, status: number, error: string) {
 const notFound = (res: Response) => respondError(res, 404, "not found");
 
 const forbidden = (res: Response) =>
-  respondError(res, 403, "users can only access their own push targets");
+  respondError(res, 403, "users can only access their own multistream targets");
 
 const badRequest = (res: Response, error: string) =>
   respondError(res, 400, error);
@@ -126,7 +126,7 @@ app.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-app.post("/", validatePost("push-target"), async (req, res) => {
+app.post("/", validatePost("multistream-target"), async (req, res) => {
   const input = req.body as MultistreamTarget;
   const data = await db.multistreamTarget.fillAndCreate({
     name: input.name,
