@@ -7,7 +7,7 @@ import { db } from "../store";
 // includes auth file tests
 
 let server: TestServer;
-let mockPushTargetInput: MultistreamTarget;
+let mockTargetInput: MultistreamTarget;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 
@@ -15,7 +15,7 @@ let mockNonAdminUserInput: User;
 
 beforeAll(async () => {
   server = await serverPromise;
-  mockPushTargetInput = {
+  mockTargetInput = {
     url: "rtmps://live.zoo.tv/cage/s5d72b3j42o",
     name: "zoo-stream",
   };
@@ -51,14 +51,14 @@ describe("controllers/push-target", () => {
 
     it("should not get all push targets without admin authorization", async () => {
       const input = {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         userId: nonAdminUser.id,
       };
       const userPushTarget = await db.pushTarget.fillAndCreate(input);
 
       for (let i = 0; i < 10; i += 1) {
         const input = {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           userId: uuid(),
         };
         const created = await db.pushTarget.fillAndCreate(input);
@@ -74,7 +74,7 @@ describe("controllers/push-target", () => {
     it("should throw 403 error if JWT is not verified", async () => {
       client.jwtAuth = "random_value";
       const input = {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         userId: uuid(),
       };
       const created = await db.pushTarget.fillAndCreate(input);
@@ -91,7 +91,7 @@ describe("controllers/push-target", () => {
       const allTargets = [];
       for (let i = 0; i < 10; i += 1) {
         const input = {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           userId: uuid(),
         };
         const created = await db.pushTarget.fillAndCreate(input);
@@ -123,7 +123,7 @@ describe("controllers/push-target", () => {
       const createdIds: string[] = [];
       for (let i = 0; i < 13; i += 1) {
         const created = await db.pushTarget.fillAndCreate({
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           userId: nonAdminUser.id,
         });
         createdIds.push(created.id);
@@ -160,12 +160,12 @@ describe("controllers/push-target", () => {
 
     it("should create a push target", async () => {
       const preCreationTime = Date.now();
-      let res = await client.post("/push-target", mockPushTargetInput);
+      let res = await client.post("/push-target", mockTargetInput);
       expect(res.status).toBe(201);
       const created = (await res.json()) as MultistreamTarget;
       expect(created.id).toBeDefined();
       expect(created.url).toBeUndefined();
-      expect(created.name).toEqual(mockPushTargetInput.name);
+      expect(created.name).toEqual(mockTargetInput.name);
       expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
 
       res = await client.get(`/push-target/${created.id}`);
@@ -175,7 +175,7 @@ describe("controllers/push-target", () => {
     });
 
     it("should patch a push target", async () => {
-      let res = await client.post("/push-target", mockPushTargetInput);
+      let res = await client.post("/push-target", mockTargetInput);
       expect(res.status).toBe(201);
       const created = (await res.json()) as MultistreamTarget;
 
@@ -196,19 +196,19 @@ describe("controllers/push-target", () => {
     });
 
     it("should support RTMP, RTMPS and SRT for URL", async () => {
-      const baseUrl = mockPushTargetInput.url.split("://")[1];
+      const baseUrl = mockTargetInput.url.split("://")[1];
       let res = await client.post("/push-target", {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         url: `rtmp://${baseUrl}`,
       });
       expect(res.status).toBe(201);
       res = await client.post("/push-target", {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         url: `rtmps://${baseUrl}`,
       });
       expect(res.status).toBe(201);
       res = await client.post("/push-target", {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         url: `srt://${baseUrl}`,
       });
       expect(res.status).toBe(201);
@@ -216,7 +216,7 @@ describe("controllers/push-target", () => {
 
     it("should use a default name with the URL host", async () => {
       let res = await client.post("/push-target", {
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         name: undefined,
       });
       expect(res.status).toBe(201);
@@ -239,47 +239,47 @@ describe("controllers/push-target", () => {
       });
       test("missing property", async () => {
         await testJsonError("required", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: undefined,
         });
       });
       test("additional properties", async () => {
         await testJsonError("additionalProperties", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           unknownField: "hello",
         });
       });
       test("wrong field type", async () => {
         await testJsonError("type", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: true,
         });
         await testJsonError("type", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           createdAt: "right now",
         });
         await testJsonError("type", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           name: ["what", "if"],
         });
       });
       test("bad field format", async () => {
         await testJsonError("pattern", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: "is this a uri?",
         });
         await testJsonError("pattern", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: "https://webrtc.stream.it/handshake",
         });
         await testJsonError("format", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: "rtmp://this started really well but",
         });
       });
       test("bad url", async () => {
         const res = await client.post("/push-target", {
-          ...mockPushTargetInput,
+          ...mockTargetInput,
           url: "rtmps://!@#$%^&*()_+",
         });
         expect(res.status).toBe(422);
@@ -290,7 +290,7 @@ describe("controllers/push-target", () => {
 
     it("should not allow non-admin users to access another user's push targets", async () => {
       const created = await db.pushTarget.fillAndCreate({
-        ...mockPushTargetInput,
+        ...mockTargetInput,
         userId: adminUser.id,
       });
 

@@ -24,7 +24,7 @@ const uuidRegex = /[0-9a-f]+(-[0-9a-f]+){4}/;
 
 let server: TestServer;
 let mockStore: ObjectStore & { kind: string };
-let mockPushTarget: MultistreamTarget;
+let mockTarget: MultistreamTarget;
 let mockUser: User;
 let mockAdminUser: User;
 let mockNonAdminUser: User;
@@ -78,7 +78,7 @@ beforeAll(async () => {
     kind: "object-store",
   };
 
-  mockPushTarget = {
+  mockTarget = {
     url: "rtmps://ultimate.sports.tv/loop/1125fts",
   };
 });
@@ -202,7 +202,7 @@ describe("controllers/stream", () => {
       beforeEach(async () => {
         await server.store.create(mockStore);
         pushTarget = await server.db.pushTarget.fillAndCreate({
-          ...mockPushTarget,
+          ...mockTarget,
           userId: adminUser.id,
         });
       });
@@ -257,7 +257,7 @@ describe("controllers/stream", () => {
             {
               profile: "test_stream_360p",
               id: pushTarget.id,
-              spec: mockPushTarget,
+              spec: mockTarget,
             },
           ],
         });
@@ -335,7 +335,7 @@ describe("controllers/stream", () => {
       beforeEach(async () => {
         await server.store.create(mockStore);
         pushTarget = await server.db.pushTarget.fillAndCreate({
-          ...mockPushTarget,
+          ...mockTarget,
           userId: adminUser.id,
         });
       });
@@ -372,7 +372,7 @@ describe("controllers/stream", () => {
       it("should create stream with inline push target", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
-          pushTargets: [{ profile: "test_stream_360p", spec: mockPushTarget }],
+          pushTargets: [{ profile: "test_stream_360p", spec: mockTarget }],
         });
         expect(res.status).toBe(201);
         const created = await res.json();
@@ -425,7 +425,7 @@ describe("controllers/stream", () => {
       beforeEach(async () => {
         await server.store.create(mockStore);
         pushTarget = await server.db.pushTarget.fillAndCreate({
-          ...mockPushTarget,
+          ...mockTarget,
           userId: adminUser.id,
         });
         const res = await client.post("/stream", postMockStream);
@@ -486,7 +486,7 @@ describe("controllers/stream", () => {
 
       it("should reject references to other users push targets", async () => {
         const nonAdminTarget = await server.db.pushTarget.fillAndCreate({
-          ...mockPushTarget,
+          ...mockTarget,
           userId: nonAdminUser.id,
         });
         const res = await client.patch(patchPath, {
@@ -520,7 +520,7 @@ describe("controllers/stream", () => {
       });
       it("should also create inline pushTargets", async () => {
         const res = await client.patch(patchPath, {
-          pushTargets: [{ profile: "test_stream_360p", spec: mockPushTarget }],
+          pushTargets: [{ profile: "test_stream_360p", spec: mockTarget }],
         });
         expect(res.status).toBe(204);
 
