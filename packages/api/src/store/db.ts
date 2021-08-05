@@ -20,7 +20,7 @@ import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
 import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
-import MultistreamTargetTable from "./push-target-table";
+import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
 
 // Should be configurable, perhaps?

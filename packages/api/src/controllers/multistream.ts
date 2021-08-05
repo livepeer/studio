@@ -8,7 +8,7 @@ import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import { MultistreamTarget } from "../schema/types";
-import { DBMultistreamTarget } from "../store/push-target-table";
+import { DBMultistreamTarget } from "../store/multistream-table";
 
 const fieldsMap = {
   id: `multistream_target.ID`,
