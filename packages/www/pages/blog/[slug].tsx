@@ -180,7 +180,7 @@ const Post = ({
                 position: "relative",
                 maxHeight: 300,
                 height: 500,
-                width: 800,
+                width: "100%",
                 borderRadius: 16,
                 overflow: "hidden",
                 mb: "$7",
