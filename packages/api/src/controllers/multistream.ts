@@ -61,11 +61,11 @@ const forbidden = (res: Response) =>
 const badRequest = (res: Response, error: string) =>
   respondError(res, 400, error);
 
-const app = Router();
+const target = Router();
 
-app.use(authMiddleware({}));
+target.use(authMiddleware({}));
 
-app.use(
+target.use(
   mung.json(function cleanWriteOnlyResponses(data, req) {
     if (req.user.admin) {
       return data;
@@ -82,7 +82,7 @@ app.use(
   })
 );
 
-app.get("/", async (req, res) => {
+target.get("/", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const qs = toStringValues(req.query);
   const { limit: limitStr, cursor, userId, order, filters } = qs;
@@ -113,7 +113,7 @@ app.get("/", async (req, res) => {
   res.json(output);
 });
 
-app.get("/:id", async (req, res) => {
+target.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const data = await db.multistreamTarget.getAuthed(
     req.params.id,
@@ -126,7 +126,7 @@ app.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-app.post("/", validatePost("multistream-target"), async (req, res) => {
+target.post("/", validatePost("multistream-target"), async (req, res) => {
   const input = req.body as MultistreamTarget;
   const data = await db.multistreamTarget.fillAndCreate({
     name: input.name,
@@ -138,7 +138,7 @@ app.post("/", validatePost("multistream-target"), async (req, res) => {
   res.json(data);
 });
 
-app.delete("/:id", async (req, res) => {
+target.delete("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
   if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
@@ -150,7 +150,7 @@ app.delete("/:id", async (req, res) => {
   res.end();
 });
 
-app.patch("/:id", async (req, res) => {
+target.patch("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
   if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
@@ -164,5 +164,9 @@ app.patch("/:id", async (req, res) => {
   res.status(204);
   res.end();
 });
+
+const app = Router();
+
+app.use("/target", target);
 
 export default app;

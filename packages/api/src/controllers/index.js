@@ -2,7 +2,7 @@ import apiToken from "./api-token";
 import broadcaster from "./broadcaster";
 import ingest from "./ingest";
 import objectStore from "./object-store";
-import pushTarget from "./push-target";
+import multistream from "./multistream";
 import orchestrator from "./orchestrator";
 import stream from "./stream";
 import user from "./user";
@@ -20,7 +20,7 @@ export default {
   "api-token": apiToken,
   broadcaster,
   "object-store": objectStore,
-  "push-target": pushTarget,
+  multistream,
   orchestrator,
   stream,
   user,
