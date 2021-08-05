@@ -13,8 +13,8 @@ export default class MessageQueue {
 
   constructor() {
     this.queues = {
-      events: "webhook_default_queue",
-      webhooks: "webhook_cannon_single_url",
+      events: QUEUE_NAME,
+      webhooks: WEBHOOK_CANNON_SINGLE_URL,
     };
   }
 
@@ -68,7 +68,7 @@ export default class MessageQueue {
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
-      return Promise.all([channel.consume(this.queues[queueName], func)]);
+      return channel.consume(this.queues[queueName], func);
     });
   }
 
@@ -103,7 +103,7 @@ export default class MessageQueue {
         }),
       ]);
     });
-    console.log("emitting ", msg);
+    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
     await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg, {
       persistent: true,
     });
