@@ -89,6 +89,8 @@ const BlogPostCard = ({ post, css = {} }) => {
                   position: "relative",
                   width: 30,
                   height: 30,
+                  borderRadius: 1000,
+                  overflow: "hidden",
                 }}>
                 <Image
                   alt={post.author.image?.alt}
