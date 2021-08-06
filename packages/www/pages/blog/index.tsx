@@ -163,11 +163,10 @@ const BlogIndex = ({ categories, posts }) => {
               />
             ))}
           </Grid>
-
-          <Fade key={0}>
-            <Prefooter />
-          </Fade>
         </Container>
+        <Fade key={0}>
+          <Prefooter />
+        </Fade>
       </Box>
     </Layout>
   );
