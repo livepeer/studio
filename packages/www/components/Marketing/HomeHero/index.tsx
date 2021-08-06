@@ -166,7 +166,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 maxWidth: 768,
                 mx: "auto",
               }}>
-              <span>Livepeer.com</span> provides quick and reliable access to{" "}
+              Livepeer.com provides quick and reliable access to{" "}
               <Box
                 href="https://livepeer.org"
                 target="_blank"
