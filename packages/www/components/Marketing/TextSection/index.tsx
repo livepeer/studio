@@ -3,7 +3,7 @@ import { Container, Box } from "@livepeer.com/design-system";
 import Guides from "@components/Marketing/Guides";
 
 const TextSection = ({ text }) => (
-  <Box>
+  <Box css={{ position: "relative" }}>
     <Guides backgroundColor="$loContrast" />
     <Box css={{ position: "relative" }}>
       <Container

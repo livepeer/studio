@@ -3,7 +3,6 @@ import {
   Box,
   Flex,
   Button,
-  Badge,
   Text,
   styled,
   AlertDialog,
@@ -17,7 +16,7 @@ import {
 } from "@livepeer.com/design-system";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useMemo, useState } from "react";
-import { useApi } from "../../../hooks";
+import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
 import {
   FilterItem,

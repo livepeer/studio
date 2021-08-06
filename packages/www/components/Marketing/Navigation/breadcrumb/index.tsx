@@ -14,7 +14,6 @@ export type BreadcrumbItem = LinkProps & {
 
 type Props = {
   breadcrumb?: BreadcrumbItem[];
-  withLogoType: boolean;
 };
 
 const Divider = () => (
@@ -36,13 +35,13 @@ const Divider = () => (
   </Box>
 );
 
-const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
+const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   if (breadcrumb) {
     return (
       <>
-        <Logo logoType={false} />
+        <Logo />
         {breadcrumb.map((item) => (
           <Box as="span" key={`breadcrumb-${item.href}`}>
             <Box
@@ -156,7 +155,7 @@ const NavigationBreadcrumb = ({ breadcrumb, withLogoType }: Props) => {
       </>
     );
   }
-  return <Logo logoType={withLogoType} />;
+  return <Logo />;
 };
 
 export default NavigationBreadcrumb;

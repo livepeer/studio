@@ -46,7 +46,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           <Box
             css={{
               position: "relative",
-              width: "50%",
+              width: "33%",
               height: 400,
               bc: "$panel",
             }}>
@@ -65,6 +65,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
+            width: "66%",
           }}>
           <Box>
             <Text

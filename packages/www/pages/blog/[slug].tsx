@@ -144,6 +144,7 @@ const Post = ({
                     borderRadius: 1000,
                     width: 32,
                     height: 32,
+                    overflow: "hidden",
                   }}>
                   <Image
                     alt={author.image?.alt}
