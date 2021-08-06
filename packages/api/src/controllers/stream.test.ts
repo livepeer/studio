@@ -386,13 +386,13 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(201);
         const created = await res.json();
-        const resultPt = created.msTargets[0];
-        expect(resultPt.profile).toEqual("test_stream_360p");
-        expect(resultPt.spec).toBeUndefined();
-        expect(resultPt.id).toBeDefined();
-        expect(resultPt.id).not.toEqual(msTarget.id);
+        const resultMst = created.multistream.targets[0];
+        expect(resultMst.profile).toEqual("test_stream_360p");
+        expect(resultMst.spec).toBeUndefined();
+        expect(resultMst.id).toBeDefined();
+        expect(resultMst.id).not.toEqual(msTarget.id);
 
-        const saved = await server.db.multistreamTarget.get(resultPt.id);
+        const saved = await server.db.multistreamTarget.get(resultMst.id);
         expect(saved).toBeDefined();
         expect(saved.userId).toEqual(adminUser.id);
       });
