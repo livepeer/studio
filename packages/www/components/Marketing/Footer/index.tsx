@@ -138,7 +138,7 @@ const Footer = ({ hideGuides = false }) => {
               as="form"
               onSubmit={handleSubmit}
               css={{ position: "relative" }}>
-              <Logo isDark />
+              <Logo />
               <Text
                 variant="gray"
                 css={{

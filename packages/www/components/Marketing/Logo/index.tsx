@@ -1,13 +1,7 @@
 import Link from "next/link";
-import { Badge, Box, Link as A } from "@livepeer.com/design-system";
+import { Link as A } from "@livepeer.com/design-system";
 
-type Props = {
-  logoType?: boolean;
-  isDark?: boolean;
-  withoutBeta?: boolean;
-};
-
-const Logo = ({ logoType = true, withoutBeta }: Props) => (
+const Logo = () => (
   <Link href="/" passHref>
     <A
       css={{
@@ -23,14 +17,7 @@ const Logo = ({ logoType = true, withoutBeta }: Props) => (
           textDecoration: "none",
         },
       }}>
-      {logoType && "Livepeer.com"}
-      {!withoutBeta && (
-        <Badge
-          variant="violet"
-          css={{ ml: "$1", fontWeight: 700, mt: "5px", px: "$2" }}>
-          beta
-        </Badge>
-      )}
+      Livepeer.com
     </A>
   </Link>
 );

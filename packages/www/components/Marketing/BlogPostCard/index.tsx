@@ -65,6 +65,7 @@ const BlogPostCard = ({ post, css = {} }) => {
             px: "$4",
             py: "$4",
             height: "100%",
+            color: "$hiContrast",
           }}>
           <Box>
             <Text

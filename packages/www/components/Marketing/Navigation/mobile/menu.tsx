@@ -4,6 +4,7 @@ import {
   Text,
   Container,
   Link as A,
+  Button as StyledButton,
 } from "@livepeer.com/design-system";
 import { User } from "@livepeer.com/api";
 import Link from "next/link";
@@ -61,7 +62,6 @@ const Menu = ({
   token,
   user,
   links,
-  breadcrumb,
 }: Props) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) setMobileMenuIsOpen(false);
@@ -88,7 +88,8 @@ const Menu = ({
           : "none",
       }}
       onClick={handleClick}>
-      <Box
+      <StyledButton
+        ghost
         css={{
           top: "$3",
           position: "absolute",
@@ -97,7 +98,7 @@ const Menu = ({
         }}
         onClick={() => setMobileMenuIsOpen(false)}>
         <Cross1Icon />
-      </Box>
+      </StyledButton>
       <Container
         css={{
           pt: "$6",
@@ -215,9 +216,12 @@ const Menu = ({
           </>
         ) : (
           <>
-            <Link href="/login" passHref>
-              <Button arrow>Login</Button>
+            <Link href="/register" passHref>
+              <Button arrow css={{ mr: "$3" }}>
+                Sign up
+              </Button>
             </Link>
+            <ArrowLink href="/login">Login</ArrowLink>
           </>
         )}
       </Flex>

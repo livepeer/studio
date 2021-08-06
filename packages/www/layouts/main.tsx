@@ -39,6 +39,7 @@ const globalStyles = global({
     margin: 0,
     backgroundColor: "$loContrast",
     fontFamily: "$untitled",
+    color: "$hiContrast",
   },
 
   "h1, h2, h3, h4, h5": { fontWeight: 500 },

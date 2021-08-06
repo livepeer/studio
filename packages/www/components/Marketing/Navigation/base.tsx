@@ -145,7 +145,7 @@ const NavigationBase = ({
                 display: "flex",
                 alignItems: "center",
               }}>
-              <NavigationBreadcrumb breadcrumb={breadcrumb} withLogoType />
+              <NavigationBreadcrumb breadcrumb={breadcrumb} />
             </Box>
             <Flex
               css={{
