@@ -121,7 +121,7 @@ async function triggerManyIdleStreamsWebhook(ids, queue) {
     ids.map(async (id) => {
       const stream = await db.stream.get(id);
       const user = await db.user.get(stream.userId);
-      queue.emit({
+      await queue.publish("events.streams", {
         id: uuid(),
         createdAt: Date.now(),
         channel: "webhooks",
@@ -883,10 +883,7 @@ app.put(
 
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-
-    // -------------------------------
-    // new webhookCannon
-    req.queue.emit({
+    await req.queue.publish("events.streams", {
       id: uuid(),
       createdAt: Date.now(),
       channel: "webhooks",
@@ -910,7 +907,8 @@ app.put(
           const ingest = ((await req.getIngest()) ?? [])[0]?.base;
           const recordingUrl = getRecordingUrl(ingest, session);
           const mp4Url = getRecordingUrl(ingest, session, true);
-          req.queue.delayedEmit(
+          await req.queue.delayedPublish(
+            "events.recording",
             {
               id: uuid(),
               createdAt: Date.now(),
@@ -943,7 +941,7 @@ app.put(
         }
       }
       if (shouldEmit) {
-        req.queue.emit({
+        await req.queue.publish("events.recording", {
           id: uuid(),
           createdAt: Date.now(),
           channel: "webhooks",
@@ -1489,7 +1487,8 @@ app.post(
         sceneClassification,
       },
     };
-    await req.queue.emit(msg);
+
+    await req.queue.publish("events.streams", msg);
     return res.status(204).end();
   }
 );

@@ -952,7 +952,7 @@ describe("controllers/stream", () => {
           });
           expect(res.status).toBe(204);
 
-          await hookSem.wait(1000);
+          await hookSem.wait(3000);
           expect(hookPayload.createdAt).toBeGreaterThanOrEqual(now);
           expect(hookPayload.timestamp).toBeGreaterThanOrEqual(now);
           delete hookPayload.createdAt;

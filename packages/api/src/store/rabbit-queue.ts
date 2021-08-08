@@ -4,12 +4,19 @@ import { Channel, ConsumeMessage, Options } from "amqplib";
 
 const QUEUE_NAME = "webhook_default_queue";
 const EXCHANGE_NAME = "webhook_default_exchange";
+const WEBHOOK_CANNON_SINGLE_URL = "webhook_cannon_single_url";
 
 export default class MessageQueue {
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
+  private queues: Record<string, string>;
 
-  constructor() {}
+  constructor() {
+    this.queues = {
+      events: QUEUE_NAME,
+      webhooks: WEBHOOK_CANNON_SINGLE_URL,
+    };
+  }
 
   public async connect(url: string): Promise<void> {
     // Create a new connection manager
@@ -24,19 +31,15 @@ export default class MessageQueue {
 
     this.channel = await this.connection.createChannel({
       json: true,
-      setup: async function (channel: Channel) {
+      setup: async (channel: Channel) => {
         await Promise.all([
-          channel.assertQueue(QUEUE_NAME),
-          // channel.assertQueue("delayedQueue", {
-          //   messageTtl: 5000,
-          //   deadLetterExchange: EXCHANGE_NAME
-          // }),
+          channel.assertQueue(this.queues.events, { durable: true }),
+          channel.assertQueue(this.queues.webhooks, { durable: true }),
           channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
+          channel.bindQueue(this.queues.events, EXCHANGE_NAME, "events.#"),
+          channel.bindQueue(this.queues.webhooks, EXCHANGE_NAME, "webhooks.#"),
           channel.prefetch(1),
-          channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "#"),
-          // channel.consume(QUEUE_NAME, handleMessage)
         ]);
-        // return channel.assertQueue('rxQueueName', {durable: true});
       },
     });
   }
@@ -56,17 +59,16 @@ export default class MessageQueue {
     this.channel.nack(data);
   }
 
-  public async consume(func: (msg: ConsumeMessage) => void): Promise<void> {
+  public async consume(
+    queueName: string,
+    func: (msg: ConsumeMessage) => void
+  ): Promise<void> {
     if (!func) {
       throw new Error("RabbitMQ | consume | func is undefined");
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
-      return Promise.all([
-        channel.assertQueue(QUEUE_NAME),
-        channel.bindQueue(QUEUE_NAME, EXCHANGE_NAME, "#"),
-        channel.consume(QUEUE_NAME, func),
-      ]);
+      return channel.consume(this.queues[queueName], func);
     });
   }
 
@@ -76,23 +78,34 @@ export default class MessageQueue {
     this.ack(data);
   }
 
-  public async emit(msg: Object): Promise<void> {
+  public async sendToQueue(msg: Object): Promise<void> {
     console.log("emitting ", msg);
     await this.channel.sendToQueue(QUEUE_NAME, msg);
   }
 
-  public async delayedEmit(msg: Object, delay: number): Promise<void> {
-    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
+  public async publish(route: string, msg: object): Promise<void> {
+    console.log(`publishing to ${route} : ${JSON.stringify(msg)}`);
+    await this.channel.publish(EXCHANGE_NAME, route, msg, { persistent: true });
+  }
+
+  public async delayedPublish(
+    routingKey: string,
+    msg: Object,
+    delay: number
+  ): Promise<void> {
     await this.channel.addSetup((channel: Channel) => {
       return Promise.all([
         channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
-          messageTtl: delay,
+          messageTtl: delay + 100,
           deadLetterExchange: EXCHANGE_NAME,
+          deadLetterRoutingKey: routingKey,
           expires: delay + 15000,
         }),
       ]);
     });
-    console.log("emitting ", msg);
-    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg);
+    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
+    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg, {
+      persistent: true,
+    });
   }
 }
