@@ -55,7 +55,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
         <Flex justify="between" align="center">
           <Flex align="center">
             <Flex align="center">
-              <Logo />
+              <Logo badge="docs" />
             </Flex>
             <Box
               onClick={onSearchOpen}
