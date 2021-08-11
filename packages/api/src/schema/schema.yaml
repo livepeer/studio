@@ -74,6 +74,9 @@ components:
               - recording.ready
               - recording.started
               - recording.waiting
+              - multistream.connected
+              - multistream.error
+              - multistream.disconnected
         url:
           type: string
           format: uri
