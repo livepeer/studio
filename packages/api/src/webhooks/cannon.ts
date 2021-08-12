@@ -336,7 +336,13 @@ export default class WebhookCannon {
       webhookId: webhook.id,
       eventId: event.id,
       statusCode: resp.status,
-      response: resp,
+      response: {
+        body: await resp.text(),
+        headers: resp.headers.raw(),
+        redirected: resp.redirected,
+        status: resp.status,
+        statusText: resp.statusText,
+      },
     });
   }
 }
