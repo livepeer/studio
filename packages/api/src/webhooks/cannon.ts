@@ -297,12 +297,12 @@ export default class WebhookCannon {
 
       try {
         logger.info(`webhook ${webhook.id} firing`);
+        const startTime = process.hrtime();
         let resp = await fetchWithTimeout(webhook.url, params);
+        await this.storeResponse(webhook, event, resp, startTime);
         if (resp.status >= 200 && resp.status < 300) {
-          // 2xx requests are cool.
-          // all is good
+          // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
-          await this.storeResponse(webhook, event, resp);
           return true;
         }
 
@@ -313,8 +313,7 @@ export default class WebhookCannon {
         console.error(
           `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
         );
-        await this.storeResponse(webhook, event, resp);
-        // we don't retry on non 200 responses. only on timeouts
+        // we don't retry on non 400 responses. only on timeouts
         // this.retry(event);
         return;
       } catch (e) {
@@ -329,12 +328,15 @@ export default class WebhookCannon {
     webhook: DBWebhook,
     event: WebhookMessage,
     resp: Response,
-    duration = 0
+    startTime: [number, number]
   ) {
+    const hrDuration = process.hrtime(startTime);
     await this.db.webhookResponse.create({
       id: uuid(),
       webhookId: webhook.id,
       eventId: event.id,
+      createdAt: Date.now(),
+      duration: hrDuration[0] + hrDuration[1] / 1e9,
       statusCode: resp.status,
       response: {
         body: await resp.text(),
