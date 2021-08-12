@@ -88,7 +88,7 @@ const HomePage = () => {
   return (
     <Layout
       title={`Home - Livepeer.com`}
-      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      description={`Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.`}
       url={`https://livepeer.com`}>
       <HomeHero />
       <Why
