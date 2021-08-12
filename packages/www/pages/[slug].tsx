@@ -8,7 +8,14 @@ import { getComponent } from "lib/utils";
 import { useRouter } from "next/router";
 import { Box } from "@livepeer.com/design-system";
 
-const Page = ({ title, description, content, noindex = false, preview }) => {
+const Page = ({
+  title,
+  slug,
+  description,
+  content,
+  noindex = false,
+  preview,
+}) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -37,9 +44,9 @@ const Page = ({ title, description, content, noindex = false, preview }) => {
       description={
         description
           ? description
-          : `Scalable, secure live transcoding at a fraction of the cost`
+          : "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API."
       }
-      url={`https://livepeer.com`}
+      url={`https://livepeer.com/${slug.current}`}
       noindex={noindex}
       preview={preview}>
       {content.map((component, i) => (

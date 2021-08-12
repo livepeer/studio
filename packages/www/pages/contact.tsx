@@ -41,10 +41,7 @@ const ContactPage = () => {
   }, [data]);
 
   return (
-    <Layout
-      title={`Contact - Livepeer.com`}
-      description={`Scalable, secure live transcoding at a fraction of the cost`}
-      url={`https://livepeer.com/contact`}>
+    <Layout title="Contact - Livepeer.com" url={`https://livepeer.com/contact`}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container
