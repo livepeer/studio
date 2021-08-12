@@ -205,6 +205,14 @@ const NavigationBase = ({
                             For Musicians
                           </Text>
                         </ArrowLink>
+                        <ArrowLink
+                          hideArrow
+                          color="$mauve9"
+                          href="/use-cases/24x7-channels">
+                          <Text variant="gray" css={{ py: "$1" }}>
+                            24x7 Channels
+                          </Text>
+                        </ArrowLink>
                       </Box>
                     </Box>
                   </Flex>
