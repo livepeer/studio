@@ -7,16 +7,16 @@ import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
-import { PushTarget } from "../schema/types";
-import { DBPushTarget } from "../store/push-target-table";
+import { MultistreamTarget } from "../schema/types";
+import { DBMultistreamTarget } from "../store/multistream-table";
 
 const fieldsMap = {
-  id: `push_target.ID`,
-  name: `push_target.data->>'name'`,
-  url: `push_target.data->>'url'`,
-  disabled: { val: `push_target.data->'disabled'`, type: "boolean" },
-  createdAt: { val: `push_target.data->'createdAt'`, type: "int" },
-  userId: `push_target.data->>'userId'`,
+  id: `multistream_target.ID`,
+  name: `multistream_target.data->>'name'`,
+  url: `multistream_target.data->>'url'`,
+  disabled: { val: `multistream_target.data->'disabled'`, type: "boolean" },
+  createdAt: { val: `multistream_target.data->'createdAt'`, type: "int" },
+  userId: `multistream_target.data->>'userId'`,
   "user.email": `users.data->>'email'`,
 };
 
@@ -27,8 +27,8 @@ function adminListQuery(
   filters: string
 ): [SQLStatement[], FindOptions] {
   const fields =
-    " push_target.id as id, push_target.data as data, users.id as usersId, users.data as usersData";
-  const from = `push_target left join users on push_target.data->>'userId' = users.id`;
+    " multistream_target.id as id, multistream_target.data as data, users.id as usersId, users.data as usersData";
+  const from = `multistream_target left join users on multistream_target.data->>'userId' = users.id`;
   const order = parseOrder(fieldsMap, orderStr);
   const process = ({ data, usersData }) => {
     return { ...data, user: db.user.cleanWriteOnlyResponse(usersData) };
@@ -56,31 +56,33 @@ function respondError(res: Response, status: number, error: string) {
 const notFound = (res: Response) => respondError(res, 404, "not found");
 
 const forbidden = (res: Response) =>
-  respondError(res, 403, "users can only access their own push targets");
+  respondError(res, 403, "users can only access their own multistream targets");
 
 const badRequest = (res: Response, error: string) =>
   respondError(res, 400, error);
 
-const app = Router();
+const target = Router();
 
-app.use(authMiddleware({}));
+target.use(authMiddleware({}));
 
-app.use(
+target.use(
   mung.json(function cleanWriteOnlyResponses(data, req) {
     if (req.user.admin) {
       return data;
     }
     if (Array.isArray(data)) {
-      return db.pushTarget.cleanWriteOnlyResponses(data);
+      return db.multistreamTarget.cleanWriteOnlyResponses(data);
     }
     if ("id" in data) {
-      return db.pushTarget.cleanWriteOnlyResponse(data as DBPushTarget);
+      return db.multistreamTarget.cleanWriteOnlyResponse(
+        data as DBMultistreamTarget
+      );
     }
     return data;
   })
 );
 
-app.get("/", async (req, res) => {
+target.get("/", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const qs = toStringValues(req.query);
   const { limit: limitStr, cursor, userId, order, filters } = qs;
@@ -102,7 +104,7 @@ app.get("/", async (req, res) => {
     }
     [query, opts] = [{ userId }, { limit, cursor }];
   }
-  const [output, newCursor] = await db.pushTarget.find(query, opts);
+  const [output, newCursor] = await db.multistreamTarget.find(query, opts);
 
   res.status(200);
   if (output.length > 0 && newCursor) {
@@ -111,9 +113,9 @@ app.get("/", async (req, res) => {
   res.json(output);
 });
 
-app.get("/:id", async (req, res) => {
+target.get("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
-  const data = await db.pushTarget.getAuthed(
+  const data = await db.multistreamTarget.getAuthed(
     req.params.id,
     req.user.id,
     isAdmin
@@ -124,9 +126,9 @@ app.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-app.post("/", validatePost("push-target"), async (req, res) => {
-  const input = req.body as PushTarget;
-  const data = await db.pushTarget.fillAndCreate({
+target.post("/", validatePost("multistream-target"), async (req, res) => {
+  const input = req.body as MultistreamTarget;
+  const data = await db.multistreamTarget.fillAndCreate({
     name: input.name,
     url: input.url,
     disabled: input.disabled,
@@ -136,31 +138,35 @@ app.post("/", validatePost("push-target"), async (req, res) => {
   res.json(data);
 });
 
-app.delete("/:id", async (req, res) => {
+target.delete("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
+  if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
   }
-  await db.pushTarget.delete(id);
+  await db.multistreamTarget.delete(id);
 
   res.status(204);
   res.end();
 });
 
-app.patch("/:id", async (req, res) => {
+target.patch("/:id", async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
-  if (!(await db.pushTarget.hasAccess(id, req.user.id, isAdmin))) {
+  if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
     return notFound(res);
   }
   const disabledPatch = req.body.disabled;
   if (typeof disabledPatch !== "boolean") {
     return respondError(res, 422, "required boolean field: disabled");
   }
-  await db.pushTarget.update(id, { disabled: disabledPatch });
+  await db.multistreamTarget.update(id, { disabled: disabledPatch });
   res.status(204);
   res.end();
 });
+
+const app = Router();
+
+app.use("/target", target);
 
 export default app;

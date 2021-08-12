@@ -8,8 +8,8 @@ tags:
     description: Stream Endpoints
   - name: object-store
     description: Object Stores Endpoints
-  - name: push-target
-    description: Push Target Endpoints
+  - name: multistream-target
+    description: Multistream Target Endpoints
   - name: user
     description: User Endpoints
   - name: api-token
@@ -74,6 +74,9 @@ components:
               - recording.ready
               - recording.started
               - recording.waiting
+              - multistream.connected
+              - multistream.error
+              - multistream.disconnected
         url:
           type: string
           format: uri
@@ -320,42 +323,47 @@ components:
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
           description:
             ID of object store where to which this stream was recorded
-        pushTargets:
-          type: array
-          example: [{ "id": "PUSH123", "profile": "720p" }]
-          description:
-            References to targets where this stream will be simultaneously
-            pushed to
-          items:
-            type: object
-            required: [profile]
-            additionalProperties: false
-            properties:
-              profile:
-                type: string
-                description:
-                  Name of transcoding profile that should be sent. Use "source"
-                  for pushing source stream data
-                minLength: 1
-                maxLength: 500
-                example: 720p
-              id:
-                type: string
-                description: ID of push target object where to push this stream
-              spec:
+        multistream:
+          type: object
+          properties:
+            targets:
+              type: array
+              example: [{ "id": "PUSH123", "profile": "720p" }]
+              description:
+                References to targets where this stream will be simultaneously
+                streamed to
+              items:
                 type: object
-                writeOnly: true
-                description:
-                  Inline push target object. Will automatically create the
-                  push-target to be used by the created stream.
-                required:
-                  - url
+                required: [profile]
                 additionalProperties: false
                 properties:
-                  name:
+                  profile:
                     type: string
-                  url:
-                    $ref: "#/components/schemas/push-target/properties/url"
+                    description:
+                      Name of transcoding profile that should be sent. Use
+                      "source" for pushing source stream data
+                    minLength: 1
+                    maxLength: 500
+                    example: 720p
+                  id:
+                    type: string
+                    description:
+                      ID of multistream target object where to push this stream
+                  spec:
+                    type: object
+                    writeOnly: true
+                    description:
+                      Inline multistream target object. Will automatically
+                      create the target resource to be used by the created
+                      stream.
+                    required:
+                      - url
+                    additionalProperties: false
+                    properties:
+                      name:
+                        type: string
+                      url:
+                        $ref: "#/components/schemas/multistream-target/properties/url"
         wowza:
           type: object
           required:
@@ -453,8 +461,8 @@ components:
           $ref: "#/components/schemas/stream/properties/record"
         suspended:
           $ref: "#/components/schemas/stream/properties/suspended"
-        pushTargets:
-          $ref: "#/components/schemas/stream/properties/pushTargets"
+        multistream:
+          $ref: "#/components/schemas/stream/properties/multistream"
 
     session:
       type: object
@@ -657,9 +665,9 @@ components:
             Timestamp (in milliseconds) at which object store object was created
           example: 1587667174725
 
-    push-target:
+    multistream-target:
       type: object
-      table: push_target
+      table: multistream_target
       required:
         - url
       additionalProperties: false
@@ -673,15 +681,16 @@ components:
         url:
           type: string
           writeOnly: true
-          description: Livepeer-compatible push target URL (RTMP(S) or SRT)
+          description:
+            Livepeer-compatible multistream target URL (RTMP(S) or SRT)
           example: rtmps://live.my-service.tv/channel/secretKey
           format: uri
           pattern: ^(srt|rtmps?)://
         disabled:
           type: boolean
           description:
-            If true then this push target will not be used for pushing even if
-            it is configured in a stream object.
+            If true then this multistream target will not be used for pushing
+            even if it is configured in a stream object.
         userId:
           type: string
           readOnly: true
@@ -691,7 +700,8 @@ components:
           type: number
           readOnly: true
           description:
-            Timestamp (in milliseconds) at which push target object was created
+            Timestamp (in milliseconds) at which multistream target object was
+            created
           example: 1587667174725
 
     api-token:
@@ -1208,12 +1218,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /push-target:
+  /multistream/target:
     tags:
-      - push-target
+      - multistream-target
 
     get:
-      description: Lists existing push targets
+      description: Lists existing multistream targets
       responses:
         200:
           description: Success
@@ -1222,7 +1232,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/push-target"
+                  $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
@@ -1231,13 +1241,13 @@ paths:
                 $ref: "#/components/schemas/error"
 
     post:
-      description: Creates new push target
+      description: Creates new multistream target
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/push-target"
+              $ref: "#/components/schemas/multistream-target"
       responses:
         201:
           description: Success
@@ -1246,7 +1256,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/push-target"
+                  $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
@@ -1254,26 +1264,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /push-target/{id}:
+  /multistream/target/{id}:
     tags:
-      - push-target
+      - multistream-target
     parameters:
       - name: id
-        description: ID of the push-target
+        description: ID of the multistream target
         in: path
         required: true
         schema:
           type: string
 
     get:
-      description: Gets a specific push target details
+      description: Gets a specific multistream target details
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/push-target"
+                $ref: "#/components/schemas/multistream-target"
         default:
           description: Error
           content:
@@ -1282,7 +1292,7 @@ paths:
                 $ref: "#/components/schemas/error"
 
     patch:
-      description: Enables or disables an existing push target
+      description: Enables or disables an existing multistream target
       requestBody:
         required: true
         content:
@@ -1292,7 +1302,7 @@ paths:
               additionalProperties: false
               properties:
                 disabled:
-                  $ref: "#/components/schemas/push-target/properties/disabled"
+                  $ref: "#/components/schemas/multistream-target/properties/disabled"
       responses:
         204:
           description: Success
@@ -1304,7 +1314,7 @@ paths:
                 $ref: "#/components/schemas/error"
 
     delete:
-      description: Deletes an existing push target
+      description: Deletes an existing multistream target
       responses:
         204:
           description: Success

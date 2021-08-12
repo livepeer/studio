@@ -1,14 +1,14 @@
 import { URL } from "url";
 import * as uuid from "uuid";
 
-import { PushTarget } from "../schema/types";
+import { MultistreamTarget } from "../schema/types";
 import Table from "./table";
 import { GetOptions, WithID } from "./types";
 import { InternalServerError, UnprocessableEntityError } from "./errors";
 
-export type DBPushTarget = WithID<PushTarget>;
+export type DBMultistreamTarget = WithID<MultistreamTarget>;
 
-export interface PushTargetInput {
+export interface MultistreamTargetInput {
   name?: string;
   url: string;
   disabled?: boolean;
@@ -23,10 +23,10 @@ const parseUrl = (url: string) => {
   }
 };
 
-export default class PushTargetTable extends Table<DBPushTarget> {
-  async fillAndCreate(input: PushTargetInput) {
+export default class MultistreamTargetTable extends Table<DBMultistreamTarget> {
+  async fillAndCreate(input: MultistreamTargetInput) {
     const url = parseUrl(input.url);
-    const pushTarget: Required<PushTarget> = {
+    const target: Required<MultistreamTarget> = {
       id: uuid.v4(),
       name: input.name || url.host,
       url: input.url,
@@ -34,16 +34,16 @@ export default class PushTargetTable extends Table<DBPushTarget> {
       userId: input.userId,
       createdAt: Date.now(),
     };
-    await super.create(pushTarget);
+    await super.create(target);
 
-    const created = await this.get(pushTarget.id, { useReplica: false });
+    const created = await this.get(target.id, { useReplica: false });
     if (!created) {
-      throw new InternalServerError("error creating new push target");
+      throw new InternalServerError("error creating new multistream target");
     }
     return created;
   }
 
-  async create(doc: DBPushTarget) {
+  async create(doc: DBMultistreamTarget) {
     throw new Error("Unimplemented API, use fillAndCreate instead");
     return doc;
   }
@@ -54,8 +54,8 @@ export default class PushTargetTable extends Table<DBPushTarget> {
     isAdmin: boolean,
     opts?: GetOptions
   ) {
-    const pushTarget = await super.get(id, opts);
-    return isAdmin || userId === pushTarget?.userId ? pushTarget : null;
+    const target = await super.get(id, opts);
+    return isAdmin || userId === target?.userId ? target : null;
   }
 
   async hasAccess(id: string, userId: string, isAdmin: boolean = false) {

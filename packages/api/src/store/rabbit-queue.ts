@@ -18,18 +18,10 @@ export default class MessageQueue {
     };
   }
 
-  public async connect(url: string): Promise<void> {
+  public connect(url: string): Promise<void> {
     // Create a new connection manager
-    this.connection = await amqp.connect([url]);
-    this.connection.on("connect", () => console.log("AMQP Connected!"));
-    this.connection.on("disconnect", (err: Error) =>
-      console.log("AMQP Disconnected.", err)
-    );
-    this.connection.on("error", (error: Error) => {
-      console.error(`Connection error: ${error}`);
-    });
-
-    this.channel = await this.connection.createChannel({
+    this.connection = amqp.connect([url]);
+    this.channel = this.connection.createChannel({
       json: true,
       setup: async (channel: Channel) => {
         await Promise.all([
@@ -41,6 +33,23 @@ export default class MessageQueue {
           channel.prefetch(1),
         ]);
       },
+    });
+    return new Promise<void>((resolve, reject) => {
+      let resolveOnce = (err?: Error) => {
+        if (!resolve) return;
+        err ? reject(err) : resolve();
+        resolve = null;
+      };
+      this.connection.on("connect", () => {
+        console.log("AMQP Connected!");
+        resolveOnce();
+      });
+      this.connection.on("disconnect", ({ err }: { err: Error }) => {
+        console.log("AMQP Disconnected.", err);
+        resolveOnce(
+          new Error(`Error connecting to RabbitMQ. ${err.name}: ${err.message}`)
+        );
+      });
     });
   }
 
