@@ -12,10 +12,9 @@ const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
   return (
     <Layout
-      title={`Team - Livepeer.com`}
-      description={`We’re building the future of video infrastructure services.`}
-      url={`https://livepeer.com/team`}
-      canonical={`https://livepeer.com/team`}>
+      title="Team - Livepeer.com"
+      description="We’re building the future of video infrastructure services."
+      url="https://livepeer.com/team">
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container

@@ -21,7 +21,7 @@ const Page = ({ title, slug, body, noindex = false, preview }) => {
   return (
     <Layout
       title={`${title} - Livepeer.com`}
-      description={`Join Us. From Anywhere.`}
+      description="Join Us. From Anywhere."
       url={`https://livepeer.com/jobs/${slug}`}
       canonical={`https://livepeer.com/jobs/${slug}`}
       noindex={noindex}

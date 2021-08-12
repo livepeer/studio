@@ -34,8 +34,7 @@ const ResetPasswordPage = () => {
 
   return (
     <Layout
-      title={`Reset Password - Livepeer.com`}
-      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
+      title="Reset Password - Livepeer.com"
       url={`https://livepeer.com/reset-password`}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>

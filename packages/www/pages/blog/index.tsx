@@ -57,7 +57,7 @@ const BlogIndex = ({ categories, posts }) => {
       title={`Blog - ${
         slug ? capitalizeFirstLetter(slug) + " Category - " : ""
       }Livepeer.com`}
-      description={`Blog posts from the Livepeer.com team and community. Discover the latest in video development.`}
+      description="Blog posts from the Livepeer.com team and community. Discover the latest in video development."
       url={`https://livepeer.com${asPath}`}>
       <Guides />
       <Box css={{ position: "relative" }}>

@@ -8,9 +8,9 @@ import Guides from "@components/Marketing/Guides";
 const PricingPage = () => {
   return (
     <Layout
-      title={`Pricing - Livepeer.com`}
-      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com/pricing`}>
+      title="Pricing - Livepeer.com"
+      description="Start free. Then pay as you grow. Enjoy flexible pricing for projects of all sizes."
+      url="https://livepeer.com/pricing">
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container

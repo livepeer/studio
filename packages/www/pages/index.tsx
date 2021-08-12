@@ -86,10 +86,7 @@ const featuresListItems = [
 
 const HomePage = () => {
   return (
-    <Layout
-      title={`Home - Livepeer.com`}
-      description={`The world’s most affordable, powerful and easy-to-use video streaming API, powered by Livepeer.`}
-      url={`https://livepeer.com`}>
+    <Layout title="Home - Livepeer.com" url="https://livepeer.com">
       <HomeHero />
       <Why
         backgroundColor="$panel"
