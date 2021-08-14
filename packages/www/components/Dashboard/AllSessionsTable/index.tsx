@@ -117,7 +117,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
           dateSort("original.created.date", ...params),
       },
       {
-        Header: "Session duration",
+        Header: "Duration",
         accessor: "duration",
         Cell: DurationCell,
         sortType: (...params: SortTypeArgs) =>

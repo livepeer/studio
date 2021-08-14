@@ -92,13 +92,40 @@ type SessionsTableData = {
   duration: DurationCellProps;
 };
 
+const defaultEmptyState = (
+  <Flex
+    direction="column"
+    justify="center"
+    css={{
+      margin: "0 auto",
+      height: "calc(100vh - 400px)",
+      maxWidth: 450,
+    }}>
+    <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
+    <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
+      Sessions belong to parent streams.
+    </Text>
+    <Link href="/docs/api-reference/session/overview" passHref>
+      <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+        <Box>Learn more</Box>
+        <ArrowRightIcon />
+      </A>
+    </Link>
+  </Flex>
+);
+
 const StreamSessionsTable = ({
   title = "Sessions",
   streamId,
+  emptyState = defaultEmptyState,
+  border = false,
+  tableLayout = "fixed",
 }: {
   title?: string;
   streamId: string;
-  mt?: string | number;
+  emptyState?: React.ReactNode;
+  border?: boolean;
+  tableLayout?: string;
 }) => {
   const { user, getStreamSessions } = useApi();
   const tableProps = useTableState({
@@ -116,7 +143,7 @@ const StreamSessionsTable = ({
           dateSort("original.created.date", ...params),
       },
       {
-        Header: "Session duration",
+        Header: "Duration",
         accessor: "duration",
         Cell: DurationCell,
         sortType: (...params: SortTypeArgs) =>
@@ -216,28 +243,6 @@ const StreamSessionsTable = ({
     [getStreamSessions, user.id]
   );
 
-  const emptyState = (
-    <Flex
-      direction="column"
-      justify="center"
-      css={{
-        margin: "0 auto",
-        height: "calc(100vh - 400px)",
-        maxWidth: 450,
-      }}>
-      <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
-      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-        Sessions belong to parent streams.
-      </Text>
-      <Link href="/docs/api-reference/session/overview" passHref>
-        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
-          <Box>Learn more</Box>
-          <ArrowRightIcon />
-        </A>
-      </Link>
-    </Flex>
-  );
-
   return (
     <Box>
       <Table
@@ -247,6 +252,7 @@ const StreamSessionsTable = ({
             <Heading>{title}</Heading>
           </>
         }
+        border={border}
         filterItems={filterItems}
         columns={columns}
         fetcher={fetcher}
@@ -254,6 +260,7 @@ const StreamSessionsTable = ({
         initialSortBy={[{ id: "created", desc: true }]}
         showOverflow={true}
         emptyState={emptyState}
+        tableLayout={tableLayout}
       />
     </Box>
   );

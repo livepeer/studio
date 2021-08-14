@@ -75,6 +75,8 @@ type Props<T extends Record<string, unknown>> = {
   fetcher: Fetcher<T>;
   emptyState?: React.ReactNode;
   viewAll?: string;
+  border?: boolean;
+  tableLayout?: string;
 };
 
 const TableComponent = <T extends Record<string, unknown>>({
@@ -92,6 +94,8 @@ const TableComponent = <T extends Record<string, unknown>>({
   createAction,
   emptyState,
   viewAll,
+  border = false,
+  tableLayout = "fixed",
 }: Props<T>) => {
   const queryKey = useMemo(() => {
     return [state.tableId, state.cursor, state.order, state.stringifiedFilters];
@@ -235,9 +239,16 @@ const TableComponent = <T extends Record<string, unknown>>({
 
   return (
     <Box>
-      <Flex align="end" justify="between" css={{ mb: "$5" }}>
+      <Flex
+        align="end"
+        justify="between"
+        css={{
+          mb: "$3",
+          borderBottom: "1px solid",
+          borderColor: border ? "$mauve5" : "transparent",
+          pb: border ? "$2" : 0,
+        }}>
         <Box>{header}</Box>
-
         <Flex css={{ alignItems: "center" }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
@@ -307,7 +318,7 @@ const TableComponent = <T extends Record<string, unknown>>({
             css={{
               margin: "0 auto",
               height: "calc(100vh - 400px)",
-              maxWidth: 450,
+              maxWidth: 300,
             }}>
             <Heading css={{ fontWeight: 500, mb: "$3" }}>
               No results found
@@ -327,6 +338,8 @@ const TableComponent = <T extends Record<string, unknown>>({
                 minWidth: "100%",
                 borderCollapse: "collapse",
                 borderSpacing: "$3",
+                // @ts-ignore
+                tableLayout,
               }}>
               <Thead>
                 {headerGroups.map((headerGroup) => (
