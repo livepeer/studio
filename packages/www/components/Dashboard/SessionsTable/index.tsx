@@ -76,7 +76,6 @@ const RecordingUrlCell = <D extends TableData>({
 };
 
 const filterItems: FilterItem[] = [
-  { label: "Session Name", id: "name", type: "text" },
   { label: "Created Date", id: "createdAt", type: "date" },
   {
     label: "Duration (in minutes)",
