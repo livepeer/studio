@@ -66,7 +66,6 @@ const Health = () => {
     { name: 0, kbps: 0 },
   ]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
-  const [videoExists, setVideoExists] = useState<boolean>(false);
   const [playbackUrl, setPlaybackUrl] = useState<string>("");
   const { getStreamInfo } = useApi();
 
@@ -170,7 +169,6 @@ const Health = () => {
                 overflow: "hidden",
               }}>
               <Player
-                setVideo={setVideoExists}
                 src={playbackUrl}
                 config={{
                   controlPanelElements: [
@@ -205,7 +203,6 @@ const Health = () => {
                 overflow: "hidden",
               }}>
               <Player
-                setVideo={setVideoExists}
                 src={playbackUrl}
                 config={{
                   controlPanelElements: [
