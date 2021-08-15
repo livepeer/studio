@@ -67,18 +67,8 @@ const Chart = ({ data }) => {
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorKbps" x1="0" y1="0" x2="0" y2="1">
-              <Box
-                as="stop"
-                offset="5%"
-                stopColor="$violet9"
-                stopOpacity={0.8}
-              />
-              <Box
-                as="stop"
-                offset="95%"
-                stopColor="$violet9"
-                stopOpacity={0}
-              />
+              <stop offset="5%" stopColor="#6E56CF" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#6E56CF" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis dataKey="name" />

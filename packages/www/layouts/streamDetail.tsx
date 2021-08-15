@@ -407,7 +407,7 @@ const StreamDetail = ({
                         </Badge>
                       )}
                       <Player
-                        setVideo={videoExists}
+                        setVideo={setVideoExists}
                         src={globalPlaybackUrl}
                         config={{
                           controlPanelElements: [
