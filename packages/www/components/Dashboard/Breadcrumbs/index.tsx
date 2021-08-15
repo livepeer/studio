@@ -48,6 +48,7 @@ const Breadcrumbs = ({ children }) => {
         css={{
           m: 0,
           fontSize: "$3",
+          lineHeight: 1.5,
         }}
         key={`child-${index}`}>
         <Box css={{ display: "inline-flex" }}>{child}</Box>
