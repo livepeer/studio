@@ -179,7 +179,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
                   <HoverCardRoot openDelay={200}>
                     <HoverCardTrigger>
-                      <Flex css={{ height: 25, ai: "center" }}>
+                      <Flex css={{ ai: "center" }}>
                         <CopyToClipboard
                           text={stream.recordingUrl}
                           onCopy={() => openSnackbar("Copied to clipboard")}>
