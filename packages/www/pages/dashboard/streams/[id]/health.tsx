@@ -90,7 +90,7 @@ const Health = () => {
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name, href: `/dashboard/streams/${id}` },
-        { title: "Stream Health" },
+        { title: "Health" },
       ]}>
       <Box
         css={{
