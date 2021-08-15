@@ -21,7 +21,6 @@ import {
   useSnackbar,
 } from "@livepeer.com/design-system";
 import Layout from "layouts/dashboard";
-import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
@@ -41,7 +40,7 @@ import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
-import { useQuery, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 
 type ShowURLProps = {
   url: string;
@@ -210,8 +209,6 @@ const StreamDetail = ({
   const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
-  const [videoExists, setVideoExists] = useState<boolean>(false);
-
   const queryClient = useQueryClient();
 
   const invalidateQuery = useCallback(() => {
@@ -258,14 +255,6 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
-  useEffect(() => {
-    if (stream?.isActive) {
-      setVideoExists(true);
-    } else {
-      setVideoExists(false);
-    }
-  }, [stream?.isActive]);
-
   if (!user || user.emailValid === false) {
     return <Layout />;
   }
@@ -277,17 +266,11 @@ const StreamDetail = ({
   if (!region && lastSession && lastSession.region) {
     region = lastSession.region;
   }
-  let broadcasterPlaybackUrl;
+
   const playbackId = (stream || {}).playbackId || "";
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
-
-  if (stream && stream.region && !lastSession) {
-    broadcasterPlaybackUrl = `https://${stream.region}.livepeer.${domain}/stream/${stream.id}.m3u8`;
-  } else if (lastSession && lastSession.region) {
-    broadcasterPlaybackUrl = `https://${lastSession.region}.livepeer.${domain}/stream/${playbackId}.m3u8`;
-  }
 
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
@@ -375,55 +358,66 @@ const StreamDetail = ({
                         mb: "$7",
                       }}>
                       {stream.isActive ? (
-                        <Badge
-                          size="2"
-                          variant="green"
-                          css={{
-                            position: "absolute",
-                            zIndex: 1,
-                            left: 10,
-                            top: 10,
-                            letterSpacing: 0,
-                          }}>
-                          <Box css={{ mr: 5 }}>
-                            <Status size="1" variant="green" />
-                          </Box>
-                          Active
-                        </Badge>
+                        <>
+                          <Badge
+                            size="2"
+                            variant="green"
+                            css={{
+                              position: "absolute",
+                              zIndex: 1,
+                              left: 10,
+                              top: 10,
+                              letterSpacing: 0,
+                            }}>
+                            <Box css={{ mr: 5 }}>
+                              <Status size="1" variant="green" />
+                            </Box>
+                            Active
+                          </Badge>
+                          <Player
+                            src={globalPlaybackUrl}
+                            config={{
+                              controlPanelElements: [
+                                "time_and_duration",
+                                "play_pause",
+                                "rewind",
+                                "fast_forward",
+                                "mute",
+                                "volume",
+                                "spacer",
+                                "fullscreen",
+                                "overflow_menu",
+                              ],
+                              overflowMenuButtons: ["quality"],
+                            }}
+                          />
+                        </>
                       ) : (
-                        <Badge
-                          size="2"
+                        <Box
                           css={{
-                            position: "absolute",
-                            zIndex: 1,
-                            left: 10,
-                            top: 10,
-                            letterSpacing: 0,
+                            width: "100%",
+                            height: 238,
+                            borderRadius: "$2",
+                            overflow: "hidden",
+                            position: "relative",
+                            bc: "#28282c",
                           }}>
-                          <Box css={{ mr: 5 }}>
-                            <Status size="1" />
-                          </Box>
-                          Idle
-                        </Badge>
+                          <Badge
+                            size="2"
+                            css={{
+                              position: "absolute",
+                              zIndex: 1,
+                              left: 10,
+                              top: 10,
+                              letterSpacing: 0,
+                            }}>
+                            <Box css={{ mr: 5 }}>
+                              <Status size="1" />
+                            </Box>
+                            Idle
+                          </Badge>
+                        </Box>
                       )}
-                      <Player
-                        setVideo={setVideoExists}
-                        src={globalPlaybackUrl}
-                        config={{
-                          controlPanelElements: [
-                            "time_and_duration",
-                            "play_pause",
-                            "rewind",
-                            "fast_forward",
-                            "mute",
-                            "volume",
-                            "spacer",
-                            "fullscreen",
-                            "overflow_menu",
-                          ],
-                          overflowMenuButtons: ["quality"],
-                        }}
-                      />
                     </Box>
                   </Box>
                   <Box
