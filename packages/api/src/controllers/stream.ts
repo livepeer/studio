@@ -20,7 +20,7 @@ import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
 import { IStore } from "../types/common";
-import { WebhookMessage } from "../webhooks/cannon";
+import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
 import {
@@ -1486,7 +1486,7 @@ app.post(
     }
     console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
 
-    const msg: WebhookMessage = {
+    const msg: messages.WebhookEvent = {
       id: uuid(),
       event: "stream.detection",
       createdAt: Date.now(),

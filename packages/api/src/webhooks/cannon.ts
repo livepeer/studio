@@ -1,40 +1,25 @@
+import { ConsumeMessage } from "amqplib";
+import { promises as dns } from "dns";
+import isLocalIP from "is-local-ip";
+import { Response } from "node-fetch";
+import { v4 as uuid } from "uuid";
+import { parse as parseUrl } from "url";
+
+import messages from "../store/messages";
 import { DB } from "../store/db";
 import { User, Stream } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
-// import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
 import { DBWebhook, EventKey } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 import { sign } from "../controllers/helpers";
-
-import uuid from "uuid/v4";
-import { parse as parseUrl } from "url";
-import { ConsumeMessage } from "amqplib";
-import { Response } from "node-fetch";
-const isLocalIP = require("is-local-ip");
-const { Resolver } = require("dns").promises;
 // const resolver = new Resolver();
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;
 const BACKOFF_COEF = 1.2;
 const MAX_RETRIES = 20;
-
-export interface TPayload {
-  [key: string]: any;
-}
-export interface WebhookMessage {
-  id: string;
-  event: EventKey;
-  createdAt: number;
-  userId: string;
-  streamId: string;
-  payload?: TPayload;
-  retries?: number;
-  lastInterval?: number;
-  status?: string;
-}
 
 export default class WebhookCannon {
   db: DB;
@@ -48,7 +33,7 @@ export default class WebhookCannon {
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
-    this.resolver = new Resolver();
+    this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
   }
@@ -69,7 +54,7 @@ export default class WebhookCannon {
       this.queue.ack(data);
       return;
     }
-    let event: WebhookMessage = message;
+    let event: messages.WebhookEvent = message;
 
     if (event.event === "recording.ready") {
       if (!event.payload.sessionId) {
@@ -199,7 +184,7 @@ export default class WebhookCannon {
     return newInterval | 0;
   }
 
-  retry(event: WebhookMessage) {
+  retry(event: messages.WebhookEvent) {
     if (event && event.retries && event.retries >= MAX_RETRIES) {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${event.id}, streamId: ${event.streamId}`
@@ -221,7 +206,7 @@ export default class WebhookCannon {
   }
 
   async _fireHook(
-    event: WebhookMessage,
+    event: messages.WebhookEvent,
     webhook: DBWebhook,
     sanitized: Stream,
     user: User,
@@ -326,7 +311,7 @@ export default class WebhookCannon {
 
   async storeResponse(
     webhook: DBWebhook,
-    event: WebhookMessage,
+    event: messages.WebhookEvent,
     resp: Response,
     startTime: [number, number]
   ) {
