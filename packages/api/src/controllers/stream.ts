@@ -1487,6 +1487,7 @@ app.post(
     console.log(`DetectionWebhookPayload: ${JSON.stringify(req.body)}`);
 
     const msg: messages.WebhookEvent = {
+      type: "webhook_event",
       id: uuid(),
       event: "stream.detection",
       createdAt: Date.now(),
