@@ -15,7 +15,7 @@ const TextCell = <D extends TableData>({
 }: CellComponentProps<D, TextCellProps>) => {
   const pid = "tooltip-" + cell.value.id;
   return (
-    <Box>
+    <Box css={{ lineHeight: 1.5 }}>
       {cell.value.tooltipChildren ? (
         <ReactTooltip
           id={pid}

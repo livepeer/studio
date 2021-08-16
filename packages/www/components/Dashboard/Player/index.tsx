@@ -6,7 +6,6 @@ const Player = ({
   src,
   posterUrl = "https://via.placeholder.com/160x90/1e1e21/1e1e21",
   config = {},
-  setVideo,
 }) => {
   const video: any = useRef(null);
   const videoContainer: any = useRef(null);
@@ -52,12 +51,6 @@ const Player = ({
   return (
     <Box className="shadow-lg mx-auto max-w-ful" ref={videoContainer}>
       <video
-        onEmptied={() => {
-          setVideo ? setVideo(false) : null;
-        }}
-        onCanPlay={() => {
-          setVideo ? setVideo(true) : null;
-        }}
         muted
         autoPlay
         id="video"

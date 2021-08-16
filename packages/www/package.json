@@ -97,7 +97,7 @@
     "remark-emoji": "^2.1.0",
     "remark-slug": "^6.0.0",
     "sanity-mux-player": "^0.0.27",
-    "shaka-player": "^3.1.0",
+    "shaka-player": "3.2.0",
     "theme-ui": "0.3.1",
     "title": "^3.4.3",
     "toc": "^0.4.0",

@@ -76,7 +76,6 @@ const RecordingUrlCell = <D extends TableData>({
 };
 
 const filterItems: FilterItem[] = [
-  { label: "Session Name", id: "name", type: "text" },
   { label: "Created Date", id: "createdAt", type: "date" },
   {
     label: "Duration (in minutes)",
@@ -117,7 +116,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
           dateSort("original.created.date", ...params),
       },
       {
-        Header: "Session duration",
+        Header: "Duration",
         accessor: "duration",
         Cell: DurationCell,
         sortType: (...params: SortTypeArgs) =>
@@ -179,7 +178,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                 stream.recordingUrl && stream.recordingStatus === "ready" ? (
                   <HoverCardRoot openDelay={200}>
                     <HoverCardTrigger>
-                      <Flex css={{ height: 25, ai: "center" }}>
+                      <Flex css={{ ai: "center" }}>
                         <CopyToClipboard
                           text={stream.recordingUrl}
                           onCopy={() => openSnackbar("Copied to clipboard")}>

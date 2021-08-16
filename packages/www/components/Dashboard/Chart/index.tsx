@@ -34,11 +34,18 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const Chart = ({ data }) => {
   return (
-    <Box css={{ width: "100%", position: "relative" }}>
+    <Box
+      css={{
+        width: "100%",
+        position: "relative",
+        ".recharts-cartesian-axis-tick": {
+          fontSize: "$2",
+        },
+      }}>
       <Text
+        variant="gray"
+        size="1"
         css={{
-          color: "#666666",
-          fontSize: "12px",
           transform: "rotate(-90deg)",
           position: "absolute",
           left: "-70px",
@@ -47,9 +54,9 @@ const Chart = ({ data }) => {
         kbps (multiplied by 1000)
       </Text>
       <Text
+        variant="gray"
+        size="1"
         css={{
-          color: "#666666",
-          fontSize: "12px",
           position: "absolute",
           bottom: "-30px",
           left: "50px",

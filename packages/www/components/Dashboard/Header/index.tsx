@@ -49,7 +49,6 @@ const StyledHyperlinkIcon = styled(HyperlinkIcon, {
 const StyledQuestionMarkIcon = styled(QuestionIcon, {
   color: "$hiContrast",
   cursor: "pointer",
-  mr: "$1",
 });
 
 const reactions: string[] = ["🤩", "😀", "😕", "😭"];
@@ -251,6 +250,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 appearance: "none",
                 WebkitAppearance: "none",
                 border: "none",
+                p: 0,
               }}>
               <StyledQuestionMarkIcon />
             </Box>
@@ -262,8 +262,9 @@ const Header = ({ breadcrumbs = [] }) => {
                 boxShadow:
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
                 background: "$panel",
+                right: "-13px",
               }}>
-              <Box css={{ position: "absolute", right: "4px", top: "-12px" }}>
+              <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
               <Text size="2" css={{ mb: "$3", color: "$mauve9" }}>

@@ -109,7 +109,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
     <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenu.Trigger
         as={Button}
-        css={{ display: "flex", ai: "center", marginRight: "6px" }}
+        css={{ display: "flex", ai: "center" }}
         size="2"
         variant="gray">
         <Flex css={{ marginRight: "5px" }}>
