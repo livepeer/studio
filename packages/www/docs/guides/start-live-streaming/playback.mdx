@@ -45,3 +45,9 @@ If this isn't the case, confirm the `streamKey` and RTMP ingest URL,
 software.
 
 Lastly, check that your playback URL is correct.
+
+## Audio-only streams
+
+You can use `?video=false` at the end of an `.m3u8` URL to get an audio-only
+stream. For example,
+`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8?video=false`.
