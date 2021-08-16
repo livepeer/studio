@@ -101,25 +101,25 @@ export default class WebhookCannon {
         );
       }
 
-      const triggers = webhooks.map<messages.WebhookTrigger>((webhook) => ({
-        type: "webhook_trigger",
-        id: uuid(),
-        event,
-        stream: sanitized,
-        user,
-        webhook,
-      }));
-      await Promise.all(
-        triggers.map(async (trigger) => {
-          try {
-            await this.queue.publish("webhooks.triggers", trigger);
-          } catch (error) {
-            console.log("Error firing single url webhook trigger", error);
-            setTimeout(() => this.queue.nack(data), 1000);
-            return;
-          }
-        })
-      );
+      try {
+        const triggers = webhooks.map<messages.WebhookTrigger>((webhook) => ({
+          type: "webhook_trigger",
+          id: uuid(),
+          event,
+          stream: sanitized,
+          user,
+          webhook,
+        }));
+        await Promise.all(
+          triggers.map((trigger) =>
+            this.queue.publish("webhooks.triggers", trigger)
+          )
+        );
+      } catch (error) {
+        console.log("Error publish webhook trigger message: ", error);
+        setTimeout(() => this.queue.nack(data), 1000);
+        return;
+      }
     } catch (err) {
       console.log("handleEventQueue Error ", err);
     }
