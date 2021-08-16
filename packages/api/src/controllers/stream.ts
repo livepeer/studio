@@ -32,6 +32,7 @@ import {
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
+import MessageQueue from "../store/rabbit-queue";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -126,15 +127,18 @@ async function validateMultistreamOpts(
   return { targets };
 }
 
-async function triggerManyIdleStreamsWebhook(ids, queue) {
+async function triggerManyIdleStreamsWebhook(
+  ids: string[],
+  queue: MessageQueue
+) {
   return Promise.all(
     ids.map(async (id) => {
       const stream = await db.stream.get(id);
       const user = await db.user.get(stream.userId);
-      await queue.publish("events.streams", {
+      await queue.publish("events.stream.idle", {
+        type: "webhook_event",
         id: uuid(),
         createdAt: Date.now(),
-        channel: "webhooks",
         event: "stream.idle",
         streamId: stream.id,
         userId: user.id,
@@ -893,11 +897,12 @@ app.put(
 
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-    await req.queue.publish("events.streams", {
+    const event = req.body.active === true ? "stream.started" : "stream.idle";
+    await req.queue.publish(`events.${event}`, {
+      type: "webhook_event",
       id: uuid(),
       createdAt: Date.now(),
-      channel: "webhooks",
-      event: req.body.active === true ? "stream.started" : "stream.idle",
+      event: event,
       streamId: id,
       userId: user.id,
     });
@@ -918,11 +923,11 @@ app.put(
           const recordingUrl = getRecordingUrl(ingest, session);
           const mp4Url = getRecordingUrl(ingest, session, true);
           await req.queue.delayedPublish(
-            "events.recording",
+            "events.recording.ready",
             {
+              type: "webhook_event",
               id: uuid(),
               createdAt: Date.now(),
-              channel: "webhooks",
               event: "recording.ready",
               streamId: id,
               userId: user.id,
@@ -951,10 +956,10 @@ app.put(
         }
       }
       if (shouldEmit) {
-        await req.queue.publish("events.recording", {
+        await req.queue.publish("events.recording.started", {
+          type: "webhook_event",
           id: uuid(),
           createdAt: Date.now(),
-          channel: "webhooks",
           event: "recording.started",
           streamId: id,
           userId: user.id,
@@ -1499,7 +1504,7 @@ app.post(
       },
     };
 
-    await req.queue.publish("events.streams", msg);
+    await req.queue.publish("events.stream.detection", msg);
     return res.status(204).end();
   }
 );

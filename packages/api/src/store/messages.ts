@@ -4,6 +4,9 @@ import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
 
 namespace messages {
+  export type Any = WebhookEvent | WebhookTrigger;
+  export type Types = Any["type"];
+
   interface TPayload {
     [key: string]: any;
   }
@@ -16,9 +19,6 @@ namespace messages {
     userId: string;
     streamId: string;
     payload?: TPayload;
-    retries?: number;
-    lastInterval?: number;
-    status?: string;
   }
 
   export interface WebhookTrigger {

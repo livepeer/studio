@@ -9,11 +9,10 @@ import { DB } from "../store/db";
 import messages from "../store/messages";
 import MessageQueue from "../store/rabbit-queue";
 import Model from "../store/model";
-import { DBWebhook, EventKey } from "../store/webhook-table";
+import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 import { sign } from "../controllers/helpers";
-// const resolver = new Resolver();
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;

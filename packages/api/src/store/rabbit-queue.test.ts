@@ -22,14 +22,13 @@ describe("Queue", () => {
 
   it("should be able to emit events and catch it via default consumer", async () => {
     await queue.consume("events", queue.handleMessage.bind(queue));
-    await queue.publish("events.test", {
+    await queue.publish("events.stream.started", {
+      type: "webhook_event",
       id: "abc123",
       createdAt: Date.now(),
-      channel: "test.channel",
-      event: "teststarted",
+      event: "stream.started",
       streamId: "asdf",
       userId: "fdsa",
-      isConsumed: false,
     });
     await sleep(500);
     console.log("done");
@@ -48,14 +47,13 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.publish("events.test", {
+    await queue.publish("events.stream.started", {
+      type: "webhook_event",
       id: "custom_msg",
       createdAt: Date.now(),
-      channel: "test.channel",
-      event: "teststarted",
+      event: "stream.started",
       streamId: "asdf",
       userId: "fdsa",
-      isConsumed: false,
     });
     await sem.wait(2000);
     expect(resp.id).toBe("custom_msg");
@@ -76,15 +74,14 @@ describe("Queue", () => {
     await queue.consume("events", onMsg);
 
     await queue.delayedPublish(
-      "events.recording",
+      "events.recording.ready",
       {
+        type: "webhook_event",
         id: "delayedMsg",
         createdAt: Date.now(),
-        channel: "test.channel",
-        event: "teststarted",
+        event: "recording.ready",
         streamId: "asdf",
         userId: "fdsa",
-        isConsumed: false,
       },
       2000
     );
@@ -111,15 +108,14 @@ describe("Queue", () => {
     await queue.consume("events", onMsg);
 
     await queue.delayedPublish(
-      "events.recording",
+      "events.recording.ready",
       {
+        type: "webhook_event",
         id: "delayedMsg2",
         createdAt: Date.now(),
-        channel: "test.channel",
-        event: "teststarted",
+        event: "recording.ready",
         streamId: "asdf",
         userId: "fdsa",
-        isConsumed: false,
       },
       1000
     );

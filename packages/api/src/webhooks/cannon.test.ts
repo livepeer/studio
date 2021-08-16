@@ -197,14 +197,13 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.publish("events.stream", {
+      await server.queue.publish("events.stream.started", {
+        type: "webhook_event",
         id: "webhook_test_12",
-        time: Date.now(),
-        channel: "test.channel",
+        createdAt: Date.now(),
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
-        isConsumed: false,
       });
 
       await sem.wait(3000);
@@ -230,14 +229,13 @@ describe("webhook cannon", () => {
         if (callCount === 2) sem.release();
       };
 
-      await server.queue.publish("events.stream", {
+      await server.queue.publish("events.stream.started", {
+        type: "webhook_event",
         id: "webhook_test_12",
-        time: Date.now(),
-        channel: "test.channel",
+        createdAt: Date.now(),
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
-        isConsumed: false,
       });
 
       await sem.wait(3000);
@@ -261,14 +259,13 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.publish("events.stream", {
+      await server.queue.publish("events.stream.started", {
+        type: "webhook_event",
         id: "webhook_test_12",
-        time: Date.now(),
-        channel: "test.channel",
+        createdAt: Date.now(),
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
-        isConsumed: false,
       });
 
       await sem.wait(3000);
@@ -276,14 +273,13 @@ describe("webhook cannon", () => {
       expect(receivedEvent).toBe("stream.started");
 
       sem = semaphore();
-      await server.queue.publish("events.stream", {
+      await server.queue.publish("events.stream.idle", {
+        type: "webhook_event",
         id: "webhook_test_42",
-        time: Date.now(),
-        channel: "test.channel",
+        createdAt: Date.now(),
         event: "stream.idle",
         streamId: "streamid",
         userId: nonAdminUser.id,
-        isConsumed: false,
       });
 
       await sem.wait(3000);
@@ -292,14 +288,13 @@ describe("webhook cannon", () => {
 
       // does not receive some random event
       sem = semaphore();
-      await server.queue.publish("events.stream", {
+      await server.queue.publish("events.stream.unknown" as any, {
+        type: "webhook_event",
         id: "webhook_test_93",
-        time: Date.now(),
-        channel: "test.channel",
-        event: "stream.unknown",
+        createdAt: Date.now(),
+        event: "stream.unknown" as any,
         streamId: "streamid",
         userId: nonAdminUser.id,
-        isConsumed: false,
       });
 
       await sem.wait(1000);
