@@ -18,7 +18,8 @@ import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
 
 const ContactPage = () => {
-  const { query } = useRouter();
+  const router = useRouter();
+  const { query } = router;
   const formEl = useRef(null);
   const { data, handleSubmit } = useForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
@@ -31,6 +32,7 @@ const ContactPage = () => {
     if (data) {
       setSubmitted(true);
       formEl.current.reset();
+      router.push("/contact?submitted=true");
       let timer = setTimeout(() => {
         setSubmitted(false);
       }, 4500);
