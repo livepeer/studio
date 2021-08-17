@@ -200,7 +200,8 @@ describe("webhook cannon", () => {
       await server.queue.publish("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
@@ -232,7 +233,8 @@ describe("webhook cannon", () => {
       await server.queue.publish("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
@@ -262,7 +264,8 @@ describe("webhook cannon", () => {
       await server.queue.publish("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "stream.started",
         streamId: "streamid",
         userId: nonAdminUser.id,
@@ -276,7 +279,8 @@ describe("webhook cannon", () => {
       await server.queue.publish("events.stream.idle", {
         type: "webhook_event",
         id: "webhook_test_42",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "stream.idle",
         streamId: "streamid",
         userId: nonAdminUser.id,
@@ -291,7 +295,8 @@ describe("webhook cannon", () => {
       await server.queue.publish("events.stream.unknown" as any, {
         type: "webhook_event",
         id: "webhook_test_93",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "stream.unknown" as any,
         streamId: "streamid",
         userId: nonAdminUser.id,

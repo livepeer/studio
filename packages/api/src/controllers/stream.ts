@@ -138,7 +138,8 @@ async function triggerManyIdleStreamsWebhook(
       await queue.publish("events.stream.idle", {
         type: "webhook_event",
         id: uuid(),
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: stream.playbackId,
         event: "stream.idle",
         streamId: stream.id,
         userId: user.id,
@@ -901,7 +902,8 @@ app.put(
     await req.queue.publish(`events.${event}`, {
       type: "webhook_event",
       id: uuid(),
-      createdAt: Date.now(),
+      timestamp: Date.now(),
+      manifestId: stream.playbackId,
       event: event,
       streamId: id,
       userId: user.id,
@@ -927,7 +929,8 @@ app.put(
             {
               type: "webhook_event",
               id: uuid(),
-              createdAt: Date.now(),
+              timestamp: Date.now(),
+              manifestId: session.playbackId,
               event: "recording.ready",
               streamId: id,
               userId: user.id,
@@ -947,9 +950,8 @@ app.put(
       let shouldEmit = true;
       const session = await db.stream.getLastSession(stream.id);
       if (session) {
-        const now = Date.now();
-        const since = now - (session.lastSeen ?? 0);
-        if (now - (session.lastSeen ?? 0) < USER_SESSION_TIMEOUT) {
+        const timeSinceSeen = Date.now() - (session.lastSeen ?? 0);
+        if (timeSinceSeen < USER_SESSION_TIMEOUT) {
           // there is recent session exits, so new one will be joined with last one
           // not emitting "recording.started" because it will be same recorded session
           shouldEmit = false;
@@ -959,7 +961,8 @@ app.put(
         await req.queue.publish("events.recording.started", {
           type: "webhook_event",
           id: uuid(),
-          createdAt: Date.now(),
+          timestamp: Date.now(),
+          manifestId: stream.playbackId,
           event: "recording.started",
           streamId: id,
           userId: user.id,
@@ -1494,8 +1497,9 @@ app.post(
     const msg: messages.WebhookEvent = {
       type: "webhook_event",
       id: uuid(),
+      timestamp: Date.now(),
+      manifestId: stream.playbackId,
       event: "stream.detection",
-      createdAt: Date.now(),
       streamId: stream.id,
       userId: stream.userId,
       payload: {

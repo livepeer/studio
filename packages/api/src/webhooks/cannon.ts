@@ -79,7 +79,14 @@ export default class WebhookCannon {
         event.event
       );
 
-      console.log("webhooks: ", webhooks);
+      console.log(
+        `fetched webhooks. userId=${event.userId} event=${event.event} webhooks=`,
+        webhooks
+      );
+      if (webhooks.length === 0) {
+        return;
+      }
+
       let stream = await this.db.stream.get(event.streamId);
       if (!stream) {
         // if stream isn't found. don't fire the webhook, log an error
@@ -102,17 +109,21 @@ export default class WebhookCannon {
       }
 
       try {
-        const triggers = webhooks.map<messages.WebhookTrigger>((webhook) => ({
-          type: "webhook_trigger",
-          id: uuid(),
+        const baseTrigger = {
+          type: "webhook_trigger" as const,
+          timestamp: Date.now(),
+          manifestId: event.manifestId,
           event,
           stream: sanitized,
           user,
-          webhook,
-        }));
+        };
         await Promise.all(
-          triggers.map((trigger) =>
-            this.queue.publish("webhooks.triggers", trigger)
+          webhooks.map((webhook) =>
+            this.queue.publish("webhooks.triggers", {
+              ...baseTrigger,
+              id: uuid(),
+              webhook,
+            })
           )
         );
       } catch (error) {
@@ -185,6 +196,8 @@ export default class WebhookCannon {
 
     trigger = {
       ...trigger,
+      id: uuid(),
+      timestamp: Date.now(),
       lastInterval: this.calcBackoff(trigger.lastInterval),
       retries: trigger.retries ? trigger.retries + 1 : 1,
     };
@@ -248,10 +261,9 @@ export default class WebhookCannon {
         },
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({
-          id: event.id, // this will allow receiver to check if it is already received same hook
-          // (possible when retrying)
+          id: event.id, // allows receiver to check if they have already processed the same event (possible when retrying)
           webhookId: webhook.id,
-          createdAt: event.createdAt, // that way receiver will know how long ago event was emitted
+          createdAt: event.timestamp, // allows receiver to know how long ago event was emitted
           timestamp,
           event: event.event,
           stream: sanitized,

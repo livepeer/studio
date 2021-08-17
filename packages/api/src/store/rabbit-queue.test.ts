@@ -25,7 +25,8 @@ describe("Queue", () => {
     await queue.publish("events.stream.started", {
       type: "webhook_event",
       id: "abc123",
-      createdAt: Date.now(),
+      timestamp: Date.now(),
+      manifestId: "manifestId",
       event: "stream.started",
       streamId: "asdf",
       userId: "fdsa",
@@ -50,7 +51,8 @@ describe("Queue", () => {
     await queue.publish("events.stream.started", {
       type: "webhook_event",
       id: "custom_msg",
-      createdAt: Date.now(),
+      timestamp: Date.now(),
+      manifestId: "manifestId",
       event: "stream.started",
       streamId: "asdf",
       userId: "fdsa",
@@ -78,7 +80,8 @@ describe("Queue", () => {
       {
         type: "webhook_event",
         id: "delayedMsg",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "recording.ready",
         streamId: "asdf",
         userId: "fdsa",
@@ -112,7 +115,8 @@ describe("Queue", () => {
       {
         type: "webhook_event",
         id: "delayedMsg2",
-        createdAt: Date.now(),
+        timestamp: Date.now(),
+        manifestId: "manifestId",
         event: "recording.ready",
         streamId: "asdf",
         userId: "fdsa",
