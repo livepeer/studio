@@ -6,7 +6,7 @@ import { EventKey } from "./webhook-table";
 
 const EXCHANGE_NAME = "webhook_default_exchange";
 const QUEUES = {
-  events: "webhook_default_queue",
+  events: "webhook_events_queue",
   webhooks: "webhook_cannon_single_url",
 } as const;
 
@@ -29,6 +29,10 @@ export default class MessageQueue {
           channel.assertQueue(QUEUES.events, { durable: true }),
           channel.assertQueue(QUEUES.webhooks, { durable: true }),
           channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
+          // TODO: remove this after all old queues have been deleted
+          channel.deleteQueue("webhook_default_queue", { ifUnused: true }),
+        ]);
+        await Promise.all([
           channel.bindQueue(QUEUES.events, EXCHANGE_NAME, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGE_NAME, "webhooks.#"),
           channel.prefetch(1),
@@ -55,9 +59,9 @@ export default class MessageQueue {
   }
 
   public async close(): Promise<void> {
-    await this.connection.removeAllListeners("connect");
-    await this.connection.removeAllListeners("disconnect");
-    await this.connection.removeAllListeners("error");
+    this.connection.removeAllListeners("connect");
+    this.connection.removeAllListeners("disconnect");
+    await this.channel.close();
     await this.connection.close();
   }
 
@@ -103,19 +107,30 @@ export default class MessageQueue {
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    await this.channel.addSetup((channel: Channel) => {
-      return Promise.all([
-        channel.assertQueue(`delayedQueue_${delay / 1000}s`, {
-          messageTtl: delay + 100,
-          deadLetterExchange: EXCHANGE_NAME,
-          deadLetterRoutingKey: routingKey,
-          expires: delay + 15000,
-        }),
-      ]);
-    });
-    console.log(`delayed emitting delay=${delay / 1000}s`, msg);
-    await this.channel.sendToQueue(`delayedQueue_${delay / 1000}s`, msg, {
-      persistent: true,
-    });
+    // TODO: Reimplement this without on-demand queues. Idea: Use a single delayed queue
+    // and per-message expiration and routing key (needs an exchange for that).
+    const delaySec = delay / 1000;
+    const delayedQueueName = `delayed_queue_${routingKey}_${delaySec}s`;
+    const setupFunc = (channel: Channel) =>
+      channel.assertQueue(delayedQueueName, {
+        messageTtl: delay + 100,
+        deadLetterExchange: EXCHANGE_NAME,
+        deadLetterRoutingKey: routingKey,
+        expires: delay + 15000,
+        durable: true,
+      });
+    await this.channel.addSetup(setupFunc);
+    try {
+      console.log(
+        `delayed emitting: delay=${delaySec}s queue=${delayedQueueName} msg=`,
+        msg
+      );
+      await this.channel.sendToQueue(delayedQueueName, msg, {
+        persistent: true,
+      });
+    } finally {
+      // avoid accumulating duplicate setup funcs on the channel manager
+      await this.channel.removeSetup(setupFunc, () => {});
+    }
   }
 }

@@ -54,7 +54,7 @@ export default class WebhookCannon {
     }
 
     if (event.event === "recording.ready") {
-      if (event.payload.sessionId) {
+      if (event.payload?.sessionId) {
         // TODO: Remove this. Backward compat only during deploy
         event.sessionId = event.payload.sessionId;
         event.payload = { ...event.payload, sessionId: undefined };
@@ -89,6 +89,7 @@ export default class WebhookCannon {
         webhooks
       );
       if (webhooks.length === 0) {
+        this.queue.ack(data);
         return;
       }
 
@@ -158,10 +159,10 @@ export default class WebhookCannon {
       await this._fireHook(trigger, false);
     } catch (err) {
       console.log("_fireHook error", err);
-      this.retry(trigger);
+      await this.retry(trigger);
+    } finally {
+      this.queue.ack(data);
     }
-
-    this.queue.ack(data);
   }
 
   // async processEvent(msg: Notification) {
@@ -206,7 +207,7 @@ export default class WebhookCannon {
       lastInterval: this.calcBackoff(trigger.lastInterval),
       retries: trigger.retries ? trigger.retries + 1 : 1,
     };
-    this.queue.delayedPublish(
+    return this.queue.delayedPublish(
       "webhooks.delayedEmits",
       trigger,
       trigger.lastInterval
@@ -294,7 +295,7 @@ export default class WebhookCannon {
         }
 
         if (resp.status >= 500) {
-          this.retry(trigger);
+          await this.retry(trigger);
         }
 
         console.error(
@@ -305,7 +306,7 @@ export default class WebhookCannon {
         return;
       } catch (e) {
         console.log("firing error", e);
-        this.retry(trigger);
+        await this.retry(trigger);
         return;
       }
     }
