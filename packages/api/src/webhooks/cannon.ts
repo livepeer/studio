@@ -53,6 +53,22 @@ export default class WebhookCannon {
       return;
     }
 
+    let ack: boolean;
+    try {
+      ack = await this.processWebhookEvent(event);
+    } catch (err) {
+      ack = true;
+      console.log("handleEventQueue Error ", err);
+    } finally {
+      if (ack) {
+        this.queue.ack(data);
+      } else {
+        setTimeout(() => this.queue.nack(data), 1000);
+      }
+    }
+  }
+
+  async processWebhookEvent(event: messages.WebhookEvent): Promise<boolean> {
     if (event.event === "recording.ready") {
       if (event.payload?.sessionId) {
         // TODO: Remove this. Backward compat only during deploy
@@ -61,87 +77,78 @@ export default class WebhookCannon {
       }
       const sessionId = event.sessionId;
       if (!sessionId) {
-        this.queue.ack(data);
-        return;
+        return true;
       }
       const session = await this.db.stream.get(sessionId, {
         useReplica: false,
       });
       if (!session) {
-        this.queue.ack(data);
-        return;
+        return true;
       }
       if (session.partialSession) {
         // new session was started, so recording is not ready yet
-        this.queue.ack(data);
-        return;
+        return true;
       }
+    }
+
+    const { data: webhooks } = await this.db.webhook.listSubscribed(
+      event.userId,
+      event.event
+    );
+
+    console.log(
+      `fetched webhooks. userId=${event.userId} event=${event.event} webhooks=`,
+      webhooks
+    );
+    if (webhooks.length === 0) {
+      return true;
+    }
+
+    let stream = await this.db.stream.get(event.streamId, {
+      useReplica: false,
+    });
+    if (!stream) {
+      // if stream isn't found. don't fire the webhook, log an error
+      throw new Error(
+        `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+      );
+    }
+    // basic sanitization.
+    let sanitized = this.db.stream.addDefaultFields(
+      this.db.stream.removePrivateFields({ ...stream })
+    );
+    delete sanitized.streamKey;
+
+    let user = await this.db.user.get(event.userId);
+    if (!user || user.suspended) {
+      // if user isn't found. don't fire the webhook, log an error
+      throw new Error(
+        `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
+      );
     }
 
     try {
-      const { data: webhooks } = await this.db.webhook.listSubscribed(
-        event.userId,
-        event.event
+      const baseTrigger = {
+        type: "webhook_trigger" as const,
+        timestamp: Date.now(),
+        manifestId: event.manifestId,
+        event,
+        stream: sanitized,
+        user,
+      };
+      await Promise.all(
+        webhooks.map((webhook) =>
+          this.queue.publish("webhooks.triggers", {
+            ...baseTrigger,
+            id: uuid(),
+            webhook,
+          })
+        )
       );
-
-      console.log(
-        `fetched webhooks. userId=${event.userId} event=${event.event} webhooks=`,
-        webhooks
-      );
-      if (webhooks.length === 0) {
-        this.queue.ack(data);
-        return;
-      }
-
-      let stream = await this.db.stream.get(event.streamId);
-      if (!stream) {
-        // if stream isn't found. don't fire the webhook, log an error
-        throw new Error(
-          `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
-        );
-      }
-      // basic sanitization.
-      let sanitized = this.db.stream.addDefaultFields(
-        this.db.stream.removePrivateFields({ ...stream })
-      );
-      delete sanitized.streamKey;
-
-      let user = await this.db.user.get(event.userId);
-      if (!user || user.suspended) {
-        // if user isn't found. don't fire the webhook, log an error
-        throw new Error(
-          `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
-        );
-      }
-
-      try {
-        const baseTrigger = {
-          type: "webhook_trigger" as const,
-          timestamp: Date.now(),
-          manifestId: event.manifestId,
-          event,
-          stream: sanitized,
-          user,
-        };
-        await Promise.all(
-          webhooks.map((webhook) =>
-            this.queue.publish("webhooks.triggers", {
-              ...baseTrigger,
-              id: uuid(),
-              webhook,
-            })
-          )
-        );
-      } catch (error) {
-        console.log("Error publish webhook trigger message: ", error);
-        setTimeout(() => this.queue.nack(data), 1000);
-        return;
-      }
-    } catch (err) {
-      console.log("handleEventQueue Error ", err);
+    } catch (error) {
+      console.log("Error publish webhook trigger message: ", error);
+      return false; // nack to retry processing the event
     }
-
-    this.queue.ack(data);
   }
 
   async handleWebhookQueue(data: ConsumeMessage) {
