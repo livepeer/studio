@@ -166,7 +166,9 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 maxWidth: 700,
                 mx: "auto",
               }}>
-              Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to{" "}
+              Build and scale next generation streaming platforms and services
+              at an industry shattering price through quick and reliable API
+              access to{" "}
               <Box
                 href="https://livepeer.org"
                 target="_blank"
