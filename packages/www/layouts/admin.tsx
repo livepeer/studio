@@ -70,15 +70,13 @@ const Layout = ({
   }, []);
 
   let seo = {
-    title: title,
-    description: description,
-    noindex: noindex,
+    title,
+    description,
+    noindex,
     openGraph: {
-      title: title ? title : "Livepeer.com",
-      description: description
-        ? description
-        : "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.",
-      url: url ? url : "https://livepeer.com",
+      title,
+      description,
+      url,
       images: [
         {
           url: image ? image.url : "https://livepeer.com/img/OG.png",
