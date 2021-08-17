@@ -154,26 +154,35 @@ describe("webhook cannon", () => {
 
   describe("receiving events", () => {
     let webhookCallback: (body: any) => void;
+    let webhook2Callback: (body: any) => void;
 
     beforeAll(() => {
       webhookServer.app.use(bodyParser.json());
-      webhookServer.app.post("/webhook", (req, res) => {
+      webhookServer.app.use((req, res, next) => {
         console.log("WEBHOOK WORKS , body", req.body);
         const signatureHeader = String(req.headers["livepeer-signature"]);
         const signature: string = signatureHeader.split(",")[1].split("=")[1];
         expect(signature).toEqual(
           sign(JSON.stringify(req.body), mockWebhook.sharedSecret)
         );
+        next();
+      });
+      webhookServer.app.post("/webhook", (req, res) => {
         webhookCallback(req.body);
+        res.status(204).end();
+      });
+      webhookServer.app.post("/webhook2", (req, res) => {
+        webhook2Callback(req.body);
         res.status(204).end();
       });
     });
 
     beforeEach(async () => {
-      webhookCallback = () => {};
+      webhookCallback = webhook2Callback = () => {};
 
       await server.store.create({
         id: "streamid",
+        playbackId: "manifestId",
         userId: nonAdminUser.id,
         kind: "stream",
       });
@@ -219,15 +228,20 @@ describe("webhook cannon", () => {
       expect(res.status).toBe(201);
       res = await client.post("/webhook", {
         ...mockWebhook,
+        url: mockWebhook.url + "2",
         name: "test-2",
       });
       expect(res.status).toBe(201);
 
-      const sem = semaphore();
-      let callCount = 0;
+      const semaphs = [semaphore(), semaphore()];
+      let calledFlags = [false, false];
       webhookCallback = () => {
-        callCount++;
-        if (callCount === 2) sem.release();
+        calledFlags[0] = true;
+        semaphs[0].release();
+      };
+      webhook2Callback = () => {
+        calledFlags[1] = true;
+        semaphs[1].release();
       };
 
       await server.queue.publish("events.stream.started", {
@@ -240,8 +254,8 @@ describe("webhook cannon", () => {
         userId: nonAdminUser.id,
       });
 
-      await sem.wait(3000);
-      expect(callCount).toBe(2);
+      await Promise.all(semaphs.map((s) => s.wait(3000)));
+      expect(calledFlags).toEqual([true, true]);
     });
 
     it("should send multiple events to same webhook", async () => {
@@ -304,6 +318,47 @@ describe("webhook cannon", () => {
 
       await sem.wait(1000);
       expect(callCount).toBe(2);
+    });
+
+    it("should retry webhook deliveries (independently)", async () => {
+      let res = await client.post("/webhook", {
+        ...mockWebhook,
+        name: "test-retries-1",
+      });
+      expect(res.status).toBe(201);
+      res = await client.post("/webhook", {
+        ...mockWebhook,
+        url: mockWebhook.url + "2",
+        name: "test-retries-2",
+      });
+      expect(res.status).toBe(201);
+
+      const semaphs = [semaphore(), semaphore()];
+      let calledCounts = [0, 0];
+      webhookCallback = () => {
+        const attempt = ++calledCounts[0];
+        if (attempt < 4) throw new Error("backoff! im busy 😡");
+        semaphs[0].release();
+      };
+      webhook2Callback = () => {
+        const attempt = ++calledCounts[1];
+        if (attempt < 2) throw new Error("could you please try later? 😇");
+        semaphs[1].release();
+      };
+      server.webhook.calcBackoff = () => 100;
+
+      await server.queue.publish("events.stream.started", {
+        type: "webhook_event",
+        id: "webhook_test_12",
+        timestamp: Date.now(),
+        manifestId: "manifestId",
+        event: "stream.started",
+        streamId: "streamid",
+        userId: nonAdminUser.id,
+      });
+
+      await Promise.all(semaphs.map((s) => s.wait(3000)));
+      expect(calledCounts).toEqual([4, 2]);
     });
   });
 });

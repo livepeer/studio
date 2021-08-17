@@ -180,7 +180,7 @@ export default class WebhookCannon {
     this.verifyUrls = false;
   }
 
-  calcBackoff(lastInterval?: number): number {
+  public calcBackoff = (lastInterval?: number): number => {
     if (!lastInterval || lastInterval < 1000) {
       lastInterval = 5000;
     }
@@ -190,7 +190,7 @@ export default class WebhookCannon {
     }
     // RabbitMQ expects integer
     return newInterval | 0;
-  }
+  };
 
   retry(trigger: messages.WebhookTrigger) {
     if (trigger?.retries >= MAX_RETRIES) {
