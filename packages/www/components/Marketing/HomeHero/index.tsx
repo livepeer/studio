@@ -163,10 +163,10 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 lineHeight: 1.6,
                 mb: "$7",
-                maxWidth: 768,
+                maxWidth: 700,
                 mx: "auto",
               }}>
-              Livepeer.com provides quick and reliable access to{" "}
+              Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to{" "}
               <Box
                 href="https://livepeer.org"
                 target="_blank"
@@ -191,10 +191,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 </Text>
                 <ArrowTopRightIcon />
               </Box>
-              , the world's open video infrastructure, allowing you to focus on
-              building and scaling next generation streaming platforms and
-              services at an industry-shattering price through an easy-to-use
-              API.
+              , the world's open video infrastructure.
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
               <Link href="/register" passHref>
