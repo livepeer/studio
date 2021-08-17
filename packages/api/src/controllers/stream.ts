@@ -932,13 +932,12 @@ app.put(
               timestamp: Date.now(),
               manifestId: session.playbackId,
               event: "recording.ready",
-              streamId: id,
               userId: user.id,
+              streamId: id,
+              sessionId: session.id,
               payload: {
                 recordingUrl,
                 mp4Url,
-                // this info is for cannon
-                sessionId: session.id,
               },
             },
             USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT

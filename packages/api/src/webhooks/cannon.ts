@@ -54,11 +54,17 @@ export default class WebhookCannon {
     }
 
     if (event.event === "recording.ready") {
-      if (!event.payload.sessionId) {
+      if (event.payload.sessionId) {
+        // TODO: Remove this. Backward compat only during deploy
+        event.sessionId = event.payload.sessionId;
+        event.payload = { ...event.payload, sessionId: undefined };
+      }
+      const sessionId = event.sessionId;
+      if (!sessionId) {
         this.queue.ack(data);
         return;
       }
-      const session = await this.db.stream.get(event.payload.sessionId, {
+      const session = await this.db.stream.get(sessionId, {
         useReplica: false,
       });
       if (!session) {
@@ -70,7 +76,6 @@ export default class WebhookCannon {
         this.queue.ack(data);
         return;
       }
-      delete event.payload.sessionId;
     }
 
     try {

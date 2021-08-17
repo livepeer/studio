@@ -21,15 +21,18 @@ namespace messages {
     manifestId: string;
   }
 
-  interface TPayload {
-    [key: string]: any;
-  }
+  type TPayload = {
+    readonly [key: string]: any;
+  };
 
   export interface WebhookEvent extends Base {
     type: "webhook_event";
     event: EventKey;
     userId: string;
     streamId: string;
+    sessionId?: string;
+    // Additional information about the event to be sent to the user on the
+    // webhook request.
     payload?: TPayload;
   }
 
