@@ -1,14 +1,14 @@
 export default {
   title: "Livepeer.com",
   description:
-    "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.",
+    "Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.",
   openGraph: {
     type: "website",
     locale: "en_IE",
     url: "https://livepeer.com",
     title: "Livepeer.com",
     description:
-      "Livepeer.com provides quick and reliable access to Livepeer, the world's open video infrastructure, allowing you to focus on building and scaling next generation streaming platforms and services at an industry-shattering price through an easy-to-use API.",
+      "Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.",
     defaultImageWidth: 1200,
     defaultImageHeight: 642,
     images: [
