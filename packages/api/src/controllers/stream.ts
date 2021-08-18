@@ -34,8 +34,8 @@ import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 
 type Profile = DBStream["profiles"][number];
-type MultistreamRef = DBStream["multistream"];
-type MultistreamTargetRef = MultistreamRef["targets"][number];
+type MultistreamOptions = DBStream["multistream"];
+type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
@@ -97,8 +97,8 @@ async function validateMultistreamTarget(
 async function validateMultistreamOpts(
   userId: string,
   profiles: Profile[],
-  multistream: MultistreamRef
-): Promise<MultistreamRef> {
+  multistream: MultistreamOptions
+): Promise<MultistreamOptions> {
   const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
