@@ -70,9 +70,10 @@ async function validateMultistreamTarget(
   target: MultistreamTargetRef
 ): Promise<Omit<MultistreamTargetRef, "spec">> {
   const { profile, id, spec } = target;
-  if (!profileNames.has(profile) && profile !== "source") {
+  if (!profileNames.has(profile)) {
+    const available = JSON.stringify([...profileNames]);
     throw new BadRequestError(
-      `multistream target must reference existing profile. not found: "${profile}"`
+      `multistream target profile not found: "${profile}". available: ${available}`
     );
   }
   if (!!spec === !!id) {
@@ -108,17 +109,21 @@ async function validateMultistreamOpts(
     }
     profileNames.add(name);
   }
+  profileNames.add("source");
 
   if (!multistream?.targets) {
     return { targets: [] };
   }
-  return {
-    targets: await Promise.all(
-      multistream.targets.map((t) =>
-        validateMultistreamTarget(userId, profileNames, t)
-      )
-    ),
-  };
+  const targets = await Promise.all(
+    multistream.targets.map((t) =>
+      validateMultistreamTarget(userId, profileNames, t)
+    )
+  );
+  const uniqueIds = new Set(targets.map((t) => t.id));
+  if (uniqueIds.size !== targets.length) {
+    throw new BadRequestError(`multistream target IDs must be unique`);
+  }
+  return { targets };
 }
 
 async function triggerManyIdleStreamsWebhook(ids, queue) {

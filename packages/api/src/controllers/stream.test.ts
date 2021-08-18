@@ -222,7 +222,9 @@ describe("controllers/stream", () => {
         });
         expect(res.status).toBe(400);
         const json = await res.json();
-        expect(json.errors[0]).toContain("must reference existing profile");
+        expect(json.errors[0]).toContain(
+          "multistream target profile not found"
+        );
       });
 
       it("should reject multistream targets with an invalid spec", async () => {
@@ -269,6 +271,29 @@ describe("controllers/stream", () => {
         const json = await res.json();
         expect(json.errors[0]).toContain(
           `must have either an "id" or a "spec"`
+        );
+      });
+
+      it("should reject duplicate multistream targets", async () => {
+        const res = await client.post("/stream", {
+          ...postMockStream,
+          multistream: {
+            targets: [
+              {
+                profile: "test_stream_360p",
+                id: msTarget.id,
+              },
+              {
+                profile: "test_stream_240p",
+                id: msTarget.id,
+              },
+            ],
+          },
+        });
+        expect(res.status).toBe(400);
+        const json = await res.json();
+        expect(json.errors[0]).toContain(
+          `multistream target IDs must be unique`
         );
       });
 
@@ -975,6 +1000,7 @@ describe("controllers/stream", () => {
           expect(res.status).toBe(204);
 
           await hookSem.wait(3000);
+          expect(hookPayload).toBeDefined();
           expect(hookPayload.createdAt).toBeGreaterThanOrEqual(now);
           expect(hookPayload.timestamp).toBeGreaterThanOrEqual(now);
           delete hookPayload.createdAt;
