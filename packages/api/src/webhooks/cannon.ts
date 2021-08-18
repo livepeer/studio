@@ -149,6 +149,7 @@ export default class WebhookCannon {
       console.log("Error publish webhook trigger message: ", error);
       return false; // nack to retry processing the event
     }
+    return true;
   }
 
   async handleWebhookQueue(data: ConsumeMessage) {
