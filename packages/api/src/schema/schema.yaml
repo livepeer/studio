@@ -325,6 +325,7 @@ components:
             ID of object store where to which this stream was recorded
         multistream:
           type: object
+          additionalProperties: false
           properties:
             targets:
               type: array

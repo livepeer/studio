@@ -34,8 +34,8 @@ import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 
 type Profile = DBStream["profiles"][number];
-type MultistreamRef = DBStream["multistream"];
-type MultistreamTargetRef = MultistreamRef["targets"][number];
+type MultistreamOptions = DBStream["multistream"];
+type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
 export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
@@ -70,9 +70,10 @@ async function validateMultistreamTarget(
   target: MultistreamTargetRef
 ): Promise<Omit<MultistreamTargetRef, "spec">> {
   const { profile, id, spec } = target;
-  if (!profileNames.has(profile) && profile !== "source") {
+  if (!profileNames.has(profile)) {
+    const available = JSON.stringify([...profileNames]);
     throw new BadRequestError(
-      `multistream target must reference existing profile. not found: "${profile}"`
+      `multistream target profile not found: "${profile}". available: ${available}`
     );
   }
   if (!!spec === !!id) {
@@ -97,8 +98,8 @@ async function validateMultistreamTarget(
 async function validateMultistreamOpts(
   userId: string,
   profiles: Profile[],
-  multistream: MultistreamRef
-): Promise<MultistreamRef> {
+  multistream: MultistreamOptions
+): Promise<MultistreamOptions> {
   const profileNames = new Set<string>();
   for (const { name } of profiles) {
     if (!name) {
@@ -108,17 +109,21 @@ async function validateMultistreamOpts(
     }
     profileNames.add(name);
   }
+  profileNames.add("source");
 
   if (!multistream?.targets) {
     return { targets: [] };
   }
-  return {
-    targets: await Promise.all(
-      multistream.targets.map((t) =>
-        validateMultistreamTarget(userId, profileNames, t)
-      )
-    ),
-  };
+  const targets = await Promise.all(
+    multistream.targets.map((t) =>
+      validateMultistreamTarget(userId, profileNames, t)
+    )
+  );
+  const uniqueIds = new Set(targets.map((t) => `${t.profile} -> ${t.id}`));
+  if (uniqueIds.size !== targets.length) {
+    throw new BadRequestError(`multistream target {id,profile} must be unique`);
+  }
+  return { targets };
 }
 
 async function triggerManyIdleStreamsWebhook(ids, queue) {
