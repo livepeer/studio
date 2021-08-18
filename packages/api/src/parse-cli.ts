@@ -27,7 +27,7 @@ export default function parseCli(argv?: string | readonly string[]) {
     `
     )
     .env("LP_")
-    //.strict(true)
+    .strict(process.env.NODE_ENV !== "test")
     .options({
       port: {
         describe: "port to listen on",
