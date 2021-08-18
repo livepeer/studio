@@ -119,9 +119,9 @@ async function validateMultistreamOpts(
       validateMultistreamTarget(userId, profileNames, t)
     )
   );
-  const uniqueIds = new Set(targets.map((t) => t.id));
+  const uniqueIds = new Set(targets.map((t) => `${t.profile} -> ${t.id}`));
   if (uniqueIds.size !== targets.length) {
-    throw new BadRequestError(`multistream target IDs must be unique`);
+    throw new BadRequestError(`multistream target {id,profile} must be unique`);
   }
   return { targets };
 }

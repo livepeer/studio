@@ -275,7 +275,7 @@ describe("controllers/stream", () => {
       });
 
       it("should reject duplicate multistream targets", async () => {
-        const res = await client.post("/stream", {
+        let res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
             targets: [
@@ -284,7 +284,7 @@ describe("controllers/stream", () => {
                 id: msTarget.id,
               },
               {
-                profile: "test_stream_240p",
+                profile: "test_stream_360p",
                 id: msTarget.id,
               },
             ],
@@ -293,8 +293,26 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.errors[0]).toContain(
-          `multistream target IDs must be unique`
+          `multistream target {id,profile} must be unique`
         );
+
+        // Should allow same ID if using different profiles
+        res = await client.post("/stream", {
+          ...postMockStream,
+          multistream: {
+            targets: [
+              {
+                profile: "test_stream_240p",
+                id: msTarget.id,
+              },
+              {
+                profile: "test_stream_360p",
+                id: msTarget.id,
+              },
+            ],
+          },
+        });
+        expect(res.status).toBe(201);
       });
 
       it("should reject references to other users multistream targets", async () => {
