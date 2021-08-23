@@ -225,9 +225,11 @@ export default class WebhookCannon {
   async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
     const { event, webhook, stream: sanitized, user } = trigger;
     if (!event || !webhook || !sanitized || !user) {
-      throw new Error(
-        `_firehook Error: event, webhook, sanitized and user are required`
+      console.error(
+        `invalid webhook trigger message received. type=${trigger.type} message=`,
+        trigger
       );
+      return;
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
     let ips, urlObj, isLocal;
