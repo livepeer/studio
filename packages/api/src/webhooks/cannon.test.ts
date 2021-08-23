@@ -233,15 +233,15 @@ describe("webhook cannon", () => {
       });
       expect(res.status).toBe(201);
 
-      const semaphs = [semaphore(), semaphore()];
+      const sems = [semaphore(), semaphore()];
       let calledFlags = [false, false];
       webhookCallback = () => {
         calledFlags[0] = true;
-        semaphs[0].release();
+        sems[0].release();
       };
       webhook2Callback = () => {
         calledFlags[1] = true;
-        semaphs[1].release();
+        sems[1].release();
       };
 
       await server.queue.publish("events.stream.started", {
@@ -254,7 +254,7 @@ describe("webhook cannon", () => {
         userId: nonAdminUser.id,
       });
 
-      await Promise.all(semaphs.map((s) => s.wait(3000)));
+      await Promise.all(sems.map((s) => s.wait(3000)));
       expect(calledFlags).toEqual([true, true]);
     });
 
@@ -333,17 +333,17 @@ describe("webhook cannon", () => {
       });
       expect(res.status).toBe(201);
 
-      const semaphs = [semaphore(), semaphore()];
+      const sems = [semaphore(), semaphore()];
       let calledCounts = [0, 0];
       webhookCallback = () => {
         const attempt = ++calledCounts[0];
         if (attempt < 4) throw new Error("backoff! im busy 😡");
-        semaphs[0].release();
+        sems[0].release();
       };
       webhook2Callback = () => {
         const attempt = ++calledCounts[1];
         if (attempt < 2) throw new Error("could you please try later? 😇");
-        semaphs[1].release();
+        sems[1].release();
       };
       server.webhook.calcBackoff = () => 100;
 
@@ -357,7 +357,7 @@ describe("webhook cannon", () => {
         userId: nonAdminUser.id,
       });
 
-      await Promise.all(semaphs.map((s) => s.wait(3000)));
+      await Promise.all(sems.map((s) => s.wait(3000)));
       expect(calledCounts).toEqual([4, 2]);
     });
   });
