@@ -4,6 +4,7 @@ import {
   User,
   Error as ApiError,
   ApiToken,
+  MultistreamTarget,
   Stream,
   Webhook,
 } from "@livepeer.com/api";
@@ -645,6 +646,16 @@ const makeContext = (state: ApiState, setState) => {
       const nextCursor = getCursor(res.headers.get("link"));
       const c = res.headers.get("X-Total-Count");
       return [streams, nextCursor, c];
+    },
+
+    async getMultistreamTarget(id: string): Promise<MultistreamTarget> {
+      const uri = `/multistream/target/${id}`;
+      const [res, target] = await context.fetch(uri);
+      if (res.status !== 200) {
+        const msg = target?.errors?.length > 0 ? target.errors[0] : target;
+        throw new Error(msg);
+      }
+      return target;
     },
 
     async getStreamSessionsByUserId(
