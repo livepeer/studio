@@ -18,12 +18,6 @@ import qs from "qs";
 import { db } from "../store";
 import { products } from "../config";
 
-if (!process.env.LP_STRIPE_SECRET_KEY) {
-  console.warn(
-    "Warning: Missing Stripe API key. In development, make sure to configure one in .env file."
-  );
-}
-const stripe = require("stripe")(process.env.LP_STRIPE_SECRET_KEY);
 const app = Router();
 
 app.get("/usage", authMiddleware({}), async (req, res) => {
@@ -508,7 +502,7 @@ app.post(
     }
 
     let user = users[0];
-    const customer = await stripe.customers.create({
+    const customer = await req.stripe.customers.create({
       email: req.body.email,
     });
     await db.user.update(user.id, {
@@ -534,18 +528,21 @@ app.post(
 
     let user = users[0];
 
-    const paymentMethod = await stripe.paymentMethods.attach(
+    const paymentMethod = await req.stripe.paymentMethods.attach(
       req.body.stripeCustomerPaymentMethodId,
       {
         customer: req.body.stripeCustomerId,
       }
     );
 
-    const customer = await stripe.customers.update(req.body.stripeCustomerId, {
-      invoice_settings: {
-        default_payment_method: req.body.stripeCustomerPaymentMethodId,
-      },
-    });
+    const customer = await req.stripe.customers.update(
+      req.body.stripeCustomerId,
+      {
+        invoice_settings: {
+          default_payment_method: req.body.stripeCustomerPaymentMethodId,
+        },
+      }
+    );
 
     // Update user's payment method
     await db.user.update(user.id, {
@@ -575,7 +572,7 @@ app.post(
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (req.body.stripeCustomerPaymentMethodId) {
       try {
-        const paymentMethod = await stripe.paymentMethods.attach(
+        const paymentMethod = await req.stripe.paymentMethods.attach(
           req.body.stripeCustomerPaymentMethodId,
           {
             customer: req.body.stripeCustomerId,
@@ -592,7 +589,7 @@ app.post(
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await stripe.customers.update(req.body.stripeCustomerId, {
+      await req.stripe.customers.update(req.body.stripeCustomerId, {
         invoice_settings: {
           default_payment_method: req.body.stripeCustomerPaymentMethodId,
         },
@@ -600,12 +597,12 @@ app.post(
     }
 
     // fetch prices associated with plan
-    const items = await stripe.prices.list({
+    const items = await req.stripe.prices.list({
       lookup_keys: products[req.body.stripeProductId].lookupKeys,
     });
 
     // Create the subscription
-    const subscription = await stripe.subscriptions.create({
+    const subscription = await req.stripe.subscriptions.create({
       cancel_at_period_end: false,
       customer: req.body.stripeCustomerId,
       items: items.data.map((item) => ({ price: item.id })),
@@ -639,7 +636,7 @@ app.post(
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (req.body.stripeCustomerPaymentMethodId) {
       try {
-        const paymentMethod = await stripe.paymentMethods.attach(
+        const paymentMethod = await req.stripe.paymentMethods.attach(
           req.body.stripeCustomerPaymentMethodId,
           {
             customer: req.body.stripeCustomerId,
@@ -656,7 +653,7 @@ app.post(
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await stripe.customers.update(req.body.stripeCustomerId, {
+      await req.stripe.customers.update(req.body.stripeCustomerId, {
         invoice_settings: {
           default_payment_method: req.body.stripeCustomerPaymentMethodId,
         },
@@ -664,17 +661,17 @@ app.post(
     }
 
     // Get all the prices associated with this plan (just transcoding price as of now)
-    const items = await stripe.prices.list({
+    const items = await req.stripe.prices.list({
       lookup_keys: products[req.body.stripeProductId].lookupKeys,
     });
 
     // Get the subscription
-    const subscription = await stripe.subscriptions.retrieve(
+    const subscription = await req.stripe.subscriptions.retrieve(
       req.body.stripeCustomerSubscriptionId
     );
 
     // Get the prices associated with the subscription
-    const subscriptionItems = await stripe.subscriptionItems.list({
+    const subscriptionItems = await req.stripe.subscriptionItems.list({
       subscription: req.body.stripeCustomerSubscriptionId,
     });
 
@@ -695,7 +692,7 @@ app.post(
           let quantity = Math.round(
             (usageRes.sourceSegmentsDuration / 60).toFixed(2)
           );
-          await stripe.invoiceItems.create({
+          await req.stripe.invoiceItems.create({
             customer: req.body.stripeCustomerId,
             currency: "usd",
             period: {
@@ -713,7 +710,7 @@ app.post(
 
     // Update the customer's subscription plan.
     // Stripe will automatically invoice the customer based on its usage up until this point
-    const updatedSubscription = await stripe.subscriptions.update(
+    const updatedSubscription = await req.stripe.subscriptions.update(
       req.body.stripeCustomerSubscriptionId,
       {
         billing_cycle_anchor: "now", // reset billing anchor when updating subscription
@@ -742,7 +739,7 @@ app.post(
 
 app.post("/retrieve-subscription", async (req, res) => {
   let { stripeCustomerSubscriptionId } = req.body;
-  const subscription = await stripe.subscriptions.retrieve(
+  const subscription = await req.stripe.subscriptions.retrieve(
     stripeCustomerSubscriptionId
   );
   res.status(200);
@@ -751,7 +748,7 @@ app.post("/retrieve-subscription", async (req, res) => {
 
 app.post("/retrieve-invoices", async (req, res) => {
   let { stripeCustomerId } = req.body;
-  const invoices = await stripe.invoices.list({
+  const invoices = await req.stripe.invoices.list({
     customer: stripeCustomerId,
   });
   res.status(200);
@@ -760,7 +757,7 @@ app.post("/retrieve-invoices", async (req, res) => {
 
 app.post("/retrieve-payment-method", async (req, res) => {
   let { stripePaymentMethodId } = req.body;
-  const paymentMethod = await stripe.paymentMethods.retrieve(
+  const paymentMethod = await req.stripe.paymentMethods.retrieve(
     stripePaymentMethodId
   );
   res.status(200);

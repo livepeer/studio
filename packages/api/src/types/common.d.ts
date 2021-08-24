@@ -3,6 +3,7 @@ import { NodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import MessageQueue from "../store/rabbit-queue";
 import { CliArgs } from "../parse-cli";
+import Stripe from "stripe";
 
 export enum AuthTokenType {
   JWT = "JWT",
@@ -17,6 +18,7 @@ declare global {
       config?: CliArgs;
       store?: IStore;
       queue?: MessageQueue;
+      stripe?: Stripe;
       frontendDomain: string;
 
       user?: User;

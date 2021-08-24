@@ -5,8 +5,6 @@ import { products } from "../config";
 import sql from "sql-template-strings";
 
 const app = Router();
-const endpointSecret = process.env.LP_STRIPE_WEBHOOK_SECRET;
-const stripe = new Stripe(process.env.LP_STRIPE_SECRET_KEY);
 
 // Webhook handler for asynchronous events.
 app.post("/webhook", async (req, res) => {
@@ -15,7 +13,8 @@ app.post("/webhook", async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    const secret = req.config.stripeWebhookSecret;
+    event = req.stripe.webhooks.constructEvent(req.body, sig, secret);
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
@@ -53,7 +52,7 @@ app.post("/webhook", async (req, res) => {
       products[user.stripeProductId].usage.map(async (product) => {
         if (product.name === "Transcoding") {
           let quantity = Math.round(usageRes.sourceSegmentsDuration / 60);
-          await stripe.invoiceItems.create({
+          await req.stripe.invoiceItems.create({
             customer: user.stripeCustomerId,
             invoice: invoice.id,
             currency: "usd",
@@ -97,23 +96,23 @@ app.post("/migrate-users-to-stripe", async (req, res) => {
   for (let index = 0; index < users.length; index++) {
     let user = users[index];
 
-    const { data } = await stripe.customers.list({
+    const { data } = await req.stripe.customers.list({
       email: user.email,
     });
 
     if (data.length === 0) {
       // create the stripe customer
-      const customer = await stripe.customers.create({
+      const customer = await req.stripe.customers.create({
         email: user.email,
       });
 
       // fetch prices associated with free plan
-      const items = await stripe.prices.list({
+      const items = await req.stripe.prices.list({
         lookup_keys: products["prod_0"].lookupKeys,
       });
 
       // Subscribe the user to the free plan
-      const subscription = await stripe.subscriptions.create({
+      const subscription = await req.stripe.subscriptions.create({
         cancel_at_period_end: false,
         customer: customer.id,
         items: items.data.map((item) => ({ price: item.id })),
