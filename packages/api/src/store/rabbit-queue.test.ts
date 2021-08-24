@@ -26,9 +26,8 @@ describe("Queue", () => {
       type: "webhook_event",
       id: "abc123",
       timestamp: Date.now(),
-      manifestId: "manifestId",
-      event: "stream.started",
       streamId: "asdf",
+      event: "stream.started",
       userId: "fdsa",
     });
     await sleep(500);
@@ -52,9 +51,8 @@ describe("Queue", () => {
       type: "webhook_event",
       id: "custom_msg",
       timestamp: Date.now(),
-      manifestId: "manifestId",
-      event: "stream.started",
       streamId: "asdf",
+      event: "stream.started",
       userId: "fdsa",
     });
     await sem.wait(2000);
@@ -81,9 +79,8 @@ describe("Queue", () => {
         type: "webhook_event",
         id: "delayedMsg",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "recording.ready",
         streamId: "asdf",
+        event: "recording.ready",
         userId: "fdsa",
       },
       2000
@@ -116,9 +113,8 @@ describe("Queue", () => {
         type: "webhook_event",
         id: "delayedMsg2",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "recording.ready",
         streamId: "asdf",
+        event: "recording.ready",
         userId: "fdsa",
       },
       1000

@@ -139,7 +139,6 @@ async function triggerManyIdleStreamsWebhook(
         type: "webhook_event",
         id: uuid(),
         timestamp: Date.now(),
-        manifestId: stream.playbackId,
         event: "stream.idle",
         streamId: stream.id,
         userId: user.id,
@@ -903,9 +902,8 @@ app.put(
       type: "webhook_event",
       id: uuid(),
       timestamp: Date.now(),
-      manifestId: stream.playbackId,
-      event: event,
       streamId: id,
+      event: event,
       userId: user.id,
     });
 
@@ -930,10 +928,9 @@ app.put(
               type: "webhook_event",
               id: uuid(),
               timestamp: Date.now(),
-              manifestId: session.playbackId,
+              streamId: id,
               event: "recording.ready",
               userId: user.id,
-              streamId: id,
               sessionId: session.id,
               payload: {
                 recordingUrl,
@@ -961,9 +958,8 @@ app.put(
           type: "webhook_event",
           id: uuid(),
           timestamp: Date.now(),
-          manifestId: stream.playbackId,
-          event: "recording.started",
           streamId: id,
+          event: "recording.started",
           userId: user.id,
         });
       }
@@ -1470,6 +1466,8 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
 
   res.json({
     manifestID,
+    streamID: stream.parentId ?? streamId,
+    sessionID: streamId,
     presets: stream.presets,
     profiles: stream.profiles,
     objectStore,
@@ -1497,9 +1495,8 @@ app.post(
       type: "webhook_event",
       id: uuid(),
       timestamp: Date.now(),
-      manifestId: stream.playbackId,
-      event: "stream.detection",
       streamId: stream.id,
+      event: "stream.detection",
       userId: stream.userId,
       payload: {
         seqNo,

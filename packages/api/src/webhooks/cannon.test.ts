@@ -210,9 +210,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.started",
         streamId: "streamid",
+        event: "stream.started",
         userId: nonAdminUser.id,
       });
 
@@ -248,9 +247,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.started",
         streamId: "streamid",
+        event: "stream.started",
         userId: nonAdminUser.id,
       });
 
@@ -279,9 +277,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.started",
         streamId: "streamid",
+        event: "stream.started",
         userId: nonAdminUser.id,
       });
 
@@ -294,9 +291,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_42",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.idle",
         streamId: "streamid",
+        event: "stream.idle",
         userId: nonAdminUser.id,
       });
 
@@ -310,9 +306,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_93",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.unknown" as any,
         streamId: "streamid",
+        event: "stream.unknown" as any,
         userId: nonAdminUser.id,
       });
 
@@ -351,9 +346,8 @@ describe("webhook cannon", () => {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
-        manifestId: "manifestId",
-        event: "stream.started",
         streamId: "streamid",
+        event: "stream.started",
         userId: nonAdminUser.id,
       });
 

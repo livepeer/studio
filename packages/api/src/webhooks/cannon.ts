@@ -131,7 +131,7 @@ export default class WebhookCannon {
       const baseTrigger = {
         type: "webhook_trigger" as const,
         timestamp: Date.now(),
-        manifestId: event.manifestId,
+        streamId: event.streamId,
         event,
         stream: sanitized,
         user,

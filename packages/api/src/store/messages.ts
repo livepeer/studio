@@ -17,8 +17,8 @@ namespace messages {
     id: string;
     // Unix timestamp in milliseconds.
     timestamp: number;
-    // Manifest ID of the stream, which is known in the API as the playback ID.
-    manifestId: string;
+    // ID of the stream as defined by the API in the authWebhook (ID from DB).
+    streamId: string;
   }
 
   type TPayload = {
@@ -29,7 +29,6 @@ namespace messages {
     type: "webhook_event";
     event: EventKey;
     userId: string;
-    streamId: string;
     sessionId?: string;
     // Additional information about the event to be sent to the user on the
     // webhook request.
