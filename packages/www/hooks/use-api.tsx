@@ -227,7 +227,7 @@ const makeContext = (state: ApiState, setState) => {
       }
 
       // Create stripe customer
-      const customer: any = await context.createCustomer(email);
+      const customer = await context.createCustomer(email);
 
       // Subscribe customer to free plan upon registation
       await context.createSubscription({
@@ -278,7 +278,15 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async getUser(userId, opts = {}): Promise<[Response, User | ApiError]> {
-      const [res, user] = await context.fetch(`/user/${userId}`, opts);
+      let [res, user] = await context.fetch(`/user/${userId}`, opts);
+      if (isDevelopment() && !user.stripeProductId && user.email) {
+        const customer = await context.createCustomer(user.email);
+        await context.createSubscription({
+          stripeCustomerId: customer.id,
+          stripeProductId: "prod_0",
+        });
+        [res, user] = await context.fetch(`/user/${userId}`, opts);
+      }
       return [res, user as User | ApiError];
     },
 
@@ -351,7 +359,7 @@ const makeContext = (state: ApiState, setState) => {
       return [res, null];
     },
 
-    async createCustomer(email): Promise<[Response, User | ApiError]> {
+    async createCustomer(email): Promise<{ id: string } | ApiError> {
       const [, body] = await context.fetch("/user/create-customer", {
         method: "POST",
         body: JSON.stringify({ email: email }),
@@ -366,7 +374,7 @@ const makeContext = (state: ApiState, setState) => {
     async createSubscription({
       stripeCustomerId,
       stripeProductId,
-    }): Promise<[Response, User | ApiError]> {
+    }): Promise<User | ApiError> {
       const [res, body] = await context.fetch("/user/create-subscription", {
         method: "POST",
         body: JSON.stringify({

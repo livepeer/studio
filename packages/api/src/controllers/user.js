@@ -17,8 +17,12 @@ import hash from "../hash";
 import qs from "qs";
 import { db } from "../store";
 import { products } from "../config";
-import sql from "sql-template-strings";
 
+if (!process.env.LP_STRIPE_SECRET_KEY) {
+  console.warn(
+    "Warning: Missing Stripe API key. In development, make sure to configure one in .env file."
+  );
+}
 const stripe = require("stripe")(process.env.LP_STRIPE_SECRET_KEY);
 const app = Router();
 
@@ -584,7 +588,7 @@ app.post(
           ccBrand: paymentMethod.card.brand,
         });
       } catch (error) {
-        return res.status("402").send({ error: { message: error.message } });
+        return res.status("402").send({ errors: [error.message] });
       }
 
       // Change the default invoice settings on the customer to the new payment method
