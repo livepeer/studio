@@ -1,5 +1,6 @@
 import StreamDetail from "layouts/streamDetail";
 import StreamSessionsTable from "components/Dashboard/SessionsTable";
+import MultistreamTargetsTable from "@components/Dashboard/MultistreamTargetsTable";
 import { useRouter } from "next/router";
 import { Text } from "@livepeer.com/design-system";
 import { useCallback } from "react";
@@ -29,6 +30,16 @@ const Overview = () => {
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name },
       ]}>
+      <MultistreamTargetsTable
+        stream={stream}
+        emptyState={
+          <Text variant="gray" size="2">
+            No targets
+          </Text>
+        }
+        tableLayout="auto"
+        border
+      />
       <StreamSessionsTable
         streamId={id}
         emptyState={
