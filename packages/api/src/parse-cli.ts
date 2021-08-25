@@ -213,6 +213,14 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "password for Mist server",
         type: "string",
       },
+      "stripe-secret-key": {
+        describe: "Stripe secret key",
+        type: "string",
+      },
+      "stripe-webhook-secret": {
+        describe: "Stripe webhook secret",
+        type: "string",
+      },
     })
     .help()
     .parse(argv);

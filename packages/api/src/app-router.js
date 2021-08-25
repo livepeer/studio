@@ -18,6 +18,7 @@ import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
 import MessageQueue from "./store/rabbit-queue";
+import Stripe from "stripe";
 
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
@@ -60,6 +61,7 @@ export default async function makeApp(params) {
     insecureTestToken,
     firestoreCredentials,
     firestoreCollection,
+    stripeSecretKey,
     amqpUrl,
   } = params;
 
@@ -91,6 +93,13 @@ export default async function makeApp(params) {
   });
   await webhookCannon.start();
 
+  if (!stripeSecretKey) {
+    console.warn(
+      "Warning: Missing Stripe API key. In development, make sure to configure one in .env file."
+    );
+  }
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" });
+
   process.on("beforeExit", (code) => {
     queue.close();
     webhookCannon.stop();
@@ -110,6 +119,7 @@ export default async function makeApp(params) {
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
     req.queue = queue;
+    req.stripe = stripe;
     next();
   });
   if (insecureTestToken) {
