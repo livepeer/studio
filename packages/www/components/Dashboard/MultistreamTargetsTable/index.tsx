@@ -1,11 +1,12 @@
-import { useCallback, useMemo } from "react";
-import { useApi } from "../../../hooks";
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { stringSort } from "components/Dashboard/Table/sorts";
+import { useMemo } from "react";
 import Link from "next/link";
-import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
+import {
+  ArrowRightIcon,
+  QuestionMarkCircledIcon as Help,
+} from "@radix-ui/react-icons";
+import { useQuery } from "react-query";
+
 import {
   Box,
   Flex,
@@ -15,13 +16,15 @@ import {
   Tooltip,
 } from "@livepeer.com/design-system";
 import { Stream } from "@livepeer.com/api";
+
+import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
+import { stringSort } from "components/Dashboard/Table/sorts";
+import { SortTypeArgs } from "components/Dashboard/Table/types";
+
+import { useApi } from "../../../hooks";
 import { FilterItem } from "../Table/filters";
-import {
-  ArrowRightIcon,
-  QuestionMarkCircledIcon as Help,
-} from "@radix-ui/react-icons";
-import Record from "components/Dashboard/StreamDetails/Record";
-import { useQuery } from "react-query";
+import Toggle from "./toggle";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -77,11 +80,6 @@ const MultistreamTargetsTable = ({
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
-
-  const invalidateTable = useCallback(async () => {
-    await invalidateStream();
-    await state.invalidate();
-  }, [invalidateStream, state.tableId]);
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -143,8 +141,10 @@ const MultistreamTargetsTable = ({
                   align="stretch"
                   css={{ position: "relative", top: "2px" }}>
                   <Box css={{ mr: "$2" }}>
-                    {/* TODO: Make this actually enable/disable MS targets */}
-                    <Record stream={stream} invalidate={invalidateTable} />
+                    <Toggle
+                      target={target.spec}
+                      invalidate={state.invalidate}
+                    />
                   </Box>
                   <Tooltip
                     multiline

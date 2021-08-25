@@ -17,7 +17,7 @@ import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 
 const Suspend = ({ stream, invalidate }) => {
-  const { suspendStream } = useApi();
+  const { patchStream } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -62,8 +62,8 @@ const Suspend = ({ stream, invalidate }) => {
             onClick={async (e) => {
               e.preventDefault();
               setSaving(true);
-              const newValue = !stream.suspended;
-              await suspendStream(stream.id, newValue);
+              const suspended = !stream.suspended;
+              await patchStream(stream.id, { suspended });
               await invalidate();
               setSaving(false);
               setOpen(false);

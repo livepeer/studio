@@ -17,59 +17,48 @@ import {
 import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
+import { MultistreamTarget } from "../../../../api/src/schema/types";
 
-const Record = ({ stream, invalidate, isSwitch = true }) => {
-  const { patchStream } = useApi();
+const Toggle = ({
+  target,
+  invalidate,
+}: {
+  target: MultistreamTarget;
+  invalidate: () => Promise<void>;
+}) => {
+  const { patchMultistreamTarget } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
 
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
-      {isSwitch ? (
-        <Switch
-          checked={!!stream.record}
-          name="record-mode"
-          value={`${!!stream.record}`}
-          onCheckedChange={async () => {
-            if (!stream.record) {
-              await patchStream(stream.id, { record: true });
-              await invalidate();
-              openSnackbar("Recording has been turned on.");
-            } else {
-              setOpen(true);
-            }
-          }}
-        />
-      ) : (
-        <Box
-          as={DropdownMenuItem}
-          onSelect={async (e) => {
-            e.preventDefault();
-            if (!stream.record) {
-              await patchStream(stream.id, { record: true });
-              await invalidate();
-              openSnackbar("Recording has been turned on.");
-            } else {
-              setOpen(true);
-            }
-          }}>
-          <Box>{!stream.record ? "Enable recording" : "Disable recording"}</Box>
-        </Box>
-      )}
+      <Switch
+        checked={!target.disabled}
+        name="multistream-target-toggle"
+        value={`${!target.disabled}`}
+        onCheckedChange={async () => {
+          if (target.disabled) {
+            await patchMultistreamTarget(target.id, { disabled: false });
+            await invalidate();
+            openSnackbar(`Target ${target.name} has been turned on.`);
+          } else {
+            setOpen(true);
+          }
+        }}
+      />
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
-          Disable recording?
+          Disable this multistream target?
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
           size="3"
           variant="gray"
           css={{ mt: "$2", lineHeight: "22px" }}>
-          Future stream sessions will not be recorded. In progress stream
-          sessions will be recorded. Past sessions recordings will still be
-          available.
+          Future stream sessions will not be multistreamed to this target. In
+          progress stream sessions will continue to be.
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
@@ -87,9 +76,10 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
             onClick={async (e) => {
               e.preventDefault();
               setSaving(true);
-              await patchStream(stream.id, { record: !stream.record });
+              const disabled = !target.disabled;
+              await patchMultistreamTarget(target.id, { disabled });
               await invalidate();
-              openSnackbar("Recording has been turned off.");
+              openSnackbar(`Target ${target.name} has been turned off.`);
               setSaving(false);
               setOpen(false);
             }}
@@ -103,7 +93,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
                 }}
               />
             )}
-            Disable recording
+            Disable target
           </AlertDialogAction>
         </Flex>
       </AlertDialogContent>
@@ -111,4 +101,4 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
   );
 };
 
-export default Record;
+export default Toggle;

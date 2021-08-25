@@ -171,10 +171,9 @@ const ID = () => {
     getStream,
     deleteStream,
     getIngest,
-    setRecord,
+    patchStream,
     getAdminStreams,
     terminateStream,
-    suspendStream,
   } = useApi();
   const userIsAdmin = user && user.admin;
   const router = useRouter();
@@ -286,7 +285,7 @@ const ID = () => {
   const doSetRecord = async (stream: Stream, record: boolean) => {
     console.log(`do set record ${stream.id} record ${record}`);
     setStream(null); // shows 'loading wheel' immediately
-    await setRecord(stream.id, record);
+    await patchStream(stream.id, { record });
     setStream(null); // make sure that we will load updated stream
   };
 
@@ -321,11 +320,11 @@ const ID = () => {
             actionText="Confirm"
             onClose={close}
             onAction={() => {
-              const newValue = !stream.suspended;
-              suspendStream(stream.id, !stream.suspended)
+              const suspended = !stream.suspended;
+              patchStream(stream.id, { suspended })
                 .then((res) => {
-                  stream.suspended = newValue;
-                  setStream({ ...stream, suspended: newValue });
+                  stream.suspended = suspended;
+                  setStream({ ...stream, suspended });
                 })
                 .catch((e) => {
                   console.error(e);

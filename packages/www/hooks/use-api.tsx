@@ -7,6 +7,7 @@ import {
   MultistreamTarget,
   Stream,
   Webhook,
+  StreamPatchPayload,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment } from "../lib/utils";
@@ -88,6 +89,14 @@ const getStoredToken = () => {
     return null;
   }
 };
+
+class HttpError extends Error {
+  constructor(status: number, body: any) {
+    const msg =
+      body?.errors?.length > 0 ? body.errors[0] : JSON.stringify(body);
+    super(`http error status ${status}: ${msg}`);
+  }
+}
 
 export const DashboardRedirect = () => {
   return (
@@ -652,10 +661,25 @@ const makeContext = (state: ApiState, setState) => {
       const uri = `/multistream/target/${id}`;
       const [res, target] = await context.fetch(uri);
       if (res.status !== 200) {
-        const msg = target?.errors?.length > 0 ? target.errors[0] : target;
-        throw new Error(msg);
+        throw new HttpError(res.status, target);
       }
       return target;
+    },
+
+    async patchMultistreamTarget(
+      id: string,
+      patch: { disabled: boolean }
+    ): Promise<void> {
+      const [res, body] = await context.fetch(`/multistream/target/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new HttpError(res.status, body);
+      }
     },
 
     async getStreamSessionsByUserId(
@@ -680,26 +704,6 @@ const makeContext = (state: ApiState, setState) => {
       const nextCursor = getCursor(res.headers.get("link"));
       const c = res.headers.get("X-Total-Count");
       return [streams, nextCursor, c];
-    },
-
-    async suspendStream(id: string, suspended: boolean): Promise<void> {
-      const [res, body] = await context.fetch(`/stream/${id}/suspended`, {
-        method: "PATCH",
-        body: JSON.stringify({ suspended }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-      if (res.status !== 204) {
-        if (body && body.errors) {
-          throw new Error(body.errors);
-        }
-        throw new Error(body);
-      }
-      if (body && body.errors) {
-        throw new Error(body.errors);
-      }
-      return;
     },
 
     async terminateStream(id: string): Promise<boolean> {
@@ -740,22 +744,20 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
-    async setRecord(
+    async patchStream(
       streamId: string,
-      record: boolean
-    ): Promise<[void | ApiError]> {
-      const [res, body] = await context.fetch(`/stream/${streamId}/record`, {
+      patch: StreamPatchPayload
+    ): Promise<void> {
+      const [res, body] = await context.fetch(`/stream/${streamId}`, {
         method: "PATCH",
-        body: JSON.stringify({ record }),
+        body: JSON.stringify(patch),
         headers: {
           "content-type": "application/json",
         },
       });
-
       if (res.status !== 204) {
-        throw new Error(res.body ? body : `http status ${res.status}`);
+        throw new HttpError(res.status, body);
       }
-
       return res;
     },
 
