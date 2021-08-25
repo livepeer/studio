@@ -6,10 +6,11 @@ import { Text } from "@livepeer.com/design-system";
 import { useCallback } from "react";
 import { useApi } from "hooks";
 import { Stream } from "@livepeer.com/api";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 
 const Overview = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { getStream } = useApi();
 
   const { query } = router;
@@ -21,17 +22,22 @@ const Overview = () => {
   }, [id]);
 
   const { data: stream } = useQuery([id], () => fetcher());
+  const invalidateStream = useCallback(() => {
+    return queryClient.invalidateQueries(id);
+  }, [queryClient, id]);
 
   return (
     <StreamDetail
       activeTab="Overview"
       stream={stream}
+      invalidateStream={invalidateStream}
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name },
       ]}>
       <MultistreamTargetsTable
         stream={stream}
+        invalidateStream={invalidateStream}
         emptyState={
           <Text variant="gray" size="2">
             No targets

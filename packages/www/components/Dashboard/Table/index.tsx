@@ -1,5 +1,5 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, UseQueryResult } from "react-query";
 import {
   useEffect,
   useMemo,
@@ -56,9 +56,17 @@ type State<T extends Record<string, unknown>> = {
   invalidate: () => Promise<void>;
 };
 
-export type Fetcher<T extends Record<string, unknown>> = (
-  state: State<T>
-) => Promise<{ rows: T[]; nextCursor: string; count: number }>;
+export type FetchResult<T extends Record<string, unknown>> = {
+  rows: T[];
+  nextCursor: string;
+  count: number;
+};
+
+export type Fetcher<T extends Record<string, unknown>> =
+  | ((state: State<T>) => Promise<FetchResult<T>>)
+  | {
+      query: (state: State<T>) => UseQueryResult<FetchResult<T>>;
+    };
 
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
@@ -97,11 +105,19 @@ const TableComponent = <T extends Record<string, unknown>>({
   border = false,
   tableLayout = "fixed",
 }: Props<T>) => {
-  const queryKey = useMemo(() => {
-    return [state.tableId, state.cursor, state.order, state.stringifiedFilters];
-  }, [state.tableId, state.cursor, state.order, state.stringifiedFilters]);
-
-  const { isLoading, data } = useQuery(queryKey, () => fetcher(state));
+  let useQueryResult: UseQueryResult<FetchResult<T>>;
+  if ("query" in fetcher) {
+    useQueryResult = fetcher.query(state);
+  } else {
+    const queryKey = [
+      state.tableId,
+      state.cursor,
+      state.order,
+      state.stringifiedFilters,
+    ];
+    useQueryResult = useQuery(queryKey, () => fetcher(state));
+  }
+  const { isLoading, data } = useQueryResult;
 
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 

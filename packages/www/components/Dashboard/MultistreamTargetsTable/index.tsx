@@ -12,10 +12,16 @@ import {
   Heading,
   Text,
   Link as A,
+  Tooltip,
 } from "@livepeer.com/design-system";
 import { Stream } from "@livepeer.com/api";
 import { FilterItem } from "../Table/filters";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import {
+  ArrowRightIcon,
+  QuestionMarkCircledIcon as Help,
+} from "@radix-ui/react-icons";
+import Record from "components/Dashboard/StreamDetails/Record";
+import { useQuery } from "react-query";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -25,8 +31,9 @@ const filterItems: FilterItem[] = [
 type TargetsTableData = {
   id: string;
   name: TextCellProps;
-  status: TextCellProps;
   profile: TextCellProps;
+  status: TextCellProps;
+  toolbox: TextCellProps;
 };
 
 const defaultEmptyState = (
@@ -54,20 +61,27 @@ const defaultEmptyState = (
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
   stream,
+  invalidateStream,
   emptyState = defaultEmptyState,
   border = false,
   tableLayout = "fixed",
 }: {
   title?: string;
   stream: Stream;
+  invalidateStream: () => Promise<void>;
   emptyState?: React.ReactNode;
   border?: boolean;
   tableLayout?: string;
 }) => {
   const { user, getMultistreamTarget } = useApi();
-  const tableProps = useTableState({
+  const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
+
+  const invalidateTable = useCallback(async () => {
+    await invalidateStream();
+    await state.invalidate();
+  }, [invalidateStream, state.tableId]);
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -79,50 +93,82 @@ const MultistreamTargetsTable = ({
           stringSort("original.name.children", ...params),
       },
       {
-        Header: "Status",
-        accessor: "status",
-        Cell: TextCell,
-        disableSortBy: true,
-      },
-      {
         Header: "Profile",
         accessor: "profile",
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.profile.children", ...params),
       },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: TextCell,
+        disableSortBy: true,
+      },
+      {
+        Header: "",
+        accessor: "toolbox",
+        Cell: TextCell,
+        disableSortBy: true,
+      },
     ],
     []
   );
 
-  const fetcher: Fetcher<TargetsTableData> = useCallback(async () => {
-    const targets = await Promise.all(
-      stream.multistream?.targets?.map(async (ref) => {
-        return { ref, spec: await getMultistreamTarget(ref.id) };
-      })
-    );
-    return {
-      count: targets.length,
-      nextCursor: null,
-      rows: targets.map((target) => ({
-        id: target.ref.id,
-        name: {
-          children: target.spec.name,
-        },
-        status: {
-          children: "unknown", // TODO: Call analyzer for the status
-        },
-        profile: {
-          children: target.ref.profile,
-        },
-      })),
-    };
-  }, [getMultistreamTarget, user.id]);
+  const fetcher: Fetcher<TargetsTableData> = {
+    query: (state) =>
+      useQuery([state.tableId, stream], async () => {
+        const targets = await Promise.all(
+          stream?.multistream?.targets?.map(async (ref) => {
+            return { ref, spec: await getMultistreamTarget(ref.id) };
+          }) ?? []
+        );
+        return {
+          count: targets.length,
+          nextCursor: null,
+          rows: targets.map((target) => ({
+            id: target.ref.id,
+            name: {
+              children: target.spec.name,
+            },
+            profile: {
+              children: target.ref.profile,
+            },
+            status: {
+              children: "unknown", // TODO: Call analyzer for the status
+            },
+            toolbox: {
+              children: (
+                <Flex
+                  align="stretch"
+                  css={{ position: "relative", top: "2px" }}>
+                  <Box css={{ mr: "$2" }}>
+                    {/* TODO: Make this actually enable/disable MS targets */}
+                    <Record stream={stream} invalidate={invalidateTable} />
+                  </Box>
+                  <Tooltip
+                    multiline
+                    content={
+                      <Box>
+                        Enable or disable multistreaming to this target.
+                      </Box>
+                    }>
+                    <Help />
+                  </Tooltip>
+                </Flex>
+              ),
+            },
+          })),
+        };
+      }),
+  };
 
   return (
     <Box>
       <Table
-        {...tableProps}
+        fetcher={fetcher}
+        state={state}
+        stateSetter={stateSetter}
         header={
           <>
             <Heading>{title}</Heading>
@@ -131,7 +177,6 @@ const MultistreamTargetsTable = ({
         border={border}
         filterItems={filterItems}
         columns={columns}
-        fetcher={fetcher}
         rowSelection={null}
         initialSortBy={[{ id: "name", desc: false }]}
         showOverflow={true}

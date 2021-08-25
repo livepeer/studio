@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import {
   Box,
   Button,
@@ -40,7 +39,6 @@ import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
-import { useQueryClient } from "react-query";
 
 type ShowURLProps = {
   url: string;
@@ -195,6 +193,7 @@ const StreamDetail = ({
   breadcrumbs,
   children,
   stream,
+  invalidateStream,
   activeTab = "Overview",
 }) => {
   useLoggedIn();
@@ -209,11 +208,6 @@ const StreamDetail = ({
   const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
-  const queryClient = useQueryClient();
-
-  const invalidateQuery = useCallback(() => {
-    return queryClient.invalidateQueries(id);
-  }, [queryClient, id]);
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -489,7 +483,7 @@ const StreamDetail = ({
                           <Box css={{ mr: "$2" }}>
                             <Record
                               stream={stream}
-                              invalidate={invalidateQuery}
+                              invalidate={invalidateStream}
                             />
                           </Box>
                           <Tooltip
@@ -599,16 +593,16 @@ const StreamDetail = ({
                         <DropdownMenuGroup>
                           <Record
                             stream={stream}
-                            invalidate={invalidateQuery}
+                            invalidate={invalidateStream}
                             isSwitch={false}
                           />
                           <Suspend
                             stream={stream}
-                            invalidate={invalidateQuery}
+                            invalidate={invalidateStream}
                           />
                           <Delete
                             stream={stream}
-                            invalidate={invalidateQuery}
+                            invalidate={invalidateStream}
                           />
                           {userIsAdmin && stream.isActive && (
                             <>
@@ -616,7 +610,7 @@ const StreamDetail = ({
                               <DropdownMenuLabel>Admin only</DropdownMenuLabel>
                               <Terminate
                                 stream={stream}
-                                invalidate={invalidateQuery}
+                                invalidate={invalidateStream}
                               />
                             </>
                           )}
