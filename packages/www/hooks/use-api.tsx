@@ -682,6 +682,15 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async deleteMultistreamTarget(id: string): Promise<void> {
+      const [res, body] = await context.fetch(`/multistream/target/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new HttpError(res.status, body);
+      }
+    },
+
     async getStreamSessionsByUserId(
       userId,
       cursor?: string,
