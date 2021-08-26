@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Column } from "react-table";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
 import { useQueries, useQuery, useQueryClient } from "react-query";
 
 import {
@@ -17,15 +17,11 @@ import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
+import { useToggleState } from "hooks/use-toggle-state";
 
 import { useApi } from "../../../hooks";
-import { FilterItem } from "../Table/filters";
-import Toolbox from "./toolbox";
-
-const filterItems: FilterItem[] = [
-  { label: "Name", id: "name", type: "text" },
-  { label: "Profile", id: "profile", type: "text" },
-];
+import Toolbox from "./Toolbox";
+import CreateTargetDialog from "./CreateTargetDialog";
 
 type TargetInfo = {
   ref: Stream["multistream"]["targets"][number];
@@ -78,10 +74,11 @@ const MultistreamTargetsTable = ({
   tableLayout?: string;
 }) => {
   const queryClient = useQueryClient();
-  const { user, getMultistreamTarget } = useApi();
+  const { getMultistreamTarget } = useApi();
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
+  const createDialogState = useToggleState();
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -115,21 +112,23 @@ const MultistreamTargetsTable = ({
     []
   );
 
-  const targets = useQueries(
-    stream?.multistream?.targets?.map((ref) => ({
-      queryKey: ["multistreamTarget", ref.id],
-      queryFn: async () => {
-        return { ref, spec: await getMultistreamTarget(ref.id) } as TargetInfo;
-      },
-    })) ?? []
-  ).map((res) => res.data as TargetInfo);
-  const invalidateTarget = useCallback(
-    (id: string) => queryClient.invalidateQueries(["multistreamTarget", id]),
-    [queryClient]
-  );
-
   const fetcher: Fetcher<TargetsTableData> = {
     query: (state) => {
+      const targetQueryKey = (id: string) => ["multistreamTarget", id];
+      const invalidateTarget = useCallback(
+        (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
+        [queryClient]
+      );
+      const targets = useQueries(
+        stream?.multistream?.targets?.map((ref) => ({
+          queryKey: targetQueryKey(ref.id),
+          queryFn: async () => {
+            const spec = await getMultistreamTarget(ref.id);
+            return { ref, spec } as TargetInfo;
+          },
+        })) ?? []
+      ).map((res) => res.data as TargetInfo);
+
       return useQuery(
         [state.tableId, ...targets],
         () => {
@@ -177,13 +176,31 @@ const MultistreamTargetsTable = ({
           </>
         }
         border={border}
-        filterItems={filterItems}
         columns={columns}
         rowSelection={null}
         initialSortBy={[{ id: "name", desc: false }]}
         showOverflow={true}
         emptyState={emptyState}
         tableLayout={tableLayout}
+        createAction={{
+          onClick: createDialogState.onOn,
+          css: { display: "flex", alignItems: "center", ml: "$1" },
+          children: (
+            <>
+              <PlusIcon />{" "}
+              <Box as="span" css={{ ml: "$2" }}>
+                Create
+              </Box>
+            </>
+          ),
+        }}
+      />
+
+      <CreateTargetDialog
+        isOpen={createDialogState.on}
+        setOpen={createDialogState.onToggle}
+        stream={stream}
+        invalidateStream={invalidateStream}
       />
     </Box>
   );

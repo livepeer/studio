@@ -8,6 +8,7 @@ import {
   Stream,
   Webhook,
   StreamPatchPayload,
+  ObjectStore,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment } from "../lib/utils";
@@ -657,6 +658,23 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, c];
     },
 
+    async createMultistreamTarget(
+      id: string,
+      input: Omit<MultistreamTarget, "id">
+    ): Promise<MultistreamTarget> {
+      const [res, target] = await context.fetch("/multistream/target", {
+        method: "POST",
+        body: JSON.stringify(input),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 201) {
+        throw new HttpError(res.status, target);
+      }
+      return target;
+    },
+
     async getMultistreamTarget(id: string): Promise<MultistreamTarget> {
       const uri = `/multistream/target/${id}`;
       const [res, target] = await context.fetch(uri);
@@ -791,7 +809,7 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res];
     },
 
-    async createObjectStore(params): Promise<Webhook> {
+    async createObjectStore(params): Promise<ObjectStore> {
       const [res, objectStore] = await context.fetch(`/object-store`, {
         method: "POST",
         body: JSON.stringify(params),
