@@ -72,12 +72,12 @@ const CreateTargetDialog = ({
             <TextField
               required
               size="2"
-              type="text"
+              type="url"
               id="targetUrl"
               autoFocus={true}
               value={targetUrl}
               onChange={(e) => setTargetUrl(e.target.value)}
-              placeholder="e.g. rtmp://rtmp.streaming-service.com/live/stream-key"
+              placeholder="e.g. rtmp://streaming.tv/live/"
             />
             {/* <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
               A-Z, a-z, 0-9, -, _, ~ only

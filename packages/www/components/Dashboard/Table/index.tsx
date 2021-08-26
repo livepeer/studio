@@ -81,6 +81,7 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
+  noPagination?: boolean;
   emptyState?: React.ReactNode;
   viewAll?: string;
   border?: boolean;
@@ -102,6 +103,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   createAction,
   emptyState,
   viewAll,
+  noPagination = false,
   border = false,
   tableLayout = "fixed",
 }: Props<T>) => {
@@ -458,36 +460,38 @@ const TableComponent = <T extends Record<string, unknown>>({
               </Tbody>
             </Table>
           </Box>
-          <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
-            <Text>
-              <b>{data?.count}</b> results
-            </Text>
-            {viewAll ? (
-              <Link href={viewAll} passHref>
-                <A variant="violet" css={{ display: "flex", ai: "center" }}>
-                  <Box>View all</Box> <ArrowRightIcon />
-                </A>
-              </Link>
-            ) : (
-              <Flex>
-                <Button
-                  css={{ marginRight: "6px" }}
-                  onClick={handlePreviousPage}
-                  disabled={state.prevCursors.length <= 0}>
-                  Previous
-                </Button>
-                <Button
-                  onClick={handleNextPage}
-                  disabled={
-                    state.nextCursor === "" ||
-                    // @ts-ignore
-                    state.pageSize >= parseFloat(data?.count)
-                  }>
-                  Next
-                </Button>
-              </Flex>
-            )}
-          </Flex>
+          {!noPagination && (
+            <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
+              <Text>
+                <b>{data?.count}</b> results
+              </Text>
+              {viewAll ? (
+                <Link href={viewAll} passHref>
+                  <A variant="violet" css={{ display: "flex", ai: "center" }}>
+                    <Box>View all</Box> <ArrowRightIcon />
+                  </A>
+                </Link>
+              ) : (
+                <Flex>
+                  <Button
+                    css={{ marginRight: "6px" }}
+                    onClick={handlePreviousPage}
+                    disabled={state.prevCursors.length <= 0}>
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={handleNextPage}
+                    disabled={
+                      state.nextCursor === "" ||
+                      // @ts-ignore
+                      state.pageSize >= parseFloat(data?.count)
+                    }>
+                    Next
+                  </Button>
+                </Flex>
+              )}
+            </Flex>
+          )}
         </Box>
       )}
     </Box>

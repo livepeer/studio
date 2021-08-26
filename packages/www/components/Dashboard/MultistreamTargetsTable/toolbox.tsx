@@ -210,21 +210,18 @@ const Toolbox = ({
   invalidateStream: () => Promise<void>;
 }) => {
   return (
-    <Flex align="stretch" css={{ position: "relative", top: "2px" }}>
-      <Box css={{ mr: "$2" }}>
-        <Toggle target={target} invalidate={invalidateTarget} />
-      </Box>
-      <Tooltip
-        multiline
-        content={<Box>Enable or disable multistreaming to this target.</Box>}>
-        <Help />
-      </Tooltip>
+    <Flex align="center" gap="2" justify="end">
+      <Toggle target={target} invalidate={invalidateTarget} />
       <DropdownMenu>
         <DropdownMenuTrigger
           as={Button}
-          variant="transparentWhite"
+          ghost
           size="1"
-          css={{ display: "flex", ai: "center" }}>
+          css={{
+            display: "flex",
+            ai: "center",
+            "&:hover": { boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)" },
+          }}>
           <Overflow />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

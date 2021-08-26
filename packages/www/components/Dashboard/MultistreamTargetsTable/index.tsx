@@ -65,6 +65,7 @@ const MultistreamTargetsTable = ({
   emptyState = defaultEmptyState,
   border = false,
   tableLayout = "fixed",
+  ...props
 }: {
   title?: string;
   stream: Stream;
@@ -165,7 +166,7 @@ const MultistreamTargetsTable = ({
   };
 
   return (
-    <Box>
+    <Box {...props}>
       <Table
         fetcher={fetcher}
         state={state}
@@ -180,6 +181,7 @@ const MultistreamTargetsTable = ({
         rowSelection={null}
         initialSortBy={[{ id: "name", desc: false }]}
         showOverflow={true}
+        noPagination={true}
         emptyState={emptyState}
         tableLayout={tableLayout}
         createAction={{
@@ -187,7 +189,7 @@ const MultistreamTargetsTable = ({
           css: { display: "flex", alignItems: "center", ml: "$1" },
           children: (
             <>
-              <PlusIcon />{" "}
+              <PlusIcon />
               <Box as="span" css={{ ml: "$2" }}>
                 Create
               </Box>

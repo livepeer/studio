@@ -38,6 +38,7 @@ const Overview = () => {
       <MultistreamTargetsTable
         stream={stream}
         invalidateStream={invalidateStream}
+        css={{ mb: "$7" }}
         emptyState={
           <Text variant="gray" size="2">
             No targets

@@ -112,7 +112,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
         css={{ display: "flex", ai: "center" }}
         size="2"
         variant="gray">
-        <Flex css={{ marginRight: "5px" }}>
+        <Flex css={{ mr: "$2" }}>
           <FilterIcon />
         </Flex>
         Filter
