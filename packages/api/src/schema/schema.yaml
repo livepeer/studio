@@ -96,6 +96,7 @@ components:
         - webhookId
         - eventId
         - statusCode
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -117,16 +118,31 @@ components:
           type: number
           readOnly: true
           description:
-            Timestamp (in milliseconds) at which stream object was created
+            Timestamp (in milliseconds) at which webhook response object was
+            created
           example: 1587667174725
+        duration:
+          type: number
         statusCode:
           type: number
           default: 0
-        responseObject:
+        response:
           type: object
-          additionalProperties: true
+          additionalProperties: false
           properties:
             body:
+              type: string
+            headers:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            redirected:
+              type: boolean
+            status:
+              type: number
+            statusText:
               type: string
 
     detection-webhook-payload:

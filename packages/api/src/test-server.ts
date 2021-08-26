@@ -67,7 +67,7 @@ async function setupServer() {
 
 afterAll(async () => {
   if (server) {
-    await server.webhook.stop();
+    server.webhook.stop();
     await server.queue.close();
     await server.close();
     server = null;

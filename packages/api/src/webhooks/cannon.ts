@@ -1,40 +1,23 @@
+import { ConsumeMessage } from "amqplib";
+import { promises as dns } from "dns";
+import isLocalIP from "is-local-ip";
+import { Response } from "node-fetch";
+import { v4 as uuid } from "uuid";
+import { parse as parseUrl } from "url";
+
 import { DB } from "../store/db";
-import { User, Stream } from "../schema/types";
+import messages from "../store/messages";
 import MessageQueue from "../store/rabbit-queue";
-// import { getWebhooks } from "../controllers/helpers";
 import Model from "../store/model";
-import { DBWebhook, EventKey } from "../store/webhook-table";
+import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
 import logger from "../logger";
 import { sign } from "../controllers/helpers";
-
-import uuid from "uuid/v4";
-import { parse as parseUrl } from "url";
-import { ConsumeMessage } from "amqplib";
-import { Response } from "node-fetch";
-const isLocalIP = require("is-local-ip");
-const { Resolver } = require("dns").promises;
-// const resolver = new Resolver();
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000;
 const BACKOFF_COEF = 1.2;
 const MAX_RETRIES = 20;
-
-export interface TPayload {
-  [key: string]: any;
-}
-export interface WebhookMessage {
-  id: string;
-  event: EventKey;
-  createdAt: number;
-  userId: string;
-  streamId: string;
-  payload?: TPayload;
-  retries?: number;
-  lastInterval?: number;
-  status?: string;
-}
 
 export default class WebhookCannon {
   db: DB;
@@ -48,7 +31,7 @@ export default class WebhookCannon {
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
-    this.resolver = new Resolver();
+    this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
   }
@@ -60,94 +43,120 @@ export default class WebhookCannon {
   }
 
   async handleEventsQueue(data: ConsumeMessage) {
-    let message;
+    let event: messages.WebhookEvent;
     try {
-      message = JSON.parse(data.content.toString());
-      console.log("events: got message", message);
+      event = JSON.parse(data.content.toString());
+      console.log("events: got event message", event);
     } catch (err) {
       console.log("events: error parsing message", err);
       this.queue.ack(data);
       return;
     }
-    let event: WebhookMessage = message;
 
-    if (event.event === "recording.ready") {
-      if (!event.payload.sessionId) {
+    let ack: boolean;
+    try {
+      ack = await this.processWebhookEvent(event);
+    } catch (err) {
+      ack = true;
+      console.log("handleEventQueue Error ", err);
+    } finally {
+      if (ack) {
         this.queue.ack(data);
-        return;
+      } else {
+        setTimeout(() => this.queue.nack(data), 1000);
       }
-      const session = await this.db.stream.get(event.payload.sessionId, {
+    }
+  }
+
+  async processWebhookEvent(event: messages.WebhookEvent): Promise<boolean> {
+    if (event.event === "recording.ready") {
+      if (event.payload?.sessionId) {
+        // TODO: Remove this. Backward compat only during deploy
+        event.sessionId = event.payload.sessionId;
+        event.payload = { ...event.payload, sessionId: undefined };
+      }
+      const sessionId = event.sessionId;
+      if (!sessionId) {
+        return true;
+      }
+      const session = await this.db.stream.get(sessionId, {
         useReplica: false,
       });
       if (!session) {
-        this.queue.ack(data);
-        return;
+        return true;
       }
       if (session.partialSession) {
         // new session was started, so recording is not ready yet
-        this.queue.ack(data);
-        return;
+        return true;
       }
-      delete event.payload.sessionId;
+    }
+
+    const { data: webhooks } = await this.db.webhook.listSubscribed(
+      event.userId,
+      event.event
+    );
+
+    console.log(
+      `fetched webhooks. userId=${event.userId} event=${event.event} webhooks=`,
+      webhooks
+    );
+    if (webhooks.length === 0) {
+      return true;
+    }
+
+    let stream = await this.db.stream.get(event.streamId, {
+      useReplica: false,
+    });
+    if (!stream) {
+      // if stream isn't found. don't fire the webhook, log an error
+      throw new Error(
+        `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+      );
+    }
+    // basic sanitization.
+    let sanitized = this.db.stream.addDefaultFields(
+      this.db.stream.removePrivateFields({ ...stream })
+    );
+    delete sanitized.streamKey;
+
+    let user = await this.db.user.get(event.userId);
+    if (!user || user.suspended) {
+      // if user isn't found. don't fire the webhook, log an error
+      throw new Error(
+        `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
+      );
     }
 
     try {
-      const { data: webhooksList } = await this.db.webhook.listSubscribed(
-        event.userId,
-        event.event
+      const baseTrigger = {
+        type: "webhook_trigger" as const,
+        timestamp: Date.now(),
+        streamId: event.streamId,
+        event,
+        stream: sanitized,
+        user,
+      };
+      await Promise.all(
+        webhooks.map((webhook) =>
+          this.queue.publish("webhooks.triggers", {
+            ...baseTrigger,
+            id: uuid(),
+            webhook,
+          })
+        )
       );
-
-      console.log("webhooks : ", webhooksList);
-      let stream = await this.db.stream.get(event.streamId);
-      if (!stream) {
-        // if stream isn't found. don't fire the webhook, log an error
-        throw new Error(
-          `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
-        );
-      }
-      // basic sanitization.
-      let sanitized = this.db.stream.addDefaultFields(
-        this.db.stream.removePrivateFields({ ...stream })
-      );
-      delete sanitized.streamKey;
-
-      let user = await this.db.user.get(event.userId);
-      if (!user || user.suspended) {
-        // if user isn't found. don't fire the webhook, log an error
-        throw new Error(
-          `webhook Cannon: onTrigger: User Not found , userId: ${event.userId}`
-        );
-      }
-
-      const responses = await Promise.all(
-        webhooksList.map(async (webhook, key) => {
-          try {
-            await this.queue.publish("webhooks.triggers", {
-              id: uuid(),
-              event: event,
-              stream: sanitized,
-              user,
-              webhook,
-            });
-          } catch (error) {
-            console.log("Error firing single url webhook trigger", error);
-            setTimeout(() => this.queue.nack(data), 1000);
-            return;
-          }
-        })
-      );
-    } catch (err) {
-      console.log("handleEventQueue Error ", err);
+    } catch (error) {
+      console.log("Error publish webhook trigger message: ", error);
+      return false; // nack to retry processing the event
     }
-
-    this.queue.ack(data);
+    return true;
   }
 
   async handleWebhookQueue(data: ConsumeMessage) {
-    let message;
+    let trigger: messages.WebhookTrigger;
     try {
-      message = JSON.parse(data.content.toString());
-      console.log("webhookCannon: got message", message);
+      trigger = JSON.parse(data.content.toString());
+      console.log("webhookCannon: got trigger message", trigger);
     } catch (err) {
       console.log("webhookCannon: error parsing message", err);
       this.queue.ack(data);
@@ -155,21 +164,13 @@ export default class WebhookCannon {
     }
     try {
       // TODO Activate URL Verification
-      if (message.event && message.webhook && message.stream && message.user) {
-        await this._fireHook(
-          message.event,
-          message.webhook,
-          message.stream,
-          message.user,
-          false
-        );
-      }
+      await this._fireHook(trigger, false);
     } catch (err) {
       console.log("_fireHook error", err);
-      this.retry(message);
+      await this.retry(trigger);
+    } finally {
+      this.queue.ack(data);
     }
-
-    this.queue.ack(data);
   }
 
   // async processEvent(msg: Notification) {
@@ -187,7 +188,7 @@ export default class WebhookCannon {
     this.verifyUrls = false;
   }
 
-  calcBackoff(lastInterval): number {
+  public calcBackoff = (lastInterval?: number): number => {
     if (!lastInterval || lastInterval < 1000) {
       lastInterval = 5000;
     }
@@ -197,40 +198,38 @@ export default class WebhookCannon {
     }
     // RabbitMQ expects integer
     return newInterval | 0;
-  }
+  };
 
-  retry(event: WebhookMessage) {
-    if (event && event.retries && event.retries >= MAX_RETRIES) {
+  retry(trigger: messages.WebhookTrigger) {
+    if (trigger?.retries >= MAX_RETRIES) {
       console.log(
-        `Webhook Cannon| Max Retries Reached, id: ${event.id}, streamId: ${event.streamId}`
+        `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
       return;
     }
 
-    event = {
-      ...event,
-      lastInterval: this.calcBackoff(event.lastInterval),
-      status: "pending",
-      retries: event.retries ? event.retries + 1 : 1,
+    trigger = {
+      ...trigger,
+      id: uuid(),
+      timestamp: Date.now(),
+      lastInterval: this.calcBackoff(trigger.lastInterval),
+      retries: trigger.retries ? trigger.retries + 1 : 1,
     };
-    this.queue.delayedPublish(
+    return this.queue.delayedPublish(
       "webhooks.delayedEmits",
-      event,
-      event.lastInterval
+      trigger,
+      trigger.lastInterval
     );
   }
 
-  async _fireHook(
-    event: WebhookMessage,
-    webhook: DBWebhook,
-    sanitized: Stream,
-    user: User,
-    verifyUrl = true
-  ) {
+  async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
+    const { event, webhook, stream: sanitized, user } = trigger;
     if (!event || !webhook || !sanitized || !user) {
-      throw new Error(
-        `_firehook Error: event, webhook, sanitized and user are required`
+      console.error(
+        `invalid webhook trigger message received. type=${trigger.type} message=`,
+        trigger
       );
+      return;
     }
     console.log(`trying webhook ${webhook.name}: ${webhook.url}`);
     let ips, urlObj, isLocal;
@@ -278,10 +277,9 @@ export default class WebhookCannon {
         },
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({
-          id: event.id, // this will allow receiver to check if it is already received same hook
-          // (possible when retrying)
+          id: event.id, // allows receiver to check if they have already processed the same event (possible when retrying)
           webhookId: webhook.id,
-          createdAt: event.createdAt, // that way receiver will know how long ago event was emitted
+          createdAt: event.timestamp, // allows receiver to know how long ago event was emitted
           timestamp,
           event: event.event,
           stream: sanitized,
@@ -297,29 +295,28 @@ export default class WebhookCannon {
 
       try {
         logger.info(`webhook ${webhook.id} firing`);
+        const startTime = process.hrtime();
         let resp = await fetchWithTimeout(webhook.url, params);
+        await this.storeResponse(webhook, event, resp, startTime);
         if (resp.status >= 200 && resp.status < 300) {
-          // 2xx requests are cool.
-          // all is good
+          // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
-          await this.storeResponse(webhook, event, resp);
           return true;
         }
 
         if (resp.status >= 500) {
-          this.retry(event);
+          await this.retry(trigger);
         }
 
         console.error(
           `webhook ${webhook.id} didn't get 200 back! response status: ${resp.status}`
         );
-        await this.storeResponse(webhook, event, resp);
-        // we don't retry on non 200 responses. only on timeouts
+        // we don't retry on non 400 responses. only on timeouts
         // this.retry(event);
         return;
       } catch (e) {
         console.log("firing error", e);
-        this.retry(event);
+        await this.retry(trigger);
         return;
       }
     }
@@ -327,16 +324,25 @@ export default class WebhookCannon {
 
   async storeResponse(
     webhook: DBWebhook,
-    event: WebhookMessage,
+    event: messages.WebhookEvent,
     resp: Response,
-    duration = 0
+    startTime: [number, number]
   ) {
+    const hrDuration = process.hrtime(startTime);
     await this.db.webhookResponse.create({
       id: uuid(),
       webhookId: webhook.id,
       eventId: event.id,
+      createdAt: Date.now(),
+      duration: hrDuration[0] + hrDuration[1] / 1e9,
       statusCode: resp.status,
-      response: resp,
+      response: {
+        body: await resp.text(),
+        headers: resp.headers.raw(),
+        redirected: resp.redirected,
+        status: resp.status,
+        statusText: resp.statusText,
+      },
     });
   }
 }
