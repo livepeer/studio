@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Column } from "react-table";
 import {
   ArrowRightIcon,
   QuestionMarkCircledIcon as Help,
 } from "@radix-ui/react-icons";
-import { useQuery } from "react-query";
+import { useQueries, useQuery, useQueryClient } from "react-query";
 
 import {
   Box,
@@ -15,7 +15,7 @@ import {
   Link as A,
   Tooltip,
 } from "@livepeer.com/design-system";
-import { Stream } from "@livepeer.com/api";
+import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
@@ -30,6 +30,11 @@ const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
   { label: "Profile", id: "profile", type: "text" },
 ];
+
+type TargetInfo = {
+  ref: Stream["multistream"]["targets"][number];
+  spec: MultistreamTarget;
+};
 
 type TargetsTableData = {
   id: string;
@@ -76,6 +81,7 @@ const MultistreamTargetsTable = ({
   border?: boolean;
   tableLayout?: string;
 }) => {
+  const queryClient = useQueryClient();
   const { user, getMultistreamTarget } = useApi();
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
@@ -113,54 +119,67 @@ const MultistreamTargetsTable = ({
     []
   );
 
+  const targets = useQueries(
+    stream?.multistream?.targets?.map((ref) => ({
+      queryKey: ["multistreamTarget", ref.id],
+      queryFn: async () => {
+        return { ref, spec: await getMultistreamTarget(ref.id) } as TargetInfo;
+      },
+    })) ?? []
+  ).map((res) => res.data as TargetInfo);
+  const invalidateTarget = useCallback(
+    (id: string) => queryClient.invalidateQueries(["multistreamTarget", id]),
+    [queryClient]
+  );
+
   const fetcher: Fetcher<TargetsTableData> = {
-    query: (state) =>
-      useQuery([state.tableId, stream], async () => {
-        const targets = await Promise.all(
-          stream?.multistream?.targets?.map(async (ref) => {
-            return { ref, spec: await getMultistreamTarget(ref.id) };
-          }) ?? []
-        );
-        return {
-          count: targets.length,
-          nextCursor: null,
-          rows: targets.map((target) => ({
-            id: target.ref.id,
-            name: {
-              children: target.spec.name,
-            },
-            profile: {
-              children: target.ref.profile,
-            },
-            status: {
-              children: "unknown", // TODO: Call analyzer for the status
-            },
-            toolbox: {
-              children: (
-                <Flex
-                  align="stretch"
-                  css={{ position: "relative", top: "2px" }}>
-                  <Box css={{ mr: "$2" }}>
-                    <Toggle
-                      target={target.spec}
-                      invalidate={state.invalidate}
-                    />
-                  </Box>
-                  <Tooltip
-                    multiline
-                    content={
-                      <Box>
-                        Enable or disable multistreaming to this target.
-                      </Box>
-                    }>
-                    <Help />
-                  </Tooltip>
-                </Flex>
-              ),
-            },
-          })),
-        };
-      }),
+    query: (state) => {
+      return useQuery(
+        [state.tableId, ...targets],
+        () => {
+          return {
+            count: targets.length,
+            nextCursor: null,
+            rows: targets.map((target) => ({
+              id: target.ref.id,
+              name: {
+                children: target.spec.name,
+              },
+              profile: {
+                children: target.ref.profile,
+              },
+              status: {
+                children: "unknown", // TODO: Call analyzer for the status
+              },
+              toolbox: {
+                children: (
+                  <Flex
+                    align="stretch"
+                    css={{ position: "relative", top: "2px" }}>
+                    <Box css={{ mr: "$2" }}>
+                      <Toggle
+                        target={target.spec}
+                        invalidate={() => invalidateTarget(target.ref.id)}
+                      />
+                    </Box>
+                    <Tooltip
+                      multiline
+                      content={
+                        <Box>
+                          Enable or disable multistreaming to this target.
+                        </Box>
+                      }>
+                      <Help />
+                    </Tooltip>
+                  </Flex>
+                ),
+              },
+            })),
+          };
+        },
+        { enabled: targets.every((t) => !!t) }
+      );
+    },
   };
 
   return (
