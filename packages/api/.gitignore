@@ -10,3 +10,5 @@ schema.json
 worker-secrets.json
 src/schema/validators
 test-build
+.env.*
+!.env.local.example
