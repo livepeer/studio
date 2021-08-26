@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Column } from "react-table";
-import {
-  ArrowRightIcon,
-  QuestionMarkCircledIcon as Help,
-} from "@radix-ui/react-icons";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 import { useQueries, useQuery, useQueryClient } from "react-query";
 
 import {
@@ -13,7 +10,6 @@ import {
   Heading,
   Text,
   Link as A,
-  Tooltip,
 } from "@livepeer.com/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
@@ -24,7 +20,7 @@ import { SortTypeArgs } from "components/Dashboard/Table/types";
 
 import { useApi } from "../../../hooks";
 import { FilterItem } from "../Table/filters";
-import Toggle from "./toggle";
+import Toolbox from "./toolbox";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -153,25 +149,12 @@ const MultistreamTargetsTable = ({
               },
               toolbox: {
                 children: (
-                  <Flex
-                    align="stretch"
-                    css={{ position: "relative", top: "2px" }}>
-                    <Box css={{ mr: "$2" }}>
-                      <Toggle
-                        target={target.spec}
-                        invalidate={() => invalidateTarget(target.ref.id)}
-                      />
-                    </Box>
-                    <Tooltip
-                      multiline
-                      content={
-                        <Box>
-                          Enable or disable multistreaming to this target.
-                        </Box>
-                      }>
-                      <Help />
-                    </Tooltip>
-                  </Flex>
+                  <Toolbox
+                    target={target.spec}
+                    stream={stream}
+                    invalidateTarget={() => invalidateTarget(target.ref.id)}
+                    invalidateStream={invalidateStream}
+                  />
                 ),
               },
             })),

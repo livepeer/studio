@@ -1,3 +1,9 @@
+import { useState } from "react";
+import {
+  DotsHorizontalIcon as Overflow,
+  QuestionMarkCircledIcon as Help,
+} from "@radix-ui/react-icons";
+
 import {
   Box,
   Button,
@@ -8,16 +14,22 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogAction,
-  DropdownMenuItem,
   Heading,
   Text,
   Switch,
   useSnackbar,
+  Tooltip,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
 } from "@livepeer.com/design-system";
-import { useState } from "react";
-import { useApi } from "../../../hooks";
+
 import Spinner from "components/Dashboard/Spinner";
-import { MultistreamTarget } from "../../../../api/src/schema/types";
+
+import { useApi } from "../../../hooks";
+import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
+import Delete from "../StreamDetails/Delete";
 
 const Toggle = ({
   target,
@@ -101,4 +113,47 @@ const Toggle = ({
   );
 };
 
-export default Toggle;
+const Toolbox = ({
+  target,
+  stream,
+  invalidateTarget,
+  invalidateStream,
+}: {
+  target: MultistreamTarget;
+  stream: Stream;
+  invalidateTarget: () => Promise<void>;
+  invalidateStream: () => Promise<void>;
+}) => {
+  return (
+    <Flex align="stretch" css={{ position: "relative", top: "2px" }}>
+      <Box css={{ mr: "$2" }}>
+        <Toggle target={target} invalidate={invalidateTarget} />
+      </Box>
+      <Tooltip
+        multiline
+        content={<Box>Enable or disable multistreaming to this target.</Box>}>
+        <Help />
+      </Tooltip>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          as={Button}
+          variant="transparentWhite"
+          size="1"
+          css={{ display: "flex", ai: "center" }}>
+          <Overflow />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuGroup>
+            <Delete
+              stream={stream}
+              invalidate={invalidateStream}
+              isSwitch={false}
+            />
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Flex>
+  );
+};
+
+export default Toolbox;
