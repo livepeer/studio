@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import moment from "moment";
 import Link from "next/link";
 import { Column } from "react-table";
 import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
@@ -59,27 +60,36 @@ const defaultEmptyState = (
 );
 
 const TargetStatusBadge = ({
-  isActive,
+  stream,
+  target,
   status,
 }: {
-  isActive: boolean;
+  stream: Stream;
+  target: MultistreamTarget;
   status: MultistreamStatus;
 }) => {
-  const props = !isActive
-    ? { variant: "gray", text: "Idle" }
-    : !status
-    ? { variant: "lime", text: "Pending", stVariant: "yellow" }
-    : !status.connected?.status
-    ? { variant: "red", text: "Offline" }
-    : { variant: "green", text: "Online" };
-  return (
-    <Badge size="2" variant={props.variant as any}>
+  const props =
+    !stream?.isActive || (!status && target?.disabled)
+      ? { color: "gray", text: "Idle", noTooltip: true }
+      : !status
+      ? { color: "lime", text: "Pending", dotColor: "yellow" }
+      : !status.connected.status
+      ? { color: "red", text: "Offline" }
+      : { color: "green", text: "Online" };
+  const badge = (
+    <Badge size="2" variant={props.color as any}>
       <Box css={{ mr: 5 }}>
-        <Status size="1" variant={props.stVariant ?? (props.variant as any)} />
+        <Status size="1" variant={props.dotColor ?? (props.color as any)} />
       </Box>
       {props.text}
     </Badge>
   );
+  const lastProbe = Date.parse(status?.connected.lastProbeTime);
+  const timeAgo = moment.unix(lastProbe / 1000);
+  if (!timeAgo.isValid() || props.noTooltip) {
+    return badge;
+  }
+  return <Tooltip content={timeAgo.fromNow()}>{badge}</Tooltip>;
 };
 
 const MultistreamTargetsTable = ({
@@ -178,7 +188,8 @@ const MultistreamTargetsTable = ({
               status: {
                 children: (
                   <TargetStatusBadge
-                    isActive={stream.isActive}
+                    stream={stream}
+                    target={target}
                     status={status}
                   />
                 ),
