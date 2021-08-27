@@ -12,6 +12,7 @@ export const docsPositions = [
   "docs/guides/start-live-streaming/cdn.mdx",
   "docs/guides/start-live-streaming/webhook.mdx",
   "docs/guides/start-live-streaming/check-webhook-signatures.mdx",
+  "docs/guides/start-live-streaming/multistream.mdx",
   "docs/guides/start-live-streaming/back-up-transcoding.mdx",
   "docs/guides/start-live-streaming/reducing-latency.mdx",
   "docs/guides/start-live-streaming/handling-disconnects.mdx",
