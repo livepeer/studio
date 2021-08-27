@@ -33,7 +33,7 @@ const makeUrl = (region: string, path: string) => {
   if (isDevelopment() && useLocalAnalyzer) {
     return `http://localhost:8080/data${path}`;
   }
-  const tld = isStaging() ? "monster" : "com";
+  const tld = isStaging() || isDevelopment() ? "monster" : "com";
   return `https://${region}.livepeer.${tld}/data${path}`;
 };
 

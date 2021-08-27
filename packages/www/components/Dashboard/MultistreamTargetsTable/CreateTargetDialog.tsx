@@ -172,7 +172,7 @@ const CreateTargetDialog = ({
               <RadioGroup onValueChange={(e) => setProfile(e.target.value)}>
                 <Box css={{ display: "flex", flexDirection: "column" }}>
                   {profileOpts.map((p) => (
-                    <Box css={{ display: "flex", mb: "$2" }}>
+                    <Box key={p.name} css={{ display: "flex", mb: "$2" }}>
                       <Radio
                         value={p.name}
                         id={`profile-${p.name}`}
