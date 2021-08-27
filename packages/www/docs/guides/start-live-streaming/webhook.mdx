@@ -3,36 +3,30 @@ title: Using webhooks
 description: Use webhooks to listen for video lifecycle events
 ---
 
-# Using Webhooks
+# **Using Webhooks**
 
-Livepeer.com uses webhooks to communicate with your application asynchronously
-when events for your stream occur. For example, you may want to know when a
-stream has become active or idle, so that you can surface this information to
-viewers. When these events happen, we’ll make a `POST` request to a URL that you
-specify.
+Livepeer.com uses webhooks to communicate with your application asynchronously when events for your stream occur. For example, you may want to know when a stream has become active or idle, so that you can surface this information to viewers. When these events happen, we’ll make a `POST` request to a URL that you specify.
 
-## How to configure endpoints
+### How to configure endpoints
 
-Webhook endpoints are specific for each `event`. Once the event is registered,
-all streams for this account will be triggering the specific event. Here is an
-example of registering for the `stream.started` and `stream.idle` events:
+Webhook endpoints are specific for each `event`. Once the event is registered, all streams for this account will be triggering the specific event. Here is an example of registering for the `stream.started` and `stream.idle` events:
 
-```bash
+``` 
 curl \
-  -X POST \
-  -H "authorization: Bearer {api_key}" \
-  -H "content-type: application/json" \
-  --data-raw '{
-    "events": ["stream.started", "stream.idle"],
-    "url": "{webhook_url}",
-    "name": "test webhooks"
+    -X POST \
+    -H "authorization: Bearer {api_key}" \
+    -H "content-type: application/json" \
+    --data-raw '{
+      "events": ["stream.started", "stream.idle"],
+      "url": "{webhook_url}",
+      "name": "test webhooks"
   }' \
-  https://livepeer.com/api/webhook
+  https://livepeer.com/api/webhook`
 ```
 
 This request should return:
 
-```bash
+```
 {
       "createdAt" : 1624939859628,
       "events": ["stream.started", "stream.idle"],
@@ -42,149 +36,30 @@ This request should return:
       "url" : "{webhook_endpoint}",
       "userId" : "ffcd3b74-9908-4d23-be05-58e1480e752a"
 }
+
 ```
 
-Now all streams will trigger the `stream.started` and `stream.idle` events for
-this account.
+Now all streams will trigger the `stream.started` and `stream.idle` events for this account.
 
-## Other webhooks endpoints
+### Other webhooks endpoints
 
 `GET /api/webhook`: Get a list of webhooks
 
 `GET /api/webhook/:webhookID`: Get a single webhook Object details
 
-`PUT /api/webhook/:webhookID`: Edit a webhook, using the same parameters as POST
-/webhook
+`PUT /api/webhook/:webhookID`: Edit a webhook, using the same parameters as POST /webhook
 
 `DEL /api/webhook/:webhookID`: Delete a webhook
 
-## Webhook events
+### Types of Events
 
-Livepeer.com currently have two webhooks events: `stream.started` and
-`stream.idle`.
-
-After you receive the `stream.started event`, the “parent” stream object’s
-`isActive` value should be marked as `true` and the .m3u8 HLS URL constructed
-from the playbackId now works.
-
-```bash
-{
-    "id": "e7b8a281-8952-4791-b837-183cb95bbf32",
-    "event": "stream.started",
-    "stream": {
-        "lastSeen": 1624835029795,
-        "isActive": false,
-        "record": false,
-        "suspended": false,
-        "sourceSegments": 348005,
-        "transcodedSegments": 1392788,
-        "sourceSegmentsDuration": 781762.2160000018,
-        "transcodedSegmentsDuration": 3127919.1879999815,
-        "sourceBytes": 264901715475844,
-        "transcodedBytes": 65773596716,
-        "id": "e0f1ed4f-1359-420c-838f-ebce7633ec3c",
-        "kind": "stream",
-        "name": "test",
-        "region": "mdw",
-        "userId": "4ef34b74-9908-4d23-be05-58e2480e752a",
-        "profiles": [
-            {
-                "fps": 0,
-                "name": "240p0",
-                "width": 426,
-                "height": 240,
-                "bitrate": 250000
-            },
-            {
-                "fps": 0,
-                "name": "360p0",
-                "width": 640,
-                "height": 360,
-                "bitrate": 800000
-            },
-            {
-                "fps": 0,
-                "name": "480p0",
-                "width": 854,
-                "height": 480,
-                "bitrate": 1600000
-            },
-            {
-                "fps": 0,
-                "name": "720p0",
-                "width": 1280,
-                "height": 720,
-                "bitrate": 3000000
-            }
-        ],
-        "createdAt": 1604415705270,
-        "ingestRate": 0,
-        "playbackId": "e0ebw4qldvlofow5",
-        "renditions": {},
-        "outgoingRate": 0
-    }
-}
-```
-
-After you receive the `stream.idle` event, the “parent” stream object’s isActive
-value should be marked as 'false` and the .m3u8 HLS URL constructed from the
-playbackId no longer works.
-
-```bash
-{
-    "id": "e7b8a281-8952-4791-b837-183cb95bbf32",
-    "event": "stream.idle",
-    "stream": {
-        "lastSeen": 1624835029795,
-        "isActive": false,
-        "record": false,
-        "suspended": false,
-        "sourceSegments": 348005,
-        "transcodedSegments": 1392788,
-        "sourceSegmentsDuration": 781762.2160000018,
-        "transcodedSegmentsDuration": 3127919.1879999815,
-        "sourceBytes": 264901715475844,
-        "transcodedBytes": 65773596716,
-        "id": "e0f1ed4f-1359-420c-838f-ebce7633ec3c",
-        "kind": "stream",
-        "name": "test",
-        "region": "mdw",
-        "userId": "4ef34b74-9908-4d23-be05-58e2480e752a",
-        "profiles": [
-            {
-                "fps": 0,
-                "name": "240p0",
-                "width": 426,
-                "height": 240,
-                "bitrate": 250000
-            },
-            {
-                "fps": 0,
-                "name": "360p0",
-                "width": 640,
-                "height": 360,
-                "bitrate": 800000
-            },
-            {
-                "fps": 0,
-                "name": "480p0",
-                "width": 854,
-                "height": 480,
-                "bitrate": 1600000
-            },
-            {
-                "fps": 0,
-                "name": "720p0",
-                "width": 1280,
-                "height": 720,
-                "bitrate": 3000000
-            }
-        ],
-        "createdAt": 1604415705270,
-        "ingestRate": 0,
-        "playbackId": "e0ebw4qldvlofow5",
-        "renditions": {},
-        "outgoingRate": 0
-    }
-}
-```
+|           Name  | Description                |
+|----------------|-------------------------------|
+|stream.started|The "parent" stream object's isActive value is marked as true and the .m3u8 HLS URL works          |
+|stream.idle          |The “parent” stream object’s isActive value should be marked as false and the .m3u8 HLS URL no longer works         |
+|recording.ready         |This fires when a recording is ready to be downloaded|
+|recording.started|This fires when recording has started on an active stream
+|recording.waiting|This fires after a stream with recording on has concluded and is not yet ready to be downloaded. Typically it takes 5 minutes for recordings to be ready for download.
+|multistream.connected|This fires when we've successfully connected to the multistream target
+|multistream.error|This fires when we've encountered an error either while attempting to connect to the third party streaming service or while broadcasting.
+|multistream.disconnected|This fires when we are no longer sending video to the multistream target
