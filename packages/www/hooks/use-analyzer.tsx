@@ -24,7 +24,7 @@ export interface Condition {
 
 export interface HealthStatus {
   id: string;
-  healthy?: Condition;
+  healthy: Condition;
   conditions: Condition[];
   multistream?: MultistreamStatus[];
 }
@@ -34,14 +34,18 @@ const makeUrl = (region: string, path: string) => {
     return `http://localhost:8080/data${path}`;
   }
   const tld = isStaging() || isDevelopment() ? "monster" : "com";
-  return `https://${region}.livepeer.${tld}/data${path}`;
+  return `https://${region || defaultRegion}.livepeer.${tld}/data${path}`;
 };
 
 class AnalyzerClient {
-  constructor(private region: string) {}
+  constructor() {}
 
-  fetchJson = async <T,>(path: string, opts: RequestInit = {}) => {
-    const url = makeUrl(this.region, path);
+  fetchJson = async <T,>(
+    region: string,
+    path: string,
+    opts: RequestInit = {}
+  ) => {
+    const url = makeUrl(region, path);
     const headers = new Headers(opts.headers || {});
     const res = await fetch(url, {
       ...opts,
@@ -55,9 +59,9 @@ class AnalyzerClient {
     return { res, body };
   };
 
-  getHealth = async (streamId: string) => {
+  getHealth = async (region: string, streamId: string) => {
     const path = `/stream/${streamId}/health`;
-    const { res, body } = await this.fetchJson<HealthStatus>(path);
+    const { res, body } = await this.fetchJson<HealthStatus>(region, path);
     if (res.status !== 200 && res.status !== 404) {
       throw new HttpError(res.status, body);
     }
@@ -65,16 +69,10 @@ class AnalyzerClient {
   };
 }
 
-export const AnalyzerContext = createContext(new AnalyzerClient(defaultRegion));
+export const AnalyzerContext = createContext(new AnalyzerClient());
 
-export const AnalyzerProvider = ({
-  children,
-  region = defaultRegion,
-}: {
-  children: ReactNode;
-  region: string;
-}) => {
-  const value = new AnalyzerClient(region);
+export const AnalyzerProvider = ({ children }: { children: ReactNode }) => {
+  const value = new AnalyzerClient();
   return <AnalyzerContext.Provider value={value} children={children} />;
 };
 
