@@ -2,7 +2,7 @@ import { useContext, createContext, ReactNode } from "react";
 
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 
-const useLocalAnalyzer = true;
+const useLocalAnalyzer = false;
 const defaultRegion = "nyc";
 
 export interface MultistreamStatus {

@@ -141,9 +141,11 @@ const MultistreamTargetsTable = ({
 
   const fetcher: Fetcher<TargetsTableData> = {
     query: (state) => {
+      const targetRefs = stream.multistream?.targets ?? [];
       const { data: streamStatus } = useQuery({
-        queryKey: ["health", stream.id],
-        queryFn: () => getHealth(stream.id),
+        queryKey: ["health", stream.id, targetRefs.length],
+        queryFn: () =>
+          targetRefs.length > 0 ? getHealth(stream.id) : Promise.resolve(null),
         refetchInterval: 5000,
       });
 
@@ -152,7 +154,6 @@ const MultistreamTargetsTable = ({
         (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
         [queryClient]
       );
-      const targetRefs = stream.multistream?.targets ?? [];
       const targets = useQueries(
         targetRefs.map((ref) => ({
           queryKey: targetQueryKey(ref.id),
