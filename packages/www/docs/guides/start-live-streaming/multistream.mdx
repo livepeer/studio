@@ -1,0 +1,191 @@
+---
+title: Multistream
+description: Start multistreaming 
+---
+
+# Overview
+
+The Multistream API allows a source stream and transcoded renditions to be pushed to multiple RTMP or SRT targets, such as Facebook Live, Twitch, and Youtube Live. 
+
+## Managing Multistream targets in the [Livepeer.com](http://livepeer.com) Dashboard
+
+To add, manage, and delete multistream targets, navigate to the Streams page ([livepeer.com/dashboard/streams](http://livepeer.com/dashboard/streams)) and click on a stream name. On the stream detail page, on the "Overview" tab, you can view all configured targets. You must configure new multistream targets for each stream. This will apply the multistream configuration to that stream. Multistream targets do not carry over  when you create new streams. 
+
+To add a new target, select "Add" on the right side of the Multistream targets section. You'll be asked to name your Target, provide the RTMP URL, and a stream key. The RTMP URL and stream key should be provided to you by the platform that you're streaming into. Select the renditions that you'd like to send to that target. Click "Add Target". Once added, you can toggle the destinations and on and off. 
+
+To edit a mulitstream target, click on the three dots to the left of the stream name. Click "Edit target" to open up the target settings. Select "Update target" when you've completed your changes. 
+
+To delete a multistream target, click on the three dots to the left of the stream name and select "Delete target". 
+
+***NOTE:*** Any changes to mulitstream targets, including adding new targets, will apply to the next active session. If you make changes while a stream is active, those changes will not apply until the current session has ended and a new session begins. 
+
+## Managing Multistream targets with the [Livepeer.com](http://livepeer.com) API
+
+### Push Target Object: `/api/multistream/target/*`
+
+You can create"multistream targets".  Each push target represents a specific RTMP endpoint.
+
+```bash
+Request:
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+    "name": "Eli\'s Twitch",
+    "url": "rtmp://rtmp.twitch.tv/live/SECRET"   
+}' \
+'https://livepeer.com/api/multistream/target'
+
+Response:
+{
+    "id": "0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "userId": "USER123",
+    "name": "Eli\'s Twitch",
+    "url": "rtmp://rtmp.twitch.tv/live/SECRET"
+}
+```
+
+You can fetch "multistream targets".  The destination url will not be returned for security purposes.  This way, the application developer doesn't have to worry about security risks of exposing the users' stream keys.
+
+```bash
+curl 'https://livepeer.com/api/multistream/target/0bf161f3-95bd-4971-a7b1-4dcb5d39e78a' 
+'{
+    "id": "0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
+    "userId": "user1",
+    "name": "Eli\'s Twitch"
+}'
+```
+
+*Supported Protocols: RTMP and SRT. (RTMPS coming later)*
+
+---
+
+### Stream Object: `/stream`
+
+You can create a stream with a list of push targets referencing the transcoding profiles.
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+	  "name": "test_stream",
+	  "profiles": [
+	    {
+	      "name": "720p",
+	      "bitrate": 2000000,
+	      "fps": 30,
+	      "width": 1280,
+	      "height": 720
+	    },
+	    {
+	      "name": "480p",
+	      "bitrate": 1000000,
+	      "fps": 30,
+	      "width": 854,
+	      "height": 480
+	    },
+	    {
+	      "name": "360p",
+	      "bitrate": 500000,
+	      "fps": 30,
+	      "width": 640,
+	      "height": 360
+	    }
+	  ],
+    "id": "STREAM99",
+    "multistream": {
+			"targets":  [
+        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "720p" },
+				{ "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78b", "profile": "720p" },
+				{ "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78c", "profile": "480p" }
+      ]
+    }
+}'\
+https://livepeer.com/api/stream
+```
+
+You can update an existing stream to add multistream targets:
+
+```bash
+curl -X PATCH \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+     "multistream": {
+			  "targets":  [
+          { "id": "PUSH123", "profile": "720p" }
+          { "id": "PUSH444", "profile": "source" }
+        ]
+      }
+    }' \
+https://livepeer.com/api/stream/2d10f1fd-dbf7-495b-8aef-08916507fcce
+```
+
+Alternatively, you can create a stream with inline definition of multistream targets:
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api_key}' \
+-d '{
+	  "name": "test_stream",
+	  "profiles": [
+	    {
+	      "name": "720p",
+	      "bitrate": 2000000,
+	      "fps": 30,
+	      "width": 1280,
+	      "height": 720
+	    },
+	    {
+	      "name": "480p",
+	      "bitrate": 1000000,
+	      "fps": 30,
+	      "width": 854,
+	      "height": 480
+	    },
+	    {
+	      "name": "360p",
+	      "bitrate": 500000,
+	      "fps": 30,
+	      "width": 640,
+	      "height": 360
+	    }
+	  ],
+    "id": "STREAM99",
+		"multistream": {
+			"targets": [
+		    {
+		      "profile": "source",
+		      "spec": {"url": "rtmp://rtmp.twitch.tv/live/SECRET"  }
+		    },
+		    {
+		      "profile": "720p",
+		      "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"  }
+		    }
+		  ]
+    }
+}'\
+https://livepeer.com/api/stream
+```
+
+## Understanding Multistream Performance
+
+### Dashboard
+
+While a session is active that has multistream targets configured, you'll be able to see if a destination is "Active" or "Offline". ***NOTE:*** There may be a slight delay between starting the stream and the push destinations connecting. When starting to stream to multistream targets, use these indicators to understand whether has connected to its target(s). 
+
+On the stream page where you've configured your multistream targets, select the "Health" tab at the top. While a session is active, you'll see the ingest rate of the source stream as well as ingest rate of any mulitstream targets. 
+
+### API
+
+We have 3 webhooks to help you monitor how your mutlistream targets are performing including:
+
+`multistream.connected`
+
+`multistream.error`
+
+`multistream.disconnected`
+
+For more information on how to use webhooks, please consult our [Webhooks documentation](https://www.notion.so/Multistream-RTMP-Push-2e869c1878eb44409e0a8928a4c0f4a4).
