@@ -18,7 +18,6 @@ import {
   Text,
   Switch,
   useSnackbar,
-  Tooltip,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -128,7 +127,7 @@ const Delete = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <Box
         as={DropdownMenuItem}
         disabled={!target}
@@ -146,9 +145,9 @@ const Delete = ({
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
-          size="2"
+          size="3"
           variant="gray"
-          css={{ mt: "$2", lineHeight: "17px" }}>
+          css={{ mt: "$2", lineHeight: "22px" }}>
           Deleting a target cannot be undone. Any active sessions will continue
           to be multistreamed to this destination.
         </AlertDialogDescription>
