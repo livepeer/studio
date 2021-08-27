@@ -3,6 +3,7 @@ import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import SEO from "../next-seo.config";
 import { ApiProvider } from "hooks/use-api";
+import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "shaka-player/dist/controls.css";
 import "../css/shaka.css";
@@ -33,8 +34,10 @@ export default class MyApp extends App {
         </Head>
         <QueryClientProvider client={queryClient}>
           <ApiProvider>
-            <DefaultSeo {...SEO} />
-            <Component {...pageProps} />
+            <AnalyzerProvider>
+              <DefaultSeo {...SEO} />
+              <Component {...pageProps} />
+            </AnalyzerProvider>
           </ApiProvider>
         </QueryClientProvider>
       </>

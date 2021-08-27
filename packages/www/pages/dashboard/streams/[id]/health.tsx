@@ -7,7 +7,7 @@ import Chart from "components/Dashboard/Chart";
 import StreamDetail from "layouts/streamDetail";
 import { useRouter } from "next/router";
 import { Stream } from "@livepeer.com/api";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 
 const interval = 10000;
 const maxItems = 6;
@@ -19,6 +19,7 @@ const Health = () => {
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const { getStream, getStreamInfo } = useApi();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { query } = router;
   const id = query.id as string;
 
@@ -28,6 +29,9 @@ const Health = () => {
   }, [id]);
 
   const { data: stream } = useQuery([id], () => fetcher());
+  const invalidateStream = useCallback(() => {
+    return queryClient.invalidateQueries(id);
+  }, [queryClient, id]);
 
   const doGetInfo = useCallback(
     async (id: string) => {
@@ -87,6 +91,7 @@ const Health = () => {
     <StreamDetail
       activeTab="Health"
       stream={stream}
+      invalidateStream={invalidateStream}
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name, href: `/dashboard/streams/${id}` },

@@ -19,7 +19,7 @@ import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
-  const { setRecord } = useApi();
+  const { patchStream } = useApi();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
@@ -33,7 +33,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
           value={`${!!stream.record}`}
           onCheckedChange={async () => {
             if (!stream.record) {
-              await setRecord(stream.id, true);
+              await patchStream(stream.id, { record: true });
               await invalidate();
               openSnackbar("Recording has been turned on.");
             } else {
@@ -47,7 +47,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
           onSelect={async (e) => {
             e.preventDefault();
             if (!stream.record) {
-              await setRecord(stream.id, true);
+              await patchStream(stream.id, { record: true });
               await invalidate();
               openSnackbar("Recording has been turned on.");
             } else {
@@ -87,7 +87,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
             onClick={async (e) => {
               e.preventDefault();
               setSaving(true);
-              await setRecord(stream.id, !stream.record);
+              await patchStream(stream.id, { record: !stream.record });
               await invalidate();
               openSnackbar("Recording has been turned off.");
               setSaving(false);

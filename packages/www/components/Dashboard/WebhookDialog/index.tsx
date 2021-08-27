@@ -49,7 +49,12 @@ const eventOptions = [
   "stream.started",
   // "stream.detection", // not yet...
   "stream.idle",
-  // "recording.ready",
+  "recording.ready",
+  "recording.started",
+  "recording.waiting",
+  "multistream.connected",
+  "multistream.error",
+  "multistream.disconnected",
 ];
 
 export enum Action {

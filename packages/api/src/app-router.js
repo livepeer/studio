@@ -95,7 +95,7 @@ export default async function makeApp(params) {
 
   if (!stripeSecretKey) {
     console.warn(
-      "Warning: Missing Stripe API key. In development, make sure to configure one in .env file."
+      "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
     );
   }
   const stripe = new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" });

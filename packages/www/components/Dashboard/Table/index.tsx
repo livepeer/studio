@@ -1,5 +1,5 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, UseQueryResult } from "react-query";
 import {
   useEffect,
   useMemo,
@@ -56,9 +56,17 @@ type State<T extends Record<string, unknown>> = {
   invalidate: () => Promise<void>;
 };
 
-export type Fetcher<T extends Record<string, unknown>> = (
-  state: State<T>
-) => Promise<{ rows: T[]; nextCursor: string; count: number }>;
+export type FetchResult<T extends Record<string, unknown>> = {
+  rows: T[];
+  nextCursor: string;
+  count: number;
+};
+
+export type Fetcher<T extends Record<string, unknown>> =
+  | ((state: State<T>) => Promise<FetchResult<T>>)
+  | {
+      query: (state: State<T>) => UseQueryResult<FetchResult<T>>;
+    };
 
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
@@ -73,6 +81,7 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
+  noPagination?: boolean;
   emptyState?: React.ReactNode;
   viewAll?: string;
   border?: boolean;
@@ -94,14 +103,23 @@ const TableComponent = <T extends Record<string, unknown>>({
   createAction,
   emptyState,
   viewAll,
+  noPagination = false,
   border = false,
   tableLayout = "fixed",
 }: Props<T>) => {
-  const queryKey = useMemo(() => {
-    return [state.tableId, state.cursor, state.order, state.stringifiedFilters];
-  }, [state.tableId, state.cursor, state.order, state.stringifiedFilters]);
-
-  const { isLoading, data } = useQuery(queryKey, () => fetcher(state));
+  let useQueryResult: UseQueryResult<FetchResult<T>>;
+  if ("query" in fetcher) {
+    useQueryResult = fetcher.query(state);
+  } else {
+    const queryKey = [
+      state.tableId,
+      state.cursor,
+      state.order,
+      state.stringifiedFilters,
+    ];
+    useQueryResult = useQuery(queryKey, () => fetcher(state));
+  }
+  const { isLoading, data } = useQueryResult;
 
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 
@@ -442,36 +460,38 @@ const TableComponent = <T extends Record<string, unknown>>({
               </Tbody>
             </Table>
           </Box>
-          <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
-            <Text>
-              <b>{data?.count}</b> results
-            </Text>
-            {viewAll ? (
-              <Link href={viewAll} passHref>
-                <A variant="violet" css={{ display: "flex", ai: "center" }}>
-                  <Box>View all</Box> <ArrowRightIcon />
-                </A>
-              </Link>
-            ) : (
-              <Flex>
-                <Button
-                  css={{ marginRight: "6px" }}
-                  onClick={handlePreviousPage}
-                  disabled={state.prevCursors.length <= 0}>
-                  Previous
-                </Button>
-                <Button
-                  onClick={handleNextPage}
-                  disabled={
-                    state.nextCursor === "" ||
-                    // @ts-ignore
-                    state.pageSize >= parseFloat(data?.count)
-                  }>
-                  Next
-                </Button>
-              </Flex>
-            )}
-          </Flex>
+          {!noPagination && (
+            <Flex justify="between" align="center" css={{ mt: "$4", p: "$1" }}>
+              <Text>
+                <b>{data?.count}</b> results
+              </Text>
+              {viewAll ? (
+                <Link href={viewAll} passHref>
+                  <A variant="violet" css={{ display: "flex", ai: "center" }}>
+                    <Box>View all</Box> <ArrowRightIcon />
+                  </A>
+                </Link>
+              ) : (
+                <Flex>
+                  <Button
+                    css={{ marginRight: "6px" }}
+                    onClick={handlePreviousPage}
+                    disabled={state.prevCursors.length <= 0}>
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={handleNextPage}
+                    disabled={
+                      state.nextCursor === "" ||
+                      // @ts-ignore
+                      state.pageSize >= parseFloat(data?.count)
+                    }>
+                    Next
+                  </Button>
+                </Flex>
+              )}
+            </Flex>
+          )}
         </Box>
       )}
     </Box>

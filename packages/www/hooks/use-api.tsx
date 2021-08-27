@@ -4,11 +4,14 @@ import {
   User,
   Error as ApiError,
   ApiToken,
+  MultistreamTarget,
   Stream,
   Webhook,
+  StreamPatchPayload,
+  ObjectStore,
 } from "@livepeer.com/api";
 import qs from "qs";
-import { isStaging, isDevelopment } from "../lib/utils";
+import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
 
 /**
@@ -647,6 +650,57 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, c];
     },
 
+    async createMultistreamTarget(
+      id: string,
+      input: Omit<MultistreamTarget, "id">
+    ): Promise<MultistreamTarget> {
+      const [res, target] = await context.fetch("/multistream/target", {
+        method: "POST",
+        body: JSON.stringify(input),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 201) {
+        throw new HttpError(res.status, target);
+      }
+      return target;
+    },
+
+    async getMultistreamTarget(id: string): Promise<MultistreamTarget> {
+      const uri = `/multistream/target/${id}`;
+      const [res, target] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new HttpError(res.status, target);
+      }
+      return target;
+    },
+
+    async patchMultistreamTarget(
+      id: string,
+      patch: { disabled: boolean }
+    ): Promise<void> {
+      const [res, body] = await context.fetch(`/multistream/target/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new HttpError(res.status, body);
+      }
+    },
+
+    async deleteMultistreamTarget(id: string): Promise<void> {
+      const [res, body] = await context.fetch(`/multistream/target/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new HttpError(res.status, body);
+      }
+    },
+
     async getStreamSessionsByUserId(
       userId,
       cursor?: string,
@@ -669,26 +723,6 @@ const makeContext = (state: ApiState, setState) => {
       const nextCursor = getCursor(res.headers.get("link"));
       const c = res.headers.get("X-Total-Count");
       return [streams, nextCursor, c];
-    },
-
-    async suspendStream(id: string, suspended: boolean): Promise<void> {
-      const [res, body] = await context.fetch(`/stream/${id}/suspended`, {
-        method: "PATCH",
-        body: JSON.stringify({ suspended }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-      if (res.status !== 204) {
-        if (body && body.errors) {
-          throw new Error(body.errors);
-        }
-        throw new Error(body);
-      }
-      if (body && body.errors) {
-        throw new Error(body.errors);
-      }
-      return;
     },
 
     async terminateStream(id: string): Promise<boolean> {
@@ -729,22 +763,20 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
-    async setRecord(
+    async patchStream(
       streamId: string,
-      record: boolean
-    ): Promise<[void | ApiError]> {
-      const [res, body] = await context.fetch(`/stream/${streamId}/record`, {
+      patch: StreamPatchPayload
+    ): Promise<void> {
+      const [res, body] = await context.fetch(`/stream/${streamId}`, {
         method: "PATCH",
-        body: JSON.stringify({ record }),
+        body: JSON.stringify(patch),
         headers: {
           "content-type": "application/json",
         },
       });
-
       if (res.status !== 204) {
-        throw new Error(res.body ? body : `http status ${res.status}`);
+        throw new HttpError(res.status, body);
       }
-
       return res;
     },
 
@@ -769,7 +801,7 @@ const makeContext = (state: ApiState, setState) => {
       return [streams, nextCursor, res];
     },
 
-    async createObjectStore(params): Promise<Webhook> {
+    async createObjectStore(params): Promise<ObjectStore> {
       const [res, objectStore] = await context.fetch(`/object-store`, {
         method: "POST",
         body: JSON.stringify(params),
