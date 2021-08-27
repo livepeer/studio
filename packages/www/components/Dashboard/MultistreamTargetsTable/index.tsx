@@ -63,22 +63,19 @@ const TargetStatusBadge = ({
   isActive: boolean;
   status: MultistreamStatus;
 }) => {
-  const badgeProps = !isActive
+  const props = !isActive
     ? { variant: "gray", text: "Idle" }
     : !status
-    ? { variant: "lime", text: "Pending", statusVariant: "yellow" }
-    : !status?.connected
+    ? { variant: "lime", text: "Pending", stVariant: "yellow" }
+    : !status.connected?.status
     ? { variant: "red", text: "Offline" }
     : { variant: "green", text: "Online" };
   return (
-    <Badge size="2" variant={badgeProps.variant as any}>
+    <Badge size="2" variant={props.variant as any}>
       <Box css={{ mr: 5 }}>
-        <Status
-          size="1"
-          variant={badgeProps.statusVariant ?? (badgeProps.variant as any)}
-        />
+        <Status size="1" variant={props.stVariant ?? (props.variant as any)} />
       </Box>
-      {badgeProps.text}
+      {props.text}
     </Badge>
   );
 };
