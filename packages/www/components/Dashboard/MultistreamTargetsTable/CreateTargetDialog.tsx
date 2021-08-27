@@ -204,9 +204,8 @@ const CreateTargetDialog = ({
             size="3"
             variant="gray"
             css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-            Future stream sessions will have the specified profile automatically
-            pushed to the target URL. In progress stream sessions need to be
-            restarted to get the update.
+            Addition of new multistream targets will take effect when the next
+            stream session is started.
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>

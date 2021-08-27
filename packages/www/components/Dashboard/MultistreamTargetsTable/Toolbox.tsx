@@ -70,8 +70,7 @@ const Toggle = ({
           size="3"
           variant="gray"
           css={{ mt: "$2", lineHeight: "22px" }}>
-          Future stream sessions will not be multistreamed to this target. In
-          progress stream sessions will continue to be.
+          Changes will take effect when the next stream session is started.
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
@@ -150,8 +149,8 @@ const Delete = ({
           size="2"
           variant="gray"
           css={{ mt: "$2", lineHeight: "17px" }}>
-          Are you sure you want to delete multistream target {target?.name}?
-          Delete action cannot be undone.
+          Deleting a target cannot be undone. Any active sessions will continue
+          to be multistreamed to this destination.
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>

@@ -12,6 +12,8 @@ import {
   Link as A,
   Badge,
   Status,
+  Tooltip,
+  Label,
 } from "@livepeer.com/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
@@ -164,7 +166,11 @@ const MultistreamTargetsTable = ({
             return {
               id: ref.id,
               name: {
-                children: target?.name ?? "...",
+                children: (
+                  <Tooltip content={ref.id}>
+                    <Label>{target?.name ?? "..."}</Label>
+                  </Tooltip>
+                ),
               },
               profile: {
                 children: ref.profile,
