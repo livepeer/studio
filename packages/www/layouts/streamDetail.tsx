@@ -23,6 +23,7 @@ import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
+import { AnalyzerProvider } from "hooks/use-analyzer";
 import { useEffect, useState } from "react";
 import { isStaging } from "lib/utils";
 import RelativeTime from "components/Dashboard/RelativeTime";
@@ -270,7 +271,7 @@ const StreamDetail = ({
     <Layout id="streams" breadcrumbs={breadcrumbs}>
       <Box css={{ px: "$6", py: "$7" }}>
         {stream ? (
-          <>
+          <AnalyzerProvider region={stream.region}>
             <Flex>
               <Box
                 css={{
@@ -622,7 +623,7 @@ const StreamDetail = ({
                 <Box css={{ py: "$4" }}>{children}</Box>
               </Box>
             </Flex>
-          </>
+          </AnalyzerProvider>
         ) : notFound ? (
           <Box>Not found</Box>
         ) : (

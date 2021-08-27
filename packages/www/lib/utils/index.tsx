@@ -192,6 +192,18 @@ export function formatNumber(
   return numberFormat.format(val);
 }
 
+export class HttpError extends Error {
+  constructor(public status: number, public body: any) {
+    super(HttpError.makeMessage(status, body));
+  }
+
+  static makeMessage(status: number, body: any) {
+    const msg =
+      body?.errors?.length > 0 ? body.errors[0] : JSON.stringify(body);
+    return `http error status ${status}: ${msg}`;
+  }
+}
+
 export async function fetchGetJSON(url: string) {
   try {
     const data = await fetch(url).then((res) => res.json());

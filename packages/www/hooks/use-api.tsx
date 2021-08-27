@@ -11,7 +11,7 @@ import {
   ObjectStore,
 } from "@livepeer.com/api";
 import qs from "qs";
-import { isStaging, isDevelopment } from "../lib/utils";
+import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
 
 /**
@@ -90,14 +90,6 @@ const getStoredToken = () => {
     return null;
   }
 };
-
-class HttpError extends Error {
-  constructor(status: number, body: any) {
-    const msg =
-      body?.errors?.length > 0 ? body.errors[0] : JSON.stringify(body);
-    super(`http error status ${status}: ${msg}`);
-  }
-}
 
 export const DashboardRedirect = () => {
   return (

@@ -10,6 +10,8 @@ import {
   Heading,
   Text,
   Link as A,
+  Badge,
+  Status,
 } from "@livepeer.com/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
@@ -18,15 +20,11 @@ import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { useToggleState } from "hooks/use-toggle-state";
+import { MultistreamStatus } from "hooks/use-analyzer";
 
-import { useApi } from "../../../hooks";
+import { useAnalyzer, useApi } from "../../../hooks";
 import Toolbox from "./Toolbox";
 import CreateTargetDialog from "./CreateTargetDialog";
-
-type TargetInfo = {
-  ref: Stream["multistream"]["targets"][number];
-  spec: MultistreamTarget;
-};
 
 type TargetsTableData = {
   id: string;
@@ -58,6 +56,33 @@ const defaultEmptyState = (
   </Flex>
 );
 
+const TargetStatusBadge = ({
+  isActive,
+  status,
+}: {
+  isActive: boolean;
+  status: MultistreamStatus;
+}) => {
+  const badgeProps = !isActive
+    ? { variant: "gray", text: "Idle" }
+    : !status
+    ? { variant: "lime", text: "Pending", statusVariant: "yellow" }
+    : !status?.connected
+    ? { variant: "red", text: "Offline" }
+    : { variant: "green", text: "Online" };
+  return (
+    <Badge size="2" variant={badgeProps.variant as any}>
+      <Box css={{ mr: 5 }}>
+        <Status
+          size="1"
+          variant={badgeProps.statusVariant ?? (badgeProps.variant as any)}
+        />
+      </Box>
+      {badgeProps.text}
+    </Badge>
+  );
+};
+
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
   stream,
@@ -76,6 +101,7 @@ const MultistreamTargetsTable = ({
 }) => {
   const queryClient = useQueryClient();
   const { getMultistreamTarget } = useApi();
+  const { getHealth } = useAnalyzer();
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
@@ -115,12 +141,18 @@ const MultistreamTargetsTable = ({
 
   const fetcher: Fetcher<TargetsTableData> = {
     query: (state) => {
+      const { data: streamStatus } = useQuery({
+        queryKey: ["health", stream.id],
+        queryFn: () => getHealth(stream.id),
+        refetchInterval: 5000,
+      });
+
       const targetQueryKey = (id: string) => ["multistreamTarget", id];
       const invalidateTarget = useCallback(
         (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
         [queryClient]
       );
-      const targetRefs = stream?.multistream?.targets ?? [];
+      const targetRefs = stream.multistream?.targets ?? [];
       const targets = useQueries(
         targetRefs.map((ref) => ({
           queryKey: targetQueryKey(ref.id),
@@ -128,34 +160,48 @@ const MultistreamTargetsTable = ({
         }))
       ).map((res) => res.data as MultistreamTarget);
 
-      return useQuery([state.tableId, ...targets], () => {
-        return {
-          count: targets.length,
-          nextCursor: null,
-          rows: targets.map((target, idx) => ({
-            id: targetRefs[idx].id,
-            name: {
-              children: target?.name ?? "...",
-            },
-            profile: {
-              children: targetRefs[idx].profile,
-            },
-            status: {
-              children: "unknown", // TODO: Call analyzer for the status
-            },
-            toolbox: {
-              children: (
-                <Toolbox
-                  target={target}
-                  stream={stream}
-                  invalidateTarget={() => invalidateTarget(target.id)}
-                  invalidateStream={invalidateStream}
-                />
-              ),
-            },
-          })),
-        };
-      });
+      return useQuery(
+        [state.tableId, streamStatus, stream.isActive, ...targets],
+        () => {
+          return {
+            count: targets.length,
+            nextCursor: null,
+            rows: targets.map((target, idx) => {
+              const ref = targetRefs[idx];
+              const status = streamStatus?.multistream?.find(
+                (m) => m.target.id === ref.id
+              );
+              return {
+                id: ref.id,
+                name: {
+                  children: target?.name ?? "...",
+                },
+                profile: {
+                  children: ref.profile,
+                },
+                status: {
+                  children: (
+                    <TargetStatusBadge
+                      isActive={stream.isActive}
+                      status={status}
+                    />
+                  ),
+                },
+                toolbox: {
+                  children: (
+                    <Toolbox
+                      target={target}
+                      stream={stream}
+                      invalidateTarget={() => invalidateTarget(target.id)}
+                      invalidateStream={invalidateStream}
+                    />
+                  ),
+                },
+              };
+            }),
+          };
+        }
+      );
     },
   };
 
