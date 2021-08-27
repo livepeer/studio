@@ -35,7 +35,7 @@ const Toggle = ({
   target,
   invalidate,
 }: {
-  target: MultistreamTarget;
+  target?: MultistreamTarget;
   invalidate: () => Promise<void>;
 }) => {
   const { patchMultistreamTarget } = useApi();
@@ -46,9 +46,10 @@ const Toggle = ({
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <Switch
-        checked={!target.disabled}
+        disabled={!target}
+        checked={!target?.disabled}
         name="multistream-target-toggle"
-        value={`${!target.disabled}`}
+        value={`${!target?.disabled}`}
         onCheckedChange={async () => {
           if (target.disabled) {
             await patchMultistreamTarget(target.id, { disabled: false });
@@ -62,7 +63,7 @@ const Toggle = ({
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
-          Disable this multistream target?
+          Disable multistream target?
         </AlertDialogTitle>
         <AlertDialogDescription
           as={Text}
@@ -77,6 +78,7 @@ const Toggle = ({
           <AlertDialogCancel
             size="2"
             onClick={() => setOpen(false)}
+            disabled={saving}
             as={Button}
             ghost>
             Cancel
@@ -118,7 +120,7 @@ const Delete = ({
   stream,
   invalidate,
 }: {
-  target: MultistreamTarget;
+  target?: MultistreamTarget;
   stream: Stream;
   invalidate: () => Promise<void>;
 }) => {
@@ -130,6 +132,7 @@ const Delete = ({
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <Box
         as={DropdownMenuItem}
+        disabled={!target}
         onSelect={(e) => {
           e.preventDefault();
           setOpen(true);
@@ -147,7 +150,7 @@ const Delete = ({
           size="2"
           variant="gray"
           css={{ mt: "$2", lineHeight: "17px" }}>
-          Are you sure you want to delete multistream target {target.name}?
+          Are you sure you want to delete multistream target {target?.name}?
           Delete action cannot be undone.
         </AlertDialogDescription>
 
@@ -204,7 +207,7 @@ const Toolbox = ({
   invalidateTarget,
   invalidateStream,
 }: {
-  target: MultistreamTarget;
+  target?: MultistreamTarget;
   stream: Stream;
   invalidateTarget: () => Promise<void>;
   invalidateStream: () => Promise<void>;

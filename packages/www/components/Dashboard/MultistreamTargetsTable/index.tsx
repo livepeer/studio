@@ -120,48 +120,42 @@ const MultistreamTargetsTable = ({
         (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
         [queryClient]
       );
+      const targetRefs = stream?.multistream?.targets ?? [];
       const targets = useQueries(
-        stream?.multistream?.targets?.map((ref) => ({
+        targetRefs.map((ref) => ({
           queryKey: targetQueryKey(ref.id),
-          queryFn: async () => {
-            const spec = await getMultistreamTarget(ref.id);
-            return { ref, spec } as TargetInfo;
-          },
-        })) ?? []
-      ).map((res) => res.data as TargetInfo);
+          queryFn: () => getMultistreamTarget(ref.id),
+        }))
+      ).map((res) => res.data as MultistreamTarget);
 
-      return useQuery(
-        [state.tableId, ...targets],
-        () => {
-          return {
-            count: targets.length,
-            nextCursor: null,
-            rows: targets.map((target) => ({
-              id: target.ref.id,
-              name: {
-                children: target.spec.name,
-              },
-              profile: {
-                children: target.ref.profile,
-              },
-              status: {
-                children: "unknown", // TODO: Call analyzer for the status
-              },
-              toolbox: {
-                children: (
-                  <Toolbox
-                    target={target.spec}
-                    stream={stream}
-                    invalidateTarget={() => invalidateTarget(target.ref.id)}
-                    invalidateStream={invalidateStream}
-                  />
-                ),
-              },
-            })),
-          };
-        },
-        { enabled: targets.every((t) => !!t) }
-      );
+      return useQuery([state.tableId, ...targets], () => {
+        return {
+          count: targets.length,
+          nextCursor: null,
+          rows: targets.map((target, idx) => ({
+            id: targetRefs[idx].id,
+            name: {
+              children: target?.name ?? "...",
+            },
+            profile: {
+              children: targetRefs[idx].profile,
+            },
+            status: {
+              children: "unknown", // TODO: Call analyzer for the status
+            },
+            toolbox: {
+              children: (
+                <Toolbox
+                  target={target}
+                  stream={stream}
+                  invalidateTarget={() => invalidateTarget(target.id)}
+                  invalidateStream={invalidateStream}
+                />
+              ),
+            },
+          })),
+        };
+      });
     },
   };
 
@@ -179,7 +173,6 @@ const MultistreamTargetsTable = ({
         border={border}
         columns={columns}
         rowSelection={null}
-        initialSortBy={[{ id: "name", desc: false }]}
         showOverflow={true}
         noPagination={true}
         emptyState={emptyState}
@@ -200,7 +193,7 @@ const MultistreamTargetsTable = ({
 
       <CreateTargetDialog
         isOpen={createDialogState.on}
-        setOpen={createDialogState.onToggle}
+        onOpenChange={createDialogState.onToggle}
         stream={stream}
         invalidateStream={invalidateStream}
       />
