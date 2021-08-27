@@ -46,6 +46,12 @@ const CreateTargetDialog = ({
   const [targetUrl, setTargetUrl] = useState("");
   const [streamKey, setStreamKey] = useState("");
   const [profile, setProfile] = useState("source");
+  const resetState = () => {
+    setName("");
+    setTargetUrl("");
+    setStreamKey("");
+    setProfile("source");
+  };
 
   const parsedUrl = useMemo(() => {
     let parsed: url.UrlWithParsedQuery;
@@ -86,6 +92,7 @@ const CreateTargetDialog = ({
       await invalidateStream();
       onOpenChange(false);
       openSnackbar(`Successfully created multistream target ${name}`);
+      resetState();
     } catch (error) {
       console.error(error);
     } finally {

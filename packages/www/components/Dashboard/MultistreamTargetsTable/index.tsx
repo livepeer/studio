@@ -94,7 +94,7 @@ const MultistreamTargetsTable = ({
 }: {
   title?: string;
   stream: Stream;
-  invalidateStream: () => Promise<void>;
+  invalidateStream: (optm?: Stream) => Promise<void>;
   emptyState?: React.ReactNode;
   border?: boolean;
   tableLayout?: string;

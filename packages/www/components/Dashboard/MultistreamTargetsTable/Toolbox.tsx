@@ -118,11 +118,11 @@ const Toggle = ({
 const Delete = ({
   target,
   stream,
-  invalidate,
+  invalidateStream,
 }: {
   target?: MultistreamTarget;
   stream: Stream;
-  invalidate: () => Promise<void>;
+  invalidateStream: (optm: Stream) => Promise<void>;
 }) => {
   const { patchStream, deleteMultistreamTarget } = useApi();
   const [saving, setSaving] = useState(false);
@@ -167,18 +167,17 @@ const Delete = ({
             size="2"
             disabled={saving}
             onClick={async (e) => {
+              e.preventDefault();
+              setSaving(true);
               try {
-                e.preventDefault();
-                setSaving(true);
                 const targets = stream.multistream.targets.filter(
                   (t) => t.id !== target.id
                 );
                 await patchStream(stream.id, { multistream: { targets } });
                 await deleteMultistreamTarget(target.id);
-                await invalidate();
-                setSaving(false);
                 setOpen(false);
-              } catch (e) {
+                await invalidateStream({ ...stream, multistream: { targets } });
+              } finally {
                 setSaving(false);
               }
             }}
@@ -210,7 +209,7 @@ const Toolbox = ({
   target?: MultistreamTarget;
   stream: Stream;
   invalidateTarget: () => Promise<void>;
-  invalidateStream: () => Promise<void>;
+  invalidateStream: (optm: Stream) => Promise<void>;
 }) => {
   return (
     <Flex align="center" gap="2" justify="end">
@@ -232,9 +231,7 @@ const Toolbox = ({
             <Delete
               target={target}
               stream={stream}
-              invalidate={() =>
-                Promise.all([invalidateTarget(), invalidateStream()]) as any
-              }
+              invalidateStream={invalidateStream}
             />
           </DropdownMenuGroup>
         </DropdownMenuContent>

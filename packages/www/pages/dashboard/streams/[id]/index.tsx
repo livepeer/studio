@@ -16,15 +16,16 @@ const Overview = () => {
   const { query } = router;
   const id = query.id as string;
 
-  const fetcher = useCallback(async () => {
-    const stream: Stream = await getStream(id);
-    return stream;
-  }, [id]);
-
-  const { data: stream } = useQuery([id], () => fetcher());
-  const invalidateStream = useCallback(() => {
-    return queryClient.invalidateQueries(id);
-  }, [queryClient, id]);
+  const { data: stream } = useQuery([id], () => getStream(id));
+  const invalidateStream = useCallback(
+    (optimistic?: Stream) => {
+      if (optimistic) {
+        queryClient.setQueryData([id], optimistic);
+      }
+      return queryClient.invalidateQueries([id]);
+    },
+    [queryClient, id]
+  );
 
   return (
     <StreamDetail
