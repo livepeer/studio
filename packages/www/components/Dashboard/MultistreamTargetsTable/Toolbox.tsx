@@ -1,8 +1,5 @@
-import { useState } from "react";
-import {
-  DotsHorizontalIcon as Overflow,
-  QuestionMarkCircledIcon as Help,
-} from "@radix-ui/react-icons";
+import { useCallback, useMemo, useState } from "react";
+import { DotsHorizontalIcon as Overflow } from "@radix-ui/react-icons";
 
 import {
   Box,
@@ -201,14 +198,18 @@ const Delete = ({
 const Toolbox = ({
   target,
   stream,
-  invalidateTarget,
+  invalidateTargetId,
   invalidateStream,
 }: {
   target?: MultistreamTarget;
   stream: Stream;
-  invalidateTarget: () => Promise<void>;
+  invalidateTargetId: (id: string) => Promise<void>;
   invalidateStream: (optm: Stream) => Promise<void>;
 }) => {
+  const invalidateTarget = useCallback(
+    () => invalidateTargetId(target?.id),
+    [invalidateTargetId, target?.id]
+  );
   return (
     <Flex align="center" gap="2" justify="end">
       <Toggle target={target} invalidate={invalidateTarget} />
