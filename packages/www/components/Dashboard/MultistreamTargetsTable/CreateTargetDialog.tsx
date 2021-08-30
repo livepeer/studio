@@ -43,12 +43,12 @@ const CreateTargetDialog = ({
   const [saving, setSaving] = useState(false);
 
   const [name, setName] = useState("");
-  const [targetUrl, setTargetUrl] = useState("");
+  const [ingestUrl, setIngestUrl] = useState("");
   const [streamKey, setStreamKey] = useState("");
   const [profile, setProfile] = useState("source");
   const resetState = () => {
     setName("");
-    setTargetUrl("");
+    setIngestUrl("");
     setStreamKey("");
     setProfile("source");
   };
@@ -56,7 +56,7 @@ const CreateTargetDialog = ({
   const parsedUrl = useMemo(() => {
     let parsed: url.UrlWithParsedQuery;
     try {
-      parsed = url.parse(targetUrl, true);
+      parsed = url.parse(ingestUrl, true);
     } catch (err) {}
     if (!streamKey || !parsed) {
       return parsed;
@@ -72,7 +72,7 @@ const CreateTargetDialog = ({
         break;
     }
     return parsed;
-  }, [targetUrl, streamKey]);
+  }, [ingestUrl, streamKey]);
 
   const saveMultistreamTarget = async () => {
     if (saving) return;
@@ -141,15 +141,15 @@ const CreateTargetDialog = ({
               onChange={(e) => setName(e.target.value)}
             />
 
-            <Label htmlFor="targetUrl">Target URL</Label>
+            <Label htmlFor="ingestUrl">Ingest URL</Label>
             <TextField
               required
               autoFocus
               size="2"
               type="url"
-              id="targetUrl"
-              value={targetUrl}
-              onChange={(e) => setTargetUrl(e.target.value)}
+              id="ingestUrl"
+              value={ingestUrl}
+              onChange={(e) => setIngestUrl(e.target.value)}
               placeholder="e.g. rtmp://streaming.tv/live"
             />
 
