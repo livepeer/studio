@@ -8,13 +8,10 @@ import { useApi, useAnalyzer } from "hooks";
 import { Stream } from "@livepeer.com/api";
 import { useQuery, useQueryClient } from "react-query";
 
-const refetchInterval = 5 * 1000;
-
 const Overview = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { getStream } = useApi();
-  const { getHealth } = useAnalyzer();
 
   const { query } = router;
   const id = query.id as string;
@@ -29,12 +26,6 @@ const Overview = () => {
     },
     [queryClient, id]
   );
-  const { data: streamHealth } = useQuery({
-    queryKey: ["health", stream?.region, stream?.id, stream?.isActive],
-    queryFn: async () =>
-      !stream?.region ? null : await getHealth(stream.region, stream.id),
-    refetchInterval,
-  });
 
   return (
     <StreamDetail
@@ -47,7 +38,6 @@ const Overview = () => {
       ]}>
       <MultistreamTargetsTable
         stream={stream}
-        streamHealth={streamHealth}
         invalidateStream={invalidateStream}
         css={{ mb: "$7" }}
         emptyState={
