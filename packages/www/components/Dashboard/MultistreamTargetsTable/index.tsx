@@ -23,13 +23,11 @@ import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { useToggleState } from "hooks/use-toggle-state";
-import { useAnalyzer, useApi } from "hooks";
-import { MultistreamStatus } from "hooks/use-analyzer";
+import { useApi } from "hooks";
+import { HealthStatus, MultistreamStatus } from "hooks/use-analyzer";
 
 import Toolbox from "./Toolbox";
 import CreateTargetDialog from "./CreateTargetDialog";
-
-const refetchInterval = 5 * 1000;
 
 type TargetsTableData = {
   id: string;
@@ -97,6 +95,7 @@ const TargetStatusBadge = ({
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
   stream,
+  streamHealth,
   invalidateStream,
   emptyState = defaultEmptyState,
   border = false,
@@ -105,6 +104,7 @@ const MultistreamTargetsTable = ({
 }: {
   title?: string;
   stream: Stream;
+  streamHealth?: HealthStatus;
   invalidateStream: (optm?: Stream) => Promise<void>;
   emptyState?: React.ReactNode;
   border?: boolean;
@@ -112,7 +112,6 @@ const MultistreamTargetsTable = ({
 }) => {
   const queryClient = useQueryClient();
   const { getMultistreamTarget } = useApi();
-  const { getHealth } = useAnalyzer();
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
@@ -152,13 +151,6 @@ const MultistreamTargetsTable = ({
 
   const fetcher: Fetcher<TargetsTableData> = {
     query: (state) => {
-      const { data: streamHealth } = useQuery({
-        queryKey: ["health", stream?.region, stream?.id, stream?.isActive],
-        queryFn: async () =>
-          !stream?.region ? null : await getHealth(stream.region, stream.id),
-        refetchInterval,
-      });
-
       const targetQueryKey = (id: string) => ["multistreamTarget", id];
       const invalidateTarget = useCallback(
         (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
