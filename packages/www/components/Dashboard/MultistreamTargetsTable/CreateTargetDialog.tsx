@@ -147,11 +147,15 @@ const CreateTargetDialog = ({
               autoFocus
               size="2"
               type="url"
+              pattern="^(srt|rtmps?)://.+"
               id="ingestUrl"
               value={ingestUrl}
               onChange={(e) => setIngestUrl(e.target.value)}
               placeholder="e.g. rtmp://streaming.tv/live"
             />
+            <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
+              Supported protocols: RTMP(S) and SRT
+            </Text>
 
             <Label htmlFor="streamKey">Stream key (optional)</Label>
             <TextField
