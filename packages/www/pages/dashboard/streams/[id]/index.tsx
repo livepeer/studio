@@ -19,7 +19,9 @@ const Overview = () => {
   const { query } = router;
   const id = query.id as string;
 
-  const { data: stream } = useQuery([id], () => getStream(id));
+  const { data: stream } = useQuery([id], () => getStream(id), {
+    refetchInterval,
+  });
   const invalidateStream = useCallback(
     (optimistic?: Stream) => {
       if (optimistic) {
