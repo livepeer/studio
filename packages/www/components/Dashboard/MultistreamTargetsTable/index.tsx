@@ -3,7 +3,7 @@ import moment from "moment";
 import Link from "next/link";
 import { Column } from "react-table";
 import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
-import { useQueries, useQuery, useQueryClient } from "react-query";
+import { useQueries, useQueryClient } from "react-query";
 
 import {
   Box,
@@ -31,7 +31,7 @@ import { useApi } from "hooks";
 import { HealthStatus, MultistreamStatus } from "hooks/use-analyzer";
 
 import Toolbox from "./Toolbox";
-import CreateTargetDialog from "./CreateTargetDialog";
+import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 
 type TargetsTableData = {
   id: string;
@@ -119,7 +119,7 @@ const MultistreamTargetsTable = ({
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
-  const createDialogState = useToggleState();
+  const saveDialogState = useToggleState();
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -233,7 +233,7 @@ const MultistreamTargetsTable = ({
         emptyState={emptyState}
         tableLayout={tableLayout}
         createAction={{
-          onClick: createDialogState.onOn,
+          onClick: saveDialogState.onOn,
           css: { display: "flex", alignItems: "center", ml: "$1" },
           children: (
             <>
@@ -246,11 +246,12 @@ const MultistreamTargetsTable = ({
         }}
       />
 
-      <CreateTargetDialog
-        isOpen={createDialogState.on}
-        onOpenChange={createDialogState.onToggle}
+      <SaveTargetDialog
+        action={Action.Create}
+        isOpen={saveDialogState.on}
+        onOpenChange={saveDialogState.onToggle}
         stream={stream}
-        invalidateStream={invalidateStream}
+        invalidate={invalidateStream}
       />
     </Box>
   );

@@ -9,6 +9,7 @@ import {
   Webhook,
   StreamPatchPayload,
   ObjectStore,
+  MultistreamTargetPatchPayload,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -678,7 +679,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async patchMultistreamTarget(
       id: string,
-      patch: { disabled: boolean }
+      patch: MultistreamTargetPatchPayload
     ): Promise<void> {
       const [res, body] = await context.fetch(`/multistream/target/${id}`, {
         method: "PATCH",

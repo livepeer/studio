@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DotsHorizontalIcon as Overflow } from "@radix-ui/react-icons";
 
 import {
@@ -25,6 +25,7 @@ import Spinner from "components/Dashboard/Spinner";
 
 import { useApi } from "../../../hooks";
 import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
+import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 
 const DisableDialog = ({
   onDialogAction,
@@ -166,12 +167,13 @@ const Toolbox = ({
   target?: MultistreamTarget;
   stream: Stream;
   invalidateTargetId: (id: string) => Promise<void>;
-  invalidateStream: (optm: Stream) => Promise<void>;
+  invalidateStream: (optm?: Stream) => Promise<void>;
 }) => {
   const { patchMultistreamTarget } = useApi();
   const [openSnackbar] = useSnackbar();
 
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const setTargetDisabled = useCallback(
@@ -191,6 +193,13 @@ const Toolbox = ({
       target?.disabled,
     ]
   );
+  const invalidateAll = useCallback(async () => {
+    await Promise.all([invalidateStream(), invalidateTargetId(target?.id)]);
+  }, [invalidateStream, invalidateTargetId, target?.id]);
+  const currProfile = useMemo(() => {
+    const ref = stream?.multistream?.targets?.find((t) => t.id == target?.id);
+    return ref?.profile;
+  }, [stream?.multistream?.targets, target?.id]);
 
   return (
     <Flex align="center" gap="2" justify="end">
@@ -223,6 +232,11 @@ const Toolbox = ({
           <DropdownMenuGroup>
             <DropdownMenuItem
               disabled={!target}
+              onSelect={() => setSaveDialogOpen(true)}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={!target}
               onSelect={() => setDeleteDialogOpen(true)}
               color="red">
               Delete
@@ -238,6 +252,15 @@ const Toolbox = ({
         )}
         open={disableDialogOpen}
         setOpen={setDisableDialogOpen}
+      />
+      <SaveTargetDialog
+        action={Action.Update}
+        isOpen={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        stream={stream}
+        target={target}
+        initialProfile={currProfile}
+        invalidate={invalidateAll}
       />
       <DeleteDialog
         target={target}
