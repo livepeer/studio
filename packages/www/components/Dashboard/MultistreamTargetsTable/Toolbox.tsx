@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { DotsHorizontalIcon as Overflow } from "@radix-ui/react-icons";
 
 import {
-  Box,
   Button,
   Flex,
   AlertDialog,
@@ -27,36 +26,18 @@ import Spinner from "components/Dashboard/Spinner";
 import { useApi } from "../../../hooks";
 import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
 
-const Toggle = ({
-  target,
-  invalidate,
+const DisableDialog = ({
+  onDialogAction,
+  open,
+  setOpen,
 }: {
-  target?: MultistreamTarget;
-  invalidate: () => Promise<void>;
+  onDialogAction: () => Promise<void>;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }) => {
-  const { patchMultistreamTarget } = useApi();
   const [saving, setSaving] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [openSnackbar] = useSnackbar();
-
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
-      <Switch
-        disabled={!target}
-        checked={!target?.disabled}
-        name="multistream-target-toggle"
-        value={`${!target?.disabled}`}
-        onCheckedChange={async () => {
-          if (target.disabled) {
-            await patchMultistreamTarget(target.id, { disabled: false });
-            await invalidate();
-            openSnackbar(`Target ${target.name} has been turned on.`);
-          } else {
-            setOpen(true);
-          }
-        }}
-      />
-
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
           Disable multistream target?
@@ -70,12 +51,7 @@ const Toggle = ({
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel
-            size="2"
-            onClick={() => setOpen(false)}
-            disabled={saving}
-            as={Button}
-            ghost>
+          <AlertDialogCancel size="2" disabled={saving} as={Button} ghost>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
@@ -85,10 +61,7 @@ const Toggle = ({
             onClick={async (e) => {
               e.preventDefault();
               setSaving(true);
-              const disabled = !target.disabled;
-              await patchMultistreamTarget(target.id, { disabled });
-              await invalidate();
-              openSnackbar(`Target ${target.name} has been turned off.`);
+              await onDialogAction();
               setSaving(false);
               setOpen(false);
             }}
@@ -110,32 +83,24 @@ const Toggle = ({
   );
 };
 
-const Delete = ({
+const DeleteDialog = ({
   target,
   stream,
   invalidateStream,
+  open,
+  setOpen,
 }: {
   target?: MultistreamTarget;
   stream: Stream;
   invalidateStream: (optm: Stream) => Promise<void>;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }) => {
   const { patchStream, deleteMultistreamTarget } = useApi();
   const [saving, setSaving] = useState(false);
-  const [open, setOpen] = useState(false);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <Box
-        as={DropdownMenuItem}
-        disabled={!target}
-        onSelect={(e) => {
-          e.preventDefault();
-          setOpen(true);
-        }}
-        color="red">
-        Delete
-      </Box>
-
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle as={Heading} size="1">
           Delete multistream target?
@@ -150,11 +115,7 @@ const Delete = ({
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel
-            size="2"
-            onClick={() => setOpen(false)}
-            as={Button}
-            ghost>
+          <AlertDialogCancel size="2" as={Button} ghost>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
@@ -168,10 +129,11 @@ const Delete = ({
                 const targets = stream.multistream.targets.filter(
                   (t) => t.id !== target.id
                 );
-                await patchStream(stream.id, { multistream: { targets } });
+                const patch = { multistream: { targets } };
+                await patchStream(stream.id, patch);
                 await deleteMultistreamTarget(target.id);
                 setOpen(false);
-                await invalidateStream({ ...stream, multistream: { targets } });
+                await invalidateStream({ ...stream, ...patch });
               } finally {
                 setSaving(false);
               }
@@ -206,13 +168,45 @@ const Toolbox = ({
   invalidateTargetId: (id: string) => Promise<void>;
   invalidateStream: (optm: Stream) => Promise<void>;
 }) => {
-  const invalidateTarget = useCallback(
-    () => invalidateTargetId(target?.id),
-    [invalidateTargetId, target?.id]
+  const { patchMultistreamTarget } = useApi();
+  const [openSnackbar] = useSnackbar();
+
+  const [disableDialogOpen, setDisableDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const setTargetDisabled = useCallback(
+    async (disabled: boolean) => {
+      await patchMultistreamTarget(target.id, { disabled });
+      await invalidateTargetId(target?.id);
+      openSnackbar(
+        `Target ${target.name} has been turned ${disabled ? "off" : "on"}.`
+      );
+    },
+    [
+      patchMultistreamTarget,
+      invalidateTargetId,
+      openSnackbar,
+      target?.id,
+      target?.name,
+      target?.disabled,
+    ]
   );
+
   return (
     <Flex align="center" gap="2" justify="end">
-      <Toggle target={target} invalidate={invalidateTarget} />
+      <Switch
+        name="multistream-target-toggle"
+        disabled={!target}
+        checked={!target?.disabled}
+        value={`${!target?.disabled}`}
+        onCheckedChange={useCallback(async () => {
+          if (target?.disabled) {
+            await setTargetDisabled(false);
+          } else {
+            setDisableDialogOpen(true);
+          }
+        }, [target?.disabled, setTargetDisabled])}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger
           as={Button}
@@ -227,14 +221,31 @@ const Toolbox = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            <Delete
-              target={target}
-              stream={stream}
-              invalidateStream={invalidateStream}
-            />
+            <DropdownMenuItem
+              disabled={!target}
+              onSelect={() => setDeleteDialogOpen(true)}
+              color="red">
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <DisableDialog
+        onDialogAction={useCallback(
+          () => setTargetDisabled(true),
+          [setTargetDisabled]
+        )}
+        open={disableDialogOpen}
+        setOpen={setDisableDialogOpen}
+      />
+      <DeleteDialog
+        target={target}
+        stream={stream}
+        invalidateStream={invalidateStream}
+        open={deleteDialogOpen}
+        setOpen={setDeleteDialogOpen}
+      />
     </Flex>
   );
 };
