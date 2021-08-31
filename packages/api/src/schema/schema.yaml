@@ -481,6 +481,11 @@ components:
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
 
+    multistream-target-patch-payload:
+      $ref: "#/components/schemas/multistream-target"
+      required: []
+      table: null
+
     session:
       type: object
       table: session
@@ -1315,11 +1320,7 @@ paths:
         content:
           application/json:
             schema:
-              required: [disabled]
-              additionalProperties: false
-              properties:
-                disabled:
-                  $ref: "#/components/schemas/multistream-target/properties/disabled"
+              $ref: "#/components/schemas/multistream-target-patch-payload"
       responses:
         204:
           description: Success

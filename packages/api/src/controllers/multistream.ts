@@ -7,7 +7,10 @@ import { Response, Router } from "express";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
-import { MultistreamTarget } from "../schema/types";
+import {
+  MultistreamTarget,
+  MultistreamTargetPatchPayload,
+} from "../schema/types";
 import { DBMultistreamTarget } from "../store/multistream-table";
 
 const fieldsMap = {
@@ -150,20 +153,33 @@ target.delete("/:id", async (req, res) => {
   res.end();
 });
 
-target.patch("/:id", async (req, res) => {
-  const isAdmin = !!req.user.admin;
-  const { id } = req.params;
-  if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
-    return notFound(res);
+target.patch(
+  "/:id",
+  validatePost("multistream-target-patch-payload"),
+  async (req, res) => {
+    const isAdmin = !!req.user.admin;
+    const { id } = req.params;
+    if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
+      return notFound(res);
+    }
+    const { disabled, name, url } = req.body as MultistreamTargetPatchPayload;
+    let patch: Partial<DBMultistreamTarget> = {};
+    if (typeof disabled === "boolean") {
+      patch = { ...patch, disabled };
+    }
+    if (name) {
+      patch = { ...patch, name };
+    }
+    if (url) {
+      patch = { ...patch, url };
+    }
+    if (Object.keys(patch).length > 0) {
+      await db.multistreamTarget.update(id, patch);
+    }
+    res.status(204);
+    res.end();
   }
-  const disabledPatch = req.body.disabled;
-  if (typeof disabledPatch !== "boolean") {
-    return respondError(res, 422, "required boolean field: disabled");
-  }
-  await db.multistreamTarget.update(id, { disabled: disabledPatch });
-  res.status(204);
-  res.end();
-});
+);
 
 const app = Router();
 

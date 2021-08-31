@@ -141,7 +141,7 @@ export class DB {
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
 
     const tables = Object.entries(schema.components.schemas).filter(
-      ([name, schema]) => "table" in schema
+      ([name, schema]) => "table" in schema && schema.table
     );
     await Promise.all(
       tables.map(([name, schema]) => {
