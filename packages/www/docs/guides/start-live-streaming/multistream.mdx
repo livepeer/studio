@@ -115,12 +115,11 @@ curl -X POST \
 	      "height": 360
 	    }
 	  ],
-    "id": "STREAM99",
     "multistream": {
-			"targets":  [
+      "targets":  [
         { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "720p" },
-				{ "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78b", "profile": "720p" },
-				{ "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78c", "profile": "480p" }
+        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78b", "profile": "720p" },
+        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78c", "profile": "480p" }
       ]
     }
 }' \
@@ -135,7 +134,7 @@ curl -X PATCH \
 -H 'authorization: Bearer {api_key}' \
 -d '{
      "multistream": {
-			  "targets":  [
+        "targets":  [
           { "id": "PUSH123", "profile": "720p" }
           { "id": "PUSH444", "profile": "source" }
         ]
@@ -176,22 +175,23 @@ curl -X POST \
 	      "height": 360
 	    }
 	  ],
-    "id": "STREAM99",
-		"multistream": {
-			"targets": [
-		    {
-		      "profile": "source",
-		      "spec": {"url": "rtmp://rtmp.twitch.tv/live/SECRET"  }
-		    },
-		    {
-		      "profile": "720p",
-		      "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"  }
-		    }
+    "multistream": {
+      "targets": [
+        {
+          "profile": "source",
+          "spec": {"url": "rtmp://rtmp.twitch.tv/live/SECRET"}
+        },
+        {
+          "profile": "720p",
+          "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"}
+        }
 		  ]
     }
 }' \
 https://livepeer.com/api/stream
 ```
+
+Inline definition also works with `PATCH` requests for updating the multistream targets.
 
 ## Understanding Multistream Performance
 
