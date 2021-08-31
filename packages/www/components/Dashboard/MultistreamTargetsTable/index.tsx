@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from "react";
-import moment from "moment";
 import Link from "next/link";
 import { Column } from "react-table";
 import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
@@ -11,8 +10,6 @@ import {
   Heading,
   Text,
   Link as A,
-  Badge,
-  Status,
   Tooltip,
   Label,
 } from "@livepeer.com/design-system";
@@ -28,10 +25,11 @@ import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "hooks";
-import { HealthStatus, MultistreamStatus } from "hooks/use-analyzer";
+import { HealthStatus } from "hooks/use-analyzer";
 
 import Toolbox from "./Toolbox";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
+import TargetStatusBadge from "./TargetStatusBadge";
 
 type TargetsTableData = {
   id: string;
@@ -62,39 +60,6 @@ const defaultEmptyState = (
     </Link>
   </Flex>
 );
-
-const TargetStatusBadge = ({
-  stream,
-  target,
-  status,
-}: {
-  stream: Stream;
-  target: MultistreamTarget;
-  status: MultistreamStatus;
-}) => {
-  const props =
-    !stream?.isActive || (!status?.connected.status && target?.disabled)
-      ? { color: "gray", text: "Idle", noTooltip: true }
-      : !status
-      ? { color: "lime", text: "Pending", dotColor: "yellow" }
-      : !status.connected.status
-      ? { color: "red", text: "Offline" }
-      : { color: "green", text: "Online" };
-  const badge = (
-    <Badge size="2" variant={props.color as any}>
-      <Box css={{ mr: 5 }}>
-        <Status size="1" variant={props.dotColor ?? (props.color as any)} />
-      </Box>
-      {props.text}
-    </Badge>
-  );
-  const lastProbe = Date.parse(status?.connected.lastProbeTime);
-  const timeAgo = moment.unix(lastProbe / 1000);
-  if (!timeAgo.isValid() || props.noTooltip) {
-    return badge;
-  }
-  return <Tooltip content={timeAgo.fromNow()}>{badge}</Tooltip>;
-};
 
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
