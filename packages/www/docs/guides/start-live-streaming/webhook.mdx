@@ -62,40 +62,46 @@ this account.
 ### Types of Events
 
 <Table
-  data= {[
+  data={[
     {
       name: "stream.started",
-      description: "The parent stream object's isActive value is marked as true and the .m3u8 HLS URL works",
+      description:
+        "The parent stream object's isActive value is marked as true and the .m3u8 HLS URL works",
     },
     {
       name: "stream.idle",
-      description: "The parent stream object's isActive value should be marked as false and the .m3u8 HLS URL no longer works",
+      description:
+        "The parent stream object's isActive value should be marked as false and the .m3u8 HLS URL no longer works",
     },
-    {                                                                                                                              
+    {
       name: "recording.ready",
       description: "This fires when a recording is ready to be downloaded",
     },
     {
       name: "recording.started",
-      description: "This fires when recording has started on an active stream" 
-    },
-    {    
-     name: "recording.waiting",
-     description: "This fires after a stream with recording on has concluded and is not yet ready to be downloaded. Typically it takes 5 minutes for recordings to be ready for download.",  
+      description: "This fires when recording has started on an active stream",
     },
     {
-    name: "multistream.connected"
-    description: "This fires when we've successfully connected to the multistream target",                             
+      name: "recording.waiting",
+      description:
+        "This fires after a stream with recording on has concluded and is not yet ready to be downloaded. Typically it takes 5 minutes for recordings to be ready for download.",
     },
-    {    
-     name: "multistream.error",
-     description: "This fires when we've encountered an error either while attempting to connect to the third party streaming service or while broadcasting.",  
+    {
+      name: "multistream.connected",
+      description:
+        "This fires when we've successfully connected to the multistream target",
     },
-    {    
-     name: "multistream.disconnected",
-     description: "This fires when we are no longer sending video to the multistream target.",  
-    }                                            
-]} 
+    {
+      name: "multistream.error",
+      description:
+        "This fires when we've encountered an error either while attempting to connect to the third party streaming service or while broadcasting.",
+    },
+    {
+      name: "multistream.disconnected",
+      description:
+        "This fires when we are no longer sending video to the multistream target.",
+    },
+  ]}
 />
 
 | Name                     | Description                                                                                                                                                            |
