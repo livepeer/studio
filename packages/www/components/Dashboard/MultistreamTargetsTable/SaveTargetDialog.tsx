@@ -145,9 +145,7 @@ const SaveTargetDialog = ({
     [action, target?.name, initialProfile]
   );
   const [state, setState] = useState(initState);
-  useEffect(() => {
-    setState(initState);
-  }, [isOpen, initState]);
+  useEffect(() => setState(initState), [isOpen]);
 
   const setStateProp = (prop: keyof typeof state, value: string) => {
     setState({ ...state, [prop]: value });
