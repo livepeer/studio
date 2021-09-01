@@ -94,16 +94,16 @@ const updateTarget = async (
   targetId: string,
   state: State,
   parsedUrl: url.UrlWithParsedQuery,
-  initialState: State
+  initState: State
 ) => {
   const patch = {
-    name: state.name !== initialState.name ? state.name : undefined,
+    name: state.name !== initState.name ? state.name : undefined,
     url: parsedUrl ? url.format(parsedUrl) : undefined,
   };
   if (patch.name || patch.url) {
     await api.patchMultistreamTarget(targetId, patch);
   }
-  if (state.profile !== initialState.profile) {
+  if (state.profile !== initState.profile) {
     const targets: CreateTargetSpec[] = stream.multistream?.targets?.map(
       (t) => ({
         ...t,
@@ -135,7 +135,7 @@ const SaveTargetDialog = ({
   const [openSnackbar] = useSnackbar();
   const [saving, setSaving] = useState(false);
 
-  const initialState = useMemo(
+  const initState = useMemo(
     () => ({
       name: action === Action.Create ? "" : target?.name,
       ingestUrl: "",
@@ -144,10 +144,10 @@ const SaveTargetDialog = ({
     }),
     [action, target?.name, initialProfile]
   );
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState(initState);
   useEffect(() => {
-    setState(initialState);
-  }, [isOpen, initialState]);
+    setState(initState);
+  }, [isOpen, initState]);
 
   const setStateProp = (prop: keyof typeof state, value: string) => {
     setState({ ...state, [prop]: value });
@@ -166,7 +166,7 @@ const SaveTargetDialog = ({
         await createTarget(api, stream, state, parsedUrl);
       } else {
         const tId = target?.id;
-        await updateTarget(api, stream, tId, state, parsedUrl, initialState);
+        await updateTarget(api, stream, tId, state, parsedUrl, initState);
       }
       await invalidate();
       onOpenChange(false);
@@ -221,7 +221,9 @@ const SaveTargetDialog = ({
               type="text"
               id="targetName"
               value={state.name}
-              placeholder={parsedUrl?.host || "e.g. streaming.tv"}
+              placeholder={
+                initState.name || parsedUrl?.host || "e.g. streaming.tv"
+              }
               onChange={(e) => setStateProp("name", e.target.value)}
             />
 
@@ -249,6 +251,7 @@ const SaveTargetDialog = ({
             <TextField
               size="2"
               type="text"
+              autoComplete="off"
               id="streamKey"
               value={state.streamKey}
               onChange={(e) => setStateProp("streamKey", e.target.value)}
