@@ -1,9 +1,8 @@
 import { useCallback, useMemo } from "react";
-import moment from "moment";
 import Link from "next/link";
 import { Column } from "react-table";
 import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
-import { useQueries, useQuery, useQueryClient } from "react-query";
+import { useQueries, useQueryClient } from "react-query";
 
 import {
   Box,
@@ -11,23 +10,26 @@ import {
   Heading,
   Text,
   Link as A,
-  Badge,
-  Status,
   Tooltip,
   Label,
 } from "@livepeer.com/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
-import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import {
+  DataTableComponent as Table,
+  TableData,
+  useTableState,
+} from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "hooks";
-import { HealthStatus, MultistreamStatus } from "hooks/use-analyzer";
+import { HealthStatus } from "hooks/use-analyzer";
 
 import Toolbox from "./Toolbox";
-import CreateTargetDialog from "./CreateTargetDialog";
+import SaveTargetDialog, { Action } from "./SaveTargetDialog";
+import TargetStatusBadge from "./TargetStatusBadge";
 
 type TargetsTableData = {
   id: string;
@@ -59,39 +61,6 @@ const defaultEmptyState = (
   </Flex>
 );
 
-const TargetStatusBadge = ({
-  stream,
-  target,
-  status,
-}: {
-  stream: Stream;
-  target: MultistreamTarget;
-  status: MultistreamStatus;
-}) => {
-  const props =
-    !stream?.isActive || (!status && target?.disabled)
-      ? { color: "gray", text: "Idle", noTooltip: true }
-      : !status
-      ? { color: "lime", text: "Pending", dotColor: "yellow" }
-      : !status.connected.status
-      ? { color: "red", text: "Offline" }
-      : { color: "green", text: "Online" };
-  const badge = (
-    <Badge size="2" variant={props.color as any}>
-      <Box css={{ mr: 5 }}>
-        <Status size="1" variant={props.dotColor ?? (props.color as any)} />
-      </Box>
-      {props.text}
-    </Badge>
-  );
-  const lastProbe = Date.parse(status?.connected.lastProbeTime);
-  const timeAgo = moment.unix(lastProbe / 1000);
-  if (!timeAgo.isValid() || props.noTooltip) {
-    return badge;
-  }
-  return <Tooltip content={timeAgo.fromNow()}>{badge}</Tooltip>;
-};
-
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
   stream,
@@ -115,7 +84,7 @@ const MultistreamTargetsTable = ({
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
-  const createDialogState = useToggleState();
+  const saveDialogState = useToggleState();
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -149,72 +118,71 @@ const MultistreamTargetsTable = ({
     []
   );
 
-  const fetcher: Fetcher<TargetsTableData> = {
-    query: (state) => {
-      const targetQueryKey = (id: string) => ["multistreamTarget", id];
-      const invalidateTarget = useCallback(
-        (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
-        [queryClient]
-      );
-      const targetRefs = stream.multistream?.targets ?? [];
-      const targets = useQueries(
-        targetRefs.map((ref) => ({
-          queryKey: targetQueryKey(ref.id),
-          queryFn: () => getMultistreamTarget(ref.id),
-        }))
-      ).map((res) => res.data as MultistreamTarget);
+  const targetQueryKey = (id: string) => ["multistreamTarget", id];
+  const invalidateTargetId = useCallback(
+    (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
+    [queryClient]
+  );
+  const targetRefs = stream.multistream?.targets ?? [];
+  const targets = useQueries(
+    targetRefs.map((ref) => ({
+      queryKey: targetQueryKey(ref.id),
+      queryFn: () => getMultistreamTarget(ref.id),
+    }))
+  ).map((res) => res.data as MultistreamTarget);
 
-      return useQuery([state.tableId, stream, streamHealth, ...targets], () => {
-        return {
-          count: targets.length,
-          nextCursor: null,
-          rows: targets.map((target, idx) => {
-            const ref = targetRefs[idx];
-            const status = streamHealth?.multistream?.find(
-              (m) => m.target.id === ref.id
-            );
-            return {
-              id: ref.id,
-              name: {
-                children: (
-                  <Tooltip content={ref.id}>
-                    <Label>{target?.name ?? "..."}</Label>
-                  </Tooltip>
-                ),
-              },
-              profile: {
-                children: ref.profile,
-              },
-              status: {
-                children: (
-                  <TargetStatusBadge
-                    stream={stream}
-                    target={target}
-                    status={status}
-                  />
-                ),
-              },
-              toolbox: {
-                children: (
-                  <Toolbox
-                    target={target}
-                    stream={stream}
-                    invalidateTarget={() => invalidateTarget(target.id)}
-                    invalidateStream={invalidateStream}
-                  />
-                ),
-              },
-            };
-          }),
-        };
-      });
-    },
-  };
+  const tableData: TableData<TargetsTableData> = useMemo(() => {
+    return {
+      isLoading: false,
+      data: {
+        count: targets.length,
+        nextCursor: null,
+        rows: targets.map((target, idx) => {
+          const ref = targetRefs[idx];
+          const status = streamHealth?.multistream?.find(
+            (m) => m.target.id === ref.id && m.target.profile === ref.profile
+          );
+          return {
+            id: ref.id,
+            name: {
+              children: (
+                <Tooltip content={ref.id}>
+                  <Label>{target?.name ?? "..."}</Label>
+                </Tooltip>
+              ),
+            },
+            profile: {
+              children: ref.profile,
+            },
+            status: {
+              children: (
+                <TargetStatusBadge
+                  stream={stream}
+                  target={target}
+                  status={status}
+                />
+              ),
+            },
+            toolbox: {
+              children: (
+                <Toolbox
+                  target={target}
+                  stream={stream}
+                  invalidateTargetId={invalidateTargetId}
+                  invalidateStream={invalidateStream}
+                />
+              ),
+            },
+          };
+        }),
+      },
+    };
+  }, [state.tableId, stream, streamHealth, ...targets]);
 
   return (
     <Box {...props}>
       <Table
-        fetcher={fetcher}
+        tableData={tableData}
         state={state}
         stateSetter={stateSetter}
         header={
@@ -230,7 +198,7 @@ const MultistreamTargetsTable = ({
         emptyState={emptyState}
         tableLayout={tableLayout}
         createAction={{
-          onClick: createDialogState.onOn,
+          onClick: saveDialogState.onOn,
           css: { display: "flex", alignItems: "center", ml: "$1" },
           children: (
             <>
@@ -243,11 +211,12 @@ const MultistreamTargetsTable = ({
         }}
       />
 
-      <CreateTargetDialog
-        isOpen={createDialogState.on}
-        onOpenChange={createDialogState.onToggle}
+      <SaveTargetDialog
+        action={Action.Create}
+        isOpen={saveDialogState.on}
+        onOpenChange={saveDialogState.onToggle}
         stream={stream}
-        invalidateStream={invalidateStream}
+        invalidate={invalidateStream}
       />
     </Box>
   );

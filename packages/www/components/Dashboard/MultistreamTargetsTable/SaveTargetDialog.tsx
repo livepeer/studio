@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import url from "url";
 
 import {
@@ -22,77 +22,157 @@ import {
 
 import Spinner from "components/Dashboard/Spinner";
 import { useApi } from "hooks";
-import { Stream, StreamPatchPayload } from "../../../../api/src/schema/types";
+import {
+  MultistreamTarget,
+  MultistreamTargetPatchPayload,
+  Stream,
+  StreamPatchPayload,
+} from "../../../../api/src/schema/types";
 import { pathJoin2 } from "@lib/utils";
 
 type CreateTargetSpec = StreamPatchPayload["multistream"]["targets"][number];
 
-const CreateTargetDialog = ({
+export enum Action {
+  Create = "Create",
+  Update = "Update",
+}
+
+type State = {
+  name: string;
+  ingestUrl: string;
+  streamKey: string;
+  profile: string;
+};
+
+type Api = ReturnType<typeof useApi>;
+
+const parseUrl = (ingestUrl: string, streamKey: string) => {
+  let parsed: url.UrlWithParsedQuery;
+  try {
+    if (ingestUrl) {
+      parsed = url.parse(ingestUrl, true);
+    }
+  } catch (err) {}
+  if (!streamKey || !parsed) {
+    return parsed;
+  }
+
+  switch (parsed.protocol) {
+    case "rtmp:":
+    case "rtmps:":
+      parsed.pathname = pathJoin2(parsed.pathname, streamKey);
+      break;
+    case "srt:":
+      parsed.query.streamId = streamKey;
+      break;
+  }
+  return parsed;
+};
+
+const createTarget = (
+  api: Api,
+  stream: Stream,
+  state: State,
+  parsedUrl: url.UrlWithParsedQuery
+) => {
+  const targets: CreateTargetSpec[] = [
+    ...(stream.multistream?.targets ?? []),
+    {
+      profile: state.profile,
+      spec: {
+        name: state.name || parsedUrl?.host,
+        url: url.format(parsedUrl),
+      },
+    },
+  ];
+  return api.patchStream(stream.id, { multistream: { targets } });
+};
+
+const updateTarget = async (
+  api: Api,
+  stream: Stream,
+  targetId: string,
+  state: State,
+  parsedUrl: url.UrlWithParsedQuery,
+  initState: State
+) => {
+  const patch = {
+    name: state.name !== initState.name ? state.name : undefined,
+    url: parsedUrl ? url.format(parsedUrl) : undefined,
+  };
+  if (patch.name || patch.url) {
+    await api.patchMultistreamTarget(targetId, patch);
+  }
+  if (state.profile !== initState.profile) {
+    const targets: CreateTargetSpec[] = stream.multistream?.targets?.map(
+      (t) => ({
+        ...t,
+        profile: t.id === targetId ? state.profile : t.profile,
+      })
+    );
+    await api.patchStream(stream.id, { multistream: { targets } });
+  }
+};
+
+const SaveTargetDialog = ({
+  action,
   isOpen,
   onOpenChange,
   stream,
-  invalidateStream,
+  target,
+  initialProfile,
+  invalidate,
 }: {
+  action: Action;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   stream: Stream;
-  invalidateStream: () => Promise<void>;
+  target?: MultistreamTarget;
+  initialProfile?: string;
+  invalidate: () => Promise<void>;
 }) => {
-  const { patchStream } = useApi();
+  const api = useApi();
   const [openSnackbar] = useSnackbar();
   const [saving, setSaving] = useState(false);
 
-  const [name, setName] = useState("");
-  const [ingestUrl, setIngestUrl] = useState("");
-  const [streamKey, setStreamKey] = useState("");
-  const [profile, setProfile] = useState("source");
-  const resetState = () => {
-    setName("");
-    setIngestUrl("");
-    setStreamKey("");
-    setProfile("source");
+  const initState = useMemo(
+    () => ({
+      name: action === Action.Create ? "" : target?.name,
+      ingestUrl: "",
+      streamKey: "",
+      profile: action === Action.Create ? "source" : initialProfile,
+    }),
+    [action, target?.name, initialProfile]
+  );
+  const [state, setState] = useState(initState);
+  useEffect(() => setState(initState), [isOpen]);
+
+  const setStateProp = (prop: keyof typeof state, value: string) => {
+    setState({ ...state, [prop]: value });
   };
 
-  const parsedUrl = useMemo(() => {
-    let parsed: url.UrlWithParsedQuery;
-    try {
-      parsed = url.parse(ingestUrl, true);
-    } catch (err) {}
-    if (!streamKey || !parsed) {
-      return parsed;
-    }
-
-    switch (parsed.protocol) {
-      case "rtmp:":
-      case "rtmps:":
-        parsed.pathname = pathJoin2(parsed.pathname, streamKey);
-        break;
-      case "srt:":
-        parsed.query.streamId = streamKey;
-        break;
-    }
-    return parsed;
-  }, [ingestUrl, streamKey]);
+  const parsedUrl = useMemo(
+    () => parseUrl(state.ingestUrl, state.streamKey),
+    [state.ingestUrl, state.streamKey]
+  );
 
   const saveMultistreamTarget = async () => {
     if (saving) return;
     setSaving(true);
     try {
-      const targets: CreateTargetSpec[] = [
-        ...(stream.multistream?.targets ?? []),
-        {
-          profile,
-          spec: {
-            name: name || parsedUrl?.host,
-            url: url.format(parsedUrl),
-          },
-        },
-      ];
-      await patchStream(stream.id, { multistream: { targets } });
-      await invalidateStream();
+      if (action === Action.Create) {
+        await createTarget(api, stream, state, parsedUrl);
+      } else {
+        const tId = target?.id;
+        await updateTarget(api, stream, tId, state, parsedUrl, initState);
+      }
+      await invalidate();
       onOpenChange(false);
-      openSnackbar(`Successfully created multistream target ${name}`);
-      resetState();
+      openSnackbar(
+        `Successfully ${
+          action === Action.Create ? "created" : "updated"
+        } multistream target ${name}`
+      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -120,7 +200,9 @@ const CreateTargetDialog = ({
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
         onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle as={Heading} size="1">
-          Create a new multistream target
+          {action === Action.Create
+            ? "Create a new multistream target"
+            : "Update multistream target"}
         </AlertDialogTitle>
 
         <Box
@@ -136,22 +218,28 @@ const CreateTargetDialog = ({
               size="2"
               type="text"
               id="targetName"
-              value={name}
-              placeholder={parsedUrl?.host || "e.g. streaming.tv"}
-              onChange={(e) => setName(e.target.value)}
+              value={state.name}
+              placeholder={
+                initState.name || parsedUrl?.host || "e.g. streaming.tv"
+              }
+              onChange={(e) => setStateProp("name", e.target.value)}
             />
 
             <Label htmlFor="ingestUrl">Ingest URL</Label>
             <TextField
-              required
+              required={action === Action.Create || !!state.streamKey}
               autoFocus
               size="2"
               type="url"
               pattern="^(srt|rtmps?)://.+"
               id="ingestUrl"
-              value={ingestUrl}
-              onChange={(e) => setIngestUrl(e.target.value)}
-              placeholder="e.g. rtmp://streaming.tv/live"
+              value={state.ingestUrl}
+              onChange={(e) => setStateProp("ingestUrl", e.target.value)}
+              placeholder={
+                action === Action.Create || !!state.streamKey
+                  ? "e.g. rtmp://streaming.tv/live"
+                  : "(redacted)"
+              }
             />
             <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
               Supported protocols: RTMP(S) and SRT
@@ -161,10 +249,15 @@ const CreateTargetDialog = ({
             <TextField
               size="2"
               type="text"
+              autoComplete="off"
               id="streamKey"
-              value={streamKey}
-              onChange={(e) => setStreamKey(e.target.value)}
-              placeholder="e.g. a1b2-4d3c-e5f6-8h7g"
+              value={state.streamKey}
+              onChange={(e) => setStateProp("streamKey", e.target.value)}
+              placeholder={
+                action === Action.Create || state.ingestUrl
+                  ? "e.g. a1b2-4d3c-e5f6-8h7g"
+                  : "(redacted)"
+              }
             />
             <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
               Stream key should be included if not already present in the URL.
@@ -180,14 +273,15 @@ const CreateTargetDialog = ({
                 justifyContent: "flex-start",
                 margin: "0px",
               }}>
-              <RadioGroup onValueChange={(e) => setProfile(e.target.value)}>
+              <RadioGroup
+                onValueChange={(e) => setStateProp("profile", e.target.value)}>
                 <Box css={{ display: "flex", flexDirection: "column" }}>
                   {profileOpts.map((p) => (
                     <Box key={p.name} css={{ display: "flex", mb: "$2" }}>
                       <Radio
                         value={p.name}
                         id={`profile-${p.name}`}
-                        checked={profile === p.name}
+                        checked={state.profile === p.name}
                       />
                       <Tooltip multiline content={p.tooltip}>
                         <Label
@@ -196,7 +290,6 @@ const CreateTargetDialog = ({
                           {p.displayName || p.name}
                         </Label>
                       </Tooltip>
-                      {/* <Label htmlFor="profile-source">source</Label> */}
                     </Box>
                   ))}
                 </Box>
@@ -208,8 +301,11 @@ const CreateTargetDialog = ({
             size="3"
             variant="gray"
             css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-            Addition of new multistream targets will take effect when the next
-            stream session is started.
+            {`${
+              action === Action.Create
+                ? "Addition of new multistream targets"
+                : "Updating a multistream target"
+            } will take effect when the next stream session is started.`}
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
@@ -220,7 +316,7 @@ const CreateTargetDialog = ({
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
-              disabled={saving}
+              disabled={saving || (action === Action.Update && !target)}
               variant="violet">
               {saving && (
                 <Spinner
@@ -232,7 +328,7 @@ const CreateTargetDialog = ({
                   }}
                 />
               )}
-              Create target
+              {`${action} target`}
             </Button>
           </Flex>
         </Box>
@@ -241,4 +337,4 @@ const CreateTargetDialog = ({
   );
 };
 
-export default CreateTargetDialog;
+export default SaveTargetDialog;

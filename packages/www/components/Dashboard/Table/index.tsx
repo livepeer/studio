@@ -62,11 +62,14 @@ export type FetchResult<T extends Record<string, unknown>> = {
   count: number;
 };
 
-export type Fetcher<T extends Record<string, unknown>> =
-  | ((state: State<T>) => Promise<FetchResult<T>>)
-  | {
-      query: (state: State<T>) => UseQueryResult<FetchResult<T>>;
-    };
+export type Fetcher<T extends Record<string, unknown>> = (
+  state: State<T>
+) => Promise<FetchResult<T>>;
+
+export type TableData<T extends Record<string, unknown>> = {
+  isLoading: boolean;
+  data: FetchResult<T>;
+};
 
 type Props<T extends Record<string, unknown>> = {
   columns: Column<T>[];
@@ -88,7 +91,12 @@ type Props<T extends Record<string, unknown>> = {
   tableLayout?: string;
 };
 
-const TableComponent = <T extends Record<string, unknown>>({
+type DataTableProps<T extends Record<string, unknown>> = Omit<
+  Props<T>,
+  "fetcher"
+> & { tableData: TableData<T> };
+
+export const DataTableComponent = <T extends Record<string, unknown>>({
   columns,
   header,
   rowSelection,
@@ -98,7 +106,7 @@ const TableComponent = <T extends Record<string, unknown>>({
   cursor = "default",
   stateSetter,
   state,
-  fetcher,
+  tableData,
   selectAction,
   createAction,
   emptyState,
@@ -106,21 +114,8 @@ const TableComponent = <T extends Record<string, unknown>>({
   noPagination = false,
   border = false,
   tableLayout = "fixed",
-}: Props<T>) => {
-  let useQueryResult: UseQueryResult<FetchResult<T>>;
-  if ("query" in fetcher) {
-    useQueryResult = fetcher.query(state);
-  } else {
-    const queryKey = [
-      state.tableId,
-      state.cursor,
-      state.order,
-      state.stringifiedFilters,
-    ];
-    useQueryResult = useQuery(queryKey, () => fetcher(state));
-  }
-  const { isLoading, data } = useQueryResult;
-
+}: DataTableProps<T>) => {
+  const { isLoading, data } = tableData;
   const dataMemo = useMemo(() => data?.rows ?? [], [data?.rows]);
 
   const someColumnCanSort = useMemo(() => {
@@ -558,6 +553,18 @@ export const useTableState = <T extends Record<string, unknown>>({
   );
 
   return { state, stateSetter };
+};
+
+const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
+  const { state, fetcher } = props;
+  const queryKey = [
+    state.tableId,
+    state.cursor,
+    state.order,
+    state.stringifiedFilters,
+  ];
+  const tableData = useQuery(queryKey, () => fetcher(state));
+  return DataTableComponent({ ...props, tableData });
 };
 
 export default TableComponent;
