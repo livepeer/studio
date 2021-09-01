@@ -140,7 +140,7 @@ const MultistreamTargetsTable = ({
         rows: targets.map((target, idx) => {
           const ref = targetRefs[idx];
           const status = streamHealth?.multistream?.find(
-            (m) => m.target.id === ref.id
+            (m) => m.target.id === ref.id && m.target.profile === ref.profile
           );
           return {
             id: ref.id,
