@@ -81,6 +81,7 @@ export default async function makeApp(params: CliArgs) {
     "https://livepeer.monster",
     "https://explorer.livepeer.org",
     "http://localhost:3000",
+    /livepeer.vercel\.app$/,
     /livepeerorg.vercel\.app$/,
     /\.livepeerorg.now\.sh$/,
   ];
