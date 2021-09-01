@@ -1,8 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Column } from "react-table";
 import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
-import { useQueries, useQueryClient } from "react-query";
+import { useQueries, useQuery, useQueryClient } from "react-query";
 
 import {
   Box,
@@ -80,7 +80,7 @@ const MultistreamTargetsTable = ({
   tableLayout?: string;
 }) => {
   const queryClient = useQueryClient();
-  const { getMultistreamTarget } = useApi();
+  const { getMultistreamTarget, getStreamSessions } = useApi();
   const { state, stateSetter } = useTableState<TargetsTableData>({
     tableId: "multistreamTargetsTable",
   });
@@ -118,15 +118,38 @@ const MultistreamTargetsTable = ({
     []
   );
 
-  const targetQueryKey = (id: string) => ["multistreamTarget", id];
+  // TODO: Expose either the lastSessionId or an activeSince field on Stream to
+  // simplify or avoid this query.
+  const { data: lastSession } = useQuery(
+    ["lastSession", stream?.id],
+    async () => {
+      if (!stream) {
+        return null;
+      }
+      const res = await getStreamSessions(stream.id, null, 1);
+      const sessions = res[0];
+      return sessions.length > 0 ? sessions[0] : null;
+    }
+  );
+  useEffect(() => {
+    queryClient.invalidateQueries(["lastSession", stream?.id]);
+  }, [stream?.lastSeen]);
+  const parentStream = lastSession?.["parentStream"];
+  // Session sometimes takes a while to update, but comes with inactive parent stream.
+  const activeSince =
+    parentStream?.isActive === stream?.isActive
+      ? lastSession.createdAt
+      : undefined;
+  console.log(parentStream?.isActive, stream?.isActive, activeSince);
+
   const invalidateTargetId = useCallback(
-    (id: string) => queryClient.invalidateQueries(targetQueryKey(id)),
+    (id: string) => queryClient.invalidateQueries(["multistreamTarget", id]),
     [queryClient]
   );
   const targetRefs = stream.multistream?.targets ?? [];
   const targets = useQueries(
     targetRefs.map((ref) => ({
-      queryKey: targetQueryKey(ref.id),
+      queryKey: ["multistreamTarget", ref.id],
       queryFn: () => getMultistreamTarget(ref.id),
     }))
   ).map((res) => res.data as MultistreamTarget);
@@ -158,6 +181,7 @@ const MultistreamTargetsTable = ({
               children: (
                 <TargetStatusBadge
                   stream={stream}
+                  activeSince={activeSince}
                   target={target}
                   status={status}
                 />
@@ -177,7 +201,7 @@ const MultistreamTargetsTable = ({
         }),
       },
     };
-  }, [state.tableId, stream, streamHealth, ...targets]);
+  }, [state.tableId, stream, activeSince, streamHealth, ...targets]);
 
   return (
     <Box {...props}>

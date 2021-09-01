@@ -10,6 +10,7 @@ import {
   StreamPatchPayload,
   ObjectStore,
   MultistreamTargetPatchPayload,
+  Session,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -633,7 +634,7 @@ const makeContext = (state: ApiState, setState) => {
       limit: number = 20,
       filters?: Array<{ id: string; value: string | object }>,
       count?: boolean
-    ): Promise<[Array<Stream>, string, number]> {
+    ): Promise<[Session[], string, number]> {
       const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
       const uri = `/session?${qs.stringify({
         limit,

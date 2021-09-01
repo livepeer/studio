@@ -26,32 +26,74 @@ const styleByStatus: Record<TargetStatus, StatusBadgeStyle> = {
   Online: { color: "green" },
 };
 
+const STALE_STATUS_TIMEOUT = 3 * 60 * 1000;
+
 const computeStatus = (
   stream: Stream,
   target: MultistreamTarget,
-  status: MultistreamStatus
+  status: MultistreamStatus,
+  activeSince: number,
+  lastProbe: number
 ): TargetStatus => {
-  if (!stream?.isActive || (!status?.connected.status && target?.disabled)) {
+  console.log(
+    "computing",
+    target?.name,
+    target?.id,
+    "lastProbe=",
+    new Date(lastProbe),
+    "activeSince=",
+    new Date(activeSince),
+    "lastSeen=",
+    new Date(stream?.lastSeen)
+  );
+  if (!activeSince || lastProbe < activeSince) {
+    status = null;
+  }
+  const timeSinceSeen = Date.now() - (stream?.lastSeen ?? 0);
+  const isLongInactive =
+    !stream?.isActive && timeSinceSeen >= STALE_STATUS_TIMEOUT;
+  if (isLongInactive) {
     return TargetStatus.Idle;
-  } else if (!status) {
+  }
+
+  const isConnected = status?.connected.status;
+  const isLateCreation = target?.createdAt > activeSince;
+  const isConnecting = stream?.isActive && !target?.disabled && !isLateCreation;
+  console.log(
+    "part compute",
+    target?.name,
+    isConnected,
+    isLateCreation,
+    isConnecting
+  );
+  if (!isConnected && !isConnecting) {
+    return TargetStatus.Idle;
+  }
+
+  if (isConnected === undefined) {
     return TargetStatus.Pending;
   }
-  const isConnected = status.connected.status;
   return isConnected ? TargetStatus.Online : TargetStatus.Offline;
 };
 
 const TargetStatusBadge = ({
   stream,
+  activeSince,
   target,
   status: msStatus,
 }: {
   stream: Stream;
+  activeSince: number;
   target: MultistreamTarget;
   status: MultistreamStatus;
 }) => {
+  const lastProbe = useMemo(
+    () => Date.parse(msStatus?.connected.lastProbeTime),
+    [msStatus?.connected.lastProbeTime]
+  );
   const status = useMemo(
-    () => computeStatus(stream, target, msStatus),
-    [stream, target, msStatus]
+    () => computeStatus(stream, target, msStatus, activeSince, lastProbe),
+    [stream, target, msStatus, activeSince, lastProbe]
   );
   const style = styleByStatus[status];
   const badge = (
@@ -62,10 +104,7 @@ const TargetStatusBadge = ({
       {status}
     </Badge>
   );
-  const timeAgo = useMemo(() => {
-    const lastProbe = Date.parse(msStatus?.connected.lastProbeTime);
-    return moment.unix(lastProbe / 1000);
-  }, [msStatus?.connected.lastProbeTime]);
+  const timeAgo = useMemo(() => moment.unix(lastProbe / 1000), [lastProbe]);
   if (!timeAgo.isValid() || style.noTooltip) {
     return badge;
   }
