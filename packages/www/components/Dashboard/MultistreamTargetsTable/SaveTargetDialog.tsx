@@ -187,12 +187,17 @@ const SaveTargetDialog = ({
       displayName: "Source",
       tooltip: "Original video",
     };
-    const fromStream = stream.profiles?.map(({ name, width, height, fps }) => ({
-      name,
-      displayName: name,
-      tooltip: `${width}x${height} @ ${fps || "Source"} FPS`,
-    }));
-    return [sourceProfile, ...fromStream];
+    const fromStream = stream.profiles
+      ?.sort(
+        (p1, p2) => p1.height - p2.height || p1.name.localeCompare(p2.name)
+      )
+      .reverse()
+      .map(({ name, width, height, fps }) => ({
+        name,
+        displayName: name,
+        tooltip: `${width}x${height} @ ${fps || "Source"} FPS`,
+      }));
+    return [sourceProfile, ...(fromStream ?? [])];
   }, [stream.profiles]);
 
   return (
