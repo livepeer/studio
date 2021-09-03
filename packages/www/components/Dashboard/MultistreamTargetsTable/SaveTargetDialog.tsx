@@ -202,9 +202,11 @@ const SaveTargetDialog = ({
         onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle as={Heading} size="1">
           {`${action} multistream target`}
-          <Badge size="2" variant="violet" css={{ ml: "$2" }}>
-            Beta
-          </Badge>
+          {action === Action.Create ? (
+            <Badge size="2" variant="violet" css={{ ml: "$2" }}>
+              Beta
+            </Badge>
+          ) : null}
         </AlertDialogTitle>
 
         <Box
