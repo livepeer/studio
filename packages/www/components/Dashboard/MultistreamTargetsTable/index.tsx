@@ -5,6 +5,7 @@ import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
 import { useQueries, useQueryClient } from "react-query";
 
 import {
+  Badge,
   Box,
   Flex,
   Heading,
@@ -187,7 +188,12 @@ const MultistreamTargetsTable = ({
         stateSetter={stateSetter}
         header={
           <>
-            <Heading>{title}</Heading>
+            <Heading>
+              {title}
+              <Badge size="2" variant="violet" css={{ ml: "$2" }}>
+                Beta
+              </Badge>
+            </Heading>
           </>
         }
         border={border}

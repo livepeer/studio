@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import url from "url";
 
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -200,9 +201,10 @@ const SaveTargetDialog = ({
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
         onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle as={Heading} size="1">
-          {action === Action.Create
-            ? "Create a new multistream target"
-            : "Update multistream target"}
+          {`${action} multistream target`}
+          <Badge size="2" variant="violet" css={{ ml: "$2" }}>
+            Beta
+          </Badge>
         </AlertDialogTitle>
 
         <Box

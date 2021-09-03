@@ -56,7 +56,7 @@ const TargetStatusBadge = ({
   const style = styleByStatus[status];
   const badge = (
     <Badge size="2" variant={style.color}>
-      <Box css={{ mr: 5 }}>
+      <Box css={{ mr: "$1" }}>
         <Status size="1" variant={style.dotColor ?? (style.color as any)} />
       </Box>
       {status}
