@@ -107,6 +107,8 @@ async function validateMultistreamOpts(
       continue;
     } else if (name === "source") {
       throw new BadRequestError(`profile cannot be named "source"`);
+    } else if (profileNames.has(name)) {
+      throw new BadRequestError(`duplicate profile name "${name}"`);
     }
     profileNames.add(name);
   }

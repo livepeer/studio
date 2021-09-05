@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import url from "url";
 
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -186,12 +187,17 @@ const SaveTargetDialog = ({
       displayName: "Source",
       tooltip: "Original video",
     };
-    const fromStream = stream.profiles?.map(({ name, width, height, fps }) => ({
-      name,
-      displayName: name,
-      tooltip: `${width}x${height} @ ${fps || "Source"} FPS`,
-    }));
-    return [sourceProfile, ...fromStream];
+    const fromStream = stream.profiles
+      ?.sort(
+        (p1, p2) => p1.height - p2.height || p1.name.localeCompare(p2.name)
+      )
+      .reverse()
+      .map(({ name, width, height, fps }) => ({
+        name,
+        displayName: name,
+        tooltip: `${width}x${height} @ ${fps || "Source"} FPS`,
+      }));
+    return [sourceProfile, ...(fromStream ?? [])];
   }, [stream.profiles]);
 
   return (
@@ -200,9 +206,12 @@ const SaveTargetDialog = ({
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
         onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle as={Heading} size="1">
-          {action === Action.Create
-            ? "Create a new multistream target"
-            : "Update multistream target"}
+          {`${action} multistream target`}
+          {action === Action.Create ? (
+            <Badge size="2" variant="violet" css={{ ml: "$2" }}>
+              Beta
+            </Badge>
+          ) : null}
         </AlertDialogTitle>
 
         <Box
