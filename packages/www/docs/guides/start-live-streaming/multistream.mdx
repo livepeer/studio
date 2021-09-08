@@ -326,7 +326,10 @@ section above. Make sure that no other `Stream` has a reference to that same
 
 ##### Removing a single Multistream Target
 
-Removing only the first target from the example above:
+To remove a specific target, we need to make a `PATCH` request maintaining only
+the targets that we want to keep in the stream, after removing the desired one.
+
+e.g.: Removing only the first target from the example above:
 
 ```bash
 curl -X PATCH \
@@ -341,6 +344,8 @@ curl -X PATCH \
     }' \
 'https://livepeer.com/api/stream/{id}'
 ```
+
+We kept only the remaining targets in the `PATCH`, i.e. the second one.
 
 You can also use a single API call to change the `profile` that should be
 multistreamed to a specific target. For that, just change the `profile` field
