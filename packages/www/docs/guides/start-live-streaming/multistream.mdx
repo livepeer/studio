@@ -9,7 +9,7 @@ The Multistream API allows a source stream and transcoded renditions to be
 pushed to multiple RTMP or SRT targets, such as Facebook Live, Twitch, and
 Youtube Live.
 
-## Managing Multistream targets in the Livepeer.com Dashboard
+# Managing Multistream targets in the Livepeer.com Dashboard
 
 To add, manage, and delete multistream targets, navigate to the Streams page
 ([livepeer.com/dashboard/streams](http://livepeer.com/dashboard/streams)) and
@@ -37,9 +37,9 @@ will apply to the next active session. If you make changes while a stream is
 active, those changes will not apply until the current session has ended and a
 new session begins.
 
-## Managing Multistream targets with the Livepeer.com API
+# Managing Multistream targets with the Livepeer.com API
 
-### Multistream Target Object `/api/multistream/target/*`
+## Multistream Target Object `/api/multistream/target/*`
 
 You can manage `Multistream Target` objects from the API. Each target represents
 a specific endpoint where a stream could be multistreamed to.
@@ -52,7 +52,7 @@ for the multistream to happen. You also need to reference the target from the
 `Multistream Target` inlined within the `Stream` object. Check the
 [Stream Object](#stream-object-stream) section for more information.
 
-#### Create
+### Create
 
 ##### Request: `POST /api/multistream/target`
 
@@ -80,7 +80,7 @@ _Supported Protocols: RTMP, RTMPS and SRT._
 }
 ```
 
-#### Read
+### Read
 
 You can fetch a specific `Multistream Target` with their ID, returned on the
 creation request. The destination url will not be returned since it contains
@@ -165,7 +165,7 @@ There is no response on a success (HTTP `204 No Content`).
 
 ---
 
-### Stream Object: `/stream`
+## Stream Object: `/stream`
 
 You can create a stream with a list of push targets referencing the transcoding
 profiles.
@@ -279,9 +279,9 @@ Inline definition also works with `PATCH` requests for updating the multistream
 targets. This can help with adding and deleting multistream targets for a
 specific stream.
 
-## Understanding Multistream Performance
+# Understanding Multistream Performance
 
-### Dashboard
+## Dashboard
 
 While a session is active that has multistream targets configured, you'll be
 able to see if a destination is "Active" or "Offline". **_NOTE:_** There may be
@@ -293,7 +293,7 @@ On the stream page where you've configured your multistream targets, select the
 "Health" tab at the top. While a session is active, you'll see the ingest rate
 of the source stream as well as ingest rate of any mulitstream targets.
 
-### API
+## API
 
 We have 3 webhooks to help you monitor how your mutlistream targets are
 performing including:
