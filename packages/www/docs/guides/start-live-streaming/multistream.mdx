@@ -39,45 +39,129 @@ new session begins.
 
 ## Managing Multistream targets with the Livepeer.com API
 
-### Push Target Object: `/api/multistream/target/*`
+### Multistream Target Object `/api/multistream/target/*`
 
-You can create"multistream targets". Each push target represents a specific RTMP
-endpoint.
+You can manage `Multistream Target` objects from the API. Each target represents
+a specific endpoint where a stream could be multistreamed to.
+
+<!-- Add notice about how other platforms call this? Re-stream, simulcast, etc -->
+
+Notice that the existence of a `Multistream Target` object itself is not enough
+for the multistream to happen. You also need to reference the target from the
+`Stream` object that should be multistreamed, or just create the
+`Multistream Target` inlined within the `Stream` object. Check the
+[Stream Object](#stream-object-stream) section for more information.
+
+#### Create
+
+##### Request: `POST /api/multistream/target`
 
 ```bash
-Request:
 curl -X POST \
 -H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
+-H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "Eli\'s Twitch",
     "url": "rtmp://rtmp.twitch.tv/live/SECRET"
 }' \
 'https://livepeer.com/api/multistream/target'
+```
 
-Response:
+_Supported Protocols: RTMP, RTMPS and SRT._
+
+##### Response
+
+```json
 {
-    "id": "0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
-    "userId": "USER123",
-    "name": "Eli\'s Twitch",
-    "url": "rtmp://rtmp.twitch.tv/live/SECRET"
+  "id": "{id}",
+  "userId": "USER123",
+  "name": "Eli's Twitch",
+  "url": "rtmp://rtmp.twitch.tv/live/SECRET"
 }
 ```
 
-You can fetch "multistream targets". The destination url will not be returned
-for security purposes. This way, the application developer doesn't have to worry
-about security risks of exposing the users' stream keys.
+#### Read
+
+You can fetch a specific `Multistream Target` with their ID, returned on the
+creation request. The destination url will not be returned since it contains
+sensitive user data. This way the application developer doesn't have to worry
+about storing and securing their users' stream keys.
+
+##### Request: `GET /api/multistream/target/{id}`
 
 ```bash
-curl 'https://livepeer.com/api/multistream/target/0bf161f3-95bd-4971-a7b1-4dcb5d39e78a'
-'{
-    "id": "0bf161f3-95bd-4971-a7b1-4dcb5d39e78a",
-    "userId": "user1",
-    "name": "Eli\'s Twitch"
-}'
+curl 'https://livepeer.com/api/multistream/target/{id}' \
+-H 'authorization: Bearer {api-key}'
 ```
 
-_Supported Protocols: RTMP and SRT. (RTMPS coming later)_
+##### Response
+
+```json
+{
+  "id": "{id}",
+  "userId": "USER123",
+  "name": "Eli's Twitch"
+}
+```
+
+You can also list all existing `Multistream Targets` in the account by omitting
+the `{id}` segment in the above request.
+
+##### List Request: `GET /api/multistream/target`
+
+```bash
+curl 'https://livepeer.com/api/multistream/target' \
+-H 'authorization: Bearer {api-key}'
+```
+
+The response is an array of `Multistream Target` objects, as returned from the
+read API above. The pagination should be done exactly the same as the other
+Livepeer list APIs.
+
+### Update
+
+You can change an existing target properties at will, and it will affect any
+stream that is currently using it.
+
+One of the updateable properties is the `disabled` field. It can be used to
+disable multistreaming to a specific target without the need of removing them
+from streams nor deleting the target completely.
+
+Notice that changes will only take effect when the next stream session is
+started.
+
+##### Request: `PATCH /api/multistream/target/{id}`
+
+```bash
+curl -X PATCH \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
+    "name": "Not Eli\'s Twitch",
+    "url": "rtmp://rtmp.twitter.tv/live/SECRET"
+    "disabled": true
+}' \
+'https://livepeer.com/api/multistream/target/{id}'
+```
+
+All request fields are optional. There is no response on a success (HTTP
+`204 No Content`).
+
+### Delete
+
+Finally, you can also delete a `Multistream Target` object completely by calling
+the delete API. You should not do this if any `Streams` are still referencing
+that target or a broken reference will be left.
+
+##### Request: `DELETE /api/multistream/target/{id}`
+
+```bash
+curl -X DELETE \
+-H 'authorization: Bearer {api-key}'
+'https://livepeer.com/api/multistream/target/{id}'
+```
+
+There is no response on a success (HTTP `204 No Content`).
 
 ---
 
@@ -89,7 +173,7 @@ profiles.
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
+-H 'authorization: Bearer {api-key}' \
 -d '{
 	  "name": "test_stream",
 	  "profiles": [
@@ -131,7 +215,7 @@ You can update an existing stream to add multistream targets:
 ```bash
 curl -X PATCH \
 -H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
+-H 'authorization: Bearer {api-key}' \
 -d '{
      "multistream": {
         "targets":  [
@@ -149,7 +233,7 @@ targets:
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
--H 'authorization: Bearer {api_key}' \
+-H 'authorization: Bearer {api-key}' \
 -d '{
 	  "name": "test_stream",
 	  "profiles": [
