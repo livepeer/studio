@@ -39,7 +39,7 @@ new session begins.
 
 # Managing Multistream targets with the Livepeer.com API
 
-## Multistream Target Object `/api/multistream/target/*`
+## Multistream Target Object `/multistream/target`
 
 You can manage `Multistream Target` objects from the API. Each target represents
 a specific endpoint where a stream could be multistreamed to.
@@ -48,9 +48,10 @@ a specific endpoint where a stream could be multistreamed to.
 
 Notice that the existence of a `Multistream Target` object itself is not enough
 for the multistream to happen. You also need to reference the target from the
-`Stream` object that should be multistreamed, or just create the
-`Multistream Target` inlined within the `Stream` object. Check the
-[Stream Object](#stream-object-stream) section for more information.
+`Stream` object that should be multistreamed. To avoid managing the separate
+`Multistream Target` objects, you can also create the targets inlined in the
+`Stream` creation and update APIs. Check the
+[`Stream Object`](#stream-object-stream) section for more information.
 
 ### Create
 
@@ -116,7 +117,7 @@ curl 'https://livepeer.com/api/multistream/target' \
 
 The response is an array of `Multistream Target` objects, as returned from the
 read API above. The pagination should be done exactly the same as the other
-Livepeer list APIs.
+Livepeer.com list APIs.
 
 ### Update
 
@@ -138,7 +139,7 @@ curl -X PATCH \
 -H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "Not Eli\'s Twitch",
-    "url": "rtmp://rtmp.twitter.tv/live/SECRET"
+    "url": "rtmp://rtmp.twitter.com/SECRET"
     "disabled": true
 }' \
 'https://livepeer.com/api/multistream/target/{id}'
@@ -151,7 +152,9 @@ All request fields are optional. There is no response on a success (HTTP
 
 Finally, you can also delete a `Multistream Target` object completely by calling
 the delete API. You should not do this if any `Streams` are still referencing
-that target or a broken reference will be left.
+that target or a broken reference will be left. So first update (`PATCH`) any
+`Stream` removing the reference to the `Multistream Target` and only then
+actually delete it.
 
 ##### Request: `DELETE /api/multistream/target/{id}`
 
@@ -167,50 +170,126 @@ There is no response on a success (HTTP `204 No Content`).
 
 ## Stream Object: `/stream`
 
-You can create a stream with a list of push targets referencing the transcoding
-profiles.
+To actually use a `Multistream Target`, you need to reference it from a `Stream`
+object.
+
+The reference is made in the `targets` sub-field of the `multistream` field in
+the `Stream` resource (`stream.multistream.targets[]`). It is represented as an
+array of target reference objects, each with a `profile` that should be
+multistreamed and the `id` of the corresponding `Multistream Target`.
+
+The `profile` field must reference an existing transcoding profile on the same
+stream, or `"source"` to multistream the same original video as ingested. The
+same profile can be mulsitreamed to several `Multistream Targets`, but there can
+be only 1 multistream to a given URL.
+
+To avoid managing separate `Multistream Target` objects, you can also create
+targets inlined in the `Stream` object. In that case, the target reference
+object in the `multistream.target` field should have a `spec` instead of an `id`
+with the payload for creating a new `Multistream Target`. Notice that `spec` is
+a write-only field, meaning that `Stream` objects returned from reads (`GET`)
+will always have only a `profile` and an `id` in the targets. To get the current
+state of a `Multistream Target`, fetch from its own read API using that `id`.
+
+### Creating a Stream with Multistream Targets
+
+You can create a `Stream` directly with some `Multistream Targets`. Either
+reference an existing `Multistream Targets` by `id` or create a new
+`Multistream Target` inline with the `spec` field. You can also have both types
+of targets on the same stream (reference and inline) as long as they are
+separate objects in the `multistream.target` array.
+
+##### By Reference
 
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
-	  "name": "test_stream",
-	  "profiles": [
-	    {
-	      "name": "720p",
-	      "bitrate": 2000000,
-	      "fps": 30,
-	      "width": 1280,
-	      "height": 720
-	    },
-	    {
-	      "name": "480p",
-	      "bitrate": 1000000,
-	      "fps": 30,
-	      "width": 854,
-	      "height": 480
-	    },
-	    {
-	      "name": "360p",
-	      "bitrate": 500000,
-	      "fps": 30,
-	      "width": 640,
-	      "height": 360
-	    }
-	  ],
+    "name": "test_multistream_reference",
+    "profiles": [
+      { "name": "720p", ... },
+      { "name": "480p", ... },
+      { "name": "360p", ... }
+    ],
     "multistream": {
       "targets":  [
-        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "720p" },
-        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78b", "profile": "720p" },
-        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78c", "profile": "480p" }
+        { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "source" },
+        { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" }
       ]
     }
 }' \
 https://livepeer.com/api/stream
 ```
 
-You can update an existing stream to add multistream targets:
+##### Inline
+
+```bash
+curl -X POST \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
+    "name": "test_multistream_reference",
+    "profiles": [
+      { "name": "720p", ... },
+      { "name": "480p", ... },
+      { "name": "360p", ... }
+    ],
+    "multistream": {
+      "targets": [
+        {
+          "profile": "720p",
+          "spec": {
+            "name": "Eli\'s Twitch",
+            "url": "rtmp://rtmp.twitch.tv/live/SECRET"
+          }
+        },
+        {
+          "profile": "360p",
+          "spec": { "url": "rtmp://rtmp.twitter.com/SECRET" }
+        }
+      ]
+    }
+}' \
+https://livepeer.com/api/stream
+```
+
+### Updating Multistream Targets of a Stream
+
+You can also update an existing `Stream` to add or remove `Multistream Targets`.
+The schema of all fields is the same as the creation API, with the targets being
+referenced with an `id` or created inlined with a `spec`.
+
+#### Adding Multistream Targets
+
+Since you can combine inlined and referenced `Multistream Targets` on the same
+request, it's really easy to add a target by URL to an existing stream.
+
+##### 1. `GET` the current state of the Stream
+
+```bash
+curl 'https://livepeer.com/api/stream/{id}' \
+-H 'authorization: Bearer {api-key}'
+```
+
+```json
+{
+  "name": "test_multistream_reference",
+  "profiles": [
+    { "name": "720p", ... },
+    { "name": "480p", ... },
+    { "name": "360p", ... }
+  ],
+   "multistream": {
+     "targets":  [
+       { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "source" },
+       { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" }
+     ]
+   }
+}
+```
+
+##### 2. `PATCH` the Stream with the new target
 
 ```bash
 curl -X PATCH \
@@ -219,12 +298,13 @@ curl -X PATCH \
 -d '{
      "multistream": {
         "targets":  [
-          { "id": "PUSH123", "profile": "720p" }
-          { "id": "PUSH444", "profile": "source" }
+          { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "source" },
+          { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" },
+          { "profile": "720p", "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"} }
         ]
       }
     }' \
-https://livepeer.com/api/stream/2d10f1fd-dbf7-495b-8aef-08916507fcce
+'https://livepeer.com/api/stream/{id}'
 ```
 
 Alternatively, you can create a stream with inline definition of multistream
@@ -235,30 +315,30 @@ curl -X POST \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
-	  "name": "test_stream",
-	  "profiles": [
-	    {
-	      "name": "720p",
-	      "bitrate": 2000000,
-	      "fps": 30,
-	      "width": 1280,
-	      "height": 720
-	    },
-	    {
-	      "name": "480p",
-	      "bitrate": 1000000,
-	      "fps": 30,
-	      "width": 854,
-	      "height": 480
-	    },
-	    {
-	      "name": "360p",
-	      "bitrate": 500000,
-	      "fps": 30,
-	      "width": 640,
-	      "height": 360
-	    }
-	  ],
+    "name": "test_stream",
+    "profiles": [
+      {
+        "name": "720p",
+        "bitrate": 2000000,
+        "fps": 30,
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "name": "480p",
+        "bitrate": 1000000,
+        "fps": 30,
+        "width": 854,
+        "height": 480
+      },
+      {
+        "name": "360p",
+        "bitrate": 500000,
+        "fps": 30,
+        "width": 640,
+        "height": 360
+      }
+    ],
     "multistream": {
       "targets": [
         {
@@ -269,7 +349,7 @@ curl -X POST \
           "profile": "720p",
           "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"}
         }
-		  ]
+      ]
     }
 }' \
 https://livepeer.com/api/stream
