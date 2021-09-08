@@ -1,0 +1,35 @@
+---
+title: "GET a list of multistream targets"
+description: Livepeer.com API Reference | GET a list of multistream targets
+---
+
+# `GET` a list of multistream targets
+
+Use `/multistream/target` to a return a list of your existing multistream
+targets.
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/multistream/target"
+```
+
+200 OK
+
+```json
+[
+  {
+    "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+    "userId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbb",
+    "name": "My First Multistream Target"
+  },
+  {
+    "id": "cccccccc-cccc-cccc-cccc-cccc",
+    "userId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbb",
+    "name": "My Second Multistream Target"
+  }
+]
+```
+
+Pagination should be done using the cursor in the `Link` response header. You
+can either use the raw link included in the header or extract the `cursor` and
+pass it in the `cursor` query-string in the request.

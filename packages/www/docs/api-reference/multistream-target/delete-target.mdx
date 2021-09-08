@@ -1,0 +1,18 @@
+---
+title: "DELETE a multistream target"
+description: Livepeer.com API Reference | DELETE a multistream target
+---
+
+# `DELETE` a multistream target
+
+`DELETE /multistream/target/{id}` deletes an existing `multistream target`
+object. Make sure to remove any references to the target on existing `streams`
+before actually deleting it from the API.
+
+```bash
+curl -X DELETE \
+-H 'authorization: Bearer {api-key}'
+'https://livepeer.com/api/multistream/target/{id}'
+```
+
+204 No Content

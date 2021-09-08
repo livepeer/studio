@@ -119,6 +119,35 @@ ingested `sourceSegments` and duration data, among others.
         "Pixel width setting for the transcoded rendition. (minimum: 128).",
     },
     {
+      parameter: <code>multistream</code>,
+      type: <code>object</code>,
+      description: "Multistream configuration.",
+    },
+    {
+      parameter: <code>multistream.targets</code>,
+      type: <code>array</code>,
+      description:
+        "List of Multistream Targets where this stream should be simultaneously pushed to.",
+    },
+    {
+      parameter: <code>multistream.targets.profile</code>,
+      type: <code>string</code>,
+      description:
+        "Name of profile that should be pushed to the referenced Multistream Target. Use `source` to push original media as ingested.",
+    },
+    {
+      parameter: <code>multistream.targets.id</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier of the Multistream Target object from its own API.",
+    },
+    {
+      parameter: <code>multistream.targets.spec</code>,
+      type: <code>object</code>,
+      description:
+        "This field is write-only, allowed only in mutation request payloads. It specifies an inline Multistream Target object to be created on the same time as the stream creation or update. Reference the specific Multistream Target API for schema.",
+    },
+    {
       parameter: <code>record</code>,
       type: <code>boolean</code>,
       description:
