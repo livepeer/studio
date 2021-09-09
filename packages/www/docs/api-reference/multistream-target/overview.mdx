@@ -1,0 +1,65 @@
+---
+title: Overview
+description: Livepeer.com API Reference | The multistream target object
+---
+
+# The `multistream target` object
+
+The `multistream target` object is a single endpoint where a `stream` can be
+multistreamed to. Multistreaming is the act of pushing the media from the given
+stream while it is currently happening, also referred to as simulcast.
+
+A `multistream target` object can be created pointing to a given URL (either
+RTMP, RTMPS or SRT) and then referenced from a `stream` object in order for the
+multistream to take place.
+
+For more information about using them check the
+[`Multistream`](/docs/guides/start-live-streaming/multistream) guide.
+
+## Attributes
+
+<Table
+  data={[
+    {
+      parameter: <code>createdAt</code>,
+      type: <code>number</code>,
+      description:
+        "Timestamp when the multistream target was created. Reported in Unix epoch time in milliseconds.",
+    },
+    {
+      parameter: <code>id</code>,
+      type: <code>string</code>,
+      description: "Unique identifier for the multistream target.",
+    },
+    {
+      parameter: <code>userId</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier for the Livepeer.com user account that created the multistream target object.",
+    },
+    {
+      parameter: <code>name</code>,
+      type: <code>string</code>,
+      description:
+        "Additional identifier for the multistream target, often set to a human readable string. This identifier does not need to be unique and is generated from the URL host if not included.",
+    },
+    {
+      parameter: <code>url</code>,
+      type: <code>string</code>,
+      description:
+        "Endpoint where to push stream media during multistream, must be an RTMP, RTMPS or SRT endpoint. Required during POST and omitted in any GET responses for security reasons.",
+    },
+    {
+      parameter: <code>disabled</code>,
+      type: <code>boolean</code>,
+      description: (
+        <>
+          If <code>true</code>, will disable multistreaming from any stream to
+          this target. Can be used to quickly disable multistream to some
+          endpoint without the need to update all streams that reference it or
+          delete the multistream target object.
+        </>
+      ),
+    },
+  ]}
+/>
