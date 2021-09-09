@@ -1,0 +1,20 @@
+---
+title: "DELETE a stream"
+description: Livepeer.com API Reference | DELETE a stream
+---
+
+# `DELETE` a stream
+
+`DELETE /stream/{id}` deletes an existing `stream` object.
+
+This will also suspend any active stream sessions, so make sure to wait until
+the stream has finished. To explicitly interrupt an active session, consider
+instead updating the `suspended` field in the `stream` using the
+[`PATCH stream` API](/docs/api-reference/stream/update-stream).
+
+```bash
+curl -X DELETE 'https://livepeer.com/api/stream/{id}' \
+-H 'authorization: Bearer {api-key}'
+```
+
+204 No Content
