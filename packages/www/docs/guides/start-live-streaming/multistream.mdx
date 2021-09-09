@@ -59,14 +59,13 @@ for the multistream to happen. You also need to reference the target from the
 ##### Request: `POST /api/multistream/target`
 
 ```bash
-curl -X POST \
+curl -X POST 'https://livepeer.com/api/multistream/target' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "Eli\'s Twitch",
     "url": "rtmp://rtmp.twitch.tv/live/SECRET"
-}' \
-'https://livepeer.com/api/multistream/target'
+}'
 ```
 
 _Supported Protocols: RTMP, RTMPS and SRT._
@@ -133,15 +132,14 @@ from streams nor deleting the target completely.
 ##### Request: `PATCH /api/multistream/target/{id}`
 
 ```bash
-curl -X PATCH \
+curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "Not Eli\'s Twitch",
-    "url": "rtmp://rtmp.twitter.com/SECRET"
+    "url": "rtmp://rtmp.twitter.com/SECRET",
     "disabled": true
-}' \
-'https://livepeer.com/api/multistream/target/{id}'
+}'
 ```
 
 All request fields are optional. There is no response on a success (HTTP
@@ -158,9 +156,8 @@ actually delete it.
 ##### Request: `DELETE /api/multistream/target/{id}`
 
 ```bash
-curl -X DELETE \
+curl -X DELETE 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'authorization: Bearer {api-key}'
-'https://livepeer.com/api/multistream/target/{id}'
 ```
 
 There is no response on a success (HTTP `204 No Content`).
@@ -201,7 +198,7 @@ separate objects in the `multistream.target` array.
 ##### By Reference
 
 ```bash
-curl -X POST \
+curl -X POST 'https://livepeer.com/api/stream' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
@@ -217,14 +214,13 @@ curl -X POST \
         { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" }
       ]
     }
-}' \
-https://livepeer.com/api/stream
+}'
 ```
 
 ##### Inline
 
 ```bash
-curl -X POST \
+curl -X POST 'https://livepeer.com/api/stream' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
@@ -249,8 +245,7 @@ curl -X POST \
         }
       ]
     }
-}' \
-https://livepeer.com/api/stream
+}'
 ```
 
 ### Updating Multistream Targets of a Stream
@@ -295,7 +290,7 @@ curl 'https://livepeer.com/api/stream/{id}' \
 ##### 2. `PATCH` the Stream with the new target
 
 ```bash
-curl -X PATCH \
+curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
@@ -306,8 +301,7 @@ curl -X PATCH \
           { "profile": "720p", "spec": {"url": "rtmp://rtmp.twitter.com/SECRET"} }
         ]
       }
-    }' \
-'https://livepeer.com/api/stream/{id}'
+    }'
 ```
 
 The `PATCH` can also add new `Multistream Targets` by `id` instead of inline,
@@ -333,7 +327,7 @@ the targets that we want to keep in the stream, after removing the desired one.
 e.g.: Removing only the first target from the example above:
 
 ```bash
-curl -X PATCH \
+curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
@@ -342,8 +336,7 @@ curl -X PATCH \
           { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" }
         ]
       }
-    }' \
-'https://livepeer.com/api/stream/{id}'
+    }'
 ```
 
 We kept only the remaining targets in the `PATCH`, i.e. the second one.
@@ -355,15 +348,14 @@ for the given target when building the `PATCH` request payload.
 ##### Removing all Multistream Targets
 
 ```bash
-curl -X PATCH \
+curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
      "multistream": {
         "targets":  []
       }
-    }' \
-'https://livepeer.com/api/stream/{id}'
+    }'
 ```
 
 # Understanding Multistream Performance

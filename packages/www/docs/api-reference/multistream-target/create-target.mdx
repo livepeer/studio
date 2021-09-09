@@ -18,14 +18,13 @@ information.
 Here is an example request:
 
 ```bash
-curl -X POST \
+curl -X POST 'https://livepeer.com/api/multistream/target' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "My Multistream Target",
     "url": "rtmp://rtmp.streaming.tv/live/SECRET"
-}' \
-'https://livepeer.com/api/multistream/target'
+}'
 ```
 
 201 Created

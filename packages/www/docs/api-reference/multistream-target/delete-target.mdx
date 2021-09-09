@@ -10,9 +10,8 @@ object. Make sure to remove any references to the target on existing `streams`
 before actually deleting it from the API.
 
 ```bash
-curl -X DELETE \
+curl -X DELETE 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'authorization: Bearer {api-key}'
-'https://livepeer.com/api/multistream/target/{id}'
 ```
 
 204 No Content

@@ -12,15 +12,14 @@ field for updating it since we redact it from GET responses, so you have to
 build the URL from scratch.
 
 ```bash
-curl -X PATCH \
+curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
     "name": "Not My Original Multistream Target Anymore",
     "url": "rtmp://rtmp.real.service.com/SECRET"
     "disabled": true
-}' \
-'https://livepeer.com/api/multistream/target/{id}'
+}'
 ```
 
 204 No Content
