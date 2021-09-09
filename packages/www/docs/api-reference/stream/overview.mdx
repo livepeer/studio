@@ -132,8 +132,12 @@ ingested `sourceSegments` and duration data, among others.
     {
       parameter: <code>multistream.targets.profile</code>,
       type: <code>string</code>,
-      description:
-        "Name of profile that should be pushed to the referenced Multistream Target. Use `source` to push original media as ingested.",
+      description: (
+        <>
+          Name of profile that should be pushed to the referenced Multistream
+          Target. Use <code>"source"</code> to push original media as ingested.
+        </>
+      ),
     },
     {
       parameter: <code>multistream.targets.id</code>,
@@ -150,8 +154,30 @@ ingested `sourceSegments` and duration data, among others.
     {
       parameter: <code>record</code>,
       type: <code>boolean</code>,
-      description:
-        "true means that new sessions are recorded, and false means they are not. Historically, on stream objects with a parentId (stream objects representing a single live stream session), the value is read-only; true means that the session is actively being recorded or was recorded, and false means that the session is not being recorded or was not recorded.",
+      description: (
+        <>
+          <code>true</code> means that new sessions are recorded and{" "}
+          <code>false</code> means they are not. The value is also inherited by
+          all future child <code>session</code> objects, which are read-only.
+          Historically, <code>stream</code> objects can also represent a single
+          live stream session, in which case they have a <code>parentId</code>.
+          In that case, <code>true</code> means that the session is actively
+          being recorded or was recorded, and <code>false</code> means that the
+          session is not being recorded or was not recorded.
+        </>
+      ),
+    },
+    {
+      parameter: <code>suspended</code>,
+      type: <code>boolean</code>,
+      description: (
+        <>
+          Default value is <code>false</code>. Can be used to forcefully stop
+          any live stream sessions happening in the current stream resource. Set
+          to <code>true</code> to immediately suspend any running stream and
+          prohibit new streams from starting.
+        </>
+      ),
     },
     {
       parameter: <code>sourceSegments</code>,

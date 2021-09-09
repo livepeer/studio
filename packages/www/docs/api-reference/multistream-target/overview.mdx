@@ -5,13 +5,16 @@ description: Livepeer.com API Reference | The multistream target object
 
 # The `multistream target` object
 
-The `multistream target` object is a single endpoint where a `Stream` can be
+The `multistream target` object is a single endpoint where a `stream` can be
 multistreamed to. Multistreaming is the act of pushing the media from the given
 stream while it is currently happening, also referred to as simulcast.
 
 A `multistream target` object can be created pointing to a given URL (either
 RTMP, RTMPS or SRT) and then referenced from a `stream` object in order for the
 multistream to take place.
+
+For more information about using them check the
+[`Multistream`](/docs/guides/start-live-streaming/multistream) guide.
 
 ## Attributes
 
@@ -49,8 +52,14 @@ multistream to take place.
     {
       parameter: <code>disabled</code>,
       type: <code>boolean</code>,
-      description:
-        "If `true`, will disable multistreaming from any stream to this target. Can be used to quickly disable multistream to some endpoint without the need to update all streams that reference it or delete the multistream target object.",
+      description: (
+        <>
+          If <code>true</code>, will disable multistreaming from any stream to
+          this target. Can be used to quickly disable multistream to some
+          endpoint without the need to update all streams that reference it or
+          delete the multistream target object.
+        </>
+      ),
     },
   ]}
 />

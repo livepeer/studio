@@ -1,0 +1,72 @@
+---
+title: "PATCH update a stream"
+description: Livepeer.com API Reference | PATCH update a stream
+---
+
+# `PATCH` update a stream
+
+`PATCH /stream/{id}` can be used to modify a `stream` object. It is a single
+endpoint that can udpate any of the mutable properties of a stream.
+Specifically:
+
+- `record`
+- `suspended`
+- `multistream.targets`
+
+For more information about them check `stream` object schema in
+[Overview](/docs/api-reference/stream/overview).
+
+All fields in the request payload are optional, and any field that is not
+included will keep the same value as before in the saved object.
+
+A `204 No Content` status response indicates the `stream` was successfully
+updated.
+
+### Turn recording on
+
+```bash
+curl -X PATCH https://livepeer.com/api/stream/{id} \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{ "record": true }'
+```
+
+### Suspend stream
+
+```bash
+curl -X PATCH https://livepeer.com/api/stream/{id} \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{ "suspended": true }'
+```
+
+### Edit Multistream Targets
+
+```bash
+curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
+     "multistream": {
+        "targets":  [
+          { "id" :"0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", "profile": "source" },
+          { "id" :"95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d", "profile": "720p" }
+        ]
+      }
+    }'
+```
+
+### Update all fields
+
+```bash
+curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
+     "record": false,
+     "suspended": false,
+     "multistream": {
+        "targets":  []
+      }
+    }'
+```
