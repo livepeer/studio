@@ -6,36 +6,37 @@ description: Start multistreaming
 # Overview
 
 The Multistream API allows a source stream and transcoded renditions to be
-pushed to multiple RTMP or SRT targets, such as Facebook Live, Twitch, and
+pushed to multiple RTMP(S) or SRT targets, such as Facebook Live, Twitch, and
 Youtube Live.
 
 # Managing Multistream targets in the Livepeer.com Dashboard
 
-To add, manage, and delete multistream targets, navigate to the Streams page
+To add, manage, and delete `Multistream Targets`, navigate to the Streams page
 ([livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams)) and
-click on a stream name. On the stream detail page, on the "Overview" tab, you
-can view all configured targets. You must configure new multistream targets for
-each stream. This will apply the multistream configuration to that stream.
-Multistream targets do not carry over when you create new streams.
+click on a stream name. On the stream detail page, on the `Overview` tab, you
+can view all configured targets. You must configure new `Multistream Targets`
+for each stream. This will apply the multistream configuration to that stream.
+`Multistream Targets` do not carry over when you create new streams.
 
-To add a new target, select "Add" on the right side of the Multistream targets
-section. You'll be asked to name your Target, provide the RTMP URL, and a stream
-key. The RTMP URL and stream key should be provided to you by the platform that
-you're streaming into. Select the renditions that you'd like to send to that
-target. Click "Add Target". Once added, you can toggle the destinations and on
-and off.
+To add a new target, select `Create` on the right side of the
+`Multistream Targets` section. You'll be asked to name your target, provide the
+Ingest URL and a stream key, being Ingest URL the only required value. The
+Ingest URL and stream key should be provided by the platform that you're
+streaming into and can be of the RTMP, RTMPS or SRT protocols. Select the
+rendition profile that you'd like to send to that target and click
+`Create Target`. Once created, you can toggle the targets on and off.
 
-To edit a mulitstream target, click on the three dots to the left of the stream
-name. Click "Edit target" to open up the target settings. Select "Update target"
-when you've completed your changes.
+To edit a `Mulitstream Target`, click on the three dots to the right of the
+target name and then on `Edit` to open up the target settings. Select
+`Update target` when you've completed your changes.
 
-To delete a multistream target, click on the three dots to the left of the
-stream name and select "Delete target".
+To delete a multistream target, click on the three dots to the right of the
+target name and then on `Delete`.
 
-**_NOTE:_** Any changes to mulitstream targets, including adding new targets,
-will apply to the next active session. If you make changes while a stream is
-active, those changes will not apply until the current session has ended and a
-new session begins.
+> **NOTE:** Any changes to `Mulitstream Targets`, including creating new
+> targets, will apply only to the next active session. If you make changes while
+> a stream is active, those changes will not apply until the current session has
+> ended and a new session begins.
 
 # Managing Multistream targets with the Livepeer.com API
 
