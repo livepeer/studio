@@ -7,9 +7,16 @@ description: Livepeer.com API Reference | PATCH update a multistream target
 
 `PATCH /multistream/target/{id}` updates an existing `multistream target`
 object. You can change any user-defined field in the current object,
-specifically `name`, `url` and `disabled`. You cannot access the current `url`
-field for updating it since we redact it from GET responses, so you have to
-build the URL from scratch.
+specifically `name`, `url` and `disabled`.
+
+All fields are optional, and if any field is not included in the request payload
+it will be kept unchanged from the saved object.
+
+You cannot access the current `url` field for updating it since we redact it
+from GET responses. If you want to update the URL you have to build it from
+scratch. You can also omit it from the `PATCH` payload to keep it as is.
+
+#### Changing all fields
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
@@ -18,7 +25,33 @@ curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 -d '{
     "name": "Not My Original Multistream Target Anymore",
     "url": "rtmp://rtmp.real.service.com/SECRET"
+    "disabled": false
+}'
+```
+
+204 No Content
+
+#### Disabling a target
+
+```bash
+curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
     "disabled": true
+}'
+```
+
+204 No Content
+
+#### Changing only the URL
+
+```bash
+curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
+-H 'content-type: application/json' \
+-H 'authorization: Bearer {api-key}' \
+-d '{
+    "url": "srt://rtmp.service.com/live?streamId=SECRET"
 }'
 ```
 

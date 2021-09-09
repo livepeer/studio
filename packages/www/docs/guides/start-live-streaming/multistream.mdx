@@ -43,7 +43,8 @@ target name and then on `Delete`.
 ## Multistream Target Object `/multistream/target`
 
 You can also manage `Multistream Target` objects from the API. Each target
-represents a specific endpoint where a stream could be multistreamed to.
+represents a specific endpoint where a stream could be multistreamed to. More
+details in the [API reference](/docs/api-reference/multistream-target/overview).
 
 <!-- Add notice about how other platforms call this? Re-stream, simulcast, etc -->
 
@@ -56,7 +57,7 @@ for the multistream to happen. You also need to reference the target from the
 
 ### Create
 
-##### Request: `POST /api/multistream/target`
+##### Request: [`POST /api/multistream/target`](/docs/api-reference/multistream-target/create-target)
 
 ```bash
 curl -X POST 'https://livepeer.com/api/multistream/target' \
@@ -88,7 +89,7 @@ creation request. The destination url will not be returned since it contains
 sensitive user data. This way the application developer doesn't have to worry
 about storing and securing their users' stream keys.
 
-##### Request: `GET /api/multistream/target/{id}`
+##### Request: [`GET /api/multistream/target/{id}`](/docs/api-reference/multistream-target/get-target)
 
 ```bash
 curl 'https://livepeer.com/api/multistream/target/{id}' \
@@ -108,7 +109,7 @@ curl 'https://livepeer.com/api/multistream/target/{id}' \
 You can also list all existing `Multistream Targets` in the account by omitting
 the `{id}` segment in the above request.
 
-##### List Request: `GET /api/multistream/target`
+##### List Request: [`GET /api/multistream/target`](/docs/api-reference/multistream-target/list-targets)
 
 ```bash
 curl 'https://livepeer.com/api/multistream/target' \
@@ -129,7 +130,7 @@ One of the updateable properties is the `disabled` field. It can be used to
 disable multistreaming to a specific target without the need of removing them
 from streams nor deleting the target completely.
 
-##### Request: `PATCH /api/multistream/target/{id}`
+##### Request: [`PATCH /api/multistream/target/{id}`](/docs/api-reference/multistream-target/update-target)
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
@@ -153,7 +154,7 @@ that target or a broken reference will be left. So first update (`PATCH`) any
 `Stream` removing the reference to the `Multistream Target` and only then
 actually delete it.
 
-##### Request: `DELETE /api/multistream/target/{id}`
+##### Request: [`DELETE /api/multistream/target/{id}`](/docs/api-reference/multistream-target/delete-target)
 
 ```bash
 curl -X DELETE 'https://livepeer.com/api/multistream/target/{id}' \
@@ -180,20 +181,21 @@ same profile can be mulsitreamed to several `Multistream Targets`, but there can
 be only 1 multistream to a given URL.
 
 To avoid managing separate `Multistream Target` objects, you can also create
-targets inlined in the `Stream` object. In that case, the target reference
-object in the `multistream.target` field should have a `spec` instead of an `id`
-with the payload for creating a new `Multistream Target`. Notice that `spec` is
-a write-only field, meaning that `Stream` objects returned from reads (`GET`)
-will always have only a `profile` and an `id` in the targets. To get the current
-state of a `Multistream Target`, fetch from its own read API using that `id`.
+targets inlined in the `Stream` object on the same mutation request (create or
+update). In that case, the target reference object in the `multistream.targets`
+field should have a `spec` instead of an `id` with the payload for creating a
+new `Multistream Target`. Notice that `spec` is a write-only field, meaning that
+`Stream` objects returned from reads (`GET`) will always have only a `profile`
+and `id` in the targets. To get the current state of a `Multistream Target`,
+fetch from its own read API using that `id`.
 
 ### Creating a Stream with Multistream Targets
 
-You can create a `Stream` directly with some `Multistream Targets`. Either
+You can create a `Stream` already with some `Multistream Targets`. Either
 reference an existing `Multistream Target` by `id` or create a new
 `Multistream Target` inline with the `spec` field. You can also use both types
 of targets on the same payload (reference and inline) as long as they are
-separate objects in the `multistream.target` array.
+separate entries in the `multistream.targets` array.
 
 ##### By Reference
 
@@ -314,10 +316,10 @@ request as above to either remove or completely clear the `multistream.targets`
 array.
 
 After removing the reference from the `Stream`, you can also delete the
-`Multistream Target` object completetly by calling the separate `DELETE` API in
-the [Multistream Target Object](#multistream-target-object-multistreamtarget)
-section above. Make sure that no other `Stream` has a reference to that same
-`Multistream Target` before doing so.
+`Multistream Target` object completetly by calling the separate
+[Delete `Multistream Target` API](/docs/api-reference/multistream-target/delete-target).
+Make sure that no other `Stream` has a reference to that `Multistream Target`
+before doing so.
 
 ##### Removing a single Multistream Target
 
