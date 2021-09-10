@@ -21,6 +21,31 @@ export default interface Queue {
     msg: messages.Any,
     delay: number
   ): Promise<void>;
+
+  close(): Promise<void>;
+}
+
+export class FakeQueue implements Queue {
+  publish(key: RoutingKey, msg: messages.Any): Promise<void> {
+    console.warn(`WARN: Publish event to fake queue. key=${key} message=`, msg);
+    return Promise.resolve();
+  }
+
+  delayedPublish(
+    key: RoutingKey,
+    msg: messages.Any,
+    delay: number
+  ): Promise<void> {
+    console.warn(
+      `WARN: Publish delayed event to fake queue. key=${key} delay=${delay} message=`,
+      msg
+    );
+    return Promise.resolve();
+  }
+
+  close(): Promise<void> {
+    return Promise.resolve();
+  }
 }
 
 export class RabbitQueue implements Queue {
