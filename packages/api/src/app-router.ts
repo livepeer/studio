@@ -15,9 +15,8 @@ import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
-import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
-import { RabbitQueue } from "./store/queue";
+import Queue, { RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 
 // Routes that should be whitelisted even when `apiRegion` is set
@@ -78,20 +77,23 @@ export default async function makeApp(params) {
   const [db, store] = await makeStore({
     postgresUrl,
     postgresReplicaUrl,
-    schema,
   });
 
   // RabbitMQ
-  const queue = new RabbitQueue();
-  await queue.connect(amqpUrl);
-  // Webhooks Cannon
-  const webhookCannon = new WebhookCannon({
-    db,
-    store,
-    verifyUrls: true,
-    queue,
-  });
-  await webhookCannon.start();
+  let queue: Queue;
+  if (amqpUrl) {
+    const rabbitQueue = new RabbitQueue();
+    await rabbitQueue.connect(amqpUrl);
+    // Webhooks Cannon
+    const webhookCannon = new WebhookCannon({
+      db,
+      store,
+      verifyUrls: true,
+      queue: rabbitQueue,
+    });
+    await webhookCannon.start();
+    queue = rabbitQueue;
+  }
 
   if (!stripeSecretKey) {
     console.warn(
@@ -123,7 +125,7 @@ export default async function makeApp(params) {
     next();
   });
   if (insecureTestToken) {
-    if (process.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production") {
       throw new Error("tried to set insecureTestToken in production!");
     }
     app.use(`/${insecureTestToken}`, insecureTest());
