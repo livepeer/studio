@@ -17,7 +17,7 @@ import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
-import MessageQueue from "./store/rabbit-queue";
+import { RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 
 // Routes that should be whitelisted even when `apiRegion` is set
@@ -82,7 +82,7 @@ export default async function makeApp(params) {
   });
 
   // RabbitMQ
-  const queue = new MessageQueue();
+  const queue = new RabbitQueue();
   await queue.connect(amqpUrl);
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({

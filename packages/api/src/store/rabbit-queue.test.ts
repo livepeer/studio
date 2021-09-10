@@ -1,13 +1,13 @@
 import { semaphore, sleep } from "../util";
-import MessageQueue from "./rabbit-queue";
+import { RabbitQueue } from "./queue";
 
 jest.setTimeout(10000);
 
 describe("Queue", () => {
-  let queue: MessageQueue;
+  let queue: RabbitQueue;
   beforeEach(async () => {
     try {
-      queue = new MessageQueue();
+      queue = new RabbitQueue();
     } catch (e) {
       console.log(e);
     }

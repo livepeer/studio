@@ -13,7 +13,17 @@ const QUEUES = {
 type QueueName = keyof typeof QUEUES;
 type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
-export default class MessageQueue {
+export default interface Queue {
+  publish(key: RoutingKey, msg: messages.Any): Promise<void>;
+
+  delayedPublish(
+    key: RoutingKey,
+    msg: messages.Any,
+    delay: number
+  ): Promise<void>;
+}
+
+export class RabbitQueue implements Queue {
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
 
