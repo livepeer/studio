@@ -7,13 +7,11 @@ describe("Queue", () => {
   let queue: RabbitQueue;
   beforeEach(async () => {
     try {
-      queue = new RabbitQueue();
+      queue = await RabbitQueue.connect("amqp://localhost:5672/livepeer");
     } catch (e) {
-      console.log(e);
+      console.error(e);
+      throw e;
     }
-    await queue.connect("amqp://localhost:5672/livepeer");
-    // await sleep(2000);
-    // await queue.consume()
   });
 
   afterEach(async () => {

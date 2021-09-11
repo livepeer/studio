@@ -7,7 +7,7 @@ import { parse as parseUrl } from "url";
 
 import { DB } from "../store/db";
 import messages from "../store/messages";
-import { RabbitQueue } from "../store/queue";
+import Queue from "../store/queue";
 import Model from "../store/model";
 import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout } from "../util";
@@ -25,7 +25,7 @@ export default class WebhookCannon {
   running: boolean;
   verifyUrls: boolean;
   resolver: any;
-  queue: RabbitQueue;
+  queue: Queue;
   constructor({ db, store, verifyUrls, queue }) {
     this.db = db;
     this.store = store;

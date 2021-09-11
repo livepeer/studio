@@ -16,7 +16,7 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
-import Queue, { FakeQueue, RabbitQueue } from "./store/queue";
+import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 
 // Routes that should be whitelisted even when `apiRegion` is set
@@ -80,28 +80,22 @@ export default async function makeApp(params) {
   });
 
   // RabbitMQ
-  let queue: Queue;
-  let webhookCannon: WebhookCannon | undefined;
-  if (!amqpUrl) {
-    queue = new FakeQueue();
-  } else {
-    const rabbitQueue = new RabbitQueue();
-    await rabbitQueue.connect(amqpUrl);
-    queue = rabbitQueue;
+  const queue: Queue = amqpUrl
+    ? await RabbitQueue.connect(amqpUrl)
+    : new NoopQueue();
 
-    // Webhooks Cannon
-    webhookCannon = new WebhookCannon({
-      db,
-      store,
-      verifyUrls: true,
-      queue: rabbitQueue,
-    });
-    await webhookCannon.start();
-  }
+  // Webhooks Cannon
+  const webhookCannon = new WebhookCannon({
+    db,
+    store,
+    verifyUrls: true,
+    queue,
+  });
+  await webhookCannon.start();
 
   process.on("beforeExit", (code) => {
     queue.close();
-    webhookCannon?.stop();
+    webhookCannon.stop();
   });
 
   if (!stripeSecretKey) {
