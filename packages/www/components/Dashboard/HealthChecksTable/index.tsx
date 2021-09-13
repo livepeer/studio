@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { Column } from "react-table";
-import { useQueries, useQueryClient } from "react-query";
+import { useQuery, useQueries, useQueryClient } from "react-query";
 
 import {
   Box,
@@ -19,13 +19,20 @@ import {
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { useApi } from "hooks";
+import { useApi, useAnalyzer } from "hooks";
 import { HealthStatus } from "hooks/use-analyzer";
 
 type HealthChecksTableData = {
   id: string;
   name: TextCellProps;
+  status: TextCellProps;
 };
+
+const conditions = [
+  "Transcoding",
+  "TranscodeRealTime",
+  "Multistreaming",
+] as const;
 
 const HealthChecksTable = ({
   title = "Health Checks",
@@ -46,6 +53,8 @@ const HealthChecksTable = ({
 }) => {
   const queryClient = useQueryClient();
   const { getMultistreamTarget } = useApi();
+
+  console.log(streamHealth);
   const { state, stateSetter } = useTableState<HealthChecksTableData>({
     tableId: "HealthChecksTable",
   });
@@ -58,6 +67,11 @@ const HealthChecksTable = ({
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.name.children", ...params),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: TextCell,
       },
     ],
     []
@@ -73,21 +87,29 @@ const HealthChecksTable = ({
     }))
   ).map((res) => res.data as MultistreamTarget);
 
+  const conditionsMap = streamHealth.conditions.reduce(function (map, obj) {
+    map[obj.type] = obj;
+    return map;
+  }, {});
+
   const tableData: TableData<HealthChecksTableData> = useMemo(() => {
     return {
       isLoading: false,
       data: {
-        count: targets.length,
+        count: conditions.length,
         nextCursor: null,
-        rows: targets.map((target, idx) => {
-          const ref = targetRefs[idx];
+        rows: conditions.map((condition, idx) => {
+          const c = conditionsMap[condition];
           return {
-            id: ref.id,
+            id: c.type,
             name: {
+              children: <Box>{c.type}</Box>,
+            },
+            status: {
               children: (
-                <Tooltip content={ref.id}>
-                  <Label>{target?.name ?? "..."}</Label>
-                </Tooltip>
+                <Box>
+                  {c.status === null ? "-" : c.status ? "Healthy" : "Unhealthy"}
+                </Box>
               ),
             },
           };
