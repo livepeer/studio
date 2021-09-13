@@ -5,7 +5,9 @@ const app = Router();
 const getOrchestrators = async (req, res, next) => {
   const orchestrators = await req.getOrchestrators(req);
 
-  return res.json(orchestrators.map(({ address }) => ({ address })));
+  return res.json(
+    orchestrators.map(({ address, score }) => ({ address, score }))
+  );
 };
 
 app.get("/", getOrchestrators);

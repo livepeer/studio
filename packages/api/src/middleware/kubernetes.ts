@@ -13,6 +13,10 @@ export interface NodeAddress {
   cliAddress: string;
 }
 
+export interface OrchestratorNodeAddress extends NodeAddress {
+  score: number;
+}
+
 export default function kubernetesMiddleware({
   kubeNamespace,
   kubeBroadcasterService,
@@ -84,7 +88,7 @@ export default function kubernetesMiddleware({
       kubeOrchestratorService,
       kubeNamespace
     );
-    const ret: NodeAddress[] = [];
+    const ret: OrchestratorNodeAddress[] = [];
     if (endpoints && endpoints.subsets) {
       for (const subset of endpoints.subsets) {
         if (!subset.addresses) {
@@ -97,6 +101,7 @@ export default function kubernetesMiddleware({
               ip: address.ip,
             }),
             cliAddress: `http://${address.ip}:7935`,
+            score: 1,
           });
         }
       }

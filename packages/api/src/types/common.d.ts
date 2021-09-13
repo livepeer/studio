@@ -1,5 +1,5 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
-import { NodeAddress } from "../middleware/kubernetes";
+import { NodeAddress, OrchestratorNodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import Queue from "../store/queue";
 import { CliArgs } from "../parse-cli";
@@ -28,7 +28,7 @@ declare global {
       tokenId?: string;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;
-      getOrchestrators?: () => Promise<NodeAddress[]>;
+      getOrchestrators?: () => Promise<OrchestratorNodeAddress[]>;
       getIngest?: () => Promise<Ingest[]>;
       getPrices?: () => Promise<Price[]>;
     }

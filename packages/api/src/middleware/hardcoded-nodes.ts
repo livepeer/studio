@@ -4,7 +4,7 @@
  */
 
 import { RequestHandler } from "express";
-import { NodeAddress } from "./kubernetes";
+import { NodeAddress, OrchestratorNodeAddress } from "./kubernetes";
 
 export interface Ingest {
   base?: string;
@@ -42,7 +42,8 @@ export default function hardcodedNodes({
       req.getBroadcasters = async () => broadcasters as NodeAddress[];
     }
     if (!req.getOrchestrators) {
-      req.getOrchestrators = async () => orchestrators as NodeAddress[];
+      req.getOrchestrators = async () =>
+        orchestrators as OrchestratorNodeAddress[];
     }
     if (!req.getIngest) {
       req.getIngest = async () => ingest as Ingest[];
