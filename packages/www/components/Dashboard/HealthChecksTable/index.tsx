@@ -19,8 +19,9 @@ import {
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { useApi, useAnalyzer } from "hooks";
-import { HealthStatus } from "hooks/use-analyzer";
+import { useApi } from "hooks";
+import { Condition, HealthStatus } from "hooks/use-analyzer";
+import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 
 type HealthChecksTableData = {
   id: string;
@@ -28,7 +29,7 @@ type HealthChecksTableData = {
   status: TextCellProps;
 };
 
-const conditions = [
+const conditionTypes = [
   "Transcoding",
   "TranscodeRealTime",
   "Multistreaming",
@@ -51,10 +52,8 @@ const HealthChecksTable = ({
   border?: boolean;
   tableLayout?: string;
 }) => {
-  const queryClient = useQueryClient();
   const { getMultistreamTarget } = useApi();
 
-  console.log(streamHealth);
   const { state, stateSetter } = useTableState<HealthChecksTableData>({
     tableId: "HealthChecksTable",
   });
@@ -77,38 +76,56 @@ const HealthChecksTable = ({
     []
   );
 
-  const targetQueryKey = (id: string) => ["multistreamTarget", id];
+  // Only need this if we actually do some custom logic for the Multistream
+  // healthcheck. If we do so, also consider moving these queries to the
+  // top-level component instead (the stream detail/health pages).
+  //
+  // const targetQueryKey = (id: string) => ["multistreamTarget", id];
+  // const targetRefs = stream.multistream?.targets ?? [];
+  // const targets = useQueries(
+  //   targetRefs.map((ref) => ({
+  //     queryKey: targetQueryKey(ref.id),
+  //     queryFn: () => getMultistreamTarget(ref.id),
+  //   }))
+  // ).map((res) => res.data as MultistreamTarget);
 
-  const targetRefs = stream.multistream?.targets ?? [];
-  const targets = useQueries(
-    targetRefs.map((ref) => ({
-      queryKey: targetQueryKey(ref.id),
-      queryFn: () => getMultistreamTarget(ref.id),
-    }))
-  ).map((res) => res.data as MultistreamTarget);
-
-  const conditionsMap = streamHealth.conditions.reduce(function (map, obj) {
-    map[obj.type] = obj;
-    return map;
-  }, {});
+  const conditionsMap = useMemo(
+    () =>
+      streamHealth?.conditions.reduce(function (map, condition) {
+        map[condition.type] = condition;
+        return map;
+      }, {} as Record<string, Condition>),
+    [streamHealth?.conditions]
+  );
 
   const tableData: TableData<HealthChecksTableData> = useMemo(() => {
     return {
       isLoading: false,
       data: {
-        count: conditions.length,
+        count: conditionTypes.length,
         nextCursor: null,
-        rows: conditions.map((condition, idx) => {
-          const c = conditionsMap[condition];
+        rows: conditionTypes.map((condType) => {
+          const cond = conditionsMap?.[condType];
           return {
-            id: c.type,
+            id: condType,
             name: {
-              children: <Box>{c.type}</Box>,
+              children: <Box>{condType}</Box>,
             },
             status: {
               children: (
                 <Box>
-                  {c.status === null ? "-" : c.status ? "Healthy" : "Unhealthy"}
+                  {!cond || cond.status === null ? (
+                    "-"
+                  ) : (
+                    <StatusBadge
+                      variant={
+                        cond.status
+                          ? StatusVariant.Healthy
+                          : StatusVariant.Unhealthy
+                      }
+                      timestamp={cond?.lastProbeTime}
+                    />
+                  )}
                 </Box>
               ),
             },
@@ -116,7 +133,7 @@ const HealthChecksTable = ({
         }),
       },
     };
-  }, [state.tableId, stream, streamHealth, ...targets]);
+  }, [state.tableId, stream, conditionsMap]);
 
   return (
     <Box {...props}>
