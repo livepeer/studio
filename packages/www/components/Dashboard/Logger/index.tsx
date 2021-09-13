@@ -4,12 +4,12 @@ const Log = ({ date, type, text }) => {
   return (
     <Flex align="center" css={{ p: "$4", fontSize: "$1", fontFamily: "$mono" }}>
       <Box css={{ color: "$mauve9" }}>{date}</Box>
-      <Badge>{type}</Badge>
+      <Badge css={{ mx: "$4" }}>{type}</Badge>
       <Box css={{ color: "$mauve9" }}>{text}</Box>
     </Flex>
   );
 };
-const Logs = ({ ...props }) => {
+const Logger = ({ ...props }) => {
   return (
     <Box {...props}>
       <Box
@@ -24,11 +24,11 @@ const Logs = ({ ...props }) => {
           Logs
         </Heading>
       </Box>
-      <Box css={{ bc: "$panel", height: 400, borderRadius: 6 }}>
+      <Box css={{ bc: "$mauve3", height: 400, borderRadius: 6 }}>
         <Log date="8/30/2021, 3:13:40 PM" type="info" text="Stream started" />
       </Box>
     </Box>
   );
 };
 
-export default Logs;
+export default Logger;

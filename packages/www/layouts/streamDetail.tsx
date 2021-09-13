@@ -537,7 +537,7 @@ const StreamDetail = ({
                     mb: "$4",
                     width: "100%",
                   }}>
-                  <Box css={{ mt: "-1px" }}>
+                  <Box>
                     <Link href={`/dashboard/streams/${stream?.id}`} passHref>
                       <A
                         variant={activeTab === "Overview" ? "violet" : "subtle"}
