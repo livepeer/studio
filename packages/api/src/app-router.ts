@@ -15,9 +15,8 @@ import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
-import schema from "./schema/schema.json";
 import WebhookCannon from "./webhooks/cannon";
-import MessageQueue from "./store/rabbit-queue";
+import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 
 // Routes that should be whitelisted even when `apiRegion` is set
@@ -78,12 +77,13 @@ export default async function makeApp(params) {
   const [db, store] = await makeStore({
     postgresUrl,
     postgresReplicaUrl,
-    schema,
   });
 
   // RabbitMQ
-  const queue = new MessageQueue();
-  await queue.connect(amqpUrl);
+  const queue: Queue = amqpUrl
+    ? await RabbitQueue.connect(amqpUrl)
+    : new NoopQueue();
+
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({
     db,
@@ -93,17 +93,17 @@ export default async function makeApp(params) {
   });
   await webhookCannon.start();
 
+  process.on("beforeExit", (code) => {
+    queue.close();
+    webhookCannon.stop();
+  });
+
   if (!stripeSecretKey) {
     console.warn(
       "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
     );
   }
   const stripe = new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" });
-
-  process.on("beforeExit", (code) => {
-    queue.close();
-    webhookCannon.stop();
-  });
   // Logging, JSON parsing, store injection
 
   const app = Router();
@@ -123,7 +123,7 @@ export default async function makeApp(params) {
     next();
   });
   if (insecureTestToken) {
-    if (process.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production") {
       throw new Error("tried to set insecureTestToken in production!");
     }
     app.use(`/${insecureTestToken}`, insecureTest());

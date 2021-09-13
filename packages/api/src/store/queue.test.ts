@@ -1,19 +1,17 @@
 import { semaphore, sleep } from "../util";
-import MessageQueue from "./rabbit-queue";
+import { RabbitQueue } from "./queue";
 
 jest.setTimeout(10000);
 
 describe("Queue", () => {
-  let queue: MessageQueue;
+  let queue: RabbitQueue;
   beforeEach(async () => {
     try {
-      queue = new MessageQueue();
+      queue = await RabbitQueue.connect("amqp://localhost:5672/livepeer");
     } catch (e) {
-      console.log(e);
+      console.error(e);
+      throw e;
     }
-    await queue.connect("amqp://localhost:5672/livepeer");
-    // await sleep(2000);
-    // await queue.consume()
   });
 
   afterEach(async () => {

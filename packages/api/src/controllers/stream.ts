@@ -32,7 +32,7 @@ import {
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
-import MessageQueue from "../store/rabbit-queue";
+import Queue from "../store/queue";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -129,10 +129,7 @@ async function validateMultistreamOpts(
   return { targets };
 }
 
-async function triggerManyIdleStreamsWebhook(
-  ids: string[],
-  queue: MessageQueue
-) {
+async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   return Promise.all(
     ids.map(async (id) => {
       const stream = await db.stream.get(id);

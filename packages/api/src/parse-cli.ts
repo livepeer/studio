@@ -48,7 +48,6 @@ export default function parseCli(argv?: string | readonly string[]) {
       "amqp-url": {
         describe: "the RabbitMQ Url",
         type: "string",
-        default: "amqp://localhost:5672/livepeer",
       },
       "client-id": {
         describe: "google auth ID",

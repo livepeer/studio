@@ -1,7 +1,7 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
 import { NodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
-import MessageQueue from "../store/rabbit-queue";
+import Queue from "../store/queue";
 import { CliArgs } from "../parse-cli";
 import Stripe from "stripe";
 
@@ -17,7 +17,7 @@ declare global {
     export interface Request {
       config?: CliArgs;
       store?: IStore;
-      queue?: MessageQueue;
+      queue?: Queue;
       stripe?: Stripe;
       frontendDomain: string;
 

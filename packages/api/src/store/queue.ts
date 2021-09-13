@@ -13,13 +13,53 @@ const QUEUES = {
 type QueueName = keyof typeof QUEUES;
 type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
-export default class MessageQueue {
+export default interface Queue {
+  publish(key: RoutingKey, msg: messages.Any): Promise<void>;
+  delayedPublish(
+    key: RoutingKey,
+    msg: messages.Any,
+    delay: number
+  ): Promise<void>;
+
+  consume(name: QueueName, func: (msg: ConsumeMessage) => void): Promise<void>;
+  ack(data: any): void;
+  nack(data: any): void;
+
+  close(): Promise<void>;
+}
+
+export class NoopQueue implements Queue {
+  async publish(key: RoutingKey, msg: messages.Any) {
+    console.warn(`WARN: Publish event to noop queue. key=${key} message=`, msg);
+  }
+
+  async delayedPublish(key: RoutingKey, msg: messages.Any, delay: number) {
+    console.warn(
+      `WARN: Delayed publish event to noop queue. key=${key} delay=${delay} message=`,
+      msg
+    );
+  }
+
+  async consume(_: QueueName, __: (_: ConsumeMessage) => void) {}
+  ack(_: any) {}
+  nack(_: any) {}
+
+  async close() {}
+}
+
+export class RabbitQueue implements Queue {
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
 
-  constructor() {}
+  public static async connect(url: string): Promise<RabbitQueue> {
+    const queue = new RabbitQueue();
+    await queue.init(url);
+    return queue;
+  }
 
-  public connect(url: string): Promise<void> {
+  private constructor() {}
+
+  private init(url: string): Promise<void> {
     // Create a new connection manager
     this.connection = amqp.connect([url]);
     this.channel = this.connection.createChannel({
