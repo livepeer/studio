@@ -1,15 +1,99 @@
-import { Box, Heading, Flex, Badge } from "@livepeer.com/design-system";
+import { useAnalyzer, useApi } from "hooks";
+import { useEffect, useState } from "react";
 
-const Log = ({ date, type, text }) => {
+import { Stream } from "@livepeer.com/api";
+import { Box, Heading, Flex, Badge } from "@livepeer.com/design-system";
+import { events } from "hooks/use-analyzer";
+
+const maxLogs = 8192;
+const pastLogsLookback = 5 * 60 * 1000; // 5 minutes
+
+type LogData = {
+  key: string;
+  timestamp: number;
+  level: "info" | "error";
+  text: string;
+};
+
+const Log = ({ timestamp, level, text }: LogData) => {
+  const dateStr = new Date(timestamp).toLocaleString();
   return (
     <Flex align="center" css={{ p: "$4", fontSize: "$1", fontFamily: "$mono" }}>
-      <Box css={{ color: "$mauve9" }}>{date}</Box>
-      <Badge css={{ mx: "$4" }}>{type}</Badge>
+      <Box css={{ color: "$mauve9" }}>{dateStr}</Box>
+      <Badge css={{ mx: "$4" }}>{level}</Badge>
       <Box css={{ color: "$mauve9" }}>{text}</Box>
     </Flex>
   );
 };
-const Logger = ({ ...props }) => {
+
+const lpHostedOrchUri = /https?:\/\/(.+)\.livepeer\.(com|monster):(80|443)/;
+
+function orchestratorName({
+  orchestrator: { address, transcodeUri },
+}: events.TranscodeAttemptInfo) {
+  const matches = lpHostedOrchUri.exec(transcodeUri);
+  return !matches?.length ? address : matches[1];
+}
+
+function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
+  switch (evt.type) {
+    case "transcode":
+      if (evt.success && !userIsAdmin) {
+        // non-admin users should only see fatal errors.
+        return [];
+      }
+      return evt.attempts
+        .filter((a) => a.error)
+        .map((a) => ({
+          key: evt.id,
+          timestamp: evt.timestamp,
+          level: "error",
+          text: `Transcode error from ${orchestratorName(a)} for segment ${
+            evt.segment.seqNo
+          }: ${a.error}`,
+        }));
+    case "webhook_event":
+      if (!evt.event.startsWith("multistream.")) {
+        console.error("unknown event:", evt.event);
+        break;
+      }
+      const payload = evt.payload as events.MultistreamWebhookPayload;
+      const action = evt.event.substring("multistream.".length);
+      const level = action === "error" ? "error" : "info";
+      return [
+        {
+          key: evt.id,
+          timestamp: evt.timestamp,
+          level,
+          text: `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`,
+        },
+      ];
+  }
+  return [];
+}
+
+const Logger = ({ stream, ...props }: { stream: Stream }) => {
+  const { getEvents } = useAnalyzer();
+
+  const { user } = useApi();
+  const userIsAdmin = user && user.admin;
+
+  const [logs, setLogs] = useState<LogData[]>([]);
+  const addLogs = (newLogs: LogData[]) =>
+    setLogs((logs) => {
+      const prevLogs = logs.length < maxLogs ? logs : logs.slice(1);
+      return [...prevLogs, ...newLogs];
+    });
+
+  useEffect(() => {
+    setLogs([]);
+    if (!stream?.region) return;
+
+    const handler = (evt: events.Any) => addLogs(handleEvent(evt, userIsAdmin));
+    const from = Date.now() - pastLogsLookback;
+    return getEvents(stream.region, stream.id, handler, from);
+  }, [stream?.region, stream?.id]);
+
   return (
     <Box {...props}>
       <Box
@@ -25,7 +109,9 @@ const Logger = ({ ...props }) => {
         </Heading>
       </Box>
       <Box css={{ bc: "$mauve3", height: 400, borderRadius: 6 }}>
-        <Log date="8/30/2021, 3:13:40 PM" type="info" text="Stream started" />
+        {logs.map((log) => (
+          <Log {...log} />
+        ))}
       </Box>
     </Box>
   );

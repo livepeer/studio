@@ -123,7 +123,7 @@ const Health = () => {
         tableLayout="auto"
         border
       />
-      <Logger css={{ mb: "$7" }} />
+      <Logger stream={stream} css={{ mb: "$7" }} />
       <Box
         css={{
           borderBottom: "1px solid",
