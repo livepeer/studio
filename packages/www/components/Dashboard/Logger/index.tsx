@@ -80,9 +80,12 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
 
   const [logs, setLogs] = useState<LogData[]>([]);
   const addLogs = (newLogs: LogData[]) =>
-    setLogs((logs) => {
-      const prevLogs = logs.length < maxLogs ? logs : logs.slice(1);
-      return [...prevLogs, ...newLogs];
+    setLogs((currLogs) => {
+      let logs = [...currLogs, ...newLogs];
+      if (logs.length > maxLogs) {
+        logs = logs.slice(logs.length - maxLogs);
+      }
+      return logs;
     });
 
   useEffect(() => {
