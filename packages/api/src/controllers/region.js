@@ -2,6 +2,8 @@ import Router from "express/lib/router";
 import { authMiddleware, validatePost } from "../middleware";
 import { db } from "../store";
 
+const defaultScore = 1;
+
 const app = Router();
 
 app.get("/", async (req, res, next) => {
@@ -14,7 +16,7 @@ app.get("/", async (req, res, next) => {
   regions.forEach((region) => {
     region.orchestrators.forEach((orch) => {
       orch.region = region.region;
-      flatOrchList.push(orch);
+      flatOrchList.push({ score: defaultScore,  ...orch});
     });
   });
 
