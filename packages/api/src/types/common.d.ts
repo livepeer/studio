@@ -1,9 +1,17 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
-import { NodeAddress, OrchestratorNodeAddress } from "../middleware/kubernetes";
 import { Stream, User, ApiToken } from "../schema/types";
 import Queue from "../store/queue";
 import { CliArgs } from "../parse-cli";
 import Stripe from "stripe";
+
+export interface NodeAddress {
+  address: string;
+  cliAddress?: string;
+}
+
+export interface OrchestratorNodeAddress extends NodeAddress {
+  score: number;
+}
 
 export enum AuthTokenType {
   JWT = "JWT",

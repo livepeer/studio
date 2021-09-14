@@ -3,8 +3,11 @@
  */
 
 import fetch from "node-fetch";
+import { OrchestratorNodeAddress } from "../types/common"
 
-export default function subgraphMiddleware({ subgraphUrl }) {
+const defaultScore = 0;
+
+export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: string }) {
   const CACHE_REFRESH_INTERVAL = 12 * 60 * 60 * 1000; // 2 hours
 
   const blockList = {
@@ -19,7 +22,7 @@ export default function subgraphMiddleware({ subgraphUrl }) {
     "0x2a15f9e60968451780bd2d09ca4e8c4498f168c3": true
   };
 
-  let cachedResp = [];
+  let cachedResp: Array<OrchestratorNodeAddress> = [];
   let lastCachedRespUpdate = 0;
 
   const getOrchestrators = async () => {
@@ -44,7 +47,7 @@ export default function subgraphMiddleware({ subgraphUrl }) {
         });
 
         const transcoders = (await res.json()).data.transcoders;
-        const cacheUpdate = []
+        const cacheUpdate: Array<OrchestratorNodeAddress> = []
         for (const tr of transcoders) {
           if (tr.id.toLowerCase() in blockList) {
             continue;
@@ -52,6 +55,7 @@ export default function subgraphMiddleware({ subgraphUrl }) {
 
           cacheUpdate.push({
             address: tr.serviceURI,
+            score: defaultScore,
           });
         }
 
