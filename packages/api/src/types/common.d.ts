@@ -36,7 +36,7 @@ declare global {
       tokenId?: string;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;
-      getOrchestrators?: () => Promise<OrchestratorNodeAddress[]>;
+      orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
       getIngest?: () => Promise<Ingest[]>;
       getPrices?: () => Promise<Price[]>;
     }

@@ -16,7 +16,7 @@ describe("kubernetes middleware", () => {
 
   describe("success cases", () => {
     beforeEach(async () => {
-      req = {} as Request;
+      req = { orchestratorsGetters: [] } as Request;
       middleware = kubernetes({
         kubeNamespace: "default",
         kubeBroadcasterService: "broadcaster",
@@ -48,19 +48,22 @@ describe("kubernetes middleware", () => {
     });
 
     it("should return orchestrators from getOrchestrators()", async () => {
-      const response = await req.getOrchestrators();
+      const response = await req.orchestratorsGetters[0]();
       expect(response).toEqual([
         {
           address: "https://10.40.0.41:8935",
           cliAddress: "http://10.40.0.41:7935",
+          score: 1,
         },
         {
           address: "https://10.40.1.48:8935",
           cliAddress: "http://10.40.1.48:7935",
+          score: 1,
         },
         {
           address: "https://10.40.2.59:8935",
           cliAddress: "http://10.40.2.59:7935",
+          score: 1,
         },
       ]);
     });
@@ -84,7 +87,7 @@ describe("kubernetes middleware", () => {
 
   describe("success cases", () => {
     beforeEach(async () => {
-      req = {} as Request;
+      req = { orchestratorsGetters: [] } as Request;
       middleware = kubernetes({
         kubeNamespace: "default",
         kubeBroadcasterService: "broadcaster-noaddress",
@@ -100,7 +103,7 @@ describe("kubernetes middleware", () => {
     it("should return nothing if no addresses are provided", async () => {
       const broadcasters = await req.getBroadcasters();
       expect(broadcasters).toEqual([]);
-      const orchestrators = await req.getOrchestrators();
+      const orchestrators = await req.orchestratorsGetters[0]();
       expect(orchestrators).toEqual([]);
     });
   });

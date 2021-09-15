@@ -71,7 +71,7 @@ export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: strin
 
   return (req, res, next) => {
     if (subgraphUrl) {
-      req.getOrchestrators = getOrchestrators;
+      req.orchestratorsGetters.push(getOrchestrators);
     }
 
     return next();

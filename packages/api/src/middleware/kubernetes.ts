@@ -108,7 +108,7 @@ export default function kubernetesMiddleware({
     }
 
     if (kubeOrchestratorService) {
-      req.getOrchestrators = getOrchestrators;
+      req.orchestratorsGetters.push(getOrchestrators);
     }
 
     return next();

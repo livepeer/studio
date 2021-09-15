@@ -58,7 +58,7 @@ describe("kubernetes middleware", () => {
   ];
 
   beforeEach(async () => {
-    req = {} as Request;
+    req = { orchestratorsGetters: [] } as Request;
     middleware = hardcodedNodes({
       broadcasters: JSON.stringify(broadcasters),
       orchestrators: JSON.stringify(orchestrators),
@@ -76,7 +76,7 @@ describe("kubernetes middleware", () => {
   });
 
   it("should return orchestrators from getOrchestrators()", async () => {
-    const response = await req.getOrchestrators();
+    const response = await req.orchestratorsGetters[0]();
     expect(response).toEqual(orchestrators);
   });
 

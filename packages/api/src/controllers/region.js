@@ -6,6 +6,19 @@ const defaultScore = 1;
 
 const app = Router();
 
+export async function regionsGetter() {
+  const [regions, cursor] = await db.region.find({}, { limit: 100 });
+
+  const flatOrchList = [];
+  regions.forEach((region) => {
+    region.orchestrators.forEach((orch) => {
+      orch.region = region.region;
+      flatOrchList.push({ score: defaultScore,  ...orch});
+    });
+  });
+  return flatOrchList;
+}
+
 app.get("/", async (req, res, next) => {
   const [regions, cursor] = await db.region.find({}, { limit: 100 });
   if (req.query.grouped === "true") {

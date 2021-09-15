@@ -1,5 +1,5 @@
 import yargs from "yargs";
-import { CamelKeys } from "./types/common";
+import { CamelKeys  } from "./types/common";
 
 function coerceArr(arg) {
   if (!Array.isArray(arg)) {
@@ -82,6 +82,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://{{ip}}:8935",
       },
+      "return-region-in-orchestrator": {
+        describe: "return /api/region result also in /api/orchestrator",
+        type: "boolean",
+      },
       "subgraph-url": {
         describe: "URL of subgraph to look for orchestrators",
         type: "string",
@@ -137,7 +141,7 @@ export default function parseCli(argv?: string | readonly string[]) {
           const split = supportAddr.split("/");
           if (split.length !== 2) {
             throw new Error(
-              `supportAddr should be of the form name/email, got ${supportAddr}`
+              `supportAddr should be of the form name / email, got ${ supportAddr } `
             );
           }
           return split;

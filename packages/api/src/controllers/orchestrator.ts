@@ -1,10 +1,15 @@
+import { Request } from "express";
 import Router from "express/lib/router";
 
 const app = Router();
 
-const getOrchestrators = async (req, res, next) => {
-  const orchestrators = await req.getOrchestrators(req);
-
+const getOrchestrators = async (req: Request, res, next) => {
+  const orchestrators = [];
+  for (const getter of req.orchestratorsGetters) {
+    const orchs = await getter();
+    orchestrators.push(...orchs);
+  }
+  
   return res.json(
     orchestrators.map(({ address, score }) => ({ address, score }))
   );
