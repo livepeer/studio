@@ -13,7 +13,7 @@ export async function regionsGetter() {
   regions.forEach((region) => {
     region.orchestrators.forEach((orch) => {
       orch.region = region.region;
-      flatOrchList.push({ score: defaultScore,  ...orch});
+      flatOrchList.push({ score: defaultScore, ...orch });
     });
   });
   return flatOrchList;
@@ -29,7 +29,7 @@ app.get("/", async (req, res, next) => {
   regions.forEach((region) => {
     region.orchestrators.forEach((orch) => {
       orch.region = region.region;
-      flatOrchList.push({ score: defaultScore,  ...orch});
+      flatOrchList.push({ score: defaultScore, ...orch });
     });
   });
 

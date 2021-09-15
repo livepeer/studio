@@ -1463,7 +1463,7 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     )}`
   );
 
-  const verificationFreq = 0;
+  const verificationFreq = 10;
 
   res.json({
     manifestID,

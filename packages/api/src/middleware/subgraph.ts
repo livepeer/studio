@@ -3,11 +3,15 @@
  */
 
 import fetch from "node-fetch";
-import { OrchestratorNodeAddress } from "../types/common"
+import { OrchestratorNodeAddress } from "../types/common";
 
 const defaultScore = 0;
 
-export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: string }) {
+export default function subgraphMiddleware({
+  subgraphUrl,
+}: {
+  subgraphUrl: string;
+}) {
   const CACHE_REFRESH_INTERVAL = 12 * 60 * 60 * 1000; // 2 hours
 
   const blockList = {
@@ -19,7 +23,7 @@ export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: strin
     "0xd84781e1a9b74d71ea76cda8bb9f30893bfd00d1": true,
     "0xfb9849b0b53f66b747bfa47396964a3fa22400a0": true,
     "0xc08dbaf4fe0cbb1d04a14b13edef38526976f2fb": true,
-    "0x2a15f9e60968451780bd2d09ca4e8c4498f168c3": true
+    "0x2a15f9e60968451780bd2d09ca4e8c4498f168c3": true,
   };
 
   let cachedResp: Array<OrchestratorNodeAddress> = [];
@@ -47,7 +51,7 @@ export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: strin
         });
 
         const transcoders = (await res.json()).data.transcoders;
-        const cacheUpdate: Array<OrchestratorNodeAddress> = []
+        const cacheUpdate: Array<OrchestratorNodeAddress> = [];
         for (const tr of transcoders) {
           if (tr.id.toLowerCase() in blockList) {
             continue;
@@ -59,7 +63,7 @@ export default function subgraphMiddleware({ subgraphUrl }: { subgraphUrl: strin
           });
         }
 
-        cachedResp = cacheUpdate
+        cachedResp = cacheUpdate;
         lastCachedRespUpdate = Date.now();
       } catch (e) {
         console.error(e);

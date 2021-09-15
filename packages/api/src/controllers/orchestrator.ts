@@ -9,7 +9,7 @@ const getOrchestrators = async (req: Request, res, next) => {
     const orchs = await getter();
     orchestrators.push(...orchs);
   }
-  
+
   return res.json(
     orchestrators.map(({ address, score }) => ({ address, score }))
   );

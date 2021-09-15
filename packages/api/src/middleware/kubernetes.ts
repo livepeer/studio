@@ -7,8 +7,7 @@ import { render } from "mustache";
 import * as k8s from "@kubernetes/client-node";
 
 import { timeout } from "../util";
-import { NodeAddress, OrchestratorNodeAddress } from "../types/common"
-
+import { NodeAddress, OrchestratorNodeAddress } from "../types/common";
 
 export default function kubernetesMiddleware({
   kubeNamespace,

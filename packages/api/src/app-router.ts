@@ -19,8 +19,8 @@ import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
-import { CliArgs } from "./parse-cli"
-import { regionsGetter } from "./controllers/region"
+import { CliArgs } from "./parse-cli";
+import { regionsGetter } from "./controllers/region";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -140,7 +140,6 @@ export default async function makeApp(params: CliArgs) {
     app.use(`/${insecureTestToken}`, insecureTest());
   }
   app.use(bearerToken());
-
 
   // Populate Kubernetes getOrchestrators and getBroadcasters is provided
   if (kubeNamespace) {
