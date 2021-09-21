@@ -111,10 +111,14 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
           Logs
         </Heading>
       </Box>
-      <Box css={{ bc: "$mauve3", height: 400, borderRadius: 6 }}>
-        {logs.map((log) => (
-          <Log {...log} />
-        ))}
+      <Box css={{ bc: "$mauve3", height: 300, borderRadius: 6 }}>
+        {!logs.length ? (
+          <Box css={{ p: "$4", fontSize: "$1", fontFamily: "$mono" }}>
+            Waiting for events...
+          </Box>
+        ) : (
+          logs.map((log) => <Log {...log} />)
+        )}
       </Box>
     </Box>
   );
