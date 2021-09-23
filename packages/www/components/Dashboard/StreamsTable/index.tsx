@@ -201,7 +201,7 @@ const StreamsTable = ({
         accessor: "name",
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
-          stringSort("original.name.children", ...params),
+          stringSort("original.name.value", ...params),
       },
       {
         Header: "Created",
@@ -250,6 +250,7 @@ const StreamsTable = ({
           id: stream.id,
           name: {
             id: stream.id,
+            value: stream.name,
             children: (
               <A as="div" variant="violet">
                 {stream.name}

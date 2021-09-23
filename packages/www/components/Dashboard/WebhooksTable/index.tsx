@@ -3,11 +3,7 @@ import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
-import {
-  dateSort,
-  numberSort,
-  stringSort,
-} from "components/Dashboard/Table/sorts";
+import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
 import {
@@ -26,12 +22,11 @@ import {
   useSnackbar,
 } from "@livepeer.com/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { Cross1Icon, PlusIcon, ArrowRightIcon } from "@radix-ui/react-icons";
+import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
 import { useRouter } from "next/router";
 import { Webhook } from "@livepeer.com/api";
-import Link from "next/link";
 
 type WebhooksTableData = {
   name: TextCellProps;
@@ -58,7 +53,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         accessor: "url",
         Cell: TextCell,
         sortType: (...params: SortTypeArgs) =>
-          numberSort("original.url.children", ...params),
+          stringSort("original.url.value", ...params),
       },
       {
         Header: "Name",
@@ -104,6 +99,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
               },
             },
             url: {
+              value: webhook.url,
               children: (
                 <A as="div" variant="violet">
                   {webhook.url}
