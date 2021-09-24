@@ -78,6 +78,20 @@ const PricingCardsContainer = () => {
               Optimize playback for your viewers across the globe via a CDN.
             </Text>
           </PricingCardContent>
+          <PricingCardContent>
+            <Text
+              size="4"
+              css={{
+                fontWeight: 600,
+                mb: "$1",
+              }}>
+              Multistreaming
+            </Text>
+            <Text size="2" variant="gray">
+              Push source streams and transcoded renditions to multiple
+              destinations (e.g. Facebook, Twitch, etc).
+            </Text>
+          </PricingCardContent>
         </Box>
         <PricingCard
           pricingTitle="Personal"
@@ -165,6 +179,34 @@ const PricingCardsContainer = () => {
                   lineHeight: "24px",
                 }}>
                 current viewers
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Multistreaming
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "32px",
+                  fontWeight: 600,
+                }}>
+                3
+              </Box>
+              <Box
+                css={{
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                }}>
+                stream destinations
               </Box>
             </PricingCardContent>
           </Box>
@@ -274,6 +316,43 @@ const PricingCardsContainer = () => {
                 / GB video streamed*
               </Box>
             </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="violet"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Multistreaming
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "32px",
+                  fontWeight: 600,
+                }}>
+                $0.002
+                <Box
+                  as="span"
+                  css={{
+                    fontSize: "16px",
+                    fontWeight: "normal",
+                    ml: "4px",
+                  }}>
+                  USD
+                </Box>
+              </Box>
+              <Box
+                css={{
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                }}>
+                / min per destination
+              </Box>
+            </PricingCardContent>
           </Box>
         </PricingCard>
         <PricingCard
@@ -339,6 +418,26 @@ const PricingCardsContainer = () => {
                   },
                 }}>
                 Stream delivery via CDN*
+              </Badge>
+              <Box
+                css={{
+                  fontSize: "$5",
+                }}>
+                Custom pricing
+              </Box>
+            </PricingCardContent>
+            <PricingCardContent>
+              <Badge
+                size="1"
+                variant="indigo"
+                css={{
+                  alignSelf: "flex-start",
+                  mb: "$2",
+                  "@bp3": {
+                    display: "none",
+                  },
+                }}>
+                Multistreaming
               </Badge>
               <Box
                 css={{
