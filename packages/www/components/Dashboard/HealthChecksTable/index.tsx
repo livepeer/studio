@@ -1,15 +1,7 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { Column } from "react-table";
-import { useQuery, useQueries, useQueryClient } from "react-query";
-
-import {
-  Box,
-  Heading,
-  Link as A,
-  Tooltip,
-  Label,
-} from "@livepeer.com/design-system";
-import { MultistreamTarget, Stream } from "@livepeer.com/api";
+import { Box, Heading } from "@livepeer.com/design-system";
+import { Stream } from "@livepeer.com/api";
 
 import {
   DataTableComponent as Table,
@@ -52,8 +44,6 @@ const HealthChecksTable = ({
   border?: boolean;
   tableLayout?: string;
 }) => {
-  const { getMultistreamTarget } = useApi();
-
   const { state, stateSetter } = useTableState<HealthChecksTableData>({
     tableId: "HealthChecksTable",
   });
@@ -76,19 +66,6 @@ const HealthChecksTable = ({
     []
   );
 
-  // Only need this if we actually do some custom logic for the Multistream
-  // healthcheck. If we do so, also consider moving these queries to the
-  // top-level component instead (the stream detail/health pages).
-  //
-  // const targetQueryKey = (id: string) => ["multistreamTarget", id];
-  // const targetRefs = stream.multistream?.targets ?? [];
-  // const targets = useQueries(
-  //   targetRefs.map((ref) => ({
-  //     queryKey: targetQueryKey(ref.id),
-  //     queryFn: () => getMultistreamTarget(ref.id),
-  //   }))
-  // ).map((res) => res.data as MultistreamTarget);
-
   const conditionsMap = useMemo(
     () =>
       streamHealth?.conditions.reduce(function (map, condition) {
@@ -109,12 +86,18 @@ const HealthChecksTable = ({
           return {
             id: condType,
             name: {
-              children: <Box>{condType}</Box>,
+              children: (
+                <Box>
+                  {condType === "TranscodeRealTime"
+                    ? "Realtime ratio"
+                    : condType}
+                </Box>
+              ),
             },
             status: {
               children: (
                 <Box>
-                  {!cond || cond.status === null ? (
+                  {!stream.isActive || !cond || cond.status === null ? (
                     "-"
                   ) : (
                     <StatusBadge

@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -61,7 +62,7 @@ const Chart = ({ data }) => {
           bottom: "-30px",
           left: "50px",
         }}>
-        Seconds since stream loaded in test player
+        Seconds since stream loaded
       </Text>
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart data={data}>
@@ -78,7 +79,7 @@ const Chart = ({ data }) => {
           <Area
             cursor="pointer"
             type="monotone"
-            dataKey="kbps"
+            dataKey="kpbs"
             stroke="#6E56CF"
             strokeWidth="2px"
             fill="url(#colorKbps)"

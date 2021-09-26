@@ -15,12 +15,21 @@ type LogData = {
   text: string;
 };
 
+const levelColorMap = {
+  info: "violet",
+  error: "red",
+};
+
 const Log = ({ timestamp, level, text }: LogData) => {
   const dateStr = new Date(timestamp).toLocaleString();
   return (
-    <Flex align="center" css={{ p: "$4", fontSize: "$1", fontFamily: "$mono" }}>
-      <Box css={{ color: "$mauve9" }}>{dateStr}</Box>
-      <Badge css={{ mx: "$4" }}>{level}</Badge>
+    <Flex
+      align="center"
+      css={{ mb: "$3", fontSize: "$1", fontFamily: "$mono" }}>
+      <Badge css={{ mr: "$4" }} variant={levelColorMap[level] as any}>
+        {level}
+      </Badge>
+      <Box css={{ color: "$mauve9", maxWidth: 100 }}>{dateStr}</Box>
       <Box css={{ color: "$mauve9" }}>{text}</Box>
     </Flex>
   );
@@ -111,9 +120,16 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
           Logs
         </Heading>
       </Box>
-      <Box css={{ bc: "$mauve3", height: 300, borderRadius: 6 }}>
+      <Box
+        css={{
+          overflow: "scroll",
+          p: "$4",
+          bc: "$mauve3",
+          height: 300,
+          borderRadius: 6,
+        }}>
         {!logs.length ? (
-          <Box css={{ p: "$4", fontSize: "$1", fontFamily: "$mono" }}>
+          <Box css={{ fontSize: "$1", fontFamily: "$mono" }}>
             Waiting for events...
           </Box>
         ) : (

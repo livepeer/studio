@@ -15,8 +15,8 @@ const interval = 10000;
 const maxItems = 6;
 
 const Health = () => {
-  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
-    { name: 0, kbps: 0 },
+  const [dataChart, setDataChart] = useState<{ name: number; kpbs: number }[]>([
+    { name: 0, kpbs: 0 },
   ]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const { getStream, getStreamInfo } = useApi();
@@ -73,7 +73,7 @@ const Health = () => {
           ...prev,
           {
             name: lastItem ? lastItem.name + interval / 1000 : 0,
-            kbps: Math.round(newInfo.session.ingestRate / 1000),
+            kpbs: Math.round(newInfo.session.ingestRate / 1000),
           },
         ].slice(Math.max(prev.length - maxItems, 0));
       });
@@ -104,6 +104,7 @@ const Health = () => {
     <StreamDetail
       activeTab="Health"
       stream={stream}
+      streamHealth={streamHealth}
       invalidateStream={invalidateStream}
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },

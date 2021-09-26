@@ -42,6 +42,7 @@ const Overview = () => {
     <StreamDetail
       activeTab="Overview"
       stream={stream}
+      streamHealth={streamHealth}
       invalidateStream={invalidateStream}
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },

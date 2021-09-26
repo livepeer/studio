@@ -194,6 +194,7 @@ const StreamDetail = ({
   breadcrumbs,
   children,
   stream,
+  streamHealth,
   invalidateStream,
   activeTab = "Overview",
 }) => {
@@ -296,7 +297,8 @@ const StreamDetail = ({
                         }}>
                         {stream.name}
                       </Box>
-                      {stream.isActive ? (
+                      {!streamHealth || !stream.isActive ? null : streamHealth
+                          .healthy.status ? (
                         <Badge
                           size="2"
                           variant="green"
@@ -304,19 +306,20 @@ const StreamDetail = ({
                           <Box css={{ mr: "$1" }}>
                             <Status size="1" variant="green" />
                           </Box>
-                          Active
+                          Healthy
                         </Badge>
                       ) : (
                         <Badge
                           size="2"
+                          variant="red"
                           css={{
                             mt: "$1",
                             letterSpacing: 0,
                           }}>
                           <Box css={{ mr: "$1" }}>
-                            <Status size="1" />
+                            <Status size="1" variant="red" />
                           </Box>
-                          Idle
+                          Unhealthy
                         </Badge>
                       )}
                       {stream.suspended && (
