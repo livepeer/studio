@@ -29,7 +29,7 @@ const Log = ({ timestamp, level, text }: LogData) => {
       <Badge css={{ mr: "$4" }} variant={levelColorMap[level] as any}>
         {level}
       </Badge>
-      <Box css={{ color: "$mauve9", maxWidth: 100 }}>{dateStr}</Box>
+      <Box css={{ color: "$mauve9", maxWidth: 100, mr: "$4" }}>{dateStr}</Box>
       <Box css={{ color: "$mauve9" }}>{text}</Box>
     </Flex>
   );
