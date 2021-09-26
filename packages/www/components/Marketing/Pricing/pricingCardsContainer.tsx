@@ -297,7 +297,7 @@ const PricingCardsContainer = () => {
                   fontSize: "32px",
                   fontWeight: 600,
                 }}>
-                $0.01
+                $0.02
                 <Box
                   as="span"
                   css={{
