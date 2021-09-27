@@ -156,7 +156,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               />
               <Item
                 displayCheck={false}
-                title="Multistreaming"
+                title="Multistreaming*"
                 css={{ borderBottom: 0 }}
               />
             </List>
@@ -343,8 +343,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             fontStyle: "italic",
             color: "$hiContrast",
           }}>
-          *Currently, we are not charging for Streaming. We’ll be sure to reach
-          out before we do.
+          *Currently, we are not charging for these features. We'll be sure to
+          reach out before we do.
         </Container>
       </Box>
     </>

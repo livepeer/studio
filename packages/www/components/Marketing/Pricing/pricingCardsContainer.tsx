@@ -85,7 +85,7 @@ const PricingCardsContainer = () => {
                 fontWeight: 600,
                 mb: "$1",
               }}>
-              Multistreaming
+              Multistreaming*
             </Text>
             <Text size="2" variant="gray">
               Push source streams and transcoded renditions to multiple
@@ -456,8 +456,8 @@ const PricingCardsContainer = () => {
           mt: "$8",
           textAlign: "center",
         }}>
-        *Currently, we are not charging for Stream Delivery via CDN. We’ll be
-        sure to reach out before we start to do so.
+        *Currently, we are not charging for these features. We'll be sure to
+        reach out before we do.
       </Text>
     </Flex>
   );
