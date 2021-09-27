@@ -14,7 +14,7 @@ const PricingCalculator = () => {
     ((60 * (streamLength / 60) * monthlyStreams * 2000) / 8 / 1024 / 1024) *
     viewCount *
     (percentageWatched / 100) *
-    0.01;
+    0.02;
 
   return (
     <Box css={{ display: "flex", flexDirection: "column", py: "$5" }}>

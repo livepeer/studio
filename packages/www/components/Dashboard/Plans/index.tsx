@@ -151,7 +151,12 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item displayCheck={false} title="Recording storage" />
               <Item
                 displayCheck={false}
-                title="Streaming*"
+                title="Stream Delivery via CDN*"
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                displayCheck={false}
+                title="Multistreaming"
                 css={{ borderBottom: 0 }}
               />
             </List>
@@ -195,30 +200,19 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               />
             </Flex>
             <List>
+              <Item title={<span>1000 minutes / month</span>} />
               <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Transcoding:</span> 1000
-                    minutes / month
-                  </span>
-                }
-              />
-              <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Storage:</span> None
-                  </span>
-                }
+                title={<span>None</span>}
                 displayX={true}
                 displayCheck={false}
               />
               <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Streaming:</span> 10
-                    concurrent viewers / account
-                  </span>
-                }
+                title={<span>10 concurrent viewers / account</span>}
+                displayCheck={true}
+                css={{ borderBottom: 0 }}
+              />
+              <Item
+                title={<span>3 stream destinations</span>}
                 displayCheck={true}
                 css={{ borderBottom: 0 }}
               />
@@ -274,29 +268,19 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             <List>
               <Item
                 css={{ borderColor: "$mauve5" }}
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Transcoding:</span> $0.005
-                    USD / min video ingested
-                  </span>
-                }
+                title={<span>$0.005 USD / min video ingested</span>}
               />
               <Item
                 css={{ borderColor: "$mauve5" }}
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Storage:</span> Coming soon
-                  </span>
-                }
+                title={<span>Coming soon</span>}
               />
               <Item
                 css={{ borderColor: "$mauve5", borderBottom: 0 }}
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Streaming:</span> $0.01 USD
-                    / gb video streamed
-                  </span>
-                }
+                title={<span>$0.02 USD / gb video streamed</span>}
+              />
+              <Item
+                css={{ borderColor: "$mauve5", borderBottom: 0 }}
+                title={<span>$0.002 USD / min per destination</span>}
               />
             </List>
           </Box>
@@ -336,28 +320,14 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             </Flex>
 
             <List>
+              <Item title={<span>Custom pricing available</span>} />
+              <Item title={<span>Coming soon</span>} />
               <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Transcoding:</span> Custom
-                    pricing available
-                  </span>
-                }
+                title={<span>Custom pricing available</span>}
+                css={{ borderBottom: 0 }}
               />
               <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Storage:</span> Coming soon
-                  </span>
-                }
-              />
-              <Item
-                title={
-                  <span>
-                    <span css={{ display: "none" }}>Streaming:</span> Custom
-                    pricing available
-                  </span>
-                }
+                title={<span>Custom pricing available</span>}
                 css={{ borderBottom: 0 }}
               />
             </List>
