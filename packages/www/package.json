@@ -10,7 +10,7 @@
     "postbuild": "next-sitemap",
     "type-check": "tsc --pretty --noEmit",
     "docs-positions": "node ./generate-docs-positions.js",
-    "docker:build": "docker build $(printf ' -t livepeerci/api:%s' ${DOCKER_TAGS:-dev}) -f Dockerfile ../..",
+    "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-dev}) -f Dockerfile ../..",
     "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done"
   },
   "license": "MIT",
