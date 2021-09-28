@@ -152,7 +152,7 @@ const MultistreamTargetsTable = ({
               ),
             },
             profile: {
-              children: ref.profile,
+              children: ref.profile + (ref.videoOnly ? " (video-only)" : ""),
             },
             status: {
               children: (

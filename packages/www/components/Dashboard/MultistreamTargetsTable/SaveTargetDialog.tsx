@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import url from "url";
 
 import {
   Badge,
   Box,
   Button,
+  Checkbox,
   Flex,
   AlertDialog,
   AlertDialogTitle,
@@ -25,7 +26,6 @@ import Spinner from "components/Dashboard/Spinner";
 import { useApi } from "hooks";
 import {
   MultistreamTarget,
-  MultistreamTargetPatchPayload,
   Stream,
   StreamPatchPayload,
 } from "../../../../api/src/schema/types";
@@ -43,6 +43,7 @@ type State = {
   ingestUrl: string;
   streamKey: string;
   profile: string;
+  videoOnly: boolean;
 };
 
 type Api = ReturnType<typeof useApi>;
@@ -80,6 +81,7 @@ const createTarget = (
     ...(stream.multistream?.targets ?? []),
     {
       profile: state.profile,
+      videoOnly: state.videoOnly,
       spec: {
         name: state.name || parsedUrl?.host,
         url: url.format(parsedUrl),
@@ -105,11 +107,14 @@ const updateTarget = async (
     await api.patchMultistreamTarget(targetId, patch);
   }
   if (state.profile !== initState.profile) {
-    const targets: CreateTargetSpec[] = stream.multistream?.targets?.map(
-      (t) => ({
-        ...t,
-        profile: t.id === targetId ? state.profile : t.profile,
-      })
+    const targets: CreateTargetSpec[] = stream.multistream?.targets?.map((t) =>
+      t.id !== targetId
+        ? t
+        : {
+            ...t,
+            profile: state.profile,
+            videoOnly: state.videoOnly,
+          }
     );
     await api.patchStream(stream.id, { multistream: { targets } });
   }
@@ -136,19 +141,20 @@ const SaveTargetDialog = ({
   const [openSnackbar] = useSnackbar();
   const [saving, setSaving] = useState(false);
 
-  const initState = useMemo(
+  const initState = useMemo<State>(
     () => ({
       name: action === Action.Create ? "" : target?.name,
       ingestUrl: "",
       streamKey: "",
       profile: action === Action.Create ? "source" : initialProfile,
+      videoOnly: false,
     }),
     [action, target?.name, initialProfile]
   );
   const [state, setState] = useState(initState);
   useEffect(() => setState(initState), [isOpen]);
 
-  const setStateProp = (prop: keyof typeof state, value: string) => {
+  const setStateProp = <T extends keyof State>(prop: T, value: State[T]) => {
     setState({ ...state, [prop]: value });
   };
 
@@ -303,6 +309,21 @@ const SaveTargetDialog = ({
                   ))}
                 </Box>
               </RadioGroup>
+            </Box>
+
+            <Box css={{ display: "flex" }}>
+              <Checkbox
+                id="videoOnly"
+                checked={state.videoOnly}
+                onCheckedChange={(e) =>
+                  setStateProp("videoOnly", e.target.checked)
+                }
+              />
+              <Tooltip content="Enable to mute audio and multistream a silent video.">
+                <Label css={{ pl: "$2" }} htmlFor="videoOnly">
+                  Video-only
+                </Label>
+              </Tooltip>
             </Box>
           </Flex>
           <AlertDialogDescription
