@@ -9,9 +9,6 @@ import {
   useTableState,
 } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { stringSort } from "components/Dashboard/Table/sorts";
-import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { useApi } from "hooks";
 import { Condition, HealthStatus } from "hooks/use-analyzer";
 import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 
@@ -54,13 +51,13 @@ const HealthChecksTable = ({
         Header: "Name",
         accessor: "name",
         Cell: TextCell,
-        sortType: (...params: SortTypeArgs) =>
-          stringSort("original.name.children", ...params),
+        disableSortBy: true,
       },
       {
         Header: "Status",
         accessor: "status",
         Cell: TextCell,
+        disableSortBy: true,
       },
     ],
     []
@@ -88,9 +85,7 @@ const HealthChecksTable = ({
             name: {
               children: (
                 <Box>
-                  {condType === "TranscodeRealTime"
-                    ? "Realtime ratio"
-                    : condType}
+                  {condType === "TranscodeRealTime" ? "Realtime" : condType}
                 </Box>
               ),
             },
