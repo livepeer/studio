@@ -48,15 +48,12 @@ jobs:
 
       - name: docker build
         env:
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+          DOCKER_TAGS: ${{ steps.tags.outputs.tags }}
+          VERSION: ${{ steps.tags.outputs.version }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_BUILDKIT: 1
         run: |
-          export VERSION="${{ steps.tags.outputs.version }}"
-          export DOCKER_TAGS="${{ steps.tags.outputs.tags }}"
           yarn run lerna-run docker:build --scope=@livepeer.com/api
           yarn run lerna-run docker:push --scope=@livepeer.com/api
 
