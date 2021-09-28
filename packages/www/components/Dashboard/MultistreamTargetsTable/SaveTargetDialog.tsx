@@ -31,7 +31,8 @@ import {
 } from "../../../../api/src/schema/types";
 import { pathJoin2 } from "@lib/utils";
 
-type CreateTargetSpec = StreamPatchPayload["multistream"]["targets"][number];
+type MultistreamTargetRef =
+  StreamPatchPayload["multistream"]["targets"][number];
 
 export enum Action {
   Create = "Create",
@@ -77,7 +78,7 @@ const createTarget = (
   state: State,
   parsedUrl: url.UrlWithParsedQuery
 ) => {
-  const targets: CreateTargetSpec[] = [
+  const targets: MultistreamTargetRef[] = [
     ...(stream.multistream?.targets ?? []),
     {
       profile: state.profile,
@@ -107,14 +108,15 @@ const updateTarget = async (
     await api.patchMultistreamTarget(targetId, patch);
   }
   if (state.profile !== initState.profile) {
-    const targets: CreateTargetSpec[] = stream.multistream?.targets?.map((t) =>
-      t.id !== targetId
-        ? t
-        : {
-            ...t,
-            profile: state.profile,
-            videoOnly: state.videoOnly,
-          }
+    const targets: MultistreamTargetRef[] = stream.multistream?.targets?.map(
+      (t) =>
+        t.id !== targetId
+          ? t
+          : {
+              ...t,
+              profile: state.profile,
+              videoOnly: state.videoOnly,
+            }
     );
     await api.patchStream(stream.id, { multistream: { targets } });
   }
@@ -126,7 +128,7 @@ const SaveTargetDialog = ({
   onOpenChange,
   stream,
   target,
-  initialProfile,
+  targetRef,
   invalidate,
 }: {
   action: Action;
@@ -134,7 +136,7 @@ const SaveTargetDialog = ({
   onOpenChange: (isOpen: boolean) => void;
   stream: Stream;
   target?: MultistreamTarget;
-  initialProfile?: string;
+  targetRef?: MultistreamTargetRef;
   invalidate: () => Promise<void>;
 }) => {
   const api = useApi();
@@ -146,10 +148,10 @@ const SaveTargetDialog = ({
       name: action === Action.Create ? "" : target?.name,
       ingestUrl: "",
       streamKey: "",
-      profile: action === Action.Create ? "source" : initialProfile,
-      videoOnly: false,
+      profile: action === Action.Create ? "source" : targetRef?.profile,
+      videoOnly: targetRef?.videoOnly ?? false,
     }),
-    [action, target?.name, initialProfile]
+    [action, target?.name, targetRef?.profile, targetRef?.videoOnly]
   );
   const [state, setState] = useState(initState);
   useEffect(() => setState(initState), [isOpen]);
@@ -319,7 +321,7 @@ const SaveTargetDialog = ({
                   setStateProp("videoOnly", e.target.checked)
                 }
               />
-              <Tooltip content="Enable to mute audio and multistream a silent video.">
+              <Tooltip content="Mute audio and multistream a silent video.">
                 <Label css={{ pl: "$2" }} htmlFor="videoOnly">
                   Video-only
                 </Label>
