@@ -362,6 +362,12 @@ components:
                     minLength: 1
                     maxLength: 500
                     example: 720p
+                  mute:
+                    type: boolean
+                    description:
+                      If true, the profile audio will be silenced and only video
+                      will be pushed to the target.
+                    default: false
                   id:
                     type: string
                     description:
