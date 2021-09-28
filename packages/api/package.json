@@ -130,7 +130,7 @@
     "nyc": "^14.0.0",
     "parcel": "^1.12.4",
     "prettier": "^2.0.5",
-    "redoc-cli": "^0.12.3",
+    "redoc-cli": "^0.8.3",
     "typescript": "^4.3.4",
     "wrangler": "^0.0.2"
   },
