@@ -107,7 +107,10 @@ const updateTarget = async (
   if (patch.name || patch.url) {
     await api.patchMultistreamTarget(targetId, patch);
   }
-  if (state.profile !== initState.profile) {
+  if (
+    state.profile !== initState.profile ||
+    state.videoOnly !== initState.videoOnly
+  ) {
     const targets: MultistreamTargetRef[] = stream.multistream?.targets?.map(
       (t) =>
         t.id !== targetId
