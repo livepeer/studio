@@ -24,5 +24,7 @@ ADD packages/api/package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY --from=builder /app/dist dist
 
+RUN node dist/cli.js --help
+
 ENV LP_PORT 80
 ENTRYPOINT ["node", "dist/cli.js"]

@@ -12,7 +12,7 @@
   "scripts": {
     "cloud-dev": "npm run docker && kubectl delete pod -l app.kubernetes.io/name=livepeer-api-server --wait && sleep 1 && kubectl logs -f --pod-running-timeout=30s $(kubectl get pods -o name -l app.kubernetes.io/name=livepeer-api-server)",
     "cloud-dev:server": "nodemon -w src -x node -r esm src/cli.js --port 3040 --kubeBroadcasterService broadcaster --kubeOrchestratorService orchestrator --kubeNamespace default --kubeBroadcasterTemplate 'https://{{nodeName}}.livepeer-staging.live' --kubeOrchestratorTemplate 'https://{{nodeName}}.livepeer-staging.live:8935'",
-    "docker:build": "TAGS=\"${DOCKER_TAGS:-master}\"; docker pull livepeerci/api:master && docker build --cache-from=livepeerci/api:master $(printf ' -t livepeerci/api:%s' $TAGS) --build-arg GITHUB_SHA --build-arg VERSION -f Dockerfile ../.. && docker run livepeerci/api:$VERSION  --help",
+    "docker:build": "docker pull livepeerci/api:master && docker build --cache-from=livepeerci/api:master $(printf ' -t livepeerci/api:%s' ${DOCKER_TAGS:-master}) --build-arg GITHUB_SHA --build-arg VERSION -f Dockerfile ../..",
     "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/api:${TAG}; done",
     "docker": "run-s docker:build docker:push",
     "postgres:start": "docker run --rm -d --name postgres -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 -v \"$(pwd)/data/postgres:/var/lib/postgresql/data\" postgres",
