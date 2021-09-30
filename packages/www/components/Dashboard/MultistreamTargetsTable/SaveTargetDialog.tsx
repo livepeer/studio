@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import url from "url";
 
 import {
   Badge,
   Box,
   Button,
+  Checkbox,
   Flex,
   AlertDialog,
   AlertDialogTitle,
@@ -25,13 +26,13 @@ import Spinner from "components/Dashboard/Spinner";
 import { useApi } from "hooks";
 import {
   MultistreamTarget,
-  MultistreamTargetPatchPayload,
   Stream,
   StreamPatchPayload,
 } from "../../../../api/src/schema/types";
 import { pathJoin2 } from "@lib/utils";
 
-type CreateTargetSpec = StreamPatchPayload["multistream"]["targets"][number];
+type MultistreamTargetRef =
+  StreamPatchPayload["multistream"]["targets"][number];
 
 export enum Action {
   Create = "Create",
@@ -43,6 +44,7 @@ type State = {
   ingestUrl: string;
   streamKey: string;
   profile: string;
+  videoOnly: boolean;
 };
 
 type Api = ReturnType<typeof useApi>;
@@ -76,10 +78,11 @@ const createTarget = (
   state: State,
   parsedUrl: url.UrlWithParsedQuery
 ) => {
-  const targets: CreateTargetSpec[] = [
+  const targets: MultistreamTargetRef[] = [
     ...(stream.multistream?.targets ?? []),
     {
       profile: state.profile,
+      videoOnly: state.videoOnly,
       spec: {
         name: state.name || parsedUrl?.host,
         url: url.format(parsedUrl),
@@ -104,12 +107,19 @@ const updateTarget = async (
   if (patch.name || patch.url) {
     await api.patchMultistreamTarget(targetId, patch);
   }
-  if (state.profile !== initState.profile) {
-    const targets: CreateTargetSpec[] = stream.multistream?.targets?.map(
-      (t) => ({
-        ...t,
-        profile: t.id === targetId ? state.profile : t.profile,
-      })
+  if (
+    state.profile !== initState.profile ||
+    state.videoOnly !== initState.videoOnly
+  ) {
+    const targets: MultistreamTargetRef[] = stream.multistream?.targets?.map(
+      (t) =>
+        t.id !== targetId
+          ? t
+          : {
+              ...t,
+              profile: state.profile,
+              videoOnly: state.videoOnly,
+            }
     );
     await api.patchStream(stream.id, { multistream: { targets } });
   }
@@ -121,7 +131,7 @@ const SaveTargetDialog = ({
   onOpenChange,
   stream,
   target,
-  initialProfile,
+  targetRef,
   invalidate,
 }: {
   action: Action;
@@ -129,26 +139,27 @@ const SaveTargetDialog = ({
   onOpenChange: (isOpen: boolean) => void;
   stream: Stream;
   target?: MultistreamTarget;
-  initialProfile?: string;
+  targetRef?: MultistreamTargetRef;
   invalidate: () => Promise<void>;
 }) => {
   const api = useApi();
   const [openSnackbar] = useSnackbar();
   const [saving, setSaving] = useState(false);
 
-  const initState = useMemo(
+  const initState = useMemo<State>(
     () => ({
       name: action === Action.Create ? "" : target?.name,
       ingestUrl: "",
       streamKey: "",
-      profile: action === Action.Create ? "source" : initialProfile,
+      profile: action === Action.Create ? "source" : targetRef?.profile,
+      videoOnly: targetRef?.videoOnly ?? false,
     }),
-    [action, target?.name, initialProfile]
+    [action, target?.name, targetRef?.profile, targetRef?.videoOnly]
   );
   const [state, setState] = useState(initState);
   useEffect(() => setState(initState), [isOpen]);
 
-  const setStateProp = (prop: keyof typeof state, value: string) => {
+  const setStateProp = <T extends keyof State>(prop: T, value: State[T]) => {
     setState({ ...state, [prop]: value });
   };
 
@@ -303,6 +314,21 @@ const SaveTargetDialog = ({
                   ))}
                 </Box>
               </RadioGroup>
+            </Box>
+
+            <Box css={{ display: "flex" }}>
+              <Checkbox
+                id="videoOnly"
+                checked={state.videoOnly}
+                onCheckedChange={(e) =>
+                  setStateProp("videoOnly", e.target.checked)
+                }
+              />
+              <Tooltip content="Mute audio and multistream a silent video.">
+                <Label css={{ pl: "$2" }} htmlFor="videoOnly">
+                  Video-only
+                </Label>
+              </Tooltip>
             </Box>
           </Flex>
           <AlertDialogDescription

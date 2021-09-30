@@ -424,7 +424,13 @@ describe("controllers/stream", () => {
         const res = await client.post("/stream", {
           ...postMockStream,
           multistream: {
-            targets: [{ profile: "test_stream_360p", spec: mockTarget }],
+            targets: [
+              {
+                profile: "test_stream_360p",
+                videoOnly: true,
+                spec: mockTarget,
+              },
+            ],
           },
         });
         expect(res.status).toBe(201);
@@ -434,6 +440,7 @@ describe("controllers/stream", () => {
         expect(resultMst.spec).toBeUndefined();
         expect(resultMst.id).toBeDefined();
         expect(resultMst.id).not.toEqual(msTarget.id);
+        expect(resultMst.videoOnly).toBe(true);
 
         const saved = await server.db.multistreamTarget.get(resultMst.id);
         expect(saved).toBeDefined();

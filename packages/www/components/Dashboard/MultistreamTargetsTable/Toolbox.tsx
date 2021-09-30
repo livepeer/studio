@@ -196,9 +196,8 @@ const Toolbox = ({
   const invalidateAll = useCallback(async () => {
     await Promise.all([invalidateStream(), invalidateTargetId(target?.id)]);
   }, [invalidateStream, invalidateTargetId, target?.id]);
-  const currProfile = useMemo(() => {
-    const ref = stream?.multistream?.targets?.find((t) => t.id == target?.id);
-    return ref?.profile;
+  const targetRef = useMemo(() => {
+    return stream?.multistream?.targets?.find((t) => t.id == target?.id);
   }, [stream?.multistream?.targets, target?.id]);
 
   return (
@@ -259,7 +258,7 @@ const Toolbox = ({
         onOpenChange={setSaveDialogOpen}
         stream={stream}
         target={target}
-        initialProfile={currProfile}
+        targetRef={targetRef}
         invalidate={invalidateAll}
       />
       <DeleteDialog

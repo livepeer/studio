@@ -182,7 +182,8 @@ multistreamed and the `id` of the corresponding `Multistream Target`.
 The `profile` field must reference an existing transcoding profile on the same
 stream, or `"source"` to multistream the same original video as ingested. The
 same profile can be mulsitreamed to several `Multistream Targets`, but there can
-be only 1 multistream to a given URL.
+be only 1 multistream to a given URL. You can also set the `videoOnly` field to
+`true` to mute the stream audio and stream only a silent video to the target.
 
 To avoid managing separate `Multistream Target` objects, you can also create
 targets inlined in the `Stream` object on the same mutation request (create or
@@ -240,6 +241,7 @@ curl -X POST 'https://livepeer.com/api/stream' \
       "targets": [
         {
           "profile": "720p",
+          "videoOnly": true,
           "spec": {
             "name": "Eli\'s Twitch",
             "url": "rtmp://rtmp.twitch.tv/live/SECRET"

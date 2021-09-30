@@ -93,7 +93,8 @@ async function validateMultistreamTarget(
     url: spec.url,
     userId,
   });
-  return { profile, id: created.id };
+  const { spec: _, ...specless } = target;
+  return { ...specless, id: created.id };
 }
 
 async function validateMultistreamOpts(
