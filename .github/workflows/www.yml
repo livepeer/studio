@@ -6,11 +6,12 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      - name: Tags
+        id: tags
+        uses: livepeer/action-gh-release-tags@v0
 
       - name: docker login
         env:
@@ -23,14 +24,12 @@ jobs:
 
       - name: docker build
         env:
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+          DOCKER_TAGS: ${{ steps.tags.outputs.tags }}
+          VERSION: ${{ steps.tags.outputs.version }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_BUILDKIT: 1
         run: |
-          export DOCKER_TAG=$(echo $BRANCH | tr -cd '[:alnum:]_')
           cd packages/www
           yarn run docker:build
           yarn run docker:push
