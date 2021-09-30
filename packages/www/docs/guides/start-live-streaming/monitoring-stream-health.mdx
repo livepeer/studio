@@ -5,44 +5,83 @@ description: Understanding stream performance on Livepeer.com
 
 # Monitoring Stream Health
 
-*Currently, stream health information is only available on the dashboard. Changes to the API, including subscribing to the events log, will be available to users soon.* 
+_Currently, stream health information is only available on the dashboard.
+Changes to the API, including subscribing to the events log, will be available
+to users soon._
 
-To monitor any active stream for issues that may impact the quality of your stream, navigate to the Stream Health tab on the stream detail page. 
+To monitor any active stream for issues that may impact the quality of your
+stream, navigate to the Stream Health tab on the stream detail page.
 
 ![image](https://user-images.githubusercontent.com/79172645/135450248-bf3edea4-e666-4927-8114-f972cd2879fe.png)
 
-During any Active stream, components on this page will display a variety of health indicators. 
+During any Active stream, components on this page will display a variety of
+health indicators.
 
 ![image](https://user-images.githubusercontent.com/79172645/135450296-168bd797-fafb-4371-af8a-86b346bbaa18.png)
 
 ## Global Health Status
 
 - `Healthy` indicates that all of the Health Checks are in a `Healthy` state.
-- `Unhealthy` indicates that one or more of the Health Checks are in an `Unhealthy` state
+- `Unhealthy` indicates that one or more of the Health Checks are in an
+  `Unhealthy` state
 - `Idle` indicates that the stream is not currently active
 
 ## Health Checks
 
 ![image](https://user-images.githubusercontent.com/79172645/135450340-4abed968-df77-473d-b926-88c11b5799d2.png)
 
-- ***Transcoding*** — A `Healthy` status indicates that video transcoding is occurring and the multiple profiles of your stream are available for playback. An `Unhealthy` status indicates that we have failed to generate the profiles so only the original video will be available. Check the event log below for any actionable errors or check the  [Status page](https://livepeer.statuspage.io/) for platform-wide issues.
-- ***Real-time —*** This indicates whether our system is transcoding the stream faster than real time, in other words, if the video transcode latency is lower than the video duration. An `Unhealthy` status may be caused by unconventional configurations. Check your stream software configuration by following the steps [in this article,](https://livepeer.com/docs/guides/start-live-streaming/debug-live-stream-issues) and restart your stream.
-- ***Multistreaming —*** This health check indicates whether all configured `Multistream Targets` are connected. If no targets are configured, this will show up as blank and not be considered for the global health state. If this shows up as `Unhealthy` you can also check the status of the individual `Multistream Targets` in the `Overivew` tab, where the targets can be either `Idle`, `Pending`, `Online`or `Offline`:
-    - An `Idle` status indicates that the stream is not currently active so neither is multistreaming.
-    - A `Pending` status indicates that our system is trying to connect to the respective `Multistream Target`.
-    - An `Online` status indicates that the `Multistream Target` is successfully connected.
-    - An `Offline` status means that we've received an error when trying to connect to the target. To try again, check the ingest URL and stream key of your destination service, re-configure your `Multistream Target` and restart your stream.
-    
-    ## Logs
-    
-    Logs will surface informational alerts (ex. multistream destinations are connected/disconnected) or any fatal errors from the transcoding process. Here is an example of a fatal error:
-    
-- `Transcode error from mdw-staging-livepeer-orchestrator-0 for segment 0: **Unsupported input pixel format**`
+- **_Transcoding_** — A `Healthy` status indicates that video transcoding is
+  occurring and the multiple profiles of your stream are available for playback.
+  An `Unhealthy` status indicates that we have failed to generate the profiles
+  so only the original video will be available. Check the event log below for
+  any actionable errors or check the
+  [Status page](https://livepeer.statuspage.io/) for platform-wide issues.
+- **_Real-time —_** This indicates whether our system is transcoding the stream
+  faster than real time, in other words, if the video transcode latency is lower
+  than the video duration. An `Unhealthy` status may be caused by unconventional
+  configurations. Check your stream software configuration by following the
+  steps
+  [in this article,](https://livepeer.com/docs/guides/start-live-streaming/debug-live-stream-issues)
+  and restart your stream.
+- **_Multistreaming —_** This health check indicates whether all configured
+  `Multistream Targets` are connected. If no targets are configured, this will
+  show up as blank and not be considered for the global health state. If this
+  shows up as `Unhealthy` you can also check the status of the individual
+  `Multistream Targets` in the `Overivew` tab, where the targets can be either
+  `Idle`, `Pending`, `Online`or `Offline`:
 
-If you run into this or any similarly formatted errors, check the configuration in your streaming software (e.g. OBS) and restart the stream.
+  - An `Idle` status indicates that the stream is not currently active so
+    neither is multistreaming.
+  - A `Pending` status indicates that our system is trying to connect to the
+    respective `Multistream Target`.
+  - An `Online` status indicates that the `Multistream Target` is successfully
+    connected.
+  - An `Offline` status means that we've received an error when trying to
+    connect to the target. To try again, check the ingest URL and stream key of
+    your destination service, re-configure your `Multistream Target` and restart
+    your stream.
+
+  ## Logs
+
+  Logs will surface informational alerts (ex. multistream destinations are
+  connected/disconnected) or any fatal errors from the transcoding process. Here
+  is an example of a fatal error:
+
+  ```bash
+  Transcode error from mdw-staging-livepeer-orchestrator-0 for segment 0: **Unsupported input pixel format**
+  ```
+
+If you run into this or any similarly formatted errors, check the configuration
+in your streaming software (e.g. OBS) and restart the stream.
 
 ## Session Ingest Rate
 
 ![image](https://user-images.githubusercontent.com/79172645/135467197-08ec63ab-4c44-4cad-a0d5-95a76b80e5c5.png)
 
-Session ingest rate tells you the bitrate of the video received by Livepeer ingest servers, updated every 10 seconds. A high bitrate is suggestive that streams into the Livepeer system are high quality, your encoder is working properly, and your internet connection is good. A fluctuating or low bitrate may suggest that your encoder is configured improperly or that the streamer internet connection isn't as strong as it should be to deliver high quality streams to your viewers.
+Session ingest rate tells you the bitrate of the video received by Livepeer
+ingest servers, updated every 10 seconds. A high bitrate is suggestive that
+streams into the Livepeer system are high quality, your encoder is working
+properly, and your internet connection is good. A fluctuating or low bitrate may
+suggest that your encoder is configured improperly or that the streamer internet
+connection isn't as strong as it should be to deliver high quality streams to
+your viewers.
