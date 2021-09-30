@@ -79,7 +79,7 @@ const Chart = ({ data }) => {
           <Area
             cursor="pointer"
             type="monotone"
-            dataKey="kpbs"
+            dataKey="kbps"
             stroke="#6E56CF"
             strokeWidth="2px"
             fill="url(#colorKbps)"
