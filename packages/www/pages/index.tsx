@@ -14,7 +14,7 @@ const benefitsListItems = [
     },
     title: "Easy to use",
     description:
-      "Our straight forward API’s make integrating Livepeer.com into your streaming platform a quick and easy task.",
+      "Our straight forward APIs make integrating your streaming platform with the Livepeer network a quick and easy task.",
   },
   {
     icon: {
@@ -53,7 +53,7 @@ const featuresListItems = [
     },
     title: "Easy-to-use API",
     description:
-      "Simple and easy to implement API’s that support seamless integration with your streaming platform.",
+      "Simple and easy to implement APIs that support seamless integration with your streaming platform.",
   },
   {
     icon: {
@@ -71,7 +71,7 @@ const featuresListItems = [
     },
     title: "Smart video",
     description:
-      "Livepeer.com leverages the GPU processing pipeline in our infrastructure to support content moderation necessary in running streaming platforms.",
+      "Leverage Livepeer's decentralized network of GPUs for AI-assisted content moderation in your streaming platform.",
   },
   {
     icon: {
