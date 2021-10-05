@@ -350,7 +350,7 @@ const PricingCardsContainer = () => {
                   fontSize: "16px",
                   lineHeight: "24px",
                 }}>
-                / min per destination
+                / min per destination*
               </Box>
             </PricingCardContent>
           </Box>
