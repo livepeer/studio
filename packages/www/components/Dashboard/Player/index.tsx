@@ -1,63 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Box } from "@livepeer.com/design-system";
-import muxjs from "mux.js/dist/mux.js";
+import videojs from "video.js";
+import "videojs-contrib-quality-levels";
+import "videojs-hls-quality-selector";
+import "video.js/dist/video-js.css";
 
-const Player = ({
-  src,
-  posterUrl = "https://via.placeholder.com/160x90/1e1e21/1e1e21",
-  config = {},
-}) => {
-  const video: any = useRef(null);
-  const videoContainer: any = useRef(null);
-  const controller: any = useRef({});
+export const Player = (props) => {
+  const videoRef = useRef(null);
+  const playerRef = useRef(null);
+  const { options, onReady } = props;
 
   useEffect(() => {
-    window["muxjs"] = muxjs;
+    // make sure Video.js player is only initialized once
+    if (!playerRef.current) {
+      const videoElement = videoRef.current;
+      if (!videoElement) return;
 
-    // Use compiled versions of these libraries so they work with ad blockers
-    const shaka = require("shaka-player/dist/shaka-player.ui.js");
+      const player = (playerRef.current = videojs(videoElement, options, () => {
+        console.log("player is ready");
+        onReady && onReady(player);
+      }));
+    }
+  }, [options, onReady]);
 
-    const player = new shaka.Player(video.current);
-    const ui = new shaka.ui.Overlay(
-      player,
-      videoContainer.current,
-      video.current
-    );
-
-    ui.configure(config);
-
-    // Store Shaka's API in order to expose it as a handle.
-    controller.current = {
-      player,
-      ui,
-      videoElement: video.current,
-      config: {},
-    };
-
+  // Dispose the Video.js player when the functional component unmounts
+  useEffect(() => {
     return () => {
-      player.destroy();
-      ui.destroy();
+      if (playerRef.current) {
+        playerRef.current.dispose();
+        playerRef.current = null;
+      }
     };
   }, []);
 
-  // Load the source url when we have one.
-  useEffect(() => {
-    const { player } = controller.current;
-    if (player) {
-      player.load(src.trim());
-    }
-  }, [src]);
-
   return (
-    <Box className="shadow-lg mx-auto max-w-ful" ref={videoContainer}>
-      <video
-        muted
-        autoPlay
-        id="video"
-        ref={video}
-        className="w-full h-full"
-        poster={posterUrl}
-      />
+    <Box>
+      <Box data-vjs-player>
+        <Box
+          as="video"
+          muted
+          autoPlay
+          ref={videoRef}
+          css={{ width: "auto", height: 265, minHeight: 265 }}
+          className="video-js vjs-big-play-centered"
+        />
+      </Box>
     </Box>
   );
 };
