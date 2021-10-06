@@ -20,10 +20,8 @@ export const Player = ({ options }) => {
         player.hlsQualitySelector();
       }));
     }
-  }, [options]);
 
-  // Dispose the Video.js player when the functional component unmounts
-  useEffect(() => {
+    // Dispose the Video.js player when the functional component unmounts
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose();
