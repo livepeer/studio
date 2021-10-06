@@ -9,11 +9,6 @@ export const Player = ({ options }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
 
-  const onReady = (player) => {
-    playerRef.current = player;
-    player.hlsQualitySelector();
-  };
-
   useEffect(() => {
     // make sure Video.js player is only initialized once
     if (!playerRef.current) {
@@ -21,10 +16,11 @@ export const Player = ({ options }) => {
       if (!videoElement) return;
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        onReady && onReady(player);
+        playerRef.current = player;
+        player.hlsQualitySelector();
       }));
     }
-  }, [options, onReady]);
+  }, [options]);
 
   // Dispose the Video.js player when the functional component unmounts
   useEffect(() => {
