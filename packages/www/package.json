@@ -97,7 +97,6 @@
     "remark-emoji": "^2.1.0",
     "remark-slug": "^6.0.0",
     "sanity-mux-player": "^0.0.27",
-    "shaka-player": "3.2.0",
     "theme-ui": "0.3.1",
     "title": "^3.4.3",
     "toc": "^0.4.0",
@@ -105,7 +104,10 @@
     "unist-util-visit": "^3.1.0",
     "url": "^0.11.0",
     "uslug": "^1.0.4",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "video.js": "^7.15.4",
+    "videojs-contrib-quality-levels": "^2.1.0",
+    "videojs-hls-quality-selector": "^1.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",

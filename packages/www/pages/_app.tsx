@@ -5,8 +5,6 @@ import SEO from "../next-seo.config";
 import { ApiProvider } from "hooks/use-api";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
-import "shaka-player/dist/controls.css";
-import "../css/shaka.css";
 import "../css/algolia-docsearch.css";
 
 const queryClient = new QueryClient();

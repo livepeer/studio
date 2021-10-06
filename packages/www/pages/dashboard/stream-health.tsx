@@ -118,6 +118,19 @@ const Health = () => {
     };
   }, [getIngestRate, info]);
 
+  const videoJsOptions = {
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [
+      {
+        src: playbackUrl,
+        type: "application/x-mpegURL",
+      },
+    ],
+  };
+
   return (
     <Layout id="streamHealth" breadcrumbs={[{ title: "Stream Health" }]}>
       <Box css={{ padding: "$6" }}>
@@ -168,23 +181,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <Player
-                src={playbackUrl}
-                config={{
-                  controlPanelElements: [
-                    "time_and_duration",
-                    "play_pause",
-                    "rewind",
-                    "fast_forward",
-                    "mute",
-                    "volume",
-                    "spacer",
-                    "fullscreen",
-                    "overflow_menu",
-                  ],
-                  overflowMenuButtons: ["quality"],
-                }}
-              />
+              <Player options={videoJsOptions} />
             </Box>
           </Box>
           <Arrow active />
@@ -202,23 +199,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <Player
-                src={playbackUrl}
-                config={{
-                  controlPanelElements: [
-                    "time_and_duration",
-                    "play_pause",
-                    "rewind",
-                    "fast_forward",
-                    "mute",
-                    "volume",
-                    "spacer",
-                    "fullscreen",
-                    "overflow_menu",
-                  ],
-                  overflowMenuButtons: ["quality"],
-                }}
-              />
+              <Player options={videoJsOptions} />
             </Box>
           </Box>
         </Box>

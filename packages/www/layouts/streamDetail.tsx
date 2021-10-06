@@ -23,8 +23,7 @@ import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
-import { AnalyzerProvider } from "hooks/use-analyzer";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { isStaging } from "lib/utils";
 import RelativeTime from "components/Dashboard/RelativeTime";
 import {
@@ -210,6 +209,7 @@ const StreamDetail = ({
   const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
+  const playerRef = useRef(null);
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -267,6 +267,19 @@ const StreamDetail = ({
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
+
+  const videoJsOptions = {
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [
+      {
+        src: globalPlaybackUrl,
+        type: "application/x-mpegURL",
+      },
+    ],
+  };
 
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
@@ -372,29 +385,13 @@ const StreamDetail = ({
                             </Box>
                             Active
                           </Badge>
-                          <Player
-                            src={globalPlaybackUrl}
-                            config={{
-                              controlPanelElements: [
-                                "time_and_duration",
-                                "play_pause",
-                                "rewind",
-                                "fast_forward",
-                                "mute",
-                                "volume",
-                                "spacer",
-                                "fullscreen",
-                                "overflow_menu",
-                              ],
-                              overflowMenuButtons: ["quality"],
-                            }}
-                          />
+                          <Player options={videoJsOptions} />
                         </>
                       ) : (
                         <Box
                           css={{
                             width: "100%",
-                            height: 238,
+                            height: 265,
                             borderRadius: "$2",
                             overflow: "hidden",
                             position: "relative",
@@ -403,6 +400,7 @@ const StreamDetail = ({
                           <Badge
                             size="2"
                             css={{
+                              backgroundColor: "$mauve7",
                               position: "absolute",
                               zIndex: 1,
                               left: 10,
@@ -410,7 +408,10 @@ const StreamDetail = ({
                               letterSpacing: 0,
                             }}>
                             <Box css={{ mr: 5 }}>
-                              <Status size="1" />
+                              <Status
+                                css={{ backgroundColor: "$mauve9" }}
+                                size="1"
+                              />
                             </Box>
                             Idle
                           </Badge>
