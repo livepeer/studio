@@ -5,10 +5,14 @@ import "videojs-contrib-quality-levels";
 import "videojs-hls-quality-selector";
 import "video.js/dist/video-js.css";
 
-export const Player = (props) => {
+export const Player = ({ options }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
-  const { options, onReady } = props;
+
+  const onReady = (player) => {
+    playerRef.current = player;
+    player.hlsQualitySelector();
+  };
 
   useEffect(() => {
     // make sure Video.js player is only initialized once
@@ -17,7 +21,6 @@ export const Player = (props) => {
       if (!videoElement) return;
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        console.log("player is ready");
         onReady && onReady(player);
       }));
     }

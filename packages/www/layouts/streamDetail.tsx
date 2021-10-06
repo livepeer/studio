@@ -281,20 +281,6 @@ const StreamDetail = ({
     ],
   };
 
-  const handlePlayerReady = (player) => {
-    playerRef.current = player;
-
-    player.hlsQualitySelector();
-
-    player.on("waiting", () => {
-      console.log("player is waiting");
-    });
-
-    player.on("dispose", () => {
-      console.log("player will dispose");
-    });
-  };
-
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
       <Box css={{ px: "$6", py: "$7" }}>
@@ -399,10 +385,7 @@ const StreamDetail = ({
                             </Box>
                             Active
                           </Badge>
-                          <Player
-                            options={videoJsOptions}
-                            onReady={handlePlayerReady}
-                          />
+                          <Player options={videoJsOptions} />
                         </>
                       ) : (
                         <Box
