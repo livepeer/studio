@@ -73,7 +73,7 @@ const Health = () => {
           ...prev,
           {
             name: lastItem ? lastItem.name + interval / 1000 : 0,
-            kbps: Math.round(newInfo.session.ingestRate / 1000),
+            kbps: Math.round((newInfo.session.ingestRate / 1000) * 8), // kilobits rather than bytes here
           },
         ].slice(Math.max(prev.length - maxItems, 0));
       });
