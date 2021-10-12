@@ -41,7 +41,7 @@ export default function hardcodedNodes({
     if (!req.getBroadcasters) {
       req.getBroadcasters = async () => broadcasters as NodeAddress[];
     }
-    if (orchestrators.length) {
+    if (orchestrators?.length) {
       req.orchestratorsGetters.push(
         async () => orchestrators as OrchestratorNodeAddress[]
       );
