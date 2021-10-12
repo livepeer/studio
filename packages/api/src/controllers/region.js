@@ -6,9 +6,14 @@ const defaultScore = 1;
 
 const app = Router();
 
-
 function flatRegions(regions = []) {
-  return regions.flatMap(reg => reg.orchestrators.map(orch => ({ score: defaultScore, region: reg.region, ...orch })));
+  return regions.flatMap((reg) =>
+    reg.orchestrators.map((orch) => ({
+      score: defaultScore,
+      region: reg.region,
+      ...orch,
+    }))
+  );
 }
 
 export async function regionsGetter() {
@@ -23,7 +28,7 @@ app.get("/", async (req, res, next) => {
     return res.json(regions);
   }
 
-  return res.json(flatRegions(regions))
+  return res.json(flatRegions(regions));
 });
 
 app.get("/:region", async (req, res, next) => {

@@ -13,7 +13,10 @@ const getOrchestrators = async (req: Request, res, next) => {
   }
 
   return res.json(
-    orchestrators.map(({ address, score = defaultScore }) => ({ address, score }))
+    orchestrators.map(({ address, score = defaultScore }) => ({
+      address,
+      score,
+    }))
   );
 };
 
