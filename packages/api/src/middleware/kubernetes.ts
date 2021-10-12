@@ -7,11 +7,7 @@ import { render } from "mustache";
 import * as k8s from "@kubernetes/client-node";
 
 import { timeout } from "../util";
-
-export interface NodeAddress {
-  address: string;
-  cliAddress: string;
-}
+import { NodeAddress, OrchestratorNodeAddress } from "../types/common";
 
 export default function kubernetesMiddleware({
   kubeNamespace,
@@ -84,7 +80,7 @@ export default function kubernetesMiddleware({
       kubeOrchestratorService,
       kubeNamespace
     );
-    const ret: NodeAddress[] = [];
+    const ret: OrchestratorNodeAddress[] = [];
     if (endpoints && endpoints.subsets) {
       for (const subset of endpoints.subsets) {
         if (!subset.addresses) {
@@ -97,6 +93,7 @@ export default function kubernetesMiddleware({
               ip: address.ip,
             }),
             cliAddress: `http://${address.ip}:7935`,
+            score: 1,
           });
         }
       }
@@ -110,7 +107,7 @@ export default function kubernetesMiddleware({
     }
 
     if (kubeOrchestratorService) {
-      req.getOrchestrators = getOrchestrators;
+      req.orchestratorsGetters.push(getOrchestrators);
     }
 
     return next();

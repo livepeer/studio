@@ -6,6 +6,7 @@ import {
   errorHandler,
   healthCheck,
   kubernetes,
+  subgraph,
   hardcodedNodes,
   insecureTest,
   geolocateMiddleware,
@@ -18,7 +19,14 @@ import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
+import { CliArgs } from "./parse-cli";
+import { regionsGetter } from "./controllers/region";
 
+enum OrchestratorSource {
+  hardcoded = "hardcoded",
+  subgraph = "subgraph",
+  region = "region",
+}
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
   "broadcaster",
@@ -27,7 +35,7 @@ const GEOLOCATION_ENDPOINTS = [
   "geolocate",
 ];
 
-export default async function makeApp(params) {
+export default async function makeApp(params: CliArgs) {
   const {
     storage,
     dbPath,
@@ -52,6 +60,7 @@ export default async function makeApp(params) {
     kubeBroadcasterTemplate,
     kubeOrchestratorService,
     kubeOrchestratorTemplate,
+    subgraphUrl,
     fallbackProxy,
     orchestrators = "[]",
     broadcasters = "[]",
@@ -62,6 +71,7 @@ export default async function makeApp(params) {
     firestoreCollection,
     stripeSecretKey,
     amqpUrl,
+    returnRegionInOrchestrator,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -115,6 +125,7 @@ export default async function makeApp(params) {
 
   app.use(bodyParser.json());
   app.use((req, res, next) => {
+    req.orchestratorsGetters = [];
     req.store = store;
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
@@ -144,6 +155,21 @@ export default async function makeApp(params) {
   }
 
   app.use(hardcodedNodes({ orchestrators, broadcasters, ingest, prices }));
+
+  if (returnRegionInOrchestrator) {
+    app.use((req, res, next) => {
+      req.orchestratorsGetters.push(regionsGetter);
+      return next();
+    });
+  }
+
+  if (subgraphUrl) {
+    app.use(
+      subgraph({
+        subgraphUrl,
+      })
+    );
+  }
 
   // Add a controller for each route at the /${httpPrefix} route
   const prefixRouter = Router(); // amalgamates our endpoints together and serves them out

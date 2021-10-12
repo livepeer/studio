@@ -1,11 +1,23 @@
+import { Request } from "express";
 import Router from "express/lib/router";
 
 const app = Router();
 
-const getOrchestrators = async (req, res, next) => {
-  const orchestrators = await req.getOrchestrators(req);
+const defaultScore = 0;
 
-  return res.json(orchestrators.map(({ address }) => ({ address })));
+const getOrchestrators = async (req: Request, res, next) => {
+  const orchestrators = [];
+  for (const getter of req.orchestratorsGetters) {
+    const orchs = await getter();
+    orchestrators.push(...orchs);
+  }
+
+  return res.json(
+    orchestrators.map(({ address, score = defaultScore }) => ({
+      address,
+      score,
+    }))
+  );
 };
 
 app.get("/", getOrchestrators);

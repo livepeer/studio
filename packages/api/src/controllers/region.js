@@ -2,7 +2,25 @@ import Router from "express/lib/router";
 import { authMiddleware, validatePost } from "../middleware";
 import { db } from "../store";
 
+const defaultScore = 1;
+
 const app = Router();
+
+function flatRegions(regions = []) {
+  return regions.flatMap((reg) =>
+    reg.orchestrators.map((orch) => ({
+      score: defaultScore,
+      region: reg.region,
+      ...orch,
+    }))
+  );
+}
+
+export async function regionsGetter() {
+  const [regions, cursor] = await db.region.find({}, { limit: 100 });
+
+  return flatRegions(regions);
+}
 
 app.get("/", async (req, res, next) => {
   const [regions, cursor] = await db.region.find({}, { limit: 100 });
@@ -10,15 +28,7 @@ app.get("/", async (req, res, next) => {
     return res.json(regions);
   }
 
-  const flatOrchList = [];
-  regions.forEach((region) => {
-    region.orchestrators.forEach((orch) => {
-      orch.region = region.region;
-      flatOrchList.push(orch);
-    });
-  });
-
-  return res.json(flatOrchList);
+  return res.json(flatRegions(regions));
 });
 
 app.get("/:region", async (req, res, next) => {

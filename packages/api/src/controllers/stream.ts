@@ -1464,6 +1464,8 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     )}`
   );
 
+  const verificationFreq = 10;
+
   res.json({
     manifestID,
     streamID: stream.parentId ?? streamId,
@@ -1475,6 +1477,7 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
     recordObjectStoreUrl,
     previousSessions: stream.previousSessions,
     detection,
+    verificationFreq,
   });
 });
 
