@@ -2,7 +2,7 @@
  * Injects getOrchestrators() using a subgraph
  */
 
-import fetch from "node-fetch";
+import { fetchWithTimeout } from "../util";
 import { OrchestratorNodeAddress } from "../types/common";
 
 const defaultScore = 0;
@@ -20,6 +20,8 @@ export default function subgraphMiddleware({
     "0x2559ae126336207c93060ed626f8bdefd998b66f": true,
   };
 
+  const SUBGRAPH_TIMEOUT = 3 * 1000;
+
   let cachedResp: Array<OrchestratorNodeAddress> = [];
   let lastCachedRespUpdate = 0;
 
@@ -35,29 +37,21 @@ export default function subgraphMiddleware({
 
     if (lastCachedRespUpdate + CACHE_REFRESH_INTERVAL < Date.now()) {
       try {
-        const res = await fetch(subgraphUrl, {
+        const res = await fetchWithTimeout(subgraphUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
           body: JSON.stringify({ query }),
+          timeout: SUBGRAPH_TIMEOUT,
         });
 
         const transcoders = (await res.json()).data.transcoders;
-        const cacheUpdate: Array<OrchestratorNodeAddress> = [];
-        for (const tr of transcoders) {
-          if (tr.id.toLowerCase() in blockList) {
-            continue;
-          }
+        cachedResp = transcoders
+          .filter(tr => !(tr.id.toLowerCase() in blockList) && !!tr.serviceURI)
+          .map(tr => ({ address: tr.serviceURI, score: defaultScore }));
 
-          cacheUpdate.push({
-            address: tr.serviceURI,
-            score: defaultScore,
-          });
-        }
-
-        cachedResp = cacheUpdate;
         lastCachedRespUpdate = Date.now();
       } catch (e) {
         console.error(e);
