@@ -7,6 +7,9 @@ import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import logger from "../logger";
 import uuid from "uuid/v4";
+import {
+  User,
+} from "../schema/types";
 
 // import { CdnUsage, CdnUsageLast } from "../schema/types";
 
@@ -22,6 +25,9 @@ interface CdnUsageRowReq {
   total_cs_bytes: number;
   total_sc_bytes: number;
   count: number;
+  // filled in /api/cdn-data handler
+  user_id: string;
+  user_email: string;
 }
 
 interface SendData {
@@ -47,7 +53,7 @@ async function addMany(
     await client.query("BEGIN");
     for (const tdoc of rows) {
       await client.query(
-        `INSERT INTO ${name} VALUES (to_timestamp($1), $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO ${name} VALUES (to_timestamp($1), $2, $3, $4, $5, $6, $7, $8, $9, $10)
           ON CONFLICT (date, region, playback_id)
           DO UPDATE SET 
               unique_users = ${name}.unique_users + EXCLUDED.unique_users,
@@ -59,6 +65,8 @@ async function addMany(
         [
           date,
           region,
+          tdoc.user_id,
+          tdoc.user_email,
           tdoc.playback_id,
           tdoc.unique_users,
           tdoc.total_filesize,
@@ -124,6 +132,26 @@ app.post(
     //         errors: ["missing name"],
     //     });
     // }
+    const usersCache = new Map()
+    const getUser = async (playbackId: string): Promise<User | null> => {
+      if (usersCache.has(playbackId)) {
+        return usersCache.get(playbackId)
+      }
+      const stream = await db.stream.getByPlaybackId(playbackId)
+      if (!stream) {
+        logger.error(`Can't find stream for playbackId=${playbackId}`)
+        return null
+      }
+      const user = await db.user.get(stream.userId)
+      if (!user) {
+        logger.error(`Can't find user for playbackId=${playbackId}`)
+        return null
+      }
+      usersCache.set(playbackId, user)
+      return user
+    }
+
+
     const start = Date.now();
     const dataAr = req.body as Array<SendData>;
     console.log("Got data: ", JSON.stringify(dataAr, null, 2));
@@ -139,6 +167,11 @@ app.post(
       // aggregate stream_ids into playback_ids
       for (const row of data.data) {
         // console.log(`===> checking row `, row)
+        const user = await getUser(row.playback_id)
+        if (user) {
+          row.user_id = user.id
+          row.user_email = user.email
+        }
         if (row.stream_id) {
           // find playbackId by streamId
           let stream = await db.stream.get(row.stream_id);

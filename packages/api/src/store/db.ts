@@ -268,6 +268,8 @@ async function createCdnUsageRegTable(db) {
             date timestamp without time zone NOT NULL,
             region character varying(128) COLLATE pg_catalog."default" NOT NULL,
             playback_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
+            user_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
+            user_email character varying(512) COLLATE pg_catalog."default" NOT NULL,
             unique_users integer NOT NULL,
             total_filesize bigint NOT NULL,
             total_cs_bytes bigint NOT NULL,
