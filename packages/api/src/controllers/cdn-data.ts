@@ -65,9 +65,9 @@ async function addMany(
         [
           date,
           region,
+          tdoc.playback_id,
           tdoc.user_id,
           tdoc.user_email,
-          tdoc.playback_id,
           tdoc.unique_users,
           tdoc.total_filesize,
           tdoc.total_cs_bytes,
@@ -218,7 +218,12 @@ app.post(
       }
       // insert data into db
       // @ts-ignore
-      const rows = data.data.filter((obj) => !obj.stream_id);
+      const rows = data.data.filter((obj) => obj.playback_id);
+      const badRows = data.data.filter((obj) => !obj.playback_id);
+      console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2))
+      const badRows2 = data.data.filter((obj) => !obj.user_id);
+      console.log(`==> bad rows 2:`, JSON.stringify(badRows2, null, 2))
+      console.log(`==> good rows:`, JSON.stringify(rows, null, 2))
       const err = await addMany(data.date, data.region, data.file_name, rows);
       if (err) {
         logger.error(`Error saving row to db hour=${hour} err=${err}`);
