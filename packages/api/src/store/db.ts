@@ -15,6 +15,8 @@ import {
   Region,
   WebhookResponse,
   Session,
+  CdnUsage,
+  CdnUsageLast,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
@@ -22,6 +24,8 @@ import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
+// import { CdnUsageRow } from "./types";
+// import { RegularTable } from "./regular-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -55,6 +59,9 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: Table<DBSession>;
+  cdnUsage: Table<CdnUsage>;
+  cdnUsageLast: Table<CdnUsageLast>;
+  // cdnUsageRegular: RegularTable<CdnUsageRow>;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -139,6 +146,14 @@ export class DB {
       schema: schemas["webhook-response"],
     });
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
+    this.cdnUsage = makeTable<CdnUsage>({
+      db: this,
+      schema: schemas["cdn-usage"],
+    });
+    this.cdnUsageLast = makeTable<CdnUsageLast>({
+      db: this,
+      schema: schemas["cdn-usage-last"],
+    });
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => "table" in schema && schema.table
@@ -149,6 +164,10 @@ export class DB {
         return this[camelName].ensureTable();
       })
     );
+
+    // this.cdnUsageRegular = new RegularTable<CdnUsageRow>({ db: this, schema: schemas["cdn-usage"] });
+    // this.cdnUsageRegular.ensureTable();
+    await createCdnUsageRegTable(this);
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
@@ -241,6 +260,23 @@ async function ensureDatabase(postgresUrl) {
   logger.info(`Created database ${dbName}`);
   pool.end();
   adminPool.end();
+}
+
+async function createCdnUsageRegTable(db) {
+  await db.query(`
+          CREATE TABLE IF NOT EXISTS cdn_usage_reg (
+            date timestamp without time zone NOT NULL,
+            region character varying(128) COLLATE pg_catalog."default" NOT NULL,
+            playback_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
+            unique_users integer NOT NULL,
+            total_filesize bigint NOT NULL,
+            total_cs_bytes bigint NOT NULL,
+            total_sc_bytes bigint NOT NULL,
+            count integer NOT NULL,
+            CONSTRAINT prim PRIMARY KEY (date, region, playback_id)
+          );
+        `);
+  logger.info(`Created table cdn_usage_reg`);
 }
 
 export default new DB();

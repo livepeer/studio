@@ -29,6 +29,61 @@ tags:
 
 components:
   schemas:
+    cdn-usage-last:
+      type: object
+      table: cdn_usage_last
+      required:
+        - region
+        - fileName
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        fileName:
+          type: number
+          index: true
+        region:
+          type: string
+          index: true
+          unique: true
+    cdn-usage:
+      type: object
+      table: cdn_usage
+      required:
+        - date
+        - region
+        - playbackId
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        date:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          index: true
+          # unique: true
+        region:
+          type: string
+        playbackId:
+          type: string
+          example: eaw4nk06ts2d0mzb
+          description: Used to form playback URL
+          index: true
+        uniqueUsers:
+          type: number
+        totalFileSize:
+          type: number
+        totalCsBytes:
+          type: number
+        totalScBytes:
+          type: number
+        count:
+          type: number
     webhook:
       type: object
       table: webhook
