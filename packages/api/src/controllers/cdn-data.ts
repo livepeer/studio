@@ -167,10 +167,12 @@ app.post(
       // aggregate stream_ids into playback_ids
       for (const row of data.data) {
         // console.log(`===> checking row `, row)
-        const user = await getUser(row.playback_id)
-        if (user) {
-          row.user_id = user.id
-          row.user_email = user.email
+        if (row.playback_id) {
+          const user = await getUser(row.playback_id)
+          if (user) {
+            row.user_id = user.id
+            row.user_email = user.email
+          }
         }
         if (row.stream_id) {
           // find playbackId by streamId
@@ -206,6 +208,11 @@ app.post(
           } else {
             row.playback_id = stream.playbackId;
             row.stream_id = null;
+            const user = await getUser(row.playback_id)
+            if (user) {
+              row.user_id = user.id
+              row.user_email = user.email
+            }
           }
         }
       }
