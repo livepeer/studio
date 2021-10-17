@@ -218,7 +218,7 @@ app.post(
       }
       // insert data into db
       // @ts-ignore
-      const rows = data.data.filter((obj) => obj.playback_id);
+      const rows = data.data.filter((obj) => obj.playback_id && obj.user_id);
       const badRows = data.data.filter((obj) => !obj.playback_id);
       console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2))
       const badRows2 = data.data.filter((obj) => !obj.user_id);
