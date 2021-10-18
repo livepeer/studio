@@ -1,49 +1,71 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Box } from "@livepeer.com/design-system";
 import videojs from "video.js";
 import "videojs-contrib-quality-levels";
 import "videojs-hls-quality-selector";
 import "video.js/dist/video-js.css";
 
-export const Player = ({ options }) => {
+const usePlayer = ({ src, controls, autoplay, muted }) => {
+  const options = {
+    fill: true,
+    fluid: true,
+    preload: "meta",
+    responsive: true,
+  };
   const videoRef = useRef(null);
-  const playerRef = useRef(null);
+  const [player, setPlayer] = useState(null);
 
   useEffect(() => {
-    // make sure Video.js player is only initialized once
-    if (!playerRef.current) {
-      const videoElement = videoRef.current;
-      if (!videoElement) return;
+    const vjsPlayer = videojs(
+      videoRef.current,
+      {
+        ...options,
+        controls,
+        autoplay,
+        muted,
+        sources: [{ src }],
+      },
+      () => {
+        videoRef.current = vjsPlayer;
+        vjsPlayer.hlsQualitySelector();
+      }
+    );
+    setPlayer(vjsPlayer);
 
-      const player = (playerRef.current = videojs(videoElement, options, () => {
-        playerRef.current = player;
-        player.hlsQualitySelector();
-      }));
-    }
-
-    // Dispose the Video.js player when the functional component unmounts
     return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
+      if (player !== null) {
+        player.dispose();
       }
     };
   }, []);
 
+  useEffect(() => {
+    if (player !== null) {
+      player.src({ src });
+    }
+  }, [src]);
+
+  return videoRef;
+};
+
+const VideoPlayer = ({
+  src,
+  controls = true,
+  autoplay = true,
+  muted = true,
+}) => {
+  const playerRef = usePlayer({ src, controls, autoplay, muted });
+
   return (
-    <Box>
-      <Box data-vjs-player>
-        <Box
-          as="video"
-          muted
-          autoPlay
-          ref={videoRef}
-          css={{ width: "auto", height: 265, minHeight: 265 }}
-          className="video-js vjs-big-play-centered"
-        />
-      </Box>
+    <Box data-vjs-player>
+      <Box
+        as="video"
+        ref={playerRef}
+        css={{ width: "auto", height: 265, minHeight: 265 }}
+        className="video-js vjs-big-play-centered"
+      />
     </Box>
   );
 };
 
-export default Player;
+export default VideoPlayer;

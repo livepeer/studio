@@ -268,19 +268,6 @@ const StreamDetail = ({
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
 
-  const videoJsOptions = {
-    autoplay: true,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    sources: [
-      {
-        src: globalPlaybackUrl,
-        type: "application/x-mpegURL",
-      },
-    ],
-  };
-
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
       <Box css={{ px: "$6", py: "$7" }}>
@@ -385,7 +372,7 @@ const StreamDetail = ({
                             </Box>
                             Active
                           </Badge>
-                          <Player options={videoJsOptions} />
+                          <Player src={globalPlaybackUrl} />
                         </>
                       ) : (
                         <Box
