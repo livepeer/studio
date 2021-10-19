@@ -228,6 +228,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "Stripe webhook secret",
         type: "string",
       },
+      "verification-frequency": {
+        describe: "verificationFreq field to return from stream/hook",
+        default: 0,
+        type: "number",
+      },
     })
     .help()
     .parse(argv);
