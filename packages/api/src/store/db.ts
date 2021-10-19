@@ -24,8 +24,6 @@ import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
-// import { CdnUsageRow } from "./types";
-// import { RegularTable } from "./regular-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -61,7 +59,6 @@ export class DB {
   session: Table<DBSession>;
   cdnUsage: Table<CdnUsage>;
   cdnUsageLast: Table<CdnUsageLast>;
-  // cdnUsageRegular: RegularTable<CdnUsageRow>;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -165,8 +162,6 @@ export class DB {
       })
     );
 
-    // this.cdnUsageRegular = new RegularTable<CdnUsageRow>({ db: this, schema: schemas["cdn-usage"] });
-    // this.cdnUsageRegular.ensureTable();
     await createCdnUsageRegTable(this);
   }
 

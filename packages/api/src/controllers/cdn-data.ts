@@ -7,13 +7,7 @@ import { db } from "../store";
 import { FindOptions, FindQuery } from "../store/types";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import {
-  User,
-} from "../schema/types";
-
-// import { CdnUsage, CdnUsageLast } from "../schema/types";
-
-// import { CdnUsageRow } from "../store/types";
+import { User } from "../schema/types";
 
 const app = Router();
 
@@ -132,25 +126,24 @@ app.post(
     //         errors: ["missing name"],
     //     });
     // }
-    const usersCache = new Map()
+    const usersCache = new Map();
     const getUser = async (playbackId: string): Promise<User | null> => {
       if (usersCache.has(playbackId)) {
-        return usersCache.get(playbackId)
+        return usersCache.get(playbackId);
       }
-      const stream = await db.stream.getByPlaybackId(playbackId)
+      const stream = await db.stream.getByPlaybackId(playbackId);
       if (!stream) {
-        logger.error(`Can't find stream for playbackId=${playbackId}`)
-        return null
+        logger.error(`Can't find stream for playbackId=${playbackId}`);
+        return null;
       }
-      const user = await db.user.get(stream.userId)
+      const user = await db.user.get(stream.userId);
       if (!user) {
-        logger.error(`Can't find user for playbackId=${playbackId}`)
-        return null
+        logger.error(`Can't find user for playbackId=${playbackId}`);
+        return null;
       }
-      usersCache.set(playbackId, user)
-      return user
-    }
-
+      usersCache.set(playbackId, user);
+      return user;
+    };
 
     const start = Date.now();
     const dataAr = req.body as Array<SendData>;
@@ -168,10 +161,10 @@ app.post(
       for (const row of data.data) {
         // console.log(`===> checking row `, row)
         if (row.playback_id) {
-          const user = await getUser(row.playback_id)
+          const user = await getUser(row.playback_id);
           if (user) {
-            row.user_id = user.id
-            row.user_email = user.email
+            row.user_id = user.id;
+            row.user_email = user.email;
           }
         }
         if (row.stream_id) {
@@ -208,10 +201,10 @@ app.post(
           } else {
             row.playback_id = stream.playbackId;
             row.stream_id = null;
-            const user = await getUser(row.playback_id)
+            const user = await getUser(row.playback_id);
             if (user) {
-              row.user_id = user.id
-              row.user_email = user.email
+              row.user_id = user.id;
+              row.user_email = user.email;
             }
           }
         }
@@ -220,45 +213,15 @@ app.post(
       // @ts-ignore
       const rows = data.data.filter((obj) => obj.playback_id && obj.user_id);
       const badRows = data.data.filter((obj) => !obj.playback_id);
-      console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2))
+      console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2));
       const badRows2 = data.data.filter((obj) => !obj.user_id);
-      console.log(`==> bad rows 2:`, JSON.stringify(badRows2, null, 2))
-      console.log(`==> good rows:`, JSON.stringify(rows, null, 2))
+      console.log(`==> bad rows 2:`, JSON.stringify(badRows2, null, 2));
+      console.log(`==> good rows:`, JSON.stringify(rows, null, 2));
       const err = await addMany(data.date, data.region, data.file_name, rows);
       if (err) {
         logger.error(`Error saving row to db hour=${hour} err=${err}`);
         process.exit(1);
-        throw "fuckk";
       }
-      /*
-      for (const row of data.data) {
-        if (row.stream_id) {
-          continue;
-        }
-        // console.log(`-----> inserting `, row)
-        await db.cdnUsage.create({
-          id: uuid(),
-          date: data.date * 1000,
-          region: data.region,
-          playbackId: row.playback_id,
-          totalCsBytes: row.total_cs_bytes,
-          totalFileSize: row.total_filesize,
-          totalScBytes: row.total_sc_bytes,
-          uniqueUsers: row.unique_users,
-          count: row.count,
-        })
-        const err = await db.cdnUsageRegular.add({
-          date: data.date,
-          region: data.region,
-          ...row,
-        })
-        if (err) {
-          logger.error(`Error saving row to db hour=${hour} err=${err}`)
-          process.exit(1)
-          throw ('fuckk')
-        }
-      }
-      */
     }
 
     const regions = dataAr.reduce((a, v) => [...a, v.region], []);
