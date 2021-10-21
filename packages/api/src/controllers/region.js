@@ -72,7 +72,7 @@ app.delete(
   "/:region",
   authMiddleware({ anyAdmin: true }),
   async (req, res, next) => {
-    const resp = await db.region.delete(eq.params.region);
+    await db.region.delete(req.params.region);
     return res.status(204);
   }
 );
