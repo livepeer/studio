@@ -96,36 +96,26 @@ async function addMany(
   return null;
 }
 
-app.get(
-  "/region/:region",
-  //  authMiddleware({}),
-  async (req, res) => {
-    const { region } = req.params;
-    if (!region) {
-      res.status(400);
-      return res.end();
-    }
-    const [docs] = await db.cdnUsageLast.find({ region: req.params.region });
-    if (!docs?.length) {
-      res.status(204);
-      return res.end();
-    }
-    res.status(200);
-    res.json(docs[0]);
+app.get("/region/:region", authMiddleware({}), async (req, res) => {
+  const { region } = req.params;
+  if (!region) {
+    res.status(400);
+    return res.end();
   }
-);
+  const [docs] = await db.cdnUsageLast.find({ region: req.params.region });
+  if (!docs?.length) {
+    res.status(204);
+    return res.end();
+  }
+  res.status(200);
+  res.json(docs[0]);
+});
 
 app.post(
   "/",
-  //   authMiddleware({}),
-  // validatePost("stream"),
+  authMiddleware({}),
+  validatePost("cdn-data-payload"),
   async (req, res) => {
-    // if (!req.body || !req.body.name) {
-    //     res.status(422);
-    //     return res.json({
-    //         errors: ["missing name"],
-    //     });
-    // }
     const usersCache = new Map();
     const getUser = async (playbackId: string): Promise<User | null> => {
       if (usersCache.has(playbackId)) {
@@ -151,6 +141,7 @@ app.post(
     if (!Array.isArray(dataAr)) {
       res.status(400);
       res.end();
+      return;
     }
     for (const data of dataAr) {
       const hour = new Date(data.date * 1000).toUTCString();
@@ -220,7 +211,8 @@ app.post(
       const err = await addMany(data.date, data.region, data.file_name, rows);
       if (err) {
         logger.error(`Error saving row to db hour=${hour} err=${err}`);
-        process.exit(1);
+        res.status(500);
+        res.end(`${err}`);
       }
     }
 
@@ -232,10 +224,6 @@ app.post(
 
     res.status(200);
     res.end();
-    // if (output.length > 0 && newCursor) {
-    //   res.links({ next: makeNextHREF(req, newCursor) });
-    // }
-    // res.json(output);
   }
 );
 

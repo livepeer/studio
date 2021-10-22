@@ -15,7 +15,6 @@ import {
   Region,
   WebhookResponse,
   Session,
-  CdnUsage,
   CdnUsageLast,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
@@ -57,7 +56,6 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: Table<DBSession>;
-  cdnUsage: Table<CdnUsage>;
   cdnUsageLast: Table<CdnUsageLast>;
 
   postgresUrl: String;
@@ -143,10 +141,6 @@ export class DB {
       schema: schemas["webhook-response"],
     });
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
-    this.cdnUsage = makeTable<CdnUsage>({
-      db: this,
-      schema: schemas["cdn-usage"],
-    });
     this.cdnUsageLast = makeTable<CdnUsageLast>({
       db: this,
       schema: schemas["cdn-usage-last"],

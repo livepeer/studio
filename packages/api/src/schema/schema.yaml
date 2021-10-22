@@ -29,6 +29,50 @@ tags:
 
 components:
   schemas:
+    cdn-data-payload:
+      type: array
+      items:
+        type: object
+        required:
+          - region
+          - file_name
+          - date
+          - data
+        properties:
+          region:
+            type: string
+          file_name:
+            type: string
+          date:
+            type: number
+          data:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+                - unique_users
+                - total_sc_bytes
+              oneOf:
+                - required:
+                    - stream_id
+                - required:
+                    - playback_id
+              properties:
+                stream_id:
+                  type: string
+                playback_id:
+                  type: string
+                unique_users:
+                  type: number
+                total_filesize:
+                  type: number
+                total_cs_bytes:
+                  type: number
+                total_sc_bytes:
+                  type: number
+                count:
+                  type: number
     cdn-usage-last:
       type: object
       table: cdn_usage_last
@@ -48,42 +92,6 @@ components:
           type: string
           index: true
           unique: true
-    cdn-usage:
-      type: object
-      table: cdn_usage
-      required:
-        - date
-        - region
-        - playbackId
-      additionalProperties: false
-      properties:
-        id:
-          type: string
-          readOnly: true
-          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
-        date:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which stream object was created
-          index: true
-          # unique: true
-        region:
-          type: string
-        playbackId:
-          type: string
-          example: eaw4nk06ts2d0mzb
-          description: Used to form playback URL
-          index: true
-        uniqueUsers:
-          type: number
-        totalFileSize:
-          type: number
-        totalCsBytes:
-          type: number
-        totalScBytes:
-          type: number
-        count:
-          type: number
     webhook:
       type: object
       table: webhook
