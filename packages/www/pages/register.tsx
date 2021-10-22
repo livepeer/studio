@@ -10,6 +10,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { Register as Content } from "content/content";
 import useApi from "../hooks/use-api";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
@@ -53,7 +54,7 @@ const RegisterPage = () => {
     }
   };
   return (
-    <Layout title="Register - Livepeer.com" url="https://livepeer.com/register">
+    <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container

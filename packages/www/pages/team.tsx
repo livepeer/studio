@@ -7,14 +7,12 @@ import Guides from "@components/Marketing/Guides";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
+import { Team as PageContent } from "content/content";
 
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;
   return (
-    <Layout
-      title="Team - Livepeer.com"
-      description="We’re building the future of video infrastructure services."
-      url="https://livepeer.com/team">
+    <Layout {...PageContent.metaData}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container

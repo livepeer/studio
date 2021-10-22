@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
+import { Register as Content } from "content/content";
 
 const ResetPasswordPage = () => {
   useLoggedIn(false);
@@ -33,9 +34,7 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <Layout
-      title="Reset Password - Livepeer.com"
-      url={`https://livepeer.com/reset-password`}>
+    <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container

@@ -4,13 +4,11 @@ import Prefooter from "@components/Marketing/Prefooter";
 import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
 import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
 import Guides from "@components/Marketing/Guides";
+import { Pricing as Content } from "content/content";
 
 const PricingPage = () => {
   return (
-    <Layout
-      title="Pricing - Livepeer.com"
-      description="Start free. Then pay as you grow. Enjoy flexible pricing for projects of all sizes."
-      url="https://livepeer.com/pricing">
+    <Layout {...Content.metaData}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
