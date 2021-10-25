@@ -1,100 +1,19 @@
-import { SQLStatement } from "sql-template-strings";
-
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
 import { db } from "../store";
-import { FindOptions, FindQuery } from "../store/types";
 import logger from "../logger";
-import uuid from "uuid/v4";
-import { User } from "../schema/types";
+import { User, CdnDataPayload } from "../schema/types";
+import { CdnUsageRowReq } from "../store/cdn-usage-table";
 
 const app = Router();
 
-interface CdnUsageRowReq {
-  stream_id: string;
-  playback_id: string;
-  unique_users: number;
-  total_filesize: number;
-  total_cs_bytes: number;
-  total_sc_bytes: number;
-  count: number;
-  // filled in /api/cdn-data handler
-  user_id: string;
-  user_email: string;
-}
-
-interface SendData {
-  date: number;
-  region: string;
-  file_name: string;
-  data: Array<CdnUsageRowReq>;
-}
-
-async function addMany(
-  date: number,
-  region,
-  fileName: string,
-  rows: Array<CdnUsageRowReq>
-): Promise<Error> {
-  const name = "cdn_usage_reg";
-  const client = await db.pool.connect();
-  const newId = uuid();
-  console.log(
-    `-----> add many date=${date} region=${region} fileName=${fileName}`
-  );
-  try {
-    await client.query("BEGIN");
-    for (const tdoc of rows) {
-      await client.query(
-        `INSERT INTO ${name} VALUES (to_timestamp($1), $2, $3, $4, $5, $6, $7, $8, $9, $10)
-          ON CONFLICT (date, region, playback_id)
-          DO UPDATE SET 
-              unique_users = ${name}.unique_users + EXCLUDED.unique_users,
-              total_filesize = ${name}.total_filesize + EXCLUDED.total_filesize,
-              total_cs_bytes = ${name}.total_cs_bytes + EXCLUDED.total_cs_bytes,
-              total_sc_bytes = ${name}.total_sc_bytes + EXCLUDED.total_sc_bytes,
-              count = ${name}.count + EXCLUDED.count;
-          `,
-        [
-          date,
-          region,
-          tdoc.playback_id,
-          tdoc.user_id,
-          tdoc.user_email,
-          tdoc.unique_users,
-          tdoc.total_filesize,
-          tdoc.total_cs_bytes,
-          tdoc.total_sc_bytes,
-          tdoc.count,
-        ]
-      );
-    }
-    await client.query(
-      `INSERT INTO cdn_usage_last VALUES ($1, $2)
-          ON CONFLICT ((data ->> 'region'::text) )
-          DO UPDATE SET 
-            data = EXCLUDED.data
-      `,
-      [newId, JSON.stringify({ region, fileName })]
-    );
-    await client.query("COMMIT");
-  } catch (e) {
-    logger.warn(`--> error, rolling back`);
-    logger.info("--");
-    await client.query("ROLLBACK");
-    logger.warn(`--> error: ${e}`);
-    if (e.message.includes("duplicate key value")) {
-      // throw new BadRequestError(e.detail);
-      // return new BadRequestError(e.detail);
-    }
-    // throw e;
-    return e;
-  } finally {
-    client.release();
-  }
-  return null;
-}
+// interface SendData {
+//   date: number;
+//   region: string;
+//   file_name: string;
+//   data: Array<CdnUsageRowReq>;
+// }
 
 app.get("/region/:region", authMiddleware({}), async (req, res) => {
   const { region } = req.params;
@@ -136,7 +55,7 @@ app.post(
     };
 
     const start = Date.now();
-    const dataAr = req.body as Array<SendData>;
+    const dataAr = req.body as CdnDataPayload;
     console.log("Got data: ", JSON.stringify(dataAr, null, 2));
     if (!Array.isArray(dataAr)) {
       res.status(400);
@@ -154,8 +73,9 @@ app.post(
         if (row.playback_id) {
           const user = await getUser(row.playback_id);
           if (user) {
-            row.user_id = user.id;
-            row.user_email = user.email;
+            const urow = row as CdnUsageRowReq;
+            urow.user_id = user.id;
+            urow.user_email = user.email;
           }
         }
         if (row.stream_id) {
@@ -194,26 +114,36 @@ app.post(
             row.stream_id = null;
             const user = await getUser(row.playback_id);
             if (user) {
-              row.user_id = user.id;
-              row.user_email = user.email;
+              const urow = row as CdnUsageRowReq;
+              urow.user_id = user.id;
+              urow.user_email = user.email;
             }
           }
         }
       }
       // insert data into db
       // @ts-ignore
-      const rows = data.data.filter((obj) => obj.playback_id && obj.user_id);
-      const badRows = data.data.filter((obj) => !obj.playback_id);
+      const udata = data.data as Array<CdnUsageRowReq>;
+
+      const rows = udata.filter((obj) => obj.playback_id && obj.user_id);
+      const badRows = udata.filter((obj) => !obj.playback_id);
       console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2));
-      const badRows2 = data.data.filter((obj) => !obj.user_id);
+      const badRows2 = udata.filter((obj) => !obj.user_id);
       console.log(`==> bad rows 2:`, JSON.stringify(badRows2, null, 2));
       console.log(`==> good rows:`, JSON.stringify(rows, null, 2));
-      const err = await addMany(data.date, data.region, data.file_name, rows);
+      const err = await db.cdnUsageTable.addMany(
+        data.date,
+        data.region,
+        data.file_name,
+        rows
+      );
+      /*
       if (err) {
         logger.error(`Error saving row to db hour=${hour} err=${err}`);
         res.status(500);
         res.end(`${err}`);
       }
+      */
     }
 
     const regions = dataAr.reduce((a, v) => [...a, v.region], []);

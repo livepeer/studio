@@ -23,6 +23,7 @@ import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
+import { CdnUsageTable } from "./cdn-usage-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -57,6 +58,7 @@ export class DB {
   region: Table<Region>;
   session: Table<DBSession>;
   cdnUsageLast: Table<CdnUsageLast>;
+  cdnUsageTable: CdnUsageTable;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -156,7 +158,8 @@ export class DB {
       })
     );
 
-    await createCdnUsageRegTable(this);
+    this.cdnUsageTable = new CdnUsageTable(this);
+    await this.cdnUsageTable.makeTable();
   }
 
   queryWithOpts<T, I extends any[] = any[]>(
@@ -249,25 +252,6 @@ async function ensureDatabase(postgresUrl) {
   logger.info(`Created database ${dbName}`);
   pool.end();
   adminPool.end();
-}
-
-async function createCdnUsageRegTable(db) {
-  await db.query(`
-          CREATE TABLE IF NOT EXISTS cdn_usage_reg (
-            date timestamp without time zone NOT NULL,
-            region character varying(128) COLLATE pg_catalog."default" NOT NULL,
-            playback_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
-            user_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
-            user_email character varying(512) COLLATE pg_catalog."default" NOT NULL,
-            unique_users integer NOT NULL,
-            total_filesize bigint NOT NULL,
-            total_cs_bytes bigint NOT NULL,
-            total_sc_bytes bigint NOT NULL,
-            count integer NOT NULL,
-            CONSTRAINT prim PRIMARY KEY (date, region, playback_id)
-          );
-        `);
-  logger.info(`Created table cdn_usage_reg`);
 }
 
 export default new DB();
