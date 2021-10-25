@@ -29,7 +29,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
   const elements = useElements();
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   function createPaymentMethod({
     cardElement,
@@ -275,9 +275,9 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                     style: {
                       base: {
                         backgroundColor:
-                          theme === "light" ? "white" : "#161618",
+                          resolvedTheme === "light" ? "white" : "#161618",
                         iconColor: "#5746af",
-                        color: theme === "light" ? "#161618" : "white",
+                        color: resolvedTheme === "light" ? "#161618" : "white",
                         fontWeight: "500",
                         fontFamily:
                           "Inter, Roboto, Open Sans, Segoe UI, sans-serif",
