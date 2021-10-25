@@ -1,3 +1,9 @@
+/**
+ * It is managed meta title, url, description tags to the hard-coded pages
+ * hard-coded pages: Home, Login, Pricing, Register, ResetPassword. ForgotPassword, Team, Contact
+ * @TODO: We will manage these contents from within the CMS in the future
+ */
+
 export const Home = {
   metaData: {
     title: "Home - Livepeer.com",
