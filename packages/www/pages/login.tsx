@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
-import { Login as Content } from "content/content";
+import { Login as Content } from "content";
 
 const LoginPage = () => {
   useLoggedIn(false);

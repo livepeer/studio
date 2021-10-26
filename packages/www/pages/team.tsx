@@ -7,7 +7,7 @@ import Guides from "@components/Marketing/Guides";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
-import { Team as PageContent } from "content/content";
+import { Team as PageContent } from "content";
 
 const TeamPage = ({ content }) => {
   const [, { teamMembers }] = content;

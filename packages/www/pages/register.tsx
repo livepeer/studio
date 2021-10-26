@@ -10,7 +10,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Register as Content } from "content/content";
+import { Register as Content } from "content";
 import useApi from "../hooks/use-api";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";

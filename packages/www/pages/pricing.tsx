@@ -4,7 +4,7 @@ import Prefooter from "@components/Marketing/Prefooter";
 import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
 import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
 import Guides from "@components/Marketing/Guides";
-import { Pricing as Content } from "content/content";
+import { Pricing as Content } from "content";
 
 const PricingPage = () => {
   return (

@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
-import { ForgotPassword as Content } from "content/content";
+import { ForgotPassword as Content } from "content";
 
 const ForgotPasswordPage = () => {
   useLoggedIn(false);

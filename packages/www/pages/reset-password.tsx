@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
-import { Register as Content } from "content/content";
+import { Register as Content } from "content";
 
 const ResetPasswordPage = () => {
   useLoggedIn(false);

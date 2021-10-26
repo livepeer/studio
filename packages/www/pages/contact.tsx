@@ -16,7 +16,7 @@ import Button from "@components/Marketing/Button";
 import Prefooter from "@components/Marketing/Prefooter";
 import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
-import { Contact as Content } from "content/content";
+import { Contact as Content } from "content";
 
 const ContactPage = () => {
   const router = useRouter();

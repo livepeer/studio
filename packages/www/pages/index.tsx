@@ -5,7 +5,7 @@ import Investors from "@components/Marketing/Investors";
 import Testimonials from "@components/Marketing/Testimonials";
 import Contact from "@components/Marketing/Contact";
 import Why from "@components/Marketing/Why";
-import { Home as Content } from "content/content";
+import { Home as Content } from "content";
 
 const benefitsListItems = [
   {
