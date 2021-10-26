@@ -83,16 +83,22 @@ const WebhookDetail = () => {
                   p: "$3",
                   width: "100%",
                   borderBottom: "1px solid $colors$mauve7",
-                  fd: "column-reverse",
-                  ai: "flex-end",
                   gap: "$3",
-                  "@bp3": {
-                    fd: "row",
-                    ai: "flex-start",
-                    jc: "space-between",
-                  },
+                  fd: "row",
+                  ai: "center",
+                  jc: "space-between",
                 }}>
-                <Heading size="2">{data.url}</Heading>
+                <Heading
+                  size="2"
+                  css={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    width: "100%",
+                    ai: "flex-start",
+                  }}>
+                  {data.url}
+                </Heading>
                 <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
                   <AlertDialog open={deleteDialogOpen}>
                     <Button
