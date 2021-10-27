@@ -5,6 +5,7 @@ import Investors from "@components/Marketing/Investors";
 import Testimonials from "@components/Marketing/Testimonials";
 import Contact from "@components/Marketing/Contact";
 import Why from "@components/Marketing/Why";
+import { Home as Content } from "content";
 
 const benefitsListItems = [
   {
@@ -86,7 +87,7 @@ const featuresListItems = [
 
 const HomePage = () => {
   return (
-    <Layout title="Home - Livepeer.com" url="https://livepeer.com">
+    <Layout {...Content.metaData}>
       <HomeHero />
       <Why
         backgroundColor="$panel"

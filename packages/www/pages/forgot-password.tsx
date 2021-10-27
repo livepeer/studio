@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
+import { ForgotPassword as Content } from "content";
 
 const ForgotPasswordPage = () => {
   useLoggedIn(false);
@@ -45,9 +46,7 @@ const ForgotPasswordPage = () => {
     );
   }
   return (
-    <Layout
-      title="Forgot Password - Livepeer.com"
-      url="https://livepeer.com/forgot-password">
+    <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container

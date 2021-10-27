@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
+import { Login as Content } from "content";
 
 const LoginPage = () => {
   useLoggedIn(false);
@@ -29,7 +30,7 @@ const LoginPage = () => {
     }
   };
   return (
-    <Layout title="Login - Livepeer.com" url="https://livepeer.com/login">
+    <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container
