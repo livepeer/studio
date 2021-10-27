@@ -100,10 +100,9 @@ const DocsIndex = ({ doc, menu }) => {
   globalStyles();
 
   const resolvedSEO: NextSeoProps = useMemo(() => {
-    const title = doc.frontMatter.title
-      ? `${doc.frontMatter.title} - Livepeer.com`
-      : defaultSEO.title;
-    const description = doc.frontMatter.description ?? defaultSEO.description;
+    const title = doc.frontMatter.metaTitle || defaultSEO.title;
+    const description =
+      doc.frontMatter.metaDescription || defaultSEO.description;
     const url = `https://livepeer.com${router.asPath}`;
     return {
       ...defaultSEO,
