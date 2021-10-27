@@ -48,6 +48,10 @@ const Post = ({
   preview,
   contentRaw,
   furtherReading,
+  metaTitle,
+  metaDescription,
+  metaUrl,
+  openGraphImage,
 }) => {
   const { isFallback, asPath } = useRouter();
   if (isFallback) {
@@ -60,13 +64,17 @@ const Post = ({
   const text = blocksToText(contentRaw);
   const stats = readingTime(text);
   const builder = imageUrlBuilder(client as any);
+
   return (
     <Layout
-      title={`${title} - Livepeer.com`}
-      description={excerpt}
+      title={metaTitle}
+      description={metaDescription}
       noindex={noindex}
-      image={{ url: builder.image(mainImage).url(), alt: mainImage?.alt }}
-      url={`https://livepeer.com${asPath}`}
+      image={{
+        url: builder.image(openGraphImage).url(),
+        alt: openGraphImage?.alt,
+      }}
+      url={metaUrl}
       preview={preview}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>

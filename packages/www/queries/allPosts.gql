@@ -43,5 +43,14 @@ query allPost($where: PostFilter) {
     excerpt
     body
     contentRaw
+    metaTitle
+    metaDescription
+    metaUrl
+    openGraphImage {
+      asset {
+        altText
+        url
+      }
+    }
   }
 }
