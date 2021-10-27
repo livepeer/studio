@@ -179,6 +179,26 @@ const config = {
         destination: "/dashboard/stream-health",
         permanent: false,
       },
+      {
+        source: "/blog/docs/guides/start-live-streaming/broadcasting",
+        destination: "/docs/guides/start-live-streaming/broadcasting",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/plans",
+        destination: "/dashboard/billing/plans",
+        permanent: false,
+      },
+      {
+        source: "/docs/api-reference/stream/stream",
+        destination: "/docs/api-reference/stream",
+        permanent: false,
+      },
+      {
+        source: "/docs/docs/guides/start-live-streaming/verify",
+        destination: "/docs/guides/start-live-streaming/verify",
+        permanent: false,
+      },
     ];
   },
 };
