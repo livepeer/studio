@@ -1,4 +1,5 @@
 import apiToken from "./api-token";
+import auth from "./auth";
 import broadcaster from "./broadcaster";
 import ingest from "./ingest";
 import objectStore from "./object-store";
@@ -19,6 +20,7 @@ import cdnData from "./cdn-data";
 // Annoying but necessary to get the routing correct
 export default {
   "api-token": apiToken,
+  auth,
   broadcaster,
   "object-store": objectStore,
   multistream,
