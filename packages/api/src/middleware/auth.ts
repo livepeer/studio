@@ -1,3 +1,4 @@
+import { URL } from "url";
 import basicAuth from "basic-auth";
 import { RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -40,6 +41,7 @@ interface AuthParams {
   admin?: boolean;
   anyAdmin?: boolean;
   noApiToken?: boolean;
+  originalUriHeader?: string;
 }
 
 /**
@@ -106,8 +108,14 @@ function authFactory(params: AuthParams): RequestHandler {
     }
     const accessRules = tokenObject?.access?.rules;
     if (accessRules) {
-      const fullPath = pathJoin2(req.baseUrl, req.path);
-      const { httpPrefix } = req.config;
+      let fullPath = pathJoin2(req.baseUrl, req.path);
+      let { httpPrefix } = req.config;
+      if (params.originalUriHeader) {
+        const header = req.headers[params.originalUriHeader];
+        const originalUri = new URL(header?.toString() ?? "");
+        fullPath = originalUri.pathname;
+        httpPrefix = null;
+      }
       if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
