@@ -67,3 +67,11 @@ export const Contact = {
     url: `https://livepeer.com/contact`,
   },
 };
+
+export const Blog = {
+  metaData: {
+    title: "Blog - Livepeer.com",
+    description: `Blog posts from the Livepeer.com team and community. Discover the latest in video development.`,
+    url: "https://livepeer.com/blog",
+  },
+};
