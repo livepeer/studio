@@ -36,7 +36,7 @@ components:
         https://support.highwinds.com/hc/en-us/articles/360052181571-Raw-Log-Access-through-GCS
       additionalProperties: false
       required:
-        - unique_users
+        - unique_client_ips
         - total_sc_bytes
       # oneOf: # allows validation, but generates too generic type definition
       #   - required:
@@ -50,7 +50,7 @@ components:
         playback_id:
           type: string
           description: Playback ID.
-        unique_users:
+        unique_client_ips:
           type: number
           description:
             Number of unique IP addresses of clients. Not accurate because

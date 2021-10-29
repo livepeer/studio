@@ -100,7 +100,7 @@ app.post(
             playbackRow.total_cs_bytes += row.total_cs_bytes;
             playbackRow.total_sc_bytes += row.total_sc_bytes;
             playbackRow.total_filesize += row.total_filesize;
-            playbackRow.unique_users += row.unique_users;
+            playbackRow.unique_client_ips += row.unique_client_ips;
           } else {
             row.playback_id = stream.playbackId;
             row.stream_id = null;

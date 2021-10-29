@@ -25,7 +25,7 @@ export class CdnUsageTable {
             playback_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
             user_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
             user_email character varying(512) COLLATE pg_catalog."default" NOT NULL,
-            unique_users integer NOT NULL,
+            unique_client_ips integer NOT NULL,
             total_filesize bigint NOT NULL,
             total_cs_bytes bigint NOT NULL,
             total_sc_bytes bigint NOT NULL,
@@ -68,7 +68,7 @@ export class CdnUsageTable {
           `INSERT INTO ${name} VALUES (to_timestamp($1), $2, $3, $4, $5, $6, $7, $8, $9, $10)
           ON CONFLICT (date, region, playback_id)
           DO UPDATE SET 
-              unique_users = ${name}.unique_users + EXCLUDED.unique_users,
+              unique_client_ips = ${name}.unique_client_ips + EXCLUDED.unique_client_ips,
               total_filesize = ${name}.total_filesize + EXCLUDED.total_filesize,
               total_cs_bytes = ${name}.total_cs_bytes + EXCLUDED.total_cs_bytes,
               total_sc_bytes = ${name}.total_sc_bytes + EXCLUDED.total_sc_bytes,
@@ -80,7 +80,7 @@ export class CdnUsageTable {
             tdoc.playback_id,
             tdoc.user_id,
             tdoc.user_email,
-            tdoc.unique_users,
+            tdoc.unique_client_ips,
             tdoc.total_filesize,
             tdoc.total_cs_bytes,
             tdoc.total_sc_bytes,
