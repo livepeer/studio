@@ -8,13 +8,6 @@ import { CdnUsageRowReq } from "../store/cdn-usage-table";
 
 const app = Router();
 
-// interface SendData {
-//   date: number;
-//   region: string;
-//   file_name: string;
-//   data: Array<CdnUsageRowReq>;
-// }
-
 app.get("/region/:region", authMiddleware({}), async (req, res) => {
   const { region } = req.params;
   if (!region) {
@@ -69,7 +62,6 @@ app.post(
       }
       // aggregate stream_ids into playback_ids
       for (const row of data.data) {
-        // console.log(`===> checking row `, row)
         if (row.playback_id) {
           const user = await getUser(row.playback_id);
           if (user) {
@@ -126,24 +118,12 @@ app.post(
       const udata = data.data as Array<CdnUsageRowReq>;
 
       const rows = udata.filter((obj) => obj.playback_id && obj.user_id);
-      const badRows = udata.filter((obj) => !obj.playback_id);
-      console.log(`==> bad rows:`, JSON.stringify(badRows, null, 2));
-      const badRows2 = udata.filter((obj) => !obj.user_id);
-      console.log(`==> bad rows 2:`, JSON.stringify(badRows2, null, 2));
-      console.log(`==> good rows:`, JSON.stringify(rows, null, 2));
       const err = await db.cdnUsageTable.addMany(
         data.date,
         data.region,
         data.file_name,
         rows
       );
-      /*
-      if (err) {
-        logger.error(`Error saving row to db hour=${hour} err=${err}`);
-        res.status(500);
-        res.end(`${err}`);
-      }
-      */
     }
 
     const regions = dataAr.reduce((a, v) => [...a, v.region], []);

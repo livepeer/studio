@@ -33,6 +33,19 @@ export class CdnUsageTable {
             CONSTRAINT prim PRIMARY KEY (date, region, playback_id)
           );
         `);
+    await this.db.query(`
+        CREATE INDEX IF NOT EXISTS userind
+          ON public.cdn_usage_reg USING hash
+          (user_id COLLATE pg_catalog."default")
+          TABLESPACE pg_default;
+        `);
+    await this.db.query(`
+        CREATE INDEX IF NOT EXISTS playbackid
+          ON public.cdn_usage_reg USING hash
+          (playback_id COLLATE pg_catalog."default")
+          TABLESPACE pg_default;
+        `);
+
     logger.info(`Created table cdn_usage_reg`);
   }
 
