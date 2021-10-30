@@ -15,6 +15,7 @@ import {
   Region,
   WebhookResponse,
   Session,
+  CdnUsageLast,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
@@ -22,6 +23,7 @@ import { kebabToCamel } from "../util";
 import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
+import { CdnUsageTable } from "./cdn-usage-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -55,6 +57,8 @@ export class DB {
   passwordResetToken: Table<PasswordResetToken>;
   region: Table<Region>;
   session: Table<DBSession>;
+  cdnUsageLast: Table<CdnUsageLast>;
+  cdnUsageTable: CdnUsageTable;
 
   postgresUrl: String;
   replicaUrl: String;
@@ -139,6 +143,10 @@ export class DB {
       schema: schemas["webhook-response"],
     });
     this.session = makeTable<Session>({ db: this, schema: schemas["session"] });
+    this.cdnUsageLast = makeTable<CdnUsageLast>({
+      db: this,
+      schema: schemas["cdn-usage-last"],
+    });
 
     const tables = Object.entries(schema.components.schemas).filter(
       ([name, schema]) => "table" in schema && schema.table
@@ -149,6 +157,9 @@ export class DB {
         return this[camelName].ensureTable();
       })
     );
+
+    this.cdnUsageTable = new CdnUsageTable(this);
+    await this.cdnUsageTable.makeTable();
   }
 
   queryWithOpts<T, I extends any[] = any[]>(

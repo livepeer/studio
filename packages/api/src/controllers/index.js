@@ -14,6 +14,7 @@ import admin from "./admin";
 import usage from "./usage";
 import region from "./region";
 import session from "./session";
+import cdnData from "./cdn-data";
 
 // Annoying but necessary to get the routing correct
 export default {
@@ -33,4 +34,5 @@ export default {
   admin,
   usage,
   session,
+  "cdn-data": cdnData,
 };

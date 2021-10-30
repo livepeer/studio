@@ -29,6 +29,85 @@ tags:
 
 components:
   schemas:
+    cdn-data-row:
+      type: object
+      description:
+        Fields names taken from log format description
+        https://support.highwinds.com/hc/en-us/articles/360052181571-Raw-Log-Access-through-GCS
+      additionalProperties: false
+      required:
+        - unique_client_ips
+        - total_sc_bytes
+      # oneOf: # allows validation, but generates too generic type definition
+      #   - required:
+      #       - stream_id
+      #   - required:
+      #       - playback_id
+      properties:
+        stream_id:
+          type: string
+          description: Session UUID. Used in recordings URLs.
+        playback_id:
+          type: string
+          description: Playback ID.
+        unique_client_ips:
+          type: number
+          description:
+            Number of unique IP addresses of clients. Not accurate because
+            StackPath zeroes last part of the IP address.
+        total_filesize:
+          type: number
+          description: Size of the asset being delivered.
+        total_cs_bytes:
+          type: number
+          description: The total size of the request header.
+        total_sc_bytes:
+          type: number
+          description: Total bytes in the response to the client.
+        count:
+          type: number
+          description: Number of parsed log lines
+    cdn-data-payload:
+      type: array
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - region
+          - file_name
+          - date
+          - data
+        properties:
+          region:
+            type: string
+          file_name:
+            type: string
+          date:
+            type: number
+          data:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/components/schemas/cdn-data-row"
+    cdn-usage-last:
+      type: object
+      table: cdn_usage_last
+      required:
+        - region
+        - fileName
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        fileName:
+          type: number
+          index: true
+        region:
+          type: string
+          index: true
+          unique: true
     webhook:
       type: object
       table: webhook
