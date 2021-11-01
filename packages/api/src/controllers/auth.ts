@@ -22,7 +22,7 @@ app.use(
     if (!hasAccess) {
       return res.status(403).json({ errors: ["access forbidden"] });
     }
-    res.status(200);
+    res.status(204).end();
   }
 );
 
