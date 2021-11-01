@@ -17,13 +17,21 @@ import Code from "@components/Marketing/Code";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
 
-const Page = ({ title, slug, body, noindex = false, preview }) => {
+const Page = ({
+  title,
+  metaTitle,
+  metaDescription,
+  metaUrl,
+  body,
+  noindex = false,
+  preview,
+}) => {
   return (
     <Layout
-      title={`${title} - Livepeer.com`}
-      description="Join Us. From Anywhere."
-      url={`https://livepeer.com/jobs/${slug}`}
-      canonical={`https://livepeer.com/jobs/${slug}`}
+      title={metaTitle}
+      description={metaDescription}
+      url={metaUrl}
+      canonical={metaUrl}
       noindex={noindex}
       preview={preview}>
       <Guides />
