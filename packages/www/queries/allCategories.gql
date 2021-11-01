@@ -4,5 +4,14 @@
     slug {
       current
     }
+    metaTitle
+    metaDescription
+    metaUrl
+    openGraphImage {
+      asset {
+        altText
+        url
+      }
+    }
   }
 }

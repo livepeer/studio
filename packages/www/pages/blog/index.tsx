@@ -1,3 +1,4 @@
+import { FC } from "react";
 import {
   Box,
   Container,
@@ -20,8 +21,31 @@ import Layout from "layouts/main";
 import Link from "next/link";
 import Prefooter from "@components/Marketing/Prefooter";
 import Guides from "@components/Marketing/Guides";
+import { Blog as BlogContent } from "content";
 
-const BlogIndex = ({ categories, posts }) => {
+type Category = {
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  metaUrl: string;
+  slug: {
+    current: string;
+  };
+};
+
+type Post = {
+  _id: string;
+  title: string;
+  _createdAt: string;
+  featured: boolean;
+};
+
+type Props = {
+  categories: Category[];
+  posts: Post[];
+};
+
+const BlogIndex: FC<Props> = ({ categories, posts }) => {
   const router = useRouter();
   const {
     query: { slug },
@@ -48,17 +72,19 @@ const BlogIndex = ({ categories, posts }) => {
     featuredPost = posts[0];
   }
 
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
+  const seoData =
+    asPath === "/blog"
+      ? BlogContent.metaData
+      : categories
+          .filter((category) => category.slug.current === slug)
+          .map((category) => ({
+            title: category.metaTitle,
+            description: category.metaDescription,
+            url: category.metaUrl,
+          }))?.[0];
 
   return (
-    <Layout
-      title={`Blog - ${
-        slug ? capitalizeFirstLetter(slug) + " Category - " : ""
-      }Livepeer.com`}
-      description="Blog posts from the Livepeer.com team and community. Discover the latest in video development."
-      url={`https://livepeer.com${asPath}`}>
+    <Layout {...seoData}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
