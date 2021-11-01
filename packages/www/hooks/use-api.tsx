@@ -60,6 +60,7 @@ export interface Ingest {
 }
 
 const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
+
 const storeToken = (token) => {
   try {
     localStorage.setItem(PERSISTENT_TOKEN, token);
@@ -80,7 +81,7 @@ const trackPageView = (email, path = null) => {
   _hsq.push(["trackPageView"]);
 };
 
-const getStoredToken = () => {
+export const getStoredToken = () => {
   if (!process.browser) {
     return null;
   }

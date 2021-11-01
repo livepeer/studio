@@ -1,6 +1,7 @@
-import { useContext, createContext, ReactNode } from "react";
+import { useContext, useMemo, createContext, ReactNode } from "react";
 
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
+import { getStoredToken } from "./use-api";
 
 const useLocalAnalyzer = false;
 const defaultRegion = "nyc";
@@ -101,7 +102,7 @@ const makeUrl = (region: string, path: string) => {
 };
 
 class AnalyzerClient {
-  constructor() {}
+  constructor(private authToken: string) {}
 
   fetchJson = async <T,>(
     region: string,
@@ -110,6 +111,9 @@ class AnalyzerClient {
   ) => {
     const url = makeUrl(region, path);
     const headers = new Headers(opts.headers || {});
+    if (this.authToken && !headers.has("authorization")) {
+      headers.set("authorization", `JWT ${this.authToken}`);
+    }
     const res = await fetch(url, {
       ...opts,
       headers,
@@ -153,10 +157,11 @@ class AnalyzerClient {
   };
 }
 
-export const AnalyzerContext = createContext(new AnalyzerClient());
+export const AnalyzerContext = createContext(new AnalyzerClient(null));
 
 export const AnalyzerProvider = ({ children }: { children: ReactNode }) => {
-  const value = new AnalyzerClient();
+  const authToken = getStoredToken();
+  const value = useMemo(() => new AnalyzerClient(authToken), [authToken]);
   return <AnalyzerContext.Provider value={value} children={children} />;
 };
 
