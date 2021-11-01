@@ -18,7 +18,7 @@ app.use(
     if (!exists) {
       return res.status(404).json({ errors: ["not found"] });
     }
-    const hasAccess = stream?.userId === req.user.id || req.isUIAdmin;
+    const hasAccess = stream?.userId === req.user.id || req.user.admin;
     if (!hasAccess) {
       return res.status(403).json({ errors: ["access forbidden"] });
     }
