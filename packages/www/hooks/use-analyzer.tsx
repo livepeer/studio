@@ -1,3 +1,4 @@
+import EventSource from "eventsource";
 import { useContext, useMemo, createContext, ReactNode } from "react";
 
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -145,7 +146,11 @@ class AnalyzerClient {
     const qs = !from ? "" : "?from=" + from;
     const url = makeUrl(region, path + qs);
 
-    const sse = new EventSource(url, {});
+    const sse = new EventSource(url, {
+      headers: {
+        authorization: `JWT ${this.authToken}`,
+      },
+    });
     sse.addEventListener("lp_event", (e: MessageEvent) => {
       handler(JSON.parse(e.data));
     });
