@@ -2,10 +2,12 @@ query allUseCase($where: UseCaseFilter) {
   allUseCase(where: $where) {
     _id
     title
-    description
     slug {
       current
     }
+    metaTitle
+    metaDescription
+    metaUrl
     openGraphImage {
       asset {
         altText
