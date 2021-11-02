@@ -326,7 +326,7 @@ const SaveTargetDialog = ({
               />
               <Tooltip content="Mute audio and multistream a silent video.">
                 <Label css={{ pl: "$2" }} htmlFor="videoOnly">
-                  Video-only
+                  Mute Audio
                 </Label>
               </Tooltip>
             </Box>
