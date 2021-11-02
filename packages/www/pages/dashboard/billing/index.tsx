@@ -17,6 +17,7 @@ import PaymentMethod from "components/Dashboard/PaymentMethod";
 import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
+import { DashboardBilling as Content } from "content";
 
 const Billing = () => {
   useLoggedIn();
@@ -83,7 +84,10 @@ const Billing = () => {
     return <Layout />;
   }
   return (
-    <Layout id="billing" breadcrumbs={[{ title: "Billing" }]}>
+    <Layout
+      id="billing"
+      breadcrumbs={[{ title: "Billing" }]}
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
           <Flex

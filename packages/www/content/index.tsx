@@ -75,3 +75,51 @@ export const Blog = {
     url: "https://livepeer.com/blog",
   },
 };
+
+export const Dashboard = {
+  metaData: {
+    title: "Dashboard - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
+export const DashboardBilling = {
+  metaData: {
+    title: "Billing - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
+export const DashboardPlans = {
+  metaData: {
+    title: "Plans - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
+export const DashboardAPIkeys = {
+  metaData: {
+    title: "API Keys - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
+export const DashboardStream = {
+  metaData: {
+    title: "Stream - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
+export const DashboardStreamHealth = {
+  metaData: {
+    title: "Stream Health - Livepeer.com",
+    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};

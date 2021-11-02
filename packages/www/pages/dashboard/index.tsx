@@ -14,6 +14,7 @@ import { useLoggedIn, useApi } from "hooks";
 import InfoIcon from "../../public/img/icons/info.svg";
 import Link from "next/link";
 import { products } from "@livepeer.com/api/src/config";
+import { Dashboard as Content } from "content";
 
 const Dashboard = () => {
   useLoggedIn();
@@ -25,7 +26,7 @@ const Dashboard = () => {
   const showPromo = !products[user.stripeProductId].order;
 
   return (
-    <Layout id="home" breadcrumbs={[{ title: "Home" }]}>
+    <Layout id="home" breadcrumbs={[{ title: "Home" }]} {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         {showPromo && (
           <Promo size="2" css={{ mb: "$7" }}>

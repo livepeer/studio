@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api";
 import Chart from "components/Dashboard/Chart";
 import Player from "components/Dashboard/Player";
+import { DashboardStreamHealth as Content } from "content";
 
 const Arrow = ({ active }: Props) => {
   return (
@@ -119,7 +120,10 @@ const Health = () => {
   }, [getIngestRate, info]);
 
   return (
-    <Layout id="streamHealth" breadcrumbs={[{ title: "Stream Health" }]}>
+    <Layout
+      id="streamHealth"
+      breadcrumbs={[{ title: "Stream Health" }]}
+      {...Content.metaData}>
       <Box css={{ padding: "$6" }}>
         <Flex
           css={{

@@ -2,6 +2,7 @@ import Layout from "../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import Plans from "components/Dashboard/Plans";
+import { DashboardPlans as Content } from "content";
 
 const PlansPage = () => {
   useLoggedIn();
@@ -16,7 +17,8 @@ const PlansPage = () => {
       breadcrumbs={[
         { title: "Billing", href: "/dashboard/billing" },
         { title: "Plans" },
-      ]}>
+      ]}
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$6" }}>
           <Flex

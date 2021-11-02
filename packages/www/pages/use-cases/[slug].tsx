@@ -12,8 +12,9 @@ import client from "../../lib/client";
 import imageUrlBuilder from "@sanity/image-url";
 
 const UseCase = ({
-  title,
-  description,
+  metaTitle,
+  metaDescription,
+  metaUrl,
   openGraphImage,
   hero,
   noindex = false,
@@ -42,8 +43,8 @@ const UseCase = ({
 
   return (
     <Layout
-      title={`${title}`}
-      description={description ? description : hero.description}
+      title={metaTitle}
+      description={metaDescription}
       noindex={noindex}
       image={
         openGraphImage
@@ -53,7 +54,7 @@ const UseCase = ({
             }
           : null
       }
-      url={`https://livepeer.com${asPath}`}
+      url={metaUrl}
       preview={preview}>
       <Hero
         tagline="Use cases"

@@ -3,7 +3,15 @@ query allPage($where: PageFilter) {
   allPage(where: $where) {
     _id
     title
-    description
+    metaTitle
+    metaDescription
+    metaUrl
+    openGraphImage {
+      asset {
+        altText
+        url
+      }
+    }
     slug {
       current
     }

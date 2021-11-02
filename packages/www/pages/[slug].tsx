@@ -1,5 +1,7 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
+import client from "lib/client";
+import imageUrlBuilder from "@sanity/image-url";
 import DefaultError from "@components/Marketing/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
@@ -11,12 +13,16 @@ import { Box } from "@livepeer.com/design-system";
 const Page = ({
   title,
   slug,
-  description,
+  metaTitle,
+  metaDescription,
+  metaUrl,
+  openGraphImage,
   content,
   noindex = false,
   preview,
 }) => {
   const router = useRouter();
+  const builder = imageUrlBuilder(client as any);
 
   if (router.isFallback) {
     return (
@@ -40,10 +46,14 @@ const Page = ({
 
   return (
     <Layout
-      title={`${title} - Livepeer.com`}
-      description={description}
-      url={`https://livepeer.com/${slug.current}`}
+      title={metaTitle}
+      description={metaDescription}
       noindex={noindex}
+      image={{
+        url: builder.image(openGraphImage).url(),
+        alt: openGraphImage?.asset?.altText,
+      }}
+      url={metaUrl}
       preview={preview}>
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
