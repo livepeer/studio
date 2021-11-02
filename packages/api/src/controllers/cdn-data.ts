@@ -55,6 +55,7 @@ app.post(
       res.end();
       return;
     }
+    let rowsNum = 0;
     for (const data of dataAr) {
       const hour = new Date(data.date * 1000).toUTCString();
       if (!data.data?.length) {
@@ -118,18 +119,21 @@ app.post(
       const udata = data.data as Array<CdnUsageRowReq>;
 
       const rows = udata.filter((obj) => obj.playback_id && obj.user_id);
-      const err = await db.cdnUsageTable.addMany(
+      await db.cdnUsageTable.addMany(
         data.date,
         data.region,
         data.file_name,
         rows
       );
+      rowsNum += rows.length;
     }
 
     const regions = dataAr.reduce((a, v) => [...a, v.region], []);
     const hours = dataAr.reduce((a, v) => [...a, v.date], []);
     logger.info(
-      `done regions=${regions} hours=${hours} elapsed=${Date.now() - start}ms`
+      `done regions=${regions} hours=${hours} rows=${rowsNum} elapsed=${
+        Date.now() - start
+      }ms`
     );
 
     res.status(200);
