@@ -8,7 +8,8 @@ import { db } from "../store";
 
 const app = Router();
 
-app.use(
+app.all(
+  "/",
   authMiddleware({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
     const streamId = req.headers["x-livepeer-stream-id"];
