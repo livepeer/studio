@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
+import { NextSeo } from "next-seo";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -70,6 +71,12 @@ interface Props {
   breadcrumbs?: Breadcrumb[];
   id?: string;
   requireLoggedIn?: boolean;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  image?: any;
+  url?: string;
+  canonical?: string;
 }
 
 function ContextProviders({ children }) {
@@ -92,6 +99,12 @@ function DashboardLayout({
   id,
   children,
   breadcrumbs,
+  title,
+  description,
+  noindex = true,
+  image,
+  url,
+  canonical,
   requireLoggedIn = true,
 }: Props) {
   useEffect(() => {
@@ -103,6 +116,29 @@ function DashboardLayout({
 
   globalStyles();
 
+  let seo = {
+    title,
+    description,
+    noindex,
+    openGraph: {
+      title,
+      description,
+      url,
+      images: [
+        {
+          url: image ? image.url : "https://livepeer.com/img/OG.png",
+          alt: image ? image.alt : "Livepeer.com",
+          width: 1200,
+          height: 642,
+        },
+      ],
+    },
+  };
+
+  if (canonical) {
+    seo["canonical"] = canonical;
+  }
+
   return (
     <>
       {requireLoggedIn && <DashboardRedirect />}
@@ -110,6 +146,7 @@ function DashboardLayout({
         <Head>
           <meta name="viewport" content="width=1023" />
         </Head>
+        <NextSeo {...seo} />
         <Sidebar id={id} />
         <Box css={{ pl: 270, width: "100%" }}>
           <Header breadcrumbs={breadcrumbs} />
