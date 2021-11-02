@@ -133,7 +133,10 @@ app.post(
     );
 
     res.status(200);
-    res.end();
+    res.json({
+      regions,
+      hours,
+    });
   }
 );
 
