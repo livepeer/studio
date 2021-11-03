@@ -159,7 +159,10 @@ const Health = () => {
             marginTop: "34px",
           }}>
           <Box>
-            <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
+            <Heading
+              as="h2"
+              size="1"
+              css={{ fontWeight: 600, marginBottom: "$2" }}>
               Source Stream
             </Heading>
             <Text
@@ -177,7 +180,10 @@ const Health = () => {
           </Box>
           <Arrow active />
           <Box>
-            <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
+            <Heading
+              as="h2"
+              size="1"
+              css={{ fontWeight: 600, marginBottom: "$2" }}>
               Source + Transcoded Renditions
             </Heading>
             <Text
@@ -195,7 +201,10 @@ const Health = () => {
           </Box>
         </Box>
         <Box css={{ my: "$8" }}>
-          <Heading size="1" css={{ fontWeight: 600, marginBottom: "$2" }}>
+          <Heading
+            as="h2"
+            size="1"
+            css={{ fontWeight: 600, marginBottom: "$2" }}>
             Session ingest rate
           </Heading>
           <Text
