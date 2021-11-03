@@ -43,6 +43,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
         }}>
         <Heading
           size="4"
+          as="h2"
           css={{
             color: "white",
             fontWeight: 700,
