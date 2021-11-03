@@ -33,6 +33,22 @@ const Login = ({
     }
   }, [router?.query?.email]);
 
+  const onClick = async () => {
+    if (!showPassword) {
+      return onSubmit({ email });
+    }
+    const [hashedPassword] = await hash(password, FRONTEND_SALT);
+    // hash password, then
+    onSubmit({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      organization,
+      phone,
+    });
+  };
+
   return (
     <Box
       css={{
@@ -40,23 +56,7 @@ const Login = ({
         width: "100%",
       }}>
       <Box
-        as="form"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          if (!showPassword) {
-            return onSubmit({ email });
-          }
-          const [hashedPassword] = await hash(password, FRONTEND_SALT);
-          // hash password, then
-          onSubmit({
-            email,
-            password: hashedPassword,
-            firstName,
-            lastName,
-            organization,
-            phone,
-          });
-        }}
+        as="div"
         css={{
           textAlign: "center",
           width: "100%",
@@ -170,10 +170,8 @@ const Login = ({
             onChange={(e) => setPassword(e.target.value)}
           />
         )}
-
         <Box>{errors.join(", ")}&nbsp;</Box>
-
-        <Button css={{ mt: "$2", px: "$5" }}>
+        <Button css={{ mt: "$2", px: "$5" }} onClick={onClick}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>
