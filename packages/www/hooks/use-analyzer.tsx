@@ -1,4 +1,6 @@
-import { useContext, createContext, ReactNode } from "react";
+import EventSource from "eventsource";
+import { useApi } from "hooks";
+import { useContext, useMemo, createContext, ReactNode } from "react";
 
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 
@@ -16,6 +18,7 @@ export interface MultistreamStatus {
 
 export interface Condition {
   type?:
+    | "Active"
     | "Transcoding"
     | "TranscodeRealTime"
     | "TranscodeNoErrors"
@@ -89,7 +92,52 @@ export namespace events {
     payload?: object;
   }
 
-  export type Any = TranscodeEvent | WebhookEvent;
+  export interface MultistreamMetrics {
+    activeSec: number;
+    bytes: number;
+    mediaTimeMs: number;
+  }
+
+  export interface MultistreamTargetMetrics {
+    target: MultistreamTargetInfo;
+    metrics?: MultistreamMetrics;
+  }
+
+  export interface StreamMetrics {
+    mediaTimeMs?: number;
+  }
+
+  export interface MediaServerMetricsEvent {
+    type: "media_server_metrics";
+    id: string;
+    timestamp: number;
+    streamId: string;
+    nodeId: string;
+    region?: string;
+    stats?: StreamMetrics;
+    multistream?: MultistreamTargetMetrics[];
+  }
+
+  export interface StreamState {
+    active: boolean;
+  }
+
+  export interface StreamStateEvent {
+    type: "stream_state";
+    id: string;
+    timestamp: number;
+    streamId: string;
+    nodeId: string;
+    region?: string;
+    userId: string;
+    state: StreamState;
+  }
+
+  export type Any =
+    | TranscodeEvent
+    | WebhookEvent
+    | MediaServerMetricsEvent
+    | StreamStateEvent;
 }
 
 const makeUrl = (region: string, path: string) => {
@@ -101,7 +149,7 @@ const makeUrl = (region: string, path: string) => {
 };
 
 class AnalyzerClient {
-  constructor() {}
+  constructor(private authToken: string) {}
 
   fetchJson = async <T,>(
     region: string,
@@ -110,6 +158,9 @@ class AnalyzerClient {
   ) => {
     const url = makeUrl(region, path);
     const headers = new Headers(opts.headers || {});
+    if (this.authToken && !headers.has("authorization")) {
+      headers.set("authorization", `JWT ${this.authToken}`);
+    }
     const res = await fetch(url, {
       ...opts,
       headers,
@@ -141,7 +192,11 @@ class AnalyzerClient {
     const qs = !from ? "" : "?from=" + from;
     const url = makeUrl(region, path + qs);
 
-    const sse = new EventSource(url, {});
+    const sse = new EventSource(url, {
+      headers: {
+        authorization: `JWT ${this.authToken}`,
+      },
+    });
     sse.addEventListener("lp_event", (e: MessageEvent) => {
       handler(JSON.parse(e.data));
     });
@@ -153,10 +208,12 @@ class AnalyzerClient {
   };
 }
 
-export const AnalyzerContext = createContext(new AnalyzerClient());
+export const AnalyzerContext = createContext(new AnalyzerClient(null));
 
 export const AnalyzerProvider = ({ children }: { children: ReactNode }) => {
-  const value = new AnalyzerClient();
+  // TODO: Create a separate context for auth token
+  const { token: authToken } = useApi();
+  const value = useMemo(() => new AnalyzerClient(authToken), [authToken]);
   return <AnalyzerContext.Provider value={value} children={children} />;
 };
 

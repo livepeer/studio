@@ -60,6 +60,7 @@ export interface Ingest {
 }
 
 const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
+
 const storeToken = (token) => {
   try {
     localStorage.setItem(PERSISTENT_TOKEN, token);
