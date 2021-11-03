@@ -54,7 +54,7 @@ function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
           key: evt.id,
           timestamp: evt.timestamp,
           level: "info",
-          text: `Stream is ${state} in region ${region}`,
+          text: `Stream is ${state} in region "${region}"`,
         },
       ];
     case "transcode":
