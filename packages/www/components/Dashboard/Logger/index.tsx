@@ -46,6 +46,17 @@ function orchestratorName({
 
 function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
   switch (evt.type) {
+    case "stream_state":
+      const state = evt.state.active ? "active" : "inactive";
+      const region = evt.region || "unknown";
+      return [
+        {
+          key: evt.id,
+          timestamp: evt.timestamp,
+          level: "info",
+          text: `Stream is ${state} in region ${region}`,
+        },
+      ];
     case "transcode":
       if (evt.success && !userIsAdmin) {
         // non-admin users should only see fatal errors.
@@ -53,8 +64,8 @@ function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
       }
       return evt.attempts
         .filter((a) => a.error)
-        .map((a) => ({
-          key: evt.id,
+        .map((a, idx) => ({
+          key: `${evt.id}-${idx}`,
           timestamp: evt.timestamp,
           level: "error",
           text: `Transcode error from ${orchestratorName(a)} for segment ${
