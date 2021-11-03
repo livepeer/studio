@@ -40,7 +40,7 @@ const defaultSEO: NextSeoProps = {
   openGraph: {
     title: "Docs - Livepeer.com",
     description: "Explore guides, tutorials and sample code.",
-    url: "https://livepeer.com/docs",
+    url: "https://livepeer.com/docs/guides",
     images: [
       {
         url: "https://livepeer.com/img/OG.png",

@@ -88,7 +88,9 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                 {(() => {
                   const { children, ...selectedProps } =
                     item.mobileDropdownLinks.find((l) => l.isSelected) ??
-                    item.mobileDropdownLinks.find((l) => l.href === "/docs");
+                    item.mobileDropdownLinks.find(
+                      (l) => l.href === "/docs/guides"
+                    );
                   return (
                     <>
                       <Box
