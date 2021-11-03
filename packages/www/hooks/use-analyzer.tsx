@@ -18,6 +18,7 @@ export interface MultistreamStatus {
 
 export interface Condition {
   type?:
+    | "Active"
     | "Transcoding"
     | "TranscodeRealTime"
     | "TranscodeNoErrors"
@@ -91,7 +92,52 @@ export namespace events {
     payload?: object;
   }
 
-  export type Any = TranscodeEvent | WebhookEvent;
+  export interface MultistreamMetrics {
+    activeSec: number;
+    bytes: number;
+    mediaTimeMs: number;
+  }
+
+  export interface MultistreamTargetMetrics {
+    target: MultistreamTargetInfo;
+    metrics?: MultistreamMetrics;
+  }
+
+  export interface StreamMetrics {
+    mediaTimeMs?: number;
+  }
+
+  export interface MediaServerMetricsEvent {
+    type: "media_server_metrics";
+    id: string;
+    timestamp: number;
+    streamId: string;
+    nodeId: string;
+    region?: string;
+    stats?: StreamMetrics;
+    multistream?: MultistreamTargetMetrics[];
+  }
+
+  export interface StreamState {
+    active: boolean;
+  }
+
+  export interface StreamStateEvent {
+    type: "stream_state";
+    id: string;
+    timestamp: number;
+    streamId: string;
+    nodeId: string;
+    region?: string;
+    userId: string;
+    state: StreamState;
+  }
+
+  export type Any =
+    | TranscodeEvent
+    | WebhookEvent
+    | MediaServerMetricsEvent
+    | StreamStateEvent;
 }
 
 const makeUrl = (region: string, path: string) => {
