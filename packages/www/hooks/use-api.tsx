@@ -81,7 +81,7 @@ const trackPageView = (email, path = null) => {
   _hsq.push(["trackPageView"]);
 };
 
-export const getStoredToken = () => {
+const getStoredToken = () => {
   if (!process.browser) {
     return null;
   }

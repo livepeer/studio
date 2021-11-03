@@ -1,8 +1,8 @@
 import EventSource from "eventsource";
+import { useApi } from "hooks";
 import { useContext, useMemo, createContext, ReactNode } from "react";
 
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
-import { getStoredToken } from "./use-api";
 
 const useLocalAnalyzer = false;
 const defaultRegion = "nyc";
@@ -165,7 +165,8 @@ class AnalyzerClient {
 export const AnalyzerContext = createContext(new AnalyzerClient(null));
 
 export const AnalyzerProvider = ({ children }: { children: ReactNode }) => {
-  const authToken = getStoredToken();
+  // TODO: Create a separate context for auth token
+  const { token: authToken } = useApi();
   const value = useMemo(() => new AnalyzerClient(authToken), [authToken]);
   return <AnalyzerContext.Provider value={value} children={children} />;
 };
