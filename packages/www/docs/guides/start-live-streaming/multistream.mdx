@@ -11,7 +11,7 @@ The Multistream API allows a source stream and transcoded renditions to be
 pushed to multiple RTMP(S) or SRT targets, such as Facebook Live, Twitch, and
 Youtube Live.
 
-# Managing Multistream targets in the Livepeer.com Dashboard
+## Managing Multistream targets in the Livepeer.com Dashboard
 
 To add, manage, and delete `Multistream Targets`, navigate to the Streams page
 ([livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams)) and
@@ -44,9 +44,9 @@ target name and then on `Delete`.
   </Text>
 </Alert>
 
-# Managing Multistream targets with the Livepeer.com API
+## Managing Multistream targets with the Livepeer.com API
 
-## Multistream Target Object `/multistream/target`
+### Multistream Target Object `/multistream/target`
 
 You can also manage `Multistream Target` objects from the API. Each target
 represents a specific endpoint where a stream could be multistreamed to. More
@@ -61,7 +61,7 @@ for the multistream to happen. You also need to reference the target from the
 `Stream` creation and update APIs. Check the
 [Stream Object](#stream-object-stream) section for more information.
 
-### Create
+#### Create
 
 ##### Request: [`POST /api/multistream/target`](/docs/api-reference/multistream-target/create-target)
 
@@ -88,7 +88,7 @@ _Supported Protocols: RTMP, RTMPS and SRT._
 }
 ```
 
-### Read
+#### Read
 
 You can fetch a specific `Multistream Target` with their ID, returned on the
 creation request. The destination url will not be returned since it contains
@@ -126,7 +126,7 @@ The response is an array of `Multistream Target` objects, as returned from the
 read API above. The pagination should be done exactly the same as the other
 Livepeer.com list APIs.
 
-### Update
+#### Update
 
 You can change an existing target properties at will, and it will affect any
 stream that is currently using it. Notice that changes will only take effect
@@ -152,7 +152,7 @@ curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 All request fields are optional. There is no response on a success (HTTP
 `204 No Content`).
 
-### Delete
+#### Delete
 
 Finally, you can also delete a `Multistream Target` object completely by calling
 the delete API. You should not do this if any `Streams` are still referencing
@@ -171,7 +171,7 @@ There is no response on a success (HTTP `204 No Content`).
 
 ---
 
-## Stream Object: `/stream`
+### Stream Object: `/stream`
 
 To actually use a `Multistream Target`, you need to reference it from a `Stream`
 object.
@@ -196,7 +196,7 @@ new `Multistream Target`. Notice that `spec` is a write-only field, meaning that
 and `id` in the targets. To get the current state of a `Multistream Target`,
 fetch from its own read API using that `id`.
 
-### Creating a Stream with Multistream Targets
+#### Creating a Stream with Multistream Targets
 
 You can create a `Stream` already with some `Multistream Targets`. Either
 reference an existing `Multistream Target` by `id` or create a new
@@ -258,7 +258,7 @@ curl -X POST 'https://livepeer.com/api/stream' \
 }'
 ```
 
-### Updating Multistream Targets of a Stream
+#### Updating Multistream Targets of a Stream
 
 You can also update an existing `Stream` to add or remove `Multistream Targets`.
 The schema of all fields is the same as the creation API, with the targets being
@@ -368,9 +368,9 @@ curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
     }'
 ```
 
-# Understanding Multistream Performance
+## Understanding Multistream Performance
 
-## Dashboard
+### Dashboard
 
 While a session is active that has multistream targets configured, you'll be
 able to see if a destination is "Active" or "Offline". **_NOTE:_** There may be
@@ -382,7 +382,7 @@ On the stream page where you've configured your multistream targets, select the
 "Health" tab at the top. While a session is active, you'll see the ingest rate
 of the source stream.
 
-## API
+### API
 
 We have 3 webhooks to help you monitor the state of your `Multistream Targets`::
 
