@@ -65,16 +65,17 @@ health indicators.
 
   ## Logs
 
-  Logs will surface informational alerts (ex. multistream destinations are
-  connected/disconnected) or any fatal errors from the transcoding process. Here
-  is an example of a fatal error:
+  Logs will surface informational alerts (ex. stream has started/stopped,
+  multistream destinations have connected/disconnected) or any fatal errors from
+  the transcoding process. Here is an example of a fatal error:
 
   ```bash
-  Transcode error from mdw-staging-livepeer-orchestrator-0 for segment 0: **Unsupported input pixel format**
+  Transcode error from ewr-prod-livepeer-orchestrator-0 for segment 0:
+  **Unsupported input pixel format**
   ```
 
-If you run into this or any similarly formatted errors, check the configuration
-in your streaming software (e.g. OBS) and restart the stream.
+If you run into this or any similar errors, check the configuration in your
+streaming software (e.g. OBS) and restart the stream.
 
 ## Session Ingest Rate
 
