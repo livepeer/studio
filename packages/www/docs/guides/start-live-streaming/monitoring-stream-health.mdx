@@ -94,10 +94,11 @@ your viewers.
 The Stream Health information can also be queried using a separate `/data` API
 endpoint. To use the `/data` API you need to include the same API key as the one
 used for the regular API, check
-[API key documentation](/docs/guides/start-live-streaming/api-key) for
+[API key documentation](/docs/guides/start-live-streaming/api-key) for more
 information.
 
-The Stream Health API consists of the following endpoints:
+The Stream Health API uses a slightly different hostname than the regular API,
+specifically `origin.livepeer.com`. It consists of the following endpoints:
 
 - `/data/stream/{streamId}/health`: Grabs the latest information about a given
   stream, referenced by its Stream ID. This API powers the dashboard
