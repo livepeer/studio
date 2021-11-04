@@ -47,6 +47,7 @@ const CaseStudy = ({
               }}>
               <Heading
                 size="3"
+                as="h2"
                 css={{
                   maxWidth: 600,
                   lineHeight: 1.4,
