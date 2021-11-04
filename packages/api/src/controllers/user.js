@@ -168,8 +168,7 @@ app.post("/", validatePost("user"), async (req, res) => {
         buttonUrl: verificationUrl,
         unsubscribe: unsubscribeUrl,
         text: [
-          "Let's verify your email so you can start using the Livepeer.com API.",
-          "Your link is active for 48 hours. After that, you will need to resend the verification email.",
+          "Please verify your email address to ensure that you can change your password or receive updates from us.",
         ].join("\n\n"),
       });
     } catch (err) {

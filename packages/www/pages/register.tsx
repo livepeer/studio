@@ -20,11 +20,26 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const { register, user } = useApi();
+  const { register, verify, user } = useApi();
+
+  const { email, emailValidToken, selectedPlan } = router.query;
 
   useEffect(() => {
+    if (email && emailValidToken) {
+      verify(email, emailValidToken).then(() => {
+        if (selectedPlan === "1") {
+          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+        } else {
+          router.replace("/dashboard");
+        }
+      });
+    }
+  }, [email, emailValidToken]);
+
+  // If existing the email(removed the email verification), get 'em out of here
+  useEffect(() => {
     if (user) {
-      router.replace("/verify");
+      router.replace("/dashboard");
     }
   }, [user]);
 
@@ -53,6 +68,7 @@ const RegisterPage = () => {
       setErrors(res.errors);
     }
   };
+
   return (
     <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />

@@ -15,17 +15,13 @@ export default (shouldBeLoggedIn = true) => {
     if (shouldBeLoggedIn === true) {
       if (!token) {
         router.replace("/login");
-      } else if (user && user.emailValid === false) {
-        router.replace("/verify");
+      } else if (user) {
+        router.replace("/dashboard");
       }
     }
-    // Check for user rather than token so we don't redirect until we've checked
+    // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
-      if (user.emailValid === false) {
-        router.replace("/verify");
-      } else {
-        router.replace(next ? next.toString() : "/dashboard");
-      }
+      router.replace(next ? next.toString() : "/dashboard");
     }
   }, [user, token, next]);
 };
