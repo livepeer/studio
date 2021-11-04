@@ -46,19 +46,20 @@ const GettingStarted = ({ firstName = "" }) => {
                 variant="gray"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
-                1. Tap <b>+ Create stream</b> below give your stream a name.
+                1. Navigate to the streams view, tap "Create stream", and give
+                your stream a name.
                 <br />
-                2. From the Stream Details, copy the Playback URL and Stream
-                Key. <br />
-                3. Then paste them into your broadcasting software. <br />
-                4. Tap “Go Live” in the broadcasting software to start
-                streaming.
+                2. Copy the Playback URL and Stream Key in the stream detail
+                view and paste them into your broadcasting software.
+                <br />
+                3. Tap "Go Live" in your broadcasting software to start
+                streaming. <br />
               </Text>
               <Text
                 variant="gray"
                 size="3"
                 css={{ mb: "$3", lineHeight: "23px" }}>
-                Need more help? Read our step-by-step guide.
+                Need more help? Read our step-by-step getting started tutorial.
               </Text>
             </Box>
             <Link href="/docs/guides/start-live-streaming/tutorial" passHref>
@@ -73,7 +74,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Get started tutorial</Box>
+                <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
