@@ -91,35 +91,38 @@ your viewers.
   <Text size="3" variant="gray">
     Note: The Stream Health API is currently in <code>beta</code> and some
     elements may change as we mature the product. Before you start building with
-    it, let us know at hello@livepeer.com so we can give you a heads up before
-    any changes that may affect the functionality.
+    it, let us know at{" "}
+    <a href="mailto:hello@livepeer.com?subject=New%20Stream%20Health%20API%20user&body=Please%20include%20details%20about%20your%20app.">
+      <code>help@livepeer.com</code>
+    </a>
+    so we can give you a heads up before any breaking changes.
   </Text>
 </Alert>
 
-The Stream Health information can also be queried using a separate `/data` API
-endpoint. To use the `/data` API you need to include the same API key as the one
-used for the regular API, check
-[API key documentation](/docs/guides/start-live-streaming/api-key) for more
-information. It consists of the following endpoints:
+The health information about a stream can also be queried using a separate
+Stream Health API, which resides on a different root path `/data`. To use it,
+you need to include the same API key as the one used for the regular API, check
+[`API key documentation`](/docs/guides/start-live-streaming/api-key) for more
+information. The API consists of the following endpoints:
 
-- `/data/stream/{streamId}/health`: Grabs the latest health status info about a
-  given stream, referenced by its Stream ID. This API powers the dashboard
-  healthchecks and multistream status.
-- `/data/stream/{streamId}/events`: Provides direct access to the low-level
-  events sent by Livepeer video processing services. It also allows subscribing
-  via SSE to receive new events live, and is useful for debugging. This API
-  powers the log feed in the dashboard.
+- Health Status (`/data/stream/{streamId}/health`): Grabs the latest health
+  status info about a given stream, referenced by its Stream ID. This API powers
+  the dashboard healthchecks and multistream status.
+- Events (`/data/stream/{streamId}/events`): Provides direct access to the
+  low-level events sent by Livepeer video-processing services. It also allows
+  subscribing via SSE to receive new events as they happen, and is useful for
+  debugging. This API powers the log feed in the dashboard.
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
-    Heads up! The Stream Health API uses <code>origin.livepeer.com</code>
+    Heads up! The Stream Health API uses <code>origin.livepeer.com</code>{" "}
     instead of <code>livepeer.com</code> as the hostname. We’d like to keep them
-    consistent so we’re working on having everything on the
-    <code>livepeer.com</code> domain soon.
+    consistent so we’re working on supporting the <code>livepeer.com</code>{" "}
+    domain as well soon.
   </Text>
 </Alert>
 
-Now let's get into more detail on each of the Stream Health API endpoints.
+Now let's go into more detail about each of the mentioned API endpoints.
 
 ### Health Status
 
@@ -129,6 +132,8 @@ Now let's get into more detail on each of the Stream Health API endpoints.
 curl 'https://origin.livepeer.com/data/stream/{id}/health' \
 -H 'authorization: Bearer {api-key}'
 ```
+
+The stream ID is the same one as used in the regular API.
 
 ##### Response
 
@@ -204,13 +209,14 @@ curl 'https://origin.livepeer.com/data/stream/{id}/health' \
 
 In the above response payload:
 
-- All timestamps are representend in milliseconds since the Unix epoch, which is
-  the default representation of timestamps across all the Livepeer API.
-- The healthy top-level condition is a computed state based on some specific
+- All `timestamps` are representend in milliseconds since the Unix epoch, which
+  is the default representation of timestamps across all the Livepeer API.
+- The `healthy` top-level `condition` is a computed state based on some specific
   conditions of the stream. As of writing this doc, a stream is considered
-  healthy if it's both active, transcoding in realtime, and if multistream
-  targets are configured that they are also healthy.
-- The conditions array contains more specific information about the stream
+  `healthy` if it's both `Active`, `Transcoding` in realtime
+  (`TranscodeRealTime`), and if multistream targets are configured that they are
+  also healthy (`Multistreaming`).
+- The `conditions` array contains more specific information about the stream
   healthy state, with the `type` field specifying what the condition means.
 - More generally, a `Condition` represents a specific state of the stream
   health.
@@ -227,8 +233,6 @@ In the above response payload:
   `timestamp` and the `value` of the last reading for that metric.
 
 ### Events
-
-### Health Status
 
 ##### Request: `GET origin.livepeer.com/data/stream/{id}/events`
 
@@ -261,35 +265,32 @@ data:
 ```
 
 The `/events` API response implements the
-[Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
-API and can be consumed using any client that supports the SSE protocol. On
-JavaScript, we recomend using the
-[`eventsource`](https://www.npmjs.com/package/eventsource) NPM package to be
-able to add an `Authorization` header to the API request.
+[Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+protocol and can be consumed using any SSE client. On JavaScript, we recomend
+using the [`eventsource`](https://www.npmjs.com/package/eventsource) NPM package
+to be able to add an `Authorization` header to the API request.
 
 The individual events sent over the SSE stream are all JSON objects, and are
-exactly the same low-level objects as published by the Open Source
-infrastructure services running in the Livepeer infrastructure. Some fields are
-always present, specifically:
+exactly the same low-level objects as published by the services running in the
+Livepeer infrastructure. Some fields are always present, specifically:
 
 - `type`: the unique type of the event, which defines the structure of the rest
   of the JSON object.
-- `id`: a unique identifier for the event, which is used to match the event, and
-  which is automatically used by SSE clients to recover a connection without
-  losing events.
+- `id`: a unique identifier for the event, which is automatically used by SSE
+  clients to recover a connection without losing events.
 - `timestamp`: the timestamp of the event, in milliseconds since the Unix epoch.
 
-You can also get a response including events from before the request was made or
-a range of events, by specifying `from` and `to` query parameters with
-timestamps in unix epoch milliseconds. For example:
+You can also get historic events and/or within a time range, by specifying the
+`from` and `to` query parameters with unix millis timestamps. For example:
 
-- `/data/stream/{id}/events?from=1635437394` to get all events since
+- `/data/stream/{id}/events?from=1635437394000` to get all events since
   `Oct 28 16:09:54Z 2021` (exclusively) and stay connected for live events.
 - `/data/stream/{id}/events?from=1635437394000&to=1635447394000` to get all
-  events between `Oct 28 16:09:54Z 2021` and `Oct 28 18:56:34Z 2021`
-  (inclusively).
+  events between `Oct 28 16:09:54Z 2021` (exclusively) and
+  `Oct 28 18:56:34Z 2021` (inclusively).
 
 Finally, we recomend using the events API mostly for debugging purposes, for
 example to get all available information about a live stream to find any issues.
-The specific events that are published and their respective schemas will keep
-evolving over time so are still subject to changes.
+The specific events that are published and
+[their respective schemas](https://github.com/livepeer/livepeer-data/tree/main/pkg/data)
+will keep evolving over time so are still subject to changes.
