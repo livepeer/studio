@@ -17,7 +17,7 @@ app.all(
 
     const exists = stream && !stream.deleted;
     if (!exists) {
-      return res.status(404).json({ errors: ["not found"] });
+      return res.status(404).json({ errors: ["stream not found"] });
     }
     const hasAccess = stream?.userId === req.user.id || req.user.admin;
     if (!hasAccess) {

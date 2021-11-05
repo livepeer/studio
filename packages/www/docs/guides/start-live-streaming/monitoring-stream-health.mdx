@@ -85,13 +85,22 @@ suggest that your encoder is configured improperly or that the streamer internet
 connection isn't as strong as it should be to deliver high quality streams to
 your viewers.
 
-## Stream Health API
+## Stream Health API <Badge size="2" variant="violet" css={{ ml: "$2" }}>Beta</Badge>
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: The Stream Health API is currently in <code>beta</code> and some
+    elements may change as we mature the product. Before you start building with
+    it, let us know at hello@livepeer.com so we can give you a heads up before
+    any changes that may affect the functionality.
+  </Text>
+</Alert>
 
 The Stream Health information can also be queried using a separate `/data` API
 endpoint. To use the `/data` API you need to include the same API key as the one
 used for the regular API, check
 [API key documentation](/docs/guides/start-live-streaming/api-key) for more
-information.
+information. It consists of the following endpoints:
 
 The Stream Health API uses a slightly different hostname than the regular API,
 specifically `origin.livepeer.com`. It consists of the following endpoints:
@@ -106,13 +115,14 @@ specifically `origin.livepeer.com`. It consists of the following endpoints:
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
-    Note: The Stream Health API is currently in <code>Beta</code> and we don't
-    guarantee long-term stability on all the interfaces. Make sure to align with
-    our customer support team before releasing applications that depend on it.
+    Heads up! The Stream Health API uses <code>origin.livepeer.com</code>
+    instead of <code>livepeer.com</code> as the hostname. We’d like to keep them
+    consistent so we’re working on having everything on the
+    <code>livepeer.com</code> domain soon.
   </Text>
 </Alert>
 
-Now let's go into more detail on each of the Stream Health API endpoints.
+Now let's get into more detail on each of the Stream Health API endpoints.
 
 ### Health Status
 
