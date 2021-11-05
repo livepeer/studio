@@ -137,6 +137,8 @@ The stream ID is the same one as used in the regular API.
 
 ##### Response
 
+`Content-Type: application/json`
+
 ```json
 {
   "id": "{id}",
@@ -217,7 +219,7 @@ In the above response payload:
   (`TranscodeRealTime`), and if multistream targets are configured that they are
   also healthy (`Multistreaming`).
 - The `conditions` array contains more specific information about the stream
-  healthy state, with the `type` field specifying what the condition means.
+  health state, with the `type` field specifying what the condition means.
 - More generally, a `Condition` represents a specific state of the stream
   health.
   - The `status` field represents the value of the last reading for that
@@ -226,9 +228,9 @@ In the above response payload:
     how it's changing over time.
   - The `lastTransitionTime` is the timestamp of the last time where the
     condition status changed, and;
-  - The `frequency` is the ratio of truthful readings in the past specified
-    timestamps.
-- The `metrics` are still an experimental API and is not recommended for use in
+  - The `frequency` is the ratio of successful probes (`status: true`) in the
+    specified time ranges preceding `lastProbeTime`.
+- The `metrics` are still an experimental API and are not recommended for use in
   production systems. But the `last` field is basically a tuple containing the
   `timestamp` and the `value` of the last reading for that metric.
 
