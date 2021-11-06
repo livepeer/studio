@@ -158,9 +158,6 @@ class AnalyzerClient {
   ) => {
     const url = makeUrl(region, path);
     const headers = new Headers(opts.headers || {});
-    if (this.authToken && !headers.has("authorization")) {
-      headers.set("authorization", `JWT ${this.authToken}`);
-    }
     const res = await fetch(url, {
       ...opts,
       headers,
@@ -193,9 +190,7 @@ class AnalyzerClient {
     const url = makeUrl(region, path + qs);
 
     const sse = new EventSource(url, {
-      headers: {
-        authorization: `JWT ${this.authToken}`,
-      },
+      headers: {},
     });
     sse.addEventListener("lp_event", (e: MessageEvent) => {
       handler(JSON.parse(e.data));
