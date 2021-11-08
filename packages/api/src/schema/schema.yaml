@@ -651,7 +651,9 @@ components:
           type: string
           readonly: true
           description: Status of the recording process of this stream session.
-          enum: [waiting, ready]
+          enum:
+            - waiting
+            - ready
         recordingUrl:
           type: string
           readonly: true
@@ -663,8 +665,7 @@ components:
         recordObjectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
-          description:
-            ID of object store where to which this stream was recorded
+          description: ID of object store where this stream was recorded
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
@@ -710,17 +711,65 @@ components:
                   - H264Main
                   - H264High
                   - H264ConstrainedHigh
-          recordingStatus:
-            type: string
-            enum:
-              - ready
-              - waiting
-          recordingUrl:
-            type: string
-          mp4Url:
-            type: string
-          lastSessionId:
-            type: string
+
+    clip:
+      type: object
+      table: clip
+      required:
+        - parentId
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+        kind:
+          type: string
+          readOnly: true
+          enum: [clip]
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          readOnly: true
+          index: true
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which stream object was created
+          example: 1587667174725
+          index: true
+        lastSeen:
+          type: number
+          example: 1587667174725
+          index: true
+        deleted:
+          type: boolean
+          description: Set to true when stream deleted
+        parentId:
+          type: string
+          example: de7818e7-610a-4057-8f6f-b785dc1e6f88
+          description: Reference to the parent stream object
+          index: true
+        recordingStatus:
+          type: string
+          readonly: true
+          description: Status of the recording process of this clip.
+          enum:
+            - waiting
+            - ready
+        recordingUrl:
+          type: string
+          readonly: true
+          description: URL for accessing the recording of this clip.
+        mp4Url:
+          type: string
+          readonly: true
+          description: URL for the clip recording packaged in an mp4.
+        recordObjectStoreId:
+          type: string
+          example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
+          description: ID of object store where this clip was recorded
 
     error:
       required:
