@@ -1,4 +1,5 @@
 import Layout from "layouts/main";
+import { RecaptchaComponent } from "layouts/recaptcha";
 import Login from "../components/Marketing/Login";
 import {
   Flex,
@@ -10,6 +11,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import useApi from "../hooks/use-api";
 import Link from "next/link";
@@ -18,6 +20,7 @@ import Guides from "@components/Marketing/Guides";
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const router = useRouter();
   const { register, user } = useApi();
@@ -36,21 +39,31 @@ const RegisterPage = () => {
     organization,
     phone,
   }) => {
-    const selectedPlan = router.query?.selectedPlan;
-    setLoading(true);
-    setErrors([]);
-    const res = await register({
-      email,
-      password,
-      selectedPlan: selectedPlan ? +selectedPlan : 0,
-      ...(firstName && { firstName }),
-      ...(lastName && { lastName }),
-      ...(organization && { organization }),
-      ...(phone && { phone }),
-    });
-    // Don't need to worry about the success case, we'll redirect
-    if (res.errors) {
-      setErrors(res.errors);
+    if (!executeRecaptcha) {
+      console.log("Execute recaptcha not yet available");
+      return;
+    }
+    try {
+      const token = await executeRecaptcha("register");
+      const selectedPlan = router.query?.selectedPlan;
+      setLoading(true);
+      setErrors([]);
+      const res = await register({
+        email,
+        password,
+        selectedPlan: selectedPlan ? +selectedPlan : 0,
+        ...(firstName && { firstName }),
+        ...(lastName && { lastName }),
+        ...(organization && { organization }),
+        ...(phone && { phone }),
+      });
+      // Don't need to worry about the success case, we'll redirect
+      if (res.errors) {
+        setErrors(res.errors);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log("err", err);
     }
   };
   return (
@@ -115,4 +128,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default RecaptchaComponent(RegisterPage);
