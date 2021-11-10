@@ -10,17 +10,19 @@ const computeStatus = (
   status: MultistreamStatus,
   streamActiveSince: number | undefined
 ): Status => {
+  if (status?.connected.lastProbeTime < streamActiveSince) {
+    status = null;
+  }
+  const isConnected = status?.connected.status;
   if (
     !stream?.isActive ||
-    status?.connected.lastProbeTime < streamActiveSince ||
     target?.createdAt > streamActiveSince ||
-    target?.disabled
+    (target?.disabled && !isConnected)
   ) {
     return Status.Idle;
   } else if (!status) {
     return Status.Pending;
   }
-  const isConnected = status.connected.status;
   return isConnected ? Status.Online : Status.Offline;
 };
 
