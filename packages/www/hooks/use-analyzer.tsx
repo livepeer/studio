@@ -26,7 +26,7 @@ export interface Condition {
   status: boolean | null;
   frequency?: Record<string, number>;
   lastProbeTime?: number;
-  lastTransitionsTime?: number;
+  lastTransitionTime?: number;
 }
 
 export interface HealthStatus {

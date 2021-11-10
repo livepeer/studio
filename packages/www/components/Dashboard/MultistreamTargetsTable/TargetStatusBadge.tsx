@@ -32,7 +32,7 @@ const TargetStatusBadge = ({
   stream: Stream;
   target: MultistreamTarget;
   status: MultistreamStatus;
-  streamActiveSince?: number;
+  streamActiveSince: number | undefined;
 }) => {
   const status = useMemo(
     () => computeStatus(stream, target, msStatus, streamActiveSince),
