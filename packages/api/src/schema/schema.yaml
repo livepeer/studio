@@ -328,6 +328,13 @@ components:
           example: de7818e7-610a-4057-8f6f-b785dc1e6f88
           description: Points to parent stream object
           index: true
+        parentKind:
+          type: string
+          description: The kind of the parent object
+          default: stream
+          enum:
+            - stream
+            - clip
         partialSession:
           description:
             Indicates that this is not final object of `user's` session
