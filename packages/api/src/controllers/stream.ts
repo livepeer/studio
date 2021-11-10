@@ -866,6 +866,10 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 });
 
+// /api/clip/:id
+//
+
+// /api/stream/:id/setactive
 app.put(
   "/:id/setactive",
   authMiddleware({ anyAdmin: true }),

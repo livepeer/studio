@@ -17,6 +17,7 @@ import {
   WebhookResponse,
   Session,
   CdnUsageLast,
+  Clip,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
@@ -60,6 +61,7 @@ const makeTable = <T>(opts: TableOptions) =>
 export class DB {
   // Table objects
   stream: StreamTable;
+  clip: Table<Clip>;
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
   apiToken: Table<ApiToken>;
@@ -131,6 +133,10 @@ export class DB {
   async makeTables() {
     const schemas = schema.components.schemas;
     this.stream = new StreamTable({ db: this, schema: schemas["stream"] });
+    this.clip = makeTable<Clip>({
+      db: this,
+      schema: schemas["clip"],
+    });
     this.objectStore = makeTable<ObjectStore>({
       db: this,
       schema: schemas["object-store"],
