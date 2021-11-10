@@ -23,7 +23,7 @@ import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { isStaging } from "lib/utils";
 import RelativeTime from "components/Dashboard/RelativeTime";
 import {
@@ -267,6 +267,16 @@ const StreamDetail = ({
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
+  const isHealthy = useMemo(() => {
+    if (!stream?.isActive || !streamHealth) return null;
+    const activeCond = streamHealth?.conditions.find(
+      (c) => c.type === "Active"
+    );
+    return !activeCond?.status ||
+      streamHealth.healthy.lastProbeTime < activeCond.lastTransitionTime
+      ? null
+      : streamHealth.healthy.status;
+  }, [stream?.isActive, streamHealth]);
 
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
@@ -297,8 +307,7 @@ const StreamDetail = ({
                         }}>
                         {stream.name}
                       </Box>
-                      {!streamHealth || !stream.isActive ? null : streamHealth
-                          .healthy.status ? (
+                      {isHealthy == null ? null : isHealthy ? (
                         <Badge
                           size="2"
                           variant="green"
