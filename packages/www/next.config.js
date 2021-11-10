@@ -13,6 +13,16 @@ const config = {
   async redirects() {
     return [
       {
+        source: "http://www.livepeer.com/:path",
+        destination: "https://livepeer.com/:path",
+        statusCode: 301,
+      },
+      {
+        source: "http://livepeer.com/:path",
+        destination: "https://livepeer.com/:path",
+        statusCode: 301,
+      },
+      {
         source: "/docs",
         destination: "/docs/guides",
         permanent: false,
