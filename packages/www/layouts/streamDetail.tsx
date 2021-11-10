@@ -39,6 +39,9 @@ import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
+import StatusBadge, {
+  Variant as StatusVariant,
+} from "@components/Dashboard/StatusBadge";
 
 type ShowURLProps = {
   url: string;
@@ -307,29 +310,16 @@ const StreamDetail = ({
                         }}>
                         {stream.name}
                       </Box>
-                      {isHealthy == null ? null : isHealthy ? (
-                        <Badge
-                          size="2"
-                          variant="green"
-                          css={{ mt: "$1", letterSpacing: 0 }}>
-                          <Box css={{ mr: "$1" }}>
-                            <Status size="1" variant="green" />
-                          </Box>
-                          Healthy
-                        </Badge>
-                      ) : (
-                        <Badge
-                          size="2"
-                          variant="red"
-                          css={{
-                            mt: "$1",
-                            letterSpacing: 0,
-                          }}>
-                          <Box css={{ mr: "$1" }}>
-                            <Status size="1" variant="red" />
-                          </Box>
-                          Unhealthy
-                        </Badge>
+                      {isHealthy == null ? null : (
+                        <StatusBadge
+                          variant={
+                            isHealthy
+                              ? StatusVariant.Healthy
+                              : StatusVariant.Unhealthy
+                          }
+                          timestamp={streamHealth?.healthy?.lastProbeTime}
+                          css={{ mt: "$1", letterSpacing: 0 }}
+                        />
                       )}
                       {stream.suspended && (
                         <Badge
