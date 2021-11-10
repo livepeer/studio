@@ -134,8 +134,8 @@ const MultistreamTargetsTable = ({
     const activeCondition = streamHealth?.conditions.find(
       (c) => c.type === "Active"
     );
-    return activeCondition.status && activeCondition.lastTransitionTime;
-  }, [streamHealth]);
+    return activeCondition.status ? activeCondition.lastTransitionTime : null;
+  }, [streamHealth?.conditions]);
 
   const tableData: TableData<TargetsTableData> = useMemo(() => {
     return {
