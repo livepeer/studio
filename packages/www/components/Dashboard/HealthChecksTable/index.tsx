@@ -65,11 +65,18 @@ const HealthChecksTable = ({
 
   const conditionsMap = useMemo(
     () =>
-      streamHealth?.conditions.reduce(function (map, condition) {
+      (streamHealth?.conditions ?? []).reduce(function (map, condition) {
         map[condition.type] = condition;
         return map;
-      }, {} as Record<string, Condition>),
+      }, {} as Record<Condition["type"], Condition>),
     [streamHealth?.conditions]
+  );
+  const streamActiveSince = useMemo(
+    () =>
+      conditionsMap.Active?.status
+        ? conditionsMap.Active.lastTransitionTime
+        : null,
+    [conditionsMap.Active]
   );
 
   const tableData: TableData<HealthChecksTableData> = useMemo(() => {
@@ -79,7 +86,11 @@ const HealthChecksTable = ({
         count: conditionTypes.length,
         nextCursor: null,
         rows: conditionTypes.map((condType) => {
-          const cond = conditionsMap?.[condType];
+          const cond = conditionsMap[condType];
+          const condValid =
+            cond &&
+            cond.status != null &&
+            cond.lastProbeTime >= streamActiveSince;
           return {
             id: condType,
             name: {
@@ -92,7 +103,7 @@ const HealthChecksTable = ({
             status: {
               children: (
                 <Box>
-                  {!stream.isActive || !cond || cond.status === null ? (
+                  {!stream.isActive || !condValid ? (
                     "-"
                   ) : (
                     <StatusBadge
