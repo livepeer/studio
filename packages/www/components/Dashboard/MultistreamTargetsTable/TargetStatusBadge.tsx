@@ -13,7 +13,8 @@ const computeStatus = (
   if (
     !stream?.isActive ||
     status?.connected.lastProbeTime < streamActiveSince ||
-    target.createdAt > streamActiveSince
+    target.createdAt > streamActiveSince ||
+    target.disabled
   ) {
     return Status.Idle;
   } else if (!status) {
