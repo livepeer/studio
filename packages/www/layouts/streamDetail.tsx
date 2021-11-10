@@ -254,6 +254,17 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
+  const isHealthy = useMemo(() => {
+    if (!stream?.isActive || !streamHealth) return null;
+    const activeCond = streamHealth?.conditions.find(
+      (c) => c.type === "Active"
+    );
+    return !activeCond?.status ||
+      streamHealth.healthy.lastProbeTime < activeCond.lastTransitionTime
+      ? null
+      : streamHealth.healthy.status;
+  }, [stream?.isActive, streamHealth]);
+
   if (!user) {
     return <Layout />;
   }
@@ -270,16 +281,6 @@ const StreamDetail = ({
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
-  const isHealthy = useMemo(() => {
-    if (!stream?.isActive || !streamHealth) return null;
-    const activeCond = streamHealth?.conditions.find(
-      (c) => c.type === "Active"
-    );
-    return !activeCond?.status ||
-      streamHealth.healthy.lastProbeTime < activeCond.lastTransitionTime
-      ? null
-      : streamHealth.healthy.status;
-  }, [stream?.isActive, streamHealth]);
 
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
