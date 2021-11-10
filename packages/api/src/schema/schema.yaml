@@ -351,44 +351,7 @@ components:
         profiles:
           type: array
           items:
-            type: object
-            required:
-              - width
-              - name
-              - height
-              - bitrate
-              - fps
-            additionalProperties: false
-            properties:
-              width:
-                type: integer
-                minimum: 128
-              name:
-                type: string
-                minLength: 1
-                maxLength: 500
-                example: "720p"
-              height:
-                type: integer
-                minimum: 128
-              bitrate:
-                type: integer
-                minimum: 400
-              fps:
-                type: integer
-                minimum: 0
-              fpsDen:
-                type: integer
-                minimum: 1
-              gop:
-                type: string
-              profile:
-                type: string
-                enum:
-                  - H264Baseline
-                  - H264Main
-                  - H264High
-                  - H264ConstrainedHigh
+            $ref: "#/components/schemas/profile"
         objectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
@@ -673,44 +636,7 @@ components:
         profiles:
           type: array
           items:
-            type: object
-            required:
-              - width
-              - name
-              - height
-              - bitrate
-              - fps
-            additionalProperties: false
-            properties:
-              width:
-                type: integer
-                minimum: 128
-              name:
-                type: string
-                minLength: 1
-                maxLength: 500
-                example: "720p"
-              height:
-                type: integer
-                minimum: 128
-              bitrate:
-                type: integer
-                minimum: 400
-              fps:
-                type: integer
-                minimum: 0
-              fpsDen:
-                type: integer
-                minimum: 1
-              gop:
-                type: string
-              profile:
-                type: string
-                enum:
-                  - H264Baseline
-                  - H264Main
-                  - H264High
-                  - H264ConstrainedHigh
+            $ref: "#/components/schemas/profile"
 
     clip:
       type: object
@@ -732,6 +658,10 @@ components:
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           readOnly: true
           index: true
+        profiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/profile"
         createdAt:
           type: number
           readOnly: true
@@ -770,6 +700,46 @@ components:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
           description: ID of object store where this clip was recorded
+
+    profile:
+      type: object
+      required:
+        - width
+        - name
+        - height
+        - bitrate
+        - fps
+      additionalProperties: false
+      properties:
+        width:
+          type: integer
+          minimum: 128
+        name:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: "720p"
+        height:
+          type: integer
+          minimum: 128
+        bitrate:
+          type: integer
+          minimum: 400
+        fps:
+          type: integer
+          minimum: 0
+        fpsDen:
+          type: integer
+          minimum: 1
+        gop:
+          type: string
+        profile:
+          type: string
+          enum:
+            - H264Baseline
+            - H264Main
+            - H264High
+            - H264ConstrainedHigh
 
     error:
       required:
