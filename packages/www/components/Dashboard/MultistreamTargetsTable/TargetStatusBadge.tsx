@@ -7,9 +7,14 @@ import StatusBadge, { Variant as Status } from "../StatusBadge";
 const computeStatus = (
   stream: Stream,
   target: MultistreamTarget,
-  status: MultistreamStatus
+  status: MultistreamStatus,
+  streamActiveSince: number | undefined
 ): Status => {
-  if (!stream?.isActive || (!status?.connected.status && target?.disabled)) {
+  if (
+    !stream?.isActive ||
+    status?.connected.lastProbeTime < streamActiveSince ||
+    target.createdAt < streamActiveSince
+  ) {
     return Status.Idle;
   } else if (!status) {
     return Status.Pending;
@@ -22,13 +27,15 @@ const TargetStatusBadge = ({
   stream,
   target,
   status: msStatus,
+  streamActiveSince,
 }: {
   stream: Stream;
   target: MultistreamTarget;
   status: MultistreamStatus;
+  streamActiveSince?: number;
 }) => {
   const status = useMemo(
-    () => computeStatus(stream, target, msStatus),
+    () => computeStatus(stream, target, msStatus, streamActiveSince),
     [stream, target, msStatus]
   );
   const timestamp = msStatus?.connected.lastProbeTime;
