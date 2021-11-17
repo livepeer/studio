@@ -40,6 +40,11 @@ export default class WebhookCannon {
     console.log("WEBHOOK CANNON STARTED");
     await this.queue.consume("webhooks", this.handleWebhookQueue.bind(this));
     await this.queue.consume("events", this.handleEventsQueue.bind(this));
+    // TODO: Move global events to their own higher-level handler
+    await this.queue.consume(
+      "returned",
+      this.handleReturnedMessages.bind(this)
+    );
   }
 
   async handleEventsQueue(data: ConsumeMessage) {
@@ -170,6 +175,67 @@ export default class WebhookCannon {
       await this.retry(trigger);
     } finally {
       this.queue.ack(data);
+    }
+  }
+
+  async handleReturnedMessages(data: ConsumeMessage) {
+    let msg: messages.Any;
+    try {
+      msg = JSON.parse(data.content.toString());
+      console.log("events: got returned message", msg);
+    } catch (err) {
+      console.error("events: error parsing message", err);
+      this.queue.ack(data);
+      return;
+    }
+
+    let ack: boolean;
+    try {
+      ack = await this.processReturnedMessage(msg);
+    } catch (err) {
+      ack = true;
+      console.error("handleEventQueue Error ", err);
+    } finally {
+      if (ack) {
+        this.queue.ack(data);
+      } else {
+        setTimeout(() => this.queue.nack(data), 1000);
+      }
+    }
+  }
+
+  async processReturnedMessage(event: messages.Any): Promise<boolean> {
+    switch (event.type) {
+      case "clip_created":
+        const clip = await this.db.clip.get(event.clip?.id, {
+          useReplica: false,
+        });
+        if (!clip) {
+          throw new Error(
+            `processReturnedMessage: Clip not found clipId: ${event.clip?.id}`
+          );
+        }
+        console.log(
+          `processReturnedMessage: No receiver to handle clip, marking as failed. clipId=${clip.id} clip=`,
+          clip
+        );
+        try {
+          await this.db.clip.update(clip.id, {
+            recordingStatus: "failed",
+            failureReason:
+              "No responsible media server found to handle clipping stream",
+          });
+        } catch (error) {
+          console.error("processReturnedMessage: Error updating clip: ", error);
+          return false; // nack to retry processing the event
+        }
+        return true;
+      default:
+        console.error(
+          `processReturnedMessage: Unknown message returned. type=${event.type} event=`,
+          event
+        );
+        break;
     }
   }
 

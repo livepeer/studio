@@ -87,6 +87,8 @@ export class RabbitQueue implements Queue {
     this.channel = this.connection.createChannel({
       json: true,
       setup: async (channel: Channel) => {
+        // TODO: Move this setup to the consumers of the queue, not to mix
+        // completely different contexts here.
         await Promise.all([
           channel.assertQueue(QUEUES.events, { durable: true }),
           channel.assertQueue(QUEUES.webhooks, { durable: true }),

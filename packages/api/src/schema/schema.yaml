@@ -695,6 +695,11 @@ components:
           enum:
             - waiting
             - ready
+            - failed
+        failureReason:
+          type: string
+          readonly: true
+          description: Message explaining the error in case of a failed state.
         recordingUrl:
           type: string
           readonly: true
