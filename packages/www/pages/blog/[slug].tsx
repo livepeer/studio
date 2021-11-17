@@ -25,6 +25,7 @@ import Prefooter from "@components/Marketing/Prefooter";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import BlogCTA from "@components/Marketing/BlogCTA";
 
 const serializers = {
   types: {
@@ -32,6 +33,15 @@ const serializers = {
       <SyntaxHighlighter language={props.node.language || "text"}>
         {props.node.code}
       </SyntaxHighlighter>
+    ),
+    cta: (props) => (
+      <BlogCTA
+        title={props.node.title}
+        variant={props.node.variant}
+        internalLink={props.node.internalLink}
+        anchorLink={props.node.anchorLink}
+        externalLink={props.node.externalLink}
+      />
     ),
     "mux.video": (props) => <Player assetId={props.node.asset._ref} />,
   },
