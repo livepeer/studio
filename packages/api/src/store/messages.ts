@@ -4,7 +4,8 @@ import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
 
 namespace messages {
-  export type Any = WebhookEvent | WebhookTrigger;
+  export type Any = Webhooks;
+  export type Webhooks = WebhookEvent | WebhookTrigger;
   export type Types = Any["type"];
 
   // This is a global format followed by all messages sent by Livepeer services

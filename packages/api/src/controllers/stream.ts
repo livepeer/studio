@@ -135,7 +135,7 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
     ids.map(async (id) => {
       const stream = await db.stream.get(id);
       const user = await db.user.get(stream.userId);
-      await queue.publish("events.stream.idle", {
+      await queue.publishWebhook("events.stream.idle", {
         type: "webhook_event",
         id: uuid(),
         timestamp: Date.now(),
@@ -898,7 +898,7 @@ app.put(
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
     const event = req.body.active === true ? "stream.started" : "stream.idle";
-    await req.queue.publish(`events.${event}`, {
+    await req.queue.publishWebhook(`events.${event}`, {
       type: "webhook_event",
       id: uuid(),
       timestamp: Date.now(),
@@ -954,7 +954,7 @@ app.put(
         }
       }
       if (shouldEmit) {
-        await req.queue.publish("events.recording.started", {
+        await req.queue.publishWebhook("events.recording.started", {
           type: "webhook_event",
           id: uuid(),
           timestamp: Date.now(),
@@ -1505,7 +1505,7 @@ app.post(
       },
     };
 
-    await req.queue.publish("events.stream.detection", msg);
+    await req.queue.publishWebhook("events.stream.detection", msg);
     return res.status(204).end();
   }
 );

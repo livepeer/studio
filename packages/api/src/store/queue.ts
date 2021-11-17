@@ -4,7 +4,9 @@ import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
 import { EventKey } from "./webhook-table";
 
-const EXCHANGE_NAME = "webhook_default_exchange";
+const EXCHANGES = {
+  webhooks: "webhook_default_exchange",
+} as const;
 const QUEUES = {
   events: "webhook_events_queue",
   webhooks: "webhook_cannon_single_url",
@@ -14,7 +16,7 @@ type QueueName = keyof typeof QUEUES;
 type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
 export default interface Queue {
-  publish(key: RoutingKey, msg: messages.Any): Promise<void>;
+  publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
   delayedPublish(
     key: RoutingKey,
     msg: messages.Any,
@@ -29,8 +31,11 @@ export default interface Queue {
 }
 
 export class NoopQueue implements Queue {
-  async publish(key: RoutingKey, msg: messages.Any) {
-    console.warn(`WARN: Publish event to noop queue. key=${key} message=`, msg);
+  async publishWebhook(key: RoutingKey, msg: messages.Webhooks) {
+    console.warn(
+      `WARN: Publish webhook to noop queue. key=${key} message=`,
+      msg
+    );
   }
 
   async delayedPublish(key: RoutingKey, msg: messages.Any, delay: number) {
@@ -68,14 +73,14 @@ export class RabbitQueue implements Queue {
         await Promise.all([
           channel.assertQueue(QUEUES.events, { durable: true }),
           channel.assertQueue(QUEUES.webhooks, { durable: true }),
-          channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
-          // TODO: remove this after all old queues have been deleted
-          channel.deleteQueue("webhook_default_queue", { ifUnused: true }),
+          channel.assertExchange(EXCHANGES.webhooks, "topic", {
+            durable: true,
+          }),
         ]);
         await Promise.all([
-          channel.bindQueue(QUEUES.events, EXCHANGE_NAME, "events.#"),
-          channel.bindQueue(QUEUES.webhooks, EXCHANGE_NAME, "webhooks.#"),
-          channel.prefetch(1),
+          channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
+          channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
+          channel.prefetch(2),
         ]);
       },
     });
@@ -137,9 +142,14 @@ export class RabbitQueue implements Queue {
     await this.channel.sendToQueue(QUEUES.events, msg);
   }
 
-  public async publish(route: RoutingKey, msg: messages.Any): Promise<void> {
-    console.log(`publishing to ${route} : ${JSON.stringify(msg)}`);
-    await this.channel.publish(EXCHANGE_NAME, route, msg, { persistent: true });
+  public async publishWebhook(
+    route: RoutingKey,
+    msg: messages.Any
+  ): Promise<void> {
+    console.log(`publishing webhook to ${route} : ${JSON.stringify(msg)}`);
+    await this.channel.publish(EXCHANGES.webhooks, route, msg, {
+      persistent: true,
+    });
   }
 
   public async delayedPublish(
@@ -154,7 +164,7 @@ export class RabbitQueue implements Queue {
     const setupFunc = (channel: Channel) =>
       channel.assertQueue(delayedQueueName, {
         messageTtl: delay + 100,
-        deadLetterExchange: EXCHANGE_NAME,
+        deadLetterExchange: EXCHANGES.webhooks,
         deadLetterRoutingKey: routingKey,
         expires: delay + 15000,
         durable: true,

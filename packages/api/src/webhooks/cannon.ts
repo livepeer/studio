@@ -138,7 +138,7 @@ export default class WebhookCannon {
       };
       await Promise.all(
         webhooks.map((webhook) =>
-          this.queue.publish("webhooks.triggers", {
+          this.queue.publishWebhook("webhooks.triggers", {
             ...baseTrigger,
             id: uuid(),
             webhook,

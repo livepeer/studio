@@ -20,7 +20,7 @@ describe("Queue", () => {
 
   it("should be able to emit events and catch it via default consumer", async () => {
     await queue.consume("events", queue.handleMessage.bind(queue));
-    await queue.publish("events.stream.started", {
+    await queue.publishWebhook("events.stream.started", {
       type: "webhook_event",
       id: "abc123",
       timestamp: Date.now(),
@@ -45,7 +45,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.publish("events.stream.started", {
+    await queue.publishWebhook("events.stream.started", {
       type: "webhook_event",
       id: "custom_msg",
       timestamp: Date.now(),
