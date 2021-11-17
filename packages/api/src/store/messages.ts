@@ -1,10 +1,10 @@
-import { User } from "../schema/types";
+import { Clip, User } from "../schema/types";
 import { DBStream } from "./stream-table";
 import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
 
 namespace messages {
-  export type Any = Webhooks;
+  export type Any = Webhooks | ClipCreated;
   export type Webhooks = WebhookEvent | WebhookTrigger;
   export type Types = Any["type"];
 
@@ -44,6 +44,12 @@ namespace messages {
     stream: DBStream;
     retries?: number;
     lastInterval?: number;
+  }
+
+  export interface ClipCreated extends Base {
+    type: "clip_created";
+    userId: string;
+    clip: WithID<Clip>;
   }
 }
 

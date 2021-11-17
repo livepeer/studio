@@ -5,10 +5,13 @@ import messages from "./messages";
 import { EventKey } from "./webhook-table";
 
 const EXCHANGES = {
+  global: "lp_api_global",
+  returned: "lp_api_returned_msgs",
   webhooks: "webhook_default_exchange",
   delayed: "webhook_delayed_exchange",
 } as const;
 const QUEUES = {
+  returned: "lp_api_returned_msgs",
   events: "webhook_events_queue",
   webhooks: "webhook_cannon_single_url",
   delayed: "webhook_delayed_queue",
@@ -19,6 +22,7 @@ type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
 export default interface Queue {
   publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
+  publishGlobal(key: string, msg: messages.Any): Promise<void>;
   delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
@@ -36,6 +40,13 @@ export class NoopQueue implements Queue {
   async publishWebhook(key: RoutingKey, msg: messages.Webhooks) {
     console.warn(
       `WARN: Publish webhook to noop queue. key=${key} message=`,
+      msg
+    );
+  }
+
+  async publishGlobal(key: string, msg: messages.Any) {
+    console.warn(
+      `WARN: Publish global to noop queue. key=${key} message=`,
       msg
     );
   }
@@ -79,16 +90,25 @@ export class RabbitQueue implements Queue {
         await Promise.all([
           channel.assertQueue(QUEUES.events, { durable: true }),
           channel.assertQueue(QUEUES.webhooks, { durable: true }),
+          channel.assertQueue(QUEUES.returned, { durable: true }),
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
           }),
           channel.assertExchange(EXCHANGES.delayed, "topic", {
             durable: true,
           }),
+          channel.assertExchange(EXCHANGES.returned, "fanout", {
+            durable: true,
+          }),
         ]);
         await Promise.all([
+          channel.assertExchange(EXCHANGES.global, "topic", {
+            durable: true,
+            alternateExchange: EXCHANGES.returned,
+          }),
           channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
+          channel.bindQueue(QUEUES.returned, EXCHANGES.returned, "#"),
           channel
             .assertQueue(QUEUES.delayed, {
               deadLetterExchange: EXCHANGES.webhooks,
@@ -165,6 +185,13 @@ export class RabbitQueue implements Queue {
   ): Promise<void> {
     console.log(`publishing webhook to ${route} : ${JSON.stringify(msg)}`);
     await this.channel.publish(EXCHANGES.webhooks, route, msg, {
+      persistent: true,
+    });
+  }
+
+  public async publishGlobal(route: string, msg: messages.Any): Promise<void> {
+    console.log(`publishing global to ${route} : ${JSON.stringify(msg)}`);
+    await this.channel.publish(EXCHANGES.global, route, msg, {
       persistent: true,
     });
   }

@@ -134,6 +134,14 @@ app.post("/", validatePost("clip"), async (req, res) => {
     createdAt: Date.now(),
     recordingStatus: "waiting",
   });
+  await req.queue.publishGlobal(`clip.created.stream.${parent.id}`, {
+    type: "clip_created",
+    id: uuid(),
+    timestamp: Date.now(),
+    userId: parent.userId,
+    streamId: parent.id,
+    clip: data,
+  });
   res.status(201);
   res.json(data);
 });
