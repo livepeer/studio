@@ -24,7 +24,14 @@ const BlogCTA = ({
   }, [internalLink]);
 
   return (
-    <Flex align="center">
+    <Flex
+      align="center"
+      css={{
+        my: "$4",
+        "@bp2": {
+          my: "40px",
+        },
+      }}>
       {document && (
         <Link href={`/${document?.slug?.current}`} passHref>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
