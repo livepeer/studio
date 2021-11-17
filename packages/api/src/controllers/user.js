@@ -109,7 +109,10 @@ app.post("/", validatePost("user"), async (req, res) => {
   }
 
   try {
-    const recaptchaScore = await recaptchaVerify(recaptchaToken);
+    const recaptchaScore = await recaptchaVerify(
+      recaptchaToken,
+      req.config.recaptchaSecretKey
+    );
     if (recaptchaScore < 0.5) {
       res.status(400);
       return res.json({
