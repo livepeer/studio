@@ -44,7 +44,7 @@ const RegisterPage = () => {
       return;
     }
     try {
-      const token = await executeRecaptcha("register");
+      const recaptchaToken = await executeRecaptcha("register");
       const selectedPlan = router.query?.selectedPlan;
       setLoading(true);
       setErrors([]);
@@ -56,6 +56,7 @@ const RegisterPage = () => {
         ...(lastName && { lastName }),
         ...(organization && { organization }),
         ...(phone && { phone }),
+        recaptchaToken,
       });
       // Don't need to worry about the success case, we'll redirect
       if (res.errors) {

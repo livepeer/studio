@@ -1150,6 +1150,11 @@ components:
           description:
             Timestamp (in milliseconds) at which user's password was used
           example: 1587667174725
+        recaptchaToken:
+          type: string
+          example: 03AGdBq24blDQQCyt9BSYjS0YZ3-tZapaQ5xO2-oykG_4dS_91TzH9qOziOwXbff_QiDOsXmWKxqtOrmOEx7qjijNhbexBzvNjM6HbbhXcji1rKcxxQRsL-t3SbycwZuNXos9OjnrYmfV9F3zsy1o73ia5Wlw_Zcf1jwbm3n-yQ2epifcMHXJhsUrqmUe6a1J1mPaD2heHvCOS3vYm0rWijdMl2E4bXQf75BiWvbLKxCWv5ZF8279nCMcGyJBIw1kno-A0x5KTOlEVxV369nz12lkvRfOtRABKB49jMTygAc2BKh9GBlAYGO6PBPoIk7_BCo7I_hsHoJeT4c80ucOPraZby0QJM5jcCQcqVCYrcaPKPiUMcIEixIhB5FAfDs88uYqDWMcgZdMRKCvmxEC3ONDVDtq0nLMc4rniuC5sQTz1E4D6SR_Adik
+          description: Recaptcha v3 Token
+          writeOnly: true
     usage:
       type: object
       table: usage

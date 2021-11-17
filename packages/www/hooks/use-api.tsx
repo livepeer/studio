@@ -200,6 +200,7 @@ const makeContext = (state: ApiState, setState) => {
       lastName = null,
       phone = null,
       organization = null,
+      recaptchaToken,
     }) {
       trackPageView(email);
       const [res, body] = await context.fetch(
@@ -213,6 +214,7 @@ const makeContext = (state: ApiState, setState) => {
             ...(lastName && { lastName }),
             ...(organization && { organization }),
             ...(phone && { phone }),
+            recaptchaToken,
           }),
           headers: {
             "content-type": "application/json",

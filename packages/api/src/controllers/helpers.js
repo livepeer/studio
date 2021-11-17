@@ -368,3 +368,17 @@ export function trimPathPrefix(prefix, path) {
   }
   return path;
 }
+
+export async function recaptchaVerify(token) {
+  const secret_key = process.env.LP_RECAPTCHA_SECRET_KEY;
+  const recaptchaVerifyApiUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${token}`;
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  return await fetch(recaptchaVerifyApiUrl, {
+    method: "POST",
+    headers,
+  })
+    .then((res) => res.json())
+    .then((res) => res.score);
+}
