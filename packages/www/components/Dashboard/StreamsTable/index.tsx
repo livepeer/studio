@@ -165,7 +165,7 @@ type StreamsTableData = {
   id: string;
   name: TextCellProps;
   details: RenditionDetailsCellProps;
-  created: DateCellProps;
+  createdAt: DateCellProps;
   lastActive: DateCellProps;
   status: TextCellProps;
 };
@@ -205,10 +205,10 @@ const StreamsTable = ({
       },
       {
         Header: "Created",
-        accessor: "created",
+        accessor: "createdAt",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          dateSort("original.created.date", ...params),
+          dateSort("original.createdAt.date", ...params),
       },
       {
         Header: "Last seen",
@@ -264,7 +264,7 @@ const StreamsTable = ({
             href: `/dashboard/streams/${stream.id}`,
           },
           details: { stream },
-          created: {
+          createdAt: {
             date: new Date(stream.createdAt),
             fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
             href: `/dashboard/streams/${stream.id}`,
@@ -359,7 +359,7 @@ const StreamsTable = ({
             </Flex>
           </Heading>
         }
-        initialSortBy={[{ id: "created", desc: true }]}
+        initialSortBy={[{ id: "createdAt", desc: true }]}
         selectAction={{
           onClick: deleteDialogState.onOn,
           children: (
