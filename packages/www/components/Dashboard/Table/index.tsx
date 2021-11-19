@@ -250,6 +250,12 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
     state.cursor,
   ]);
 
+  const onSetFilters = (e) => {
+    stateSetter.setCursor("");
+    stateSetter.setPrevCursors([]);
+    stateSetter.setFilters(e);
+  };
+
   return (
     <Box>
       <Flex
@@ -299,7 +305,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               {!viewAll && filterItems && (
                 <TableFilter
                   items={filterItems}
-                  onDone={stateSetter.setFilters}
+                  onDone={(e) => onSetFilters(e)}
                 />
               )}
               {createAction && (
