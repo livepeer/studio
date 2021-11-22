@@ -43,28 +43,25 @@ const RegisterPage = () => {
       console.log("Execute recaptcha not yet available");
       return;
     }
-    try {
-      const recaptchaToken = await executeRecaptcha("register");
-      const selectedPlan = router.query?.selectedPlan;
-      setLoading(true);
-      setErrors([]);
-      const res = await register({
-        email,
-        password,
-        selectedPlan: selectedPlan ? +selectedPlan : 0,
-        ...(firstName && { firstName }),
-        ...(lastName && { lastName }),
-        ...(organization && { organization }),
-        ...(phone && { phone }),
-        recaptchaToken,
-      });
-      // Don't need to worry about the success case, we'll redirect
-      if (res.errors) {
-        setErrors(res.errors);
-        setLoading(false);
-      }
-    } catch (err) {
-      console.log("err", err);
+
+    setLoading(true);
+    setErrors([]);
+    const recaptchaToken = await executeRecaptcha("register");
+    const selectedPlan = router.query?.selectedPlan;
+    const res = await register({
+      email,
+      password,
+      selectedPlan: selectedPlan ? +selectedPlan : 0,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(organization && { organization }),
+      ...(phone && { phone }),
+      recaptchaToken,
+    });
+    // Don't need to worry about the success case, we'll redirect
+    if (res.errors) {
+      setErrors(res.errors);
+      setLoading(false);
     }
   };
   return (

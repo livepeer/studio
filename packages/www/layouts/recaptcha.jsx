@@ -1,5 +1,5 @@
-import React from 'react';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import React from "react";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 const RecaptchaComponent = (Component) => {
   const Recaptcha = ({ children }) => {
@@ -12,14 +12,10 @@ const RecaptchaComponent = (Component) => {
     );
   };
 
-  return class Higher extends React.Component {
-    render() {
-      return (
-        <Recaptcha>
-          <Component {...this.props} />
-        </Recaptcha>
-      );
-    }
-  };
+  return (props) => (
+    <Recaptcha>
+      <Component {...props} />
+    </Recaptcha>
+  );
 };
 export { RecaptchaComponent };
