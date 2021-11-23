@@ -1,7 +1,6 @@
 # *
 User-agent: *
 Allow: /
-Disallow: /dashboard*
 
 # Host
 Host: https://livepeer.com

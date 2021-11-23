@@ -166,7 +166,7 @@ type StreamsTableData = {
   name: TextCellProps;
   details: RenditionDetailsCellProps;
   createdAt: DateCellProps;
-  lastActive: DateCellProps;
+  lastSeen: DateCellProps;
   status: TextCellProps;
 };
 
@@ -212,10 +212,10 @@ const StreamsTable = ({
       },
       {
         Header: "Last seen",
-        accessor: "lastActive",
+        accessor: "lastSeen",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          dateSort("original.lastActive.date", ...params),
+          dateSort("original.lastSeen.date", ...params),
       },
       {
         Header: "Status",
@@ -269,7 +269,7 @@ const StreamsTable = ({
             fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
             href: `/dashboard/streams/${stream.id}`,
           },
-          lastActive: {
+          lastSeen: {
             date: stream.lastSeen ? new Date(stream.lastSeen) : null,
             fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
             href: `/dashboard/streams/${stream.id}`,
