@@ -1,13 +1,5 @@
 import { Box, Grid, Text, Container } from "@livepeer.com/design-system";
-import Guides from "@components/Marketing/Guides";
 
-const investorIds = [
-  "northzone",
-  "compound",
-  "dgc",
-  "collaborative-fund",
-  "notation",
-];
 const Investors = ({ backgroundColor }) => {
   return (
     <Box
@@ -55,22 +47,81 @@ const Investors = ({ backgroundColor }) => {
               },
             }}
             gap="5">
-            {investorIds.map((id) => (
-              <Box
-                as="img"
-                key={id}
-                src={`/img/investors/${id}.svg`}
-                alt={`${id} logo`}
-                className="lazyload"
-                css={{
-                  justifySelf: "center",
-                  mb: "$5",
-                  "@bp1": {
-                    mb: 0,
-                  },
-                }}
-              />
-            ))}
+            <Box
+              as="img"
+              width="137"
+              height="25"
+              src={`/img/investors/northzone.svg`}
+              alt={`northzone logo`}
+              className="lazyload"
+              css={{
+                justifySelf: "center",
+                mb: "$5",
+                "@bp1": {
+                  mb: 0,
+                },
+              }}
+            />
+            <Box
+              as="img"
+              width="136"
+              height="27"
+              src={`/img/investors/compound.svg`}
+              alt={`compound logo`}
+              className="lazyload"
+              css={{
+                justifySelf: "center",
+                mb: "$5",
+                "@bp1": {
+                  mb: 0,
+                },
+              }}
+            />
+            <Box
+              as="img"
+              width="96"
+              height="68"
+              src={`/img/investors/dgc.svg`}
+              alt={`dgc logo`}
+              className="lazyload"
+              css={{
+                justifySelf: "center",
+                mb: "$5",
+                "@bp1": {
+                  mb: 0,
+                },
+              }}
+            />
+            <Box
+              as="img"
+              width="157"
+              height="21"
+              src={`/img/investors/collaborative-fund.svg`}
+              alt={`collaborative-fund logo`}
+              className="lazyload"
+              css={{
+                justifySelf: "center",
+                mb: "$5",
+                "@bp1": {
+                  mb: 0,
+                },
+              }}
+            />
+            <Box
+              as="img"
+              width="111"
+              height="31"
+              src={`/img/investors/notation.svg`}
+              alt={`notation logo`}
+              className="lazyload"
+              css={{
+                justifySelf: "center",
+                mb: "$5",
+                "@bp1": {
+                  mb: 0,
+                },
+              }}
+            />
           </Grid>
         </Box>
       </Container>
