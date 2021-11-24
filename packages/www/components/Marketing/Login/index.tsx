@@ -171,7 +171,7 @@ const Login = ({
           />
         )}
         <Box>{errors.join(", ")}&nbsp;</Box>
-        <Button css={{ mt: "$2", px: "$5" }} onClick={onClick}>
+        <Button css={{ mt: "$2", px: "$5" }} onClick={!loading && onClick}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>

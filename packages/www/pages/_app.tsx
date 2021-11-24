@@ -6,6 +6,7 @@ import { ApiProvider } from "hooks/use-api";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "../css/algolia-docsearch.css";
+import "../css/recaptcha.css";
 
 const queryClient = new QueryClient();
 
