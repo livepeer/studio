@@ -1,8 +1,6 @@
 "use strict";
 
 import fetch from "node-fetch";
-// This is a spec but it doesn't look like it's very well supported, so
-import promiseAny from "promise.any";
 
 export function addProtocol(url, protocol = "https") {
   if (url.indexOf("://") > 0) {
@@ -58,7 +56,7 @@ function geoLocateFactory({ first = true, region = "region" }) {
     let data;
     try {
       if (first) {
-        data = await promiseAny(promises);
+        data = await Promise.any(promises);
         data = [data];
       } else {
         data = await Promise.all(promises);

@@ -3,14 +3,6 @@
 <url><loc>https://livepeer.com</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.941Z</lastmod></url>
 <url><loc>https://livepeer.com/blog</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/contact</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/billing</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/billing/plans</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/developers/api-keys</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/developers/webhooks</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/sessions</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/stream-health</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/dashboard/streams</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/forgot-password</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/login</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/pricing</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
@@ -55,7 +47,6 @@
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/tutorial</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/handling-disconnects</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference/ingest</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
-<url><loc>https://livepeer.com/docs</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides/start-live-streaming/multistream</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/api-reference</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>
 <url><loc>https://livepeer.com/docs/guides</loc><changefreq>daily</changefreq><priority>0.7</priority><lastmod>2021-09-07T18:14:37.942Z</lastmod></url>

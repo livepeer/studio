@@ -233,6 +233,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: 0,
         type: "number",
       },
+      recaptchaSecretKey: {
+        describe: "google recaptcha secret key",
+        type: "string",
+      },
     })
     .help()
     .parse(argv);

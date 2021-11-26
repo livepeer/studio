@@ -36,7 +36,9 @@ const Card = ({ description, title, image, href }) => {
           )}
         </Box>
         <Box css={{ p: "$4" }}>
-          <Heading size="1">{title}</Heading>
+          <Heading size="1" as="h2">
+            {title}
+          </Heading>
           {description && (
             <Text variant="gray" css={{ mt: "$1" }}>
               {description}

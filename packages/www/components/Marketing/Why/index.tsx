@@ -69,6 +69,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                 {title}
               </Text>
               <Heading
+                as="h2"
                 size="3"
                 css={{
                   maxWidth: 520,

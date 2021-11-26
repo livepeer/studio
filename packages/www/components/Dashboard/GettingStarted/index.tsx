@@ -7,6 +7,7 @@ import {
   Text,
   Button,
   Box,
+  Link as A,
 } from "@livepeer.com/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
@@ -15,7 +16,7 @@ const GettingStarted = ({ firstName = "" }) => {
   return (
     <>
       <Heading size="2" css={{ letterSpacing: "0", fontWeight: 600, mb: "$4" }}>
-        Get started with Livepeer.com{firstName && `, ${firstName}`}
+        Welcome to your dashboard{firstName && `, ${firstName}`}
       </Heading>
       <Accordion type="single" defaultValue="accordion-one">
         <AccordionItem value="accordion-one">
@@ -25,13 +26,42 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
           </AccordionButton>
           <AccordionPanel>
-            <Text
-              variant="gray"
-              size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
-              Learn how to create a stream, broadcast live video content and
-              playback your live stream with Livepeer.com. No code required.
-            </Text>
+            <Box>
+              <Text
+                variant="gray"
+                size="3"
+                css={{ mb: "$3", lineHeight: "23px" }}>
+                No code required! All you need to do is create a RTMP stream
+                with broadcasting software like{" "}
+                <Link passHref href="https://obsproject.com/">
+                  <A target="_blank">OBS Studio</A>
+                </Link>{" "}
+                or{" "}
+                <Link passHref href="https://streamlabs.com/">
+                  <A target="_blank">streamlabs</A>
+                </Link>
+                . Here’s how.
+              </Text>
+              <Text
+                variant="gray"
+                size="3"
+                css={{ mb: "$3", lineHeight: "23px" }}>
+                1. Navigate to the streams view, tap "Create stream", and give
+                your stream a name.
+                <br />
+                2. Copy the Playback URL and Stream Key in the stream detail
+                view and paste them into your broadcasting software.
+                <br />
+                3. Tap "Go Live" in your broadcasting software to start
+                streaming. <br />
+              </Text>
+              <Text
+                variant="gray"
+                size="3"
+                css={{ mb: "$3", lineHeight: "23px" }}>
+                Need more help? Read our step-by-step getting started tutorial.
+              </Text>
+            </Box>
             <Link href="/docs/guides/start-live-streaming/tutorial" passHref>
               <Button
                 as="a"
@@ -44,7 +74,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore docs</Box>
+                <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
@@ -53,7 +83,7 @@ const GettingStarted = ({ firstName = "" }) => {
         <AccordionItem value="accordion-two">
           <AccordionButton css={{ color: "$mauve12" }}>
             <Text size="3" css={{ color: "inherit" }}>
-              Integrate with the API
+              Build with the Livepeer API
             </Text>
           </AccordionButton>
           <AccordionPanel>
@@ -61,12 +91,23 @@ const GettingStarted = ({ firstName = "" }) => {
               variant="gray"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
-              The Livepeer.com API is easy to use and customizable. The only
-              prerequisite for using the API is creating an RTMP stream using
-              open broadcaster software (OBS) such as OpenOBS, React Native Node
-              Media Client, streamlabs or ffmpeg.
+              Ready to code? The Livepeer API is nimble and designed for
+              customization. All you need to do is create an RTMP stream with
+              broadcasting software like{" "}
+              <Link passHref href="https://obsproject.com/">
+                <A target="_blank">OBS Studio</A>
+              </Link>
+              ,{" "}
+              <Link passHref href="https://streamlabs.com/">
+                <A target="_blank">streamlabs</A>
+              </Link>
+              , or{" "}
+              <Link passHref href="https://ffmpeg.org/">
+                <A target="_blank">ffmpeg</A>
+              </Link>
+              .
             </Text>
-            <Link href="/docs/guides/api" passHref>
+            <Link href="/docs/api-reference" passHref>
               <Button
                 as="a"
                 target="_blank"
@@ -78,7 +119,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore API Docs</Box>
+                <Box css={{ mr: "$1" }}>Explore the API</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
@@ -87,7 +128,7 @@ const GettingStarted = ({ firstName = "" }) => {
         <AccordionItem value="accordion-three">
           <AccordionButton css={{ color: "$mauve12" }}>
             <Text size="3" css={{ color: "inherit" }}>
-              Create your first app
+              Create your own app
             </Text>
           </AccordionButton>
           <AccordionPanel>
@@ -95,8 +136,9 @@ const GettingStarted = ({ firstName = "" }) => {
               variant="gray"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
-              The quickest and easiest way to create your first app using
-              Livepeer.com is to fork an example app.
+              Livepeer video infrastructure is designed to serve your app, from
+              the ground up and at scale. Get started by reviewing and cloning
+              one of our sample apps.
             </Text>
             <Link
               href="/docs/guides/application-development/example-app"
@@ -112,7 +154,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 }}
                 size="2"
                 variant="violet">
-                <Box css={{ mr: "$1" }}>Explore example apps</Box>
+                <Box css={{ mr: "$1" }}>Clone and create</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>
