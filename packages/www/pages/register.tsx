@@ -15,6 +15,8 @@ import useApi from "../hooks/use-api";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
 
+const emailVerificationMode = process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE;
+
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,10 +38,13 @@ const RegisterPage = () => {
     }
   }, [email, emailValidToken]);
 
-  // If existing the email(removed the email verification), get 'em out of here
   useEffect(() => {
     if (user) {
-      router.replace("/dashboard");
+      if (emailVerificationMode && user.emailValid === false) {
+        router.replace("/verify");
+      } else {
+        router.replace("/dashboard");
+      }
     }
   }, [user]);
 

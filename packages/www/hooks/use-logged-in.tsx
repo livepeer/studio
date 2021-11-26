@@ -15,11 +15,24 @@ export default function useLoggedIn(shouldBeLoggedIn = true) {
     if (shouldBeLoggedIn === true) {
       if (!token) {
         router.replace("/login");
+      } else if (
+        process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE &&
+        user &&
+        user.emailValid === false
+      ) {
+        router.replace("/verify");
       }
     }
     // Check for user rather than token so redirects to /dashboard.
     if (shouldBeLoggedIn === false && user) {
-      router.replace(next ? next.toString() : "/dashboard");
+      if (
+        process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE &&
+        user.emailValid === false
+      ) {
+        router.replace("/verify");
+      } else {
+        router.replace(next ? next.toString() : "/dashboard");
+      }
     }
   }, [user, token, next]);
 }
