@@ -17,7 +17,8 @@ import useApi from "../hooks/use-api";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
 
-const emailVerificationMode = process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE;
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
