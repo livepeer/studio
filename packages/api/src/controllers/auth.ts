@@ -14,12 +14,10 @@ app.all(
   async (req, res) => {
     const streamId = req.headers["x-livepeer-stream-id"];
     const stream = await db.stream.get(streamId?.toString() ?? "");
-
-    const exists = stream && !stream.deleted;
-    if (!exists) {
+    if (!stream) {
       return res.status(404).json({ errors: ["stream not found"] });
     }
-    const hasAccess = stream?.userId === req.user.id || req.user.admin;
+    const hasAccess = stream.userId === req.user.id || req.user.admin;
     if (!hasAccess) {
       return res.status(403).json({ errors: ["access forbidden"] });
     }
