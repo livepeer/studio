@@ -237,6 +237,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "google recaptcha secret key",
         type: "string",
       },
+      disableRecaptcha: {
+        describe:
+          "whether to validate user registrations with google recaptcha",
+        type: "boolean",
+        default: false,
+      },
     })
     .help()
     .parse(argv);

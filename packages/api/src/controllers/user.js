@@ -102,30 +102,33 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   const { selectedPlan } = req.query;
 
-  if (!recaptchaToken) {
-    res.status(422);
-    res.json({ errors: ["Recaptcha error: it doesn't exist recaptcha token"] });
-    return;
-  }
-
-  try {
-    const recaptchaScore = await recaptchaVerify(
-      recaptchaToken,
-      req.config.recaptchaSecretKey
-    );
-    if (recaptchaScore < 0.5) {
+  if (!req.config.disableRecaptcha) {
+    if (!recaptchaToken) {
+      res.status(422);
+      res.json({
+        errors: ["Recaptcha error: it doesn't exist recaptcha token"],
+      });
+      return;
+    }
+    try {
+      const recaptchaScore = await recaptchaVerify(
+        recaptchaToken,
+        req.config.recaptchaSecretKey
+      );
+      if (recaptchaScore < 0.5) {
+        res.status(400);
+        return res.json({
+          errors: [
+            `Suspicious behavior detected. Please try again later or contact support.`,
+          ],
+        });
+      }
+    } catch (error) {
       res.status(400);
       return res.json({
-        errors: [
-          `Suspicious behavior detected. Please try again later or contact support.`,
-        ],
+        errors: [`Recaptcha error: ${error}`],
       });
     }
-  } catch (error) {
-    res.status(400);
-    return res.json({
-      errors: [`Recaptcha error: ${error}`],
-    });
   }
 
   const emailValid = validator.validate(email);
