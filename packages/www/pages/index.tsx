@@ -1,11 +1,15 @@
-import Layout from "layouts/main";
-import Prefooter from "@components/Marketing/Prefooter";
-import HomeHero from "@components/Marketing/HomeHero";
-import Investors from "@components/Marketing/Investors";
-import Testimonials from "@components/Marketing/Testimonials";
-import Contact from "@components/Marketing/Contact";
-import Why from "@components/Marketing/Why";
+import dynamic from "next/dynamic";
 import { Home as Content } from "content";
+
+const Layout = dynamic(() => import("layouts/main"));
+const Prefooter = dynamic(() => import("@components/Marketing/Prefooter"));
+const HomeHero = dynamic(() => import("@components/Marketing/HomeHero"));
+const Investors = dynamic(() => import("@components/Marketing/Investors"));
+const Testimonials = dynamic(
+  () => import("@components/Marketing/Testimonials")
+);
+const Contact = dynamic(() => import("@components/Marketing/Contact"));
+const Why = dynamic(() => import("@components/Marketing/Why"));
 
 const benefitsListItems = [
   {
