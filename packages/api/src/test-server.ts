@@ -19,7 +19,6 @@ const jwtSecret = "secret";
 const supportAddr = "Livepeer Team/angie@livepeer.org";
 const sendgridTemplateId = "iamanid";
 const sendgridApiKey = "SG. iamanapikey";
-const disableRecaptcha = true;
 
 fs.ensureDirSync(dbPath);
 
@@ -45,7 +44,6 @@ if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
 params.listen = true;
-params.disableRecaptcha = disableRecaptcha;
 let server: AppServer & { host?: string };
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);
