@@ -102,7 +102,7 @@ app.post("/", validatePost("user"), async (req, res) => {
 
   const { selectedPlan } = req.query;
 
-  if (req.config.recaptchaMode) {
+  if (!req.config.disableRecaptcha) {
     if (!recaptchaToken) {
       res.status(422);
       res.json({
