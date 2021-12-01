@@ -182,7 +182,9 @@ const DocsIndex = ({ doc, menu }) => {
                   </Fragment>
                 ))}
               </Box>
-              <Box>{content}</Box>
+              <Box as="main" className="algolia-document">
+                {content}
+              </Box>
             </Box>
           </Grid>
         </Container>
