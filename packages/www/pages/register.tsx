@@ -17,17 +17,38 @@ import useApi from "../hooks/use-api";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   const router = useRouter();
-  const { register, user } = useApi();
+  const { register, verify, user } = useApi();
+
+  const { email, emailValidToken, selectedPlan } = router.query;
+
+  useEffect(() => {
+    if (email && emailValidToken) {
+      verify(email, emailValidToken).then(() => {
+        if (selectedPlan === "1") {
+          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+        } else {
+          router.replace("/dashboard");
+        }
+      });
+    }
+  }, [email, emailValidToken]);
 
   useEffect(() => {
     if (user) {
-      router.replace("/verify");
+      if (emailVerificationMode && user.emailValid === false) {
+        router.replace("/verify");
+      } else {
+        router.replace("/dashboard");
+      }
     }
   }, [user]);
 
@@ -64,6 +85,7 @@ const RegisterPage = () => {
       setLoading(false);
     }
   };
+
   return (
     <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
