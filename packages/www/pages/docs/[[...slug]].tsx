@@ -21,6 +21,10 @@ const mobileCategories = [
     name: "API Reference",
     slug: "/docs/api-reference",
   },
+  {
+    name: "Dashboard",
+    slug: "/dashboard",
+  },
 ];
 
 const categories = [
@@ -31,6 +35,10 @@ const categories = [
   {
     name: "API Reference",
     slug: "/docs/api-reference",
+  },
+  {
+    name: "Dashboard",
+    slug: "/dashboard",
   },
 ];
 
