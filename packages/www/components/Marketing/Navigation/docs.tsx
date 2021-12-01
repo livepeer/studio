@@ -14,6 +14,7 @@ import { useApi } from "hooks";
 import { useRouter } from "next/router";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useDocSearch } from "@components/Marketing/AlgoliaDocsSearch";
+import ThemeSwitch from "@components/Dashboard/ThemeSwitch";
 import { ListBulletIcon, Cross1Icon } from "@radix-ui/react-icons";
 import {
   MobileTableOfContents,
@@ -92,6 +93,15 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                 }}>
                 <Box css={{ fontSize: "10px" }}>⌘ K</Box>
               </Box>
+            </Box>
+            <Box
+              css={{
+                ml: "$4",
+                "@bp2": {
+                  ml: "$6",
+                },
+              }}>
+              <ThemeSwitch />
             </Box>
           </Flex>
           <Dialog>
