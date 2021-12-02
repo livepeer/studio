@@ -12,33 +12,21 @@ import title from "title";
 import { components } from "@components/Marketing/MDXComponents";
 import { ContextProviders } from "layouts/main";
 
-const mobileCategories = [
-  {
-    name: "Guides",
-    slug: "/docs/guides",
-  },
-  {
-    name: "API Reference",
-    slug: "/docs/api-reference",
-  },
-  {
-    name: "Dashboard",
-    slug: "/dashboard",
-  },
-];
-
 const categories = [
   {
     name: "Guides",
     slug: "/docs/guides",
+    type: "link",
   },
   {
     name: "API Reference",
     slug: "/docs/api-reference",
+    type: "link",
   },
   {
     name: "Dashboard",
     slug: "/dashboard",
+    type: "button",
   },
 ];
 
@@ -139,11 +127,7 @@ const DocsIndex = ({ doc, menu }) => {
             display: "grid",
           },
         }}>
-        <DocsNav
-          menu={currentMenu}
-          categories={categories}
-          mobileCategories={mobileCategories}
-        />
+        <DocsNav menu={currentMenu} categories={categories} />
         <TableOfContents
           menu={currentMenu}
           hideTableOfContents={hideTableOfContents}
