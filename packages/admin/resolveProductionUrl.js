@@ -1,7 +1,7 @@
 const projectUrl =
   process.env.NODE_ENV === "production"
     ? "https://livepeer.com"
-    : "https://livepeer.monster/api";
+    : "http://localhost:3004";
 
 export default function resolveProductionUrl(document) {
   if (document._type === "post") {

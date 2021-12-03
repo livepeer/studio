@@ -147,7 +147,7 @@ const makeContext = (state: ApiState, setState) => {
         : `/api${url}`;
 
       if (isDevelopment()) {
-        endpoint = `https://livepeer.monster/api${url}`;
+        endpoint = `http://localhost:3004/api${url}`;
       }
 
       const res = await fetch(endpoint, {
