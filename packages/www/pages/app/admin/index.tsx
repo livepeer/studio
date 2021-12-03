@@ -48,10 +48,17 @@ export function getTabs(i: number): Array<TabType> {
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const AdminPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
-  if (!user || user.emailValid === false || !user.admin) {
+  if (
+    !user ||
+    (emailVerificationMode && user.emailValid === false) ||
+    !user.admin
+  ) {
     return <Layout />;
   }
   const tabs = getTabs(0);

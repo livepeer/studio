@@ -4,11 +4,14 @@ import { useApi, useLoggedIn } from "hooks";
 import StreamsTable from "components/Dashboard/StreamsTable";
 import { DashboardStream as Content } from "content";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Streams = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
 

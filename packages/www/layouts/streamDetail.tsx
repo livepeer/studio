@@ -211,6 +211,9 @@ const StreamDetail = ({
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
   const playerRef = useRef(null);
 
+  const emailVerificationMode =
+    process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
       setLastSessionLoading(true);
@@ -251,7 +254,7 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
 

@@ -16,6 +16,9 @@ import Layout from "layouts/admin";
 import useLoggedIn from "hooks/use-logged-in";
 import { useRouter } from "next/router";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const NewStream = () => {
   useLoggedIn();
   const [creating, setCreating] = useState(false);
@@ -24,7 +27,7 @@ const NewStream = () => {
   const { user, createStream } = useApi();
   const backLink = router.query.admin ? "/app/admin/streams" : "/app/user";
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
 

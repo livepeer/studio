@@ -16,11 +16,14 @@ import Link from "next/link";
 import { products } from "@livepeer.com/api/src/config";
 import { Dashboard as Content } from "content";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Dashboard = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
   const showPromo = !products[user.stripeProductId].order;

@@ -3,11 +3,14 @@ import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import AllSessionsTable from "components/Dashboard/AllSessionsTable";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Sessions = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
 

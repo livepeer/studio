@@ -24,6 +24,9 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { format } from "date-fns";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Cell = styled(Text, {
   py: "$2",
   fontSize: "$3",
@@ -62,7 +65,8 @@ const WebhookDetail = () => {
     return queryClient.invalidateQueries(id);
   }, [queryClient, id]);
 
-  return !user || user.emailValid === false ? null : (
+  return !user ||
+    (emailVerificationMode && user.emailValid === false) ? null : (
     <Layout
       id="developers/webhooks"
       breadcrumbs={[

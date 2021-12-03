@@ -4,11 +4,14 @@ import { useApi, useLoggedIn } from "hooks";
 import Plans from "components/Dashboard/Plans";
 import { DashboardPlans as Content } from "content";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
   return (

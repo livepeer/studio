@@ -7,10 +7,13 @@ import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminUsageTable from "@components/Admin/AdminUsageTable";
 import { getTabs } from "../admin";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Usage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
   const tabs = getTabs(5);

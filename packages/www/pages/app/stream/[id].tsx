@@ -40,6 +40,9 @@ import { RenditionsDetails } from "@components/Admin/StreamsTable";
 import { RelativeTime } from "@components/Admin/CommonAdminTable";
 import { getTabs as getTabsAdmin } from "../admin";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 type TimedAlertProps = {
   text: string;
   close: Function;
@@ -265,7 +268,7 @@ const ID = () => {
     setRecordOffModal(false);
   };
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
 

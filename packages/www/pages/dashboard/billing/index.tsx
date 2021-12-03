@@ -19,6 +19,9 @@ import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
 
+const emailVerificationMode =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
+
 const Billing = () => {
   useLoggedIn();
   const { user, getUsage, getSubscription, getInvoices, getPaymentMethod } =
@@ -80,7 +83,7 @@ const Billing = () => {
     }
   }, [user]);
 
-  if (!user || user.emailValid === false) {
+  if (!user || (emailVerificationMode && user.emailValid === false)) {
     return <Layout />;
   }
   return (
