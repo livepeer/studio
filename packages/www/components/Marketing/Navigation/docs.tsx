@@ -2,13 +2,14 @@ import {
   Box,
   Flex,
   Text,
-  Button,
+  Button as ThemeUIButton,
   Link as A,
   DialogTrigger,
   Dialog,
   DialogContent,
   DialogClose,
 } from "@livepeer.com/design-system";
+import Button from "@components/Marketing/Button";
 import Logo from "@components/Marketing/Logo";
 import { useApi } from "hooks";
 import { useRouter } from "next/router";
@@ -23,8 +24,7 @@ import {
 import Link from "next/link";
 
 type DocsNavProps = {
-  categories: { name: string; slug: string }[];
-  mobileCategories: { name: string; slug: string }[];
+  categories: { name: string; slug: string; type: string }[];
   menu: MenuProps;
 };
 
@@ -152,24 +152,30 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                 {categories.map((each, idx) => {
                   return (
                     <Link href={each?.slug} key={idx} passHref>
-                      <A
-                        css={{
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          ml: "$5",
-                          textDecoration: "none",
-                          color:
-                            each?.slug === currentPath
-                              ? "$hiContrast"
-                              : "$mauve11",
-                          "&:hover": {
+                      {each?.type === "button" ? (
+                        <Button as="a" arrow css={{ ml: "$5" }}>
+                          {each.name}
+                        </Button>
+                      ) : (
+                        <A
+                          css={{
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            ml: "$5",
                             textDecoration: "none",
-                            color: "$hiContrast",
-                          },
-                        }}>
-                        {each.name}
-                      </A>
+                            color:
+                              each?.slug === currentPath
+                                ? "$hiContrast"
+                                : "$mauve11",
+                            "&:hover": {
+                              textDecoration: "none",
+                              color: "$hiContrast",
+                            },
+                          }}>
+                          {each.name}
+                        </A>
+                      )}
                     </Link>
                   );
                 })}
@@ -213,14 +219,14 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
               );
             })}
           </Flex>
-          <Button onClick={onSearchOpen} ref={searchButtonRef} css={{}}>
+          <ThemeUIButton onClick={onSearchOpen} ref={searchButtonRef} css={{}}>
             <Flex css={{ alignItems: "center" }}>
               <MagnifyingGlassIcon />
               <Text variant="gray" css={{ ml: "$1", fontSize: "$2" }}>
                 Search
               </Text>
             </Flex>
-          </Button>
+          </ThemeUIButton>
         </Flex>
       </Flex>
       <SearchModal />
