@@ -651,8 +651,9 @@ const ID = () => {
                       When checked, transcoded streaming sessions will be
                       recorded and stored by Livepeer.com.
                       <br /> Each recorded session will have a recording .m3u8
-                      URL for playback. <br />
-                      This feature is currently in beta and free.
+                      URL for playback and an MP4 download link.
+                      <br />
+                      This feature is currently free.
                     </p>
                   </ReactTooltip>
                 </Box>
