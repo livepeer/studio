@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
-import Layout from "layouts/admin";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "hooks/use-logged-in";
 import UserTable from "@components/Admin/UserTable";
 import TabbedLayout from "@components/Admin/TabbedLayout";
@@ -48,19 +48,9 @@ export function getTabs(i: number): Array<TabType> {
   return tabs.map((t, ti) => (ti === i ? { ...t, isActive: true } : t));
 }
 
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
-
 const AdminPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
-  if (
-    !user ||
-    (emailVerificationMode && user.emailValid === false) ||
-    !user.admin
-  ) {
-    return <Layout />;
-  }
   const tabs = getTabs(0);
 
   return (
@@ -69,4 +59,5 @@ const AdminPage = () => {
     </TabbedLayout>
   );
 };
-export default AdminPage;
+
+export default withEmailVerifyMode(AdminPage);

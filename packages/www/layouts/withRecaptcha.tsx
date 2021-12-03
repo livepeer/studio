@@ -1,7 +1,7 @@
 import React from "react";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
-const RecaptchaComponent = (Component) => {
+const withRecaptcha = (Component) => {
   const Recaptcha = ({ children }) => {
     return (
       <GoogleReCaptchaProvider
@@ -18,4 +18,5 @@ const RecaptchaComponent = (Component) => {
     </Recaptcha>
   );
 };
-export { RecaptchaComponent };
+
+export { withRecaptcha };

@@ -1,4 +1,5 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "layouts/dashboard";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import { useApi, useLoggedIn } from "hooks";
 import {
   Box,
@@ -18,9 +19,6 @@ import UpcomingInvoiceTable from "components/Dashboard/UpcomingInvoiceTable";
 import PastInvoicesTable from "components/Dashboard/PastInvoicesTable";
 import { useQuery, useQueryClient } from "react-query";
 import { DashboardBilling as Content } from "content";
-
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
 const Billing = () => {
   useLoggedIn();
@@ -83,9 +81,6 @@ const Billing = () => {
     }
   }, [user]);
 
-  if (!user || (emailVerificationMode && user.emailValid === false)) {
-    return <Layout />;
-  }
   return (
     <Layout
       id="billing"
@@ -299,4 +294,4 @@ const Billing = () => {
   );
 };
 
-export default Billing;
+export default withEmailVerifyMode(Billing);

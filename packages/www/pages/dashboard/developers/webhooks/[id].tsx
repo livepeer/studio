@@ -1,4 +1,5 @@
-import Layout from "../../../../layouts/dashboard";
+import Layout from "layouts/dashboard";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import {
   Box,
   Button,
@@ -24,9 +25,6 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { format } from "date-fns";
 
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
-
 const Cell = styled(Text, {
   py: "$2",
   fontSize: "$3",
@@ -46,7 +44,7 @@ const StyledCross = styled(Cross1Icon, {
 
 const WebhookDetail = () => {
   useLoggedIn();
-  const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
+  const { getWebhook, deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
@@ -65,8 +63,7 @@ const WebhookDetail = () => {
     return queryClient.invalidateQueries(id);
   }, [queryClient, id]);
 
-  return !user ||
-    (emailVerificationMode && user.emailValid === false) ? null : (
+  return (
     <Layout
       id="developers/webhooks"
       breadcrumbs={[
@@ -231,4 +228,4 @@ const WebhookDetail = () => {
   );
 };
 
-export default WebhookDetail;
+export default withEmailVerifyMode(WebhookDetail);

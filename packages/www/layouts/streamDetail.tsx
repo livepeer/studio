@@ -19,6 +19,7 @@ import {
   HoverCardTrigger,
   useSnackbar,
 } from "@livepeer.com/design-system";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
@@ -211,9 +212,6 @@ const StreamDetail = ({
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
   const playerRef = useRef(null);
 
-  const emailVerificationMode =
-    process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
-
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
       setLastSessionLoading(true);
@@ -253,10 +251,6 @@ const StreamDetail = ({
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
-
-  if (!user || (emailVerificationMode && user.emailValid === false)) {
-    return <Layout />;
-  }
 
   let { broadcasterHost, region } = stream || {};
   if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
@@ -635,4 +629,4 @@ const StreamDetail = ({
   );
 };
 
-export default StreamDetail;
+export default withEmailVerifyMode(StreamDetail);

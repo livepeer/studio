@@ -1,19 +1,14 @@
 import Layout from "../../../layouts/dashboard";
 import { Box, Flex, Heading } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import Plans from "components/Dashboard/Plans";
 import { DashboardPlans as Content } from "content";
-
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
 const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || (emailVerificationMode && user.emailValid === false)) {
-    return <Layout />;
-  }
   return (
     <Layout
       id="billing/plans"
@@ -59,4 +54,4 @@ const PlansPage = () => {
   );
 };
 
-export default PlansPage;
+export default withEmailVerifyMode(PlansPage);

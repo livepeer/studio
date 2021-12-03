@@ -7,29 +7,22 @@ import {
   Flex,
   Button,
   Box,
-  Grid,
   Input,
   Container,
   Heading,
 } from "@theme-ui/components";
 import Layout from "layouts/admin";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "hooks/use-logged-in";
 import { useRouter } from "next/router";
-
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
 const NewStream = () => {
   useLoggedIn();
   const [creating, setCreating] = useState(false);
   const router = useRouter();
   const [streamName, setStreamName] = useState("");
-  const { user, createStream } = useApi();
+  const { createStream } = useApi();
   const backLink = router.query.admin ? "/app/admin/streams" : "/app/user";
-
-  if (!user || (emailVerificationMode && user.emailValid === false)) {
-    return <Layout />;
-  }
 
   return (
     <Layout>
@@ -125,4 +118,4 @@ const NewStream = () => {
   );
 };
 
-export default NewStream;
+export default withEmailVerifyMode(NewStream);

@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import { RecaptchaComponent } from "layouts/recaptcha";
+import { withRecaptcha } from "layouts/withRecaptcha";
 import Login from "../components/Marketing/Login";
 import {
   Flex,
@@ -148,4 +148,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RecaptchaComponent(RegisterPage);
+export default withRecaptcha(RegisterPage);

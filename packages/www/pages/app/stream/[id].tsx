@@ -15,7 +15,7 @@ import {
   Alert,
   Close,
 } from "@theme-ui/components";
-import Layout from "../../../layouts/admin";
+import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -39,9 +39,6 @@ import {
 import { RenditionsDetails } from "@components/Admin/StreamsTable";
 import { RelativeTime } from "@components/Admin/CommonAdminTable";
 import { getTabs as getTabsAdmin } from "../admin";
-
-const emailVerificationMode =
-  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
 type TimedAlertProps = {
   text: string;
@@ -267,10 +264,6 @@ const ID = () => {
     setDeleteModal(false);
     setRecordOffModal(false);
   };
-
-  if (!user || (emailVerificationMode && user.emailValid === false)) {
-    return <Layout />;
-  }
 
   const getIngestURL = (
     stream: Stream,
@@ -924,4 +917,4 @@ const ID = () => {
     </TabbedLayout>
   );
 };
-export default ID;
+export default withEmailVerifyMode(ID);
