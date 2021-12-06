@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
+import Layout from "layouts/admin";
 import useLoggedIn from "hooks/use-logged-in";
 import UserTable from "@components/Admin/UserTable";
 import TabbedLayout from "@components/Admin/TabbedLayout";
@@ -50,6 +51,9 @@ export function getTabs(i: number): Array<TabType> {
 const AdminPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
+  if (!user || user.emailValid === false || !user.admin) {
+    return <Layout />;
+  }
   const tabs = getTabs(0);
 
   return (

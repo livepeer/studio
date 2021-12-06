@@ -20,8 +20,12 @@ const NewStream = () => {
   const [creating, setCreating] = useState(false);
   const router = useRouter();
   const [streamName, setStreamName] = useState("");
-  const { createStream } = useApi();
+  const { user, createStream } = useApi();
   const backLink = router.query.admin ? "/app/admin/streams" : "/app/user";
+
+  if (!user) {
+    return <Layout />;
+  }
 
   return (
     <Layout>
