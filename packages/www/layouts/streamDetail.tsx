@@ -251,6 +251,10 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
+  if (!user) {
+    return <Layout />;
+  }
+
   let { broadcasterHost, region } = stream || {};
   if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
     broadcasterHost = lastSession.broadcasterHost;
