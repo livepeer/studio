@@ -50,6 +50,7 @@ interface AuthParams {
  */
 function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
+    console.log("=========>", req.config);
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
     const { tokenType, tokenValue } = parseAuthToken(authToken);
@@ -95,6 +96,15 @@ function authFactory(params: AuthParams): RequestHandler {
     }
     if (user.suspended) {
       throw new ForbiddenError(`user is suspended`);
+    }
+
+    if (
+      (req.config.requireEmailVerification || !params.allowUnverified) &&
+      user.emailValid === false
+    ) {
+      throw new ForbiddenError(
+        `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
+      );
     }
 
     // UI admins must have a JWT
