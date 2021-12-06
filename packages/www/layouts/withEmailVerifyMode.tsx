@@ -1,5 +1,5 @@
 import { useApi } from "hooks";
-import Layout from "./dashboard";
+import { useRouter } from "next/router";
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
@@ -7,9 +7,11 @@ const emailVerificationMode =
 const withEmailVerifyMode = (Component) => {
   return (props) => {
     const { user } = useApi();
-    if (!user || (emailVerificationMode && user.emailValid === false)) {
-      return <Layout />;
+    const router = useRouter();
+    if (emailVerificationMode && user.emailValid === false) {
+      router.replace("/verify");
     }
+
     return <Component {...props} />;
   };
 };

@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "../../../hooks/use-api";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminUsageTable from "@components/Admin/AdminUsageTable";
@@ -19,4 +18,4 @@ const Usage = () => {
   );
 };
 
-export default withEmailVerifyMode(Usage);
+export default Usage;

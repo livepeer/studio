@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "hooks/use-logged-in";
 import UserTable from "@components/Admin/UserTable";
 import TabbedLayout from "@components/Admin/TabbedLayout";
@@ -60,4 +59,4 @@ const AdminPage = () => {
   );
 };
 
-export default withEmailVerifyMode(AdminPage);
+export default AdminPage;

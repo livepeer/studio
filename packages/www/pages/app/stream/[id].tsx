@@ -15,7 +15,6 @@ import {
   Alert,
   Close,
 } from "@theme-ui/components";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -917,4 +916,4 @@ const ID = () => {
     </TabbedLayout>
   );
 };
-export default withEmailVerifyMode(ID);
+export default ID;

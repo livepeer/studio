@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "hooks/use-logged-in";
 import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminTokenTable from "@components/Admin/AdminTokenTable";
@@ -20,4 +19,4 @@ const Keys = () => {
   );
 };
 
-export default withEmailVerifyMode(Keys);
+export default Keys;

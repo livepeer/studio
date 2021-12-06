@@ -1,5 +1,4 @@
 import Layout from "layouts/dashboard";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import StreamsTable from "components/Dashboard/StreamsTable";
@@ -8,6 +7,10 @@ import { DashboardStream as Content } from "content";
 const Streams = () => {
   useLoggedIn();
   const { user } = useApi();
+
+  if (!user) {
+    return <Layout />;
+  }
 
   return (
     <Layout
@@ -26,4 +29,4 @@ const Streams = () => {
   );
 };
 
-export default withEmailVerifyMode(Streams);
+export default Streams;

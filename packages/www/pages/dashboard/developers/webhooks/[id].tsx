@@ -1,5 +1,4 @@
 import Layout from "layouts/dashboard";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import {
   Box,
   Button,
@@ -44,7 +43,7 @@ const StyledCross = styled(Cross1Icon, {
 
 const WebhookDetail = () => {
   useLoggedIn();
-  const { getWebhook, deleteWebhook, updateWebhook } = useApi();
+  const { user, getWebhook, deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
@@ -63,7 +62,7 @@ const WebhookDetail = () => {
     return queryClient.invalidateQueries(id);
   }, [queryClient, id]);
 
-  return (
+  return !user ? null : (
     <Layout
       id="developers/webhooks"
       breadcrumbs={[
@@ -228,4 +227,4 @@ const WebhookDetail = () => {
   );
 };
 
-export default withEmailVerifyMode(WebhookDetail);
+export default WebhookDetail;

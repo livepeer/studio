@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import useApi from "../../../hooks/use-api";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import TabbedLayout from "@components/Admin/TabbedLayout";
 import AdminStreamsTable from "@components/Admin/AdminStreamsTable";
@@ -19,4 +18,4 @@ const AdminStreamsPage = () => {
   );
 };
 
-export default withEmailVerifyMode(AdminStreamsPage);
+export default AdminStreamsPage;

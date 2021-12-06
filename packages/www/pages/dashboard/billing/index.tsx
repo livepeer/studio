@@ -1,5 +1,4 @@
 import Layout from "layouts/dashboard";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import { useApi, useLoggedIn } from "hooks";
 import {
   Box,
@@ -81,6 +80,9 @@ const Billing = () => {
     }
   }, [user]);
 
+  if (!user) {
+    return <Layout />;
+  }
   return (
     <Layout
       id="billing"
@@ -294,4 +296,4 @@ const Billing = () => {
   );
 };
 
-export default withEmailVerifyMode(Billing);
+export default Billing;

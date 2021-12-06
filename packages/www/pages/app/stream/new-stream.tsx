@@ -12,7 +12,6 @@ import {
   Heading,
 } from "@theme-ui/components";
 import Layout from "layouts/admin";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import useLoggedIn from "hooks/use-logged-in";
 import { useRouter } from "next/router";
 
@@ -118,4 +117,4 @@ const NewStream = () => {
   );
 };
 
-export default withEmailVerifyMode(NewStream);
+export default NewStream;

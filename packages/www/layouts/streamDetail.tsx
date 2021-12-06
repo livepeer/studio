@@ -19,7 +19,6 @@ import {
   HoverCardTrigger,
   useSnackbar,
 } from "@livepeer.com/design-system";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
@@ -629,4 +628,4 @@ const StreamDetail = ({
   );
 };
 
-export default withEmailVerifyMode(StreamDetail);
+export default StreamDetail;

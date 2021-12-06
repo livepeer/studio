@@ -1,6 +1,5 @@
 import Layout from "../../layouts/dashboard";
 import { Box, Flex, Button, Text, Promo } from "@livepeer.com/design-system";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import GettingStarted from "components/Dashboard/GettingStarted";
 import UsageSummary from "components/Dashboard/UsageSummary";
 import StreamsTable from "components/Dashboard/StreamsTable";
@@ -13,6 +12,9 @@ const Dashboard = () => {
   useLoggedIn();
   const { user } = useApi();
 
+  if (!user) {
+    return <Layout />;
+  }
   const showPromo = !products[user.stripeProductId].order;
 
   return (
@@ -63,4 +65,4 @@ const Dashboard = () => {
   );
 };
 
-export default withEmailVerifyMode(Dashboard);
+export default Dashboard;

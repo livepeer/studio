@@ -1,5 +1,4 @@
 import Layout from "../../../layouts/dashboard";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
 import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import TokenTable from "components/Dashboard/TokenTable";
@@ -9,6 +8,9 @@ const ApiKeys = () => {
   useLoggedIn();
   const { user } = useApi();
 
+  if (!user) {
+    return <Layout />;
+  }
   return (
     <Layout
       id="developers"
@@ -26,4 +28,4 @@ const ApiKeys = () => {
   );
 };
 
-export default withEmailVerifyMode(ApiKeys);
+export default ApiKeys;

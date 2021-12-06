@@ -1,9 +1,15 @@
 import Layout from "layouts/dashboard";
-import { withEmailVerifyMode } from "layouts/withEmailVerifyMode";
+import { useApi, useLoggedIn } from "hooks";
 import { Box } from "@livepeer.com/design-system";
 import WebhooksTable from "components/Dashboard/WebhooksTable";
 
 const ApiKeys = () => {
+  useLoggedIn();
+  const { user } = useApi();
+
+  if (!user) {
+    return <Layout />;
+  }
   return (
     <Layout
       id="developers/webhooks"
@@ -20,4 +26,4 @@ const ApiKeys = () => {
   );
 };
 
-export default withEmailVerifyMode(ApiKeys);
+export default ApiKeys;
