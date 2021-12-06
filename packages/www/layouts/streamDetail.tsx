@@ -254,15 +254,22 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
-  const isHealthy = useMemo(() => {
-    if (!stream?.isActive || !streamHealth) return null;
+  const healthState = useMemo(() => {
+    if (!stream?.isActive) return null;
+
     const activeCond = streamHealth?.conditions.find(
       (c) => c.type === "Active"
     );
-    return !activeCond?.status ||
-      streamHealth.healthy.lastProbeTime < activeCond.lastTransitionTime
-      ? null
-      : streamHealth.healthy.status;
+    const healthyCond = streamHealth?.healthy;
+    const healthValid =
+      activeCond?.status &&
+      healthyCond?.status != null &&
+      healthyCond.lastProbeTime >= activeCond.lastTransitionTime;
+    return !healthValid
+      ? StatusVariant.Pending
+      : healthyCond.status
+      ? StatusVariant.Healthy
+      : StatusVariant.Unhealthy;
   }, [stream?.isActive, streamHealth]);
 
   if (!user) {
@@ -311,13 +318,9 @@ const StreamDetail = ({
                         }}>
                         {stream.name}
                       </Box>
-                      {isHealthy == null ? null : (
+                      {!healthState ? null : (
                         <StatusBadge
-                          variant={
-                            isHealthy
-                              ? StatusVariant.Healthy
-                              : StatusVariant.Unhealthy
-                          }
+                          variant={healthState}
                           timestamp={streamHealth?.healthy?.lastProbeTime}
                           css={{ mt: "$1", letterSpacing: 0 }}
                         />
