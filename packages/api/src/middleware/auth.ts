@@ -50,7 +50,6 @@ interface AuthParams {
  */
 function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
-    console.log("=========>", req.config);
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
     const { tokenType, tokenValue } = parseAuthToken(authToken);
