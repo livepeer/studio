@@ -10,7 +10,10 @@ const computeStatus = (
   status: MultistreamStatus,
   streamActiveSince: number | undefined
 ): Status => {
-  if (status?.connected.lastProbeTime < streamActiveSince) {
+  if (
+    status?.connected.lastProbeTime < streamActiveSince ||
+    !streamActiveSince
+  ) {
     status = null;
   }
   const isConnected = status?.connected.status;
@@ -39,7 +42,7 @@ const TargetStatusBadge = ({
 }) => {
   const status = useMemo(
     () => computeStatus(stream, target, msStatus, streamActiveSince),
-    [stream, target, msStatus]
+    [stream, target, msStatus, streamActiveSince]
   );
   const timestamp = msStatus?.connected.lastProbeTime;
   return <StatusBadge variant={status} timestamp={timestamp} />;
