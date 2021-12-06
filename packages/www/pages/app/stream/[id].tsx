@@ -15,6 +15,7 @@ import {
   Alert,
   Close,
 } from "@theme-ui/components";
+import Layout from "../../../layouts/admin";
 import useLoggedIn from "../../../hooks/use-logged-in";
 import { Stream } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -263,6 +264,10 @@ const ID = () => {
     setDeleteModal(false);
     setRecordOffModal(false);
   };
+
+  if (!user) {
+    return <Layout />;
+  }
 
   const getIngestURL = (
     stream: Stream,
