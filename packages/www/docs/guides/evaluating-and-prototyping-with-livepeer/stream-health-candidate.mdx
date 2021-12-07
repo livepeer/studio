@@ -7,25 +7,28 @@ metaDescription: X
 
 # Real-Time Monitoring of Stream Health
 
-Livepeer provides a number of methods for teams to do real-time monitoring of your app's use of the Livepeer.com service, including via the Dashboard UI, Logging, or a custom app/script using the Stream Health API.
+Livepeer provides a number of methods for teams to do real-time monitoring of
+your app's use of the Livepeer.com service, including via the Dashboard UI,
+Logging, or a custom app/script using the Stream Health API.
 
 ## Types of Health Metrics
 
 - **_Transcoding_** — A `Healthy` status indicates that video transcoding is
   occurring and the multiple profiles of your stream are available for playback.
   An `Unhealthy` status indicates that we have failed to generate the profiles
-  so only the original video will be available. Check the event log (described below) for
-  any actionable errors or check the
-  [Livepeer.com Status page](https://livepeer.statuspage.io/) for platform-wide issues.
+  so only the original video will be available. Check the event log (described
+  below) for any actionable errors or check the
+  [Livepeer.com Status page](https://livepeer.statuspage.io/) for platform-wide
+  issues.
 
-- **_Real-time —_** This indicates whether the Livepeer.com network is transcoding your source stream
-  faster than real time, in other words, if the video transcode rate is lower
-  than the video duration. An `Unhealthy` status here may be caused by unconventional
-  configurations.
+- **_Real-time —_** This indicates whether the Livepeer.com network is
+  transcoding your source stream faster than real time, in other words, if the
+  video transcode rate is lower than the video duration. An `Unhealthy` status
+  here may be caused by unconventional configurations.
 
-- **_Multistreaming —_** For multistream connections to destinations like YouTube, Facebook, etc, this health check indicates whether all configured
+- **_Multistreaming —_** For multistream connections to destinations like
+  YouTube, Facebook, etc, this health check indicates whether all configured
   `Multistream Targets` are connected.
-
 
 ## Global Health Status
 
@@ -35,7 +38,6 @@ Across all streams, here's how Livepeer aggregates health status:
 - `Unhealthy` indicates that one or more of the Health Checks are in an
   `Unhealthy` state
 - `Idle` indicates that there are no currently active streams
-
 
 ## Logs
 
@@ -48,21 +50,20 @@ Transcode error from ewr-prod-livepeer-orchestrator-0 for segment 0:
 **Unsupported input pixel format**
 ```
 
-
 ## Session Ingest Rate
 
 Session ingest rate tells you the bitrate of the video received by Livepeer
 ingest servers, updated every 10 seconds. A high bitrate is suggestive that
 streams into the Livepeer system are high quality, your encoder is working
-properly, and your encoder network's internet connection is good. A fluctuating or low bitrate may
-suggest that your encoder is configured improperly or that the encoder network's internet
-connection isn't as strong as it should be to deliver high quality streams to
-your viewers.
+properly, and your encoder network's internet connection is good. A fluctuating
+or low bitrate may suggest that your encoder is configured improperly or that
+the encoder network's internet connection isn't as strong as it should be to
+deliver high quality streams to your viewers.
 
 The Dashboard provides a graphical view into this metric on a per-stream basis.
 
-
 ## Related
+
 Additional topics that cover stream health in more detail include:
 
 [Stream Health API (Candidate)](./developing-a-production-app/stream-health-candidate)
