@@ -147,7 +147,7 @@ const makeContext = (state: ApiState, setState) => {
         : `/api${url}`;
 
       if (isDevelopment()) {
-        endpoint = `http://localhost:3004/api${url}`;
+        endpoint = `https://livepeer.monster/api${url}`;
       }
 
       const res = await fetch(endpoint, {
@@ -709,6 +709,7 @@ const makeContext = (state: ApiState, setState) => {
       userId,
       cursor?: string,
       limit: number = 20,
+      order?: string,
       filters?: Array<{ id: string; value: string | object }>,
       count?: boolean
     ): Promise<[Array<Stream>, string, number]> {
@@ -716,6 +717,7 @@ const makeContext = (state: ApiState, setState) => {
       const uri = `/session?${qs.stringify({
         limit,
         cursor,
+        order,
         userId,
         filters: stringifiedFilters,
         count,
