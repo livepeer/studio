@@ -51,7 +51,7 @@ export function getTabs(i: number): Array<TabType> {
 const AdminPage = () => {
   useLoggedIn();
   const { user, logout } = useApi();
-  if (!user || user.emailValid === false || !user.admin) {
+  if (!user || !user.admin) {
     return <Layout />;
   }
   const tabs = getTabs(0);
@@ -62,4 +62,5 @@ const AdminPage = () => {
     </TabbedLayout>
   );
 };
+
 export default AdminPage;

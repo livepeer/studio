@@ -1,13 +1,13 @@
-import Layout from "../../../../layouts/dashboard";
-import { Box } from "@livepeer.com/design-system";
+import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
+import { Box } from "@livepeer.com/design-system";
 import WebhooksTable from "components/Dashboard/WebhooksTable";
 
 const ApiKeys = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
   return (

@@ -1,4 +1,4 @@
-import Layout from "../../../layouts/dashboard";
+import Layout from "layouts/dashboard";
 import { Box } from "@livepeer.com/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import StreamsTable from "components/Dashboard/StreamsTable";
@@ -8,7 +8,7 @@ const Streams = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
 

@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
+import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
 import { IdProvider } from "@radix-ui/react-id";
@@ -159,4 +160,4 @@ const Layout = ({
   );
 };
 
-export default Layout;
+export default withEmailVerifyMode(Layout);

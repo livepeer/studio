@@ -7,7 +7,6 @@ import {
   Flex,
   Button,
   Box,
-  Grid,
   Input,
   Container,
   Heading,
@@ -24,7 +23,7 @@ const NewStream = () => {
   const { user, createStream } = useApi();
   const backLink = router.query.admin ? "/app/admin/streams" : "/app/user";
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
 

@@ -251,7 +251,7 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
 

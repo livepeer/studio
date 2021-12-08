@@ -96,11 +96,16 @@ function authFactory(params: AuthParams): RequestHandler {
     if (user.suspended) {
       throw new ForbiddenError(`user is suspended`);
     }
-    if (!params.allowUnverified && user.emailValid === false) {
+
+    if (
+      (req.config.requireEmailVerification || !params.allowUnverified) &&
+      user.emailValid === false
+    ) {
       throw new ForbiddenError(
         `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
       );
     }
+
     // UI admins must have a JWT
     const isUIAdmin = user.admin && tokenType === "JWT";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {

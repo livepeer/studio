@@ -7,6 +7,7 @@ import {
   Box,
   SnackbarProvider,
 } from "@livepeer.com/design-system";
+import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
 import { Elements } from "@stripe/react-stripe-js";
@@ -163,4 +164,4 @@ function DashboardLayout({
   );
 }
 
-export default DashboardLayout;
+export default withEmailVerifyMode(DashboardLayout);

@@ -265,7 +265,7 @@ const ID = () => {
     setRecordOffModal(false);
   };
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
 

@@ -73,7 +73,7 @@ function cleanAdminOnlyFields(aof, obj) {
   }
 }
 
-app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
+app.get("/:id", authMiddleware({}), async (req, res) => {
   const user = await req.store.get(`user/${req.params.id}`);
   if (req.user.admin !== true && req.user.id !== req.params.id) {
     res.status(403);

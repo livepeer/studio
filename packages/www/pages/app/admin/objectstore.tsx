@@ -10,7 +10,7 @@ import { getTabs } from "../admin";
 const ObjectStore = () => {
   useLoggedIn();
   const { user, logout } = useApi();
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
   const tabs = getTabs(4);

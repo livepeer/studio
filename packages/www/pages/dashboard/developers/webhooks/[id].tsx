@@ -1,4 +1,4 @@
-import Layout from "../../../../layouts/dashboard";
+import Layout from "layouts/dashboard";
 import {
   Box,
   Button,
@@ -62,7 +62,7 @@ const WebhookDetail = () => {
     return queryClient.invalidateQueries(id);
   }, [queryClient, id]);
 
-  return !user || user.emailValid === false ? null : (
+  return !user ? null : (
     <Layout
       id="developers/webhooks"
       breadcrumbs={[

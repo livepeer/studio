@@ -8,7 +8,7 @@ const PlansPage = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  if (!user || user.emailValid === false) {
+  if (!user) {
     return <Layout />;
   }
   return (
