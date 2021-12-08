@@ -87,8 +87,8 @@ const filterItems: FilterItem[] = [
 type SessionsTableData = {
   id: string;
   recordingUrl: TextCellProps;
-  created: DateCellProps;
-  duration: DurationCellProps;
+  createdAt: DateCellProps;
+  sourceSegmentsDuration: DurationCellProps;
 };
 
 const defaultEmptyState = (
@@ -136,17 +136,20 @@ const StreamSessionsTable = ({
     () => [
       {
         Header: "Created at",
-        accessor: "created",
+        accessor: "createdAt",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          dateSort("original.created.date", ...params),
+          dateSort("original.createdAt.date", ...params),
       },
       {
         Header: "Duration",
-        accessor: "duration",
+        accessor: "sourceSegmentsDuration",
         Cell: DurationCell,
         sortType: (...params: SortTypeArgs) =>
-          numberSort("original.duration.duration", ...params),
+          numberSort(
+            "original.sourceSegmentsDuration.sourceSegmentsDuration",
+            ...params
+          ),
       },
       {
         Header: "Recording URL",
@@ -227,11 +230,11 @@ const StreamSessionsTable = ({
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
-            duration: {
-              duration: stream.sourceSegmentsDuration || 0,
+            sourceSegmentsDuration: {
+              sourceSegmentsDuration: stream.sourceSegmentsDuration || 0,
               status: stream.recordingStatus,
             },
-            created: {
+            createdAt: {
               date: new Date(stream.createdAt),
               fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
             },
@@ -256,7 +259,7 @@ const StreamSessionsTable = ({
         columns={columns}
         fetcher={fetcher}
         rowSelection={null}
-        initialSortBy={[{ id: "created", desc: true }]}
+        initialSortBy={[{ id: "createdAt", desc: true }]}
         showOverflow={true}
         emptyState={emptyState}
         tableLayout={tableLayout}

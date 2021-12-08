@@ -88,8 +88,8 @@ type SessionsTableData = {
   id: string;
   parentStream: TextCellProps;
   recordingUrl: TextCellProps;
-  created: DateCellProps;
-  duration: DurationCellProps;
+  createdAt: DateCellProps;
+  sourceSegmentsDuration: DurationCellProps;
 };
 
 const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
@@ -110,17 +110,20 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       },
       {
         Header: "Created at",
-        accessor: "created",
+        accessor: "createdAt",
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
-          dateSort("original.created.date", ...params),
+          dateSort("original.createdAt.date", ...params),
       },
       {
         Header: "Duration",
-        accessor: "duration",
+        accessor: "sourceSegmentsDuration",
         Cell: DurationCell,
         sortType: (...params: SortTypeArgs) =>
-          numberSort("original.duration.duration", ...params),
+          numberSort(
+            "original.sourceSegmentsDuration.sourceSegmentsDuration",
+            ...params
+          ),
       },
       {
         Header: "Recording URL",
@@ -138,6 +141,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         user.id,
         state.cursor,
         state.pageSize,
+        state.order,
         formatFiltersForApiRequest(state.filters, {
           parseNumber: (n) => n * 60,
         }),
@@ -217,11 +221,11 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
-            duration: {
-              duration: stream.sourceSegmentsDuration || 0,
+            sourceSegmentsDuration: {
+              sourceSegmentsDuration: stream.sourceSegmentsDuration || 0,
               status: stream.recordingStatus,
             },
-            created: {
+            createdAt: {
               date: new Date(stream.createdAt),
               fallback: <i>unseen</i>,
             },
@@ -260,7 +264,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         {...tableProps}
         columns={columns}
         fetcher={fetcher}
-        initialSortBy={[{ id: "created", desc: true }]}
+        initialSortBy={[{ id: "createdAt", desc: true }]}
         showOverflow={true}
         filterItems={filterItems}
         emptyState={emptyState}

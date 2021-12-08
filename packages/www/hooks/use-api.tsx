@@ -709,6 +709,7 @@ const makeContext = (state: ApiState, setState) => {
       userId,
       cursor?: string,
       limit: number = 20,
+      order?: string,
       filters?: Array<{ id: string; value: string | object }>,
       count?: boolean
     ): Promise<[Array<Stream>, string, number]> {
@@ -716,6 +717,7 @@ const makeContext = (state: ApiState, setState) => {
       const uri = `/session?${qs.stringify({
         limit,
         cursor,
+        order,
         userId,
         filters: stringifiedFilters,
         count,
