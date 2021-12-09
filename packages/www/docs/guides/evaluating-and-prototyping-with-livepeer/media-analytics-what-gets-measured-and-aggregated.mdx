@@ -5,4 +5,30 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Evaluating...
+# Media Analytics: What Gets Measured and Aggregated
+Great media analytics are a vital part of any contemporary application that streams media. This topic then discusses a variety of media analytics considerations when building with Livepeer Video.
+
+As a way to level-set, the types of analytics available from the Livepeer Video service will be ones that help you measure what's often referred to as [Quality of Service](https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=145718). For measuring what's often called Quality of Experience, your custom Livepeer-based application's own client-side analytics and the analytics that you get from your chosen media player are currently your best source of end user-level analytics (e.g. how many person-minutes of live playback did a given stream have).
+
+## Getting Answers to Your Analytics-Based Questions
+
+With that in mind, let's cover, through examples, the types of analytics-based questions that can be answered programmaticly (i.e., through the Livepeer Video REST API).
+
+Examples:
+
+### Count of All Active Media Sessions
+Want to assess the media-creation vitality of your creator community? It's straightforward to programmaticly sample an aggregate count of your creator's active live streams.
+### % of Sessions with a Given Health Status
+Anticipating what you'd do upon getting reports of end users not able to playback media at their expected quality or without pauses and skips? It's really straightforward to programmaticly create an indicator that snapshots the percentage of all of your Livepeer Video sessions that are in an unhealthy state.
+
+For additional background on the Stream Health API, see [this developer-centric topic](../developing-a-production-app/stream-health-candidate).
+### Total Transcoding Minutes in a Past Time Period
+Here you might aggregate your total transcoding minutes in a given time period as a high-level measure of how intensive is your own platform being used by media creators. The Livepeer Video Dashboard app does just that (for the current billing period) as seen in its Home > Usage section.
+
+### Connecting Livepeer Video Analytics to Your Other Analytics
+Connecting analytics systems requires shared identifiers/keys between those systems. Below is discussion about the primary identifiers from the Livepeer Video service and considerations for using them to connect analytics across Livepeer, your custom app, and your chosen media player.
+
+There are 2 primary Livepeer Video identifiers relevant to analytics, the Stream ID and Playback ID.
+
+As seen in this [example end-user app utilizing JW Player](https://github.com/livepeer/livepeer-jwplayer-demo/blob/main/pages/api/stream/index.ts#L120), at the creation of every media stream, a Stream ID and Playback ID are returned from the Livepeer Video REST API. It should be a straightforward exercise to associate those 2 Livepeer Video identifiers with the JW Media player's Analytics ID. Upon doing so, you now have a bridge between Livepeer's Quality of Service analytics and your media player's Quality of Experience analytics. You're consequently able to answer questions like: What Livepeer Video service events are correlated to stalls in the video player?
+
