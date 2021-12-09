@@ -25,8 +25,8 @@ export interface Condition {
     | "Multistreaming";
   status: boolean | null;
   frequency?: Record<string, number>;
-  lastProbeTime?: string;
-  lastTransitionsTime?: string;
+  lastProbeTime?: number;
+  lastTransitionTime?: number;
 }
 
 export interface HealthStatus {

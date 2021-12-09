@@ -23,7 +23,7 @@ import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { isStaging } from "lib/utils";
 import RelativeTime from "components/Dashboard/RelativeTime";
 import {
@@ -39,6 +39,9 @@ import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
 import Link from "next/link";
+import StatusBadge, {
+  Variant as StatusVariant,
+} from "@components/Dashboard/StatusBadge";
 
 type ShowURLProps = {
   url: string;
@@ -251,6 +254,24 @@ const StreamDetail = ({
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
 
+  const healthState = useMemo(() => {
+    if (!stream?.isActive) return null;
+
+    const activeCond = streamHealth?.conditions.find(
+      (c) => c.type === "Active"
+    );
+    const healthyCond = streamHealth?.healthy;
+    const healthValid =
+      activeCond?.status &&
+      healthyCond?.status != null &&
+      healthyCond.lastProbeTime >= activeCond.lastTransitionTime;
+    return !healthValid
+      ? StatusVariant.Pending
+      : healthyCond.status
+      ? StatusVariant.Healthy
+      : StatusVariant.Unhealthy;
+  }, [stream?.isActive, streamHealth]);
+
   if (!user) {
     return <Layout />;
   }
@@ -297,30 +318,12 @@ const StreamDetail = ({
                         }}>
                         {stream.name}
                       </Box>
-                      {!streamHealth || !stream.isActive ? null : streamHealth
-                          .healthy.status ? (
-                        <Badge
-                          size="2"
-                          variant="green"
-                          css={{ mt: "$1", letterSpacing: 0 }}>
-                          <Box css={{ mr: "$1" }}>
-                            <Status size="1" variant="green" />
-                          </Box>
-                          Healthy
-                        </Badge>
-                      ) : (
-                        <Badge
-                          size="2"
-                          variant="red"
-                          css={{
-                            mt: "$1",
-                            letterSpacing: 0,
-                          }}>
-                          <Box css={{ mr: "$1" }}>
-                            <Status size="1" variant="red" />
-                          </Box>
-                          Unhealthy
-                        </Badge>
+                      {!healthState ? null : (
+                        <StatusBadge
+                          variant={healthState}
+                          timestamp={streamHealth?.healthy?.lastProbeTime}
+                          css={{ mt: "$1", letterSpacing: 0 }}
+                        />
                       )}
                       {stream.suspended && (
                         <Badge

@@ -130,6 +130,12 @@ const MultistreamTargetsTable = ({
       queryFn: () => getMultistreamTarget(ref.id),
     }))
   ).map((res) => res.data as MultistreamTarget);
+  const streamActiveSince = useMemo(() => {
+    const activeCondition = streamHealth?.conditions.find(
+      (c) => c.type === "Active"
+    );
+    return activeCondition?.status ? activeCondition.lastTransitionTime : null;
+  }, [streamHealth?.conditions]);
 
   const tableData: TableData<TargetsTableData> = useMemo(() => {
     return {
@@ -160,6 +166,7 @@ const MultistreamTargetsTable = ({
                   stream={stream}
                   target={target}
                   status={status}
+                  streamActiveSince={streamActiveSince}
                 />
               ),
             },
