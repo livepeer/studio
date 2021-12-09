@@ -267,7 +267,9 @@ const StreamDetail = ({
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
   const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
-  const globalSrtIngestUrl = `srt://rtmp.livepeer.${domain}:2935?streamid=${stream.streamKey}`;
+  const globalSrtIngestUrl = `srt://rtmp.livepeer.${domain}:2935?streamid=${
+    stream?.streamKey || ""
+  }`;
 
   return (
     <Layout id="streams" breadcrumbs={breadcrumbs}>
@@ -464,7 +466,7 @@ const StreamDetail = ({
                         <ShowURL
                           url={globalSrtIngestUrl}
                           shortendUrl={globalSrtIngestUrl.replace(
-                            globalSrtIngestUrl.slice(38, 57),
+                            globalSrtIngestUrl.slice(38),
                             "…"
                           )}
                           anchor={false}
