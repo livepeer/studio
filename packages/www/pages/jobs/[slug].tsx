@@ -5,17 +5,15 @@ import {
   Text,
   Grid,
 } from "@livepeer.com/design-system";
-import { GraphQLClient, request } from "graphql-request";
-import { print } from "graphql/language/printer";
 import ReactMarkdown from "react-markdown";
 import Fade from "react-reveal/Fade";
 import Button from "@components/Marketing/Button";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
-import allJobs from "../../queries/allJobs.gql";
 import Code from "@components/Marketing/Code";
 import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
+import { getJobs, getJobById } from "hooks";
 
 const Page = ({
   title,
@@ -91,7 +89,7 @@ const Page = ({
                   color: "$violet9",
                 },
               }}>
-              <ReactMarkdown renderers={{ code: Code }}>{body}</ReactMarkdown>
+              <div dangerouslySetInnerHTML={{ __html: body }} />
             </Box>
             <Box
               css={{
@@ -140,15 +138,9 @@ const Page = ({
 };
 
 export async function getStaticPaths() {
-  const { allJob } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allJobs),
-    {
-      where: {},
-    }
-  );
+  const allJob = await getJobs();
   let paths = [];
-  allJob.map((page) => paths.push({ params: { slug: page.slug.current } }));
+  allJob.map((page) => paths.push({ params: { slug: page.id } }));
   return {
     fallback: true,
     paths,
@@ -157,21 +149,11 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params, preview = false }) {
   const { slug } = params;
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
-
-  let data: any = await graphQLClient.request(print(allJobs), {
-    where: {
-      slug: { current: { eq: slug } },
-    },
-  });
-
-  let job = data.allJob.find((j) => j.slug.current === slug);
-
+  const job = await getJobById(slug);
   return {
     props: {
-      ...job,
+      title: job.attributes.title,
+      body: job.attributes.body,
       slug,
       preview,
     },
