@@ -13,8 +13,8 @@ when building with Livepeer.com.
 
 As a way to level-set, the types of analytics available from the Livepeer.com
 service will be ones that help you measure what's often referred to as
-[Quality of Service](https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=145718).
-For measuring what's often called Quality of Experience, your custom
+[Quality of Service (QoS)](https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=145718).
+For measuring what's often called Quality of Experience (QOE), your custom
 Livepeer.com-based application's own client-side analytics and the analytics
 that you get from your chosen media player are currently your best source of end
 user-level analytics (e.g. how many person-minutes of live playback did a
@@ -52,12 +52,12 @@ as a high-level measure of how intensive is your own platform being used by
 media creators. The Livepeer.com Dashboard app does just that (for the current
 billing period) as seen in its Home > Usage section.
 
-## Connecting Livepeer Video Analytics to Your Other Analytics
+## Connecting Livepeer.com Analytics to Your Other Analytics
 
 Connecting analytics systems requires shared identifiers/keys between those
 systems. Below is discussion about the primary identifiers from the Livepeer.com
 service and considerations for using them to connect analytics across
-Livepeer.com, your chosen media player, and your custom app.
+Livepeer.com (QoS), your chosen media player (QoE), and your custom app.
 
 There are 2 primary Livepeer.com identifiers relevant to analytics, the Stream
 ID and Playback ID.
@@ -65,9 +65,7 @@ ID and Playback ID.
 As seen in
 [this sample end-user app utilizing JW Player](https://github.com/livepeer/livepeer-jwplayer-demo/blob/main/pages/api/stream/index.ts#L120),
 at the creation of every media stream, a Stream ID and Playback ID are returned
-from the Livepeer Video REST API. It should be a straightforward exercise to
+from the Livepeer.com API. It should be a straightforward exercise to
 associate those 2 Livepeer Video identifiers with the JW Media player's
-Analytics ID. Upon doing so, you now have a bridge between Livepeer's Quality of
-Service analytics and your media player's Quality of Experience analytics.
-You're consequently able to answer questions like: What Livepeer.com service
+Analytics ID. Upon doing so, you now have a bridge between Livepeer's QoS analytics and your media player's QoE analytics. You're consequently able to answer powerful questions like: What Livepeer.com service
 events are correlated to stalls in the media player?
