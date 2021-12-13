@@ -37,7 +37,11 @@ beforeAll(async () => {
   const { app } = (testServer = await startAuxTestServer());
   app.use(bearerToken());
   app.use((req, res, next) => {
-    req.config = { httpPrefix } as any;
+    req.config = {
+      httpPrefix,
+      jwtAudience: "livepeer",
+      jwtSecret: "secret",
+    } as any;
     next();
   });
 
@@ -69,6 +73,8 @@ describe("auth middleware", () => {
     let nonAdminUser: User;
     let nonAdminApiKey: string;
     let nonAdminToken: string;
+    let basicAuth: string;
+    let basicAuth64: string;
     let client: TestClient;
 
     const fetchWithHeader = async (header?: string) => {
@@ -87,6 +93,9 @@ describe("auth middleware", () => {
         mockAdminUserInput,
         mockNonAdminUserInput
       ));
+      basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
+      basicAuth64 = Buffer.from(basicAuth).toString("base64");
+
       client = new TestClient({ server: testServer });
     });
 
@@ -100,7 +109,7 @@ describe("auth middleware", () => {
     });
 
     it("should auth by basic auth (api key password)", async () => {
-      client.basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
+      client.basicAuth = basicAuth;
       await expectStatus().toBe(204);
     });
 
@@ -110,13 +119,11 @@ describe("auth middleware", () => {
     });
 
     it("should be case and whitespace insensitive", async () => {
-      await expectStatus(`   beAReR \t${nonAdminApiKey}`).toBe(204);
-      await expectStatus(`BEARER ${nonAdminApiKey}`).toBe(204);
-      await expectStatus(` basic  ${nonAdminUser.id}:${nonAdminApiKey}`).toBe(
-        204
-      );
+      await expectStatus(`   beAReR ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(`  BEARER ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(` baSIc  ${basicAuth64}`).toBe(204);
       await expectStatus(`   Jwt    ${nonAdminToken}`).toBe(204);
-      await expectStatus(`JWT\t${nonAdminToken}   `).toBe(204);
+      await expectStatus(` JWT  ${nonAdminToken}   `).toBe(204);
     });
   });
 

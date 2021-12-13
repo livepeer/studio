@@ -14,7 +14,7 @@ import tracking from "./tracking";
 type AuthScheme = "jwt" | "bearer" | "basic";
 
 function parseAuthHeader(authHeader: string) {
-  const match = authHeader?.match(/^\s*(\w+)\s+(.+)$/);
+  const match = authHeader?.match(/^ *(\w+) +(.+)$/);
   if (!match) return {};
   return {
     rawAuthScheme: match[1],
@@ -68,7 +68,7 @@ function authFactory(params: AuthParams): RequestHandler {
       throw new ForbiddenError(`no authorization header provided`);
     } else if (["bearer", "basic"].includes(authScheme) && !params.noApiToken) {
       const isBasic = authScheme === "basic";
-      const tokenId = isBasic ? basicUser?.pass : req.token;
+      const tokenId = isBasic ? basicUser?.pass : authToken;
       if (!tokenId) {
         throw new ForbiddenError(`no authorization token provided`);
       }
