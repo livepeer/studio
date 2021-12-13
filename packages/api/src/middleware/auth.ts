@@ -8,14 +8,18 @@ import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, ForbiddenError } from "../store/errors";
 import { WithID } from "../store/types";
-import { AuthTokenType } from "../types/common";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
+type AuthTokenType = "jwt" | "bearer" | "basic";
+
 function parseAuthToken(authToken: string) {
-  const match = authToken?.match(/^(\w+) +(.+)$/);
+  const match = authToken?.match(/^\s+(\w+)\s+(.+)$/);
   if (!match) return {};
-  return { tokenType: match[1] as AuthTokenType, tokenValue: match[2] };
+  return {
+    tokenType: match[1].trim().toLowerCase() as AuthTokenType,
+    tokenValue: match[2].trim(),
+  };
 }
 
 function isAuthorized(
@@ -60,8 +64,8 @@ function authFactory(params: AuthParams): RequestHandler {
 
     if (!tokenType) {
       throw new ForbiddenError(`no authorization header provided`);
-    } else if (["Bearer", "Basic"].includes(tokenType) && !params.noApiToken) {
-      const isBasic = tokenType === "Basic";
+    } else if (["bearer", "basic"].includes(tokenType) && !params.noApiToken) {
+      const isBasic = tokenType === "basic";
       const tokenId = isBasic ? basicUser?.pass : req.token;
       if (!tokenId) {
         throw new ForbiddenError(`no authorization token provided`);
@@ -75,7 +79,7 @@ function authFactory(params: AuthParams): RequestHandler {
       userId = tokenObject.userId;
       // track last seen
       tracking.recordToken(db, tokenObject);
-    } else if (tokenType === "JWT") {
+    } else if (tokenType === "jwt") {
       try {
         const verified = jwt.verify(tokenValue, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
@@ -107,7 +111,7 @@ function authFactory(params: AuthParams): RequestHandler {
     }
 
     // UI admins must have a JWT
-    const isUIAdmin = user.admin && tokenType === "JWT";
+    const isUIAdmin = user.admin && tokenType === "jwt";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
@@ -127,7 +131,6 @@ function authFactory(params: AuthParams): RequestHandler {
     }
 
     req.user = user;
-    req.authTokenType = tokenType;
     req.isUIAdmin = isUIAdmin;
     if (tokenObject && tokenObject.name) {
       req.tokenName = tokenObject.name;
