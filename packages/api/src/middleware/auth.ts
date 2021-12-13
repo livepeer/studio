@@ -11,15 +11,15 @@ import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
 
-type AuthTokenType = "jwt" | "bearer" | "basic";
+type AuthScheme = "jwt" | "bearer" | "basic";
 
-function parseAuthToken(authToken: string) {
-  const match = authToken?.match(/^\s+(\w+)\s+(.+)$/);
+function parseAuthHeader(authHeader: string) {
+  const match = authHeader?.match(/^\s+(\w+)\s+(.+)$/);
   if (!match) return {};
   return {
-    rawTokenType: match[1],
-    tokenType: match[1].trim().toLowerCase() as AuthTokenType,
-    tokenValue: match[2].trim(),
+    rawAuthScheme: match[1],
+    authScheme: match[1].trim().toLowerCase() as AuthScheme,
+    authToken: match[2].trim(),
   };
 }
 
@@ -56,17 +56,18 @@ interface AuthParams {
 function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
-    const authToken = req.headers.authorization;
-    const { tokenType, tokenValue, rawTokenType } = parseAuthToken(authToken);
-    const basicUser = basicAuth.parse(authToken);
+    const authHeader = req.headers.authorization;
+    const { authScheme, authToken, rawAuthScheme } =
+      parseAuthHeader(authHeader);
+    const basicUser = basicAuth.parse(authHeader);
     let user: User;
     let tokenObject: WithID<ApiToken>;
     let userId: string;
 
-    if (!tokenType) {
+    if (!authScheme) {
       throw new ForbiddenError(`no authorization header provided`);
-    } else if (["bearer", "basic"].includes(tokenType) && !params.noApiToken) {
-      const isBasic = tokenType === "basic";
+    } else if (["bearer", "basic"].includes(authScheme) && !params.noApiToken) {
+      const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : req.token;
       if (!tokenId) {
         throw new ForbiddenError(`no authorization token provided`);
@@ -80,9 +81,9 @@ function authFactory(params: AuthParams): RequestHandler {
       userId = tokenObject.userId;
       // track last seen
       tracking.recordToken(db, tokenObject);
-    } else if (tokenType === "jwt") {
+    } else if (authScheme === "jwt") {
       try {
-        const verified = jwt.verify(tokenValue, req.config.jwtSecret, {
+        const verified = jwt.verify(authToken, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
         }) as JwtPayload;
         userId = verified.sub;
@@ -92,13 +93,13 @@ function authFactory(params: AuthParams): RequestHandler {
       }
     } else {
       throw new ForbiddenError(
-        `unsupported authorization type: ${rawTokenType}`
+        `unsupported authorization header scheme: ${rawAuthScheme}`
       );
     }
 
     user = await db.user.get(userId);
     if (!user) {
-      throw new InternalServerError(`no user found for token ${authToken}`);
+      throw new InternalServerError(`no user found from auth: ${authHeader}`);
     }
     if (user.suspended) {
       throw new ForbiddenError(`user is suspended`);
@@ -114,7 +115,7 @@ function authFactory(params: AuthParams): RequestHandler {
     }
 
     // UI admins must have a JWT
-    const isUIAdmin = user.admin && tokenType === "jwt";
+    const isUIAdmin = user.admin && authScheme === "jwt";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
