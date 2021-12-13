@@ -1,5 +1,4 @@
 import { Router } from "express";
-import bearerToken from "express-bearer-token";
 import { authMiddleware } from ".";
 
 import { ApiToken, User } from "../schema/types";
@@ -35,7 +34,6 @@ beforeAll(async () => {
   };
 
   const { app } = (testServer = await startAuxTestServer());
-  app.use(bearerToken());
   app.use((req, res, next) => {
     req.config = {
       httpPrefix,

@@ -1,6 +1,5 @@
 // import 'express-async-errors' // it monkeypatches, i guess
 import Router from "express/lib/router";
-import bearerToken from "express-bearer-token";
 import makeStore from "./store";
 import {
   errorHandler,
@@ -139,7 +138,6 @@ export default async function makeApp(params: CliArgs) {
     }
     app.use(`/${insecureTestToken}`, insecureTest());
   }
-  app.use(bearerToken());
 
   // Populate Kubernetes getOrchestrators and getBroadcasters is provided
   if (kubeNamespace) {
