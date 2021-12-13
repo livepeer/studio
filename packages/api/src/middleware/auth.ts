@@ -14,7 +14,7 @@ import tracking from "./tracking";
 type AuthScheme = "jwt" | "bearer" | "basic";
 
 function parseAuthHeader(authHeader: string) {
-  const match = authHeader?.match(/^ *(\w+) +(.+)$/);
+  const match = authHeader?.match(/^\s*(\w+)\s+(.+)$/);
   if (!match) return {};
   return {
     rawAuthScheme: match[1],

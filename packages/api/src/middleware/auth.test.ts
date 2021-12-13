@@ -119,11 +119,11 @@ describe("auth middleware", () => {
     });
 
     it("should be case and whitespace insensitive", async () => {
-      await expectStatus(`   beAReR ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(`   beAReR\t ${nonAdminApiKey}`).toBe(204);
       await expectStatus(`  BEARER ${nonAdminApiKey}`).toBe(204);
       await expectStatus(` baSIc  ${basicAuth64}`).toBe(204);
-      await expectStatus(`   Jwt    ${nonAdminToken}`).toBe(204);
-      await expectStatus(` JWT  ${nonAdminToken}   `).toBe(204);
+      await expectStatus(`\tJwt    ${nonAdminToken}`).toBe(204);
+      await expectStatus(`JWT \t${nonAdminToken}   `).toBe(204);
     });
   });
 
