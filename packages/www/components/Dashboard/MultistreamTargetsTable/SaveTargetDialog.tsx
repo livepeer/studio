@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import querystring from "querystring";
 import url from "url";
 
 import {
@@ -49,34 +50,52 @@ type State = {
 
 type Api = ReturnType<typeof useApi>;
 
-const parseUrl = (ingestUrl: string, streamKey: string) => {
-  let parsed: url.UrlWithParsedQuery;
+const parseUrlSafe = (str: string) => {
   try {
-    if (ingestUrl) {
-      parsed = url.parse(ingestUrl, true);
+    if (str) {
+      return url.parse(str, true);
     }
   } catch (err) {}
-  if (!streamKey || !parsed) {
-    return parsed;
+  return null;
+};
+
+const addQuery = (
+  url: url.UrlWithParsedQuery,
+  query: querystring.ParsedUrlQuery
+) => {
+  url.query = { ...url.query, ...query };
+  url.search = `?${querystring.stringify(url.query)}`;
+};
+
+const composeIngestUrl = (ingestUrlStr: string, streamKeyStr: string) => {
+  const ingestUrl = parseUrlSafe(ingestUrlStr);
+  if (!streamKeyStr || !ingestUrl) {
+    return ingestUrl;
   }
 
-  switch (parsed.protocol) {
+  switch (ingestUrl.protocol) {
     case "rtmp:":
     case "rtmps:":
-      parsed.pathname = pathJoin2(parsed.pathname, streamKey);
+      const streamKey = parseUrlSafe(streamKeyStr);
+      if (streamKey?.pathname) {
+        ingestUrl.pathname = pathJoin2(ingestUrl.pathname, streamKey.pathname);
+      }
+      if (streamKey?.search) {
+        addQuery(ingestUrl, streamKey.query);
+      }
       break;
     case "srt:":
-      parsed.query.streamId = streamKey;
+      addQuery(ingestUrl, { streamId: streamKeyStr });
       break;
   }
-  return parsed;
+  return ingestUrl;
 };
 
 const createTarget = (
   api: Api,
   stream: Stream,
   state: State,
-  parsedUrl: url.UrlWithParsedQuery
+  parsedUrl: url.Url
 ) => {
   const targets: MultistreamTargetRef[] = [
     ...(stream.multistream?.targets ?? []),
@@ -97,7 +116,7 @@ const updateTarget = async (
   stream: Stream,
   targetId: string,
   state: State,
-  parsedUrl: url.UrlWithParsedQuery,
+  parsedUrl: url.Url,
   initState: State
 ) => {
   const patch = {
@@ -164,7 +183,7 @@ const SaveTargetDialog = ({
   };
 
   const parsedUrl = useMemo(
-    () => parseUrl(state.ingestUrl, state.streamKey),
+    () => composeIngestUrl(state.ingestUrl, state.streamKey),
     [state.ingestUrl, state.streamKey]
   );
 
