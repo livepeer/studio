@@ -8,8 +8,8 @@ const app = Router();
 
 function flatRegions(regions = []) {
   return regions.flatMap((reg) =>
-    reg.orchestrators.map((orch) => ({
-      score: defaultScore,
+    reg.orchestrators.map((orch, i) => ({
+      score: i % 2 == 0 ? defaultScore : 0,
       region: reg.region,
       ...orch,
     }))
