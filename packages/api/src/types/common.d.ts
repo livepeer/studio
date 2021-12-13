@@ -13,12 +13,6 @@ export interface OrchestratorNodeAddress extends NodeAddress {
   score: number;
 }
 
-export enum AuthTokenType {
-  JWT = "JWT",
-  Bearer = "Bearer",
-  Basic = "Basic",
-}
-
 declare global {
   namespace Express {
     // add custom properties to Request object
@@ -30,7 +24,6 @@ declare global {
       frontendDomain: string;
 
       user?: User;
-      authTokenType?: AuthTokenType;
       isUIAdmin?: boolean;
       tokenName?: string;
       tokenId?: string;

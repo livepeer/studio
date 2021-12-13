@@ -91,21 +91,21 @@ export class TestClient {
     let headers = args.headers || {};
     if (this.apiKey) {
       headers = {
-        ...headers,
         authorization: `Bearer ${this.apiKey}`,
+        ...headers,
       };
     }
     if (this.jwtAuth) {
       headers = {
-        ...headers,
         authorization: `JWT ${this.jwtAuth}`,
+        ...headers,
       };
     }
     if (this.basicAuth) {
       const basic64 = Buffer.from(this.basicAuth).toString("base64");
       headers = {
-        ...headers,
         authorization: `Basic ${basic64}`,
+        ...headers,
       };
     }
     const res = await fetch(

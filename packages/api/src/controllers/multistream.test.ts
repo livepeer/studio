@@ -367,7 +367,7 @@ describe("controllers/multistream-target", () => {
       expect(res.status).toBe(500);
       const errJson = await res.json();
       expect(errJson.errors[0]).toEqual(
-        `no user found for token Bearer ${tokenId}`
+        `no user found from authorization header: Bearer ${tokenId}`
       );
     });
   });
