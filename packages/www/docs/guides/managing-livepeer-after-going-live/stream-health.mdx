@@ -1,11 +1,11 @@
 ---
-title: Monitoring Stream Health (Candidate)
+title: Monitoring Stream and System Health (Candidate)
 description: X
 metaTitle: X
 metaDescription: X
 ---
 
-# Monitoring Stream Health
+# Monitoring Stream and System Health
 
 To monitor any active stream for issues that may impact the quality of your
 stream, navigate to the Stream Health tab on the stream detail page.
@@ -59,15 +59,15 @@ health indicators.
     your destination service, re-configure your `Multistream Target` and restart
     your stream.
 
-  ## Logs
+## Logs
 
-  Logs will surface informational alerts (ex. stream has started/stopped,
-  multistream destinations have connected/disconnected) or any fatal errors from
-  the transcoding process. Here is an example of a fatal error:
+Logs will surface informational alerts (ex. stream has started/stopped,
+multistream destinations have connected/disconnected) or any fatal errors from
+the transcoding process. Here is an example of a fatal error:
 
-  ```bash
-  Transcode error from ewr-prod-livepeer-orchestrator-0 for segment 0:
-  **Unsupported input pixel format**
+```bash
+Transcode error from ewr-prod-livepeer-orchestrator-0 for segment 0:
+**Unsupported input pixel format**
   ```
 
 If you run into this or any similar errors, check the configuration in your

@@ -5,4 +5,22 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Evaluating...
+# Live Streaming: How and What to Send to Livepeer
+
+<!-- Establishes that we support RTMP ingest well (and SRT in beta) and describes how we take a single input stream and transform it into multiple outputs. -->
+
+Like with playback, Livepeer.com supports the most widely adopted approaches for sending media from an encoder. RTMP/RTMPS is the venerable standard for live media ingest and widely supported among software and hardware media encoders. RTMP/RTMPS URLs in Livepeer.com have the following form:
+
+`rtmp://rtmp.livepeer.com/live/{stream key}`
+`rtmps://rtmp.livepeer.com/live/{stream key}`
+
+SRT is an emerging live media ingest standard and where supported, there's strong interoperability. Livepeer.com support for SRT is currently in Beta. RTMP/RTMPS URLs in Livepeer have the following form:
+
+`srt://rtmp.livepeer.com:2935?streamid={stream key}`
+
+
+RTMP and SRT also serve as the standards for Livepeer.com's multistreaming functionality.
+
+## Related
+[Multistreaming for Expanded Reach](./multistreaming-for-expanded-reach)
+

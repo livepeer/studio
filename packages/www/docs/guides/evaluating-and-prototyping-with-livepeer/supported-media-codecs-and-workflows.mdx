@@ -1,8 +1,242 @@
 ---
-title: Supported Media Codecs and Workflows
-description: X
-metaTitle: X
-metaDescription: X
+title: Supported codecs and workflows
+description: Codecs and workflows supported by Livepeer.com
+metaTitle: Supported codecs and workflows - Livepeer.com
+metaDescription: Codecs and workflows supported by Livepeer.com
 ---
 
-# Evaluating...
+# Supported Media Codecs and Workflows
+
+<!-- A revision of this existing topic where we aren't so specific about how support depends on the plan you are on—the existing topic content may not have kept up with changes in the plans.
+We will also excerpt portions of this into articles within Developing a Production App (e.g. Selecting a Video Player for Your App). -->
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+<Text size="3" variant="gray">
+Note: Your plan level may affect the system capabilities described in this topic. See the plan descriptions for details about capability enhancements or limitations.
+</Text>
+</Alert>
+
+## Ingest Support
+
+<Table
+  data={[
+    {
+      attribute: "Location",
+      notes: "EU, US",
+    },
+    {
+      attribute: "Ingest Format",
+      notes: "RTMP, SRT",
+    },
+    {
+      attribute: "Ingest Codec",
+      notes: "H264 + AAC",
+    },
+    {
+      attribute: "Ingest Authentication",
+      notes: "Webhook based",
+    },
+    {
+      attribute: "Encoder Software",
+      notes: (
+        <Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            OBS 25.0.8, ffmpeg 4.3, Streamaxia
+          </Box>
+          <Box css={{ my: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Xsplit, other versions of OBS and ffmpeg, other RTMP encoders, SRT
+            encoders
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Unsupported:
+            </Box>{" "}
+            WebRTC
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Framerate",
+      notes: "Between 5fps and 60fps, passthrough or custom",
+    },
+    {
+      attribute: "GOP Size (Keyframe Interval)",
+      notes: (
+        <Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            Constant GOP, Variable GOP of 0.5s to 8s
+          </Box>
+          <Box css={{ my: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Xsplit, Other versions of OBS and ffmpeg, other RTMP encoders
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Unsupported:
+            </Box>{" "}
+            Variable GOP not within 0.5s to 8s
+          </Box>
+        </Box>
+      ),
+    },
+  ]}
+/>
+
+## Transcoding Support
+
+<Table
+  data={[
+    {
+      attribute: "Location",
+      notes: "EU, US",
+    },
+    {
+      attribute: "Codec",
+      notes: "H264 + AAC",
+    },
+    {
+      attribute: "H264 Transcoding Profiles",
+      notes: "Baseline, Main, High",
+    },
+    {
+      attribute: "FPS",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            24, 25, 30, 60 fps, uniform across all renditions
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            custom fps, uniform across all renditions
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Resolution",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            Custom resolution up to 1080p
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Custom resolution up to 4k
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Pixel format",
+      notes: "YUV4:2:0",
+    },
+  ]}
+/>
+
+## Video Workflow Support
+
+<Table
+  data={[
+    {
+      attribute: "Latency",
+      notes:
+        "10-18 seconds with good RTMP ingest health, 2s segment size, and standard 3 seg buffering in player",
+    },
+    {
+      attribute: "Live output format",
+      notes: "HLS playback URL (m3u8)",
+    },
+    {
+      attribute: "H264 Transcoding Profiles",
+      notes: "Baseline, Main, High",
+    },
+    {
+      attribute: "Video players",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            video.js, hls.js, safari/ios native player, Theoplayer
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Video Delivery Location",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            EU, US
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            Asia, South America, Australia, Africa
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      attribute: "Live stream recording",
+      notes:
+        "HLS playback URL (m3u8) available 5 minutes after session ends. Livepeer.com stores recording and serves recorded media via its CDN. Recording length is limited by live stream max length.",
+    },
+    {
+      attribute: "Recording output format",
+      notes: "HLS playback URL (m3u8)",
+    },
+    {
+      attribute: "Stream length",
+      notes: (
+        <Box>
+          We can support streams up to 12 hours in length. Please reach out to
+          hello@livepeer.com if you’re looking to run longer uninterrupted
+          streams through Livepeer.com.
+        </Box>
+      ),
+    },
+    {
+      attribute: "Scalability",
+      notes: (
+        <Box>
+          1000 concurrent streams across all users. Please contact us at
+          hello@livepeer.com for additional capacity.
+        </Box>
+      ),
+    },
+  ]}
+/>

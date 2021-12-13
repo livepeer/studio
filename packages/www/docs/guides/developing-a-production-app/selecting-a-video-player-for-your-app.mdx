@@ -5,4 +5,32 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Developing...
+# Selecting a Video Player for Your App
+
+Livepeer.com supports playback via the [HTTP Live Streaming (HLS) standard](https://en.wikipedia.org/wiki/HTTP_Live_Streaming). This standard has extremely wide support across web and native technologies across a wide variety of devices used for media playback. See the table below for details on Livepeer.com support for popular HLS player implementations.
+
+Importantly, when you send your live video to Livepeer.com, we automatically do the work required for end-user playback at a variety of bitrates and sizes, especially lower bitrates and sizes for mobile users.
+
+<Table
+  data={[
+    {
+      attribute: "Video players",
+      notes: (
+        <Box>
+          <Box css={{ mb: "$2" }}>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported tested:
+            </Box>{" "}
+            video.js, hls.js, safari/ios native player, Theoplayer
+          </Box>
+          <Box>
+            <Box as="span" css={{ fontWeight: 600 }}>
+              Supported untested:
+            </Box>{" "}
+            JWPlayer, android native, Shaka, Exo, Bitmovin, Brightcove
+          </Box>
+        </Box>
+      ),
+    }
+  ]}
+/>

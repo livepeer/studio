@@ -5,4 +5,140 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Developing...
+# Webhooks for Custom Media-Centric Logic
+
+Livepeer.com uses webhooks to communicate with your application asynchronously when events for your stream occur. For example, you may want to know when a stream has become active or idle, so that you can surface this information to viewers. When these events happen, we’ll make a POST request to a URL that you specify.
+
+## Using Webhooks
+
+### How to configure endpoints
+
+Webhook endpoints are specific for each `event`. Once the event is registered,
+all streams for this account will be triggering the specific event. Here is an
+example of registering for the `stream.started` and `stream.idle` events:
+
+```
+curl \
+    -X POST \
+    -H "authorization: Bearer {api_key}" \
+    -H "content-type: application/json" \
+    --data-raw '{
+      "events": ["stream.started", "stream.idle"],
+      "url": "{webhook_url}",
+      "name": "test webhooks"
+  }' \
+  https://livepeer.com/api/webhook`
+```
+
+This request should return:
+
+```
+{
+      "createdAt" : 1624939859628,
+      "events": ["stream.started", "stream.idle"],
+      "id" : "e7b8a281-8952-4791-b837-183cb95bbf32",
+      "kind" : "webhook",
+      "name" : "test webhooks",
+      "url" : "{webhook_endpoint}",
+      "userId" : "ffcd3b74-9908-4d23-be05-58e1480e752a"
+}
+
+```
+
+Now all streams will trigger the `stream.started` and `stream.idle` events for
+this account.
+
+### Other webhooks endpoints
+
+`GET /api/webhook`: Get a list of webhooks
+
+`GET /api/webhook/:webhookID`: Get a single webhook Object details
+
+`PUT /api/webhook/:webhookID`: Edit a webhook, using the same parameters as POST
+/webhook
+
+`DEL /api/webhook/:webhookID`: Delete a webhook
+
+### Types of Events
+
+<Table
+  data={[
+    {
+      name: "stream.started",
+      description:
+        "The parent stream object's isActive value is marked as true and the .m3u8 HLS URL works",
+    },
+    {
+      name: "stream.idle",
+      description:
+        "The parent stream object's isActive value should be marked as false and the .m3u8 HLS URL no longer works",
+    },
+    {
+      name: "recording.ready",
+      description: "This fires when a recording is ready to be downloaded",
+    },
+    {
+      name: "recording.started",
+      description: "This fires when recording has started on an active stream",
+    },
+    {
+      name: "recording.waiting",
+      description:
+        "This fires after a stream with recording on has concluded and is not yet ready to be downloaded. Typically it takes 5 minutes for recordings to be ready for download.",
+    },
+    {
+      name: "multistream.connected",
+      description:
+        "This fires when we've successfully connected to the multistream target",
+    },
+    {
+      name: "multistream.error",
+      description:
+        "This fires when we've encountered an error either while attempting to connect to the third party streaming service or while broadcasting.",
+    },
+    {
+      name: "multistream.disconnected",
+      description:
+        "This fires when we are no longer sending video to the multistream target.",
+    },
+  ]}
+/>
+
+## Webhook Signatures
+
+You can verify webhook requests that Livepeer.com sends to your endpoints, using
+the request header signature included by Livepeer.com. This signature will help
+you verify the incoming request comes from Livepeer.com and not a third party.
+
+Livepeer.com will include a signature in each event’s `Livepeer-Signature`
+header. The timestamp is prefixed by `t=` and the signature is prefixed by a
+scheme. Schemes start with `v`, followed by an integer. Currently, the only
+valid signature scheme is v1. Livepeer.com generates signatures using HMAC with
+SHA2-256.
+
+`Livepeer-Signature: t=36285904404,v1=88f3ff0fds9sf8a98vb0b096e81507cfd5c932fc17cf63a4a55566fd38da3a2d3d2`
+
+To validate the signature, take the following steps:
+
+### Step 1: Extract the timestamp and signatures from the header
+
+Split the header, using the `,` character as the separator, to get a list of
+elements. Then split each element, using the `=` character as the separator, to
+get a prefix and value pair. The value for the prefix `t` corresponds to the
+timestamp, and `v1` corresponds to the signature (or signatures). You can
+discard all other elements.
+
+### Step 2: Prepare the signed_payload string
+
+The `signed_payload` is the raw request payload. Note that the JSON in the
+request payload includes the same `timestamp` from the signature header to
+protect against replay attacks.
+
+### Step 3: Determine the expected signature
+
+Compare the signature (or signatures) in the header to the expected signature.
+For an equality match, compute the difference between the current timestamp and
+the received timestamp, then decide if the difference is within your tolerance.
+
+To protect against timing attacks, use a constant-time string comparison to
+compare the expected signature to each of the received signatures.

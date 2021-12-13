@@ -5,4 +5,26 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Evaluating...
+# Live Streaming: Playback in a Diverse World
+
+<!-- Establishes that we support HLS playback well, including the best HLS players/frameworks and that we're adaptive to a wide range of device displays and network speeds. -->
+
+Every great contemporary app relies on standards and open source implementations of those standards, media playback apps especially.
+
+Livepeer.com playback is built upon one such foundational standard called [HTTP Live Streaming (HLS) standard](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) and the media engine behind Livepeer.com has excellent and mature support for it. Consequently, expect to see nearly complete contemporary device support across web and native.
+
+Additionally, Livepeer.com supports adaptive HLS and thus automatically does the work required for end-user playback at a variety of bitrates and pixel dimensions, especially lower bitrates and dimensions for mobile users.
+
+Playback URLs for live and recorded media have the following form on Liveper.com:
+
+Live
+`https://cdn.livepeer.com/hls/{playback id}/index.m3u8`
+
+Recorded
+`https://mdw-cdn.livepeer.com/recordings/{stream id}/index.m3u8`
+
+## Related
+
+[Live Streaming: How and What to Send to Livepeer](./live-streaming-how-and-what-to-send-to-livepeer)
+
+[Selecting a Video Player for Your App](../developing-a-production-app/selecting-a-video-player-for-your-app)

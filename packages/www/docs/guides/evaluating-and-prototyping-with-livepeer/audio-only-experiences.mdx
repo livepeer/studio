@@ -5,4 +5,14 @@ metaTitle: X
 metaDescription: X
 ---
 
-# Evaluating...
+# Audio-Only Experiences
+
+<!-- Motivation for a separate topic at this level is the ubiquity of audio-only experiences. "Audio-only streams" content moves here from the former playback topic. -->
+
+With Livepeer, live audio-only experiences are as straightforward to implement as audio-visual experiences.
+
+Often the only change required is to append `?video=false` at the end of playback URL to get an audio-only stream:
+
+`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8?video=false`
+
+For many web-based HLS players, simple substituting an HTML `<audio>` tag for the `video` tag and then CSS styling as appropriate is sufficient.
