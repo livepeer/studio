@@ -17,6 +17,7 @@ function parseAuthToken(authToken: string) {
   const match = authToken?.match(/^\s+(\w+)\s+(.+)$/);
   if (!match) return {};
   return {
+    rawTokenType: match[1],
     tokenType: match[1].trim().toLowerCase() as AuthTokenType,
     tokenValue: match[2].trim(),
   };
@@ -56,7 +57,7 @@ function authFactory(params: AuthParams): RequestHandler {
   return async (req, res, next) => {
     // must have either an API key (starts with 'Bearer') or a JWT token
     const authToken = req.headers.authorization;
-    const { tokenType, tokenValue } = parseAuthToken(authToken);
+    const { tokenType, tokenValue, rawTokenType } = parseAuthToken(authToken);
     const basicUser = basicAuth.parse(authToken);
     let user: User;
     let tokenObject: WithID<ApiToken>;
@@ -90,7 +91,9 @@ function authFactory(params: AuthParams): RequestHandler {
         throw new ForbiddenError(err.message);
       }
     } else {
-      throw new ForbiddenError(`unsupported authorization type ${tokenType}`);
+      throw new ForbiddenError(
+        `unsupported authorization type: ${rawTokenType}`
+      );
     }
 
     user = await db.user.get(userId);
