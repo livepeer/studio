@@ -99,7 +99,9 @@ function authFactory(params: AuthParams): RequestHandler {
 
     user = await db.user.get(userId);
     if (!user) {
-      throw new InternalServerError(`no user found from auth: ${authHeader}`);
+      throw new InternalServerError(
+        `no user found from authorization header: ${authHeader}`
+      );
     }
     if (user.suspended) {
       throw new ForbiddenError(`user is suspended`);

@@ -60,10 +60,66 @@ beforeAll(async () => {
 afterAll(() => testServer.close());
 
 afterEach(async () => {
+  httpPrefix = "";
   await clearDatabase(server);
 });
 
 describe("auth middleware", () => {
+  describe("api header parsing", () => {
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let nonAdminToken: string;
+    let client: TestClient;
+
+    const fetchWithHeader = async (header?: string) => {
+      const res = await client.fetch("/foo", {
+        headers: header ? { authorization: header } : {},
+      });
+      return res.status;
+    };
+
+    const expectStatus = (header?: string) =>
+      expect(fetchWithHeader(header)).resolves;
+
+    beforeEach(async () => {
+      ({ nonAdminUser, nonAdminApiKey, nonAdminToken } = await setupUsers(
+        server,
+        mockAdminUserInput,
+        mockNonAdminUserInput
+      ));
+      client = new TestClient({ server: testServer });
+    });
+
+    it("should forbid without auth", async () => {
+      await expectStatus().toBe(403);
+    });
+
+    it("should auth by bearer api key", async () => {
+      client.apiKey = nonAdminApiKey;
+      await expectStatus().toBe(204);
+    });
+
+    it("should auth by basic auth (api key password)", async () => {
+      client.basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
+      await expectStatus().toBe(204);
+    });
+
+    it("should auth by jwt", async () => {
+      client.jwtAuth = nonAdminToken;
+      await expectStatus().toBe(204);
+    });
+
+    it("should be case and whitespace insensitive", async () => {
+      await expectStatus(`   beAReR \t${nonAdminApiKey}`).toBe(204);
+      await expectStatus(`BEARER ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(` basic  ${nonAdminUser.id}:${nonAdminApiKey}`).toBe(
+        204
+      );
+      await expectStatus(`   Jwt    ${nonAdminToken}`).toBe(204);
+      await expectStatus(`JWT\t${nonAdminToken}   `).toBe(204);
+    });
+  });
+
   describe("api token access rules", () => {
     let adminUser: User;
     let adminApiKey: string;
@@ -86,7 +142,6 @@ describe("auth middleware", () => {
       ({ adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
 
-      httpPrefix = "";
       client = new TestClient({ server: testServer });
       client.apiKey = nonAdminApiKey;
     });
