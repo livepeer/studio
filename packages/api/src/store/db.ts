@@ -97,6 +97,7 @@ export class DB {
       this.replicaPool = new Pool({
         connectionTimeoutMillis: CONNECT_TIMEOUT,
         connectionString: postgresReplicaUrl,
+        application_name: `${appName}-read-${hostname()}`,
       });
     } else {
       console.log("no replica url found, not using read replica");
