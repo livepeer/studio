@@ -107,10 +107,9 @@ function authFactory(params: AuthParams): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
-    if (
-      (req.config.requireEmailVerification || !params.allowUnverified) &&
-      user.emailValid === false
-    ) {
+    const verifyEmail =
+      req.config.requireEmailVerification && !params.allowUnverified;
+    if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
         `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
       );
