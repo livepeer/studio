@@ -36,29 +36,19 @@ const GEOLOCATION_ENDPOINTS = [
 
 export default async function makeApp(params: CliArgs) {
   const {
-    storage,
-    dbPath,
     httpPrefix = "/api",
-    port,
     postgresUrl,
     postgresReplicaUrl,
-    cloudflareNamespace,
-    cloudflareAccount,
-    cloudflareAuth,
-    listen = true,
-    clientId,
     frontendDomain = "livepeer.com",
-    jwtSecret,
-    jwtAudience,
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
-    segmentApiKey,
     kubeNamespace,
     kubeBroadcasterService,
     kubeBroadcasterTemplate,
     kubeOrchestratorService,
     kubeOrchestratorTemplate,
+    ownRegion,
     subgraphUrl,
     fallbackProxy,
     orchestrators = "[]",
@@ -66,8 +56,6 @@ export default async function makeApp(params: CliArgs) {
     ingest = "[]",
     prices = "[]",
     insecureTestToken,
-    firestoreCredentials,
-    firestoreCollection,
     stripeSecretKey,
     amqpUrl,
     returnRegionInOrchestrator,
@@ -86,6 +74,7 @@ export default async function makeApp(params: CliArgs) {
   const [db, store] = await makeStore({
     postgresUrl,
     postgresReplicaUrl,
+    appName: ownRegion ? `${ownRegion}-api` : "api",
   });
 
   // RabbitMQ
