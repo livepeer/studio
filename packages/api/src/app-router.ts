@@ -48,6 +48,7 @@ export default async function makeApp(params: CliArgs) {
     kubeBroadcasterTemplate,
     kubeOrchestratorService,
     kubeOrchestratorTemplate,
+    ownRegion,
     subgraphUrl,
     fallbackProxy,
     orchestrators = "[]",
@@ -73,6 +74,7 @@ export default async function makeApp(params: CliArgs) {
   const [db, store] = await makeStore({
     postgresUrl,
     postgresReplicaUrl,
+    appName: ownRegion ? `${ownRegion}-api` : "api",
   });
 
   // RabbitMQ
