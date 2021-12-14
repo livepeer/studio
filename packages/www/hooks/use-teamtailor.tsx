@@ -58,3 +58,30 @@ export const getJobById = async (id) => {
 
   return body.data;
 };
+
+export const getQuestionIdsByJobId = async (id) => {
+  const [res, body] = await fetchService(
+    `/jobs/${id}/relationships/questions`,
+    {
+      method: "GET",
+    }
+  );
+
+  if (res.status !== 200) {
+    throw new Error(body);
+  }
+
+  return body.data;
+};
+
+export const getQuestionsById = async (id) => {
+  const [res, body] = await fetchService(`/questions/${id}`, {
+    method: "GET",
+  });
+
+  if (res.status !== 200) {
+    throw new Error(body);
+  }
+
+  return body.data;
+};
