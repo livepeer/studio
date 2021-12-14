@@ -55,7 +55,7 @@ const globalStyles = global({
     fontFamily: "$untitled",
   },
 
-  "h1, h2, h3, h4, h5": { fontWeight: 500 },
+  "h1, h2, h3, h4, h5": { fontWeight: 500, textTransform: "capitalize" },
 
   "body, button": {
     fontFamily: "$untitled",
