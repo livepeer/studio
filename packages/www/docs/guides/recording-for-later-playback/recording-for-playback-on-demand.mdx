@@ -1,0 +1,39 @@
+---
+title: Recording for Playback On Demand
+description: X
+metaTitle: X
+metaDescription: X
+---
+
+# Recording for Playback On Demand
+
+<!-- Establishes that we do recording well and that recorded playback likewise allows
+instant playback start and seek across the same wide range of devices as with
+live. -->
+
+With Livepeer.com, recording is a capability that can be enabled (default is
+off) at the stream level, either via the API or via the Dashboard UI. In either
+case, the recording setting applies to only new live sessions for that stream.
+
+Default playback of recorded media uses the same HLS standard as live, thus
+providing capabilities like fast startup, instant seek, and the same wide device
+support as HLS live. On-demand HLS will be available for adaptive playback with
+the same set of bitrates and dimensions as the live source was. The on-demand
+download will be at the same bitrate and dimensions as the live source.
+
+The structure of the playback URLs for Live, On-Demand, and Download are
+contrasted below:
+
+Live HLS `https://cdn.livepeer.com/hls/{Stream Key}/index.m3u8`
+
+On-Demand HLS `https://cdn.livepeer.com/recordings/{Stream ID}/index.m3u8`
+
+On-Demand Download
+`https://mdw-cdn.livepeer.com/recordings/{Stream ID}/source.mp4`
+
+Most media players support playback of all 3 forms above without special
+configuration.
+
+## Related
+
+<!-- Need to find a home for the Recording API content currently in docs/guides/start-live-streaming/record -->

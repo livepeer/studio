@@ -214,7 +214,7 @@ const TableOfContents = ({
         overflowY: "auto",
         justifyContent: "space-between",
         position: "sticky",
-        marginLeft: hideTableOfContents ? -220 : 0,
+        marginLeft: hideTableOfContents ? -270 : 0,
         transition: "all 0.2s",
         top: 72,
         display: "none",
@@ -224,9 +224,9 @@ const TableOfContents = ({
       }}>
       <Box
         css={{
-          width: 220,
-          minWidth: 220,
-          maxWidth: 220,
+          width: 270,
+          minWidth: 270,
+          maxWidth: 270,
         }}>
         <Box
           css={{
@@ -249,8 +249,8 @@ const TableOfContents = ({
           borderRight: "1px solid $colors$mauve5",
           pt: "$5",
           transition: "all 0.2s",
-          width: "60px",
-          minWidth: "60px",
+          width: "50px",
+          minWidth: "50px",
           display: "flex",
           justifyContent: "center",
         }}>
