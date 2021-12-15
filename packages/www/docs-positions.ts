@@ -20,7 +20,7 @@ export const docsPositions = [
   "docs/guides/start-live-streaming/create-paywall.mdx",
   "docs/guides/start-live-streaming/support-matrix.mdx",
   "docs/guides/start-live-streaming/monitoring-stream-health.mdx",
-  "docs/guides/start-live-streaming/srt-support",
+  "docs/guides/start-live-streaming/srt-support.mdx",
   "docs/guides/api.mdx",
   "docs/guides/application-development/index.mdx",
   "docs/guides/application-development/example-app.mdx",
