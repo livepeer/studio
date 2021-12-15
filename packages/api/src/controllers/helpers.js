@@ -293,6 +293,10 @@ export function parseFilters(fieldsMap, val) {
               } `
             )
           );
+        } else if (fv.type === "full-text") {
+          q.push(
+            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
+          );
         } else if (isObject(filter.value)) {
           // if value is a dictionary
           Object.keys(filter.value).forEach(function (key, _index) {
