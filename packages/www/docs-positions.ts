@@ -23,6 +23,7 @@ export const docsPositions = [
   "docs/guides/developing-a-production-app/selecting-a-video-player-for-your-app.mdx",
   "docs/guides/developing-a-production-app/deployment-and-networking-considerations.mdx",
   "docs/guides/developing-a-production-app/stream-health.mdx",
+  "docs/guides/developing-a-production-app/recording-api.mdx",
   "docs/guides/managing-livepeer-after-going-live/index.mdx",
   "docs/guides/managing-livepeer-after-going-live/livepeer-dashboard-stream-management.mdx",
   "docs/guides/managing-livepeer-after-going-live/stream-health.mdx",
