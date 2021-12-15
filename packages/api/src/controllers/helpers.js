@@ -293,41 +293,37 @@ export function parseFilters(fieldsMap, val) {
               } `
             )
           );
-        } else {
+        } else if (isObject(filter.value)) {
           // if value is a dictionary
-          if (isObject(filter.value)) {
-            Object.keys(filter.value).map(function (key, _index) {
-              let comparison = "";
-              switch (key) {
-                case "gt":
-                  comparison = ">";
-                  break;
-                case "gte":
-                  comparison = ">=";
-                  break;
-                case "lt":
-                  comparison = "<";
-                  break;
-                case "lte":
-                  comparison = "<=";
-                  break;
-                default:
-                  comparison = "=";
-              }
-              q.push(
-                sql``
-                  .append(fv.val)
-                  .append(comparison)
-                  .append(sql` ${filter.value[key]}`)
-              );
-            });
-          } else {
+          Object.keys(filter.value).forEach(function (key, _index) {
+            let comparison = "";
+            switch (key) {
+              case "gt":
+                comparison = ">";
+                break;
+              case "gte":
+                comparison = ">=";
+                break;
+              case "lt":
+                comparison = "<";
+                break;
+              case "lte":
+                comparison = "<=";
+                break;
+              default:
+                comparison = "=";
+            }
             q.push(
               sql``
                 .append(fv.val)
-                .append(sql` LIKE ${"%" + filter.value + "%"}`)
+                .append(comparison)
+                .append(sql` ${filter.value[key]}`)
             );
-          }
+          });
+        } else {
+          q.push(
+            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
+          );
         }
       }
     }
