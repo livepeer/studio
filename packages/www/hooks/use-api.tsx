@@ -551,6 +551,7 @@ const makeContext = (state: ApiState, setState) => {
     async getAdminStreams({
       active,
       nonLivepeerOnly,
+      userId,
       order,
       filters,
       limit,
@@ -559,6 +560,7 @@ const makeContext = (state: ApiState, setState) => {
     }: {
       active?: boolean;
       nonLivepeerOnly?: boolean;
+      userId?: string;
       order?: string;
       filters?: Array<{ id: string; value: string }>;
       limit?: number;
@@ -576,6 +578,7 @@ const makeContext = (state: ApiState, setState) => {
           cursor,
           filters: f,
           nonLivepeerOnly,
+          userId,
           sessionsonly,
         })}`
       );
