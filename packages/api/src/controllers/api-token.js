@@ -45,10 +45,10 @@ app.delete("/:id", async (req, res) => {
 
 const fieldsMap = {
   id: `api_token.ID`,
-  name: `api_token.data->>'name'`,
+  name: { val: `api_token.data->>'name'`, type: "full-text" },
   lastSeen: `api_token.data->'lastSeen'`,
   userId: `api_token.data->>'userId'`,
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
 };
 
 app.get("/", async (req, res) => {

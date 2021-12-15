@@ -18,11 +18,11 @@ const app = Router();
 
 const fieldsMap = {
   id: `session.ID`,
-  name: `session.data->>'name'`,
+  name: { val: `session.data->>'name'`, type: "full-text" },
   lastSeen: { val: `session.data->'lastSeen'`, type: "int" },
   createdAt: { val: `session.data->'createdAt'`, type: "int" },
   userId: `session.data->>'userId'`,
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `session.data->>'parentId'`,
   record: { val: `session.data->'record'`, type: "boolean" },
   sourceSegments: `session.data->'sourceSegments'`,
