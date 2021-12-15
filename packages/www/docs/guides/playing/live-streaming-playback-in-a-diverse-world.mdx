@@ -29,7 +29,26 @@ Live `https://cdn.livepeer.com/hls/{playback id}/index.m3u8`
 
 Recorded `https://mdw-cdn.livepeer.com/recordings/{stream id}/index.m3u8`
 
-## Related
+## Creating Paywall for Your Live Streams
+
+Building paywall is a common approach for monetizing live video content. While
+Livepeer.com does not have a built-in paywall feature, it integrates well with
+other tools and platforms that do.
+
+Example solutions include:
+
+1. [JWPlayer](https://www.jwplayer.com/) allows you to create a password for
+   each video asset, or to lock down access to public video altogether via URL
+   token signing. Refer to the
+   [JWPlayer Livepeer.com demo app](https://github.com/livepeer/livepeer-jwplayer-demo)
+   for an example integration between JWPlayer and Livepeer.com.
+2. For WordPress sites, there is a
+   [rich plugin ecosystem](https://wordpress.org/plugins/search/paywall/) that
+   provide many different paywall options.
+3. You can use application logic to hide the unique Livepeer.com video playback
+   URL behind a custom paywall by default.
+
+## Related Topics
 
 [Live Streaming: How and What to Send to Livepeer](../encoding-and-connecting/live-streaming-how-and-what-to-send-to-livepeer)
 
