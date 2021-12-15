@@ -283,7 +283,7 @@ export function parseFilters(fieldsMap, val) {
     const fv = fieldsMap[filter.id];
     if (fv) {
       if (typeof fv === "string") {
-        q.push(sql``.append(fv).append(sql` LIKE ${"%" + filter.value + "%"}`));
+        q.push(sql``.append(fv).append(sql` = ${filter.value}`));
       } else if (fv.val) {
         if (fv.type === "boolean") {
           q.push(
@@ -321,9 +321,7 @@ export function parseFilters(fieldsMap, val) {
             );
           });
         } else {
-          q.push(
-            sql``.append(fv.val).append(sql` LIKE ${"%" + filter.value + "%"}`)
-          );
+          q.push(sql``.append(fv.val).append(sql` = ${filter.value}`));
         }
       }
     }
