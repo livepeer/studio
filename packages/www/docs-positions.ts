@@ -28,6 +28,7 @@ export const docsPositions = [
   "docs/guides/managing-livepeer-after-going-live/livepeer-dashboard-stream-management.mdx",
   "docs/guides/managing-livepeer-after-going-live/stream-health.mdx",
   "docs/guides/managing-livepeer-after-going-live/debug-live-stream-issues.mdx",
+  "docs/guides/managing-livepeer-after-going-live/reducing-latency.mdx",
   "docs/api-reference/index.mdx",
   "docs/api-reference/stream/index.mdx",
   "docs/api-reference/stream/overview.mdx",
