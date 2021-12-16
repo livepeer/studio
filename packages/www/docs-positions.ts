@@ -10,7 +10,7 @@ export const docsPositions = [
   "docs/guides/developing-and-prototyping/selecting-a-video-player-for-your-app.mdx",
   "docs/guides/developing-and-prototyping/deployment-and-networking-considerations.mdx",
   "docs/guides/developing-and-prototyping/stream-health.mdx",
-  "docs/guides/developing-and-prototyping/recording-api.mdx"
+  "docs/guides/developing-and-prototyping/recording-api.mdx",
   "docs/guides/developing-and-prototyping/livepeer-dashboard-no-code.mdx",
   "docs/guides/encoding-and-connecting/index.mdx",
   "docs/guides/encoding-and-connecting/live-streaming-how-and-what-to-send-to-livepeer.mdx",
@@ -24,6 +24,7 @@ export const docsPositions = [
   "docs/guides/operating/debug-live-stream-issues.mdx",
   "docs/guides/operating/livepeer-dashboard-stream-management.mdx",
   "docs/guides/operating/stream-health.mdx",
+  "docs/guides/operating/reducing-latency.mdx",
   "docs/guides/reference/index.mdx",
   "docs/guides/reference/supported-media-codecs-and-workflows.mdx",
   "docs/api-reference/index.mdx",
