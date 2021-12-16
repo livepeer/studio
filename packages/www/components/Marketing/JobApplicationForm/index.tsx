@@ -1,10 +1,22 @@
 import { TextField, Grid, Box, TextArea } from "@livepeer.com/design-system";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
 import client from "lib/client";
 import { useDropzone } from "react-dropzone";
 import { createJobApplication, createCandidate, createAnswer } from "hooks";
+
+const activeStyle = {
+  borderColor: "white",
+};
+
+const acceptStyle = {
+  borderColor: "#5842c3",
+};
+
+const rejectStyle = {
+  borderColor: "red",
+};
 
 type ResumeFileData = {
   name: string;
@@ -118,8 +130,14 @@ const JobApplicationForm = ({
     }
   }, []);
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: ".pdf",
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
+    accept: "application/pdf",
     maxFiles: 1,
     onDrop,
   });
@@ -136,6 +154,15 @@ const JobApplicationForm = ({
     });
     setAnswers(updatedA);
   };
+
+  const style = useMemo(
+    () => ({
+      ...(isDragActive ? activeStyle : {}),
+      ...(isDragAccept ? acceptStyle : {}),
+      ...(isDragReject ? rejectStyle : {}),
+    }),
+    [isDragActive, isDragReject, isDragAccept]
+  );
 
   return (
     <Box
@@ -265,7 +292,7 @@ const JobApplicationForm = ({
                 border: "1px solid $colors$mauve7",
                 borderRadius: "$1",
               }}
-              {...getRootProps({ className: "dropzone" })}>
+              {...getRootProps({ style })}>
               <Box as="input" {...getInputProps()} />
               <Box
                 as="p"
@@ -277,6 +304,7 @@ const JobApplicationForm = ({
                   m: 0,
                   fontSize: "$3",
                   p: "$3",
+                  transition: "border .24s ease-in-out",
                 }}>
                 Drag and Drop your CV file or upload files here
               </Box>
