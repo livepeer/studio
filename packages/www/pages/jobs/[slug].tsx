@@ -6,10 +6,8 @@ import {
   Grid,
 } from "@livepeer.com/design-system";
 import Fade from "react-reveal/Fade";
-import Button from "@components/Marketing/Button";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
-import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
 import {
   getJobs,
@@ -137,15 +135,6 @@ const Page = ({
                 coverLetter={coverLetter}
                 phone={phone}
               />
-              {/* <Text variant="gray" css={{ mb: "$4" }}>
-                If you are interested in applying for this position, please send
-                an email containing your Github profile and/or LinkedIn.
-              </Text> */}
-              {/* <Link href="mailto:work@livepeer.com" passHref>
-                <Button size="4" as="a" arrow css={{ width: "100%" }}>
-                  Send email
-                </Button>
-              </Link> */}
             </Box>
           </Grid>
         </Container>
@@ -175,7 +164,9 @@ export async function getStaticProps({ params, preview = false }) {
   const questions = [];
   for (const questionId of questionIds) {
     const question = await getQuestionsById(questionId.id);
+
     questions.push({
+      id: question.id,
       type: question.attributes["question-type"],
       title: question.attributes.title,
     });

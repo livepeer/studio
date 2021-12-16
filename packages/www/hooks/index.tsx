@@ -9,4 +9,7 @@ export {
   getJobById,
   getQuestionIdsByJobId,
   getQuestionsById,
+  createCandidate,
+  createJobApplication,
+  createAnswer,
 } from "./use-teamtailor";

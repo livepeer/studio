@@ -1,15 +1,22 @@
-import {
-  TextField,
-  Grid,
-  Box,
-  Container,
-  TextArea,
-  Button as DesignSystemButton,
-} from "@livepeer.com/design-system";
-import { useEffect, useState } from "react";
-import hash from "@livepeer.com/api/dist/hash";
+import { TextField, Grid, Box, TextArea } from "@livepeer.com/design-system";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
+import client from "lib/client";
+import { useDropzone } from "react-dropzone";
+import { createJobApplication, createCandidate, createAnswer } from "hooks";
+
+type ResumeFileData = {
+  name: string;
+  url: string;
+};
+
+type AnswerData = {
+  title: string;
+  questionId: string;
+  questionType: string;
+  value: string | string[];
+};
 
 const JobApplicationForm = ({
   id,
@@ -20,12 +27,25 @@ const JobApplicationForm = ({
   phone,
 }) => {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [cover, setCover] = useState("");
-  const [email, setEmail] = useState("");
-  const [resumeUrl, setResumeUrl] = useState("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [cover, setCover] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [resumeFile, setResumeFile] = useState<ResumeFileData | null>(null);
+  const [answers, setAnswers] = useState<AnswerData[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const initSetAnswers = () => {
+    const data = questions.map((q) => ({
+      questionId: q.id,
+      title: q.title,
+      questionType: q.type.toLowerCase(),
+      value: "",
+    }));
+    setAnswers(data);
+  };
 
   useEffect(() => {
     if (router?.query?.email) {
@@ -33,16 +53,89 @@ const JobApplicationForm = ({
     }
   }, [router?.query?.email]);
 
-  const onClick = async () => {
-    // onSubmit({
-    //   email,
-    //   firstName,
-    //   lastName,
-    //   phone,
-    // });
+  useEffect(() => {
+    initSetAnswers();
+  }, [questions]);
+
+  const reSet = () => {
+    setFirstName("");
+    setLastName("");
+    setPhoneNumber("");
+    setCover("");
+    setEmail("");
+    setResumeFile(null);
+    setError(null);
+    initSetAnswers();
   };
 
-  console.log(phone);
+  const onClick = async () => {
+    if (resumeFile) {
+      setLoading(true);
+      try {
+        const candidate = await createCandidate({
+          "first-name": firstName,
+          "last-name": lastName,
+          email: email,
+          phone: phoneNumber,
+          resume: resumeFile.url,
+        });
+
+        for (const answer of answers) {
+          await createAnswer({
+            ...answer,
+            candidateId: candidate.id,
+          });
+        }
+
+        const res = await createJobApplication({
+          candidateId: candidate.id,
+          jobId: id,
+          "cover-letter": cover,
+        });
+        reSet();
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setError("Please upload your CV");
+    }
+  };
+
+  const onDrop = useCallback((acceptedFiles) => {
+    if (!!acceptedFiles[0]) {
+      client.assets
+        .upload("file", acceptedFiles[0], {
+          filename: acceptedFiles[0].path,
+        })
+        .then((fileAsset) => {
+          setResumeFile({
+            name: fileAsset.originalFilename,
+            url: fileAsset.url,
+          });
+        });
+    }
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: ".pdf",
+    maxFiles: 1,
+    onDrop,
+  });
+
+  const onChangeAnswer = (questionId, value) => {
+    const updatedA = answers.map((answer) => {
+      if (answer.questionId === questionId) {
+        return {
+          ...answer,
+          value,
+        };
+      }
+      return answer;
+    });
+    setAnswers(updatedA);
+  };
 
   return (
     <Box
@@ -64,10 +157,10 @@ const JobApplicationForm = ({
           maxWidth: 500,
         }}
         id={id}>
-        {questions &&
-          questions.map((q, index) => (
+        {answers &&
+          answers.map((a, index) => (
             <Box key={index} css={{ width: "100%", m: "$0" }}>
-              <Box css={{ mb: "$1" }}>{q.title}</Box>
+              <Box css={{ mb: "$1" }}>{a.title}</Box>
               <TextField
                 size="3"
                 id={`question-${index}`}
@@ -80,8 +173,8 @@ const JobApplicationForm = ({
                 type="text"
                 placeholder="Type an answer"
                 required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={a.value}
+                onChange={(e) => onChangeAnswer(a.questionId, e.target.value)}
               />
             </Box>
           ))}
@@ -158,26 +251,46 @@ const JobApplicationForm = ({
         />
 
         {resume !== "off" && (
-          <DesignSystemButton
+          <Box
             css={{
-              width: "100%",
-              cursor: "pointer",
-              p: "$1",
               mb: "$3",
-              height: "auto",
             }}>
             <Box
-              as="div"
               css={{
                 width: "100%",
-                height: "100%",
-                border: "1px dotted $colors$mauve7",
+                cursor: "pointer",
+                p: "$1",
+                mb: "$0",
+                height: "auto",
+                border: "1px solid $colors$mauve7",
                 borderRadius: "$1",
-              }}>
-              Upload your CV file
+              }}
+              {...getRootProps({ className: "dropzone" })}>
+              <Box as="input" {...getInputProps()} />
+              <Box
+                as="p"
+                css={{
+                  width: "100%",
+                  height: "100%",
+                  border: "1px dotted $colors$mauve7",
+                  borderRadius: "$1",
+                  m: 0,
+                  fontSize: "$3",
+                  p: "$3",
+                }}>
+                Drag and Drop your CV file or upload files here
+              </Box>
             </Box>
-          </DesignSystemButton>
+            {resumeFile && (
+              <Box
+                as="li"
+                css={{ width: "100%", textAlign: "left", fontSize: "$2" }}>
+                {resumeFile.name}
+              </Box>
+            )}
+          </Box>
         )}
+
         {coverLetter !== "off" && (
           <TextArea
             size="3"
@@ -186,12 +299,16 @@ const JobApplicationForm = ({
             name="cover"
             placeholder="Cover Letter"
             value={cover}
+            onChange={(e) => setCover(e.target.value)}
             required={coverLetter === "required"}
           />
         )}
 
-        {/* <Box>{errors.join(", ")}&nbsp;</Box> */}
-        <Button css={{ mt: "$2", px: "$5" }} onClick={onClick}>
+        <Box>{error}</Box>
+        <Button
+          css={{ mt: "$2", px: "$5" }}
+          onClick={onClick}
+          disabled={loading}>
           Submit Application
         </Button>
       </Box>

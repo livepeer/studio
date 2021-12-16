@@ -11,7 +11,7 @@ export async function getServerSideProps({ params }) {
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     {
       headers: {
-        authorization: `Bearer ${process.env.SANITY_API_TOKEN}`,
+        authorization: `Bearer ${process.env.NEXT_PUBLIC_SANITY_API_TOKEN}`,
       },
     }
   );
