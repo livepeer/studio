@@ -19,7 +19,7 @@ type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
 export default interface Queue {
   publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
-  delayedPublish(
+  delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
     delay: number
@@ -40,7 +40,11 @@ export class NoopQueue implements Queue {
     );
   }
 
-  async delayedPublish(key: RoutingKey, msg: messages.Any, delay: number) {
+  async delayedPublishWebhook(
+    key: RoutingKey,
+    msg: messages.Any,
+    delay: number
+  ) {
     console.warn(
       `WARN: Delayed publish event to noop queue. key=${key} delay=${delay} message=`,
       msg
@@ -165,7 +169,7 @@ export class RabbitQueue implements Queue {
     });
   }
 
-  public async delayedPublish(
+  public async delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
     delay: number

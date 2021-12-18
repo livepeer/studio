@@ -215,7 +215,7 @@ export default class WebhookCannon {
       lastInterval: this.calcBackoff(trigger.lastInterval),
       retries: trigger.retries ? trigger.retries + 1 : 1,
     };
-    return this.queue.delayedPublish(
+    return this.queue.delayedPublishWebhook(
       "webhooks.delayedEmits",
       trigger,
       trigger.lastInterval

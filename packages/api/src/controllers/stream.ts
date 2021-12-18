@@ -922,7 +922,7 @@ app.put(
           const ingest = ((await req.getIngest()) ?? [])[0]?.base;
           const recordingUrl = getRecordingUrl(ingest, session);
           const mp4Url = getRecordingUrl(ingest, session, true);
-          await req.queue.delayedPublish(
+          await req.queue.delayedPublishWebhook(
             "events.recording.ready",
             {
               type: "webhook_event",

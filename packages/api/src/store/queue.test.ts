@@ -71,7 +71,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedPublish(
+    await queue.delayedPublishWebhook(
       "events.recording.ready",
       {
         type: "webhook_event",
@@ -105,7 +105,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedPublish(
+    await queue.delayedPublishWebhook(
       "events.recording.ready",
       {
         type: "webhook_event",
