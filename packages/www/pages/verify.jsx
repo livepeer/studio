@@ -31,7 +31,7 @@ const Verify = () => {
 
   // If they've already validated their email, get 'em out of here
   useEffect(() => {
-    if (user && user.emailValid !== false) {
+    if (user?.emailValid === true) {
       router.replace("/dashboard");
     }
   }, [user]);
