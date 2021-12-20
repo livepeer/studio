@@ -78,7 +78,7 @@ const Verify = () => {
                       <Box as="span" css={{ color: "$mauve11" }}>
                         {errors}.
                       </Box>
-                      <br /> Please access the llink you received by email
+                      <br /> Please access the link you received by email
                       again.
                     </Heading>
                   ) : (
