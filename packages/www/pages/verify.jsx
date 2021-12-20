@@ -14,8 +14,27 @@ import Guides from "components/Marketing/Guides";
 const Verify = () => {
   useLoggedIn();
   const router = useRouter();
-  const { user } = useApi();
+  const { user, verify } = useApi();
   const { email, emailValidToken } = router.query;
+
+  useEffect(() => {
+    if (email && emailValidToken) {
+      verify(email, emailValidToken).then(() => {
+        if (selectedPlan === "1") {
+          router.replace("/dashboard/billing/plans?promptUpgrade=true");
+        } else {
+          router.replace("/dashboard");
+        }
+      });
+    }
+  }, [email, emailValidToken]);
+
+  // If they've already validated their email, get 'em out of here
+  useEffect(() => {
+    if (user && user.emailValid !== false) {
+      router.replace("/dashboard");
+    }
+  }, [user]);
 
   return (
     <Layout>
