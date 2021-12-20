@@ -106,7 +106,11 @@ const Page = ({
                 top: "100px",
                 display: "block",
                 alignSelf: "start",
-                ml: "auto",
+                mx: "auto",
+                mt: "100px",
+                "@bp2": {
+                  mr: "0",
+                },
               }}>
               <JobApplicationForm
                 id={slug}
