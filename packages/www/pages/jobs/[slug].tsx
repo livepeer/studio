@@ -59,7 +59,7 @@ const Page = ({
             css={{
               my: "$5",
               fontWeight: 600,
-              lineHeight: '1.2 !important',
+              lineHeight: "1.2 !important",
             }}>
             {title}
           </Heading>
