@@ -59,6 +59,7 @@ const Page = ({
             css={{
               my: "$5",
               fontWeight: 600,
+              lineHeight: '1.2 !important',
             }}>
             {title}
           </Heading>
@@ -106,27 +107,7 @@ const Page = ({
                 display: "block",
                 alignSelf: "start",
                 ml: "auto",
-                px: "$6",
-                py: "$5",
-                borderRadius: 24,
-                border: "1px solid",
-                borderColor: "$mauve5",
-                bc: "$mauve2",
-                transition: "box-shadow .2s",
-                "&:hover": {
-                  textDecoration: "none",
-                  boxShadow:
-                    "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
-                },
-                "@bp2": {
-                  width: 380,
-                },
               }}>
-              <Text
-                size="5"
-                css={{ mb: "$2", textAlign: "center", fontWeight: "bold" }}>
-                Apply for this job
-              </Text>
               <JobApplicationForm
                 id={slug}
                 name={name}

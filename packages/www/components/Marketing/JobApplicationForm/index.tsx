@@ -1,4 +1,11 @@
-import { TextField, Grid, Box, TextArea } from "@livepeer.com/design-system";
+import Fade from "react-reveal/Fade";
+import {
+  TextField,
+  Grid,
+  Box,
+  Text,
+  TextArea,
+} from "@livepeer.com/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
@@ -48,6 +55,8 @@ const JobApplicationForm = ({
   const [answers, setAnswers] = useState<AnswerData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingPdf, setLoadingPdf] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const initSetAnswers = () => {
     const data = questions.map((q) => ({
@@ -104,7 +113,14 @@ const JobApplicationForm = ({
           jobId: id,
           "cover-letter": cover,
         });
+        setSubmitted(true);
         reSet();
+        let timer = setTimeout(() => {
+          setSubmitted(false);
+        }, 4500);
+        return () => {
+          clearTimeout(timer);
+        };
       } catch (err) {
         setError(err.message);
       } finally {
@@ -117,6 +133,7 @@ const JobApplicationForm = ({
 
   const onDrop = useCallback((acceptedFiles) => {
     if (!!acceptedFiles[0]) {
+      setLoadingPdf(true);
       client.assets
         .upload("file", acceptedFiles[0], {
           filename: acceptedFiles[0].path,
@@ -126,6 +143,9 @@ const JobApplicationForm = ({
             name: fileAsset.originalFilename,
             url: fileAsset.url,
           });
+        })
+        .finally(() => {
+          setLoadingPdf(false);
         });
     }
   }, []);
@@ -165,180 +185,222 @@ const JobApplicationForm = ({
   );
 
   return (
-    <Box
-      css={{
-        position: "relative",
-        width: "100%",
-      }}>
+    <Box>
       <Box
-        as="div"
         css={{
-          textAlign: "center",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          mb: "$3",
-          ml: "auto",
-          mr: "auto",
-          maxWidth: 500,
-        }}
-        id={id}>
-        {answers &&
-          answers.map((a, index) => (
-            <Box key={index} css={{ width: "100%", m: "$0" }}>
-              <Box css={{ mb: "$1" }}>{a.title}</Box>
+          px: "$6",
+          py: "$5",
+          borderRadius: 24,
+          border: "1px solid",
+          borderColor: "$mauve5",
+          bc: "$mauve2",
+          transition: "box-shadow .2s",
+          "&:hover": {
+            textDecoration: "none",
+            boxShadow:
+              "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
+          },
+          "@bp2": {
+            width: 380,
+          },
+        }}>
+        <Text
+          size="5"
+          css={{ mb: "$2", textAlign: "center", fontWeight: "bold" }}>
+          Apply for this job
+        </Text>
+        <Box
+          css={{
+            position: "relative",
+            width: "100%",
+          }}>
+          <Box
+            as="div"
+            css={{
+              textAlign: "center",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mb: "$3",
+              ml: "auto",
+              mr: "auto",
+              maxWidth: 500,
+            }}
+            id={id}>
+            {answers &&
+              answers.map((a, index) => (
+                <Box key={index} css={{ width: "100%", m: "$0" }}>
+                  <TextField
+                    size="3"
+                    id={`question-${index}`}
+                    css={{
+                      width: "100%",
+                      mb: "$3",
+                      mx: "$0",
+                    }}
+                    name={`question-${index}`}
+                    type="text"
+                    placeholder={a.title}
+                    required
+                    value={a.value}
+                    onChange={(e) =>
+                      onChangeAnswer(a.questionId, e.target.value)
+                    }
+                  />
+                </Box>
+              ))}
+            {name !== "off" && (
+              <Grid
+                gap={3}
+                css={{
+                  gridTemplateColumns: "1fr 1fr",
+                  width: "100%",
+                  alignItems: "center",
+                }}>
+                <TextField
+                  size="3"
+                  id="firstName"
+                  css={{ width: "100%", mb: "$3" }}
+                  name="firstName"
+                  type="text"
+                  placeholder="First name"
+                  required={name === "required"}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+                <TextField
+                  size="3"
+                  id="lastName"
+                  css={{ width: "100%", mb: "$3" }}
+                  name="lastName"
+                  type="text"
+                  placeholder="Last name"
+                  required={name === "required"}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </Grid>
+            )}
+            {phone !== "off" && (
               <TextField
                 size="3"
-                id={`question-${index}`}
+                id="phone"
                 css={{
                   width: "100%",
                   mb: "$3",
-                  mx: "$0",
+                  mx: "$2",
+                  "@bp1": {
+                    mx: "$4",
+                  },
                 }}
-                name={`question-${index}`}
-                type="text"
-                placeholder="Type an answer"
-                required
-                value={a.value}
-                onChange={(e) => onChangeAnswer(a.questionId, e.target.value)}
+                name="phone"
+                type="phone"
+                placeholder="Phone (optional)"
+                required={phone === "required"}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
               />
-            </Box>
-          ))}
-        {name !== "off" && (
-          <Grid
-            gap={3}
-            css={{
-              gridTemplateColumns: "1fr 1fr",
-              width: "100%",
-              alignItems: "center",
-            }}>
+            )}
+
             <TextField
               size="3"
-              id="firstName"
-              css={{ width: "100%", mb: "$3" }}
-              name="firstName"
-              type="text"
-              placeholder="First name"
-              required={name === "required"}
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <TextField
-              size="3"
-              id="lastName"
-              css={{ width: "100%", mb: "$3" }}
-              name="lastName"
-              type="text"
-              placeholder="Last name"
-              required={name === "required"}
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </Grid>
-        )}
-        {phone !== "off" && (
-          <TextField
-            size="3"
-            id="phone"
-            css={{
-              width: "100%",
-              mb: "$3",
-              mx: "$2",
-              "@bp1": {
-                mx: "$4",
-              },
-            }}
-            name="phone"
-            type="phone"
-            placeholder="Phone (optional)"
-            required={phone === "required"}
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        )}
-
-        <TextField
-          size="3"
-          id="email"
-          css={{
-            width: "100%",
-            mb: "$3",
-            mx: "$2",
-            "@bp1": {
-              mx: "$4",
-            },
-          }}
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        {resume !== "off" && (
-          <Box
-            css={{
-              mb: "$3",
-            }}>
-            <Box
+              id="email"
               css={{
                 width: "100%",
-                cursor: "pointer",
-                p: "$1",
-                mb: "$0",
-                height: "auto",
-                border: "1px solid $colors$mauve7",
-                borderRadius: "$1",
+                mb: "$3",
+                mx: "$2",
+                "@bp1": {
+                  mx: "$4",
+                },
               }}
-              {...getRootProps({ style })}>
-              <Box as="input" {...getInputProps()} />
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            {resume !== "off" && (
               <Box
-                as="p"
                 css={{
+                  mb: "$3",
                   width: "100%",
-                  height: "100%",
-                  border: "1px dotted $colors$mauve7",
-                  borderRadius: "$1",
-                  m: 0,
-                  fontSize: "$3",
-                  p: "$3",
-                  transition: "border .24s ease-in-out",
                 }}>
-                Drag and Drop your CV file or upload files here
-              </Box>
-            </Box>
-            {resumeFile && (
-              <Box
-                as="li"
-                css={{ width: "100%", textAlign: "left", fontSize: "$2" }}>
-                {resumeFile.name}
+                <Box
+                  css={{
+                    width: "100%",
+                    cursor: "pointer",
+                    p: "$1",
+                    mb: "$0",
+                    height: "auto",
+                    border: "1px solid $colors$mauve7",
+                    borderRadius: "$1",
+                  }}
+                  {...getRootProps({ style })}>
+                  <Box as="input" {...getInputProps()} />
+                  <Box
+                    as="p"
+                    css={{
+                      width: "100%",
+                      height: "100%",
+                      border: "1px dotted $colors$mauve7",
+                      borderRadius: "$1",
+                      m: 0,
+                      fontSize: "$3",
+                      p: "$3",
+                      transition: "border .24s ease-in-out",
+                      minWidth: "296px",
+                      minHeight: "70px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}>
+                    {loadingPdf
+                      ? "Uploading..."
+                      : "Drag and Drop your CV file or upload files here"}
+                  </Box>
+                </Box>
+                {resumeFile && (
+                  <Box
+                    as="li"
+                    css={{ width: "100%", textAlign: "left", fontSize: "$2" }}>
+                    {resumeFile.name}
+                  </Box>
+                )}
               </Box>
             )}
+
+            {coverLetter !== "off" && (
+              <TextArea
+                size="3"
+                id="cover"
+                css={{ width: "100%", boxSizing: "border-box", mb: "$3" }}
+                name="cover"
+                placeholder="Cover Letter"
+                value={cover}
+                onChange={(e) => setCover(e.target.value)}
+                required={coverLetter === "required"}
+              />
+            )}
+
+            <Box>{error}</Box>
+            <Button
+              css={{ mt: "$2", px: "$5" }}
+              onClick={onClick}
+              disabled={loading}>
+              Submit Application
+            </Button>
           </Box>
-        )}
-
-        {coverLetter !== "off" && (
-          <TextArea
-            size="3"
-            id="cover"
-            css={{ width: "100%", boxSizing: "border-box", mb: "$3" }}
-            name="cover"
-            placeholder="Cover Letter"
-            value={cover}
-            onChange={(e) => setCover(e.target.value)}
-            required={coverLetter === "required"}
-          />
-        )}
-
-        <Box>{error}</Box>
-        <Button
-          css={{ mt: "$2", px: "$5" }}
-          onClick={onClick}
-          disabled={loading}>
-          Submit Application
-        </Button>
+        </Box>
+      </Box>
+      <Box>
+        <Fade in={submitted}>
+          <Text variant="gray" css={{ mt: "$3" }}>
+            Thanks for reaching out! We'll get back to you shortly.
+          </Text>
+        </Fade>
       </Box>
     </Box>
   );
