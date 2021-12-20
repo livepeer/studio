@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "layouts/main";
-import { useLoggedIn, useApi } from "hooks";
+import { useApi } from "hooks";
 import {
   Container,
   Flex,
@@ -12,10 +12,33 @@ import {
 import Guides from "components/Marketing/Guides";
 
 const Verify = () => {
-  useLoggedIn();
   const router = useRouter();
-  const { user } = useApi();
-  const { email, emailValidToken } = router.query;
+  const { user, verify } = useApi();
+  const [errors, setErrors] = useState<string | null>(null);
+  const { email, emailValidToken, selectedPlan } = router.query;
+
+  useEffect(() => {
+    if (email && emailValidToken) {
+      verify(email, emailValidToken)
+        .then(() => {
+          if (selectedPlan === "1") {
+            router.replace("/dashboard/billing/plans?promptUpgrade=true");
+          } else {
+            router.replace("/dashboard");
+          }
+        })
+        .catch((e) => {
+          setErrors(e.message);
+        });
+    }
+  }, [email, emailValidToken]);
+
+  // If they've already validated their email, get 'em out of here
+  useEffect(() => {
+    if (user?.emailValid === true) {
+      router.replace("/dashboard");
+    }
+  }, [user]);
 
   return (
     <Layout>
@@ -48,7 +71,20 @@ const Verify = () => {
                 mb: 65,
               }}>
               {email && emailValidToken ? (
-                <Heading>Verifying...</Heading>
+                <>
+                  {errors ? (
+                    <Heading>
+                      Email verification failed:{" "}
+                      <Box as="span" css={{ color: "$mauve11" }}>
+                        {errors}.
+                      </Box>
+                      <br /> Please access the link you received by email
+                      again.
+                    </Heading>
+                  ) : (
+                    <Heading>Verifying... </Heading>
+                  )}
+                </>
               ) : (
                 <>
                   <Heading size="2" css={{ my: "$3", fontWeight: 600 }}>
