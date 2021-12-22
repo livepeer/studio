@@ -21,6 +21,7 @@ export const docsPositions = [
   "docs/guides/developing-a-production-app/start-with-our-sample-apps.mdx",
   "docs/guides/developing-a-production-app/webhooks.mdx",
   "docs/guides/developing-a-production-app/selecting-a-video-player-for-your-app.mdx",
+  "docs/guides/developing-a-production-app/livestreaming-from-your-app.mdx",
   "docs/guides/developing-a-production-app/deployment-and-networking-considerations.mdx",
   "docs/guides/developing-a-production-app/stream-health.mdx",
   "docs/guides/developing-a-production-app/recording-api.mdx",
