@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Fade from "react-reveal/Fade";
 import { Element } from "react-scroll";
 import { Box } from "@livepeer.com/design-system";
@@ -9,29 +9,10 @@ import { getJobs } from "hooks";
 import { Jobs as Content } from "content";
 import JobsSection from "@components/Marketing/JobsSection";
 
-type jobState = {
-  id: string;
-  title: string;
-  slug: string;
-};
+const JobsPage = ({ allJobs }) => {
+  const router = useRouter();
 
-const JobsPage = () => {
-  const [jobs, setJobs] = useState<jobState[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    getJobs()
-      .then((res) => {
-        setJobs(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
+  if (router.isFallback) {
     return (
       <Layout {...Content.metaData}>
         <Box
@@ -64,11 +45,21 @@ const JobsPage = () => {
       </Fade>
       <Fade>
         <Element offset={-20} key="hero" id="hero" name="hero">
-          <JobsSection jobs={jobs} />
+          <JobsSection jobs={allJobs} />
         </Element>
       </Fade>
     </Layout>
   );
 };
+
+export async function getStaticProps() {
+  const allJobs = await getJobs();
+
+  return {
+    props: {
+      allJobs,
+    },
+  };
+}
 
 export default JobsPage;

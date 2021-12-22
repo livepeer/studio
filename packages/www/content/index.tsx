@@ -126,8 +126,8 @@ export const DashboardStreamHealth = {
 
 export const Jobs = {
   metaData: {
-    title: "Stream Health - Livepeer.com",
-    description: `Build and scale next generation streaming platforms and services at an industry shattering price through quick and reliable API access to Livepeer, the world's open video infrastructure.`,
-    url: "https://livepeer.com/",
+    title: "Jobs - Livepeer.com",
+    description: `Join Us. From Anywhere.`,
+    url: "https://livepeer.com/jobs",
   },
 };
