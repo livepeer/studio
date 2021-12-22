@@ -202,7 +202,7 @@ async function trackActionAsync(userId, email, event, apiKey) {
   await fetchSegmentApi(trackInfo, "track", apiKey);
 }
 
-export async function fetchSegmentApi(body, endpoint, apiKey) {
+async function fetchSegmentApi(body, endpoint, apiKey) {
   const timer = segmentMetrics.startTimer();
   const segmentApiUrl = "https://api.segment.io/v1";
 
