@@ -8,6 +8,7 @@ export const docsPositions = [
   "docs/guides/developing-and-prototyping/start-with-our-sample-apps.mdx",
   "docs/guides/developing-and-prototyping/webhooks.mdx",
   "docs/guides/developing-and-prototyping/selecting-a-video-player-for-your-app.mdx",
+  "docs/guides/developing-and-prototyping/livestreaming-from-your-app.mdx",
   "docs/guides/developing-and-prototyping/deployment-and-networking-considerations.mdx",
   "docs/guides/developing-and-prototyping/stream-health.mdx",
   "docs/guides/developing-and-prototyping/recording-api.mdx",

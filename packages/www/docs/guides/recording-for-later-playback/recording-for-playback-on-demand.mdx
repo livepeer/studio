@@ -30,6 +30,16 @@ On-Demand Download
 Most media players support playback of all 3 forms above without special
 configuration.
 
-## Related Topics
+## Recording and Disconnects
 
-<!-- Need to find a home for the Recording API content currently in docs/guides/start-live-streaming/record -->
+Sometimes, after you’ve connected your encoder (for example, OBS) to a
+Livepeer.com RTMP server, the connection drops. For example, this could happen
+because of a bug in the encoder software or a problem with the streamer’s
+internet connection.
+
+Livepeer.com has a built-in 5 minute reconnect window, which means that if the
+streamer’s encoder disconnects and then reconnects within 5 minutes, the session
+will resume. When using the Livepeer.com recording feature, the recorded session
+will**not**be split into two separate sessions.
+
+The reconnect window is currently not customizable.

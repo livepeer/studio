@@ -7,8 +7,6 @@ metaDescription: X
 
 # Live Streaming: How and What to Send to Livepeer
 
-<!-- Establishes that we support RTMP ingest well (and SRT in beta) and describes how we take a single input stream and transform it into multiple outputs. -->
-
 Like with playback, Livepeer.com supports the most widely adopted approaches for
 sending media from an encoder. RTMP/RTMPS is the venerable standard for live
 media ingest and widely supported among software and hardware media encoders.
@@ -24,8 +22,15 @@ URLs in Livepeer have the following form:
 `srt://rtmp.livepeer.com:2935?streamid={stream key}`
 
 RTMP and SRT also serve as the standards for Livepeer.com's multistreaming
-functionality. See Related Topics below for details.
+functionality. See Related Topics below for multistreaming details.
+
+## Software Encoders that Support Both RTMP and SRT
+
+- [OBS](https://obsproject.com/)
+- [ffmpeg](https://ffmpeg.org/)
+- [Larix](https://softvelum.com/larix/) for iOS and Android
 
 ## Related Topics
 
+[Livestreaming from Your App](../developing-and-prototyping/livestreaming-from-your-app)
 [Multistreaming for Expanded Reach](../multistreaming/multistreaming-for-expanded-reach)
