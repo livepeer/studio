@@ -728,9 +728,8 @@ app.post(
     await Promise.all(
       products[user.stripeProductId].usage.map(async (product) => {
         if (product.name === "Transcoding") {
-          let quantity = Math.round(
-            (usageRes.sourceSegmentsDuration / 60).toFixed(2)
-          );
+          const durMins = usageRes.sourceSegmentsDuration / 60;
+          let quantity = Math.round(parseFloat(durMins.toFixed(2)));
           await req.stripe.invoiceItems.create({
             customer: req.body.stripeCustomerId,
             currency: "usd",
