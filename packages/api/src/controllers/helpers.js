@@ -163,11 +163,14 @@ export async function sendgridEmail({
   await SendgridMail.send(msg);
 }
 
-export async function trackAction(userId, email, event, apiKey) {
+export function trackAction(userId, email, event, apiKey) {
   if (!apiKey) {
     return;
   }
+  trackActionAsync(userId, email, event, apiKey);
+}
 
+async function trackActionAsync(userId, email, event, apiKey) {
   const identifyInfo = {
     userId,
     traits: {
