@@ -167,7 +167,14 @@ export function trackAction(userId, email, event, apiKey) {
   if (!apiKey) {
     return;
   }
-  trackActionAsync(userId, email, event, apiKey);
+  trackActionAsync(userId, email, event, apiKey).catch((err) => {
+    console.error(
+      `error tracking action on segment API email=${email} event=${JSON.stringify(
+        event
+      )} err=`,
+      err
+    );
+  });
 }
 
 async function trackActionAsync(userId, email, event, apiKey) {

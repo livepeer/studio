@@ -760,28 +760,28 @@ app.post(
 
     try {
       await req.store.create(doc);
-      setImmediate(async () => {
-        // execute in parallel to not slowdown stream creation
-        try {
-          let email = req.user.email;
-          const user = await db.user.get(stream.userId);
-          if (user) {
-            email = user.email;
-          }
-          trackAction(
-            stream.userId,
-            email,
-            { name: "Stream Session Created" },
-            req.config.segmentApiKey
-          );
-        } catch (e) {
-          console.error(`error tracking session err=`, e);
-        }
-      });
     } catch (e) {
       console.error(e);
       throw e;
     }
+    const {
+      user: { email },
+      config: { segmentApiKey },
+    } = req;
+    db.user
+      .get(stream.userId)
+      .then((user) =>
+        trackAction(
+          stream.userId,
+          user?.email ?? email,
+          { name: "Stream Session Created" },
+          segmentApiKey
+        )
+      )
+      .catch((err) => {
+        console.error(`error fetching user for segment API tracking err=`, err);
+      });
+
     res.status(201);
     res.json(db.stream.removePrivateFields(doc, req.user.admin));
     logger.info(
