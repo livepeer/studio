@@ -768,7 +768,7 @@ app.post(
           if (user) {
             email = user.email;
           }
-          await trackAction(
+          trackAction(
             stream.userId,
             email,
             { name: "Stream Session Created" },
@@ -848,15 +848,13 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     doc.multistream
   );
 
-  await Promise.all([
-    req.store.create(doc),
-    trackAction(
-      req.user.id,
-      req.user.email,
-      { name: "Stream Created" },
-      req.config.segmentApiKey
-    ),
-  ]);
+  await req.store.create(doc);
+  trackAction(
+    req.user.id,
+    req.user.email,
+    { name: "Stream Created" },
+    req.config.segmentApiKey
+  );
 
   res.status(201);
   res.json(
