@@ -887,18 +887,30 @@ components:
       type: object
       table: password_reset_token
       required:
-        - email
+        - kind
+        - userId
+        - resetToken
+        - expiration
       additionalProperties: false
       properties:
-        email:
+        kind:
           type: string
-          description: user email address
-          example: useremail@gmail.com
-          index: true
+          readOnly: true
+          enum: [password-reset-token]
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
+        resetToken:
+          type: string
+          example: E1F53135E559C253
+          writeOnly: true
+        expiration:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which reset token will be expired
+          example: 1587667174725
 
     make-admin:
       type: object
@@ -944,7 +956,10 @@ components:
         stripeProductId:
           type: string
           description: stripe product id
-          example: prod_0
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
 
     update-subscription:
       type: object
@@ -968,7 +983,10 @@ components:
         stripeProductId:
           type: string
           description: stripe product id
-          example: prod_0
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
 
     update-customer-payment-method:
       type: object
@@ -1106,7 +1124,10 @@ components:
           example: 2034212122
         stripeProductId:
           type: string
-          example: prod_0
+          enum:
+            - prod_0
+            - prod_1
+            - prod_2
         stripeCustomerId:
           type: string
           unique: true
