@@ -147,7 +147,11 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-export function getRecordingUrl(ingest, session, mp4 = false) {
+export function getRecordingUrl(
+  ingest: string,
+  session: DBSession,
+  mp4 = false
+) {
   return pathJoin(
     ingest,
     `recordings`,

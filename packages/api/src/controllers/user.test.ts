@@ -1,14 +1,16 @@
-import serverPromise from "../test-server";
-import { TestClient, clearDatabase } from "../test-helpers";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
+
+import { User } from "../schema/types";
 import db from "../store/db";
+import { TestClient, clearDatabase } from "../test-helpers";
+import serverPromise, { TestServer } from "../test-server";
 
-let server;
-let mockUser;
-let mockAdminUser;
-let mockNonAdminUser;
+let server: TestServer;
+let mockUser: User;
+let mockAdminUser: User;
+let mockNonAdminUser: User;
 
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // jest.setTimeout(70000)
 
@@ -36,8 +38,8 @@ afterEach(async () => {
 
 describe("controllers/user", () => {
   describe("basic CRUD with JWT authorization", () => {
-    let client;
-    let adminUser;
+    let client: TestClient;
+    let adminUser: User;
 
     beforeEach(async () => {
       client = new TestClient({
@@ -413,9 +415,9 @@ describe("controllers/user", () => {
   });
 
   describe("user endpoint with api key", () => {
-    let client;
-    let adminUser;
-    let nonAdminUser;
+    let client: TestClient;
+    let adminUser: User;
+    let nonAdminUser: User;
     const adminApiKey = uuid();
     const nonAdminApiKey = uuid();
 
