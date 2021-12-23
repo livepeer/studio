@@ -17,8 +17,12 @@ import hash from "../hash";
 import qs from "qs";
 import { db } from "../store";
 import { products } from "../config";
-import { doubleclickbidmanager } from "googleapis/build/src/apis/doubleclickbidmanager";
-import { CreateSubscription, UpdateSubscription } from "../schema/types";
+import {
+  CreateSubscription,
+  PasswordReset,
+  UpdateSubscription,
+} from "../schema/types";
+import { InternalServerError, NotFoundError } from "../store/errors";
 
 function toStringValues(obj: Record<string, any>) {
   const strObj: Record<string, string> = {};
@@ -34,6 +38,16 @@ function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
     delete obj[f];
   }
+}
+
+async function findUserByEmail(email: string, useReplica = true) {
+  const [users] = await db.user.find({ email }, { useReplica });
+  if (!users?.length) {
+    throw new NotFoundError("user not found");
+  } else if (users.length > 1) {
+    throw new InternalServerError("multiple users found with same email");
+  }
+  return users[0];
 }
 
 const app = Router();
@@ -84,19 +98,17 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
-  const user = await req.store.get(`user/${req.params.id}`);
   if (req.user.admin !== true && req.user.id !== req.params.id) {
-    res.status(403);
-    res.json({
+    return res.status(403).json({
       errors: ["user can only request information on their own user object"],
     });
-  } else {
-    if (!req.user.admin) {
-      cleanAdminOnlyFields(adminOnlyFields, user);
-    }
-    res.status(200);
-    res.json(user);
   }
+  const user = db.user.cleanWriteOnlyResponse(await db.user.get(req.params.id));
+  if (!req.user.admin) {
+    cleanAdminOnlyFields(adminOnlyFields, user);
+  }
+  res.status(200);
+  res.json(user);
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
@@ -168,7 +180,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
-  await req.store.create({
+  await db.user.create({
     kind: "user",
     id: id,
     password: hashedPassword,
@@ -184,7 +196,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     createdAt: Date.now(),
   });
 
-  const user = await req.store.get(`user/${id}`);
+  const user = db.user.cleanWriteOnlyResponse(await db.user.get(id));
 
   const protocol =
     req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
@@ -257,21 +269,7 @@ app.patch(
 );
 
 app.post("/token", validatePost("user"), async (req, res) => {
-  const { data: userIds } = await req.store.query({
-    kind: "user",
-    query: { email: req.body.email },
-  });
-
-  if (userIds.length < 1) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-  const user = await db.user.get(userIds[0]);
-  if (!user) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-
+  const user = await findUserByEmail(req.body.email);
   const [hashedPassword] = await hash(req.body.password, user.salt);
   if (hashedPassword !== user.password) {
     res.status(403);
@@ -296,16 +294,7 @@ app.post("/token", validatePost("user"), async (req, res) => {
 });
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
-  const { data: userIds } = await req.store.query({
-    kind: "user",
-    query: { email: req.body.email },
-  });
-  if (userIds.length < 1) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-
-  let user = await db.user.get(userIds[0]);
+  let user = await findUserByEmail(req.body.email);
   if (user.emailValidToken === req.body.emailValidToken) {
     // alert sales of new verified user
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
@@ -355,44 +344,22 @@ app.post(
   "/password/reset",
   validatePost("password-reset"),
   async (req, res) => {
-    const { email, password, resetToken } = req.body;
-    const {
-      data: [userId],
-    } = await req.store.query({
-      kind: "user",
-      query: { email: email },
-    });
-    if (!userId) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await req.store.get(`user/${userId}`);
+    const { email, password, resetToken } = req.body as PasswordReset;
+    let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
       return res.json({ errors: [`user email ${email} not found`] });
     }
 
-    const { data: tokens } = await req.store.query({
-      kind: "password-reset-token",
-      query: {
-        userId: user.id,
-      },
+    const [tokens] = await db.passwordResetToken.find({
+      userId: user.id,
     });
-
     if (tokens.length < 1) {
       res.status(404);
       return res.json({ errors: ["Password reset token not found"] });
     }
 
-    let dbResetToken;
-    for (let i = 0; i < tokens.length; i++) {
-      const token = await db.passwordResetToken.get(tokens[i]);
-      if (token.resetToken === resetToken) {
-        dbResetToken = token;
-      }
-    }
-
+    const dbResetToken = tokens.find((t) => t.resetToken === resetToken);
     if (!dbResetToken || dbResetToken.expiration < Date.now()) {
       res.status(403);
       return res.json({
@@ -402,22 +369,16 @@ app.post(
 
     // change user password
     const [hashedPassword, salt] = await hash(password);
-    await req.store.replace({
-      ...user,
+    await db.user.update(user.id, {
       password: hashedPassword,
-      salt: salt,
+      salt,
       emailValid: true,
     });
+    // delete all password reset tokens from user
+    await Promise.all(tokens.map((t) => db.passwordResetToken.delete(t.id)));
 
-    user = await req.store.get(`user/${userId}`);
-
-    // delete all reset tokens associated with user
-    for (const t of tokens) {
-      await req.store.delete(`password-reset-token/${t}`);
-    }
-
-    res.status(201);
-    return res.json(user);
+    const userResp = db.user.cleanWriteOnlyResponse(await db.user.get(user.id));
+    return res.status(200).json(userResp);
   }
 );
 
@@ -426,18 +387,7 @@ app.post(
   validatePost("password-reset-token"),
   async (req, res) => {
     const email = req.body.email;
-    const {
-      data: [userId],
-    } = await req.store.query({
-      kind: "user",
-      query: { email: email },
-    });
-    if (!userId) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await req.store.get(`user/${userId}`);
+    let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
       return res.json({ errors: [`user email ${email} not found`] });
@@ -448,7 +398,7 @@ app.post(
     await db.passwordResetToken.create({
       kind: "password-reset-token",
       id: id,
-      userId: userId,
+      userId: user.id,
       resetToken: resetToken,
       expiration: Date.now() + ms("48 hours"),
     });
@@ -485,8 +435,9 @@ app.post(
       });
     }
 
-    const newToken = await req.store.get(`password-reset-token/${id}`, false);
-
+    const newToken = db.passwordResetToken.cleanWriteOnlyResponse(
+      await db.passwordResetToken.get(id)
+    );
     if (newToken) {
       delete newToken.resetToken;
       res.status(201);
@@ -503,25 +454,9 @@ app.post(
   authMiddleware({ admin: true }),
   validatePost("make-admin"),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: "user",
-      query: { email: req.body.email },
-    });
-    if (userIds.length < 1) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await db.user.get(userIds[0]);
-    if (user) {
-      user = { ...user, admin: req.body.admin };
-      await req.store.replace(user);
-      res.status(201);
-      res.json({ email: user.email, admin: user.admin });
-    } else {
-      res.status(403);
-      res.json({ errors: ["user not made an admin"] });
-    }
+    let user = await findUserByEmail(req.body.email);
+    await db.user.update(user.id, { admin: req.body.admin });
+    res.status(200).json({ email: user.email, admin: user.admin });
   }
 );
 
@@ -529,16 +464,7 @@ app.post(
   "/create-customer",
   validatePost("create-customer"),
   async (req, res) => {
-    const [users] = await db.user.find(
-      { email: req.body.email },
-      { useReplica: false }
-    );
-    if (users.length < 1) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = users[0];
+    let user = await findUserByEmail(req.body.email, false);
     const customer = await req.stripe.customers.create({
       email: req.body.email,
     });
