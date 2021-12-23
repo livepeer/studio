@@ -490,6 +490,7 @@ app.post(
     const newToken = await req.store.get(`password-reset-token/${id}`, false);
 
     if (newToken) {
+      delete newToken.resetToken;
       res.status(201);
       res.json(newToken);
     } else {
