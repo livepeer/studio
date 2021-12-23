@@ -883,6 +883,21 @@ components:
           example: E1F53135E559C253
           writeOnly: true
 
+    make-admin:
+      type: object
+      required:
+        - email
+        - admin
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+        admin:
+          type: boolean
+          example: true
+
     password-reset-token:
       type: object
       table: password_reset_token
@@ -900,6 +915,7 @@ components:
         userId:
           type: string
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          readOnly: true
           index: true
         resetToken:
           type: string
@@ -912,20 +928,43 @@ components:
             Timestamp (in milliseconds) at which reset token will be expired
           example: 1587667174725
 
-    make-admin:
+    password-reset-token-request:
       type: object
       required:
         - email
-        - admin
       additionalProperties: false
       properties:
         email:
           type: string
           description: user email address
           example: useremail@gmail.com
-        admin:
-          type: boolean
-          example: true
+
+    password-reset-confirm:
+      type: object
+      required:
+        - email
+        - resetToken
+        - password
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+          index: true
+        resetToken:
+          type: string
+          example: E1F53135E559C253
+          writeOnly: true
+        password:
+          type: string
+          example: thisisapassword
+          minLength: 64
+          maxLength: 64
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
 
     create-customer:
       type: object
@@ -1014,33 +1053,6 @@ components:
           type: string
           description: stripe payment method id
           example: src_xxxxxxxxxxxxxxxxxxxxxxxx
-
-    password-reset:
-      type: object
-      required:
-        - email
-        - resetToken
-        - password
-      additionalProperties: false
-      properties:
-        email:
-          type: string
-          description: user email address
-          example: useremail@gmail.com
-          index: true
-        resetToken:
-          type: string
-          example: E1F53135E559C253
-          writeOnly: true
-        password:
-          type: string
-          example: thisisapassword
-          minLength: 64
-          maxLength: 64
-        userId:
-          type: string
-          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
-          index: true
 
     region:
       type: object
@@ -1494,7 +1506,7 @@ paths:
           application/json:
             schema:
               type: object
-              $ref: "#/components/schemas/password-reset-token"
+              $ref: "#/components/schemas/password-reset-token-request"
 
       responses:
         200:
@@ -1504,7 +1516,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/password-reset"
+                  $ref: "#/components/schemas/password-reset-token"
         default:
           description: Error
           content:
@@ -1516,14 +1528,14 @@ paths:
     tags:
       - password-reset
     post:
-      description: Verifies password reset token
+      description: Confirms password reset token
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              $ref: "#/components/schemas/password-reset"
+              $ref: "#/components/schemas/password-reset-confirm"
 
       responses:
         200:
