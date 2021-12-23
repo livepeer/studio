@@ -1,7 +1,7 @@
 import serverPromise from "../test-server";
 import { TestClient, clearDatabase } from "../test-helpers";
 import uuid from "uuid/v4";
-import hash from "../hash";
+import db from "../store/db";
 
 let server;
 let mockUser;
@@ -364,8 +364,13 @@ describe("controllers/user", () => {
         email: user.email,
       });
       expect(req.status).toBe(201);
-      let token = await req.json();
-      expect(token.userId).toBe(userRes.id);
+      let resToken = await req.json();
+      expect(resToken.userId).toBe(userRes.id);
+      expect(resToken.resetToken).toBeUndefined();
+
+      const token = await db.passwordResetToken.get(resToken.id);
+      expect(token).toMatchObject(resToken);
+      expect(token.resetToken).toBeDefined();
 
       // should return 404 when user email not found
       req = await client.post(`/user/password/reset-token`, {
