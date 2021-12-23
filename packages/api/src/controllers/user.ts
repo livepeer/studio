@@ -23,8 +23,10 @@ import {
   PasswordResetTokenRequest,
   PasswordResetConfirm,
   UpdateSubscription,
+  User,
 } from "../schema/types";
 import { InternalServerError, NotFoundError } from "../store/errors";
+import { WithID } from "../store/types";
 
 function toStringValues(obj: Record<string, any>) {
   const strObj: Record<string, string> = {};
@@ -40,6 +42,16 @@ function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
     delete obj[f];
   }
+}
+
+function cleanUserFields(user: WithID<User>, isAdmin = false) {
+  if (!user) return user;
+
+  user = db.user.cleanWriteOnlyResponse(user);
+  if (!isAdmin) {
+    cleanAdminOnlyFields(adminOnlyFields, user);
+  }
+  return user;
 }
 
 async function findUserByEmail(email: string, useReplica = true) {
@@ -105,12 +117,9 @@ app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
       errors: ["user can only request information on their own user object"],
     });
   }
-  const user = db.user.cleanWriteOnlyResponse(await db.user.get(req.params.id));
-  if (!req.user.admin) {
-    cleanAdminOnlyFields(adminOnlyFields, user);
-  }
+  const user = await db.user.get(req.params.id);
   res.status(200);
-  res.json(user);
+  res.json(cleanUserFields(user, req.user.admin));
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
@@ -206,7 +215,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     ),
   ]);
 
-  const user = db.user.cleanWriteOnlyResponse(await db.user.get(id));
+  const user = cleanUserFields(await db.user.get(id));
 
   const protocol =
     req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
@@ -387,8 +396,8 @@ app.post(
     // delete all password reset tokens from user
     await Promise.all(tokens.map((t) => db.passwordResetToken.delete(t.id)));
 
-    const userResp = db.user.cleanWriteOnlyResponse(await db.user.get(user.id));
-    return res.status(200).json(userResp);
+    const userResp = await db.user.get(user.id);
+    res.status(200).json(cleanUserFields(userResp));
   }
 );
 
@@ -465,7 +474,8 @@ app.post(
   async (req, res) => {
     let user = await findUserByEmail(req.body.email);
     await db.user.update(user.id, { admin: req.body.admin });
-    res.status(200).json({ email: user.email, admin: user.admin });
+    user = await db.user.get(user.id);
+    res.status(200).json(cleanUserFields(user, req.user.admin));
   }
 );
 
