@@ -2,15 +2,13 @@ import { v4 as uuid } from "uuid";
 
 import { User } from "../schema/types";
 import db from "../store/db";
-import { TestClient, clearDatabase } from "../test-helpers";
+import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 
 let server: TestServer;
 let mockUser: User;
 let mockAdminUser: User;
 let mockNonAdminUser: User;
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // jest.setTimeout(70000)
 
@@ -40,26 +38,14 @@ describe("controllers/user", () => {
   describe("basic CRUD with JWT authorization", () => {
     let client: TestClient;
     let adminUser: User;
+    let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminToken: string;
 
     beforeEach(async () => {
-      client = new TestClient({
-        server,
-      });
-
-      // setting up admin user and token
-      const userRes = await client.post(`/user/`, { ...mockAdminUser });
-      adminUser = await userRes.json();
-
-      let tokenRes = await client.post(`/user/token`, { ...mockAdminUser });
-      const adminToken = await tokenRes.json();
-      client.jwtAuth = `${adminToken["token"]}`;
-
-      const user = await server.store.get(`user/${adminUser.id}`, false);
-      if (!user) {
-        throw new Error("user not found");
-      }
-      adminUser = { ...user, admin: true, emailValid: true };
-      await server.store.replace(adminUser);
+      ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+        await setupUsers(server, mockAdminUser, mockNonAdminUser));
+      client.jwtAuth = adminToken;
     });
 
     it("should not get all users without authorization", async () => {
@@ -73,13 +59,12 @@ describe("controllers/user", () => {
 
     it("should get all users with admin authorization", async () => {
       for (let i = 0; i < 4; i += 1) {
-        const u = {
+        const u = await db.user.create({
           email: `user${i}@gmail.com`,
           password: "mypassword",
           id: uuid(),
           kind: "user",
-        };
-        await server.store.create(u);
+        });
         const res = await client.get(`/user/${u.id}`);
         expect(res.status).toBe(200);
         const userRes = await res.json();
@@ -91,18 +76,17 @@ describe("controllers/user", () => {
       const res = await client.get("/user");
       expect(res.status).toBe(200);
       const users = await res.json();
-      expect(users.length).toEqual(5);
+      expect(users.length).toEqual(6);
     });
 
     it("should get some of the users & get a working next Link", async () => {
       for (let i = 0; i < 13; i += 1) {
-        const u = {
+        const u = await db.user.create({
           email: `user${i}@gmail.com`,
           password: "mypassword",
           id: uuid(),
           kind: "user",
-        };
-        await server.store.create(u);
+        });
         const res = await client.get(`/user/${u.id}`);
         expect(res.status).toBe(200);
         const user = await res.json();
@@ -124,8 +108,7 @@ describe("controllers/user", () => {
       expect(user.kind).toBe("user");
       expect(user.email).toBe(mockUser.email);
 
-      const resUser = await server.store.get(`user/${user.id}`);
-
+      const resUser = await db.user.get(user.id);
       expect(resUser.email).toEqual(user.email);
 
       // if same request is made, should return a 403
@@ -193,32 +176,18 @@ describe("controllers/user", () => {
       const userRes = await res.json();
       expect(userRes.id).toBeDefined();
 
-      const resGet = await server.store.get(`user/${userRes.id}`);
+      const resGet = await db.user.get(userRes.id);
       expect(resGet.id).toEqual(userRes.id);
 
-      // to be added back once we fully support replace method
-      // should successfully replace user
-      // const newEmail = 'mock_user_replace@gmail.com'
-      // const replaceUser = { ...userRes, email: newEmail }
-      // await server.store.replace(replaceUser)
-
-      // // should successfully replace useremail
-      // const oldUserIds = await server.store.getPropertyIds(`useremail/${mockUser.email}`)
-      // expect(oldUserIds.length).toBe(0)
-
-      // const userIds = await server.store.getPropertyIds(`useremail/${newEmail}`)
-      // expect(userIds.length).toBe(1)
-      // expect(userIds[0]).toBe(userReplaced.id)
-
       // should delete user
-      await server.store.delete(`user/${resGet.id}`);
-      const deleted = await server.store.get(`user/${resGet.id}`);
+      await db.user.delete(resGet.id);
+      const deleted = await db.user.get(resGet.id);
       expect(deleted).toBe(null);
 
       // it should return a NotFound Error when trying to delete a record that doesn't exist
       let error;
       try {
-        await server.store.deleteKey(`user/${userRes.id}`);
+        await db.user.delete(userRes.id);
       } catch (err) {
         error = err;
       }
@@ -227,7 +196,7 @@ describe("controllers/user", () => {
       // it should return a NotFound Error when trying to replace a record that doesn't exist
       let replaceError;
       try {
-        await server.store.replace(userRes);
+        await db.user.replace(userRes);
       } catch (err) {
         replaceError = err;
       }
@@ -235,31 +204,18 @@ describe("controllers/user", () => {
     });
 
     it("should not get all users with non-admin user", async () => {
-      // setting up non-admin user
-      const resNonAdmin = await client.post(`/user/`, { ...mockNonAdminUser });
-      let nonAdminUser = await resNonAdmin.json();
-
-      const tokenRes = await client.post(`/user/token`, {
-        ...mockNonAdminUser,
+      client.jwtAuth = nonAdminToken;
+      await db.user.update(nonAdminUser.id, {
+        emailValid: true,
       });
-      const nonAdminToken = await tokenRes.json();
-      client.jwtAuth = nonAdminToken["token"];
-
-      const nonAdminUserRes = await server.store.get(
-        `user/${nonAdminUser.id}`,
-        false
-      );
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
-      await server.store.replace(nonAdminUser);
 
       for (let i = 0; i < 3; i += 1) {
-        const u = {
+        const u = await db.user.create({
           email: `user${i}@gmail.com`,
           password: "mypassword",
           id: uuid(),
           kind: "user",
-        };
-        await server.store.create(u);
+        });
         const res = await client.get(`/user/${u.id}`);
         expect(res.status).toBe(403);
       }
@@ -358,7 +314,7 @@ describe("controllers/user", () => {
       const userRes = await res.json();
       expect(userRes.id).toBeDefined();
 
-      let user = await server.store.get(`user/${userRes.id}`, false);
+      let user = await db.user.get(userRes.id);
       expect(user.id).toEqual(userRes.id);
 
       // should get password reset token
@@ -397,7 +353,7 @@ describe("controllers/user", () => {
       });
 
       expect(req.status).toBe(200);
-      user = await server.store.get(`user/${userRes.id}`, false);
+      user = await db.user.get(userRes.id);
       expect(user.id).toEqual(userRes.id);
       expect(user.emailValid).toEqual(true);
 
@@ -417,40 +373,14 @@ describe("controllers/user", () => {
   describe("user endpoint with api key", () => {
     let client: TestClient;
     let adminUser: User;
+    let adminApiKey: string;
     let nonAdminUser: User;
-    const adminApiKey = uuid();
-    const nonAdminApiKey = uuid();
+    let nonAdminApiKey: string;
 
     beforeEach(async () => {
-      client = new TestClient({
-        server,
-        apiKey: uuid(),
-      });
-
-      const userRes = await client.post(`/user/`, { ...mockAdminUser });
-      adminUser = await userRes.json();
-
-      const nonAdminRes = await client.post(`/user/`, { ...mockNonAdminUser });
-      nonAdminUser = await nonAdminRes.json();
-
-      await server.store.create({
-        id: adminApiKey,
-        kind: "api-token",
-        userId: adminUser.id,
-      });
-
-      await server.store.create({
-        id: nonAdminApiKey,
-        kind: "api-token",
-        userId: nonAdminUser.id,
-      });
-
-      const user = await server.store.get(`user/${adminUser.id}`, false);
-      if (!user) {
-        throw new Error("user not found");
-      }
-      adminUser = { ...user, admin: true };
-      await server.store.replace(adminUser);
+      ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
+        await setupUsers(server, mockAdminUser, mockNonAdminUser, false));
+      client.apiKey = uuid();
     });
 
     it("should not get all users", async () => {
@@ -472,12 +402,7 @@ describe("controllers/user", () => {
       );
 
       // adding emailValid true to user
-      const nonAdminUserRes = await server.store.get(
-        `user/${nonAdminUser.id}`,
-        false
-      );
-      nonAdminUser = { ...nonAdminUserRes, emailValid: true };
-      await server.store.replace(nonAdminUser);
+      await db.user.update(nonAdminUser.id, { emailValid: true });
 
       // should return admin priviledges error
       client.apiKey = nonAdminApiKey;
@@ -487,12 +412,7 @@ describe("controllers/user", () => {
       expect(resJson.errors[0]).toBe("user does not have admin priviledges");
 
       // adding emailValid true to admin user
-      const adminUserRes = await server.store.get(
-        `user/${adminUser.id}`,
-        false
-      );
-      adminUser = { ...adminUserRes, emailValid: true };
-      await server.store.replace(adminUser);
+      await db.user.update(adminUser.id, { emailValid: true });
 
       // only jwt auth should be allowed access to this list API
       client.apiKey = adminApiKey;
