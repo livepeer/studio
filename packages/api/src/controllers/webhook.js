@@ -39,13 +39,13 @@ const app = Router();
 
 const fieldsMap = {
   id: `webhook.ID`,
-  name: `webhook.data->>'name'`,
+  name: { val: `webhook.data->>'name'`, type: "full-text" },
   url: `webhook.data->>'url'`,
   blocking: `webhook.data->'blocking'`,
   deleted: `webhook.data->'deleted'`,
   createdAt: `webhook.data->'createdAt'`,
   userId: `webhook.data->>'userId'`,
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
   sharedSecret: `webhook.data->>'sharedSecret'`,
 };
 

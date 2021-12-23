@@ -40,7 +40,7 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
 
 const fieldsMap = {
   id: `users.ID`,
-  email: `data->>'email'`,
+  email: { val: `data->>'email'`, type: "full-text" },
   emailValid: { val: `data->'emailValid'`, type: "boolean" },
   admin: { val: `data->'admin'`, type: "boolean" },
   stripeProductId: `data->>'stripeProductId'`,
@@ -73,7 +73,7 @@ function cleanAdminOnlyFields(aof, obj) {
   }
 }
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
   const user = await req.store.get(`user/${req.params.id}`);
   if (req.user.admin !== true && req.user.id !== req.params.id) {
     res.status(403);
@@ -490,6 +490,7 @@ app.post(
     const newToken = await req.store.get(`password-reset-token/${id}`, false);
 
     if (newToken) {
+      delete newToken.resetToken;
       res.status(201);
       res.json(newToken);
     } else {

@@ -201,6 +201,7 @@ const ID = () => {
         limit: 1,
         order: "createdAt-true",
         filters: [{ id: "parentId", value: stream.id }],
+        userId: stream.userId,
       })
         .then((res) => {
           const [streamsOrError] = res;

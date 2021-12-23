@@ -1,6 +1,5 @@
 // import 'express-async-errors' // it monkeypatches, i guess
 import Router from "express/lib/router";
-import bearerToken from "express-bearer-token";
 import makeStore from "./store";
 import {
   errorHandler,
@@ -37,29 +36,19 @@ const GEOLOCATION_ENDPOINTS = [
 
 export default async function makeApp(params: CliArgs) {
   const {
-    storage,
-    dbPath,
     httpPrefix = "/api",
-    port,
     postgresUrl,
     postgresReplicaUrl,
-    cloudflareNamespace,
-    cloudflareAccount,
-    cloudflareAuth,
-    listen = true,
-    clientId,
     frontendDomain = "livepeer.com",
-    jwtSecret,
-    jwtAudience,
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
-    segmentApiKey,
     kubeNamespace,
     kubeBroadcasterService,
     kubeBroadcasterTemplate,
     kubeOrchestratorService,
     kubeOrchestratorTemplate,
+    ownRegion,
     subgraphUrl,
     fallbackProxy,
     orchestrators = "[]",
@@ -67,8 +56,6 @@ export default async function makeApp(params: CliArgs) {
     ingest = "[]",
     prices = "[]",
     insecureTestToken,
-    firestoreCredentials,
-    firestoreCollection,
     stripeSecretKey,
     amqpUrl,
     returnRegionInOrchestrator,
@@ -87,6 +74,7 @@ export default async function makeApp(params: CliArgs) {
   const [db, store] = await makeStore({
     postgresUrl,
     postgresReplicaUrl,
+    appName: ownRegion ? `${ownRegion}-api` : "api",
   });
 
   // RabbitMQ
@@ -139,7 +127,6 @@ export default async function makeApp(params: CliArgs) {
     }
     app.use(`/${insecureTestToken}`, insecureTest());
   }
-  app.use(bearerToken());
 
   // Populate Kubernetes getOrchestrators and getBroadcasters is provided
   if (kubeNamespace) {

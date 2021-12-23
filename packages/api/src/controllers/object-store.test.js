@@ -308,7 +308,7 @@ describe("controllers/object-stores", () => {
       const objStore = await res.json();
       expect(res.status).toBe(500);
       expect(objStore.errors[0]).toBe(
-        `no user found for token Bearer ${tokenId}`
+        `no user found from authorization header: Bearer ${tokenId}`
       );
     });
   });

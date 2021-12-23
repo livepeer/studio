@@ -186,13 +186,13 @@ function activeCleanup(streams: DBStream[], activeOnly = false) {
 
 const fieldsMap = {
   id: `stream.ID`,
-  name: `stream.data->>'name'`,
+  name: { val: `stream.data->>'name'`, type: "full-text" },
   sourceSegments: `stream.data->'sourceSegments'`,
   lastSeen: { val: `stream.data->'lastSeen'`, type: "int" },
   createdAt: { val: `stream.data->'createdAt'`, type: "int" },
   userId: `stream.data->>'userId'`,
   isActive: { val: `stream.data->'isActive'`, type: "boolean" },
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
   parentId: `stream.data->>'parentId'`,
   record: { val: `stream.data->'record'`, type: "boolean" },
   suspended: { val: `stream.data->'suspended'`, type: "boolean" },

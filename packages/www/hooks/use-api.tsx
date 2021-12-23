@@ -247,14 +247,19 @@ const makeContext = (state: ApiState, setState) => {
 
     async verify(email, emailValidToken) {
       trackPageView(email);
-      const res = await context.fetch("/user/verify", {
+      const [res, body] = await context.fetch("/user/verify", {
         method: "POST",
         body: JSON.stringify({ email, emailValidToken }),
         headers: {
           "content-type": "application/json",
         },
       });
+
       setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status !== 201) {
+        throw new Error(body.errors[0]);
+      }
     },
 
     async makePasswordResetToken(email) {
@@ -551,6 +556,7 @@ const makeContext = (state: ApiState, setState) => {
     async getAdminStreams({
       active,
       nonLivepeerOnly,
+      userId,
       order,
       filters,
       limit,
@@ -559,6 +565,7 @@ const makeContext = (state: ApiState, setState) => {
     }: {
       active?: boolean;
       nonLivepeerOnly?: boolean;
+      userId?: string;
       order?: string;
       filters?: Array<{ id: string; value: string }>;
       limit?: number;
@@ -576,6 +583,7 @@ const makeContext = (state: ApiState, setState) => {
           cursor,
           filters: f,
           nonLivepeerOnly,
+          userId,
           sessionsonly,
         })}`
       );

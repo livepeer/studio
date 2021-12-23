@@ -44,6 +44,7 @@ if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
 params.listen = true;
+params.requireEmailVerification = true;
 let server: AppServer & { host?: string };
 
 console.log(`test run parameters: ${JSON.stringify(params)}`);

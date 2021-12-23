@@ -1,5 +1,4 @@
 import { Router } from "express";
-import bearerToken from "express-bearer-token";
 import { authMiddleware } from ".";
 
 import { ApiToken, User } from "../schema/types";
@@ -35,9 +34,12 @@ beforeAll(async () => {
   };
 
   const { app } = (testServer = await startAuxTestServer());
-  app.use(bearerToken());
   app.use((req, res, next) => {
-    req.config = { httpPrefix } as any;
+    req.config = {
+      httpPrefix,
+      jwtAudience: "livepeer",
+      jwtSecret: "secret",
+    } as any;
     next();
   });
 
@@ -60,10 +62,69 @@ beforeAll(async () => {
 afterAll(() => testServer.close());
 
 afterEach(async () => {
+  httpPrefix = "";
   await clearDatabase(server);
 });
 
 describe("auth middleware", () => {
+  describe("api header parsing", () => {
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let nonAdminToken: string;
+    let basicAuth: string;
+    let basicAuth64: string;
+    let client: TestClient;
+
+    const fetchWithHeader = async (header?: string) => {
+      const res = await client.fetch("/foo", {
+        headers: header ? { authorization: header } : {},
+      });
+      return res.status;
+    };
+
+    const expectStatus = (header?: string) =>
+      expect(fetchWithHeader(header)).resolves;
+
+    beforeEach(async () => {
+      ({ nonAdminUser, nonAdminApiKey, nonAdminToken } = await setupUsers(
+        server,
+        mockAdminUserInput,
+        mockNonAdminUserInput
+      ));
+      basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
+      basicAuth64 = Buffer.from(basicAuth).toString("base64");
+
+      client = new TestClient({ server: testServer });
+    });
+
+    it("should forbid without auth", async () => {
+      await expectStatus().toBe(403);
+    });
+
+    it("should auth by bearer api key", async () => {
+      client.apiKey = nonAdminApiKey;
+      await expectStatus().toBe(204);
+    });
+
+    it("should auth by basic auth (api key password)", async () => {
+      client.basicAuth = basicAuth;
+      await expectStatus().toBe(204);
+    });
+
+    it("should auth by jwt", async () => {
+      client.jwtAuth = nonAdminToken;
+      await expectStatus().toBe(204);
+    });
+
+    it("should be case and whitespace insensitive", async () => {
+      await expectStatus(`   beAReR\t ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(`  BEARER ${nonAdminApiKey}`).toBe(204);
+      await expectStatus(` baSIc  ${basicAuth64}`).toBe(204);
+      await expectStatus(`\tJwt    ${nonAdminToken}`).toBe(204);
+      await expectStatus(`JWT \t${nonAdminToken}   `).toBe(204);
+    });
+  });
+
   describe("api token access rules", () => {
     let adminUser: User;
     let adminApiKey: string;
@@ -86,7 +147,6 @@ describe("auth middleware", () => {
       ({ adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
 
-      httpPrefix = "";
       client = new TestClient({ server: testServer });
       client.apiKey = nonAdminApiKey;
     });

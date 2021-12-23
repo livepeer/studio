@@ -15,12 +15,12 @@ import { DBMultistreamTarget } from "../store/multistream-table";
 
 const fieldsMap = {
   id: `multistream_target.ID`,
-  name: `multistream_target.data->>'name'`,
+  name: { val: `multistream_target.data->>'name'`, type: "full-text" },
   url: `multistream_target.data->>'url'`,
   disabled: { val: `multistream_target.data->'disabled'`, type: "boolean" },
   createdAt: { val: `multistream_target.data->'createdAt'`, type: "int" },
   userId: `multistream_target.data->>'userId'`,
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
 };
 
 function adminListQuery(

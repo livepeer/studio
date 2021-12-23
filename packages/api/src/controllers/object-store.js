@@ -9,13 +9,13 @@ const app = Router();
 
 const fieldsMap = {
   id: `object_store.ID`,
-  name: `object_store.data->>'name'`,
+  name: { val: `object_store.data->>'name'`, type: "full-text" },
   url: `object_store.data->>'url'`,
   publicUrl: `object_store.data->>'publicUrl'`,
   disabled: `object_store.data->'disabled'`,
   createdAt: `object_store.data->'createdAt'`,
   userId: `object_store.data->>'userId'`,
-  "user.email": `users.data->>'email'`,
+  "user.email": { val: `users.data->>'email'`, type: "full-text" },
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
