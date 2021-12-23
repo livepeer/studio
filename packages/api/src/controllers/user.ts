@@ -3,6 +3,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import qs from "qs";
+import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
 import { products } from "../config";
@@ -62,6 +63,14 @@ async function findUserByEmail(email: string, useReplica = true) {
     throw new InternalServerError("multiple users found with same email");
   }
   return users[0];
+}
+
+async function getOrCreateCustomer(stripe: Stripe, email: string) {
+  const existing = await stripe.customers.list({ email });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+  return await stripe.customers.create({ email });
 }
 
 const app = Router();
@@ -484,13 +493,19 @@ app.post(
   validatePost("create-customer"),
   async (req, res) => {
     let user = await findUserByEmail(req.body.email, false);
-    const customer = await req.stripe.customers.create({
-      email: req.body.email,
-    });
-    await db.user.update(user.id, {
-      stripeCustomerId: customer.id,
-    });
-    res.status(201);
+    let customer: Stripe.Customer;
+    if (user?.stripeCustomerId) {
+      customer = await req.stripe.customers
+        .retrieve(user.stripeCustomerId)
+        .then((c) => (c.deleted !== true ? c : null));
+    }
+    if (!customer) {
+      customer = await getOrCreateCustomer(req.stripe, req.body.email);
+      await db.user.update(user.id, {
+        stripeCustomerId: customer.id,
+      });
+      res.status(201);
+    }
     res.json(customer);
   }
 );
