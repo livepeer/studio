@@ -1,5 +1,5 @@
 import validator from "email-validator";
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import qs from "qs";
@@ -98,6 +98,15 @@ async function getOrCreateSubscription(
     items: prices.data.map((item) => ({ price: item.id })),
     expand: ["latest_invoice.payment_intent"],
   });
+}
+
+function requireStripe(): RequestHandler {
+  return (req, res, next) => {
+    if (!req.stripe) {
+      return res.status(500).json({ errors: ["stripe not configured"] });
+    }
+    return next();
+  };
 }
 
 const app = Router();
@@ -227,14 +236,22 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
-  const customer = await getOrCreateCustomer(req.stripe, email);
-  const subscription = await getOrCreateSubscription(
-    req.stripe,
-    defaultProductId,
-    customer.id
-  );
+  let stripeFields: Partial<User> = {};
+  if (req.stripe) {
+    const customer = await getOrCreateCustomer(req.stripe, email);
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      defaultProductId,
+      customer.id
+    );
+    stripeFields = {
+      stripeCustomerId: customer.id,
+      stripeCustomerSubscriptionId: subscription.id,
+      stripeProductId: defaultProductId,
+    };
+  }
 
-  db.user.create({
+  await db.user.create({
     kind: "user",
     id: id,
     createdAt: Date.now(),
@@ -248,9 +265,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
-    stripeCustomerId: customer.id,
-    stripeCustomerSubscriptionId: subscription.id,
-    stripeProductId: defaultProductId,
+    ...stripeFields,
   });
 
   const user = cleanUserFields(await db.user.get(id));
@@ -520,12 +535,13 @@ app.post(
 app.post(
   "/create-customer",
   validatePost("create-customer"),
+  requireStripe(),
   async (req, res) => {
     const { email } = req.body as CreateCustomer;
     let user = await findUserByEmail(email, false);
 
     let customer: Stripe.Customer;
-    if (user?.stripeCustomerId) {
+    if (user.stripeCustomerId) {
       customer = await req.stripe.customers
         .retrieve(user.stripeCustomerId)
         .then((c) => (c.deleted !== true ? c : null));
@@ -549,6 +565,7 @@ app.post(
   "/update-customer-payment-method",
   authMiddleware({}),
   validatePost("update-customer-payment-method"),
+  requireStripe(),
   async (req, res) => {
     const [users] = await db.user.find(
       { stripeCustomerId: req.body.stripeCustomerId },
@@ -589,6 +606,7 @@ app.post(
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
+  requireStripe(),
   async (req, res) => {
     const { stripeCustomerId, stripeProductId, stripeCustomerPaymentMethodId } =
       req.body as CreateSubscription;
@@ -661,6 +679,7 @@ app.post(
   "/update-subscription",
   authMiddleware({}),
   validatePost("update-subscription"),
+  requireStripe(),
   async (req, res) => {
     const payload = req.body as UpdateSubscription;
     const [users] = await db.user.find(
@@ -779,37 +798,54 @@ app.post(
   }
 );
 
-app.post("/retrieve-subscription", authMiddleware({}), async (req, res) => {
-  let { stripeCustomerSubscriptionId } = req.body;
-  if (req.user.stripeCustomerSubscriptionId !== stripeCustomerSubscriptionId) {
-    return res.status(403).json({ errors: ["access forbidden"] });
+app.post(
+  "/retrieve-subscription",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerSubscriptionId } = req.body;
+    if (
+      req.user.stripeCustomerSubscriptionId !== stripeCustomerSubscriptionId
+    ) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const subscription = await req.stripe.subscriptions.retrieve(
+      stripeCustomerSubscriptionId
+    );
+    res.status(200).json(subscription);
   }
-  const subscription = await req.stripe.subscriptions.retrieve(
-    stripeCustomerSubscriptionId
-  );
-  res.status(200).json(subscription);
-});
+);
 
-app.post("/retrieve-invoices", authMiddleware({}), async (req, res) => {
-  let { stripeCustomerId } = req.body;
-  if (req.user.stripeCustomerId !== stripeCustomerId) {
-    return res.status(403).json({ errors: ["access forbidden"] });
+app.post(
+  "/retrieve-invoices",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerId } = req.body;
+    if (req.user.stripeCustomerId !== stripeCustomerId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const invoices = await req.stripe.invoices.list({
+      customer: stripeCustomerId,
+    });
+    res.status(200).json(invoices);
   }
-  const invoices = await req.stripe.invoices.list({
-    customer: stripeCustomerId,
-  });
-  res.status(200).json(invoices);
-});
+);
 
-app.post("/retrieve-payment-method", authMiddleware({}), async (req, res) => {
-  let { stripePaymentMethodId } = req.body;
-  if (req.user.stripeCustomerPaymentMethodId !== stripePaymentMethodId) {
-    return res.status(403).json({ errors: ["access forbidden"] });
+app.post(
+  "/retrieve-payment-method",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripePaymentMethodId } = req.body;
+    if (req.user.stripeCustomerPaymentMethodId !== stripePaymentMethodId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const paymentMethod = await req.stripe.paymentMethods.retrieve(
+      stripePaymentMethodId
+    );
+    res.status(200).json(paymentMethod);
   }
-  const paymentMethod = await req.stripe.paymentMethods.retrieve(
-    stripePaymentMethodId
-  );
-  res.status(200).json(paymentMethod);
-});
+);
 
 export default app;
