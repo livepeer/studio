@@ -12,7 +12,7 @@ export const docsPositions = [
   "docs/guides/evaluating-and-prototyping-with-livepeer/stream-health.mdx",
   "docs/guides/evaluating-and-prototyping-with-livepeer/multistreaming-for-expanded-reach.mdx",
   "docs/guides/evaluating-and-prototyping-with-livepeer/audio-only-experiences.mdx",
-  "docs/guides/evaluating-and-prototyping-with-livepeer/scalability-and-the-livepeer-network.mdx",
+  "docs/guides/evaluating-and-prototyping-with-livepeer/understanding-livepeer-network.mdx",
   "docs/guides/evaluating-and-prototyping-with-livepeer/recording-for-playback-on-demand.mdx",
   "docs/guides/evaluating-and-prototyping-with-livepeer/supported-media-codecs-and-workflows.mdx",
   "docs/guides/developing-a-production-app/index.mdx",
