@@ -11,6 +11,7 @@ import hash from "../hash";
 import logger from "../logger";
 import { authMiddleware, validatePost } from "../middleware";
 import {
+  CreateCustomer,
   CreateSubscription,
   PasswordResetTokenRequest,
   PasswordResetConfirm,
@@ -65,6 +66,8 @@ async function findUserByEmail(email: string, useReplica = true) {
 }
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
+
+const defaultProductId: StripeProductIDs = "prod_0";
 
 async function getOrCreateCustomer(stripe: Stripe, email: string) {
   const existing = await stripe.customers.list({ email });
@@ -224,11 +227,19 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
-  await db.user.create({
+  const customer = await getOrCreateCustomer(req.stripe, email);
+  const subscription = await getOrCreateSubscription(
+    req.stripe,
+    defaultProductId,
+    customer.id
+  );
+
+  db.user.create({
     kind: "user",
     id: id,
-    password: hashedPassword,
+    createdAt: Date.now(),
     email: email,
+    password: hashedPassword,
     salt: salt,
     admin: admin,
     emailValidToken: emailValidToken,
@@ -237,7 +248,9 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
-    createdAt: Date.now(),
+    stripeCustomerId: customer.id,
+    stripeCustomerSubscriptionId: subscription.id,
+    stripeProductId: defaultProductId,
   });
 
   const user = cleanUserFields(await db.user.get(id));
@@ -508,14 +521,26 @@ app.post(
   "/create-customer",
   validatePost("create-customer"),
   async (req, res) => {
-    let user = await findUserByEmail(req.body.email, false);
-    const customer = await req.stripe.customers.create({
-      email: req.body.email,
-    });
-    await db.user.update(user.id, {
-      stripeCustomerId: customer.id,
-    });
-    res.status(201);
+    const { email } = req.body as CreateCustomer;
+    let user = await findUserByEmail(email, false);
+
+    let customer: Stripe.Customer;
+    if (user?.stripeCustomerId) {
+      customer = await req.stripe.customers
+        .retrieve(user.stripeCustomerId)
+        .then((c) => (c.deleted !== true ? c : null));
+    }
+
+    if (!customer) {
+      console.warn(
+        `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
+      customer = await getOrCreateCustomer(req.stripe, email);
+      await db.user.update(user.id, {
+        stripeCustomerId: customer.id,
+      });
+      res.status(201);
+    }
     res.json(customer);
   }
 );
@@ -576,9 +601,21 @@ app.post(
       return res.json({ errors: ["user not found"] });
     }
     let user = users[0];
+    if (user.stripeCustomerSubscriptionId) {
+      const subscription = await req.stripe.subscriptions.retrieve(
+        user.stripeCustomerSubscriptionId
+      );
+      return res.send(subscription);
+    }
+    console.warn(
+      `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`
+    );
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (stripeCustomerPaymentMethodId) {
+      console.warn(
+        `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
           stripeCustomerPaymentMethodId,
