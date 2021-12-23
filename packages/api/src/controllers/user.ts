@@ -3,6 +3,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import qs from "qs";
+import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
 import { products } from "../config";
@@ -61,6 +62,39 @@ async function findUserByEmail(email: string, useReplica = true) {
     throw new InternalServerError("multiple users found with same email");
   }
   return users[0];
+}
+
+type StripeProductIDs = CreateSubscription["stripeProductId"];
+
+async function getOrCreateCustomer(stripe: Stripe, email: string) {
+  const existing = await stripe.customers.list({ email });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+  return await stripe.customers.create({ email });
+}
+
+async function getOrCreateSubscription(
+  stripe: Stripe,
+  stripeProductId: StripeProductIDs,
+  stripeCustomerId: string
+) {
+  const existing = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+  });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+
+  const prices = await stripe.prices.list({
+    lookup_keys: products[stripeProductId].lookupKeys,
+  });
+  return await stripe.subscriptions.create({
+    cancel_at_period_end: false,
+    customer: stripeCustomerId,
+    items: prices.data.map((item) => ({ price: item.id })),
+    expand: ["latest_invoice.payment_intent"],
+  });
 }
 
 const app = Router();
@@ -531,9 +565,10 @@ app.post(
   "/create-subscription",
   validatePost("create-subscription"),
   async (req, res) => {
-    const payload = req.body as CreateSubscription;
+    const { stripeCustomerId, stripeProductId, stripeCustomerPaymentMethodId } =
+      req.body as CreateSubscription;
     const [users] = await db.user.find(
-      { stripeCustomerId: payload.stripeCustomerId },
+      { stripeCustomerId: stripeCustomerId },
       { useReplica: false }
     );
     if (users.length < 1) {
@@ -543,17 +578,17 @@ app.post(
     let user = users[0];
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
-    if (payload.stripeCustomerPaymentMethodId) {
+    if (stripeCustomerPaymentMethodId) {
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
-          payload.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId,
           {
-            customer: payload.stripeCustomerId,
+            customer: stripeCustomerId,
           }
         );
         // Update user's payment method
         await db.user.update(user.id, {
-          stripeCustomerPaymentMethodId: payload.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId: stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
         });
@@ -562,29 +597,23 @@ app.post(
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await req.stripe.customers.update(payload.stripeCustomerId, {
+      await req.stripe.customers.update(stripeCustomerId, {
         invoice_settings: {
-          default_payment_method: payload.stripeCustomerPaymentMethodId,
+          default_payment_method: stripeCustomerPaymentMethodId,
         },
       });
     }
 
-    // fetch prices associated with plan
-    const items = await req.stripe.prices.list({
-      lookup_keys: products[payload.stripeProductId].lookupKeys,
-    });
-
     // Create the subscription
-    const subscription = await req.stripe.subscriptions.create({
-      cancel_at_period_end: false,
-      customer: payload.stripeCustomerId,
-      items: items.data.map((item) => ({ price: item.id })),
-      expand: ["latest_invoice.payment_intent"],
-    });
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      stripeProductId,
+      stripeCustomerId
+    );
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
-      stripeProductId: payload.stripeProductId,
+      stripeProductId,
       stripeCustomerSubscriptionId: subscription.id,
     });
     res.send(subscription);
