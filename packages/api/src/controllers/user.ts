@@ -19,7 +19,8 @@ import { db } from "../store";
 import { products } from "../config";
 import {
   CreateSubscription,
-  PasswordReset,
+  PasswordResetTokenRequest,
+  PasswordResetConfirm,
   UpdateSubscription,
 } from "../schema/types";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -342,9 +343,9 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 
 app.post(
   "/password/reset",
-  validatePost("password-reset"),
+  validatePost("password-reset-confirm"),
   async (req, res) => {
-    const { email, password, resetToken } = req.body as PasswordReset;
+    const { email, password, resetToken } = req.body as PasswordResetConfirm;
     let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
@@ -384,9 +385,9 @@ app.post(
 
 app.post(
   "/password/reset-token",
-  validatePost("password-reset-token"),
+  validatePost("password-reset-token-request"),
   async (req, res) => {
-    const email = req.body.email;
+    const { email } = req.body as PasswordResetTokenRequest;
     let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
