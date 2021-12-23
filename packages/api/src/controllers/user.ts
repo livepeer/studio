@@ -448,7 +448,6 @@ app.post(
       await db.passwordResetToken.get(id)
     );
     if (newToken) {
-      delete newToken.resetToken;
       res.status(201);
       res.json(newToken);
     } else {
