@@ -26,6 +26,7 @@ export const docsPositions = [
   "docs/guides/operating/livepeer-dashboard-stream-management.mdx",
   "docs/guides/operating/stream-health.mdx",
   "docs/guides/operating/reducing-latency.mdx",
+  "docs/guides/operating/understanding-livepeer-network.mdx",
   "docs/guides/reference/index.mdx",
   "docs/guides/reference/supported-media-codecs-and-workflows.mdx",
   "docs/api-reference/index.mdx",
