@@ -81,8 +81,8 @@ describe("controllers/user", () => {
         const res = await client.get(`/user/${u.id}`);
         expect(res.status).toBe(200);
         const userRes = await res.json();
-        expect(userRes.password).toEqual(null);
-        expect(userRes.salt).toEqual(null);
+        expect(userRes.password).toBeUndefined();
+        expect(userRes.salt).toBeUndefined();
         expect(userRes.id).toEqual(u.id);
       }
 
@@ -143,7 +143,7 @@ describe("controllers/user", () => {
         email: mockUser.email,
         admin: true,
       });
-      expect(resAdminChange.status).toBe(201);
+      expect(resAdminChange.status).toBe(200);
       let userAdmin = await resAdminChange.json();
       expect(userAdmin.email).toBe(mockUser.email);
       expect(userAdmin.admin).toBe(true);
@@ -152,7 +152,7 @@ describe("controllers/user", () => {
         email: mockUser.email,
         admin: false,
       });
-      expect(resAdminChange.status).toBe(201);
+      expect(resAdminChange.status).toBe(200);
       userAdmin = await resAdminChange.json();
       expect(userAdmin.email).toBe(mockUser.email);
       expect(userAdmin.admin).toBe(false);
@@ -394,7 +394,7 @@ describe("controllers/user", () => {
         resetToken: token.resetToken,
       });
 
-      expect(req.status).toBe(201);
+      expect(req.status).toBe(200);
       user = await server.store.get(`user/${userRes.id}`, false);
       expect(user.id).toEqual(userRes.id);
       expect(user.emailValid).toEqual(true);
