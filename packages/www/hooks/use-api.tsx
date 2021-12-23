@@ -222,6 +222,24 @@ const makeContext = (state: ApiState, setState) => {
       if (res.status !== 201) {
         return body;
       }
+
+      // Only create stripe customer if developer explicitly enables stripe in dev mode
+      if (
+        process.env.NODE_ENV === "development" &&
+        !process.env.NEXT_PUBLIC_STRIPE_ENABLED_IN_DEV_MODE
+      ) {
+        return context.login(email, password);
+      }
+
+      // Create stripe customer
+      const customer = await context.createCustomer(email);
+
+      // Subscribe customer to free plan upon registation
+      await context.createSubscription({
+        stripeCustomerId: customer.id,
+        stripeProductId: "prod_0",
+      });
+
       return context.login(email, password);
     },
 
