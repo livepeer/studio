@@ -1,22 +1,14 @@
-import { authMiddleware } from "../middleware";
-import { validatePost } from "../middleware";
-import { Router } from "express";
-import { v4 as uuid } from "uuid";
-import ms from "ms";
-import jwt from "jsonwebtoken";
 import validator from "email-validator";
-import {
-  makeNextHREF,
-  sendgridEmail,
-  parseFilters,
-  parseOrder,
-  recaptchaVerify,
-} from "./helpers";
-import logger from "../logger";
-import hash from "../hash";
+import { Router } from "express";
+import jwt from "jsonwebtoken";
+import ms from "ms";
 import qs from "qs";
-import { db } from "../store";
+import { v4 as uuid } from "uuid";
+
 import { products } from "../config";
+import hash from "../hash";
+import logger from "../logger";
+import { authMiddleware, validatePost } from "../middleware";
 import {
   CreateSubscription,
   PasswordResetTokenRequest,
@@ -24,8 +16,16 @@ import {
   UpdateSubscription,
   User,
 } from "../schema/types";
+import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
+import {
+  makeNextHREF,
+  sendgridEmail,
+  parseFilters,
+  parseOrder,
+  recaptchaVerify,
+} from "./helpers";
 
 function toStringValues(obj: Record<string, any>) {
   const strObj: Record<string, string> = {};
