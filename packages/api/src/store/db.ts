@@ -1,9 +1,10 @@
-import { Pool } from "pg";
-import logger from "../logger";
+import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import schema from "../schema/schema.json";
-import { QueryResult, QueryConfig } from "pg";
 import { hostname } from "os";
+import { Histogram, register } from "prom-client";
+
+import logger from "../logger";
+import schema from "../schema/schema.json";
 import {
   ObjectStore,
   ApiToken,
@@ -66,6 +67,8 @@ export class DB {
   pool: Pool;
   replicaPool: Pool;
 
+  metricHistogram: Histogram;
+
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
     // constructor logic has moved to start({}).
@@ -102,6 +105,13 @@ export class DB {
     } else {
       console.log("no replica url found, not using read replica");
     }
+
+    this.metricHistogram = new Histogram({
+      name: "pgsql_query_duration_seconds",
+      help: "duration histogram of pgsql queries",
+      buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
+      registers: [register],
+    });
 
     await this.query("SELECT NOW()");
     await this.replicaQuery("SELECT NOW()");
@@ -195,17 +205,19 @@ export class DB {
     query: string | QueryConfig<I>,
     values?: I
   ): Promise<QueryResult<T>> {
-    let queryLog;
+    let queryLog: string;
     if (typeof query === "string") {
       queryLog = JSON.stringify({ query: query.trim(), values });
     } else {
       queryLog = JSON.stringify(query);
     }
-    let result;
+    let result: QueryResult;
     logger.info(`runQuery phase=start query=${queryLog}`);
     const start = Date.now();
+    const queryTimer = this.metricHistogram.startTimer();
     try {
       result = await pool.query(query, values);
+      queryTimer();
     } catch (e) {
       logger.error(
         `runQuery phase=error elapsed=${Date.now() - start}ms error=${

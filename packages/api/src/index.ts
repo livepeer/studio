@@ -77,7 +77,10 @@ export default async function makeApp(params: CliArgs) {
   const { db, queue, router, store, webhookCannon: webhook } = appRoute;
 
   const app = express();
-  const metricsMiddleware = promBundle({});
+  const metricsMiddleware = promBundle({
+    includeMethod: true,
+    includePath: true,
+  });
   const whitelist = [
     "https://livepeer.com",
     "https://livepeer.monster",
