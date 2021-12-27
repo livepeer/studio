@@ -29,6 +29,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
       - name: Tags
         id: tags
         uses: livepeer/action-gh-release-tags@v0
