@@ -1,5 +1,8 @@
 name: api
-on: push
+on:
+  push:
+    branches-ignore:
+      - latest
 defaults:
   run:
     working-directory: packages/api
