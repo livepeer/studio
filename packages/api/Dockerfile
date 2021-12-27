@@ -15,14 +15,14 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
+ADD packages/api/package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+COPY --from=builder /app/dist dist
+
 ARG VERSION
 ENV VERSION ${VERSION}
 ARG GITHUB_SHA
 ENV GITHUB_SHA ${GITHUB_SHA}
-
-ADD packages/api/package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-COPY --from=builder /app/dist dist
 
 RUN node dist/cli.js --help
 
