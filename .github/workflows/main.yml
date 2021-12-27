@@ -1,3 +1,4 @@
+name: main
 on: push
 jobs:
   build:
@@ -25,19 +26,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Tags
-        id: tags
-        uses: livepeer/action-gh-release-tags@v0
-
-      - name: docker login
-        env:
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-        run: |
-          # docker login
-          docker version
-          docker login -u $DOCKER_USER -p $DOCKER_PASS
-
       - name: yarn install
         run: |
           yarn install --frozen-lockfile
@@ -45,17 +33,3 @@ jobs:
       - name: yarn test
         run: |
           yarn test
-
-      - name: docker build
-        env:
-          DOCKER_TAGS: ${{ steps.tags.outputs.tags }}
-          VERSION: ${{ steps.tags.outputs.version }}
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          CF_EMAIL: ${{ secrets.CF_EMAIL }}
-          DOCKER_BUILDKIT: 1
-        run: |
-          yarn run lerna-run docker:build --scope=@livepeer.com/api
-          yarn run lerna-run docker:push --scope=@livepeer.com/api
-
-          # Livepeer internal build alerting
-          curl -X POST https://holy-bread-207a.livepeer.workers.dev

@@ -1,9 +1,8 @@
-name: www
+name: api
 on: push
 jobs:
   build:
     runs-on: ubuntu-18.04
-
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -31,7 +30,7 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_BUILDKIT: 1
         run: |
-          cd packages/www
+          cd packages/api
           yarn run docker:build
           yarn run docker:push
 
