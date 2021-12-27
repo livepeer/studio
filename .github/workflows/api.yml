@@ -1,5 +1,8 @@
 name: api
 on: push
+defaults:
+  run:
+    working-directory: packages/api
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -12,6 +15,14 @@ jobs:
       - name: Tags
         id: tags
         uses: livepeer/action-gh-release-tags@v0
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile
+
+      - name: yarn test
+        run: |
+          yarn test
 
       - name: docker login
         env:
@@ -30,7 +41,6 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_BUILDKIT: 1
         run: |
-          cd packages/api
           yarn run docker:build
           yarn run docker:push
 
