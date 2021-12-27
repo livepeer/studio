@@ -35,12 +35,10 @@ jobs:
 
       - name: yarn install
         run: |
-          cd packages/api
           yarn install --frozen-lockfile
 
       - name: yarn test
         run: |
-          cd packages/api
           yarn test
 
       - name: docker login
@@ -60,7 +58,6 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_BUILDKIT: 1
         run: |
-          cd packages/api
           yarn run docker:build
           yarn run docker:push
 
