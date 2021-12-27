@@ -38,6 +38,14 @@ jobs:
         id: tags
         uses: livepeer/action-gh-release-tags@v0
 
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile
+
+      - name: yarn test
+        run: |
+          yarn test
+
       - name: docker login
         env:
           DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
@@ -47,7 +55,7 @@ jobs:
           docker version
           docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - name: test & docker build
+      - name: docker build & push
         env:
           DOCKER_TAGS: ${{ steps.tags.outputs.tags }}
           VERSION: ${{ steps.tags.outputs.version }}
@@ -55,30 +63,7 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_BUILDKIT: 1
         run: |
-          sub_step() {
-            local cmd_name=$1
-            shift
-            (time sh -c "$@" || echo $cmd_name >> fail.txt) 2>&1 > $cmd_name.txt
-          }
-
-          sub_step test 'yarn install --frozen-lockfile && yarn test' &
-          sub_step docker-build 'yarn docker:build' &
-
-          wait
-          cat test.txt
-          cat docker-build.txt
-          if [ -f fail.txt ]; then
-            cat fail.txt
-            exit 1
-          fi
-
-      - name: docker push
-        env:
-          DOCKER_TAGS: ${{ steps.tags.outputs.tags }}
-          VERSION: ${{ steps.tags.outputs.version }}
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          CF_EMAIL: ${{ secrets.CF_EMAIL }}
-        run: |
+          yarn run docker:build
           yarn run docker:push
 
       - name: notify livepeer-infra
