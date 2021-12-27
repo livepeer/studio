@@ -6,6 +6,23 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-18.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: "trust"
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      rabbitmq:
+        image: rabbitmq@sha256:f0be9e47ec42081a36593dfc6604274a623caed074fc043e0a927fbd1533dc20
+        env:
+          RABBITMQ_DEFAULT_VHOST: "livepeer"
+        ports:
+          - 5672:5672
     steps:
       - name: checkout
         uses: actions/checkout@v2
