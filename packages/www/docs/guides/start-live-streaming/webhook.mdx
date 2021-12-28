@@ -36,15 +36,14 @@ This request should return:
 
 ```json
 {
-      "createdAt" : 1624939859628,
-      "events": ["stream.started", "stream.idle"],
-      "id" : "e7b8a281-8952-4791-b837-183cb95bbf32",
-      "kind" : "webhook",
-      "name" : "test webhooks",
-      "url" : "{webhook_endpoint}",
-      "userId" : "ffcd3b74-9908-4d23-be05-58e1480e752a"
+  "createdAt": 1624939859628,
+  "events": ["stream.started", "stream.idle"],
+  "id": "e7b8a281-8952-4791-b837-183cb95bbf32",
+  "kind": "webhook",
+  "name": "test webhooks",
+  "url": "{webhook_endpoint}",
+  "userId": "ffcd3b74-9908-4d23-be05-58e1480e752a"
 }
-
 ```
 
 Now all streams will trigger the `stream.started` and `stream.idle` events for
