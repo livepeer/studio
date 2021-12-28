@@ -19,7 +19,7 @@ Webhook endpoints are specific for each `event`. Once the event is registered,
 all streams for this account will be triggering the specific event. Here is an
 example of registering for the `stream.started` and `stream.idle` events:
 
-```
+```bash
 curl \
     -X POST \
     -H "authorization: Bearer {api_key}" \
@@ -29,12 +29,12 @@ curl \
       "url": "{webhook_url}",
       "name": "test webhooks"
   }' \
-  https://livepeer.com/api/webhook`
+  https://livepeer.com/api/webhook
 ```
 
 This request should return:
 
-```
+```json
 {
       "createdAt" : 1624939859628,
       "events": ["stream.started", "stream.idle"],
