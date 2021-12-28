@@ -78,8 +78,10 @@ export default async function makeApp(params: CliArgs) {
 
   const app = express();
   const metricsMiddleware = promBundle({
+    includeUp: false,
     includeMethod: true,
     includePath: true,
+    httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
   });
   const whitelist = [
     "https://livepeer.com",

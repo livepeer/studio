@@ -2,9 +2,11 @@ import crypto from "isomorphic-webcrypto";
 import util from "util";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
-import { db } from "../store";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
+import { Histogram } from "prom-client";
+
+import { db } from "../store";
 
 let Encoder;
 if (typeof TextEncoder === "undefined") {
@@ -14,6 +16,12 @@ if (typeof TextEncoder === "undefined") {
 }
 
 const ITERATIONS = 10000;
+const segmentMetrics = new Histogram({
+  name: "livepeer_api_segment_request_duration_seconds",
+  help: "duration histogram of http calls to segment.io APIs",
+  labelNames: ["endpoint", "status_code"],
+  buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
+});
 
 export function sign(data, secret) {
   const hmac = createHmac("sha256", secret);
@@ -185,6 +193,8 @@ export async function trackAction(userId, email, event, apiKey) {
 }
 
 export async function fetchSegmentApi(body, endpoint, apiKey) {
+  const labels = { endpoint };
+  const timer = segmentMetrics.startTimer(labels);
   const segmentApiUrl = "https://api.segment.io/v1";
 
   const headers = {
@@ -192,11 +202,13 @@ export async function fetchSegmentApi(body, endpoint, apiKey) {
     Authorization: "Basic " + Buffer.from(`${apiKey}:`).toString("base64"),
   };
 
-  await fetch(`${segmentApiUrl}/${endpoint}`, {
+  let response = await fetch(`${segmentApiUrl}/${endpoint}`, {
     method: "POST",
     body: JSON.stringify(body),
     headers: headers,
   });
+  labels.status_code = response.status.toString();
+  timer();
 }
 
 export async function getWebhooks(

@@ -61,13 +61,13 @@ export class DB {
   cdnUsageLast: Table<CdnUsageLast>;
   cdnUsageTable: CdnUsageTable;
 
-  postgresUrl: String;
-  replicaUrl: String;
+  postgresUrl: string;
+  replicaUrl: string;
   ready: Promise<void>;
   pool: Pool;
   replicaPool: Pool;
 
-  metricHistogram: Histogram;
+  metricHistogram: Histogram<string>;
 
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
@@ -107,7 +107,7 @@ export class DB {
     }
 
     this.metricHistogram = new Histogram({
-      name: "pgsql_query_duration_seconds",
+      name: "livepeer_api_pgsql_query_duration_seconds",
       help: "duration histogram of pgsql queries",
       buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
       registers: [register],
@@ -236,7 +236,7 @@ export class DB {
 }
 
 // Auto-create database if it doesn't exist
-async function ensureDatabase(postgresUrl) {
+async function ensureDatabase(postgresUrl: string) {
   const pool = new Pool({
     connectionString: postgresUrl,
     connectionTimeoutMillis: CONNECT_TIMEOUT,

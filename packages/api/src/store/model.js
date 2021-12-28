@@ -189,6 +189,6 @@ export default class Model {
   }
 
   async close() {
-    this.db.close();
+    return this.db.close();
   }
 }
