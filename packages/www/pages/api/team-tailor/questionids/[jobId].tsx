@@ -28,7 +28,6 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<SuccessResponse | FallbackResponse>
 ) => {
-  console.log(req.query.jobId);
   try {
     const response = await getQuestionIdsByJobId(req.query.jobId);
     res.status(200).json({
