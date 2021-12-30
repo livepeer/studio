@@ -1,7 +1,6 @@
 import { IncomingForm } from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
 import sanityClient from "@sanity/client";
-import { createReadStream } from "fs";
 
 const client = sanityClient({
   projectId: "dp4k3mpw",
@@ -25,11 +24,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
   });
 
-  const newLocal = createReadStream(data.files.file.path);
-
-  if (newLocal)
+  if (data.files.file.path)
     client.assets
-      .upload("file", newLocal, {
+      .upload("file", data.files.file.path, {
         filename: data.files.file.name,
       })
       .then((fileAsset) => {
