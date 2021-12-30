@@ -42,6 +42,11 @@ export type DBSession = WithID<Session> &
 
 type Table<T> = BaseTable<WithID<T>>;
 
+type QueryHistogramLabels = {
+  query: string;
+  result?: string;
+};
+
 const makeTable = <T>(opts: TableOptions) =>
   new BaseTable<WithID<T>>(opts) as Table<T>;
 
@@ -110,7 +115,7 @@ export class DB {
       name: "livepeer_api_pgsql_query_duration_seconds",
       help: "duration histogram of pgsql queries",
       buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
-      registers: [register],
+      labelNames: ["query", "result"] as const,
     });
 
     await this.query("SELECT NOW()");
@@ -199,36 +204,28 @@ export class DB {
     return this.runQuery(pool, query, values);
   }
 
-  // Internal logging function — use query() or replicaQuery() externally
-  async runQuery<T, I extends any[] = any[]>(
+  async runQueryNoMetrics<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
     values?: I
   ): Promise<QueryResult<T>> {
     let queryLog: string;
-    const labels: any = {};
     if (typeof query === "string") {
       queryLog = JSON.stringify({ query: query.trim(), values });
-      labels.query = query.trim();
     } else {
-      labels.query = query.text;
       queryLog = JSON.stringify(query);
     }
     let result: QueryResult;
     logger.info(`runQuery phase=start query=${queryLog}`);
     const start = Date.now();
-    const queryTimer = this.metricHistogram.startTimer(labels);
     try {
       result = await pool.query(query, values);
-      labels.phase = "success";
     } catch (e) {
-      labels.phase = "error";
       logger.error(
         `runQuery phase=error elapsed=${Date.now() - start}ms error=${
           e.message
         } query=${queryLog}`
       );
-      queryTimer();
       throw e;
     }
     logger.info(
@@ -236,8 +233,28 @@ export class DB {
         result?.rowCount
       } query=${queryLog}`
     );
-    queryTimer();
     return result;
+  }
+
+  // Internal logging function — use query() or replicaQuery() externally
+  async runQuery<T, I extends any[] = any[]>(
+    pool: Pool,
+    query: string | QueryConfig<I>,
+    values?: I
+  ): Promise<QueryResult<T>> {
+    let labels: QueryHistogramLabels = {
+      query: typeof query === "string" ? query.trim() : query.text,
+      result: "success",
+    };
+    const queryTimer = this.metricHistogram.startTimer();
+    try {
+      return await this.runQueryNoMetrics(pool, query, values);
+    } catch (e) {
+      labels.result = "error";
+      throw e;
+    } finally {
+      queryTimer(labels);
+    }
   }
 }
 
