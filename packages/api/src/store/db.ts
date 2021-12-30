@@ -206,24 +206,29 @@ export class DB {
     values?: I
   ): Promise<QueryResult<T>> {
     let queryLog: string;
+    const labels: any = {};
     if (typeof query === "string") {
       queryLog = JSON.stringify({ query: query.trim(), values });
+      labels.query = query.trim();
     } else {
+      labels.query = query.text;
       queryLog = JSON.stringify(query);
     }
     let result: QueryResult;
     logger.info(`runQuery phase=start query=${queryLog}`);
     const start = Date.now();
-    const queryTimer = this.metricHistogram.startTimer();
+    const queryTimer = this.metricHistogram.startTimer(labels);
     try {
       result = await pool.query(query, values);
-      queryTimer();
+      labels.phase = "success";
     } catch (e) {
+      labels.phase = "error";
       logger.error(
         `runQuery phase=error elapsed=${Date.now() - start}ms error=${
           e.message
         } query=${queryLog}`
       );
+      queryTimer();
       throw e;
     }
     logger.info(
@@ -231,6 +236,7 @@ export class DB {
         result?.rowCount
       } query=${queryLog}`
     );
+    queryTimer();
     return result;
   }
 }
