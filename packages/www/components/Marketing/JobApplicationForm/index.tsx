@@ -9,9 +9,7 @@ import {
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
-import client from "lib/client";
 import { useDropzone } from "react-dropzone";
-import { createJobApplication, createCandidate, createAnswer } from "hooks";
 
 const activeStyle = {
   borderColor: "white",
@@ -93,26 +91,46 @@ const JobApplicationForm = ({
     if (resumeFile) {
       setLoading(true);
       try {
-        const candidate = await createCandidate({
-          "first-name": firstName,
-          "last-name": lastName,
-          email: email,
-          phone: phoneNumber,
-          resume: resumeFile.url,
-        });
+        const candidate = await fetch(`/api/team-tailor/candidates`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            "first-name": firstName,
+            "last-name": lastName,
+            email: email,
+            phone: phoneNumber,
+            resume: resumeFile.url,
+          }),
+        }).then((response) => response.json());
 
         for (const answer of answers) {
-          await createAnswer({
-            ...answer,
-            candidateId: candidate.id,
-          });
+          await fetch(`/api/team-tailor/answers`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ...answer,
+              candidateId: candidate.data.id,
+            }),
+          }).then((response) => response.json());
         }
 
-        const res = await createJobApplication({
-          candidateId: candidate.id,
-          jobId: id,
-          "cover-letter": cover,
-        });
+        await fetch(`/api/team-tailor/job-applications`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            candidateId: candidate.data.id,
+            jobId: id,
+            "cover-letter": cover,
+          }),
+        }).then((response) => response.json());
+
         setSubmitted(true);
         reSet();
         let timer = setTimeout(() => {
@@ -131,22 +149,29 @@ const JobApplicationForm = ({
     }
   };
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback(async (acceptedFiles) => {
     if (!!acceptedFiles[0]) {
       setLoadingPdf(true);
-      client.assets
-        .upload("file", acceptedFiles[0], {
-          filename: acceptedFiles[0].path,
-        })
-        .then((fileAsset) => {
+      setError(null);
+      let form = new FormData();
+      form.append("file", acceptedFiles[0]);
+      form.append("file_name", acceptedFiles[0].name);
+      await fetch("/api/upload", {
+        method: "POST",
+        body: form,
+      })
+        .then((response) => response.json())
+        .then((res) => {
           setResumeFile({
-            name: fileAsset.originalFilename,
-            url: fileAsset.url,
+            name: res.originalFilename,
+            url: res.url,
           });
         })
-        .finally(() => {
-          setLoadingPdf(false);
+        .catch((error) => {
+          setError("Your CV upload failed! Please try it again.");
         });
+
+      setLoadingPdf(false);
     }
   }, []);
 

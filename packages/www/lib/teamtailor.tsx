@@ -1,4 +1,4 @@
-const token = process.env.NEXT_PUBLIC_TEAMTAILOR_API_TOKEN;
+const token = process.env.TEAMTAILOR_API_TOKEN;
 
 type Candidate = {
   "first-name": string;

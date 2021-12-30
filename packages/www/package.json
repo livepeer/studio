@@ -42,6 +42,7 @@
     "date-fns": "^2.16.1",
     "eventsource": "^1.1.0",
     "filenamify": "^4.3.0",
+    "formidable-serverless": "^1.1.1",
     "fs": "^0.0.1-security",
     "globby": "^11.0.3",
     "graphql": "^14.6.0",

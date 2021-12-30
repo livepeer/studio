@@ -1,10 +1,4 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Grid,
-} from "@livepeer.com/design-system";
+import { Box, Container, Heading, Grid } from "@livepeer.com/design-system";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
@@ -14,7 +8,7 @@ import {
   getJobById,
   getQuestionIdsByJobId,
   getQuestionsById,
-} from "hooks";
+} from "lib/teamtailor";
 import JobApplicationForm from "@components/Marketing/JobApplicationForm";
 
 const Page = ({

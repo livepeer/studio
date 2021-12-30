@@ -4,7 +4,7 @@ import { Element } from "react-scroll";
 import { Box } from "@livepeer.com/design-system";
 import Hero from "components/Marketing/Hero";
 import Layout from "layouts/main";
-import { getJobs } from "hooks";
+import { getJobs } from "lib/teamtailor";
 
 import { Jobs as Content } from "content";
 import JobsSection from "@components/Marketing/JobsSection";
