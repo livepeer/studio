@@ -44,7 +44,7 @@ type Table<T> = BaseTable<WithID<T>>;
 
 type QueryHistogramLabels = {
   query: string;
-  result?: string;
+  result: string;
 };
 
 const makeTable = <T>(opts: TableOptions) =>
@@ -72,7 +72,7 @@ export class DB {
   pool: Pool;
   replicaPool: Pool;
 
-  metricHistogram: Histogram<string>;
+  metricHistogram: Histogram<keyof QueryHistogramLabels>;
 
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
