@@ -193,8 +193,7 @@ export async function trackAction(userId, email, event, apiKey) {
 }
 
 export async function fetchSegmentApi(body, endpoint, apiKey) {
-  const labels = { endpoint };
-  const timer = segmentMetrics.startTimer(labels);
+  const timer = segmentMetrics.startTimer();
   const segmentApiUrl = "https://api.segment.io/v1";
 
   const headers = {
@@ -207,8 +206,8 @@ export async function fetchSegmentApi(body, endpoint, apiKey) {
     body: JSON.stringify(body),
     headers: headers,
   });
-  labels.status_code = response.status.toString();
-  timer();
+  const labels = { endpoint, status_code: response.status };
+  timer(labels);
 }
 
 export async function getWebhooks(
