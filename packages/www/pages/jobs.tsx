@@ -4,7 +4,6 @@ import { Element } from "react-scroll";
 import { Box } from "@livepeer.com/design-system";
 import Hero from "components/Marketing/Hero";
 import Layout from "layouts/main";
-import { getJobs } from "lib/teamtailor";
 
 import { Jobs as Content } from "content";
 import JobsSection from "@components/Marketing/JobsSection";
@@ -53,11 +52,16 @@ const JobsPage = ({ allJobs }) => {
 };
 
 export async function getStaticProps() {
-  const allJobs = await getJobs();
+  const jobsRes = await fetch(`https://livepeer.org/api/teamtailor/jobs`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.json());
 
   return {
     props: {
-      allJobs,
+      allJobs: jobsRes.data,
     },
   };
 }

@@ -60,7 +60,7 @@ const JobApplicationForm = ({
     const data = questions.map((q) => ({
       questionId: q.id,
       title: q.title,
-      questionType: q.type.toLowerCase(),
+      questionType: q.questionType.toLowerCase(),
       value: "",
     }));
     setAnswers(data);
@@ -91,23 +91,26 @@ const JobApplicationForm = ({
     if (resumeFile) {
       setLoading(true);
       try {
-        const candidate = await fetch(`/api/team-tailor/candidates`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            "first-name": firstName,
-            "last-name": lastName,
-            email: email,
-            phone: phoneNumber,
-            resume: resumeFile.url,
-          }),
-        }).then((response) => response.json());
+        const candidate = await fetch(
+          `https://livepeer.org/api/teamtailor/candidates`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              "first-name": firstName,
+              "last-name": lastName,
+              email: email,
+              phone: phoneNumber,
+              resume: resumeFile.url,
+            }),
+          }
+        ).then((response) => response.json());
 
         for (const answer of answers) {
-          await fetch(`/api/team-tailor/answers`, {
+          await fetch(`https://livepeer.org/api/teamtailor/answers`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -119,7 +122,7 @@ const JobApplicationForm = ({
           }).then((response) => response.json());
         }
 
-        await fetch(`/api/team-tailor/job-applications`, {
+        await fetch(`https://livepeer.org/api/teamtailor/job-applications`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -156,7 +159,7 @@ const JobApplicationForm = ({
       let form = new FormData();
       form.append("file", acceptedFiles[0]);
       form.append("file_name", acceptedFiles[0].name);
-      await fetch("/api/upload", {
+      await fetch("https://livepeer.org/api/upload", {
         method: "POST",
         body: form,
       })

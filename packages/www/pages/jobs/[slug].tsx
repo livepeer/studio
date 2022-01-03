@@ -3,12 +3,6 @@ import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
 import Guides from "@components/Marketing/Guides";
-import {
-  getJobs,
-  getJobById,
-  getQuestionIdsByJobId,
-  getQuestionsById,
-} from "lib/teamtailor";
 import JobApplicationForm from "@components/Marketing/JobApplicationForm";
 
 const Page = ({
@@ -126,9 +120,15 @@ const Page = ({
 };
 
 export async function getStaticPaths() {
-  const allJob = await getJobs();
+  const jobsRes = await fetch(`https://livepeer.org/api/teamtailor/jobs`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.json());
+
   let paths = [];
-  allJob.map((page) => paths.push({ params: { slug: page.id } }));
+  jobsRes.data.map((page) => paths.push({ params: { slug: page.id } }));
   return {
     fallback: true,
     paths,
@@ -137,28 +137,47 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params, preview = false }) {
   const { slug } = params;
-  const job = await getJobById(slug);
-  const questionIds = await getQuestionIdsByJobId(slug);
+
+  const jobRes = await fetch(
+    `https://livepeer.org/api/teamtailor/jobs/${slug}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => response.json());
+
+  const questionIdsRes = await fetch(
+    `https://livepeer.org/api/teamtailor/questionids/${slug}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => response.json());
 
   const questions = [];
-  for (const questionId of questionIds) {
-    const question = await getQuestionsById(questionId.id);
+  for (const questionId of questionIdsRes.data) {
+    const questionRes = await fetch(
+      `https://livepeer.org/api/teamtailor/questions/${questionId.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((response) => response.json());
 
     questions.push({
-      id: question.id,
-      type: question.attributes["question-type"],
-      title: question.attributes.title,
+      ...questionRes.data,
     });
   }
 
   return {
     props: {
-      title: job.attributes.title,
-      body: job.attributes.body,
-      name: job.attributes["name-requirement"],
-      resume: job.attributes["resume-requirement"],
-      coverLetter: job.attributes["cover-letter-requirement"],
-      phone: job.attributes["phone-requirement"],
+      ...jobRes.data,
       questions,
       slug,
       preview,
