@@ -123,3 +123,11 @@ export const DashboardStreamHealth = {
     url: "https://livepeer.com/",
   },
 };
+
+export const Jobs = {
+  metaData: {
+    title: "Jobs - Livepeer.com",
+    description: `Join Us. From Anywhere.`,
+    url: "https://livepeer.com/jobs",
+  },
+};

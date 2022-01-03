@@ -25,7 +25,7 @@ const JobsSection = ({ jobs }) => {
               borderRadius: "8px",
             },
           }}>
-          <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
+          <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
             <A
               css={{
                 textDecoration: "none",
@@ -35,7 +35,7 @@ const JobsSection = ({ jobs }) => {
               </Heading>
             </A>
           </Link>
-          <Link href="/jobs/[slug]" as={`/jobs/${j.slug.current}`} passHref>
+          <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
             <A variant="violet">Apply</A>
           </Link>
         </Flex>

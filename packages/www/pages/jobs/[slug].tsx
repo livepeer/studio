@@ -1,23 +1,12 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Grid,
-} from "@livepeer.com/design-system";
-import { GraphQLClient, request } from "graphql-request";
-import { print } from "graphql/language/printer";
-import ReactMarkdown from "react-markdown";
+import { Box, Container, Heading, Grid } from "@livepeer.com/design-system";
 import Fade from "react-reveal/Fade";
-import Button from "@components/Marketing/Button";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
-import allJobs from "../../queries/allJobs.gql";
-import Code from "@components/Marketing/Code";
-import Link from "next/link";
 import Guides from "@components/Marketing/Guides";
+import JobApplicationForm from "@components/Marketing/JobApplicationForm";
 
 const Page = ({
+  slug,
   title,
   metaTitle,
   metaDescription,
@@ -25,6 +14,11 @@ const Page = ({
   body,
   noindex = false,
   preview,
+  questions,
+  name,
+  resume,
+  coverLetter,
+  phone,
 }) => {
   return (
     <Layout
@@ -53,6 +47,7 @@ const Page = ({
             css={{
               my: "$5",
               fontWeight: 600,
+              lineHeight: "1.2 !important",
             }}>
             {title}
           </Heading>
@@ -91,7 +86,7 @@ const Page = ({
                   color: "$violet9",
                 },
               }}>
-              <ReactMarkdown renderers={{ code: Code }}>{body}</ReactMarkdown>
+              <div dangerouslySetInnerHTML={{ __html: body }} />
             </Box>
             <Box
               css={{
@@ -99,35 +94,20 @@ const Page = ({
                 top: "100px",
                 display: "block",
                 alignSelf: "start",
-                ml: "auto",
-                px: "$6",
-                py: "$5",
-                borderRadius: 24,
-                border: "1px solid",
-                borderColor: "$mauve5",
-                bc: "$mauve2",
-                transition: "box-shadow .2s",
-                "&:hover": {
-                  textDecoration: "none",
-                  boxShadow:
-                    "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
-                },
+                mx: "auto",
+                mt: "100px",
                 "@bp2": {
-                  width: 380,
+                  mr: "0",
                 },
               }}>
-              <Text size="5" css={{ mb: "$2" }}>
-                How to Apply
-              </Text>
-              <Text variant="gray" css={{ mb: "$4" }}>
-                If you are interested in applying for this position, please send
-                an email containing your Github profile and/or LinkedIn.
-              </Text>
-              <Link href="mailto:work@livepeer.com" passHref>
-                <Button size="4" as="a" arrow css={{ width: "100%" }}>
-                  Send email
-                </Button>
-              </Link>
+              <JobApplicationForm
+                id={slug}
+                name={name}
+                questions={questions}
+                resume={resume}
+                coverLetter={coverLetter}
+                phone={phone}
+              />
             </Box>
           </Grid>
         </Container>
@@ -140,15 +120,15 @@ const Page = ({
 };
 
 export async function getStaticPaths() {
-  const { allJob } = await request(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
-    print(allJobs),
-    {
-      where: {},
-    }
-  );
+  const jobsRes = await fetch(`https://livepeer.org/api/teamtailor/jobs`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.json());
+
   let paths = [];
-  allJob.map((page) => paths.push({ params: { slug: page.slug.current } }));
+  jobsRes.data.map((page) => paths.push({ params: { slug: page.id } }));
   return {
     fallback: true,
     paths,
@@ -157,21 +137,48 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params, preview = false }) {
   const { slug } = params;
-  const graphQLClient = new GraphQLClient(
-    "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
-  );
 
-  let data: any = await graphQLClient.request(print(allJobs), {
-    where: {
-      slug: { current: { eq: slug } },
-    },
-  });
+  const jobRes = await fetch(
+    `https://livepeer.org/api/teamtailor/jobs/${slug}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => response.json());
 
-  let job = data.allJob.find((j) => j.slug.current === slug);
+  const questionIdsRes = await fetch(
+    `https://livepeer.org/api/teamtailor/questionids/${slug}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => response.json());
+
+  const questions = [];
+  for (const questionId of questionIdsRes.data) {
+    const questionRes = await fetch(
+      `https://livepeer.org/api/teamtailor/questions/${questionId.id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((response) => response.json());
+
+    questions.push({
+      ...questionRes.data,
+    });
+  }
 
   return {
     props: {
-      ...job,
+      ...jobRes.data,
+      questions,
       slug,
       preview,
     },
