@@ -256,28 +256,6 @@ const JobApplicationForm = ({
               maxWidth: 500,
             }}
             id={id}>
-            {answers &&
-              answers.map((a, index) => (
-                <Box key={index} css={{ width: "100%", m: "$0" }}>
-                  <TextField
-                    size="3"
-                    id={`question-${index}`}
-                    css={{
-                      width: "100%",
-                      mb: "$3",
-                      mx: "$0",
-                    }}
-                    name={`question-${index}`}
-                    type="text"
-                    placeholder={a.title}
-                    required
-                    value={a.value}
-                    onChange={(e) =>
-                      onChangeAnswer(a.questionId, e.target.value)
-                    }
-                  />
-                </Box>
-              ))}
             {name !== "off" && (
               <Grid
                 gap={3}
@@ -384,16 +362,24 @@ const JobApplicationForm = ({
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
+                      color: "$mauve9",
                     }}>
                     {loadingPdf
                       ? "Uploading..."
-                      : "Drag and Drop your CV file or upload files here"}
+                      : "Drag and Drop your CV file or upload file here"}
                   </Box>
                 </Box>
                 {resumeFile && (
                   <Box
-                    as="li"
-                    css={{ width: "100%", textAlign: "left", fontSize: "$2" }}>
+                    as="p"
+                    css={{
+                      my: "$1",
+                      width: "100%",
+                      textAlign: "left",
+                      fontSize: "$1",
+                      overflowWrap: "break-word",
+                      pl: "0",
+                    }}>
                     {resumeFile.name}
                   </Box>
                 )}
@@ -412,6 +398,39 @@ const JobApplicationForm = ({
                 required={coverLetter === "required"}
               />
             )}
+
+            {answers &&
+              answers.map((a, index) => (
+                <Box key={index} css={{ width: "100%", m: "$0" }}>
+                  <Box
+                    css={{
+                      textAlign: "left",
+                      mb: "$1",
+                      color: "$mauve9",
+                      fontSize: "$1",
+                      lineHeight: "1.5",
+                    }}>
+                    {a.title}
+                  </Box>
+                  <TextField
+                    size="3"
+                    id={`question-${index}`}
+                    css={{
+                      width: "100%",
+                      mb: "$3",
+                      mx: "$0",
+                    }}
+                    name={`question-${index}`}
+                    type="text"
+                    placeholder="Type an answer..."
+                    required
+                    value={a.value}
+                    onChange={(e) =>
+                      onChangeAnswer(a.questionId, e.target.value)
+                    }
+                  />
+                </Box>
+              ))}
 
             <Box>{error}</Box>
             <Button
