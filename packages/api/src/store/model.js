@@ -188,7 +188,7 @@ export default class Model {
     return responses;
   }
 
-  close() {
-    this.db.close();
+  async close() {
+    return this.db.close();
   }
 }

@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { AddressInfo } from "net";
 import "source-map-support/register";
 import cors from "cors";
+import promBundle from "express-prom-bundle";
 
 import appRouter from "./app-router";
 import logger from "./logger";
@@ -76,6 +77,12 @@ export default async function makeApp(params: CliArgs) {
   const { db, queue, router, store, webhookCannon: webhook } = appRoute;
 
   const app = express();
+  const metricsMiddleware = promBundle({
+    includeUp: false,
+    includeMethod: true,
+    includePath: true,
+    httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
+  });
   const whitelist = [
     "https://livepeer.com",
     "https://livepeer.monster",
@@ -92,6 +99,8 @@ export default async function makeApp(params: CliArgs) {
       exposedHeaders: ["*"],
     })
   );
+  app.use(metricsMiddleware);
+
   const isSilentTest =
     process.env.NODE_ENV === "test" && process.argv.indexOf("--silent") > 0;
   app.use(

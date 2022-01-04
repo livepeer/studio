@@ -1,9 +1,10 @@
-import { Pool } from "pg";
-import logger from "../logger";
+import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
-import schema from "../schema/schema.json";
-import { QueryResult, QueryConfig } from "pg";
 import { hostname } from "os";
+import { Histogram, register } from "prom-client";
+
+import logger from "../logger";
+import schema from "../schema/schema.json";
 import {
   ObjectStore,
   ApiToken,
@@ -41,6 +42,11 @@ export type DBSession = WithID<Session> &
 
 type Table<T> = BaseTable<WithID<T>>;
 
+type QueryHistogramLabels = {
+  query: string;
+  result: string;
+};
+
 const makeTable = <T>(opts: TableOptions) =>
   new BaseTable<WithID<T>>(opts) as Table<T>;
 
@@ -60,11 +66,13 @@ export class DB {
   cdnUsageLast: Table<CdnUsageLast>;
   cdnUsageTable: CdnUsageTable;
 
-  postgresUrl: String;
-  replicaUrl: String;
+  postgresUrl: string;
+  replicaUrl: string;
   ready: Promise<void>;
   pool: Pool;
   replicaPool: Pool;
+
+  metricHistogram: Histogram<keyof QueryHistogramLabels>;
 
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
@@ -102,6 +110,13 @@ export class DB {
     } else {
       console.log("no replica url found, not using read replica");
     }
+
+    this.metricHistogram = new Histogram({
+      name: "livepeer_api_pgsql_query_duration_seconds",
+      help: "duration histogram of pgsql queries",
+      buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
+      labelNames: ["query", "result"] as const,
+    });
 
     await this.query("SELECT NOW()");
     await this.replicaQuery("SELECT NOW()");
@@ -189,19 +204,18 @@ export class DB {
     return this.runQuery(pool, query, values);
   }
 
-  // Internal logging function — use query() or replicaQuery() externally
-  async runQuery<T, I extends any[] = any[]>(
+  async runQueryNoMetrics<T, I extends any[] = any[]>(
     pool: Pool,
     query: string | QueryConfig<I>,
     values?: I
   ): Promise<QueryResult<T>> {
-    let queryLog;
+    let queryLog: string;
     if (typeof query === "string") {
       queryLog = JSON.stringify({ query: query.trim(), values });
     } else {
       queryLog = JSON.stringify(query);
     }
-    let result;
+    let result: QueryResult;
     logger.info(`runQuery phase=start query=${queryLog}`);
     const start = Date.now();
     try {
@@ -221,10 +235,31 @@ export class DB {
     );
     return result;
   }
+
+  // Internal logging function — use query() or replicaQuery() externally
+  async runQuery<T, I extends any[] = any[]>(
+    pool: Pool,
+    query: string | QueryConfig<I>,
+    values?: I
+  ): Promise<QueryResult<T>> {
+    let labels: QueryHistogramLabels = {
+      query: typeof query === "string" ? query.trim() : query.text,
+      result: "success",
+    };
+    const queryTimer = this.metricHistogram.startTimer();
+    try {
+      return await this.runQueryNoMetrics(pool, query, values);
+    } catch (e) {
+      labels.result = "error";
+      throw e;
+    } finally {
+      queryTimer(labels);
+    }
+  }
 }
 
 // Auto-create database if it doesn't exist
-async function ensureDatabase(postgresUrl) {
+async function ensureDatabase(postgresUrl: string) {
   const pool = new Pool({
     connectionString: postgresUrl,
     connectionTimeoutMillis: CONNECT_TIMEOUT,
