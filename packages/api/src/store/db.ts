@@ -1,7 +1,7 @@
 import { Pool, QueryConfig, QueryResult } from "pg";
 import { parse as parseUrl, format as stringifyUrl } from "url";
 import { hostname } from "os";
-import { Histogram, register } from "prom-client";
+import { Histogram } from "prom-client";
 
 import logger from "../logger";
 import schema from "../schema/schema.json";
@@ -47,6 +47,13 @@ type QueryHistogramLabels = {
   result: string;
 };
 
+const metricHistogram: Histogram<keyof QueryHistogramLabels> = new Histogram({
+  name: "livepeer_api_pgsql_query_duration_seconds",
+  help: "duration histogram of pgsql queries",
+  buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
+  labelNames: ["query", "result"] as const,
+});
+
 const makeTable = <T>(opts: TableOptions) =>
   new BaseTable<WithID<T>>(opts) as Table<T>;
 
@@ -71,8 +78,6 @@ export class DB {
   ready: Promise<void>;
   pool: Pool;
   replicaPool: Pool;
-
-  metricHistogram: Histogram<keyof QueryHistogramLabels>;
 
   constructor() {
     // This is empty now so we can have a `db` singleton. All the former
@@ -110,13 +115,6 @@ export class DB {
     } else {
       console.log("no replica url found, not using read replica");
     }
-
-    this.metricHistogram = new Histogram({
-      name: "livepeer_api_pgsql_query_duration_seconds",
-      help: "duration histogram of pgsql queries",
-      buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
-      labelNames: ["query", "result"] as const,
-    });
 
     await this.query("SELECT NOW()");
     await this.replicaQuery("SELECT NOW()");
@@ -246,7 +244,7 @@ export class DB {
       query: typeof query === "string" ? query.trim() : query.text,
       result: "success",
     };
-    const queryTimer = this.metricHistogram.startTimer();
+    const queryTimer = metricHistogram.startTimer();
     try {
       return await this.runQueryNoMetrics(pool, query, values);
     } catch (e) {
