@@ -132,7 +132,7 @@ probably get merged quickly if there aren't any major problems with the
 implementation (we try to watch out for code duplication/complexity). CoacoaPods
 has
 [some really useful tips](https://github.com/CocoaPods/CocoaPods/wiki/Communication-&-Design-Rules#design-rules)
-when it comes to coding. I highly recommend taking a look 🤓.
+when it comes to coding. I highly recommend taking a look 🤓
 
 ### When is it appropriate to follow up?
 
