@@ -158,22 +158,24 @@ export async function getStaticProps({ params, preview = false }) {
     }
   ).then((response) => response.json());
 
+  const qIdsData = questionIdsRes["data"];
   const questions = [];
-  for (const questionId of questionIdsRes.data) {
-    const questionRes = await fetch(
-      `https://livepeer.org/api/teamtailor/questions/${questionId.id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    ).then((response) => response.json());
+  if (qIdsData)
+    for (const questionId of qIdsData) {
+      const questionRes = await fetch(
+        `https://livepeer.org/api/teamtailor/questions/${questionId.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((response) => response.json());
 
-    questions.push({
-      ...questionRes.data,
-    });
-  }
+      questions.push({
+        ...questionRes.data,
+      });
+    }
 
   return {
     props: {
