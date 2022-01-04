@@ -155,6 +155,11 @@ const config = {
         permanent: false,
       },
       {
+        source: "/docs/guides/application-development/contact",
+        destination: "/docs/guides/application-development/example-app",
+        permanent: false,
+      },
+      {
         source: "/app/user",
         destination: "/dashboard",
         permanent: false,
