@@ -156,4 +156,4 @@ suggestion or merge a PR. If that happens, maintainer will still...
 
 But do not despair! In many cases, this can still be a great opportunity to
 follow-up with an improved suggestion or pull request. Worst case, this repo is
-open source, so forking is always an option 😎.
+open source, so forking is always an option 😎
