@@ -16,12 +16,6 @@ if (typeof TextEncoder === "undefined") {
 }
 
 const ITERATIONS = 10000;
-const segmentMetrics = new Histogram({
-  name: "livepeer_api_segment_request_duration_seconds",
-  help: "duration histogram of http calls to segment.io APIs",
-  labelNames: ["endpoint", "status_code"],
-  buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
-});
 
 export function sign(data, secret) {
   const hmac = createHmac("sha256", secret);
