@@ -343,7 +343,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             fontStyle: "italic",
             color: "$hiContrast",
           }}>
-          *Currently, we are not charging for these features. We'll be sure to
+          *Currently, we are not charging for this feature. We'll be sure to
           reach out before we do.
         </Container>
       </Box>

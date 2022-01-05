@@ -297,7 +297,7 @@ const PricingCardsContainer = () => {
                   fontSize: "32px",
                   fontWeight: 600,
                 }}>
-                $0.02
+                $0.015
                 <Box
                   as="span"
                   css={{
@@ -313,7 +313,7 @@ const PricingCardsContainer = () => {
                   fontSize: "16px",
                   lineHeight: "24px",
                 }}>
-                / GB video streamed*
+                / GB video streamed
               </Box>
             </PricingCardContent>
             <PricingCardContent>
@@ -456,8 +456,8 @@ const PricingCardsContainer = () => {
           mt: "$8",
           textAlign: "center",
         }}>
-        *Currently, we are not charging for these features. We'll be sure to
-        reach out before we do.
+        *Currently, we are not charging for this feature. We'll be sure to reach
+        out before we do.
       </Text>
     </Flex>
   );
