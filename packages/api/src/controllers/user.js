@@ -8,7 +8,6 @@ import validator from "email-validator";
 import {
   makeNextHREF,
   sendgridEmail,
-  trackAction,
   parseFilters,
   parseOrder,
   recaptchaVerify,
@@ -173,7 +172,6 @@ app.post("/", validatePost("user"), async (req, res) => {
     phone,
     createdAt: Date.now(),
   });
-  trackAction(id, email, { name: "user registered" }, req.config.segmentApiKey);
 
   const user = await req.store.get(`user/${id}`);
 

@@ -163,63 +163,6 @@ export async function sendgridEmail({
   await SendgridMail.send(msg);
 }
 
-export function trackAction(userId, email, event, apiKey) {
-  if (!apiKey) {
-    return;
-  }
-  trackActionAsync(userId, email, event, apiKey).catch((err) => {
-    console.error(
-      `error tracking action on segment API email=${email} event=${JSON.stringify(
-        event
-      )} err=`,
-      err
-    );
-  });
-}
-
-async function trackActionAsync(userId, email, event, apiKey) {
-  const identifyInfo = {
-    userId,
-    traits: {
-      email,
-    },
-    email,
-  };
-  await fetchSegmentApi(identifyInfo, "identify", apiKey);
-
-  let properties = {};
-  if ("properties" in event) {
-    properties = { ...properties, ...event.properties };
-  }
-
-  const trackInfo = {
-    userId,
-    event: event.name,
-    email,
-    properties,
-  };
-
-  await fetchSegmentApi(trackInfo, "track", apiKey);
-}
-
-async function fetchSegmentApi(body, endpoint, apiKey) {
-  const timer = segmentMetrics.startTimer();
-  const segmentApiUrl = "https://api.segment.io/v1";
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: "Basic " + Buffer.from(`${apiKey}:`).toString("base64"),
-  };
-
-  let response = await fetch(`${segmentApiUrl}/${endpoint}`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: headers,
-  });
-  const labels = { endpoint, status_code: response.status };
-  timer(labels);
-}
-
 export async function getWebhooks(
   store,
   userId,

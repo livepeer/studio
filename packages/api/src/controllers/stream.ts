@@ -23,13 +23,7 @@ import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
-import {
-  makeNextHREF,
-  trackAction,
-  parseFilters,
-  parseOrder,
-  pathJoin,
-} from "./helpers";
+import { makeNextHREF, parseFilters, parseOrder, pathJoin } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -764,23 +758,6 @@ app.post(
       console.error(e);
       throw e;
     }
-    const {
-      user: { email },
-      config: { segmentApiKey },
-    } = req;
-    db.user
-      .get(stream.userId)
-      .then((user) =>
-        trackAction(
-          stream.userId,
-          user?.email ?? email,
-          { name: "Stream Session Created" },
-          segmentApiKey
-        )
-      )
-      .catch((err) => {
-        console.error(`error fetching user for segment API tracking err=`, err);
-      });
 
     res.status(201);
     res.json(db.stream.removePrivateFields(doc, req.user.admin));
@@ -849,12 +826,6 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
   );
 
   await req.store.create(doc);
-  trackAction(
-    req.user.id,
-    req.user.email,
-    { name: "Stream Created" },
-    req.config.segmentApiKey
-  );
 
   res.status(201);
   res.json(
