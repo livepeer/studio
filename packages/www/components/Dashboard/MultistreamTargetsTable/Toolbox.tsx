@@ -24,8 +24,10 @@ import {
 import Spinner from "components/Dashboard/Spinner";
 
 import { useApi } from "../../../hooks";
+import { useToggleState } from "hooks/use-toggle-state";
 import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
+import ErrorRecordDialog from "../ErrorRecordDialog";
 
 const DisableDialog = ({
   onDialogAction,
@@ -170,6 +172,7 @@ const Toolbox = ({
   invalidateStream: (optm?: Stream) => Promise<void>;
 }) => {
   const { patchMultistreamTarget } = useApi();
+  const errorRecordDialogState = useToggleState();
   const [openSnackbar] = useSnackbar();
 
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
@@ -208,10 +211,14 @@ const Toolbox = ({
         checked={!target?.disabled}
         value={`${!target?.disabled}`}
         onCheckedChange={useCallback(async () => {
-          if (target?.disabled) {
-            await setTargetDisabled(false);
+          if (stream.isActive) {
+            errorRecordDialogState.onOn();
           } else {
-            setDisableDialogOpen(true);
+            if (target?.disabled) {
+              await setTargetDisabled(false);
+            } else {
+              setDisableDialogOpen(true);
+            }
           }
         }, [target?.disabled, setTargetDisabled])}
       />
@@ -231,18 +238,31 @@ const Toolbox = ({
           <DropdownMenuGroup>
             <DropdownMenuItem
               disabled={!target}
-              onSelect={() => setSaveDialogOpen(true)}>
+              onSelect={() =>
+                stream.isActive
+                  ? errorRecordDialogState.onOn()
+                  : setSaveDialogOpen(true)
+              }>
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={!target}
-              onSelect={() => setDeleteDialogOpen(true)}
+              onSelect={() =>
+                stream.isActive
+                  ? errorRecordDialogState.onOn()
+                  : setDeleteDialogOpen(true)
+              }
               color="red">
               Delete
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ErrorRecordDialog
+        isOpen={errorRecordDialogState.on}
+        onOpenChange={errorRecordDialogState.onToggle}
+      />
 
       <DisableDialog
         onDialogAction={useCallback(
