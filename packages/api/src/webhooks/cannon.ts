@@ -16,7 +16,7 @@ import { sign, sendgridEmail } from "../controllers/helpers";
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 10 * 60 * 1000 * 6;
 const BACKOFF_COEF = 2;
-const MAX_RETRIES = 20;
+const MAX_RETRIES = 33;
 
 export default class WebhookCannon {
   db: DB;
@@ -277,7 +277,7 @@ export default class WebhookCannon {
           buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
           unsubscribe: `https://${this.frontendDomain}/contact`,
           text: [
-            `Your webhook failed to receive this payload: `,
+            `Your webhook failed to receive this payload in the last 24 hours: `,
             `<code>${payload}</code>`,
             `This is the error we are receiving:`,
             `${err}`,
