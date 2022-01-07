@@ -24,13 +24,30 @@ export default class WebhookCannon {
   store: Model;
   running: boolean;
   verifyUrls: boolean;
+  frontendDomain: string;
+  sendgridTemplateId: string;
+  sendgridApiKey: string;
+  supportAddr: string;
   resolver: any;
   queue: Queue;
-  constructor({ db, store, verifyUrls, queue }) {
+  constructor({
+    db,
+    store,
+    frontendDomain,
+    sendgridTemplateId,
+    sendgridApiKey,
+    supportAddr,
+    verifyUrls,
+    queue,
+  }) {
     this.db = db;
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
+    this.frontendDomain = frontendDomain;
+    this.sendgridTemplateId = sendgridTemplateId;
+    this.sendgridApiKey = sendgridApiKey;
+    this.supportAddr = supportAddr;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
