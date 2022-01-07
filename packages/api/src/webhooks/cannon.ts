@@ -9,14 +9,16 @@ import messages from "../store/messages";
 import Queue from "../store/queue";
 import Model from "../store/model";
 import { DBWebhook } from "../store/webhook-table";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
-const MAX_BACKOFF = 10 * 60 * 1000 * 6;
+const MAX_BACKOFF = 60 * 60 * 1000;
 const BACKOFF_COEF = 2;
 const MAX_RETRIES = 33;
+
+const SIGNATURE_HEADER = "Livepeer-Signature";
 
 export default class WebhookCannon {
   db: DB;
@@ -221,8 +223,14 @@ export default class WebhookCannon {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
-      this.notifyDisabledWebhook(trigger, webhookPayload, err);
-      return;
+      try {
+        this.notifyFailedWebhook(trigger, webhookPayload, err);
+        return;
+      } catch (err) {
+        console.error(
+          `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        );
+      }
     }
 
     trigger = {
@@ -239,67 +247,58 @@ export default class WebhookCannon {
     );
   }
 
-  async notifyDisabledWebhook(
+  async notifyFailedWebhook(
     trigger: messages.WebhookTrigger,
-    params?: any,
+    params?: RequestInitWithTimeout,
     err?: any
   ) {
-    try {
-      if (trigger.user.emailValid) {
-        if (
-          !(this.supportAddr && this.sendgridTemplateId && this.sendgridApiKey)
-        ) {
-          console.error(
-            `Webhook Cannon| Unable to send notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
-          );
-          console.error(
-            `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
-          );
-
-          return;
-        }
-
-        let signature_header = "";
-        if (trigger.webhook.sharedSecret) {
-          signature_header = "-H " + params.headers["Livepeer-Signature"];
-        }
-
-        let payload = params.body;
-
-        await sendgridEmail({
-          email: trigger.user.email,
-          supportAddr: this.supportAddr,
-          sendgridTemplateId: this.sendgridTemplateId,
-          sendgridApiKey: this.sendgridApiKey,
-          subject: "Your webhook has been disabled",
-          preheader: "Failure notification",
-          buttonText: "Manage your webhooks",
-          buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
-          unsubscribe: `https://${this.frontendDomain}/contact`,
-          text: [
-            `Your webhook failed to receive this payload in the last 24 hours: `,
-            `<code>${payload}</code>`,
-            `This is the error we are receiving:`,
-            `${err}`,
-            `We disabled your webhook, please check your configuration and try again.`,
-            `If you want to try yourself the call we are making, here is a curl command for that:`,
-            `<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signature_header} -d '${payload}' ${trigger.webhook.url}</code>`,
-          ].join("\n\n"),
-        });
-      } else {
-        console.error(
-          `Webhook Cannon| User email is not valid, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
-        );
-        return;
-      }
-      console.log(
-        `Webhook Cannon| Email sent to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
-      );
-    } catch (err) {
+    if (!trigger.user.emailValid) {
       console.error(
-        `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        `Webhook Cannon| User email is not valid, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
+      return;
     }
+    if (!(this.supportAddr && this.sendgridTemplateId && this.sendgridApiKey)) {
+      console.error(
+        `Webhook Cannon| Unable to send notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+      );
+      console.error(
+        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
+      );
+      return;
+    }
+
+    let signature_header = "";
+    if (params.headers[SIGNATURE_HEADER]) {
+      signature_header = `-H  : ${params.headers[SIGNATURE_HEADER]}`;
+    }
+
+    let payload = params.body;
+
+    await sendgridEmail({
+      email: trigger.user.email,
+      supportAddr: this.supportAddr,
+      sendgridTemplateId: this.sendgridTemplateId,
+      sendgridApiKey: this.sendgridApiKey,
+      subject: "Your webhook has been disabled",
+      preheader: "Failure notification",
+      buttonText: "Manage your webhooks",
+      buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
+      unsubscribe: `https://${this.frontendDomain}/contact`,
+      text: [
+        `Your webhook failed to receive this payload in the last 24 hours: `,
+        `<code>${payload}</code>`,
+        `This is the error we are receiving:`,
+        `${err}`,
+        `We disabled your webhook, please check your configuration and try again.`,
+        `If you want to try yourself the call we are making, here is a curl command for that:`,
+        `<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signature_header} -d '${payload}' ${trigger.webhook.url}</code>`,
+      ].join("\n\n"),
+    });
+
+    console.log(
+      `Webhook Cannon| Email sent to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+    );
   }
 
   async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
@@ -370,7 +369,7 @@ export default class WebhookCannon {
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
         let signature = sign(params.body, webhook.sharedSecret);
-        params.headers["Livepeer-Signature"] = `t=${timestamp},v1=${signature}`;
+        params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
 
       try {
