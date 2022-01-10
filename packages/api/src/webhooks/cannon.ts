@@ -185,7 +185,7 @@ export default class WebhookCannon {
       await this._fireHook(trigger, false);
     } catch (err) {
       console.log("_fireHook error", err);
-      await this.retry(trigger, err);
+      await this.retry(trigger, null, err);
     } finally {
       this.queue.ack(data);
     }
@@ -218,19 +218,23 @@ export default class WebhookCannon {
     return newInterval | 0;
   };
 
-  retry(trigger: messages.WebhookTrigger, webhookPayload?: any, err?: any) {
+  retry(
+    trigger: messages.WebhookTrigger,
+    webhookPayload?: RequestInitWithTimeout,
+    err?: Error
+  ) {
     if (trigger?.retries >= MAX_RETRIES) {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
       try {
         this.notifyFailedWebhook(trigger, webhookPayload, err);
-        return;
       } catch (err) {
         console.error(
           `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
         );
       }
+      return;
     }
 
     trigger = {
@@ -268,9 +272,9 @@ export default class WebhookCannon {
       return;
     }
 
-    let signature_header = "";
+    let signatureHeader = "";
     if (params.headers[SIGNATURE_HEADER]) {
-      signature_header = `-H  "${SIGNATURE_HEADER}: ${params.headers["Livepeer-Signature"]}"`;
+      signatureHeader = `-H  "${SIGNATURE_HEADER}: ${params.headers["Livepeer-Signature"]}"`;
     }
 
     let payload = params.body;
@@ -288,11 +292,13 @@ export default class WebhookCannon {
       text: [
         `Your webhook ${trigger.webhook.url} failed to receive our payload in the last 24 hours`,
         //`<code>${payload}</code>`,
-        //`This is the error we are receiving:`,
-        //`${err}`,
+        `This is the error we are receiving:`,
+        `${err}`,
         //`We disabled your webhook, please check your configuration and try again.`,
         //`If you want to try yourself the call we are making, here is a curl command for that:`,
-        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signature_header} -d '${payload}' ${trigger.webhook.url}</code>`,
+        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signatureHeader} -d '${payload}' ${trigger.webhook.url}</code>`,
+
+        // TODO: Uncomment the additional information here once we get access to Sendgrid to change the tempalte
       ].join("\n\n"),
     });
 
@@ -384,7 +390,11 @@ export default class WebhookCannon {
         }
 
         if (resp.status >= 500) {
-          await this.retry(trigger, params, "Status code: " + resp.status);
+          await this.retry(
+            trigger,
+            params,
+            new Error("Status code: " + resp.status)
+          );
         }
 
         console.error(
