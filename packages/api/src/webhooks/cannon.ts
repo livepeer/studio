@@ -286,13 +286,13 @@ export default class WebhookCannon {
       buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
       unsubscribe: `https://${this.frontendDomain}/contact`,
       text: [
-        `Your webhook failed to receive this payload in the last 24 hours: `,
-        `<code>${payload}</code>`,
-        `This is the error we are receiving:`,
-        `${err}`,
-        `We disabled your webhook, please check your configuration and try again.`,
-        `If you want to try yourself the call we are making, here is a curl command for that:`,
-        `<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signature_header} -d '${payload}' ${trigger.webhook.url}</code>`,
+        `Your webhook ${trigger.webhook.url} failed to receive our payload in the last 24 hours`,
+        //`<code>${payload}</code>`,
+        //`This is the error we are receiving:`,
+        //`${err}`,
+        //`We disabled your webhook, please check your configuration and try again.`,
+        //`If you want to try yourself the call we are making, here is a curl command for that:`,
+        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signature_header} -d '${payload}' ${trigger.webhook.url}</code>`,
       ].join("\n\n"),
     });
 
