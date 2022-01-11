@@ -1446,16 +1446,21 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
   );
   let detection = undefined;
   if (webhooks.length > 0 || stream.detection) {
+    console.warn(
+      `Ignoring configured detection webhooks="${webhooks.map(
+        (w) => w.id
+      )}" for manifestId=${manifestID}`
+    );
     // TODO: Validate if these are the best default configs
-    detection = {
-      freq: 4, // Segment sample rate. Process 1 / freq segments
-      sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
-      sceneClassification: [{ name: "soccer" }, { name: "adult" }],
-    };
-    if (stream.detection?.sceneClassification) {
-      detection.sceneClassification = stream.detection?.sceneClassification;
-    }
-    console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
+    // detection = {
+    //   freq: 4, // Segment sample rate. Process 1 / freq segments
+    //   sampleRate: 10, // Frames sample rate. Process 1 / sampleRate frames of a segment
+    //   sceneClassification: [{ name: "soccer" }, { name: "adult" }],
+    // };
+    // if (stream.detection?.sceneClassification) {
+    //   detection.sceneClassification = stream.detection?.sceneClassification;
+    // }
+    // console.log(`DetectionHookResponse: ${JSON.stringify(detection)}`);
   }
 
   console.log(
