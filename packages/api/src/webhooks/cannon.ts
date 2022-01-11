@@ -138,7 +138,7 @@ export default class WebhookCannon {
       };
       await Promise.all(
         webhooks.map((webhook) =>
-          this.queue.publish("webhooks.triggers", {
+          this.queue.publishWebhook("webhooks.triggers", {
             ...baseTrigger,
             id: uuid(),
             webhook,
@@ -215,7 +215,7 @@ export default class WebhookCannon {
       lastInterval: this.calcBackoff(trigger.lastInterval),
       retries: trigger.retries ? trigger.retries + 1 : 1,
     };
-    return this.queue.delayedPublish(
+    return this.queue.delayedPublishWebhook(
       "webhooks.delayedEmits",
       trigger,
       trigger.lastInterval

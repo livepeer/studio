@@ -206,7 +206,7 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.publish("events.stream.started", {
+      await server.queue.publishWebhook("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
@@ -243,7 +243,7 @@ describe("webhook cannon", () => {
         sems[1].release();
       };
 
-      await server.queue.publish("events.stream.started", {
+      await server.queue.publishWebhook("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
@@ -273,7 +273,7 @@ describe("webhook cannon", () => {
         sem.release();
       };
 
-      await server.queue.publish("events.stream.started", {
+      await server.queue.publishWebhook("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),
@@ -287,7 +287,7 @@ describe("webhook cannon", () => {
       expect(receivedEvent).toBe("stream.started");
 
       sem = semaphore();
-      await server.queue.publish("events.stream.idle", {
+      await server.queue.publishWebhook("events.stream.idle", {
         type: "webhook_event",
         id: "webhook_test_42",
         timestamp: Date.now(),
@@ -302,7 +302,7 @@ describe("webhook cannon", () => {
 
       // does not receive some random event
       sem = semaphore();
-      await server.queue.publish("events.stream.unknown" as any, {
+      await server.queue.publishWebhook("events.stream.unknown" as any, {
         type: "webhook_event",
         id: "webhook_test_93",
         timestamp: Date.now(),
@@ -342,7 +342,7 @@ describe("webhook cannon", () => {
       };
       server.webhook.calcBackoff = () => 100;
 
-      await server.queue.publish("events.stream.started", {
+      await server.queue.publishWebhook("events.stream.started", {
         type: "webhook_event",
         id: "webhook_test_12",
         timestamp: Date.now(),

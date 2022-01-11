@@ -4,18 +4,22 @@ import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
 import { EventKey } from "./webhook-table";
 
-const EXCHANGE_NAME = "webhook_default_exchange";
+const EXCHANGES = {
+  webhooks: "webhook_default_exchange",
+  delayed: "webhook_delayed_exchange",
+} as const;
 const QUEUES = {
   events: "webhook_events_queue",
   webhooks: "webhook_cannon_single_url",
+  delayed: "webhook_delayed_queue",
 } as const;
 
 type QueueName = keyof typeof QUEUES;
 type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
 export default interface Queue {
-  publish(key: RoutingKey, msg: messages.Any): Promise<void>;
-  delayedPublish(
+  publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
+  delayedPublishWebhook(
     key: RoutingKey,
     msg: messages.Any,
     delay: number
@@ -29,11 +33,18 @@ export default interface Queue {
 }
 
 export class NoopQueue implements Queue {
-  async publish(key: RoutingKey, msg: messages.Any) {
-    console.warn(`WARN: Publish event to noop queue. key=${key} message=`, msg);
+  async publishWebhook(key: RoutingKey, msg: messages.Webhooks) {
+    console.warn(
+      `WARN: Publish webhook to noop queue. key=${key} message=`,
+      msg
+    );
   }
 
-  async delayedPublish(key: RoutingKey, msg: messages.Any, delay: number) {
+  async delayedPublishWebhook(
+    key: RoutingKey,
+    msg: messages.Any,
+    delay: number
+  ) {
     console.warn(
       `WARN: Delayed publish event to noop queue. key=${key} delay=${delay} message=`,
       msg
@@ -68,14 +79,25 @@ export class RabbitQueue implements Queue {
         await Promise.all([
           channel.assertQueue(QUEUES.events, { durable: true }),
           channel.assertQueue(QUEUES.webhooks, { durable: true }),
-          channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true }),
-          // TODO: remove this after all old queues have been deleted
-          channel.deleteQueue("webhook_default_queue", { ifUnused: true }),
+          channel.assertExchange(EXCHANGES.webhooks, "topic", {
+            durable: true,
+          }),
+          channel.assertExchange(EXCHANGES.delayed, "topic", {
+            durable: true,
+          }),
         ]);
         await Promise.all([
-          channel.bindQueue(QUEUES.events, EXCHANGE_NAME, "events.#"),
-          channel.bindQueue(QUEUES.webhooks, EXCHANGE_NAME, "webhooks.#"),
-          channel.prefetch(1),
+          channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
+          channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
+          channel
+            .assertQueue(QUEUES.delayed, {
+              deadLetterExchange: EXCHANGES.webhooks,
+              durable: true,
+            })
+            .then(() =>
+              channel.bindQueue(QUEUES.delayed, EXCHANGES.delayed, "#")
+            ),
+          channel.prefetch(2),
         ]);
       },
     });
@@ -137,40 +159,29 @@ export class RabbitQueue implements Queue {
     await this.channel.sendToQueue(QUEUES.events, msg);
   }
 
-  public async publish(route: RoutingKey, msg: messages.Any): Promise<void> {
-    console.log(`publishing to ${route} : ${JSON.stringify(msg)}`);
-    await this.channel.publish(EXCHANGE_NAME, route, msg, { persistent: true });
+  public async publishWebhook(
+    route: RoutingKey,
+    msg: messages.Any
+  ): Promise<void> {
+    console.log(`publishing webhook to ${route} : ${JSON.stringify(msg)}`);
+    await this.channel.publish(EXCHANGES.webhooks, route, msg, {
+      persistent: true,
+    });
   }
 
-  public async delayedPublish(
+  // This function publishes a message to an alternate exchange/queue used only
+  // for delayed messages. Messages are published with an expiration equal to
+  // the desired `delay` parameter, and after they expire are sent to the main
+  // exchange through the delayed queue deadletterExchange configuration.
+  public async delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    // TODO: Reimplement this without on-demand queues. Idea: Use a single delayed queue
-    // and per-message expiration and routing key (needs an exchange for that).
-    const delaySec = delay / 1000;
-    const delayedQueueName = `delayed_queue_${routingKey}_${delaySec}s`;
-    const setupFunc = (channel: Channel) =>
-      channel.assertQueue(delayedQueueName, {
-        messageTtl: delay + 100,
-        deadLetterExchange: EXCHANGE_NAME,
-        deadLetterRoutingKey: routingKey,
-        expires: delay + 15000,
-        durable: true,
-      });
-    await this.channel.addSetup(setupFunc);
-    try {
-      console.log(
-        `delayed emitting: delay=${delaySec}s queue=${delayedQueueName} msg=`,
-        msg
-      );
-      await this.channel.sendToQueue(delayedQueueName, msg, {
-        persistent: true,
-      });
-    } finally {
-      // avoid accumulating duplicate setup funcs on the channel manager
-      await this.channel.removeSetup(setupFunc, () => {});
-    }
+    console.log(`emitting delayed message: delay=${delay / 1000}s msg=`, msg);
+    await this.channel.publish(EXCHANGES.delayed, routingKey, msg, {
+      persistent: true,
+      expiration: delay,
+    });
   }
 }

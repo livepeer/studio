@@ -20,7 +20,7 @@ describe("Queue", () => {
 
   it("should be able to emit events and catch it via default consumer", async () => {
     await queue.consume("events", queue.handleMessage.bind(queue));
-    await queue.publish("events.stream.started", {
+    await queue.publishWebhook("events.stream.started", {
       type: "webhook_event",
       id: "abc123",
       timestamp: Date.now(),
@@ -45,7 +45,7 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.publish("events.stream.started", {
+    await queue.publishWebhook("events.stream.started", {
       type: "webhook_event",
       id: "custom_msg",
       timestamp: Date.now(),
@@ -71,7 +71,8 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedPublish(
+    emittedAt = Date.now();
+    await queue.delayedPublishWebhook(
       "events.recording.ready",
       {
         type: "webhook_event",
@@ -83,7 +84,6 @@ describe("Queue", () => {
       },
       2000
     );
-    emittedAt = Date.now();
     await sem.wait(4000);
     let duration = consumedAt - emittedAt;
     console.log("duration: ", duration);
@@ -105,7 +105,8 @@ describe("Queue", () => {
 
     await queue.consume("events", onMsg);
 
-    await queue.delayedPublish(
+    emittedAt = Date.now();
+    await queue.delayedPublishWebhook(
       "events.recording.ready",
       {
         type: "webhook_event",
@@ -117,7 +118,6 @@ describe("Queue", () => {
       },
       1000
     );
-    emittedAt = Date.now();
     await sem.wait(3000);
     let duration = consumedAt - emittedAt;
     console.log("duration: ", duration);
