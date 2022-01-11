@@ -378,17 +378,26 @@ export default class WebhookCannon {
         params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
 
+      await this.storeTriggerTime(webhook);
+      let resp = {} as Response;
+      let errorMessage;
+      let statusCode;
+
       try {
         logger.info(`webhook ${webhook.id} firing`);
         const startTime = process.hrtime();
-        let resp = await fetchWithTimeout(webhook.url, params);
-        await this.storeResponse(webhook, event, resp, startTime);
+        resp = await fetchWithTimeout(webhook.url, params);
+        // getting the response text here to avoid the overhead of reading the body twice
+        let responseBody = await resp.text();
+        await this.storeResponse(webhook, event, resp, startTime, responseBody);
+        statusCode = resp.status;
+
         if (resp.status >= 200 && resp.status < 300) {
           // 2xx requests are cool. all is good
           logger.info(`webhook ${webhook.id} fired successfully`);
           return true;
         }
-
+        errorMessage = responseBody;
         if (resp.status >= 500) {
           await this.retry(
             trigger,
@@ -402,20 +411,55 @@ export default class WebhookCannon {
         );
         // we don't retry on non 400 responses. only on timeouts
         // this.retry(event);
-        return;
       } catch (e) {
         console.log("firing error", e);
+        errorMessage = e.message;
         await this.retry(trigger, params, e);
+      } finally {
+        if (statusCode >= 300 || !statusCode) {
+          await this.storeWebhookFailure(
+            trigger.webhook,
+            statusCode,
+            errorMessage
+          );
+        }
         return;
       }
     }
+  }
+
+  async storeTriggerTime(webhook: DBWebhook) {
+    await this.db.webhook.update(webhook.id, {
+      status: {
+        lastTriggerTime: Date.now(),
+        lastFailure: webhook.status?.lastFailure,
+      },
+    });
+  }
+
+  async storeWebhookFailure(
+    webhook: DBWebhook,
+    statusCode?: number,
+    errorMessage?: string
+  ) {
+    await this.db.webhook.update(webhook.id, {
+      status: {
+        lastTriggerTime: webhook.status?.lastTriggerTime,
+        lastFailure: {
+          timestamp: Date.now(),
+          statusCode: statusCode,
+          errorMessage: errorMessage,
+        },
+      },
+    });
   }
 
   async storeResponse(
     webhook: DBWebhook,
     event: messages.WebhookEvent,
     resp: Response,
-    startTime: [number, number]
+    startTime: [number, number],
+    responseBody: string
   ) {
     const hrDuration = process.hrtime(startTime);
     await this.db.webhookResponse.create({
@@ -426,7 +470,7 @@ export default class WebhookCannon {
       duration: hrDuration[0] + hrDuration[1] / 1e9,
       statusCode: resp.status,
       response: {
-        body: await resp.text(),
+        body: responseBody,
         headers: resp.headers.raw(),
         redirected: resp.redirected,
         status: resp.status,
