@@ -91,6 +91,7 @@ export class RabbitQueue implements Queue {
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
           channel
             .assertQueue(QUEUES.delayed, {
+              arguments: { "x-queue-type": "quorum" },
               deadLetterExchange: EXCHANGES.webhooks,
               durable: true,
             })
