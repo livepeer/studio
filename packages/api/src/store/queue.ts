@@ -169,6 +169,10 @@ export class RabbitQueue implements Queue {
     });
   }
 
+  // This function publishes a message to an alternate exchange/queue used only
+  // for delayed messages. Messages are published with an expiration equal to
+  // the desired `delay` parameter, and after they expire are sent to the main
+  // exchange through the delayed queue deadletterExchange configuration.
   public async delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
