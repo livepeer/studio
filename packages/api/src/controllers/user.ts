@@ -27,6 +27,7 @@ import {
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridValidateEmail,
 } from "./helpers";
 
 function toStringValues(obj: Record<string, any>) {
@@ -281,6 +282,9 @@ app.post("/", validatePost("user"), async (req, res) => {
   if (!validUser && user) {
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     try {
+      // This is a test of the Sendgrid email validation API. Remove this
+      // if we decide not to use it and revert to more basic Sendgrid plan.
+      sendgridValidateEmail(email, sendgridApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
         email,
