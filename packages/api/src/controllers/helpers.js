@@ -2,6 +2,7 @@ import crypto from "isomorphic-webcrypto";
 import util from "util";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
+import SendgridClient from "@sendgrid/client";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
 import { Histogram } from "prom-client";
@@ -155,6 +156,32 @@ export async function sendgridEmail({
 
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
+}
+
+export function sendgridValidateEmail(email, sendgridApiKey) {
+  SendgridClient.setApiKey(sendgridApiKey);
+
+  const request = {
+    url: `/v3/validations/email`,
+    method: "POST",
+    body: { email, source: "signup" },
+  };
+  client
+    .request(request)
+    .then(([response]) => {
+      const {
+        statusCode,
+        body: { verdict },
+      } = response;
+      const rawBody = JSON.stringify(JSON.stringify(response.body)); // stringify twice to escape string for logging
+      console.log(
+        `Email address validation successful ` +
+          `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
+      );
+    })
+    .catch((error) => {
+      console.error(`Email address validation error=`, error);
+    });
 }
 
 export async function getWebhooks(

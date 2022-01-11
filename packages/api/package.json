@@ -48,7 +48,7 @@
     "@kubernetes/client-node": "^0.10.2",
     "@livepeer/axios": "^0.19.2",
     "@livepeer/sdk": "1.0.0-alpha.7",
-    "@sendgrid/mail": "^7.0.0",
+    "@sendgrid/mail": "^7.6.0",
     "@types/amqp-connection-manager": "^2.0.10",
     "ajv": "^6.10.0",
     "ajv-cli": "^3.1.0",
