@@ -6,6 +6,7 @@ import { AddressInfo } from "net";
 import "source-map-support/register";
 import cors from "cors";
 import promBundle from "express-prom-bundle";
+import { collectDefaultMetrics } from "prom-client";
 
 import appRouter from "./app-router";
 import logger from "./logger";
@@ -13,6 +14,7 @@ import { CliArgs } from "./parse-cli";
 import { UnboxPromise } from "./types/common";
 
 export type AppServer = UnboxPromise<ReturnType<typeof makeApp>>;
+collectDefaultMetrics({ prefix: "livepeer_api_" });
 
 export default async function makeApp(params: CliArgs) {
   const {
@@ -82,6 +84,9 @@ export default async function makeApp(params: CliArgs) {
     includeMethod: true,
     includePath: true,
     httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
+    urlValueParser: {
+      extraMasks: [/[\da-z]{4}(?:\-[\da-z]{4}){3}/, /[\da-z]{16}/],
+    },
   });
   const whitelist = [
     "https://livepeer.com",
