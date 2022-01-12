@@ -166,8 +166,7 @@ export function sendgridValidateEmail(email, sendgridApiKey) {
     method: "POST",
     body: { email, source: "signup" },
   };
-  client
-    .request(request)
+  SendgridClient.request(request)
     .then(([response]) => {
       const {
         statusCode,
