@@ -152,26 +152,33 @@ export async function sendgridEmail({
 }
 
 export function sendgridValidateEmail(email: string, sendgridApiKey: string) {
-  SendgridClient.setApiKey(sendgridApiKey);
+  sendgridValidateEmailAsync(email, sendgridApiKey).catch((error) => {
+    console.error(
+      `Email address validation error email="${email}" error=`,
+      error
+    );
+  });
+}
 
-  const request = {
+async function sendgridValidateEmailAsync(
+  email: string,
+  sendgridApiKey: string
+) {
+  SendgridClient.setApiKey(sendgridApiKey);
+  const [response, body] = await SendgridClient.request({
     url: `/v3/validations/email`,
     method: "POST",
     body: { email, source: "signup" },
-  } as const;
-  SendgridClient.request(request)
-    .then(([response, body]) => {
-      const { statusCode } = response;
-      const { verdict } = body;
-      const rawBody = JSON.stringify(JSON.stringify(body)); // stringify twice to escape string for logging
-      console.log(
-        `Email address validation successful ` +
-          `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
-      );
-    })
-    .catch((error) => {
-      console.error(`Email address validation error=`, error);
-    });
+  });
+
+  const { statusCode } = response;
+  const { verdict } = body;
+  // stringify twice to escape string for logging
+  const rawBody = JSON.stringify(JSON.stringify(body));
+  console.log(
+    `Email address validation result ` +
+      `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
+  );
 }
 
 export type FieldsMap = {
