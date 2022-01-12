@@ -7,7 +7,7 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import {
   USER_SESSION_TIMEOUT,
   getCombinedStats,
@@ -16,7 +16,7 @@ import {
 
 const app = Router();
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `session.ID`,
   name: { val: `session.data->>'name'`, type: "full-text" },
   lastSeen: { val: `session.data->'lastSeen'`, type: "int" },

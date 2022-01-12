@@ -23,7 +23,13 @@ import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
-import { makeNextHREF, parseFilters, parseOrder, pathJoin } from "./helpers";
+import {
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  pathJoin,
+  FieldsMap,
+} from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
@@ -182,7 +188,7 @@ function activeCleanup(streams: DBStream[], activeOnly = false) {
   return streams;
 }
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `stream.ID`,
   name: { val: `stream.data->>'name'`, type: "full-text" },
   sourceSegments: `stream.data->'sourceSegments'`,

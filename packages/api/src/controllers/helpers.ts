@@ -1,30 +1,27 @@
-import crypto from "isomorphic-webcrypto";
-import util from "util";
+import { Crypto } from "@peculiar/webcrypto";
+import { TextEncoder } from "util";
+import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
+import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
 import { Histogram } from "prom-client";
 
 import { db } from "../store";
 
-let Encoder;
-if (typeof TextEncoder === "undefined") {
-  Encoder = util.TextEncoder;
-} else {
-  Encoder = TextEncoder;
-}
-
 const ITERATIONS = 10000;
 
-export function sign(data, secret) {
+const crypto = new Crypto();
+
+export function sign(data: string, secret: string) {
   const hmac = createHmac("sha256", secret);
   hmac.update(Buffer.from(data));
   return hmac.digest("hex");
 }
 
-export async function hash(password, salt) {
+export async function hash(password: string, salt: string) {
   let saltBuffer;
   if (salt) {
     saltBuffer = fromHexString(salt);
@@ -32,7 +29,7 @@ export async function hash(password, salt) {
     saltBuffer = crypto.getRandomValues(new Uint8Array(8));
   }
 
-  var encoder = new Encoder("utf-8");
+  var encoder = new TextEncoder();
   var passphraseKey = encoder.encode(password);
 
   // You should firstly import your passphrase Uint8array into a CryptoKey
@@ -73,10 +70,10 @@ export async function hash(password, salt) {
   return [outKey, outSalt];
 }
 
-const fromHexString = (hexString) =>
+const fromHexString = (hexString: string) =>
   new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
-function bytesToHexString(bytes, separate) {
+function bytesToHexString(bytes: Uint8Array, separate = false) {
   /// <signature>
   ///     <summary>Converts an Array of bytes values (0-255) to a Hex string</summary>
   ///     <param name="bytes" type="Array"/>
@@ -85,10 +82,6 @@ function bytesToHexString(bytes, separate) {
   /// </signature>
 
   var result = "";
-  if (typeof separate === "undefined") {
-    separate = false;
-  }
-
   for (var i = 0; i < bytes.length; i++) {
     if (separate && i % 4 === 0 && i !== 0) {
       result += "-";
@@ -106,7 +99,7 @@ function bytesToHexString(bytes, separate) {
   return result;
 }
 
-export function makeNextHREF(req, nextCursor) {
+export function makeNextHREF(req: express.Request, nextCursor: string) {
   let baseUrl = new URL(
     `${req.protocol}://${req.get("host")}${req.originalUrl}`
   );
@@ -131,8 +124,8 @@ export async function sendgridEmail({
   const msg = {
     personalizations: [
       {
-        to: [{ email: email }],
-        dynamic_template_data: {
+        to: { email: email },
+        dynamicTemplateData: {
           subject,
           preheader,
           text,
@@ -151,28 +144,26 @@ export async function sendgridEmail({
       name: supportName,
     },
     // email template id: https://mc.sendgrid.com/dynamic-templates
-    template_id: sendgridTemplateId,
+    templateId: sendgridTemplateId,
   };
 
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
 }
 
-export function sendgridValidateEmail(email, sendgridApiKey) {
+export function sendgridValidateEmail(email: string, sendgridApiKey: string) {
   SendgridClient.setApiKey(sendgridApiKey);
 
   const request = {
     url: `/v3/validations/email`,
     method: "POST",
     body: { email, source: "signup" },
-  };
+  } as const;
   SendgridClient.request(request)
-    .then(([response]) => {
-      const {
-        statusCode,
-        body: { verdict },
-      } = response;
-      const rawBody = JSON.stringify(JSON.stringify(response.body)); // stringify twice to escape string for logging
+    .then(([response, body]) => {
+      const { statusCode } = response;
+      const { verdict } = body;
+      const rawBody = JSON.stringify(JSON.stringify(body)); // stringify twice to escape string for logging
       console.log(
         `Email address validation successful ` +
           `email="${email}" status=${statusCode} verdict=${verdict} body=${rawBody}`
@@ -183,30 +174,16 @@ export function sendgridValidateEmail(email, sendgridApiKey) {
     });
 }
 
-export async function getWebhooks(
-  store,
-  userId,
-  event,
-  limit = 100,
-  cursor = undefined,
-  includeDeleted = false
-) {
-  const query = [sql`data->>'userId' = ${userId}`];
-  if (event) {
-    query.push(sql`data->>'event' = ${event}`);
-  }
-  if (!includeDeleted) {
-    query.push(sql`data->>'deleted' IS NULL`);
-  }
-  const [webhooks, nextCursor] = await db.webhook.find(query, {
-    limit,
-    cursor,
-  });
+export type FieldsMap = {
+  [key: string]:
+    | string
+    | {
+        type: "boolean" | "int" | "real" | "full-text";
+        val: string;
+      };
+};
 
-  return { data: webhooks, cursor: nextCursor };
-}
-
-export function parseOrder(fieldsMap, val) {
+export function parseOrder(fieldsMap: FieldsMap, val: string) {
   if (!val) {
     return;
   }
@@ -241,7 +218,7 @@ export function parseOrder(fieldsMap, val) {
   return prep.length ? prep.join(", ") : undefined;
 }
 
-export function parseFilters(fieldsMap, val) {
+export function parseFilters(fieldsMap: FieldsMap, val: string) {
   const isObject = function (a) {
     return !!a && a.constructor === Object;
   };
@@ -317,7 +294,7 @@ export function parseFilters(fieldsMap, val) {
   return q;
 }
 
-export function pathJoin2(p1, p2) {
+export function pathJoin2(p1: string, p2: string) {
   if (!p1) {
     return p2;
   }
@@ -330,11 +307,11 @@ export function pathJoin2(p1, p2) {
   return p1 + "/" + (p2 || "");
 }
 
-export function pathJoin(...items) {
+export function pathJoin(...items: string[]) {
   return items.reduce(pathJoin2, "");
 }
 
-export function trimPathPrefix(prefix, path) {
+export function trimPathPrefix(prefix: string, path: string) {
   const prefixIdx = path.indexOf(prefix);
   if (prefix[prefix.length - 1] !== "/") {
     const nextCharIdx = prefixIdx + prefix.length;
@@ -351,7 +328,7 @@ export function trimPathPrefix(prefix, path) {
   return path;
 }
 
-export async function recaptchaVerify(token, secretKey) {
+export async function recaptchaVerify(token: string, secretKey: string) {
   const recaptchaVerifyApiUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
   const headers = {
     "Content-Type": "application/json",
