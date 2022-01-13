@@ -198,7 +198,10 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
 
         <AlertDialogContent
           css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-          <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+          <Box
+            as="form"
+            onSubmit={handleSubmit(onSubmit)}
+            id="plan-stripe-form">
             <AlertDialogTitle as={Heading} size="1">
               {!user.stripeCustomerPaymentMethodId
                 ? "Enter card details"

@@ -76,6 +76,7 @@ const ContactPage = () => {
           </Box>
           <Box
             as="form"
+            id="contact-form"
             ref={formEl}
             onSubmit={handleSubmit}
             css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>
