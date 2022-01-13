@@ -11,7 +11,8 @@
     "type-check": "tsc --pretty --noEmit",
     "docs-positions": "node ./generate-docs-positions.js",
     "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
-    "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done"
+    "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done",
+    "pkg": "pkg --output livepeer-www --out-path=bin --no-bytecode --public-packages \"*\" --public ."
   },
   "license": "MIT",
   "dependencies": {
@@ -146,6 +147,23 @@
     "*.mdx?": [
       "prettier --write --parser mdx",
       "git add"
+    ]
+  },
+  "bin": "server.js",
+  "pkg": {
+    "assets": [
+      ".next/**/*",
+      "../../node_modules/dom-helpers/**/*"
+    ],
+    "scripts": [
+      ".next/dist/**/*.js"
+    ],
+    "targets": [
+      "node16-macos-arm64",
+      "node16-macos-x86_64",
+      "node16-linux-arm64",
+      "node16-linux-x86_64",
+      "node16-windows-x86_64"
     ]
   }
 }
