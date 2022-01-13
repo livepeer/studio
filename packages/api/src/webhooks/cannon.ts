@@ -377,9 +377,15 @@ export default class WebhookCannon {
         let signature = sign(params.body, webhook.sharedSecret);
         params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
+      try {
+        await this.storeTriggerTime(webhook);
+      } catch (e) {
+        console.log(
+          `Unable to store trigger time of webhook ${webhook.id} url: ${webhook.url}`
+        );
+      }
 
-      await this.storeTriggerTime(webhook);
-      let resp = {} as Response;
+      let resp: Response;
       let errorMessage;
       let statusCode;
 
@@ -416,11 +422,17 @@ export default class WebhookCannon {
         await this.retry(trigger, params, e);
       } finally {
         if (statusCode >= 300 || !statusCode) {
-          await this.storeWebhookFailure(
-            trigger.webhook,
-            statusCode,
-            errorMessage
-          );
+          try {
+            await this.storeWebhookFailure(
+              trigger.webhook,
+              statusCode,
+              errorMessage
+            );
+          } catch (e) {
+            console.log(
+              `Unable to store failure of webhook ${webhook.id} url: ${webhook.url}`
+            );
+          }
         }
         return;
       }
