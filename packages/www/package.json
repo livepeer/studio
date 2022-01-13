@@ -12,7 +12,7 @@
     "docs-positions": "node ./generate-docs-positions.js",
     "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
     "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done",
-    "pkg": "pkg --output livepeer-www --out-path=bin --no-bytecode --public-packages \"*\" --public ."
+    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public ."
   },
   "license": "MIT",
   "dependencies": {
@@ -129,6 +129,7 @@
     "husky": "^4.0.0",
     "js-levenshtein": "^1.1.6",
     "lint-staged": "^9.5.0",
+    "pkg": "^5.5.1",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.12.0",
     "sass": "^1.34.1",

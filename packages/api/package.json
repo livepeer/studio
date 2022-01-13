@@ -39,7 +39,8 @@
     "go-livepeer:orchestrator": "bin/livepeer -orchestrator -datadir ./bin/orchestrator -transcoder -serviceAddr 127.0.0.1:3086 -cliAddr :3076 -v 6",
     "test": "jest \"${PWD}/src\" -i --silent",
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
-    "coverage": "yarn run test --coverage"
+    "coverage": "yarn run test --coverage",
+    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public ."
   },
   "dependencies": {
     "@cloudflare/json-schema-walker": "^0.1.1",
@@ -129,6 +130,7 @@
     "npm-run-all": "^4.1.5",
     "nyc": "^14.0.0",
     "parcel": "^1.12.4",
+    "pkg": "^5.5.1",
     "prettier": "^2.0.5",
     "redoc-cli": "^0.8.3",
     "typescript": "^4.3.4",
@@ -157,5 +159,14 @@
   "types": "src/schema/types.d.ts",
   "nodemonConfig": {
     "delay": "250"
+  },
+  "pkg": {
+    "targets": [
+      "node16-macos-arm64",
+      "node16-macos-x86_64",
+      "node16-linux-arm64",
+      "node16-linux-x86_64",
+      "node16-windows-x86_64"
+    ]
   }
 }
