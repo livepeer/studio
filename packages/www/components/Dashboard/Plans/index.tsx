@@ -276,7 +276,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               />
               <Item
                 css={{ borderColor: "$mauve5", borderBottom: 0 }}
-                title={<span>$0.02 USD / gb video streamed</span>}
+                title={<span>$0.015 USD / gb video streamed</span>}
               />
               <Item
                 css={{ borderColor: "$mauve5", borderBottom: 0 }}
@@ -343,7 +343,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             fontStyle: "italic",
             color: "$hiContrast",
           }}>
-          *Currently, we are not charging for these features. We'll be sure to
+          *Currently, we are not charging for this feature. We'll be sure to
           reach out before we do.
         </Container>
       </Box>
