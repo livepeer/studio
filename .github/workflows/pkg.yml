@@ -3,9 +3,6 @@ on:
   push:
     branches-ignore:
       - latest
-defaults:
-  run:
-    working-directory: packages/api
 jobs:
   build:
     runs-on: ubuntu-20.04
