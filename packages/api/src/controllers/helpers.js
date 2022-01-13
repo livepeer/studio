@@ -16,12 +16,6 @@ if (typeof TextEncoder === "undefined") {
 }
 
 const ITERATIONS = 10000;
-const segmentMetrics = new Histogram({
-  name: "livepeer_api_segment_request_duration_seconds",
-  help: "duration histogram of http calls to segment.io APIs",
-  labelNames: ["endpoint", "status_code"],
-  buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10],
-});
 
 export function sign(data, secret) {
   const hmac = createHmac("sha256", secret);
@@ -161,53 +155,6 @@ export async function sendgridEmail({
 
   SendgridMail.setApiKey(sendgridApiKey);
   await SendgridMail.send(msg);
-}
-
-export async function trackAction(userId, email, event, apiKey) {
-  if (!apiKey) {
-    return;
-  }
-
-  const identifyInfo = {
-    userId,
-    traits: {
-      email,
-    },
-    email,
-  };
-  await fetchSegmentApi(identifyInfo, "identify", apiKey);
-
-  let properties = {};
-  if ("properties" in event) {
-    properties = { ...properties, ...event.properties };
-  }
-
-  const trackInfo = {
-    userId,
-    event: event.name,
-    email,
-    properties,
-  };
-
-  await fetchSegmentApi(trackInfo, "track", apiKey);
-}
-
-export async function fetchSegmentApi(body, endpoint, apiKey) {
-  const timer = segmentMetrics.startTimer();
-  const segmentApiUrl = "https://api.segment.io/v1";
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: "Basic " + Buffer.from(`${apiKey}:`).toString("base64"),
-  };
-
-  let response = await fetch(`${segmentApiUrl}/${endpoint}`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: headers,
-  });
-  const labels = { endpoint, status_code: response.status };
-  timer(labels);
 }
 
 export async function getWebhooks(

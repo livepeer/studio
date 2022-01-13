@@ -4,7 +4,7 @@ import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import { makeNextHREF, trackAction, parseFilters, parseOrder } from "./helpers";
+import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError } from "../store/errors";
@@ -130,12 +130,6 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
   const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
   try {
     await req.store.create(doc);
-    trackAction(
-      req.user.id,
-      req.user.email,
-      { name: "Webhook Created" },
-      req.config.segmentApiKey
-    );
   } catch (e) {
     console.error(e);
     throw e;

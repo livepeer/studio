@@ -8,7 +8,6 @@ import validator from "email-validator";
 import {
   makeNextHREF,
   sendgridEmail,
-  trackAction,
   parseFilters,
   parseOrder,
   recaptchaVerify,
@@ -158,29 +157,21 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
-  await Promise.all([
-    req.store.create({
-      kind: "user",
-      id: id,
-      password: hashedPassword,
-      email: email,
-      salt: salt,
-      admin: admin,
-      emailValidToken: emailValidToken,
-      emailValid: validUser,
-      firstName,
-      lastName,
-      organization,
-      phone,
-      createdAt: Date.now(),
-    }),
-    trackAction(
-      id,
-      email,
-      { name: "user registered" },
-      req.config.segmentApiKey
-    ),
-  ]);
+  await req.store.create({
+    kind: "user",
+    id: id,
+    password: hashedPassword,
+    email: email,
+    salt: salt,
+    admin: admin,
+    emailValidToken: emailValidToken,
+    emailValid: validUser,
+    firstName,
+    lastName,
+    organization,
+    phone,
+    createdAt: Date.now(),
+  });
 
   const user = await req.store.get(`user/${id}`);
 
