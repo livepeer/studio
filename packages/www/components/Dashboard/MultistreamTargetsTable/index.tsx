@@ -30,6 +30,7 @@ import { HealthStatus } from "hooks/use-analyzer";
 import Toolbox from "./Toolbox";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 import TargetStatusBadge from "./TargetStatusBadge";
+import ErrorDialog from "../ErrorDialog";
 
 type TargetsTableData = {
   id: string;
@@ -85,6 +86,7 @@ const MultistreamTargetsTable = ({
     tableId: "multistreamTargetsTable",
   });
   const saveDialogState = useToggleState();
+  const errorRecordDialogState = useToggleState();
 
   const columns: Column<TargetsTableData>[] = useMemo(
     () => [
@@ -205,7 +207,10 @@ const MultistreamTargetsTable = ({
         emptyState={emptyState}
         tableLayout={tableLayout}
         createAction={{
-          onClick: saveDialogState.onOn,
+          onClick: () =>
+            stream.isActive
+              ? errorRecordDialogState.onOn()
+              : saveDialogState.onOn(),
           css: { display: "flex", alignItems: "center", ml: "$1" },
           children: (
             <>
@@ -216,6 +221,12 @@ const MultistreamTargetsTable = ({
             </>
           ),
         }}
+      />
+
+      <ErrorDialog
+        isOpen={errorRecordDialogState.on}
+        onOpenChange={errorRecordDialogState.onToggle}
+        description="You cannot change multistream preferences while a session is active"
       />
 
       <SaveTargetDialog
