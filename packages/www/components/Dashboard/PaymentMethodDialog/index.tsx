@@ -16,7 +16,7 @@ import {
 } from "@livepeer.com/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useApi } from "hooks";
+import { useApi, useHubspotForm } from "hooks";
 import { useForm } from "react-hook-form";
 import { MdCreditCard } from "react-icons/md";
 import { useTheme } from "next-themes";
@@ -30,6 +30,10 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
   const { resolvedTheme } = useTheme();
+  const { handleSubmit: hubspotSubmit } = useHubspotForm({
+    portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_STRIPE_FORM_ID,
+  });
 
   function createPaymentMethod({
     cardElement,
@@ -77,6 +81,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
+    hubspotSubmit(e);
 
     // Abort if form isn't valid
     if (!e.target.reportValidity()) return;

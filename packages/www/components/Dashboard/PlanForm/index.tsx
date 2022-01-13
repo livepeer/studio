@@ -16,7 +16,7 @@ import {
   useSnackbar,
 } from "@livepeer.com/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useApi } from "hooks";
+import { useApi, useHubspotForm } from "hooks";
 import { products } from "@livepeer.com/api/src/config";
 import { useForm } from "react-hook-form";
 import Spinner from "components/Dashboard/Spinner";
@@ -31,6 +31,10 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
   const [openSnackbar] = useSnackbar();
   const { register, handleSubmit } = useForm();
   const { theme } = useTheme();
+  const { handleSubmit: hubspotSubmit } = useHubspotForm({
+    portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_STRIPE_FORM_ID,
+  });
 
   function createPaymentMethod({
     cardElement,
@@ -138,7 +142,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
-
+    hubspotSubmit(e);
     // Abort if form isn't valid
     if (!e.target.reportValidity()) return;
     setStatus("processing");
@@ -201,9 +205,11 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 : "Change plan"}
             </AlertDialogTitle>
 
-            <AlertDialogDescription css={{ mt: "$4", lineHeight: "22px" }}>
+            <AlertDialogDescription
+              as="div"
+              css={{ mt: "$4", lineHeight: "22px" }}>
               {!user.stripeCustomerPaymentMethodId ? (
-                <Box css={{ color: "$hiContrast" }}>
+                <Box css={{ color: "$hiContrast", mt: "$4" }}>
                   <Box>
                     <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
                       Full name
