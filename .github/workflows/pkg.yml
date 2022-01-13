@@ -1,0 +1,33 @@
+name: pkg releases
+on:
+  push:
+    branches-ignore:
+      - latest
+defaults:
+  run:
+    working-directory: packages/api
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          cache: "yarn"
+
+      - name: Tags
+        id: tags
+        uses: livepeer/action-gh-release-tags@v0
+
+      - name: yarn install
+        run: |
+          yarn install --frozen-lockfile
+
+      - name: build pkgs
+        run: |
+          yarn run lerna-run pkg
