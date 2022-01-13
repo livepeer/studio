@@ -123,7 +123,10 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
       </Flex>
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <Box as="form" onSubmit={handleSubmit(onSubmit)} id="billing-stripe-form">
+        <Box
+          as="form"
+          onSubmit={handleSubmit(onSubmit)}
+          id="billing-stripe-form">
           <AlertDialogTitle as={Heading} size="1">
             {!user.stripeCustomerPaymentMethodId
               ? "Add payment method"
