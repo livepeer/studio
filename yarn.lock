@@ -5623,15 +5623,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0":
+"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0", "@types/node@^10.12.0":
   version "14.6.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.4.tgz#a145cc0bb14ef9c4777361b7bbafa5cf8e3acb5a"
   integrity sha512-Wk7nG1JSaMfMpoMJDKUsWYugliB2Vy55pdjLpmLixeyMi7HizW2I/9QoxsPCkXl3dO+ZOVqPumKaDUv5zJu2uQ==
-
-"@types/node@^10.12.0":
-  version "10.17.60"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
-  integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -6866,7 +6861,7 @@ axios-retry@^3.0.2:
   dependencies:
     is-retry-allowed "^1.1.0"
 
-axios@^0.18.0, axios@^0.18.1:
+axios@^0.18.1:
   version "0.18.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.18.1.tgz#ff3f0de2e7b5d180e757ad98000f1081b87bcea3"
   integrity sha512-0BfJq4NSfQXd+SkFdrvFbG7addhYSBA2mQwISr46pD6E5iqkWg02RAs8vyTT/j0RTnoYmeXauBuSv1qKwR179g==
@@ -21558,14 +21553,6 @@ react-hotjar@^3.0.1:
   resolved "https://registry.yarnpkg.com/react-hotjar/-/react-hotjar-3.0.1.tgz#7917b57223d37f9ce3bf4638e5f83c5bc46e5e06"
   integrity sha512-3ZiZQhbsisJkK+iUlPVVTa7hUJXVQ/o/3+Bzocpjb2+of8lMh7uiDXLsSKxD6T4J3JR9sZ+L3v9CYyUgrp1R8g==
 
-react-hubspot@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/react-hubspot/-/react-hubspot-1.0.4.tgz#cc67342c50826803fe1921ccb45ea0b534b55353"
-  integrity sha512-kZB9Em15deKsOKY+F7t7rdie28/UOocXKwAeo4z2Pkjx+0znsQC+PwTrC/CmEHerfJvAivi2E9Tp7rXiXBEnrA==
-  dependencies:
-    axios "^0.18.0"
-    react "^16.8.0-alpha.1"
-
 react-icon-base@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.1.2.tgz#a17101dad9c1192652356096860a9ab43a0766c7"
@@ -22032,7 +22019,7 @@ react@17.0.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-react@^16.12.0, react@^16.13.1, react@^16.8.0-alpha.1, react@^16.8.6:
+react@^16.12.0, react@^16.13.1, react@^16.8.6:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
   integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
