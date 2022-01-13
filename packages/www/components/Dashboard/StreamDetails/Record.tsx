@@ -6,7 +6,7 @@ import {
 } from "@livepeer.com/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../../hooks";
-import ErrorRecordDialog from "../ErrorRecordDialog";
+import ErrorDialog from "../ErrorDialog";
 
 const Record = ({ stream, invalidate, isSwitch = true }) => {
   const { patchStream } = useApi();
@@ -17,16 +17,14 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
     e.preventDefault();
     if (stream.isActive) {
       errorRecordDialogState.onOn();
+    } else if (!stream.record) {
+      await patchStream(stream.id, { record: true });
+      await invalidate();
+      openSnackbar("Recording has been turned on.");
     } else {
-      if (!stream.record) {
-        await patchStream(stream.id, { record: true });
-        await invalidate();
-        openSnackbar("Recording has been turned on.");
-      } else {
-        await patchStream(stream.id, { record: false });
-        await invalidate();
-        openSnackbar("Recording has been turned off.");
-      }
+      await patchStream(stream.id, { record: false });
+      await invalidate();
+      openSnackbar("Recording has been turned off.");
     }
   };
 
@@ -45,9 +43,10 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
         </Box>
       )}
 
-      <ErrorRecordDialog
+      <ErrorDialog
         isOpen={errorRecordDialogState.on}
         onOpenChange={errorRecordDialogState.onToggle}
+        description="You cannot change recording preferences while a session is active"
       />
     </Box>
   );

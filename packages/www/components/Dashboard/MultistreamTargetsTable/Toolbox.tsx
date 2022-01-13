@@ -27,7 +27,7 @@ import { useApi } from "../../../hooks";
 import { useToggleState } from "hooks/use-toggle-state";
 import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
-import ErrorRecordDialog from "../ErrorRecordDialog";
+import ErrorDialog from "../ErrorDialog";
 
 const DisableDialog = ({
   onDialogAction,
@@ -213,12 +213,10 @@ const Toolbox = ({
         onCheckedChange={useCallback(async () => {
           if (stream.isActive) {
             errorRecordDialogState.onOn();
+          } else if (target?.disabled) {
+            await setTargetDisabled(false);
           } else {
-            if (target?.disabled) {
-              await setTargetDisabled(false);
-            } else {
-              setDisableDialogOpen(true);
-            }
+            setDisableDialogOpen(true);
           }
         }, [target?.disabled, setTargetDisabled])}
       />
@@ -259,9 +257,10 @@ const Toolbox = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ErrorRecordDialog
+      <ErrorDialog
         isOpen={errorRecordDialogState.on}
         onOpenChange={errorRecordDialogState.onToggle}
+        description="You cannot change multistream preferences while a session is active"
       />
 
       <DisableDialog

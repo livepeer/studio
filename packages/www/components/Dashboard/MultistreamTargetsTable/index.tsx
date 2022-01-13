@@ -30,7 +30,7 @@ import { HealthStatus } from "hooks/use-analyzer";
 import Toolbox from "./Toolbox";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 import TargetStatusBadge from "./TargetStatusBadge";
-import ErrorRecordDialog from "../ErrorRecordDialog";
+import ErrorDialog from "../ErrorDialog";
 
 type TargetsTableData = {
   id: string;
@@ -223,9 +223,10 @@ const MultistreamTargetsTable = ({
         }}
       />
 
-      <ErrorRecordDialog
+      <ErrorDialog
         isOpen={errorRecordDialogState.on}
         onOpenChange={errorRecordDialogState.onToggle}
+        description="You cannot change multistream preferences while a session is active"
       />
 
       <SaveTargetDialog

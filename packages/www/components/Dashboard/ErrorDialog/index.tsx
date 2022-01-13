@@ -10,10 +10,12 @@ import {
   Text,
 } from "@livepeer.com/design-system";
 
-const ErrorRecordDialog = ({
+const ErrorDialog = ({
+  description,
   isOpen,
   onOpenChange,
 }: {
+  description: string;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }) => {
@@ -28,7 +30,7 @@ const ErrorRecordDialog = ({
           size="3"
           variant="gray"
           css={{ mt: "$2", lineHeight: "22px" }}>
-          You cannot change recording preferences while a session is active
+          {description}
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
@@ -41,4 +43,4 @@ const ErrorRecordDialog = ({
   );
 };
 
-export default ErrorRecordDialog;
+export default ErrorDialog;
