@@ -387,8 +387,7 @@ export default class WebhookCannon {
         logger.info(`webhook ${webhook.id} firing`);
         const startTime = process.hrtime();
         resp = await fetchWithTimeout(webhook.url, params);
-        // getting the response text here to avoid the overhead of reading the body twice
-        let responseBody = await resp.text();
+        const responseBody = await resp.text();
         await this.storeResponse(webhook, event, resp, startTime, responseBody);
         statusCode = resp.status;
 
