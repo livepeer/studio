@@ -181,7 +181,7 @@ app.post("/", validatePost("user"), async (req, res) => {
   const verificationUrl = `${protocol}://${
     req.frontendDomain
   }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
-  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
   if (!validUser && user) {
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
@@ -301,7 +301,7 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
     const protocol =
       req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
     const buttonUrl = `${protocol}://${req.frontendDomain}/login`;
-    const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+    const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
     const salesEmail = "sales@livepeer.org";
 
     if (req.headers.host.includes("livepeer.com")) {
@@ -454,7 +454,7 @@ app.post(
       const verificationUrl = `${protocol}://${
         req.frontendDomain
       }/reset-password?${qs.stringify({ email, resetToken })}`;
-      const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+      const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
       await sendgridEmail({
         email,

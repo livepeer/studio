@@ -1,5 +1,10 @@
 import fetch, { RequestInit, Response } from "node-fetch";
 
+// extend requestinit with timeout parameter
+export interface RequestInitWithTimeout extends RequestInit {
+  timeout?: number;
+}
+
 export const timeout = <T>(ms: number, fn: () => Promise<T>) => {
   return new Promise<T>((resolve, reject) => {
     const handle = setTimeout(() => {
@@ -54,7 +59,7 @@ export const shuffle = <T>(arr: T[]) => {
 
 export const fetchWithTimeout = (
   url: string,
-  options: RequestInit & { timeout?: number }
+  options: RequestInitWithTimeout
 ) =>
   new Promise<Response>((resolve, reject) => {
     let timeout = setTimeout(() => {
