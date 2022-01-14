@@ -1009,26 +1009,28 @@ components:
           type: string
           description: ID of the main asset (root)
           example: 123123123123
-        nfts:
-          type: object
+        nft:
+          type: array
           description: List of NFTs associated with the asset
-          required:
-            - chain
-            - contract
-            - token
-          properties:
-            chain:
-              type: string
-              description: Chain of the NFT
-              example: eth
-            contract:
-              type: string
-              description: Contract of the NFT
-              example: 0x57f1887a8bf19b14fc0d912b9b2acc9af147ea85
-            token:
-              type: number
-              description: Token id of the NFT
-              example: 123
+          items:
+            type: object
+            required:
+              - chain
+              - contract
+              - token
+            properties:
+              chain:
+                type: string
+                description: Chain of the NFT
+                example: eth
+              contract:
+                type: string
+                description: Contract of the NFT
+                example: 0x57f1887a8bf19b14fc0d912b9b2acc9af147ea85
+              token:
+                type: number
+                description: Token id of the NFT
+                example: 123
 
     task:
       type: object
