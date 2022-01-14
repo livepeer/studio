@@ -855,6 +855,211 @@ components:
             created
           example: 1587667174725
 
+    vod-asset:
+      type: object
+      table: vod_asset
+      required:
+        - id
+        - objectStoreId
+        - name
+        - duration
+        - hash
+        - createdAt
+        - format
+        - status
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+          index: true
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description: Name of the asset
+          example: filename.mp4
+        duration:
+          type: number
+          description: Duration of the asset in seconds
+          example: 23.8328
+        aspectRatio:
+          type: string
+          description: Aspect ratio of the asset
+          example: 16:9
+        meta:
+          type: object
+          description: User input metadata associated with the asset
+          example:
+            {
+              "title": "My awesome video",
+              "description": "This is a video of my awesome life",
+              "tags": ["awesome", "life", "video"],
+            }
+        updatedAt:
+          type: string
+          description:
+            Timestamp (in milliseconds) at which asset was last updated
+          example: 2022-01-01T02:20:00Z
+        createdAt:
+          type: string
+          description: Timestamp (in milliseconds) at which asset was created
+          example: 2022-01-01T02:20:00Z
+        format:
+          type: string
+          description: Format of the asset
+          example: mp4
+        hash:
+          type: string
+          description: Hash of the asset
+          example: sha256:hu31498hf14398
+        tracks:
+          type: array
+          description: List of tracks associated with the asset
+          items:
+            type: object
+            required:
+              - kind
+              - id
+            properties:
+              kind:
+                type: string
+                description: Type of the track
+                example: video
+              width:
+                type: number
+                description: width of the track
+                example: 1920
+              height:
+                type: number
+                description: height of the track
+                example: 1080
+              frameRate:
+                type: number
+                description: Frame rate of the track
+                example: 30
+              id:
+                type: string
+                description: ID of the track
+                example: ABC123
+              duration:
+                type: number
+                description: Duration of the track in seconds
+                example: 23.8238
+              bitrate:
+                type: number
+                description: Bitrate of the track in bits per second
+                example: 1000000
+        profiles:
+          type: object
+          description: HLS Profiles manifests associated with the asset
+          properties:
+            kind:
+              type: string
+              description: Type of the profile
+              example: manifest
+            name:
+              type: string
+              description: Name of the manifest
+              example: variant_1080.m3u8
+            width:
+              type: number
+              description: width of the profile
+              example: 1920
+            height:
+              type: number
+              description: height of the profile
+              example: 1080
+            frameRate:
+              type: number
+              description: Frame rate of the profile
+              example: 30
+            id:
+              type: string
+              description: ID of the profile
+              example: ABC123
+            duration:
+              type: number
+              description: Duration of the profile in seconds
+              example: 23.8238
+            bitrate:
+              type: number
+              description: Bitrate of the profile in bits per second
+              example: 1000000
+        playbackUrl:
+          type: string
+          description: Playback url of playlist manifest
+          example: https://cdn.livepeer.com/ABC123/playlist.m3u8
+        status:
+          type: string
+          description: Status of the asset
+          example: ready
+        originTaskId:
+          type: string
+          description: Task ID of the task that created the asset
+          example: 1-23-123-123-1123-123
+        relatedTasks:
+          type: array
+          description: List of task IDs associated with the asset
+          items:
+            $ref: "#/components/schemas/task"
+        mainAssetId:
+          type: string
+          description: ID of the main asset (root)
+          example: 123123123123
+        nfts:
+          type: object
+          description: List of NFTs associated with the asset
+          required:
+            - chain
+            - contract
+            - token
+          properties:
+            chain:
+              type: string
+              description: Chain of the NFT
+              example: eth
+            contract:
+              type: string
+              description: Contract of the NFT
+              example: 0x57f1887a8bf19b14fc0d912b9b2acc9af147ea85
+            token:
+              type: number
+              description: Token id of the NFT
+              example: 123
+
+    task:
+      type: object
+      table: task
+      required:
+        - id
+        - kind
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Task ID
+          example: 1-23-123-123-1123-123
+        kind:
+          type: string
+          description: Type of the task
+          example: import
+        status:
+          type: string
+          description: Status of the task
+          example: ready
+        createdAt:
+          type: string
+          description: Timestamp (in milliseconds) at which task was created
+          example: 2022-01-01T02:20:00Z
+        updatedAt:
+          type: string
+          description: Timestamp (in milliseconds) at which task was updated
+          example: 2022-01-01T02:20:00Z
+
     api-token:
       type: object
       additionalProperties: false
