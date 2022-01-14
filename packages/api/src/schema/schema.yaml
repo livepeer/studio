@@ -866,7 +866,6 @@ components:
         - hash
         - createdAt
         - format
-        - status
       properties:
         id:
           type: string
@@ -879,11 +878,13 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
-          description: Name of the asset
+          description:
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
           example: filename.mp4
         duration:
           type: number
-          description: Duration of the asset in seconds
+          description: Duration of the asset in seconds (float)
           example: 23.8328
         aspectRatio:
           type: string
@@ -901,7 +902,7 @@ components:
         updatedAt:
           type: string
           description:
-            Timestamp (in milliseconds) at which asset was last updated
+            Timestamp (in milliseconds) at which the asset was last updated
           example: 2022-01-01T02:20:00Z
         createdAt:
           type: string
@@ -917,7 +918,9 @@ components:
           example: sha256:hu31498hf14398
         tracks:
           type: array
-          description: List of tracks associated with the asset
+          description:
+            List of tracks associated with the asset when the format contemplate
+            them (e.g. mp4)
           items:
             type: object
             required:
@@ -926,19 +929,19 @@ components:
             properties:
               kind:
                 type: string
-                description: Type of the track
+                description: Kind of track
                 example: video
               width:
                 type: number
-                description: width of the track
+                description: Width of the track - only for video tracks
                 example: 1920
               height:
                 type: number
-                description: height of the track
+                description: Height of the track - only for video tracks
                 example: 1080
               frameRate:
                 type: number
-                description: Frame rate of the track
+                description: Frame rate of the track - only for video tracks
                 example: 30
               id:
                 type: string
@@ -952,9 +955,27 @@ components:
                 type: number
                 description: Bitrate of the track in bits per second
                 example: 1000000
+              channels:
+                type: number
+                description: Amount of audio channels in the track
+                example: 2
+              sampleRate:
+                type: number
+                description:
+                  Sample rate of the track in samples per second - only for
+                  audio tracks
+                example: 44100
+              bitDepth:
+                type: number
+                description: Bit depth of the track - only for audio tracks
+                example: 16
+              codec:
+                type: string
+                description: Codec of the track
+                example: aac
         profiles:
           type: object
-          description: HLS Profiles manifests associated with the asset
+          description: HLS Profile manifests associated with the asset
           properties:
             kind:
               type: string
@@ -962,7 +983,7 @@ components:
               example: manifest
             name:
               type: string
-              description: Name of the manifest
+              description: Filename of the manifest
               example: variant_1080.m3u8
             width:
               type: number
@@ -990,7 +1011,7 @@ components:
               example: 1000000
         playbackUrl:
           type: string
-          description: Playback url of playlist manifest
+          description: Playback url of the playlist manifest
           example: https://cdn.livepeer.com/ABC123/playlist.m3u8
         status:
           type: string
@@ -1005,13 +1026,14 @@ components:
           description: List of task IDs associated with the asset
           items:
             $ref: "#/components/schemas/task"
-        mainAssetId:
+        sourceAssetId:
           type: string
-          description: ID of the main asset (root)
+          description:
+            ID of the source asset (root) - If missing, this is a root asset
           example: 123123123123
         nft:
           type: array
-          description: List of NFTs associated with the asset
+          description: List of NFTs minted with the asset as a source
           items:
             type: object
             required:
