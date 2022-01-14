@@ -28,3 +28,19 @@ jobs:
       - name: build pkgs
         run: |
           yarn run lerna-run pkg
+
+      - name: move pkgs
+        run: |
+          mkdir -p ./pkg-releases
+          for package in api www; do
+            for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64.exe; do
+              mv "./packages/$package/bin/$package-$arch" "./pkg-releases/livepeer-$package-$arch"
+            done
+          done
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pkg-releases
+          path: |
+            ./pkg-releases/*
