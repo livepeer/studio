@@ -280,11 +280,16 @@ app.post("/", validatePost("user"), async (req, res) => {
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
   if (!validUser && user) {
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
+    const {
+      supportAddr,
+      sendgridTemplateId,
+      sendgridApiKey,
+      sendgridValidationApiKey,
+    } = req.config;
     try {
       // This is a test of the Sendgrid email validation API. Remove this
       // if we decide not to use it and revert to more basic Sendgrid plan.
-      sendgridValidateEmail(email, sendgridApiKey);
+      sendgridValidateEmail(email, sendgridValidationApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
         email,

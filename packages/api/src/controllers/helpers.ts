@@ -151,8 +151,8 @@ export async function sendgridEmail({
   await SendgridMail.send(msg);
 }
 
-export function sendgridValidateEmail(email: string, sendgridApiKey: string) {
-  sendgridValidateEmailAsync(email, sendgridApiKey).catch((error) => {
+export function sendgridValidateEmail(email: string, validationApiKey: string) {
+  sendgridValidateEmailAsync(email, validationApiKey).catch((error) => {
     console.error(
       `Email address validation error email="${email}" error=`,
       error
@@ -162,9 +162,9 @@ export function sendgridValidateEmail(email: string, sendgridApiKey: string) {
 
 async function sendgridValidateEmailAsync(
   email: string,
-  sendgridApiKey: string
+  validationApiKey: string
 ) {
-  SendgridClient.setApiKey(sendgridApiKey);
+  SendgridClient.setApiKey(validationApiKey);
   const [response, body] = await SendgridClient.request({
     url: `/v3/validations/email`,
     method: "POST",
