@@ -27,14 +27,20 @@ jobs:
 
       - name: build pkgs
         run: |
-          yarn run lerna-run pkg
+          yarn run lerna-run pkg --parallel
 
       - name: move pkgs
         run: |
           mkdir -p ./pkg-releases
           for package in api www; do
-            for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64.exe; do
-              mv "./packages/$package/bin/$package-$arch" "./pkg-releases/livepeer-$package-$arch"
+            for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64; do
+              name="$package-$arch"
+              if [[ "$arch" == "win-x64" ]]; then
+                name="$name.exe"
+              fi
+              cd ./packages/$package/bin
+              tar -czvf ./livepeer-$package-$arch.tar.gz ../../../pkg-releases/livepeer-$name
+              cd -
             done
           done
 
@@ -43,4 +49,4 @@ jobs:
         with:
           name: pkg-releases
           path: |
-            ./pkg-releases/*
+            ./pkg-releases/*.tar.gz
