@@ -26,8 +26,9 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: build pkgs
+        # I want to do --parallel here, but the binary downloads conflict with each other
         run: |
-          yarn run lerna-run pkg --parallel
+          yarn run lerna-run pkg
 
       - name: move pkgs
         run: |
