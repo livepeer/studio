@@ -45,9 +45,73 @@ jobs:
             done
           done
 
-      - name: Archive production artifacts
+      # This is a proof-of-concept, we're going to want something a bit more elegant
+      - name: archive livepeer-api-linux-arm64.tar.gz
         uses: actions/upload-artifact@v2
         with:
-          name: pkg-releases
+          name: livepeer-api-linux-arm64.tar.gz
           path: |
-            ./pkg-releases/*.tar.gz
+            ./pkg-releases/livepeer-api-linux-arm64.tar.gz
+
+      - name: archive livepeer-api-linux-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-api-linux-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-api-linux-x64.tar.gz
+
+      - name: archive livepeer-api-macos-arm64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-api-macos-arm64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-api-macos-arm64.tar.gz
+
+      - name: archive livepeer-api-macos-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-api-macos-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-api-macos-x64.tar.gz
+
+      - name: archive livepeer-api-win-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-api-win-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-api-win-x64.tar.gz
+
+      - name: archive livepeer-www-linux-arm64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-www-linux-arm64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-www-linux-arm64.tar.gz
+
+      - name: archive livepeer-www-linux-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-www-linux-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-www-linux-x64.tar.gz
+
+      - name: archive livepeer-www-macos-arm64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-www-macos-arm64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-www-macos-arm64.tar.gz
+
+      - name: archive livepeer-www-macos-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-www-macos-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-www-macos-x64.tar.gz
+
+      - name: archive livepeer-www-win-x64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-www-win-x64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-www-win-x64.tar.gz
