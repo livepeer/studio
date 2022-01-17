@@ -9,14 +9,14 @@ import {
   TextArea,
   Link as A,
 } from "@livepeer.com/design-system";
-import { useForm } from "react-hubspot";
+import { useHubspotForm } from "hooks";
 import Button from "@components/Marketing/Button";
 import Fade from "react-reveal/Fade";
 import Guides from "@components/Marketing/Guides";
 
 const Contact = () => {
   const formEl = useRef(null);
-  const { data, handleSubmit } = useForm({
+  const { data, handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
   });

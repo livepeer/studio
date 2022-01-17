@@ -20,8 +20,7 @@ import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.sv
 import CheckedIcon from "../../../public/img/icons/checked.svg";
 import { TextArea } from "@modulz/design-system";
 import { useEffect, useState, useRef } from "react";
-import { useForm } from "react-hubspot";
-import { useApi } from "hooks";
+import { useApi, useHubspotForm } from "hooks";
 
 const StyledHornIcon = styled(HornIcon, {
   color: "$hiContrast",
@@ -63,7 +62,7 @@ const Header = ({ breadcrumbs = [] }) => {
   });
   const [formSent, setFormSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { data, handleSubmit } = useForm({
+  const { data, handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FEEDBACK_FORM_ID,
   });
