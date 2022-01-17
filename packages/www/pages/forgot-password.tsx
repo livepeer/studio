@@ -30,64 +30,63 @@ const ForgotPasswordPage = () => {
       setSuccess(true);
     }
   };
-  if (success) {
-    return (
-      <Layout>
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexGrow: 1,
-            flexDirection: "column",
-          }}>
-          Password reset link sent to your email.
-        </Flex>
-      </Layout>
-    );
-  }
+
   return (
     <Layout {...Content.metaData}>
       <Guides backgroundColor="$mauve2" />
-      <Box css={{ position: "relative" }}>
-        <Container
-          size="3"
+      {success ? (
+        <Box
           css={{
-            px: "$6",
-            py: "$7",
-            width: "100%",
-            "@bp3": {
-              py: "$8",
-              px: "$4",
-            },
+            minHeight: "calc(100vh - 510px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1,
           }}>
-          <Flex
-            align="center"
-            justify="center"
+          Password reset link sent to your email.
+        </Box>
+      ) : (
+        <Box css={{ position: "relative" }}>
+          <Container
+            size="3"
             css={{
-              flexGrow: 1,
-              flexDirection: "column",
+              px: "$6",
+              py: "$7",
+              width: "100%",
+              "@bp3": {
+                py: "$8",
+                px: "$4",
+              },
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
-              Reset your password
-            </Heading>
-            <Login
-              id="forgot-password"
-              showEmail={true}
-              showPassword={false}
-              buttonText="Get reset link"
-              onSubmit={onSubmit}
-              errors={errors}
-              loading={loading}
-            />
-            <Box>
-              Nevermind!&nbsp;
-              <Link href="/login" passHref>
-                <A>Take me back to log in</A>
-              </Link>
-            </Box>
-          </Flex>
-        </Container>
-      </Box>
+            <Flex
+              align="center"
+              justify="center"
+              css={{
+                flexGrow: 1,
+                flexDirection: "column",
+              }}>
+              <Heading size="3" as="h1" css={{ mb: "$5" }}>
+                Reset your password
+              </Heading>
+              <Login
+                id="forgot-password"
+                showEmail={true}
+                showPassword={false}
+                buttonText="Get reset link"
+                onSubmit={onSubmit}
+                errors={errors}
+                loading={loading}
+              />
+              <Box>
+                Nevermind!&nbsp;
+                <Link href="/login" passHref>
+                  <A>Take me back to log in</A>
+                </Link>
+              </Box>
+            </Flex>
+          </Container>
+        </Box>
+      )}
     </Layout>
   );
 };
