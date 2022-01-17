@@ -40,7 +40,8 @@ jobs:
                 name="$name.exe"
               fi
               cd ./packages/$package/bin
-              tar -czvf ../../../pkg-releases/livepeer-$name ./livepeer-$package-$arch.tar.gz
+              mv ./$name ./livepeer-$name
+              tar -czvf ../../../pkg-releases/livepeer-$package-$arch.tar.gz ./livepeer-$name
               cd -
             done
           done
