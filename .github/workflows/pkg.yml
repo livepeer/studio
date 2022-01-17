@@ -37,7 +37,7 @@ jobs:
             for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64; do
               inName="$package-$arch"
               outName="livepeer-$package"
-              archiveName="livepeer-$(echo $inName | sed s/x64/amd64/ | sed s/win/windows/ | sed s/macos/darwin/).tar.gz"
+              archiveName="livepeer-$(echo $inName | sed -e 's/x64/amd64/;s/win/windows/;s/macos/darwin/').tar.gz"
               if [[ "$arch" == "win-x64" ]]; then
                 inName="$inName.exe"
                 outName="$outName.exe"
