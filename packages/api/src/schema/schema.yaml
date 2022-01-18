@@ -170,37 +170,31 @@ components:
         status:
           type: object
           description: status of webhook
-          default: null
           readOnly: true
           properties:
             lastFailure:
               type: object
               description: failure timestamp and error message with status code
-              default: null
               readOnly: true
               properties:
                 timestamp:
                   type: number
                   readOnly: true
-                  default: null
                   example: 1587667174725
                   description:
                     Timestamp (in milliseconds) at which the webhook last failed
                 error:
                   type: string
                   readOnly: true
-                  default: null
                   description: Webhook failure error message
                   example: "Error message"
                 statusCode:
                   type: number
                   readOnly: true
-                  default: null
                   description: Webhook failure status code
                   example: 500
             lastTriggerTime:
               type: number
-              default: null
               readyOnly: true
               description:
                 Timestamp (in milliseconds) at which the webhook last was
