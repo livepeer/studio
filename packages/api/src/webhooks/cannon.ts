@@ -208,7 +208,7 @@ export default class WebhookCannon {
 
   public calcBackoff = (lastInterval?: number): number => {
     if (!lastInterval || lastInterval < 1000) {
-      lastInterval = 5000;
+      return 5000;
     }
     let newInterval = lastInterval * BACKOFF_COEF;
     if (newInterval > MAX_BACKOFF) {
@@ -284,7 +284,7 @@ export default class WebhookCannon {
       supportAddr: this.supportAddr,
       sendgridTemplateId: this.sendgridTemplateId,
       sendgridApiKey: this.sendgridApiKey,
-      subject: "Your webhook has been disabled",
+      subject: "Your webhook is failing",
       preheader: "Failure notification",
       buttonText: "Manage your webhooks",
       buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
