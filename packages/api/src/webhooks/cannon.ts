@@ -377,14 +377,7 @@ export default class WebhookCannon {
         let signature = sign(params.body, webhook.sharedSecret);
         params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
-      try {
-        await this.storeTriggerTime(webhook);
-      } catch (e) {
-        console.log(
-          `Unable to store trigger time of webhook ${webhook.id} url: ${webhook.url}`
-        );
-      }
-
+      await this.storeTriggerTime(webhook);
       let resp: Response;
       let errorMessage;
       let statusCode;
@@ -422,17 +415,11 @@ export default class WebhookCannon {
         await this.retry(trigger, params, e);
       } finally {
         if (statusCode >= 300 || !statusCode) {
-          try {
-            await this.storeWebhookFailure(
-              trigger.webhook,
-              statusCode,
-              errorMessage
-            );
-          } catch (e) {
-            console.log(
-              `Unable to store failure of webhook ${webhook.id} url: ${webhook.url}`
-            );
-          }
+          await this.storeWebhookFailure(
+            trigger.webhook,
+            statusCode,
+            errorMessage
+          );
         }
         return;
       }
@@ -440,12 +427,18 @@ export default class WebhookCannon {
   }
 
   async storeTriggerTime(webhook: DBWebhook) {
-    await this.db.webhook.update(webhook.id, {
-      status: {
-        lastTriggeredAt: Date.now(),
-        lastFailure: webhook.status?.lastFailure,
-      },
-    });
+    try {
+      await this.db.webhook.update(webhook.id, {
+        status: {
+          lastTriggeredAt: Date.now(),
+          lastFailure: webhook.status?.lastFailure,
+        },
+      });
+    } catch (e) {
+      console.log(
+        `Unable to store trigger time of webhook ${webhook.id} url: ${webhook.url}`
+      );
+    }
   }
 
   async storeWebhookFailure(
@@ -453,16 +446,22 @@ export default class WebhookCannon {
     statusCode?: number,
     errorMessage?: string
   ) {
-    await this.db.webhook.update(webhook.id, {
-      status: {
-        lastTriggeredAt: webhook.status?.lastTriggeredAt,
-        lastFailure: {
-          timestamp: Date.now(),
-          statusCode: statusCode,
-          errorMessage: errorMessage,
+    try {
+      await this.db.webhook.update(webhook.id, {
+        status: {
+          lastTriggeredAt: webhook.status?.lastTriggeredAt,
+          lastFailure: {
+            timestamp: Date.now(),
+            statusCode: statusCode,
+            errorMessage: errorMessage,
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      console.log(
+        `Unable to store failure of webhook ${webhook.id} url: ${webhook.url}`
+      );
+    }
   }
 
   async storeResponse(
