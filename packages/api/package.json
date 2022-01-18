@@ -78,6 +78,7 @@
     "http-proxy": "^1.18.0",
     "http-proxy-middleware": "^0.20.0",
     "is-local-ip": "^1.1.0",
+    "isomorphic-webcrypto": "^2.3.8",
     "js-yaml": "^3.13.1",
     "jsonwebtoken": "^8.5.1",
     "level": "^5.0.1",
