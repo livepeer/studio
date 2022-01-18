@@ -81,11 +81,9 @@ export class RabbitQueue implements Queue {
         await Promise.all([
           channel.assertQueue(QUEUES.events, {
             arguments: { "x-queue-type": "quorum" },
-            durable: true,
           }),
           channel.assertQueue(QUEUES.webhooks, {
             arguments: { "x-queue-type": "quorum" },
-            durable: true,
           }),
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
