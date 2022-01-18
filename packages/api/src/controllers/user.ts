@@ -21,12 +21,14 @@ import {
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
+import { FieldsMap } from "./helpers";
 import {
   makeNextHREF,
   sendgridEmail,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridValidateEmail,
 } from "./helpers";
 
 function toStringValues(obj: Record<string, any>) {
@@ -128,7 +130,7 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
   res.json(usageRes);
 });
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `users.ID`,
   email: { val: `data->>'email'`, type: "full-text" },
   emailValid: { val: `data->'emailValid'`, type: "boolean" },
@@ -279,8 +281,16 @@ app.post("/", validatePost("user"), async (req, res) => {
   const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
   if (!validUser && user) {
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
+    const {
+      supportAddr,
+      sendgridTemplateId,
+      sendgridApiKey,
+      sendgridValidationApiKey,
+    } = req.config;
     try {
+      // This is a test of the Sendgrid email validation API. Remove this
+      // if we decide not to use it and revert to more basic Sendgrid plan.
+      sendgridValidateEmail(email, sendgridValidationApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
         email,

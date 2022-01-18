@@ -4,7 +4,7 @@ import mung from "express-mung";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery, WithID } from "../store/types";
 import {
@@ -14,7 +14,7 @@ import {
 } from "../schema/types";
 import { DBMultistreamTarget } from "../store/multistream-table";
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `multistream_target.ID`,
   name: { val: `multistream_target.data->>'name'`, type: "full-text" },
   url: `multistream_target.data->>'url'`,
