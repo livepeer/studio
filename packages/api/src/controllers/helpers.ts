@@ -149,6 +149,9 @@ export async function sendgridEmail({
 }
 
 export function sendgridValidateEmail(email: string, validationApiKey: string) {
+  if (!validationApiKey) {
+    return;
+  }
   sendgridValidateEmailAsync(email, validationApiKey).catch((error) => {
     console.error(
       `Email address validation error email="${email}" error=`,
