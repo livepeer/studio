@@ -21,6 +21,7 @@ import {
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
+import { FieldsMap } from "./helpers";
 import {
   makeNextHREF,
   sendgridEmail,
@@ -129,7 +130,7 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
   res.json(usageRes);
 });
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `users.ID`,
   email: { val: `data->>'email'`, type: "full-text" },
   emailValid: { val: `data->'emailValid'`, type: "boolean" },
