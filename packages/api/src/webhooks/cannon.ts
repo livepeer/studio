@@ -303,7 +303,7 @@ export default class WebhookCannon {
     });
 
     console.log(
-      `Webhook Cannon| Email sent to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+      `Webhook Cannon| Email sent to user ${trigger.user.email}, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
     );
   }
 
@@ -379,13 +379,13 @@ export default class WebhookCannon {
       }
       const triggerTime = Date.now();
       let resp: Response;
-      let errorMessage;
-      let statusCode;
+      let errorMessage: string;
+      let statusCode: number;
       try {
         logger.info(`webhook ${webhook.id} firing`);
         const startTime = process.hrtime();
         resp = await fetchWithTimeout(webhook.url, params);
-        const responseBody = await resp.text();
+        const responseBody = (errorMessage = await resp.text());
         await this.storeResponse(webhook, event, resp, startTime, responseBody);
         statusCode = resp.status;
 
@@ -394,7 +394,6 @@ export default class WebhookCannon {
           logger.info(`webhook ${webhook.id} fired successfully`);
           return true;
         }
-        errorMessage = responseBody;
         if (resp.status >= 500) {
           await this.retry(
             trigger,
