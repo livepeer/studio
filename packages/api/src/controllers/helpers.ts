@@ -172,7 +172,7 @@ async function sendgridValidateEmailAsync(
   });
 
   const { statusCode } = response;
-  const { verdict } = body;
+  const verdict = body?.result?.verdict;
   // stringify twice to escape string for logging
   const rawBody = JSON.stringify(JSON.stringify(body));
   console.log(
