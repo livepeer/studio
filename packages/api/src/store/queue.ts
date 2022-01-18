@@ -9,8 +9,10 @@ const EXCHANGES = {
   delayed: "webhook_delayed_exchange",
 } as const;
 const QUEUES = {
-  events: "webhook_events_queue",
-  webhooks: "webhook_cannon_single_url",
+  events: "webhook_events_queue_v1",
+  webhooks: "webhook_cannon_single_url_v1",
+  events_old: "webhook_events_queue",
+  webhooks_old: "webhook_cannon_single_url",
   delayed: "webhook_delayed_queue",
 } as const;
 
@@ -77,8 +79,12 @@ export class RabbitQueue implements Queue {
       json: true,
       setup: async (channel: Channel) => {
         await Promise.all([
-          channel.assertQueue(QUEUES.events, { durable: true }),
-          channel.assertQueue(QUEUES.webhooks, { durable: true }),
+          channel.assertQueue(QUEUES.events, {
+            arguments: { "x-queue-type": "quorum" },
+          }),
+          channel.assertQueue(QUEUES.webhooks, {
+            arguments: { "x-queue-type": "quorum" },
+          }),
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
           }),
@@ -91,6 +97,8 @@ export class RabbitQueue implements Queue {
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
           channel
             .assertQueue(QUEUES.delayed, {
+              // Quorum queues do not support message expiration, so this has to
+              // be a Classic Mirrored Queue configured by a policy on RabbitMQ.
               deadLetterExchange: EXCHANGES.webhooks,
               durable: true,
             })
@@ -98,6 +106,27 @@ export class RabbitQueue implements Queue {
               channel.bindQueue(QUEUES.delayed, EXCHANGES.delayed, "#")
             ),
           channel.prefetch(2),
+        ]);
+        // TODO: Remove this once all old queues have been deleted.
+        await Promise.all([
+          channel.unbindQueue(
+            QUEUES.events_old,
+            EXCHANGES.webhooks,
+            "events.#"
+          ),
+          channel.unbindQueue(
+            QUEUES.webhooks_old,
+            EXCHANGES.webhooks,
+            "webhooks.#"
+          ),
+          channel.deleteQueue(QUEUES.events_old, {
+            ifUnused: true,
+            ifEmpty: true,
+          }),
+          channel.deleteQueue(QUEUES.webhooks_old, {
+            ifUnused: true,
+            ifEmpty: true,
+          }),
         ]);
       },
     });
