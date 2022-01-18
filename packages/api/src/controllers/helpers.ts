@@ -7,9 +7,6 @@ import SendgridClient from "@sendgrid/client";
 import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
-import { Histogram } from "prom-client";
-
-import { db } from "../store";
 
 const ITERATIONS = 10000;
 
