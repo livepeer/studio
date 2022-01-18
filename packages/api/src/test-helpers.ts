@@ -87,7 +87,7 @@ export class TestClient {
     }
   }
 
-  async fetch(path, args: RequestInit = {}) {
+  async fetch(path: string, args: RequestInit = {}) {
     let headers = args.headers || {};
     if (this.apiKey) {
       headers = {
@@ -135,7 +135,7 @@ export class TestClient {
     return await this.fetch(path, params);
   }
 
-  async post(path: string, data: any) {
+  async post(path: string, data?: any) {
     const params: RequestInit = {
       method: "POST",
     };
@@ -179,7 +179,8 @@ export async function createUser(
   server: TestServer,
   client: TestClient,
   userData: User,
-  admin: boolean
+  admin: boolean,
+  emailValid: boolean
 ) {
   const userRes = await client.post(`/user`, userData);
   let user = await userRes.json();
@@ -189,7 +190,7 @@ export async function createUser(
   const token = tokenJson.token;
 
   const storedUser = await server.store.get(`user/${user.id}`, false);
-  user = { ...storedUser, admin, emailValid: true };
+  user = { ...storedUser, admin, emailValid };
   await server.store.replace(user);
 
   const apiKey = uuid();
@@ -204,19 +205,20 @@ export async function createUser(
 export async function setupUsers(
   server: TestServer,
   admin: User,
-  nonAdmin: User
+  nonAdmin: User,
+  emailValid = true
 ) {
   const client = new TestClient({ server });
   const {
     user: adminUser,
     token: adminToken,
     apiKey: adminApiKey,
-  } = await createUser(server, client, admin, true);
+  } = await createUser(server, client, admin, true, emailValid);
   const {
     user: nonAdminUser,
     token: nonAdminToken,
     apiKey: nonAdminApiKey,
-  } = await createUser(server, client, nonAdmin, false);
+  } = await createUser(server, client, nonAdmin, false, emailValid);
 
   return {
     client,

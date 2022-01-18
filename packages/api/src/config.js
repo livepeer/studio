@@ -27,5 +27,6 @@ exports.products = {
     order: 2,
     name: "Business",
     lookupKeys: ["price_2"],
+    usage: [],
   },
 };
