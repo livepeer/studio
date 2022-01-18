@@ -121,7 +121,7 @@ export async function sendgridEmail({
   const msg = {
     personalizations: [
       {
-        to: { email: email },
+        to: [{ email }],
         dynamicTemplateData: {
           subject,
           preheader,

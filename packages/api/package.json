@@ -49,6 +49,7 @@
     "@livepeer/axios": "^0.19.2",
     "@livepeer/sdk": "1.0.0-alpha.7",
     "@peculiar/webcrypto": "^1.2.3",
+    "@sendgrid/client": "^7.6.0",
     "@sendgrid/mail": "^7.6.0",
     "@types/amqp-connection-manager": "^2.0.10",
     "ajv": "^6.10.0",
