@@ -378,11 +378,9 @@ export default class WebhookCannon {
         params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
       const triggerTime = Date.now();
-      await this.storeTriggerTime(webhook, triggerTime);
       let resp: Response;
       let errorMessage;
       let statusCode;
-
       try {
         logger.info(`webhook ${webhook.id} firing`);
         const startTime = process.hrtime();
@@ -415,54 +413,46 @@ export default class WebhookCannon {
         errorMessage = e.message;
         await this.retry(trigger, params, e);
       } finally {
-        if (statusCode >= 300 || !statusCode) {
-          await this.storeWebhookFailure(
-            trigger.webhook,
-            triggerTime,
-            statusCode,
-            errorMessage
-          );
-        }
+        await this.storeTriggerStatus(
+          trigger.webhook,
+          triggerTime,
+          statusCode,
+          errorMessage
+        );
         return;
       }
     }
   }
 
-  async storeTriggerTime(webhook: DBWebhook, triggerTime: number) {
-    try {
-      await this.db.webhook.update(webhook.id, {
-        status: {
-          lastTriggeredAt: triggerTime,
-          lastFailure: webhook.status?.lastFailure,
-        },
-      });
-    } catch (e) {
-      console.log(
-        `Unable to store trigger time of webhook ${webhook.id} url: ${webhook.url}`
-      );
-    }
-  }
-
-  async storeWebhookFailure(
+  async storeTriggerStatus(
     webhook: DBWebhook,
     triggerTime: number,
     statusCode?: number,
     errorMessage?: string
   ) {
     try {
-      await this.db.webhook.update(webhook.id, {
-        status: {
-          lastTriggeredAt: webhook.status?.lastTriggeredAt,
-          lastFailure: {
-            timestamp: triggerTime,
-            statusCode: statusCode,
-            errorMessage: errorMessage,
+      if (statusCode >= 300 || !statusCode) {
+        await this.db.webhook.update(webhook.id, {
+          status: {
+            lastTriggeredAt: triggerTime,
+            lastFailure: {
+              timestamp: triggerTime,
+              statusCode: statusCode,
+              errorMessage: errorMessage,
+            },
           },
-        },
-      });
+        });
+      } else {
+        await this.db.webhook.update(webhook.id, {
+          status: {
+            lastTriggeredAt: triggerTime,
+            ...webhook.status,
+          },
+        });
+      }
     } catch (e) {
       console.log(
-        `Unable to store failure of webhook ${webhook.id} url: ${webhook.url}`
+        `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
       );
     }
   }
