@@ -1,8 +1,9 @@
 import validator from "email-validator";
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import qs from "qs";
+import Stripe from "stripe";
 import { v4 as uuid } from "uuid";
 
 import { products } from "../config";
@@ -10,6 +11,7 @@ import hash from "../hash";
 import logger from "../logger";
 import { authMiddleware, validatePost } from "../middleware";
 import {
+  CreateCustomer,
   CreateSubscription,
   PasswordResetTokenRequest,
   PasswordResetConfirm,
@@ -61,6 +63,50 @@ async function findUserByEmail(email: string, useReplica = true) {
     throw new InternalServerError("multiple users found with same email");
   }
   return users[0];
+}
+
+type StripeProductIDs = CreateSubscription["stripeProductId"];
+
+const defaultProductId: StripeProductIDs = "prod_0";
+
+async function getOrCreateCustomer(stripe: Stripe, email: string) {
+  const existing = await stripe.customers.list({ email });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+  return await stripe.customers.create({ email });
+}
+
+async function getOrCreateSubscription(
+  stripe: Stripe,
+  stripeProductId: StripeProductIDs,
+  stripeCustomerId: string
+) {
+  const existing = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+  });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+
+  const prices = await stripe.prices.list({
+    lookup_keys: products[stripeProductId].lookupKeys,
+  });
+  return await stripe.subscriptions.create({
+    cancel_at_period_end: false,
+    customer: stripeCustomerId,
+    items: prices.data.map((item) => ({ price: item.id })),
+    expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+function requireStripe(): RequestHandler {
+  return (req, res, next) => {
+    if (!req.stripe) {
+      return res.status(500).json({ errors: ["stripe not configured"] });
+    }
+    return next();
+  };
 }
 
 const app = Router();
@@ -190,11 +236,27 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
+  let stripeFields: Partial<User> = {};
+  if (req.stripe) {
+    const customer = await getOrCreateCustomer(req.stripe, email);
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      defaultProductId,
+      customer.id
+    );
+    stripeFields = {
+      stripeCustomerId: customer.id,
+      stripeCustomerSubscriptionId: subscription.id,
+      stripeProductId: defaultProductId,
+    };
+  }
+
   await db.user.create({
     kind: "user",
     id: id,
-    password: hashedPassword,
+    createdAt: Date.now(),
     email: email,
+    password: hashedPassword,
     salt: salt,
     admin: admin,
     emailValidToken: emailValidToken,
@@ -203,7 +265,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     lastName,
     organization,
     phone,
-    createdAt: Date.now(),
+    ...stripeFields,
   });
 
   const user = cleanUserFields(await db.user.get(id));
@@ -473,32 +535,46 @@ app.post(
 app.post(
   "/create-customer",
   validatePost("create-customer"),
+  requireStripe(),
   async (req, res) => {
-    let user = await findUserByEmail(req.body.email, false);
-    const customer = await req.stripe.customers.create({
-      email: req.body.email,
-    });
-    await db.user.update(user.id, {
-      stripeCustomerId: customer.id,
-    });
-    res.status(201);
+    const { email } = req.body as CreateCustomer;
+    let user = await findUserByEmail(email, false);
+
+    let customer: Stripe.Customer;
+    if (user.stripeCustomerId) {
+      customer = await req.stripe.customers
+        .retrieve(user.stripeCustomerId)
+        .then((c) => (c.deleted !== true ? c : null));
+    }
+
+    if (!customer) {
+      console.warn(
+        `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
+      customer = await getOrCreateCustomer(req.stripe, email);
+      await db.user.update(user.id, {
+        stripeCustomerId: customer.id,
+      });
+      res.status(201);
+    }
     res.json(customer);
   }
 );
 
 app.post(
   "/update-customer-payment-method",
+  authMiddleware({}),
   validatePost("update-customer-payment-method"),
+  requireStripe(),
   async (req, res) => {
     const [users] = await db.user.find(
       { stripeCustomerId: req.body.stripeCustomerId },
       { useReplica: false }
     );
-    if (users.length < 1) {
+    if (users.length < 1 || users[0].id !== req.user.id) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
 
     const paymentMethod = await req.stripe.paymentMethods.attach(
@@ -530,31 +606,44 @@ app.post(
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
+  requireStripe(),
   async (req, res) => {
-    const payload = req.body as CreateSubscription;
+    const { stripeCustomerId, stripeProductId, stripeCustomerPaymentMethodId } =
+      req.body as CreateSubscription;
     const [users] = await db.user.find(
-      { stripeCustomerId: payload.stripeCustomerId },
+      { stripeCustomerId: stripeCustomerId },
       { useReplica: false }
     );
     if (users.length < 1) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
+    if (user.stripeCustomerSubscriptionId) {
+      const subscription = await req.stripe.subscriptions.retrieve(
+        user.stripeCustomerSubscriptionId
+      );
+      return res.send(subscription);
+    }
+    console.warn(
+      `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`
+    );
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
-    if (payload.stripeCustomerPaymentMethodId) {
+    if (stripeCustomerPaymentMethodId) {
+      console.warn(
+        `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
-          payload.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId,
           {
-            customer: payload.stripeCustomerId,
+            customer: stripeCustomerId,
           }
         );
         // Update user's payment method
         await db.user.update(user.id, {
-          stripeCustomerPaymentMethodId: payload.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId: stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
         });
@@ -563,29 +652,23 @@ app.post(
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await req.stripe.customers.update(payload.stripeCustomerId, {
+      await req.stripe.customers.update(stripeCustomerId, {
         invoice_settings: {
-          default_payment_method: payload.stripeCustomerPaymentMethodId,
+          default_payment_method: stripeCustomerPaymentMethodId,
         },
       });
     }
 
-    // fetch prices associated with plan
-    const items = await req.stripe.prices.list({
-      lookup_keys: products[payload.stripeProductId].lookupKeys,
-    });
-
     // Create the subscription
-    const subscription = await req.stripe.subscriptions.create({
-      cancel_at_period_end: false,
-      customer: payload.stripeCustomerId,
-      items: items.data.map((item) => ({ price: item.id })),
-      expand: ["latest_invoice.payment_intent"],
-    });
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      stripeProductId,
+      stripeCustomerId
+    );
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
-      stripeProductId: payload.stripeProductId,
+      stripeProductId,
       stripeCustomerSubscriptionId: subscription.id,
     });
     res.send(subscription);
@@ -594,18 +677,22 @@ app.post(
 
 app.post(
   "/update-subscription",
+  authMiddleware({}),
   validatePost("update-subscription"),
+  requireStripe(),
   async (req, res) => {
     const payload = req.body as UpdateSubscription;
     const [users] = await db.user.find(
       { stripeCustomerId: payload.stripeCustomerId },
       { useReplica: false }
     );
-    if (users.length < 1) {
+    if (
+      users.length < 1 ||
+      users[0].stripeCustomerId !== payload.stripeCustomerId
+    ) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
@@ -711,31 +798,54 @@ app.post(
   }
 );
 
-app.post("/retrieve-subscription", async (req, res) => {
-  let { stripeCustomerSubscriptionId } = req.body;
-  const subscription = await req.stripe.subscriptions.retrieve(
-    stripeCustomerSubscriptionId
-  );
-  res.status(200);
-  res.json(subscription);
-});
+app.post(
+  "/retrieve-subscription",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerSubscriptionId } = req.body;
+    if (
+      req.user.stripeCustomerSubscriptionId !== stripeCustomerSubscriptionId
+    ) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const subscription = await req.stripe.subscriptions.retrieve(
+      stripeCustomerSubscriptionId
+    );
+    res.status(200).json(subscription);
+  }
+);
 
-app.post("/retrieve-invoices", async (req, res) => {
-  let { stripeCustomerId } = req.body;
-  const invoices = await req.stripe.invoices.list({
-    customer: stripeCustomerId,
-  });
-  res.status(200);
-  res.json(invoices);
-});
+app.post(
+  "/retrieve-invoices",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerId } = req.body;
+    if (req.user.stripeCustomerId !== stripeCustomerId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const invoices = await req.stripe.invoices.list({
+      customer: stripeCustomerId,
+    });
+    res.status(200).json(invoices);
+  }
+);
 
-app.post("/retrieve-payment-method", async (req, res) => {
-  let { stripePaymentMethodId } = req.body;
-  const paymentMethod = await req.stripe.paymentMethods.retrieve(
-    stripePaymentMethodId
-  );
-  res.status(200);
-  res.json(paymentMethod);
-});
+app.post(
+  "/retrieve-payment-method",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripePaymentMethodId } = req.body;
+    if (req.user.stripeCustomerPaymentMethodId !== stripePaymentMethodId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const paymentMethod = await req.stripe.paymentMethods.retrieve(
+      stripePaymentMethodId
+    );
+    res.status(200).json(paymentMethod);
+  }
+);
 
 export default app;

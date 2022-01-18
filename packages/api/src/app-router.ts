@@ -105,7 +105,9 @@ export default async function makeApp(params: CliArgs) {
       "Warning: Missing Stripe API key. In development, make sure to configure one in .env.local file."
     );
   }
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" });
+  const stripe = stripeSecretKey
+    ? new Stripe(stripeSecretKey, { apiVersion: "2020-08-27" })
+    : null;
   // Logging, JSON parsing, store injection
 
   const app = Router();
