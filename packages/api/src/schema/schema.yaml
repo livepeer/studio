@@ -193,7 +193,7 @@ components:
                   readOnly: true
                   description: Webhook failure status code
                   example: 500
-            lastTriggerTime:
+            lastTriggeredAt:
               type: number
               readyOnly: true
               description:

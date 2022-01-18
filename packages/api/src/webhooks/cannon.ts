@@ -442,7 +442,7 @@ export default class WebhookCannon {
   async storeTriggerTime(webhook: DBWebhook) {
     await this.db.webhook.update(webhook.id, {
       status: {
-        lastTriggerTime: Date.now(),
+        lastTriggeredAt: Date.now(),
         lastFailure: webhook.status?.lastFailure,
       },
     });
@@ -455,7 +455,7 @@ export default class WebhookCannon {
   ) {
     await this.db.webhook.update(webhook.id, {
       status: {
-        lastTriggerTime: webhook.status?.lastTriggerTime,
+        lastTriggeredAt: webhook.status?.lastTriggeredAt,
         lastFailure: {
           timestamp: Date.now(),
           statusCode: statusCode,
