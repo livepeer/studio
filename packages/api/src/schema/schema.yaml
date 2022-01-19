@@ -24,6 +24,8 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
+  - name: vod-asset
+    description: VOD Asset Endpoints
   - name: webhook-response
     description: webhook client responses
 
@@ -859,12 +861,7 @@ components:
       type: object
       table: vod_asset
       required:
-        - id
-        - objectStoreId
         - name
-        - duration
-        - hash
-        - createdAt
         - format
       properties:
         id:
@@ -2102,6 +2099,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /vod-asset:
+    tags:
+      - vod-asset
+    get:
+      description: gets a list of vod assets defined by the user
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/vod-asset"
         default:
           description: Error
           content:
