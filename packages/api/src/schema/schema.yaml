@@ -872,6 +872,14 @@ components:
           readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
           index: true
+        userId:
+          type: string
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the asset
+        deleted:
+          type: boolean
+          description: Set to true when the asset is deleted
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
