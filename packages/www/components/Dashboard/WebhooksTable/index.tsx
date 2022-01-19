@@ -135,7 +135,10 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
                     <StatusBadge
                       variant={
                         webhook.status.lastFailure
-                          ? StatusVariant.Unhealthy
+                          ? webhook.status.lastFailure.timestamp >=
+                            webhook.status.lastTriggeredAt
+                            ? StatusVariant.Unhealthy
+                            : StatusVariant.Healthy
                           : StatusVariant.Healthy
                       }
                       timestamp={webhook.status.lastTriggeredAt}
