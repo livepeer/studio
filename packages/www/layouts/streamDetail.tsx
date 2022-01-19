@@ -198,6 +198,7 @@ const StreamDetail = ({
   stream,
   streamHealth,
   invalidateStream,
+  setSwitchTab,
   activeTab = "Overview",
 }) => {
   useLoggedIn();
@@ -206,13 +207,12 @@ const StreamDetail = ({
   const router = useRouter();
   const { query } = router;
   const id = query.id;
-  const [ingest, setIngest] = useState([]);
+  const [_, setIngest] = useState([]);
   const [notFound, setNotFound] = useState(false);
   const [isCopied, setCopied] = useState(0);
   const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
-  const playerRef = useRef(null);
 
   useEffect(() => {
     if (user && user.admin && stream && !lastSessionLoading) {
@@ -546,48 +546,43 @@ const StreamDetail = ({
                     mb: "$4",
                     width: "100%",
                   }}>
-                  <Box>
-                    <Link href={`/dashboard/streams/${stream?.id}`} passHref>
-                      <A
-                        variant={activeTab === "Overview" ? "violet" : "subtle"}
-                        css={{
-                          pb: "$2",
-                          width: "100%",
-                          cursor: "pointer",
+                  <Box css={{ display: "flex" }}>
+                    <Box
+                      as="div"
+                      onClick={() => setSwitchTab("Overview")}
+                      css={{
+                        pb: "$2",
+                        width: "100%",
+                        cursor: "pointer",
+                        textDecoration: "none",
+                        borderBottom: "2px solid",
+                        borderColor:
+                          activeTab === "Overview" ? "$violet9" : "transparent",
+                        mr: "$5",
+                        "&:hover": {
                           textDecoration: "none",
-                          borderBottom: "2px solid",
-                          borderColor:
-                            activeTab === "Overview"
-                              ? "$violet9"
-                              : "transparent",
-                          mr: "$5",
-                          "&:hover": {
-                            textDecoration: "none",
-                          },
-                        }}>
-                        Overview
-                      </A>
-                    </Link>
-                    <Link
-                      href={`/dashboard/streams/${stream?.id}/health`}
-                      passHref>
-                      <A
-                        variant={activeTab === "Health" ? "violet" : "subtle"}
-                        css={{
+                        },
+                      }}>
+                      Overview
+                    </Box>
+
+                    <Box
+                      as="div"
+                      onClick={() => setSwitchTab("Health")}
+                      css={{
+                        textDecoration: "none",
+                        pb: "$2",
+                        width: "100%",
+                        cursor: "pointer",
+                        borderBottom: "2px solid",
+                        borderColor:
+                          activeTab === "Health" ? "$violet9" : "transparent",
+                        "&:hover": {
                           textDecoration: "none",
-                          pb: "$2",
-                          width: "100%",
-                          cursor: "pointer",
-                          borderBottom: "2px solid",
-                          borderColor:
-                            activeTab === "Health" ? "$violet9" : "transparent",
-                          "&:hover": {
-                            textDecoration: "none",
-                          },
-                        }}>
-                        Health
-                      </A>
-                    </Link>
+                        },
+                      }}>
+                      Health
+                    </Box>
                   </Box>
                   <Box css={{ position: "relative", top: "-8px" }}>
                     <DropdownMenu>
