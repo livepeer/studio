@@ -1,6 +1,7 @@
 import sql from "sql-template-strings";
 
 import { Webhook } from "../schema/types";
+import { NotFoundError } from "./errors";
 import Table from "./table";
 
 export type EventKey = Webhook["events"][0];
@@ -37,5 +38,19 @@ export default class WebhookTable extends Table<DBWebhook> {
       cursor,
     });
     return { data: webhooks, cursor: nextCursor };
+  }
+
+  async updateStatus(id: string, status: DBWebhook["status"]) {
+    const res = await this.db.query(
+      `UPDATE ${
+        this.name
+      } SET data = jsonb_set(data, '{status}', data->'status' || ${JSON.stringify(
+        status
+      )}) WHERE id = ${id}`
+    );
+
+    if (res.rowCount < 1) {
+      throw new NotFoundError(`couldn't find ${this.name} id=${id}`);
+    }
   }
 }
