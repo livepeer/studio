@@ -3,6 +3,7 @@ import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
+import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
@@ -32,6 +33,7 @@ type WebhooksTableData = {
   name: TextCellProps;
   url: TextCellProps;
   created: DateCellProps;
+  status: TextCellProps;
 };
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
@@ -68,6 +70,12 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
           dateSort("original.created.date", ...params),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: TextCell,
+        disableSortBy: true,
       },
     ],
     []
@@ -117,6 +125,24 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
               css: {
                 cursor: "pointer",
               },
+            },
+            status: {
+              children: (
+                <Box>
+                  {!webhook.status ? (
+                    "-"
+                  ) : (
+                    <StatusBadge
+                      variant={
+                        webhook.status.lastFailure
+                          ? StatusVariant.Unhealthy
+                          : StatusVariant.Healthy
+                      }
+                      timestamp={webhook.status.lastTriggeredAt}
+                    />
+                  )}
+                </Box>
+              ),
             },
           };
         }),
