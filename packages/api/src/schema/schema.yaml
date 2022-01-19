@@ -862,7 +862,6 @@ components:
       table: vod_asset
       required:
         - name
-        - format
       properties:
         id:
           type: string
@@ -928,9 +927,6 @@ components:
             them (e.g. mp4)
           items:
             type: object
-            required:
-              - kind
-              - id
             properties:
               kind:
                 type: string
@@ -1041,10 +1037,6 @@ components:
           description: List of NFTs minted with the asset as a source
           items:
             type: object
-            required:
-              - chain
-              - contract
-              - token
             properties:
               chain:
                 type: string
@@ -1062,11 +1054,6 @@ components:
     task:
       type: object
       table: task
-      required:
-        - id
-        - kind
-        - status
-        - createdAt
       properties:
         id:
           type: string
