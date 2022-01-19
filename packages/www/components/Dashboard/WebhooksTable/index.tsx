@@ -142,6 +142,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
                           : StatusVariant.Healthy
                       }
                       timestamp={webhook.status.lastTriggeredAt}
+                      tooltipText="Last triggered"
                     />
                   )}
                 </Box>
