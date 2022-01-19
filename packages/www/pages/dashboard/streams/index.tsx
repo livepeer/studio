@@ -17,7 +17,15 @@ const Streams = () => {
       id="streams"
       breadcrumbs={[{ title: "Streams" }]}
       {...Content.metaData}>
-      <Box css={{ p: "$6" }}>
+      <Box
+        css={{
+          pb: "$9",
+          px: "$6",
+          pt: "$6",
+          "@bp4": {
+            p: "$6",
+          },
+        }}>
         <StreamsTable
           title="Streams"
           userId={user.id}

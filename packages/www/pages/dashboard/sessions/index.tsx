@@ -13,7 +13,15 @@ const Sessions = () => {
 
   return (
     <Layout id="streams/sessions" breadcrumbs={[{ title: "Sessions" }]}>
-      <Box css={{ p: "$6" }}>
+      <Box
+        css={{
+          pb: "$9",
+          px: "$6",
+          pt: "$6",
+          "@bp4": {
+            p: "$6",
+          },
+        }}>
         <AllSessionsTable />
       </Box>
     </Layout>
