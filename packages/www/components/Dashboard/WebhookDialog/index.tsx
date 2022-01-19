@@ -220,8 +220,9 @@ const WebhookDialog = ({
               css={{
                 width: "100%",
                 borderRadius: 6,
-                height: "auto",
-                minHeight: 200,
+                height: 200,
+                overflowX: "hidden",
+                overflowY: "auto",
                 border: "1px solid $colors$mauve7",
                 backgroundColor: "$mauve2",
                 mt: "-3px",
