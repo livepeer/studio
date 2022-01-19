@@ -378,15 +378,15 @@ export default class WebhookCannon {
         params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
       const triggerTime = Date.now();
+      const startTime = process.hrtime();
       let resp: Response;
       let errorMessage: string;
+      let responseBody: string;
       let statusCode: number;
       try {
         logger.info(`webhook ${webhook.id} firing`);
-        const startTime = process.hrtime();
         resp = await fetchWithTimeout(webhook.url, params);
-        const responseBody = (errorMessage = await resp.text());
-        await this.storeResponse(webhook, event, resp, startTime, responseBody);
+        responseBody = errorMessage = await resp.text();
         statusCode = resp.status;
 
         if (resp.status >= 200 && resp.status < 300) {
@@ -412,6 +412,7 @@ export default class WebhookCannon {
         errorMessage = e.message;
         await this.retry(trigger, params, e);
       } finally {
+        await this.storeResponse(webhook, event, resp, startTime, responseBody);
         await this.storeTriggerStatus(
           trigger.webhook,
           triggerTime,
@@ -431,7 +432,7 @@ export default class WebhookCannon {
   ) {
     try {
       if (statusCode >= 300 || !statusCode) {
-        await this.db.webhook.update(webhook.id, {
+        await this.db.webhook.updateStatus(webhook.id, {
           status: {
             lastTriggeredAt: triggerTime,
             lastFailure: {
@@ -442,10 +443,10 @@ export default class WebhookCannon {
           },
         });
       } else {
-        await this.db.webhook.update(webhook.id, {
+        await this.db.webhook.updateStatus(webhook.id, {
           status: {
-            lastTriggeredAt: triggerTime,
             ...webhook.status,
+            lastTriggeredAt: triggerTime,
           },
         });
       }
@@ -463,21 +464,27 @@ export default class WebhookCannon {
     startTime: [number, number],
     responseBody: string
   ) {
-    const hrDuration = process.hrtime(startTime);
-    await this.db.webhookResponse.create({
-      id: uuid(),
-      webhookId: webhook.id,
-      eventId: event.id,
-      createdAt: Date.now(),
-      duration: hrDuration[0] + hrDuration[1] / 1e9,
-      statusCode: resp.status,
-      response: {
-        body: responseBody,
-        headers: resp.headers.raw(),
-        redirected: resp.redirected,
-        status: resp.status,
-        statusText: resp.statusText,
-      },
-    });
+    try {
+      const hrDuration = process.hrtime(startTime);
+      await this.db.webhookResponse.create({
+        id: uuid(),
+        webhookId: webhook.id,
+        eventId: event.id,
+        createdAt: Date.now(),
+        duration: hrDuration[0] + hrDuration[1] / 1e9,
+        statusCode: resp.status,
+        response: {
+          body: responseBody,
+          headers: resp.headers.raw(),
+          redirected: resp.redirected,
+          status: resp.status,
+          statusText: resp.statusText,
+        },
+      });
+    } catch (e) {
+      console.log(
+        `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
+      );
+    }
   }
 }
