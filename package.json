@@ -38,7 +38,8 @@
     "postinstall": "lerna run --stream postinstall",
     "prettier:base": "prettier '**/*.{ts,js,css,html,md,tsx,mdx,yaml,yml}'",
     "prettier": "yarn run prettier:base --write",
-    "prettier:check": "yarn run prettier:base --check"
+    "prettier:check": "yarn run prettier:base --check",
+    "release": "lerna version"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
