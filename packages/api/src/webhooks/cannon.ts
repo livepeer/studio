@@ -274,7 +274,7 @@ export default class WebhookCannon {
 
     let signatureHeader = "";
     if (params.headers[SIGNATURE_HEADER]) {
-      signatureHeader = `-H  "${SIGNATURE_HEADER}: ${params.headers["Livepeer-Signature"]}"`;
+      signatureHeader = `-H  "${SIGNATURE_HEADER}: ${params.headers[SIGNATURE_HEADER]}"`;
     }
 
     let payload = params.body;
