@@ -29,13 +29,14 @@ type MistConfig = {
 
 // Takes a Yargs `.options()` block and returns a Mist-compatible JSON exmplanations
 export default function yargsToMist(options: any) {
+  const pkg = require("../package.json");
   // const pkg = require("../package.json");
   const obj = <MistConfig>{
     name: "livepeer-api",
     friendly: "Livepeer API Server",
     desc: "Livepeer TypeScript API Server, backed by Postgres + RabbitMQ",
     optional: {},
-    version: "Unknown",
+    version: pkg.version,
   };
   for (const [flag, option] of Object.entries(options)) {
     const opt = option as any;
