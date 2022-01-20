@@ -55,9 +55,11 @@ const Log = ({ timestamp, level, text }: LogData) => {
 
 const lpHostedOrchUri = /https?:\/\/(.+)\.livepeer\.(com|monster):(80|443)/;
 
-function orchestratorName({
-  orchestrator: { address, transcodeUri },
-}: events.TranscodeAttemptInfo) {
+function orchestratorName(orchestrator: events.OrchestratorMetadata) {
+  if (!orchestrator) {
+    return null;
+  }
+  const { address, transcodeUri } = orchestrator;
   const matches = lpHostedOrchUri.exec(transcodeUri);
   return !matches?.length ? address : matches[1];
 }
@@ -82,7 +84,7 @@ function createEventHandler() {
             const errLogs = evt.attempts
               .filter((a) => a.error)
               .map((a, idx) => {
-                const orch = orchestratorName(a);
+                const orch = orchestratorName(a.orchestrator);
                 const msg = `Transcode error from ${orch} for segment ${seqNo}: ${a.error}`;
                 return errorLog(evt, msg, `error-${idx}`);
               });
@@ -92,10 +94,8 @@ function createEventHandler() {
             }
           }
 
-          const lastAttempt = evt.attempts?.length
-            ? evt.attempts[evt.attempts.length - 1]
-            : null;
-          const orchestrator = orchestratorName(lastAttempt);
+          const [lastAttempt] = evt.attempts?.slice(-1) ?? [];
+          const orchestrator = orchestratorName(lastAttempt?.orchestrator);
           if (evt.success && orchestrator !== lastOrchestrator.current) {
             lastOrchestrator.current = orchestrator;
             logs.push(
