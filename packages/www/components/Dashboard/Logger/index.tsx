@@ -44,52 +44,59 @@ function orchestratorName({
   return !matches?.length ? address : matches[1];
 }
 
-function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
-  switch (evt.type) {
-    case "stream_state":
-      const state = evt.state.active ? "active" : "inactive";
-      const region = evt.region || "unknown";
-      return [
-        {
-          key: evt.id,
-          timestamp: evt.timestamp,
-          level: "info",
-          text: `Stream is ${state} in region "${region}"`,
-        },
-      ];
-    case "transcode":
-      if (evt.success && !userIsAdmin) {
-        // non-admin users should only see fatal errors.
-        return [];
-      }
-      return evt.attempts
-        .filter((a) => a.error)
-        .map((a, idx) => ({
-          key: `${evt.id}-${idx}`,
-          timestamp: evt.timestamp,
-          level: "error",
-          text: `Transcode error from ${orchestratorName(a)} for segment ${
-            evt.segment.seqNo
-          }: ${a.error}`,
-        }));
-    case "webhook_event":
-      if (!evt.event.startsWith("multistream.")) {
-        console.error("unknown event:", evt.event);
-        break;
-      }
-      const payload = evt.payload as events.MultistreamWebhookPayload;
-      const action = evt.event.substring("multistream.".length);
-      const level = action === "error" ? "error" : "info";
-      return [
-        {
-          key: evt.id,
-          timestamp: evt.timestamp,
-          level,
-          text: `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`,
-        },
-      ];
-  }
-  return [];
+function createEventHandler() {
+  const [state, setState] = useState<{}>();
+
+  return function handleEvent(
+    evt: events.Any,
+    userIsAdmin: boolean
+  ): LogData[] {
+    switch (evt.type) {
+      case "stream_state":
+        const state = evt.state.active ? "active" : "inactive";
+        const region = evt.region || "unknown";
+        return [
+          {
+            key: evt.id,
+            timestamp: evt.timestamp,
+            level: "info",
+            text: `Stream is ${state} in region "${region}"`,
+          },
+        ];
+      case "transcode":
+        if (evt.success && !userIsAdmin) {
+          // non-admin users should only see fatal errors.
+          return [];
+        }
+        return evt.attempts
+          .filter((a) => a.error)
+          .map((a, idx) => ({
+            key: `${evt.id}-${idx}`,
+            timestamp: evt.timestamp,
+            level: "error",
+            text: `Transcode error from ${orchestratorName(a)} for segment ${
+              evt.segment.seqNo
+            }: ${a.error}`,
+          }));
+      case "webhook_event":
+        if (!evt.event.startsWith("multistream.")) {
+          console.error("unknown event:", evt.event);
+          break;
+        }
+        const payload = evt.payload as events.MultistreamWebhookPayload;
+        const action = evt.event.substring("multistream.".length);
+        const level = action === "error" ? "error" : "info";
+        return [
+          {
+            key: evt.id,
+            timestamp: evt.timestamp,
+            level,
+            text: `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`,
+          },
+        ];
+    }
+    return [];
+  };
 }
 
 const Logger = ({ stream, ...props }: { stream: Stream }) => {
@@ -108,6 +115,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
       return logs;
     });
 
+  const handleEvent = createEventHandler();
   useEffect(() => {
     setLogs([]);
     if (!stream?.region) return;
