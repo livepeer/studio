@@ -1,50 +1,26 @@
-import React, { useCallback } from "react";
-import { Box, Heading, Text, Flex } from "@livepeer.com/design-system";
-import { useApi, useAnalyzer } from "hooks";
-import { useEffect, useState } from "react";
-import { StreamInfo } from "hooks/use-api";
-import Chart from "components/Dashboard/Chart";
-import StreamDetail from "layouts/streamDetail";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Stream } from "@livepeer.com/api";
-import { useQuery, useQueryClient } from "react-query";
-import HealthChecksTable from "components/Dashboard/HealthChecksTable";
+import { useApi } from "hooks";
+import { StreamInfo } from "hooks/use-api";
 import Logger from "@components/Dashboard/Logger";
+import Chart from "@components/Dashboard/Chart";
+import HealthChecksTable from "@components/Dashboard/HealthChecksTable";
+import { Text, Box, Heading } from "@livepeer.com/design-system";
 
-const interval = 10000;
+const ingestInterval = 10 * 1000;
 const maxItems = 6;
 
-const Health = () => {
+const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
+  const router = useRouter();
   const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
     { name: 0, kbps: 0 },
   ]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
-  const { getStream, getStreamInfo } = useApi();
-  const { getHealth } = useAnalyzer();
 
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const { getStreamInfo } = useApi();
+
   const { query } = router;
   const id = query.id as string;
-
-  const fetcher = useCallback(async () => {
-    const stream: Stream = await getStream(id);
-    return stream;
-  }, [id]);
-
-  const { data: stream } = useQuery([id], () => fetcher());
-
-  const invalidateStream = useCallback(() => {
-    return queryClient.invalidateQueries(id);
-  }, [queryClient, id]);
-
-  const refetchInterval = 5 * 1000;
-  const { data: streamHealth } = useQuery({
-    queryKey: ["health", stream?.region, stream?.id, stream?.isActive],
-    queryFn: async () =>
-      !stream?.region ? null : await getHealth(stream.region, stream.id),
-    refetchInterval,
-  });
 
   const doGetInfo = useCallback(
     async (id: string) => {
@@ -72,7 +48,7 @@ const Health = () => {
         return [
           ...prev,
           {
-            name: lastItem ? lastItem.name + interval / 1000 : 0,
+            name: lastItem ? lastItem.name + ingestInterval / 1000 : 0,
             kbps: Math.round((newInfo.session.ingestRate / 1000) * 8), // kilobits rather than bytes here
           },
         ].slice(Math.max(prev.length - maxItems, 0));
@@ -82,10 +58,10 @@ const Health = () => {
   );
 
   useEffect(() => {
-    if (!id) {
+    if (typeof id !== "string") {
       return;
     }
-    doGetInfo(typeof id === "string" ? id : null);
+    doGetInfo(id);
   }, [doGetInfo]);
 
   useEffect(() => {
@@ -93,7 +69,7 @@ const Health = () => {
       if (info) {
         getIngestRate(typeof id === "string" ? id : null);
       } else return null;
-    }, interval);
+    }, ingestInterval);
 
     return () => {
       window.clearInterval(intervalId);
@@ -101,16 +77,7 @@ const Health = () => {
   }, [getIngestRate, info]);
 
   return (
-    <StreamDetail
-      activeTab="Health"
-      stream={stream}
-      streamHealth={streamHealth}
-      invalidateStream={invalidateStream}
-      breadcrumbs={[
-        { title: "Streams", href: "/dashboard/streams" },
-        { title: stream?.name, href: `/dashboard/streams/${id}` },
-        { title: "Health" },
-      ]}>
+    <>
       <HealthChecksTable
         stream={stream}
         streamHealth={streamHealth}
@@ -140,9 +107,9 @@ const Health = () => {
           After the stream loads, ingest rate updates every 10 seconds.
         </Text>
       </Box>
-
       <Chart data={dataChart} />
-    </StreamDetail>
+    </>
   );
 };
-export default Health;
+
+export default StreamHealthTab;
