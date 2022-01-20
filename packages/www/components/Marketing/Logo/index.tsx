@@ -16,7 +16,7 @@ const Logo = ({ badge = null }) => (
             textDecoration: "none",
           },
         }}>
-        Livepeer.com
+        Livepeer Video Services
       </A>
     </Link>
     {badge && (
