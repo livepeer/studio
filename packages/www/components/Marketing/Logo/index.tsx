@@ -10,10 +10,13 @@ const Logo = ({ badge = null }) => (
           color: "$hiContrast",
           cursor: "pointer",
           letterSpacing: "-.3px",
-          fontSize: "21px",
+          fontSize: "16px",
           fontWeight: 700,
           "&:hover": {
             textDecoration: "none",
+          },
+          "@bp3": {
+            fontSize: "20px",
           },
         }}>
         Livepeer Video Services
