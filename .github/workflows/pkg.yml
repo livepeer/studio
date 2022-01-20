@@ -3,6 +3,8 @@ on:
   push:
     branches-ignore:
       - latest
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   build:
     runs-on: macos-latest
@@ -49,73 +51,40 @@ jobs:
             done
           done
 
-      # This is a proof-of-concept, we're going to want something a bit more elegant
-      - name: archive livepeer-api-linux-arm64.tar.gz
-        uses: actions/upload-artifact@v2
+      - name: Check if release is necessary
+        run: |
+          if [[ $GITHUB_EVENT_NAME == 'tag' ]]; then
+              echo "RELEASE=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create Release
+        if: ${{ env.GITHUB_EVENT_NAME == 'tag' }}
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          name: livepeer-api-linux-arm64.tar.gz
-          path: |
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Add binaries to release
+        if: ${{ env.GITHUB_EVENT_NAME == 'tag' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
             ./pkg-releases/livepeer-api-linux-arm64.tar.gz
-
-      - name: archive livepeer-api-linux-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-api-linux-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-api-linux-amd64.tar.gz
-
-      - name: archive livepeer-api-darwin-arm64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-api-darwin-arm64.tar.gz
-          path: |
             ./pkg-releases/livepeer-api-darwin-arm64.tar.gz
-
-      - name: archive livepeer-api-darwin-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-api-darwin-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-api-darwin-amd64.tar.gz
-
-      - name: archive livepeer-api-windows-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-api-windows-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-api-windows-amd64.tar.gz
-
-      - name: archive livepeer-www-linux-arm64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-www-linux-arm64.tar.gz
-          path: |
             ./pkg-releases/livepeer-www-linux-arm64.tar.gz
-
-      - name: archive livepeer-www-linux-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-www-linux-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-www-linux-amd64.tar.gz
-
-      - name: archive livepeer-www-darwin-arm64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-www-darwin-arm64.tar.gz
-          path: |
             ./pkg-releases/livepeer-www-darwin-arm64.tar.gz
-
-      - name: archive livepeer-www-darwin-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-www-darwin-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-www-darwin-amd64.tar.gz
-
-      - name: archive livepeer-www-windows-amd64.tar.gz
-        uses: actions/upload-artifact@v2
-        with:
-          name: livepeer-www-windows-amd64.tar.gz
-          path: |
             ./pkg-releases/livepeer-www-windows-amd64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
