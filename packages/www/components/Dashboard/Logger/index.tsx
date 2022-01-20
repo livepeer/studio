@@ -1,5 +1,5 @@
 import { useAnalyzer, useApi } from "hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Stream } from "@livepeer.com/api";
 import { Box, Heading, Flex, Badge } from "@livepeer.com/design-system";
@@ -63,82 +63,82 @@ function orchestratorName({
 }
 
 function createEventHandler() {
-  const [lastOrchestrator, setLastOrchestrator] = useState<string>();
-  const [failedSegments, setFailedSegments] = useState<Record<number, boolean>>(
-    {}
+  const lastOrchestrator = useRef<string>();
+  const failedSegments = useRef(new Set<number>());
+
+  return useCallback(
+    function handleEvent(evt: events.Any, userIsAdmin: boolean): LogData[] {
+      switch (evt.type) {
+        case "stream_state":
+          const state = evt.state.active ? "active" : "inactive";
+          const region = evt.region || "unknown";
+          return [infoLog(evt, `Stream is ${state} in region "${region}"`)];
+        case "transcode":
+          const logs: LogData[] = [];
+          const seqNo = evt.segment.seqNo;
+
+          // non-admin users should only see fatal errors.
+          if (!evt.success || userIsAdmin) {
+            const errLogs = evt.attempts
+              .filter((a) => a.error)
+              .map((a, idx) => {
+                const orch = orchestratorName(a);
+                const msg = `Transcode error from ${orch} for segment ${seqNo}: ${a.error}`;
+                return errorLog(evt, msg, `error-${idx}`);
+              });
+            if (errLogs.length > 0) {
+              failedSegments.current.add(seqNo);
+            }
+            logs.push(...errLogs);
+          }
+
+          const lastAttempt = evt.attempts?.length
+            ? evt.attempts[evt.attempts.length - 1]
+            : null;
+          const orchestrator = orchestratorName(lastAttempt);
+          if (evt.success && orchestrator !== lastOrchestrator.current) {
+            lastOrchestrator.current = orchestrator;
+            logs.push(
+              infoLog(
+                evt,
+                `Stream is being transcoded by orchestrator ${orchestrator}`,
+                "transcoding-orchestrator"
+              )
+            );
+          }
+
+          if (evt.success && failedSegments.current.has(seqNo)) {
+            logs.push(
+              infoLog(
+                evt,
+                `Segment ${seqNo} successfully transcoded on ${orchestrator}`,
+                "segment-success"
+              )
+            );
+            failedSegments.current.delete(seqNo);
+          }
+
+          return logs;
+        case "webhook_event":
+          if (!evt.event.startsWith("multistream.")) {
+            console.error("unknown event:", evt.event);
+            break;
+          }
+          const payload = evt.payload as events.MultistreamWebhookPayload;
+          const action = evt.event.substring("multistream.".length);
+          const level = action === "error" ? "error" : "info";
+          return [
+            newLog(
+              evt,
+              level,
+              `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`
+            ),
+          ];
+      }
+      return [];
+    },
+    [lastOrchestrator, failedSegments]
   );
-
-  return function handleEvent(
-    evt: events.Any,
-    userIsAdmin: boolean
-  ): LogData[] {
-    switch (evt.type) {
-      case "stream_state":
-        const state = evt.state.active ? "active" : "inactive";
-        const region = evt.region || "unknown";
-        return [infoLog(evt, `Stream is ${state} in region "${region}"`)];
-      case "transcode":
-        const logs: LogData[] = [];
-        const seqNo = evt.segment.seqNo;
-
-        // non-admin users should only see fatal errors.
-        if (!evt.success || userIsAdmin) {
-          setFailedSegments({ ...failedSegments, [seqNo]: true });
-          const errLogs = evt.attempts
-            .filter((a) => a.error)
-            .map((a, idx) => {
-              const orch = orchestratorName(a);
-              const msg = `Transcode error from ${orch} for segment ${seqNo}: ${a.error}`;
-              return errorLog(evt, msg, `error-${idx}`);
-            });
-          logs.push(...errLogs);
-        }
-
-        const lastAttempt = evt.attempts?.length
-          ? evt.attempts[evt.attempts.length - 1]
-          : null;
-        const orchestrator = orchestratorName(lastAttempt);
-        if (evt.success && orchestrator !== lastOrchestrator) {
-          setLastOrchestrator(orchestrator);
-          logs.push(
-            infoLog(
-              evt,
-              `Stream is being transcoded on ${orchestrator}`,
-              "transcoding-orchestrator"
-            )
-          );
-        }
-
-        if (evt.success && failedSegments[seqNo]) {
-          logs.push(
-            infoLog(
-              evt,
-              `Segment ${seqNo} successfully transcoded on ${orchestrator}`,
-              "segment-success"
-            )
-          );
-          setFailedSegments({ ...failedSegments, [seqNo]: false });
-        }
-
-        return logs;
-      case "webhook_event":
-        if (!evt.event.startsWith("multistream.")) {
-          console.error("unknown event:", evt.event);
-          break;
-        }
-        const payload = evt.payload as events.MultistreamWebhookPayload;
-        const action = evt.event.substring("multistream.".length);
-        const level = action === "error" ? "error" : "info";
-        return [
-          newLog(
-            evt,
-            level,
-            `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`
-          ),
-        ];
-    }
-    return [];
-  };
 }
 
 const Logger = ({ stream, ...props }: { stream: Stream }) => {
@@ -165,7 +165,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
     const handler = (evt: events.Any) => addLogs(handleEvent(evt, userIsAdmin));
     const from = Date.now() - pastLogsLookback;
     return getEvents(stream.region, stream.id, handler, from);
-  }, [stream?.region, stream?.id]);
+  }, [stream?.region, stream?.id, handleEvent]);
 
   return (
     <Box {...props}>
