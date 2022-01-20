@@ -58,10 +58,10 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
   );
 
   useEffect(() => {
-    if (!id) {
+    if (typeof id !== "string") {
       return;
     }
-    doGetInfo(typeof id === "string" ? id : null);
+    doGetInfo(id);
   }, [doGetInfo]);
 
   useEffect(() => {
