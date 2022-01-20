@@ -175,8 +175,8 @@ export default class StreamTable extends Table<DBStream> {
 
   async usage(
     userId: string,
-    fromTime: number,
-    toTime: number,
+    fromTime: number | string,
+    toTime: number | string,
     opts?: QueryOptions
   ): Promise<UsageData> {
     const q1 = sql`SELECT

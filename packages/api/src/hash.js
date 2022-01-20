@@ -1,3 +1,5 @@
+// This file is used directly by the www code as well, so we use isomorphic
+// libraries for consistent implementation between back and frontend.
 import crypto from "isomorphic-webcrypto";
 import util from "util";
 

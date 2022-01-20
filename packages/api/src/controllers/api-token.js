@@ -2,7 +2,7 @@ import Router from "express/lib/router";
 import uuid from "uuid/v4";
 import sql from "sql-template-strings";
 
-import { trackAction, makeNextHREF, parseOrder, parseFilters } from "./helpers";
+import { makeNextHREF, parseOrder, parseFilters } from "./helpers";
 import { authMiddleware, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
@@ -146,23 +146,14 @@ app.post("/", validatePost("api-token"), async (req, res) => {
       return res.json({ errors: [`Bad access rules: ${err}`] });
     }
   }
-  await Promise.all([
-    req.store.create({
-      id: id,
-      userId: userId,
-      kind: "api-token",
-      name: req.body.name,
-      access: req.body.access,
-      createdAt: Date.now(),
-    }),
-    trackAction(
-      userId,
-      req.user.email,
-      { name: "Api Token Created" },
-      req.config.segmentApiKey
-    ),
-  ]);
-
+  await req.store.create({
+    id: id,
+    userId: userId,
+    kind: "api-token",
+    name: req.body.name,
+    access: req.body.access,
+    createdAt: Date.now(),
+  });
   const apiToken = await req.store.get(`api-token/${id}`);
 
   if (apiToken) {

@@ -25,10 +25,10 @@ import { getBroadcasterHandler } from "./broadcaster";
 import { generateStreamKey } from "./generate-stream-key";
 import {
   makeNextHREF,
-  trackAction,
   parseFilters,
   parseOrder,
   pathJoin,
+  FieldsMap,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -147,7 +147,11 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-export function getRecordingUrl(ingest, session, mp4 = false) {
+export function getRecordingUrl(
+  ingest: string,
+  session: DBSession,
+  mp4 = false
+) {
   return pathJoin(
     ingest,
     `recordings`,
@@ -184,7 +188,7 @@ function activeCleanup(streams: DBStream[], activeOnly = false) {
   return streams;
 }
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `stream.ID`,
   name: { val: `stream.data->>'name'`, type: "full-text" },
   sourceSegments: `stream.data->'sourceSegments'`,
@@ -760,28 +764,11 @@ app.post(
 
     try {
       await req.store.create(doc);
-      setImmediate(async () => {
-        // execute in parallel to not slowdown stream creation
-        try {
-          let email = req.user.email;
-          const user = await db.user.get(stream.userId);
-          if (user) {
-            email = user.email;
-          }
-          await trackAction(
-            stream.userId,
-            email,
-            { name: "Stream Session Created" },
-            req.config.segmentApiKey
-          );
-        } catch (e) {
-          console.error(`error tracking session err=`, e);
-        }
-      });
     } catch (e) {
       console.error(e);
       throw e;
     }
+
     res.status(201);
     res.json(db.stream.removePrivateFields(doc, req.user.admin));
     logger.info(
@@ -848,15 +835,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
     doc.multistream
   );
 
-  await Promise.all([
-    req.store.create(doc),
-    trackAction(
-      req.user.id,
-      req.user.email,
-      { name: "Stream Created" },
-      req.config.segmentApiKey
-    ),
-  ]);
+  await req.store.create(doc);
 
   res.status(201);
   res.json(

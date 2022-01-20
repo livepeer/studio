@@ -11,7 +11,7 @@ import {
   Heading,
   Link as A,
 } from "@livepeer.com/design-system";
-import { useForm } from "react-hubspot";
+import { useHubspotForm } from "hooks";
 import Button from "@components/Marketing/Button";
 import Prefooter from "@components/Marketing/Prefooter";
 import { useRouter } from "next/router";
@@ -22,7 +22,7 @@ const ContactPage = () => {
   const router = useRouter();
   const { query } = router;
   const formEl = useRef(null);
-  const { data, handleSubmit } = useForm({
+  const { data, handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
     formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
   });
@@ -76,6 +76,7 @@ const ContactPage = () => {
           </Box>
           <Box
             as="form"
+            id="contact-form"
             ref={formEl}
             onSubmit={handleSubmit}
             css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>

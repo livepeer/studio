@@ -4,16 +4,17 @@ import mung from "express-mung";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
-import { FindOptions, FindQuery } from "../store/types";
+import { FindOptions, FindQuery, WithID } from "../store/types";
 import {
   MultistreamTarget,
   MultistreamTargetPatchPayload,
+  User,
 } from "../schema/types";
 import { DBMultistreamTarget } from "../store/multistream-table";
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `multistream_target.ID`,
   name: { val: `multistream_target.data->>'name'`, type: "full-text" },
   url: `multistream_target.data->>'url'`,
@@ -29,11 +30,17 @@ function adminListQuery(
   orderStr: string,
   filters: string
 ): [SQLStatement[], FindOptions] {
+  type ResultRow = {
+    id: string;
+    data: DBMultistreamTarget;
+    usersId: string;
+    usersData: WithID<User>;
+  };
   const fields =
     " multistream_target.id as id, multistream_target.data as data, users.id as usersId, users.data as usersData";
   const from = `multistream_target left join users on multistream_target.data->>'userId' = users.id`;
   const order = parseOrder(fieldsMap, orderStr);
-  const process = ({ data, usersData }) => {
+  const process = ({ data, usersData }: ResultRow) => {
     return { ...data, user: db.user.cleanWriteOnlyResponse(usersData) };
   };
 
@@ -42,8 +49,8 @@ function adminListQuery(
   return [query, opts];
 }
 
-function toStringValues(obj: Record<string, any>): Record<string, string> {
-  const strObj = {};
+function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
   for (const [key, value] of Object.entries(obj)) {
     strObj[key] = value.toString();
   }

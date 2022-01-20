@@ -189,7 +189,6 @@ const WebhookDetail = () => {
               <Box
                 css={{
                   display: "grid",
-                  alignItems: "center",
                   gridTemplateColumns: "12em auto",
                   width: "100%",
                   fontSize: "$2",
@@ -208,12 +207,12 @@ const WebhookDetail = () => {
                 <Cell variant="gray">Created</Cell>
                 <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
                 <Cell variant="gray">Event types</Cell>
-                <Cell css={{ display: "flex" }}>
+                <Cell css={{ display: "flex", fw: "wrap" }}>
                   {data.events.map((e) => (
                     <Badge
                       variant="violet"
                       size="2"
-                      css={{ fontWeight: 600, mr: "$1" }}>
+                      css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
                       {e}
                     </Badge>
                   ))}

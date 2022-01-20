@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
+import { useHubspotForm } from "hooks";
 
 // The frontend salts are all the same. This could be configurable someday.
 export const FRONTEND_SALT = "69195A9476F08546";
@@ -27,13 +28,21 @@ const Login = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { handleSubmit } = useHubspotForm({
+    portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_LOGIN_FORM_ID,
+  });
+
   useEffect(() => {
     if (router?.query?.email) {
       setEmail(router.query.email as string);
     }
   }, [router?.query?.email]);
 
-  const onClick = async () => {
+  const submit = async (e) => {
+    e.preventDefault();
+    handleSubmit(e);
+
     if (!showPassword) {
       return onSubmit({ email });
     }
@@ -56,7 +65,8 @@ const Login = ({
         width: "100%",
       }}>
       <Box
-        as="div"
+        as="form"
+        onSubmit={submit}
         css={{
           textAlign: "center",
           width: "100%",
@@ -171,7 +181,8 @@ const Login = ({
           />
         )}
         <Box>{errors.join(", ")}&nbsp;</Box>
-        <Button css={{ mt: "$2", px: "$5" }} onClick={!loading && onClick}>
+
+        <Button css={{ mt: "$2", px: "$5" }}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>

@@ -1,28 +1,120 @@
-import { authMiddleware } from "../middleware";
-import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import uuid from "uuid/v4";
-import ms from "ms";
-import jwt from "jsonwebtoken";
 import validator from "email-validator";
+import { RequestHandler, Router } from "express";
+import jwt from "jsonwebtoken";
+import ms from "ms";
+import qs from "qs";
+import Stripe from "stripe";
+import { v4 as uuid } from "uuid";
+
+import { products } from "../config";
+import hash from "../hash";
+import logger from "../logger";
+import { authMiddleware, validatePost } from "../middleware";
+import {
+  CreateCustomer,
+  CreateSubscription,
+  PasswordResetTokenRequest,
+  PasswordResetConfirm,
+  UpdateSubscription,
+  User,
+} from "../schema/types";
+import { db } from "../store";
+import { InternalServerError, NotFoundError } from "../store/errors";
+import { WithID } from "../store/types";
+import { FieldsMap } from "./helpers";
 import {
   makeNextHREF,
   sendgridEmail,
-  trackAction,
   parseFilters,
   parseOrder,
   recaptchaVerify,
+  sendgridValidateEmail,
 } from "./helpers";
-import logger from "../logger";
-import hash from "../hash";
-import qs from "qs";
-import { db } from "../store";
-import { products } from "../config";
+
+function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
+const adminOnlyFields = ["verifiedAt", "planChangedAt"];
+
+function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
+  for (const f of fields) {
+    delete obj[f];
+  }
+}
+
+function cleanUserFields(user: WithID<User>, isAdmin = false) {
+  if (!user) return user;
+
+  user = db.user.cleanWriteOnlyResponse(user);
+  if (!isAdmin) {
+    cleanAdminOnlyFields(adminOnlyFields, user);
+  }
+  return user;
+}
+
+async function findUserByEmail(email: string, useReplica = true) {
+  const [users] = await db.user.find({ email }, { useReplica });
+  if (!users?.length) {
+    throw new NotFoundError("user not found");
+  } else if (users.length > 1) {
+    throw new InternalServerError("multiple users found with same email");
+  }
+  return users[0];
+}
+
+type StripeProductIDs = CreateSubscription["stripeProductId"];
+
+const defaultProductId: StripeProductIDs = "prod_0";
+
+async function getOrCreateCustomer(stripe: Stripe, email: string) {
+  const existing = await stripe.customers.list({ email });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+  return await stripe.customers.create({ email });
+}
+
+async function getOrCreateSubscription(
+  stripe: Stripe,
+  stripeProductId: StripeProductIDs,
+  stripeCustomerId: string
+) {
+  const existing = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+  });
+  if (existing.data.length > 0) {
+    return existing.data[0];
+  }
+
+  const prices = await stripe.prices.list({
+    lookup_keys: products[stripeProductId].lookupKeys,
+  });
+  return await stripe.subscriptions.create({
+    cancel_at_period_end: false,
+    customer: stripeCustomerId,
+    items: prices.data.map((item) => ({ price: item.id })),
+    expand: ["latest_invoice.payment_intent"],
+  });
+}
+
+function requireStripe(): RequestHandler {
+  return (req, res, next) => {
+    if (!req.stripe) {
+      return res.status(500).json({ errors: ["stripe not configured"] });
+    }
+    return next();
+  };
+}
 
 const app = Router();
 
 app.get("/usage", authMiddleware({}), async (req, res) => {
-  let { userId, fromTime, toTime } = req.query;
+  let { userId, fromTime, toTime } = toStringValues(req.query);
   if (!fromTime || !toTime) {
     res.status(400);
     return res.json({ errors: ["should specify time range"] });
@@ -38,7 +130,7 @@ app.get("/usage", authMiddleware({}), async (req, res) => {
   res.json(usageRes);
 });
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `users.ID`,
   email: { val: `data->>'email'`, type: "full-text" },
   emailValid: { val: `data->'emailValid'`, type: "boolean" },
@@ -47,7 +139,7 @@ const fieldsMap = {
 };
 
 app.get("/", authMiddleware({ admin: true }), async (req, res) => {
-  let { limit, cursor, order, filters } = req.query;
+  let { limit, cursor, order, filters } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -66,27 +158,15 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   res.json(db.user.cleanWriteOnlyResponses(output));
 });
 
-const adminOnlyFields = ["verifiedAt", "planChangedAt"];
-function cleanAdminOnlyFields(aof, obj) {
-  for (const f of aof) {
-    delete obj[f];
-  }
-}
-
 app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
-  const user = await req.store.get(`user/${req.params.id}`);
   if (req.user.admin !== true && req.user.id !== req.params.id) {
-    res.status(403);
-    res.json({
+    return res.status(403).json({
       errors: ["user can only request information on their own user object"],
     });
-  } else {
-    if (!req.user.admin) {
-      cleanAdminOnlyFields(adminOnlyFields, user);
-    }
-    res.status(200);
-    res.json(user);
   }
+  const user = await db.user.get(req.params.id);
+  res.status(200);
+  res.json(cleanUserFields(user, req.user.admin));
 });
 
 app.post("/", validatePost("user"), async (req, res) => {
@@ -158,31 +238,39 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
-  await Promise.all([
-    req.store.create({
-      kind: "user",
-      id: id,
-      password: hashedPassword,
-      email: email,
-      salt: salt,
-      admin: admin,
-      emailValidToken: emailValidToken,
-      emailValid: validUser,
-      firstName,
-      lastName,
-      organization,
-      phone,
-      createdAt: Date.now(),
-    }),
-    trackAction(
-      id,
-      email,
-      { name: "user registered" },
-      req.config.segmentApiKey
-    ),
-  ]);
+  let stripeFields: Partial<User> = {};
+  if (req.stripe) {
+    const customer = await getOrCreateCustomer(req.stripe, email);
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      defaultProductId,
+      customer.id
+    );
+    stripeFields = {
+      stripeCustomerId: customer.id,
+      stripeCustomerSubscriptionId: subscription.id,
+      stripeProductId: defaultProductId,
+    };
+  }
 
-  const user = await req.store.get(`user/${id}`);
+  await db.user.create({
+    kind: "user",
+    id: id,
+    createdAt: Date.now(),
+    email: email,
+    password: hashedPassword,
+    salt: salt,
+    admin: admin,
+    emailValidToken: emailValidToken,
+    emailValid: validUser,
+    firstName,
+    lastName,
+    organization,
+    phone,
+    ...stripeFields,
+  });
+
+  const user = cleanUserFields(await db.user.get(id));
 
   const protocol =
     req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
@@ -190,11 +278,19 @@ app.post("/", validatePost("user"), async (req, res) => {
   const verificationUrl = `${protocol}://${
     req.frontendDomain
   }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
-  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
   if (!validUser && user) {
-    const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
+    const {
+      supportAddr,
+      sendgridTemplateId,
+      sendgridApiKey,
+      sendgridValidationApiKey,
+    } = req.config;
     try {
+      // This is a test of the Sendgrid email validation API. Remove this
+      // if we decide not to use it and revert to more basic Sendgrid plan.
+      sendgridValidateEmail(email, sendgridValidationApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
         email,
@@ -255,21 +351,7 @@ app.patch(
 );
 
 app.post("/token", validatePost("user"), async (req, res) => {
-  const { data: userIds } = await req.store.query({
-    kind: "user",
-    query: { email: req.body.email },
-  });
-
-  if (userIds.length < 1) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-  const user = await req.store.get(`user/${userIds[0]}`, false);
-  if (!user) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-
+  const user = await findUserByEmail(req.body.email);
   const [hashedPassword] = await hash(req.body.password, user.salt);
   if (hashedPassword !== user.password) {
     res.status(403);
@@ -294,23 +376,14 @@ app.post("/token", validatePost("user"), async (req, res) => {
 });
 
 app.post("/verify", validatePost("user-verification"), async (req, res) => {
-  const { data: userIds } = await req.store.query({
-    kind: "user",
-    query: { email: req.body.email },
-  });
-  if (userIds.length < 1) {
-    res.status(404);
-    return res.json({ errors: ["user not found"] });
-  }
-
-  let user = await req.store.get(`user/${userIds[0]}`, false);
+  let user = await findUserByEmail(req.body.email);
   if (user.emailValidToken === req.body.emailValidToken) {
     // alert sales of new verified user
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     const protocol =
       req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
     const buttonUrl = `${protocol}://${req.frontendDomain}/login`;
-    const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+    const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
     const salesEmail = "sales@livepeer.org";
 
     if (req.headers.host.includes("livepeer.com")) {
@@ -351,50 +424,24 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
 
 app.post(
   "/password/reset",
-  validatePost("password-reset"),
+  validatePost("password-reset-confirm"),
   async (req, res) => {
-    const { email, password, resetToken } = req.body;
-    const {
-      data: [userId],
-    } = await req.store.query({
-      kind: "user",
-      query: { email: email },
-    });
-    if (!userId) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await req.store.get(`user/${userId}`);
+    const { email, password, resetToken } = req.body as PasswordResetConfirm;
+    let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
       return res.json({ errors: [`user email ${email} not found`] });
     }
 
-    const { data: tokens } = await req.store.query({
-      kind: "password-reset-token",
-      query: {
-        userId: user.id,
-      },
+    const [tokens] = await db.passwordResetToken.find({
+      userId: user.id,
     });
-
     if (tokens.length < 1) {
       res.status(404);
       return res.json({ errors: ["Password reset token not found"] });
     }
 
-    let dbResetToken;
-    for (let i = 0; i < tokens.length; i++) {
-      const token = await req.store.get(
-        `password-reset-token/${tokens[i]}`,
-        false
-      );
-
-      if (token.resetToken === resetToken) {
-        dbResetToken = token;
-      }
-    }
-
+    const dbResetToken = tokens.find((t) => t.resetToken === resetToken);
     if (!dbResetToken || dbResetToken.expiration < Date.now()) {
       res.status(403);
       return res.json({
@@ -404,42 +451,25 @@ app.post(
 
     // change user password
     const [hashedPassword, salt] = await hash(password);
-    await req.store.replace({
-      ...user,
+    await db.user.update(user.id, {
       password: hashedPassword,
-      salt: salt,
+      salt,
       emailValid: true,
     });
+    // delete all password reset tokens from user
+    await Promise.all(tokens.map((t) => db.passwordResetToken.delete(t.id)));
 
-    user = await req.store.get(`user/${userId}`);
-
-    // delete all reset tokens associated with user
-    for (const t of tokens) {
-      await req.store.delete(`password-reset-token/${t}`);
-    }
-
-    res.status(201);
-    return res.json(user);
+    const userResp = await db.user.get(user.id);
+    res.status(200).json(cleanUserFields(userResp));
   }
 );
 
 app.post(
   "/password/reset-token",
-  validatePost("password-reset-token"),
+  validatePost("password-reset-token-request"),
   async (req, res) => {
-    const email = req.body.email;
-    const {
-      data: [userId],
-    } = await req.store.query({
-      kind: "user",
-      query: { email: email },
-    });
-    if (!userId) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await req.store.get(`user/${userId}`);
+    const { email } = req.body as PasswordResetTokenRequest;
+    let user = await findUserByEmail(email);
     if (!user) {
       res.status(404);
       return res.json({ errors: [`user email ${email} not found`] });
@@ -447,10 +477,10 @@ app.post(
 
     const id = uuid();
     let resetToken = uuid();
-    await req.store.create({
+    await db.passwordResetToken.create({
       kind: "password-reset-token",
       id: id,
-      userId: userId,
+      userId: user.id,
       resetToken: resetToken,
       expiration: Date.now() + ms("48 hours"),
     });
@@ -463,7 +493,7 @@ app.post(
       const verificationUrl = `${protocol}://${
         req.frontendDomain
       }/reset-password?${qs.stringify({ email, resetToken })}`;
-      const unsubscribeUrl = `${protocol}://${req.frontendDomain}/#contactSection`;
+      const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
       await sendgridEmail({
         email,
@@ -487,10 +517,10 @@ app.post(
       });
     }
 
-    const newToken = await req.store.get(`password-reset-token/${id}`, false);
-
+    const newToken = db.passwordResetToken.cleanWriteOnlyResponse(
+      await db.passwordResetToken.get(id)
+    );
     if (newToken) {
-      delete newToken.resetToken;
       res.status(201);
       res.json(newToken);
     } else {
@@ -505,66 +535,56 @@ app.post(
   authMiddleware({ admin: true }),
   validatePost("make-admin"),
   async (req, res) => {
-    const { data: userIds } = await req.store.query({
-      kind: "user",
-      query: { email: req.body.email },
-    });
-    if (userIds.length < 1) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
-    }
-
-    let user = await req.store.get(`user/${userIds[0]}`, false);
-    if (user) {
-      user = { ...user, admin: req.body.admin };
-      await req.store.replace(user);
-      res.status(201);
-      res.json({ email: user.email, admin: user.admin });
-    } else {
-      res.status(403);
-      res.json({ errors: ["user not made an admin"] });
-    }
+    let user = await findUserByEmail(req.body.email);
+    await db.user.update(user.id, { admin: req.body.admin });
+    user = await db.user.get(user.id);
+    res.status(200).json(cleanUserFields(user, req.user.admin));
   }
 );
 
 app.post(
   "/create-customer",
   validatePost("create-customer"),
+  requireStripe(),
   async (req, res) => {
-    const [users] = await db.user.find(
-      { email: req.body.email },
-      { useReplica: false }
-    );
-    if (users.length < 1) {
-      res.status(404);
-      return res.json({ errors: ["user not found"] });
+    const { email } = req.body as CreateCustomer;
+    let user = await findUserByEmail(email, false);
+
+    let customer: Stripe.Customer;
+    if (user.stripeCustomerId) {
+      customer = await req.stripe.customers
+        .retrieve(user.stripeCustomerId)
+        .then((c) => (c.deleted !== true ? c : null));
     }
 
-    let user = users[0];
-    const customer = await req.stripe.customers.create({
-      email: req.body.email,
-    });
-    await db.user.update(user.id, {
-      stripeCustomerId: customer.id,
-    });
-    res.status(201);
+    if (!customer) {
+      console.warn(
+        `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
+      customer = await getOrCreateCustomer(req.stripe, email);
+      await db.user.update(user.id, {
+        stripeCustomerId: customer.id,
+      });
+      res.status(201);
+    }
     res.json(customer);
   }
 );
 
 app.post(
   "/update-customer-payment-method",
+  authMiddleware({}),
   validatePost("update-customer-payment-method"),
+  requireStripe(),
   async (req, res) => {
     const [users] = await db.user.find(
       { stripeCustomerId: req.body.stripeCustomerId },
       { useReplica: false }
     );
-    if (users.length < 1) {
+    if (users.length < 1 || users[0].id !== req.user.id) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
 
     const paymentMethod = await req.stripe.paymentMethods.attach(
@@ -596,61 +616,69 @@ app.post(
 app.post(
   "/create-subscription",
   validatePost("create-subscription"),
+  requireStripe(),
   async (req, res) => {
+    const { stripeCustomerId, stripeProductId, stripeCustomerPaymentMethodId } =
+      req.body as CreateSubscription;
     const [users] = await db.user.find(
-      { stripeCustomerId: req.body.stripeCustomerId },
+      { stripeCustomerId: stripeCustomerId },
       { useReplica: false }
     );
     if (users.length < 1) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
+    if (user.stripeCustomerSubscriptionId) {
+      const subscription = await req.stripe.subscriptions.retrieve(
+        user.stripeCustomerSubscriptionId
+      );
+      return res.send(subscription);
+    }
+    console.warn(
+      `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`
+    );
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
-    if (req.body.stripeCustomerPaymentMethodId) {
+    if (stripeCustomerPaymentMethodId) {
+      console.warn(
+        `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`
+      );
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
-          req.body.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId,
           {
-            customer: req.body.stripeCustomerId,
+            customer: stripeCustomerId,
           }
         );
         // Update user's payment method
         await db.user.update(user.id, {
-          stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId: stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
         });
       } catch (error) {
-        return res.status("402").send({ errors: [error.message] });
+        return res.status(402).send({ errors: [error.message] });
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await req.stripe.customers.update(req.body.stripeCustomerId, {
+      await req.stripe.customers.update(stripeCustomerId, {
         invoice_settings: {
-          default_payment_method: req.body.stripeCustomerPaymentMethodId,
+          default_payment_method: stripeCustomerPaymentMethodId,
         },
       });
     }
 
-    // fetch prices associated with plan
-    const items = await req.stripe.prices.list({
-      lookup_keys: products[req.body.stripeProductId].lookupKeys,
-    });
-
     // Create the subscription
-    const subscription = await req.stripe.subscriptions.create({
-      cancel_at_period_end: false,
-      customer: req.body.stripeCustomerId,
-      items: items.data.map((item) => ({ price: item.id })),
-      expand: ["latest_invoice.payment_intent"],
-    });
+    const subscription = await getOrCreateSubscription(
+      req.stripe,
+      stripeProductId,
+      stripeCustomerId
+    );
 
     // Update user's product and subscription id in our db
     await db.user.update(user.id, {
-      stripeProductId: req.body.stripeProductId,
+      stripeProductId,
       stripeCustomerSubscriptionId: subscription.id,
     });
     res.send(subscription);
@@ -659,59 +687,64 @@ app.post(
 
 app.post(
   "/update-subscription",
+  authMiddleware({}),
   validatePost("update-subscription"),
+  requireStripe(),
   async (req, res) => {
+    const payload = req.body as UpdateSubscription;
     const [users] = await db.user.find(
-      { stripeCustomerId: req.body.stripeCustomerId },
+      { stripeCustomerId: payload.stripeCustomerId },
       { useReplica: false }
     );
-    if (users.length < 1) {
+    if (
+      users.length < 1 ||
+      users[0].stripeCustomerId !== payload.stripeCustomerId
+    ) {
       res.status(404);
       return res.json({ errors: ["user not found"] });
     }
-
     let user = users[0];
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
-    if (req.body.stripeCustomerPaymentMethodId) {
+    if (payload.stripeCustomerPaymentMethodId) {
       try {
         const paymentMethod = await req.stripe.paymentMethods.attach(
-          req.body.stripeCustomerPaymentMethodId,
+          payload.stripeCustomerPaymentMethodId,
           {
-            customer: req.body.stripeCustomerId,
+            customer: payload.stripeCustomerId,
           }
         );
         // Update user's payment method in our db
         await db.user.update(user.id, {
-          stripeCustomerPaymentMethodId: req.body.stripeCustomerPaymentMethodId,
+          stripeCustomerPaymentMethodId: payload.stripeCustomerPaymentMethodId,
           ccLast4: paymentMethod.card.last4,
           ccBrand: paymentMethod.card.brand,
         });
       } catch (error) {
-        return res.status("402").send({ error: { message: error.message } });
+        return res.status(402).send({ error: { message: error.message } });
       }
 
       // Change the default invoice settings on the customer to the new payment method
-      await req.stripe.customers.update(req.body.stripeCustomerId, {
+      await req.stripe.customers.update(payload.stripeCustomerId, {
         invoice_settings: {
-          default_payment_method: req.body.stripeCustomerPaymentMethodId,
+          default_payment_method: payload.stripeCustomerPaymentMethodId,
         },
       });
     }
 
     // Get all the prices associated with this plan (just transcoding price as of now)
     const items = await req.stripe.prices.list({
-      lookup_keys: products[req.body.stripeProductId].lookupKeys,
+      lookup_keys: products[payload.stripeProductId].lookupKeys,
     });
 
     // Get the subscription
     const subscription = await req.stripe.subscriptions.retrieve(
-      req.body.stripeCustomerSubscriptionId
+      payload.stripeCustomerSubscriptionId
     );
 
     // Get the prices associated with the subscription
     const subscriptionItems = await req.stripe.subscriptionItems.list({
-      subscription: req.body.stripeCustomerSubscriptionId,
+      subscription: payload.stripeCustomerSubscriptionId,
     });
 
     // Get the customer's usage
@@ -728,18 +761,17 @@ app.post(
     await Promise.all(
       products[user.stripeProductId].usage.map(async (product) => {
         if (product.name === "Transcoding") {
-          let quantity = Math.round(
-            (usageRes.sourceSegmentsDuration / 60).toFixed(2)
-          );
+          const durMins = usageRes.sourceSegmentsDuration / 60;
+          let quantity = Math.round(parseFloat(durMins.toFixed(2)));
           await req.stripe.invoiceItems.create({
-            customer: req.body.stripeCustomerId,
+            customer: payload.stripeCustomerId,
             currency: "usd",
             period: {
               start: subscription.current_period_start,
               end: subscription.current_period_end,
             },
-            unit_amount_decimal: product.price * 100,
-            subscription: req.body.stripeCustomerSubscriptionId,
+            unit_amount_decimal: (product.price * 100).toString(),
+            subscription: payload.stripeCustomerSubscriptionId,
             quantity,
             description: product.description,
           });
@@ -750,7 +782,7 @@ app.post(
     // Update the customer's subscription plan.
     // Stripe will automatically invoice the customer based on its usage up until this point
     const updatedSubscription = await req.stripe.subscriptions.update(
-      req.body.stripeCustomerSubscriptionId,
+      payload.stripeCustomerSubscriptionId,
       {
         billing_cycle_anchor: "now", // reset billing anchor when updating subscription
         items: [
@@ -769,38 +801,61 @@ app.post(
 
     // Update user's product subscription in our db
     await db.user.update(user.id, {
-      stripeProductId: req.body.stripeProductId,
+      stripeProductId: payload.stripeProductId,
       planChangedAt: Date.now(),
     });
     res.send(updatedSubscription);
   }
 );
 
-app.post("/retrieve-subscription", async (req, res) => {
-  let { stripeCustomerSubscriptionId } = req.body;
-  const subscription = await req.stripe.subscriptions.retrieve(
-    stripeCustomerSubscriptionId
-  );
-  res.status(200);
-  res.json(subscription);
-});
+app.post(
+  "/retrieve-subscription",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerSubscriptionId } = req.body;
+    if (
+      req.user.stripeCustomerSubscriptionId !== stripeCustomerSubscriptionId
+    ) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const subscription = await req.stripe.subscriptions.retrieve(
+      stripeCustomerSubscriptionId
+    );
+    res.status(200).json(subscription);
+  }
+);
 
-app.post("/retrieve-invoices", async (req, res) => {
-  let { stripeCustomerId } = req.body;
-  const invoices = await req.stripe.invoices.list({
-    customer: stripeCustomerId,
-  });
-  res.status(200);
-  res.json(invoices);
-});
+app.post(
+  "/retrieve-invoices",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripeCustomerId } = req.body;
+    if (req.user.stripeCustomerId !== stripeCustomerId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const invoices = await req.stripe.invoices.list({
+      customer: stripeCustomerId,
+    });
+    res.status(200).json(invoices);
+  }
+);
 
-app.post("/retrieve-payment-method", async (req, res) => {
-  let { stripePaymentMethodId } = req.body;
-  const paymentMethod = await req.stripe.paymentMethods.retrieve(
-    stripePaymentMethodId
-  );
-  res.status(200);
-  res.json(paymentMethod);
-});
+app.post(
+  "/retrieve-payment-method",
+  authMiddleware({}),
+  requireStripe(),
+  async (req, res) => {
+    let { stripePaymentMethodId } = req.body;
+    if (req.user.stripeCustomerPaymentMethodId !== stripePaymentMethodId) {
+      return res.status(403).json({ errors: ["access forbidden"] });
+    }
+    const paymentMethod = await req.stripe.paymentMethods.retrieve(
+      stripePaymentMethodId
+    );
+    res.status(200).json(paymentMethod);
+  }
+);
 
 export default app;

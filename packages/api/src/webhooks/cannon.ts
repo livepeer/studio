@@ -4,33 +4,51 @@ import isLocalIP from "is-local-ip";
 import { Response } from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { parse as parseUrl } from "url";
-
 import { DB } from "../store/db";
 import messages from "../store/messages";
 import Queue from "../store/queue";
 import Model from "../store/model";
 import { DBWebhook } from "../store/webhook-table";
-import { fetchWithTimeout } from "../util";
+import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
-import { sign } from "../controllers/helpers";
+import { sign, sendgridEmail } from "../controllers/helpers";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
-const MAX_BACKOFF = 10 * 60 * 1000;
-const BACKOFF_COEF = 1.2;
-const MAX_RETRIES = 20;
+const MAX_BACKOFF = 60 * 60 * 1000;
+const BACKOFF_COEF = 2;
+const MAX_RETRIES = 33;
+
+const SIGNATURE_HEADER = "Livepeer-Signature";
 
 export default class WebhookCannon {
   db: DB;
   store: Model;
   running: boolean;
   verifyUrls: boolean;
+  frontendDomain: string;
+  sendgridTemplateId: string;
+  sendgridApiKey: string;
+  supportAddr: string;
   resolver: any;
   queue: Queue;
-  constructor({ db, store, verifyUrls, queue }) {
+  constructor({
+    db,
+    store,
+    frontendDomain,
+    sendgridTemplateId,
+    sendgridApiKey,
+    supportAddr,
+    verifyUrls,
+    queue,
+  }) {
     this.db = db;
     this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
+    this.frontendDomain = frontendDomain;
+    this.sendgridTemplateId = sendgridTemplateId;
+    this.sendgridApiKey = sendgridApiKey;
+    this.supportAddr = supportAddr;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -167,7 +185,7 @@ export default class WebhookCannon {
       await this._fireHook(trigger, false);
     } catch (err) {
       console.log("_fireHook error", err);
-      await this.retry(trigger);
+      await this.retry(trigger, null, err);
     } finally {
       this.queue.ack(data);
     }
@@ -190,7 +208,7 @@ export default class WebhookCannon {
 
   public calcBackoff = (lastInterval?: number): number => {
     if (!lastInterval || lastInterval < 1000) {
-      lastInterval = 5000;
+      return 5000;
     }
     let newInterval = lastInterval * BACKOFF_COEF;
     if (newInterval > MAX_BACKOFF) {
@@ -200,11 +218,22 @@ export default class WebhookCannon {
     return newInterval | 0;
   };
 
-  retry(trigger: messages.WebhookTrigger) {
+  retry(
+    trigger: messages.WebhookTrigger,
+    webhookPayload?: RequestInitWithTimeout,
+    err?: Error
+  ) {
     if (trigger?.retries >= MAX_RETRIES) {
       console.log(
         `Webhook Cannon| Max Retries Reached, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
       );
+      try {
+        this.notifyFailedWebhook(trigger, webhookPayload, err);
+      } catch (err) {
+        console.error(
+          `Webhook Cannon| Error sending notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+        );
+      }
       return;
     }
 
@@ -219,6 +248,62 @@ export default class WebhookCannon {
       "webhooks.delayedEmits",
       trigger,
       trigger.lastInterval
+    );
+  }
+
+  async notifyFailedWebhook(
+    trigger: messages.WebhookTrigger,
+    params?: RequestInitWithTimeout,
+    err?: any
+  ) {
+    if (!trigger.user.emailValid) {
+      console.error(
+        `Webhook Cannon| User email is not valid, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+      );
+      return;
+    }
+    if (!(this.supportAddr && this.sendgridTemplateId && this.sendgridApiKey)) {
+      console.error(
+        `Webhook Cannon| Unable to send notification email to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+      );
+      console.error(
+        `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
+      );
+      return;
+    }
+
+    let signatureHeader = "";
+    if (params.headers[SIGNATURE_HEADER]) {
+      signatureHeader = `-H  "${SIGNATURE_HEADER}: ${params.headers["Livepeer-Signature"]}"`;
+    }
+
+    let payload = params.body;
+
+    await sendgridEmail({
+      email: trigger.user.email,
+      supportAddr: this.supportAddr,
+      sendgridTemplateId: this.sendgridTemplateId,
+      sendgridApiKey: this.sendgridApiKey,
+      subject: "Your webhook is failing",
+      preheader: "Failure notification",
+      buttonText: "Manage your webhooks",
+      buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
+      unsubscribe: `https://${this.frontendDomain}/contact`,
+      text: [
+        `Your webhook ${trigger.webhook.url} failed to receive our payload in the last 24 hours`,
+        //`<code>${payload}</code>`,
+        `This is the error we are receiving:`,
+        `${err}`,
+        //`We disabled your webhook, please check your configuration and try again.`,
+        //`If you want to try yourself the call we are making, here is a curl command for that:`,
+        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signatureHeader} -d '${payload}' ${trigger.webhook.url}</code>`,
+
+        // TODO: Uncomment the additional information here once we get access to Sendgrid to change the tempalte
+      ].join("\n\n"),
+    });
+
+    console.log(
+      `Webhook Cannon| Email sent to user, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
     );
   }
 
@@ -290,7 +375,7 @@ export default class WebhookCannon {
       // sign payload if there is a webhook secret
       if (webhook.sharedSecret) {
         let signature = sign(params.body, webhook.sharedSecret);
-        params.headers["Livepeer-Signature"] = `t=${timestamp},v1=${signature}`;
+        params.headers[SIGNATURE_HEADER] = `t=${timestamp},v1=${signature}`;
       }
 
       try {
@@ -305,7 +390,11 @@ export default class WebhookCannon {
         }
 
         if (resp.status >= 500) {
-          await this.retry(trigger);
+          await this.retry(
+            trigger,
+            params,
+            new Error("Status code: " + resp.status)
+          );
         }
 
         console.error(
@@ -316,7 +405,7 @@ export default class WebhookCannon {
         return;
       } catch (e) {
         console.log("firing error", e);
-        await this.retry(trigger);
+        await this.retry(trigger, params, e);
         return;
       }
     }
