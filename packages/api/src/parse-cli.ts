@@ -139,6 +139,9 @@ export default function parseCli(argv?: string | readonly string[]) {
           "email address where outgoing emails originate. should be of the form name/email@example.com",
         type: "string",
         coerce: (supportAddr) => {
+          if (!supportAddr) {
+            return undefined;
+          }
           const split = supportAddr.split("/");
           if (split.length !== 2) {
             throw new Error(
