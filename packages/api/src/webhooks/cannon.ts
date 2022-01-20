@@ -290,7 +290,7 @@ export default class WebhookCannon {
       buttonUrl: `https://${this.frontendDomain}/dashboard/developers/webhooks`,
       unsubscribe: `https://${this.frontendDomain}/contact`,
       text: [
-        `Your webhook ${trigger.webhook.url} failed to receive our payload in the last 24 hours`,
+        `Your webhook ${trigger.webhook.name} with url ${trigger.webhook.url} failed to receive our payload in the last 24 hours`,
         //`<code>${payload}</code>`,
         `This is the error we are receiving:`,
         `${err}`,
