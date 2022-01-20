@@ -28,7 +28,7 @@ yargs.options = function (arg) {
 };
 
 export default function parseCli(argv?: string | readonly string[]) {
-  const cli = yargs
+  const parsed = yargs
     .options({
       port: {
         describe: "port to listen on",
@@ -263,8 +263,8 @@ export default function parseCli(argv?: string | readonly string[]) {
     )
     .env("LP_")
     .strict(process.env.NODE_ENV !== "test")
-    .help();
-  const parsed = cli.argv;
+    .help()
+    .parse(argv);
   if (parsed.json === true) {
     const mistOutput = yargsToMist(args);
     console.log(JSON.stringify(mistOutput));
