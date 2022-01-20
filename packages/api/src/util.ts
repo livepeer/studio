@@ -1,6 +1,4 @@
 import fetch, { RequestInit, Response } from "node-fetch";
-
-// extend requestinit with timeout parameter
 export interface RequestInitWithTimeout extends RequestInit {
   timeout?: number;
 }

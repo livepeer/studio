@@ -167,6 +167,44 @@ components:
           type: string
           writeOnly: true
           description: shared secret used to sign the webhook payload
+        status:
+          type: object
+          description: status of webhook
+          readOnly: true
+          properties:
+            lastFailure:
+              type: object
+              description: failure timestamp and error message with status code
+              readOnly: true
+              properties:
+                timestamp:
+                  type: number
+                  readOnly: true
+                  example: 1587667174725
+                  description:
+                    Timestamp (in milliseconds) at which the webhook last failed
+                error:
+                  type: string
+                  readOnly: true
+                  description: Webhook failure error message
+                  example: "Error message"
+                response:
+                  type: string
+                  readOnly: true
+                  description: Webhook failure response
+                  example: "Response body"
+                statusCode:
+                  type: number
+                  readOnly: true
+                  description: Webhook failure status code
+                  example: 500
+            lastTriggeredAt:
+              type: number
+              readyOnly: true
+              description:
+                Timestamp (in milliseconds) at which the webhook last was
+                triggered
+              example: 1587667174725
 
     webhook-response:
       type: object
