@@ -1075,6 +1075,135 @@ components:
           type: string
           description: Timestamp (in milliseconds) at which task was updated
           example: 2022-01-01T02:20:00Z
+        params:
+          type: object
+          description: Parameters of the task
+          properties:
+            import:
+              type: object
+              description: Parameters for the import task
+              properties:
+                url:
+                  type: string
+                  description: URL of the asset to import
+                  example: https://cdn.livepeer.com/ABC123/filename.mp4
+            export:
+              type: object
+              description: Parameters for the export task
+              properties:
+                kind:
+                  type: string
+                  description: Type of the export
+                  example: arweave|ipfs|s3
+                s3:
+                  type: object
+                  description: Parameters for the S3 export
+                  properties:
+                    destination:
+                      type: string
+                      description: Destination of the export
+                      example: s3://bucket/path/to/file.mp4
+                    key:
+                      type: string
+                      description: Key of the export
+                      example: ABC123
+                    secret:
+                      type: string
+                      description: Secret of the export
+                      example: ABC123
+            transcode:
+              type: object
+              description: Parameters for the transcode task
+              properties:
+                assetId:
+                  type: string
+                  description: ID of the asset to transcode
+                  example: 123123123123
+                preset:
+                  type: string
+                  description: Preset to use for the transcode
+                  example: 1080p
+                container:
+                  type: string
+                  description: Container to use for the transcode
+                  example: mp4
+                audio:
+                  type: object
+                  description: Audio parameters for the transcode
+                  properties:
+                    codec:
+                      type: string
+                      description: Codec to use for the audio
+                      example: aac
+                    bitrate:
+                      type: number
+                      description: Bitrate of the audio
+                      example: 128000
+                    channels:
+                      type: number
+                      description: Amount of audio channels
+                      example: 2
+                    sampleRate:
+                      type: number
+                      description: Sample rate of the audio
+                      example: 44100
+                    bitDepth:
+                      type: number
+                      description: Bit depth of the audio
+                      example: 16
+                video:
+                  type: object
+                  description: Video parameters for the transcode
+                  properties:
+                    codec:
+                      type: string
+                      description: Codec to use for the video
+                      example: h264
+                    codecOptions:
+                      type: object
+                      description: Codec options for the video
+                      properties:
+                        profile:
+                          type: string
+                          description: Profile of the video
+                          example: main
+                        level:
+                          type: string
+                          description: Level of the video
+                          example: 3.1
+                        maxBitrate:
+                          type: number
+                          description: Max bitrate of the video
+                          example: 1000000
+                        maxReferenceFrames:
+                          type: number
+                          description: Max reference frames of the video
+                          example: 16
+                        bufferSize:
+                          type: number
+                          description: Buffer size of the video
+                          example: 16
+                        colorSpace:
+                          type: string
+                          description: Color space of the video
+                          example: bt709
+                    bitRate:
+                      type: number
+                      description:
+                        Video bit rate of output file in kilobits/second
+                      example: 1000000
+                    frameRate:
+                      type: number
+                      description: Frame rate of the video
+                      example: auto|10|15|23.97|24|25|29.97|30|50|60
+                    maxWidht:
+                      type: number
+                      description: Max width of the video
+                      example: 1920
+                    maxHeight:
+                      type: number
+                      description: Max height of the video
+                      example: 1080
 
     api-token:
       type: object
@@ -2107,6 +2236,21 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/vod-asset"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      description: creates a new vod asset
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/vod-asset"
         default:
           description: Error
           content:
