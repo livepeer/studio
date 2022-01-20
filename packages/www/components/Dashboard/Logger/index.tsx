@@ -101,7 +101,7 @@ function createEventHandler() {
             logs.push(
               infoLog(
                 evt,
-                `Stream is being transcoded by orchestrator ${orchestrator}`,
+                `Stream is being transcoded on orchestrator ${orchestrator}`,
                 "transcoding-orchestrator"
               )
             );
