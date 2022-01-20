@@ -88,8 +88,8 @@ function createEventHandler() {
               });
             if (errLogs.length > 0) {
               failedSegments.current.add(seqNo);
+              logs.push(...errLogs);
             }
-            logs.push(...errLogs);
           }
 
           const lastAttempt = evt.attempts?.length
