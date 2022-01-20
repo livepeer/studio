@@ -45,8 +45,8 @@ function orchestratorName({
 }
 
 function createEventHandler() {
-  const [handlerState, setHandlerState] =
-    useState<{ lastOrchestrator: string }>();
+  const [lastOrchestrator, setLastOrchestrator] = useState<string>();
+  const [failedSegments, setFailedSegments] = useState<number[]>([]);
 
   return function handleEvent(
     evt: events.Any,
@@ -68,10 +68,11 @@ function createEventHandler() {
         let logs: LogData[] = [];
         // non-admin users should only see fatal errors.
         if (!evt.success || userIsAdmin) {
+          setFailedSegments([...failedSegments, evt.segment.seqNo]);
           logs = evt.attempts
             .filter((a) => a.error)
             .map((a, idx) => ({
-              key: `${evt.id}-${idx}`,
+              key: `${evt.id}-error-${idx}`,
               timestamp: evt.timestamp,
               level: "error",
               text: `Transcode error from ${orchestratorName(a)} for segment ${
@@ -83,17 +84,31 @@ function createEventHandler() {
           ? evt.attempts[evt.attempts.length - 1]
           : null;
         const orchestrator = orchestratorName(lastAttempt);
-        if (evt.success && orchestrator !== handlerState.lastOrchestrator) {
-          setHandlerState({ lastOrchestrator: orchestrator });
+        if (evt.success && orchestrator !== lastOrchestrator) {
+          setLastOrchestrator(orchestrator);
           logs = [
             ...logs,
             {
-              key: evt.id,
+              key: `${evt.id}-transcoding-orchestrator`,
               timestamp: evt.timestamp,
               level: "info",
               text: `Stream is being transcoded on ${orchestrator}`,
             },
           ];
+        }
+        if (evt.success && failedSegments.includes(evt.segment.seqNo)) {
+          logs = [
+            ...logs,
+            {
+              key: `${evt.id}-segment-success`,
+              timestamp: evt.timestamp,
+              level: "info",
+              text: `Segment ${evt.segment.seqNo} successfully transcoded on ${orchestrator}`,
+            },
+          ];
+          setFailedSegments(
+            failedSegments.filter((s) => s !== evt.segment.seqNo)
+          );
         }
         return logs;
       case "webhook_event":
