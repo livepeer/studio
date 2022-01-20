@@ -188,6 +188,11 @@ components:
                   readOnly: true
                   description: Webhook failure error message
                   example: "Error message"
+                response:
+                  type: string
+                  readOnly: true
+                  description: Webhook failure response
+                  example: "Response body"
                 statusCode:
                   type: number
                   readOnly: true

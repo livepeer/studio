@@ -45,7 +45,7 @@ export default class WebhookTable extends Table<DBWebhook> {
       `UPDATE ${
         this.name
       } SET data = jsonb_set(data, '{status}', case when data->'status' is null then '{}' else data->'status' end || '${JSON.stringify(
-        status.status
+        status
       )}') WHERE id = '${id}'`
     );
 

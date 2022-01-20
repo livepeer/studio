@@ -303,7 +303,7 @@ export default class WebhookCannon {
     });
 
     console.log(
-      `Webhook Cannon| Email sent to user ${trigger.user.email}, id: ${trigger.id}, streamId: ${trigger.stream?.id}`
+      `Webhook Cannon| Email sent to user="${trigger.user.email}" id=${trigger.id} streamId=${trigger.stream?.id}`
     );
   }
 
@@ -386,7 +386,7 @@ export default class WebhookCannon {
       try {
         logger.info(`webhook ${webhook.id} firing`);
         resp = await fetchWithTimeout(webhook.url, params);
-        responseBody = errorMessage = await resp.text();
+        responseBody = await resp.text();
         statusCode = resp.status;
 
         if (resp.status >= 200 && resp.status < 300) {
@@ -417,7 +417,8 @@ export default class WebhookCannon {
           trigger.webhook,
           triggerTime,
           statusCode,
-          errorMessage
+          errorMessage,
+          responseBody
         );
         return;
       }
@@ -428,28 +429,23 @@ export default class WebhookCannon {
     webhook: DBWebhook,
     triggerTime: number,
     statusCode?: number,
-    errorMessage?: string
+    errorMessage?: string,
+    responseBody?: string
   ) {
     try {
+      let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
       if (statusCode >= 300 || !statusCode) {
-        await this.db.webhook.updateStatus(webhook.id, {
-          status: {
-            lastTriggeredAt: triggerTime,
-            lastFailure: {
-              timestamp: triggerTime,
-              statusCode: statusCode,
-              errorMessage: errorMessage,
-            },
+        status = {
+          ...status,
+          lastFailure: {
+            timestamp: triggerTime,
+            statusCode,
+            error: errorMessage,
+            response: responseBody,
           },
-        });
-      } else {
-        await this.db.webhook.updateStatus(webhook.id, {
-          status: {
-            ...webhook.status,
-            lastTriggeredAt: triggerTime,
-          },
-        });
+        };
       }
+      await this.db.webhook.updateStatus(webhook.id, status);
     } catch (e) {
       console.log(
         `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
