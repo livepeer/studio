@@ -45,7 +45,8 @@ function orchestratorName({
 }
 
 function createEventHandler() {
-  const [state, setState] = useState<{}>();
+  const [handlerState, setHandlerState] =
+    useState<{ lastOrchestrator: string }>();
 
   return function handleEvent(
     evt: events.Any,
@@ -64,20 +65,37 @@ function createEventHandler() {
           },
         ];
       case "transcode":
-        if (evt.success && !userIsAdmin) {
-          // non-admin users should only see fatal errors.
-          return [];
+        let logs: LogData[] = [];
+        // non-admin users should only see fatal errors.
+        if (!evt.success || userIsAdmin) {
+          logs = evt.attempts
+            .filter((a) => a.error)
+            .map((a, idx) => ({
+              key: `${evt.id}-${idx}`,
+              timestamp: evt.timestamp,
+              level: "error",
+              text: `Transcode error from ${orchestratorName(a)} for segment ${
+                evt.segment.seqNo
+              }: ${a.error}`,
+            }));
         }
-        return evt.attempts
-          .filter((a) => a.error)
-          .map((a, idx) => ({
-            key: `${evt.id}-${idx}`,
-            timestamp: evt.timestamp,
-            level: "error",
-            text: `Transcode error from ${orchestratorName(a)} for segment ${
-              evt.segment.seqNo
-            }: ${a.error}`,
-          }));
+        const lastAttempt = evt.attempts?.length
+          ? evt.attempts[evt.attempts.length - 1]
+          : null;
+        const orchestrator = orchestratorName(lastAttempt);
+        if (evt.success && orchestrator !== handlerState.lastOrchestrator) {
+          setHandlerState({ lastOrchestrator: orchestrator });
+          logs = [
+            ...logs,
+            {
+              key: evt.id,
+              timestamp: evt.timestamp,
+              level: "info",
+              text: `Stream is being transcoded on ${orchestrator}`,
+            },
+          ];
+        }
+        return logs;
       case "webhook_event":
         if (!evt.event.startsWith("multistream.")) {
           console.error("unknown event:", evt.event);
