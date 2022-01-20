@@ -64,7 +64,9 @@ function orchestratorName({
 
 function createEventHandler() {
   const [lastOrchestrator, setLastOrchestrator] = useState<string>();
-  const [failedSegments, setFailedSegments] = useState<number[]>([]);
+  const [failedSegments, setFailedSegments] = useState<Record<number, boolean>>(
+    {}
+  );
 
   return function handleEvent(
     evt: events.Any,
@@ -81,7 +83,7 @@ function createEventHandler() {
 
         // non-admin users should only see fatal errors.
         if (!evt.success || userIsAdmin) {
-          setFailedSegments([...failedSegments, seqNo]);
+          setFailedSegments({ ...failedSegments, [seqNo]: true });
           const errLogs = evt.attempts
             .filter((a) => a.error)
             .map((a, idx) => {
@@ -107,7 +109,7 @@ function createEventHandler() {
           );
         }
 
-        if (evt.success && failedSegments.includes(seqNo)) {
+        if (evt.success && failedSegments[seqNo]) {
           logs.push(
             infoLog(
               evt,
@@ -115,7 +117,7 @@ function createEventHandler() {
               "segment-success"
             )
           );
-          setFailedSegments(failedSegments.filter((s) => s !== seqNo));
+          setFailedSegments({ ...failedSegments, [seqNo]: false });
         }
 
         return logs;
