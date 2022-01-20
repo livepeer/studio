@@ -15,6 +15,24 @@ type LogData = {
   text: string;
 };
 
+const newLog = (
+  evt: events.Any,
+  level: "info" | "error",
+  text: string,
+  keySuffix?: string
+): LogData => ({
+  key: keySuffix ? `${evt.id}-${keySuffix}` : evt.id,
+  timestamp: evt.timestamp,
+  level,
+  text,
+});
+
+const infoLog = (evt: events.Any, text: string, key?: string) =>
+  newLog(evt, "info", text, key);
+
+const errorLog = (evt: events.Any, text: string, key?: string) =>
+  newLog(evt, "error", text, key);
+
 const levelColorMap = {
   info: "violet",
   error: "red",
@@ -56,60 +74,50 @@ function createEventHandler() {
       case "stream_state":
         const state = evt.state.active ? "active" : "inactive";
         const region = evt.region || "unknown";
-        return [
-          {
-            key: evt.id,
-            timestamp: evt.timestamp,
-            level: "info",
-            text: `Stream is ${state} in region "${region}"`,
-          },
-        ];
+        return [infoLog(evt, `Stream is ${state} in region "${region}"`)];
       case "transcode":
-        let logs: LogData[] = [];
+        const logs: LogData[] = [];
+        const seqNo = evt.segment.seqNo;
+
         // non-admin users should only see fatal errors.
         if (!evt.success || userIsAdmin) {
-          setFailedSegments([...failedSegments, evt.segment.seqNo]);
-          logs = evt.attempts
+          setFailedSegments([...failedSegments, seqNo]);
+          const errLogs = evt.attempts
             .filter((a) => a.error)
-            .map((a, idx) => ({
-              key: `${evt.id}-error-${idx}`,
-              timestamp: evt.timestamp,
-              level: "error",
-              text: `Transcode error from ${orchestratorName(a)} for segment ${
-                evt.segment.seqNo
-              }: ${a.error}`,
-            }));
+            .map((a, idx) => {
+              const orch = orchestratorName(a);
+              const msg = `Transcode error from ${orch} for segment ${seqNo}: ${a.error}`;
+              return errorLog(evt, msg, `error-${idx}`);
+            });
+          logs.push(...errLogs);
         }
+
         const lastAttempt = evt.attempts?.length
           ? evt.attempts[evt.attempts.length - 1]
           : null;
         const orchestrator = orchestratorName(lastAttempt);
         if (evt.success && orchestrator !== lastOrchestrator) {
           setLastOrchestrator(orchestrator);
-          logs = [
-            ...logs,
-            {
-              key: `${evt.id}-transcoding-orchestrator`,
-              timestamp: evt.timestamp,
-              level: "info",
-              text: `Stream is being transcoded on ${orchestrator}`,
-            },
-          ];
-        }
-        if (evt.success && failedSegments.includes(evt.segment.seqNo)) {
-          logs = [
-            ...logs,
-            {
-              key: `${evt.id}-segment-success`,
-              timestamp: evt.timestamp,
-              level: "info",
-              text: `Segment ${evt.segment.seqNo} successfully transcoded on ${orchestrator}`,
-            },
-          ];
-          setFailedSegments(
-            failedSegments.filter((s) => s !== evt.segment.seqNo)
+          logs.push(
+            infoLog(
+              evt,
+              `Stream is being transcoded on ${orchestrator}`,
+              "transcoding-orchestrator"
+            )
           );
         }
+
+        if (evt.success && failedSegments.includes(seqNo)) {
+          logs.push(
+            infoLog(
+              evt,
+              `Segment ${seqNo} successfully transcoded on ${orchestrator}`,
+              "segment-success"
+            )
+          );
+          setFailedSegments(failedSegments.filter((s) => s !== seqNo));
+        }
+
         return logs;
       case "webhook_event":
         if (!evt.event.startsWith("multistream.")) {
@@ -120,12 +128,11 @@ function createEventHandler() {
         const action = evt.event.substring("multistream.".length);
         const level = action === "error" ? "error" : "info";
         return [
-          {
-            key: evt.id,
-            timestamp: evt.timestamp,
+          newLog(
+            evt,
             level,
-            text: `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`,
-          },
+            `Multistream of "${payload.target.profile}" to target "${payload.target.name}" ${action}!`
+          ),
         ];
     }
     return [];
