@@ -1,4 +1,5 @@
 import yargs from "yargs";
+import yargsToMist from "./yargs-to-mist";
 import { CamelKeys } from "./types/common";
 
 function coerceArr(arg) {
@@ -14,20 +15,20 @@ function coerceArr(arg) {
 
 export type CliArgs = ReturnType<typeof parseCli>;
 
+// Hack alert! We need to capture the args passed to yarns.options to generate the
+// mist compatible config on -j. But assigning the `.options()` object to a variable
+// before passing it to yargs completely breaks type inference, which is a huge shame.
+// So... this monkeypatches yargs to capture that variable. If you know of a more
+// elegant way, I'd love to hear it!
+let args;
+const originalOpts = yargs.options;
+yargs.options = function (arg) {
+  args = arg;
+  return originalOpts.call(this, arg);
+};
+
 export default function parseCli(argv?: string | readonly string[]) {
   const parsed = yargs
-    .usage(
-      `
-    Livepeer API Node
-
-    Options my also be provided as LP_ prefixed environment variables, e.g. LP_PORT=5000 is the same as --port=5000.
-
-    --broadcaster and --orchestrator options should be of the form
-    [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
-    `
-    )
-    .env("LP_")
-    .strict(process.env.NODE_ENV !== "test")
     .options({
       port: {
         describe: "port to listen on",
@@ -133,11 +134,14 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "[]",
       },
-      supportAddr: {
+      "support-addr": {
         describe:
           "email address where outgoing emails originate. should be of the form name/email@example.com",
         type: "string",
         coerce: (supportAddr) => {
+          if (!supportAddr) {
+            return undefined;
+          }
           const split = supportAddr.split("/");
           if (split.length !== 2) {
             throw new Error(
@@ -147,19 +151,19 @@ export default function parseCli(argv?: string | readonly string[]) {
           return split;
         },
       },
-      sendgridApiKey: {
+      "sendgrid-api-key": {
         describe: "sendgrid api key for sending emails",
         type: "string",
       },
-      sendgridValidationApiKey: {
+      "sendgrid-validation-api-key": {
         describe: "sendgrid api key for validating email addresses",
         type: "string",
       },
-      sendgridTemplateId: {
+      "sendgrid-template-id": {
         describe: "sendgrid template id to use",
         type: "string",
       },
-      insecureTestToken: {
+      "insecure-test-token": {
         describe:
           "[DO NOT USE EXCEPT FOR TESTING] token that test harness can use to bypass validation and access the database",
         type: "string",
@@ -198,6 +202,7 @@ export default function parseCli(argv?: string | readonly string[]) {
       "base-stream-name": {
         describe:
           "base stream name to be used in wildcard-based routing scheme.",
+        type: "string",
       },
       "own-region": {
         describe: "identify region in which this server runs (fra, mdw, etc)",
@@ -233,7 +238,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: 0,
         type: "number",
       },
-      recaptchaSecretKey: {
+      "recaptcha-secret-key": {
         describe: "google recaptcha secret key",
         type: "string",
       },
@@ -242,8 +247,31 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: false,
         type: "boolean",
       },
+      json: {
+        describe: "print MistController-compatible json description",
+        default: false,
+        type: "boolean",
+        alias: "j",
+      },
     })
+    .usage(
+      `
+    Livepeer API Node
+
+    Options my also be provided as LP_ prefixed environment variables, e.g. LP_PORT=5000 is the same as --port=5000.
+
+    --broadcaster and --orchestrator options should be of the form
+    [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
+    `
+    )
+    .env("LP_")
+    .strict(process.env.NODE_ENV !== "test")
     .help()
     .parse(argv);
+  if (parsed.json === true) {
+    const mistOutput = yargsToMist(args);
+    console.log(JSON.stringify(mistOutput));
+    process.exit(0);
+  }
   return parsed as any as CamelKeys<typeof parsed>;
 }
