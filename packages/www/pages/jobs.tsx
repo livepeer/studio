@@ -51,7 +51,7 @@ const JobsPage = ({ allJobs }) => {
   );
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const jobsRes = await fetch(`https://livepeer.org/api/teamtailor/jobs`, {
     method: "GET",
     headers: {

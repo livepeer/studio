@@ -13,7 +13,6 @@ const Page = ({
   metaUrl,
   body,
   noindex = false,
-  preview,
   questions,
   name,
   resume,
@@ -26,8 +25,7 @@ const Page = ({
       description={metaDescription}
       url={metaUrl}
       canonical={metaUrl}
-      noindex={noindex}
-      preview={preview}>
+      noindex={noindex}>
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
@@ -119,23 +117,7 @@ const Page = ({
   );
 };
 
-export async function getStaticPaths() {
-  const jobsRes = await fetch(`https://livepeer.org/api/teamtailor/jobs`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response.json());
-
-  let paths = [];
-  jobsRes.data.map((page) => paths.push({ params: { slug: page.id } }));
-  return {
-    fallback: true,
-    paths,
-  };
-}
-
-export async function getStaticProps({ params, preview = false }) {
+export async function getServerSideProps({ params }) {
   const { slug } = params;
 
   const jobRes = await fetch(
@@ -182,9 +164,7 @@ export async function getStaticProps({ params, preview = false }) {
       ...jobRes.data,
       questions,
       slug,
-      preview,
     },
-    revalidate: 1,
   };
 }
 
