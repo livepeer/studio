@@ -873,6 +873,7 @@ components:
           index: true
         userId:
           type: string
+          readOnly: true
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
           index: true
           description: owner of the asset
@@ -913,6 +914,7 @@ components:
           example: 2022-01-01T02:20:00Z
         createdAt:
           type: string
+          readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
           example: 2022-01-01T02:20:00Z
         format:
@@ -1073,6 +1075,7 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         kind:
@@ -1085,6 +1088,7 @@ components:
           example: ready
         createdAt:
           type: string
+          readOnly: true
           description: Timestamp (in milliseconds) at which task was created
           example: 1587667174725
         updatedAt:
