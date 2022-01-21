@@ -50,12 +50,17 @@ const StatusBadge = ({
       typeof timestamp === "string" ? Date.parse(timestamp) : timestamp;
     return !tsNum ? moment.invalid() : moment.unix(tsNum / 1000);
   }, [timestamp]);
-  if (!timeAgo.isValid() || style.noTooltip) {
+  if (
+    (!timeAgo.isValid() && !tooltipText) ||
+    (style.noTooltip && !tooltipText)
+  ) {
     return badge;
   }
-  let contentText = timeAgo.fromNow();
-  if (tooltipText) {
-    contentText = `${tooltipText} ${contentText}`;
+  let contentText: string;
+  if (tooltipText && timestamp) {
+    contentText = `${tooltipText} ${timeAgo.fromNow()}`;
+  } else {
+    contentText = tooltipText;
   }
   return <Tooltip content={contentText}>{badge}</Tooltip>;
 };

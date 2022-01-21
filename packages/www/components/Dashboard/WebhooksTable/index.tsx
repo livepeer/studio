@@ -36,6 +36,9 @@ type WebhooksTableData = {
   status: TextCellProps;
 };
 
+// 1 hour
+const WARNING_TIMEFRAME = 1000 * 60 * 60;
+
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
   const { user, getWebhooks, deleteWebhook, deleteWebhooks, createWebhook } =
@@ -130,17 +133,21 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
               children: (
                 <Box>
                   {!webhook.status ? (
-                    "-"
+                    <StatusBadge
+                      variant={StatusVariant.Idle}
+                      tooltipText="This webhook hasn't received any events yet"
+                    />
+                  ) : webhook.status.lastFailure &&
+                    +Date.now() - webhook.status.lastFailure.timestamp <
+                      WARNING_TIMEFRAME ? (
+                    <StatusBadge
+                      variant={StatusVariant.Unhealthy}
+                      timestamp={webhook.status.lastTriggeredAt}
+                      tooltipText="A trigger has failed in the last hour. Last triggered"
+                    />
                   ) : (
                     <StatusBadge
-                      variant={
-                        webhook.status.lastFailure
-                          ? webhook.status.lastFailure.timestamp >=
-                            webhook.status.lastTriggeredAt
-                            ? StatusVariant.Unhealthy
-                            : StatusVariant.Healthy
-                          : StatusVariant.Healthy
-                      }
+                      variant={StatusVariant.Healthy}
                       timestamp={webhook.status.lastTriggeredAt}
                       tooltipText="Last triggered"
                     />
