@@ -911,12 +911,12 @@ components:
           type: string
           description:
             Timestamp (in milliseconds) at which the asset was last updated
-          example: 2022-01-01T02:20:00Z
+          example: 1587667174725
         createdAt:
           type: string
           readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
-          example: 2022-01-01T02:20:00Z
+          example: 1587667174725
         format:
           type: string
           description: Format of the asset
@@ -961,8 +961,9 @@ components:
                 example: 30
               id:
                 type: string
+                readOnly: true
                 description: ID of the track
-                example: ABC123
+                example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
               duration:
                 type: number
                 description: Duration of the track in seconds
@@ -1047,7 +1048,7 @@ components:
           type: string
           description:
             ID of the source asset (root) - If missing, this is a root asset
-          example: 123123123123
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         nft:
           type: array
           description: List of NFTs minted with the asset as a source
@@ -1143,7 +1144,7 @@ components:
                 assetId:
                   type: string
                   description: ID of the asset to transcode
-                  example: 123123123123
+                  example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
                 preset:
                   type: string
                   description: Preset to use for the transcode
