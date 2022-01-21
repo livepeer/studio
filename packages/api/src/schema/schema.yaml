@@ -940,7 +940,7 @@ components:
                 type: number
                 description: Height of the track - only for video tracks
                 example: 1080
-              frameRate:
+              fps:
                 type: number
                 description: Frame rate of the track - only for video tracks
                 example: 30
@@ -994,7 +994,7 @@ components:
               type: number
               description: height of the profile
               example: 1080
-            frameRate:
+            fps:
               type: number
               description: Frame rate of the profile
               example: 30
@@ -1192,9 +1192,9 @@ components:
                       description:
                         Video bit rate of output file in kilobits/second
                       example: 1000000
-                    frameRate:
+                    fps:
                       type: number
-                      description: Frame rate of the video
+                      description: Target frame rate of the video
                       example: auto|10|15|23.97|24|25|29.97|30|50|60
                     maxWidht:
                       type: number
