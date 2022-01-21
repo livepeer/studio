@@ -937,8 +937,8 @@ components:
         tracks:
           type: array
           description:
-            List of tracks associated with the asset when the format contemplate
-            them (e.g. mp4)
+            List of tracks associated with the asset when the format
+            contemplates them (e.g. mp4)
           items:
             type: object
             additionalProperties: false
