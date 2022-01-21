@@ -1021,7 +1021,7 @@ components:
         originTaskId:
           type: string
           description: Task ID of the task that created the asset
-          example: 1-23-123-123-1123-123
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         relatedTasks:
           type: array
           description: List of task IDs associated with the asset
@@ -1045,7 +1045,7 @@ components:
               contract:
                 type: string
                 description: Contract of the NFT
-                example: 0x57f1887a8bf19b14fc0d912b9b2acc9af147ea85
+                example: 0x0000000000000000000000000000000000000000
               token:
                 type: number
                 description: Token id of the NFT
@@ -1058,7 +1058,7 @@ components:
         id:
           type: string
           description: Task ID
-          example: 1-23-123-123-1123-123
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         kind:
           type: string
           description: Type of the task
@@ -1070,11 +1070,11 @@ components:
         createdAt:
           type: string
           description: Timestamp (in milliseconds) at which task was created
-          example: 2022-01-01T02:20:00Z
+          example: 1587667174725
         updatedAt:
           type: string
           description: Timestamp (in milliseconds) at which task was updated
-          example: 2022-01-01T02:20:00Z
+          example: 1587667174725
         params:
           type: object
           description: Parameters of the task
@@ -2245,7 +2245,7 @@ paths:
     post:
       description: creates a new vod asset
       responses:
-        200:
+        201:
           description: Success
           content:
             application/json:
