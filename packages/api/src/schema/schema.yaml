@@ -1070,10 +1070,6 @@ components:
           type: string
           description: Type of the task
           example: import
-        status:
-          type: string
-          description: Status of the task
-          example: ready
         createdAt:
           type: number
           readOnly: true
@@ -1083,6 +1079,10 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which task was updated
           example: 1587667174725
+        parentAssetId:
+          type: string
+          description: ID of the source asset
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
           type: object
           additionalProperties: false
@@ -1097,129 +1097,20 @@ components:
                   type: string
                   description: URL of the asset to import
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
-            export:
+        output:
+          type: object
+          additionalProperties: false
+          description: Output of the task
+          properties:
+            import:
               type: object
               additionalProperties: false
-              description: Parameters for the export task
+              description: Output of the import task
               properties:
-                kind:
+                status:
                   type: string
-                  description: Type of the export
-                  example: arweave|ipfs|s3
-                s3:
-                  type: object
-                  additionalProperties: false
-                  description: Parameters for the S3 export
-                  properties:
-                    destination:
-                      type: string
-                      description: Destination of the export
-                      example: s3://bucket/path/to/file.mp4
-                    key:
-                      type: string
-                      description: Key of the export
-                      example: ABC123
-                    secret:
-                      type: string
-                      description: Secret of the export
-                      example: ABC123
-            transcode:
-              type: object
-              additionalProperties: false
-              description: Parameters for the transcode task
-              properties:
-                assetId:
-                  type: string
-                  description: ID of the asset to transcode
-                  example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-                preset:
-                  type: string
-                  description: Preset to use for the transcode
-                  example: 1080p
-                container:
-                  type: string
-                  description: Container to use for the transcode
-                  example: mp4
-                audio:
-                  type: object
-                  additionalProperties: false
-                  description: Audio parameters for the transcode
-                  properties:
-                    codec:
-                      type: string
-                      description: Codec to use for the audio
-                      example: aac
-                    bitrate:
-                      type: number
-                      description: Bitrate of the audio
-                      example: 128000
-                    channels:
-                      type: number
-                      description: Amount of audio channels
-                      example: 2
-                    sampleRate:
-                      type: number
-                      description: Sample rate of the audio
-                      example: 44100
-                    bitDepth:
-                      type: number
-                      description: Bit depth of the audio
-                      example: 16
-                video:
-                  type: object
-                  additionalProperties: false
-                  description: Video parameters for the transcode
-                  properties:
-                    codec:
-                      type: string
-                      description: Codec to use for the video
-                      example: h264
-                    codecOptions:
-                      type: object
-                      additionalProperties: false
-                      description: Codec options for the video
-                      properties:
-                        profile:
-                          type: string
-                          description: Profile of the video
-                          example: main
-                        level:
-                          type: string
-                          description: Level of the video
-                          example: 3.1
-                        maxBitrate:
-                          type: number
-                          description: Max bitrate of the video
-                          example: 1000000
-                        maxReferenceFrames:
-                          type: number
-                          description: Max reference frames of the video
-                          example: 16
-                        bufferSize:
-                          type: number
-                          description: Buffer size of the video
-                          example: 16
-                        colorSpace:
-                          type: string
-                          description: Color space of the video
-                          example: bt709
-                    bitRate:
-                      type: number
-                      description:
-                        Video bit rate of output file in kilobits/second
-                      example: 1000000
-                    fps:
-                      type: number
-                      description: Target frame rate of the video
-                      example: auto|10|15|23.97|24|25|29.97|30|50|60
-                    maxWidht:
-                      type: number
-                      description: Max width of the video
-                      example: 1920
-                    maxHeight:
-                      type: number
-                      description: Max height of the video
-                      example: 1080
+                  description: Status of the task
+                  example: Ready|Pending|Running|Failed|Canceled
 
     api-token:
       type: object
