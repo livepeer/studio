@@ -890,14 +890,6 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
-        duration:
-          type: number
-          description: Duration of the asset in seconds (float)
-          example: 23.8328
-        aspectRatio:
-          type: string
-          description: Aspect ratio of the asset
-          example: 16:9
         meta:
           type: object
           description: User input metadata associated with the asset
@@ -917,10 +909,6 @@ components:
           readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
-        format:
-          type: string
-          description: Format of the asset
-          example: mp4
         hash:
           type: object
           additionalProperties: false
@@ -934,103 +922,124 @@ components:
               type: string
               description: Hash algorithm used to compute the hash
               example: sha256
-        tracks:
-          type: array
-          description:
-            List of tracks associated with the asset when the format
-            contemplates them (e.g. mp4)
-          items:
-            type: object
-            additionalProperties: false
-            properties:
-              kind:
-                type: string
-                description: Kind of track
-                example: video
-              width:
-                type: number
-                description: Width of the track - only for video tracks
-                example: 1920
-              height:
-                type: number
-                description: Height of the track - only for video tracks
-                example: 1080
-              fps:
-                type: number
-                description: Frame rate of the track - only for video tracks
-                example: 30
-              id:
-                type: string
-                readOnly: true
-                description: ID of the track
-                example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-              duration:
-                type: number
-                description: Duration of the track in seconds
-                example: 23.8238
-              bitrate:
-                type: number
-                description: Bitrate of the track in bits per second
-                example: 1000000
-              channels:
-                type: number
-                description: Amount of audio channels in the track
-                example: 2
-              sampleRate:
-                type: number
-                description:
-                  Sample rate of the track in samples per second - only for
-                  audio tracks
-                example: 44100
-              bitDepth:
-                type: number
-                description: Bit depth of the track - only for audio tracks
-                example: 16
-              codec:
-                type: string
-                description: Codec of the track
-                example: aac
-        profiles:
+        video:
           type: object
           additionalProperties: false
-          description: HLS Profile manifests associated with the asset
+          readOnly: true
+          description: Video metadata
           properties:
-            kind:
+            format:
               type: string
-              description: Type of the profile
-              example: manifest
-            name:
-              type: string
-              description: Filename of the manifest
-              example: variant_1080.m3u8
-            width:
-              type: number
-              description: width of the profile
-              example: 1920
-            height:
-              type: number
-              description: height of the profile
-              example: 1080
-            fps:
-              type: number
-              description: Frame rate of the profile
-              example: 30
-            id:
-              type: string
-              description: ID of the profile
-              example: ABC123
+              description: Format of the asset
+              example: mp4
             duration:
               type: number
-              description: Duration of the profile in seconds
-              example: 23.8238
-            bitrate:
-              type: number
-              description: Bitrate of the profile in bits per second
-              example: 1000000
-        playbackUrl:
-          type: string
-          description: Playback url of the playlist manifest
-          example: https://cdn.livepeer.com/ABC123/playlist.m3u8
+              description: Duration of the asset in seconds (float)
+              example: 23.8328
+            tracks:
+              type: array
+              description:
+                List of tracks associated with the asset when the format
+                contemplates them (e.g. mp4)
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - kind
+                properties:
+                  kind:
+                    type: string
+                    description: Kind of track
+                    example: video
+                  width:
+                    type: number
+                    description: Width of the track - only for video tracks
+                    example: 1920
+                  height:
+                    type: number
+                    description: Height of the track - only for video tracks
+                    example: 1080
+                  fps:
+                    type: number
+                    description: Frame rate of the track - only for video tracks
+                    example: 30
+                  id:
+                    type: string
+                    readOnly: true
+                    description: ID of the track
+                    example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+                  duration:
+                    type: number
+                    description: Duration of the track in seconds
+                    example: 23.8238
+                  bitrate:
+                    type: number
+                    description: Bitrate of the track in bits per second
+                    example: 1000000
+                  channels:
+                    type: number
+                    description: Amount of audio channels in the track
+                    example: 2
+                  sampleRate:
+                    type: number
+                    description:
+                      Sample rate of the track in samples per second - only for
+                      audio tracks
+                    example: 44100
+                  bitDepth:
+                    type: number
+                    description: Bit depth of the track - only for audio tracks
+                    example: 16
+                  codec:
+                    type: string
+                    description: Codec of the track
+                    example: aac
+            hlsSpec:
+              type: object
+              additionalProperties: false
+              description: HLS spec for the asset
+              properties:
+                profiles:
+                  type: object
+                  additionalProperties: false
+                  description: HLS Profile manifests associated with the asset
+                  properties:
+                    kind:
+                      type: string
+                      description: Type of the profile
+                      example: manifest
+                    name:
+                      type: string
+                      description: Filename of the manifest
+                      example: variant_1080.m3u8
+                    width:
+                      type: number
+                      description: width of the profile
+                      example: 1920
+                    height:
+                      type: number
+                      description: height of the profile
+                      example: 1080
+                    fps:
+                      type: number
+                      description: Frame rate of the profile
+                      example: 30
+                    id:
+                      type: string
+                      description: ID of the profile
+                      example: ABC123
+                    duration:
+                      type: number
+                      description: Duration of the profile in seconds
+                      example: 23.8238
+                    bitrate:
+                      type: number
+                      description: Bitrate of the profile in bits per second
+                      example: 1000000
+                    playbackId:
+                      type: string
+                      description: Playback ID of the asset
+                      example: ABC123
         status:
           type: string
           description: Status of the asset
@@ -1039,35 +1048,11 @@ components:
           type: string
           description: Task ID of the task that created the asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        relatedTasks:
-          type: array
-          description: List of task IDs associated with the asset
-          items:
-            $ref: "#/components/schemas/task"
         sourceAssetId:
           type: string
           description:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        nft:
-          type: array
-          description: List of NFTs minted with the asset as a source
-          items:
-            type: object
-            additionalProperties: false
-            properties:
-              chain:
-                type: string
-                description: Chain of the NFT
-                example: eth
-              contract:
-                type: string
-                description: Contract of the NFT
-                example: 0x0000000000000000000000000000000000000000
-              token:
-                type: number
-                description: Token id of the NFT
-                example: 123
 
     task:
       type: object
