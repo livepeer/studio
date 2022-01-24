@@ -900,28 +900,30 @@ components:
               "tags": ["awesome", "life", "video"],
             }
         updatedAt:
-          type: string
+          type: number
           description:
             Timestamp (in milliseconds) at which the asset was last updated
           example: 1587667174725
         createdAt:
-          type: string
+          type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
         hash:
-          type: object
-          additionalProperties: false
+          type: array
           description: Hash of the asset
-          properties:
-            hash:
-              type: string
-              description: Hash of the asset
-              example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
-            algorithm:
-              type: string
-              description: Hash algorithm used to compute the hash
-              example: sha256
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              hash:
+                type: string
+                description: Hash of the asset
+                example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+              algorithm:
+                type: string
+                description: Hash algorithm used to compute the hash
+                example: sha256
         video:
           type: object
           additionalProperties: false
@@ -1064,7 +1066,7 @@ components:
           readOnly: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        kind:
+        type:
           type: string
           description: Type of the task
           example: import
@@ -1073,12 +1075,12 @@ components:
           description: Status of the task
           example: ready
         createdAt:
-          type: string
+          type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
           example: 1587667174725
         updatedAt:
-          type: string
+          type: number
           description: Timestamp (in milliseconds) at which task was updated
           example: 1587667174725
         params:
