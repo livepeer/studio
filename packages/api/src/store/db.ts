@@ -12,7 +12,7 @@ import {
   Webhook,
   PasswordResetToken,
   MultistreamTarget,
-  VodAsset,
+  Asset,
   Task,
   Usage,
   Region,
@@ -64,7 +64,7 @@ export class DB {
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
-  vodAsset: Table<VodAsset>;
+  asset: Table<Asset>;
   task: Table<Task>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
@@ -147,9 +147,9 @@ export class DB {
       db: this,
       schema: schemas["api-token"],
     });
-    this.vodAsset = makeTable<VodAsset>({
+    this.asset = makeTable<Asset>({
       db: this,
-      schema: schemas["vod-asset"],
+      schema: schemas["asset"],
     });
     this.task = makeTable<Task>({
       db: this,

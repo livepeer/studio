@@ -24,10 +24,10 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
-  - name: vod-asset
-    description: VOD Asset Endpoints
+  - name: asset
+    description: Asset Endpoints
   - name: task
-    description: VOD Task Endpoints
+    description: Task Endpoints
   - name: webhook-response
     description: webhook client responses
 
@@ -859,9 +859,9 @@ components:
             created
           example: 1587667174725
 
-    vod-asset:
+    asset:
       type: object
-      table: vod_asset
+      table: asset
       additionalProperties: false
       required:
         - name
@@ -871,6 +871,13 @@ components:
           readOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
           index: true
+        type:
+          type: string
+          enum:
+            - video
+            - audio
+          description: Type of the asset.
+          example: video
         userId:
           type: string
           readOnly: true
@@ -924,7 +931,7 @@ components:
                 type: string
                 description: Hash algorithm used to compute the hash
                 example: sha256
-        video:
+        videoSpec:
           type: object
           additionalProperties: false
           readOnly: true
@@ -2140,11 +2147,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /vod-asset:
+  /asset:
     tags:
-      - vod-asset
+      - asset
     get:
-      description: gets a list of vod assets defined by the user
+      description: gets a list of assets defined by the user
       responses:
         200:
           description: Success
@@ -2153,22 +2160,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/vod-asset"
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error"
-    post:
-      description: creates a new vod asset
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/vod-asset"
+                  $ref: "#/components/schemas/asset"
         default:
           description: Error
           content:
