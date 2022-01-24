@@ -952,6 +952,9 @@ components:
                   kind:
                     type: string
                     description: Kind of track
+                    enum:
+                      - video
+                      - audio
                     example: video
                   width:
                     type: number
@@ -1069,7 +1072,10 @@ components:
         type:
           type: string
           description: Type of the task
-          example: import
+          enum:
+            - Import
+            - Export
+          example: Import
         createdAt:
           type: number
           readOnly: true
@@ -1110,7 +1116,12 @@ components:
                 status:
                   type: string
                   description: Status of the task
-                  example: Ready|Pending|Running|Failed|Canceled
+                  enum:
+                    - Pending
+                    - Running
+                    - Failed
+                    - Completed
+                  example: Pending
 
     api-token:
       type: object
