@@ -107,7 +107,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await req.store.get(`task/${req.params.id}`);
+  const os = await db.task.get(`task/${req.params.id}`);
   if (!os) {
     res.status(404);
     return res.json({
@@ -128,12 +128,9 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 app.post("/", authMiddleware({}), validatePost("task"), async (req, res) => {
   const id = uuid();
   const doc = validateTaskPayload(id, req.user.id, Date.now(), req.body);
-  try {
-    await db.task.create(doc);
-  } catch (e) {
-    console.error(e);
-    throw e;
-  }
+
+  await db.task.create(doc);
+
   res.status(201);
   res.json(doc);
 });
@@ -158,7 +155,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
 
 app.put("/:id", authMiddleware({}), validatePost("task"), async (req, res) => {
   // update a specific task
-  const task = await req.store.get(`task/${req.body.id}`);
+  const task = await db.task.get(`task/${req.body.id}`);
   if ((task.userId !== req.user.id || task.deleted) && !req.user.admin) {
     // do not reveal that task exists
     res.status(404);
