@@ -1,17 +1,19 @@
-import { URL } from "url";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
-import logger from "../logger";
 import uuid from "uuid/v4";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { UnprocessableEntityError } from "../store/errors";
 
 const app = Router();
 
-function validateTaskPayload(id, userId, createdAt, payload) {
+function validateTaskPayload(
+  id: string,
+  userId: string,
+  createdAt: number,
+  payload
+) {
   return {
     id,
     userId,
@@ -107,22 +109,23 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await db.task.get(`task/${req.params.id}`);
-  if (!os) {
+  const task = await db.task.get(req.params.id);
+  console.log(task);
+  if (!task) {
     res.status(404);
     return res.json({
       errors: ["not found"],
     });
   }
 
-  if (req.user.admin !== true && req.user.id !== os.userId) {
+  if (req.user.admin !== true && req.user.id !== task.userId) {
     res.status(403);
     return res.json({
       errors: ["user can only request information on their own tasks"],
     });
   }
 
-  res.json(os);
+  res.json(task);
 });
 
 app.post("/", authMiddleware({}), validatePost("task"), async (req, res) => {
@@ -155,21 +158,16 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
 
 app.put("/:id", authMiddleware({}), validatePost("task"), async (req, res) => {
   // update a specific task
-  const task = await db.task.get(`task/${req.body.id}`);
+  const task = await db.task.get(req.body.id);
   if ((task.userId !== req.user.id || task.deleted) && !req.user.admin) {
     // do not reveal that task exists
     res.status(404);
     return res.json({ errors: ["not found"] });
   }
 
-  const { id, userId, createdAt } = task;
   const doc = req.body;
-  try {
-    await db.task.replace(doc);
-  } catch (e) {
-    console.error(e);
-    throw e;
-  }
+  await db.task.replace(doc);
+
   res.status(200);
   res.json({ id: req.body.id });
 });

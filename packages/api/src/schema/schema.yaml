@@ -1101,6 +1101,9 @@ components:
           type: number
           description: Timestamp (in milliseconds) at which task was updated
           example: 1587667174725
+        deleted:
+          type: boolean
+          description: Set to true when the task is deleted
         parentAssetId:
           type: string
           description: ID of the source asset
