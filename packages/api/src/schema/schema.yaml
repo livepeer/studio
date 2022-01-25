@@ -1076,6 +1076,15 @@ components:
           readOnly: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description: Name of the task
+          example: Import video file
+        userId:
+          type: string
+          readOnly: true
+          description: User ID of the task owner
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         type:
           type: string
           description: Type of the task
