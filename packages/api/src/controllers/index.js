@@ -9,7 +9,7 @@ import stream from "./stream";
 import user from "./user";
 import geolocate from "./geolocate";
 import webhook from "./webhook";
-//import asset from "./asset"
+import asset from "./asset";
 import task from "./task";
 import stripe from "./stripe";
 import version from "./version";
@@ -32,7 +32,7 @@ export default {
   geolocate,
   ingest,
   webhook,
-  //asset,
+  asset,
   task,
   region,
   stripe,
