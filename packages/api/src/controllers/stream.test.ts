@@ -1076,6 +1076,22 @@ describe("controllers/stream", () => {
       }
     });
 
+    it("should set default profiles if none provided", async () => {
+      const res = await client.post("/stream", {
+        ...stream,
+        profiles: undefined,
+      });
+      expect(res.status).toBe(201);
+      const data = (await res.json()) as DBStream;
+      expect(data.profiles).not.toEqual(stream.profiles);
+      expect(data.profiles.map((p) => p.name).sort()).toEqual([
+        "240p0",
+        "360p0",
+        "480p0",
+        "720p0",
+      ]);
+    });
+
     it("should reject profiles we do not have", async () => {
       const badStream = {
         ...profileStream,
