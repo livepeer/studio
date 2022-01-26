@@ -156,20 +156,24 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.put("/:id", authMiddleware({}), validatePost("task"), async (req, res) => {
-  // update a specific task
-  const task = await db.task.get(req.body.id);
-  if ((task.userId !== req.user.id || task.deleted) && !req.user.admin) {
-    // do not reveal that task exists
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+app.patch(
+  "/:id",
+  authMiddleware({}),
+  validatePost("task"),
+  async (req, res) => {
+    // update a specific task
+    const task = await db.task.get(req.body.id);
+    if (!req.user.admin) {
+      res.status(403);
+      return res.json({ errors: ["Forbidden"] });
+    }
+
+    const doc = req.body;
+    await db.task.update(req.body.id, doc);
+
+    res.status(200);
+    res.json({ id: req.body.id });
   }
-
-  const doc = req.body;
-  await db.task.replace(doc);
-
-  res.status(200);
-  res.json({ id: req.body.id });
-});
+);
 
 export default app;
