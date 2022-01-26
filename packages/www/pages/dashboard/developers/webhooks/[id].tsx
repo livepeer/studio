@@ -241,7 +241,7 @@ const WebhookDetail = () => {
                 <Cell>
                   {data.status?.lastFailure
                     ? data.status.lastFailure.response
-                      ? data.status.lastFailure.response
+                      ? `Status code: ${data.status.lastFailure.statusCode} - ${data.status.lastFailure.response}`
                       : data.status.lastFailure.error
                     : ""}
                 </Cell>
