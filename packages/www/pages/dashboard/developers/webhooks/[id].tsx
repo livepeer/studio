@@ -217,6 +217,34 @@ const WebhookDetail = () => {
                     </Badge>
                   ))}
                 </Cell>
+                <Cell variant="gray">Last trigger</Cell>
+                <Cell>
+                  {data.status
+                    ? format(
+                        data.status?.lastTriggeredAt,
+                        "MMMM dd, yyyy h:mm:ss a"
+                      )
+                    : "Never"}
+                </Cell>
+                <Cell variant="gray">Last failure</Cell>
+                <Cell>
+                  {!data.status
+                    ? "Never"
+                    : data.status.lastFailure
+                    ? format(
+                        data.status.lastFailure.timestamp,
+                        "MMMM dd, yyyy h:mm:ss a"
+                      )
+                    : "Never"}
+                </Cell>
+                <Cell variant="gray"></Cell>
+                <Cell>
+                  {data.status?.lastFailure
+                    ? data.status.lastFailure.response
+                      ? data.status.lastFailure.response
+                      : data.status.lastFailure.error
+                    : ""}
+                </Cell>
               </Box>
             </Box>
           )}
