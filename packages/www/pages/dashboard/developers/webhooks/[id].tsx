@@ -23,6 +23,7 @@ import Spinner from "components/Dashboard/Spinner";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { format } from "date-fns";
+import { STATUS_CODES } from "http";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -237,14 +238,42 @@ const WebhookDetail = () => {
                       )
                     : "Never"}
                 </Cell>
-                <Cell variant="gray"></Cell>
-                <Cell>
-                  {data.status?.lastFailure
-                    ? data.status.lastFailure.response
-                      ? `Status code: ${data.status.lastFailure.statusCode} - ${data.status.lastFailure.response}`
-                      : data.status.lastFailure.error
-                    : ""}
-                </Cell>
+                {data.status ? (
+                  data.status.lastFailure?.statusCode ? (
+                    <>
+                      <Cell variant="gray">Error Status Code</Cell>
+                      <Cell>{`${data.status.lastFailure.statusCode} 
+                        ${
+                          STATUS_CODES[data.status.lastFailure.statusCode]
+                        }`}</Cell>
+                    </>
+                  ) : (
+                    <>
+                      <Cell variant="gray">Error message</Cell>
+                      <Cell
+                        css={{
+                          fontFamily: "monospace",
+                        }}>
+                        {data.status.lastFailure.error}
+                      </Cell>
+                    </>
+                  )
+                ) : (
+                  ""
+                )}
+                {data.status?.lastFailure.response ? (
+                  <>
+                    <Cell variant="gray">Error response</Cell>
+                    <Cell
+                      css={{
+                        fontFamily: "monospace",
+                      }}>
+                      {data.status.lastFailure.response}
+                    </Cell>
+                  </>
+                ) : (
+                  ""
+                )}
               </Box>
             </Box>
           )}
