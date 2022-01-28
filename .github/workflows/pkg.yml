@@ -7,7 +7,7 @@ on:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -50,6 +50,13 @@ jobs:
               cd -
             done
           done
+
+      - name: archive livepeer-api-darwin-arm64.tar.gz
+        uses: actions/upload-artifact@v2
+        with:
+          name: livepeer-api-darwin-arm64.tar.gz
+          path: |
+            ./pkg-releases/livepeer-api-darwin-arm64.tar.gz
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
