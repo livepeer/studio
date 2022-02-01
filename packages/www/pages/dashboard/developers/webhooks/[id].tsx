@@ -254,7 +254,7 @@ const WebhookDetail = () => {
                         css={{
                           fontFamily: "monospace",
                         }}>
-                        {data.status.lastFailure?.error}
+                        {data.status.lastFailure.error ?? "unknown"}
                       </Cell>
                     </>
                   ) : (
