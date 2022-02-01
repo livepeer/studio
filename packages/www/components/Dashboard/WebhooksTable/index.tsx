@@ -138,9 +138,9 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
                       tooltipText="No triggers yet"
                     />
                   ) : (webhook.status.lastFailure &&
-                      +Date.now() - webhook.status.lastFailure.timestamp <
+                      +Date.now() - webhook.status.lastFailure?.timestamp <
                         WARNING_TIMEFRAME) ||
-                    webhook.status.lastFailure.timestamp >=
+                    webhook.status.lastFailure?.timestamp >=
                       webhook.status.lastTriggeredAt ? (
                     <StatusBadge
                       variant={StatusVariant.Unhealthy}

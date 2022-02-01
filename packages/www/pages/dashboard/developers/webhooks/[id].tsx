@@ -247,21 +247,23 @@ const WebhookDetail = () => {
                           STATUS_CODES[data.status.lastFailure.statusCode]
                         }`}</Cell>
                     </>
-                  ) : (
+                  ) : data.status.lastFailure ? (
                     <>
                       <Cell variant="gray">Error message</Cell>
                       <Cell
                         css={{
                           fontFamily: "monospace",
                         }}>
-                        {data.status.lastFailure.error}
+                        {data.status.lastFailure?.error}
                       </Cell>
                     </>
+                  ) : (
+                    ""
                   )
                 ) : (
                   ""
                 )}
-                {data.status?.lastFailure.response ? (
+                {data.status?.lastFailure?.response ? (
                   <>
                     <Cell variant="gray">Error response</Cell>
                     <Cell
