@@ -3,6 +3,7 @@ import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
+import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
@@ -32,7 +33,11 @@ type WebhooksTableData = {
   name: TextCellProps;
   url: TextCellProps;
   created: DateCellProps;
+  status: TextCellProps;
 };
+
+// 1 hour
+const WARNING_TIMEFRAME = 1000 * 60 * 60;
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
@@ -68,6 +73,12 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
           dateSort("original.created.date", ...params),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: TextCell,
+        disableSortBy: true,
       },
     ],
     []
@@ -113,6 +124,38 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             created: {
               date: new Date(webhook.createdAt),
               fallback: <i>unseen</i>,
+              href: `/dashboard/developers/webhooks/${webhook.id}`,
+              css: {
+                cursor: "pointer",
+              },
+            },
+            status: {
+              children: (
+                <Box>
+                  {!webhook.status ? (
+                    <StatusBadge
+                      variant={StatusVariant.Idle}
+                      tooltipText="No triggers yet"
+                    />
+                  ) : (webhook.status.lastFailure &&
+                      +Date.now() - webhook.status.lastFailure.timestamp <
+                        WARNING_TIMEFRAME) ||
+                    webhook.status.lastFailure.timestamp >=
+                      webhook.status.lastTriggeredAt ? (
+                    <StatusBadge
+                      variant={StatusVariant.Unhealthy}
+                      timestamp={webhook.status.lastFailure.timestamp}
+                      tooltipText="Last failure"
+                    />
+                  ) : (
+                    <StatusBadge
+                      variant={StatusVariant.Healthy}
+                      timestamp={webhook.status.lastTriggeredAt}
+                      tooltipText="Last triggered"
+                    />
+                  )}
+                </Box>
+              ),
               href: `/dashboard/developers/webhooks/${webhook.id}`,
               css: {
                 cursor: "pointer",

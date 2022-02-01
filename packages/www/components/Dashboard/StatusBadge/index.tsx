@@ -30,9 +30,11 @@ const styleByVariant: Record<Variant, Style> = {
 const StatusBadge = ({
   variant,
   timestamp,
+  tooltipText,
 }: {
   variant: Variant;
   timestamp?: string | number;
+  tooltipText?: string;
 }) => {
   const style = styleByVariant[variant];
   const badge = (
@@ -48,10 +50,16 @@ const StatusBadge = ({
       typeof timestamp === "string" ? Date.parse(timestamp) : timestamp;
     return !tsNum ? moment.invalid() : moment.unix(tsNum / 1000);
   }, [timestamp]);
-  if (!timeAgo.isValid() || style.noTooltip) {
+  if (!tooltipText && (!timeAgo.isValid() || style.noTooltip)) {
     return badge;
   }
-  return <Tooltip content={timeAgo.fromNow()}>{badge}</Tooltip>;
+  let contentText: string;
+  if (tooltipText && timeAgo.isValid()) {
+    contentText = `${tooltipText} ${timeAgo.fromNow()}`;
+  } else {
+    contentText = tooltipText;
+  }
+  return <Tooltip content={contentText}>{badge}</Tooltip>;
 };
 
 export default StatusBadge;

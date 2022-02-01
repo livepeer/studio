@@ -23,6 +23,7 @@ import Spinner from "components/Dashboard/Spinner";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { format } from "date-fns";
+import { STATUS_CODES } from "http";
 
 const Cell = styled(Text, {
   py: "$2",
@@ -217,6 +218,62 @@ const WebhookDetail = () => {
                     </Badge>
                   ))}
                 </Cell>
+                <Cell variant="gray">Last trigger</Cell>
+                <Cell>
+                  {data.status
+                    ? format(
+                        data.status?.lastTriggeredAt,
+                        "MMMM dd, yyyy h:mm:ss a"
+                      )
+                    : "Never"}
+                </Cell>
+                <Cell variant="gray">Last failure</Cell>
+                <Cell>
+                  {!data.status
+                    ? "Never"
+                    : data.status.lastFailure
+                    ? format(
+                        data.status.lastFailure.timestamp,
+                        "MMMM dd, yyyy h:mm:ss a"
+                      )
+                    : "Never"}
+                </Cell>
+                {data.status ? (
+                  data.status.lastFailure?.statusCode ? (
+                    <>
+                      <Cell variant="gray">Error Status Code</Cell>
+                      <Cell>{`${data.status.lastFailure.statusCode} 
+                        ${
+                          STATUS_CODES[data.status.lastFailure.statusCode]
+                        }`}</Cell>
+                    </>
+                  ) : (
+                    <>
+                      <Cell variant="gray">Error message</Cell>
+                      <Cell
+                        css={{
+                          fontFamily: "monospace",
+                        }}>
+                        {data.status.lastFailure.error}
+                      </Cell>
+                    </>
+                  )
+                ) : (
+                  ""
+                )}
+                {data.status?.lastFailure.response ? (
+                  <>
+                    <Cell variant="gray">Error response</Cell>
+                    <Cell
+                      css={{
+                        fontFamily: "monospace",
+                      }}>
+                      {data.status.lastFailure.response}
+                    </Cell>
+                  </>
+                ) : (
+                  ""
+                )}
               </Box>
             </Box>
           )}
