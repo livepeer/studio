@@ -16,10 +16,37 @@ const Dashboard = () => {
     return <Layout />;
   }
   const showPromo = !products[user.stripeProductId].order;
+  const { emailValid } = user;
+
+  console.log(user)
 
   return (
     <Layout id="home" breadcrumbs={[{ title: "Home" }]} {...Content.metaData}>
       <Box css={{ p: "$6" }}>
+        {!emailValid && (
+          <Promo size="2" css={{ mb: "$3" }}>
+            <Flex>
+              <Box>
+                <Text
+                  size="2"
+                  css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
+                  Verify your Email
+                </Text>
+                <Text variant="gray" size="2" css={{ lineHeight: 1.4 }}>
+                  Verify to the account email, then we'll send you a link to
+                  verify your email.
+                </Text>
+              </Box>
+            </Flex>
+            <Flex align="center" justify="end">
+              <Link href="/dashboard/billing/plans" passHref>
+                <Button as="a" size="2" css={{ cursor: "default" }}>
+                  Resend the verification email
+                </Button>
+              </Link>
+            </Flex>
+          </Promo>
+        )}
         {showPromo && (
           <Promo size="2" css={{ mb: "$7" }}>
             <Flex>

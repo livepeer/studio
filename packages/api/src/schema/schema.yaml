@@ -26,6 +26,8 @@ tags:
     description: Webhooks endpoints
   - name: webhook-response
     description: webhook client responses
+  - name: verify-email
+    description: Resend User Email Verification
 
 components:
   schemas:
@@ -927,6 +929,19 @@ components:
           example: E1F53135E559C253
           writeOnly: true
 
+    verify-email:
+      type: object
+      required:
+        - email
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          description: user email address
+          example: useremail@gmail.com
+          unique: true
+          index: true
+
     make-admin:
       type: object
       required:
@@ -1590,6 +1605,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/user"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /verify-email:
+    tags:
+      - verify-email
+    post:
+      description: Resend User Email Verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: "#/components/schemas/verify-email"
+
+      responses:
+        200:
+          description: Success
         default:
           description: Error
           content:
