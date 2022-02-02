@@ -135,7 +135,7 @@ const Menu = ({
           variant="gray"
           size="2"
           css={{ mb: "$4", textTransform: "uppercase", fontWeight: 600 }}>
-          Use Cases
+          Products
         </Text>
         <Box css={{ mb: "$4" }}>
           <Flex>
@@ -143,9 +143,7 @@ const Menu = ({
               css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
             />
             <Box>
-              <Text css={{ fontWeight: 600, mb: "$2" }}>
-                Streaming Platforms
-              </Text>
+              <Text css={{ fontWeight: 600, mb: "$2" }}>Streaming Service</Text>
               <Box css={{ color: "$mauve5" }}>
                 <ArrowLink
                   hideArrow
@@ -179,26 +177,29 @@ const Menu = ({
                     24x7 Channels
                   </Text>
                 </ArrowLink>
+
+                <ArrowLink
+                  hideArrow
+                  color="$mauve9"
+                  href="/use-cases/ecommerce">
+                  <Text variant="gray" css={{ py: "$1" }}>
+                    Ecommerce
+                  </Text>
+                </ArrowLink>
               </Box>
             </Box>
           </Flex>
         </Box>
         <Box>
           <Flex>
-            <StyledEcommerceIcon
-              css={{
-                color: "$hiContrast",
-                mt: "1px",
-                mr: "$3",
-                width: 14,
-                height: 14,
-              }}
+            <StyledPlatformsIcon
+              css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
             />
             <ArrowLink
               hideArrow
-              href="/use-cases/ecommerce"
+              href="https://mistserver.org/"
               css={{ fontWeight: 600, mb: "$2", fontSize: "$3" }}>
-              Ecommerce
+              Media Server
             </ArrowLink>
           </Flex>
         </Box>
