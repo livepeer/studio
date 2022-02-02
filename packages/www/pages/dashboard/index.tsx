@@ -100,7 +100,6 @@ const Dashboard = () => {
 
 const DashboardPage = () => {
   useLoggedIn();
-
   const { user } = useApi();
 
   if (!user) {

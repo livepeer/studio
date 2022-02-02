@@ -14,6 +14,7 @@ import {
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
+import { products } from "@livepeer.com/api/src/config";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -30,6 +31,7 @@ type ApiState = {
   user?: User;
   token?: string;
   userRefresh?: number;
+  noStripe?: boolean;
 };
 
 export interface UsageData {
@@ -132,6 +134,8 @@ const getCursor = (link?: string): string => {
   const { cursor } = qs.parse(match[1]);
   return cursor?.toString() ?? "";
 };
+
+let noStripe = false;
 
 const makeContext = (state: ApiState, setState) => {
   const context = {
@@ -302,7 +306,12 @@ const makeContext = (state: ApiState, setState) => {
 
     async getUser(userId, opts = {}): Promise<[Response, User | ApiError]> {
       let [res, user] = await context.fetch(`/user/${userId}`, opts);
-      if (isDevelopment() && !user.stripeProductId && user.email) {
+      if (
+        isDevelopment() &&
+        !user.stripeProductId &&
+        user.email &&
+        noStripe !== true
+      ) {
         const customer = await context.createCustomer(user.email);
         await context.createSubscription({
           stripeCustomerId: customer.id,
@@ -311,6 +320,14 @@ const makeContext = (state: ApiState, setState) => {
         [res, user] = await context.fetch(`/user/${userId}`, opts);
       }
       return [res, user as User | ApiError];
+    },
+
+    // Get current Stripe product, allowing for development users that don't have any
+    getUserProduct(user: User) {
+      if (user.stripeProductId) {
+        return products[user.stripeProductId];
+      }
+      return Object.values(products)[0];
     },
 
     async getUsers(
@@ -383,13 +400,17 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async createCustomer(email): Promise<{ id: string } | ApiError> {
-      const [, body] = await context.fetch("/user/create-customer", {
+      const [res, body] = await context.fetch("/user/create-customer", {
         method: "POST",
         body: JSON.stringify({ email: email }),
         headers: {
           "content-type": "application/json",
         },
       });
+
+      if (res.status === 501) {
+        noStripe = true;
+      }
 
       return body;
     },
@@ -409,6 +430,10 @@ const makeContext = (state: ApiState, setState) => {
         },
       });
       setState({ ...state, userRefresh: Date.now() });
+
+      if (res.status === 501) {
+        noStripe = true;
+      }
 
       if (res.status !== 201) {
         return body;
