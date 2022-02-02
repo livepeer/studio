@@ -878,6 +878,10 @@ components:
             - audio
           description: Type of the asset.
           example: video
+        playbackId:
+          type: string
+          example: eaw4nk06ts2d0mzb
+          description: Used to form playback URL and storage folder
         userId:
           type: string
           readOnly: true
@@ -890,6 +894,7 @@ components:
         objectStoreId:
           type: string
           description: Object store ID where the asset is stored
+          writeOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
           type: string
