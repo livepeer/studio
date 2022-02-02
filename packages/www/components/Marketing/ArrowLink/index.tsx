@@ -7,6 +7,7 @@ const ArrowLink = ({
   color = "$hiContrast",
   children,
   css = {},
+  target = "_self",
 }) => {
   return (
     <Link href={href} passHref>
@@ -48,7 +49,8 @@ const ArrowLink = ({
             },
           },
           ...css,
-        }}>
+        }}
+        target={target}>
         <Box>{children}</Box>
         <svg
           className="HoverArrow"

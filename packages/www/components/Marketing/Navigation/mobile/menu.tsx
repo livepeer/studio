@@ -198,7 +198,9 @@ const Menu = ({
             <ArrowLink
               hideArrow
               href="https://mistserver.org/"
-              css={{ fontWeight: 600, mb: "$2", fontSize: "$3" }}>
+              css={{ fontWeight: 600, mb: "$2", fontSize: "$3" }}
+              target="_blank"
+              >
               Media Server
             </ArrowLink>
           </Flex>
