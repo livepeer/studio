@@ -40,7 +40,8 @@
     "test": "jest \"${PWD}/src\" -i --silent",
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
     "coverage": "yarn run test --coverage",
-    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip"
+    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip",
+    "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')"
   },
   "dependencies": {
     "@cloudflare/json-schema-walker": "^0.1.1",

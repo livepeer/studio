@@ -20,6 +20,8 @@ import Guides from "@components/Marketing/Guides";
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
 
+const shouldRecaptcha = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
 const RegisterPage = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,14 +62,17 @@ const RegisterPage = () => {
     organization,
     phone,
   }) => {
-    if (!executeRecaptcha) {
+    if (shouldRecaptcha && !executeRecaptcha) {
       console.log("Execute recaptcha not yet available");
       return;
     }
 
     setLoading(true);
     setErrors([]);
-    const recaptchaToken = await executeRecaptcha("register");
+    let recaptchaToken;
+    if (shouldRecaptcha) {
+      recaptchaToken = await executeRecaptcha("register");
+    }
     const selectedPlan = router.query?.selectedPlan;
     const res = await register({
       email,
