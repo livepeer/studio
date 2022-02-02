@@ -43,6 +43,7 @@ export default async function makeApp(params: CliArgs) {
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
+    vodObjectStoreId,
     kubeNamespace,
     kubeBroadcasterService,
     kubeBroadcasterTemplate,
@@ -67,6 +68,10 @@ export default async function makeApp(params: CliArgs) {
         `Sending emails requires supportAddr, sendgridTemplateId, and sendgridApiKey`
       );
     }
+  }
+
+  if (!vodObjectStoreId) {
+    throw new Error(`Upload files to vod storage requires vodObjectStoreId`);
   }
 
   // Storage init

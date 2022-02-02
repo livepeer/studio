@@ -175,6 +175,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: [],
         coerce: coerceArr,
       },
+      vodObjectStoreId: {
+        describe: "s3 object store id for vod",
+        type: "string",
+      },
       "ingest-region": {
         describe:
           "list of ingest endpoints to use as servers to consult for /api/ingest",
