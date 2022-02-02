@@ -210,9 +210,27 @@ const Sidebar = ({ id }) => {
                       backgroundClip: "text",
                       ml: 31,
                       mt: "$1",
+                      mb: "$1",
                       lineHeight: 1.2,
                     }}>
                     Webhooks
+                  </Text>
+                </NavLink>
+              </Link>
+
+              <Link href="/dashboard/developers/media-server" passHref>
+                <NavLink>
+                  <Text
+                    gradient={id === "developers/media-server"}
+                    variant={id === "developers/media-server" ? "violet" : null}
+                    css={{
+                      fontWeight: id === "developers/media-server" ? 700 : 400,
+                      backgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Media Server
                   </Text>
                 </NavLink>
               </Link>
