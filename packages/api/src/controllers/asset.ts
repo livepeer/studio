@@ -4,14 +4,36 @@ import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import {
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  getS3PresignedUrl,
+  FieldsMap,
+} from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError } from "../store/errors";
+import httpProxy from "http-proxy";
+import { generateStreamKey } from "./generate-stream-key";
+import { IStore } from "../types/common";
 
 const app = Router();
 
 const META_MAX_SIZE = 1024;
+
+async function generateUniquePlaybackId(store: IStore, otherKeys: string[]) {
+  while (true) {
+    const playbackId: string = await generateStreamKey();
+    const qres = await store.query({
+      kind: "asset",
+      query: { playbackId },
+    });
+    if (!qres.data.length && !otherKeys.includes(playbackId)) {
+      return playbackId;
+    }
+  }
+}
 
 function validateAssetPayload(id, userId, createdAt, payload) {
   try {
@@ -38,7 +60,7 @@ function validateAssetPayload(id, userId, createdAt, payload) {
   };
 }
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
@@ -154,6 +176,46 @@ app.post("/", authMiddleware({}), validatePost("asset"), async (req, res) => {
 
   res.status(201);
   res.json(doc);
+});
+
+app.post("/import", authMiddleware({}), async (req, res) => {
+  res.json({});
+});
+
+app.post("/request-upload", authMiddleware({}), async (req, res) => {
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(req.store, [id]);
+
+  const { vodObjectStoreId } = req.config;
+
+  const presignedUrl = await getS3PresignedUrl({
+    objectKey: `${playbackId}/source`,
+    vodObjectStoreId,
+  });
+
+  const b64SignedUrl = Buffer.from(presignedUrl).toString("base64");
+  const lpSignedUrl = `https://${req.frontendDomain}/api/asset/upload/${b64SignedUrl}`;
+
+  await db.asset.create({
+    id,
+    name: "",
+    playbackId,
+    userId: req.user.id,
+  });
+
+  res.json({ url: lpSignedUrl, playbackId: playbackId });
+});
+
+app.put("/upload/:url", async (req, res) => {
+  const { url } = req.params;
+  const uploadUrl = Buffer.from(url, "base64").toString();
+
+  var proxy = httpProxy.createProxyServer({});
+  proxy.web(req, res, {
+    target: uploadUrl,
+    changeOrigin: true,
+    ignorePath: true,
+  });
 });
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {

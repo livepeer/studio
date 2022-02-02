@@ -7,6 +7,10 @@ import SendgridClient from "@sendgrid/client";
 import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+import { db } from "../store";
 
 const ITERATIONS = 10000;
 
@@ -103,6 +107,40 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   let next = baseUrl;
   next.searchParams.set("cursor", nextCursor);
   return next.href;
+}
+
+export async function getS3PresignedUrl({ objectKey, vodObjectStoreId }) {
+  const store = await db.objectStore.get(vodObjectStoreId);
+  let s3urlRegex =
+    /s3\+https:\/\/([a-zA-Z0-9-_]*):([a-zA-Z0-9-_]*)@([a-zA-Z0-9-.-_]*)\/([a-zA-Z0-9-_]*)\/([a-zA-Z0-9-_]*)/;
+  let match = s3urlRegex.exec(store.url);
+
+  if (match) {
+    var vodAccessKey = match[1];
+    var vodSecretAccessKey = match[2];
+    var publicUrl = match[3];
+    var vodRegion = match[4];
+    var vodBucket = match[5];
+  }
+
+  const s3Configuration = {
+    credentials: {
+      accessKeyId: vodAccessKey,
+      secretAccessKey: vodSecretAccessKey,
+    },
+    region: vodRegion,
+    signingRegion: vodRegion,
+    endpoint: `https://${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}/${vodBucket}`,
+  };
+
+  const s3 = new S3Client(s3Configuration);
+  const putCommand = new PutObjectCommand({
+    Bucket: vodBucket,
+    Key: objectKey,
+  });
+  const url = await getSignedUrl(s3, putCommand, { expiresIn: 15 * 60 }); // expires in seconds
+
+  return url;
 }
 
 export async function sendgridEmail({

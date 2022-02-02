@@ -2,7 +2,7 @@ import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import uuid from "uuid/v4";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 
@@ -23,7 +23,7 @@ function validateTaskPayload(
   };
 }
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `task.ID`,
   name: { val: `task.data->>'name'`, type: "full-text" },
   createdAt: `task.data->'createdAt'`,
