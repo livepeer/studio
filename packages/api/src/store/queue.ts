@@ -7,6 +7,7 @@ import { EventKey } from "./webhook-table";
 const EXCHANGES = {
   webhooks: "webhook_default_exchange",
   delayed: "webhook_delayed_exchange",
+  task: "task_default_exchange",
 } as const;
 const QUEUES = {
   events: "webhook_events_queue_v1",
@@ -14,9 +15,11 @@ const QUEUES = {
   events_old: "webhook_events_queue",
   webhooks_old: "webhook_cannon_single_url",
   delayed: "webhook_delayed_queue",
+  task: "task_events_queue",
 } as const;
 
 type QueueName = keyof typeof QUEUES;
+type ExchangeName = keyof typeof EXCHANGES;
 type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
 
 export default interface Queue {
@@ -85,16 +88,23 @@ export class RabbitQueue implements Queue {
           channel.assertQueue(QUEUES.webhooks, {
             arguments: { "x-queue-type": "quorum" },
           }),
+          channel.assertQueue(QUEUES.task, {
+            arguments: { "x-queue-type": "quorum" },
+          }),
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
           }),
           channel.assertExchange(EXCHANGES.delayed, "topic", {
             durable: true,
           }),
+          channel.assertExchange(EXCHANGES.task, "topic", {
+            durable: true,
+          }),
         ]);
         await Promise.all([
           channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
+          channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.#"),
           channel
             .assertQueue(QUEUES.delayed, {
               // Quorum queues do not support message expiration, so this has to
@@ -192,8 +202,20 @@ export class RabbitQueue implements Queue {
     route: RoutingKey,
     msg: messages.Any
   ): Promise<void> {
-    console.log(`publishing webhook to ${route} : ${JSON.stringify(msg)}`);
-    await this.channel.publish(EXCHANGES.webhooks, route, msg, {
+    await this.publish("webhooks", route, msg);
+  }
+
+  public async publish(
+    exchangeName: ExchangeName,
+    route: RoutingKey,
+    msg: messages.Any
+  ): Promise<void> {
+    console.log(
+      `publishing message to ${route} on exchange ${exchangeName} : ${JSON.stringify(
+        msg
+      )}`
+    );
+    await this.channel.publish(EXCHANGES[exchangeName], route, msg, {
       persistent: true,
     });
   }
