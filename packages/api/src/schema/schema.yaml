@@ -921,6 +921,11 @@ components:
           readOnly: true
           description: Timestamp (in milliseconds) at which asset was created
           example: 1587667174725
+        size:
+          type: number
+          readOnly: true
+          description: Size of the asset in bytes
+          example: 84934509
         hash:
           type: array
           description: Hash of the asset
@@ -976,15 +981,15 @@ components:
                     type: number
                     description: Height of the track - only for video tracks
                     example: 1080
+                  pixelFormat:
+                    type: string
+                    description:
+                      Pixel format of the track - only for video tracks
+                    example: yuv420p
                   fps:
                     type: number
                     description: Frame rate of the track - only for video tracks
                     example: 30
-                  id:
-                    type: string
-                    readOnly: true
-                    description: ID of the track
-                    example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
                   duration:
                     type: number
                     description: Duration of the track in seconds
