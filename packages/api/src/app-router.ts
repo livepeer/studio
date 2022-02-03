@@ -70,10 +70,6 @@ export default async function makeApp(params: CliArgs) {
     }
   }
 
-  if (!vodObjectStoreId) {
-    throw new Error(`Upload files to vod storage requires vodObjectStoreId`);
-  }
-
   // Storage init
   const bodyParser = require("body-parser");
   const [db, store] = await makeStore({
