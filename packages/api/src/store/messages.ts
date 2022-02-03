@@ -4,8 +4,9 @@ import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
 
 namespace messages {
-  export type Any = Webhooks;
+  export type Any = Webhooks | Task;
   export type Webhooks = WebhookEvent | WebhookTrigger;
+  export type Task = TaskResultEvent | TaskTrigger;
   export type Types = Any["type"];
 
   // This is a global format followed by all messages sent by Livepeer services
@@ -44,6 +45,17 @@ namespace messages {
     stream: DBStream;
     retries?: number;
     lastInterval?: number;
+  }
+
+  export interface TaskResultEvent extends Base {
+    type: "task_trigger";
+    event: EventKey;
+    payload?: TPayload;
+  }
+
+  export interface TaskTrigger extends Base {
+    type: "task_event";
+    event: TaskResultEvent;
   }
 }
 
