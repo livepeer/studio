@@ -959,11 +959,11 @@ components:
                 type: object
                 additionalProperties: false
                 required:
-                  - kind
+                  - type
                 properties:
-                  kind:
+                  type:
                     type: string
-                    description: Kind of track
+                    description: type of track
                     enum:
                       - video
                       - audio
@@ -1011,52 +1011,54 @@ components:
                     type: string
                     description: Codec of the track
                     example: aac
-            hlsSpec:
-              type: object
-              additionalProperties: false
-              description: HLS spec for the asset
-              properties:
-                profiles:
-                  type: object
-                  additionalProperties: false
-                  description: HLS Profile manifests associated with the asset
-                  properties:
-                    kind:
-                      type: string
-                      description: Type of the profile
-                      example: manifest
-                    name:
-                      type: string
-                      description: Filename of the manifest
-                      example: variant_1080.m3u8
-                    width:
-                      type: number
-                      description: width of the profile
-                      example: 1920
-                    height:
-                      type: number
-                      description: height of the profile
-                      example: 1080
-                    fps:
-                      type: number
-                      description: Frame rate of the profile
-                      example: 30
-                    id:
-                      type: string
-                      description: ID of the profile
-                      example: ABC123
-                    duration:
-                      type: number
-                      description: Duration of the profile in seconds
-                      example: 23.8238
-                    bitrate:
-                      type: number
-                      description: Bitrate of the profile in bits per second
-                      example: 1000000
-                    playbackId:
-                      type: string
-                      description: Playback ID of the asset
-                      example: ABC123
+            # hlsSpec:
+            #   type: object
+            #   additionalProperties: false
+            #   description: HLS spec for the asset
+            #   properties:
+            #     profiles:
+            #       type: array
+            #       description: HLS Profile manifests associated with the asset
+            #       items:
+            #         type: object
+            #         additionalProperties: false
+            #         properties:
+            #           type:
+            #             type: string
+            #             description: Type of the profile
+            #             example: manifest
+            #           name:
+            #             type: string
+            #             description: Filename of the manifest
+            #             example: variant_1080.m3u8
+            #           width:
+            #             type: number
+            #             description: width of the profile
+            #             example: 1920
+            #           height:
+            #             type: number
+            #             description: height of the profile
+            #             example: 1080
+            #           fps:
+            #             type: number
+            #             description: Frame rate of the profile
+            #             example: 30
+            #           id:
+            #             type: string
+            #             description: ID of the profile
+            #             example: ABC123
+            #           duration:
+            #             type: number
+            #             description: Duration of the profile in seconds
+            #             example: 23.8238
+            #           bitrate:
+            #             type: number
+            #             description: Bitrate of the profile in bits per second
+            #             example: 1000000
+            #           playbackId:
+            #             type: string
+            #             description: Playback ID of the asset
+            #             example: ABC123
         status:
           type: string
           description: Status of the asset
@@ -1127,6 +1129,25 @@ components:
                   type: string
                   description: URL of the asset to import
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
+        status:
+          type: object
+          additionalProperties: false
+          description: Status of the task
+          properties:
+            phase:
+              type: string
+              description: Phase of the task
+              enum:
+                - Pending
+                - Running
+                - Failed
+                - Completed
+                - Canceled
+              example: Running
+            updatedAt:
+              type: number
+              description: Timestamp (in milliseconds) at which task was updated
+              example: 1587667174725
         output:
           type: object
           additionalProperties: false
@@ -1137,15 +1158,10 @@ components:
               additionalProperties: false
               description: Output of the import task
               properties:
-                status:
+                result:
                   type: string
-                  description: Status of the task
-                  enum:
-                    - Pending
-                    - Running
-                    - Failed
-                    - Completed
-                  example: Pending
+                  description: result of the import task
+                  example: Asset imported successfully
 
     api-token:
       type: object
