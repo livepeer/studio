@@ -138,6 +138,33 @@ app.post("/", authMiddleware({}), validatePost("task"), async (req, res) => {
   res.json(doc);
 });
 
+app.post(
+  "/status/:id",
+  authMiddleware({}),
+  validatePost("task"),
+  async (req, res) => {
+    // update status of a specific task
+    const { id } = req.params;
+    const task = await db.task.get(id);
+    if (!req.user.admin) {
+      res.status(403);
+      return res.json({ errors: ["Forbidden"] });
+    }
+
+    let status = req.body.status;
+    status.updatedAt = Date.now();
+    let doc = {
+      id: id,
+      status: status,
+    };
+
+    await db.task.update(id, doc);
+
+    res.status(200);
+    res.json({ id: id });
+  }
+);
+
 app.delete("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
   const task = await db.task.get(id);
