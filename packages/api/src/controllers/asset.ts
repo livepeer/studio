@@ -66,6 +66,7 @@ const fieldsMap: FieldsMap = {
   objectStoreId: `asset.data->>'objectStoreId'`,
   createdAt: `asset.data->'createdAt'`,
   userId: `asset.data->>'userId'`,
+  playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
 };
@@ -184,10 +185,10 @@ app.post("/import", authMiddleware({}), async (req, res) => {
 
 app.post("/request-upload", authMiddleware({}), async (req, res) => {
   const id = uuid();
-  const playbackId = await generateUniquePlaybackId(req.store, [id]);
+  let playbackId = await generateUniquePlaybackId(req.store, [id]);
+  playbackId = playbackId.replace(/-/g, "");
 
   const { vodObjectStoreId } = req.config;
-
   const presignedUrl = await getS3PresignedUrl({
     objectKey: `${playbackId}/source`,
     vodObjectStoreId,
@@ -208,14 +209,48 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
 
 app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
-  const uploadUrl = Buffer.from(url, "base64").toString();
+  let uploadUrl = Buffer.from(url, "base64").toString();
+  let bucket = uploadUrl.match(/https:\/\/(.*)\/./)[1].split(".")[0];
+  let playbackId = uploadUrl.split(`/${bucket}/`)[1].split("/")[0];
+  const obj = await db.asset.find({ playbackId: playbackId });
 
-  var proxy = httpProxy.createProxyServer({});
-  proxy.web(req, res, {
-    target: uploadUrl,
-    changeOrigin: true,
-    ignorePath: true,
-  });
+  if (obj?.length) {
+    let asset = obj[0][0];
+    var proxy = httpProxy.createProxyServer({});
+
+    proxy.on("end", async function (proxyReq, _, res) {
+      if (res.statusCode == 200) {
+        const taskId = uuid();
+
+        let task = await db.task.create({
+          id: taskId,
+          name: "asset-upload",
+          type: "Import",
+          parentAssetId: asset.id,
+          userId: asset.userId,
+        });
+
+        /*await req.queue.publish("task","task.trigger.upload", {
+          type: "task_trigger",
+          id: uuid(),
+          timestamp: Date.now(),
+          task: task,
+          event: "task.upload"
+        });*/
+      }
+    });
+
+    proxy.web(req, res, {
+      target: uploadUrl,
+      changeOrigin: true,
+      ignorePath: true,
+    });
+  } else {
+    res.status(400);
+    return res.json({
+      errors: ["the asset does not exist"],
+    });
+  }
 });
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
