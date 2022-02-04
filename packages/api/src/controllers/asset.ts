@@ -180,7 +180,40 @@ app.post("/", authMiddleware({}), validatePost("asset"), async (req, res) => {
 });
 
 app.post("/import", authMiddleware({}), async (req, res) => {
-  res.json({});
+  const id = uuid();
+  const asset = validateAssetPayload(id, req.user.id, Date.now(), req.body);
+  if (!req.body.url) {
+    res.status(400);
+    return res.json({ errors: ["You must provide a url to import an asset"] });
+  }
+
+  await db.asset.create(asset);
+  const taskId = uuid();
+
+  // TODO: move the task creation and spawn into task store
+  let task = await db.task.create({
+    id: taskId,
+    name: "asset-import",
+    type: "Import",
+    parentAssetId: asset.id,
+    userId: asset.userId,
+    params: {
+      import: {
+        url: req.body.url,
+      },
+    },
+  });
+
+  await req.queue.publish("task", "task.trigger.import", {
+    type: "task_trigger",
+    id: uuid(),
+    timestamp: Date.now(),
+    task: task,
+    event: "asset.import",
+  });
+
+  res.status(201);
+  res.end();
 });
 
 app.post("/request-upload", authMiddleware({}), async (req, res) => {
@@ -222,6 +255,7 @@ app.put("/upload/:url", async (req, res) => {
       if (res.statusCode == 200) {
         const taskId = uuid();
 
+        // TODO: move the task creation and spawn into task store
         let task = await db.task.create({
           id: taskId,
           name: "asset-upload",
@@ -230,13 +264,14 @@ app.put("/upload/:url", async (req, res) => {
           userId: asset.userId,
         });
 
-        /*await req.queue.publish("task","task.trigger.upload", {
+        await req.queue.publish("task", "task.trigger.upload", {
           type: "task_trigger",
           id: uuid(),
           timestamp: Date.now(),
           task: task,
-          event: "task.upload"
-        });*/
+          playbackId: playbackId,
+          event: "asset.upload",
+        });
       }
     });
 
