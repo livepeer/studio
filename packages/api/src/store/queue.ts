@@ -7,7 +7,7 @@ import { EventKey } from "./webhook-table";
 const EXCHANGES = {
   webhooks: "webhook_default_exchange",
   delayed: "webhook_delayed_exchange",
-  task: "task_default_exchange",
+  task: "lp_tasks",
 } as const;
 const QUEUES = {
   events: "webhook_events_queue_v1",
@@ -15,7 +15,7 @@ const QUEUES = {
   events_old: "webhook_events_queue",
   webhooks_old: "webhook_cannon_single_url",
   delayed: "webhook_delayed_queue",
-  task: "task_events_queue",
+  task: "task_results_queue",
 } as const;
 
 type QueueName = keyof typeof QUEUES;
