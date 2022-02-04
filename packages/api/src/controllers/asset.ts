@@ -1,8 +1,6 @@
-import { URL } from "url";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import logger from "../logger";
+import { Router } from "express";
 import uuid from "uuid/v4";
 import {
   makeNextHREF,
@@ -10,6 +8,7 @@ import {
   parseOrder,
   getS3PresignedUrl,
   FieldsMap,
+  toStringValues,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -17,25 +16,36 @@ import { UnprocessableEntityError } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { IStore } from "../types/common";
+import { Asset } from "../schema/types";
+import { WithID } from "../store/types";
 
 const app = Router();
 
 const META_MAX_SIZE = 1024;
 
-async function generateUniquePlaybackId(store: IStore, otherKeys: string[]) {
+async function generateUniquePlaybackId(store: IStore, assetId: string) {
+  const shardKey = assetId.slice(4);
   while (true) {
     const playbackId: string = await generateStreamKey();
     const qres = await store.query({
       kind: "asset",
       query: { playbackId },
     });
-    if (!qres.data.length && !otherKeys.includes(playbackId)) {
-      return playbackId;
+    if (!qres.data.length && playbackId != assetId) {
+      const shardedId = shardKey + playbackId.slice(shardKey.length);
+      return shardedId.replace(/-/g, "");
     }
   }
 }
 
-function validateAssetPayload(id, userId, createdAt, payload) {
+function validateAssetPayload(
+  id: string,
+  playbackId: string,
+  userId: string,
+  createdAt: number,
+  // TODO: This could be just a new schema like `import-asset-payload`
+  payload: any
+): WithID<Asset> {
   try {
     if (payload.meta && JSON.stringify(payload.meta).length > META_MAX_SIZE) {
       console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
@@ -52,11 +62,12 @@ function validateAssetPayload(id, userId, createdAt, payload) {
 
   return {
     id,
+    playbackId,
     userId,
     createdAt,
+    status: "waiting",
     name: payload.name,
     meta: payload.meta,
-    hash: payload.hash,
   };
 }
 
@@ -73,7 +84,7 @@ const fieldsMap: FieldsMap = {
 
 app.get("/", authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+    toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -166,36 +177,55 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(os);
 });
 
-app.post("/", authMiddleware({}), validatePost("asset"), async (req, res) => {
-  const id = uuid();
-  const doc = validateAssetPayload(id, req.user.id, Date.now(), req.body);
-  if (!req.user.admin) {
-    res.status(403);
-    return res.json({ errors: ["Forbidden"] });
+// TODO: Delete this API? Assets will only be created by task result events.
+app.post(
+  "/",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("asset"),
+  async (req, res) => {
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(req.store, id);
+    const doc = validateAssetPayload(
+      id,
+      playbackId,
+      req.user.id,
+      Date.now(),
+      req.body
+    );
+    if (!req.user.admin) {
+      res.status(403);
+      return res.json({ errors: ["Forbidden"] });
+    }
+    await db.asset.create(doc);
+    res.status(201);
+    res.json(doc);
   }
-  await db.asset.create(doc);
-  res.status(201);
-  res.json(doc);
-});
+);
 
 app.post("/import", authMiddleware({}), async (req, res) => {
   const id = uuid();
-  const asset = validateAssetPayload(id, req.user.id, Date.now(), req.body);
+  const playbackId = await generateUniquePlaybackId(req.store, id);
+  const asset = validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.body
+  );
   if (!req.body.url) {
-    res.status(400);
-    return res.json({
+    return res.status(422).json({
       errors: ["You must provide a url from which import an asset"],
     });
   }
 
   await db.asset.create(asset);
-  const taskId = uuid();
 
   // TODO: move the task creation and spawn into task scheduler
-  let task = await db.task.create({
-    id: taskId,
-    name: "asset-import",
-    type: "Import",
+  const task = await db.task.create({
+    id: uuid(),
+    name: `asset-import-${asset.name}-${asset.createdAt}`,
+    createdAt: asset.createdAt,
+    type: "import",
     parentAssetId: asset.id,
     userId: asset.userId,
     params: {
@@ -203,14 +233,23 @@ app.post("/import", authMiddleware({}), async (req, res) => {
         url: req.body.url,
       },
     },
+    status: {
+      phase: "pending",
+      updatedAt: asset.createdAt,
+    },
   });
-
-  await req.queue.publish("task", `task.trigger.${taskId}`, {
+  await req.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
     type: "task_trigger",
     id: uuid(),
     timestamp: Date.now(),
-    task: task,
-    event: "asset.import",
+    task: {
+      id: task.id,
+      type: task.type,
+      snapshot: task,
+    },
+  });
+  await db.task.update(task.id, {
+    status: { phase: "waiting", updatedAt: Date.now() },
   });
 
   res.status(201);
@@ -219,8 +258,7 @@ app.post("/import", authMiddleware({}), async (req, res) => {
 
 app.post("/request-upload", authMiddleware({}), async (req, res) => {
   const id = uuid();
-  let playbackId = await generateUniquePlaybackId(req.store, [id]);
-  playbackId = playbackId.replace(/-/g, "");
+  let playbackId = await generateUniquePlaybackId(req.store, id);
 
   const { vodObjectStoreId } = req.config;
   const presignedUrl = await getS3PresignedUrl({
@@ -264,13 +302,13 @@ app.put("/upload/:url", async (req, res) => {
 
     proxy.on("end", async function (proxyReq, _, res) {
       if (res.statusCode == 200) {
-        const taskId = uuid();
-
         // TODO: move the task creation and spawn into task scheduler
+        const createdAt = Date.now();
         let task = await db.task.create({
-          id: taskId,
-          name: "asset-upload",
-          type: "Import",
+          id: uuid(),
+          name: `asset-upload-${asset.name}-${asset.createdAt}`,
+          createdAt,
+          type: "import",
           parentAssetId: asset.id,
           userId: asset.userId,
           params: {
@@ -278,14 +316,27 @@ app.put("/upload/:url", async (req, res) => {
               uploadedObjectKey: `${playbackId}/source`,
             },
           },
+          status: {
+            phase: "pending",
+            updatedAt: createdAt,
+          },
         });
-
-        await req.queue.publish("task", `task.trigger.${taskId}`, {
-          type: "task_trigger",
-          id: uuid(),
-          timestamp: Date.now(),
-          task: task,
-          event: "asset.upload",
+        await req.queue.publish(
+          "task",
+          `task.trigger.${task.type}.${task.id}`,
+          {
+            type: "task_trigger",
+            id: uuid(),
+            timestamp: Date.now(),
+            task: {
+              id: task.id,
+              type: task.type,
+              snapshot: task,
+            },
+          }
+        );
+        await db.task.update(task.id, {
+          status: { phase: "waiting", updatedAt: Date.now() },
         });
       } else {
         console.log(
@@ -326,9 +377,10 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
+// TODO: Delete this API as well?
 app.patch(
   "/:id",
-  authMiddleware({}),
+  authMiddleware({ anyAdmin: true }),
   validatePost("asset"),
   async (req, res) => {
     // update a specific asset
@@ -340,7 +392,14 @@ app.patch(
     }
 
     const { id, userId, createdAt } = asset;
-    const doc = validateAssetPayload(id, userId, createdAt, req.body);
+    const playbackId = await generateUniquePlaybackId(req.store, id);
+    const doc = validateAssetPayload(
+      id,
+      playbackId,
+      userId,
+      createdAt,
+      req.body
+    );
 
     await db.asset.update(req.body.id, doc);
 

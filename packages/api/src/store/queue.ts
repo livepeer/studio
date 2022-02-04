@@ -20,9 +20,17 @@ const QUEUES = {
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
-type RoutingKey = `events.${EventKey}` | `webhooks.${string}`;
+type RoutingKey =
+  | `events.${EventKey}`
+  | `webhooks.${string}`
+  | `task.trigger.${string}.${string}`;
 
 export default interface Queue {
+  publish(
+    exchange: ExchangeName,
+    key: RoutingKey,
+    msg: messages.Any
+  ): Promise<void>;
   publishWebhook(key: RoutingKey, msg: messages.Webhooks): Promise<void>;
   delayedPublishWebhook(
     key: RoutingKey,
@@ -38,11 +46,19 @@ export default interface Queue {
 }
 
 export class NoopQueue implements Queue {
-  async publishWebhook(key: RoutingKey, msg: messages.Webhooks) {
+  async publish(
+    exchange: ExchangeName,
+    key: RoutingKey,
+    msg: messages.Webhooks
+  ) {
     console.warn(
-      `WARN: Publish webhook to noop queue. key=${key} message=`,
+      `WARN: Publish to exchange=${exchange} on noop queue. key=${key} message=`,
       msg
     );
+  }
+
+  async publishWebhook(key: RoutingKey, msg: messages.Webhooks) {
+    this.publish("webhooks", key, msg);
   }
 
   async delayedPublishWebhook(

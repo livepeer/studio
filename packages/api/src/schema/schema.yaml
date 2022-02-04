@@ -1076,7 +1076,10 @@ components:
         status:
           type: string
           description: Status of the asset
-          example: ready
+          enum:
+           - waiting
+           - ready
+           - failed
         originTaskId:
           type: string
           description: Task ID of the task that created the asset
@@ -1110,9 +1113,8 @@ components:
           type: string
           description: Type of the task
           enum:
-            - Import
-            - Export
-          example: Import
+            - import
+            - export
         createdAt:
           type: number
           readOnly: true
@@ -1156,12 +1158,12 @@ components:
               type: string
               description: Phase of the task
               enum:
-                - Pending
-                - Running
-                - Failed
-                - Completed
-                - Canceled
-              example: Running
+                - pending
+                - waiting
+                - running
+                - failed
+                - completed
+                - cancelled
             updatedAt:
               type: number
               description: Timestamp (in milliseconds) at which task was updated

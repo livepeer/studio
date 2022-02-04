@@ -74,6 +74,14 @@ export async function hash(password: string, salt: string) {
 const fromHexString = (hexString: string) =>
   new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 
+export function toStringValues(obj: Record<string, any>) {
+  const strObj: Record<string, string> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    strObj[key] = value.toString();
+  }
+  return strObj;
+}
+
 function bytesToHexString(bytes: Uint8Array, separate = false) {
   /// <signature>
   ///     <summary>Converts an Array of bytes values (0-255) to a Hex string</summary>

@@ -1,4 +1,4 @@
-import { User } from "../schema/types";
+import { Asset, Task as ApiTask, User } from "../schema/types";
 import { DBStream } from "./stream-table";
 import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
@@ -6,7 +6,7 @@ import { DBWebhook, EventKey } from "./webhook-table";
 namespace messages {
   export type Any = Webhooks | Task;
   export type Webhooks = WebhookEvent | WebhookTrigger;
-  export type Task = TaskResultEvent | TaskTrigger;
+  export type Task = TaskTrigger | TaskResult;
   export type Types = Any["type"];
 
   // This is a global format followed by all messages sent by Livepeer services
@@ -20,7 +20,7 @@ namespace messages {
     // Unix timestamp in milliseconds.
     timestamp: number;
     // ID of the stream as defined by the API in the authWebhook (ID from DB).
-    streamId: string;
+    streamId?: string;
   }
 
   type TPayload = {
@@ -47,15 +47,32 @@ namespace messages {
     lastInterval?: number;
   }
 
-  export interface TaskResultEvent extends Base {
-    type: "task_trigger";
-    event: EventKey;
-    payload?: TPayload;
-  }
+  type TaskInfo = {
+    id: string;
+    type: ApiTask["type"];
+    snapshot: ApiTask;
+  };
 
   export interface TaskTrigger extends Base {
-    type: "task_event";
-    event: TaskResultEvent;
+    type: "task_trigger";
+    task: TaskInfo;
+  }
+
+  export interface TaskResult extends Base {
+    type: "task_result";
+    task: TaskInfo;
+    error: {
+      message: string;
+      unretriable: boolean;
+    };
+    output: {
+      import: {
+        videoFilePath: string;
+        metadataFilePath: string;
+        metadata: any;
+        assetSpec: Partial<Asset>;
+      };
+    };
   }
 }
 
