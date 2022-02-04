@@ -955,6 +955,10 @@ components:
               type: number
               description: Duration of the asset in seconds (float)
               example: 23.8328
+            bitrate:
+              type: number
+              description: Bitrate of the video in bits per second
+              example: 1000000
             tracks:
               type: array
               description:
@@ -965,6 +969,7 @@ components:
                 additionalProperties: false
                 required:
                   - type
+                  - codec
                 properties:
                   type:
                     type: string
@@ -973,6 +978,22 @@ components:
                       - video
                       - audio
                     example: video
+                  codec:
+                    type: string
+                    description: Codec of the track
+                    example: aac
+                  startTime:
+                    type: number
+                    description: Start time of the track in seconds
+                    example: 23.8238
+                  duration:
+                    type: number
+                    description: Duration of the track in seconds
+                    example: 23.8238
+                  bitrate:
+                    type: number
+                    description: Bitrate of the track in bits per second
+                    example: 1000000
                   width:
                     type: number
                     description: Width of the track - only for video tracks
@@ -990,14 +1011,6 @@ components:
                     type: number
                     description: Frame rate of the track - only for video tracks
                     example: 30
-                  duration:
-                    type: number
-                    description: Duration of the track in seconds
-                    example: 23.8238
-                  bitrate:
-                    type: number
-                    description: Bitrate of the track in bits per second
-                    example: 1000000
                   channels:
                     type: number
                     description: Amount of audio channels in the track
@@ -1012,10 +1025,6 @@ components:
                     type: number
                     description: Bit depth of the track - only for audio tracks
                     example: 16
-                  codec:
-                    type: string
-                    description: Codec of the track
-                    example: aac
             # hlsSpec:
             #   type: object
             #   additionalProperties: false
