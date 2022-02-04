@@ -204,7 +204,7 @@ app.post("/import", authMiddleware({}), async (req, res) => {
     },
   });
 
-  await req.queue.publish("task", "task.trigger.import", {
+  await req.queue.publish("task", `task.trigger.${taskId}`, {
     type: "task_trigger",
     id: uuid(),
     timestamp: Date.now(),
@@ -264,7 +264,7 @@ app.put("/upload/:url", async (req, res) => {
           userId: asset.userId,
         });
 
-        await req.queue.publish("task", "task.trigger.upload", {
+        await req.queue.publish("task", `task.trigger.${taskId}`, {
           type: "task_trigger",
           id: uuid(),
           timestamp: Date.now(),
