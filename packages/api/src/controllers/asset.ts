@@ -190,7 +190,7 @@ app.post("/import", authMiddleware({}), async (req, res) => {
   await db.asset.create(asset);
   const taskId = uuid();
 
-  // TODO: move the task creation and spawn into task store
+  // TODO: move the task creation and spawn into task scheduler
   let task = await db.task.create({
     id: taskId,
     name: "asset-import",
@@ -235,6 +235,7 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
     name: "",
     playbackId,
     userId: req.user.id,
+    objectStoreId: vodObjectStoreId,
   });
 
   res.json({ url: lpSignedUrl, playbackId: playbackId });
@@ -255,13 +256,18 @@ app.put("/upload/:url", async (req, res) => {
       if (res.statusCode == 200) {
         const taskId = uuid();
 
-        // TODO: move the task creation and spawn into task store
+        // TODO: move the task creation and spawn into task scheduler
         let task = await db.task.create({
           id: taskId,
           name: "asset-upload",
           type: "Import",
           parentAssetId: asset.id,
           userId: asset.userId,
+          params: {
+            import: {
+              uploadedObjectKey: `${playbackId}/source`,
+            },
+          },
         });
 
         await req.queue.publish("task", `task.trigger.${taskId}`, {
@@ -269,7 +275,6 @@ app.put("/upload/:url", async (req, res) => {
           id: uuid(),
           timestamp: Date.now(),
           task: task,
-          playbackId: playbackId,
           event: "asset.upload",
         });
       }

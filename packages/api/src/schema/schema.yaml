@@ -1134,6 +1134,10 @@ components:
                   type: string
                   description: URL of the asset to import
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
+                uploadedObjectKey:
+                  type: string
+                  description: S3 object key of the uploaded asset
+                  example: ABC123/filename.mp4
         status:
           type: object
           additionalProperties: false
