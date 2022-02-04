@@ -1,10 +1,11 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import uuid from "uuid/v4";
-import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { Router } from "express";
+import { v4 as uuid } from "uuid";
+import { makeNextHREF, parseFilters, parseOrder, toStringValues, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
+import { Task } from "../schema/types";
 
 const app = Router();
 
@@ -34,7 +35,7 @@ const fieldsMap: FieldsMap = {
 
 app.get("/", authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
-    req.query;
+    toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -138,27 +139,38 @@ app.post("/", authMiddleware({}), validatePost("task"), async (req, res) => {
   res.json(doc);
 });
 
-app.post("/:id/status", authMiddleware({}), async (req, res) => {
-  // update status of a specific task
-  const { id } = req.params;
-  const task = await db.task.get(id);
-  if (!req.user.admin) {
-    res.status(403);
-    return res.json({ errors: ["Forbidden"] });
+app.post(
+  "/:id/status",
+  authMiddleware({ anyAdmin: true }),
+  async (req, res) => {
+    // update status of a specific task
+    const { id } = req.params;
+    const task = await db.task.get(id);
+    console.log(req.params.id, task);
+    if (!task) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+
+    const doc = req.body.status;
+    if (!doc) {
+      return res.status(422).json({ errors: ["missing status in payload"] });
+    } else if (doc.phase && doc.phase !== "running") {
+      return res
+        .status(422)
+        .json({ errors: ["can only update phase to running"] });
+    }
+    const status: Task["status"] = {
+      ...task.status,
+      phase: "running",
+      progress: doc.progress,
+      updatedAt: Date.now(),
+    };
+    await db.task.update(id, { status });
+
+    res.status(200);
+    res.json({ id, status });
   }
-
-  let status = req.body.status;
-  status.updatedAt = Date.now();
-  let doc = {
-    id: id,
-    status: status,
-  };
-
-  await db.task.update(id, doc);
-
-  res.status(200);
-  res.json({ id: id });
-});
+);
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
@@ -178,9 +190,10 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
+// TODO: Remove this API.
 app.patch(
   "/:id",
-  authMiddleware({}),
+  authMiddleware({ anyAdmin: true }),
   validatePost("task"),
   async (req, res) => {
     // update a specific task

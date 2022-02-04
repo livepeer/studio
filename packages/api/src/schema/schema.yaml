@@ -1168,6 +1168,9 @@ components:
               type: number
               description: Timestamp (in milliseconds) at which task was updated
               example: 1587667174725
+            progress:
+              type: number
+              description: Current progress of the task in a 0-100 percentage
         output:
           type: object
           additionalProperties: false

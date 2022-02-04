@@ -1,7 +1,7 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 import {
   makeNextHREF,
   parseFilters,
@@ -12,7 +12,7 @@ import {
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { UnprocessableEntityError } from "../store/errors";
+import { ForbiddenError, UnprocessableEntityError } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { IStore } from "../types/common";
@@ -38,14 +38,15 @@ async function generateUniquePlaybackId(store: IStore, assetId: string) {
   }
 }
 
-function validateAssetPayload(
+async function validateAssetPayload(
   id: string,
   playbackId: string,
   userId: string,
   createdAt: number,
+  defaultObjectStoreId: string,
   // TODO: This could be just a new schema like `import-asset-payload`
   payload: any
-): WithID<Asset> {
+): Promise<WithID<Asset>> {
   try {
     if (payload.meta && JSON.stringify(payload.meta).length > META_MAX_SIZE) {
       console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
@@ -59,6 +60,14 @@ function validateAssetPayload(
       `the provided meta is not in a valid json format`
     );
   }
+  if (payload.objectStoreId) {
+    const os = await db.objectStore.get(payload.objectStoreId);
+    if (os.userId !== userId) {
+      throw new ForbiddenError(
+        `the provided objectStoreId is not owned by the user`
+      );
+    }
+  }
 
   return {
     id,
@@ -68,6 +77,7 @@ function validateAssetPayload(
     status: "waiting",
     name: payload.name,
     meta: payload.meta,
+    objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
 
@@ -185,11 +195,12 @@ app.post(
   async (req, res) => {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = validateAssetPayload(
+    const doc = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
+      req.config.vodObjectStoreId,
       req.body
     );
     if (!req.user.admin) {
@@ -205,11 +216,12 @@ app.post(
 app.post("/import", authMiddleware({}), async (req, res) => {
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(req.store, id);
-  const asset = validateAssetPayload(
+  const asset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
     Date.now(),
+    req.config.vodObjectStoreId,
     req.body
   );
   if (!req.body.url) {
@@ -393,11 +405,12 @@ app.patch(
 
     const { id, userId, createdAt } = asset;
     const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = validateAssetPayload(
+    const doc = await validateAssetPayload(
       id,
       playbackId,
       userId,
       createdAt,
+      req.config.vodObjectStoreId,
       req.body
     );
 
