@@ -104,7 +104,7 @@ export class RabbitQueue implements Queue {
         await Promise.all([
           channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
-          channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.#"),
+          channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.result.#"),
           channel
             .assertQueue(QUEUES.delayed, {
               // Quorum queues do not support message expiration, so this has to
