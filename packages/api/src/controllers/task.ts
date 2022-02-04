@@ -111,7 +111,6 @@ app.get("/", authMiddleware({}), async (req, res) => {
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
   const task = await db.task.get(req.params.id);
-  console.log(task);
   if (!task) {
     res.status(404);
     return res.json({
@@ -146,7 +145,6 @@ app.post(
     // update status of a specific task
     const { id } = req.params;
     const task = await db.task.get(id);
-    console.log(req.params.id, task);
     if (!task) {
       return res.status(404).json({ errors: ["not found"] });
     }
