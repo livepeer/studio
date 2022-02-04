@@ -28,6 +28,7 @@ export const docsPositions = [
   "docs/guides/application-development/video-playback-in-your-app.mdx",
   "docs/guides/application-development/custom-domain.mdx",
   "docs/guides/application-development/per-stream-metrics.mdx",
+  "docs/guides/media-server.mdx",
   "docs/guides/usage-and-billing.mdx",
   "docs/api-reference/index.mdx",
   "docs/api-reference/stream/index.mdx",
