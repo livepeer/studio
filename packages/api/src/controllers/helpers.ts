@@ -121,6 +121,8 @@ export async function getS3PresignedUrl({ objectKey, vodObjectStoreId }) {
     var publicUrl = match[3];
     var vodRegion = match[4];
     var vodBucket = match[5];
+  } else {
+    throw new Error("Invalid S3 URL");
   }
 
   const s3Configuration = {

@@ -174,7 +174,6 @@ app.post("/", authMiddleware({}), validatePost("asset"), async (req, res) => {
     return res.json({ errors: ["Forbidden"] });
   }
   await db.asset.create(doc);
-
   res.status(201);
   res.json(doc);
 });
@@ -184,7 +183,9 @@ app.post("/import", authMiddleware({}), async (req, res) => {
   const asset = validateAssetPayload(id, req.user.id, Date.now(), req.body);
   if (!req.body.url) {
     res.status(400);
-    return res.json({ errors: ["You must provide a url to import an asset"] });
+    return res.json({
+      errors: ["You must provide a url from which import an asset"],
+    });
   }
 
   await db.asset.create(asset);
@@ -244,8 +245,17 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
 app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
   let uploadUrl = Buffer.from(url, "base64").toString();
-  let bucket = uploadUrl.match(/https:\/\/(.*)\/./)[1].split(".")[0];
-  let playbackId = uploadUrl.split(`/${bucket}/`)[1].split("/")[0];
+
+  // get bucket and playbackId from s3 url
+  let bucket, playbackId;
+  try {
+    bucket = uploadUrl.match(/https:\/\/(.*)\/./)[1].split(".")[0];
+    playbackId = uploadUrl.split(`/${bucket}/`)[1].split("/")[0];
+  } catch (e) {
+    throw new UnprocessableEntityError(
+      `the provided url for the upload is not valid or not supported: ${uploadUrl}`
+    );
+  }
   const obj = await db.asset.find({ playbackId: playbackId });
 
   if (obj?.length) {
@@ -277,6 +287,10 @@ app.put("/upload/:url", async (req, res) => {
           task: task,
           event: "asset.upload",
         });
+      } else {
+        console.log(
+          `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
+        );
       }
     });
 
@@ -286,9 +300,10 @@ app.put("/upload/:url", async (req, res) => {
       ignorePath: true,
     });
   } else {
-    res.status(400);
+    // we expect an existing asset to be found
+    res.status(404);
     return res.json({
-      errors: ["the asset does not exist"],
+      errors: ["related asset not found"],
     });
   }
 });
