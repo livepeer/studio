@@ -75,8 +75,8 @@ export default class TaskScheduler {
               `task event process error: assetSpec not found in TaskResult for task ${event.task.id}`
             );
           }
-
-          db.asset.update(task.parentAssetId, {
+          // TODO: bundle them in a single transaction
+          await db.asset.update(task.parentAssetId, {
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
             size: assetSpec.size,
@@ -84,7 +84,7 @@ export default class TaskScheduler {
             status: "ready",
           });
 
-          db.task.update(task.id, {
+          await db.task.update(task.id, {
             status: {
               phase: "completed",
               updatedAt: Date.now(),

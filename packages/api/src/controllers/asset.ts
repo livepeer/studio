@@ -281,9 +281,10 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
   const b64SignedUrl = Buffer.from(presignedUrl).toString("base64");
   const lpSignedUrl = `https://${req.frontendDomain}/api/asset/upload/${b64SignedUrl}`;
 
+  // TODO: use the same function as the one used in import
   await db.asset.create({
     id,
-    name: "",
+    name: `asset-upload-${id}`,
     playbackId,
     userId: req.user.id,
     objectStoreId: vodObjectStoreId,
