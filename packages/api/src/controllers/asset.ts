@@ -274,7 +274,7 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
 
   const { vodObjectStoreId } = req.config;
   const presignedUrl = await getS3PresignedUrl({
-    objectKey: `${playbackId}/source`,
+    objectKey: `directUpload/${playbackId}/source`,
     vodObjectStoreId,
   });
 
@@ -288,7 +288,6 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
     userId: req.user.id,
     objectStoreId: vodObjectStoreId,
   });
-
   res.json({ url: lpSignedUrl, playbackId: playbackId });
 });
 
@@ -296,11 +295,13 @@ app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
   let uploadUrl = Buffer.from(url, "base64").toString();
 
-  // get bucket and playbackId from s3 url
-  let bucket, playbackId;
+  // get playbackId from s3 url
+  let playbackId;
   try {
-    bucket = uploadUrl.match(/https:\/\/(.*)\/./)[1].split(".")[0];
-    playbackId = uploadUrl.split(`/${bucket}/`)[1].split("/")[0];
+    playbackId = uploadUrl.match(
+      /^https:\/\/storage.googleapis.com\/[^/]+\/directUpload\/([^/]+)/
+    )[1];
+    console.log(`playbackId: ${playbackId}`);
   } catch (e) {
     throw new UnprocessableEntityError(
       `the provided url for the upload is not valid or not supported: ${uploadUrl}`
@@ -325,7 +326,7 @@ app.put("/upload/:url", async (req, res) => {
           userId: asset.userId,
           params: {
             import: {
-              uploadedObjectKey: `${playbackId}/source`,
+              uploadedObjectKey: `directUpload/${playbackId}/source`,
             },
           },
           status: {

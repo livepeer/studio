@@ -140,7 +140,8 @@ export async function getS3PresignedUrl({ objectKey, vodObjectStoreId }) {
     },
     region: vodRegion,
     signingRegion: vodRegion,
-    endpoint: `https://${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}/${vodBucket}`,
+    endpoint: `https://${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
+    forcePathStyle: true,
   };
 
   const s3 = new S3Client(s3Configuration);
@@ -149,7 +150,7 @@ export async function getS3PresignedUrl({ objectKey, vodObjectStoreId }) {
     Key: objectKey,
   });
   const url = await getSignedUrl(s3, putCommand, { expiresIn: 15 * 60 }); // expires in seconds
-
+  console.log(`Signed URL: ${url}`);
   return url;
 }
 
