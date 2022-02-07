@@ -65,14 +65,7 @@ namespace messages {
       message: string;
       unretriable: boolean;
     };
-    output: {
-      import: {
-        videoFilePath: string;
-        metadataFilePath: string;
-        metadata: any;
-        assetSpec: Partial<Asset>;
-      };
-    };
+    output: ApiTask["output"];
   }
 }
 

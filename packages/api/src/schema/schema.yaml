@@ -881,6 +881,7 @@ components:
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
+          index: true
           description: Used to form playback URL and storage folder
         userId:
           type: string
@@ -1025,54 +1026,6 @@ components:
                     type: number
                     description: Bit depth of the track - only for audio tracks
                     example: 16
-            # hlsSpec:
-            #   type: object
-            #   additionalProperties: false
-            #   description: HLS spec for the asset
-            #   properties:
-            #     profiles:
-            #       type: array
-            #       description: HLS Profile manifests associated with the asset
-            #       items:
-            #         type: object
-            #         additionalProperties: false
-            #         properties:
-            #           type:
-            #             type: string
-            #             description: Type of the profile
-            #             example: manifest
-            #           name:
-            #             type: string
-            #             description: Filename of the manifest
-            #             example: variant_1080.m3u8
-            #           width:
-            #             type: number
-            #             description: width of the profile
-            #             example: 1920
-            #           height:
-            #             type: number
-            #             description: height of the profile
-            #             example: 1080
-            #           fps:
-            #             type: number
-            #             description: Frame rate of the profile
-            #             example: 30
-            #           id:
-            #             type: string
-            #             description: ID of the profile
-            #             example: ABC123
-            #           duration:
-            #             type: number
-            #             description: Duration of the profile in seconds
-            #             example: 23.8238
-            #           bitrate:
-            #             type: number
-            #             description: Bitrate of the profile in bits per second
-            #             example: 1000000
-            #           playbackId:
-            #             type: string
-            #             description: Playback ID of the asset
-            #             example: ABC123
         status:
           type: string
           description: Status of the asset
@@ -1082,10 +1035,14 @@ components:
             - failed
         originTaskId:
           type: string
+          index: true
+          readOnly: true
           description: Task ID of the task that created the asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         sourceAssetId:
           type: string
+          index: true
+          readOnly: true
           description:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
@@ -1098,6 +1055,7 @@ components:
         id:
           type: string
           readOnly: true
+          index: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         name:
@@ -1107,6 +1065,7 @@ components:
         userId:
           type: string
           readOnly: true
+          index: true
           description: User ID of the task owner
           example: 66E2161C-7670-4D05-B71D-DA2D6979556F
         type:
@@ -1130,6 +1089,7 @@ components:
         parentAssetId:
           type: string
           description: ID of the source asset
+          index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
           type: object
@@ -1181,13 +1141,16 @@ components:
           properties:
             import:
               type: object
-              additionalProperties: false
+              additionalProperties: true
               description: Output of the import task
               properties:
-                result:
+                videoFilePath:
                   type: string
-                  description: result of the import task
-                  example: Asset imported successfully
+                metadataFilePath:
+                  type: string
+                assetSpec:
+                  type: object
+                  $ref: "#/components/schemas/asset"
 
     api-token:
       type: object

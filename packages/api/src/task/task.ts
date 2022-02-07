@@ -87,7 +87,9 @@ export default class TaskScheduler {
           db.task.update(task.id, {
             status: {
               phase: "completed",
+              updatedAt: Date.now(),
             },
+            output: event.output,
           });
           return true;
         }
