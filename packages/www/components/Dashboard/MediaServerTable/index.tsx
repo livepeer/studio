@@ -26,7 +26,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           Configurable, deployable, and open-source
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Media Server (Mist) allows you to take any media from any
+          Livepeer Media Server (MistServer) allows you to take any media from any
           location, using any method, and deliver it seamlessly to anyone,
           anywhere, in any format.
         </Text>
