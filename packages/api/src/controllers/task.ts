@@ -128,15 +128,20 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(task);
 });
 
-app.post("/", authMiddleware({}), validatePost("task"), async (req, res) => {
-  const id = uuid();
-  const doc = validateTaskPayload(id, req.user.id, Date.now(), req.body);
+app.post(
+  "/",
+  authMiddleware({ anyAdmin: true }),
+  validatePost("task"),
+  async (req, res) => {
+    const id = uuid();
+    const doc = validateTaskPayload(id, req.user.id, Date.now(), req.body);
 
-  await db.task.create(doc);
+    await db.task.create(doc);
 
-  res.status(201);
-  res.json(doc);
-});
+    res.status(201);
+    res.json(doc);
+  }
+);
 
 app.post(
   "/:id/status",

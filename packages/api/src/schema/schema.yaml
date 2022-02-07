@@ -1077,9 +1077,9 @@ components:
           type: string
           description: Status of the asset
           enum:
-           - waiting
-           - ready
-           - failed
+            - waiting
+            - ready
+            - failed
         originTaskId:
           type: string
           description: Task ID of the task that created the asset
@@ -1171,6 +1171,9 @@ components:
             progress:
               type: number
               description: Current progress of the task in a 0-100 percentage
+            errorMessage:
+              type: string
+              description: Error message if the task failed
         output:
           type: object
           additionalProperties: false
