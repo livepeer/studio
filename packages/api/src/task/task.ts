@@ -46,8 +46,6 @@ export default class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    console.log(event);
-
     let obj = await db.task.find({ id: event.task.id });
     if (obj?.length) {
       let task = obj[0][0];
@@ -60,7 +58,7 @@ export default class TaskScheduler {
           updatedAt: Date.now(),
         });
         if (!event.error.unretriable) {
-          console.log("TASK ERROR: ", event.error.message);
+          console.log(`task event process error: ${event.error.message}`);
           return true;
         }
         // TODO: retry task
