@@ -12,6 +12,7 @@ import { BreadcrumbItem } from "../breadcrumb";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import Button from "@components/Marketing/Button";
 import ArrowLink from "@components/Marketing/ArrowLink";
+import { StyledServerIcon } from "@components/Marketing/Navigation/base";
 
 type Props = {
   links: any;
@@ -192,13 +193,18 @@ const Menu = ({
         </Box>
         <Box>
           <Flex>
-            <StyledPlatformsIcon
-              css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
+            <StyledServerIcon
+              css={{
+                fill: "white",
+                mt: "0px",
+                mr: "$3",
+                width: "16px",
+              }}
             />
             <ArrowLink
               hideArrow
               href="https://mistserver.org/"
-              css={{ fontWeight: 600, mb: "$2", fontSize: "$3" }}
+              css={{ fontWeight: 600, fontSize: "$3" }}
               target="_blank">
               Media Server
             </ArrowLink>

@@ -19,6 +19,12 @@ import ArrowLink from "../ArrowLink";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
+export const StyledServerIcon = ({ ...props }) => (
+  <Box as="svg" viewBox="0 0 24 24" {...props}>
+    <path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path>
+  </Box>
+);
+
 const StyledEcommerceIcon = ({ active = false, ...props }) => {
   return (
     <Box
@@ -227,14 +233,19 @@ const NavigationBase = ({
                   </Flex>
                 </Box>
                 <Box>
-                  <Flex>
-                    <StyledPlatformsIcon
-                      css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
+                  <Flex css={{ alignItems: "center" }}>
+                    <StyledServerIcon
+                      css={{
+                        fill: "white",
+                        mt: "0px",
+                        mr: "$3",
+                        width: "16px",
+                      }}
                     />
                     <ArrowLink
                       hideArrow
                       href="https://mistserver.org/"
-                      css={{ fontWeight: 500, mb: "$2", fontSize: "$3" }}
+                      css={{ fontWeight: 500, fontSize: "$3" }}
                       target="_blank">
                       Media Server
                     </ArrowLink>
