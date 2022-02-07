@@ -81,6 +81,13 @@ export default class TaskScheduler {
             videoSpec: assetSpec.videoSpec,
             size: assetSpec.size,
             originTaskId: task.id,
+            status: "ready",
+          });
+
+          db.task.update(task.id, {
+            status: {
+              phase: "completed",
+            },
           });
           return true;
         }
