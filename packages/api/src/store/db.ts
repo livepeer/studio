@@ -12,6 +12,8 @@ import {
   Webhook,
   PasswordResetToken,
   MultistreamTarget,
+  Asset,
+  Task,
   Usage,
   Region,
   WebhookResponse,
@@ -62,6 +64,8 @@ export class DB {
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
+  asset: Table<Asset>;
+  task: Table<Task>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -142,6 +146,14 @@ export class DB {
     this.apiToken = makeTable<ApiToken>({
       db: this,
       schema: schemas["api-token"],
+    });
+    this.asset = makeTable<Asset>({
+      db: this,
+      schema: schemas["asset"],
+    });
+    this.task = makeTable<Task>({
+      db: this,
+      schema: schemas["task"],
     });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });

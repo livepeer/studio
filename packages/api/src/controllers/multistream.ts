@@ -4,7 +4,13 @@ import mung from "express-mung";
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
-import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import {
+  FieldsMap,
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
 import { db } from "../store";
 import { FindOptions, FindQuery, WithID } from "../store/types";
 import {
@@ -47,14 +53,6 @@ function adminListQuery(
   const query = parseFilters(fieldsMap, filters);
   const opts = { limit, cursor, fields, from, order, process };
   return [query, opts];
-}
-
-function toStringValues(obj: Record<string, any>) {
-  const strObj: Record<string, string> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    strObj[key] = value.toString();
-  }
-  return strObj;
 }
 
 function respondError(res: Response, status: number, error: string) {

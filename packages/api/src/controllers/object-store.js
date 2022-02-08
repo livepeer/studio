@@ -78,7 +78,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await req.store.get(`object-store/${req.params.id}`);
+  const os = await req.store.get(
+    `object-store/${req.params.id}`,
+    !req.user.admin
+  );
   if (!os) {
     res.status(404);
     return res.json({

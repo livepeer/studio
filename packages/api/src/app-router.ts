@@ -16,6 +16,7 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
+import TaskScheduler from "./task/task";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 import { CliArgs } from "./parse-cli";
@@ -43,6 +44,7 @@ export default async function makeApp(params: CliArgs) {
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
+    vodObjectStoreId,
     kubeNamespace,
     kubeBroadcasterService,
     kubeBroadcasterTemplate,
@@ -98,6 +100,17 @@ export default async function makeApp(params: CliArgs) {
   process.on("beforeExit", (code) => {
     queue.close();
     webhookCannon.stop();
+  });
+
+  // Task Scheduler
+  const taskScheduler = new TaskScheduler({
+    queue,
+  });
+  await taskScheduler.start();
+
+  process.on("beforeExit", (code) => {
+    queue.close();
+    taskScheduler.stop();
   });
 
   if (!stripeSecretKey) {
@@ -203,6 +216,7 @@ export default async function makeApp(params: CliArgs) {
   return {
     router: app,
     webhookCannon,
+    taskScheduler,
     store,
     db,
     queue,

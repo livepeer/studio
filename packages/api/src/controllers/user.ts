@@ -21,7 +21,6 @@ import {
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
 import { WithID } from "../store/types";
-import { FieldsMap } from "./helpers";
 import {
   makeNextHREF,
   sendgridEmail,
@@ -29,15 +28,9 @@ import {
   parseOrder,
   recaptchaVerify,
   sendgridValidateEmail,
+  toStringValues,
+  FieldsMap,
 } from "./helpers";
-
-function toStringValues(obj: Record<string, any>) {
-  const strObj: Record<string, string> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    strObj[key] = value.toString();
-  }
-  return strObj;
-}
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 

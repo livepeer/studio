@@ -29,6 +29,7 @@ import {
   parseOrder,
   pathJoin,
   FieldsMap,
+  toStringValues,
 } from "./helpers";
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
@@ -219,14 +220,6 @@ const fieldsMap: FieldsMap = {
     type: "real",
   },
 };
-
-function toStringValues(obj: Record<string, any>) {
-  const strObj: Record<string, string> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    strObj[key] = value.toString();
-  }
-  return strObj;
-}
 
 app.get("/", authMiddleware({}), async (req, res) => {
   let {

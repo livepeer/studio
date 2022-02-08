@@ -1,11 +1,12 @@
-import { User } from "../schema/types";
+import { Asset, Task as ApiTask, User } from "../schema/types";
 import { DBStream } from "./stream-table";
 import { WithID } from "./types";
 import { DBWebhook, EventKey } from "./webhook-table";
 
 namespace messages {
-  export type Any = Webhooks;
+  export type Any = Webhooks | Task;
   export type Webhooks = WebhookEvent | WebhookTrigger;
+  export type Task = TaskTrigger | TaskResult;
   export type Types = Any["type"];
 
   // This is a global format followed by all messages sent by Livepeer services
@@ -19,7 +20,7 @@ namespace messages {
     // Unix timestamp in milliseconds.
     timestamp: number;
     // ID of the stream as defined by the API in the authWebhook (ID from DB).
-    streamId: string;
+    streamId?: string;
   }
 
   type TPayload = {
@@ -44,6 +45,27 @@ namespace messages {
     stream: DBStream;
     retries?: number;
     lastInterval?: number;
+  }
+
+  type TaskInfo = {
+    id: string;
+    type: ApiTask["type"];
+    snapshot: ApiTask;
+  };
+
+  export interface TaskTrigger extends Base {
+    type: "task_trigger";
+    task: TaskInfo;
+  }
+
+  export interface TaskResult extends Base {
+    type: "task_result";
+    task: TaskInfo;
+    error: {
+      message: string;
+      unretriable: boolean;
+    };
+    output: ApiTask["output"];
   }
 }
 

@@ -24,6 +24,10 @@ tags:
     description: Changes user admin status
   - name: webhook
     description: Webhooks endpoints
+  - name: asset
+    description: Asset Endpoints
+  - name: task
+    description: Task Endpoints
   - name: webhook-response
     description: webhook client responses
 
@@ -854,6 +858,299 @@ components:
             Timestamp (in milliseconds) at which multistream target object was
             created
           example: 1587667174725
+
+    asset:
+      type: object
+      table: asset
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+          index: true
+        type:
+          type: string
+          enum:
+            - video
+            - audio
+          description: Type of the asset.
+          example: video
+        playbackId:
+          type: string
+          example: eaw4nk06ts2d0mzb
+          index: true
+          description: Used to form playback URL and storage folder
+        userId:
+          type: string
+          readOnly: true
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+          index: true
+          description: owner of the asset
+        deleted:
+          type: boolean
+          description: Set to true when the asset is deleted
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description:
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
+          example: filename.mp4
+        meta:
+          type: object
+          description: User input metadata associated with the asset
+          example:
+            {
+              "title": "My awesome video",
+              "description": "This is a video of my awesome life",
+              "tags": ["awesome", "life", "video"],
+            }
+        updatedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which the asset was last updated
+          example: 1587667174725
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which asset was created
+          example: 1587667174725
+        size:
+          type: number
+          readOnly: true
+          description: Size of the asset in bytes
+          example: 84934509
+        hash:
+          type: array
+          description: Hash of the asset
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              hash:
+                type: string
+                description: Hash of the asset
+                example: 9b560b28b85378a5004117539196ab24e21bbd75b0e9eb1a8bc7c5fd80dc5b57
+              algorithm:
+                type: string
+                description: Hash algorithm used to compute the hash
+                example: sha256
+        videoSpec:
+          type: object
+          additionalProperties: false
+          readOnly: true
+          description: Video metadata
+          properties:
+            format:
+              type: string
+              description: Format of the asset
+              example: mp4
+            duration:
+              type: number
+              description: Duration of the asset in seconds (float)
+              example: 23.8328
+            bitrate:
+              type: number
+              description: Bitrate of the video in bits per second
+              example: 1000000
+            tracks:
+              type: array
+              description:
+                List of tracks associated with the asset when the format
+                contemplates them (e.g. mp4)
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - type
+                  - codec
+                properties:
+                  type:
+                    type: string
+                    description: type of track
+                    enum:
+                      - video
+                      - audio
+                    example: video
+                  codec:
+                    type: string
+                    description: Codec of the track
+                    example: aac
+                  startTime:
+                    type: number
+                    description: Start time of the track in seconds
+                    example: 23.8238
+                  duration:
+                    type: number
+                    description: Duration of the track in seconds
+                    example: 23.8238
+                  bitrate:
+                    type: number
+                    description: Bitrate of the track in bits per second
+                    example: 1000000
+                  width:
+                    type: number
+                    description: Width of the track - only for video tracks
+                    example: 1920
+                  height:
+                    type: number
+                    description: Height of the track - only for video tracks
+                    example: 1080
+                  pixelFormat:
+                    type: string
+                    description:
+                      Pixel format of the track - only for video tracks
+                    example: yuv420p
+                  fps:
+                    type: number
+                    description: Frame rate of the track - only for video tracks
+                    example: 30
+                  channels:
+                    type: number
+                    description: Amount of audio channels in the track
+                    example: 2
+                  sampleRate:
+                    type: number
+                    description:
+                      Sample rate of the track in samples per second - only for
+                      audio tracks
+                    example: 44100
+                  bitDepth:
+                    type: number
+                    description: Bit depth of the track - only for audio tracks
+                    example: 16
+        status:
+          type: string
+          description: Status of the asset
+          enum:
+            - waiting
+            - ready
+            - failed
+        originTaskId:
+          type: string
+          index: true
+          readOnly: true
+          description: Task ID of the task that created the asset
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        sourceAssetId:
+          type: string
+          index: true
+          readOnly: true
+          description:
+            ID of the source asset (root) - If missing, this is a root asset
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+
+    task:
+      type: object
+      table: task
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          readOnly: true
+          index: true
+          description: Task ID
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description: Name of the task
+          example: Import video file
+        userId:
+          type: string
+          readOnly: true
+          index: true
+          description: User ID of the task owner
+          example: 66E2161C-7670-4D05-B71D-DA2D6979556F
+        type:
+          type: string
+          description: Type of the task
+          enum:
+            - import
+            - export
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which task was created
+          example: 1587667174725
+        updatedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which task was updated
+          example: 1587667174725
+        deleted:
+          type: boolean
+          description: Set to true when the task is deleted
+        parentAssetId:
+          type: string
+          description: ID of the source asset
+          index: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        params:
+          type: object
+          additionalProperties: false
+          description: Parameters of the task
+          properties:
+            import:
+              type: object
+              additionalProperties: false
+              description: Parameters for the import task
+              properties:
+                url:
+                  type: string
+                  description: URL of the asset to import
+                  example: https://cdn.livepeer.com/ABC123/filename.mp4
+                uploadedObjectKey:
+                  type: string
+                  description: S3 object key of the uploaded asset
+                  example: ABC123/filename.mp4
+        status:
+          type: object
+          additionalProperties: false
+          description: Status of the task
+          properties:
+            phase:
+              type: string
+              description: Phase of the task
+              enum:
+                - pending
+                - waiting
+                - running
+                - failed
+                - completed
+                - cancelled
+            updatedAt:
+              type: number
+              description: Timestamp (in milliseconds) at which task was updated
+              example: 1587667174725
+            progress:
+              type: number
+              description: Current progress of the task in a 0-100 percentage
+            errorMessage:
+              type: string
+              description: Error message if the task failed
+        output:
+          type: object
+          additionalProperties: false
+          description: Output of the task
+          properties:
+            import:
+              type: object
+              additionalProperties: true
+              description: Output of the import task
+              properties:
+                videoFilePath:
+                  type: string
+                metadataFilePath:
+                  type: string
+                assetSpec:
+                  type: object
+                  $ref: "#/components/schemas/asset"
 
     api-token:
       type: object
@@ -1865,6 +2162,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/webhook"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /asset:
+    tags:
+      - asset
+    get:
+      description: gets a list of assets defined by the user
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/asset"
         default:
           description: Error
           content:

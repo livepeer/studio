@@ -7,7 +7,13 @@ import { db } from "../store";
 import { DBSession } from "../store/db";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { FieldsMap, makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import {
+  FieldsMap,
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
 import {
   USER_SESSION_TIMEOUT,
   getCombinedStats,
@@ -44,14 +50,6 @@ const fieldsMap: FieldsMap = {
   outgoingRate: { val: `session.data->'outgoingRate'`, type: "real" },
   recordingStatus: `session.data->'recordingStatus'`,
 };
-
-function toStringValues(obj: Record<string, any>) {
-  const strObj: Record<string, string> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    strObj[key] = value.toString();
-  }
-  return strObj;
-}
 
 app.get("/", authMiddleware({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId, count } =
