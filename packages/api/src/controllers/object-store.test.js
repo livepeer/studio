@@ -117,8 +117,8 @@ describe("controllers/object-stores", () => {
         expect(res.status).toBe(200);
         const objStore = await res.json();
         expect(objStore.id).toEqual(storeChangeId.id);
-        // making sure url is coming back as null
-        expect(objStore.url).toEqual(null);
+        // admins should be able to access the URL
+        expect(objStore.url).toEqual(store.url);
       }
 
       const res = await client.get(`/object-store`);
@@ -149,10 +149,10 @@ describe("controllers/object-stores", () => {
     });
 
     it("should create an object store", async () => {
-      postMockStore.userId = adminUser.id;
-      postMockStore.name = "test name";
+      client.jwtAuth = `${nonAdminToken["token"]}`;
+      const mockStore = { ...postMockStore, name: "test name" };
       const now = Date.now();
-      let res = await client.post("/object-store", { ...postMockStore });
+      let res = await client.post("/object-store", { ...mockStore });
       expect(res.status).toBe(201);
       const objStore = await res.json();
       expect(objStore.id).toBeDefined();
@@ -163,11 +163,11 @@ describe("controllers/object-stores", () => {
       const resp = await client.get(`/object-store/${objStore.id}`);
       expect(resp.status).toBe(200);
       const objStoreGet = await resp.json();
-      expect(objStore.url).toEqual(undefined);
-      expect(objStore.userId).toBe(objStoreGet.userId);
+      expect(objStoreGet.url).toEqual(null);
+      expect(objStoreGet.userId).toBe(objStore.userId);
 
       // if same request is made, should return a 201
-      res = await client.post("/object-store", { ...postMockStore });
+      res = await client.post("/object-store", { ...mockStore });
       expect(res.status).toBe(201);
     });
 
