@@ -198,10 +198,14 @@ app.post("/export", authMiddleware({}), async (req, res) => {
     throw new ForbiddenError(`User can only export their own assets`);
   }
 
-  await req.taskScheduler.scheduleTask(asset, "export", {
-    ipfs: req.body.ipfs,
-    url: req.body.url,
-  });
+  await req.taskScheduler.scheduleTask(
+    "export",
+    {
+      ipfs: req.body.ipfs,
+      url: req.body.url,
+    },
+    asset
+  );
 
   res.status(201);
   res.end();
@@ -226,9 +230,14 @@ app.post("/import", authMiddleware({}), async (req, res) => {
 
   await db.asset.create(asset);
 
-  await req.taskScheduler.scheduleTask(asset, "import", {
-    url: req.body.url,
-  });
+  await req.taskScheduler.scheduleTask(
+    "import",
+    {
+      url: req.body.url,
+    },
+    undefined,
+    asset
+  );
 
   res.status(201);
   res.end();
@@ -282,9 +291,14 @@ app.put("/upload/:url", async (req, res) => {
 
     proxy.on("end", async function (proxyReq, _, res) {
       if (res.statusCode == 200) {
-        await req.taskScheduler.scheduleTask(asset, "import", {
-          uploadedObjectKey: `directUpload/${playbackId}/source`,
-        });
+        await req.taskScheduler.scheduleTask(
+          "import",
+          {
+            uploadedObjectKey: `directUpload/${playbackId}/source`,
+          },
+          undefined,
+          asset
+        );
       } else {
         console.log(
           `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`

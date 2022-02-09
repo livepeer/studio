@@ -84,7 +84,6 @@ export default class TaskScheduler {
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
             size: assetSpec.size,
-            originTaskId: task.id,
             status: "ready",
           });
 
@@ -107,17 +106,18 @@ export default class TaskScheduler {
   }
 
   async scheduleTask(
-    asset: Asset,
     type: "import" | "export" | "transcode",
-    params: object
+    params: object,
+    inputAsset?: Asset,
+    outputAsset?: Asset
   ) {
     let newTask: WithID<Task> = {
       id: uuid(),
-      name: `asset-upload-${asset.name}-${asset.createdAt}`,
       createdAt: Date.now(),
       type: type,
-      inputAssetId: asset.id,
-      userId: asset.userId,
+      outputAssetId: outputAsset?.id,
+      inputAssetId: inputAsset?.id,
+      userId: inputAsset?.userId || outputAsset?.userId,
       params: {},
       status: {
         phase: "pending",

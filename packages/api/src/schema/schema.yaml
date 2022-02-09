@@ -1033,12 +1033,6 @@ components:
             - waiting
             - ready
             - failed
-        originTaskId:
-          type: string
-          index: true
-          readOnly: true
-          description: Task ID of the task that created the asset
-          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         sourceAssetId:
           type: string
           index: true
@@ -1058,10 +1052,6 @@ components:
           index: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        name:
-          type: string
-          description: Name of the task
-          example: Import video file
         userId:
           type: string
           readOnly: true
