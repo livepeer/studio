@@ -80,7 +80,7 @@ export default class TaskScheduler {
             );
           }
           // TODO: bundle asset and task update in a single transaction
-          await db.asset.update(task.parentAssetId, {
+          await db.asset.update(task.inputAssetId, {
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
             size: assetSpec.size,
@@ -116,7 +116,7 @@ export default class TaskScheduler {
       name: `asset-upload-${asset.name}-${asset.createdAt}`,
       createdAt: Date.now(),
       type: type,
-      parentAssetId: asset.id,
+      inputAssetId: asset.id,
       userId: asset.userId,
       params: {},
       status: {

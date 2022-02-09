@@ -1087,9 +1087,14 @@ components:
         deleted:
           type: boolean
           description: Set to true when the task is deleted
-        parentAssetId:
+        inputAssetId:
           type: string
-          description: ID of the source asset
+          description: ID of the input asset
+          index: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        outputAssetId:
+          type: string
+          description: ID of the input asset
           index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
