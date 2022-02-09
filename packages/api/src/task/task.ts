@@ -46,6 +46,8 @@ export default class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
+    const allowedTasks = ["import", "export", "transcode"];
+
     let obj = await db.task.find({ id: event.task.id });
     if (obj?.length) {
       let task = obj[0][0];
@@ -75,7 +77,7 @@ export default class TaskScheduler {
               `task event process error: assetSpec not found in TaskResult for task ${event.task.id}`
             );
           }
-          // TODO: bundle them in a single transaction
+          // TODO: bundle asset and task update in a single transaction
           await db.asset.update(task.parentAssetId, {
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
@@ -84,17 +86,22 @@ export default class TaskScheduler {
             status: "ready",
           });
 
-          await db.task.update(task.id, {
-            status: {
-              phase: "completed",
-              updatedAt: Date.now(),
-            },
-            output: event.output,
-          });
           return true;
         }
       }
-      console.log(`task type unknown: ${event.task.type}`);
+
+      if (allowedTasks.includes(event.task.type)) {
+        await db.task.update(task.id, {
+          status: {
+            phase: "completed",
+            updatedAt: Date.now(),
+          },
+          output: event.output,
+        });
+        return true;
+      } else {
+        console.log(`task type unknown: ${event.task.type}`);
+      }
     } else {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
