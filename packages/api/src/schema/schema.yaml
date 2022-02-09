@@ -1109,6 +1109,17 @@ components:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+            export:
+              type: object
+              additionalProperties: false
+              description: Parameters for the export task
+              properties:
+                url:
+                  type: string
+                  description: s3 presigned url of the asset to export
+                  example: s3+https://s3.amazonaws.com/livepeer-test/ABC123/filename.mp4
+                ipfs:
+                  type: boolean
         status:
           type: object
           additionalProperties: false
@@ -1151,6 +1162,22 @@ components:
                 assetSpec:
                   type: object
                   $ref: "#/components/schemas/asset"
+            export:
+              type: object
+              additionalProperties: true
+              description: Output of the export task
+              properties:
+                videoFilePath:
+                  type: string
+                  description: could be a url or a IPFS CID
+                metadataFilePath:
+                  type: string
+                  description: could be a url or a IPFS CID
+                assetSpec:
+                  type: object
+                  $ref: "#/components/schemas/asset"
+                ipfs:
+                  type: boolean
 
     api-token:
       type: object

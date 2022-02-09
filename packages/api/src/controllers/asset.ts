@@ -12,7 +12,11 @@ import {
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { ForbiddenError, UnprocessableEntityError } from "../store/errors";
+import {
+  ForbiddenError,
+  UnprocessableEntityError,
+  NotFoundError,
+} from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { IStore } from "../types/common";
@@ -169,49 +173,68 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await db.asset.get(req.params.id);
-  if (!os) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
+  const asset = await db.asset.get(req.params.id);
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
   }
 
-  if (req.user.admin !== true && req.user.id !== os.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own assets"],
-    });
+  if (req.user.admin !== true && req.user.id !== asset.userId) {
+    throw new ForbiddenError(
+      `      errors: ["user can only request information on their own assets"],
+      `
+    );
   }
 
-  res.json(os);
+  res.json(asset);
 });
 
-// TODO: Delete this API? Assets will only be created by task result events.
-app.post(
-  "/",
-  authMiddleware({ anyAdmin: true }),
-  validatePost("asset"),
-  async (req, res) => {
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      req.body
-    );
-    if (!req.user.admin) {
-      res.status(403);
-      return res.json({ errors: ["Forbidden"] });
-    }
-    await db.asset.create(doc);
-    res.status(201);
-    res.json(doc);
+app.post("/export", authMiddleware({}), async (req, res) => {
+  const assetId = req.body.assetId;
+  const asset = await db.asset.get(assetId);
+  if (!asset) {
+    throw new NotFoundError(`Asset not found with id ${assetId}`);
   }
-);
+  if (req.user.id !== asset.userId) {
+    throw new ForbiddenError(`User can only export their own assets`);
+  }
+
+  const task = await db.task.create({
+    id: uuid(),
+    name: `asset-export-${asset.name}-${asset.createdAt}`,
+    createdAt: asset.createdAt,
+    type: "export",
+    parentAssetId: asset.id,
+    userId: asset.userId,
+    params: {
+      export: {
+        ipfs: req.body.ipfs,
+        url: req.body.url,
+      },
+    },
+    status: {
+      phase: "pending",
+      updatedAt: asset.createdAt,
+    },
+  });
+
+  await req.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
+    type: "task_trigger",
+    id: uuid(),
+    timestamp: Date.now(),
+    task: {
+      id: task.id,
+      type: task.type,
+      snapshot: task,
+    },
+  });
+
+  await db.task.update(task.id, {
+    status: { phase: "waiting", updatedAt: Date.now() },
+  });
+
+  res.status(201);
+  res.end();
+});
 
 app.post("/import", authMiddleware({}), async (req, res) => {
   const id = uuid();
@@ -366,10 +389,7 @@ app.put("/upload/:url", async (req, res) => {
     });
   } else {
     // we expect an existing asset to be found
-    res.status(404);
-    return res.json({
-      errors: ["related asset not found"],
-    });
+    throw new NotFoundError(`related asset not found`);
   }
 });
 
@@ -377,14 +397,10 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
   if (!asset) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    throw new NotFoundError(`Asset not found`);
   }
   if (!req.user.admin && req.user.id !== asset.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users may only delete their own assets"],
-    });
+    throw new ForbiddenError(`users may only delete their own assets`);
   }
   await db.asset.delete(id);
   res.status(204);
@@ -401,8 +417,7 @@ app.patch(
     const asset = await db.asset.get(req.body.id);
     if (!req.user.admin) {
       // do not reveal that asset exists
-      res.status(403);
-      return res.json({ errors: ["Forbidden"] });
+      throw new ForbiddenError(`Forbidden`);
     }
 
     const { id, userId, createdAt } = asset;
