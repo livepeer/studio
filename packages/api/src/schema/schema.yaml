@@ -1120,7 +1120,7 @@ components:
                   description: s3 presigned url of the asset to export
                   example: s3+https://s3.amazonaws.com/livepeer-test/ABC123/filename.mp4
                 ipfs:
-                  type: boolean
+                  type: object
             transcode:
               type: object
               additionalProperties: false
@@ -1175,17 +1175,16 @@ components:
               additionalProperties: true
               description: Output of the export task
               properties:
-                videoFilePath:
-                  type: string
-                  description: could be a url or a IPFS CID
-                metadataFilePath:
-                  type: string
-                  description: could be a url or a IPFS CID
-                assetSpec:
-                  type: object
-                  $ref: "#/components/schemas/asset"
                 ipfs:
-                  type: boolean
+                  type: object
+                  properties:
+                    videoFileCid:
+                      type: string
+                      description: IPFS CID of the exported video file
+                    erc1155MetadataCid:
+                      type: string
+                      description:
+                        IPFS CID of the default metadata exported for the video
 
     api-token:
       type: object

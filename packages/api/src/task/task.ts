@@ -92,18 +92,13 @@ export default class TaskScheduler {
         }
       }
 
-      if (allowedTasks.includes(event.task.type)) {
-        await db.task.update(task.id, {
-          status: {
-            phase: "completed",
-            updatedAt: Date.now(),
-          },
-          output: event.output,
-        });
-        return true;
-      } else {
-        console.log(`task type unknown: ${event.task.type}`);
-      }
+      await db.task.update(task.id, {
+        status: {
+          phase: "completed",
+          updatedAt: Date.now(),
+        },
+        output: event.output,
+      });
     } else {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
@@ -143,6 +138,7 @@ export default class TaskScheduler {
         snapshot: task,
       },
     });
+
     await db.task.update(task.id, {
       status: { phase: "waiting", updatedAt: Date.now() },
     });

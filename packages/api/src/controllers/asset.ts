@@ -198,13 +198,9 @@ app.post("/export", authMiddleware({}), async (req, res) => {
     throw new ForbiddenError(`User can only export their own assets`);
   }
 
-  let task = await req.taskScheduler.scheduleTask(asset, "export", {
+  await req.taskScheduler.scheduleTask(asset, "export", {
     ipfs: req.body.ipfs,
     url: req.body.url,
-  });
-
-  await db.task.update(task.id, {
-    status: { phase: "waiting", updatedAt: Date.now() },
   });
 
   res.status(201);
@@ -230,12 +226,8 @@ app.post("/import", authMiddleware({}), async (req, res) => {
 
   await db.asset.create(asset);
 
-  let task = await req.taskScheduler.scheduleTask(asset, "import", {
+  await req.taskScheduler.scheduleTask(asset, "import", {
     url: req.body.url,
-  });
-
-  await db.task.update(task.id, {
-    status: { phase: "waiting", updatedAt: Date.now() },
   });
 
   res.status(201);
@@ -290,12 +282,8 @@ app.put("/upload/:url", async (req, res) => {
 
     proxy.on("end", async function (proxyReq, _, res) {
       if (res.statusCode == 200) {
-        let task = await req.taskScheduler.scheduleTask(asset, "import", {
+        await req.taskScheduler.scheduleTask(asset, "import", {
           uploadedObjectKey: `directUpload/${playbackId}/source`,
-        });
-
-        await db.task.update(task.id, {
-          status: { phase: "waiting", updatedAt: Date.now() },
         });
       } else {
         console.log(
