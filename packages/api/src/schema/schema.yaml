@@ -1074,6 +1074,7 @@ components:
           enum:
             - import
             - export
+            - transcode
         createdAt:
           type: number
           readOnly: true
@@ -1120,6 +1121,13 @@ components:
                   example: s3+https://s3.amazonaws.com/livepeer-test/ABC123/filename.mp4
                 ipfs:
                   type: boolean
+            transcode:
+              type: object
+              additionalProperties: false
+              description: Parameters for the transcode task
+              properties:
+                params:
+                  type: object
         status:
           type: object
           additionalProperties: false

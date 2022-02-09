@@ -198,34 +198,9 @@ app.post("/export", authMiddleware({}), async (req, res) => {
     throw new ForbiddenError(`User can only export their own assets`);
   }
 
-  const task = await db.task.create({
-    id: uuid(),
-    name: `asset-export-${asset.name}-${asset.createdAt}`,
-    createdAt: asset.createdAt,
-    type: "export",
-    parentAssetId: asset.id,
-    userId: asset.userId,
-    params: {
-      export: {
-        ipfs: req.body.ipfs,
-        url: req.body.url,
-      },
-    },
-    status: {
-      phase: "pending",
-      updatedAt: asset.createdAt,
-    },
-  });
-
-  await req.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
-    type: "task_trigger",
-    id: uuid(),
-    timestamp: Date.now(),
-    task: {
-      id: task.id,
-      type: task.type,
-      snapshot: task,
-    },
+  let task = await req.taskScheduler.scheduleTask(asset, "export", {
+    ipfs: req.body.ipfs,
+    url: req.body.url,
   });
 
   await db.task.update(task.id, {
@@ -255,34 +230,10 @@ app.post("/import", authMiddleware({}), async (req, res) => {
 
   await db.asset.create(asset);
 
-  // TODO: move the task creation and spawn into task scheduler
-  const task = await db.task.create({
-    id: uuid(),
-    name: `asset-import-${asset.name}-${asset.createdAt}`,
-    createdAt: asset.createdAt,
-    type: "import",
-    parentAssetId: asset.id,
-    userId: asset.userId,
-    params: {
-      import: {
-        url: req.body.url,
-      },
-    },
-    status: {
-      phase: "pending",
-      updatedAt: asset.createdAt,
-    },
+  let task = await req.taskScheduler.scheduleTask(asset, "import", {
+    url: req.body.url,
   });
-  await req.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
-    type: "task_trigger",
-    id: uuid(),
-    timestamp: Date.now(),
-    task: {
-      id: task.id,
-      type: task.type,
-      snapshot: task,
-    },
-  });
+
   await db.task.update(task.id, {
     status: { phase: "waiting", updatedAt: Date.now() },
   });
@@ -339,39 +290,10 @@ app.put("/upload/:url", async (req, res) => {
 
     proxy.on("end", async function (proxyReq, _, res) {
       if (res.statusCode == 200) {
-        // TODO: move the task creation and spawn into task scheduler
-        const createdAt = Date.now();
-        let task = await db.task.create({
-          id: uuid(),
-          name: `asset-upload-${asset.name}-${asset.createdAt}`,
-          createdAt,
-          type: "import",
-          parentAssetId: asset.id,
-          userId: asset.userId,
-          params: {
-            import: {
-              uploadedObjectKey: `directUpload/${playbackId}/source`,
-            },
-          },
-          status: {
-            phase: "pending",
-            updatedAt: createdAt,
-          },
+        let task = await req.taskScheduler.scheduleTask(asset, "import", {
+          uploadedObjectKey: `directUpload/${playbackId}/source`,
         });
-        await req.queue.publish(
-          "task",
-          `task.trigger.${task.type}.${task.id}`,
-          {
-            type: "task_trigger",
-            id: uuid(),
-            timestamp: Date.now(),
-            task: {
-              id: task.id,
-              type: task.type,
-              snapshot: task,
-            },
-          }
-        );
+
         await db.task.update(task.id, {
           status: { phase: "waiting", updatedAt: Date.now() },
         });

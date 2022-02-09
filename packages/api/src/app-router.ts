@@ -137,6 +137,7 @@ export default async function makeApp(params: CliArgs) {
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
     req.queue = queue;
+    req.taskScheduler = taskScheduler;
     req.stripe = stripe;
     next();
   });
@@ -216,7 +217,6 @@ export default async function makeApp(params: CliArgs) {
   return {
     router: app,
     webhookCannon,
-    taskScheduler,
     store,
     db,
     queue,

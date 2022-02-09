@@ -2,7 +2,9 @@ import { ConsumeMessage } from "amqplib";
 import { db } from "../store";
 import messages from "../store/messages";
 import Queue from "../store/queue";
-
+import { Asset, Task } from "../schema/types";
+import { v4 as uuid } from "uuid";
+import { WithID } from "../store/types";
 export default class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -107,5 +109,44 @@ export default class TaskScheduler {
       return true;
     }
     return false;
+  }
+
+  async scheduleTask(
+    asset: Asset,
+    type: "import" | "export" | "transcode",
+    params: object
+  ) {
+    let newTask: WithID<Task> = {
+      id: uuid(),
+      name: `asset-upload-${asset.name}-${asset.createdAt}`,
+      createdAt: Date.now(),
+      type: type,
+      parentAssetId: asset.id,
+      userId: asset.userId,
+      params: {},
+      status: {
+        phase: "pending",
+        updatedAt: Date.now(),
+      },
+    };
+
+    newTask.params[type] = params;
+
+    let task = await db.task.create(newTask);
+    await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
+      type: "task_trigger",
+      id: uuid(),
+      timestamp: Date.now(),
+      task: {
+        id: task.id,
+        type: task.type,
+        snapshot: task,
+      },
+    });
+    await db.task.update(task.id, {
+      status: { phase: "waiting", updatedAt: Date.now() },
+    });
+
+    return task;
   }
 }
