@@ -1224,59 +1224,72 @@ components:
                         gateway
 
     export-task-params:
-      type: object
-      additionalProperties: false
       description: Parameters for the export task
-      properties:
-        custom:
-          type: object
-          description: custom URL parameters for the export task
+      oneOf:
+        - type: object
           additionalProperties: false
-          required: [url]
+          required: [custom]
           properties:
-            url:
-              type: string
-              description: URL where to export the asset
-              example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
-            method:
-              type: string
-              description: Method to use on the export request
-              default: PUT
-            headers:
+            custom:
               type: object
-              description: Headers to add to the export request
-              additionalProperties:
-                type: string
-        ipfs:
-          type: object
+              description: custom URL parameters for the export task
+              additionalProperties: false
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  description: URL where to export the asset
+                  example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
+                method:
+                  type: string
+                  description: Method to use on the export request
+                  default: PUT
+                headers:
+                  type: object
+                  description: Headers to add to the export request
+                  additionalProperties:
+                    type: string
+        - type: object
           additionalProperties: false
+          required: [ipfs]
           properties:
-            pinata:
+            ipfs:
               type: object
-              description:
-                Custom credentials for the Piñata service. Must have either a
-                JWT or an API key and an API secret.
               additionalProperties: false
               properties:
-                jwt:
-                  type: string
-                  writeOnly: true
+                pinata:
                   description:
-                    Will be added to the Authorization header as a Bearer token.
-                apiKey:
-                  type: string
-                  description: Will be added to the pinata_api_key header.
-                apiSecret:
-                  type: string
-                  writeOnly: true
+                    Custom credentials for the Piñata service. Must have either
+                    a JWT or an API key and an API secret.
+                  oneOf:
+                    - type: object
+                      additionalProperties: false
+                      required: [jwt]
+                      properties:
+                        jwt:
+                          type: string
+                          writeOnly: true
+                          description:
+                            Will be added to the Authorization header as a
+                            Bearer token.
+                    - type: object
+                      additionalProperties: false
+                      required: [apiKey, apiSecret]
+                      properties:
+                        apiKey:
+                          type: string
+                          description: Will be added to the pinata_api_key header.
+                        apiSecret:
+                          type: string
+                          writeOnly: true
+                          description:
+                            Will be added to the pinata_secret_api_key header.
+                erc1155Metadata:
+                  type: object
                   description:
-                    Will be added to the pinata_secret_api_key header.
-            erc1155Metadata:
-              type: object
-              description:
-                Additional data to add to the automatic ERC-1155 default export.
-                Will be deep merged with the default metadata regularly
-                exported.
+                    Additional data to add to the automatic ERC-1155 default
+                    export. Will be deep merged with the default metadata
+                    exported.
 
     api-token:
       type: object

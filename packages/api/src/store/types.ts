@@ -1,6 +1,7 @@
 export interface FieldSpec {
   [key: string]: any;
   writeOnly?: boolean;
+  oneOf?: FieldSpec[];
   properties?: Record<string, FieldSpec>;
 }
 

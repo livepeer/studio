@@ -277,6 +277,11 @@ export default class Table<T extends DBObject> {
 
   // obfuscates writeOnly fields in objects returned
   cleanWriteOnlyResponse(doc: T, schema: FieldSpec = this.schema): T {
+    if (schema.oneOf?.length) {
+      for (const oneSchema of schema.oneOf) {
+        doc = this.cleanWriteOnlyResponse(doc, oneSchema);
+      }
+    }
     if (!schema.properties) {
       return doc;
     }
