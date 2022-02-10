@@ -12,7 +12,6 @@ import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
-import { getRecordingUrl } from "../controllers/stream";
 import TaskScheduler from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/asset";
 
@@ -120,11 +119,7 @@ export default class WebhookCannon {
         return true;
       }
       try {
-        let mp4RecordingUrl = getRecordingUrl(
-          this.baseIngest,
-          session,
-          true
-        );
+        let mp4RecordingUrl = event.payload?.mp4RecordingUrl;
 
         await this.recordingToVodAsset(
           mp4RecordingUrl,
