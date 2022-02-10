@@ -883,6 +883,11 @@ components:
           example: eaw4nk06ts2d0mzb
           index: true
           description: Used to form playback URL and storage folder
+        downloadUrl:
+          type: string
+          readOnly: true
+          example: https://cdn.livepeer.com/asset/eaw4nk06ts2d0mzb/video
+          description: URL to manually download the asset if desired
         userId:
           type: string
           readOnly: true
@@ -1106,16 +1111,7 @@ components:
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
             export:
-              type: object
-              additionalProperties: false
-              description: Parameters for the export task
-              properties:
-                url:
-                  type: string
-                  description: s3 presigned url of the asset to export
-                  example: s3+https://s3.amazonaws.com/livepeer-test/ABC123/filename.mp4
-                ipfs:
-                  type: object
+              $ref: "#/components/schemas/export-task-params"
             transcode:
               type: object
               additionalProperties: false
@@ -1167,19 +1163,91 @@ components:
                   $ref: "#/components/schemas/asset"
             export:
               type: object
-              additionalProperties: true
+              additionalProperties: false
               description: Output of the export task
               properties:
+                internal:
+                  writeOnly: true
+                  description: |
+                    Internal data of the export task that should not be returned
+                    to users. Contains internal tracking information like which
+                    service was used for the export in case it is maintained by
+                    us (e.g. the first-party piñata service).
                 ipfs:
                   type: object
+                  additionalProperties: false
+                  required: [videoFileCid]
                   properties:
                     videoFileCid:
                       type: string
                       description: IPFS CID of the exported video file
+                    videoFileUrl:
+                      type: string
+                      readOnly: true
+                      description: URL to access file through HTTP on an IPFS gateway
                     erc1155MetadataCid:
                       type: string
                       description:
                         IPFS CID of the default metadata exported for the video
+                    erc1155MetadataUrl:
+                      type: string
+                      readOnly: true
+                      description: URL to access metadata file through HTTP on an IPFS gateway
+
+    export-task-params:
+      type: object
+      additionalProperties: false
+      description: Parameters for the export task
+      properties:
+        custom:
+          type: object
+          description: custom URL parameters for the export task
+          additionalProperties: false
+          required: [url]
+          properties:
+            url:
+              type: string
+              description: URL where to export the asset
+              example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
+            method:
+              type: string
+              description: Method to use on the export request
+              default: PUT
+            headers:
+              type: object
+              description: Headers to add to the export request
+              additionalProperties:
+                type: string
+        ipfs:
+          type: object
+          additionalProperties: false
+          properties:
+            pinata:
+              type: object
+              description:
+                Custom credentials for the Piñata service. Must have
+                either a JWT or an API key and an API secret.
+              additionalProperties: false
+              properties:
+                jwt:
+                  type: string
+                  writeOnly: true
+                  description:
+                    Will be added to the Authorization header
+                    as a Bearer token.
+                apiKey:
+                  type: string
+                  description: Will be added to the pinata_api_key header.
+                apiSecret:
+                  type: string
+                  writeOnly: true
+                  description: Will be added to the pinata_secret_api_key header.
+            erc1155Metadata:
+              type: object
+              description:
+                Additional data to add to the automatic ERC-1155 default
+                export. Will be deep merged with the default metadata
+                regularly exported.
 
     api-token:
       type: object

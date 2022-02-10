@@ -48,13 +48,11 @@ export default class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    const allowedTasks = ["import", "export", "transcode"];
-
     let obj = await db.task.find({ id: event.task.id });
     if (obj?.length) {
       let task = obj[0][0];
       if (event.error) {
-        db.task.update(task.id, {
+        await db.task.update(task.id, {
           status: {
             errorMessage: event.error.message,
             phase: "failed",
@@ -69,7 +67,7 @@ export default class TaskScheduler {
         return true;
       }
 
-      if (event.task.type == "import") {
+      if (event.task.type === "import") {
         if (event.output) {
           let assetSpec;
           try {
@@ -80,7 +78,7 @@ export default class TaskScheduler {
             );
           }
           // TODO: bundle asset and task update in a single transaction
-          await db.asset.update(task.inputAssetId, {
+          await db.asset.update(task.outputAssetId, {
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
             size: assetSpec.size,
@@ -98,11 +96,11 @@ export default class TaskScheduler {
         },
         output: event.output,
       });
+      return true;
     } else {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
     }
-    return false;
   }
 
   async scheduleTask(
