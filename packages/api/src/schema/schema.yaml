@@ -1184,7 +1184,8 @@ components:
                     videoFileUrl:
                       type: string
                       readOnly: true
-                      description: URL to access file through HTTP on an IPFS gateway
+                      description:
+                        URL to access file through HTTP on an IPFS gateway
                     erc1155MetadataCid:
                       type: string
                       description:
@@ -1192,7 +1193,9 @@ components:
                     erc1155MetadataUrl:
                       type: string
                       readOnly: true
-                      description: URL to access metadata file through HTTP on an IPFS gateway
+                      description:
+                        URL to access metadata file through HTTP on an IPFS
+                        gateway
 
     export-task-params:
       type: object
@@ -1225,29 +1228,29 @@ components:
             pinata:
               type: object
               description:
-                Custom credentials for the Piñata service. Must have
-                either a JWT or an API key and an API secret.
+                Custom credentials for the Piñata service. Must have either a
+                JWT or an API key and an API secret.
               additionalProperties: false
               properties:
                 jwt:
                   type: string
                   writeOnly: true
                   description:
-                    Will be added to the Authorization header
-                    as a Bearer token.
+                    Will be added to the Authorization header as a Bearer token.
                 apiKey:
                   type: string
                   description: Will be added to the pinata_api_key header.
                 apiSecret:
                   type: string
                   writeOnly: true
-                  description: Will be added to the pinata_secret_api_key header.
+                  description:
+                    Will be added to the pinata_secret_api_key header.
             erc1155Metadata:
               type: object
               description:
-                Additional data to add to the automatic ERC-1155 default
-                export. Will be deep merged with the default metadata
-                regularly exported.
+                Additional data to add to the automatic ERC-1155 default export.
+                Will be deep merged with the default metadata regularly
+                exported.
 
     api-token:
       type: object

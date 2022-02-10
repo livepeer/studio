@@ -84,6 +84,12 @@ export default async function makeApp(params: CliArgs) {
     ? await RabbitQueue.connect(amqpUrl)
     : new NoopQueue();
 
+  // Task Scheduler
+  const taskScheduler = new TaskScheduler({
+    queue,
+  });
+  await taskScheduler.start();
+
   // Webhooks Cannon
   const baseIngest = JSON.parse(ingest)[0].base;
   const webhookCannon = new WebhookCannon({
@@ -93,6 +99,8 @@ export default async function makeApp(params: CliArgs) {
     sendgridTemplateId,
     sendgridApiKey,
     baseIngest,
+    taskScheduler,
+    vodObjectStoreId,
     supportAddr,
     verifyUrls: true,
     queue,
@@ -103,12 +111,6 @@ export default async function makeApp(params: CliArgs) {
     queue.close();
     webhookCannon.stop();
   });
-
-  // Task Scheduler
-  const taskScheduler = new TaskScheduler({
-    queue,
-  });
-  await taskScheduler.start();
 
   process.on("beforeExit", (code) => {
     queue.close();

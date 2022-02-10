@@ -28,7 +28,7 @@ const app = Router();
 
 const META_MAX_SIZE = 1024;
 
-async function generateUniquePlaybackId(store: IStore, assetId: string) {
+export async function generateUniquePlaybackId(store: any, assetId: string) {
   const shardKey = assetId.substring(0, 4);
   while (true) {
     const playbackId: string = await generateStreamKey();
