@@ -155,7 +155,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return { ...data };
+      return withIpfsUrls(data);
     },
   });
 
