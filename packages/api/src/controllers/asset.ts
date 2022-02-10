@@ -21,8 +21,7 @@ import {
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
-import { IStore } from "../types/common";
-import { Asset } from "../schema/types";
+import { Asset, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
 
 const app = Router();
@@ -50,8 +49,7 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  // TODO: This could be just a new schema like `import-asset-payload`
-  payload: any
+  payload: NewAssetPayload
 ): Promise<WithID<Asset>> {
   try {
     if (payload.meta && JSON.stringify(payload.meta).length > META_MAX_SIZE) {
@@ -266,73 +264,83 @@ app.post(
   }
 );
 
-app.post("/import", authMiddleware({}), async (req, res) => {
-  const id = uuid();
-  const playbackId = await generateUniquePlaybackId(req.store, id);
-  let asset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    req.config.vodObjectStoreId,
-    req.body
-  );
-  if (!req.body.url) {
-    return res.status(422).json({
-      errors: ["You must provide a url from which import an asset"],
-    });
-  }
+app.post(
+  "/import",
+  validatePost("new-asset-payload"),
+  authMiddleware({}),
+  async (req, res) => {
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(req.store, id);
+    let asset = await validateAssetPayload(
+      id,
+      playbackId,
+      req.user.id,
+      Date.now(),
+      req.config.vodObjectStoreId,
+      req.body
+    );
+    if (!req.body.url) {
+      return res.status(422).json({
+        errors: ["You must provide a url from which import an asset"],
+      });
+    }
 
-  asset = await db.asset.create(asset);
+    asset = await db.asset.create(asset);
 
-  const task = await req.taskScheduler.scheduleTask(
-    "import",
-    {
-      import: {
-        url: req.body.url,
+    const task = await req.taskScheduler.scheduleTask(
+      "import",
+      {
+        import: {
+          url: req.body.url,
+        },
       },
-    },
-    undefined,
-    asset
-  );
+      undefined,
+      asset
+    );
 
-  res.status(201);
-  res.json({ asset, task });
-});
-
-app.post("/request-upload", authMiddleware({}), async (req, res) => {
-  const id = uuid();
-  let playbackId = await generateUniquePlaybackId(req.store, id);
-
-  let asset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    req.config.vodObjectStoreId,
-    { name: `asset-upload-${id}`, ...req.body }
-  );
-  const presignedUrl = await getS3PresignedUrl(
-    asset.objectStoreId,
-    `directUpload/${playbackId}/source`
-  );
-
-  const b64SignedUrl = encodeURIComponent(
-    Buffer.from(presignedUrl).toString("base64")
-  );
-
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
+    res.status(201);
+    res.json({ asset, task });
   }
-  const baseUrl = ingests[0].origin;
-  const url = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
+);
 
-  asset = await db.asset.create(asset);
+app.post(
+  "/request-upload",
+  validatePost("new-asset-payload"),
+  authMiddleware({}),
+  async (req, res) => {
+    const id = uuid();
+    let playbackId = await generateUniquePlaybackId(req.store, id);
 
-  res.json({ url, asset });
-});
+    let asset = await validateAssetPayload(
+      id,
+      playbackId,
+      req.user.id,
+      Date.now(),
+      req.config.vodObjectStoreId,
+      { name: `asset-upload-${id}`, ...req.body }
+    );
+    const presignedUrl = await getS3PresignedUrl(
+      asset.objectStoreId,
+      `directUpload/${playbackId}/source`
+    );
+
+    const b64SignedUrl = encodeURIComponent(
+      Buffer.from(presignedUrl).toString("base64")
+    );
+
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      res.status(501);
+      return res.json({ errors: ["Ingest not configured"] });
+    }
+    const baseUrl = ingests[0].origin;
+    const url = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
+
+    asset = await db.asset.create(asset);
+
+    res.json({ url, asset });
+  }
+);
 
 app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
@@ -408,23 +416,21 @@ app.patch(
   async (req, res) => {
     // update a specific asset
     const asset = await db.asset.get(req.body.id);
-    if (!req.user.admin) {
-      // do not reveal that asset exists
-      throw new ForbiddenError(`Forbidden`);
+    if (!asset) {
+      throw new NotFoundError(`asset not found`);
     }
 
-    const { id, userId, createdAt } = asset;
-    const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = await validateAssetPayload(
+    const { id, playbackId, userId, createdAt, objectStoreId } = asset;
+    await db.asset.update(req.body.id, {
+      ...req.body,
+      // these fields are not updateable
       id,
       playbackId,
       userId,
       createdAt,
-      req.config.vodObjectStoreId,
-      req.body
-    );
-
-    await db.asset.update(req.body.id, doc);
+      updatedAt: Date.now(),
+      objectStoreId,
+    });
 
     res.status(200);
     res.json({ id: req.body.id });

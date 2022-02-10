@@ -54,10 +54,10 @@ export default class TaskScheduler {
       if (event.error) {
         await db.task.update(task.id, {
           status: {
-            errorMessage: event.error.message,
             phase: "failed",
+            updatedAt: Date.now(),
+            errorMessage: event.error.message,
           },
-          updatedAt: Date.now(),
         });
         if (!event.error.unretriable) {
           console.log(`task event process error: ${event.error.message}`);
@@ -79,10 +79,11 @@ export default class TaskScheduler {
           }
           // TODO: bundle asset and task update in a single transaction
           await db.asset.update(task.outputAssetId, {
+            size: assetSpec.size,
             hash: assetSpec.hash,
             videoSpec: assetSpec.videoSpec,
-            size: assetSpec.size,
             status: "ready",
+            updatedAt: Date.now(),
           });
 
           return true;

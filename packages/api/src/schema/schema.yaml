@@ -911,6 +911,8 @@ components:
         meta:
           type: object
           description: User input metadata associated with the asset
+          additionalProperties:
+            type: string
           example:
             {
               "title": "My awesome video",
@@ -1046,6 +1048,34 @@ components:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
 
+    new-asset-payload:
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description:
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
+          example: filename.mp4
+        meta:
+          type: object
+          description: User input metadata associated with the asset
+          additionalProperties:
+            type: string
+          example:
+            {
+              "title": "My awesome video",
+              "description": "This is a video of my awesome life",
+              "tags": ["awesome", "life", "video"],
+            }
+
     task:
       type: object
       table: task
@@ -1074,10 +1104,6 @@ components:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
-          example: 1587667174725
-        updatedAt:
-          type: number
-          description: Timestamp (in milliseconds) at which task was updated
           example: 1587667174725
         deleted:
           type: boolean
