@@ -120,7 +120,8 @@ const fieldsMap: FieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
-  createdAt: `asset.data->'createdAt'`,
+  createdAt: { val: `asset.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `asset.data->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
@@ -132,6 +133,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
+  }
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
   }
   const ingests = await req.getIngest();
   if (!ingests.length) {

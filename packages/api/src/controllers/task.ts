@@ -64,7 +64,8 @@ function withIpfsUrls(task: WithID<Task>): WithID<Task> {
 const fieldsMap: FieldsMap = {
   id: `task.ID`,
   name: { val: `task.data->>'name'`, type: "full-text" },
-  createdAt: `task.data->'createdAt'`,
+  createdAt: { val: `task.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `task.data->'status'->'updatedAt'`, type: "int" },
   userId: `task.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   type: `task.data->>'type'`,
@@ -90,6 +91,9 @@ app.get("/", authMiddleware({}), async (req, res) => {
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
+  }
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
   }
 
   if (req.user.admin && allUsers && allUsers !== "false") {
