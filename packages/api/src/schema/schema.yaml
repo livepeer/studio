@@ -1069,7 +1069,7 @@ components:
           enum:
             - import
             - export
-            - transcode
+            # - transcode
         createdAt:
           type: number
           readOnly: true
