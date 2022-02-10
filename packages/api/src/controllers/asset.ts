@@ -9,6 +9,7 @@ import {
   getS3PresignedUrl,
   FieldsMap,
   toStringValues,
+  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -85,6 +86,16 @@ async function validateAssetPayload(
   };
 }
 
+function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+  if (asset.status !== "ready") {
+    return asset;
+  }
+  return {
+    ...asset,
+    downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
+  };
+}
+
 const fieldsMap: FieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
@@ -102,6 +113,12 @@ app.get("/", authMiddleware({}), async (req, res) => {
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    res.status(501);
+    return res.json({ errors: ["Ingest not configured"] });
+  }
+  const ingest = ingests[0].base;
 
   if (req.user.admin && allUsers && allUsers !== "false") {
     const query = parseFilters(fieldsMap, filters);
@@ -125,7 +142,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
         if (count) {
           res.set("X-Total-Count", c);
         }
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+        return {
+          ...withDownloadUrl(data, ingest),
+          user: db.user.cleanWriteOnlyResponse(usersdata),
+        };
       },
     });
 
@@ -159,7 +179,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return { ...data };
+      return withDownloadUrl(data, ingest);
     },
   });
 
@@ -173,6 +193,13 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    res.status(501);
+    return res.json({ errors: ["Ingest not configured"] });
+  }
+
+  const ingest = ingests[0].base;
   const asset = await db.asset.get(req.params.id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
@@ -180,12 +207,11 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 
   if (req.user.admin !== true && req.user.id !== asset.userId) {
     throw new ForbiddenError(
-      `      errors: ["user can only request information on their own assets"],
-      `
+      "user can only request information on their own assets"
     );
   }
 
-  res.json(asset);
+  res.json(withDownloadUrl(asset, ingest));
 });
 
 app.post(

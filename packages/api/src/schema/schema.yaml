@@ -883,6 +883,11 @@ components:
           example: eaw4nk06ts2d0mzb
           index: true
           description: Used to form playback URL and storage folder
+        downloadUrl:
+          type: string
+          readOnly: true
+          example: https://cdn.livepeer.com/asset/eaw4nk06ts2d0mzb/video
+          description: URL to manually download the asset if desired
         userId:
           type: string
           readOnly: true
