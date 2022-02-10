@@ -188,33 +188,35 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(asset);
 });
 
-app.post("/export", authMiddleware({}), async (req, res) => {
-  const assetId = req.body.assetId;
-  const asset = await db.asset.get(assetId);
-  if (!asset) {
-    throw new NotFoundError(`Asset not found with id ${assetId}`);
-  }
-  if (req.user.id !== asset.userId) {
-    throw new ForbiddenError(`User can only export their own assets`);
-  }
+app.post(
+  "/:id/export",
+  validatePost("export-task-params"),
+  authMiddleware({}),
+  async (req, res) => {
+    const assetId = req.params.id;
+    const asset = await db.asset.get(assetId);
+    if (!asset) {
+      throw new NotFoundError(`Asset not found with id ${assetId}`);
+    }
+    if (req.user.id !== asset.userId) {
+      throw new ForbiddenError(`User can only export their own assets`);
+    }
 
-  await req.taskScheduler.scheduleTask(
-    "export",
-    {
-      ipfs: req.body.ipfs,
-      url: req.body.url,
-    },
-    asset
-  );
+    const task = await req.taskScheduler.scheduleTask(
+      "export",
+      req.body,
+      asset
+    );
 
-  res.status(201);
-  res.end();
-});
+    res.status(201);
+    res.json({ task });
+  }
+);
 
 app.post("/import", authMiddleware({}), async (req, res) => {
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(req.store, id);
-  const asset = await validateAssetPayload(
+  let asset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
@@ -228,9 +230,9 @@ app.post("/import", authMiddleware({}), async (req, res) => {
     });
   }
 
-  await db.asset.create(asset);
+  asset = await db.asset.create(asset);
 
-  await req.taskScheduler.scheduleTask(
+  const task = await req.taskScheduler.scheduleTask(
     "import",
     {
       url: req.body.url,
@@ -240,7 +242,7 @@ app.post("/import", authMiddleware({}), async (req, res) => {
   );
 
   res.status(201);
-  res.end();
+  res.json({ asset, task });
 });
 
 app.post("/request-upload", authMiddleware({}), async (req, res) => {

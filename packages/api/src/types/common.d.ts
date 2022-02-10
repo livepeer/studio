@@ -1,7 +1,7 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
 import { Stream, User, ApiToken } from "../schema/types";
 import Queue from "../store/queue";
-import TaskScheduler from "../task/task";
+import TaskScheduler from "../task/scheduler";
 import { CliArgs } from "../parse-cli";
 import Stripe from "stripe";
 

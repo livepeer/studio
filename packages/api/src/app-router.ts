@@ -16,7 +16,7 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
-import TaskScheduler from "./task/task";
+import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 import { CliArgs } from "./parse-cli";
