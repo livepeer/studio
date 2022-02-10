@@ -1,6 +1,7 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
+import mung from "express-mung";
 import { v4 as uuid } from "uuid";
 import {
   makeNextHREF,
@@ -12,6 +13,7 @@ import {
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { Task } from "../schema/types";
+import { WithID } from "../store/types";
 
 const app = Router();
 
@@ -38,6 +40,21 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   type: `task.data->>'type'`,
 };
+
+app.use(
+  mung.json(function cleanWriteOnlyResponses(data, req) {
+    if (req.user.admin) {
+      return data;
+    }
+    if (Array.isArray(data)) {
+      return db.task.cleanWriteOnlyResponses(data);
+    }
+    if ("id" in data) {
+      return db.task.cleanWriteOnlyResponse(data as WithID<Task>);
+    }
+    return data;
+  })
+);
 
 app.get("/", authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
