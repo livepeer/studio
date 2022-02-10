@@ -37,7 +37,6 @@ function validateTaskPayload(
 
 function withIpfsUrls(task: WithID<Task>): WithID<Task> {
   if (task.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
-    console.log("returning");
     return task;
   }
   return {

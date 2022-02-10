@@ -12,6 +12,7 @@ import {
   FindOptions,
   UpdateOptions,
   DBLegacyObject,
+  FieldSpec,
 } from "./types";
 
 const DEFAULT_SORT = "id ASC";
@@ -274,41 +275,29 @@ export default class Table<T extends DBObject> {
     }
   }
 
-  cleanWriteOnlyResponse(doc: T): T {
-    // obfuscate writeOnly fields in objects returned
+  // obfuscates writeOnly fields in objects returned
+  cleanWriteOnlyResponse(doc: T, schema: FieldSpec = this.schema): T {
+    if (!schema.properties) {
+      return doc;
+    }
     const res = { ...doc };
-    if (this.schema.properties) {
-      for (const [fieldName, fieldArray] of Object.entries(
-        this.schema.properties
-      )) {
-        if (fieldArray.writeOnly) {
-          delete res[fieldName];
-        }
+    for (const fieldName in schema.properties) {
+      const fieldSpec = schema.properties[fieldName];
+      if (fieldSpec.writeOnly) {
+        delete res[fieldName];
+      } else if (fieldSpec.properties) {
+        res[fieldName] = this.cleanWriteOnlyResponse(
+          res[fieldName] as any,
+          fieldSpec
+        );
       }
     }
     return res;
   }
 
+  // obfuscates writeOnly fields in array of objects returned
   cleanWriteOnlyResponses(docs: Array<T>): Array<T> {
-    // obfuscate writeOnly fields in objects returned
-    const writeOnlyFields = [];
-    if (this.schema.properties) {
-      for (const [fieldName, fieldArray] of Object.entries(
-        this.schema.properties
-      )) {
-        if (fieldArray.writeOnly) {
-          writeOnlyFields.push(fieldName);
-        }
-      }
-    }
-
-    return docs.map((doc) => {
-      const cleaned = { ...doc };
-      for (const field of writeOnlyFields) {
-        delete cleaned[field];
-      }
-      return cleaned;
-    });
+    return docs.map((doc) => this.cleanWriteOnlyResponse(doc));
   }
 
   // on startup: auto-create table if it doesn't exist

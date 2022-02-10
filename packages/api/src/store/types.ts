@@ -1,6 +1,7 @@
 export interface FieldSpec {
   [key: string]: any;
   writeOnly?: boolean;
+  properties?: Record<string, FieldSpec>;
 }
 
 export interface TableSchema {
