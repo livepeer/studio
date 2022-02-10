@@ -287,7 +287,15 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
   const b64SignedUrl = encodeURIComponent(
     Buffer.from(presignedUrl).toString("base64")
   );
-  const lpSignedUrl = `https://${req.frontendDomain}/api/asset/upload/${b64SignedUrl}`;
+
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    res.status(501);
+    return res.json({ errors: ["Ingest not configured"] });
+  }
+  const baseUrl = ingests[0].origin;
+
+  const lpSignedUrl = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
 
   // TODO: use the same function as the one used in import
   await db.asset.create({
