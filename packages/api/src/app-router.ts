@@ -91,14 +91,12 @@ export default async function makeApp(params: CliArgs) {
   await taskScheduler.start();
 
   // Webhooks Cannon
-  const baseIngest = JSON.parse(ingest)[0].base;
   const webhookCannon = new WebhookCannon({
     db,
     store,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
-    baseIngest,
     taskScheduler,
     vodObjectStoreId,
     supportAddr,
