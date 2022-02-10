@@ -2,6 +2,7 @@ import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
 import { v4 as uuid } from "uuid";
+import mung from "express-mung";
 import {
   makeNextHREF,
   parseFilters,
@@ -9,22 +10,26 @@ import {
   getS3PresignedUrl,
   FieldsMap,
   toStringValues,
+  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { ForbiddenError, UnprocessableEntityError } from "../store/errors";
+import {
+  ForbiddenError,
+  UnprocessableEntityError,
+  NotFoundError,
+} from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
-import { IStore } from "../types/common";
-import { Asset } from "../schema/types";
+import { Asset, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
 
 const app = Router();
 
 const META_MAX_SIZE = 1024;
 
-async function generateUniquePlaybackId(store: IStore, assetId: string) {
-  const shardKey = assetId.slice(4);
+export async function generateUniquePlaybackId(store: any, assetId: string) {
+  const shardKey = assetId.substring(0, 4);
   while (true) {
     const playbackId: string = await generateStreamKey();
     const qres = await store.query({
@@ -44,8 +49,7 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  // TODO: This could be just a new schema like `import-asset-payload`
-  payload: any
+  payload: NewAssetPayload
 ): Promise<WithID<Asset>> {
   try {
     if (payload.meta && JSON.stringify(payload.meta).length > META_MAX_SIZE) {
@@ -81,11 +85,43 @@ async function validateAssetPayload(
   };
 }
 
+function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+  if (asset.status !== "ready") {
+    return asset;
+  }
+  return {
+    ...asset,
+    downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
+  };
+}
+
+app.use(
+  mung.json(function cleanWriteOnlyResponses(
+    data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
+    req
+  ) {
+    if (req.user.admin) {
+      return data;
+    }
+    if (Array.isArray(data)) {
+      return db.asset.cleanWriteOnlyResponses(data);
+    }
+    if ("id" in data) {
+      return db.asset.cleanWriteOnlyResponse(data);
+    }
+    if ("asset" in data) {
+      return { ...data, asset: db.asset.cleanWriteOnlyResponse(data.asset) };
+    }
+    return data;
+  })
+);
+
 const fieldsMap: FieldsMap = {
   id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
-  createdAt: `asset.data->'createdAt'`,
+  createdAt: { val: `asset.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `asset.data->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
@@ -98,6 +134,15 @@ app.get("/", authMiddleware({}), async (req, res) => {
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
+  }
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    res.status(501);
+    return res.json({ errors: ["Ingest not configured"] });
+  }
+  const ingest = ingests[0].base;
 
   if (req.user.admin && allUsers && allUsers !== "false") {
     const query = parseFilters(fieldsMap, filters);
@@ -121,7 +166,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
         if (count) {
           res.set("X-Total-Count", c);
         }
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+        return {
+          ...withDownloadUrl(data, ingest),
+          user: db.user.cleanWriteOnlyResponse(usersdata),
+        };
       },
     });
 
@@ -155,7 +203,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return { ...data };
+      return withDownloadUrl(data, ingest);
     },
   });
 
@@ -169,33 +217,65 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
-  const os = await db.asset.get(req.params.id);
-  if (!os) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
+  const ingests = await req.getIngest();
+  if (!ingests.length) {
+    res.status(501);
+    return res.json({ errors: ["Ingest not configured"] });
   }
 
-  if (req.user.admin !== true && req.user.id !== os.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own assets"],
-    });
+  const ingest = ingests[0].base;
+  const asset = await db.asset.get(req.params.id);
+  if (!asset) {
+    throw new NotFoundError(`Asset not found`);
   }
 
-  res.json(os);
+  if (req.user.admin !== true && req.user.id !== asset.userId) {
+    throw new ForbiddenError(
+      "user can only request information on their own assets"
+    );
+  }
+
+  res.json(withDownloadUrl(asset, ingest));
 });
 
-// TODO: Delete this API? Assets will only be created by task result events.
 app.post(
-  "/",
-  authMiddleware({ anyAdmin: true }),
-  validatePost("asset"),
+  "/:id/export",
+  validatePost("export-task-params"),
+  authMiddleware({}),
+  async (req, res) => {
+    const assetId = req.params.id;
+    const asset = await db.asset.get(assetId);
+    if (!asset) {
+      throw new NotFoundError(`Asset not found with id ${assetId}`);
+    }
+    if (asset.status !== "ready") {
+      res.status(412);
+      return res.json({ errors: ["asset is not ready to be exported"] });
+    }
+    if (req.user.id !== asset.userId) {
+      throw new ForbiddenError(`User can only export their own assets`);
+    }
+    const task = await req.taskScheduler.scheduleTask(
+      "export",
+      {
+        export: req.body,
+      },
+      asset
+    );
+
+    res.status(201);
+    res.json({ task });
+  }
+);
+
+app.post(
+  "/import",
+  validatePost("new-asset-payload"),
+  authMiddleware({}),
   async (req, res) => {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = await validateAssetPayload(
+    let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
@@ -203,98 +283,72 @@ app.post(
       req.config.vodObjectStoreId,
       req.body
     );
-    if (!req.user.admin) {
-      res.status(403);
-      return res.json({ errors: ["Forbidden"] });
+    if (!req.body.url) {
+      return res.status(422).json({
+        errors: ["You must provide a url from which import an asset"],
+      });
     }
-    await db.asset.create(doc);
+
+    asset = await db.asset.create(asset);
+
+    const task = await req.taskScheduler.scheduleTask(
+      "import",
+      {
+        import: {
+          url: req.body.url,
+        },
+      },
+      undefined,
+      asset
+    );
+
     res.status(201);
-    res.json(doc);
+    res.json({ asset, task });
   }
 );
 
-app.post("/import", authMiddleware({}), async (req, res) => {
-  const id = uuid();
-  const playbackId = await generateUniquePlaybackId(req.store, id);
-  const asset = await validateAssetPayload(
-    id,
-    playbackId,
-    req.user.id,
-    Date.now(),
-    req.config.vodObjectStoreId,
-    req.body
-  );
-  if (!req.body.url) {
-    return res.status(422).json({
-      errors: ["You must provide a url from which import an asset"],
-    });
+app.post(
+  "/request-upload",
+  validatePost("new-asset-payload"),
+  authMiddleware({}),
+  async (req, res) => {
+    const id = uuid();
+    let playbackId = await generateUniquePlaybackId(req.store, id);
+
+    let asset = await validateAssetPayload(
+      id,
+      playbackId,
+      req.user.id,
+      Date.now(),
+      req.config.vodObjectStoreId,
+      { name: `asset-upload-${id}`, ...req.body }
+    );
+    const presignedUrl = await getS3PresignedUrl(
+      asset.objectStoreId,
+      `directUpload/${playbackId}/source`
+    );
+
+    const b64SignedUrl = encodeURIComponent(
+      Buffer.from(presignedUrl).toString("base64")
+    );
+
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      res.status(501);
+      return res.json({ errors: ["Ingest not configured"] });
+    }
+    const baseUrl = ingests[0].origin;
+    const url = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
+
+    asset = await db.asset.create(asset);
+
+    res.json({ url, asset });
   }
-
-  await db.asset.create(asset);
-
-  // TODO: move the task creation and spawn into task scheduler
-  const task = await db.task.create({
-    id: uuid(),
-    name: `asset-import-${asset.name}-${asset.createdAt}`,
-    createdAt: asset.createdAt,
-    type: "import",
-    parentAssetId: asset.id,
-    userId: asset.userId,
-    params: {
-      import: {
-        url: req.body.url,
-      },
-    },
-    status: {
-      phase: "pending",
-      updatedAt: asset.createdAt,
-    },
-  });
-  await req.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
-    type: "task_trigger",
-    id: uuid(),
-    timestamp: Date.now(),
-    task: {
-      id: task.id,
-      type: task.type,
-      snapshot: task,
-    },
-  });
-  await db.task.update(task.id, {
-    status: { phase: "waiting", updatedAt: Date.now() },
-  });
-
-  res.status(201);
-  res.end();
-});
-
-app.post("/request-upload", authMiddleware({}), async (req, res) => {
-  const id = uuid();
-  let playbackId = await generateUniquePlaybackId(req.store, id);
-
-  const { vodObjectStoreId } = req.config;
-  const presignedUrl = await getS3PresignedUrl({
-    objectKey: `directUpload/${playbackId}/source`,
-    vodObjectStoreId,
-  });
-
-  const b64SignedUrl = Buffer.from(presignedUrl).toString("base64");
-  const lpSignedUrl = `https://${req.frontendDomain}/api/asset/upload/${b64SignedUrl}`;
-
-  // TODO: use the same function as the one used in import
-  await db.asset.create({
-    id,
-    name: `asset-upload-${id}`,
-    playbackId,
-    userId: req.user.id,
-    objectStoreId: vodObjectStoreId,
-  });
-  res.json({ url: lpSignedUrl, playbackId: playbackId });
-});
+);
 
 app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
-  let uploadUrl = Buffer.from(url, "base64").toString();
+  let uploadUrl = decodeURIComponent(Buffer.from(url, "base64").toString());
 
   // get playbackId from s3 url
   let playbackId;
@@ -308,83 +362,51 @@ app.put("/upload/:url", async (req, res) => {
       `the provided url for the upload is not valid or not supported: ${uploadUrl}`
     );
   }
-  const obj = await db.asset.find({ playbackId: playbackId });
-
-  if (obj?.length) {
-    let asset = obj[0][0];
-    var proxy = httpProxy.createProxyServer({});
-
-    proxy.on("end", async function (proxyReq, _, res) {
-      if (res.statusCode == 200) {
-        // TODO: move the task creation and spawn into task scheduler
-        const createdAt = Date.now();
-        let task = await db.task.create({
-          id: uuid(),
-          name: `asset-upload-${asset.name}-${asset.createdAt}`,
-          createdAt,
-          type: "import",
-          parentAssetId: asset.id,
-          userId: asset.userId,
-          params: {
-            import: {
-              uploadedObjectKey: `directUpload/${playbackId}/source`,
-            },
-          },
-          status: {
-            phase: "pending",
-            updatedAt: createdAt,
-          },
-        });
-        await req.queue.publish(
-          "task",
-          `task.trigger.${task.type}.${task.id}`,
-          {
-            type: "task_trigger",
-            id: uuid(),
-            timestamp: Date.now(),
-            task: {
-              id: task.id,
-              type: task.type,
-              snapshot: task,
-            },
-          }
-        );
-        await db.task.update(task.id, {
-          status: { phase: "waiting", updatedAt: Date.now() },
-        });
-      } else {
-        console.log(
-          `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
-        );
-      }
-    });
-
-    proxy.web(req, res, {
-      target: uploadUrl,
-      changeOrigin: true,
-      ignorePath: true,
-    });
-  } else {
-    // we expect an existing asset to be found
-    res.status(404);
-    return res.json({
-      errors: ["related asset not found"],
-    });
+  const assets = await db.asset.find({ playbackId: playbackId });
+  if (!assets?.length) {
+    throw new NotFoundError(`asset not found`);
   }
+  let asset = assets[0][0];
+  if (asset.status !== "waiting") {
+    throw new UnprocessableEntityError(`asset has already been processed`);
+  }
+  var proxy = httpProxy.createProxyServer({});
+
+  proxy.on("end", async function (proxyReq, _, res) {
+    if (res.statusCode == 200) {
+      // TODO: Find a way to return the task in the response
+      await req.taskScheduler.scheduleTask(
+        "import",
+        {
+          import: {
+            uploadedObjectKey: `directUpload/${playbackId}/source`,
+          },
+        },
+        undefined,
+        asset
+      );
+    } else {
+      console.log(
+        `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
+      );
+    }
+  });
+
+  proxy.web(req, res, {
+    target: uploadUrl,
+    changeOrigin: true,
+    ignorePath: true,
+  });
 });
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
   if (!asset) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    throw new NotFoundError(`Asset not found`);
   }
   if (!req.user.admin && req.user.id !== asset.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users may only delete their own assets"],
-    });
+    throw new ForbiddenError(`users may only delete their own assets`);
   }
   await db.asset.delete(id);
   res.status(204);
@@ -399,24 +421,21 @@ app.patch(
   async (req, res) => {
     // update a specific asset
     const asset = await db.asset.get(req.body.id);
-    if (!req.user.admin) {
-      // do not reveal that asset exists
-      res.status(403);
-      return res.json({ errors: ["Forbidden"] });
+    if (!asset) {
+      throw new NotFoundError(`asset not found`);
     }
 
-    const { id, userId, createdAt } = asset;
-    const playbackId = await generateUniquePlaybackId(req.store, id);
-    const doc = await validateAssetPayload(
+    const { id, playbackId, userId, createdAt, objectStoreId } = asset;
+    await db.asset.update(req.body.id, {
+      ...req.body,
+      // these fields are not updateable
       id,
       playbackId,
       userId,
       createdAt,
-      req.config.vodObjectStoreId,
-      req.body
-    );
-
-    await db.asset.update(req.body.id, doc);
+      updatedAt: Date.now(),
+      objectStoreId,
+    });
 
     res.status(200);
     res.json({ id: req.body.id });

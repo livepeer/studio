@@ -16,7 +16,7 @@ import apiProxy from "./controllers/api-proxy";
 import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
-import TaskScheduler from "./task/task";
+import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import Stripe from "stripe";
 import { CliArgs } from "./parse-cli";
@@ -84,6 +84,12 @@ export default async function makeApp(params: CliArgs) {
     ? await RabbitQueue.connect(amqpUrl)
     : new NoopQueue();
 
+  // Task Scheduler
+  const taskScheduler = new TaskScheduler({
+    queue,
+  });
+  await taskScheduler.start();
+
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({
     db,
@@ -91,6 +97,8 @@ export default async function makeApp(params: CliArgs) {
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
+    taskScheduler,
+    vodObjectStoreId,
     supportAddr,
     verifyUrls: true,
     queue,
@@ -101,12 +109,6 @@ export default async function makeApp(params: CliArgs) {
     queue.close();
     webhookCannon.stop();
   });
-
-  // Task Scheduler
-  const taskScheduler = new TaskScheduler({
-    queue,
-  });
-  await taskScheduler.start();
 
   process.on("beforeExit", (code) => {
     queue.close();
@@ -137,6 +139,7 @@ export default async function makeApp(params: CliArgs) {
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.com
     req.queue = queue;
+    req.taskScheduler = taskScheduler;
     req.stripe = stripe;
     next();
   });
@@ -216,7 +219,6 @@ export default async function makeApp(params: CliArgs) {
   return {
     router: app,
     webhookCannon,
-    taskScheduler,
     store,
     db,
     queue,

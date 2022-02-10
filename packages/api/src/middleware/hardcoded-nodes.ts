@@ -7,6 +7,7 @@ import { RequestHandler } from "express";
 import { NodeAddress, OrchestratorNodeAddress } from "../types/common";
 
 export interface Ingest {
+  origin?: string;
   base?: string;
   ingest: string;
   playback: string;

@@ -883,6 +883,11 @@ components:
           example: eaw4nk06ts2d0mzb
           index: true
           description: Used to form playback URL and storage folder
+        downloadUrl:
+          type: string
+          readOnly: true
+          example: https://cdn.livepeer.com/asset/eaw4nk06ts2d0mzb/video
+          description: URL to manually download the asset if desired
         userId:
           type: string
           readOnly: true
@@ -906,6 +911,8 @@ components:
         meta:
           type: object
           description: User input metadata associated with the asset
+          additionalProperties:
+            type: string
           example:
             {
               "title": "My awesome video",
@@ -1033,12 +1040,6 @@ components:
             - waiting
             - ready
             - failed
-        originTaskId:
-          type: string
-          index: true
-          readOnly: true
-          description: Task ID of the task that created the asset
-          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         sourceAssetId:
           type: string
           index: true
@@ -1046,6 +1047,34 @@ components:
           description:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+
+    new-asset-payload:
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description:
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
+          example: filename.mp4
+        meta:
+          type: object
+          description: User input metadata associated with the asset
+          additionalProperties:
+            type: string
+          example:
+            {
+              "title": "My awesome video",
+              "description": "This is a video of my awesome life",
+              "tags": ["awesome", "life", "video"],
+            }
 
     task:
       type: object
@@ -1058,10 +1087,6 @@ components:
           index: true
           description: Task ID
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        name:
-          type: string
-          description: Name of the task
-          example: Import video file
         userId:
           type: string
           readOnly: true
@@ -1074,21 +1099,23 @@ components:
           enum:
             - import
             - export
+            # - transcode
         createdAt:
           type: number
           readOnly: true
           description: Timestamp (in milliseconds) at which task was created
           example: 1587667174725
-        updatedAt:
-          type: number
-          description: Timestamp (in milliseconds) at which task was updated
-          example: 1587667174725
         deleted:
           type: boolean
           description: Set to true when the task is deleted
-        parentAssetId:
+        inputAssetId:
           type: string
-          description: ID of the source asset
+          description: ID of the input asset
+          index: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        outputAssetId:
+          type: string
+          description: ID of the output asset
           index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         params:
@@ -1109,6 +1136,15 @@ components:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+            export:
+              $ref: "#/components/schemas/export-task-params"
+            transcode:
+              type: object
+              additionalProperties: false
+              description: Parameters for the transcode task
+              properties:
+                params:
+                  type: object
         status:
           type: object
           additionalProperties: false
@@ -1151,6 +1187,110 @@ components:
                 assetSpec:
                   type: object
                   $ref: "#/components/schemas/asset"
+            export:
+              type: object
+              additionalProperties: false
+              description: Output of the export task
+              properties:
+                internal:
+                  writeOnly: true
+                  description: |
+                    Internal data of the export task that should not be returned
+                    to users. Contains internal tracking information like which
+                    service was used for the export in case it is maintained by
+                    us (e.g. the first-party piñata service).
+                ipfs:
+                  type: object
+                  additionalProperties: false
+                  required: [videoFileCid]
+                  properties:
+                    videoFileCid:
+                      type: string
+                      description: IPFS CID of the exported video file
+                    videoFileUrl:
+                      type: string
+                      readOnly: true
+                      description:
+                        URL to access file through HTTP on an IPFS gateway
+                    erc1155MetadataCid:
+                      type: string
+                      description:
+                        IPFS CID of the default metadata exported for the video
+                    erc1155MetadataUrl:
+                      type: string
+                      readOnly: true
+                      description:
+                        URL to access metadata file through HTTP on an IPFS
+                        gateway
+
+    export-task-params:
+      description: Parameters for the export task
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [custom]
+          properties:
+            custom:
+              type: object
+              description: custom URL parameters for the export task
+              additionalProperties: false
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  description: URL where to export the asset
+                  example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
+                method:
+                  type: string
+                  description: Method to use on the export request
+                  default: PUT
+                headers:
+                  type: object
+                  description: Headers to add to the export request
+                  additionalProperties:
+                    type: string
+        - type: object
+          additionalProperties: false
+          required: [ipfs]
+          properties:
+            ipfs:
+              type: object
+              additionalProperties: false
+              properties:
+                pinata:
+                  description:
+                    Custom credentials for the Piñata service. Must have either
+                    a JWT or an API key and an API secret.
+                  oneOf:
+                    - type: object
+                      additionalProperties: false
+                      required: [jwt]
+                      properties:
+                        jwt:
+                          type: string
+                          writeOnly: true
+                          description:
+                            Will be added to the Authorization header as a
+                            Bearer token.
+                    - type: object
+                      additionalProperties: false
+                      required: [apiKey, apiSecret]
+                      properties:
+                        apiKey:
+                          type: string
+                          description:
+                            Will be added to the pinata_api_key header.
+                        apiSecret:
+                          type: string
+                          writeOnly: true
+                          description:
+                            Will be added to the pinata_secret_api_key header.
+                erc1155Metadata:
+                  type: object
+                  description:
+                    Additional data to add to the automatic ERC-1155 default
+                    export. Will be deep merged with the default metadata
+                    exported.
 
     api-token:
       type: object

@@ -12,6 +12,8 @@ import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
+import TaskScheduler from "../task/scheduler";
+import { generateUniquePlaybackId } from "../controllers/asset";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -29,6 +31,8 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: string;
+  taskScheduler: TaskScheduler;
+  vodObjectStoreId: string;
   resolver: any;
   queue: Queue;
   constructor({
@@ -38,6 +42,8 @@ export default class WebhookCannon {
     sendgridTemplateId,
     sendgridApiKey,
     supportAddr,
+    taskScheduler,
+    vodObjectStoreId,
     verifyUrls,
     queue,
   }) {
@@ -49,6 +55,8 @@ export default class WebhookCannon {
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
+    this.taskScheduler = taskScheduler;
+    this.vodObjectStoreId = vodObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
     // this.start();
@@ -106,6 +114,20 @@ export default class WebhookCannon {
       if (session.partialSession) {
         // new session was started, so recording is not ready yet
         return true;
+      }
+      try {
+        let mp4RecordingUrl = event.payload?.mp4RecordingUrl;
+
+        await this.recordingToVodAsset(
+          mp4RecordingUrl,
+          session.userId,
+          session.id
+        );
+      } catch (e) {
+        console.log(
+          `Unable to make vod asset from recording with session id ${sessionId}`,
+          e
+        );
       }
     }
 
@@ -482,5 +504,35 @@ export default class WebhookCannon {
         `Unable to store response of webhook ${webhook.id} url: ${webhook.url}`
       );
     }
+  }
+
+  async recordingToVodAsset(
+    mp4RecordingUrl: string,
+    userId: string,
+    sessionId: string
+  ) {
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(this.store, sessionId);
+
+    const asset = await this.db.asset.create({
+      id,
+      playbackId,
+      userId,
+      createdAt: Date.now(),
+      status: "waiting",
+      name: `live-to-vod-${sessionId}`,
+      objectStoreId: this.vodObjectStoreId,
+    });
+
+    const task = await this.taskScheduler.scheduleTask(
+      "import",
+      {
+        import: {
+          url: mp4RecordingUrl,
+        },
+      },
+      undefined,
+      asset
+    );
   }
 }

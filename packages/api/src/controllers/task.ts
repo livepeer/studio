@@ -1,6 +1,7 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
+import mung from "express-mung";
 import { v4 as uuid } from "uuid";
 import {
   makeNextHREF,
@@ -8,10 +9,14 @@ import {
   parseOrder,
   toStringValues,
   FieldsMap,
+  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { Task } from "../schema/types";
+import { WithID } from "../store/types";
+
+const ipfsGateway = "https://ipfs.livepeer.com/ipfs/";
 
 const app = Router();
 
@@ -30,20 +35,65 @@ function validateTaskPayload(
   };
 }
 
+function withIpfsUrls(task: WithID<Task>): WithID<Task> {
+  if (task.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
+    return task;
+  }
+  return {
+    ...task,
+    output: {
+      ...task.output,
+      export: {
+        ...task.output.export,
+        ipfs: {
+          ...task.output.export.ipfs,
+          videoFileUrl: pathJoin(
+            ipfsGateway,
+            task.output.export.ipfs.videoFileCid
+          ),
+          erc1155MetadataUrl: pathJoin(
+            ipfsGateway,
+            task.output.export.ipfs.erc1155MetadataCid
+          ),
+        },
+      },
+    },
+  };
+}
+
 const fieldsMap: FieldsMap = {
   id: `task.ID`,
   name: { val: `task.data->>'name'`, type: "full-text" },
-  createdAt: `task.data->'createdAt'`,
+  createdAt: { val: `task.data->'createdAt'`, type: "int" },
+  updatedAt: { val: `task.data->'status'->'updatedAt'`, type: "int" },
   userId: `task.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   type: `task.data->>'type'`,
 };
+
+app.use(
+  mung.json(function cleanWriteOnlyResponses(data, req) {
+    if (req.user.admin) {
+      return data;
+    }
+    if (Array.isArray(data)) {
+      return db.task.cleanWriteOnlyResponses(data);
+    }
+    if ("id" in data) {
+      return db.task.cleanWriteOnlyResponse(data as WithID<Task>);
+    }
+    return data;
+  })
+);
 
 app.get("/", authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
+  }
+  if (!order) {
+    order = "updatedAt-true,createdAt-true";
   }
 
   if (req.user.admin && allUsers && allUsers !== "false") {
@@ -68,7 +118,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
         if (count) {
           res.set("X-Total-Count", c);
         }
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+        return {
+          ...withIpfsUrls(data),
+          user: db.user.cleanWriteOnlyResponse(usersdata),
+        };
       },
     });
 
@@ -102,7 +155,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return { ...data };
+      return withIpfsUrls(data);
     },
   });
 
@@ -131,7 +184,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     });
   }
 
-  res.json(task);
+  res.json(withIpfsUrls(task));
 });
 
 app.post(
