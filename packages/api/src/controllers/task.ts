@@ -16,7 +16,7 @@ import sql from "sql-template-strings";
 import { Task } from "../schema/types";
 import { WithID } from "../store/types";
 
-const ipfsGateway = "https://gateway.ipfs.io/ipfs/";
+const ipfsGateway = "https://ipfs.livepeer.com/ipfs/";
 
 const app = Router();
 
