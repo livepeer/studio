@@ -224,6 +224,10 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
+    if (asset.status !== "ready") {
+      res.status(409);
+      return res.json({ errors: ["asset is not ready to be exported"] });
+    }
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
