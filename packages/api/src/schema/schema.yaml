@@ -1181,10 +1181,18 @@ components:
                     videoFileCid:
                       type: string
                       description: IPFS CID of the exported video file
+                    videoFileUrl:
+                      type: string
+                      readOnly: true
+                      description: URL to access file through HTTP on an IPFS gateway
                     erc1155MetadataCid:
                       type: string
                       description:
                         IPFS CID of the default metadata exported for the video
+                    erc1155MetadataUrl:
+                      type: string
+                      readOnly: true
+                      description: URL to access metadata file through HTTP on an IPFS gateway
 
     export-task-params:
       type: object

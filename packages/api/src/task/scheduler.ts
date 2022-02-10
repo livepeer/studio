@@ -48,8 +48,6 @@ export default class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    const allowedTasks = ["import", "export", "transcode"];
-
     let obj = await db.task.find({ id: event.task.id });
     if (obj?.length) {
       let task = obj[0][0];
@@ -69,7 +67,7 @@ export default class TaskScheduler {
         return true;
       }
 
-      if (event.task.type == "import") {
+      if (event.task.type === "import") {
         if (event.output) {
           let assetSpec;
           try {
@@ -98,11 +96,11 @@ export default class TaskScheduler {
         },
         output: event.output,
       });
+      return true;
     } else {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
     }
-    return false;
   }
 
   async scheduleTask(

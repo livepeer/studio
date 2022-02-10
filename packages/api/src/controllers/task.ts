@@ -9,11 +9,14 @@ import {
   parseOrder,
   toStringValues,
   FieldsMap,
+  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { Task } from "../schema/types";
 import { WithID } from "../store/types";
+
+const ipfsGateway = "https://gateway.ipfs.io/ipfs/";
 
 const app = Router();
 
@@ -29,6 +32,33 @@ function validateTaskPayload(
     createdAt,
     name: payload.name,
     type: payload.type,
+  };
+}
+
+function withIpfsUrls(task: WithID<Task>): WithID<Task> {
+  if (task.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
+    console.log("returning");
+    return task;
+  }
+  return {
+    ...task,
+    output: {
+      ...task.output,
+      export: {
+        ...task.output.export,
+        ipfs: {
+          ...task.output.export.ipfs,
+          videoFileUrl: pathJoin(
+            ipfsGateway,
+            task.output.export.ipfs.videoFileCid
+          ),
+          erc1155MetadataUrl: pathJoin(
+            ipfsGateway,
+            task.output.export.ipfs.erc1155MetadataCid
+          ),
+        },
+      },
+    },
   };
 }
 
@@ -85,7 +115,10 @@ app.get("/", authMiddleware({}), async (req, res) => {
         if (count) {
           res.set("X-Total-Count", c);
         }
-        return { ...data, user: db.user.cleanWriteOnlyResponse(usersdata) };
+        return {
+          ...withIpfsUrls(data),
+          user: db.user.cleanWriteOnlyResponse(usersdata),
+        };
       },
     });
 
@@ -148,7 +181,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
     });
   }
 
-  res.json(task);
+  res.json(withIpfsUrls(task));
 });
 
 app.post(
