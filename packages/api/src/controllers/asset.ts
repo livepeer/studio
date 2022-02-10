@@ -225,7 +225,7 @@ app.post(
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
     if (asset.status !== "ready") {
-      res.status(409);
+      res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
     }
     if (req.user.id !== asset.userId) {
