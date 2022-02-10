@@ -523,7 +523,7 @@ export default class WebhookCannon {
     streamId: string
   ) {
     const id = uuid();
-    const playbackId = await generateUniquePlaybackId(this.store, id);
+    const playbackId = await generateUniquePlaybackId(this.store, streamId);
 
     const asset = await this.db.asset.create({
       id,
@@ -538,7 +538,9 @@ export default class WebhookCannon {
     const task = await this.taskScheduler.scheduleTask(
       "import",
       {
-        url: mp4RecordingUrl,
+        import: {
+          url: mp4RecordingUrl,
+        },
       },
       undefined,
       asset

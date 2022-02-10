@@ -227,10 +227,11 @@ app.post(
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
-
     const task = await req.taskScheduler.scheduleTask(
       "export",
-      req.body,
+      {
+        export: req.body,
+      },
       asset
     );
 
@@ -261,7 +262,9 @@ app.post("/import", authMiddleware({}), async (req, res) => {
   const task = await req.taskScheduler.scheduleTask(
     "import",
     {
-      url: req.body.url,
+      import: {
+        url: req.body.url,
+      },
     },
     undefined,
     asset
@@ -322,7 +325,9 @@ app.put("/upload/:url", async (req, res) => {
         await req.taskScheduler.scheduleTask(
           "import",
           {
-            uploadedObjectKey: `directUpload/${playbackId}/source`,
+            import: {
+              uploadedObjectKey: `directUpload/${playbackId}/source`,
+            },
           },
           undefined,
           asset
