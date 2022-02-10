@@ -48,57 +48,65 @@ export default class TaskScheduler {
   }
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
-    let obj = await db.task.find({ id: event.task.id });
-    if (obj?.length) {
-      let task = obj[0][0];
-      if (event.error) {
-        await db.task.update(task.id, {
-          status: {
-            phase: "failed",
-            updatedAt: Date.now(),
-            errorMessage: event.error.message,
-          },
-        });
-        if (!event.error.unretriable) {
-          console.log(`task event process error: ${event.error.message}`);
-          return true;
-        }
-        // TODO: retry task
-        return true;
-      }
-
-      if (event.task.type === "import") {
-        if (event.output) {
-          let assetSpec;
-          try {
-            assetSpec = event.output.import.assetSpec;
-          } catch (e) {
-            console.log(
-              `task event process error: assetSpec not found in TaskResult for task ${event.task.id}`
-            );
-          }
-          // TODO: bundle asset and task update in a single transaction
-          await db.asset.update(task.outputAssetId, {
-            size: assetSpec.size,
-            hash: assetSpec.hash,
-            videoSpec: assetSpec.videoSpec,
-            status: "ready",
-            updatedAt: Date.now(),
-          });
-        }
-      }
-
-      await db.task.update(task.id, {
-        status: {
-          phase: "completed",
-          updatedAt: Date.now(),
-        },
-        output: event.output,
-      });
-      return true;
-    } else {
+    const tasks = await db.task.find({ id: event.task.id });
+    if (!tasks?.length) {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
+    }
+
+    // TODO: bundle all db updates in a single transaction
+    const task = tasks[0][0];
+    if (event.error) {
+      await this.failTask(task, event.error.message);
+      // TODO: retry task
+      console.log(
+        `task event process error: err="${event.error.message}" unretriable=${event.error.unretriable}`
+      );
+      return true;
+    }
+
+    if (event.task.type === "import") {
+      const assetSpec = event.output?.import?.assetSpec;
+      if (!assetSpec) {
+        const error = "bad task output: missing assetSpec";
+        console.log(
+          `task event process error: err=${error} taskId=${event.task.id}`
+        );
+        await this.failTask(task, error, event.output);
+        return true;
+      }
+      await db.asset.update(task.outputAssetId, {
+        size: assetSpec.size,
+        hash: assetSpec.hash,
+        videoSpec: assetSpec.videoSpec,
+        status: "ready",
+        updatedAt: Date.now(),
+      });
+    }
+    await db.task.update(task.id, {
+      status: {
+        phase: "completed",
+        updatedAt: Date.now(),
+      },
+      output: event.output,
+    });
+    return true;
+  }
+
+  private async failTask(task: Task, error: string, output?: Task["output"]) {
+    await db.task.update(task.id, {
+      output,
+      status: {
+        phase: "failed",
+        updatedAt: Date.now(),
+        errorMessage: error,
+      },
+    });
+    if (task.outputAssetId) {
+      await db.asset.update(task.outputAssetId, {
+        status: "failed",
+        updatedAt: Date.now(),
+      });
     }
   }
 
@@ -108,21 +116,21 @@ export default class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    let newTask: WithID<Task> = {
+    let task: WithID<Task> = {
       id: uuid(),
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
       userId: inputAsset?.userId || outputAsset?.userId,
-      params: params,
+      params,
       status: {
         phase: "pending",
         updatedAt: Date.now(),
       },
     };
 
-    let task = await db.task.create(newTask);
+    task = await db.task.create(task);
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),

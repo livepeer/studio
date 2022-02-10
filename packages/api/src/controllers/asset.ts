@@ -358,40 +358,40 @@ app.put("/upload/:url", async (req, res) => {
       `the provided url for the upload is not valid or not supported: ${uploadUrl}`
     );
   }
-  const obj = await db.asset.find({ playbackId: playbackId });
-
-  if (obj?.length) {
-    let asset = obj[0][0];
-    var proxy = httpProxy.createProxyServer({});
-
-    proxy.on("end", async function (proxyReq, _, res) {
-      if (res.statusCode == 200) {
-        await req.taskScheduler.scheduleTask(
-          "import",
-          {
-            import: {
-              uploadedObjectKey: `directUpload/${playbackId}/source`,
-            },
-          },
-          undefined,
-          asset
-        );
-      } else {
-        console.log(
-          `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
-        );
-      }
-    });
-
-    proxy.web(req, res, {
-      target: uploadUrl,
-      changeOrigin: true,
-      ignorePath: true,
-    });
-  } else {
-    // we expect an existing asset to be found
-    throw new NotFoundError(`related asset not found`);
+  const assets = await db.asset.find({ playbackId: playbackId });
+  if (!assets?.length) {
+    throw new NotFoundError(`asset not found`);
   }
+  let asset = assets[0][0];
+  if (asset.status !== "waiting") {
+    throw new UnprocessableEntityError(`asset has already been processed`);
+  }
+  var proxy = httpProxy.createProxyServer({});
+
+  proxy.on("end", async function (proxyReq, _, res) {
+    if (res.statusCode == 200) {
+      await req.taskScheduler.scheduleTask(
+        "import",
+        {
+          import: {
+            uploadedObjectKey: `directUpload/${playbackId}/source`,
+          },
+        },
+        undefined,
+        asset
+      );
+    } else {
+      console.log(
+        `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
+      );
+    }
+  });
+
+  proxy.web(req, res, {
+    target: uploadUrl,
+    changeOrigin: true,
+    ignorePath: true,
+  });
 });
 
 app.delete("/:id", authMiddleware({}), async (req, res) => {
