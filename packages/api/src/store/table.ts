@@ -285,7 +285,7 @@ export default class Table<T extends DBObject> {
       const fieldSpec = schema.properties[fieldName];
       if (fieldSpec.writeOnly) {
         delete res[fieldName];
-      } else if (fieldSpec.properties) {
+      } else if (fieldSpec.properties && res[fieldName]) {
         res[fieldName] = this.cleanWriteOnlyResponse(
           res[fieldName] as any,
           fieldSpec
