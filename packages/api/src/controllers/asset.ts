@@ -284,7 +284,9 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
     vodObjectStoreId,
   });
 
-  const b64SignedUrl = Buffer.from(presignedUrl).toString("base64");
+  const b64SignedUrl = encodeURIComponent(
+    Buffer.from(presignedUrl).toString("base64")
+  );
   const lpSignedUrl = `https://${req.frontendDomain}/api/asset/upload/${b64SignedUrl}`;
 
   // TODO: use the same function as the one used in import
@@ -300,7 +302,7 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
 
 app.put("/upload/:url", async (req, res) => {
   const { url } = req.params;
-  let uploadUrl = Buffer.from(url, "base64").toString();
+  let uploadUrl = decodeURIComponent(Buffer.from(url, "base64").toString());
 
   // get playbackId from s3 url
   let playbackId;
