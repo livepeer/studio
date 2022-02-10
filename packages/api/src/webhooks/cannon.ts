@@ -120,19 +120,16 @@ export default class WebhookCannon {
         return true;
       }
       try {
-        const stream = await this.db.stream.get(event.streamId);
-        const streamSession = await this.db.stream.getLastSession(stream.id);
-
         let mp4RecordingUrl = getRecordingUrl(
           this.baseIngest,
-          streamSession,
+          session,
           true
         );
 
         await this.recordingToVodAsset(
           mp4RecordingUrl,
-          stream.userId,
-          stream.id
+          session.userId,
+          session.id
         );
       } catch (e) {
         console.log(
@@ -520,10 +517,10 @@ export default class WebhookCannon {
   async recordingToVodAsset(
     mp4RecordingUrl: string,
     userId: string,
-    streamId: string
+    sessionId: string
   ) {
     const id = uuid();
-    const playbackId = await generateUniquePlaybackId(this.store, streamId);
+    const playbackId = await generateUniquePlaybackId(this.store, sessionId);
 
     const asset = await this.db.asset.create({
       id,
@@ -531,7 +528,7 @@ export default class WebhookCannon {
       userId,
       createdAt: Date.now(),
       status: "waiting",
-      name: `live-to-vod-${streamId}`,
+      name: `live-to-vod-${sessionId}`,
       objectStoreId: this.vodObjectStoreId,
     });
 
