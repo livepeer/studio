@@ -374,6 +374,7 @@ app.put("/upload/:url", async (req, res) => {
 
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {
+      // TODO: Find a way to return the task in the response
       await req.taskScheduler.scheduleTask(
         "import",
         {

@@ -49,13 +49,13 @@ export default class TaskScheduler {
 
   async processTaskEvent(event: messages.TaskResult): Promise<boolean> {
     const tasks = await db.task.find({ id: event.task.id });
-    if (!tasks?.length) {
+    if (!tasks?.length || !tasks[0].length) {
       console.log(`task event process error: task ${event.task.id} not found`);
       return true;
     }
+    const task = tasks[0][0];
 
     // TODO: bundle all db updates in a single transaction
-    const task = tasks[0][0];
     if (event.error) {
       await this.failTask(task, event.error.message);
       // TODO: retry task
