@@ -31,7 +31,6 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: string;
-  baseIngest: any;
   taskScheduler: TaskScheduler;
   vodObjectStoreId: string;
   resolver: any;
@@ -43,7 +42,6 @@ export default class WebhookCannon {
     sendgridTemplateId,
     sendgridApiKey,
     supportAddr,
-    baseIngest,
     taskScheduler,
     vodObjectStoreId,
     verifyUrls,
@@ -57,7 +55,6 @@ export default class WebhookCannon {
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
-    this.baseIngest = baseIngest;
     this.taskScheduler = taskScheduler;
     this.vodObjectStoreId = vodObjectStoreId;
     this.resolver = new dns.Resolver();
