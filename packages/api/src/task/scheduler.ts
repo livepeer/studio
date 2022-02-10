@@ -104,8 +104,8 @@ export default class TaskScheduler {
   }
 
   async scheduleTask(
-    type: "import" | "export" | "transcode",
-    params: object,
+    type: Task["type"],
+    params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
@@ -116,14 +116,12 @@ export default class TaskScheduler {
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
       userId: inputAsset?.userId || outputAsset?.userId,
-      params: {},
+      params: params,
       status: {
         phase: "pending",
         updatedAt: Date.now(),
       },
     };
-
-    newTask.params[type] = params;
 
     let task = await db.task.create(newTask);
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
