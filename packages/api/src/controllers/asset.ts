@@ -2,6 +2,7 @@ import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
 import { v4 as uuid } from "uuid";
+import mung from "express-mung";
 import {
   makeNextHREF,
   parseFilters,
@@ -95,6 +96,27 @@ function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
 }
+
+app.use(
+  mung.json(function cleanWriteOnlyResponses(
+    data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
+    req
+  ) {
+    if (req.user.admin) {
+      return data;
+    }
+    if (Array.isArray(data)) {
+      return db.asset.cleanWriteOnlyResponses(data);
+    }
+    if ("id" in data) {
+      return db.asset.cleanWriteOnlyResponse(data);
+    }
+    if ("asset" in data) {
+      return db.asset.cleanWriteOnlyResponse(data.asset);
+    }
+    return data;
+  })
+);
 
 const fieldsMap: FieldsMap = {
   id: `asset.ID`,
