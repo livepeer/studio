@@ -110,7 +110,7 @@ app.use(
       return db.asset.cleanWriteOnlyResponse(data);
     }
     if ("asset" in data) {
-      return db.asset.cleanWriteOnlyResponse(data.asset);
+      return { ...data, asset: db.asset.cleanWriteOnlyResponse(data.asset) };
     }
     return data;
   })
