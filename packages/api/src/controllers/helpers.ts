@@ -117,21 +117,23 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
-export async function getS3PresignedUrl({ objectKey, vodObjectStoreId }) {
-  const store = await db.objectStore.get(vodObjectStoreId);
-  let s3urlRegex =
-    /s3\+https:\/\/([a-zA-Z0-9-_]*):([a-zA-Z0-9-_]*)@([a-zA-Z0-9-.-_]*)\/([a-zA-Z0-9-_]*)\/([a-zA-Z0-9-_]*)/;
-  let match = s3urlRegex.exec(store.url);
+const s3urlRegex =
+  /s3\+https:\/\/([a-zA-Z0-9-_]*):([a-zA-Z0-9-_]*)@([a-zA-Z0-9-.-_]*)\/([a-zA-Z0-9-_]*)\/([a-zA-Z0-9-_]*)/;
 
-  if (match) {
-    var vodAccessKey = match[1];
-    var vodSecretAccessKey = match[2];
-    var publicUrl = match[3];
-    var vodRegion = match[4];
-    var vodBucket = match[5];
-  } else {
+export async function getS3PresignedUrl(
+  vodObjectStoreId: string,
+  objectKey: string
+) {
+  const store = await db.objectStore.get(vodObjectStoreId);
+  let match = s3urlRegex.exec(store.url);
+  if (!match) {
     throw new Error("Invalid S3 URL");
   }
+  var vodAccessKey = match[1];
+  var vodSecretAccessKey = match[2];
+  var publicUrl = match[3];
+  var vodRegion = match[4];
+  var vodBucket = match[5];
 
   const s3Configuration = {
     credentials: {

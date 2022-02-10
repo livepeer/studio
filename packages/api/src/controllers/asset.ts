@@ -282,11 +282,18 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
   const id = uuid();
   let playbackId = await generateUniquePlaybackId(req.store, id);
 
-  const { vodObjectStoreId } = req.config;
-  const presignedUrl = await getS3PresignedUrl({
-    objectKey: `directUpload/${playbackId}/source`,
-    vodObjectStoreId,
-  });
+  let asset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    { name: `asset-upload-${id}`, ...req.body }
+  );
+  const presignedUrl = await getS3PresignedUrl(
+    asset.objectStoreId,
+    `directUpload/${playbackId}/source`
+  );
 
   const b64SignedUrl = encodeURIComponent(
     Buffer.from(presignedUrl).toString("base64")
@@ -298,18 +305,11 @@ app.post("/request-upload", authMiddleware({}), async (req, res) => {
     return res.json({ errors: ["Ingest not configured"] });
   }
   const baseUrl = ingests[0].origin;
+  const url = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
 
-  const lpSignedUrl = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
+  asset = await db.asset.create(asset);
 
-  // TODO: use the same function as the one used in import
-  await db.asset.create({
-    id,
-    name: `asset-upload-${id}`,
-    playbackId,
-    userId: req.user.id,
-    objectStoreId: vodObjectStoreId,
-  });
-  res.json({ url: lpSignedUrl, playbackId: playbackId });
+  res.json({ url, asset });
 });
 
 app.put("/upload/:url", async (req, res) => {
