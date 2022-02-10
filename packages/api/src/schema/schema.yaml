@@ -1278,7 +1278,8 @@ components:
                       properties:
                         apiKey:
                           type: string
-                          description: Will be added to the pinata_api_key header.
+                          description:
+                            Will be added to the pinata_api_key header.
                         apiSecret:
                           type: string
                           writeOnly: true
