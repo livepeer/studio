@@ -85,8 +85,6 @@ export default class TaskScheduler {
             status: "ready",
             updatedAt: Date.now(),
           });
-
-          return true;
         }
       }
 
