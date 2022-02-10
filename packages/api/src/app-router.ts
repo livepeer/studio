@@ -85,12 +85,14 @@ export default async function makeApp(params: CliArgs) {
     : new NoopQueue();
 
   // Webhooks Cannon
+  const baseIngest = JSON.parse(ingest)[0].base;
   const webhookCannon = new WebhookCannon({
     db,
     store,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
+    baseIngest,
     supportAddr,
     verifyUrls: true,
     queue,
