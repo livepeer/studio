@@ -116,10 +116,8 @@ export default class WebhookCannon {
         return true;
       }
       try {
-        let mp4RecordingUrl = event.payload?.mp4RecordingUrl;
-
         await this.recordingToVodAsset(
-          mp4RecordingUrl,
+          event.payload.mp4Url,
           session.userId,
           session.id
         );
