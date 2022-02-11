@@ -8,7 +8,7 @@ import PlayDJIcon from "../../../public/img/testimonials/playdj-tv/logo.svg";
 const testimonials: CardProps[] = [
   {
     quote:
-      "Livepeer.com is an exciting video infrastructure solution that’s highly reliable and price disruptive.",
+      "Livepeer Video Services is an exciting video infrastructure solution that’s highly reliable and price disruptive.",
     id: "cbs-interactive",
     logo: <CBSIcon css={{ color: "$hiContrast" }} />,
     author: {
@@ -19,23 +19,23 @@ const testimonials: CardProps[] = [
   },
   {
     quote:
-      "Livepeer.com is an incredible team building the future of video infrastructure services.",
+      "Livepeer Video Services is an incredible team building the future of video infrastructure services.",
     id: "houseparty",
     logo: <HousePartyIcon css={{ color: "$hiContrast" }} />,
     author: {
       name: "Ben Rubin",
       role: "CEO",
-      company: "Houseparty (Acquired by Epic Games)",
+      company: "Houseparty (acquired by Epic Games)",
     },
   },
   {
     quote:
-      "Partnering with Livepeer.com has allowed PlayDJ.tv to get ahead of our competitors through innovation and new technology.",
+      "Partnering with Livepeer Video Services has allowed PlayDJ.tv to get ahead of our competitors through innovation and new technology.",
     id: "playdj-tv",
     logo: <PlayDJIcon css={{ color: "$hiContrast" }} />,
     author: {
       name: "Tom Burman",
-      role: "Co-founder",
+      role: "Co-Founder",
       company: "PlayDJ.TV",
     },
   },
