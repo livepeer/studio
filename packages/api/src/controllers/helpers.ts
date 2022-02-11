@@ -1,6 +1,6 @@
 import { Crypto } from "@peculiar/webcrypto";
 import { TextEncoder } from "util";
-import { URL } from "url";
+import { URL, parse as parseUrl } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
@@ -117,23 +117,19 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
-const s3urlRegex =
-  /s3\+https:\/\/([a-zA-Z0-9-_]*):([a-zA-Z0-9-_]*)@([a-zA-Z0-9-.-_]*)\/([a-zA-Z0-9-_]*)\/([a-zA-Z0-9-_]*)/;
-
 export async function getS3PresignedUrl(
   vodObjectStoreId: string,
   objectKey: string
 ) {
   const store = await db.objectStore.get(vodObjectStoreId);
-  let match = s3urlRegex.exec(store.url);
-  if (!match) {
-    throw new Error("Invalid S3 URL");
+  const parsed = parseUrl(store.url);
+  const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
+  const publicUrl = parsed.host;
+  const [_, vodRegion, vodBucket] = parsed.path.split("/");
+  let protocol = parsed.protocol;
+  if (protocol.includes("+")) {
+    protocol = protocol.split("+")[1];
   }
-  var vodAccessKey = match[1];
-  var vodSecretAccessKey = match[2];
-  var publicUrl = match[3];
-  var vodRegion = match[4];
-  var vodBucket = match[5];
 
   const s3Configuration = {
     credentials: {
@@ -142,7 +138,7 @@ export async function getS3PresignedUrl(
     },
     region: vodRegion,
     signingRegion: vodRegion,
-    endpoint: `https://${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
+    endpoint: `${protocol}//${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
     forcePathStyle: true,
   };
 
