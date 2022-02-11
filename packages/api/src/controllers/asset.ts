@@ -209,7 +209,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 
   res.status(200);
 
-  if (output.length > 0) {
+  if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
 
@@ -323,9 +323,18 @@ app.post(
       req.config.vodObjectStoreId,
       { name: `asset-upload-${id}`, ...req.body }
     );
+    const uploadedObjectKey = `directUpload/${playbackId}/source`;
     const presignedUrl = await getS3PresignedUrl(
       asset.objectStoreId,
-      `directUpload/${playbackId}/source`
+      uploadedObjectKey
+    );
+    const task = await req.taskScheduler.createTask(
+      "import",
+      {
+        import: { uploadedObjectKey },
+      },
+      null,
+      asset
     );
 
     const b64SignedUrl = encodeURIComponent(
@@ -342,7 +351,7 @@ app.post(
 
     asset = await db.asset.create(asset);
 
-    res.json({ url, asset });
+    res.json({ url, asset, task });
   }
 );
 
@@ -363,34 +372,31 @@ app.put("/upload/:url", async (req, res) => {
     );
   }
   const assets = await db.asset.find({ playbackId: playbackId });
-  if (!assets?.length) {
+  if (!assets?.length || !assets[0]?.length) {
     throw new NotFoundError(`asset not found`);
   }
   let asset = assets[0][0];
   if (asset.status !== "waiting") {
-    throw new UnprocessableEntityError(`asset has already been processed`);
+    throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
+
+  const tasks = await db.task.find(
+    { outputAssetId: asset.id },
+    { useReplica: false }
+  );
+  if (!tasks?.length && !tasks[0]?.length) {
+    throw new NotFoundError(`task not found`);
+  }
+  const task = tasks[0][0];
+  if (task.status?.phase !== "pending") {
+    throw new UnprocessableEntityError(`asset has already been uploaded`);
+  }
+
   var proxy = httpProxy.createProxyServer({});
-
-  // Pre-generate the task ID so we can return it in the response headers.
-  // TODO: Actually intercept the full proxy response and return our own body.
-  const taskId = uuid();
-  res.set("Livepeer-Task-Id", taskId);
-
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {
       // TODO: Find a way to return the task in the response
-      await req.taskScheduler.scheduleTask(
-        "import",
-        {
-          import: {
-            uploadedObjectKey: `directUpload/${playbackId}/source`,
-          },
-        },
-        undefined,
-        asset,
-        taskId
-      );
+      await req.taskScheduler.enqueueTask(task);
     } else {
       console.log(
         `assetUpload: Proxy upload to s3 on url ${uploadUrl} failed with status code: ${res.statusCode}`
