@@ -1049,7 +1049,7 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
 
     new-asset-payload:
-      additionalProperties: false
+      additionalProperties: true
       required:
         - name
       properties:
