@@ -203,9 +203,9 @@ const Menu = ({
             />
             <ArrowLink
               hideArrow
-              href="https://mistserver.org/"
+              href="/products/media-server"
               css={{ fontWeight: 600, fontSize: "$3" }}
-              target="_blank">
+           >
               Media Server
             </ArrowLink>
           </Flex>

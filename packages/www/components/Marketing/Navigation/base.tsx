@@ -244,9 +244,8 @@ const NavigationBase = ({
                     />
                     <ArrowLink
                       hideArrow
-                      href="https://mistserver.org/"
-                      css={{ fontWeight: 500, fontSize: "$3" }}
-                      target="_blank">
+                      href="/products/media-server"
+                      css={{ fontWeight: 500, fontSize: "$3" }}>
                       Media Server
                     </ArrowLink>
                   </Flex>
