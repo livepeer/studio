@@ -1188,10 +1188,11 @@ components:
               properties:
                 videoFilePath:
                   type: string
+                  writeOnly: true
                 metadataFilePath:
                   type: string
+                  writeOnly: true
                 assetSpec:
-                  type: object
                   $ref: "#/components/schemas/asset"
             export:
               type: object
