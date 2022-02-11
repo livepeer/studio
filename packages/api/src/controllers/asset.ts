@@ -283,9 +283,9 @@ app.post(
       req.config.vodObjectStoreId,
       req.body
     );
-    if (typeof req.body?.url !== "string") {
+    if (!req.body.url) {
       return res.status(422).json({
-        errors: ["You must provide a url from which import an asset"],
+        errors: [`Must provide a "url" field for the asset contents`],
       });
     }
 
