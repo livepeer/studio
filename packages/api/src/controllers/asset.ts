@@ -372,6 +372,11 @@ app.put("/upload/:url", async (req, res) => {
   }
   var proxy = httpProxy.createProxyServer({});
 
+  // Pre-generate the task ID so we can return it in the response headers.
+  // TODO: Actually intercept the full proxy response and return our own body.
+  const taskId = uuid();
+  res.set("X-Task-Id", taskId);
+
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {
       // TODO: Find a way to return the task in the response
@@ -383,7 +388,8 @@ app.put("/upload/:url", async (req, res) => {
           },
         },
         undefined,
-        asset
+        asset,
+        taskId
       );
     } else {
       console.log(

@@ -114,10 +114,11 @@ export default class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    forcedTaskId?: string
   ) {
     let task: WithID<Task> = {
-      id: uuid(),
+      id: forcedTaskId ?? uuid(),
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
