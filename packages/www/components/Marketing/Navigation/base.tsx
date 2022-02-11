@@ -19,6 +19,12 @@ import ArrowLink from "../ArrowLink";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
+export const StyledServerIcon = ({ ...props }) => (
+  <Box as="svg" viewBox="0 0 24 24" {...props}>
+    <path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path>
+  </Box>
+);
+
 const StyledEcommerceIcon = ({ active = false, ...props }) => {
   return (
     <Box
@@ -168,7 +174,7 @@ const NavigationBase = ({
                       cursor: "pointer",
                       color: "$hiContrast",
                     }}>
-                    Use Cases
+                    Products
                   </Box>
                 }>
                 <Box css={{ mb: "$3" }}>
@@ -178,7 +184,7 @@ const NavigationBase = ({
                     />
                     <Box>
                       <Text css={{ fontWeight: 500, mb: "$2" }}>
-                        Streaming Platforms
+                        Streaming Service
                       </Text>
                       <Box css={{ color: "$mauve5" }}>
                         <ArrowLink
@@ -213,26 +219,34 @@ const NavigationBase = ({
                             24x7 Channels
                           </Text>
                         </ArrowLink>
+
+                        <ArrowLink
+                          hideArrow
+                          color="$mauve9"
+                          href="/use-cases/ecommerce">
+                          <Text variant="gray" css={{ py: "$1" }}>
+                            Ecommerce
+                          </Text>
+                        </ArrowLink>
                       </Box>
                     </Box>
                   </Flex>
                 </Box>
                 <Box>
-                  <Flex>
-                    <StyledEcommerceIcon
+                  <Flex css={{ alignItems: "center" }}>
+                    <StyledServerIcon
                       css={{
-                        color: "$hiContrast",
-                        mt: "1px",
+                        fill: "white",
+                        mt: "0px",
                         mr: "$3",
-                        width: 14,
-                        height: 14,
+                        width: "16px",
                       }}
                     />
                     <ArrowLink
                       hideArrow
-                      href="/use-cases/ecommerce"
-                      css={{ fontWeight: 500, mb: "$2", fontSize: "$3" }}>
-                      Ecommerce
+                      href="/products/media-server"
+                      css={{ fontWeight: 500, fontSize: "$3" }}>
+                      Media Server
                     </ArrowLink>
                   </Flex>
                 </Box>
