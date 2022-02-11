@@ -3,7 +3,11 @@ import Link from "next/link";
 
 export type LinksListProps = {
   heading: string;
-  links: any;
+  links: Array<{
+    children: string;
+    href: string;
+    target?: "_self" | "_blank";
+  }>;
 };
 
 const LinksList = ({ heading, links }: LinksListProps) => (
@@ -16,7 +20,7 @@ const LinksList = ({ heading, links }: LinksListProps) => (
         key={`link-${link.href}-${i}`}
         css={{ "&:not(:last-of-type)": { mb: "$3" } }}>
         <Link href={link.href} passHref>
-          <A>{link.children}</A>
+          <A target={link.target ? link.target : "_self"}>{link.children}</A>
         </Link>
       </Box>
     ))}
