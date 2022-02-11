@@ -39,8 +39,7 @@ const linksLists: LinksListProps[] = [
       { children: "Blog", href: "/blog" },
       {
         children: "Media Server",
-        href: "https://mistserver.org/",
-        target: "_blank",
+        href: "/products/media-server",
       },
       { children: "Privacy Policy", href: "/privacy-policy" },
       { children: "Terms of Service", href: "/terms-of-service" },
