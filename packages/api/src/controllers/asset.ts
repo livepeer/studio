@@ -18,6 +18,7 @@ import {
   ForbiddenError,
   UnprocessableEntityError,
   NotFoundError,
+  BadRequestError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
@@ -302,6 +303,63 @@ app.post(
       asset
     );
 
+    res.status(201);
+    res.json({ asset, task });
+  }
+);
+
+app.post(
+  "/transcode",
+  validatePost("new-transcode-payload"),
+  authMiddleware({}),
+  async (req, res) => {
+    if (!req.body.assetId) {
+      throw new BadRequestError("You must provide a assetId of an asset");
+    }
+    const asset = await db.asset.get(req.body.assetId);
+    if (!asset) {
+      throw new NotFoundError(`asset not found`);
+    }
+
+    const os = await db.objectStore.get(asset.objectStoreId);
+    if (!os) {
+      throw new UnprocessableEntityError("Asset has invalid objectStoreId");
+    }
+    const outputAssets = [];
+    for (let profile of req.body.profiles) {
+      const id = uuid();
+      const playbackId = await generateUniquePlaybackId(req.store, id);
+      let oasset = await validateAssetPayload(
+        id,
+        playbackId,
+        req.user.id,
+        Date.now(),
+        req.config.vodObjectStoreId,
+        {
+          name:
+            (req.body.name ?? "") +
+              "_" +
+              (asset.name ?? "default") +
+              "_" +
+              profile.name ?? "default",
+        }
+      );
+      oasset.sourceAssetId = asset.id;
+      oasset = await db.asset.create(oasset);
+      outputAssets.push(oasset);
+    }
+
+    const task = await req.taskScheduler.scheduleTask(
+      "transcode",
+      {
+        transcode: {
+          profiles: req.body.profiles,
+        },
+      },
+      asset,
+      undefined,
+      outputAssets
+    );
     res.status(201);
     res.json({ asset, task });
   }

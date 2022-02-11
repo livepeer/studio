@@ -33,6 +33,53 @@ tags:
 
 components:
   schemas:
+    ffmpeg-profile:
+      type: object
+      description: LMPS ffmpeg profile
+      additionalProperties: false
+      required:
+        - width
+        - name
+        - height
+        - bitrate
+        - fps
+      properties:
+        width:
+          type: integer
+          minimum: 128
+        name:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: "720p"
+        height:
+          type: integer
+          minimum: 128
+        bitrate:
+          type: integer
+          minimum: 400
+        fps:
+          type: integer
+          minimum: 0
+        fpsDen:
+          type: integer
+          minimum: 1
+        gop:
+          type: string
+        profile:
+          type: string
+          enum:
+            - H264Baseline
+            - H264Main
+            - H264High
+            - H264ConstrainedHigh
+        encoder:
+          type: string
+          enum:
+            - h264
+            - hevc
+            - vp8
+            - vp9
     cdn-data-row:
       type: object
       description:
@@ -399,44 +446,7 @@ components:
             - { name: "480p0", fps: 0, bitrate: 1600000, width: 854, height: 480 }
             - { name: "720p0", fps: 0, bitrate: 3000000, width: 1280, height: 720 }
           items:
-            type: object
-            required:
-              - width
-              - name
-              - height
-              - bitrate
-              - fps
-            additionalProperties: false
-            properties:
-              width:
-                type: integer
-                minimum: 128
-              name:
-                type: string
-                minLength: 1
-                maxLength: 500
-                example: "720p"
-              height:
-                type: integer
-                minimum: 128
-              bitrate:
-                type: integer
-                minimum: 400
-              fps:
-                type: integer
-                minimum: 0
-              fpsDen:
-                type: integer
-                minimum: 1
-              gop:
-                type: string
-              profile:
-                type: string
-                enum:
-                  - H264Baseline
-                  - H264Main
-                  - H264High
-                  - H264ConstrainedHigh
+            $ref: "#/components/schemas/ffmpeg-profile"
         objectStoreId:
           type: string
           example: D8321C3E-B29C-45EB-A1BB-A623D8BE0F65
@@ -720,55 +730,9 @@ components:
         profiles:
           type: array
           items:
-            type: object
-            required:
-              - width
-              - name
-              - height
-              - bitrate
-              - fps
-            additionalProperties: false
-            properties:
-              width:
-                type: integer
-                minimum: 128
-              name:
-                type: string
-                minLength: 1
-                maxLength: 500
-                example: "720p"
-              height:
-                type: integer
-                minimum: 128
-              bitrate:
-                type: integer
-                minimum: 400
-              fps:
-                type: integer
-                minimum: 0
-              fpsDen:
-                type: integer
-                minimum: 1
-              gop:
-                type: string
-              profile:
-                type: string
-                enum:
-                  - H264Baseline
-                  - H264Main
-                  - H264High
-                  - H264ConstrainedHigh
-          recordingStatus:
-            type: string
-            enum:
-              - ready
-              - waiting
-          recordingUrl:
-            type: string
-          mp4Url:
-            type: string
-          lastSessionId:
-            type: string
+            $ref: "#/components/schemas/ffmpeg-profile"
+        lastSessionId:
+          type: string
 
     error:
       required:
@@ -1083,6 +1047,32 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+    new-transcode-payload:
+      additionalProperties: true
+      required:
+        - name
+        - profiles
+        - assetId
+      properties:
+        assetId:
+          type: string
+          description: ID of the asset to transcode
+        objectStoreId:
+          type: string
+          description: Object store ID where the asset is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        name:
+          type: string
+          description:
+            Name of the asset. This is not necessarily the filename, can be a
+            custom name or title
+          example: filename.mp4
+        profiles:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ffmpeg-profile"
 
     task:
       type: object
@@ -1107,7 +1097,7 @@ components:
           enum:
             - import
             - export
-            # - transcode
+            - transcode
         createdAt:
           type: number
           readOnly: true
@@ -1126,6 +1116,11 @@ components:
           description: ID of the output asset
           index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        outputAssetsIds:
+          description: ID sof the output assets
+          type: array
+          items:
+            type: string
         params:
           type: object
           additionalProperties: false
@@ -1151,8 +1146,11 @@ components:
               additionalProperties: false
               description: Parameters for the transcode task
               properties:
-                params:
-                  type: object
+                profiles:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: "#/components/schemas/ffmpeg-profile"
         status:
           type: object
           additionalProperties: false
@@ -1240,6 +1238,24 @@ components:
                       description:
                         URL to access metadata file via HTTP through an IPFS
                         gateway
+            transcode:
+              type: object
+              additionalProperties: false
+              properties:
+                assets:
+                  type: array
+                  description: Output of the transcode task
+                  items:
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      videoFilePath:
+                        type: string
+                      metadataFilePath:
+                        type: string
+                      assetSpec:
+                        type: object
+                        $ref: "#/components/schemas/asset"
 
     export-task-params:
       description: Parameters for the export task

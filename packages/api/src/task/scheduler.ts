@@ -25,7 +25,10 @@ export default class TaskScheduler {
     let event: messages.TaskResult;
     try {
       event = JSON.parse(data.content.toString());
-      console.log("events: got task result message", event);
+      console.log(
+        "events: got task result message",
+        JSON.stringify(event, null, 2)
+      );
     } catch (err) {
       console.log("events: error parsing task message", err);
       this.queue.ack(data);
@@ -69,7 +72,7 @@ export default class TaskScheduler {
       const assetSpec = event.output?.import?.assetSpec;
       if (!assetSpec) {
         const error = "bad task output: missing assetSpec";
-        console.log(
+        console.error(
           `task event process error: err=${error} taskId=${event.task.id}`
         );
         await this.failTask(task, error, event.output);
@@ -82,6 +85,26 @@ export default class TaskScheduler {
         status: "ready",
         updatedAt: Date.now(),
       });
+    } else if (event.task.type === "transcode") {
+      const assets = event.output?.transcode?.assets;
+      if (!assets) {
+        const error = "bad task output: missing assets";
+        console.error(
+          `task event process error: err=${error} taskId=${event.task.id}`
+        );
+        await this.failTask(task, error, event.output);
+        return true;
+      }
+      for (let i = 0; i < assets.length; i++) {
+        const assetSpec = assets[i].assetSpec;
+        await db.asset.update(task.outputAssetsIds[i], {
+          size: assetSpec.size,
+          hash: assetSpec.hash,
+          videoSpec: assetSpec.videoSpec,
+          status: "ready",
+          updatedAt: Date.now(),
+        });
+      }
     }
     await db.task.update(task.id, {
       status: {
@@ -114,7 +137,8 @@ export default class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset
+    outputAsset?: Asset,
+    outputAssets?: Array<Asset>
   ) {
     const task = await this.createTask(type, params, inputAsset, outputAsset);
     await this.enqueueTask(task);
@@ -132,6 +156,7 @@ export default class TaskScheduler {
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
+      outputAssetsIds: outputAssets?.map((asset) => asset.id),
       inputAssetId: inputAsset?.id,
       userId: inputAsset?.userId || outputAsset?.userId,
       params,
