@@ -10,6 +10,7 @@ import job from "./documents/job";
 import post from "./documents/post";
 import author from "./documents/author";
 import category from "./documents/category";
+import product from "./documents/product";
 import useCase from "./documents/useCase";
 import route from "./documents/route";
 import siteConfig from "./documents/siteConfig";
@@ -78,6 +79,7 @@ export default createSchema({
     post,
     author,
     category,
+    product,
     useCase,
     why,
     caseStudy,
