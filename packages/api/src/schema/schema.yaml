@@ -1077,6 +1077,8 @@ components:
             }
         url:
           type: string
+          format: uri
+          pattern: ^http(s)?://
           description:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
@@ -1245,6 +1247,8 @@ components:
               properties:
                 url:
                   type: string
+                  format: uri
+                  pattern: ^http(s)?://
                   description: URL where to export the asset
                   example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
                 method:
