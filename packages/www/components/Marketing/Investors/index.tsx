@@ -39,7 +39,7 @@ const Investors = ({ backgroundColor }) => {
               textAlign: "center",
               mb: "$8",
             }}>
-            Backed by these amazing organizations and trusted by the best
+            Trusted by video industry and Web3 leaders
           </Text>
 
           <Grid
