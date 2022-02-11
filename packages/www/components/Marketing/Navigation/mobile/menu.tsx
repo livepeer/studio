@@ -204,8 +204,7 @@ const Menu = ({
             <ArrowLink
               hideArrow
               href="/products/media-server"
-              css={{ fontWeight: 600, fontSize: "$3" }}
-           >
+              css={{ fontWeight: 600, fontSize: "$3" }}>
               Media Server
             </ArrowLink>
           </Flex>
