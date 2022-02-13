@@ -20,7 +20,7 @@ const Product = ({
   why,
   preview,
 }) => {
-  const { isFallback, asPath } = useRouter();
+  const { isFallback } = useRouter();
   const builder = imageUrlBuilder(client);
 
   if (isFallback) {
@@ -55,10 +55,11 @@ const Product = ({
       url={metaUrl}
       preview={preview}>
       <Hero
+        centered={hero.centered}
         tagline="Products"
         heading={hero.heading}
         description={hero.description}
-        image={hero.image.asset.url}
+        image={hero.image.asset?.url}
         ctas={[
           {
             href: "/register",
