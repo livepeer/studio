@@ -20,6 +20,7 @@ export default {
       type: "iconPicker",
       options: {
         outputFormat: "react",
+        providers: ["fa", "mdi", "hi", "fi"],
       },
     },
   ],

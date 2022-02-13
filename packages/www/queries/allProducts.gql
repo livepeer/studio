@@ -15,6 +15,7 @@ query allProduct($where: ProductFilter) {
       }
     }
     hero {
+      centered
       heading
       description
       image {
