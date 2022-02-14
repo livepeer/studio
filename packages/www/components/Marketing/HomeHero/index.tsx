@@ -166,9 +166,8 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 maxWidth: 700,
                 mx: "auto",
               }}>
-              Build and scale next generation streaming platforms and services
-              at an industry shattering price through quick and reliable API
-              access to{" "}
+              Accessible APIs and infrastructure to build video streaming
+              applications — big and small. Powered by{" "}
               <Box
                 href="https://livepeer.org"
                 target="_blank"
@@ -193,7 +192,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 </Text>
                 <ArrowTopRightIcon />
               </Box>
-              , the world's open video infrastructure.
+              &nbsp;the video layer for Web3.
             </Text>
             <Flex align="center" css={{ justifyContent: "center" }}>
               <Link href="/register" passHref>

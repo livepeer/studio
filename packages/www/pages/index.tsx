@@ -10,21 +10,21 @@ import { Home as Content } from "content";
 const benefitsListItems = [
   {
     icon: {
-      provider: "fi",
-      name: "FiUserCheck",
+      provider: "mdi",
+      name: "MdMoneyOff",
     },
-    title: "Easy to use",
+    title: "Affordable",
     description:
-      "Our straight forward APIs make integrating your streaming platform with the Livepeer network a quick and easy task.",
+      "Extraordinary cost savings up to 10x less expensive than centralized industry standards.",
   },
   {
     icon: {
       provider: "fi",
-      name: "FiSmile",
+      name: "FiUserCheck",
     },
-    title: "Reliable",
+    title: "Accessible",
     description:
-      "Ensure content creator audiences remain engaged by delivering high quality streams with 99.99% reliability.",
+      "Straightforward, no nonsense product and documentation designed for developers.",
   },
   {
     icon: {
@@ -33,16 +33,16 @@ const benefitsListItems = [
     },
     title: "Scalable",
     description:
-      "Freedom to scale up or down so you can manage content creator demand without over investing in infrastructure.",
+      "Leverage the near-infinite scalability of the Livepeer Network, rivaling Amazon’s cloud compute.",
   },
   {
     icon: {
-      provider: "mdi",
-      name: "MdMoneyOff",
+      provider: "fi",
+      name: "FiSmile",
     },
-    title: "Affordable",
+    title: "Reliable",
     description:
-      "Live Streaming at a fraction of the cost of comparable services.",
+      "An always-on, incentivized network and intelligent distribution guarantees transcoding never stops.",
   },
 ];
 
@@ -92,7 +92,7 @@ const HomePage = () => {
       <Why
         backgroundColor="$panel"
         title="Benefits"
-        heading="An API uniquely tailored to address the needs of today’s streaming platforms."
+        heading="Built by developers, for developers, with open software and decentralized infrastructure"
         reasons={benefitsListItems}
       />
       <Why
