@@ -1221,11 +1221,11 @@ components:
                       readOnly: true
                       description:
                         URL to access file through HTTP on an IPFS gateway
-                    erc1155MetadataCid:
+                    nftMetadataCid:
                       type: string
                       description:
                         IPFS CID of the default metadata exported for the video
-                    erc1155MetadataUrl:
+                    nftMetadataUrl:
                       type: string
                       readOnly: true
                       description:
@@ -1296,12 +1296,11 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
-                erc1155Metadata:
+                nftMetadata:
                   type: object
                   description:
-                    Additional data to add to the automatic ERC-1155 default
-                    export. Will be deep merged with the default metadata
-                    exported.
+                    Additional data to add to the NFT metadata exported to IPFS.
+                    Will be deep merged with the default metadata exported.
 
     api-token:
       type: object
