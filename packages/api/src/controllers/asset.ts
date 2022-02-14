@@ -371,7 +371,10 @@ app.put("/upload/:url", async (req, res) => {
       `the provided url for the upload is not valid or not supported: ${uploadUrl}`
     );
   }
-  const assets = await db.asset.find({ playbackId: playbackId });
+  const assets = await db.asset.find(
+    { playbackId: playbackId },
+    { useReplica: false }
+  );
   if (!assets?.length || !assets[0]?.length) {
     throw new NotFoundError(`asset not found`);
   }
