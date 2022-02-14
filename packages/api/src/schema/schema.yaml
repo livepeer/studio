@@ -1049,7 +1049,7 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
 
     new-asset-payload:
-      additionalProperties: true
+      additionalProperties: false
       required:
         - name
       properties:
@@ -1075,6 +1075,14 @@ components:
               "description": "This is a video of my awesome life",
               "tags": ["awesome", "life", "video"],
             }
+        url:
+          type: string
+          format: uri
+          pattern: ^http(s)?://
+          description:
+            URL where the asset contents can be retrieved. Only valid for the
+            import task endpoint.
+          example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
 
     task:
       type: object
@@ -1182,10 +1190,11 @@ components:
               properties:
                 videoFilePath:
                   type: string
+                  writeOnly: true
                 metadataFilePath:
                   type: string
+                  writeOnly: true
                 assetSpec:
-                  type: object
                   $ref: "#/components/schemas/asset"
             export:
               type: object
@@ -1212,11 +1221,11 @@ components:
                       readOnly: true
                       description:
                         URL to access file through HTTP on an IPFS gateway
-                    erc1155MetadataCid:
+                    nftMetadataCid:
                       type: string
                       description:
                         IPFS CID of the default metadata exported for the video
-                    erc1155MetadataUrl:
+                    nftMetadataUrl:
                       type: string
                       readOnly: true
                       description:
@@ -1238,6 +1247,8 @@ components:
               properties:
                 url:
                   type: string
+                  format: uri
+                  pattern: ^http(s)?://
                   description: URL where to export the asset
                   example: https://s3.amazonaws.com/my-bucket/path/filename.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LLMMB
                 method:
@@ -1285,12 +1296,11 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
-                erc1155Metadata:
+                nftMetadata:
                   type: object
                   description:
-                    Additional data to add to the automatic ERC-1155 default
-                    export. Will be deep merged with the default metadata
-                    exported.
+                    Additional data to add to the NFT metadata exported to IPFS.
+                    Will be deep merged with the default metadata exported.
 
     api-token:
       type: object

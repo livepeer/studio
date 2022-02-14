@@ -51,9 +51,9 @@ function withIpfsUrls(task: WithID<Task>): WithID<Task> {
             ipfsGateway,
             task.output.export.ipfs.videoFileCid
           ),
-          erc1155MetadataUrl: pathJoin(
+          nftMetadataUrl: pathJoin(
             ipfsGateway,
-            task.output.export.ipfs.erc1155MetadataCid
+            task.output.export.ipfs.nftMetadataCid
           ),
         },
       },

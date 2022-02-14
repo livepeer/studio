@@ -116,7 +116,18 @@ export default class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    let task: WithID<Task> = {
+    const task = await this.createTask(type, params, inputAsset, outputAsset);
+    await this.enqueueTask(task);
+    return task;
+  }
+
+  createTask(
+    type: Task["type"],
+    params: Task["params"],
+    inputAsset?: Asset,
+    outputAsset?: Asset
+  ) {
+    return db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
@@ -128,9 +139,10 @@ export default class TaskScheduler {
         phase: "pending",
         updatedAt: Date.now(),
       },
-    };
+    });
+  }
 
-    task = await db.task.create(task);
+  async enqueueTask(task: WithID<Task>) {
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
@@ -141,11 +153,8 @@ export default class TaskScheduler {
         snapshot: task,
       },
     });
-
     await db.task.update(task.id, {
       status: { phase: "waiting", updatedAt: Date.now() },
     });
-
-    return task;
   }
 }
