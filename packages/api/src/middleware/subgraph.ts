@@ -25,18 +25,37 @@ export default function subgraphMiddleware({
   let cachedResp: Array<OrchestratorNodeAddress> = [];
   let lastCachedRespUpdate = 0;
 
-  const getOrchestrators = async () => {
-    const query = `
-      {
-        transcoders(where: { active: true }) {
-          id
-          serviceURI
-        }
-      }
-    `;
+  const getCurrentRound = async () => {
+    const res = await fetchWithTimeout(subgraphUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `{ protocol(id: "0") { currentRound { id } } }`,
+      }),
+      timeout: SUBGRAPH_TIMEOUT,
+    });
 
+    return +(await res.json()).data.protocol.currentRound.id;
+  };
+
+  const getOrchestrators = async () => {
     if (lastCachedRespUpdate + CACHE_REFRESH_INTERVAL < Date.now()) {
       try {
+        const currentRound = await getCurrentRound();
+        const query = `
+          {
+            transcoders(where: { activationRound_lte: "${
+              currentRound + 1
+            }", deactivationRound_gt: "${currentRound}" }) {
+              id
+              serviceURI
+            }
+          }
+        `;
+
         const res = await fetchWithTimeout(subgraphUrl, {
           method: "POST",
           headers: {
