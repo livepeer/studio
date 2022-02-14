@@ -10,8 +10,8 @@ import { Home as Content } from "content";
 const benefitsListItems = [
   {
     icon: {
-        provider: "mdi",
-        name: "MdMoneyOff",
+      provider: "mdi",
+      name: "MdMoneyOff",
     },
     title: "Affordable",
     description:
@@ -19,8 +19,8 @@ const benefitsListItems = [
   },
   {
     icon: {
-        provider: "fi",
-        name: "FiUserCheck",
+      provider: "fi",
+      name: "FiUserCheck",
     },
     title: "Accessible",
     description:
@@ -37,8 +37,8 @@ const benefitsListItems = [
   },
   {
     icon: {
-        provider: "fi",
-        name: "FiSmile",
+      provider: "fi",
+      name: "FiSmile",
     },
     title: "Reliable",
     description:

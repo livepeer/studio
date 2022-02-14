@@ -64,12 +64,14 @@ const Contact = () => {
               size="4"
               variant="gray"
               css={{ maxWidth: 512, margin: "0 auto" }}>
-              Learn more about Livepeer Video Service's innovative
-              streaming API and media server. Leave us a message and we’ll get back to you.
+              Learn more about Livepeer Video Service's innovative streaming API
+              and media server. Leave us a message and we’ll get back to you.
               <br />
               <br />
               Or email us at{" "}
-              <A href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry" target="_blank">
+              <A
+                href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry"
+                target="_blank">
                 hello@livepeer.com
               </A>
               .
@@ -148,7 +150,8 @@ const Contact = () => {
 
               <Fade in={submitted}>
                 <Text variant="gray" css={{ mt: "$3" }}>
-                  Thank you for getting in touch. Our team will get back to you soon.
+                  Thank you for getting in touch. Our team will get back to you
+                  soon.
                 </Text>
               </Fade>
             </Box>

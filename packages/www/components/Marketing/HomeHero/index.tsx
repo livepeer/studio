@@ -166,7 +166,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 maxWidth: 700,
                 mx: "auto",
               }}>
-              Accessible APIs and infrastructure to build video streaming 
+              Accessible APIs and infrastructure to build video streaming
               applications — big and small. Powered by{" "}
               <Box
                 href="https://livepeer.org"

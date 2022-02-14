@@ -1,145 +1,145 @@
 import {
-    Container,
-    Heading,
-    Text,
-    Flex,
-    Box,
-    Link as A,
-  } from "@livepeer.com/design-system";
-  import Button from "@components/Marketing/Button";
-  import Guides from "@components/Marketing/Guides";
-  import Link from "next/link";
-  
-  const Prefooter = ({ backgroundColor = "$loContrast" }) => (
-    <Box css={{ position: "relative" }}>
-      <Guides backgroundColor={backgroundColor} />
-      <Container
-        size="3"
+  Container,
+  Heading,
+  Text,
+  Flex,
+  Box,
+  Link as A,
+} from "@livepeer.com/design-system";
+import Button from "@components/Marketing/Button";
+import Guides from "@components/Marketing/Guides";
+import Link from "next/link";
+
+const Prefooter = ({ backgroundColor = "$loContrast" }) => (
+  <Box css={{ position: "relative" }}>
+    <Guides backgroundColor={backgroundColor} />
+    <Container
+      size="3"
+      css={{
+        px: "$6",
+        py: 70,
+        width: "100%",
+        "@bp3": {
+          px: "$3",
+          py: 120,
+        },
+      }}>
+      <Box
         css={{
-          px: "$6",
-          py: 70,
-          width: "100%",
-          "@bp3": {
-            px: "$3",
-            py: 120,
+          px: 32,
+          py: 60,
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: 24,
+          color: "white",
+          background:
+            "linear-gradient(90deg, $colors$blue9 0%, $colors$violet10 33%,  $colors$violet11 66%, $colors$violet11 100%);",
+          backgroundSize: "cover",
+          "@bp2": {
+            px: 72,
+            py: 126,
           },
         }}>
-        <Box
+        <Heading
+          size="4"
+          as="h2"
           css={{
-            px: 32,
-            py: 60,
-            textAlign: "center",
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: 24,
             color: "white",
-            background:
-              "linear-gradient(90deg, $colors$blue9 0%, $colors$violet10 33%,  $colors$violet11 66%, $colors$violet11 100%);",
-            backgroundSize: "cover",
+            fontWeight: 700,
+            mb: "$6",
+          }}>
+          Ready to get started?
+        </Heading>
+        <Text
+          variant="gray"
+          size="4"
+          css={{
+            color: "white",
+            mb: "$7",
+            maxWidth: "700px",
+            mx: "auto",
+          }}>
+          Create a free account to get 1,000 transcoding minutes a month... for
+          free! Contact us anytime about custom pricing or use cases for your
+          business.
+        </Text>
+        <Flex
+          css={{
+            ai: "center",
+            justifyContent: "center",
+            flexDirection: "column",
             "@bp2": {
-              px: 72,
-              py: 126,
+              flexDirection: "row",
             },
           }}>
-          <Heading
-            size="4"
-            as="h2"
-            css={{
-              color: "white",
-              fontWeight: 700,
-              mb: "$6",
-            }}>
-            Ready to get started?
-          </Heading>
-          <Text
-            variant="gray"
-            size="4"
-            css={{
-              color: "white",
-              mb: "$7",
-              maxWidth: "700px",
-              mx: "auto",
-            }}>
-            Create a free account to get 1,000 transcoding minutes a month... for free! 
-            Contact us anytime about custom pricing or use cases for your business.
-          </Text>
-          <Flex
-            css={{
-              ai: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-              "@bp2": {
-                flexDirection: "row",
-              },
-            }}>
-            <Link href="/register" passHref>
-              <Button
-                size="4"
-                as="a"
-                arrow
-                css={{
-                  mr: "$4",
-                  mb: "$3",
-                  "@bp2": {
-                    mb: 0,
-                  },
-                }}>
-                Sign up for free
-              </Button>
-            </Link>
-            <Link href="/contact" passHref>
-              <A
-                css={{
-                  textDecoration: "none",
-                  fontWeight: 500,
-                  display: "flex",
-                  color: "white",
-                  ai: "center",
-                  ".HoverArrow": {
-                    position: "relative",
-                    top: "1px",
-                    marginLeft: "4px",
-                    strokeWidth: "2",
-                    fill: "none",
-                    stroke: "currentColor",
-                  },
+          <Link href="/register" passHref>
+            <Button
+              size="4"
+              as="a"
+              arrow
+              css={{
+                mr: "$4",
+                mb: "$3",
+                "@bp2": {
+                  mb: 0,
+                },
+              }}>
+              Sign up for free
+            </Button>
+          </Link>
+          <Link href="/contact" passHref>
+            <A
+              css={{
+                textDecoration: "none",
+                fontWeight: 500,
+                display: "flex",
+                color: "white",
+                ai: "center",
+                ".HoverArrow": {
+                  position: "relative",
+                  top: "1px",
+                  marginLeft: "4px",
+                  strokeWidth: "2",
+                  fill: "none",
+                  stroke: "currentColor",
+                },
+                ".HoverArrow__linePath": {
+                  opacity: "0",
+                  transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s",
+                },
+                ".HoverArrow__tipPath": {
+                  transition:
+                    "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s",
+                },
+                "&:hover .HoverArrow": {
+                  transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
                   ".HoverArrow__linePath": {
-                    opacity: "0",
-                    transition: "opacity cubic-bezier(0.215,0.61,0.355,1) .1s",
+                    opacity: 1,
                   },
                   ".HoverArrow__tipPath": {
-                    transition:
-                      "transform cubic-bezier(0.215,0.61,0.355,1) .1s, transform cubic-bezier(0.215,0.61,0.355,1) .1s",
+                    transform: "translateX(3px)",
                   },
-                  "&:hover .HoverArrow": {
-                    transition: "cubic-bezier(0.215,0.61,0.355,1) .1s",
-                    ".HoverArrow__linePath": {
-                      opacity: 1,
-                    },
-                    ".HoverArrow__tipPath": {
-                      transform: "translateX(3px)",
-                    },
-                  },
-                }}>
-                <Box>Contact us</Box>
-                <svg
-                  className="HoverArrow"
-                  width="10"
-                  height="10"
-                  viewBox="0 0 10 10"
-                  aria-hidden="true">
-                  <g fillRule="evenodd">
-                    <path className="HoverArrow__linePath" d="M0 5h7" />
-                    <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
-                  </g>
-                </svg>
-              </A>
-            </Link>
-          </Flex>
-        </Box>
-      </Container>
-    </Box>
-  );
-  
-  export default Prefooter;
-  
+                },
+              }}>
+              <Box>Contact us</Box>
+              <svg
+                className="HoverArrow"
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                aria-hidden="true">
+                <g fillRule="evenodd">
+                  <path className="HoverArrow__linePath" d="M0 5h7" />
+                  <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />
+                </g>
+              </svg>
+            </A>
+          </Link>
+        </Flex>
+      </Box>
+    </Container>
+  </Box>
+);
+
+export default Prefooter;
