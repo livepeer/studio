@@ -36,8 +36,21 @@ function validateTaskPayload(
 }
 
 function withIpfsUrls(task: WithID<Task>): WithID<Task> {
-  if (task.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
+  if (task?.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
     return task;
+  }
+  let { ipfs } = task.output.export;
+  ipfs = {
+    ...ipfs,
+    videoFileUrl: `ipfs://${ipfs.videoFileCid}`,
+    videoFileGatewayUrl: pathJoin(ipfsGateway, ipfs.videoFileCid),
+  };
+  if (ipfs.nftMetadataCid) {
+    ipfs = {
+      ...ipfs,
+      nftMetadataUrl: `ipfs://${ipfs.nftMetadataCid}`,
+      nftMetadataGatewayUrl: pathJoin(ipfsGateway, ipfs.nftMetadataCid),
+    };
   }
   return {
     ...task,
@@ -45,17 +58,7 @@ function withIpfsUrls(task: WithID<Task>): WithID<Task> {
       ...task.output,
       export: {
         ...task.output.export,
-        ipfs: {
-          ...task.output.export.ipfs,
-          videoFileUrl: pathJoin(
-            ipfsGateway,
-            task.output.export.ipfs.videoFileCid
-          ),
-          nftMetadataUrl: pathJoin(
-            ipfsGateway,
-            task.output.export.ipfs.nftMetadataCid
-          ),
-        },
+        ipfs,
       },
     },
   };

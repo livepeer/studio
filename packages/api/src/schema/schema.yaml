@@ -1219,8 +1219,12 @@ components:
                     videoFileUrl:
                       type: string
                       readOnly: true
+                      description: URL for the file with the IPFS protocol
+                    videoFileGatewayUrl:
+                      type: string
+                      readOnly: true
                       description:
-                        URL to access file through HTTP on an IPFS gateway
+                        URL to access file via HTTP through an IPFS gateway
                     nftMetadataCid:
                       type: string
                       description:
@@ -1229,7 +1233,12 @@ components:
                       type: string
                       readOnly: true
                       description:
-                        URL to access metadata file through HTTP on an IPFS
+                        URL for the metadata file with the IPFS protocol
+                    nftMetadataGatewayUrl:
+                      type: string
+                      readOnly: true
+                      description:
+                        URL to access metadata file via HTTP through an IPFS
                         gateway
 
     export-task-params:
