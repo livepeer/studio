@@ -68,7 +68,7 @@ const featuresListItems = [
   {
     icon: {
       provider: "fa",
-      name: "FaRobot",
+      name: "FaToolbox",
     },
     title: "Best in class compatibility",
     description:
@@ -76,8 +76,8 @@ const featuresListItems = [
   },
   {
     icon: {
-      provider: "mdi",
-      name: "MdLocationSearching",
+      provider: "fi",
+      name: "FiTool",
     },
     title: "Web3 video toolkit",
     description:
