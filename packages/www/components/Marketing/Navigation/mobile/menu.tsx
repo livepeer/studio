@@ -144,14 +144,19 @@ const Menu = ({
               css={{ color: "$hiContrast", mt: "4px", mr: "$3" }}
             />
             <Box>
-              <Text css={{ fontWeight: 600, mb: "$2" }}>Streaming Service</Text>
+              <ArrowLink
+                hideArrow
+                href="/products/streaming-service"
+                css={{ fontWeight: 600, mb: "$2" }}>
+                Streaming Service
+              </ArrowLink>
               <Box css={{ color: "$mauve5" }}>
                 <ArrowLink
                   hideArrow
                   color="$mauve9"
                   href="/use-cases/creator-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
-                    For Creators
+                    For creator apps
                   </Text>
                 </ArrowLink>
                 <ArrowLink
@@ -159,7 +164,7 @@ const Menu = ({
                   color="$mauve9"
                   href="/use-cases/game-streaming-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
-                    For Gamers
+                    For live gaming apps
                   </Text>
                 </ArrowLink>
                 <ArrowLink
@@ -167,7 +172,7 @@ const Menu = ({
                   color="$mauve9"
                   href="/use-cases/music-streaming-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
-                    For Musicians
+                    For live music apps
                   </Text>
                 </ArrowLink>
                 <ArrowLink
@@ -175,7 +180,7 @@ const Menu = ({
                   color="$mauve9"
                   href="/use-cases/24x7-channels">
                   <Text variant="gray" css={{ py: "$1" }}>
-                    24x7 Channels
+                    For 24x7 video apps
                   </Text>
                 </ArrowLink>
 
@@ -184,7 +189,7 @@ const Menu = ({
                   color="$mauve9"
                   href="/use-cases/ecommerce">
                   <Text variant="gray" css={{ py: "$1" }}>
-                    Ecommerce
+                    For e-commerce apps
                   </Text>
                 </ArrowLink>
               </Box>
