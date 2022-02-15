@@ -23,12 +23,12 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           maxWidth: 450,
         }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Configurable, deployable, and open-source
+          MistServer, Livepeer's open source media server
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Media Server (MistServer) allows you to take any media from
-          any location, using any method, and deliver it seamlessly to anyone,
-          anywhere, in any format.
+        Take any media from any location, using any method, and deliver it seamlessly 
+        to anyone, anywhere, in any format. Create your own live, linear, or on-demand 
+        streaming applications.
         </Text>
 
         <Link href="https://mistserver.org/" passHref>
