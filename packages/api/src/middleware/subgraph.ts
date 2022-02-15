@@ -38,7 +38,7 @@ export default function subgraphMiddleware({
       timeout: SUBGRAPH_TIMEOUT,
     });
 
-    return +(await res.json()).data.protocol.currentRound.id;
+    return +(await res.json()).data.protocol.lastInitializedRound.id;
   };
 
   const getOrchestrators = async () => {
