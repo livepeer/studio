@@ -1,12 +1,14 @@
-name: www
+name: Build web service docker image
+
 on: push
+
 jobs:
   build:
     runs-on: ubuntu-18.04
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
         with:
           fetch-depth: 0
 
