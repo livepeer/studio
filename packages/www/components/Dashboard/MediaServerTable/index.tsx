@@ -31,15 +31,41 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           linear, or on-demand streaming applications.
         </Text>
 
-        <Link href="https://mistserver.org/" passHref>
-          <A
-            target="_blank"
-            variant="violet"
-            css={{ display: "flex", ai: "center", mb: "$5" }}>
-            <Box>Learn more</Box>
-            <ArrowRightIcon />
-          </A>
-        </Link>
+        <Box
+          css={{
+            display: "block",
+            "@bp1": {
+              display: "flex",
+            },
+          }}>
+          <Link href="https://mistserver.org/" passHref>
+            <A
+              target="_blank"
+              variant="violet"
+              css={{ display: "flex", ai: "center", mb: "$5" }}>
+              <Box>Learn more</Box>
+              <ArrowRightIcon />
+            </A>
+          </Link>
+
+          <Link href="https://mistserver.org/download" passHref>
+            <A
+              target="_blank"
+              variant="violet"
+              css={{
+                display: "flex",
+                ai: "center",
+                mb: "$5",
+                ml: "$0",
+                "@bp1": {
+                  ml: "$3",
+                },
+              }}>
+              <Box>Downloads</Box>
+              <ArrowRightIcon />
+            </A>
+          </Link>
+        </Box>
       </Flex>
     </>
   );
