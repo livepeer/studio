@@ -1219,8 +1219,7 @@ components:
                     videoFileUrl:
                       type: string
                       readOnly: true
-                      description:
-                        URL for the file with the IPFS protocol
+                      description: URL for the file with the IPFS protocol
                     videoFileGatewayUrl:
                       type: string
                       readOnly: true
