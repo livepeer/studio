@@ -33,7 +33,7 @@ export default function subgraphMiddleware({
         Accept: "application/json",
       },
       body: JSON.stringify({
-        query: `{ protocol(id: "0") { currentRound { id } } }`,
+        query: `{ protocol(id: "0") { lastInitializedRound { id } } }`,
       }),
       timeout: SUBGRAPH_TIMEOUT,
     });
