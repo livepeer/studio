@@ -66,30 +66,12 @@ jobs:
           done
           ls -lh releases/
 
-      - name: Create sha256 checksums
-        run: |
-          cd releases/
-          for file in ./*; do
-            sha256sum "$file" > "${file}.txt"
-          done
-
-      - name: Create detached gpg signatures for releases
-        run: |
-          cd releases/
-          echo "$CI_GPG_SIGNING_KEY" | gpg --batch --import
-          echo "Signature imported!"
-           for file in $(ls ./ -I "*.txt"); do
-             gpg \
-               --no-tty \
-               --passphrase "$CI_GPG_SIGNING_PASSPHRASE" \
-               --pinentry-mode loopback \
-               --output "${file}.sig" \
-               --detach-sign \
-               "$file"
-           done
-        env:
-          CI_GPG_SIGNING_KEY: ${{ secrets.CI_GPG_SIGNING_KEY }}
-          CI_GPG_SIGNING_PASSPHRASE: ${{ secrets.CI_GPG_SIGNING_PASSPHRASE }}
+      - name: Generate sha256 checksum and gpg signatures for release artifacts
+        uses: livepeer/action-gh-checksum-and-gpg-sign@latest
+        with:
+          artifacts-dir: releases
+          gpg-key: ${{ secrets.CI_GPG_SIGNING_KEY }}
+          gpg-key-passphrase: ${{ secrets.CI_GPG_SIGNING_PASSPHRASE }}
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -110,6 +92,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./releases/livepeer-*
+            ./releases/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
