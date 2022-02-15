@@ -1051,7 +1051,7 @@ components:
       additionalProperties: true
       required:
         - name
-        - profiles
+        - profile
         - assetId
       properties:
         assetId:
@@ -1068,11 +1068,8 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
-        profiles:
-          type: array
-          minItems: 1
-          items:
-            $ref: "#/components/schemas/ffmpeg-profile"
+        profile:
+          $ref: "#/components/schemas/ffmpeg-profile"
 
     task:
       type: object
@@ -1116,11 +1113,6 @@ components:
           description: ID of the output asset
           index: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
-        outputAssetsIds:
-          description: ID sof the output assets
-          type: array
-          items:
-            type: string
         params:
           type: object
           additionalProperties: false
@@ -1146,11 +1138,8 @@ components:
               additionalProperties: false
               description: Parameters for the transcode task
               properties:
-                profiles:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: "#/components/schemas/ffmpeg-profile"
+                profile:
+                  $ref: "#/components/schemas/ffmpeg-profile"
         status:
           type: object
           additionalProperties: false
@@ -1242,20 +1231,17 @@ components:
               type: object
               additionalProperties: false
               properties:
-                assets:
-                  type: array
-                  description: Output of the transcode task
-                  items:
-                    type: object
-                    additionalProperties: true
-                    properties:
-                      videoFilePath:
-                        type: string
-                      metadataFilePath:
-                        type: string
-                      assetSpec:
-                        type: object
-                        $ref: "#/components/schemas/asset"
+                asset:
+                  type: object
+                  additionalProperties: true
+                  properties:
+                    videoFilePath:
+                      type: string
+                    metadataFilePath:
+                      type: string
+                    assetSpec:
+                      type: object
+                      $ref: "#/components/schemas/asset"
 
     export-task-params:
       description: Parameters for the export task

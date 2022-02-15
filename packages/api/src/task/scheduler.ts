@@ -86,25 +86,22 @@ export default class TaskScheduler {
         updatedAt: Date.now(),
       });
     } else if (event.task.type === "transcode") {
-      const assets = event.output?.transcode?.assets;
-      if (!assets) {
-        const error = "bad task output: missing assets";
+      const assetSpec = event.output?.transcode?.asset?.assetSpec;
+      if (!assetSpec) {
+        const error = "bad task output: missing assetSpec";
         console.error(
           `task event process error: err=${error} taskId=${event.task.id}`
         );
         await this.failTask(task, error, event.output);
         return true;
       }
-      for (let i = 0; i < assets.length; i++) {
-        const assetSpec = assets[i].assetSpec;
-        await db.asset.update(task.outputAssetsIds[i], {
-          size: assetSpec.size,
-          hash: assetSpec.hash,
-          videoSpec: assetSpec.videoSpec,
-          status: "ready",
-          updatedAt: Date.now(),
-        });
-      }
+      await db.asset.update(task.outputAssetId, {
+        size: assetSpec.size,
+        hash: assetSpec.hash,
+        videoSpec: assetSpec.videoSpec,
+        status: "ready",
+        updatedAt: Date.now(),
+      });
     }
     await db.task.update(task.id, {
       status: {
@@ -137,8 +134,7 @@ export default class TaskScheduler {
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
-    outputAsset?: Asset,
-    outputAssets?: Array<Asset>
+    outputAsset?: Asset
   ) {
     const task = await this.createTask(type, params, inputAsset, outputAsset);
     await this.enqueueTask(task);
@@ -156,7 +152,6 @@ export default class TaskScheduler {
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
-      outputAssetsIds: outputAssets?.map((asset) => asset.id),
       inputAssetId: inputAsset?.id,
       userId: inputAsset?.userId || outputAsset?.userId,
       params,

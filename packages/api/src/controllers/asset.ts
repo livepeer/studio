@@ -325,40 +325,30 @@ app.post(
     if (!os) {
       throw new UnprocessableEntityError("Asset has invalid objectStoreId");
     }
-    const outputAssets = [];
-    for (let profile of req.body.profiles) {
-      const id = uuid();
-      const playbackId = await generateUniquePlaybackId(req.store, id);
-      let oasset = await validateAssetPayload(
-        id,
-        playbackId,
-        req.user.id,
-        Date.now(),
-        req.config.vodObjectStoreId,
-        {
-          name:
-            (req.body.name ?? "") +
-              "_" +
-              (asset.name ?? "default") +
-              "_" +
-              profile.name ?? "default",
-        }
-      );
-      oasset.sourceAssetId = asset.id;
-      oasset = await db.asset.create(oasset);
-      outputAssets.push(oasset);
-    }
+    const id = uuid();
+    const playbackId = await generateUniquePlaybackId(req.store, id);
+    let outputAsset = await validateAssetPayload(
+      id,
+      playbackId,
+      req.user.id,
+      Date.now(),
+      req.config.vodObjectStoreId,
+      {
+        name: req.body.name ?? asset.name,
+      }
+    );
+    outputAsset.sourceAssetId = asset.id;
+    outputAsset = await db.asset.create(outputAsset);
 
     const task = await req.taskScheduler.scheduleTask(
       "transcode",
       {
         transcode: {
-          profiles: req.body.profiles,
+          profile: req.body.profile,
         },
       },
       asset,
-      undefined,
-      outputAssets
+      outputAsset
     );
     res.status(201);
     res.json({ asset, task });
