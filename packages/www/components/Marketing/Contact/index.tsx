@@ -64,8 +64,8 @@ const Contact = () => {
               size="4"
               variant="gray"
               css={{ maxWidth: 512, margin: "0 auto" }}>
-              Learn more about Livepeer Video Service's innovative streaming API
-              and media server. Leave us a message and we’ll get back to you.
+              Learn more about Livepeer Video Service's streaming API and media
+              server. Leave us a message and we’ll get back to you.
               <br />
               <br />
               Or email us at{" "}

@@ -33,7 +33,7 @@ const benefitsListItems = [
     },
     title: "Scalable",
     description:
-      "Leverage the near-infinite scalability of the Livepeer Network, rivaling Amazon’s cloud compute.",
+      "Leverage the near-infinite scalability of the Livepeer network, rivaling Amazon’s cloud compute.",
   },
   {
     icon: {
@@ -52,36 +52,36 @@ const featuresListItems = [
       provider: "fi",
       name: "FiCode",
     },
-    title: "Easy-to-use API",
+    title: "Streaming API",
     description:
-      "Simple and easy to implement APIs that support seamless integration with your streaming platform.",
+      "One API for your video streaming needs. Configure details for live broadcasting software, generate a playback URL, get usage data for stream sessions, and more.",
   },
   {
     icon: {
       provider: "fa",
       name: "FaPhotoVideo",
     },
-    title: "Affordable transcoding",
+    title: "Always-on transcoding",
     description:
-      "High quality, reliable transcoding at a cost that makes running a video centric streaming platform with millions of content creators viable.",
+      "Tap into Livepeer’s superpower: a decentralized network of always-on, incentivized transcoding providers around the globe. Expect zero boot-up latency for every API request.",
   },
   {
     icon: {
       provider: "fa",
-      name: "FaRobot",
+      name: "FaToolbox",
     },
-    title: "Smart video",
+    title: "Best in class compatibility",
     description:
-      "Leverage Livepeer's decentralized network of GPUs for AI-assisted content moderation in your streaming platform.",
+      "MistServer, Livepeer’s open source media server, enables you to ingest any video stream or file and deliver it to any device. Create the consistent viewing experience your audience expects.",
   },
   {
     icon: {
-      provider: "mdi",
-      name: "MdLocationSearching",
+      provider: "fi",
+      name: "FiTool",
     },
-    title: "Interactivity",
+    title: "Web3 video toolkit",
     description:
-      "Key features to enable interactive use cases that drive engagement on streaming platforms including low latency and object detection.",
+      "Livepeer is building the chain-agnostic video infrastructure layer for Web3 apps — from live broadcast and the creator economy to metaverse and video NFTs.",
   },
 ];
 
@@ -92,12 +92,12 @@ const HomePage = () => {
       <Why
         backgroundColor="$panel"
         title="Benefits"
-        heading="Built by developers, for developers, with open software and decentralized infrastructure"
+        heading="Built for developers, by developers, with open software and decentralized infrastructure"
         reasons={benefitsListItems}
       />
       <Why
         title="Features"
-        heading="Feature-rich, high quality streaming for your project."
+        heading="The necessary infrastructure and software for any video streaming app, at a fraction of the cost"
         reasons={featuresListItems}
       />
       <Investors backgroundColor="rgb(30 30 33)" />
