@@ -1095,6 +1095,7 @@ components:
             - import
             - export
             - transcode
+            - delete
         createdAt:
           type: number
           readOnly: true
@@ -1140,6 +1141,15 @@ components:
               properties:
                 profile:
                   $ref: "#/components/schemas/ffmpeg-profile"
+            delete:
+              type: object
+              additionalProperties: false
+              description: Parameters for the delete task
+              properties:
+                assetId:
+                  type: string
+                  description: ID of the asset to delete
+                  example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         status:
           type: object
           additionalProperties: false

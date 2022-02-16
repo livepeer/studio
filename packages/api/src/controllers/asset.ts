@@ -471,9 +471,36 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
-  await db.asset.delete(id);
-  res.status(204);
-  res.end();
+  await db.asset.markDeleted(id);
+  const childrenAssets = await db.asset.find(
+    { sourceAssetId: id },
+    { useReplica: false }
+  );
+
+  const task = await req.taskScheduler.scheduleTask(
+    "delete",
+    {
+      delete: {
+        assetId: id,
+      },
+    },
+    asset
+  );
+
+  if (!childrenAssets?.length || !childrenAssets[0]?.length) {
+    res.status(200);
+    return res.json({ task });
+  }
+
+  for (var i = 0; i < childrenAssets[0].length; i++) {
+    // remove the sourceAssetId from the children assets making them orphans
+    db.asset.update(childrenAssets[0][i].id, {
+      sourceAssetId: null,
+    });
+  }
+
+  res.status(200);
+  res.json({ task });
 });
 
 // TODO: Delete this API as well?
