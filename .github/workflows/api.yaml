@@ -1,14 +1,17 @@
-name: api
+name: Build API service docker image
+
 on:
   push:
     branches-ignore:
       - latest
+
 defaults:
   run:
     working-directory: packages/api
+
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres
@@ -26,9 +29,10 @@ jobs:
           RABBITMQ_DEFAULT_VHOST: "livepeer"
         ports:
           - 5672:5672
+
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
         with:
           fetch-depth: 0
 
