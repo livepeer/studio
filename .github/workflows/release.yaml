@@ -64,7 +64,6 @@ jobs:
               cd -
             done
           done
-          ls -lh releases/
 
       - name: Upload artifacts for processing further in linux
         uses: actions/upload-artifact@master
