@@ -25,7 +25,10 @@ export default class TaskScheduler {
     let event: messages.TaskResult;
     try {
       event = JSON.parse(data.content.toString());
-      console.log("events: got task result message", event);
+      console.log(
+        "events: got task result message",
+        JSON.stringify(event, null, 2)
+      );
     } catch (err) {
       console.log("events: error parsing task message", err);
       this.queue.ack(data);
@@ -69,7 +72,24 @@ export default class TaskScheduler {
       const assetSpec = event.output?.import?.assetSpec;
       if (!assetSpec) {
         const error = "bad task output: missing assetSpec";
-        console.log(
+        console.error(
+          `task event process error: err=${error} taskId=${event.task.id}`
+        );
+        await this.failTask(task, error, event.output);
+        return true;
+      }
+      await db.asset.update(task.outputAssetId, {
+        size: assetSpec.size,
+        hash: assetSpec.hash,
+        videoSpec: assetSpec.videoSpec,
+        status: "ready",
+        updatedAt: Date.now(),
+      });
+    } else if (event.task.type === "transcode") {
+      const assetSpec = event.output?.transcode?.asset?.assetSpec;
+      if (!assetSpec) {
+        const error = "bad task output: missing assetSpec";
+        console.error(
           `task event process error: err=${error} taskId=${event.task.id}`
         );
         await this.failTask(task, error, event.output);
