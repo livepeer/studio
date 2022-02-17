@@ -61,6 +61,7 @@ const UseCase = ({
         heading={hero.heading}
         description={hero.description}
         image={hero.image.asset.url}
+        imageType="rectangle"
         ctas={[
           {
             href: "/register",
