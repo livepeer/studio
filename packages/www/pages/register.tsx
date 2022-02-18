@@ -115,7 +115,7 @@ const RegisterPage = () => {
               py: "$5",
             }}>
             <Heading size="3" as="h1" css={{ mb: "$3" }}>
-              Create an Account
+              Create an account
             </Heading>
             <Text
               size="4"
@@ -126,7 +126,7 @@ const RegisterPage = () => {
                 maxWidth: 630,
                 mx: "auto",
               }}>
-              Sign up to try Livepeer.com's video streaming API.
+              Get free access to our streaming API and open source media server.
             </Text>
             <Login
               id="register"
