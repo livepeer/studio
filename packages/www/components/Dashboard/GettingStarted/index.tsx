@@ -160,6 +160,43 @@ const GettingStarted = ({ firstName = "" }) => {
             </Link>
           </AccordionPanel>
         </AccordionItem>
+
+        <AccordionItem value="accordion-four">
+          <AccordionButton css={{ color: "$mauve12" }}>
+            <Text size="3" css={{ color: "inherit" }}>
+              Deploy MistServer, Livepeer's media server
+            </Text>
+          </AccordionButton>
+          <AccordionPanel>
+            <Text
+              variant="gray"
+              size="3"
+              css={{ mb: "$3", lineHeight: "23px" }}>
+              MistServer is a free, full-featured streaming media toolkit. It
+              enables you to take any media from any location, using any method,
+              and deliver it seamlessly to anyone, anywhere, in any format.
+              <br />
+              It's open source and integrates with Livepeer's streaming API to
+              transcode video at scale.
+            </Text>
+            <Link href="https://mistserver.org/download" passHref>
+              <Button
+                as="a"
+                target="_blank"
+                rel="noopener noreferrer"
+                css={{
+                  cursor: "default",
+                  display: "inline-flex",
+                  ai: "center",
+                }}
+                size="2"
+                variant="violet">
+                <Box css={{ mr: "$1" }}>Downloads</Box>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
+          </AccordionPanel>
+        </AccordionItem>
       </Accordion>
     </>
   );
