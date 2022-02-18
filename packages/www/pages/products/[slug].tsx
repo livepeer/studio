@@ -60,6 +60,7 @@ const Product = ({
         heading={hero.heading}
         description={hero.description}
         image={hero.image.asset?.url}
+        imageType="sequare"
         ctas={[
           {
             href: "/register",

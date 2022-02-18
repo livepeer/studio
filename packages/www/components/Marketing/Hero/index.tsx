@@ -12,6 +12,7 @@ const Hero = ({
   centered = false,
   skinny = false,
   image,
+  imageType = "rectangle",
   ctas = [],
 }) => {
   return (
@@ -92,14 +93,28 @@ const Hero = ({
                     display: "block",
                   },
                 }}>
-                <Box
-                  css={{
-                    position: "absolute",
-                    transform: "translate(-50%)",
-                    left: "50%",
-                  }}>
-                  <Image src={image} width={542 / 2} height={1096 / 2} />
-                </Box>
+                {imageType === "rectangle" ? (
+                  <Box
+                    css={{
+                      position: "absolute",
+                      transform: "translate(-50%)",
+                      left: "50%",
+                    }}>
+                    <Image src={image} width={542 / 2} height={1096 / 2} />
+                  </Box>
+                ) : (
+                  <Box
+                    css={{
+                      position: "absolute",
+                      transform: "translate(-50%)",
+                      left: "50%",
+                      top: "-5%",
+                      width: "110%",
+                      height: "110%",
+                    }}>
+                    <Image src={image} objectFit="cover" layout="fill" />
+                  </Box>
+                )}
                 <Box
                   css={{
                     width: 545,
