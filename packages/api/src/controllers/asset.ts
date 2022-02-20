@@ -29,7 +29,7 @@ import cors from "cors";
 var corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
+  preflightContinue: true,
   credentials: true,
   optionsSuccessStatus: 200,
 };
