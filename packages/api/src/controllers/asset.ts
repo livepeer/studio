@@ -24,6 +24,12 @@ import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { Asset, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
+import cors from "cors";
+
+var corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+};
 
 const app = Router();
 
@@ -129,8 +135,7 @@ const fieldsMap: FieldsMap = {
   meta: `asset.data->>'meta'`,
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
+app.get("/", cors(corsOptions), authMiddleware({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
@@ -217,8 +222,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
+app.get("/:id", cors(corsOptions), authMiddleware({}), async (req, res) => {
   const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
@@ -242,10 +246,10 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 
 app.post(
   "/:id/export",
+  cors(corsOptions),
   validatePost("export-task-params"),
   authMiddleware({}),
   async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
     if (!asset) {
@@ -273,10 +277,10 @@ app.post(
 
 app.post(
   "/import",
+  cors(corsOptions),
   validatePost("new-asset-payload"),
   authMiddleware({}),
   async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(req.store, id);
     let asset = await validateAssetPayload(
@@ -313,10 +317,10 @@ app.post(
 
 app.post(
   "/transcode",
+  cors(corsOptions),
   validatePost("new-transcode-payload"),
   authMiddleware({}),
   async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
     if (!req.body.assetId) {
       throw new BadRequestError("You must provide a assetId of an asset");
     }
@@ -361,10 +365,10 @@ app.post(
 
 app.post(
   "/request-upload",
+  cors(corsOptions),
   validatePost("new-asset-payload"),
   authMiddleware({}),
   async (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(req.store, id);
 
@@ -408,8 +412,7 @@ app.post(
   }
 );
 
-app.put("/upload/:url", async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
+app.put("/upload/:url", cors(corsOptions), async (req, res) => {
   const { url } = req.params;
   let uploadUrl = decodeURIComponent(Buffer.from(url, "base64").toString());
 
