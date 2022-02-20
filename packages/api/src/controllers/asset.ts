@@ -130,6 +130,7 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authMiddleware({}), async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
@@ -207,7 +208,6 @@ app.get("/", authMiddleware({}), async (req, res) => {
       return withDownloadUrl(data, ingest);
     },
   });
-
   res.status(200);
 
   if (output.length > 0 && newCursor) {
@@ -218,6 +218,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
 });
 
 app.get("/:id", authMiddleware({}), async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
@@ -244,6 +245,7 @@ app.post(
   validatePost("export-task-params"),
   authMiddleware({}),
   async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
     if (!asset) {
@@ -274,6 +276,7 @@ app.post(
   validatePost("new-asset-payload"),
   authMiddleware({}),
   async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(req.store, id);
     let asset = await validateAssetPayload(
@@ -313,6 +316,7 @@ app.post(
   validatePost("new-transcode-payload"),
   authMiddleware({}),
   async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     if (!req.body.assetId) {
       throw new BadRequestError("You must provide a assetId of an asset");
     }
@@ -360,6 +364,7 @@ app.post(
   validatePost("new-asset-payload"),
   authMiddleware({}),
   async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(req.store, id);
 
@@ -404,6 +409,7 @@ app.post(
 );
 
 app.put("/upload/:url", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
   const { url } = req.params;
   let uploadUrl = decodeURIComponent(Buffer.from(url, "base64").toString());
 
