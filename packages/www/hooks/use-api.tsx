@@ -10,6 +10,8 @@ import {
   StreamPatchPayload,
   ObjectStore,
   MultistreamTargetPatchPayload,
+  Task,
+  Asset,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -790,6 +792,80 @@ const makeContext = (state: ApiState, setState) => {
         throw new HttpError(res.status, body);
       }
       return res;
+    },
+
+    async getVodAssetsByUserId(
+      userId,
+      cursor?: string,
+      limit: number = 20,
+      order?: string,
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Asset>, string, number]> {
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/asset?${qs.stringify({
+        limit,
+        cursor,
+        order,
+        userId,
+        filters: stringifiedFilters,
+        count,
+      })}`;
+      const [res, assets] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new Error(assets);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const c = res.headers.get("X-Total-Count");
+      return [assets, nextCursor, c];
+    },
+
+    async getVodTasksByUserId(
+      userId,
+      cursor?: string,
+      limit: number = 20,
+      order?: string,
+      filters?: Array<{ id: string; value: string | object }>,
+      count?: boolean
+    ): Promise<[Array<Task>, string, number]> {
+      const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
+      const uri = `/task?${qs.stringify({
+        limit,
+        cursor,
+        order,
+        userId,
+        filters: stringifiedFilters,
+        count,
+      })}`;
+      const [res, assets] = await context.fetch(uri);
+      if (res.status !== 200) {
+        throw new Error(assets);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const c = res.headers.get("X-Total-Count");
+      return [assets, nextCursor, c];
+    },
+
+    async deleteAsset(id: string): Promise<void> {
+      const [res, body] = await context.fetch(`/asset/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new Error(body.errors.join(", "));
+      }
+    },
+
+    async deleteAssets(ids: Array<string>): Promise<void> {
+      const [res, body] = await context.fetch(`/asset`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
     },
 
     async getObjectStore(

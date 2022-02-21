@@ -161,6 +161,32 @@ const Sidebar = ({ id }) => {
         </Box>
 
         <Box>
+          <Link href="/dashboard/assets" passHref>
+            <NavLink>
+              <StreamIcon active={id?.split("/")[0] === "assets"} />
+              <Text
+                css={{
+                  fontWeight: id?.split("/")[0] === "assets" ? 500 : 400,
+                  backgroundClip: "text",
+                  ml: "$2",
+                  lineHeight: 1.2,
+                }}>
+                Assets
+              </Text>
+            </NavLink>
+          </Link>
+
+          {id?.split("/")[0] === "assets" && (
+            <Box
+              css={{
+                "> :first-child": {
+                  mt: "$1",
+                },
+              }}></Box>
+          )}
+        </Box>
+
+        <Box>
           <Link href="/dashboard/developers/api-keys" passHref>
             <NavLink>
               <TerminalIcon active={id?.split("/")[0] === "developers"} />
