@@ -75,8 +75,8 @@ const TransactEth = () => {
   if (!transaction) {
     return (
       <div>
-        Add `?nftUrl=` param with IPFS URL for file. May also include `to` param
-        to mint NFT for another address.
+        Add `?tokenUri=` param with IPFS URL for file. May also include
+        `recipient` param to mint NFT for another address.
       </div>
     );
   }
