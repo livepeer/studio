@@ -110,6 +110,23 @@ const Header = ({ breadcrumbs = [] }) => {
           })}
         </Breadcrumbs>
         <Flex align="center" css={{ fontSize: "$3" }}>
+          <Flex
+            align="center"
+            css={{
+              cursor: "pointer",
+              mr: "$5",
+              background: "transparent",
+              appearance: "none",
+              WebkitAppearance: "none",
+              border: "none",
+            }}>
+            <StyledDocumentationIcon />
+            <Link href="/docs/guides" passHref>
+              <A css={{ mr: "$2" }}>
+                <Box css={{ color: "$hiContrast" }}>Documentation</Box>
+              </A>
+            </Link>
+          </Flex>
           <DropdownMenu>
             <Flex
               as={DropdownMenuTrigger}
