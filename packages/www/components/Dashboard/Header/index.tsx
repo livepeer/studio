@@ -117,10 +117,12 @@ const Header = ({ breadcrumbs = [] }) => {
               mr: "$5",
               background: "transparent",
               appearance: "none",
-              WebkitAppearance: "none",
               border: "none",
             }}>
-            <StyledDocumentationIcon />
+            <Box
+              as={DocumentationIcon}
+              css={{ mr: "$2", color: "$hiContrast" }}
+            />
             <Link href="/docs/guides" passHref>
               <A css={{ mr: "$2" }}>
                 <Box css={{ color: "$hiContrast" }}>Documentation</Box>
@@ -136,7 +138,6 @@ const Header = ({ breadcrumbs = [] }) => {
                 mr: "$5",
                 background: "transparent",
                 appearance: "none",
-                WebkitAppearance: "none",
                 border: "none",
               }}>
               <StyledHornIcon />
@@ -287,12 +288,17 @@ const Header = ({ breadcrumbs = [] }) => {
                 HELP
               </Text>
               <Link href="/docs/guides" passHref>
-                <A>
-                  <Flex align="center" css={{ mb: "$3", cursor: "pointer" }}>
-                    <StyledDocumentationIcon />
-                    <Text css={{ margin: "0 $2" }}>Documentation</Text>
-                    <StyledHyperlinkIcon />
-                  </Flex>
+                <A
+                  css={{
+                    display: "flex",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    mb: "$3",
+                    cursor: "pointer",
+                  }}>
+                  <StyledDocumentationIcon />
+                  <Text css={{ margin: "0 $2" }}>Documentation</Text>
+                  <StyledHyperlinkIcon />
                 </A>
               </Link>
               <Link href="/contact" passHref>
