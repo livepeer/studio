@@ -47,48 +47,57 @@ const TransactEth = () => {
     if (status !== "connected" || !transaction) {
       return;
     }
-    Promise.resolve().then(async () => {
-      const nonce = await web3.eth.getTransactionCount(account, "latest");
-      const tx = {
-        ...transaction,
-        from: account,
-        nonce,
-      };
-      addLog("Minting...");
-      const receipt = await web3.eth.sendTransaction(tx);
+    Promise.resolve()
+      .then(async () => {
+        const nonce = await web3.eth.getTransactionCount(account, "latest");
+        const tx = {
+          ...transaction,
+          from: account,
+          nonce,
+        };
+        addLog("Minting...");
+        const receipt = await web3.eth.sendTransaction(tx);
 
-      const events = await videoNft.getPastEvents("Mint", {
-        filter: { sender: account },
-        fromBlock: receipt.blockNumber,
-        toBlock: receipt.blockNumber,
-      });
-      const event = events.find(
-        (ev) => ev.transactionHash === receipt.transactionHash
-      );
-      if (!event) {
-        addLog(
-          `NFT minted but failed to find event. Transacton receipt:\n${JSON.stringify(
-            receipt,
-            null,
-            2
-          )}`
+        const events = await videoNft.getPastEvents("Mint", {
+          filter: { sender: account },
+          fromBlock: receipt.blockNumber,
+          toBlock: receipt.blockNumber,
+        });
+        const event = events.find(
+          (ev) => ev.transactionHash === receipt.transactionHash
         );
-        return;
-      }
-      const { tokenId } = event.returnValues;
-      addLog(
-        <>
-          Successfully minted token with ID {tokenId}! Check it on{" "}
-          <a
-            href={`https://opensea.io/assets/matic/${contractAddress}/${tokenId}`}
-            target="_blank">
-            OpenSea
-          </a>
-          !
-        </>
-      );
-    });
-  }, [status, transaction]);
+        if (!event) {
+          addLog(
+            `NFT minted but failed to find event. Transacton receipt:\n${JSON.stringify(
+              receipt,
+              null,
+              2
+            )}`
+          );
+          return;
+        }
+        const { tokenId } = event.returnValues;
+        addLog(
+          <>
+            Successfully minted token with ID {tokenId}! Check it on{" "}
+            <a
+              href={`https://opensea.io/assets/matic/${contractAddress}/${tokenId}`}
+              target="_blank">
+              OpenSea
+            </a>
+            !
+          </>
+        );
+      })
+      .catch((err) => {
+        let log = `Error during main mint routine: ${err.message}`;
+        if ("data" in err) {
+          const errData = (err as any).data;
+          log += `: ${errData.message || errData.details}`;
+        }
+        addLog(log);
+      });
+  }, [status, account, transaction]);
 
   switch (status) {
     case "initializing":
