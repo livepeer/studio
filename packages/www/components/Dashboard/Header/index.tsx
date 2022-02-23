@@ -126,6 +126,9 @@ const Header = ({ breadcrumbs = [] }) => {
                   ml: "$2",
                   color: "$hiContrast",
                   textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
                 }}>
                 <Box>Documentation</Box>
               </A>
@@ -143,7 +146,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 border: "none",
               }}>
               <StyledHornIcon />
-              <Box css={{ color: "$hiContrast" }}>Feedback</Box>
+              <Box css={{ fontSize: "$3", color: "$hiContrast" }}>Feedback</Box>
             </Flex>
             <DropdownMenuContent
               css={{
