@@ -7,38 +7,22 @@ import videoNftAbi from "./types/video-nft.json";
 
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
 
-const parseTransaction = (value: string) => {
-  if (!value) {
-    return null;
-  }
-  try {
-    value = decodeURIComponent(value);
-    value = Buffer.from(value).toString("base64");
-    return JSON.parse(value);
-  } catch (err) {
-    console.error("Failed to parse transaction", err);
-    return null;
-  }
-};
-
 const TransactEth = () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
 
-  let { inputTransaction, contractAddress, tokenUri, recipient } =
-    useMemo(() => {
-      if (typeof window === "undefined") {
-        return {};
-      }
-      const searchParams = new URLSearchParams(window.location.search);
-      return {
-        inputTransaction: parseTransaction(searchParams.get("transaction")),
-        contractAddress:
-          searchParams.get("contractAddress") || livepeerNftMinterAddress,
-        tokenUri: searchParams.get("tokenUri"),
-        recipient: searchParams.get("recipient") || account,
-      };
-    }, [typeof window !== "undefined" && window?.location?.search, account]);
+  let { contractAddress, tokenUri, recipient } = useMemo(() => {
+    if (typeof window === "undefined") {
+      return {};
+    }
+    const searchParams = new URLSearchParams(window.location.search);
+    return {
+      contractAddress:
+        searchParams.get("contractAddress") || livepeerNftMinterAddress,
+      tokenUri: searchParams.get("tokenUri"),
+      recipient: searchParams.get("recipient") || account,
+    };
+  }, [typeof window !== "undefined" && window?.location?.search, account]);
   const [logs, setLogs] = useState<JSX.Element[]>([]);
   const addLog = (log: JSX.Element | string) =>
     setLogs((prev) => [...prev, typeof log === "string" ? <>{log}</> : log]);
@@ -48,9 +32,7 @@ const TransactEth = () => {
     [web3, contractAddress]
   ) as unknown as VideoNft;
   const transaction = useMemo(() => {
-    if (inputTransaction) {
-      return inputTransaction;
-    } else if (!tokenUri || !recipient) {
+    if (!tokenUri || !recipient) {
       return null;
     }
     return {
@@ -59,7 +41,7 @@ const TransactEth = () => {
       maxPriorityFeePerGas: 39999999987,
       data: videoNft.methods.mint(recipient, tokenUri).encodeABI(),
     };
-  }, [inputTransaction, contractAddress, recipient, tokenUri]);
+  }, [contractAddress, recipient, tokenUri]);
 
   useEffect(() => {
     if (status !== "connected" || !transaction) {
