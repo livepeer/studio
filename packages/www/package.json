@@ -3,7 +3,8 @@
   "name": "@livepeer.com/www",
   "version": "0.2.7",
   "scripts": {
-    "prepare": "cd ../api && yarn run prepare",
+    "prepare": "yarn run prepare:typechain && cd ../api && yarn run prepare",
+    "prepare:typechain": "typechain --target web3-v1 --out-dir pages/transact/eth/types './pages/transact/eth/types/*.json'",
     "dev": "next",
     "build": "next build",
     "start": "next start -p 3012",
@@ -119,6 +120,7 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-transform-react-jsx": "7.8.3",
     "@emotion/babel-plugin-jsx-pragmatic": "0.1.5",
+    "@typechain/web3-v1": "^5.0.0",
     "@types/eventsource": "^1.1.7",
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/react-syntax-highlighter": "^13.5.0",
@@ -136,6 +138,7 @@
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.12.0",
     "sass": "^1.34.1",
+    "typechain": "^7.0.0",
     "typescript": "^4.1.3",
     "yargs": "^17.3.1"
   },
