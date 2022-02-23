@@ -119,13 +119,15 @@ const Header = ({ breadcrumbs = [] }) => {
               appearance: "none",
               border: "none",
             }}>
-            <Box
-              as={DocumentationIcon}
-              css={{ mr: "$2", color: "$hiContrast" }}
-            />
+            <StyledDocumentationIcon />
             <Link href="/docs/guides" passHref>
-              <A css={{ mr: "$2" }}>
-                <Box css={{ color: "$hiContrast" }}>Documentation</Box>
+              <A
+                css={{
+                  ml: "$2",
+                  color: "$hiContrast",
+                  textDecoration: "none",
+                }}>
+                <Box>Documentation</Box>
               </A>
             </Link>
           </Flex>
