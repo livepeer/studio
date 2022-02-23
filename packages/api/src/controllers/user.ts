@@ -422,8 +422,8 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
   }
 });
 
+// resend verify email
 app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
-  console.log("----------");
   const { selectedPlan } = req.query;
   const user = await findUserByEmail(req.body.email);
   const { emailValid, email, emailValidToken } = user;
@@ -442,7 +442,6 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
       sendgridValidationApiKey,
     } = req.config;
 
-    console.log(sendgridTemplateId)
     try {
       sendgridValidateEmail(email, sendgridValidationApiKey);
       await sendgridEmail({

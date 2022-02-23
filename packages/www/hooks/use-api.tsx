@@ -260,6 +260,19 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    // resend verify email
+    async verifyEmail(email) {
+      const [res, body] = await context.fetch("/user/verify-email", {
+        method: "POST",
+        body: JSON.stringify({ email: "sadf@dsf.com" }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      return body;
+    },
+
     async makePasswordResetToken(email) {
       trackPageView(email);
       const [res, body] = await context.fetch("/user/password/reset-token", {
