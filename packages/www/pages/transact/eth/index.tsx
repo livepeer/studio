@@ -72,14 +72,6 @@ const TransactEth = () => {
     });
   }, [status, transaction]);
 
-  if (!transaction) {
-    return (
-      <div>
-        Add `?tokenUri=` param with IPFS URL for file. May also include
-        `recipient` param to mint NFT for another address.
-      </div>
-    );
-  }
   switch (status) {
     case "initializing":
       return <div>Synchronisation with MetaMask ongoing...</div>;
@@ -92,6 +84,14 @@ const TransactEth = () => {
     default:
       return <div>Unknown MetaMask status: ${status}.</div>;
     case "connected":
+      if (!transaction) {
+        return (
+          <div>
+            Add `?tokenUri=` param with IPFS URL for file. May also include
+            `recipient` param to mint NFT for another address.
+          </div>
+        );
+      }
       return (
         <>
           <Box
