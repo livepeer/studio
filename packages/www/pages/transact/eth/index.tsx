@@ -2,8 +2,7 @@ import { Box } from "@livepeer.com/design-system";
 import { useMetaMask } from "metamask-react";
 import { useEffect, useMemo, useState } from "react";
 import Web3 from "web3";
-import { VideoNft } from "./types/video-nft";
-import videoNftAbi from "./types/video-nft.json";
+import videoNftAbi from "./video-nft.json";
 
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
 
@@ -30,7 +29,7 @@ const TransactEth = () => {
   const videoNft = useMemo(
     () => new web3.eth.Contract(videoNftAbi as any, contractAddress),
     [web3, contractAddress]
-  ) as unknown as VideoNft;
+  );
   const transaction = useMemo(() => {
     if (!tokenUri || !recipient) {
       return null;
