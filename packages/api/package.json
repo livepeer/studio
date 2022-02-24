@@ -27,7 +27,7 @@
     "dev-server": "run-s compile-schemas && node dist/cli.js",
     "redoc": "nodemon -w src/schema/schema.yaml -x npm run prepare:redoc",
     "siserver": "nodemon -w dist -x node -r esm dist/stream-info-service.js -e js,yaml",
-    "dev:server": "nodemon -w dist -x node dist/cli.js -e js,yaml",
+    "dev:server": "NODE_ENV=development nodemon -w dist -x node dist/cli.js -e js,yaml",
     "dev:babel": "yarn run prepare:babel --watch",
     "dev:yaml-json": "nodemon -w ./src/schema -e 'yaml' -x 'run-s compile-schemas'",
     "dev": "run-p \"dev:**\"",
