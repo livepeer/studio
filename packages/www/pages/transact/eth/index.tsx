@@ -8,6 +8,7 @@ const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; /
 
 const TransactEth = () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
+  const [txStarted, setTxStarted] = useState<boolean>();
   const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
 
   let { contractAddress, tokenUri, recipient } = useMemo(() => {
@@ -43,7 +44,7 @@ const TransactEth = () => {
   }, [contractAddress, recipient, tokenUri]);
 
   useEffect(() => {
-    if (status !== "connected" || !transaction) {
+    if (status !== "connected" || !transaction || !txStarted) {
       return;
     }
     Promise.resolve()
@@ -96,7 +97,7 @@ const TransactEth = () => {
         }
         addLog(log);
       });
-  }, [status, account, transaction]);
+  }, [status, account, transaction, txStarted]);
 
   switch (status) {
     case "initializing":
@@ -130,9 +131,11 @@ const TransactEth = () => {
             <div>
               Connected account {account} on chain ID {chainId}
             </div>
-            {logs.map((log, idx) => (
-              <div key={`log-${idx}`}>{log}</div>
-            ))}
+            {!txStarted ? (
+              <button onClick={() => setTxStarted(true)}>Mint NFT</button>
+            ) : (
+              logs.map((log, idx) => <div key={`log-${idx}`}>{log}</div>)
+            )}
           </Box>
         </>
       );
