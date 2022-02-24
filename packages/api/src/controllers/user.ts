@@ -415,6 +415,54 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
   }
 });
 
+// resend verify email
+app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
+  const { selectedPlan } = req.query;
+  const user = await findUserByEmail(req.body.email);
+  const { emailValid, email, emailValidToken } = user;
+  const protocol =
+    req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+  const verificationUrl = `${protocol}://${
+    req.frontendDomain
+  }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
+  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
+
+  if (emailValid) {
+    const {
+      supportAddr,
+      sendgridTemplateId,
+      sendgridApiKey,
+      sendgridValidationApiKey,
+    } = req.config;
+
+    try {
+      sendgridValidateEmail(email, sendgridValidationApiKey);
+      await sendgridEmail({
+        email,
+        supportAddr,
+        sendgridTemplateId,
+        sendgridApiKey,
+        subject: "Verify your Livepeer.com Email",
+        preheader: "Welcome to Livepeer.com!",
+        buttonText: "Verify Email",
+        buttonUrl: verificationUrl,
+        unsubscribe: unsubscribeUrl,
+        text: [
+          "Please verify your email address to ensure that you can change your password or receive updates from us.",
+        ].join("\n\n"),
+      });
+    } catch (err) {
+      res.status(400);
+      return res.json({
+        errors: [
+          `error sending confirmation email to ${req.body.email}: error: ${err}`,
+        ],
+      });
+    }
+  }
+  res.status(200).json(cleanUserFields(user));
+});
+
 app.post(
   "/password/reset",
   validatePost("password-reset-confirm"),
