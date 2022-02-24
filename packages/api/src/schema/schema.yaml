@@ -940,7 +940,6 @@ components:
           description: user email address
           example: useremail@gmail.com
           unique: true
-          index: true
 
     make-admin:
       type: object
