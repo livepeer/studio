@@ -1,14 +1,73 @@
 import { Box } from "@livepeer.com/design-system";
+import { useToggleState } from "hooks/use-toggle-state";
 import { useMetaMask } from "metamask-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Web3 from "web3";
+import { TransactionConfig } from "web3-core";
+import { Contract } from "web3-eth-contract";
 import videoNftAbi from "./video-nft.json";
 
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
 
+async function mintNft(
+  web3: Web3,
+  videoNft: Contract,
+  account: string,
+  transaction: TransactionConfig,
+  logger: (log: JSX.Element | string) => void
+) {
+  try {
+    const nonce = await web3.eth.getTransactionCount(account, "latest");
+    const tx = {
+      ...transaction,
+      from: account,
+      nonce,
+    };
+    logger("Minting...");
+    const receipt = await web3.eth.sendTransaction(tx);
+
+    const events = await videoNft.getPastEvents("Mint", {
+      filter: { sender: account },
+      fromBlock: receipt.blockNumber,
+      toBlock: receipt.blockNumber,
+    });
+    const event = events.find(
+      (ev) => ev.transactionHash === receipt.transactionHash
+    );
+    if (!event) {
+      logger(
+        `NFT minted but failed to find event. Transacton receipt:\n${JSON.stringify(
+          receipt,
+          null,
+          2
+        )}`
+      );
+      return;
+    }
+    const { tokenId } = event.returnValues;
+    const url = `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`;
+    logger(
+      <>
+        Successfully minted token with ID {tokenId}! Check it on{" "}
+        <a href={url} target="_blank">
+          OpenSea
+        </a>
+        !
+      </>
+    );
+  } catch (err) {
+    let log = `Error during main mint routine: ${err.message}`;
+    if ("data" in err) {
+      const errData = (err as any).data;
+      log += `: ${errData.message || errData.details}`;
+    }
+    logger(log);
+  }
+}
+
 const TransactEth = () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
-  const [txStarted, setTxStarted] = useState<boolean>();
+  const isMinting = useToggleState();
   const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
 
   let { contractAddress, tokenUri, recipient } = useMemo(() => {
@@ -24,8 +83,11 @@ const TransactEth = () => {
     };
   }, [typeof window !== "undefined" && window?.location?.search, account]);
   const [logs, setLogs] = useState<JSX.Element[]>([]);
-  const addLog = (log: JSX.Element | string) =>
-    setLogs((prev) => [...prev, typeof log === "string" ? <>{log}</> : log]);
+  const addLog = useCallback(
+    (log: JSX.Element | string) =>
+      setLogs((prev) => [...prev, typeof log === "string" ? <>{log}</> : log]),
+    [setLogs]
+  );
 
   const videoNft = useMemo(
     () => new web3.eth.Contract(videoNftAbi as any, contractAddress),
@@ -43,61 +105,14 @@ const TransactEth = () => {
     };
   }, [contractAddress, recipient, tokenUri]);
 
-  useEffect(() => {
-    if (status !== "connected" || !transaction || !txStarted) {
-      return;
+  const onClickMint = useCallback(async () => {
+    isMinting.onOn();
+    try {
+      await mintNft(web3, videoNft, account, transaction, addLog);
+    } finally {
+      isMinting.onOff();
     }
-    Promise.resolve()
-      .then(async () => {
-        const nonce = await web3.eth.getTransactionCount(account, "latest");
-        const tx = {
-          ...transaction,
-          from: account,
-          nonce,
-        };
-        addLog("Minting...");
-        const receipt = await web3.eth.sendTransaction(tx);
-
-        const events = await videoNft.getPastEvents("Mint", {
-          filter: { sender: account },
-          fromBlock: receipt.blockNumber,
-          toBlock: receipt.blockNumber,
-        });
-        const event = events.find(
-          (ev) => ev.transactionHash === receipt.transactionHash
-        );
-        if (!event) {
-          addLog(
-            `NFT minted but failed to find event. Transacton receipt:\n${JSON.stringify(
-              receipt,
-              null,
-              2
-            )}`
-          );
-          return;
-        }
-        const { tokenId } = event.returnValues;
-        addLog(
-          <>
-            Successfully minted token with ID {tokenId}! Check it on{" "}
-            <a
-              href={`https://opensea.io/assets/matic/${contractAddress}/${tokenId}`}
-              target="_blank">
-              OpenSea
-            </a>
-            !
-          </>
-        );
-      })
-      .catch((err) => {
-        let log = `Error during main mint routine: ${err.message}`;
-        if ("data" in err) {
-          const errData = (err as any).data;
-          log += `: ${errData.message || errData.details}`;
-        }
-        addLog(log);
-      });
-  }, [status, account, transaction, txStarted]);
+  }, [status, transaction, web3, videoNft, account, addLog]);
 
   switch (status) {
     case "initializing":
@@ -131,10 +146,11 @@ const TransactEth = () => {
             <div>
               Connected account {account} on chain ID {chainId}
             </div>
-            {!txStarted ? (
-              <button onClick={() => setTxStarted(true)}>Mint NFT</button>
-            ) : (
-              logs.map((log, idx) => <div key={`log-${idx}`}>{log}</div>)
+            {logs.map((log, idx) => (
+              <div key={`log-${idx}`}>{log}</div>
+            ))}
+            {isMinting.on ? null : (
+              <button onClick={onClickMint}>Mint NFT</button>
             )}
           </Box>
         </>
