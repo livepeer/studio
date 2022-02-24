@@ -1,10 +1,16 @@
-import { Box } from "@livepeer.com/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useMetaMask } from "metamask-react";
+import { Container } from "next/app";
 import { useCallback, useMemo, useState } from "react";
 import Web3 from "web3";
 import { TransactionConfig } from "web3-core";
 import { Contract } from "web3-eth-contract";
+
+import Guides from "@components/Marketing/Guides";
+import { Box, Flex, Heading } from "@livepeer.com/design-system";
+import { Transact as Content } from "content";
+import Layout from "layouts/main";
+
 import videoNftAbi from "./video-nft.json";
 
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
@@ -119,48 +125,81 @@ const TransactEth = () => {
     }
   }, [status, transaction, web3, videoNft, account, addLog]);
 
-  switch (status) {
-    case "initializing":
-      return <div>Synchronisation with MetaMask ongoing...</div>;
-    case "unavailable":
-      return <div>MetaMask not available :(</div>;
-    case "notConnected":
-      return <button onClick={connect}>Connect to MetaMask</button>;
-    case "connecting":
-      return <div>Connecting...</div>;
-    default:
-      return <div>Unknown MetaMask status: ${status}.</div>;
-    case "connected":
-      if (!transaction) {
-        return (
-          <div>
-            Add `?tokenUri=` param with IPFS URL for file. May also include
-            `recipient` param to mint NFT for another address.
-          </div>
-        );
-      }
-      return (
-        <>
-          <Box
+  return (
+    <Layout {...Content.metaData}>
+      <Guides backgroundColor="$mauve2" />
+      <Box css={{ position: "relative" }}>
+        <Container
+          size="3"
+          css={{
+            px: "$6",
+            py: "$7",
+            width: "100%",
+            "@bp3": {
+              py: "$8",
+              px: "$4",
+            },
+          }}>
+          <Flex
             css={{
-              overflow: "scroll",
-              p: "$4",
-              height: 300,
-              borderRadius: 6,
+              alignItems: "center",
+              justifyContent: "center",
+              flexGrow: 1,
+              flexDirection: "column",
             }}>
-            <div>
-              Connected account {account} on chain ID {chainId}
-            </div>
-            {logs.map((log, idx) => (
-              <div key={`log-${idx}`}>{log}</div>
-            ))}
-            {isMinting.on ? null : (
-              <button onClick={onClickMint}>Mint NFT</button>
-            )}
-          </Box>
-        </>
-      );
-  }
+            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+              Mint NFT
+            </Heading>
+            {(() => {
+              switch (status) {
+                case "initializing":
+                  return <div>Synchronisation with MetaMask ongoing...</div>;
+                case "unavailable":
+                  return <div>MetaMask not available :(</div>;
+                case "notConnected":
+                  return <button onClick={connect}>Connect to MetaMask</button>;
+                case "connecting":
+                  return <div>Connecting...</div>;
+                default:
+                  return <div>Unknown MetaMask status: ${status}.</div>;
+                case "connected":
+                  if (!transaction) {
+                    return (
+                      <div>
+                        Add `?tokenUri=` param with IPFS URL for file. May also
+                        include `recipient` param to mint NFT for another
+                        address.
+                      </div>
+                    );
+                  }
+                  return (
+                    <>
+                      <Box
+                        css={{
+                          overflow: "scroll",
+                          p: "$4",
+                          height: 300,
+                          borderRadius: 6,
+                        }}>
+                        <div>
+                          Connected account {account} on chain ID {chainId}
+                        </div>
+                        {logs.map((log, idx) => (
+                          <div key={`log-${idx}`}>{log}</div>
+                        ))}
+                        {isMinting.on ? null : (
+                          <button onClick={onClickMint}>Mint NFT</button>
+                        )}
+                      </Box>
+                    </>
+                  );
+              }
+            })()}
+          </Flex>
+        </Container>
+      </Box>
+    </Layout>
+  );
 };
 
 export default TransactEth;

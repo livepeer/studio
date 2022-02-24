@@ -55,8 +55,16 @@ export const ForgotPassword = {
 export const Team = {
   metaData: {
     title: "Team - Livepeer Video Services",
-    description: `Learn about the team behind Livepeer. We’re building the world's open video infrastructure and software.`,
+    description: `Learn about the team behind Livepeer. We're building the world's open video infrastructure and software.`,
     url: "https://livepeer.com/team",
+  },
+};
+
+export const Transact = {
+  metaData: {
+    title: "Mint NFT - Livepeer Video Services",
+    description: `Mint NFTs on Ethereum-compatible networks`,
+    url: "https://livepeer.com/transact/eth",
   },
 };
 
