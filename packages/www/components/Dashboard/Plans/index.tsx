@@ -151,7 +151,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Item displayCheck={false} title="Recording storage" />
               <Item
                 displayCheck={false}
-                title="Stream Delivery via CDN*"
+                title="Stream Delivery via CDN"
                 css={{ borderBottom: 0 }}
               />
               <Item
