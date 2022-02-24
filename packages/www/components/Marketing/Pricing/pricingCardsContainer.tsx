@@ -72,7 +72,7 @@ const PricingCardsContainer = () => {
                 fontWeight: 600,
                 mb: "$1",
               }}>
-              Stream Delivery via CDN*
+              Stream Delivery via CDN
             </Text>
             <Text size="2" variant="gray">
               Optimize playback for your viewers across the globe via a CDN.
@@ -164,7 +164,7 @@ const PricingCardsContainer = () => {
                     display: "none",
                   },
                 }}>
-                Stream delivery via CDN*
+                Stream delivery via CDN
               </Badge>
               <Box
                 css={{
@@ -290,7 +290,7 @@ const PricingCardsContainer = () => {
                     display: "none",
                   },
                 }}>
-                Stream delivery via CDN*
+                Stream delivery via CDN
               </Badge>
               <Box
                 css={{
@@ -417,7 +417,7 @@ const PricingCardsContainer = () => {
                     display: "none",
                   },
                 }}>
-                Stream delivery via CDN*
+                Stream delivery via CDN
               </Badge>
               <Box
                 css={{
