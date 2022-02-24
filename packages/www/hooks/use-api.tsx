@@ -264,7 +264,7 @@ const makeContext = (state: ApiState, setState) => {
     async verifyEmail(email) {
       const [res, body] = await context.fetch("/user/verify-email", {
         method: "POST",
-        body: JSON.stringify({ email: "sadf@dsf.com" }),
+        body: JSON.stringify({ email }),
         headers: {
           "content-type": "application/json",
         },
