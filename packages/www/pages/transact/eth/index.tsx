@@ -85,7 +85,12 @@ const TransactEth = () => {
   const [logs, setLogs] = useState<JSX.Element[]>([]);
   const addLog = useCallback(
     (log: JSX.Element | string) =>
-      setLogs((prev) => [...prev, typeof log === "string" ? <>{log}</> : log]),
+      setLogs((prev) => [
+        ...prev,
+        <>
+          [{new Date().toLocaleTimeString()}] {log}
+        </>,
+      ]),
     [setLogs]
   );
 
