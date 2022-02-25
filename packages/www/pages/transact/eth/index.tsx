@@ -29,17 +29,22 @@ import Layout from "layouts/main";
 
 import videoNftAbi from "./video-nft.json";
 
-const polygon = {
-  chainId: "0x89",
-  chainName: "Polygon Mainnet",
-  rpcUrls: ["https://polygon-rpc.com/"],
-  nativeCurrency: { symbol: "MATIC", decimals: 18 },
-  blockExplorerUrls: ["https://polygonscan.com"],
-  iconUrls: [
-    "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
-  ],
-};
-const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
+const networks = {
+  "0x89": {
+    network: {
+      chainId: "0x89",
+      chainName: "Polygon Mainnet",
+      rpcUrls: ["https://polygon-rpc.com/"],
+      nativeCurrency: { symbol: "MATIC", decimals: 18 },
+      blockExplorerUrls: ["https://polygonscan.com"],
+      iconUrls: [
+        "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
+      ],
+    },
+    defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F", // TODO: Final address here
+  },
+} as const;
+const defaultNet = networks["0x89"]; // polygon
 
 async function getMintedTokenIdOnce(
   videoNft: Contract,
@@ -140,12 +145,13 @@ async function mintNft(
 
 async function switchNetwork(
   ethereum: MetaMask,
+  chainId: keyof typeof networks,
   logger: (log: JSX.Element | string) => void
 ) {
   try {
     await ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: polygon.chainId }],
+      params: [{ chainId }],
     });
     logger("Successfully switched to Polygon network.");
     return;
@@ -160,7 +166,7 @@ async function switchNetwork(
   try {
     await ethereum.request({
       method: "wallet_addEthereumChain",
-      params: [polygon],
+      params: [networks[chainId]],
     });
     logger("Successfully added Polygon network to MetaMask.");
     return;
@@ -180,8 +186,7 @@ const TransactEth = () => {
     }
     const searchParams = new URLSearchParams(window.location.search);
     return {
-      contractAddress:
-        searchParams.get("contractAddress") || livepeerNftMinterAddress,
+      contractAddress: searchParams.get("contractAddress"),
       tokenUri: searchParams.get("tokenUri"),
       recipient: searchParams.get("recipient"),
     };
@@ -209,7 +214,7 @@ const TransactEth = () => {
     try {
       await mintNft(
         web3,
-        state.contractAddress,
+        state.contractAddress ?? networks[chainId].defaultContract,
         account,
         state.recipient ?? account,
         state.tokenUri,
@@ -222,7 +227,7 @@ const TransactEth = () => {
 
   const onClickSwitchNetwork = useCallback(() => {
     setLogs([]);
-    return switchNetwork(ethereum, addLog);
+    return switchNetwork(ethereum, defaultNet.network.chainId, addLog);
   }, [setLogs, ethereum, addLog]);
 
   const onClickConnect = useCallback(() => {
@@ -345,7 +350,7 @@ const TransactEth = () => {
                               <div>Unknown MetaMask status: ${status}.</div>
                             );
                           case "connected":
-                            if (chainId !== polygon.chainId) {
+                            if (!(chainId in networks)) {
                               return (
                                 <div>
                                   Only Polygon network is supported right now.
@@ -381,8 +386,7 @@ const TransactEth = () => {
                         onClick={onClickConnect}>
                         Connect to MetaMask
                       </Button>
-                    ) : status === "connected" &&
-                      chainId !== polygon.chainId ? (
+                    ) : status === "connected" && !(chainId in networks) ? (
                       <Button
                         css={{ display: "flex", ai: "center" }}
                         type="button"
