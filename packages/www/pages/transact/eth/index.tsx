@@ -235,11 +235,45 @@ const TransactEth = () => {
                         height: 200,
                         borderRadius: 6,
                       }}>
-                      <div>
-                        Connected to:
-                        <br /> account: {account}
-                        <br /> chain ID: {chainId}
-                      </div>
+                      {(() => {
+                        switch (status) {
+                          case "initializing":
+                            return (
+                              <div>
+                                Synchronisation with MetaMask ongoing...
+                              </div>
+                            );
+                          case "unavailable":
+                            return (
+                              <div>
+                                MetaMask not available. Install it at{" "}
+                                <a
+                                  href="https://metamask.io/download"
+                                  target="_blank">
+                                  metamask.io
+                                </a>
+                              </div>
+                            );
+                          case "notConnected":
+                            return (
+                              <div>Connect your MetaMask wallet below.</div>
+                            );
+                          case "connecting":
+                            return <div>Connecting to MetaMask...</div>;
+                          default:
+                            return (
+                              <div>Unknown MetaMask status: ${status}.</div>
+                            );
+                          case "connected":
+                            return (
+                              <div>
+                                Connected to:
+                                <br /> account: {account}
+                                <br /> chain ID: {chainId}
+                              </div>
+                            );
+                        }
+                      })()}
                       {logs.map((log, idx) => (
                         <div key={`log-${idx}`}>{log}</div>
                       ))}
@@ -247,31 +281,36 @@ const TransactEth = () => {
                   </AlertDialogDescription>
 
                   <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-                    {/* <AlertDialogCancel
-                      disabled={isMinting.on}
-                      size="2"
-                      as={Button}
-                      ghost>
-                      Cancel
-                    </AlertDialogCancel> */}
-                    <Button
-                      css={{ display: "flex", ai: "center" }}
-                      type="submit"
-                      size="2"
-                      disabled={isMinting.on || status !== "connected"}
-                      variant="violet">
-                      {isMinting.on && (
-                        <Spinner
-                          css={{
-                            color: "$hiContrast",
-                            width: 16,
-                            height: 16,
-                            mr: "$2",
-                          }}
-                        />
-                      )}
-                      {isMinting.on ? "Minting..." : "Mint NFT"}
-                    </Button>
+                    {status === "notConnected" ? (
+                      <Button
+                        css={{ display: "flex", ai: "center" }}
+                        type="button"
+                        size="2"
+                        disabled={status !== "notConnected"}
+                        variant="violet"
+                        onClick={connect}>
+                        Connect to MetaMask
+                      </Button>
+                    ) : (
+                      <Button
+                        css={{ display: "flex", ai: "center" }}
+                        type="submit"
+                        size="2"
+                        disabled={isMinting.on || status !== "connected"}
+                        variant="violet">
+                        {isMinting.on && (
+                          <Spinner
+                            css={{
+                              color: "$hiContrast",
+                              width: 16,
+                              height: 16,
+                              mr: "$2",
+                            }}
+                          />
+                        )}
+                        {isMinting.on ? "Minting..." : "Mint NFT"}
+                      </Button>
+                    )}
                   </Flex>
                 </Box>
               </AlertDialogContent>
