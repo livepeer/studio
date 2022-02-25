@@ -133,7 +133,9 @@ async function mintNft(
     logger(
       <>
         {tokenId
-          ? `Successfully minted token with ID ${tokenId} to ${to}! Check it on `
+          ? `Successfully minted token ${(
+              <code>{tokenId}</code>
+            )} to ${displayAddr(to)}! Check it on `
           : `NFT minted but failed to find token ID. Check last minted NFTs on `}
         <Link
           href={
@@ -155,6 +157,12 @@ async function mintNft(
     logger(log);
   }
 }
+
+const displayAddr = (str: string) => (
+  <code>
+    {str.slice(0, 5)}…{str.slice(-4)}
+  </code>
+);
 
 async function switchNetwork(
   ethereum: MetaMask,
@@ -374,12 +382,13 @@ const TransactEth = () => {
                             }
                             return (
                               <>
-                                <div>
-                                  Connected to {displayAddr(account)} on chain
-                                  ID <code>{parseInt(chainId, 16)}</code>.
-                                </div>
+                                <Box css={{ mb: "$2" }}>
+                                  Connected to {displayAddr(account)} on{" "}
+                                  {networks[chainId].spec.chainName} (
+                                  <code>{parseInt(chainId, 16)}</code>)
+                                </Box>
                                 {logs.map((log, idx) => (
-                                  <div key={`log-${idx}`}>{log}</div>
+                                  <Box key={`log-${idx}`}>{log}</Box>
                                 ))}
                               </>
                             );
