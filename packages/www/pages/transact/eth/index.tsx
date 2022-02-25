@@ -2,6 +2,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
 import { useCallback, useMemo, useState } from "react";
+import { AbstractProvider as MetaMask } from "web3-core";
 import Web3 from "web3";
 
 import Guides from "components/Marketing/Guides";
@@ -25,6 +26,16 @@ import Layout from "layouts/main";
 
 import videoNftAbi from "./video-nft.json";
 
+const polygon = {
+  chainId: "0x89",
+  chainName: "Polygon Mainnet",
+  rpcUrls: ["https://polygon-rpc.com/"],
+  nativeCurrency: { symbol: "MATIC", decimals: 18 },
+  blockExplorerUrls: ["https://polygonscan.com"],
+  iconUrls: [
+    "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
+  ],
+};
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
 
 async function mintNft(
@@ -99,6 +110,37 @@ async function mintNft(
   }
 }
 
+async function switchNetwork(
+  ethereum: MetaMask,
+  logger: (log: JSX.Element | string) => void
+) {
+  try {
+    await ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: polygon.chainId }],
+    });
+    logger("Successfully switched to Polygon network.");
+    return;
+  } catch (err) {
+    // 4902 is the not found error code
+    if (err.code !== 4902) {
+      logger(`Error switching to Polygon network: ${err.message}`);
+      return;
+    }
+  }
+
+  try {
+    await ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [polygon],
+    });
+    logger("Successfully added Polygon network to MetaMask.");
+    return;
+  } catch (err) {
+    logger(`Error adding Polygon network: ${err.message}`);
+  }
+}
+
 const TransactEth = () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const isMinting = useToggleState();
@@ -149,6 +191,11 @@ const TransactEth = () => {
       isMinting.onOff();
     }
   }, [state, web3, account, addLog]);
+
+  const onClickSwitchNetwork = useCallback(() => {
+    setLogs([]);
+    return switchNetwork(ethereum, addLog);
+  }, [ethereum, addLog]);
 
   return (
     <Layout {...Content.metaData}>
@@ -265,18 +312,28 @@ const TransactEth = () => {
                               <div>Unknown MetaMask status: ${status}.</div>
                             );
                           case "connected":
+                            if (chainId !== polygon.chainId) {
+                              return (
+                                <div>
+                                  Only Polygon network is supported right now.
+                                  Click below to switch or add it to MetaMask.
+                                </div>
+                              );
+                            }
                             return (
-                              <div>
-                                Connected to:
-                                <br /> account: {account}
-                                <br /> chain ID: {chainId}
-                              </div>
+                              <>
+                                <div>
+                                  Connected to:
+                                  <br /> account: {account}
+                                  <br /> chain ID: {chainId}
+                                </div>
+                                {logs.map((log, idx) => (
+                                  <div key={`log-${idx}`}>{log}</div>
+                                ))}
+                              </>
                             );
                         }
                       })()}
-                      {logs.map((log, idx) => (
-                        <div key={`log-${idx}`}>{log}</div>
-                      ))}
                     </Box>
                   </AlertDialogDescription>
 
@@ -290,6 +347,16 @@ const TransactEth = () => {
                         variant="violet"
                         onClick={connect}>
                         Connect to MetaMask
+                      </Button>
+                    ) : status === "connected" &&
+                      chainId !== polygon.chainId ? (
+                      <Button
+                        css={{ display: "flex", ai: "center" }}
+                        type="button"
+                        size="2"
+                        variant="violet"
+                        onClick={onClickSwitchNetwork}>
+                        Switch Network
                       </Button>
                     ) : (
                       <Button
