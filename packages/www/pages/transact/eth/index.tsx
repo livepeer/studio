@@ -47,7 +47,7 @@ async function mintNft(
   logger: (log: JSX.Element | string) => void
 ) {
   try {
-    logger("Started minting process...");
+    logger("Started minting transaction...");
     const videoNft = new web3.eth.Contract(videoNftAbi as any, contractAddress);
     const transaction = {
       to: contractAddress,
