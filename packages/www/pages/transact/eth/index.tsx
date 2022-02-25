@@ -43,19 +43,19 @@ const networks = {
     },
     defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F", // TODO: Final address here
   },
-  "0xa4b1": {
-    spec: {
-      chainId: "0xa4b1",
-      chainName: "Arbitrum One",
-      rpcUrls: ["https://arb1.arbitrum.io/rpc"],
-      nativeCurrency: { symbol: "AETH", decimals: 18 },
-      blockExplorerUrls: ["https://arbiscan.io"],
-      iconUrls: [
-        "https://cloudflare-ipfs.com/ipfs/bafkreiamd2sujbbc673tljl7hkz66m4fqubqraq3jwnfo6smtmh6afak5i",
-      ],
-    },
-    defaultContract: "0xX", // TODO: Deploy a contract and add address here
-  },
+  // "0xa4b1": {
+  //   spec: {
+  //     chainId: "0xa4b1",
+  //     chainName: "Arbitrum One",
+  //     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+  //     nativeCurrency: { symbol: "AETH", decimals: 18 },
+  //     blockExplorerUrls: ["https://arbiscan.io"],
+  //     iconUrls: [
+  //       "https://cloudflare-ipfs.com/ipfs/bafkreiamd2sujbbc673tljl7hkz66m4fqubqraq3jwnfo6smtmh6afak5i",
+  //     ],
+  //   },
+  //   defaultContract: "0xX", // TODO: Deploy a contract and add address here
+  // },
 } as const;
 const defaultNet = networks["0x89"]; // polygon
 
