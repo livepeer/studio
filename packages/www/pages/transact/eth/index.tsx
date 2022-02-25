@@ -3,7 +3,8 @@ import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { AbstractProvider as MetaMask } from "web3-core";
+import { AbstractProvider as MetaMask, TransactionReceipt } from "web3-core";
+import { Contract } from "web3-eth-contract";
 import Web3 from "web3";
 
 import Guides from "components/Marketing/Guides";
@@ -40,6 +41,51 @@ const polygon = {
 };
 const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; // TODO: Real address here
 
+async function getMintedTokenIdOnce(
+  videoNft: Contract,
+  sender: string,
+  txReceipt: TransactionReceipt
+) {
+  const events = await videoNft.getPastEvents("Mint", {
+    filter: { sender },
+    fromBlock: txReceipt.blockNumber,
+    toBlock: txReceipt.blockNumber,
+  });
+  const event = events.find(
+    (ev) => ev.transactionHash === txReceipt.transactionHash
+  );
+  return event?.returnValues?.tokenId as string;
+}
+
+async function getMintedTokenId(
+  videoNft: Contract,
+  sender: string,
+  txReceipt: TransactionReceipt,
+  logger: (log: JSX.Element | string) => void
+) {
+  const maxAttempts = 5;
+  const retryDelayMs = 5 * 1000;
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  let lastErr: Error | undefined;
+  for (let a = 1; a <= maxAttempts; a++) {
+    if (a > 1) {
+      await sleep(retryDelayMs);
+    }
+    try {
+      const tokenId = await getMintedTokenIdOnce(videoNft, sender, txReceipt);
+      if (!tokenId) {
+        throw new Error("Missing tokenId");
+      }
+      return tokenId;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  logger(`Error getting minted token ID: ${lastErr}`);
+  return null;
+}
+
 async function mintNft(
   web3: Web3,
   contractAddress: string,
@@ -65,41 +111,21 @@ async function mintNft(
     };
     const receipt = await web3.eth.sendTransaction(tx);
 
-    let tokenId: string;
-    try {
-      const events = await videoNft.getPastEvents("Mint", {
-        filter: { sender: from },
-        fromBlock: receipt.blockNumber,
-        toBlock: receipt.blockNumber,
-      });
-      const event = events.find(
-        (ev) => ev.transactionHash === receipt.transactionHash
-      );
-      tokenId = event?.returnValues?.tokenId;
-    } catch (err) {
-      logger(`Error getting events: ${err}`);
-    }
-    if (!tokenId) {
-      const searchUrl = `https://opensea.io/assets?search%5Bquery%5D=${videoNft.options.address}`;
-      logger(
-        <>
-          NFT minted but failed to find token ID. Check last minted NFTs on{" "}
-          <Link href={searchUrl} passHref>
-            <A target="_blank">OpenSea</A>
-          </Link>
-          .
-        </>
-      );
-      return;
-    }
-    const nftUrl = `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`;
+    const tokenId = await getMintedTokenId(videoNft, from, receipt, logger);
     logger(
       <>
-        Successfully minted token with ID {tokenId}! Check it on{" "}
-        <Link href={nftUrl} passHref>
+        {tokenId
+          ? `Successfully minted token with ID ${tokenId} to ${to}! Check it on `
+          : `NFT minted but failed to find token ID. Check last minted NFTs on `}
+        <Link
+          href={
+            tokenId
+              ? `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`
+              : `https://opensea.io/assets?search%5Bquery%5D=${videoNft.options.address}`
+          }
+          passHref>
           <A target="_blank">OpenSea</A>
         </Link>
-        !
       </>
     );
   } catch (err) {
