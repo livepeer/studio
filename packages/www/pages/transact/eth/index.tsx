@@ -195,7 +195,12 @@ const TransactEth = () => {
   const onClickSwitchNetwork = useCallback(() => {
     setLogs([]);
     return switchNetwork(ethereum, addLog);
-  }, [ethereum, addLog]);
+  }, [setLogs, ethereum, addLog]);
+
+  const onClickConnect = useCallback(() => {
+    setLogs([]);
+    return connect();
+  }, [setLogs, connect]);
 
   return (
     <Layout {...Content.metaData}>
@@ -345,7 +350,7 @@ const TransactEth = () => {
                         size="2"
                         disabled={status !== "notConnected"}
                         variant="violet"
-                        onClick={connect}>
+                        onClick={onClickConnect}>
                         Connect to MetaMask
                       </Button>
                     ) : status === "connected" &&
