@@ -3,11 +3,23 @@ import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
 import { useCallback, useMemo, useState } from "react";
 import Web3 from "web3";
-import { TransactionConfig } from "web3-core";
-import { Contract } from "web3-eth-contract";
 
-import Guides from "@components/Marketing/Guides";
-import { Box, Flex, Heading } from "@livepeer.com/design-system";
+import Guides from "components/Marketing/Guides";
+import Spinner from "components/Dashboard/Spinner";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Label,
+  Text,
+  TextField,
+  Tooltip,
+} from "@livepeer.com/design-system";
 import { Transact as Content } from "content";
 import Layout from "layouts/main";
 
@@ -17,40 +29,56 @@ const livepeerNftMinterAddress = "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F"; /
 
 async function mintNft(
   web3: Web3,
-  videoNft: Contract,
-  account: string,
-  transaction: TransactionConfig,
+  contractAddress: string,
+  from: string,
+  to: string,
+  tokenUri: string,
   logger: (log: JSX.Element | string) => void
 ) {
   try {
-    const nonce = await web3.eth.getTransactionCount(account, "latest");
+    logger("Started minting process...");
+    const videoNft = new web3.eth.Contract(videoNftAbi as any, contractAddress);
+    const transaction = {
+      to: contractAddress,
+      gas: 500000,
+      maxPriorityFeePerGas: 39999999987,
+      data: videoNft.methods.mint(to, tokenUri).encodeABI(),
+    };
+    const nonce = await web3.eth.getTransactionCount(from, "latest");
     const tx = {
       ...transaction,
-      from: account,
+      from,
       nonce,
     };
-    logger("Minting...");
     const receipt = await web3.eth.sendTransaction(tx);
 
-    const events = await videoNft.getPastEvents("Mint", {
-      filter: { sender: account },
-      fromBlock: receipt.blockNumber,
-      toBlock: receipt.blockNumber,
-    });
-    const event = events.find(
-      (ev) => ev.transactionHash === receipt.transactionHash
-    );
-    if (!event) {
+    let tokenId: string;
+    try {
+      const events = await videoNft.getPastEvents("Mint", {
+        filter: { sender: from },
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      });
+      const event = events.find(
+        (ev) => ev.transactionHash === receipt.transactionHash
+      );
+      tokenId = event?.returnValues?.tokenId;
+    } catch (err) {
+      logger(`Error getting events: ${err}`);
+    }
+    if (!tokenId) {
+      const searchUrl = `https://opensea.io/assets/matic/${videoNft.options.address}?search[sortAscending]=false&search[sortBy]=CREATED_DATE`;
       logger(
-        `NFT minted but failed to find event. Transacton receipt:\n${JSON.stringify(
-          receipt,
-          null,
-          2
-        )}`
+        <>
+          NFT minted but failed to find token ID. Check last minted NFTs on{" "}
+          <a href={searchUrl} target="_blank">
+            OpenSea
+          </a>
+          .
+        </>
       );
       return;
     }
-    const { tokenId } = event.returnValues;
     const url = `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`;
     logger(
       <>
@@ -62,7 +90,7 @@ async function mintNft(
       </>
     );
   } catch (err) {
-    let log = `Error during main mint routine: ${err.message}`;
+    let log = `Error during minting process: ${err.message}`;
     if ("data" in err) {
       const errData = (err as any).data;
       log += `: ${errData.message || errData.details}`;
@@ -76,7 +104,7 @@ const TransactEth = () => {
   const isMinting = useToggleState();
   const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
 
-  let { contractAddress, tokenUri, recipient } = useMemo(() => {
+  const initState = useMemo(() => {
     if (typeof window === "undefined") {
       return {};
     }
@@ -85,9 +113,15 @@ const TransactEth = () => {
       contractAddress:
         searchParams.get("contractAddress") || livepeerNftMinterAddress,
       tokenUri: searchParams.get("tokenUri"),
-      recipient: searchParams.get("recipient") || account,
+      recipient: searchParams.get("recipient"),
     };
-  }, [typeof window !== "undefined" && window?.location?.search, account]);
+  }, [typeof window !== "undefined" && window?.location?.search]);
+  const [state, setState] = useState(initState);
+  type State = typeof state;
+  const setStateProp = <T extends keyof State>(prop: T, value: State[T]) => {
+    setState({ ...state, [prop]: value });
+  };
+
   const [logs, setLogs] = useState<JSX.Element[]>([]);
   const addLog = useCallback(
     (log: JSX.Element | string) =>
@@ -100,30 +134,21 @@ const TransactEth = () => {
     [setLogs]
   );
 
-  const videoNft = useMemo(
-    () => new web3.eth.Contract(videoNftAbi as any, contractAddress),
-    [web3, contractAddress]
-  );
-  const transaction = useMemo(() => {
-    if (!tokenUri || !recipient) {
-      return null;
-    }
-    return {
-      to: contractAddress,
-      gas: 500000,
-      maxPriorityFeePerGas: 39999999987,
-      data: videoNft.methods.mint(recipient, tokenUri).encodeABI(),
-    };
-  }, [contractAddress, recipient, tokenUri]);
-
   const onClickMint = useCallback(async () => {
     isMinting.onOn();
     try {
-      await mintNft(web3, videoNft, account, transaction, addLog);
+      await mintNft(
+        web3,
+        state.contractAddress,
+        account,
+        state.recipient ?? account,
+        state.tokenUri,
+        addLog
+      );
     } finally {
       isMinting.onOff();
     }
-  }, [status, transaction, web3, videoNft, account, addLog]);
+  }, [state, web3, account, addLog]);
 
   return (
     <Layout {...Content.metaData}>
@@ -147,54 +172,110 @@ const TransactEth = () => {
               flexGrow: 1,
               flexDirection: "column",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
-              Mint NFT
-            </Heading>
-            {(() => {
-              switch (status) {
-                case "initializing":
-                  return <div>Synchronisation with MetaMask ongoing...</div>;
-                case "unavailable":
-                  return <div>MetaMask not available :(</div>;
-                case "notConnected":
-                  return <button onClick={connect}>Connect to MetaMask</button>;
-                case "connecting":
-                  return <div>Connecting...</div>;
-                default:
-                  return <div>Unknown MetaMask status: ${status}.</div>;
-                case "connected":
-                  if (!transaction) {
-                    return (
+            <AlertDialog open={true}>
+              <AlertDialogContent
+                css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
+                onOpenAutoFocus={(e) => e.preventDefault()}>
+                <AlertDialogTitle as={Heading} size="1">
+                  Mint a Video NFT
+                </AlertDialogTitle>
+
+                <Box
+                  css={{ mt: "$3" }}
+                  as="form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    return onClickMint();
+                  }}>
+                  <Flex direction="column" gap="2">
+                    <Label htmlFor="contractAddress">Contract Address</Label>
+                    <Tooltip content="Defaults to Livepeer-owned Video NFT contract.">
+                      <TextField
+                        size="2"
+                        type="text"
+                        id="contractAddress"
+                        value={
+                          state.contractAddress === initState.contractAddress
+                            ? ""
+                            : state.contractAddress
+                        }
+                        placeholder={`Livepeer Video NFT (${initState.contractAddress})`}
+                        onChange={(e) =>
+                          setStateProp(
+                            "contractAddress",
+                            e.target.value || initState.contractAddress
+                          )
+                        }
+                      />
+                    </Tooltip>
+
+                    <Label htmlFor="tokenUri">Token URI</Label>
+                    <TextField
+                      required={true}
+                      autoFocus
+                      size="2"
+                      type="url"
+                      pattern="^ipfs://.+"
+                      id="tokenUri"
+                      value={state.tokenUri}
+                      onChange={(e) => setStateProp("tokenUri", e.target.value)}
+                      placeholder="ipfs://..."
+                    />
+                  </Flex>
+
+                  <AlertDialogDescription
+                    as={Text}
+                    size="3"
+                    variant="gray"
+                    css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
+                    <Box
+                      css={{
+                        overflow: "scroll",
+                        p: "$4",
+                        height: 200,
+                        borderRadius: 6,
+                      }}>
                       <div>
-                        Add `?tokenUri=` param with IPFS URL for file. May also
-                        include `recipient` param to mint NFT for another
-                        address.
+                        Connected to:
+                        <br /> account: {account}
+                        <br /> chain ID: {chainId}
                       </div>
-                    );
-                  }
-                  return (
-                    <>
-                      <Box
-                        css={{
-                          overflow: "scroll",
-                          p: "$4",
-                          height: 300,
-                          borderRadius: 6,
-                        }}>
-                        <div>
-                          Connected account {account} on chain ID {chainId}
-                        </div>
-                        {logs.map((log, idx) => (
-                          <div key={`log-${idx}`}>{log}</div>
-                        ))}
-                        {isMinting.on ? null : (
-                          <button onClick={onClickMint}>Mint NFT</button>
-                        )}
-                      </Box>
-                    </>
-                  );
-              }
-            })()}
+                      {logs.map((log, idx) => (
+                        <div key={`log-${idx}`}>{log}</div>
+                      ))}
+                    </Box>
+                  </AlertDialogDescription>
+
+                  <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
+                    {/* <AlertDialogCancel
+                      disabled={isMinting.on}
+                      size="2"
+                      as={Button}
+                      ghost>
+                      Cancel
+                    </AlertDialogCancel> */}
+                    <Button
+                      css={{ display: "flex", ai: "center" }}
+                      type="submit"
+                      size="2"
+                      disabled={isMinting.on || status !== "connected"}
+                      variant="violet">
+                      {isMinting.on && (
+                        <Spinner
+                          css={{
+                            color: "$hiContrast",
+                            width: 16,
+                            height: 16,
+                            mr: "$2",
+                          }}
+                        />
+                      )}
+                      {isMinting.on ? "Minting..." : "Mint NFT"}
+                    </Button>
+                  </Flex>
+                </Box>
+              </AlertDialogContent>
+            </AlertDialog>
           </Flex>
         </Container>
       </Box>
