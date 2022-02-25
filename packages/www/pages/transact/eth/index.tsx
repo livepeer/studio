@@ -1,6 +1,7 @@
 import { useToggleState } from "hooks/use-toggle-state";
 import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { AbstractProvider as MetaMask } from "web3-core";
 import Web3 from "web3";
@@ -8,6 +9,7 @@ import Web3 from "web3";
 import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
 import {
+  Link as A,
   AlertDialog,
   AlertDialogContent,
   AlertDialogDescription,
@@ -47,7 +49,7 @@ async function mintNft(
   logger: (log: JSX.Element | string) => void
 ) {
   try {
-    logger("Started minting transaction...");
+    logger("Started mint transaction...");
     const videoNft = new web3.eth.Contract(videoNftAbi as any, contractAddress);
     const transaction = {
       to: contractAddress,
@@ -78,25 +80,25 @@ async function mintNft(
       logger(`Error getting events: ${err}`);
     }
     if (!tokenId) {
-      const searchUrl = `https://opensea.io/assets/matic/${videoNft.options.address}?search[sortAscending]=false&search[sortBy]=CREATED_DATE`;
+      const searchUrl = `https://opensea.io/assets?search%5Bquery%5D=${videoNft.options.address}`;
       logger(
         <>
           NFT minted but failed to find token ID. Check last minted NFTs on{" "}
-          <a href={searchUrl} target="_blank">
-            OpenSea
-          </a>
+          <Link href={searchUrl} passHref>
+            <A target="_blank">OpenSea</A>
+          </Link>
           .
         </>
       );
       return;
     }
-    const url = `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`;
+    const nftUrl = `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`;
     logger(
       <>
         Successfully minted token with ID {tokenId}! Check it on{" "}
-        <a href={url} target="_blank">
-          OpenSea
-        </a>
+        <Link href={nftUrl} passHref>
+          <A target="_blank">OpenSea</A>
+        </Link>
         !
       </>
     );
