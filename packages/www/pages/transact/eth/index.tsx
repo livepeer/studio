@@ -31,7 +31,7 @@ import videoNftAbi from "./video-nft.json";
 
 const networks = {
   "0x89": {
-    network: {
+    spec: {
       chainId: "0x89",
       chainName: "Polygon Mainnet",
       rpcUrls: ["https://polygon-rpc.com/"],
@@ -42,6 +42,19 @@ const networks = {
       ],
     },
     defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F", // TODO: Final address here
+  },
+  "0xa4b1": {
+    spec: {
+      chainId: "0xa4b1",
+      chainName: "Arbitrum One",
+      rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+      nativeCurrency: { symbol: "AETH", decimals: 18 },
+      blockExplorerUrls: ["https://arbiscan.io"],
+      iconUrls: [
+        "https://cloudflare-ipfs.com/ipfs/bafkreiamd2sujbbc673tljl7hkz66m4fqubqraq3jwnfo6smtmh6afak5i",
+      ],
+    },
+    defaultContract: "0xX", // TODO: Deploy a contract and add address here
   },
 } as const;
 const defaultNet = networks["0x89"]; // polygon
@@ -166,7 +179,7 @@ async function switchNetwork(
   try {
     await ethereum.request({
       method: "wallet_addEthereumChain",
-      params: [networks[chainId]],
+      params: [networks[chainId].spec],
     });
     logger("Successfully added Polygon network to MetaMask.");
     return;
@@ -191,6 +204,10 @@ const TransactEth = () => {
       recipient: searchParams.get("recipient"),
     };
   }, [typeof window !== "undefined" && window?.location?.search]);
+  const defaultContractAddress = useMemo<string>(
+    () => networks[chainId]?.defaultContract,
+    [chainId]
+  );
   const [state, setState] = useState(initState);
   type State = typeof state;
   const setStateProp = <T extends keyof State>(prop: T, value: State[T]) => {
@@ -214,7 +231,7 @@ const TransactEth = () => {
     try {
       await mintNft(
         web3,
-        state.contractAddress ?? networks[chainId].defaultContract,
+        state.contractAddress ?? defaultContractAddress,
         account,
         state.recipient ?? account,
         state.tokenUri,
@@ -223,11 +240,11 @@ const TransactEth = () => {
     } finally {
       isMinting.onOff();
     }
-  }, [state, web3, account, addLog]);
+  }, [state, web3, defaultContractAddress, account, addLog]);
 
   const onClickSwitchNetwork = useCallback(() => {
     setLogs([]);
-    return switchNetwork(ethereum, defaultNet.network.chainId, addLog);
+    return switchNetwork(ethereum, defaultNet.spec.chainId, addLog);
   }, [setLogs, ethereum, addLog]);
 
   const onClickConnect = useCallback(() => {
@@ -280,16 +297,13 @@ const TransactEth = () => {
                         type="text"
                         id="contractAddress"
                         value={
-                          state.contractAddress === initState.contractAddress
+                          state.contractAddress === defaultContractAddress
                             ? ""
                             : state.contractAddress
                         }
-                        placeholder={`Livepeer Video NFT (${initState.contractAddress})`}
+                        placeholder={`Livepeer Video NFT (${defaultContractAddress})`}
                         onChange={(e) =>
-                          setStateProp(
-                            "contractAddress",
-                            e.target.value || initState.contractAddress
-                          )
+                          setStateProp("contractAddress", e.target.value)
                         }
                       />
                     </Tooltip>
@@ -361,9 +375,8 @@ const TransactEth = () => {
                             return (
                               <>
                                 <div>
-                                  Connected to:
-                                  <br /> account: {account}
-                                  <br /> chain ID: {chainId}
+                                  Connected to {displayAddr(account)} on chain
+                                  ID <code>{parseInt(chainId, 16)}</code>.
                                 </div>
                                 {logs.map((log, idx) => (
                                   <div key={`log-${idx}`}>{log}</div>
