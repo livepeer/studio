@@ -132,11 +132,14 @@ async function mintNft(
     const tokenId = await getMintedTokenId(videoNft, from, receipt, logger);
     logger(
       <>
-        {tokenId
-          ? `Successfully minted token ${(
-              <code>{tokenId}</code>
-            )} to ${displayAddr(to)}! Check it on `
-          : `NFT minted but failed to find token ID. Check last minted NFTs on `}
+        {tokenId ? (
+          <>
+            Successfully minted token <code>{tokenId}</code> to{" "}
+            {displayAddr(to)}! Check it on{" "}
+          </>
+        ) : (
+          `NFT minted but failed to find token ID. Check last minted NFTs on `
+        )}
         <Link
           href={
             tokenId
