@@ -14,6 +14,8 @@ import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { Column } from "react-table";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useToggleState } from "hooks/use-toggle-state";
+import ImportVideoDialog from "./ImportVideoDialog";
+import { useRouter } from "next/router";
 import {
   CellComponentProps,
   TableData,
@@ -104,12 +106,33 @@ type AssetsTableData = {
   downloadUrl: TextCellProps;
 };
 
-const assetsTable = ({ title = "Assets" }: { title?: string }) => {
-  const { user, getVodAssetsByUserId, getVodTasksByUserId } = useApi();
+const assetsTable = ({
+  title = "Assets",
+  pageSize = 20,
+  tableId,
+  userId,
+  viewAll,
+}: {
+  title: string;
+  pageSize?: number;
+  userId: string;
+  tableId: string;
+  viewAll?: string;
+}) => {
+  const router = useRouter();
+  const { user, getVodAssetsByUserId, getVodTasksByUserId, importVideo } =
+    useApi();
   const deleteDialogState = useToggleState();
+  const createDialogState = useToggleState();
   const tableProps = useTableState({
     tableId: "assetsTable",
   });
+
+  const { state, stateSetter } = useTableState<AssetsTableData>({
+    pageSize,
+    tableId,
+  });
+
   const [openSnackbar] = useSnackbar();
 
   const columns: Column<AssetsTableData>[] = useMemo(
@@ -182,7 +205,7 @@ const assetsTable = ({ title = "Assets" }: { title?: string }) => {
       }
 
       let groupedAssets = groupAssetsBySourceAsset(assets);
-      console.log(groupedAssets);
+
       return {
         nextCursor,
         count,
@@ -199,7 +222,7 @@ const assetsTable = ({ title = "Assets" }: { title?: string }) => {
                 <Box>
                   {assetTasks[asset.id]?.params
                     ? assetTasks[asset.id]?.params?.import
-                      ? assetTasks[asset.id]?.params.import.url.indexOf(
+                      ? assetTasks[asset.id]?.params.import.url?.indexOf(
                           "https://cdn.livepeer.com"
                         ) == 0
                         ? "Live Stream"
@@ -376,6 +399,34 @@ const assetsTable = ({ title = "Assets" }: { title?: string }) => {
               </Box>
             </>
           ),
+        }}
+        createAction={{
+          onClick: createDialogState.onOn,
+          css: { display: "flex", alignItems: "center" },
+          children: (
+            <>
+              <PlusIcon />{" "}
+              <Box as="span" css={{ ml: "$2" }}>
+                Import video
+              </Box>
+            </>
+          ),
+        }}
+      />
+      <ImportVideoDialog
+        isOpen={createDialogState.on}
+        onOpenChange={createDialogState.onToggle}
+        onCreate={async (videoName, videoUrl) => {
+          const newTask = await importVideo({
+            name: videoName,
+            url: videoUrl,
+          });
+          await state.invalidate();
+          const query = router.query.admin === "true" ? { admin: true } : {};
+          await router.push({
+            pathname: `/dashboard/assets/${newTask.id}`,
+            query,
+          });
         }}
       />
     </>

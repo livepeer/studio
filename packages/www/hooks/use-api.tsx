@@ -868,6 +868,21 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    async importVideo(params): Promise<[Task, Asset]> {
+      const [res, newTask, newAsset] = await context.fetch(`/asset/import`, {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 201) {
+        throw new Error(newAsset.errors.join(", "));
+      }
+      return newTask;
+    },
+
     async getObjectStore(
       userId?: string,
       order?: string,
