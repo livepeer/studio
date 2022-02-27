@@ -320,7 +320,7 @@ app.post("/", validatePost("user"), async (req, res) => {
 
 app.patch(
   "/:id/suspended",
-  authMiddleware({ admin: true }),
+  authMiddleware({ anyAdmin: true }),
   async (req, res) => {
     const { id } = req.params;
     const user = await db.user.get(id);
