@@ -80,6 +80,26 @@ components:
             - hevc
             - vp8
             - vp9
+    ffmpeg-trim:
+      type: object
+      description: ffmpeg cut/trim parameters
+      additionalProperties: false
+      required:
+        - start
+      properties:
+        start:
+          type: number
+          description: start time in seconds
+          minimum: 0
+        time:
+          type: number
+          description: length of clip in seconds
+          minimum: 0
+        to:
+          type: number
+          description:
+            end time in seconds (if time is specified, only -t is used)
+          minimum: 0
     cdn-data-row:
       type: object
       description:
@@ -1070,6 +1090,8 @@ components:
           example: filename.mp4
         profile:
           $ref: "#/components/schemas/ffmpeg-profile"
+        clip:
+          $ref: "#/components/schemas/ffmpeg-trim"
 
     task:
       type: object
