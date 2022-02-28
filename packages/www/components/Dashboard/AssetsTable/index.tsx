@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
@@ -15,6 +15,7 @@ import { Column } from "react-table";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useToggleState } from "hooks/use-toggle-state";
 import ImportVideoDialog from "./ImportVideoDialog";
+import ExportVideoDialog from "./ExportVideoDialog";
 import { useRouter } from "next/router";
 import {
   CellComponentProps,
@@ -27,11 +28,19 @@ import {
   Heading,
   Link as A,
   Text,
+  AlertDialog,
+  AlertDialogTitle,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+  Button,
   HoverCardRoot,
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
 } from "@livepeer.com/design-system";
+import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Asset } from "@livepeer.com/api";
@@ -120,10 +129,17 @@ const assetsTable = ({
   viewAll?: string;
 }) => {
   const router = useRouter();
-  const { user, getVodAssetsByUserId, getVodTasksByUserId, importVideo } =
-    useApi();
+  const {
+    user,
+    getVodAssetsByUserId,
+    getVodTasksByUserId,
+    importVideo,
+    exportVideo,
+  } = useApi();
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
+  const exportDialogState = useToggleState();
+  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const tableProps = useTableState({
     tableId: "assetsTable",
   });
@@ -391,28 +407,85 @@ const assetsTable = ({
         }
         selectAction={{
           onClick: deleteDialogState.onOn,
-          children: (
+          children: [
             <>
               <Cross1Icon />{" "}
               <Box css={{ ml: "$2" }} as="span">
                 Delete
               </Box>
-            </>
-          ),
+            </>,
+            <>
+              <Box css={{ ml: "$2" }} as="span">
+                Export
+              </Box>
+            </>,
+          ],
         }}
         createAction={{
           onClick: createDialogState.onOn,
           css: { display: "flex", alignItems: "center" },
-          children: (
+          children: [
             <>
               <PlusIcon />{" "}
               <Box as="span" css={{ ml: "$2" }}>
                 Import video
               </Box>
-            </>
-          ),
+            </>,
+          ],
         }}
       />
+
+      <AlertDialog
+        open={deleteDialogState.on}
+        onOpenChange={deleteDialogState.onOff}>
+        <AlertDialogContent
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          <AlertDialogTitle as={Heading} size="1">
+            Delete{" "}
+            {state.selectedRows.length > 1 ? state.selectedRows.length : ""}{" "}
+            asset
+            {state.selectedRows.length > 1 && "s"}?
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            as={Text}
+            size="3"
+            variant="gray"
+            css={{ mt: "$2", lineHeight: "22px" }}>
+            This will permanently remove the asset
+            {state.selectedRows.length > 1 && "s"}. This action cannot be
+            undone.
+          </AlertDialogDescription>
+
+          <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
+            <AlertDialogCancel
+              size="2"
+              onClick={deleteDialogState.onOff}
+              as={Button}
+              ghost>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              as={Button}
+              size="2"
+              disabled={savingDeleteDialog}
+              onClick={async (e) => {}}
+              variant="red">
+              {savingDeleteDialog && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Delete
+            </AlertDialogAction>
+          </Flex>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <ImportVideoDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
@@ -424,7 +497,33 @@ const assetsTable = ({
           await state.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
           await router.push({
-            pathname: `/dashboard/assets/${newTask.id}`,
+            pathname: `/dashboard/assets/${newTask[0].id}`,
+            query,
+          });
+        }}
+      />
+
+      <ExportVideoDialog
+        isOpen={exportDialogState.on}
+        onOpenChange={exportDialogState.onToggle}
+        onCreate={async (pinataJwt, pinataApiKey, pinataApiSecret) => {
+          let params = {};
+          if (pinataJwt) {
+            params["pinataJwt"] = pinataJwt;
+          } else {
+            params["pinataApiKey"] = pinataApiKey;
+            params["pinataApiSecret"] = pinataApiSecret;
+          }
+          const newTask = await exportVideo(
+            {
+              ipfs: {},
+            },
+            "assetId"
+          );
+          await state.invalidate();
+          const query = router.query.admin === "true" ? { admin: true } : {};
+          await router.push({
+            pathname: `/dashboard/assets/${newTask[0].id}`,
             query,
           });
         }}
