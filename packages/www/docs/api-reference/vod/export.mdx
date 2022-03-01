@@ -1,0 +1,83 @@
+---
+title: Export to IPFS
+description: Livepeer.com API Reference | Export
+metaTitle: Export - Livepeer.com
+metaDescription: Livepeer.com API Reference | Export
+---
+
+# Export an Asset to IPFS
+
+Export a video `Asset` from Livepeer to IPFS on the
+`POST /api/asset/$ASSET_ID/export` endpoint. This request spawns an `export`
+task.
+
+```jsx
+curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export' \
+--header 'Authorization: Bearer $API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "ipfs": {}
+}'
+```
+
+<Table
+  data={[
+    {
+      parameter: <code>ipfs</code>,
+      type: <code>object</code>,
+      description: "Defined properties to export the `Asset` on IPFS",
+    },
+    {
+      parameter: <code>ipfs.pinata</code>,
+      type: <code>object</code>,
+      description:
+        "Custom credentials for the Piñata service. Must have either a JWT or an API key and an API secret. (Optional)",
+    },
+    {
+      parameter: <code>ipfs.pinata.jwt</code>,
+      type: <code>string</code>,
+      description:
+        "Will be added to the `Authorization` header as a Bearer token.",
+    },
+    {
+      parameter: <code>ipfs.pinata.apiKey</code>,
+      type: <code>string</code>,
+      description: "Will be added to the `pinata_api_key` header.",
+    },
+    {
+      parameter: <code>ipfs.pinata.apiSecret</code>,
+      type: <code>string</code>,
+      description: "Will be added to the `pinata_secret_api_key` header.",
+    },
+    {
+      parameter: <code>ipfs.erc1155Metadata</code>,
+      type: <code>object</code>,
+      description:
+        "Additional data to add to the automatic ERC-1155 default export. Will be deep merged with the default metadata regularly exported.",
+    },
+    {
+      parameter: <code>custom</code>,
+      type: <code>object</code>,
+      description:
+        "Define properties to export the `Asset` on a custom URL.  (Optional)",
+    },
+    {
+      parameter: <code>custom.url</code>,
+      type: <code>string</code>,
+      description: "URL where to export the `Asset`",
+    },
+    {
+      parameter: <code>custom.method</code>,
+      type: <code>string</code>,
+      description: "Method to use on the export request",
+    },
+    {
+      parameter: <code>custom.headers</code>,
+      type: <code>object</code>,
+      description: "Headers to add to the export request",
+    },
+  ]}
+/>
+
+You can then check the result of the export through the tasks API, by querying
+for the specific task returned as a response.

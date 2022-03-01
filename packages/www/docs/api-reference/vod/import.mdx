@@ -1,0 +1,48 @@
+---
+title: Import an Asset
+description: Livepeer.com API Reference | Import
+metaTitle: Import - Livepeer.com
+metaDescription: Livepeer.com API Reference | Import
+---
+
+# Import an Asset
+
+Import a video `Asset` to Livepeer from an external URL through the
+`POST /api/asset/import` API.
+
+```jsx
+curl --location --request POST 'https://livepeer.com/api/asset/import' \
+--header 'Authorization: Bearer $API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "url":"$EXTERNAL_URL",
+    "name":"Example name"
+}'
+```
+
+### Request body parameters
+
+<Table
+  data={[
+    {
+      parameter: <code>url</code>,
+      type: <code>string</code>,
+      description: "The URL of the file that Livepeer should download and use.",
+    },
+    {
+      parameter: <code>name</code>,
+      type: <code>string</code>,
+      description:
+        "The name of the `Asset` containing a custom human-readable description or title.",
+    },
+  ]}
+/>
+
+# How do I import a Live stream into my Assets?
+
+Livepeer live stream recordings are automatically imported as `Asset` objects.
+All you need to do is enable recording on your streams.
+
+After the stream session ends and the recording is processed (`~6min`) you
+should have a new asset in your account which you can retrieve from the list
+assets API above.
