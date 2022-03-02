@@ -135,7 +135,7 @@ const getCursor = (link?: string): string => {
   return cursor?.toString() ?? "";
 };
 
-let noStripe = false;
+const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
   const context = {
@@ -306,12 +306,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async getUser(userId, opts = {}): Promise<[Response, User | ApiError]> {
       let [res, user] = await context.fetch(`/user/${userId}`, opts);
-      if (
-        isDevelopment() &&
-        !user.stripeProductId &&
-        user.email &&
-        noStripe !== true
-      ) {
+      if (isDevelopment() && hasStripe && !user.stripeProductId && user.email) {
         const customer = await context.createCustomer(user.email);
         await context.createSubscription({
           stripeCustomerId: customer.id,
@@ -400,6 +395,9 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async createCustomer(email): Promise<{ id: string } | ApiError> {
+      if (!hasStripe) {
+        return;
+      }
       const [res, body] = await context.fetch("/user/create-customer", {
         method: "POST",
         body: JSON.stringify({ email: email }),
@@ -408,10 +406,6 @@ const makeContext = (state: ApiState, setState) => {
         },
       });
 
-      if (res.status === 501) {
-        noStripe = true;
-      }
-
       return body;
     },
 
@@ -419,6 +413,9 @@ const makeContext = (state: ApiState, setState) => {
       stripeCustomerId,
       stripeProductId,
     }): Promise<User | ApiError> {
+      if (!hasStripe) {
+        return;
+      }
       const [res, body] = await context.fetch("/user/create-subscription", {
         method: "POST",
         body: JSON.stringify({
@@ -430,10 +427,6 @@ const makeContext = (state: ApiState, setState) => {
         },
       });
       setState({ ...state, userRefresh: Date.now() });
-
-      if (res.status === 501) {
-        noStripe = true;
-      }
 
       if (res.status !== 201) {
         return body;

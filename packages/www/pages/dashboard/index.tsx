@@ -15,11 +15,12 @@ import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
 
 const Dashboard = () => {
-  const { user, verifyEmail } = useApi();
+  const { user, verifyEmail, getUserProduct } = useApi();
   const { emailValid } = user;
 
   const [loading, setLoading] = useState(false);
-  const showPromo = !products[user.stripeProductId].order;
+  const product = getUserProduct(user);
+  const showPromo = !product.order;
   const [openSnackbar] = useSnackbar();
 
   const resendVerificationEmail = async () => {
