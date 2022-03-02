@@ -268,10 +268,10 @@ export default function parseCli(argv?: string | readonly string[]) {
     [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
     `
     )
-    .env("LP_")
     .strict(
       process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
     )
+    .env("LP_API_")
     .help()
     .parse(argv);
   if (parsed.json === true) {
