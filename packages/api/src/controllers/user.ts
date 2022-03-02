@@ -98,7 +98,7 @@ async function getOrCreateSubscription(
 function requireStripe(): RequestHandler {
   return (req, res, next) => {
     if (!req.stripe) {
-      return res.status(500).json({ errors: ["stripe not configured"] });
+      return res.status(501).json({ errors: ["stripe not configured"] });
     }
     return next();
   };
@@ -585,8 +585,8 @@ app.post(
 
 app.post(
   "/create-customer",
-  validatePost("create-customer"),
   requireStripe(),
+  validatePost("create-customer"),
   async (req, res) => {
     const { email } = req.body as CreateCustomer;
     let user = await findUserByEmail(email, false);

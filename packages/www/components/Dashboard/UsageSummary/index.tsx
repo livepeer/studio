@@ -59,11 +59,12 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
 };
 
 const UsageSummary = () => {
-  const { user, getUsage, getSubscription, getInvoices } = useApi();
+  const { user, getUsage, getSubscription, getInvoices, getUserProduct } =
+    useApi();
   const [usage, setUsage] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [invoices, setInvoices] = useState(null);
-  const prices = products[user.stripeProductId].usage;
+  const prices = getUserProduct(user).usage;
   const transcodingPrice = prices[0].price;
 
   useEffect(() => {
