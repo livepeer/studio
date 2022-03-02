@@ -319,10 +319,10 @@ const makeContext = (state: ApiState, setState) => {
 
     // Get current Stripe product, allowing for development users that don't have any
     getUserProduct(user: User) {
-      if (user.stripeProductId) {
+      if (hasStripe) {
         return products[user.stripeProductId];
       }
-      return Object.values(products)[0];
+      return products[user.stripeProductId || "prod_0"];
     },
 
     async getUsers(
