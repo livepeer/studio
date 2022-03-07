@@ -327,7 +327,11 @@ const TransactEth = () => {
                             : state.contractAddress
                         }
                         disabled={isMinting.on}
-                        placeholder={`Livepeer Video NFT (${defaultContractAddress})`}
+                        placeholder={
+                          !defaultContractAddress
+                            ? ""
+                            : `Livepeer Video NFT (${defaultContractAddress})`
+                        }
                         onChange={(e) =>
                           setStateProp("contractAddress", e.target.value)
                         }
