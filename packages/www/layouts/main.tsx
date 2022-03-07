@@ -72,7 +72,7 @@ interface Props {
   noindex?: boolean;
   preview?: boolean;
   theme?: string;
-  css: Record<string, any>;
+  css?: Record<string, any>;
 }
 
 export function ContextProviders({ theme = DEFAULT_THEME, children }) {
