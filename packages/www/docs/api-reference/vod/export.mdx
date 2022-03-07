@@ -69,12 +69,13 @@ curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export'
     {
       parameter: <code>custom.method</code>,
       type: <code>string</code>,
-      description: "Method to use on the export request",
+      description:
+        "Alternative method to use on the export request. Will use PUT if not specified (Optional)",
     },
     {
       parameter: <code>custom.headers</code>,
       type: <code>object</code>,
-      description: "Headers to add to the export request",
+      description: "Additional headers to add to the export request (Optional)",
     },
   ]}
 />

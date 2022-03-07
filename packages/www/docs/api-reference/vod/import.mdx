@@ -43,6 +43,7 @@ curl --location --request POST 'https://livepeer.com/api/asset/import' \
 Livepeer live stream recordings are automatically imported as `Asset` objects.
 All you need to do is enable recording on your streams.
 
-After the stream session ends and the recording is processed (`~6min`) you
-should have a new asset in your account which you can retrieve from the list
-assets API above.
+When the stream session ends, the platform waits `6min` to give a chance for the
+user to reconnect on the same recording session. After that delay, the recording
+is processed and you should have a new asset in your account which you can
+retrieve from the list assets API.
