@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useApi } from "hooks";
 import { StreamInfo } from "hooks/use-api";
@@ -10,11 +10,27 @@ import { Text, Box, Heading } from "@livepeer.com/design-system";
 const ingestInterval = 10 * 1000;
 const maxItems = 6;
 
+interface ChartType {
+  name: number;
+  "Session bitrate": number;
+}
+
+interface MultistreamChartType {
+  [kbps: string]: number;
+}
+
 const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
   const router = useRouter();
-  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
-    { name: 0, kbps: 0 },
+  const [dataChart, setDataChart] = useState<ChartType[]>([
+    { name: 0, "Session bitrate": 0 },
   ]);
+
+  const [multiDataChart, setMultiDataChart] = useState<MultistreamChartType[]>(
+    []
+  );
+
+  const startTime = useMemo(() => Date.now(), []);
+
   const [info, setInfo] = useState<StreamInfo | null>(null);
 
   const { getStreamInfo } = useApi();
@@ -43,13 +59,16 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         return;
       }
       const newInfo = rinfo as StreamInfo;
+
       setDataChart((prev) => {
         const lastItem = prev[prev.length - 1];
         return [
           ...prev,
           {
             name: lastItem ? lastItem.name + ingestInterval / 1000 : 0,
-            kbps: Math.round((newInfo.session.ingestRate / 1000) * 8), // kilobits rather than bytes here
+            "Session bitrate": Math.round(
+              (newInfo.session.ingestRate / 1000) * 8
+            ), // kilobits rather than bytes here
           },
         ].slice(Math.max(prev.length - maxItems, 0));
       });
@@ -76,6 +95,24 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
     };
   }, [getIngestRate, info]);
 
+  useEffect(() => {
+    const multistreamBitrateSec = streamHealth?.metrics?.MultistreamBitrateSec;
+    if (multistreamBitrateSec) {
+      const data: MultistreamChartType = {};
+      multistreamBitrateSec?.forEach((item, i) => {
+        const { dimensions, last } = item;
+        if (i === 0) {
+          data.name = Math.round((last[0] - startTime) / 1000);
+        }
+        data[`${dimensions.targetName} (${dimensions.targetProfile})`] =
+          Math.round(last[1] / 1000);
+      });
+
+      const newData = [...multiDataChart, data].slice(-(maxItems + 10));
+      setMultiDataChart(newData);
+    }
+  }, [streamHealth]);
+
   return (
     <>
       <HealthChecksTable
@@ -101,13 +138,13 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
           width: "100%",
         }}>
         <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
-          Session ingest rate
+          Session bitrate
         </Heading>
         <Text variant="gray" size="3">
           After the stream loads, ingest rate updates every 10 seconds.
         </Text>
       </Box>
-      <Chart data={dataChart} />
+      <Chart data={dataChart} multiData={multiDataChart} />
     </>
   );
 };
