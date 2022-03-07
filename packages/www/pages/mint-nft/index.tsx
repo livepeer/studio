@@ -116,10 +116,11 @@ async function mintNft(
   try {
     logger("Started mint transaction...");
     const videoNft = new web3.eth.Contract(videoNftAbi as any, contractAddress);
+    const gasPrice = Math.round(1.2 * parseInt(await web3.eth.getGasPrice()));
     const transaction = {
       to: contractAddress,
       gas: 500000,
-      maxPriorityFeePerGas: 39999999987,
+      maxPriorityFeePerGas: gasPrice,
       data: videoNft.methods.mint(to, tokenUri).encodeABI(),
     };
     const nonce = await web3.eth.getTransactionCount(from, "latest");
