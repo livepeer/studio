@@ -57,6 +57,7 @@
     "markdown-it-anchor": "^5.3.0",
     "markdown-toc-unlazy": "^1.0.1",
     "marked": "^2.0.5",
+    "metamask-react": "^2.3.0",
     "moment": "^2.24.0",
     "mux.js": "^5.11.0",
     "next": "^10.2.2",
@@ -111,7 +112,8 @@
     "uuid": "^8.3.2",
     "video.js": "^7.15.4",
     "videojs-contrib-quality-levels": "^2.1.0",
-    "videojs-hls-quality-selector": "^1.1.4"
+    "videojs-hls-quality-selector": "^1.1.4",
+    "web3": "^1.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
@@ -124,6 +126,7 @@
     "@types/segment-analytics": "^0.0.32",
     "@types/theme-ui": "0.3.1",
     "@types/title": "^3.4.0",
+    "@types/web3": "^1.2.2",
     "babel-plugin-import-graphql": "^2.7.0",
     "babel-plugin-inline-react-svg": "^1.1.1",
     "husky": "^4.0.0",
