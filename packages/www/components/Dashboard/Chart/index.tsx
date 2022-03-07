@@ -100,7 +100,7 @@ const Chart = ({ data, multiData }) => {
           <YAxis domain={[0, 1600]} />
           <CartesianGrid vertical={false} />
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: "10px" }} />
           <Line
             data={data}
             cursor="pointer"
