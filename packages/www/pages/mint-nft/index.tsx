@@ -326,6 +326,7 @@ const TransactEth = () => {
                             ? ""
                             : state.contractAddress
                         }
+                        disabled={isMinting.on}
                         placeholder={`Livepeer Video NFT (${defaultContractAddress})`}
                         onChange={(e) =>
                           setStateProp("contractAddress", e.target.value)
@@ -342,6 +343,7 @@ const TransactEth = () => {
                       pattern="^ipfs://.+"
                       id="tokenUri"
                       value={state.tokenUri}
+                      disabled={isMinting.on || !!initState.tokenUri}
                       onChange={(e) => setStateProp("tokenUri", e.target.value)}
                       placeholder="ipfs://..."
                     />
