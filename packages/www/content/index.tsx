@@ -60,11 +60,11 @@ export const Team = {
   },
 };
 
-export const Transact = {
+export const MintNFT = {
   metaData: {
     title: "Mint NFT - Livepeer Video Services",
     description: `Mint NFTs on Ethereum-compatible networks`,
-    url: "https://livepeer.com/transact/eth",
+    url: "https://livepeer.com/mint-nft",
   },
 };
 

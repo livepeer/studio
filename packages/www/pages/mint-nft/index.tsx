@@ -24,7 +24,7 @@ import {
   TextField,
   Tooltip,
 } from "@livepeer.com/design-system";
-import { Transact as Content } from "content";
+import { MintNFT as Content } from "content";
 import Layout from "layouts/main";
 
 import videoNftAbi from "./video-nft.json";
@@ -213,7 +213,7 @@ async function switchNetwork(
   }
 }
 
-const TransactEth = () => {
+export default () => {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const isMinting = useToggleState();
   const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
@@ -471,5 +471,3 @@ const TransactEth = () => {
     </Layout>
   );
 };
-
-export default TransactEth;
