@@ -110,7 +110,8 @@ async function mintNft(
   from: string,
   to: string,
   tokenUri: string,
-  logger: (log: JSX.Element | string) => void
+  logger: (log: JSX.Element | string) => void,
+  explorerUrl?: string
 ) {
   try {
     logger("Started mint transaction...");
@@ -128,6 +129,18 @@ async function mintNft(
       nonce,
     };
     const receipt = await web3.eth.sendTransaction(tx);
+    logger(
+      <>
+        Mint transaction sent:{" "}
+        {!explorerUrl ? (
+          displayAddr(receipt.transactionHash)
+        ) : (
+          <Link href={`${explorerUrl}/tx/${receipt.transactionHash}`} passHref>
+            <A target="_blank">{displayAddr(receipt.transactionHash)}</A>
+          </Link>
+        )}
+      </>
+    );
 
     const tokenId = await getMintedTokenId(videoNft, from, receipt, logger);
     logger(
@@ -246,12 +259,13 @@ const TransactEth = () => {
         account,
         state.recipient ?? account,
         state.tokenUri,
-        addLog
+        addLog,
+        networks[chainId]?.spec.blockExplorerUrls?.[0]
       );
     } finally {
       isMinting.onOff();
     }
-  }, [state, web3, defaultContractAddress, account, addLog]);
+  }, [state, web3, defaultContractAddress, account, addLog, chainId]);
 
   const onClickSwitchNetwork = useCallback(() => {
     setLogs([]);
