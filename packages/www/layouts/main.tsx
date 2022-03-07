@@ -72,6 +72,7 @@ interface Props {
   noindex?: boolean;
   preview?: boolean;
   theme?: string;
+  css: Record<string, any>;
 }
 
 export function ContextProviders({ theme = DEFAULT_THEME, children }) {
@@ -98,6 +99,7 @@ function Layout({
   theme = DEFAULT_THEME,
   noindex = false,
   preview = false,
+  css = {},
 }: Props) {
   useEffect(() => {
     if (window.location.hostname === "livepeer.com") {
@@ -140,6 +142,7 @@ function Layout({
           justifyContent: "flex-start",
           zIndex: 1,
           position: "relative",
+          ...css,
         }}>
         <NextSeo {...seo} />
         {preview && (

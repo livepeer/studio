@@ -279,9 +279,9 @@ const TransactEth = () => {
   }, [setLogs, connect]);
 
   return (
-    <Layout {...Content.metaData}>
+    <Layout {...Content.metaData} css={{ minHeight: "100vh" }}>
       <Guides backgroundColor="$mauve2" />
-      <Box css={{ position: "relative" }}>
+      <Box css={{ position: "relative", flex: 1 }}>
         <Container
           size="3"
           css={{
