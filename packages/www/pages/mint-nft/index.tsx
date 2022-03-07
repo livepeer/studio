@@ -134,7 +134,7 @@ async function mintNft(
       <>
         Mint transaction sent:{" "}
         {!explorerUrl ? (
-          displayAddr(receipt.transactionHash)
+          <code>{receipt.transactionHash}</code>
         ) : (
           <Link href={`${explorerUrl}/tx/${receipt.transactionHash}`} passHref>
             <A target="_blank">{displayAddr(receipt.transactionHash)}</A>
