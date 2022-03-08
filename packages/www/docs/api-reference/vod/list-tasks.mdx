@@ -1,0 +1,115 @@
+---
+title: List Tasks
+description: Livepeer.com API Reference | List Tasks
+metaTitle: List Tasks - Livepeer.com
+metaDescription: Livepeer.com API Reference | List Tasks
+---
+
+# Tasks
+
+You can track the status of an import or an export Task through the Livepeer
+API.
+
+# List tasks
+
+List all tasks in the account, most recent first.
+
+```jsx
+curl --location --request GET 'https://livepeer.com/api/task' \
+--header 'Authorization: Bearer $API_TOKEN'
+```
+
+### **Request path & query params**
+
+<Table
+  data={[
+    {
+      parameter: <code>limit</code>,
+      type: <code>number</code>,
+      description: "Number of items to include in the response",
+    },
+    {
+      parameter: <code>name</code>,
+      type: <code>string</code>,
+      description: "For custom sorting of the objects in the response list.",
+    },
+  ]}
+/>
+
+# Retrieve a Task
+
+Retrieves the details of a `Task`, including progress updates and status. Supply
+the unique `Task` ID that was returned from your previous request or from an
+`Asset` import or export.
+
+```jsx
+curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
+--header 'Authorization: Bearer $API_TOKEN'
+```
+
+### Response example
+
+```jsx
+curl --location --request GET 'https://livepeer.com/api/asset' \
+--header 'Authorization: Bearer $API_TOKEN'{
+        "id": "$TASK_ID",
+        "type": "import",
+        "output": {
+            "import": {
+                "assetSpec": {
+                    "hash": [
+                        {
+                            "hash": "61b42e9371c1d29a9b99a7f62621e584",
+                            "algorithm": "md5"
+                        },
+                        {
+                            "hash": "b3b5891d6f0767012706fc8548f397b38876d309ca90689314c94615fb4c6e62",
+                            "algorithm": "sha256"
+                        }
+                    ],
+                    "name": "Example name",
+                    "size": 52615193,
+                    "type": "video",
+                    "videoSpec": {
+                        "format": "mp4",
+                        "tracks": [
+                            {
+                                "fps": 30,
+                                "type": "video",
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate": 1225660,
+                                "duration": 309.966667,
+                                "pixelFormat": "yuv420p"
+                            },
+                            {
+                                "type": "audio",
+                                "codec": "aac",
+                                "bitrate": 127999,
+                                "channels": 2,
+                                "duration": 309.986395,
+                                "sampleRate": 44100
+                            }
+                        ],
+                        "duration": 309.986393
+                    }
+                },
+                "videoFilePath": "https://storage.googleapis.com/bucket/$PLAYBACK_ID/video",
+                "metadataFilePath": "https://storage.googleapis.com/bucket/$PLAYBACK_ID/video.json"
+            }
+        },
+        "params": {
+            "import": {
+                "url": "$EXTERNAL_IMPORT_URL"
+            }
+        },
+        "status": {
+            "phase": "completed",
+            "updatedAt": 1644546541229
+        },
+        "userId": "$USER_ID",
+        "createdAt": 1644546528663,
+        "outputAssetId": "$ASSET_ID"
+    }
+```
