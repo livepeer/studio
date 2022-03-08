@@ -131,7 +131,12 @@ const fieldsMap: FieldsMap = {
   stripeProductId: `data->>'stripeProductId'`,
 };
 
-app.get("/", authMiddleware({ admin: true }), async (req, res) => {
+app.get("/", authMiddleware({ allowUnverified: true }), async (req, res) => {
+  if (req.user.admin !== true) {
+    const user = await db.user.get(req.user.id);
+    res.status(200);
+    return res.json(cleanUserFields(user, req.user.admin));
+  }
   let { limit, cursor, order, filters } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
