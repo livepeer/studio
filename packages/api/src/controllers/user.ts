@@ -131,7 +131,7 @@ const fieldsMap: FieldsMap = {
   stripeProductId: `data->>'stripeProductId'`,
 };
 
-app.get("/", authMiddleware({ allowUnverified: true }), async (req, res) => {
+app.get("/", authMiddleware({}), async (req, res) => {
   if (req.user.admin !== true) {
     const user = await db.user.get(req.user.id);
     res.status(200);
