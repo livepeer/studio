@@ -383,6 +383,12 @@ describe("controllers/user", () => {
       client.apiKey = uuid();
     });
 
+    it("should return personal user info", async () => {
+      client.apiKey = nonAdminApiKey;
+      let res = await client.get("/user/me");
+      expect(res.status).toBe(200);
+    });
+
     it("should not get all users", async () => {
       // should return nonverified error
       client.apiKey = nonAdminApiKey;
