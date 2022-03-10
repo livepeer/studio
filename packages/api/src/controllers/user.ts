@@ -131,12 +131,7 @@ const fieldsMap: FieldsMap = {
   stripeProductId: `data->>'stripeProductId'`,
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
-  if (req.user.admin !== true) {
-    const user = await db.user.get(req.user.id);
-    res.status(200);
-    return res.json(cleanUserFields(user, req.user.admin));
-  }
+app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   let { limit, cursor, order, filters } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -154,6 +149,12 @@ app.get("/", authMiddleware({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   res.json(db.user.cleanWriteOnlyResponses(output));
+});
+
+app.get("/me", authMiddleware({}), async (req, res) => {
+  const user = await db.user.get(req.user.id);
+  res.status(200);
+  return res.json(cleanUserFields(user, req.user.admin));
 });
 
 app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {

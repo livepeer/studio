@@ -221,9 +221,7 @@ describe("controllers/user", () => {
       }
 
       let res = await client.get("/user");
-      let resJson = await res.json();
-      let condition = Array.isArray(resJson);
-      expect(condition).toBe(false);
+      expect(res.status).toBe(403);
 
       // should not be able to make users admin with non-admin user
       const resAdminChange = await client.post(`/user/make-admin/`, {
@@ -390,14 +388,11 @@ describe("controllers/user", () => {
       client.apiKey = nonAdminApiKey;
       let res = await client.get("/user");
       let resJson = await res.json();
-      let condition = Array.isArray(resJson);
       expect(res.status).toBe(403);
-      expect(condition).toBe(false);
       expect(resJson.errors[0]).toBe(
         `useremail ${nonAdminUser.email} has not been verified. Please check your inbox for verification email.`
       );
 
-      // should return nonverified error
       client.apiKey = adminApiKey;
       res = await client.get("/user");
       resJson = await res.json();
@@ -409,26 +404,29 @@ describe("controllers/user", () => {
       // adding emailValid true to user
       await db.user.update(nonAdminUser.id, { emailValid: true });
 
+      // should return admin priviledges error
       client.apiKey = nonAdminApiKey;
       res = await client.get("/user");
       resJson = await res.json();
-      condition = Array.isArray(resJson);
-      expect(res.status).toBe(200);
-      expect(condition).toBe(false);
+      expect(res.status).toBe(403);
+      expect(resJson.errors[0]).toBe("user does not have admin priviledges");
 
       // adding emailValid true to admin user
       await db.user.update(adminUser.id, { emailValid: true });
 
+      // only jwt auth should be allowed access to this list API
       client.apiKey = adminApiKey;
       res = await client.get("/user");
       resJson = await res.json();
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
+      expect(resJson.errors[0]).toBe("user does not have admin priviledges");
 
       client.apiKey = undefined;
       client.basicAuth = `${adminUser.id}:${adminApiKey}`;
       res = await client.get("/user");
       resJson = await res.json();
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
+      expect(resJson.errors[0]).toBe("user does not have admin priviledges");
     });
 
     it("should return verified user", async () => {
