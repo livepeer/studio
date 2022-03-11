@@ -334,7 +334,7 @@ export default () => {
                         }
                         placeholder={
                           !defaultContractAddress
-                            ? ""
+                            ? "Unsupported network"
                             : `Livepeer Video NFT (${defaultContractAddress})`
                         }
                         onChange={(e) =>
