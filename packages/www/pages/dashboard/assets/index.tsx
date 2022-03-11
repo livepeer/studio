@@ -4,7 +4,7 @@ import { useApi, useLoggedIn } from "hooks";
 import AssetsTable from "@components/Dashboard/AssetsTable";
 import { DashboardAssets as Content } from "content";
 
-const MediaServer = () => {
+const Assets = () => {
   useLoggedIn();
   const { user } = useApi();
 
@@ -25,4 +25,4 @@ const MediaServer = () => {
   );
 };
 
-export default MediaServer;
+export default Assets;
