@@ -51,8 +51,17 @@ const CustomTooltip = ({ active, payload }: any) => {
 
   return null;
 };
-const Chart = ({ data, multiData }) => {
-  const multistreamNames = multiData[0] && Object.keys(multiData[0]);
+const Chart = ({
+  data,
+  multiData,
+}: {
+  data: Array<{ name: number; "Session bitrate": number }>;
+  multiData?: Array<{
+    [kbps: string]: number;
+  }>;
+}) => {
+  const multistreamNames =
+    multiData && multiData[0] && Object.keys(multiData[0]);
   return (
     <Box
       css={{

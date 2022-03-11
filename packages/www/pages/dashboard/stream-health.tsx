@@ -63,9 +63,9 @@ const interval = 10000;
 const maxItems = 6;
 
 const Health = () => {
-  const [dataChart, setDataChart] = useState<{ name: number; kbps: number }[]>([
-    { name: 0, kbps: 0 },
-  ]);
+  const [dataChart, setDataChart] = useState<
+    { name: number; "Session bitrate": number }[]
+  >([{ name: 0, "Session bitrate": 0 }]);
   const [info, setInfo] = useState<StreamInfo | null>(null);
   const [playbackUrl, setPlaybackUrl] = useState<string>("");
   const { getStreamInfo } = useApi();
@@ -98,7 +98,7 @@ const Health = () => {
             ...prev,
             {
               name: lastItem ? lastItem.name + interval / 1000 : 0,
-              kbps: Math.round(newInfo.session.ingestRate / 1000),
+              "Session bitrate": Math.round(newInfo.session.ingestRate / 1000),
             },
           ].slice(Math.max(prev.length - maxItems, 0));
         });
