@@ -1,0 +1,74 @@
+---
+title: Upload an Asset
+description: Livepeer.com API Reference | Upload
+metaTitle: Upload - Livepeer.com
+metaDescription: Livepeer.com API Reference | Upload
+---
+
+# Directly Upload an Asset
+
+To manually upload an asset to the Livepeer platform, your first need to request
+for a direct upload URL and only then actually upload the contents of the asset.
+
+This also allows your users to upload files directly to Livepeer, since the
+upload URL is pre-signed with your credentials and is accessible from the
+browser. The initial API call to get the upload URL must be done from a backend
+though, from which an API token is available.
+
+## Step 1: Create a new Direct Upload URL
+
+First generate a URL to directly upload a video `Asset` to Livepeer on
+`POST /api/asset/request-upload`:
+
+```jsx
+curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
+--header 'Authorization: Bearer $API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name":"Example name"
+}'
+```
+
+### Request body parameters
+
+<Table
+  data={[
+    {
+      parameter: <code>name</code>,
+      type: <code>string</code>,
+      description:
+        "The name of the `Asset` containing a custom human-readable description or title.",
+    },
+  ]}
+/>
+
+### Response example
+
+```jsx
+{
+    "url": "https://origin.livepeer.com/api/asset/upload/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2xwLW55Yy12b2QtbW9uc3Rlci9kaXJlY3RVcGxvYWQvNjI3OHQyZWlrY2JqZXUxNC9zb3VyY2U%2F...",
+    "asset": {
+        "id": "$ASSET_ID",
+        "playbackId": "$PLAYBACK_ID",
+        "userId": "$USER_ID",
+        "createdAt": 1644595454248,
+        "status": "waiting",
+        "name": "Example name"
+    }
+}
+```
+
+## Step 2: Upload the contents
+
+Now upload (`PUT`) a video file on the exact URL in the `url` field of the
+response above:
+
+```jsx
+curl --location --request PUT "${url}" \
+--header 'Content-Type: video/mp4' \
+--data-binary '@$VIDEO_FILE_PATH'
+```
+
+Notice that we only support mp4 files encoded with H264 video and AAC audio for
+now. If you are unsure about these, try sending the file anyway and check any
+returned errors!

@@ -5,6 +5,7 @@ import SEO from "../next-seo.config";
 import { ApiProvider } from "hooks/use-api";
 import { AnalyzerProvider } from "hooks/use-analyzer";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { MetaMaskProvider } from "metamask-react";
 import "../css/algolia-docsearch.css";
 import "../css/recaptcha.css";
 
@@ -32,12 +33,14 @@ export default class MyApp extends App {
           />
         </Head>
         <QueryClientProvider client={queryClient}>
-          <ApiProvider>
-            <AnalyzerProvider>
-              <DefaultSeo {...SEO} />
-              <Component {...pageProps} />
-            </AnalyzerProvider>
-          </ApiProvider>
+          <MetaMaskProvider>
+            <ApiProvider>
+              <AnalyzerProvider>
+                <DefaultSeo {...SEO} />
+                <Component {...pageProps} />
+              </AnalyzerProvider>
+            </ApiProvider>
+          </MetaMaskProvider>
         </QueryClientProvider>
       </>
     );

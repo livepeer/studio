@@ -110,6 +110,30 @@ const Header = ({ breadcrumbs = [] }) => {
           })}
         </Breadcrumbs>
         <Flex align="center" css={{ fontSize: "$3" }}>
+          <Flex
+            align="center"
+            css={{
+              cursor: "pointer",
+              mr: "$5",
+              background: "transparent",
+              appearance: "none",
+              border: "none",
+            }}>
+            <StyledDocumentationIcon />
+            <Link href="/docs/guides" passHref>
+              <A
+                css={{
+                  ml: "$2",
+                  color: "$hiContrast",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
+                }}>
+                <Box>Documentation</Box>
+              </A>
+            </Link>
+          </Flex>
           <DropdownMenu>
             <Flex
               as={DropdownMenuTrigger}
@@ -119,11 +143,10 @@ const Header = ({ breadcrumbs = [] }) => {
                 mr: "$5",
                 background: "transparent",
                 appearance: "none",
-                WebkitAppearance: "none",
                 border: "none",
               }}>
               <StyledHornIcon />
-              <Box css={{ color: "$hiContrast" }}>Feedback</Box>
+              <Box css={{ fontSize: "$3", color: "$hiContrast" }}>Feedback</Box>
             </Flex>
             <DropdownMenuContent
               css={{
@@ -270,12 +293,17 @@ const Header = ({ breadcrumbs = [] }) => {
                 HELP
               </Text>
               <Link href="/docs/guides" passHref>
-                <A>
-                  <Flex align="center" css={{ mb: "$3", cursor: "pointer" }}>
-                    <StyledDocumentationIcon />
-                    <Text css={{ margin: "0 $2" }}>Documentation</Text>
-                    <StyledHyperlinkIcon />
-                  </Flex>
+                <A
+                  css={{
+                    display: "flex",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    mb: "$3",
+                    cursor: "pointer",
+                  }}>
+                  <StyledDocumentationIcon />
+                  <Text css={{ margin: "0 $2" }}>Documentation</Text>
+                  <StyledHyperlinkIcon />
                 </A>
               </Link>
               <Link href="/contact" passHref>

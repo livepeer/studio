@@ -14,6 +14,7 @@ import {
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
+import { products } from "@livepeer.com/api/src/config";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -30,6 +31,7 @@ type ApiState = {
   user?: User;
   token?: string;
   userRefresh?: number;
+  noStripe?: boolean;
 };
 
 export interface UsageData {
@@ -132,6 +134,8 @@ const getCursor = (link?: string): string => {
   const { cursor } = qs.parse(match[1]);
   return cursor?.toString() ?? "";
 };
+
+const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
   const context = {
@@ -260,6 +264,19 @@ const makeContext = (state: ApiState, setState) => {
       }
     },
 
+    // resend verify email
+    async verifyEmail(email) {
+      const [res, body] = await context.fetch("/user/verify-email", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      return body;
+    },
+
     async makePasswordResetToken(email) {
       trackPageView(email);
       const [res, body] = await context.fetch("/user/password/reset-token", {
@@ -289,7 +306,7 @@ const makeContext = (state: ApiState, setState) => {
 
     async getUser(userId, opts = {}): Promise<[Response, User | ApiError]> {
       let [res, user] = await context.fetch(`/user/${userId}`, opts);
-      if (isDevelopment() && !user.stripeProductId && user.email) {
+      if (isDevelopment() && hasStripe && !user.stripeProductId && user.email) {
         const customer = await context.createCustomer(user.email);
         await context.createSubscription({
           stripeCustomerId: customer.id,
@@ -298,6 +315,14 @@ const makeContext = (state: ApiState, setState) => {
         [res, user] = await context.fetch(`/user/${userId}`, opts);
       }
       return [res, user as User | ApiError];
+    },
+
+    // Get current Stripe product, allowing for development users that don't have any
+    getUserProduct(user: User) {
+      if (hasStripe) {
+        return products[user.stripeProductId];
+      }
+      return products[user.stripeProductId || "prod_0"];
     },
 
     async getUsers(
@@ -370,7 +395,10 @@ const makeContext = (state: ApiState, setState) => {
     },
 
     async createCustomer(email): Promise<{ id: string } | ApiError> {
-      const [, body] = await context.fetch("/user/create-customer", {
+      if (!hasStripe) {
+        return;
+      }
+      const [res, body] = await context.fetch("/user/create-customer", {
         method: "POST",
         body: JSON.stringify({ email: email }),
         headers: {
@@ -385,6 +413,9 @@ const makeContext = (state: ApiState, setState) => {
       stripeCustomerId,
       stripeProductId,
     }): Promise<User | ApiError> {
+      if (!hasStripe) {
+        return;
+      }
       const [res, body] = await context.fetch("/user/create-subscription", {
         method: "POST",
         body: JSON.stringify({

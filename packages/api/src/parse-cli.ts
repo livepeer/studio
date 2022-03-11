@@ -269,7 +269,9 @@ export default function parseCli(argv?: string | readonly string[]) {
     `
     )
     .env("LP_")
-    .strict(process.env.NODE_ENV !== "test")
+    .strict(
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+    )
     .help()
     .parse(argv);
   if (parsed.json === true) {
