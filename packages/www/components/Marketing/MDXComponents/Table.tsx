@@ -1,4 +1,5 @@
-import { Box, Text } from "@livepeer.com/design-system";
+import { Box, Text, Link as A } from "@livepeer.com/design-system";
+import Link from "next/link";
 import TableContainer from "./TableContainer";
 
 type PropDef = {
@@ -51,7 +52,7 @@ const Table = ({
       <Box as="tbody">
         {data.map((row, i) => (
           <Box as="tr" key={`-${i}`}>
-            {Object.entries(row).map(([, value], i) => (
+            {Object.entries(row).map(([key, value], i) => (
               <Box
                 key={i}
                 as="td"
@@ -60,7 +61,13 @@ const Table = ({
                   py: "$3",
                   pr: "$4",
                 }}>
-                <Text>{value}</Text>
+                {key === "link" ? (
+                  <Link href={value as string} passHref>
+                    <A variant="violet">{value}</A>
+                  </Link>
+                ) : (
+                  <Text>{value}</Text>
+                )}
               </Box>
             ))}
           </Box>

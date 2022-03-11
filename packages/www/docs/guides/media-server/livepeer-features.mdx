@@ -1,0 +1,40 @@
+---
+title: Livepeer Features
+description: Livepeer's media server, MistServer documentation
+metaTitle: Media Server - Livepeer.com
+metaDescription: Livepeer's media server, MistServer documentation
+---
+
+# Livepeer Features
+
+## Automated failover across many ingest points
+
+Each instance of MistServer is aware of multiple ingest points in the Livepeer
+network. This allows MistServer to quickly failover to another ingest point in
+case the current ingest point becomes unstable or unavailable, without
+interrupting the stream.
+
+## Global ingest infrastructure
+
+The Livepeer network has ingest points across North America, Europe, and Asia.
+This means applications can use Mist and Livepeer to serve a global operation.
+
+## Automated geo load balancing
+
+Automated geo load balancing makes configuration very simple. Video will
+automatically be transcoded at the closest location to the source.
+
+## Sub real-time transcoding
+
+The Livepeer infrastructure is quite powerful and aims to keep the latency as
+low as possible, it is however currently limited in the sense that it needs to
+build a buffer of a whole segment before it has something to transcode. The
+transcode itself goes faster than real time, which helps in keeping the latency
+low, but it will always be behind by the GOP size (keyframe interval) + network
+latency.
+
+Livepeer routes your live streams to the nearest available datacenter to ensure
+your streamers and live stream viewers have a consistent, high quality
+experience with the minimum latency Livepeer.com can provide. In the future we
+will be moving to a fully streaming workflow removing this limitation and
+lowering latency even further.

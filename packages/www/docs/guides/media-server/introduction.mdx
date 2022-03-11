@@ -1,0 +1,53 @@
+---
+title: Introduction
+description: Livepeer's media server, MistServer documentation
+metaTitle: Media Server - Livepeer.com
+metaDescription: Livepeer's media server, MistServer documentation
+---
+
+# Introduction
+
+MistServer is a free, full-featured streaming media toolkit. It enables you to
+take any media from any location, using any method, and deliver it seamlessly to
+anyone, anywhere, in any format.
+
+It is open source and can integrate with Livepeer's streaming API to transcode
+video at scale.
+
+MistServer is particularly known for being able to automate video workflows,
+having best in class compatibility and being deployable with any streaming
+architecture. All while remaining lightweight and delivering high performance.
+
+Transcoding takes the source video and converts it into multiple versions of the
+same video in different sizes and qualities, each of which is optimized for
+viewers with different internet speeds and devices. This ensures the viewers
+have the most optimized experience no matter where they are.
+
+Your video characteristics like framerate, resolution, rate, keyframe interval
+and bandwidth are all determined by the encoding. Leveraging the power of the
+Livepeer decentralized transcoding network, the combination of MistServer and
+Livepeer creates a full solution for video streaming. This article introduces
+the Livepeer transcoding network, the available features from the current Mist
+and Livepeer integration available today, and the required steps needed to set
+this up.
+
+Livepeer Video Services is a scalable Infrastructure as a Service for developers
+who want to add live or on-demand video to their project. It aims to increase
+the reliability of video streaming while reducing costs associated with it by up
+to 10x. While video transcoding is an important step to ensure high quality
+viewing experience, it also requires a lot of computation power. This is
+problematic for most video services, translating to high maintenance cost and
+complexity.
+
+To achieve cost reduction combined with a resilient platform, Livepeer is
+building peer-to-peer infrastructure that interacts through a marketplace
+secured by the Ethereum blockchain. Currently, Livepeer runs enough nodes and
+total computing power to transcode tens of millions of minutes each week.. For a
+more detailed and quick primer on Livepeer, please refer to
+https://livepeer.org/primer
+
+The MistServer Livepeer integration (MistProcLivepeer) leverages the Livepeer
+network for video transcoding. This removes the transcoding bottleneck, allowing
+MistServer to handle hundreds of transcoded video streams concurrently.
+
+![](/img/docs/mistserver-intro.png)
