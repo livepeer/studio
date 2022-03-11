@@ -327,7 +327,11 @@ export default () => {
                             ? ""
                             : state.contractAddress
                         }
-                        disabled={isMinting.on}
+                        disabled={
+                          isMinting.on ||
+                          status !== "connected" ||
+                          !(chainId in networks)
+                        }
                         placeholder={
                           !defaultContractAddress
                             ? ""
