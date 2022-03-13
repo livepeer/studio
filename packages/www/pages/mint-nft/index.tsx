@@ -41,23 +41,26 @@ const networks = {
         "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
       ],
     },
-    defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F", // TODO: Final address here
+    defasultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F",
+    openseaBaseUrl: "https://opensea.io",
+    openseaNetworkName: "matic",
   },
-  // "0xa4b1": {
-  //   spec: {
-  //     chainId: "0xa4b1",
-  //     chainName: "Arbitrum One",
-  //     rpcUrls: ["https://arb1.arbitrum.io/rpc"],
-  //     nativeCurrency: { symbol: "AETH", decimals: 18 },
-  //     blockExplorerUrls: ["https://arbiscan.io"],
-  //     iconUrls: [
-  //       "https://cloudflare-ipfs.com/ipfs/bafkreiamd2sujbbc673tljl7hkz66m4fqubqraq3jwnfo6smtmh6afak5i",
-  //     ],
-  //   },
-  //   defaultContract: "0xX", // TODO: Deploy a contract and add address here
-  // },
+  "0x13881": {
+    spec: {
+      chainId: "0x13881",
+      chainName: "Polygon Testnet",
+      rpcUrls: ["https://matic-mumbai.chainstacklabs.com"],
+      nativeCurrency: { symbol: "MATIC", decimals: 18 },
+      blockExplorerUrls: ["https://mumbai.polygonscan.com"],
+    },
+    defaultContract: "0xA4E1d8FE768d471B048F9d73ff90ED8fcCC03643",
+    openseaBaseUrl: "https://testnets.opensea.io",
+    openseaNetworkName: "mumbai",
+  },
 } as const;
-const defaultNet = networks["0x89"]; // polygon
+
+type SupportedChainIDs = keyof typeof networks;
+type NetworkInfo = typeof networks[SupportedChainIDs];
 
 async function getMintedTokenIdOnce(
   videoNft: Contract,
@@ -111,7 +114,7 @@ async function mintNft(
   to: string,
   tokenUri: string,
   logger: (log: JSX.Element | string) => void,
-  explorerUrl?: string
+  network: NetworkInfo
 ) {
   try {
     logger("Started mint transaction...");
@@ -133,13 +136,11 @@ async function mintNft(
     logger(
       <>
         Mint transaction sent:{" "}
-        {!explorerUrl ? (
-          <code>{receipt.transactionHash}</code>
-        ) : (
-          <Link href={`${explorerUrl}/tx/${receipt.transactionHash}`} passHref>
-            <A target="_blank">{displayAddr(receipt.transactionHash)}</A>
-          </Link>
-        )}
+        <Link
+          href={`${network.spec.blockExplorerUrls[0]}/tx/${receipt.transactionHash}`}
+          passHref>
+          <A target="_blank">{displayAddr(receipt.transactionHash)}</A>
+        </Link>
       </>
     );
 
@@ -157,8 +158,8 @@ async function mintNft(
         <Link
           href={
             tokenId
-              ? `https://opensea.io/assets/matic/${videoNft.options.address}/${tokenId}`
-              : `https://opensea.io/assets?search%5Bquery%5D=${videoNft.options.address}`
+              ? `${network.openseaBaseUrl}/assets/${network.openseaNetworkName}/${videoNft.options.address}/${tokenId}`
+              : `${network.openseaBaseUrl}/assets?search%5Bquery%5D=${videoNft.options.address}`
           }
           passHref>
           <A target="_blank">OpenSea</A>
@@ -183,7 +184,7 @@ const displayAddr = (str: string) => (
 
 async function switchNetwork(
   ethereum: MetaMask,
-  chainId: keyof typeof networks,
+  chainId: SupportedChainIDs,
   logger: (log: JSX.Element | string) => void
 ) {
   try {
@@ -261,17 +262,17 @@ export default () => {
         state.recipient ?? account,
         state.tokenUri,
         addLog,
-        networks[chainId]?.spec.blockExplorerUrls?.[0]
+        networks[chainId]
       );
     } finally {
       isMinting.onOff();
     }
   }, [state, web3, defaultContractAddress, account, addLog, chainId]);
 
-  const onClickSwitchNetwork = useCallback(() => {
+  const onClickSwitchNetwork = (chainId: SupportedChainIDs) => () => {
     setLogs([]);
-    return switchNetwork(ethereum, defaultNet.spec.chainId, addLog);
-  }, [setLogs, ethereum, addLog]);
+    return switchNetwork(ethereum, chainId, addLog);
+  };
 
   const onClickConnect = useCallback(() => {
     setLogs([]);
@@ -316,7 +317,9 @@ export default () => {
                     return onClickMint();
                   }}>
                   <Flex direction="column" gap="2">
-                    <Label htmlFor="contractAddress">Contract Address</Label>
+                    <Label htmlFor="contractAddress">
+                      Contract Address (optional)
+                    </Label>
                     <Tooltip content="Defaults to Livepeer-owned Video NFT contract.">
                       <TextField
                         size="2"
@@ -437,14 +440,24 @@ export default () => {
                         Connect to MetaMask
                       </Button>
                     ) : status === "connected" && !(chainId in networks) ? (
-                      <Button
-                        css={{ display: "flex", ai: "center" }}
-                        type="button"
-                        size="2"
-                        variant="violet"
-                        onClick={onClickSwitchNetwork}>
-                        Switch Network
-                      </Button>
+                      <>
+                        <Button
+                          css={{ display: "flex", ai: "center" }}
+                          type="button"
+                          size="2"
+                          variant="violet"
+                          onClick={onClickSwitchNetwork("0x13881")}>
+                          Polygon Testnet
+                        </Button>
+                        <Button
+                          css={{ display: "flex", ai: "center" }}
+                          type="button"
+                          size="2"
+                          variant="violet"
+                          onClick={onClickSwitchNetwork("0x89")}>
+                          Polygon Mainnet
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         css={{ display: "flex", ai: "center" }}
