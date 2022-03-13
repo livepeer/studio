@@ -41,7 +41,7 @@ const networks = {
         "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
       ],
     },
-    defasultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F",
+    defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F",
     openseaBaseUrl: "https://opensea.io",
     openseaNetworkName: "matic",
   },
