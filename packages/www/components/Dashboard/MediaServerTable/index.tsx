@@ -38,7 +38,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
               display: "flex",
             },
           }}>
-          <Link href="https://mistserver.org/" passHref>
+          <Link href="https://livepeer.com/docs/guides/media-server/introduction" passHref>
             <A
               target="_blank"
               variant="violet"
@@ -48,7 +48,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
             </A>
           </Link>
 
-          <Link href="https://mistserver.org/download" passHref>
+          <Link href="https://livepeer.com/docs/guides/media-server/download" passHref>
             <A
               target="_blank"
               variant="violet"
