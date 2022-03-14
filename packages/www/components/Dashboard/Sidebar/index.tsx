@@ -15,7 +15,13 @@ import {
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import ThemeSwitch from "../ThemeSwitch";
 import Link from "next/link";
-import { HomeIcon, StreamIcon, TerminalIcon, BillingIcon } from "./NavIcons";
+import {
+  HomeIcon,
+  StreamIcon,
+  TerminalIcon,
+  BillingIcon,
+  AssetsIcon,
+} from "./NavIcons";
 import { useApi } from "../../../hooks";
 import Router from "next/router";
 
@@ -159,6 +165,23 @@ const Sidebar = ({ id }) => {
             </Box>
           )}
         </Box>
+
+        <Link href="/dashboard/assets" passHref>
+          <NavLink>
+            <AssetsIcon active={id === "assets"} />
+            <Text
+              gradient={id === "assets"}
+              variant={id === "assets" ? "violet" : null}
+              css={{
+                fontWeight: id === "assets" ? 700 : 400,
+                backgroundClip: "text",
+                ml: "$2",
+                lineHeight: 1.2,
+              }}>
+              Assets
+            </Text>
+          </NavLink>
+        </Link>
 
         <Box>
           <Link href="/dashboard/developers/api-keys" passHref>

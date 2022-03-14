@@ -132,6 +132,14 @@ export const DashboardStreamHealth = {
   },
 };
 
+export const DashboardAssets = {
+  metaData: {
+    title: "Assets - Livepeer Video Services",
+    description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
+    url: "https://livepeer.com/",
+  },
+};
+
 export const Jobs = {
   metaData: {
     title: "Jobs - Livepeer Video Services",
