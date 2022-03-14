@@ -176,10 +176,11 @@ const GettingStarted = ({ firstName = "" }) => {
               enables you to take any media from any location, using any method,
               and deliver it seamlessly to anyone, anywhere, in any format.
               <br />
+              <br />
               It's open source and integrates with Livepeer's streaming API to
               transcode video at scale.
             </Text>
-            <Link href="https://mistserver.org/download" passHref>
+            <Link href="https://livepeer.com/docs/guides/media-server/download" passHref>
               <Button
                 as="a"
                 target="_blank"
