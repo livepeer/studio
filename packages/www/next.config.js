@@ -205,6 +205,11 @@ const config = {
         permanent: false,
       },
       {
+        source: "/docs/guides/media-server",
+        destination: "/docs/guides/media-server/introduction",
+        permanent: false,
+      },
+      {
         source: "/jobs/technical-writer",
         destination: "/jobs/1496366",
         permanent: false,
