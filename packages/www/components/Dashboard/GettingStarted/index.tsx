@@ -178,8 +178,9 @@ const GettingStarted = ({ firstName = "" }) => {
               <br />
               It's open source and integrates with Livepeer's streaming API to
               transcode video at scale.
+              <br />
             </Text>
-            <Link href="https://mistserver.org/download" passHref>
+            <Link href="/docs/guides/media-server/downloads" passHref>
               <Button
                 as="a"
                 target="_blank"
