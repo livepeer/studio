@@ -1,6 +1,7 @@
 import { authMiddleware } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
 import {
@@ -103,6 +104,49 @@ function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
     ...asset,
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
+}
+
+async function genUploadUrl(
+  playbackId: string,
+  objectStoreId: string,
+  jwtSecret: string,
+  aud: string
+) {
+  const uploadedObjectKey = `directUpload/${playbackId}/source`;
+  const presignedUrl = await getS3PresignedUrl(
+    objectStoreId,
+    uploadedObjectKey
+  );
+  const signedUploadUrl = jwt.sign({ presignedUrl, aud }, jwtSecret, {
+    algorithm: "HS256",
+  });
+  return { uploadedObjectKey, signedUploadUrl };
+}
+
+function parseUploadUrl(
+  signedUploadUrl: string,
+  jwtSecret: string,
+  audience: string
+) {
+  let uploadUrl: string;
+  try {
+    const urlJwt = jwt.verify(signedUploadUrl, jwtSecret, {
+      audience,
+    }) as JwtPayload;
+    uploadUrl = urlJwt.presignedUrl;
+  } catch (err) {
+    throw new ForbiddenError(`Invalid signed upload URL: ${err}`);
+  }
+
+  // get playbackId from s3 url
+  const matches = uploadUrl.match(/\/directUpload\/([^/]+)\/source/);
+  if (!matches || matches.length < 2) {
+    throw new UnprocessableEntityError(
+      `the provided url for the upload is not valid or not supported: ${uploadUrl}`
+    );
+  }
+  const playbackId = matches[1];
+  return { uploadUrl, playbackId };
 }
 
 app.use(
@@ -375,19 +419,31 @@ app.post(
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(req.store, id);
 
+    const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
-      req.config.vodObjectStoreId,
+      vodObjectStoreId,
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const uploadedObjectKey = `directUpload/${playbackId}/source`;
-    const presignedUrl = await getS3PresignedUrl(
+    const { uploadedObjectKey, signedUploadUrl } = await genUploadUrl(
+      playbackId,
       asset.objectStoreId,
-      uploadedObjectKey
+      jwtSecret,
+      jwtAudience
     );
+
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      res.status(501);
+      return res.json({ errors: ["Ingest not configured"] });
+    }
+    const baseUrl = ingests[0].origin;
+    const url = `${baseUrl}/api/asset/upload/${signedUploadUrl}`;
+
+    asset = await db.asset.create(asset);
     const task = await req.taskScheduler.createTask(
       "import",
       {
@@ -397,44 +453,18 @@ app.post(
       asset
     );
 
-    const b64SignedUrl = encodeURIComponent(
-      Buffer.from(presignedUrl).toString("base64")
-    );
-
-    const ingests = await req.getIngest();
-    if (!ingests.length) {
-      res.status(501);
-      return res.json({ errors: ["Ingest not configured"] });
-    }
-    const baseUrl = ingests[0].origin;
-    const url = `${baseUrl}/api/asset/upload/${b64SignedUrl}`;
-
-    asset = await db.asset.create(asset);
-
     res.json({ url, asset, task });
   }
 );
 
 app.put("/upload/:url", cors(corsOptions), async (req, res) => {
-  const { url } = req.params;
-  let uploadUrl = decodeURIComponent(Buffer.from(url, "base64").toString());
+  const {
+    params: { url },
+    config: { jwtSecret, jwtAudience },
+  } = req;
+  const { uploadUrl, playbackId } = parseUploadUrl(url, jwtSecret, jwtAudience);
 
-  // get playbackId from s3 url
-  let playbackId;
-  try {
-    playbackId = uploadUrl.match(
-      /^https:\/\/storage.googleapis.com\/[^/]+\/directUpload\/([^/]+)/
-    )[1];
-    console.log(`playbackId: ${playbackId}`);
-  } catch (e) {
-    throw new UnprocessableEntityError(
-      `the provided url for the upload is not valid or not supported: ${uploadUrl}`
-    );
-  }
-  const assets = await db.asset.find(
-    { playbackId: playbackId },
-    { useReplica: false }
-  );
+  const assets = await db.asset.find({ playbackId }, { useReplica: false });
   if (!assets?.length || !assets[0]?.length) {
     throw new NotFoundError(`asset not found`);
   }
