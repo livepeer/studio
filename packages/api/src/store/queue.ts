@@ -6,14 +6,14 @@ import { EventKey } from "./webhook-table";
 
 const EXCHANGES = {
   webhooks: "webhook_default_exchange",
-  delayed: "webhook_delayed_exchange",
   task: "lp_tasks",
+  delayed_old: "webhook_delayed_exchange",
 } as const;
 const QUEUES = {
   events: "webhook_events_queue_v1",
   webhooks: "webhook_cannon_single_url_v1",
-  delayed: "webhook_delayed_queue",
   task: "task_results_queue",
+  delayed_old: "webhook_delayed_queue",
 } as const;
 const delayedWebhookQueue = (routingKey: string, delaySec: number) =>
   `delayed_webhook_${routingKey}_${delaySec}s`;
@@ -110,9 +110,6 @@ export class RabbitQueue implements Queue {
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
           }),
-          channel.assertExchange(EXCHANGES.delayed, "topic", {
-            durable: true,
-          }),
           channel.assertExchange(EXCHANGES.task, "topic", {
             durable: true,
           }),
@@ -121,17 +118,18 @@ export class RabbitQueue implements Queue {
           channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
           channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.result.#"),
-          channel
-            .assertQueue(QUEUES.delayed, {
-              // Quorum queues do not support message expiration, so this has to
-              // be a Classic Mirrored Queue configured by a policy on RabbitMQ.
-              deadLetterExchange: EXCHANGES.webhooks,
-              durable: true,
-            })
-            .then(() =>
-              channel.bindQueue(QUEUES.delayed, EXCHANGES.delayed, "#")
-            ),
           channel.prefetch(2),
+        ]);
+        // TODO: Remove this once all old queues have been deleted.
+        await Promise.all([
+          channel.unbindQueue(QUEUES.delayed_old, EXCHANGES.delayed_old, "#"),
+          channel.deleteQueue(QUEUES.delayed_old, {
+            ifUnused: true,
+            ifEmpty: true,
+          }),
+          channel.deleteExchange(EXCHANGES.delayed_old, {
+            ifUnused: true,
+          }),
         ]);
       },
     });
