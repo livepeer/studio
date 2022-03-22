@@ -183,4 +183,52 @@ describe("Queue", () => {
     duration = consumedAt1 - emittedAt;
     expect(duration).toBeGreaterThanOrEqual(1000);
   });
+
+  it("delayed messages keep the original routing key", async () => {
+    const sem1 = semaphore();
+    const sem2 = semaphore();
+    let consumedIds = ["", ""];
+    function onEvent(data) {
+      var message = JSON.parse(data.content.toString());
+      queue.ack(data);
+      consumedIds[0] = message.id;
+      sem1.release();
+    }
+    function onWebhook(data) {
+      var message = JSON.parse(data.content.toString());
+      queue.ack(data);
+      consumedIds[1] = message.id;
+      sem2.release();
+    }
+    await queue.consume("events", onEvent);
+    await queue.consume("webhooks", onWebhook);
+
+    await queue.delayedPublishWebhook(
+      "events.recording.ready",
+      {
+        type: "webhook_event",
+        id: "delayedMsg",
+        timestamp: Date.now(),
+        streamId: "asdf",
+        event: "recording.ready",
+        userId: "fdsa",
+      },
+      200
+    );
+    await queue.delayedPublishWebhook(
+      "webhooks.recording.ready",
+      {
+        type: "webhook_event",
+        id: "delayedMsg2",
+        timestamp: Date.now(),
+        streamId: "asdf",
+        event: "recording.ready",
+        userId: "fdsa",
+      },
+      200
+    );
+    await sem1.wait(3000);
+    await sem2.wait(3000);
+    expect(consumedIds).toEqual(["delayedMsg", "delayedMsg2"]);
+  });
 });
