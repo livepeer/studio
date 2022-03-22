@@ -232,7 +232,7 @@ export default class WebhookCannon {
     }
     let newInterval = lastInterval * BACKOFF_COEF;
     if (newInterval > MAX_BACKOFF) {
-      return lastInterval;
+      return MAX_BACKOFF;
     }
     // RabbitMQ expects integer
     return newInterval | 0;

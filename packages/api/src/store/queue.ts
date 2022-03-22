@@ -6,17 +6,16 @@ import { EventKey } from "./webhook-table";
 
 const EXCHANGES = {
   webhooks: "webhook_default_exchange",
-  delayed: "webhook_delayed_exchange",
   task: "lp_tasks",
+  delayed_old: "webhook_delayed_exchange",
 } as const;
 const QUEUES = {
   events: "webhook_events_queue_v1",
   webhooks: "webhook_cannon_single_url_v1",
-  events_old: "webhook_events_queue",
-  webhooks_old: "webhook_cannon_single_url",
-  delayed: "webhook_delayed_queue",
   task: "task_results_queue",
+  delayed_old: "webhook_delayed_queue",
 } as const;
+const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
@@ -110,9 +109,6 @@ export class RabbitQueue implements Queue {
           channel.assertExchange(EXCHANGES.webhooks, "topic", {
             durable: true,
           }),
-          channel.assertExchange(EXCHANGES.delayed, "topic", {
-            durable: true,
-          }),
           channel.assertExchange(EXCHANGES.task, "topic", {
             durable: true,
           }),
@@ -121,37 +117,17 @@ export class RabbitQueue implements Queue {
           channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
           channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
           channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.result.#"),
-          channel
-            .assertQueue(QUEUES.delayed, {
-              // Quorum queues do not support message expiration, so this has to
-              // be a Classic Mirrored Queue configured by a policy on RabbitMQ.
-              deadLetterExchange: EXCHANGES.webhooks,
-              durable: true,
-            })
-            .then(() =>
-              channel.bindQueue(QUEUES.delayed, EXCHANGES.delayed, "#")
-            ),
           channel.prefetch(2),
         ]);
         // TODO: Remove this once all old queues have been deleted.
         await Promise.all([
-          channel.unbindQueue(
-            QUEUES.events_old,
-            EXCHANGES.webhooks,
-            "events.#"
-          ),
-          channel.unbindQueue(
-            QUEUES.webhooks_old,
-            EXCHANGES.webhooks,
-            "webhooks.#"
-          ),
-          channel.deleteQueue(QUEUES.events_old, {
+          channel.unbindQueue(QUEUES.delayed_old, EXCHANGES.delayed_old, "#"),
+          channel.deleteQueue(QUEUES.delayed_old, {
             ifUnused: true,
             ifEmpty: true,
           }),
-          channel.deleteQueue(QUEUES.webhooks_old, {
+          channel.deleteExchange(EXCHANGES.delayed_old, {
             ifUnused: true,
-            ifEmpty: true,
           }),
         ]);
       },
@@ -240,15 +216,52 @@ export class RabbitQueue implements Queue {
   // for delayed messages. Messages are published with an expiration equal to
   // the desired `delay` parameter, and after they expire are sent to the main
   // exchange through the delayed queue deadletterExchange configuration.
-  public async delayedPublishWebhook(
+  public delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    console.log(`emitting delayed message: delay=${delay / 1000}s msg=`, msg);
-    await this.channel.publish(EXCHANGES.delayed, routingKey, msg, {
-      persistent: true,
-      expiration: delay,
-    });
+    delay = Math.round(delay);
+    const delayedQueueName = delayedWebhookQueue(delay);
+    // TODO: Find a way to reimplement this without on-demand queues.
+    return this.withSetup(
+      async (channel: Channel) => {
+        await Promise.all([
+          channel.assertExchange(delayedQueueName, "topic", {
+            durable: true,
+            autoDelete: true,
+          }),
+          channel.assertQueue(delayedQueueName, {
+            durable: true,
+            messageTtl: delay,
+            deadLetterExchange: EXCHANGES.webhooks,
+            expires: delay + 15000,
+          }),
+        ]);
+        await channel.bindQueue(delayedQueueName, delayedQueueName, "#");
+      },
+      () => {
+        console.log(
+          `emitting delayed message: delay=${delay / 1000}s msg=`,
+          msg
+        );
+        return this.channel.publish(delayedQueueName, routingKey, msg, {
+          persistent: true,
+        });
+      }
+    );
+  }
+
+  public async withSetup(
+    setup: amqp.SetupFunc,
+    action: () => Promise<void>
+  ): Promise<void> {
+    await this.channel.addSetup(setup);
+    try {
+      await action();
+    } finally {
+      // avoid accumulating duplicate setup funcs on the channel manager
+      await this.channel.removeSetup(setup, () => {});
+    }
   }
 }
