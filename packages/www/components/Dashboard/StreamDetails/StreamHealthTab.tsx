@@ -59,7 +59,6 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         return;
       }
       const newInfo = rinfo as StreamInfo;
-
       setDataChart((prev) => {
         const lastItem = prev[prev.length - 1];
         return [
@@ -108,8 +107,13 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
           Math.round(last[1] / 1000);
       });
 
-      const newData = [...multiDataChart, data].slice(-(maxItems + 10));
-      setMultiDataChart(newData);
+      setMultiDataChart((currData) => {
+        let logs = [...currData, data];
+        if (logs.length > maxItems + 10) {
+          logs = logs.slice(logs.length - maxItems - 10);
+        }
+        return logs;
+      });
     }
   }, [streamHealth]);
 

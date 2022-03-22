@@ -57,7 +57,7 @@ const Chart = ({
 }: {
   data: Array<{ name: number; "Session bitrate": number }>;
   multiData?: Array<{
-    [kbps: string]: number;
+    [name: string]: number;
   }>;
 }) => {
   const multistreamNames =
@@ -99,9 +99,7 @@ const Chart = ({
             dataKey="name"
             domain={[
               data[0]?.name,
-              data[data.length - 1].name === 0
-                ? 10
-                : data[data.length - 1].name,
+              data.length < 2 ? 10 : data[data.length - 1].name,
             ]}
             tickCount={7}
             allowDataOverflow
