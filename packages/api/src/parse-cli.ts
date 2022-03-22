@@ -262,13 +262,16 @@ export default function parseCli(argv?: string | readonly string[]) {
       `
     Livepeer API Node
 
-    Options my also be provided as LP_ prefixed environment variables, e.g. LP_PORT=5000 is the same as --port=5000.
+    Options my also be provided as LP_API_ prefixed environment variables, e.g. LP_API_PORT=5000 is the same as --port=5000.
 
     --broadcaster and --orchestrator options should be of the form
     [{"address":"https://127.0.0.1:3086","cliAddress":"http://127.0.0.1:3076"}]
     `
     )
-    .env("LP_")
+    .strict(
+      process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
+    )
+    .env("LP_API_")
     .strict(
       process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "development"
     )
