@@ -15,8 +15,8 @@ const QUEUES = {
   task: "task_results_queue",
   delayed_old: "webhook_delayed_queue",
 } as const;
-const delayedWebhookQueue = (routingKey: string, delaySec: number) =>
-  `delayed_webhook_${routingKey}_${delaySec}s`;
+const delayedWebhookQueue = (delaySec: number) =>
+  `delayed_webhook_${delaySec}s`;
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
@@ -223,17 +223,23 @@ export class RabbitQueue implements Queue {
     delay: number
   ): Promise<void> {
     const delaySec = delay / 1000;
-    const delayedQueueName = delayedWebhookQueue(routingKey, delaySec);
+    const delayedQueueName = delayedWebhookQueue(delaySec);
     // TODO: Find a way to reimplement this without on-demand queues.
     return this.withSetup(
       async (channel: Channel) => {
-        await channel.assertQueue(delayedQueueName, {
-          messageTtl: delay,
-          deadLetterExchange: EXCHANGES.webhooks,
-          deadLetterRoutingKey: routingKey,
-          expires: delay + 15000,
-          durable: true,
-        });
+        await Promise.all([
+          channel.assertExchange(delayedQueueName, "topic", {
+            durable: true,
+            autoDelete: true,
+          }),
+          channel.assertQueue(delayedQueueName, {
+            durable: true,
+            messageTtl: delay,
+            deadLetterExchange: EXCHANGES.webhooks,
+            expires: delay + 15000,
+          }),
+        ]);
+        await channel.bindQueue(delayedQueueName, delayedQueueName, "#");
       },
       () => {
         console.log(
