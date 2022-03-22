@@ -246,7 +246,7 @@ export class RabbitQueue implements Queue {
           `emitting delayed message: delay=${delay / 1000}s msg=`,
           msg
         );
-        return this.channel.sendToQueue(delayedQueueName, msg, {
+        return this.channel.publish(delayedQueueName, routingKey, msg, {
           persistent: true,
         });
       }

@@ -124,4 +124,63 @@ describe("Queue", () => {
     expect(duration).toBeGreaterThanOrEqual(1000);
     expect(resp.id).toBe("delayedMsg2");
   });
+
+  it("delayed messages do not affect one another", async () => {
+    const sem1 = semaphore();
+    const sem2 = semaphore();
+    let emittedAt, consumedAt1, consumedAt2;
+    function onMsg(data) {
+      var message = JSON.parse(data.content.toString());
+      queue.ack(data);
+      switch (message.id) {
+        case "delayedMsg":
+          consumedAt1 ??= Date.now();
+          sem1.release();
+          break;
+        case "delayedMsg2":
+          consumedAt2 ??= Date.now();
+          sem2.release();
+          break;
+        default:
+          console.error("unknown message", message);
+          consumedAt1 = consumedAt2 = 0;
+          break;
+      }
+    }
+    await queue.consume("events", onMsg);
+
+    emittedAt = Date.now();
+    await queue.delayedPublishWebhook(
+      "events.recording.ready",
+      {
+        type: "webhook_event",
+        id: "delayedMsg",
+        timestamp: Date.now(),
+        streamId: "asdf",
+        event: "recording.ready",
+        userId: "fdsa",
+      },
+      1000
+    );
+    await queue.delayedPublishWebhook(
+      "events.recording.ready",
+      {
+        type: "webhook_event",
+        id: "delayedMsg2",
+        timestamp: Date.now(),
+        streamId: "asdf",
+        event: "recording.ready",
+        userId: "fdsa",
+      },
+      200
+    );
+    await sem2.wait(3000);
+    let duration = consumedAt2 - emittedAt;
+    expect(duration).toBeGreaterThanOrEqual(200);
+    expect(duration).toBeLessThanOrEqual(500);
+
+    await sem1.wait(3000);
+    duration = consumedAt1 - emittedAt;
+    expect(duration).toBeGreaterThanOrEqual(1000);
+  });
 });
