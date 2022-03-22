@@ -1,7 +1,7 @@
 import { Box, Text } from "@livepeer.com/design-system";
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   CartesianGrid,
   XAxis,
   YAxis,
@@ -9,6 +9,21 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+
+const getMultistreamColor = (number) => {
+  switch (number) {
+    case 1:
+      return "#aa99ec";
+    case 2:
+      return "#8da4ef";
+    case 3:
+      return "#2da4ef";
+    case 4:
+      return "#7da41f";
+    default:
+      return "#7d241f";
+  }
+};
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload) {
@@ -24,7 +39,11 @@ const CustomTooltip = ({ active, payload }: any) => {
             fontSize: "12px",
             color: "white",
           }}>
-          Rate: <b>{payload[0].value} kbps</b>
+          {payload.map((item) => (
+            <div>
+              {item.dataKey}: <b>{item.value} kbps</b>
+            </div>
+          ))}
         </Text>
       </Box>
     );
@@ -32,8 +51,17 @@ const CustomTooltip = ({ active, payload }: any) => {
 
   return null;
 };
-
-const Chart = ({ data }) => {
+const Chart = ({
+  data,
+  multiData,
+}: {
+  data: Array<{ name: number; "Session bitrate": number }>;
+  multiData?: Array<{
+    [name: string]: number;
+  }>;
+}) => {
+  const multistreamNames =
+    multiData && multiData[0] && Object.keys(multiData[0]);
   return (
     <Box
       css={{
@@ -65,26 +93,43 @@ const Chart = ({ data }) => {
         Seconds since stream loaded
       </Text>
       <ResponsiveContainer width="99%" height={300}>
-        <AreaChart data={data}>
-          <defs>
-            <linearGradient id="colorKbps" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6E56CF" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#6E56CF" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="name" />
+        <LineChart>
+          <XAxis
+            type="number"
+            dataKey="name"
+            domain={[
+              data[0]?.name,
+              data.length < 2 ? 10 : data[data.length - 1].name,
+            ]}
+            tickCount={7}
+            allowDataOverflow
+          />
           <YAxis domain={[0, 1600]} />
           <CartesianGrid vertical={false} />
           <Tooltip content={<CustomTooltip />} />
-          <Area
+          <Legend wrapperStyle={{ fontSize: "10px" }} />
+          <Line
+            data={data}
             cursor="pointer"
             type="monotone"
-            dataKey="kbps"
-            stroke="#6E56CF"
+            dataKey="Session bitrate"
+            stroke="#5746AF"
             strokeWidth="2px"
-            fill="url(#colorKbps)"
           />
-        </AreaChart>
+          {multistreamNames?.map((item, index) => {
+            if (item !== "name")
+              return (
+                <Line
+                  data={multiData}
+                  cursor="pointer"
+                  type="monotone"
+                  dataKey={item}
+                  stroke={getMultistreamColor(index)}
+                  strokeWidth="2px"
+                />
+              );
+          })}
+        </LineChart>
       </ResponsiveContainer>
     </Box>
   );
