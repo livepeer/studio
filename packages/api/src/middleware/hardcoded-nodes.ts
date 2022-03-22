@@ -34,7 +34,7 @@ export default function hardcodedNodes({
     prices = JSON.parse(prices);
   } catch (e) {
     console.error(
-      "Error parsing LP_BROADCASTERS, LP_ORCHESTRATORS, LP_INGEST and AND LP_PRICES"
+      "Error parsing LP_API_BROADCASTERS, LP_API_ORCHESTRATORS, LP_API_INGEST and AND LP_API_PRICES"
     );
     throw e;
   }

@@ -80,7 +80,7 @@ async function sleep(millis) {
 
 // Migrate existing users to stripe
 app.post("/migrate-users-to-stripe", async (req, res) => {
-  if (process.env.LP_STRIPE_SECRET_KEY != req.body.stripeSecretKey) {
+  if (req.config.stripeSecretKey != req.body.stripeSecretKey) {
     res.status(403);
     return res.json({ errors: ["unauthorized"] });
   }

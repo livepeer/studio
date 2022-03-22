@@ -26,5 +26,5 @@ ENV GITHUB_SHA ${GITHUB_SHA}
 
 RUN node dist/cli.js --help
 
-ENV LP_PORT 80
+ENV LP_API_PORT 80
 ENTRYPOINT ["node", "dist/cli.js"]
