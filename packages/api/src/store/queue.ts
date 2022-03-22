@@ -17,6 +17,8 @@ const QUEUES = {
   delayed: "webhook_delayed_queue",
   task: "task_results_queue",
 } as const;
+const delayedWebhookQueue = (routingKey: string, delaySec: number) =>
+  `delayed_webhook_${routingKey}_${delaySec}s`;
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
@@ -245,10 +247,26 @@ export class RabbitQueue implements Queue {
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    console.log(`emitting delayed message: delay=${delay / 1000}s msg=`, msg);
-    await this.channel.publish(EXCHANGES.delayed, routingKey, msg, {
-      persistent: true,
-      expiration: delay,
-    });
+    // TODO: Find a way to reimplement this without on-demand queues.
+    const delaySec = delay / 1000;
+    const delayedQueueName = delayedWebhookQueue(routingKey, delaySec);
+    const setupFunc = (channel: Channel) =>
+      channel.assertQueue(delayedQueueName, {
+        messageTtl: delay,
+        deadLetterExchange: EXCHANGES.webhooks,
+        deadLetterRoutingKey: routingKey,
+        expires: delay + 15000,
+        durable: true,
+      });
+    await this.channel.addSetup(setupFunc);
+    try {
+      console.log(`emitting delayed message: delay=${delay / 1000}s msg=`, msg);
+      await this.channel.sendToQueue(delayedQueueName, msg, {
+        persistent: true,
+      });
+    } finally {
+      // avoid accumulating duplicate setup funcs on the channel manager
+      await this.channel.removeSetup(setupFunc, () => {});
+    }
   }
 }
