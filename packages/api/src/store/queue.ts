@@ -217,31 +217,46 @@ export class RabbitQueue implements Queue {
   // for delayed messages. Messages are published with an expiration equal to
   // the desired `delay` parameter, and after they expire are sent to the main
   // exchange through the delayed queue deadletterExchange configuration.
-  public async delayedPublishWebhook(
+  public delayedPublishWebhook(
     routingKey: RoutingKey,
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    // TODO: Find a way to reimplement this without on-demand queues.
     const delaySec = delay / 1000;
     const delayedQueueName = delayedWebhookQueue(routingKey, delaySec);
-    const setupFunc = (channel: Channel) =>
-      channel.assertQueue(delayedQueueName, {
-        messageTtl: delay,
-        deadLetterExchange: EXCHANGES.webhooks,
-        deadLetterRoutingKey: routingKey,
-        expires: delay + 15000,
-        durable: true,
-      });
-    await this.channel.addSetup(setupFunc);
+    // TODO: Find a way to reimplement this without on-demand queues.
+    return this.withSetup(
+      async (channel: Channel) => {
+        await channel.assertQueue(delayedQueueName, {
+          messageTtl: delay,
+          deadLetterExchange: EXCHANGES.webhooks,
+          deadLetterRoutingKey: routingKey,
+          expires: delay + 15000,
+          durable: true,
+        });
+      },
+      () => {
+        console.log(
+          `emitting delayed message: delay=${delay / 1000}s msg=`,
+          msg
+        );
+        return this.channel.sendToQueue(delayedQueueName, msg, {
+          persistent: true,
+        });
+      }
+    );
+  }
+
+  public async withSetup(
+    setup: amqp.SetupFunc,
+    action: () => Promise<void>
+  ): Promise<void> {
+    await this.channel.addSetup(setup);
     try {
-      console.log(`emitting delayed message: delay=${delay / 1000}s msg=`, msg);
-      await this.channel.sendToQueue(delayedQueueName, msg, {
-        persistent: true,
-      });
+      await action();
     } finally {
       // avoid accumulating duplicate setup funcs on the channel manager
-      await this.channel.removeSetup(setupFunc, () => {});
+      await this.channel.removeSetup(setup, () => {});
     }
   }
 }
