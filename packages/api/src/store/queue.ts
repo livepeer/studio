@@ -15,8 +15,7 @@ const QUEUES = {
   task: "task_results_queue",
   delayed_old: "webhook_delayed_queue",
 } as const;
-const delayedWebhookQueue = (delaySec: number) =>
-  `delayed_webhook_${delaySec}s`;
+const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
@@ -222,8 +221,8 @@ export class RabbitQueue implements Queue {
     msg: messages.Any,
     delay: number
   ): Promise<void> {
-    const delaySec = delay / 1000;
-    const delayedQueueName = delayedWebhookQueue(delaySec);
+    delay = Math.round(delay);
+    const delayedQueueName = delayedWebhookQueue(delay);
     // TODO: Find a way to reimplement this without on-demand queues.
     return this.withSetup(
       async (channel: Channel) => {
