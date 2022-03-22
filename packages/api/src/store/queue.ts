@@ -12,8 +12,6 @@ const EXCHANGES = {
 const QUEUES = {
   events: "webhook_events_queue_v1",
   webhooks: "webhook_cannon_single_url_v1",
-  events_old: "webhook_events_queue",
-  webhooks_old: "webhook_cannon_single_url",
   delayed: "webhook_delayed_queue",
   task: "task_results_queue",
 } as const;
@@ -134,27 +132,6 @@ export class RabbitQueue implements Queue {
               channel.bindQueue(QUEUES.delayed, EXCHANGES.delayed, "#")
             ),
           channel.prefetch(2),
-        ]);
-        // TODO: Remove this once all old queues have been deleted.
-        await Promise.all([
-          channel.unbindQueue(
-            QUEUES.events_old,
-            EXCHANGES.webhooks,
-            "events.#"
-          ),
-          channel.unbindQueue(
-            QUEUES.webhooks_old,
-            EXCHANGES.webhooks,
-            "webhooks.#"
-          ),
-          channel.deleteQueue(QUEUES.events_old, {
-            ifUnused: true,
-            ifEmpty: true,
-          }),
-          channel.deleteQueue(QUEUES.webhooks_old, {
-            ifUnused: true,
-            ifEmpty: true,
-          }),
         ]);
       },
     });
