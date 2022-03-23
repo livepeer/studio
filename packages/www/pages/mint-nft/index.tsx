@@ -55,12 +55,12 @@ async function richMintNft(
       </>
     );
 
-    const tokenId = await videoNft.getMintedNftInfo(tx);
+    const info = await videoNft.getMintedNftInfo(tx);
     logger(
       <>
-        {tokenId ? (
+        {info?.openseaUrl ? (
           <>
-            Successfully minted token <code>{tokenId}</code> to{" "}
+            Successfully minted token <code>{info.tokenId}</code> to{" "}
             {displayAddr(to)}! Check it on{" "}
           </>
         ) : (
@@ -68,9 +68,8 @@ async function richMintNft(
         )}
         <Link
           href={
-            tokenId
-              ? `${chain.openseaBaseUrl}/assets/${chain.openseaChainName}/${contractAddress}/${tokenId}`
-              : `${chain.openseaBaseUrl}/assets?search%5Bquery%5D=${contractAddress}`
+            info.openseaUrl ??
+            `${chain.openseaBaseUrl}/assets?search%5Bquery%5D=${contractAddress}`
           }
           passHref>
           <A target="_blank">OpenSea</A>
