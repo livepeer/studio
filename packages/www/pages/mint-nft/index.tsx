@@ -1,9 +1,17 @@
 import { useToggleState } from "hooks/use-toggle-state";
+import { useApi } from "hooks";
 import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { ethers } from "ethers";
+import {
+  VideoNFT,
+  BuiltinChainInfo,
+  ChainSpec,
+  builtinChains,
+  switchOrAddChain,
+  isChainBuiltin,
+} from "@livepeer/video-nft";
 
 import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
@@ -25,77 +33,29 @@ import {
 import { MintNFT as Content } from "content";
 import Layout from "layouts/main";
 
-import videoNftAbi from "./video-nft.json";
-
-const networks = {
-  "0x89": {
-    spec: {
-      chainId: "0x89",
-      chainName: "Polygon Mainnet",
-      rpcUrls: ["https://polygon-rpc.com/"],
-      nativeCurrency: { symbol: "MATIC", decimals: 18 },
-      blockExplorerUrls: ["https://polygonscan.com"],
-      iconUrls: [
-        "https://cloudflare-ipfs.com/ipfs/bafkreiduv5pzw233clfjuahv5lkq2xvjomapou7yarik2lynu3bjm2xki4",
-      ],
-    },
-    defaultContract: "0x69C53E7b8c41bF436EF5a2D81DB759Dc8bD83b5F",
-    openseaBaseUrl: "https://opensea.io",
-    openseaNetworkName: "matic",
-  },
-  "0x13881": {
-    spec: {
-      chainId: "0x13881",
-      chainName: "Polygon Testnet",
-      rpcUrls: ["https://matic-mumbai.chainstacklabs.com"],
-      nativeCurrency: { symbol: "MATIC", decimals: 18 },
-      blockExplorerUrls: ["https://mumbai.polygonscan.com"],
-    },
-    defaultContract: "0xA4E1d8FE768d471B048F9d73ff90ED8fcCC03643",
-    openseaBaseUrl: "https://testnets.opensea.io",
-    openseaNetworkName: "mumbai",
-  },
-} as const;
-
-type SupportedChainIDs = keyof typeof networks;
-type NetworkInfo = typeof networks[SupportedChainIDs];
-
-async function mintNft(
-  provider: ethers.providers.Web3Provider,
+async function richMintNft(
+  videoNft: VideoNFT,
   contractAddress: string,
   to: string,
   tokenUri: string,
   logger: (log: JSX.Element | string) => void,
-  network: NetworkInfo
+  chain: BuiltinChainInfo
 ) {
   try {
     logger("Started mint transaction...");
-    const signer = provider.getSigner();
-    const videoNft = new ethers.Contract(
-      contractAddress,
-      videoNftAbi,
-      provider
-    ).connect(signer);
-
-    const tx = (await videoNft.mint(
-      to,
-      tokenUri
-    )) as ethers.ContractTransaction;
+    const tx = await videoNft.mintNft(contractAddress, tokenUri, to);
     logger(
       <>
         Mint transaction sent:{" "}
         <Link
-          href={`${network.spec.blockExplorerUrls[0]}/tx/${tx.hash}`}
+          href={`${chain.spec.blockExplorerUrls[0]}/tx/${tx.hash}`}
           passHref>
           <A target="_blank">{displayAddr(tx.hash)}</A>
         </Link>
       </>
     );
 
-    const receipt = await tx.wait();
-    const mintEv = receipt.events?.find((ev) => ev?.event === "Mint")?.args;
-    const tokenId =
-      mintEv && mintEv.length > 3 ? (mintEv[3].toNumber() as number) : null;
+    const tokenId = await videoNft.getMintedNftInfo(tx);
     logger(
       <>
         {tokenId ? (
@@ -109,8 +69,8 @@ async function mintNft(
         <Link
           href={
             tokenId
-              ? `${network.openseaBaseUrl}/assets/${network.openseaNetworkName}/${videoNft.address}/${tokenId}`
-              : `${network.openseaBaseUrl}/assets?search%5Bquery%5D=${videoNft.address}`
+              ? `${chain.openseaBaseUrl}/assets/${chain.openseaChainName}/${contractAddress}/${tokenId}`
+              : `${chain.openseaBaseUrl}/assets?search%5Bquery%5D=${contractAddress}`
           }
           passHref>
           <A target="_blank">OpenSea</A>
@@ -133,45 +93,31 @@ const displayAddr = (str: string) => (
   </code>
 );
 
-async function switchNetwork(
+async function richSwitchChain(
   ethereum: any,
-  chainId: SupportedChainIDs,
+  spec: ChainSpec,
   logger: (log: JSX.Element | string) => void
 ) {
   try {
-    await ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId }],
-    });
-    logger("Successfully switched to Polygon network.");
-    return;
+    const { added } = await switchOrAddChain(ethereum, spec);
+    logger(
+      added
+        ? "Successfully added Polygon network to MetaMask."
+        : "Successfully switched to Polygon network."
+    );
   } catch (err) {
-    // 4902 is the not found error code
-    if (err.code !== 4902) {
-      logger(`Error switching to Polygon network: ${err.message}`);
-      return;
-    }
-  }
-
-  try {
-    await ethereum.request({
-      method: "wallet_addEthereumChain",
-      params: [networks[chainId].spec],
-    });
-    logger("Successfully added Polygon network to MetaMask.");
-    return;
-  } catch (err) {
-    logger(`Error adding Polygon network: ${err.message}`);
+    logger(`Error switching to Polygon network: ${err.message}`);
   }
 }
 
 export default function MintNFT() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
-  const isMinting = useToggleState();
-  const provider = useMemo(
-    () => (ethereum ? new ethers.providers.Web3Provider(ethereum) : null),
-    [ethereum, chainId]
+  const { token: authToken } = useApi();
+  const videoNft = useMemo(
+    () => new VideoNFT(ethereum, chainId, { jwt: authToken }),
+    [ethereum, chainId, authToken]
   );
+  const isMinting = useToggleState();
 
   const initState = useMemo(() => {
     if (typeof window === "undefined") {
@@ -185,7 +131,7 @@ export default function MintNFT() {
     };
   }, [typeof window !== "undefined" && window?.location?.search]);
   const defaultContractAddress = useMemo<string>(
-    () => networks[chainId]?.defaultContract,
+    () => builtinChains[chainId]?.defaultContract,
     [chainId]
   );
   const [state, setState] = useState(initState);
@@ -209,22 +155,22 @@ export default function MintNFT() {
   const onClickMint = useCallback(async () => {
     isMinting.onOn();
     try {
-      await mintNft(
-        provider,
+      await richMintNft(
+        videoNft,
         state.contractAddress ?? defaultContractAddress,
         state.recipient ?? account,
         state.tokenUri,
         addLog,
-        networks[chainId]
+        builtinChains[chainId]
       );
     } finally {
       isMinting.onOff();
     }
-  }, [state, provider, defaultContractAddress, account, addLog, chainId]);
+  }, [state, videoNft, defaultContractAddress, account, addLog, chainId]);
 
-  const onClickSwitchNetwork = (chainId: SupportedChainIDs) => () => {
+  const onClickSwitchNetwork = (chainId: string) => () => {
     setLogs([]);
-    return switchNetwork(ethereum, chainId, addLog);
+    return richSwitchChain(videoNft, builtinChains[chainId].spec, addLog);
   };
 
   const onClickConnect = useCallback(() => {
@@ -286,7 +232,7 @@ export default function MintNFT() {
                         disabled={
                           isMinting.on ||
                           status !== "connected" ||
-                          !(chainId in networks)
+                          !isChainBuiltin(chainId)
                         }
                         placeholder={
                           !defaultContractAddress
@@ -356,7 +302,7 @@ export default function MintNFT() {
                               <div>Unknown MetaMask status: ${status}.</div>
                             );
                           case "connected":
-                            if (!(chainId in networks)) {
+                            if (!isChainBuiltin(chainId)) {
                               return (
                                 <div>
                                   Only Polygon network is supported right now.
@@ -368,7 +314,7 @@ export default function MintNFT() {
                               <>
                                 <Box css={{ mb: "$2" }}>
                                   Connected to {displayAddr(account)} on{" "}
-                                  {networks[chainId].spec.chainName} (
+                                  {builtinChains[chainId].spec.chainName} (
                                   <code>{parseInt(chainId, 16)}</code>)
                                 </Box>
                                 {logs.map((log, idx) => (
@@ -392,7 +338,7 @@ export default function MintNFT() {
                         onClick={onClickConnect}>
                         Connect to MetaMask
                       </Button>
-                    ) : status === "connected" && !(chainId in networks) ? (
+                    ) : status === "connected" && !isChainBuiltin(chainId) ? (
                       <>
                         <Button
                           css={{ display: "flex", ai: "center" }}
