@@ -1,13 +1,17 @@
 import { semaphore, sleep } from "../util";
 import { RabbitQueue } from "./queue";
+import { rabbitMgmt } from "../test-helpers";
 
 jest.setTimeout(10000);
 
 describe("Queue", () => {
   let queue: RabbitQueue;
+  let vhost: string;
   beforeEach(async () => {
     try {
-      queue = await RabbitQueue.connect("amqp://localhost:5672/livepeer");
+      vhost = `test_${Date.now()}`;
+      await rabbitMgmt.createVhost(vhost);
+      queue = await RabbitQueue.connect(`amqp://localhost:5672/${vhost}`);
     } catch (e) {
       console.error(e);
       throw e;
@@ -16,6 +20,7 @@ describe("Queue", () => {
 
   afterEach(async () => {
     await queue.close();
+    await rabbitMgmt.deleteVhost(vhost);
   });
 
   it("should be able to emit events and catch it via default consumer", async () => {
