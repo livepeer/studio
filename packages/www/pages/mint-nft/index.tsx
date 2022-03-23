@@ -77,23 +77,10 @@ async function mintNft(
       provider
     ).connect(signer);
 
-    const selfAddr = await signer.getAddress();
-    let cancelTokenId: () => void;
-    const tokenIdPromise = new Promise<number | null>((resolve, reject) => {
-      const handler = (f, t, mintedUri: string, tokenId: ethers.BigNumber) => {
-        if (mintedUri !== tokenUri) return;
-        videoNft.off(filter, handler);
-        resolve(tokenId.toNumber());
-      };
-      cancelTokenId = () => {
-        videoNft.off(filter, handler);
-        resolve(null);
-      };
-      const filter = videoNft.filters.Mint(selfAddr, selfAddr, null, null);
-      videoNft.once(filter, handler);
-    });
-
-    const tx = (await videoNft.mint(to, tokenUri)) as ethers.Transaction;
+    const tx = (await videoNft.mint(
+      to,
+      tokenUri
+    )) as ethers.ContractTransaction;
     logger(
       <>
         Mint transaction sent:{" "}
@@ -104,11 +91,11 @@ async function mintNft(
         </Link>
       </>
     );
-    setTimeout(() => {
-      cancelTokenId();
-    }, 60 * 1000);
 
-    const tokenId = await tokenIdPromise;
+    const receipt = await tx.wait();
+    const mintEv = receipt.events?.find((ev) => ev?.event === "Mint")?.args;
+    const tokenId =
+      mintEv && mintEv.length > 3 ? (mintEv[3].toNumber() as number) : null;
     logger(
       <>
         {tokenId ? (
