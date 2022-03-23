@@ -3,9 +3,7 @@ import { useMetaMask } from "metamask-react";
 import { Container } from "next/app";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { AbstractProvider as MetaMask, TransactionReceipt } from "web3-core";
-import { Contract } from "web3-eth-contract";
-import Web3 from "web3";
+import { ethers } from "ethers";
 
 import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
@@ -62,55 +60,9 @@ const networks = {
 type SupportedChainIDs = keyof typeof networks;
 type NetworkInfo = typeof networks[SupportedChainIDs];
 
-async function getMintedTokenIdOnce(
-  videoNft: Contract,
-  sender: string,
-  txReceipt: TransactionReceipt
-) {
-  const events = await videoNft.getPastEvents("Mint", {
-    filter: { sender },
-    fromBlock: txReceipt.blockNumber,
-    toBlock: txReceipt.blockNumber,
-  });
-  const event = events.find(
-    (ev) => ev.transactionHash === txReceipt.transactionHash
-  );
-  return event?.returnValues?.tokenId as string;
-}
-
-async function getMintedTokenId(
-  videoNft: Contract,
-  sender: string,
-  txReceipt: TransactionReceipt,
-  logger: (log: JSX.Element | string) => void
-) {
-  const maxAttempts = 5;
-  const retryDelayMs = 5 * 1000;
-  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-  let lastErr: Error | undefined;
-  for (let a = 1; a <= maxAttempts; a++) {
-    if (a > 1) {
-      await sleep(retryDelayMs);
-    }
-    try {
-      const tokenId = await getMintedTokenIdOnce(videoNft, sender, txReceipt);
-      if (!tokenId) {
-        throw new Error("Missing tokenId");
-      }
-      return tokenId;
-    } catch (err) {
-      lastErr = err;
-    }
-  }
-  logger(`Error getting minted token ID: ${lastErr}`);
-  return null;
-}
-
 async function mintNft(
-  web3: Web3,
+  provider: ethers.providers.Web3Provider,
   contractAddress: string,
-  from: string,
   to: string,
   tokenUri: string,
   logger: (log: JSX.Element | string) => void,
@@ -118,33 +70,45 @@ async function mintNft(
 ) {
   try {
     logger("Started mint transaction...");
-    const videoNft = new web3.eth.Contract(videoNftAbi as any, contractAddress);
-    const gasPrice = Math.round(1.2 * parseInt(await web3.eth.getGasPrice()));
-    const transaction = {
-      to: contractAddress,
-      gas: 500000,
-      maxPriorityFeePerGas: gasPrice,
-      data: videoNft.methods.mint(to, tokenUri).encodeABI(),
-    };
-    const nonce = await web3.eth.getTransactionCount(from, "latest");
-    const tx = {
-      ...transaction,
-      from,
-      nonce,
-    };
-    const receipt = await web3.eth.sendTransaction(tx);
+    const signer = provider.getSigner();
+    const videoNft = new ethers.Contract(
+      contractAddress,
+      videoNftAbi,
+      provider
+    ).connect(signer);
+
+    const selfAddr = await signer.getAddress();
+    let cancelTokenId: () => void;
+    const tokenIdPromise = new Promise<number | null>((resolve, reject) => {
+      const handler = (f, t, mintedUri: string, tokenId: ethers.BigNumber) => {
+        if (mintedUri !== tokenUri) return;
+        videoNft.off(filter, handler);
+        resolve(tokenId.toNumber());
+      };
+      cancelTokenId = () => {
+        videoNft.off(filter, handler);
+        resolve(null);
+      };
+      const filter = videoNft.filters.Mint(selfAddr, selfAddr, null, null);
+      videoNft.once(filter, handler);
+    });
+
+    const tx = (await videoNft.mint(to, tokenUri)) as ethers.Transaction;
     logger(
       <>
         Mint transaction sent:{" "}
         <Link
-          href={`${network.spec.blockExplorerUrls[0]}/tx/${receipt.transactionHash}`}
+          href={`${network.spec.blockExplorerUrls[0]}/tx/${tx.hash}`}
           passHref>
-          <A target="_blank">{displayAddr(receipt.transactionHash)}</A>
+          <A target="_blank">{displayAddr(tx.hash)}</A>
         </Link>
       </>
     );
+    setTimeout(() => {
+      cancelTokenId();
+    }, 60 * 1000);
 
-    const tokenId = await getMintedTokenId(videoNft, from, receipt, logger);
+    const tokenId = await tokenIdPromise;
     logger(
       <>
         {tokenId ? (
@@ -158,8 +122,8 @@ async function mintNft(
         <Link
           href={
             tokenId
-              ? `${network.openseaBaseUrl}/assets/${network.openseaNetworkName}/${videoNft.options.address}/${tokenId}`
-              : `${network.openseaBaseUrl}/assets?search%5Bquery%5D=${videoNft.options.address}`
+              ? `${network.openseaBaseUrl}/assets/${network.openseaNetworkName}/${videoNft.address}/${tokenId}`
+              : `${network.openseaBaseUrl}/assets?search%5Bquery%5D=${videoNft.address}`
           }
           passHref>
           <A target="_blank">OpenSea</A>
@@ -183,7 +147,7 @@ const displayAddr = (str: string) => (
 );
 
 async function switchNetwork(
-  ethereum: MetaMask,
+  ethereum: any,
   chainId: SupportedChainIDs,
   logger: (log: JSX.Element | string) => void
 ) {
@@ -214,10 +178,13 @@ async function switchNetwork(
   }
 }
 
-export default () => {
+export default function MintNFT() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const isMinting = useToggleState();
-  const web3 = useMemo(() => new Web3(ethereum), [ethereum]);
+  const provider = useMemo(
+    () => (ethereum ? new ethers.providers.Web3Provider(ethereum) : null),
+    [ethereum, chainId]
+  );
 
   const initState = useMemo(() => {
     if (typeof window === "undefined") {
@@ -256,9 +223,8 @@ export default () => {
     isMinting.onOn();
     try {
       await mintNft(
-        web3,
+        provider,
         state.contractAddress ?? defaultContractAddress,
-        account,
         state.recipient ?? account,
         state.tokenUri,
         addLog,
@@ -267,7 +233,7 @@ export default () => {
     } finally {
       isMinting.onOff();
     }
-  }, [state, web3, defaultContractAddress, account, addLog, chainId]);
+  }, [state, provider, defaultContractAddress, account, addLog, chainId]);
 
   const onClickSwitchNetwork = (chainId: SupportedChainIDs) => () => {
     setLogs([]);
@@ -487,4 +453,4 @@ export default () => {
       </Box>
     </Layout>
   );
-};
+}
