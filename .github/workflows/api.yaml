@@ -29,6 +29,7 @@ jobs:
           RABBITMQ_DEFAULT_VHOST: "livepeer"
         ports:
           - 5672:5672
+          - 15672:15672
 
     steps:
       - name: checkout
