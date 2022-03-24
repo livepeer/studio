@@ -1,14 +1,13 @@
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "hooks";
 import { useMetaMask } from "metamask-react";
-import { Container } from "next/app";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import {
   VideoNFT,
   BuiltinChainInfo,
   ChainSpec,
-  builtinChains,
+  getBuiltinChain,
   switchOrAddChain,
   isChainBuiltin,
 } from "@livepeer/video-nft";
@@ -23,6 +22,7 @@ import {
   AlertDialogTitle,
   Box,
   Button,
+  Container,
   Flex,
   Heading,
   Label,
@@ -43,7 +43,7 @@ async function richMintNft(
 ) {
   try {
     logger("Started mint transaction...");
-    const tx = await videoNft.mintNft(contractAddress, tokenUri, to);
+    const tx = await videoNft.mintNft(tokenUri, contractAddress, to);
     logger(
       <>
         Mint transaction sent:{" "}
@@ -58,7 +58,7 @@ async function richMintNft(
     const info = await videoNft.getMintedNftInfo(tx);
     logger(
       <>
-        {info?.openseaUrl ? (
+        {info?.opensea?.tokenUrl ? (
           <>
             Successfully minted token <code>{info.tokenId}</code> to{" "}
             {displayAddr(to)}! Check it on{" "}
@@ -67,10 +67,7 @@ async function richMintNft(
           `NFT minted but failed to find token ID. Check last minted NFTs on `
         )}
         <Link
-          href={
-            info.openseaUrl ??
-            `${chain.openseaBaseUrl}/assets?search%5Bquery%5D=${contractAddress}`
-          }
+          href={info?.opensea?.tokenUrl ?? info?.opensea?.contractUrl}
           passHref>
           <A target="_blank">OpenSea</A>
         </Link>
@@ -113,7 +110,7 @@ export default function MintNFT() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const { token: authToken } = useApi();
   const videoNft = useMemo(
-    () => new VideoNFT(ethereum, chainId, { jwt: authToken }),
+    () => new VideoNFT({ auth: { jwt: authToken } }, { ethereum, chainId }),
     [ethereum, chainId, authToken]
   );
   const isMinting = useToggleState();
@@ -130,7 +127,7 @@ export default function MintNFT() {
     };
   }, [typeof window !== "undefined" && window?.location?.search]);
   const defaultContractAddress = useMemo<string>(
-    () => builtinChains[chainId]?.defaultContract,
+    () => getBuiltinChain(chainId)?.defaultContract,
     [chainId]
   );
   const [state, setState] = useState(initState);
@@ -160,7 +157,7 @@ export default function MintNFT() {
         state.recipient ?? account,
         state.tokenUri,
         addLog,
-        builtinChains[chainId]
+        getBuiltinChain(chainId)
       );
     } finally {
       isMinting.onOff();
@@ -169,7 +166,7 @@ export default function MintNFT() {
 
   const onClickSwitchNetwork = (chainId: string) => () => {
     setLogs([]);
-    return richSwitchChain(videoNft, builtinChains[chainId].spec, addLog);
+    return richSwitchChain(videoNft, getBuiltinChain(chainId).spec, addLog);
   };
 
   const onClickConnect = useCallback(() => {
@@ -313,7 +310,7 @@ export default function MintNFT() {
                               <>
                                 <Box css={{ mb: "$2" }}>
                                   Connected to {displayAddr(account)} on{" "}
-                                  {builtinChains[chainId].spec.chainName} (
+                                  {getBuiltinChain(chainId).spec.chainName} (
                                   <code>{parseInt(chainId, 16)}</code>)
                                 </Box>
                                 {logs.map((log, idx) => (
