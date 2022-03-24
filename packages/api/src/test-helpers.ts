@@ -6,6 +6,14 @@ import schema from "./schema/schema.json";
 import { User } from "./schema/types";
 import { TestServer } from "./test-server";
 
+const vhostUrl = (vhost: string) =>
+  `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
+
+export const rabbitMgmt = {
+  createVhost: (vhost: string) => fetch(vhostUrl(vhost), { method: "PUT" }),
+  deleteVhost: (vhost: string) => fetch(vhostUrl(vhost), { method: "DELETE" }),
+};
+
 /**
  * Clear the entire database! Not to be used outside of tests
  */

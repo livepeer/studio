@@ -24,11 +24,12 @@ jobs:
         ports:
           - 5432:5432
       rabbitmq:
-        image: rabbitmq@sha256:f0be9e47ec42081a36593dfc6604274a623caed074fc043e0a927fbd1533dc20
+        image: rabbitmq:3.9-management
         env:
           RABBITMQ_DEFAULT_VHOST: "livepeer"
         ports:
           - 5672:5672
+          - 15672:15672
 
     steps:
       - name: checkout

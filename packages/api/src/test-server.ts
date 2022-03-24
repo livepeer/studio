@@ -9,6 +9,7 @@ import os from "os";
 import makeApp, { AppServer } from "./index";
 import argParser from "./parse-cli";
 import { UnboxPromise } from "./types/common";
+import { rabbitMgmt } from "./test-helpers";
 
 const dbPath = path.resolve(os.tmpdir(), "livepeer", uuid());
 const clientId = "EXPECTED_AUDIENCE";
@@ -26,6 +27,7 @@ const params = argParser();
 // Secret code used for back-door DB access in test env
 
 // Some overrides... we want to run on a random port for parallel reasons
+const testId = `test_${Date.now()}`;
 delete params.port;
 params.dbPath = dbPath;
 params.clientId = clientId;
@@ -35,11 +37,11 @@ params.jwtSecret = jwtSecret;
 params.supportAddr = supportAddr;
 params.sendgridTemplateId = sendgridTemplateId;
 params.sendgridApiKey = sendgridApiKey;
-params.postgresUrl = `postgresql://postgres@127.0.0.1/test_${Date.now()}`;
+params.postgresUrl = `postgresql://postgres@127.0.0.1/${testId}`;
 params.recordObjectStoreId = "mock_store";
 params.ingest =
   '[{"ingest": "rtmp://test/live","playback": "https://test/hls","base": "https://test"}]';
-params.amqpUrl = "amqp://localhost:5672/livepeer";
+params.amqpUrl = `amqp://localhost:5672/${testId}`;
 if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();
 }
@@ -50,6 +52,7 @@ let server: AppServer & { host?: string };
 console.log(`test run parameters: ${JSON.stringify(params)}`);
 
 async function setupServer() {
+  await rabbitMgmt.createVhost(testId);
   server = await makeApp(params);
 
   server.host = `http://127.0.0.1:${server.port}`;
@@ -74,6 +77,7 @@ afterAll(async () => {
     server = null;
   }
   fs.removeSync(dbPath);
+  await rabbitMgmt.deleteVhost(testId);
 });
 
 export type TestServer = UnboxPromise<ReturnType<typeof setupServer>>;
