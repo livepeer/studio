@@ -323,7 +323,7 @@ function setRecordingStatus(
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
     const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
-    if (isReady || (req.user.admin && forceUrl)) {
+    if (isReady || forceUrl) {
       session.recordingUrl = getRecordingUrl(ingest, session);
       session.mp4Url = getRecordingUrl(ingest, session, true);
     }
