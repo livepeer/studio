@@ -141,23 +141,22 @@ const getCursor = (link?: string): string => {
 const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
+  const baseUrl = isDevelopment()
+    ? `http://localhost:3004/api`
+    : isStaging()
+    ? `https://livepeer.monster/api`
+    : `/api`;
   const context = {
     ...state,
-    async fetch(url, opts: RequestInit = {}) {
+    baseUrl,
+    async fetch(url: string, opts: RequestInit = {}) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
 
-      let endpoint = isStaging()
-        ? `https://livepeer.monster/api${url}`
-        : `/api${url}`;
-
-      if (isDevelopment()) {
-        endpoint = `http://localhost:3004/api${url}`;
-      }
-
-      const res = await fetch(endpoint, {
+      url = `${baseUrl}${url}`;
+      const res = await fetch(url, {
         ...opts,
         headers,
       });
