@@ -3899,10 +3899,10 @@
     ethjs-provider-signer "^0.1.4"
     ethjs-query "^0.3.1"
 
-"@livepeer/video-nft@0.2.0-beta.2":
-  version "0.2.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@livepeer/video-nft/-/video-nft-0.2.0-beta.2.tgz#30cdcb6dc9ab6b2425013105ae3ef630a51ed358"
-  integrity sha512-FxGyzIncjwRbuxJasE3GsmpWXoucGLnrkP4O83GFwqdm3cn+IB9YTYyBes63iABsA8D4o1QS1va7GeowCnVD6g==
+"@livepeer/video-nft@0.2.0-beta.4":
+  version "0.2.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@livepeer/video-nft/-/video-nft-0.2.0-beta.4.tgz#9c49f1294945bae4c0f9935afcc0256fd8ef115d"
+  integrity sha512-lSaufpnzeUE0mPQGFaIdpNCua1svjO2b+dBsWMIEYdtEhHJj4N2uqYiRosNxYEtT6IDuSF6Jfs/6K+fP4RHTNA==
   dependencies:
     axios "^0.26.0"
     browser-fs-access "^0.25.0"

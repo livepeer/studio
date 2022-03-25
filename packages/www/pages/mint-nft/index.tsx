@@ -386,9 +386,10 @@ export default function MintNFT() {
                           try {
                             const { file } = state;
                             addLog("Uploading file...");
-                            let asset = await videoNft.createAsset(file.name, {
-                              file,
-                            });
+                            let asset = await videoNft.createAsset(
+                              file.name,
+                              file
+                            );
                             addLog("Normalizing for NFT...");
                             asset = await videoNft.nftNormalize(asset);
                             addLog("Exporting to IPFS...");
