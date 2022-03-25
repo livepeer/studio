@@ -166,7 +166,7 @@ export default function MintNFT() {
 
   const onClickSwitchNetwork = (chainId: string) => () => {
     setLogs([]);
-    return richSwitchChain(videoNft, getBuiltinChain(chainId).spec, addLog);
+    return richSwitchChain(ethereum, getBuiltinChain(chainId).spec, addLog);
   };
 
   const onClickConnect = useCallback(() => {
