@@ -114,6 +114,7 @@ export default function MintNFT() {
     [ethereum, chainId, authToken]
   );
   const isMinting = useToggleState();
+  const isUploading = useToggleState();
 
   const initState = useMemo(() => {
     if (typeof window === "undefined") {
@@ -378,10 +379,10 @@ export default function MintNFT() {
                         css={{ display: "flex", ai: "center" }}
                         type="button"
                         size="2"
-                        disabled={isMinting.on}
+                        disabled={isUploading.on}
                         variant="violet"
                         onClick={async () => {
-                          isMinting.onOn();
+                          isUploading.onOn();
                           try {
                             const { file } = state;
                             addLog("Uploading file...");
@@ -395,8 +396,10 @@ export default function MintNFT() {
                               await videoNft.exportToIPFS(asset.id);
                             addLog("Done! NFT token URI: " + nftMetadataUrl);
                             setStateProp("tokenUri", nftMetadataUrl);
+                          } catch (err) {
+                            addLog("Error uploading file: " + err.message);
                           } finally {
-                            isMinting.onOff();
+                            isUploading.onOff();
                           }
                         }}>
                         {isMinting.on && (
