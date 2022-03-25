@@ -121,6 +121,7 @@ export default function MintNFT() {
     }
     const searchParams = new URLSearchParams(window.location.search);
     return {
+      file: null as File,
       contractAddress: searchParams.get("contractAddress"),
       tokenUri: searchParams.get("tokenUri"),
       recipient: searchParams.get("recipient"),
@@ -212,6 +213,25 @@ export default function MintNFT() {
                     return onClickMint();
                   }}>
                   <Flex direction="column" gap="2">
+                    {state?.tokenUri ? undefined : (
+                      <>
+                        <Label htmlFor="file">File {state?.tokenUri}</Label>
+                        <Flex direction="row" gap="2">
+                          <Text>{state.file?.name}</Text>
+                          <Button
+                            css={{ display: "flex", ai: "center" }}
+                            type="button"
+                            size="2"
+                            variant="violet"
+                            onClick={async () => {
+                              setStateProp("file", await videoNft.pickFile());
+                            }}>
+                            Pick a file
+                          </Button>
+                        </Flex>
+                      </>
+                    )}
+
                     <Label htmlFor="contractAddress">
                       Contract Address (optional)
                     </Label>
@@ -353,6 +373,44 @@ export default function MintNFT() {
                           Polygon Mainnet
                         </Button>
                       </>
+                    ) : state?.file ? (
+                      <Button
+                        css={{ display: "flex", ai: "center" }}
+                        type="button"
+                        size="2"
+                        disabled={isMinting.on}
+                        variant="violet"
+                        onClick={async () => {
+                          isMinting.onOn();
+                          try {
+                            const { file } = state;
+                            addLog("Uploading file...");
+                            let asset = await videoNft.createAsset(file.name, {
+                              file,
+                            });
+                            addLog("Normalizing for NFT...");
+                            asset = await videoNft.nftNormalize(asset);
+                            addLog("Exporting to IPFS...");
+                            const { nftMetadataUrl } =
+                              await videoNft.exportToIPFS(asset.id);
+                            addLog("Done! NFT token URI: " + nftMetadataUrl);
+                            setStateProp("tokenUri", nftMetadataUrl);
+                          } finally {
+                            isMinting.onOff();
+                          }
+                        }}>
+                        {isMinting.on && (
+                          <Spinner
+                            css={{
+                              color: "$hiContrast",
+                              width: 16,
+                              height: 16,
+                              mr: "$2",
+                            }}
+                          />
+                        )}
+                        {isMinting.on ? "Uploading..." : "Upload file"}
+                      </Button>
                     ) : (
                       <Button
                         css={{ display: "flex", ai: "center" }}
