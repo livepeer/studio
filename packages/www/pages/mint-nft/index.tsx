@@ -108,7 +108,7 @@ async function richSwitchChain(
 
 export default function MintNFT() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
-  const { token: jwt, baseUrl: endpoint } = useApi();
+  const { token: jwt, endpoint } = useApi();
   const videoNft = useMemo(
     () => new VideoNFT({ auth: { jwt }, endpoint }, { ethereum, chainId }),
     [ethereum, chainId, jwt, endpoint]
