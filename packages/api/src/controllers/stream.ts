@@ -39,7 +39,7 @@ type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
 type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
-export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
+export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
 const ACTIVE_TIMEOUT = 90 * 1000;
 
