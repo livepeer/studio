@@ -374,7 +374,7 @@ export default function MintNFT() {
                           Polygon Mainnet
                         </Button>
                       </>
-                    ) : state?.file ? (
+                    ) : state.file && !state.tokenUri ? (
                       <Button
                         css={{ display: "flex", ai: "center" }}
                         type="button"
