@@ -87,7 +87,7 @@ const trackPageView = (email, path = null) => {
 };
 
 const getStoredToken = () => {
-  if (!process.browser) {
+  if (!("browser" in process)) {
     return null;
   }
   try {
