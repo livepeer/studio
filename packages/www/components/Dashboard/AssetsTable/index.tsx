@@ -1,5 +1,7 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { useApi, usePageVisibility } from "hooks";
 import {
   Flex,
   Heading,
@@ -8,11 +10,69 @@ import {
   Box,
 } from "@livepeer.com/design-system";
 
+type StreamsTableData = {
+  id: string;
+  name: TextCellProps;
+  details: RenditionDetailsCellProps;
+  createdAt: DateCellProps;
+  lastSeen: DateCellProps;
+  status: TextCellProps;
+};
+
 const AssetsTable = ({
+  userId,
   title = "Video on Demand Assets",
 }: {
+  userId: string;
   title?: string;
 }) => {
+  const [assets, setAssets] = useState([]);
+
+  const { getAssets } = useApi();
+
+  useEffect(() => {
+    async function init() {
+      const [assets] = await getAssets(userId);
+      setAssets(assets);
+    }
+    init();
+  }, [userId]);
+
+  console.log(assets);
+
+  const columns: Column<StreamsTableData>[] = useMemo(
+    () => [
+      {
+        Header: "Name",
+        accessor: "name",
+        Cell: TextCell,
+        sortType: (...params: SortTypeArgs) =>
+          stringSort("original.name.value", ...params),
+      },
+      {
+        Header: "Created",
+        accessor: "createdAt",
+        Cell: DateCell,
+        sortType: (...params: SortTypeArgs) =>
+          dateSort("original.createdAt.date", ...params),
+      },
+      {
+        Header: "Last seen",
+        accessor: "lastSeen",
+        Cell: DateCell,
+        sortType: (...params: SortTypeArgs) =>
+          dateSort("original.lastSeen.date", ...params),
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: TextCell,
+        disableSortBy: true,
+      },
+    ],
+    []
+  );
+
   return (
     <>
       <Heading size="2" css={{ fontWeight: 600 }}>

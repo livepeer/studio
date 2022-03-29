@@ -10,6 +10,7 @@ import {
   StreamPatchPayload,
   ObjectStore,
   MultistreamTargetPatchPayload,
+  Asset
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -151,7 +152,7 @@ const makeContext = (state: ApiState, setState) => {
         : `/api${url}`;
 
       if (isDevelopment()) {
-        endpoint = `http://localhost:3004/api${url}`;
+        endpoint = `https://livepeer.com/api${url}`;
       }
 
       const res = await fetch(endpoint, {
@@ -821,6 +822,38 @@ const makeContext = (state: ApiState, setState) => {
         throw new HttpError(res.status, body);
       }
       return res;
+    },
+
+    async getAssets(
+      userId: string,
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
+        count?: boolean;
+      }
+    ): Promise<[Asset[], string, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
+      const [res, assets] = await context.fetch(
+        `/asset?${qs.stringify({
+          userId,
+          filters,
+          active: opts?.active,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
+          streamsonly: 1,
+        })}`
+      );
+      if (res.status !== 200) {
+        throw new Error(assets);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [assets, nextCursor, count];
     },
 
     async getObjectStore(
