@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
-import { InternalServerError, ForbiddenError } from "../store/errors";
+import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
@@ -77,12 +77,12 @@ function authenticator(): RequestHandler {
       const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : authToken;
       if (!tokenId) {
-        throw new ForbiddenError(`no authorization token provided`);
+        throw new UnauthorizedError(`no authorization token provided`);
       }
       tokenObject = await db.apiToken.get(tokenId);
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
-        throw new ForbiddenError(`no token ${tokenId} found`);
+        throw new UnauthorizedError(`no token ${tokenId} found`);
       }
 
       userId = tokenObject.userId;
@@ -96,17 +96,17 @@ function authenticator(): RequestHandler {
         userId = verified.sub;
         tracking.recordUser(db, userId);
       } catch (err) {
-        throw new ForbiddenError(err.message);
+        throw new UnauthorizedError(err.message);
       }
     } else {
-      throw new ForbiddenError(
+      throw new UnauthorizedError(
         `unsupported authorization header scheme: ${rawAuthScheme}`
       );
     }
 
     user = await db.user.get(userId);
     if (!user) {
-      throw new InternalServerError(
+      throw new UnauthorizedError(
         `no user found from authorization header: ${authHeader}`
       );
     }
@@ -143,7 +143,7 @@ function authorizer(params: AuthzParams): RequestHandler {
   return async (req, res, next) => {
     const { user, isUIAdmin, token } = req;
     if (!user) {
-      throw new ForbiddenError(`request is not authenticated`);
+      throw new UnauthorizedError(`request is not authenticated`);
     }
 
     const verifyEmail =
