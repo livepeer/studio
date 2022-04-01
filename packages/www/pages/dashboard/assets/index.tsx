@@ -18,7 +18,7 @@ const Assets = () => {
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
-          <AssetsTable userId={user.id} />
+          <AssetsTable userId={user.id} tableId="dashboardAssetsTable" />
         </Box>
       </Box>
     </Layout>

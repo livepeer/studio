@@ -10,7 +10,7 @@ import {
   StreamPatchPayload,
   ObjectStore,
   MultistreamTargetPatchPayload,
-  Asset
+  Asset,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -152,7 +152,7 @@ const makeContext = (state: ApiState, setState) => {
         : `/api${url}`;
 
       if (isDevelopment()) {
-        endpoint = `https://livepeer.com/api${url}`;
+        endpoint = `http://localhost:3004/api${url}`;
       }
 
       const res = await fetch(endpoint, {
@@ -824,6 +824,21 @@ const makeContext = (state: ApiState, setState) => {
       return res;
     },
 
+    async createAsset(params): Promise<Asset> {
+      const [res, asset] = await context.fetch(`/asset/import`, {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 201) {
+        throw new Error(asset.errors.join(", "));
+      }
+      return asset;
+    },
+
     async getAssets(
       userId: string,
       opts?: {
@@ -854,6 +869,28 @@ const makeContext = (state: ApiState, setState) => {
       const nextCursor = getCursor(res.headers.get("link"));
       const count = res.headers.get("X-Total-Count");
       return [assets, nextCursor, count];
+    },
+
+    async deleteAsset(id: string): Promise<void> {
+      const [res, body] = await context.fetch(`/asset/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
+    },
+
+    async deleteAssets(ids: Array<string>): Promise<void> {
+      const [res, body] = await context.fetch(`/asset`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 204) {
+        throw new Error(body);
+      }
     },
 
     async getObjectStore(
