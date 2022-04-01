@@ -1,5 +1,10 @@
 // import 'express-async-errors' // it monkeypatches, i guess
-import Router from "express/lib/router";
+import cors from "cors";
+import { Router } from "express";
+import promBundle from "express-prom-bundle";
+import proxy from "http-proxy-middleware";
+import Stripe from "stripe";
+
 import makeStore from "./store";
 import {
   errorHandler,
@@ -13,12 +18,10 @@ import {
 import controllers from "./controllers";
 import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
-import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
 import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
-import Stripe from "stripe";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 
@@ -27,6 +30,7 @@ enum OrchestratorSource {
   subgraph = "subgraph",
   region = "region",
 }
+
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
   "broadcaster",
@@ -34,6 +38,26 @@ const GEOLOCATION_ENDPOINTS = [
   "ingest",
   "geolocate",
 ];
+
+const CORS_WHITELIST = [
+  "https://livepeer.com",
+  "https://livepeer.monster",
+  "https://explorer.livepeer.org",
+  "http://localhost:3000",
+  /livepeer.vercel\.app$/,
+  /livepeerorg.vercel\.app$/,
+  /\.livepeerorg.now\.sh$/,
+];
+
+const PROM_BUNDLE_OPTS: promBundle.Opts = {
+  includeUp: false,
+  includeMethod: true,
+  includePath: true,
+  httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
+  urlValueParser: {
+    extraMasks: [/[\da-z]{4}(?:\-[\da-z]{4}){3}/, /[\da-z]{16}/],
+  },
+};
 
 export default async function makeApp(params: CliArgs) {
   const {
@@ -127,6 +151,14 @@ export default async function makeApp(params: CliArgs) {
 
   const app = Router();
   app.use(healthCheck);
+  app.use(promBundle(PROM_BUNDLE_OPTS));
+  app.use(
+    cors({
+      origin: CORS_WHITELIST,
+      credentials: true,
+      exposedHeaders: ["*"],
+    })
+  );
 
   // stripe webhook requires raw body
   // https://github.com/stripe/stripe-node/issues/331
