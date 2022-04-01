@@ -27,8 +27,7 @@ declare global {
 
       user?: User;
       isUIAdmin?: boolean;
-      tokenName?: string;
-      tokenId?: string;
+      token?: WithId<ApiToken>;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;

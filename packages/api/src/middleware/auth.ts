@@ -41,21 +41,28 @@ function isAuthorized(
   }
 }
 
-interface AuthParams {
-  allowUnverified?: boolean;
-  admin?: boolean;
-  anyAdmin?: boolean;
-  noApiToken?: boolean;
-  originalUriHeader?: string;
-}
-
 /**
- * creates an authentication middleware that can be customized.
- * @param {Object} params auth middleware params, to be defined later
+ * Creates a middleware that parses and verifies the authentication method from
+ * the request and populates the `express.Request` object.
+ *
+ * @remarks
+ * The only auth method supported is the `Authorization` header. It can use:
+ *  * the `Bearer` scheme with an API key (used by external applications);
+ *  * the `JWT` scheme with a JWT token (used by the dashboard), or;
+ *  * the `Basic` scheme with an `userId` as the username and an API key from
+ *    that user as the `password` (used by `go-livepeer` that only supports a
+ *    URL to specify some endpoints like the stream auth webhook).
+ *
+ * @remarks
+ * It is supposed to be used as a global middleware that runs for every request
+ * and should be used in conjunction with the `authorizer` middleware below.
+ *
+ * As such it allows requests without any authentication method to pass through.
+ * If the specific API requires a user, it must add an {@link authorizer}
+ * middleware which will fail if the request is not authenticated.
  */
-function authFactory(params: AuthParams): RequestHandler {
+function authenticator(): RequestHandler {
   return async (req, res, next) => {
-    // must have either an API key (starts with 'Bearer') or a JWT token
     const authHeader = req.headers.authorization;
     const { authScheme, authToken, rawAuthScheme } =
       parseAuthHeader(authHeader);
@@ -65,8 +72,8 @@ function authFactory(params: AuthParams): RequestHandler {
     let userId: string;
 
     if (!authScheme) {
-      throw new ForbiddenError(`no authorization header provided`);
-    } else if (["bearer", "basic"].includes(authScheme) && !params.noApiToken) {
+      return next();
+    } else if (["bearer", "basic"].includes(authScheme)) {
       const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : authToken;
       if (!tokenId) {
@@ -107,20 +114,50 @@ function authFactory(params: AuthParams): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
+    req.user = user;
+    // UI admins must have a JWT
+    req.isUIAdmin = user.admin && authScheme === "jwt";
+    req.token = tokenObject;
+    return next();
+  };
+}
+
+interface AuthzParams {
+  allowUnverified?: boolean;
+  admin?: boolean;
+  anyAdmin?: boolean;
+  noApiToken?: boolean;
+  originalUriHeader?: string;
+}
+
+/**
+ * Creates a customizable authorization middleware that ensures any access
+ * restrictions are met for the request to go through.
+ *
+ * @remarks
+ * This has a strict dependency on the {@link authenticator} middleware above.
+ * If that middleware hasn't run in the request before this one, all requests
+ * will be rejected.
+ */
+function authorizer(params: AuthzParams): RequestHandler {
+  return async (req, res, next) => {
+    const { user, isUIAdmin, token } = req;
+    if (!user) {
+      throw new ForbiddenError(`request is not authenticated`);
+    }
+
     const verifyEmail =
       req.config.requireEmailVerification && !params.allowUnverified;
     if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
-        `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
+        `user ${user.email} has not been verified. please check your inbox for verification email.`
       );
     }
 
-    // UI admins must have a JWT
-    const isUIAdmin = user.admin && authScheme === "jwt";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const accessRules = tokenObject?.access?.rules;
+    const accessRules = token?.access?.rules;
     if (accessRules) {
       let fullPath = pathJoin2(req.baseUrl, req.path);
       let { httpPrefix } = req.config;
@@ -134,18 +171,20 @@ function authFactory(params: AuthParams): RequestHandler {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
     }
-
-    req.user = user;
-    req.isUIAdmin = isUIAdmin;
-    if (tokenObject && tokenObject.name) {
-      req.tokenName = tokenObject.name;
-    }
-    if (tokenObject && tokenObject.id) {
-      req.tokenId = tokenObject.id;
-    }
     return next();
   };
 }
 
-// export default router
-export default authFactory;
+export { authenticator, authorizer };
+
+// For backward compatibility export both authn and authz together.
+export default (params: AuthzParams): RequestHandler => {
+  const authn = authenticator();
+  const authz = authorizer(params);
+
+  return (req, res, next) => {
+    return authn(req, res, (err: any) => {
+      return err ? next(err) : authz(req, res, next);
+    });
+  };
+};
