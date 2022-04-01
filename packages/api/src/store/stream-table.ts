@@ -365,7 +365,7 @@ export default class StreamTable extends Table<DBStream> {
   }
 }
 
-const adminOnlyFields = ["mistHost", "broadcasterHost"];
+const adminOnlyFields = ["mistHost", "broadcasterHost", "createdByTokenId"];
 
 const privateFields = [
   "recordObjectStoreId",
