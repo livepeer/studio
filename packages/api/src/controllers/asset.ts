@@ -25,15 +25,6 @@ import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { Asset, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
-import cors from "cors";
-
-var corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: true,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
 
 const app = Router();
 
@@ -182,7 +173,7 @@ const fieldsMap: FieldsMap = {
   meta: `asset.data->>'meta'`,
 };
 
-app.get("/", cors(corsOptions), authorizer({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
@@ -269,7 +260,7 @@ app.get("/", cors(corsOptions), authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", cors(corsOptions), authorizer({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
@@ -293,7 +284,6 @@ app.get("/:id", cors(corsOptions), authorizer({}), async (req, res) => {
 
 app.post(
   "/:id/export",
-  cors(corsOptions),
   validatePost("export-task-params"),
   authorizer({}),
   async (req, res) => {
@@ -324,7 +314,6 @@ app.post(
 
 app.post(
   "/import",
-  cors(corsOptions),
   validatePost("new-asset-payload"),
   authorizer({}),
   async (req, res) => {
@@ -364,7 +353,6 @@ app.post(
 
 app.post(
   "/transcode",
-  cors(corsOptions),
   validatePost("new-transcode-payload"),
   authorizer({}),
   async (req, res) => {
@@ -412,7 +400,6 @@ app.post(
 
 app.post(
   "/request-upload",
-  cors(corsOptions),
   validatePost("new-asset-payload"),
   authorizer({}),
   async (req, res) => {
@@ -457,7 +444,7 @@ app.post(
   }
 );
 
-app.put("/upload/:url", cors(corsOptions), async (req, res) => {
+app.put("/upload/:url", async (req, res) => {
   const {
     params: { url },
     config: { jwtSecret, jwtAudience },
