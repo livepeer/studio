@@ -64,6 +64,7 @@ function isAuthorized(
  */
 function authenticator(): RequestHandler {
   return async (req, res, next) => {
+    res.vary("Authorization");
     const authHeader = req.headers.authorization;
     const { authScheme, authToken, rawAuthScheme } =
       parseAuthHeader(authHeader);
