@@ -1,7 +1,7 @@
+export * from "./auth";
 export * from "./validators";
 export { default as errorHandler } from "./errorHandler";
 export { default as healthCheck } from "./health-check";
-export { default as authMiddleware } from "./auth";
 export { default as kubernetes } from "./kubernetes";
 export { default as subgraph } from "./subgraph";
 export { default as checkKubernetes } from "./check-kubernetes";

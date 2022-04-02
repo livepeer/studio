@@ -3,14 +3,14 @@
  */
 
 import { Router } from "express";
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { db } from "../store";
 
 const app = Router();
 
 app.all(
   "/",
-  authMiddleware({ originalUriHeader: "x-original-uri" }),
+  authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
     const streamId = req.headers["x-livepeer-stream-id"];
     const stream = await db.stream.get(streamId?.toString() ?? "");

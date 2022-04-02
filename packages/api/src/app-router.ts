@@ -14,6 +14,8 @@ import {
   hardcodedNodes,
   insecureTest,
   geolocateMiddleware,
+  authenticator,
+  corsOptsProvider,
 } from "./middleware";
 import controllers from "./controllers";
 import streamProxy from "./controllers/stream-proxy";
@@ -24,7 +26,6 @@ import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
-import { authenticator, corsOptsProvider } from "./middleware/auth";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -153,6 +154,17 @@ export default async function makeApp(params: CliArgs) {
   const app = Router();
   app.use(healthCheck);
   app.use(promBundle(PROM_BUNDLE_OPTS));
+
+  app.use((req, res, next) => {
+    req.orchestratorsGetters = [];
+    req.store = store;
+    req.config = params;
+    req.frontendDomain = frontendDomain; // defaults to livepeer.com
+    req.queue = queue;
+    req.taskScheduler = taskScheduler;
+    req.stripe = stripe;
+    next();
+  });
   app.use(authenticator());
   app.use(
     cors(
@@ -169,18 +181,8 @@ export default async function makeApp(params: CliArgs) {
   // stripe webhook requires raw body
   // https://github.com/stripe/stripe-node/issues/331
   app.use("/api/stripe/webhook", bodyParser.raw({ type: "*/*" }));
-
   app.use(bodyParser.json());
-  app.use((req, res, next) => {
-    req.orchestratorsGetters = [];
-    req.store = store;
-    req.config = params;
-    req.frontendDomain = frontendDomain; // defaults to livepeer.com
-    req.queue = queue;
-    req.taskScheduler = taskScheduler;
-    req.stripe = stripe;
-    next();
-  });
+
   if (insecureTestToken) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("tried to set insecureTestToken in production!");

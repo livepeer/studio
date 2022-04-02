@@ -1,7 +1,7 @@
 import { Router } from "express";
 import sql from "sql-template-strings";
 
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { User } from "../schema/types";
 import { db } from "../store";
 import { DBSession } from "../store/db";
@@ -51,7 +51,7 @@ const fieldsMap: FieldsMap = {
   recordingStatus: `session.data->'recordingStatus'`,
 };
 
-app.get("/", authMiddleware({}), async (req, res, next) => {
+app.get("/", authorizer({}), async (req, res, next) => {
   let { limit, cursor, all, order, filters, userId, parentId, count } =
     toStringValues(req.query);
   const { forceUrl } = req.query;
@@ -145,106 +145,98 @@ app.get("/", authMiddleware({}), async (req, res, next) => {
   res.json(sessions);
 });
 
-app.get(
-  "/migrate2",
-  authMiddleware({ anyAdmin: true }),
-  async (req, res, next) => {
-    const query = [];
-    query.push(sql`data->>'record' = 'true'`);
-    query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
+app.get("/migrate2", authorizer({ anyAdmin: true }), async (req, res, next) => {
+  const query = [];
+  query.push(sql`data->>'record' = 'true'`);
+  query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
 
-    let docs, cursor;
-    const now = Date.now();
-    const toClean = [];
-    res.writeHead(200);
-    res.flushHeaders();
-    let processed = 0;
-    do {
-      [docs, cursor] = await db.session.find(query, { cursor, limit: 100 });
-      // sending progress should prevent request timing out
-      res.write(".");
-      for (const session of docs) {
-        if (!session.lastSessionId) {
-          const stream = await db.stream.get(session.id);
-          if (stream && stream.lastSessionId) {
-            await db.session.update(session.id, {
-              lastSessionId: stream.lastSessionId,
-            });
-          }
+  let docs, cursor;
+  const now = Date.now();
+  const toClean = [];
+  res.writeHead(200);
+  res.flushHeaders();
+  let processed = 0;
+  do {
+    [docs, cursor] = await db.session.find(query, { cursor, limit: 100 });
+    // sending progress should prevent request timing out
+    res.write(".");
+    for (const session of docs) {
+      if (!session.lastSessionId) {
+        const stream = await db.stream.get(session.id);
+        if (stream && stream.lastSessionId) {
+          await db.session.update(session.id, {
+            lastSessionId: stream.lastSessionId,
+          });
         }
-        processed++;
       }
-    } while (cursor);
-    res.write("\n");
-    res.end(`processed ${processed} sessions\n`);
-  }
-);
+      processed++;
+    }
+  } while (cursor);
+  res.write("\n");
+  res.end(`processed ${processed} sessions\n`);
+});
 
-app.get(
-  "/migrate",
-  authMiddleware({ anyAdmin: true }),
-  async (req, res, next) => {
-    const query = [];
-    query.push(sql`data->>'record' = 'true'`);
-    query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
-    query.push(sql`data->'parentId' is not null `);
-    query.push(sql`(data->'lastSeen')::bigint > 0`);
-    query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
-    query.push(sql`data->>'partialSession' IS NULL`);
+app.get("/migrate", authorizer({ anyAdmin: true }), async (req, res, next) => {
+  const query = [];
+  query.push(sql`data->>'record' = 'true'`);
+  query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
+  query.push(sql`data->'parentId' is not null `);
+  query.push(sql`(data->'lastSeen')::bigint > 0`);
+  query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
+  query.push(sql`data->>'partialSession' IS NULL`);
 
-    let docs, cursor;
-    const now = Date.now();
-    const toClean = [];
-    res.writeHead(200);
-    res.flushHeaders();
-    let processed = 0;
-    const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-    do {
-      [docs, cursor] = await db.stream.find(query, { cursor, limit: 100 });
-      // sending progress should prevent request timing out
-      res.write(".");
-      for (const stream of docs) {
-        const isReady = stream.lastSeen > 0 && stream.lastSeen < olderThen;
-        if (!isReady) {
-          continue;
-        }
-        let sessionId = stream.id;
-        if (stream.previousSessions && stream.previousSessions.length) {
-          sessionId = stream.previousSessions[0];
-        }
-        const sessObj = await db.session.get(sessionId);
-        if (sessObj) {
-          continue;
-        }
-        const parent = await db.stream.get(stream.parentId);
-        const combinedStats = getCombinedStats(
-          stream,
-          stream.previousStats || {}
-        );
-        const newSession: DBSession & DBStream = {
-          ...stream,
-          ...combinedStats,
-          createdAt: stream.userSessionCreatedAt || stream.createdAt,
-          id: sessionId,
-          deleted: false,
-          isActive: undefined,
-          previousStats: undefined,
-          previousSessions: undefined,
-          userSessionCreatedAt: undefined,
-          renditions: undefined,
-          kind: "session",
-          playbackId: parent.playbackId,
-        };
-        await db.session.create(newSession);
-        processed++;
+  let docs, cursor;
+  const now = Date.now();
+  const toClean = [];
+  res.writeHead(200);
+  res.flushHeaders();
+  let processed = 0;
+  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
+  do {
+    [docs, cursor] = await db.stream.find(query, { cursor, limit: 100 });
+    // sending progress should prevent request timing out
+    res.write(".");
+    for (const stream of docs) {
+      const isReady = stream.lastSeen > 0 && stream.lastSeen < olderThen;
+      if (!isReady) {
+        continue;
       }
-    } while (cursor);
-    res.write("\n");
-    res.end(`processed ${processed} sessions\n`);
-  }
-);
+      let sessionId = stream.id;
+      if (stream.previousSessions && stream.previousSessions.length) {
+        sessionId = stream.previousSessions[0];
+      }
+      const sessObj = await db.session.get(sessionId);
+      if (sessObj) {
+        continue;
+      }
+      const parent = await db.stream.get(stream.parentId);
+      const combinedStats = getCombinedStats(
+        stream,
+        stream.previousStats || {}
+      );
+      const newSession: DBSession & DBStream = {
+        ...stream,
+        ...combinedStats,
+        createdAt: stream.userSessionCreatedAt || stream.createdAt,
+        id: sessionId,
+        deleted: false,
+        isActive: undefined,
+        previousStats: undefined,
+        previousSessions: undefined,
+        userSessionCreatedAt: undefined,
+        renditions: undefined,
+        kind: "session",
+        playbackId: parent.playbackId,
+      };
+      await db.session.create(newSession);
+      processed++;
+    }
+  } while (cursor);
+  res.write("\n");
+  res.end(`processed ${processed} sessions\n`);
+});
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||

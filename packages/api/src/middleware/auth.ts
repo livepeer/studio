@@ -163,7 +163,7 @@ function authorizer(params: AuthzParams): RequestHandler {
       throw new UnauthorizedError(`request is not authenticated`);
     }
     if (token && params.noApiToken) {
-      throw new ForbiddenError(`This API cannot be accessed by API keys`);
+      throw new ForbiddenError(`access forbidden for API keys`);
     }
 
     const verifyEmail =
@@ -196,15 +196,3 @@ function authorizer(params: AuthzParams): RequestHandler {
 }
 
 export { authenticator, corsOptsProvider, authorizer };
-
-// For backward compatibility export both authn and authz together.
-export default (params: AuthzParams): RequestHandler => {
-  const authn = authenticator();
-  const authz = authorizer(params);
-
-  return (req, res, next) => {
-    return authn(req, res, (err: any) => {
-      return err ? next(err) : authz(req, res, next);
-    });
-  };
-};

@@ -1,10 +1,10 @@
 import Router from "express/lib/router";
 import { db } from "../store";
-import { authMiddleware, validatePost } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 
 const app = Router();
 
-app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
+app.get("/", authorizer({ anyAdmin: true }), async (req, res) => {
   let { fromTime, toTime } = req.query;
 
   // if time range isn't specified return all usage
@@ -27,7 +27,7 @@ app.get("/", authMiddleware({ anyAdmin: true }), async (req, res) => {
 
 app.post(
   "/update",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("usage"),
   async (req, res) => {
     let { fromTime, toTime } = req.query;

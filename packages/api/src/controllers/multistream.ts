@@ -1,7 +1,7 @@
 import { SQLStatement } from "sql-template-strings";
 import mung from "express-mung";
 
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
 import {
@@ -71,7 +71,7 @@ const badRequest = (res: Response, error: string) =>
 
 const target = Router();
 
-target.use(authMiddleware({}));
+target.use(authorizer({}));
 
 target.use(
   mung.json(function cleanWriteOnlyResponses(data, req) {

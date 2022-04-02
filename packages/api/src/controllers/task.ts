@@ -1,4 +1,4 @@
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { Router } from "express";
 import mung from "express-mung";
@@ -89,7 +89,7 @@ app.use(
   })
 );
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
@@ -171,7 +171,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const task = await db.task.get(req.params.id);
   if (!task) {
     res.status(404);
@@ -192,7 +192,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 
 app.post(
   "/",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("task"),
   async (req, res) => {
     const id = uuid();
@@ -205,39 +205,35 @@ app.post(
   }
 );
 
-app.post(
-  "/:id/status",
-  authMiddleware({ anyAdmin: true }),
-  async (req, res) => {
-    // update status of a specific task
-    const { id } = req.params;
-    const task = await db.task.get(id);
-    if (!task) {
-      return res.status(404).json({ errors: ["not found"] });
-    }
-
-    const doc = req.body.status;
-    if (!doc) {
-      return res.status(422).json({ errors: ["missing status in payload"] });
-    } else if (doc.phase && doc.phase !== "running") {
-      return res
-        .status(422)
-        .json({ errors: ["can only update phase to running"] });
-    }
-    const status: Task["status"] = {
-      ...task.status,
-      phase: "running",
-      progress: doc.progress,
-      updatedAt: Date.now(),
-    };
-    await db.task.update(id, { status });
-
-    res.status(200);
-    res.json({ id, status });
+app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
+  // update status of a specific task
+  const { id } = req.params;
+  const task = await db.task.get(id);
+  if (!task) {
+    return res.status(404).json({ errors: ["not found"] });
   }
-);
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+  const doc = req.body.status;
+  if (!doc) {
+    return res.status(422).json({ errors: ["missing status in payload"] });
+  } else if (doc.phase && doc.phase !== "running") {
+    return res
+      .status(422)
+      .json({ errors: ["can only update phase to running"] });
+  }
+  const status: Task["status"] = {
+    ...task.status,
+    phase: "running",
+    progress: doc.progress,
+    updatedAt: Date.now(),
+  };
+  await db.task.update(id, { status });
+
+  res.status(200);
+  res.json({ id, status });
+});
+
+app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const task = await db.task.get(id);
   if (!task) {
@@ -258,7 +254,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
 // TODO: Remove this API.
 app.patch(
   "/:id",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("task"),
   async (req, res) => {
     // update a specific task

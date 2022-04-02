@@ -6,7 +6,7 @@ import { parse as parseUrl } from "url";
 import { v4 as uuid } from "uuid";
 
 import logger from "../logger";
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
 import {
@@ -222,7 +222,7 @@ const fieldsMap: FieldsMap = {
   },
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let {
     limit,
     cursor,
@@ -332,7 +332,7 @@ function setRecordingStatus(
 }
 
 // returns only 'user' sessions and adds
-app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
+app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const { parentId } = req.params;
   const { record, forceUrl } = req.query;
   let { limit, cursor } = toStringValues(req.query);
@@ -408,7 +408,7 @@ app.get("/:parentId/sessions", authMiddleware({}), async (req, res) => {
   res.json(db.stream.addDefaultFieldsMany(sessions));
 });
 
-app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
+app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   const { parentId } = req.params;
   const { limit, cursor } = toStringValues(req.query);
   logger.info(`cursor params ${cursor}, limit ${limit}`);
@@ -440,7 +440,7 @@ app.get("/sessions/:parentId", authMiddleware({}), async (req, res) => {
   );
 });
 
-app.get("/user/:userId", authMiddleware({}), async (req, res) => {
+app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
   let { limit, cursor, streamsonly, sessionsonly } = toStringValues(req.query);
 
@@ -481,7 +481,7 @@ app.get("/user/:userId", authMiddleware({}), async (req, res) => {
   );
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   let stream = await db.stream.get(req.params.id);
   if (
@@ -527,7 +527,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 });
 
 // returns stream by steamKey
-app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
+app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
   console.log(`headers:`, req.headers);
   const {
     data: [stream],
@@ -551,7 +551,7 @@ app.get("/playback/:playbackId", authMiddleware({}), async (req, res) => {
 });
 
 // returns stream by steamKey
-app.get("/key/:streamKey", authMiddleware({}), async (req, res) => {
+app.get("/key/:streamKey", authorizer({}), async (req, res) => {
   const useReplica = req.query.main !== "true";
   const [docs] = await db.stream.find(
     { streamKey: req.params.streamKey },
@@ -594,7 +594,7 @@ async function generateUniqueStreamKey(store: IStore, otherKeys: string[]) {
 
 app.post(
   "/:streamId/stream",
-  authMiddleware({}),
+  authorizer({}),
   validatePost("stream"),
   async (req, res) => {
     if (!req.body || !req.body.name) {
@@ -784,7 +784,7 @@ app.post(
   }
 );
 
-app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
+app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
   if (!req.body || !req.body.name) {
     res.status(422);
     return res.json({
@@ -851,7 +851,7 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
 
 app.put(
   "/:id/setactive",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("stream-set-active-payload"),
   async (req, res) => {
     const { id } = req.params;
@@ -1012,7 +1012,7 @@ const sendSetActiveHooks = async (
 // sets 'isActive' field to false for many objects at once
 app.patch(
   "/deactivate-many",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("deactivate-many-payload"),
   async (req, res) => {
     let upRes: QueryResult;
@@ -1045,7 +1045,7 @@ app.patch(
 
 app.patch(
   "/:id",
-  authMiddleware({}),
+  authorizer({}),
   validatePost("stream-patch-payload"),
   async (req, res) => {
     const { id } = req.params;
@@ -1095,7 +1095,7 @@ app.patch(
   }
 );
 
-app.patch("/:id/record", authMiddleware({}), async (req, res) => {
+app.patch("/:id/record", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
   if (!stream || stream.deleted) {
@@ -1118,7 +1118,7 @@ app.patch("/:id/record", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
   if (
@@ -1139,7 +1139,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.delete("/", authMiddleware({}), async (req, res) => {
+app.delete("/", authorizer({}), async (req, res) => {
   if (!req.body || !req.body.ids || !req.body.ids.length) {
     res.status(422);
     return res.json({
@@ -1164,7 +1164,7 @@ app.delete("/", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.get("/:id/info", authMiddleware({}), async (req, res) => {
+app.get("/:id/info", authorizer({}), async (req, res) => {
   let { id } = req.params;
   let stream = await db.stream.getByStreamKey(id);
   let session,
@@ -1216,7 +1216,7 @@ app.get("/:id/info", authMiddleware({}), async (req, res) => {
   res.json(resp);
 });
 
-app.patch("/:id/suspended", authMiddleware({}), async (req, res) => {
+app.patch("/:id/suspended", authorizer({}), async (req, res) => {
   const { id } = req.params;
   if (
     !req.body ||
@@ -1246,7 +1246,7 @@ app.patch("/:id/suspended", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
+app.delete("/:id/terminate", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const stream = await db.stream.get(id);
   if (
@@ -1320,7 +1320,7 @@ export async function terminateStreamReq(
 
 // Hooks
 
-app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
+app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
   if (!req.body || !req.body.url) {
     res.status(422);
     return res.json({
@@ -1500,7 +1500,7 @@ app.post("/hook", authMiddleware({ anyAdmin: true }), async (req, res) => {
 
 app.post(
   "/hook/detection",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("detection-webhook-payload"),
   async (req, res) => {
     const { manifestID, seqNo, sceneClassification }: DetectionWebhookPayload =

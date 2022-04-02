@@ -290,9 +290,7 @@ describe("controllers/api-token", () => {
         const res = await client.fetch(path, { method });
         expect(res.status).toBe(403);
         const body = await res.json();
-        expect(body.errors[0]).toEqual(
-          "unsupported authorization header scheme: Bearer"
-        );
+        expect(body.errors[0]).toEqual("access forbidden for API keys");
       };
       const expectAll403s = async () => {
         await expect403("post", `/api-token`);
