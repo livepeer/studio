@@ -145,6 +145,9 @@ function authorizer(params: AuthzParams): RequestHandler {
     if (!user) {
       throw new UnauthorizedError(`request is not authenticated`);
     }
+    if (token && params.noApiToken) {
+      throw new ForbiddenError(`This API cannot be accessed by API keys`);
+    }
 
     const verifyEmail =
       req.config.requireEmailVerification && !params.allowUnverified;
