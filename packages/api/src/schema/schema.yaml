@@ -1364,6 +1364,15 @@ components:
           type: object
           additionalProperties: false
           properties:
+            allowedOrigins:
+              type: array
+              description:
+                Origins from which the token can be used. If empty, CORS be
+                prohibited by default (safest). To allow any origin set to `[*]`
+              default: []
+              items:
+                type: string
+                example: https://example.com
             rules:
               type: array
               default: [{ resources: ["*"] }]

@@ -24,6 +24,7 @@ import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
+import { authenticator, corsOptsProvider } from "./middleware/auth";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -152,12 +153,17 @@ export default async function makeApp(params: CliArgs) {
   const app = Router();
   app.use(healthCheck);
   app.use(promBundle(PROM_BUNDLE_OPTS));
+  app.use(authenticator());
   app.use(
-    cors({
-      origin: CORS_WHITELIST,
-      credentials: true,
-      exposedHeaders: ["*"],
-    })
+    cors(
+      corsOptsProvider({
+        baseOpts: {
+          origin: CORS_WHITELIST,
+          credentials: true,
+          exposedHeaders: ["*"],
+        },
+      })
+    )
   );
 
   // stripe webhook requires raw body

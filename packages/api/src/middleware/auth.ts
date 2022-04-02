@@ -1,6 +1,7 @@
 import { URL } from "url";
 import basicAuth from "basic-auth";
-import { RequestHandler } from "express";
+import { CorsOptions, CorsOptionsDelegate } from "cors";
+import { Request, RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
@@ -130,6 +131,21 @@ interface AuthzParams {
   originalUriHeader?: string;
 }
 
+function corsOptsProvider(params: {
+  baseOpts: CorsOptions & { origin: (string | RegExp)[] };
+}): CorsOptionsDelegate<Request> {
+  const { baseOpts } = params;
+  return (req, callback) => {
+    if (!req.token?.access?.allowedOrigins) {
+      return callback(null, baseOpts);
+    }
+    return callback(null, {
+      ...baseOpts,
+      origin: [...baseOpts.origin, ...req.token.access.allowedOrigins],
+    });
+  };
+}
+
 /**
  * Creates a customizable authorization middleware that ensures any access
  * restrictions are met for the request to go through.
@@ -178,7 +194,7 @@ function authorizer(params: AuthzParams): RequestHandler {
   };
 }
 
-export { authenticator, authorizer };
+export { authenticator, corsOptsProvider, authorizer };
 
 // For backward compatibility export both authn and authz together.
 export default (params: AuthzParams): RequestHandler => {
