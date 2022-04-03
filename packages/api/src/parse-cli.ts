@@ -121,9 +121,10 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "identifies the recipients that the JWT is intended for",
         type: "string",
       },
-      "cors-allowlist": {
+      "cors-jwt-allowlist": {
         describe:
-          "comma-separated list of domains to allow CORS from. add a / prefix and suffix to an element to have it parsed as a regex",
+          "comma-separated list of domains to allow CORS for requests authenticated with a JWT. " +
+          "add a / prefix and suffix to an element to have it parsed as a regex",
         type: "string",
         default: undefined,
         coerce: coerceCorsList,

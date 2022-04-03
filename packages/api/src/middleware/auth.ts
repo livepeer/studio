@@ -133,16 +133,18 @@ interface AuthzParams {
 }
 
 function corsOptsProvider(params: {
-  baseOpts: CorsOptions & { origin: (string | RegExp)[] };
+  baseOpts: CorsOptions;
+  jwtOrigin: (string | RegExp)[];
 }): CorsOptionsDelegate<Request> {
-  const { baseOpts } = params;
+  const { baseOpts, jwtOrigin } = params;
+  const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   return (req, callback) => {
-    if (!req.token?.access?.allowedOrigins) {
-      return callback(null, baseOpts);
+    if (!req.token) {
+      return callback(null, jwtOpts);
     }
     return callback(null, {
       ...baseOpts,
-      origin: [...baseOpts.origin, ...req.token.access.allowedOrigins],
+      origin: req.token.access?.allowedOrigins,
     });
   };
 }
