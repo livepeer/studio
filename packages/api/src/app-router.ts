@@ -41,7 +41,7 @@ const GEOLOCATION_ENDPOINTS = [
   "geolocate",
 ];
 
-const CORS_WHITELIST = [
+const DEFAULT_CORS_ALLOWLIST = [
   "https://livepeer.com",
   "https://livepeer.monster",
   "https://explorer.livepeer.org",
@@ -83,6 +83,7 @@ export default async function makeApp(params: CliArgs) {
     broadcasters = "[]",
     ingest = "[]",
     prices = "[]",
+    corsAllowlist = DEFAULT_CORS_ALLOWLIST,
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,
@@ -170,7 +171,7 @@ export default async function makeApp(params: CliArgs) {
     cors(
       corsOptsProvider({
         baseOpts: {
-          origin: CORS_WHITELIST,
+          origin: corsAllowlist,
           credentials: true,
           exposedHeaders: ["*"],
         },

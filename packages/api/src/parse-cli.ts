@@ -2,7 +2,7 @@ import yargs from "yargs";
 import yargsToMist from "./yargs-to-mist";
 import { CamelKeys } from "./types/common";
 
-function coerceArr(arg) {
+function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
     const arr = [];
     for (const [key, value] of Object.entries(arg)) {
@@ -11,6 +11,16 @@ function coerceArr(arg) {
     return arr;
   }
   return arg;
+}
+
+function coerceCorsList(arg: any): (string | RegExp)[] {
+  const arr: string[] = coerceArr(arg);
+  return arr.map((str) => {
+    if (str.startsWith("/") && str.endsWith("/")) {
+      return new RegExp(str.slice(1, -1));
+    }
+    return str;
+  });
 }
 
 export type CliArgs = ReturnType<typeof parseCli>;
@@ -110,6 +120,13 @@ export default function parseCli(argv?: string | readonly string[]) {
       "jwt-audience": {
         describe: "identifies the recipients that the JWT is intended for",
         type: "string",
+      },
+      "cors-allowlist": {
+        describe:
+          "comma-separated list of domains to allow CORS from. add a / prefix and suffix to an element to have it parsed as a regex",
+        type: "string",
+        default: undefined,
+        coerce: coerceCorsList,
       },
       broadcasters: {
         describe:
