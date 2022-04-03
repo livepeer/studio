@@ -45,7 +45,6 @@ const DEFAULT_CORS_JWT_ALLOWLIST = [
   "https://livepeer.com",
   "https://livepeer.monster",
   "https://explorer.livepeer.org",
-  "http://localhost:3000",
   /livepeer.vercel\.app$/,
   /livepeerorg.vercel\.app$/,
   /\.livepeerorg.now\.sh$/,
