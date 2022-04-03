@@ -44,10 +44,9 @@ const GEOLOCATION_ENDPOINTS = [
 const DEFAULT_CORS_JWT_ALLOWLIST = [
   "https://livepeer.com",
   "https://livepeer.monster",
-  "https://explorer.livepeer.org",
-  /livepeer.vercel\.app$/,
-  /livepeerorg.vercel\.app$/,
-  /\.livepeerorg.now\.sh$/,
+  /livepeer\.vercel\.app$/,
+  /livepeerorg\.vercel\.app$/,
+  /\.livepeerorg\.now\.sh$/,
 ];
 
 const PROM_BUNDLE_OPTS: promBundle.Opts = {
