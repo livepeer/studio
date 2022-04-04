@@ -332,113 +332,123 @@ function setRecordingStatus(
 }
 
 // returns only 'user' sessions and adds
-app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
-  const { parentId } = req.params;
-  const { record, forceUrl } = req.query;
-  let { limit, cursor } = toStringValues(req.query);
-  const raw = req.query.raw && req.user.admin;
+app.get(
+  "/:parentId/sessions",
+  authorizer({ allowCorsApiKey: true }),
+  async (req, res) => {
+    const { parentId } = req.params;
+    const { record, forceUrl } = req.query;
+    let { limit, cursor } = toStringValues(req.query);
+    const raw = req.query.raw && req.user.admin;
 
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
-
-  const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    (stream.deleted && !req.isUIAdmin) ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
-  }
-
-  let filterOut;
-  const query = [];
-  query.push(sql`data->>'parentId' = ${stream.id}`);
-  query.push(sql`(data->'lastSeen')::bigint > 0`);
-  query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
-  query.push(sql`data->>'partialSession' IS NULL`);
-  if (record) {
-    if (record === "true" || record === "1") {
-      query.push(sql`data->>'record' = 'true'`);
-      query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
-    } else if (record === "false" || record === "0") {
-      query.push(sql`data->>'recordObjectStoreId' IS NULL`);
-      filterOut = true;
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      res.status(501);
+      return res.json({ errors: ["Ingest not configured"] });
     }
-  }
+    const ingest = ingests[0].base;
 
-  let [sessions] = await db.stream.find(query, {
-    order: `data->'lastSeen' DESC NULLS LAST`,
-    limit,
-    cursor,
-  });
+    const stream = await db.stream.get(parentId);
+    if (
+      !stream ||
+      (stream.deleted && !req.isUIAdmin) ||
+      (stream.userId !== req.user.id && !req.isUIAdmin)
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
 
-  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  sessions = sessions.map((session) => {
-    setRecordingStatus(req, ingest, session, !!forceUrl);
-    if (!raw) {
-      if (session.previousSessions && session.previousSessions.length) {
-        session.id = session.previousSessions[0]; // return id of the first session object so
-        // user always see same id for the 'user' session
+    let filterOut;
+    const query = [];
+    query.push(sql`data->>'parentId' = ${stream.id}`);
+    query.push(sql`(data->'lastSeen')::bigint > 0`);
+    query.push(sql`(data->'sourceSegmentsDuration')::bigint > 0`);
+    query.push(sql`data->>'partialSession' IS NULL`);
+    if (record) {
+      if (record === "true" || record === "1") {
+        query.push(sql`data->>'record' = 'true'`);
+        query.push(sql`data->>'recordObjectStoreId' IS NOT NULL`);
+      } else if (record === "false" || record === "0") {
+        query.push(sql`data->>'recordObjectStoreId' IS NULL`);
+        filterOut = true;
       }
-      const combinedStats = getCombinedStats(
-        session,
-        session.previousStats || {}
-      );
-      return {
-        ...session,
-        ...combinedStats,
-        createdAt: session.userSessionCreatedAt || session.createdAt,
-      };
     }
-    return session;
-  });
-  if (filterOut) {
-    sessions = sessions.filter((sess) => !sess.record);
-  }
 
-  res.status(200);
-  if (!raw) {
-    db.stream.removePrivateFieldsMany(sessions, req.user.admin);
-  }
-  res.json(db.stream.addDefaultFieldsMany(sessions));
-});
+    let [sessions] = await db.stream.find(query, {
+      order: `data->'lastSeen' DESC NULLS LAST`,
+      limit,
+      cursor,
+    });
 
-app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
-  const { parentId } = req.params;
-  const { limit, cursor } = toStringValues(req.query);
-  logger.info(`cursor params ${cursor}, limit ${limit}`);
+    const olderThen = Date.now() - USER_SESSION_TIMEOUT;
+    sessions = sessions.map((session) => {
+      setRecordingStatus(req, ingest, session, !!forceUrl);
+      if (!raw) {
+        if (session.previousSessions && session.previousSessions.length) {
+          session.id = session.previousSessions[0]; // return id of the first session object so
+          // user always see same id for the 'user' session
+        }
+        const combinedStats = getCombinedStats(
+          session,
+          session.previousStats || {}
+        );
+        return {
+          ...session,
+          ...combinedStats,
+          createdAt: session.userSessionCreatedAt || session.createdAt,
+        };
+      }
+      return session;
+    });
+    if (filterOut) {
+      sessions = sessions.filter((sess) => !sess.record);
+    }
 
-  const stream = await db.stream.get(parentId);
-  if (
-    !stream ||
-    stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
-  ) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+    res.status(200);
+    if (!raw) {
+      db.stream.removePrivateFieldsMany(sessions, req.user.admin);
+    }
+    res.json(db.stream.addDefaultFieldsMany(sessions));
   }
+);
 
-  const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>({
-    kind: "stream",
-    query: { parentId },
-    cursor,
-    limit,
-  });
-  res.status(200);
-  if (data.length > 0 && nextCursor) {
-    res.links({ next: makeNextHREF(req, nextCursor) });
+app.get(
+  "/sessions/:parentId",
+  authorizer({ allowCorsApiKey: true }),
+  async (req, res) => {
+    const { parentId } = req.params;
+    const { limit, cursor } = toStringValues(req.query);
+    logger.info(`cursor params ${cursor}, limit ${limit}`);
+
+    const stream = await db.stream.get(parentId);
+    if (
+      !stream ||
+      stream.deleted ||
+      (stream.userId !== req.user.id && !req.isUIAdmin)
+    ) {
+      res.status(404);
+      return res.json({ errors: ["not found"] });
+    }
+
+    const { data, cursor: nextCursor } = await req.store.queryObjects<DBStream>(
+      {
+        kind: "stream",
+        query: { parentId },
+        cursor,
+        limit,
+      }
+    );
+    res.status(200);
+    if (data.length > 0 && nextCursor) {
+      res.links({ next: makeNextHREF(req, nextCursor) });
+    }
+    res.json(
+      db.stream.addDefaultFieldsMany(
+        db.stream.removePrivateFieldsMany(data, req.user.admin)
+      )
+    );
   }
-  res.json(
-    db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(data, req.user.admin)
-    )
-  );
-});
+);
 
 app.get("/user/:userId", authorizer({}), async (req, res) => {
   const { userId } = req.params;
@@ -481,7 +491,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   );
 });
 
-app.get("/:id", authorizer({}), async (req, res) => {
+app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
   let stream = await db.stream.get(req.params.id);
   if (
@@ -784,70 +794,75 @@ app.post(
   }
 );
 
-app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
-  if (!req.body || !req.body.name) {
-    res.status(422);
-    return res.json({
-      errors: ["missing name"],
-    });
-  }
-  const id = uuid();
-  const createdAt = Date.now();
-  let streamKey = await generateUniqueStreamKey(req.store, []);
-  // Mist doesn't allow dashes in the URLs
-  let playbackId = (
-    await generateUniqueStreamKey(req.store, [streamKey])
-  ).replace(/-/g, "");
-
-  // use the first four characters of the id as the "shard key" across all identifiers
-  const shardKey = id.slice(0, 4);
-  streamKey = shardKey + streamKey.slice(4);
-  playbackId = shardKey + playbackId.slice(4);
-
-  let objectStoreId;
-  if (req.body.objectStoreId) {
-    const store = await db.objectStore.get(req.body.objectStoreId);
-    if (!store) {
-      res.status(400);
+app.post(
+  "/",
+  authorizer({ allowCorsApiKey: true }),
+  validatePost("stream"),
+  async (req, res) => {
+    if (!req.body || !req.body.name) {
+      res.status(422);
       return res.json({
-        errors: [`object-store ${req.body.objectStoreId} does not exist`],
+        errors: ["missing name"],
       });
     }
+    const id = uuid();
+    const createdAt = Date.now();
+    let streamKey = await generateUniqueStreamKey(req.store, []);
+    // Mist doesn't allow dashes in the URLs
+    let playbackId = (
+      await generateUniqueStreamKey(req.store, [streamKey])
+    ).replace(/-/g, "");
+
+    // use the first four characters of the id as the "shard key" across all identifiers
+    const shardKey = id.slice(0, 4);
+    streamKey = shardKey + streamKey.slice(4);
+    playbackId = shardKey + playbackId.slice(4);
+
+    let objectStoreId;
+    if (req.body.objectStoreId) {
+      const store = await db.objectStore.get(req.body.objectStoreId);
+      if (!store) {
+        res.status(400);
+        return res.json({
+          errors: [`object-store ${req.body.objectStoreId} does not exist`],
+        });
+      }
+    }
+
+    const doc: DBStream = wowzaHydrate({
+      ...DEFAULT_STREAM_FIELDS,
+      ...req.body,
+      kind: "stream",
+      userId: req.user.id,
+      renditions: {},
+      objectStoreId,
+      id,
+      createdAt,
+      streamKey,
+      playbackId,
+      createdByTokenName: req.token?.name,
+      createdByTokenId: req.token?.id,
+      isActive: false,
+      lastSeen: 0,
+    });
+
+    doc.profiles = hackMistSettings(req, doc.profiles);
+    doc.multistream = await validateMultistreamOpts(
+      req.user.id,
+      doc.profiles,
+      doc.multistream
+    );
+
+    await req.store.create(doc);
+
+    res.status(201);
+    res.json(
+      db.stream.addDefaultFields(
+        db.stream.removePrivateFields(doc, req.user.admin)
+      )
+    );
   }
-
-  const doc: DBStream = wowzaHydrate({
-    ...DEFAULT_STREAM_FIELDS,
-    ...req.body,
-    kind: "stream",
-    userId: req.user.id,
-    renditions: {},
-    objectStoreId,
-    id,
-    createdAt,
-    streamKey,
-    playbackId,
-    createdByTokenName: req.token?.name,
-    createdByTokenId: req.token?.id,
-    isActive: false,
-    lastSeen: 0,
-  });
-
-  doc.profiles = hackMistSettings(req, doc.profiles);
-  doc.multistream = await validateMultistreamOpts(
-    req.user.id,
-    doc.profiles,
-    doc.multistream
-  );
-
-  await req.store.create(doc);
-
-  res.status(201);
-  res.json(
-    db.stream.addDefaultFields(
-      db.stream.removePrivateFields(doc, req.user.admin)
-    )
-  );
-});
+);
 
 app.put(
   "/:id/setactive",
@@ -1045,7 +1060,7 @@ app.patch(
 
 app.patch(
   "/:id",
-  authorizer({}),
+  authorizer({ allowCorsApiKey: true }),
   validatePost("stream-patch-payload"),
   async (req, res) => {
     const { id } = req.params;

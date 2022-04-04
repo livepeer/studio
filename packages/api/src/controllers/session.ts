@@ -236,7 +236,7 @@ app.get("/migrate", authorizer({ anyAdmin: true }), async (req, res, next) => {
   res.end(`processed ${processed} sessions\n`);
 });
 
-app.get("/:id", authorizer({}), async (req, res) => {
+app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   let session = await db.session.get(req.params.id);
   if (
     !session ||
