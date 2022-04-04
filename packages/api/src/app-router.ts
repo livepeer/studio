@@ -41,14 +41,6 @@ const GEOLOCATION_ENDPOINTS = [
   "geolocate",
 ];
 
-const DEFAULT_CORS_JWT_ALLOWLIST = [
-  "https://livepeer.com",
-  "https://livepeer.monster",
-  /livepeer\.vercel\.app$/,
-  /livepeerorg\.vercel\.app$/,
-  /\.livepeerorg\.now\.sh$/,
-];
-
 const PROM_BUNDLE_OPTS: promBundle.Opts = {
   includeUp: false,
   includeMethod: true,
@@ -81,7 +73,7 @@ export default async function makeApp(params: CliArgs) {
     broadcasters = "[]",
     ingest = "[]",
     prices = "[]",
-    corsJwtAllowlist = DEFAULT_CORS_JWT_ALLOWLIST,
+    corsJwtAllowlist = [`https://${frontendDomain}`],
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,

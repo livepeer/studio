@@ -14,6 +14,9 @@ function coerceArr(arg: any) {
 }
 
 function coerceCorsList(arg: any): (string | RegExp)[] {
+  if (!arg) {
+    return undefined;
+  }
   const arr: string[] = coerceArr(arg);
   return arr.map((str) => {
     if (str.startsWith("/") && str.endsWith("/")) {
