@@ -260,7 +260,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authorizer({}), async (req, res) => {
+app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
@@ -285,7 +285,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 app.post(
   "/:id/export",
   validatePost("export-task-params"),
-  authorizer({}),
+  authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
@@ -354,7 +354,7 @@ app.post(
 app.post(
   "/transcode",
   validatePost("new-transcode-payload"),
-  authorizer({}),
+  authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     if (!req.body.assetId) {
       throw new BadRequestError("You must provide a assetId of an asset");
@@ -401,7 +401,7 @@ app.post(
 app.post(
   "/request-upload",
   validatePost("new-asset-payload"),
-  authorizer({}),
+  authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(req.store, id);
