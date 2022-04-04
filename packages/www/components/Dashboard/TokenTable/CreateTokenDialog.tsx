@@ -207,9 +207,7 @@ const CreateTokenDialog = ({
                   id="tokenName"
                   autoFocus={true}
                   value={tokenName}
-                  onChange={(e) =>
-                    setTokenName(e.target.value.replace(/\s/g, ""))
-                  }
+                  onChange={(e) => setTokenName(e.target.value)}
                   placeholder="e.g. New key"
                 />
 
