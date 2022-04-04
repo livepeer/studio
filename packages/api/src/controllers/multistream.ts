@@ -71,8 +71,6 @@ const badRequest = (res: Response, error: string) =>
 
 const target = Router();
 
-target.use(authorizer({}));
-
 target.use(
   mung.json(function cleanWriteOnlyResponses(data, req) {
     if (req.user.admin) {
@@ -90,7 +88,7 @@ target.use(
   })
 );
 
-target.get("/", async (req, res) => {
+target.get("/", authorizer({}), async (req, res) => {
   const isAdmin = !!req.user.admin;
   const qs = toStringValues(req.query);
   const { limit: limitStr, cursor, userId, order, filters } = qs;
@@ -121,7 +119,7 @@ target.get("/", async (req, res) => {
   res.json(output);
 });
 
-target.get("/:id", async (req, res) => {
+target.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   const isAdmin = !!req.user.admin;
   const data = await db.multistreamTarget.getAuthed(
     req.params.id,
@@ -134,19 +132,24 @@ target.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-target.post("/", validatePost("multistream-target"), async (req, res) => {
-  const input = req.body as MultistreamTarget;
-  const data = await db.multistreamTarget.fillAndCreate({
-    name: input.name,
-    url: input.url,
-    disabled: input.disabled,
-    userId: req.user.id,
-  });
-  res.status(201);
-  res.json(data);
-});
+target.post(
+  "/",
+  authorizer({ allowCorsApiKey: true }),
+  validatePost("multistream-target"),
+  async (req, res) => {
+    const input = req.body as MultistreamTarget;
+    const data = await db.multistreamTarget.fillAndCreate({
+      name: input.name,
+      url: input.url,
+      disabled: input.disabled,
+      userId: req.user.id,
+    });
+    res.status(201);
+    res.json(data);
+  }
+);
 
-target.delete("/:id", async (req, res) => {
+target.delete("/:id", authorizer({}), async (req, res) => {
   const isAdmin = !!req.user.admin;
   const { id } = req.params;
   if (!(await db.multistreamTarget.hasAccess(id, req.user.id, isAdmin))) {
@@ -160,6 +163,7 @@ target.delete("/:id", async (req, res) => {
 
 target.patch(
   "/:id",
+  authorizer({ allowCorsApiKey: true }),
   validatePost("multistream-target-patch-payload"),
   async (req, res) => {
     const isAdmin = !!req.user.admin;
