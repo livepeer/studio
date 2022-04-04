@@ -17,8 +17,9 @@ import {
   Label,
   Tooltip,
   Checkbox,
+  styled,
 } from "@livepeer.com/design-system";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -26,6 +27,7 @@ import { ApiToken } from "../../../../api/src/schema/types";
 import {
   CopyIcon as Copy,
   ExclamationTriangleIcon as Warning,
+  Cross1Icon as Cross,
 } from "@radix-ui/react-icons";
 
 type Props = {
@@ -101,6 +103,10 @@ const initialCorsOpts: ApiToken["access"]["cors"] = {
   allowedOrigins: ["http://localhost/"],
 };
 
+const StyledCross = styled(Cross, {
+  cursor: "pointer",
+});
+
 const CreateTokenDialog = ({
   isOpen,
   onOpenChange,
@@ -123,6 +129,21 @@ const CreateTokenDialog = ({
       return () => clearTimeout(interval);
     }
   }, [isCopied]);
+
+  const toggleOrigin = useCallback(
+    (origin) => {
+      setCors((cors) => {
+        const allowedOrigins = cors.allowedOrigins?.includes(origin)
+          ? cors.allowedOrigins.filter((item) => item !== origin)
+          : [...cors.allowedOrigins, origin];
+        return {
+          ...cors,
+          allowedOrigins,
+        };
+      });
+    },
+    [setCors]
+  );
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -167,7 +188,9 @@ const CreateTokenDialog = ({
                   id="tokenName"
                   autoFocus={true}
                   value={tokenName}
-                  onChange={(e) => setTokenName(e.target.value)}
+                  onChange={(e) =>
+                    setTokenName(e.target.value.replace(/\s/g, ""))
+                  }
                   placeholder="e.g. New key"
                 />
 
@@ -186,6 +209,82 @@ const CreateTokenDialog = ({
                     <Warning />
                   </Tooltip>
                 </Box>
+
+                {allowCors && (
+                  <>
+                    <Label htmlFor="addAllowedOrigin" css={{ mt: "$1" }}>
+                      Add an origin
+                    </Label>
+                    <TextField
+                      size="2"
+                      type="text"
+                      id="addAllowedOrigin"
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        const field = e.target as HTMLInputElement;
+                        if (field.value !== "") {
+                          toggleOrigin(field.value);
+                          field.value = "";
+                        }
+                      }}
+                      placeholder="e.g. * for all origins; https://example.com for specific one"
+                    />
+
+                    <Flex
+                      align="center"
+                      direction="column"
+                      justify={
+                        cors.allowedOrigins.length > 0 ? "start" : "center"
+                      }
+                      css={{
+                        width: "100%",
+                        borderRadius: 6,
+                        height: 120,
+                        overflowX: "hidden",
+                        overflowY: "auto",
+                        border: "1px solid $colors$mauve7",
+                        backgroundColor: "$mauve2",
+                        mt: "-3px",
+                        zIndex: 1,
+                      }}>
+                      {cors.allowedOrigins.length > 0 ? (
+                        cors.allowedOrigins.map((origin, i) => (
+                          <Flex
+                            key={i}
+                            justify="between"
+                            align="center"
+                            css={{
+                              width: "100%",
+                              borderBottom: "1px solid $colors$mauve5",
+                              p: "$2",
+                              fontSize: "$2",
+                              color: "$hiContrast",
+                            }}>
+                            {origin}
+                            <StyledCross
+                              onClick={() => {
+                                toggleOrigin(origin);
+                              }}
+                            />
+                          </Flex>
+                        ))
+                      ) : (
+                        <Flex
+                          direction="column"
+                          css={{ just: "center" }}
+                          align="center">
+                          <Text css={{ fontWeight: 600 }}>
+                            No origins allowed
+                          </Text>
+                          <Text variant="gray">
+                            Add origins with the input field above.
+                          </Text>
+                        </Flex>
+                      )}
+                    </Flex>
+                  </>
+                )}
               </Flex>
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
