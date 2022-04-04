@@ -219,13 +219,17 @@ const CreateTokenDialog = ({
                     checked={allowCors}
                     onCheckedChange={(e) => setAllowCors(e.target.checked)}
                   />
-                  <Label css={{ pl: "$2", mr: "$1" }} htmlFor="videoOnly">
-                    Allow CORS access
-                  </Label>
                   <Tooltip
                     content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
                     multiline>
-                    <Warning />
+                    <Flex
+                      direction="row"
+                      css={{ ml: "$2" }}
+                      gap="1"
+                      align="center">
+                      <Label htmlFor="allowCors">Allow CORS access</Label>
+                      <Warning />
+                    </Flex>
                   </Tooltip>
                 </Box>
 
@@ -247,7 +251,7 @@ const CreateTokenDialog = ({
                             onSubmitNewOrigin();
                           }
                         }}
-                        placeholder="e.g. * for all origins; https://example.com for specific one"
+                        placeholder="e.g. * for all origins; https://example.com for one"
                       />
                       <Button
                         css={{ ml: "$1" }}
@@ -313,6 +317,25 @@ const CreateTokenDialog = ({
                         </Flex>
                       )}
                     </Flex>
+
+                    <Box css={{ display: "flex", mt: "$2" }}>
+                      <Checkbox
+                        id="corsFullAccess"
+                        checked={cors.fullAccess ?? false}
+                        onCheckedChange={(e) =>
+                          setCors({ ...cors, fullAccess: e.target.checked })
+                        }
+                      />
+                      <Tooltip
+                        content="This will give access to the entire API for the CORS-enabled API key. Resources in your account will be fully exposed to anyone that grabs the API key from your web page. Only check this if you know what you are doing."
+                        multiline>
+                        <Label
+                          css={{ pl: "$2", mr: "$1" }}
+                          htmlFor="corsFullAccess">
+                          Full API access (not recommended)
+                        </Label>
+                      </Tooltip>
+                    </Box>
                   </>
                 )}
               </Flex>
