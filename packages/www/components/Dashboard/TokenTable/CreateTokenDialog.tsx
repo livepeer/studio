@@ -28,6 +28,7 @@ import {
   CopyIcon as Copy,
   ExclamationTriangleIcon as Warning,
   Cross1Icon as Cross,
+  PlusIcon as Plus,
 } from "@radix-ui/react-icons";
 
 type Props = {
@@ -117,6 +118,7 @@ const CreateTokenDialog = ({
   const [tokenName, setTokenName] = useState("");
   const [allowCors, setAllowCors] = useState(false);
   const [cors, setCors] = useState(initialCorsOpts);
+  const [newAllowedOrigin, setNewAllowedOrigin] = useState("");
   const { createApiToken } = useApi();
   const [isCopied, setCopied] = useState(0);
   const [newToken, setNewToken] = useState<ApiToken | null>(null);
@@ -144,6 +146,15 @@ const CreateTokenDialog = ({
     },
     [setCors]
   );
+
+  const onSubmitNewOrigin = useCallback(() => {
+    setNewAllowedOrigin((value) => {
+      if (value !== "") {
+        toggleOrigin(value);
+      }
+      return "";
+    });
+  }, [toggleOrigin, setNewAllowedOrigin]);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -215,21 +226,32 @@ const CreateTokenDialog = ({
                     <Label htmlFor="addAllowedOrigin" css={{ mt: "$1" }}>
                       Add an origin
                     </Label>
-                    <TextField
-                      size="2"
-                      type="text"
-                      id="addAllowedOrigin"
-                      onKeyDown={(e) => {
-                        if (e.key !== "Enter") return;
-                        e.preventDefault();
-                        const field = e.target as HTMLInputElement;
-                        if (field.value !== "") {
-                          toggleOrigin(field.value);
-                          field.value = "";
-                        }
-                      }}
-                      placeholder="e.g. * for all origins; https://example.com for specific one"
-                    />
+                    <Box css={{ display: "flex", alignItems: "stretch" }}>
+                      <TextField
+                        size="2"
+                        type="text"
+                        id="addAllowedOrigin"
+                        value={newAllowedOrigin}
+                        onChange={(e) => setNewAllowedOrigin(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            onSubmitNewOrigin();
+                          }
+                        }}
+                        placeholder="e.g. * for all origins; https://example.com for specific one"
+                      />
+                      <Button
+                        css={{ ml: "$1" }}
+                        size="3"
+                        variant="violet"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSubmitNewOrigin();
+                        }}>
+                        <Plus />
+                      </Button>
+                    </Box>
 
                     <Flex
                       align="center"
@@ -337,6 +359,7 @@ const CreateTokenDialog = ({
                   setTokenName("");
                   setAllowCors(false);
                   setCors(initialCorsOpts);
+                  setNewAllowedOrigin("");
                   onClose();
                 }}
                 size="2">
