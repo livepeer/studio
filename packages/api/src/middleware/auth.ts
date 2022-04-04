@@ -125,13 +125,18 @@ function authenticator(): RequestHandler {
 }
 
 function corsOptsProvider(params: {
+  anyOriginPathPrefixes: string[];
   baseOpts: CorsOptions;
   jwtOrigin: (string | RegExp)[];
 }): CorsOptionsDelegate<Request> {
-  const { baseOpts, jwtOrigin } = params;
+  const { anyOriginPathPrefixes, baseOpts, jwtOrigin } = params;
+  const anyOriginOpts = { ...baseOpts, origin: true };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   return (req, callback) => {
-    const { token } = req;
+    const { path, token } = req;
+    if (anyOriginPathPrefixes.some((p) => path.startsWith(p))) {
+      return callback(null, anyOriginOpts);
+    }
     if (!token) {
       return callback(null, jwtOpts);
     }

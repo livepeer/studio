@@ -26,6 +26,7 @@ import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
+import { pathJoin } from "./controllers/helpers";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -160,6 +161,7 @@ export default async function makeApp(params: CliArgs) {
   app.use(
     cors(
       corsOptsProvider({
+        anyOriginPathPrefixes: [pathJoin("/", httpPrefix, "/asset/upload/")],
         jwtOrigin: corsJwtAllowlist,
         baseOpts: {
           credentials: true,
