@@ -14,13 +14,19 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
+  Label,
+  Tooltip,
+  Checkbox,
 } from "@livepeer.com/design-system";
 import { useState, useEffect } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ApiToken } from "../../../../api/src/schema/types";
-import { CopyIcon as Copy } from "@radix-ui/react-icons";
+import {
+  CopyIcon as Copy,
+  ExclamationTriangleIcon as Warning,
+} from "@radix-ui/react-icons";
 
 type Props = {
   isOpen: boolean;
@@ -91,6 +97,10 @@ const ClipBut = ({ text }) => {
   );
 };
 
+const initialCorsOpts: ApiToken["access"]["cors"] = {
+  allowedOrigins: ["http://localhost/"],
+};
+
 const CreateTokenDialog = ({
   isOpen,
   onOpenChange,
@@ -99,6 +109,8 @@ const CreateTokenDialog = ({
 }: Props) => {
   const [creating, setCreating] = useState(false);
   const [tokenName, setTokenName] = useState("");
+  const [allowCors, setAllowCors] = useState(false);
+  const [cors, setCors] = useState(initialCorsOpts);
   const { createApiToken } = useApi();
   const [isCopied, setCopied] = useState(0);
   const [newToken, setNewToken] = useState<ApiToken | null>(null);
@@ -129,7 +141,10 @@ const CreateTokenDialog = ({
                 }
                 setCreating(true);
                 try {
-                  const _newToken = await createApiToken({ name: tokenName });
+                  const _newToken = await createApiToken({
+                    name: tokenName,
+                    access: allowCors ? { cors } : undefined,
+                  });
                   setNewToken(_newToken);
                   onCreateSuccess?.();
                 } finally {
@@ -155,6 +170,22 @@ const CreateTokenDialog = ({
                   onChange={(e) => setTokenName(e.target.value)}
                   placeholder="e.g. New key"
                 />
+
+                <Box css={{ display: "flex", mt: "$2" }}>
+                  <Checkbox
+                    id="allowCors"
+                    checked={allowCors}
+                    onCheckedChange={(e) => setAllowCors(e.target.checked)}
+                  />
+                  <Label css={{ pl: "$2", mr: "$1" }} htmlFor="videoOnly">
+                    Allow CORS access
+                  </Label>
+                  <Tooltip
+                    content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including it in web pages will expose your API key to the world."
+                    multiline>
+                    <Warning />
+                  </Tooltip>
+                </Box>
               </Flex>
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
@@ -205,6 +236,8 @@ const CreateTokenDialog = ({
                 onClick={() => {
                   setNewToken(null);
                   setTokenName("");
+                  setAllowCors(false);
+                  setCors(initialCorsOpts);
                   onClose();
                 }}
                 size="2">
