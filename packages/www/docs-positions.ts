@@ -34,6 +34,7 @@ export const docsPositions = [
   "docs/guides/media-server/mistserver-features.mdx",
   "docs/guides/media-server/user-guide.mdx",
   "docs/guides/media-server/downloads.mdx",
+  "docs/guides/video-nft.mdx",
   "docs/guides/usage-and-billing.mdx",
   "docs/api-reference/index.mdx",
   "docs/api-reference/stream/index.mdx",

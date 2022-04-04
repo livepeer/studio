@@ -1,0 +1,351 @@
+---
+title: Mint a Video NFT
+description: Livepeer.com API Reference | Mint
+metaTitle: Mint a Video NFT - Livepeer.com
+metaDescription: Livepeer.com API Reference | Mint
+---
+
+# Tutorial: How to Mint a Video NFT
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    This is a good tutorial for someone who is minting NFTs for the first time.
+    If you know how to use <code>tokenURI</code> to mint an NFT you can follow
+    only <b>Step 1</b> and use the <code>nftMetadataUrl</code> field as the{" "}
+    <code>tokenURI</code> for your NFT. The URL is compatible with both ERC-721
+    and ERC-1155.
+  </Text>
+</Alert>
+
+In this tutorial, we’ll be using [Alchemy](https://www.alchemy.com/) as the Eth
+service provider.
+
+# **Step 1: Upload the Video and configure the metadata for your NFT**
+
+You can use the `@livepeer/video-nft`
+[npm](https://www.npmjs.com/package/@livepeer/video-nft) script to have a local
+file uploaded to Livepeer, exported to IPFS and then mint the NFT out of it.
+Alternatively, if you don’t have `node` installed you can use
+[this script](https://gist.github.com/victorges/3369cc04c0002a63b2fab33079d8827e)
+(`bash`) which works in a similar way.
+
+Start by getting a Livepeer API key to use from the tool:
+[Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
+
+Then simply run `npx @livepeer/video-nft` . The CLI will ask you for any
+information it needs and in the end will give you a URL for a simple page for
+minting the NFT.
+
+Some tips in case you use it often:
+
+- Install it in your system with `npm install -g @livepeer/video-nft` and then
+  use it as `video-nft <args>`
+- Set the API key on the `LP_API_KEY` environment variable to avoid the prompt
+  for it.
+- Send all required properties as CLI arguments and avoid all the other prompts
+  (good for scripting).
+  - The filename can be passed as a single positional argument to the command;
+  - The asset name can be set via the `--asset-name` flag and;
+  - The NFT metadata can be specified on the `--nft-metadata` flag. It accepts
+    either a raw JSON or a file with the metadata.
+
+Example:
+
+```jsx
+$ npx @livepeer/video-nft
+Need to install the following packages:
+  @livepeer/video-nft@0.1.3
+Ok to proceed? (y) y
+? Enter your Livepeer API key (learn more at http://bit.ly/lp-api-key): ********
+****************************
+Tip: You can set the LP_API_KEY environment variable to avoid this prompt.
+? What file do you want to use? nasa25.mp4
+You can also send the filename as an argument to this command.
+? What name do you want to give to your NFT? NASA 25th bday
+? Would you like to customize the NFT metadata? No
+1. Requesting upload URL...
+Pending asset with id=08266a15-ff67-4ce6-9b8c-dff485ff3825
+2. Uploading file...
+Waiting for import task completion... id=5412f48e-af58-4d1b-80a8-2ec818519ffe
+ - progress: 35.3%
+ - progress: 60.8%
+ - progress: 92.30000000000001%
+3. Starting export...
+Created export task with id=b008532d-839b-4925-9833-094d2d6a1cc3
+Waiting for export task completion... id=b008532d-839b-4925-9833-094d2d6a1cc3
+ - progress: 99%
+4. Export successful! Result:
+{
+  "videoFileCid": "QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
+  "nftMetadataCid": "QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h",
+  "videoFileUrl": "ipfs://QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
+  "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
+  "nftMetadataUrl": "ipfs://QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h",
+  "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h"
+}
+5. Mint your NFT at:
+https://livepeer.com/mint-nft?tokenUri=ipfs://QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h
+```
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    💡 The <code>nftMetadataUrl</code> is what you need to remember for custom
+    minting of the NFT.
+  </Text>
+</Alert>
+
+The equivalent command avoiding all the prompts would be:
+
+```json
+$ export LP_API_KEY=<your API key obtained from the Livepeer dashboard>
+$ npx @livepeer/video-nft nasa25.mp4 --asset-name "NASA 25th bday" --nft-metadata '{"description":"NASA's commemorative video for their 25th birthday"'
+```
+
+# **Step 2: Install web3**
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    ❗ If you are happy with the NFT minted by the <code>video-nft</code> script
+    above you can stop here! Keep going if you are curious how to create custom
+    ERC-721 contracts and/or having your own NFT minting logic. You can
+    reference the same exported files on IPFS for your custom NFTs, grabbed from
+    the script output.
+  </Text>
+</Alert>
+
+This tutorial assumes you have already
+[deployed an ERC721 contract](https://docs.alchemy.com/alchemy/tutorials/how-to-create-an-nft).
+
+In your project home directory, run:
+
+```json
+npm install @alch/alchemy-web3
+```
+
+# **Step 3: Create a mint-nft.js file**
+
+Inside your `scripts` directory, create an `mint-nft.js` file and add the
+following lines of code:
+
+```json
+require('dotenv').config();
+const API_URL = process.env.API_URL;
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(API_URL);
+```
+
+# **Step 4: Grab your contract ABI**
+
+The contract ABI (Application Binary Interface) is the interface to interact
+with our smart contract. Hardhat automatically generates an ABI for us and saves
+it in the MyNFT.json file. In order to use this we'll need to parse out the
+contents by adding the following lines of code to our `mint-nft.js` file:
+
+```json
+const contract = require("../artifacts/contracts/MyNFT.sol/MyNFT.json");
+```
+
+If you want to see the ABI you can print it to your console:
+
+```json
+console.log(JSON.stringify(contract.abi));
+```
+
+To run `mint-nft.js`and see your ABI printed to the console navigate to your
+terminal and run:
+
+```json
+node scripts/mint-nft.js
+```
+
+# **Step 5: Create an instance of your contract**
+
+Now, to interact with our contract, we need to create an instance of it in our
+code. To do so we'll need our contract address which we can get from the
+deployment or [Etherscan](https://ropsten.etherscan.io/) by looking up the
+address you used to deploy the contract.
+
+For this example, our contract address is
+`0xD6A8375E7A3BE7157f9bBD9D53348b39d75bEb3E`
+
+Next we will use the web3 `contract` method to create our contract using the ABI
+and address. In your `mint-nft.js` file, add the following:
+
+```json
+const contractAddress = "0xD6A8375E7A3BE7157f9bBD9D53348b39d75bEb3E";
+const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
+```
+
+# **Step 6: Update the `.env` file**
+
+Now, in order to create and send transactions to the Ethereum chain, we'll use
+your public ethereum account address to get the account `nonce` (will explain
+below).
+
+Add your public key to your `.env` file —if you completed part 1 of the
+tutorial, our .`env` file should now look like this:
+
+```json
+API_URL = "https://eth-ropsten.alchemyapi.io/v2/your-api-key"
+PRIVATE_KEY = "your-private-account-address"
+PUBLIC_KEY = "your-public-account-address"
+```
+
+# **Step 7: Create your transaction**
+
+First, let's define a function called `mintNFT(tokenData)` and create our
+transaction by doing the following:
+
+1. Grab your `PRIVATE_KEY` and `PUBLIC_KEY` from the .env file.
+2. Next, we'll need to figure out the account `nonce`. The nonce specification
+   is used to keep track of the number of transactions sent from your address—
+   which we need for security purposes and to prevent
+   [replay attacks](https://docs.alchemyapi.io/alchemy/resources/blockchain-glossary#account-nonce).
+   To get the number of transactions sent from your address, we use
+   [getTransactionCount](https://docs.alchemyapi.io/alchemy/documentation/alchemy-api-reference/json-rpc#eth_gettransactioncount).
+3. Finally we'll set up our `transaction` with the following info:
+4. `'from': PUBLIC_KEY` : The origin of our transaction is our public address
+5. `'to': contractAddress` : The contract we wish to interact with and send the
+   transaction
+6. `'nonce': nonce` : The account nonce with the number of transactions sent
+   from our address
+7. `'gas': estimatedGas` : The estimated gas needed to complete the transaction
+8. `'maxPriorityFeePerGas': estimatedFee`: The estimated fee to bid per gas.
+9. `'data': nftContract.methods.mintNFT(PUBLIC_KEY, tokenURI).encodeABI()` : The
+   computation we wish to perform in this transaction— which in this case is
+   minting an NFT
+
+Your `mint-nft.js` file should look like this now:
+
+```jsx
+require("dotenv").config();
+const API_URL = process.env.API_URL;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(API_URL);
+
+const contract = require("../artifacts/contracts/MyNFT.sol/MyNFT.json");
+const contractAddress = "0xD6A8375E7A3BE7157f9bBD9D53348b39d75bEb3E";
+const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
+
+async function mintNFT(tokenURI) {
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest"); //get latest nonce
+
+  //the transaction
+  const tx = {
+    from: PUBLIC_KEY,
+    to: contractAddress,
+    nonce: nonce,
+    gas: 500000,
+    maxPriorityFeePerGas: 2999999987,
+    data: nftContract.methods.mintNFT(PUBLIC_KEY, tokenURI).encodeABI(),
+  };
+}
+```
+
+# **Step 8: Sign the transaction**
+
+Now that we've created our transaction, we need to sign it in order to send it
+off. Here is where we'll use our private key.
+
+`web3.eth.sendSignedTransaction` will give us the transaction hash, which we can
+use to make sure our transaction was mined and didn't get dropped by the
+network. You'll notice in the transaction signing section, we've added some
+error checking so we know if our transaction successfully went through.
+
+```jsx
+require("dotenv").config();
+const API_URL = process.env.API_URL;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(API_URL);
+
+const contract = require("../artifacts/contracts/MyNFT.sol/MyNFT.json");
+const contractAddress = "0xD6A8375E7A3BE7157f9bBD9D53348b39d75bEb3E";
+const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
+
+async function mintNFT(tokenURI) {
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest"); //get latest nonce
+
+  //the transaction
+  const tx = {
+    from: PUBLIC_KEY,
+    to: contractAddress,
+    nonce: nonce,
+    gas: 500000,
+    maxPriorityFeePerGas: 2999999987,
+    data: nftContract.methods.mintNFT(PUBLIC_KEY, tokenURI).encodeABI(),
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+  const transactionReceipt = await web3.eth.sendSignedTransaction(
+    signedTx.rawTransaction
+  );
+
+  console.log(`Transaction receipt: ${JSON.stringify(transactionReceipt)}`);
+}
+```
+
+# **Step 9: Call `mintNFT` and run `node scripts/mint-nft.js`**
+
+Remember the `nfcMetadataUrl` from uploading your uploaded to Livepeer? Now it’s
+time to use it to mint our NFT.
+
+Altogether, your code should look like this:
+
+```jsx
+require("dotenv").config();
+const API_URL = process.env.API_URL;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(API_URL);
+
+const contract = require("../artifacts/contracts/MyNFT.sol/MyNFT.json");
+const contractAddress = "0xD6A8375E7A3BE7157f9bBD9D53348b39d75bEb3E";
+const nftContract = new web3.eth.Contract(contract.abi, contractAddress);
+
+async function mintNFT(tokenURI) {
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest"); //get latest nonce
+
+  //the transaction
+  const tx = {
+    from: PUBLIC_KEY,
+    to: contractAddress,
+    nonce: nonce,
+    gas: 500000,
+    maxPriorityFeePerGas: 2999999987,
+    data: nftContract.methods.mintNFT(PUBLIC_KEY, tokenURI).encodeABI(),
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+  const transactionReceipt = await web3.eth.sendSignedTransaction(
+    signedTx.rawTransaction
+  );
+
+  console.log(`Transaction receipt: ${JSON.stringify(transactionReceipt)}`);
+}
+
+mintNFT("ipfs://QmTju7Q4iPbosYJfFvSdxcRkT4KPYCpem31Z6mGL979Kkg");
+```
+
+Now, run `node scripts/mint-nft.js` to deploy your NFT. After a couple of
+seconds, you should see a response like this in your terminal :
+
+```jsx
+The hash of your transaction is: 0x13edd7e9f1349ac7a92ed187686afd7c48e211f28ac1041b700d9691cc816455
+Check Alchemy's Mempool to view the status of your transaction!
+```
+
+Using the `mint-nft.js` you can mint as many NFT's as you want! Just be sure to
+pass in a new `tokenURI` describing the NFT's metadata --otherwise, you'll just
+end up making many identical NFTs with different IDs.
+
+That’s it! You have now minted your video NFT! You can take a look at the NFT on
+Etherscan through the contract address, or on OpenSea at
+`https://testnets.opensea.io/assets/{contract_address}/{id}`
