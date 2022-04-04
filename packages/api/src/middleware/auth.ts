@@ -124,14 +124,6 @@ function authenticator(): RequestHandler {
   };
 }
 
-interface AuthzParams {
-  allowUnverified?: boolean;
-  admin?: boolean;
-  anyAdmin?: boolean;
-  noApiToken?: boolean;
-  originalUriHeader?: string;
-}
-
 function corsOptsProvider(params: {
   baseOpts: CorsOptions;
   jwtOrigin: (string | RegExp)[];
@@ -139,14 +131,24 @@ function corsOptsProvider(params: {
   const { baseOpts, jwtOrigin } = params;
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   return (req, callback) => {
-    if (!req.token) {
+    const { token } = req;
+    if (!token) {
       return callback(null, jwtOpts);
     }
     return callback(null, {
       ...baseOpts,
-      origin: req.token.access?.allowedOrigins,
+      origin: token.access?.cors?.allowedOrigins ?? [],
     });
   };
+}
+
+interface AuthzParams {
+  allowUnverified?: boolean;
+  admin?: boolean;
+  anyAdmin?: boolean;
+  noApiToken?: boolean;
+  originalUriHeader?: string;
+  allowCorsApiKey?: boolean;
 }
 
 /**
@@ -179,8 +181,8 @@ function authorizer(params: AuthzParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const accessRules = token?.access?.rules;
-    if (accessRules) {
+    const access = token?.access;
+    if (access?.rules) {
       let fullPath = pathJoin2(req.baseUrl, req.path);
       let { httpPrefix } = req.config;
       if (params.originalUriHeader) {
@@ -189,8 +191,15 @@ function authorizer(params: AuthzParams): RequestHandler {
         fullPath = originalUri.pathname;
         httpPrefix = null;
       }
-      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
+      if (!isAuthorized(req.method, fullPath, access?.rules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
+      }
+    } else {
+      const cors = access?.cors;
+      if (cors && !cors.fullAccess && !params.allowCorsApiKey) {
+        throw new ForbiddenError(
+          `access forbidden for restricted CORS API tokens`
+        );
       }
     }
     return next();

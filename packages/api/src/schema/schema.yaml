@@ -1364,15 +1364,27 @@ components:
           type: object
           additionalProperties: false
           properties:
-            allowedOrigins:
-              type: array
-              description:
-                Origins from which the token can be used. If empty, CORS be
-                prohibited by default (safest). To allow any origin set to `[*]`
-              default: []
-              items:
-                type: string
-                example: https://example.com
+            cors:
+              type: object
+              additionalProperties: false
+              properties:
+                fullAccess:
+                  type: boolean
+                  description:
+                    Whether the token grants full access to the API. If false, the
+                    token will only have access to some pre-defined endpoints, not
+                    expose the whole account from the webpage.
+                  default: false
+                allowedOrigins:
+                  type: array
+                  description:
+                    Origins from which the token can be used. If empty, CORS
+                    will be prohibited by default (safest). To allow all origin
+                    values set this to `[*]`.
+                  default: []
+                  items:
+                    type: string
+                    example: https://example.com
             rules:
               type: array
               default: [{ resources: ["*"] }]

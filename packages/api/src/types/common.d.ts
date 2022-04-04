@@ -1,5 +1,6 @@
 import { Ingest, Price } from "../middleware/hardcoded-nodes";
 import { Stream, User, ApiToken } from "../schema/types";
+import { WithID } from "../store/types";
 import Queue from "../store/queue";
 import TaskScheduler from "../task/scheduler";
 import { CliArgs } from "../parse-cli";
@@ -27,7 +28,7 @@ declare global {
 
       user?: User;
       isUIAdmin?: boolean;
-      token?: WithId<ApiToken>;
+      token?: WithID<ApiToken>;
 
       getBroadcasters?: () => Promise<NodeAddress[]>;
       orchestratorsGetters?: Array<() => Promise<OrchestratorNodeAddress[]>>;
