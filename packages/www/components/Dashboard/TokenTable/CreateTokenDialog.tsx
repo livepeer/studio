@@ -223,7 +223,7 @@ const CreateTokenDialog = ({
                     Allow CORS access
                   </Label>
                   <Tooltip
-                    content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including it in web pages will expose your API key to the world."
+                    content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
                     multiline>
                     <Warning />
                   </Tooltip>
