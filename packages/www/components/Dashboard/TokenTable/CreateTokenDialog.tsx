@@ -124,6 +124,14 @@ const CreateTokenDialog = ({
   const [newToken, setNewToken] = useState<ApiToken | null>(null);
 
   useEffect(() => {
+    setNewToken(null);
+    setTokenName("");
+    setAllowCors(false);
+    setCors(initialCorsOpts);
+    setNewAllowedOrigin("");
+  }, [isOpen]);
+
+  useEffect(() => {
     if (isCopied) {
       const interval = setTimeout(() => {
         setCopied(0);
@@ -353,16 +361,7 @@ const CreateTokenDialog = ({
               </Box>
             </AlertDialogDescription>
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button
-                onClick={() => {
-                  setNewToken(null);
-                  setTokenName("");
-                  setAllowCors(false);
-                  setCors(initialCorsOpts);
-                  setNewAllowedOrigin("");
-                  onClose();
-                }}
-                size="2">
+              <Button onClick={() => onClose()} size="2">
                 Close
               </Button>
             </Flex>
