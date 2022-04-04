@@ -101,7 +101,7 @@ const ClipBut = ({ text }) => {
 };
 
 const initialCorsOpts: ApiToken["access"]["cors"] = {
-  allowedOrigins: ["http://localhost/"],
+  allowedOrigins: ["http://localhost:3000"],
 };
 
 const StyledCross = styled(Cross, {
