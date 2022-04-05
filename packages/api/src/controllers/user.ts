@@ -357,6 +357,20 @@ app.post("/", validatePost("user"), async (req, res) => {
   res.json(user);
 });
 
+const suspensionEmailText = (
+  emailTemplate: SuspendUserPayload["emailTemplate"]
+) => {
+  switch (emailTemplate) {
+    case "copyright":
+      return [
+        "We were notified that your stream contained illegal or copyrighted content. We have suspended your account.",
+        "Please note that you cannot use Livepeer to stream copyrighted content. Any copyrighted content will be taken down and your account will be suspended.",
+      ].join("\n\n");
+    default:
+      return "Your account has been suspended. Please contact us for more information.";
+  }
+};
+
 app.patch(
   "/:id/suspended",
   validatePost("suspend-user-payload"),
@@ -379,7 +393,7 @@ app.patch(
       );
     });
 
-    if (suspended && emailTemplate === "copyright") {
+    if (suspended) {
       const {
         frontendDomain,
         supportAddr,
@@ -397,10 +411,7 @@ app.patch(
           buttonText: "Appeal Suspension",
           buttonUrl: frontendUrl(req, "/contact"),
           unsubscribe: unsubscribeUrl(req),
-          text: [
-            "We were notified that your stream contained illegal or copyrighted content. We have suspended your account.",
-            "Please note that you cannot use Livepeer to stream copyrighted content. Any copyrighted content will be taken down and your account will be suspended.",
-          ].join("\n\n"),
+          text: suspensionEmailText(emailTemplate),
         });
       } catch (err) {
         logger.error(
