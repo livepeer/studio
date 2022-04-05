@@ -152,8 +152,23 @@ export async function getS3PresignedUrl(
   return url;
 }
 
+type EmailParams = {
+  email: string;
+  bcc?: string;
+  supportAddr: [string, string];
+  sendgridTemplateId: string;
+  sendgridApiKey: string;
+  subject: string;
+  preheader: string;
+  text: string;
+  buttonText: string;
+  buttonUrl: string;
+  unsubscribe: string;
+};
+
 export async function sendgridEmail({
   email,
+  bcc,
   supportAddr,
   sendgridTemplateId,
   sendgridApiKey,
@@ -163,12 +178,13 @@ export async function sendgridEmail({
   buttonText,
   buttonUrl,
   unsubscribe,
-}) {
+}: EmailParams) {
   const [supportName, supportEmail] = supportAddr;
   const msg = {
     personalizations: [
       {
         to: [{ email }],
+        bcc: bcc ? [{ email: bcc }] : undefined,
         dynamicTemplateData: {
           subject,
           preheader,

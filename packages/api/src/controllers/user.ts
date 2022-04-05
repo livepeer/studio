@@ -36,6 +36,9 @@ import { terminateStreamReq } from "./stream";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
+const salesEmail = "sales@livepeer.org";
+const infraEmail = "infraservice@livepeer.org";
+
 function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
   for (const f of fields) {
     delete obj[f];
@@ -320,6 +323,7 @@ app.post("/", validatePost("user"), async (req, res) => {
       await sendgridEmail({
         email,
         supportAddr,
+        bcc: infraEmail,
         sendgridTemplateId,
         sendgridApiKey,
         subject: "Verify your Livepeer.com Email",
@@ -440,7 +444,6 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
   if (user.emailValidToken === req.body.emailValidToken) {
     // alert sales of new verified user
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
-    const salesEmail = "sales@livepeer.org";
 
     if (req.headers.host.includes("livepeer.com")) {
       try {
