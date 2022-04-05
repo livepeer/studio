@@ -132,7 +132,7 @@ function corsOptsProvider(params: {
   const { anyOriginPathPrefixes, baseOpts, jwtOrigin } = params;
   const anyOriginOpts = { ...baseOpts, origin: true, credentials: false };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
-  return (req, callback) => {
+  const getCorsOpts = (req: Request) => {
     const {
       method,
       path,
@@ -140,22 +140,23 @@ function corsOptsProvider(params: {
       token,
     } = req;
     if (anyOriginPathPrefixes.some((p) => path.startsWith(p))) {
-      return callback(null, anyOriginOpts);
+      return anyOriginOpts;
     }
     if (!token && method === "OPTIONS") {
-      return callback(null, {
+      return {
         ...baseOpts,
         origin: reqOrigin ? [reqOrigin] : true,
-      });
+      };
     }
-    if (!token) {
-      return callback(null, jwtOpts);
-    }
-    return callback(null, {
-      ...baseOpts,
-      origin: token.access?.cors?.allowedOrigins ?? [],
-    });
+    return !token
+      ? jwtOpts
+      : {
+          ...baseOpts,
+          origin: token.access?.cors?.allowedOrigins ?? [],
+        };
   };
+
+  return (req, callback) => callback(null, getCorsOpts(req));
 }
 
 interface AuthzParams {
