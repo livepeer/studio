@@ -323,7 +323,6 @@ app.post("/", validatePost("user"), async (req, res) => {
       await sendgridEmail({
         email,
         supportAddr,
-        bcc: infraEmail,
         sendgridTemplateId,
         sendgridApiKey,
         subject: "Verify your Livepeer.com Email",
@@ -403,6 +402,7 @@ app.patch(
       try {
         await sendgridEmail({
           email,
+          bcc: infraEmail,
           supportAddr,
           sendgridTemplateId,
           sendgridApiKey,
