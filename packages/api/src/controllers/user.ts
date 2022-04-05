@@ -88,7 +88,7 @@ export async function suspendUserStreams(
       }
       await Promise.all(promises);
     } catch (err) {
-      console.error(
+      logger.error(
         `error suspending stream id=${stream.id} userId=${userId} err=${err}`
       );
     }
@@ -399,7 +399,7 @@ app.patch(
           ].join("\n\n"),
         });
       } catch (err) {
-        console.error(
+        logger.error(
           `error sending suspension email to user=${email} err=${err}`
         );
       }
@@ -460,7 +460,7 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
           ].join("\n\n"),
         });
       } catch (err) {
-        console.error(`error sending email to ${salesEmail}: error: ${err}`);
+        logger.error(`error sending email to ${salesEmail}: error: ${err}`);
       }
     }
 
@@ -654,7 +654,7 @@ app.post(
     }
 
     if (!customer) {
-      console.warn(
+      logger.warn(
         `deprecated /create-customer API used. userEmail=${user.email} createdAt=${user.createdAt}`
       );
       customer = await getOrCreateCustomer(req.stripe, email);
@@ -731,13 +731,13 @@ app.post(
       );
       return res.send(subscription);
     }
-    console.warn(
+    logger.warn(
       `deprecated /create-subscription API used. userEmail=${user.email} createdAt=${user.createdAt}`
     );
 
     // Attach the payment method to the customer if it exists (free plan doesn't require payment)
     if (stripeCustomerPaymentMethodId) {
-      console.warn(
+      logger.warn(
         `attaching payment method through /create-subscription. userEmail=${user.email} createdAt=${user.createdAt}`
       );
       try {
