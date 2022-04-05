@@ -32,6 +32,7 @@ import {
   toStringValues,
   FieldsMap,
 } from "./helpers";
+import { terminateStreamReq } from "./stream";
 
 const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
@@ -70,6 +71,29 @@ const frontendUrl = (
 ) => `${proto || "http"}://${frontendDomain}${path}`;
 
 const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
+
+export async function suspendUserStreams(
+  req: Request,
+  userId: string,
+  suspended: boolean
+): Promise<void> {
+  const [streams] = await db.stream.find({ userId });
+  for (const stream of streams) {
+    try {
+      const promises: Promise<any>[] = [
+        db.stream.update(stream.id, { suspended }),
+      ];
+      if (suspended) {
+        promises.push(terminateStreamReq(req, stream));
+      }
+      await Promise.all(promises);
+    } catch (err) {
+      console.error(
+        `error suspending stream id=${stream.id} userId=${userId} err=${err}`
+      );
+    }
+  }
+}
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
@@ -338,12 +362,19 @@ app.patch(
     const { id } = req.params;
     const user = await db.user.get(id);
     if (!user) {
-      res.status(404);
-      return res.json({ errors: ["not found"] });
+      return res.status(404).json({ errors: ["not found"] });
     }
     const { email } = user;
+
     logger.info(`set user ${id} (${email}) suspended ${suspended}`);
     await db.user.update(id, { suspended });
+
+    suspendUserStreams(req, id, suspended).catch((err) => {
+      logger.error(
+        `error suspending user streams id=${id} email=${email} err=${err}`
+      );
+    });
+
     if (suspended && emailTemplate === "copyright") {
       const {
         frontendDomain,

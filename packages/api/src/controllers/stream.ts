@@ -1229,7 +1229,7 @@ app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
   return res.json({ result, errors });
 });
 
-async function terminateStreamReq(
+export async function terminateStreamReq(
   req: Request,
   stream: DBStream
 ): Promise<{ status: number; errors?: string[]; result?: boolean | any }> {
