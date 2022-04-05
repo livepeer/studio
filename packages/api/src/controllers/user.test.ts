@@ -386,6 +386,8 @@ describe("controllers/user", () => {
     it("should return personal user info", async () => {
       client.apiKey = nonAdminApiKey;
       let res = await client.get("/user/me");
+      let resJson = await res.json();
+      expect(resJson.email).toBe(nonAdminUser.email);
       expect(res.status).toBe(200);
     });
 
