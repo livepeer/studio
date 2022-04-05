@@ -130,12 +130,23 @@ function corsOptsProvider(params: {
   jwtOrigin: (string | RegExp)[];
 }): CorsOptionsDelegate<Request> {
   const { anyOriginPathPrefixes, baseOpts, jwtOrigin } = params;
-  const anyOriginOpts = { ...baseOpts, origin: true };
+  const anyOriginOpts = { ...baseOpts, origin: true, credentials: false };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   return (req, callback) => {
-    const { path, token } = req;
+    const {
+      method,
+      path,
+      headers: { origin: reqOrigin },
+      token,
+    } = req;
     if (anyOriginPathPrefixes.some((p) => path.startsWith(p))) {
       return callback(null, anyOriginOpts);
+    }
+    if (!token && method === "OPTIONS") {
+      return callback(null, {
+        ...baseOpts,
+        origin: reqOrigin ? [reqOrigin] : true,
+      });
     }
     if (!token) {
       return callback(null, jwtOpts);
