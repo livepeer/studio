@@ -6,6 +6,7 @@ import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.com/api/src/config";
 import CommonAdminTable from "@components/Admin/CommonAdminTable";
+import { Box, Checkbox, Label, Tooltip } from "@livepeer.com/design-system";
 
 type UserTableProps = {
   userId: string;
@@ -20,6 +21,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [adminModal, setAdminModal] = useState(false);
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
   const [suspendModal, setSuspendModal] = useState(false);
+  const [isCopyrightInfringiment, setIsCopyrightInfringiment] = useState(true);
   const [unsuspendModal, setUnsuspendModal] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
   const [lastCursor, setLastCursor] = useState("");
@@ -154,6 +156,24 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           <p>
             Are you sure you want to <b>suspend</b> user "{selectedUser.email}"?
           </p>
+
+          <Box sx={{ display: "flex", mt: 2, mb: 2 }}>
+            <Checkbox
+              id="isCopyrightInfringiment"
+              checked={isCopyrightInfringiment}
+              onCheckedChange={(e) =>
+                setIsCopyrightInfringiment(e.target.checked)
+              }
+            />
+            <Tooltip
+              content="Checking this will send the copyright infringiment email instead of the default one."
+              multiline>
+              <Label sx={{ ml: 2 }} htmlFor="isCopyrightInfringiment">
+                Copyright infringiment
+              </Label>
+            </Tooltip>
+          </Box>
+
           <Flex sx={{ justifyContent: "flex-end" }}>
             <Button
               type="button"
@@ -166,7 +186,12 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="primarySmall"
               onClick={() => {
-                setUserSuspended(selectedUser.id, true)
+                setUserSuspended(selectedUser.id, {
+                  suspended: true,
+                  emailTemplate: isCopyrightInfringiment
+                    ? "copyright"
+                    : undefined,
+                })
                   .then(refecth)
                   .finally(close);
               }}>
@@ -194,7 +219,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="primarySmall"
               onClick={() => {
-                setUserSuspended(selectedUser.id, false)
+                setUserSuspended(selectedUser.id, { suspended: false })
                   .then(refecth)
                   .finally(close);
               }}>
