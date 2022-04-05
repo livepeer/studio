@@ -1,5 +1,5 @@
 import validator from "email-validator";
-import { RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import jwt from "jsonwebtoken";
 import ms from "ms";
 import qs from "qs";
@@ -60,6 +60,16 @@ async function findUserByEmail(email: string, useReplica = true) {
   }
   return users[0];
 }
+
+const frontendUrl = (
+  {
+    headers: { "x-forwarded-proto": proto },
+    config: { frontendDomain },
+  }: Request,
+  path: string
+) => `${proto || "http"}://${frontendDomain}${path}`;
+
+const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
 
 type StripeProductIDs = CreateSubscription["stripeProductId"];
 
@@ -271,15 +281,6 @@ app.post("/", validatePost("user"), async (req, res) => {
   });
 
   const user = cleanUserFields(await db.user.get(id));
-
-  const protocol =
-    req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-
-  const verificationUrl = `${protocol}://${
-    req.frontendDomain
-  }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
-  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
-
   if (!validUser && user) {
     const {
       supportAddr,
@@ -300,8 +301,11 @@ app.post("/", validatePost("user"), async (req, res) => {
         subject: "Verify your Livepeer.com Email",
         preheader: "Welcome to Livepeer.com!",
         buttonText: "Verify Email",
-        buttonUrl: verificationUrl,
-        unsubscribe: unsubscribeUrl,
+        buttonUrl: frontendUrl(
+          req,
+          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+        ),
+        unsubscribe: unsubscribeUrl(req),
         text: [
           "Please verify your email address to ensure that you can change your password or receive updates from us.",
         ].join("\n\n"),
@@ -337,8 +341,38 @@ app.patch(
       res.status(404);
       return res.json({ errors: ["not found"] });
     }
-    logger.info(`set user ${id} (${user.email}) suspended ${suspended}`);
+    const { email } = user;
+    logger.info(`set user ${id} (${email}) suspended ${suspended}`);
     await db.user.update(id, { suspended });
+    if (suspended && emailTemplate === "copyright") {
+      const {
+        frontendDomain,
+        supportAddr,
+        sendgridTemplateId,
+        sendgridApiKey,
+      } = req.config;
+      try {
+        await sendgridEmail({
+          email,
+          supportAddr,
+          sendgridTemplateId,
+          sendgridApiKey,
+          subject: "Account Suspended",
+          preheader: `Your ${frontendDomain} account has been suspended.`,
+          buttonText: "Appeal Suspension",
+          buttonUrl: unsubscribeUrl(req),
+          unsubscribe: unsubscribeUrl(req),
+          text: [
+            "We were notified that your stream contained illegal or copyrighted content. We have suspended your account.",
+            "Please note that you cannot use Livepeer to stream copyrighted content. Any copyrighted content will be taken down and your account will be suspended.",
+          ].join("\n\n"),
+        });
+      } catch (err) {
+        console.error(
+          `error sending suspension email to user=${email} err=${err}`
+        );
+      }
+    }
 
     res.status(204);
     res.end();
@@ -375,10 +409,6 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
   if (user.emailValidToken === req.body.emailValidToken) {
     // alert sales of new verified user
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
-    const protocol =
-      req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-    const buttonUrl = `${protocol}://${req.frontendDomain}/login`;
-    const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
     const salesEmail = "sales@livepeer.org";
 
     if (req.headers.host.includes("livepeer.com")) {
@@ -392,8 +422,8 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
           subject: `User ${user.email} signed up with Livepeer!`,
           preheader: "We have a new verified user",
           buttonText: "Log into livepeer",
-          buttonUrl: buttonUrl,
-          unsubscribe: unsubscribeUrl,
+          buttonUrl: frontendUrl(req, "/login"),
+          unsubscribe: unsubscribeUrl(req),
           text: [
             `User ${user.email} has signed up and verified their email with Livepeer!`,
           ].join("\n\n"),
@@ -422,12 +452,6 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
   const { selectedPlan } = req.query;
   const user = await findUserByEmail(req.body.email);
   const { emailValid, email, emailValidToken } = user;
-  const protocol =
-    req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-  const verificationUrl = `${protocol}://${
-    req.frontendDomain
-  }/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`;
-  const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
 
   if (emailValid) {
     const {
@@ -447,8 +471,11 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
         subject: "Verify your Livepeer.com Email",
         preheader: "Welcome to Livepeer.com!",
         buttonText: "Verify Email",
-        buttonUrl: verificationUrl,
-        unsubscribe: unsubscribeUrl,
+        buttonUrl: frontendUrl(
+          req,
+          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+        ),
+        unsubscribe: unsubscribeUrl(req),
         text: [
           "Please verify your email address to ensure that you can change your password or receive updates from us.",
         ].join("\n\n"),
@@ -530,14 +557,6 @@ app.post(
 
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
     try {
-      const protocol =
-        req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-
-      const verificationUrl = `${protocol}://${
-        req.frontendDomain
-      }/reset-password?${qs.stringify({ email, resetToken })}`;
-      const unsubscribeUrl = `${protocol}://${req.frontendDomain}/contact`;
-
       await sendgridEmail({
         email,
         supportAddr,
@@ -546,8 +565,11 @@ app.post(
         subject: "Livepeer Password Reset",
         preheader: "Reset your Livepeer Password!",
         buttonText: "Reset Password",
-        buttonUrl: verificationUrl,
-        unsubscribe: unsubscribeUrl,
+        buttonUrl: frontendUrl(
+          req,
+          `/reset-password?${qs.stringify({ email, resetToken })}`
+        ),
+        unsubscribe: unsubscribeUrl(req),
         text: [
           "Let's change your password so you can log into the Livepeer API.",
           "Your link is active for 48 hours. After that, you will need to resend the password reset email.",
