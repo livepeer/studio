@@ -242,7 +242,9 @@ const CreateTokenDialog = ({
                         type="text"
                         id="addAllowedOrigin"
                         value={newAllowedOrigin}
-                        onChange={(e) => setNewAllowedOrigin(e.target.value)}
+                        onChange={(e) =>
+                          setNewAllowedOrigin(e.target.value.replace(/\s/g, ""))
+                        }
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
