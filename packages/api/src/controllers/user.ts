@@ -17,6 +17,7 @@ import {
   PasswordResetConfirm,
   UpdateSubscription,
   User,
+  SuspendUserPayload,
 } from "../schema/types";
 import { db } from "../store";
 import { InternalServerError, NotFoundError } from "../store/errors";
@@ -326,23 +327,18 @@ app.post("/", validatePost("user"), async (req, res) => {
 
 app.patch(
   "/:id/suspended",
+  validatePost("suspend-user-payload"),
   authMiddleware({ anyAdmin: true }),
   async (req, res) => {
+    const { suspended, emailTemplate } = req.body as SuspendUserPayload;
     const { id } = req.params;
     const user = await db.user.get(id);
     if (!user) {
       res.status(404);
       return res.json({ errors: ["not found"] });
     }
-    if (req.body.suspended === undefined) {
-      res.status(400);
-      return res.json({ errors: ["suspended field required"] });
-    }
-    logger.info(
-      `set user ${id} (${user.email}) suspended ${req.body.suspended}`
-    );
-
-    await db.user.update(id, { suspended: !!req.body.suspended });
+    logger.info(`set user ${id} (${user.email}) suspended ${suspended}`);
+    await db.user.update(id, { suspended });
 
     res.status(204);
     res.end();

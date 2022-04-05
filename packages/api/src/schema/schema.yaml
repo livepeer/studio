@@ -626,6 +626,19 @@ components:
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
 
+    suspend-user-payload:
+      type: object
+      additionalProperties: false
+      required: [suspended]
+      properties:
+        suspended:
+          $ref: "#/components/schemas/user/properties/suspended"
+        emailTemplate:
+          type: string
+          description:
+            Name of template to send to the users regarding the suspension.
+          enum: [copyright]
+
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
       required: []
