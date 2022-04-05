@@ -138,7 +138,8 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "email address where outgoing emails originate. should be of the form name/email@example.com",
         type: "string",
-        coerce: (supportAddr) => {
+        default: undefined,
+        coerce: (supportAddr: string) => {
           if (!supportAddr) {
             return undefined;
           }
@@ -148,7 +149,7 @@ export default function parseCli(argv?: string | readonly string[]) {
               `supportAddr should be of the form name / email, got ${supportAddr} `
             );
           }
-          return split;
+          return split as [string, string];
         },
       },
       "sendgrid-api-key": {
