@@ -391,7 +391,7 @@ app.patch(
           subject: "Account Suspended",
           preheader: `Your ${frontendDomain} account has been suspended.`,
           buttonText: "Appeal Suspension",
-          buttonUrl: unsubscribeUrl(req),
+          buttonUrl: frontendUrl(req, "/contact"),
           unsubscribe: unsubscribeUrl(req),
           text: [
             "We were notified that your stream contained illegal or copyrighted content. We have suspended your account.",
