@@ -157,7 +157,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             Are you sure you want to <b>suspend</b> user "{selectedUser.email}"?
           </p>
 
-          <Box css={{ display: "flex", mt: "$2" }}>
+          <Box sx={{ display: "flex", mt: 2, mb: 2 }}>
             <Checkbox
               id="isCopyrightInfringiment"
               checked={isCopyrightInfringiment}
@@ -168,11 +168,12 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             <Tooltip
               content="Checking this will send the copyright infringiment email instead of the default one."
               multiline>
-              <Label css={{ pl: "$2", mr: "$1" }} htmlFor="corsFullAccess">
-                Is copyright infringiment?
+              <Label sx={{ ml: 2 }} htmlFor="isCopyrightInfringiment">
+                Copyright infringiment
               </Label>
             </Tooltip>
           </Box>
+
           <Flex sx={{ justifyContent: "flex-end" }}>
             <Button
               type="button"
