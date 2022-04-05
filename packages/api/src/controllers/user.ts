@@ -151,6 +151,12 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   res.json(db.user.cleanWriteOnlyResponses(output));
 });
 
+app.get("/me", authMiddleware({ allowUnverified: true }), async (req, res) => {
+  const user = await db.user.get(req.user.id);
+  res.status(200);
+  return res.json(cleanUserFields(user, req.user.admin));
+});
+
 app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
   if (req.user.admin !== true && req.user.id !== req.params.id) {
     return res.status(403).json({
