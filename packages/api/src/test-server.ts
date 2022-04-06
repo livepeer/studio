@@ -17,7 +17,7 @@ const trustedDomain = "livepeer.org";
 const jwtAudience = "livepeer";
 const jwtSecret = "secret";
 // enable to test SendGrid integration
-const supportAddr = "Livepeer Team/angie@livepeer.org";
+const supportAddr: [string, string] = ["Livepeer Team", "angie@livepeer.org"];
 const sendgridTemplateId = "iamanid";
 const sendgridApiKey = "SG. iamanapikey";
 

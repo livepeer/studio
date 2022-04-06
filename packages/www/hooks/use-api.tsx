@@ -12,6 +12,7 @@ import {
   MultistreamTargetPatchPayload,
   Asset,
   Task,
+  SuspendUserPayload,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -374,11 +375,11 @@ const makeContext = (state: ApiState, setState) => {
 
     async setUserSuspended(
       userId: string,
-      suspended: boolean
+      payload: SuspendUserPayload
     ): Promise<[Response, ApiError]> {
       const [res, body] = await context.fetch(`/user/${userId}/suspended`, {
         method: "PATCH",
-        body: JSON.stringify({ suspended }),
+        body: JSON.stringify(payload),
         headers: {
           "content-type": "application/json",
         },

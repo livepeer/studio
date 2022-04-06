@@ -39,7 +39,7 @@ type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
 type MultistreamTargetRef = MultistreamOptions["targets"][number];
 
-export const USER_SESSION_TIMEOUT = 5 * 60 * 1000; // 5 min
+export const USER_SESSION_TIMEOUT = 60 * 1000; // 1 min
 const HTTP_PUSH_TIMEOUT = 60 * 1000; // value in the go-livepeer codebase
 const ACTIVE_TIMEOUT = 90 * 1000;
 
@@ -323,7 +323,7 @@ function setRecordingStatus(
   if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
     const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
     session.recordingStatus = isReady ? "ready" : "waiting";
-    if (isReady || (req.user.admin && forceUrl)) {
+    if (isReady || forceUrl) {
       session.recordingUrl = getRecordingUrl(ingest, session);
       session.mp4Url = getRecordingUrl(ingest, session, true);
     }
@@ -1229,7 +1229,7 @@ app.delete("/:id/terminate", authMiddleware({}), async (req, res) => {
   return res.json({ result, errors });
 });
 
-async function terminateStreamReq(
+export async function terminateStreamReq(
   req: Request,
   stream: DBStream
 ): Promise<{ status: number; errors?: string[]; result?: boolean | any }> {
