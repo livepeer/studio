@@ -615,6 +615,21 @@ components:
           items:
             type: string
 
+    stream-set-active-payload:
+      type: object
+      required: [active]
+      properties:
+        active:
+          $ref: "#/components/schemas/stream/properties/isActive"
+        hostName:
+          $ref: "#/components/schemas/stream/properties/mistHost"
+        startedAt:
+          type: number
+          description:
+            Timestamp (in milliseconds) at which the stream started.
+          example: 1587667174725
+
+
     stream-patch-payload:
       type: object
       additionalProperties: false

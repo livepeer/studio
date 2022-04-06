@@ -12,6 +12,7 @@ import { geolocateMiddleware } from "../middleware";
 import {
   DetectionWebhookPayload,
   StreamPatchPayload,
+  StreamSetActivePayload,
   User,
 } from "../schema/types";
 import { db } from "../store";
@@ -851,9 +852,10 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
 app.put(
   "/:id/setactive",
   authMiddleware({ anyAdmin: true }),
+  validatePost("stream-set-active-payload"),
   async (req, res) => {
     const { id } = req.params;
-    const { active, startedAt, hostName } = req.body;
+    const { active, startedAt, hostName } = req.body as StreamSetActivePayload;
     logger.info(
       `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
     );
@@ -882,7 +884,7 @@ app.put(
 
     // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
     // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-    const event = req.body.active === true ? "stream.started" : "stream.idle";
+    const event = active ? "stream.started" : "stream.idle";
     await req.queue.publishWebhook(`events.${event}`, {
       type: "webhook_event",
       id: uuid(),
@@ -892,14 +894,14 @@ app.put(
       userId: user.id,
     });
 
-    if (!req.body.active && stream.record === true) {
+    if (!active && stream.record === true) {
       // emit recording.ready
       // find last session
       const session = await db.stream.getLastSession(stream.id);
       if (session) {
         if (
           (session.lastSeen ?? 0) <
-          (req.body.startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
+          (startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
         ) {
           // last session is too old, probably transcoding wasn't happening, and so there
           // will be no recording
@@ -927,7 +929,7 @@ app.put(
         }
       }
     }
-    if (req.body.active === true && stream.record === true) {
+    if (active && stream.record === true) {
       let shouldEmit = true;
       const session = await db.stream.getLastSession(stream.id);
       if (session) {
@@ -949,29 +951,22 @@ app.put(
         });
       }
     }
-    stream.isActive = !!req.body.active;
-    stream.lastSeen = +new Date();
-    const { ownRegion: region } = req.config;
-    const { hostName: mistHost } = req.body;
-    await db.stream.update(stream.id, {
-      isActive: stream.isActive,
-      lastSeen: stream.lastSeen,
-      mistHost,
-      region,
-    });
 
-    db.user.update(stream.userId, {
+    const patch = {
+      isActive: active,
+      lastSeen: Date.now(),
+      mistHost: hostName,
+      region: req.config.ownRegion,
+    };
+    await db.stream.update(stream.id, patch);
+    await db.user.update(stream.userId, {
       lastStreamedAt: Date.now(),
     });
 
     if (stream.parentId) {
       const pStream = await db.stream.get(stream.parentId);
       if (pStream && !pStream.deleted) {
-        await db.stream.update(pStream.id, {
-          isActive: stream.isActive,
-          lastSeen: stream.lastSeen,
-          region,
-        });
+        await db.stream.update(pStream.id, patch);
       }
     }
 
