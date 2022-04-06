@@ -969,9 +969,11 @@ app.put(
       region: req.config.ownRegion,
     };
     await db.stream.update(stream.id, patch);
-    await db.user.update(stream.userId, {
-      lastStreamedAt: Date.now(),
-    });
+    if (active) {
+      await db.user.update(stream.userId, {
+        lastStreamedAt: Date.now(),
+      });
+    }
 
     if (stream.parentId) {
       const pStream = await db.stream.get(stream.parentId);
