@@ -853,14 +853,17 @@ app.put(
   authMiddleware({ anyAdmin: true }),
   async (req, res) => {
     const { id } = req.params;
-    // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
+    const { active, startedAt, hostName } = req.body;
+    logger.info(
+      `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
+    );
+
     const stream = await db.stream.get(id, { useReplica: false });
     if (!stream || (stream.deleted && !req.user.admin)) {
       res.status(404);
       return res.json({ errors: ["not found"] });
     }
 
-    const { active } = req.body;
     if (active && stream.suspended) {
       res.status(403);
       return res.json({ errors: ["stream is suspended"] });
