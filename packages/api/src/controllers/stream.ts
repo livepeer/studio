@@ -952,6 +952,16 @@ app.put(
       }
     }
 
+    const sameFromStream =
+      stream.region === req.config.ownRegion && stream.mistHost === hostName;
+    if (stream.isActive && !active && !sameFromStream) {
+      // Don't clear the isActive field if this is being called for a different
+      // session than the last one to update the stream object. This probably
+      // means the user is doing more than 1 session with the same stream key.
+      // We only support 1 conc. session tho so ignore all but the last one.
+      return res.status(204).end();
+    }
+
     const patch = {
       isActive: active,
       lastSeen: Date.now(),
