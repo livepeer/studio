@@ -13,11 +13,11 @@ function coerceArr(arg: any) {
   return arg;
 }
 
-function coerceCorsList(arg: any): (string | RegExp)[] {
+function coerceCorsList(arg: string): (string | RegExp)[] {
   if (!arg) {
     return undefined;
   }
-  const arr: string[] = coerceArr(arg);
+  const arr: string[] = arg.split(",");
   return arr.map((str) => {
     if (str.startsWith("/") && str.endsWith("/")) {
       return new RegExp(str.slice(1, -1));

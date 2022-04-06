@@ -129,7 +129,7 @@ function corsOptsProvider(params: {
   anyOriginPathPrefixes: string[];
   jwtOrigin: (string | RegExp)[];
 }): CorsOptionsDelegate<Request> {
-  const { anyOriginPathPrefixes, baseOpts, jwtOrigin } = params;
+  const { baseOpts, anyOriginPathPrefixes, jwtOrigin } = params;
   const anyOriginOpts = { ...baseOpts, origin: true };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   const getCorsOpts = (req: Request) => {
