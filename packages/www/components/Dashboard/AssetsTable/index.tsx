@@ -31,7 +31,6 @@ import CreateAssetDialog from "./CreateAssetDialog";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
-  { label: "Source", id: "source", type: "text" },
   { label: "Created", id: "createdAt", type: "date" },
   { label: "Updated", id: "updatedAt", type: "date" },
 ];
@@ -96,6 +95,7 @@ const AssetsTable = ({
         Header: "Source",
         accessor: "source",
         Cell: TextCell,
+        disableSortBy: true,
       },
       {
         Header: "Created",
