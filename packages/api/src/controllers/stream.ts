@@ -884,7 +884,7 @@ app.put(
 
     const ingest = ((await req.getIngest()) ?? [])[0]?.base;
     sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
-      logger.error("Error sending /setactive hooks", err);
+      logger.error("Error sending /setactive hooks err=", err);
     });
 
     const sameFromStream =
@@ -904,21 +904,30 @@ app.put(
       region: req.config.ownRegion,
     };
     await db.stream.update(stream.id, patch);
-    if (active) {
-      await db.user.update(stream.userId, {
-        lastStreamedAt: Date.now(),
-      });
-    }
+    // update the other auxiliary info in the database in background.
+    setImmediate(async () => {
+      try {
+        if (active) {
+          await db.user.update(stream.userId, {
+            lastStreamedAt: Date.now(),
+          });
+        }
 
-    if (stream.parentId) {
-      const pStream = await db.stream.get(stream.parentId);
-      if (pStream && !pStream.deleted) {
-        await db.stream.update(pStream.id, patch);
+        if (stream.parentId) {
+          const pStream = await db.stream.get(stream.parentId);
+          if (pStream && !pStream.deleted) {
+            await db.stream.update(pStream.id, patch);
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "Error updating aux info from /setactive in database err=",
+          err
+        );
       }
-    }
+    });
 
-    res.status(204);
-    res.end();
+    res.status(204).end();
   }
 );
 
