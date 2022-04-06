@@ -33,12 +33,12 @@ export default function subgraphMiddleware({
         Accept: "application/json",
       },
       body: JSON.stringify({
-        query: `{ protocol(id: "0") { currentRound { id } } }`,
+        query: `{ protocol(id: "0") { lastInitializedRound { id } } }`,
       }),
       timeout: SUBGRAPH_TIMEOUT,
     });
 
-    return +(await res.json()).data.protocol.currentRound.id;
+    return +(await res.json()).data.protocol.lastInitializedRound.id;
   };
 
   const getOrchestrators = async () => {
