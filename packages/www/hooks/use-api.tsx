@@ -11,6 +11,7 @@ import {
   ObjectStore,
   MultistreamTargetPatchPayload,
   Asset,
+  Task,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -871,26 +872,36 @@ const makeContext = (state: ApiState, setState) => {
       return [assets, nextCursor, count];
     },
 
-    async deleteAsset(id: string): Promise<void> {
-      const [res, body] = await context.fetch(`/asset/${id}`, {
-        method: "DELETE",
-      });
-      if (res.status !== 204) {
-        throw new Error(body);
+    async getTasks(
+      userId,
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
+        count?: boolean;
       }
-    },
+    ): Promise<[Array<Task>, string, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
 
-    async deleteAssets(ids: Array<string>): Promise<void> {
-      const [res, body] = await context.fetch(`/asset`, {
-        method: "DELETE",
-        body: JSON.stringify({ ids }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-      if (res.status !== 204) {
-        throw new Error(body);
+      const [res, tasks] = await context.fetch(
+        `/task?${qs.stringify({
+          userId,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
+        })}`
+      );
+
+      if (res.status !== 200) {
+        throw new Error(tasks);
       }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [tasks, nextCursor, count];
     },
 
     async getObjectStore(

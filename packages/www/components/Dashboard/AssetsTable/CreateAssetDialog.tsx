@@ -83,7 +83,7 @@ const CreateAssetDialog = ({
               id="assetUrl"
               value={assetUrl}
               onChange={(e) => setAssetUrl(e.target.value)}
-              placeholder="https://common---ForBiggerBlazes.mp4"
+              placeholder="e.g. https://example.com/play.mp4"
             />
           </Flex>
           <AlertDialogDescription
