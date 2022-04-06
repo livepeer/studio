@@ -377,6 +377,9 @@ app.patch(
   async (req, res) => {
     const { suspended, emailTemplate } = req.body as SuspendUserPayload;
     const { id } = req.params;
+    if (id === req.user?.id) {
+      return res.status(400).json({ errors: ["cannot suspend own user"] });
+    }
     const user = await db.user.get(id);
     if (!user) {
       return res.status(404).json({ errors: ["not found"] });
@@ -683,7 +686,7 @@ app.post(
 
 app.post(
   "/update-customer-payment-method",
-  authorizer({}),
+  authorizer({ noApiToken: true }),
   validatePost("update-customer-payment-method"),
   requireStripe(),
   async (req, res) => {
@@ -797,7 +800,7 @@ app.post(
 
 app.post(
   "/update-subscription",
-  authorizer({}),
+  authorizer({ noApiToken: true }),
   validatePost("update-subscription"),
   requireStripe(),
   async (req, res) => {
@@ -920,7 +923,7 @@ app.post(
 
 app.post(
   "/retrieve-subscription",
-  authorizer({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripeCustomerSubscriptionId } = req.body;
@@ -938,7 +941,7 @@ app.post(
 
 app.post(
   "/retrieve-invoices",
-  authorizer({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripeCustomerId } = req.body;
@@ -954,7 +957,7 @@ app.post(
 
 app.post(
   "/retrieve-payment-method",
-  authorizer({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripePaymentMethodId } = req.body;
