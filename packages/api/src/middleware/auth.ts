@@ -130,7 +130,7 @@ function corsOptsProvider(params: {
   jwtOrigin: (string | RegExp)[];
 }): CorsOptionsDelegate<Request> {
   const { anyOriginPathPrefixes, baseOpts, jwtOrigin } = params;
-  const anyOriginOpts = { ...baseOpts, origin: true, credentials: false };
+  const anyOriginOpts = { ...baseOpts, origin: true };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
   const getCorsOpts = (req: Request) => {
     const {
@@ -148,11 +148,15 @@ function corsOptsProvider(params: {
         origin: reqOrigin ? [reqOrigin] : true,
       };
     }
-    return !token
-      ? jwtOpts
+    if (!token) {
+      return jwtOpts;
+    }
+    const allowedOrigins = token.access?.cors?.allowedOrigins ?? [];
+    return allowedOrigins.includes("*")
+      ? anyOriginOpts
       : {
           ...baseOpts,
-          origin: token.access?.cors?.allowedOrigins ?? [],
+          origin: allowedOrigins,
         };
   };
 
