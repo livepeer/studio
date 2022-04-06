@@ -625,10 +625,8 @@ components:
           $ref: "#/components/schemas/stream/properties/mistHost"
         startedAt:
           type: number
-          description:
-            Timestamp (in milliseconds) at which the stream started.
+          description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
-
 
     stream-patch-payload:
       type: object

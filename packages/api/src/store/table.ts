@@ -108,7 +108,6 @@ export default class Table<T extends DBObject> {
     if (Array.isArray(query)) {
       filters = [...query];
     }
-
     // ...or a {name: "whatever"} query
     else {
       for (const [key, value] of Object.entries(query)) {
