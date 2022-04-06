@@ -854,14 +854,14 @@ app.put(
   async (req, res) => {
     const { id } = req.params;
     // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
-    const useReplica = !req.body.active;
-    const stream = await db.stream.get(id, { useReplica });
+    const stream = await db.stream.get(id, { useReplica: false });
     if (!stream || (stream.deleted && !req.user.admin)) {
       res.status(404);
       return res.json({ errors: ["not found"] });
     }
 
-    if (stream.suspended) {
+    const { active } = req.body;
+    if (active && stream.suspended) {
       res.status(403);
       return res.json({ errors: ["stream is suspended"] });
     }
@@ -872,7 +872,7 @@ app.put(
       return res.json({ errors: ["not found"] });
     }
 
-    if (user.suspended) {
+    if (active && user.suspended) {
       res.status(403);
       return res.json({ errors: ["user is suspended"] });
     }
