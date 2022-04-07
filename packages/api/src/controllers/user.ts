@@ -381,7 +381,7 @@ app.patch(
     if (!user) {
       return res.status(404).json({ errors: ["not found"] });
     }
-    const { email } = user;
+    const { email, suspended: wasSuspended } = user;
 
     logger.info(`set user ${id} (${email}) suspended ${suspended}`);
     await db.user.update(id, { suspended });
@@ -392,7 +392,7 @@ app.patch(
       );
     });
 
-    if (suspended) {
+    if (suspended && !wasSuspended) {
       const {
         frontendDomain,
         supportAddr,

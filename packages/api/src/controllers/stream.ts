@@ -12,6 +12,7 @@ import { geolocateMiddleware } from "../middleware";
 import {
   DetectionWebhookPayload,
   StreamPatchPayload,
+  StreamSetActivePayload,
   User,
 } from "../schema/types";
 import { db } from "../store";
@@ -851,17 +852,21 @@ app.post("/", authMiddleware({}), validatePost("stream"), async (req, res) => {
 app.put(
   "/:id/setactive",
   authMiddleware({ anyAdmin: true }),
+  validatePost("stream-set-active-payload"),
   async (req, res) => {
     const { id } = req.params;
-    // logger.info(`got /setactive/${id}: ${JSON.stringify(req.body)}`)
-    const useReplica = !req.body.active;
-    const stream = await db.stream.get(id, { useReplica });
+    const { active, startedAt, hostName } = req.body as StreamSetActivePayload;
+    logger.info(
+      `got /setactive for stream=${id} active=${active} hostName=${hostName} startedAt=${startedAt}`
+    );
+
+    const stream = await db.stream.get(id, { useReplica: false });
     if (!stream || (stream.deleted && !req.user.admin)) {
       res.status(404);
       return res.json({ errors: ["not found"] });
     }
 
-    if (stream.suspended) {
+    if (active && stream.suspended) {
       res.status(403);
       return res.json({ errors: ["stream is suspended"] });
     }
@@ -872,110 +877,137 @@ app.put(
       return res.json({ errors: ["not found"] });
     }
 
-    if (user.suspended) {
+    if (active && user.suspended) {
       res.status(403);
       return res.json({ errors: ["user is suspended"] });
     }
 
-    // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
-    // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
-    const event = req.body.active === true ? "stream.started" : "stream.idle";
-    await req.queue.publishWebhook(`events.${event}`, {
-      type: "webhook_event",
-      id: uuid(),
-      timestamp: Date.now(),
-      streamId: id,
-      event: event,
-      userId: user.id,
+    const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+    sendSetActiveHooks(stream, req.body, req.queue, ingest).catch((err) => {
+      logger.error("Error sending /setactive hooks err=", err);
     });
 
-    if (!req.body.active && stream.record === true) {
-      // emit recording.ready
-      // find last session
-      const session = await db.stream.getLastSession(stream.id);
-      if (session) {
-        if (
-          (session.lastSeen ?? 0) <
-          (req.body.startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
-        ) {
-          // last session is too old, probably transcoding wasn't happening, and so there
-          // will be no recording
-        } else {
-          const ingest = ((await req.getIngest()) ?? [])[0]?.base;
-          const recordingUrl = getRecordingUrl(ingest, session);
-          const mp4Url = getRecordingUrl(ingest, session, true);
-          await req.queue.delayedPublishWebhook(
-            "events.recording.ready",
-            {
-              type: "webhook_event",
-              id: uuid(),
-              timestamp: Date.now(),
-              streamId: id,
-              event: "recording.ready",
-              userId: user.id,
-              sessionId: session.id,
-              payload: {
-                recordingUrl,
-                mp4Url,
-              },
-            },
-            USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
-          );
+    const sameFromStream =
+      stream.region === req.config.ownRegion && stream.mistHost === hostName;
+    if (stream.isActive && !active && !sameFromStream) {
+      // This likely means the user is doing multiple sessions with the same
+      // stream key. We only support 1 conc. session so ignore previous ones.
+      logger.info(
+        `Ignoring /setactive false since another session had already started. ` +
+          `stream=${id} currMist="${stream.region}-${stream.mistHost}" oldMist="${req.config.ownRegion}-${hostName}"`
+      );
+      return res.status(204).end();
+    }
+
+    const patch = {
+      isActive: active,
+      lastSeen: Date.now(),
+      mistHost: hostName,
+      region: req.config.ownRegion,
+    };
+    await db.stream.update(stream.id, patch);
+    // update the other auxiliary info in the database in background.
+    setImmediate(async () => {
+      try {
+        if (active) {
+          await db.user.update(stream.userId, {
+            lastStreamedAt: Date.now(),
+          });
         }
-      }
-    }
-    if (req.body.active === true && stream.record === true) {
-      let shouldEmit = true;
-      const session = await db.stream.getLastSession(stream.id);
-      if (session) {
-        const timeSinceSeen = Date.now() - (session.lastSeen ?? 0);
-        if (timeSinceSeen < USER_SESSION_TIMEOUT) {
-          // there is recent session exits, so new one will be joined with last one
-          // not emitting "recording.started" because it will be same recorded session
-          shouldEmit = false;
+
+        if (stream.parentId) {
+          const pStream = await db.stream.get(stream.parentId);
+          if (pStream && !pStream.deleted) {
+            await db.stream.update(pStream.id, patch);
+          }
         }
+      } catch (err) {
+        logger.error(
+          "Error updating aux info from /setactive in database err=",
+          err
+        );
       }
-      if (shouldEmit) {
-        await req.queue.publishWebhook("events.recording.started", {
-          type: "webhook_event",
-          id: uuid(),
-          timestamp: Date.now(),
-          streamId: id,
-          event: "recording.started",
-          userId: user.id,
-        });
-      }
-    }
-    stream.isActive = !!req.body.active;
-    stream.lastSeen = +new Date();
-    const { ownRegion: region } = req.config;
-    const { hostName: mistHost } = req.body;
-    await db.stream.update(stream.id, {
-      isActive: stream.isActive,
-      lastSeen: stream.lastSeen,
-      mistHost,
-      region,
     });
 
-    db.user.update(stream.userId, {
-      lastStreamedAt: Date.now(),
-    });
-
-    if (stream.parentId) {
-      const pStream = await db.stream.get(stream.parentId);
-      if (pStream && !pStream.deleted) {
-        await db.stream.update(pStream.id, {
-          isActive: stream.isActive,
-          lastSeen: stream.lastSeen,
-          region,
-        });
-      }
-    }
-
-    res.status(204);
-    res.end();
+    res.status(204).end();
   }
 );
+
+const sendSetActiveHooks = async (
+  stream: DBStream,
+  { active, startedAt }: StreamSetActivePayload,
+  queue: Queue,
+  ingest: string
+) => {
+  // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
+  // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
+  const event = active ? "stream.started" : "stream.idle";
+  await queue.publishWebhook(`events.${event}`, {
+    type: "webhook_event",
+    id: uuid(),
+    timestamp: Date.now(),
+    streamId: stream.id,
+    event: event,
+    userId: stream.userId,
+  });
+
+  if (!active && stream.record === true) {
+    // emit recording.ready
+    // find last session
+    const session = await db.stream.getLastSession(stream.id);
+    if (session) {
+      if (
+        (session.lastSeen ?? 0) <
+        (startedAt ?? Date.now() - USER_SESSION_TIMEOUT)
+      ) {
+        // last session is too old, probably transcoding wasn't happening, and so there
+        // will be no recording
+      } else {
+        const recordingUrl = getRecordingUrl(ingest, session);
+        const mp4Url = getRecordingUrl(ingest, session, true);
+        await queue.delayedPublishWebhook(
+          "events.recording.ready",
+          {
+            type: "webhook_event",
+            id: uuid(),
+            timestamp: Date.now(),
+            streamId: stream.id,
+            event: "recording.ready",
+            userId: stream.userId,
+            sessionId: session.id,
+            payload: {
+              recordingUrl,
+              mp4Url,
+            },
+          },
+          USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
+        );
+      }
+    }
+  }
+  if (active && stream.record === true) {
+    let shouldEmit = true;
+    const session = await db.stream.getLastSession(stream.id);
+    if (session) {
+      const timeSinceSeen = Date.now() - (session.lastSeen ?? 0);
+      if (timeSinceSeen < USER_SESSION_TIMEOUT) {
+        // there is recent session exits, so new one will be joined with last one
+        // not emitting "recording.started" because it will be same recorded session
+        shouldEmit = false;
+      }
+    }
+    if (shouldEmit) {
+      await queue.publishWebhook("events.recording.started", {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp: Date.now(),
+        streamId: stream.id,
+        event: "recording.started",
+        userId: stream.userId,
+      });
+    }
+  }
+};
 
 // sets 'isActive' field to false for many objects at once
 app.patch(
