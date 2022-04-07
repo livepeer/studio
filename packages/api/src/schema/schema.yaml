@@ -209,6 +209,7 @@ components:
               - multistream.connected
               - multistream.error
               - multistream.disconnected
+              - user.new
         url:
           type: string
           format: uri
