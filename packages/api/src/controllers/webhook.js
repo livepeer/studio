@@ -125,8 +125,8 @@ app.get("/", authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/subscribed", authMiddleware({}), async (req, res) => {
-  let { event } = req.query;
+app.get("/subscribed/:event", authMiddleware({}), async (req, res) => {
+  let event = req.params.event;
 
   let userId = req.user.id;
 
