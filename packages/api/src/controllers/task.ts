@@ -171,7 +171,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authorizer({}), async (req, res) => {
+app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   const task = await db.task.get(req.params.id);
   if (!task) {
     res.status(404);
@@ -233,7 +233,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   res.json({ id, status });
 });
 
-app.delete("/:id", authorizer({}), async (req, res) => {
+app.delete("/:id", authorizer({ anyAdmin: true }), async (req, res) => {
   const { id } = req.params;
   const task = await db.task.get(id);
   if (!task) {
@@ -250,26 +250,5 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
-
-// TODO: Remove this API.
-app.patch(
-  "/:id",
-  authorizer({ anyAdmin: true }),
-  validatePost("task"),
-  async (req, res) => {
-    // update a specific task
-    const task = await db.task.get(req.body.id);
-    if (!req.user.admin) {
-      res.status(403);
-      return res.json({ errors: ["Forbidden"] });
-    }
-
-    const doc = req.body;
-    await db.task.update(req.body.id, doc);
-
-    res.status(200);
-    res.json({ id: req.body.id });
-  }
-);
 
 export default app;
