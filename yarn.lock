@@ -3899,10 +3899,10 @@
     ethjs-provider-signer "^0.1.4"
     ethjs-query "^0.3.1"
 
-"@livepeer/video-nft@^0.3.2-beta":
-  version "0.3.2-beta"
-  resolved "https://registry.yarnpkg.com/@livepeer/video-nft/-/video-nft-0.3.2-beta.tgz#3062bd2012bf537719a2a1ab50a2bc5793e61f28"
-  integrity sha512-X8XFi9Zq9tnb0sxF3c+DJj/D4QCfatfBPsFDElo9O0JYQCNinRCAksloXQqM/8cBwRraqhIe2RxYPU0pOyx2kw==
+"@livepeer/video-nft@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@livepeer/video-nft/-/video-nft-0.3.2.tgz#12005619039979e5a3c862fb056b9b3668776ee4"
+  integrity sha512-3rpS8HQDO5emP5ZuWEoN3qdYeQjC2MrSDwmVBZd6V0691C1QyPvQm3nUCibGLeRvbQJ+Z+qi/fqKYNGSpsU2Pg==
   dependencies:
     axios "^0.26.0"
     browser-fs-access "^0.25.0"
@@ -6878,10 +6878,15 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0", "@types/node@^10.12.0":
+"@types/node@*", "@types/node@14.6.4", "@types/node@>= 8", "@types/node@>=8.1.0":
   version "14.6.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.4.tgz#a145cc0bb14ef9c4777361b7bbafa5cf8e3acb5a"
   integrity sha512-Wk7nG1JSaMfMpoMJDKUsWYugliB2Vy55pdjLpmLixeyMi7HizW2I/9QoxsPCkXl3dO+ZOVqPumKaDUv5zJu2uQ==
+
+"@types/node@^10.12.0":
+  version "10.17.60"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
+  integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
