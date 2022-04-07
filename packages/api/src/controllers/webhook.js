@@ -125,6 +125,21 @@ app.get("/", authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
+app.get("/subscribed", authMiddleware({}), async (req, res) => {
+  let { event } = req.query;
+
+  let userId = req.user.id;
+
+  if (req.user.admin && req.query.userId) {
+    userId = req.query.userId;
+  }
+
+  const { data } = await db.webhook.listSubscribed(userId, event);
+
+  res.status(200);
+  return res.json(data);
+});
+
 app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
   const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
