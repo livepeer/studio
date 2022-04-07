@@ -408,7 +408,7 @@ export default function MintNFT() {
                             isUploading.onOff();
                           }
                         }}>
-                        {isMinting.on && (
+                        {isUploading.on && (
                           <Spinner
                             css={{
                               color: "$hiContrast",
@@ -418,7 +418,7 @@ export default function MintNFT() {
                             }}
                           />
                         )}
-                        {isMinting.on ? "Uploading..." : "Upload file"}
+                        {isUploading.on ? "Uploading..." : "Upload file"}
                       </Button>
                     ) : (
                       <Button
