@@ -55,6 +55,7 @@ const eventOptions = [
   "multistream.connected",
   "multistream.error",
   "multistream.disconnected",
+  "user.new",
 ];
 
 export enum Action {
