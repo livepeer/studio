@@ -42,8 +42,6 @@ function isAuthorized(
   }
 }
 
-type AsyncRequestHandler = (req: Request, res: Response) => Promise<void>;
-
 /**
  * Creates a middleware that parses and verifies the authentication method from
  * the request and populates the `express.Request` object.
@@ -64,8 +62,8 @@ type AsyncRequestHandler = (req: Request, res: Response) => Promise<void>;
  * If the specific API requires a user, it must add an {@link authorizer}
  * middleware which will fail if the request is not authenticated.
  */
-function authenticator(): AsyncRequestHandler {
-  return async (req, res) => {
+function authenticator(): RequestHandler {
+  return async (req, res, next) => {
     res.vary("Authorization");
     const authHeader = req.headers.authorization;
     const { authScheme, authToken, rawAuthScheme } =
@@ -76,7 +74,7 @@ function authenticator(): AsyncRequestHandler {
     let userId: string;
 
     if (!authScheme) {
-      return;
+      return next();
     } else if (["bearer", "basic"].includes(authScheme)) {
       const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : authToken;
@@ -122,6 +120,7 @@ function authenticator(): AsyncRequestHandler {
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
     req.token = tokenObject;
+    return next();
   };
 }
 
@@ -161,13 +160,21 @@ function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
   const auth = authenticator();
   const _cors = cors(params.cors);
   return async (req, res, next) => {
-    let corsNext = next;
+    const corsNext = (err1: any) => {
+      const joinedNext = (err2: any) => next(err1 ?? err2);
+      try {
+        _cors(req, res, joinedNext);
+      } catch (err) {
+        joinedNext(err);
+      }
+    };
     try {
-      await auth(req, res);
+      // we know that auth middleware is async
+      await auth(req, res, corsNext);
     } catch (err) {
-      corsNext = () => next(err);
+      // make sure we call cors even on thrown auth errs
+      corsNext(err);
     }
-    _cors(req, res, corsNext);
   };
 }
 
