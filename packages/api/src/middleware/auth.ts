@@ -1,7 +1,7 @@
 import { URL } from "url";
 import basicAuth from "basic-auth";
-import { CorsOptions, CorsOptionsDelegate } from "cors";
-import { Request, RequestHandler } from "express";
+import corsLib, { CorsOptions } from "cors";
+import { Request, RequestHandler, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
@@ -42,6 +42,8 @@ function isAuthorized(
   }
 }
 
+type AsyncRequestHandler = (req: Request, res: Response) => Promise<void>;
+
 /**
  * Creates a middleware that parses and verifies the authentication method from
  * the request and populates the `express.Request` object.
@@ -62,8 +64,8 @@ function isAuthorized(
  * If the specific API requires a user, it must add an {@link authorizer}
  * middleware which will fail if the request is not authenticated.
  */
-function authenticator(): RequestHandler {
-  return async (req, res, next) => {
+function authenticator(): AsyncRequestHandler {
+  return async (req, res) => {
     res.vary("Authorization");
     const authHeader = req.headers.authorization;
     const { authScheme, authToken, rawAuthScheme } =
@@ -74,7 +76,7 @@ function authenticator(): RequestHandler {
     let userId: string;
 
     if (!authScheme) {
-      return next();
+      return;
     } else if (["bearer", "basic"].includes(authScheme)) {
       const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : authToken;
@@ -120,15 +122,16 @@ function authenticator(): RequestHandler {
     // UI admins must have a JWT
     req.isUIAdmin = user.admin && authScheme === "jwt";
     req.token = tokenObject;
-    return next();
   };
 }
 
-function corsOptsProvider(params: {
+type CorsParams = {
   baseOpts: CorsOptions;
   anyOriginPathPrefixes: string[];
   jwtOrigin: (string | RegExp)[];
-}): CorsOptionsDelegate<Request> {
+};
+
+function cors(params: CorsParams): RequestHandler {
   const { baseOpts, anyOriginPathPrefixes, jwtOrigin } = params;
   const anyOriginOpts = { ...baseOpts, origin: true };
   const jwtOpts = { ...baseOpts, origin: jwtOrigin };
@@ -151,7 +154,21 @@ function corsOptsProvider(params: {
         };
   };
 
-  return (req, callback) => callback(null, getCorsOpts(req));
+  return corsLib((req, callback) => callback(null, getCorsOpts(req)));
+}
+
+function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
+  const auth = authenticator();
+  const _cors = cors(params.cors);
+  return async (req, res, next) => {
+    let corsNext = next;
+    try {
+      await auth(req, res);
+    } catch (err) {
+      corsNext = () => next(err);
+    }
+    _cors(req, res, corsNext);
+  };
 }
 
 interface AuthzParams {
@@ -218,4 +235,4 @@ function authorizer(params: AuthzParams): RequestHandler {
   };
 }
 
-export { authenticator, corsOptsProvider, authorizer };
+export { authenticator, cors, authenticateWithCors, authorizer };

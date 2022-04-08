@@ -1,5 +1,4 @@
 // import 'express-async-errors' // it monkeypatches, i guess
-import cors from "cors";
 import { Router } from "express";
 import promBundle from "express-prom-bundle";
 import proxy from "http-proxy-middleware";
@@ -14,8 +13,7 @@ import {
   hardcodedNodes,
   insecureTest,
   geolocateMiddleware,
-  authenticator,
-  corsOptsProvider,
+  authenticateWithCors,
 } from "./middleware";
 import controllers from "./controllers";
 import streamProxy from "./controllers/stream-proxy";
@@ -157,18 +155,17 @@ export default async function makeApp(params: CliArgs) {
     req.stripe = stripe;
     next();
   });
-  app.use(authenticator());
   app.use(
-    cors(
-      corsOptsProvider({
+    authenticateWithCors({
+      cors: {
         anyOriginPathPrefixes: [pathJoin("/", httpPrefix, "/asset/upload/")],
         jwtOrigin: corsJwtAllowlist,
         baseOpts: {
           credentials: true,
           exposedHeaders: ["*"],
         },
-      })
-    )
+      },
+    })
   );
 
   // stripe webhook requires raw body
