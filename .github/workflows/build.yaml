@@ -3,117 +3,161 @@ name: Build binaries
 on:
   pull_request:
   push:
+    branches:
+      - "master"
     tags:
       - "v*"
 
 jobs:
   build:
     name: Build binary packages
-    runs-on: macos-latest
+    runs-on: ubuntu-20.04
     steps:
-      - name: checkout
-        uses: actions/checkout@master
+      - name: Check out code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          # Check https://github.com/livepeer/go-livepeer/pull/1891
+          # for ref value discussion
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
 
       - name: Tags
         id: tags
-        uses: livepeer/action-gh-release-tags@v0
+        uses: livepeer/action-gh-release-tags@latest
 
       - name: restore lerna
-        uses: actions/cache@v2
+        id: cache-lerna
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
+      - name: restore pkg cache
+        id: cache-pkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pkg-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: yarn install
-        run: |
-          yarn install --frozen-lockfile
+        if: steps.cache-lerna.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
 
       - name: build pkgs
         # I want to do --parallel here, but the binary downloads conflict with each other
         run: |
+          echo RELEASE_PATH="${GITHUB_WORKSPACE}/releases" >> "${GITHUB_ENV}"
+          echo BIN_PATH="${GITHUB_WORKSPACE}/bin" >> "${GITHUB_ENV}"
           yarn run lerna-run pkg
 
-      - name: move pkgs
+      - name: Rename and move built binaries
         run: |
-          mkdir -p releases/
+          mkdir -p "${RELEASE_PATH}" "${BIN_PATH}"
+
           for package in api www; do
             for arch in linux-arm64 linux-x64 macos-arm64 macos-x64 win-x64; do
               in_name="$package-$arch"
               out_name="livepeer-$package"
               archive_name="livepeer-$(echo $in_name | sed -e 's/x64/amd64/;s/win/windows/;s/macos/darwin/')"
               cd ./packages/$package/bin
-              if [[ "$arch" == "win-x64" ]]; then
-                in_name="$in_name.exe"
-                out_name="$out_name.exe"
-                mv ./$in_name ./$out_name
-                zip -q9 "../../../releases/${archive_name}.zip" "./$out_name"
-              else
-                mv ./$in_name ./$out_name
-                tar -czvf "../../../releases/${archive_name}.tar.gz" "./$out_name"
-              fi
+              case "$arch" in
+                win-x64)
+                  in_name="$in_name.exe"
+                  out_name="$out_name.exe"
+                  mv "./$in_name" "./$out_name"
+                  zip -q9 "${RELEASE_PATH}/releases/${archive_name}.zip" "./$out_name"
+                  ;;
+                linux-*)
+                  mv "./$in_name" "./$out_name"
+                  tar -czvf "${RELEASE_PATH}/releases/${archive_name}.tar.gz" "./$out_name"
+                  ;;
+                macos-*)
+                  mkdir -p "${BIN_PATH}/$arch"
+                  mv "./$in_name" "${BIN_PATH}/$arch/$out_name"
+                  ;;
+              esac
               cd -
             done
           done
 
-      - name: Upload artifacts for processing further in linux
+      - name: Upload macos binaries for codesigning (arm64)
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-arm64
+          path: bin/macos-arm64
+
+      - name: Upload macos binaries for codesigning (amd64)
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-amd64
+          path: bin/macos-x64
+
+      - name: Upload artifacts for cutting release
         uses: actions/upload-artifact@master
         with:
           name: release-artifacts
           path: releases/
 
-  release:
-    name: Release new version artifacts to github
-    if: ${{ github.ref_type == 'tag' }}
-    runs-on: ubuntu-latest
+  macos:
+    strategy:
+      fail-fast: true
+      matrix:
+        arch:
+          - amd64
+          - arm64
+    name: Codesign and archive macOS binaries
+    runs-on: macos-11
     needs: build
     steps:
-      - name: checkout
-        uses: actions/checkout@master
-        with:
-          fetch-depth: 0
+      - name: Setup env
+        run: |
+          echo ARCH="${{ matrix.arch }}" >> "$GITHUB_ENV"
 
-      - name: Download artifacts from build stage
-        uses: actions/download-artifact@master
+      - name: Download binaries from build stage
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-${{ matrix.arch }}
+          path: bin/
+
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: match-tag
+        with:
+          text: ${{ github.ref_name }}
+          regex: '^(master|main|v[0-9]+\.\d+\.\d+)$'
+
+      - name: Codesign and notarize binaries
+        if: ${{ steps.match-tag.outputs.match != '' }}
+        uses: livepeer/action-gh-codesign-apple@latest
+        with:
+          developer-certificate-id: ${{ secrets.CI_MACOS_CERTIFICATE_ID }}
+          developer-certificate-base64:
+            ${{ secrets.CI_MACOS_CERTIFICATE_BASE64 }}
+          developer-certificate-password:
+            ${{ secrets.CI_MACOS_CERTIFICATE_PASSWORD }}
+          app-notarization-email: ${{ secrets.CI_MACOS_NOTARIZATION_USER }}
+          app-notarization-password:
+            ${{ secrets.CI_MACOS_NOTARIZATION_PASSWORD }}
+          binary-path: "bin/"
+          app-bundle-id: "org.livepeer.api"
+
+      - name: Archive built binaries
+        run: |
+          mkdir -p releases/
+          cd bin/
+          for file in $(find . -type f -perm -a+x); do
+            tar -czf "../releases/${file}-darwin-${ARCH}.tar.gz" "${file}"
+          done
+
+      - name: Upload artifacts for cutting release
+        uses: actions/upload-artifact@master
         with:
           name: release-artifacts
           path: releases/
-
-      - name: Generate sha256 checksum and gpg signatures for release artifacts
-        uses: livepeer/action-gh-checksum-and-gpg-sign@latest
-        with:
-          artifacts-dir: releases
-          release-name: ${{ github.ref_name }}
-          gpg-key: ${{ secrets.CI_GPG_SIGNING_KEY }}
-          gpg-key-passphrase: ${{ secrets.CI_GPG_SIGNING_PASSPHRASE }}
-
-      - name: Create release
-        if: startsWith(github.ref, 'refs/tags/')
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Add binaries to release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./releases/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
