@@ -128,11 +128,8 @@ app.get("/", authMiddleware({}), async (req, res) => {
 app.get("/subscribed/:event", authMiddleware({}), async (req, res) => {
   let event = req.params.event;
 
-  let userId = req.user.id;
-
-  if (req.user.admin && req.query.userId) {
-    userId = req.query.userId;
-  }
+  let userId =
+    req.user.admin && req.query.userId ? req.query.userId : req.user.id;
 
   const { data } = await db.webhook.listSubscribed(userId, event);
 
