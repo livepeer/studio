@@ -66,17 +66,28 @@ We recommend that you add the minimal list of origins to your API key. Ideally
 also creating separate API keys to be used for development or production. At
 your own discretion, you can add all the origins you will need on the same API
 key and use it from all your environments, or even just add the `*` special
-origin to allow the key to be used from any origin.
+value to allow the key to be used from any origin.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: CORS is only a client-side check that browsers make and sometimes does
+    not prevent the API from being called. It also does not prevent the API key
+    from being used from other places like a backend or a custom client. <br />
+  </Text>
+</Alert>
+
+For an additional layer of security, we also limit the access of the
+CORS-enabled keys to the API. Continue reading for more information.
 
 ### API access
 
 CORS-enabled API keys have restricted access to the API by default. This means
 that they are only allowed to call some specific endpoints of the API.
 
-This is another intermediate security measure, so that even if malicious actors
-snoop the API key from your web page they still won't be able access some of the
-most sensitive APIs. For example, APIs that expose PIIs, payment information or
-list API resources created by other users are disallowed.
+This is another intermediate security measure, so that even if a malicious actor
+snoops the API key from your web page they still won't be able access the most
+sensitive data in your account. For example, APIs that expose PIIs, payment
+information or list API resources created by other users are disallowed.
 
 These are the main API endpoints that a restricted CORS API key will have
 access:
@@ -178,12 +189,19 @@ access:
   ]}
 />
 
+These endpoints allow you to use all the features of the
+[Video NFT SDK](https://www.npmjs.com/package/@livepeer/video-nft) from the
+browser. If you still have any issues using it let us know through any of the
+support channels.
+
 #### Full Access
 
 If your application needs further access to the API, it is strongly recommended
 that you run a backend to secure an API key and call the API privately. From it
 you can also perform any custom authentication with your frontend and validate
-the API calls to protect your Livepeer.com account.
+the API calls to protect your Livepeer.com account. Check the
+[livepeer-web-api-proxy](https://github.com/victorges/livepeer-web-api-proxy)
+for a sample project with such a backend.
 
 If you are aware of the implications but still want to create an API key with
 full access to your account, you can do so by ticking the `Full API access`
