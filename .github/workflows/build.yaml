@@ -1,9 +1,8 @@
-name: pkg releases
+name: Build binaries
 
 on:
+  pull_request:
   push:
-    branches-ignore:
-      - latest
     tags:
       - "v*"
 
