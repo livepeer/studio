@@ -1,6 +1,6 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
@@ -351,51 +351,71 @@ app.post(
   }
 );
 
+// /:id/transcode and /transcode routes registered right below
+const transcodeAssetHandler: RequestHandler = async (req, res) => {
+  if (!req.params?.id && !req.body.assetId) {
+    // called from the old `/api/asset/transcode` endpoint
+    throw new BadRequestError(
+      "Missing `assetId` payload field of the input asset"
+    );
+  }
+  if (req.params?.id && req.body.assetId) {
+    // called from the new `/api/asset/:assetId/transcode` endpoint
+    throw new BadRequestError(
+      "Field `assetId` is not allowed in payload when included in the URL"
+    );
+  }
+  const assetId = req.params?.id || req.body.assetId;
+
+  const asset = await db.asset.get(assetId);
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  const os = await db.objectStore.get(asset.objectStoreId);
+  if (!os) {
+    throw new UnprocessableEntityError("Asset has invalid objectStoreId");
+  }
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(req.store, id);
+  let outputAsset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    {
+      name: req.body.name ?? asset.name,
+    }
+  );
+  outputAsset.sourceAssetId = asset.id;
+  outputAsset = await db.asset.create(outputAsset);
+
+  const task = await req.taskScheduler.scheduleTask(
+    "transcode",
+    {
+      transcode: {
+        profile: req.body.profile,
+      },
+    },
+    asset,
+    outputAsset
+  );
+  res.status(201);
+  res.json({ asset, task });
+};
+app.post(
+  "/:id/transcode",
+  validatePost("transcode-asset-payload"),
+  authorizer({ allowCorsApiKey: true }),
+  transcodeAssetHandler
+);
+// TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/transcode",
-  validatePost("new-transcode-payload"),
+  validatePost("transcode-asset-payload"),
   authorizer({ allowCorsApiKey: true }),
-  async (req, res) => {
-    if (!req.body.assetId) {
-      throw new BadRequestError("You must provide a assetId of an asset");
-    }
-    const asset = await db.asset.get(req.body.assetId);
-    if (!asset) {
-      throw new NotFoundError(`asset not found`);
-    }
-
-    const os = await db.objectStore.get(asset.objectStoreId);
-    if (!os) {
-      throw new UnprocessableEntityError("Asset has invalid objectStoreId");
-    }
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(req.store, id);
-    let outputAsset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      {
-        name: req.body.name ?? asset.name,
-      }
-    );
-    outputAsset.sourceAssetId = asset.id;
-    outputAsset = await db.asset.create(outputAsset);
-
-    const task = await req.taskScheduler.scheduleTask(
-      "transcode",
-      {
-        transcode: {
-          profile: req.body.profile,
-        },
-      },
-      asset,
-      outputAsset
-    );
-    res.status(201);
-    res.json({ asset, task });
-  }
+  transcodeAssetHandler
 );
 
 app.post(

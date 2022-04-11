@@ -1075,12 +1075,12 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
-    new-transcode-payload:
-      additionalProperties: true
+
+    transcode-asset-payload:
+      additionalProperties: false
       required:
         - name
         - profile
-        - assetId
       properties:
         assetId:
           type: string
