@@ -9,7 +9,7 @@ import { v4 as uuid } from "uuid";
 import { products } from "../config";
 import hash from "../hash";
 import logger from "../logger";
-import { authMiddleware, validatePost } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 import {
   CreateCustomer,
   CreateSubscription,
@@ -144,7 +144,7 @@ function requireStripe(): RequestHandler {
 
 const app = Router();
 
-app.get("/usage", authMiddleware({}), async (req, res) => {
+app.get("/usage", authorizer({}), async (req, res) => {
   let { userId, fromTime, toTime } = toStringValues(req.query);
   if (!fromTime || !toTime) {
     res.status(400);
@@ -169,7 +169,7 @@ const fieldsMap: FieldsMap = {
   stripeProductId: `data->>'stripeProductId'`,
 };
 
-app.get("/", authMiddleware({ admin: true }), async (req, res) => {
+app.get("/", authorizer({ admin: true }), async (req, res) => {
   let { limit, cursor, order, filters } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -189,13 +189,13 @@ app.get("/", authMiddleware({ admin: true }), async (req, res) => {
   res.json(db.user.cleanWriteOnlyResponses(output));
 });
 
-app.get("/me", authMiddleware({ allowUnverified: true }), async (req, res) => {
+app.get("/me", authorizer({ allowUnverified: true }), async (req, res) => {
   const user = await db.user.get(req.user.id);
   res.status(200);
   return res.json(cleanUserFields(user, req.user.admin));
 });
 
-app.get("/:id", authMiddleware({ allowUnverified: true }), async (req, res) => {
+app.get("/:id", authorizer({ allowUnverified: true }), async (req, res) => {
   if (req.user.admin !== true && req.user.id !== req.params.id) {
     return res.status(403).json({
       errors: ["user can only request information on their own user object"],
@@ -373,10 +373,13 @@ const suspensionEmailText = (
 app.patch(
   "/:id/suspended",
   validatePost("suspend-user-payload"),
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   async (req, res) => {
     const { suspended, emailTemplate } = req.body as SuspendUserPayload;
     const { id } = req.params;
+    if (id === req.user?.id) {
+      return res.status(400).json({ errors: ["cannot suspend own user"] });
+    }
     const user = await db.user.get(id);
     if (!user) {
       return res.status(404).json({ errors: ["not found"] });
@@ -642,7 +645,7 @@ app.post(
 
 app.post(
   "/make-admin",
-  authMiddleware({ admin: true }),
+  authorizer({ admin: true }),
   validatePost("make-admin"),
   async (req, res) => {
     let user = await findUserByEmail(req.body.email);
@@ -683,7 +686,7 @@ app.post(
 
 app.post(
   "/update-customer-payment-method",
-  authMiddleware({}),
+  authorizer({ noApiToken: true }),
   validatePost("update-customer-payment-method"),
   requireStripe(),
   async (req, res) => {
@@ -797,7 +800,7 @@ app.post(
 
 app.post(
   "/update-subscription",
-  authMiddleware({}),
+  authorizer({ noApiToken: true }),
   validatePost("update-subscription"),
   requireStripe(),
   async (req, res) => {
@@ -920,7 +923,7 @@ app.post(
 
 app.post(
   "/retrieve-subscription",
-  authMiddleware({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripeCustomerSubscriptionId } = req.body;
@@ -938,7 +941,7 @@ app.post(
 
 app.post(
   "/retrieve-invoices",
-  authMiddleware({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripeCustomerId } = req.body;
@@ -954,7 +957,7 @@ app.post(
 
 app.post(
   "/retrieve-payment-method",
-  authMiddleware({}),
+  authorizer({ noApiToken: true }),
   requireStripe(),
   async (req, res) => {
     let { stripePaymentMethodId } = req.body;

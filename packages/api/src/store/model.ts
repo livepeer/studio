@@ -3,12 +3,16 @@
  */
 
 import schema from "../schema/schema.json";
-import { NotFoundError, ForbiddenError, InternalServerError } from "./errors";
+import { NotFoundError } from "./errors";
 import { kebabToCamel } from "../util";
+import { DB } from "./db";
+import { IStore } from "../types/common";
+import { TableSchema } from "./types";
 
-export default class Model {
-  constructor(db) {
-    this.db = db;
+export default class Model implements IStore {
+  public ready: Promise<void>;
+
+  constructor(private db: DB) {
     this.ready = db.ready;
   }
 
@@ -70,7 +74,7 @@ export default class Model {
     };
   }
 
-  async listKeys(prefix, cursor, limit) {
+  async listKeys(prefix, cursor, limit): Promise<[string[], string]> {
     const [table] = this.getTable(prefix);
     const [response, nextCursor] = await this.db[table].find(
       {},
@@ -145,16 +149,16 @@ export default class Model {
     return await this.db[table].create(doc);
   }
 
-  getSchema(kind) {
+  getSchema(kind: string) {
     const cleanKind = this.getCleanKind(kind);
-    const schemas = schema.components.schemas[cleanKind];
+    const schemas: TableSchema = schema.components.schemas[cleanKind];
     if (!schemas) {
-      return [null, null];
+      return [null, null] as const;
     }
-    return [schemas.properties, cleanKind];
+    return [schemas.properties, cleanKind] as const;
   }
 
-  getCleanKind(kind) {
+  getCleanKind(kind: string): string {
     let cleanKind = kind.charAt(0) === "/" ? kind.substring(1) : kind;
     return cleanKind.indexOf("/") > -1
       ? cleanKind.substr(0, cleanKind.indexOf("/"))

@@ -1,4 +1,4 @@
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
@@ -18,7 +18,7 @@ const fieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, userId, order, filters } = req.query;
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -77,7 +77,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   res.json(data);
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const os = await req.store.get(
     `object-store/${req.params.id}`,
     !req.user.admin
@@ -101,7 +101,7 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
 
 app.post(
   "/",
-  authMiddleware({}),
+  authorizer({}),
   validatePost("object-store"),
   async (req, res) => {
     const id = uuid();
@@ -127,7 +127,7 @@ app.post(
   }
 );
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const objectStore = await db.objectStore.get(id);
   if (!objectStore) {
@@ -145,7 +145,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.patch("/:id", authMiddleware({}), async (req, res) => {
+app.patch("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const objectStore = await db.objectStore.get(id);
   if (!objectStore) {
