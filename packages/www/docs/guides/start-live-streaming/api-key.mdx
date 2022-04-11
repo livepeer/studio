@@ -8,15 +8,63 @@ metaDescription: Get a Livepeer.com API key
 # Get an API key
 
 You need an API key to make requests of the Livepeer.com API. You do not need to
-create an API key if you are creating and configuring live streams using the
-Livepeer.com Dashboard only.
+create an API key if you are creating and configuring live streams using only
+the Livepeer.com Dashboard.
 
-Login to the Livepeer.com Dashboard, and navigate to the Developers tab,
+Login to the Livepeer.com Dashboard, and navigate to the API keys page within
+the Developers tab
 [livepeer.com/dashboard/developers/api-keys](https://livepeer.com/dashboard/developers/api-keys).
-On this page, you can create, delete and find out the most recent usage of your
-API keys.
+On this page, you can manage your API keys including creating or deleting them
+and monitoring their usage.
 
-When you create a new API key, copy and secure the API key. This key is a
-secret, and for your security, Livepeer.com will not show it to you again.
+When you create a new API key, copy and secure the value displayed to you. This
+is the sole secret you will have to use when making requests to the Livepeer.com
+API, so share and store it with caution. We currently allow you to reveal the
+secret of any existing API key but this behavior may change in the future, so
+make sure to persist the API key safely. If you ever forget an API key you'll
+always be able to delete it and create a new one anyway.
 
-If you forget your API key, delete the forgotten key, and create a new API key.
+To use an API key, simply add an `Authorization` header to your request with the
+`Bearer` scheme and the API key as the value. Example:
+
+```bash
+curl -X GET \
+  -H 'Authorization: Bearer {api_key}'
+  https://livepeer.com/api/user/me
+```
+
+## CORS
+
+By default, API keys can only be used from a backend server. This is to ensure
+maximum security and prevent that you accidentally expose your account by
+including the secret API key in some public web page.
+
+However, if you are developing a frontend application and want to get started
+quickly with the Livepeer API, you can also create an API key with CORS access
+enabled. API keys created with that option can be used from the browser, from
+any origin that you configure it for.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: An origin is just a combination of a scheme, like
+    <code>https</code>, with a domain like <code>example.com</code>. You will also
+    need to include the port number if you are using a non-standard port. <br />
+    e.g.: <code>http://localhost:8080</code> when developing locally on port
+    8080 or <code>https://my.app.io</code> after deploying it on a public
+    domain.
+  </Text>
+</Alert>
+
+To do so, simply tick the `Allow CORS access` checkbox when creating your API
+key. You will then be prompted to add all the origins that you would like the
+API key to be used from:
+
+![image](https://ipfs.livepeer.com/ipfs/QmSWaMT83UP8QhARuYTrLj76bPQpjkWc74mMCCraR36hN5)
+
+We recommend that you add the minimal list of origins to your API key. Ideally
+also creating separate API keys to be used for development or production. At
+your own discretion, you can add all the origins you will need on the same API
+key and use it from all your environments, or even just add the `*` special
+origin to allow the key to be used from any origin.
+
+<!-- TODO: ### API access -->
