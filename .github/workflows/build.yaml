@@ -126,6 +126,11 @@ jobs:
           name: macos-${{ matrix.arch }}
           path: bin/
 
+      - name: Fix file permissions
+        run: |
+          cd bin/
+          chmod a+x livepeer-*
+
       - uses: actions-ecosystem/action-regex-match@v2
         id: match-tag
         with:
@@ -149,11 +154,10 @@ jobs:
 
       - name: Archive built binaries
         run: |
-          ls -lhaR .
           mkdir -p releases/
           cd bin/
           for file in $(find . -type f -perm -a+x); do
-            tar -czvf "../releases/${file}-darwin-${ARCH}.tar.gz" "${file}"
+            tar -czf "../releases/${file}-darwin-${ARCH}.tar.gz" "${file}"
           done
 
       - name: Upload artifacts for cutting release
