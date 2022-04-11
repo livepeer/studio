@@ -3,6 +3,8 @@ name: Build web service docker image
 on:
   pull_request:
   push:
+    paths:
+      - "packages/www/*"
     branches-ignore:
       - latest
 
