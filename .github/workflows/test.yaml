@@ -23,7 +23,7 @@ jobs:
           - 5432:5432
 
       rabbitmq:
-        image: rabbitmq@3.9-management
+        image: rabbitmq:3.9-management
         env:
           RABBITMQ_DEFAULT_VHOST: "livepeer"
         ports:

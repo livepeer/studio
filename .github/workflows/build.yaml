@@ -73,11 +73,11 @@ jobs:
                   in_name="$in_name.exe"
                   out_name="$out_name.exe"
                   mv "./$in_name" "./$out_name"
-                  zip -q9 "${RELEASE_PATH}/releases/${archive_name}.zip" "./$out_name"
+                  zip -q9 "${RELEASE_PATH}/${archive_name}.zip" "./$out_name"
                   ;;
                 linux-*)
                   mv "./$in_name" "./$out_name"
-                  tar -czvf "${RELEASE_PATH}/releases/${archive_name}.tar.gz" "./$out_name"
+                  tar -czvf "${RELEASE_PATH}/${archive_name}.tar.gz" "./$out_name"
                   ;;
                 macos-*)
                   mkdir -p "${BIN_PATH}/$arch"
