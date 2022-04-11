@@ -15,6 +15,7 @@ import {
   HoverCardTrigger,
   useSnackbar,
   Label,
+  Link,
   Tooltip,
   Checkbox,
   styled,
@@ -27,6 +28,7 @@ import { ApiToken } from "../../../../api/src/schema/types";
 import {
   CopyIcon as Copy,
   ExclamationTriangleIcon as Warning,
+  QuestionMarkCircledIcon as Help,
   Cross1Icon as Cross,
   PlusIcon as Plus,
 } from "@radix-ui/react-icons";
@@ -244,7 +246,11 @@ const CreateTokenDialog = ({
                       gap="1"
                       align="center">
                       <Label htmlFor="allowCors">Allow CORS access</Label>
-                      <Warning />
+                      <Link
+                        href={"/docs/guides/start-live-streaming/api-key#cors"}
+                        target="_blank">
+                        <Warning />
+                      </Link>
                     </Flex>
                   </Tooltip>
                 </Box>
@@ -351,11 +357,22 @@ const CreateTokenDialog = ({
                       <Tooltip
                         content="This will give access to the entire API for the CORS-enabled API key. Resources in your account will be fully exposed to anyone that grabs the API key from your web page. Only check this if you know what you are doing."
                         multiline>
-                        <Label
-                          css={{ pl: "$2", mr: "$1" }}
-                          htmlFor="corsFullAccess">
-                          Full API access (not recommended)
-                        </Label>
+                        <Flex
+                          direction="row"
+                          css={{ ml: "$2" }}
+                          gap="1"
+                          align="center">
+                          <Label htmlFor="corsFullAccess">
+                            Full API access (not recommended)
+                          </Label>
+                          <Link
+                            href={
+                              "/docs/guides/start-live-streaming/api-key#api-access"
+                            }
+                            target="_blank">
+                            <Help />
+                          </Link>
+                        </Flex>
                       </Tooltip>
                     </Box>
                   </>

@@ -67,4 +67,21 @@ your own discretion, you can add all the origins you will need on the same API
 key and use it from all your environments, or even just add the `*` special
 origin to allow the key to be used from any origin.
 
-<!-- TODO: ### API access -->
+### API access
+
+CORS-enabled API keys have restricted access to the API by default. This means
+that they are only allowed to call some very specific endpoints of the API. This
+is another intermediate security measure, so that even if your API key is from
+your web page, malicious actors won't be able access some of the most sensitive
+APIs that expose PIIs or resources created by other users.
+
+The logic here was that we only allow APIs for creating resources (e.g. streams
+or assets) and for reading or manipulating those, as long as you already have
+the ID for those.
+
+- able
+- backend
+- can
+- dashboard
+
+Full access is even riskier. But you can also enable it.
