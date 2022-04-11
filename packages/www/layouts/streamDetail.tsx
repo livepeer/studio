@@ -288,7 +288,7 @@ const StreamDetail = ({
   const playbackId = (stream || {}).playbackId || "";
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
-  const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
+  const globalPlaybackUrl = `https://livepeercdn.${domain}/hls/${playbackId}/index.m3u8`;
   const globalSrtIngestUrl = `srt://rtmp.livepeer.${domain}:2935?streamid=${
     stream?.streamKey || ""
   }`;

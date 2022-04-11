@@ -15,7 +15,7 @@ These globally-optimized URLs are the best option for nearly all Livepeer.com
 users.
 
 - Stream into: `rtmp://rtmp.livepeer.com/live/[stream-key]`
-- Playback from: `https://cdn.livepeer.com/hls/[playbackId]/index.m3u8`
+- Playback from: `https://livepeercdn.com/hls/[playbackId]/index.m3u8`
 
 ## Back-up transcoding with regional ingest and playback URLs
 
@@ -51,7 +51,7 @@ URL pairs, here's what you need to know.
    multiple unique stream keys.
 2. Stream into: `rtmp://[region]-rtmp.livepeer.com/live/[stream-key]`.
 3. Playback from:
-   `https://[region]-cdn.livepeer.com/hls/[playbackId]/index.m3u8`.
+   `https://[region]-livepeercdn.com/hls/[playbackId]/index.m3u8`.
 
 An RTMP ingest and playback URL pair references hardware in different parts of
 the world. Each region is three letters, the airport code of the server
@@ -74,7 +74,7 @@ And you should get results like this:
 [
   {
     ingest: "rtmp://{nearbyRegion}-rtmp.livepeer.com/live",
-    playback: "https://{nearbyRegion}-cdn.livepeer.com/hls"
+    playback: "https://{nearbyRegion}-livepeercdn.com/hls"
   }
 ];
 ```
@@ -95,18 +95,18 @@ And you should get a result similar to this:
 [
    {
       "ingest":"rtmp://{region-1}-rtmp.livepeer.com/live",
-      "playback":"https://{region-1}-cdn.livepeer.com/hls",
-      "base":"https://{region-1}-cdn.livepeer.com"
+      "playback":"https://{region-1}-livepeercdn.com/hls",
+      "base":"https://{region-1}-livepeercdn.com"
    },
    {
       "ingest":"rtmp://{region-2}-rtmp.livepeer.com/live",
-      "playback":"https://{region-2}-cdn.livepeer.com/hls",
-      "base":"https://{region-2}-cdn.livepeer.com"
+      "playback":"https://{region-2}-livepeercdn.com/hls",
+      "base":"https://{region-2}-livepeercdn.com"
    },
    {
       "ingest":"rtmp://{region-3}-rtmp.livepeer.com/live",
-      "playback":"https://{region-3}-cdn.livepeer.com/hls",
-      "base":"https://{region-3}-cdn.livepeer.com"
+      "playback":"https://{region-3}-livepeercdn.com/hls",
+      "base":"https://{region-3}-livepeercdn.com"
    }
 ]
 ```

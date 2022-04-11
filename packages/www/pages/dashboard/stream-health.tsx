@@ -147,7 +147,7 @@ const Health = () => {
             setPlaybackUrl(e.target.value);
           }}
           size="2"
-          placeholder="ie. https://cdn.livepeer.com/hls/123456abcdef7890/index.m3u8"
+          placeholder="ie. https://livepeercdn.com/hls/123456abcdef7890/index.m3u8"
         />
         <Box
           css={{

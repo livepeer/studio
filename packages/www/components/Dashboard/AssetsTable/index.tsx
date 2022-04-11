@@ -146,8 +146,7 @@ const AssetsTable = ({
           source: {
             children: (
               <Box>
-                {sourceUrl &&
-                sourceUrl.indexOf("https://cdn.livepeer.com") === 0
+                {sourceUrl && sourceUrl.indexOf("https://livepeercdn.com") === 0
                   ? "Live Stream"
                   : "Import"}
               </Box>
