@@ -48,7 +48,6 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: yarn install
-        if: steps.cache-lerna.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
       - name: build pkgs
