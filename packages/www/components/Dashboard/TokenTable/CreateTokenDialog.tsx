@@ -143,9 +143,12 @@ const CreateTokenDialog = ({
   const toggleOrigin = useCallback(
     (origin) => {
       setCors((cors) => {
-        const allowedOrigins = cors.allowedOrigins?.includes(origin)
+        let allowedOrigins = cors.allowedOrigins?.includes(origin)
           ? cors.allowedOrigins.filter((item) => item !== origin)
           : [...cors.allowedOrigins, origin];
+        if (allowedOrigins.includes("*")) {
+          allowedOrigins = ["*"];
+        }
         return {
           ...cors,
           allowedOrigins,
