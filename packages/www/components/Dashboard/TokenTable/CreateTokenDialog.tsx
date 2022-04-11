@@ -19,7 +19,7 @@ import {
   Checkbox,
   styled,
 } from "@livepeer.com/design-system";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -155,14 +155,29 @@ const CreateTokenDialog = ({
     [setCors]
   );
 
+  const isNewOriginValid = useMemo(() => {
+    if (newAllowedOrigin === "*") {
+      return true;
+    }
+    try {
+      const url = new URL(newAllowedOrigin);
+      return url.origin === newAllowedOrigin;
+    } catch (err) {
+      return false;
+    }
+  }, [newAllowedOrigin]);
+
   const onSubmitNewOrigin = useCallback(() => {
+    if (!isNewOriginValid) {
+      return;
+    }
     setNewAllowedOrigin((value) => {
       if (value !== "") {
         toggleOrigin(value);
       }
       return "";
     });
-  }, [toggleOrigin, setNewAllowedOrigin]);
+  }, [toggleOrigin, setNewAllowedOrigin, isNewOriginValid]);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -242,9 +257,12 @@ const CreateTokenDialog = ({
                         type="text"
                         id="addAllowedOrigin"
                         value={newAllowedOrigin}
-                        onChange={(e) =>
-                          setNewAllowedOrigin(e.target.value.replace(/\s/g, ""))
+                        state={
+                          newAllowedOrigin !== "" && !isNewOriginValid
+                            ? "invalid"
+                            : null
                         }
+                        onChange={(e) => setNewAllowedOrigin(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
@@ -257,6 +275,7 @@ const CreateTokenDialog = ({
                         css={{ ml: "$1" }}
                         size="3"
                         variant="violet"
+                        disabled={!isNewOriginValid}
                         onClick={(e) => {
                           e.preventDefault();
                           onSubmitNewOrigin();
