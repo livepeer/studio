@@ -150,10 +150,11 @@ jobs:
 
       - name: Archive built binaries
         run: |
+          ls -lhaR .
           mkdir -p releases/
           cd bin/
           for file in $(find . -type f -perm -a+x); do
-            tar -czf "../releases/${file}-darwin-${ARCH}.tar.gz" "${file}"
+            tar -czvf "../releases/${file}-darwin-${ARCH}.tar.gz" "${file}"
           done
 
       - name: Upload artifacts for cutting release
