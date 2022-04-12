@@ -205,6 +205,14 @@ function authorizer(params: AuthzParams): RequestHandler {
     if (token && params.noApiToken) {
       throw new ForbiddenError(`access forbidden for API keys`);
     }
+    const reqOrigin = req.headers["origin"];
+    // response header will have been set by the cors middleware
+    const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
+    if (reqOrigin && reqOrigin !== resOrigin) {
+      throw new ForbiddenError(
+        `credentials do not allow CORS access from origin ${reqOrigin}`
+      );
+    }
 
     const verifyEmail =
       req.config.requireEmailVerification && !params.allowUnverified;
