@@ -42,19 +42,19 @@
     "release": "lerna version"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.5.2",
-    "@commitlint/config-conventional": "^7.5.0",
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
     "@livepeer/prettier-config": "^1.0.1",
-    "commitizen": "^3.1.1",
+    "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^2.1.0",
-    "depcheck": "^0.7.1",
+    "depcheck": "^1.4.3",
     "flow-bin": "^0.97.0",
     "husky": "^4.2.5",
     "lcov-result-merger": "^3.0.0",
     "lerna": "^3.13.3",
-    "vercel": "^19.2.0",
     "prettier": "^2.2.1",
-    "pretty-quick": "^3.1.0"
+    "pretty-quick": "^3.1.0",
+    "vercel": "^19.2.0"
   },
   "config": {
     "commitizen": {

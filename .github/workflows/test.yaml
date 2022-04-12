@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Test
+    name: Run tests defined for the project
     runs-on: ubuntu-20.04
     services:
       postgres:
@@ -38,6 +38,11 @@ jobs:
           # Check https://github.com/livepeer/go-livepeer/pull/1891
           # for ref value discussion
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
 
       - name: yarn install
         run: yarn install --frozen-lockfile
