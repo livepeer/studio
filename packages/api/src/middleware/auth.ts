@@ -267,7 +267,7 @@ function authorizer(params: AuthzParams): RequestHandler {
     const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
     if (reqOrigin && reqOrigin !== resOrigin) {
       throw new ForbiddenError(
-        `credentials disallow CORS access from origin ${reqOrigin}`
+        `credential disallows CORS access from origin ${reqOrigin}`
       );
     }
 
@@ -300,7 +300,7 @@ function authorizer(params: AuthzParams): RequestHandler {
       if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(
           isRestrictedCors(token)
-            ? "access forbidden to CORS-enabled API key with restricted access"
+            ? "access forbidden for CORS-enabled API key with restricted access"
             : "credential has insufficent privileges"
         );
       }
