@@ -178,13 +178,54 @@ function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
   };
 }
 
+const corsApiKeyAccessRules: AuthRule[] = [
+  {
+    methods: ["get"],
+    resources: [
+      "/stream/:id",
+      "/stream/:parentId/sessions",
+      "/stream/sessions/:parentId",
+      "/session/:id",
+      "/multistream/target/:id",
+      "/asset/:id",
+      "/task/:id",
+    ],
+  },
+  {
+    methods: ["post"],
+    resources: [
+      "/stream",
+      "/multistream/target",
+      "/asset/request-upload",
+      "/asset/:id/transcode",
+      "/asset/transcode", // legacy, remove
+      "/asset/:id/export",
+    ],
+  },
+  {
+    methods: ["patch"],
+    resources: ["/stream/:id", "/multistream/target/:id"],
+  },
+];
+
+function tokenAccessRules(token?: ApiToken) {
+  if (!token?.access) {
+    return null;
+  }
+  if (token.access.rules || !token.access.cors) {
+    return token.access.rules;
+  }
+  const { allowedOrigins, fullAccess } = token.access.cors;
+  const hasCors = allowedOrigins?.length > 0;
+  return hasCors && !fullAccess ? corsApiKeyAccessRules : null;
+}
+
 interface AuthzParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
   noApiToken?: boolean;
   originalUriHeader?: string;
-  allowCorsApiKey?: boolean;
 }
 
 /**
@@ -225,8 +266,13 @@ function authorizer(params: AuthzParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const access = token?.access;
-    if (access?.rules) {
+    if (token?.access?.cors && req.user.admin) {
+      throw new ForbiddenError(
+        `cors access is not available to admins (how did you get this API key?)`
+      );
+    }
+    const accessRules = tokenAccessRules(token);
+    if (accessRules) {
       let fullPath = pathJoin2(req.baseUrl, req.path);
       let { httpPrefix } = req.config;
       if (params.originalUriHeader) {
@@ -235,20 +281,8 @@ function authorizer(params: AuthzParams): RequestHandler {
         fullPath = originalUri.pathname;
         httpPrefix = null;
       }
-      if (!isAuthorized(req.method, fullPath, access?.rules, httpPrefix)) {
+      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
-      }
-    } else if (access?.cors) {
-      const cors = access.cors;
-      if (req.user.admin) {
-        throw new ForbiddenError(
-          `cors access is not available to admins (how did you get an API key?)`
-        );
-      }
-      if (!cors.fullAccess && !params.allowCorsApiKey) {
-        throw new ForbiddenError(
-          `access forbidden for restricted CORS API tokens`
-        );
       }
     }
     return next();

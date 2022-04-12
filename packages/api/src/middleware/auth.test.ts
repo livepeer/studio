@@ -226,6 +226,7 @@ describe("auth middleware", () => {
         await expectStatus("put", "/fra").toBe(403);
         await expectStatus("post", "/bar").toBe(403);
         await expectStatus("patch", "/gus").toBe(403);
+        await expectStatus("patch", "/gus/bar/fra").toBe(403);
       });
 
       it("should allow matching paths", async () => {

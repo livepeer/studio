@@ -119,7 +119,7 @@ target.get("/", authorizer({}), async (req, res) => {
   res.json(output);
 });
 
-target.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
+target.get("/:id", authorizer({}), async (req, res) => {
   const isAdmin = !!req.user.admin;
   const data = await db.multistreamTarget.getAuthed(
     req.params.id,
@@ -134,7 +134,7 @@ target.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
 
 target.post(
   "/",
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   validatePost("multistream-target"),
   async (req, res) => {
     const input = req.body as MultistreamTarget;
@@ -163,7 +163,7 @@ target.delete("/:id", authorizer({}), async (req, res) => {
 
 target.patch(
   "/:id",
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   validatePost("multistream-target-patch-payload"),
   async (req, res) => {
     const isAdmin = !!req.user.admin;

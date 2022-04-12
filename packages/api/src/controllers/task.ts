@@ -171,7 +171,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const task = await db.task.get(req.params.id);
   if (!task) {
     res.status(404);

@@ -312,7 +312,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   const asset = await db.asset.get(req.params.id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
@@ -330,7 +330,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
 app.post(
   "/:id/export",
   validatePost("export-task-params"),
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   async (req, res) => {
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
@@ -455,21 +455,21 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
 app.post(
   "/:id/transcode",
   validatePost("transcode-asset-payload"),
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   transcodeAssetHandler
 );
 // TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/transcode",
   validatePost("transcode-asset-payload"),
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   transcodeAssetHandler
 );
 
 app.post(
   "/request-upload",
   validatePost("new-asset-payload"),
-  authorizer({ allowCorsApiKey: true }),
+  authorizer({}),
   async (req, res) => {
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
