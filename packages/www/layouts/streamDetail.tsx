@@ -486,6 +486,15 @@ const StreamDetail = ({
                           )}
                           anchor={false}
                         />
+                        <Tooltip
+                          content={
+                            <Box>
+                              We changed our playback domain, but
+                              cdn.livepeer.com is still working.
+                            </Box>
+                          }>
+                          <Help />
+                        </Tooltip>
                       </Cell>
                       <Cell css={{ color: "$mauve11" }}>Record sessions</Cell>
                       <Cell>
