@@ -121,10 +121,11 @@ const CreateTokenDialog = ({
   const [allowCors, setAllowCors] = useState(false);
   const [cors, setCors] = useState(initialCorsOpts);
   const [newAllowedOrigin, setNewAllowedOrigin] = useState("");
-  const { createApiToken } = useApi();
+  const { createApiToken, user } = useApi();
   const [isCopied, setCopied] = useState(0);
   const [newToken, setNewToken] = useState<ApiToken | null>(null);
 
+  const isAdmin = useMemo(() => user?.admin === true, [user]);
   useEffect(() => {
     setNewToken(null);
     setTokenName("");
@@ -236,12 +237,17 @@ const CreateTokenDialog = ({
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}
+                    disabled={isAdmin}
                     onCheckedChange={(checked: boolean) =>
                       setAllowCors(checked)
                     }
                   />
                   <Tooltip
-                    content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
+                    content={
+                      isAdmin
+                        ? "CORS API keys are not available to admins."
+                        : "This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
+                    }
                     multiline>
                     <Flex
                       direction="row"
