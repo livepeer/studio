@@ -236,6 +236,16 @@ interface AuthzParams {
  * This has a strict dependency on the {@link authenticator} middleware above.
  * If that middleware hasn't run in the request before this one, all requests
  * will be rejected.
+ *
+ * @remarks
+ * This middleware will also do a CORS check on the `Origin` header. This is
+ * necessary here, apart from only letting the browser do its thing, because we
+ * do a non-standard thing on the pre-flight OPTIONS request. That is to allow
+ * all pre-flight requests to pass through (check CORS middleware above) and
+ * only do any actual filtering on the real/"post-flight" request. We need that
+ * because we change the CORS policy based on the API key in the `Authorization`
+ * header and the browser does not send it on the pre-flight. Then to disallow
+ * the actual request to go through we need the explicit check and block here.
  */
 function authorizer(params: AuthzParams): RequestHandler {
   return async (req, res, next) => {
@@ -247,11 +257,11 @@ function authorizer(params: AuthzParams): RequestHandler {
       throw new ForbiddenError(`access forbidden for API keys`);
     }
     const reqOrigin = req.headers["origin"];
-    // response header will have been set by the cors middleware
+    // cors middleware before will set the header (check func comment for ctx)
     const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
     if (reqOrigin && reqOrigin !== resOrigin) {
       throw new ForbiddenError(
-        `credentials do not allow CORS access from origin ${reqOrigin}`
+        `credentials disallow CORS access from origin ${reqOrigin}`
       );
     }
 
