@@ -1,5 +1,5 @@
 import { URL } from "url";
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
@@ -49,7 +49,7 @@ const fieldsMap = {
   sharedSecret: `webhook.data->>'sharedSecret'`,
 };
 
-app.get("/", authMiddleware({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     req.query;
   if (isNaN(parseInt(limit))) {
@@ -125,7 +125,7 @@ app.get("/", authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
-app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
+app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
   const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
   try {
@@ -138,7 +138,7 @@ app.post("/", authMiddleware({}), validatePost("webhook"), async (req, res) => {
   res.json(doc);
 });
 
-app.get("/:id", authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({}), async (req, res) => {
   // get a specific webhook
   logger.info(`webhook params ${req.params.id}`);
 
@@ -155,36 +155,28 @@ app.get("/:id", authMiddleware({}), async (req, res) => {
   res.json(webhook);
 });
 
-app.put(
-  "/:id",
-  authMiddleware({}),
-  validatePost("webhook"),
-  async (req, res) => {
-    // modify a specific webhook
-    const webhook = await req.store.get(`webhook/${req.body.id}`);
-    if (
-      (webhook.userId !== req.user.id || webhook.deleted) &&
-      !req.user.admin
-    ) {
-      // do not reveal that webhooks exists
-      res.status(404);
-      return res.json({ errors: ["not found"] });
-    }
-
-    const { id, userId, createdAt } = webhook;
-    const doc = validateWebhookPayload(id, userId, createdAt, req.body);
-    try {
-      await req.store.replace(doc);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-    res.status(200);
-    res.json({ id: req.body.id });
+app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
+  // modify a specific webhook
+  const webhook = await req.store.get(`webhook/${req.body.id}`);
+  if ((webhook.userId !== req.user.id || webhook.deleted) && !req.user.admin) {
+    // do not reveal that webhooks exists
+    res.status(404);
+    return res.json({ errors: ["not found"] });
   }
-);
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+  const { id, userId, createdAt } = webhook;
+  const doc = validateWebhookPayload(id, userId, createdAt, req.body);
+  try {
+    await req.store.replace(doc);
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+  res.status(200);
+  res.json({ id: req.body.id });
+});
+
+app.delete("/:id", authorizer({}), async (req, res) => {
   // delete a specific webhook
   const webhook = await db.webhook.get(req.params.id);
   if (
@@ -206,7 +198,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
   res.end();
 });
 
-app.delete("/", authMiddleware({}), async (req, res) => {
+app.delete("/", authorizer({}), async (req, res) => {
   const ids = req.body?.ids;
   if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
     res.status(422);

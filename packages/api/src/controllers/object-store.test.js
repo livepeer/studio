@@ -89,13 +89,13 @@ describe("controllers/object-stores", () => {
         storeChangeId.id = uuid();
         await server.store.create(storeChangeId);
         const res = await client.get(`/object-store/${store.id}`);
-        expect(res.status).toBe(403);
+        expect(res.status).toBe(401);
       }
       const res = await client.get(`/object-store?userId=${store.userId}`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
-    it("should throw 403 error if JWT is not verified", async () => {
+    it("should throw 401 error if JWT is not verified", async () => {
       client.jwtAuth = "random_value";
       const storeChangeId = JSON.parse(JSON.stringify(store));
       storeChangeId.id = uuid();
@@ -103,7 +103,7 @@ describe("controllers/object-stores", () => {
 
       let res = await client.get(`/object-store/${store.id}`);
       const objStore = await res.json();
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
       expect(objStore.errors[0]).toBe("jwt malformed");
     });
 
@@ -240,7 +240,6 @@ describe("controllers/object-stores", () => {
     beforeEach(async () => {
       client = new TestClient({
         server,
-        apiKey: uuid(),
       });
 
       const userRes = await client.post(`/user/`, { ...mockAdminUser });
@@ -291,10 +290,10 @@ describe("controllers/object-stores", () => {
       client.apiKey = "random_key";
       const res = await client.get(`/object-store?userId=${nonAdminUser.id}`);
       const objStore = await res.json();
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
-    it("should throw 500 internal server error if user does not exist", async () => {
+    it("should return 401 if user does not exist", async () => {
       // create token with no user
       const tokenId = uuid();
       await server.store.create({
@@ -306,7 +305,7 @@ describe("controllers/object-stores", () => {
 
       const res = await client.get(`/object-store/${adminUser.id}`);
       const objStore = await res.json();
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(401);
       expect(objStore.errors[0]).toBe(
         `no user found from authorization header: Bearer ${tokenId}`
       );

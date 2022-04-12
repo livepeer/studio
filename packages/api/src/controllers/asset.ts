@@ -1,6 +1,6 @@
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
@@ -25,15 +25,6 @@ import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
 import { Asset, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
-import cors from "cors";
-
-var corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: true,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
 
 const app = Router();
 
@@ -182,7 +173,7 @@ const fieldsMap: FieldsMap = {
   meta: `asset.data->>'meta'`,
 };
 
-app.get("/", cors(corsOptions), authMiddleware({}), async (req, res) => {
+app.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, event, allUsers, order, filters, count } =
     toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
@@ -269,7 +260,7 @@ app.get("/", cors(corsOptions), authMiddleware({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", cors(corsOptions), authMiddleware({}), async (req, res) => {
+app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   const ingests = await req.getIngest();
   if (!ingests.length) {
     res.status(501);
@@ -293,9 +284,8 @@ app.get("/:id", cors(corsOptions), authMiddleware({}), async (req, res) => {
 
 app.post(
   "/:id/export",
-  cors(corsOptions),
   validatePost("export-task-params"),
-  authMiddleware({}),
+  authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
@@ -324,9 +314,8 @@ app.post(
 
 app.post(
   "/import",
-  cors(corsOptions),
   validatePost("new-asset-payload"),
-  authMiddleware({}),
+  authorizer({}),
   async (req, res) => {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(req.store, id);
@@ -362,59 +351,77 @@ app.post(
   }
 );
 
+// /:id/transcode and /transcode routes registered right below
+const transcodeAssetHandler: RequestHandler = async (req, res) => {
+  if (!req.params?.id && !req.body.assetId) {
+    // called from the old `/api/asset/transcode` endpoint
+    throw new BadRequestError(
+      "Missing `assetId` payload field of the input asset"
+    );
+  }
+  if (req.params?.id && req.body.assetId) {
+    // called from the new `/api/asset/:assetId/transcode` endpoint
+    throw new BadRequestError(
+      "Field `assetId` is not allowed in payload when included in the URL"
+    );
+  }
+  const assetId = req.params?.id || req.body.assetId;
+
+  const asset = await db.asset.get(assetId);
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  }
+
+  const os = await db.objectStore.get(asset.objectStoreId);
+  if (!os) {
+    throw new UnprocessableEntityError("Asset has invalid objectStoreId");
+  }
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(req.store, id);
+  let outputAsset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    {
+      name: req.body.name ?? asset.name,
+    }
+  );
+  outputAsset.sourceAssetId = asset.id;
+  outputAsset = await db.asset.create(outputAsset);
+
+  const task = await req.taskScheduler.scheduleTask(
+    "transcode",
+    {
+      transcode: {
+        profile: req.body.profile,
+      },
+    },
+    asset,
+    outputAsset
+  );
+  res.status(201);
+  res.json({ asset, task });
+};
+app.post(
+  "/:id/transcode",
+  validatePost("transcode-asset-payload"),
+  authorizer({ allowCorsApiKey: true }),
+  transcodeAssetHandler
+);
+// TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/transcode",
-  cors(corsOptions),
-  validatePost("new-transcode-payload"),
-  authMiddleware({}),
-  async (req, res) => {
-    if (!req.body.assetId) {
-      throw new BadRequestError("You must provide a assetId of an asset");
-    }
-    const asset = await db.asset.get(req.body.assetId);
-    if (!asset) {
-      throw new NotFoundError(`asset not found`);
-    }
-
-    const os = await db.objectStore.get(asset.objectStoreId);
-    if (!os) {
-      throw new UnprocessableEntityError("Asset has invalid objectStoreId");
-    }
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(req.store, id);
-    let outputAsset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      {
-        name: req.body.name ?? asset.name,
-      }
-    );
-    outputAsset.sourceAssetId = asset.id;
-    outputAsset = await db.asset.create(outputAsset);
-
-    const task = await req.taskScheduler.scheduleTask(
-      "transcode",
-      {
-        transcode: {
-          profile: req.body.profile,
-        },
-      },
-      asset,
-      outputAsset
-    );
-    res.status(201);
-    res.json({ asset, task });
-  }
+  validatePost("transcode-asset-payload"),
+  authorizer({ allowCorsApiKey: true }),
+  transcodeAssetHandler
 );
 
 app.post(
   "/request-upload",
-  cors(corsOptions),
   validatePost("new-asset-payload"),
-  authMiddleware({}),
+  authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(req.store, id);
@@ -457,7 +464,7 @@ app.post(
   }
 );
 
-app.put("/upload/:url", cors(corsOptions), async (req, res) => {
+app.put("/upload/:url", async (req, res) => {
   const {
     params: { url },
     config: { jwtSecret, jwtAudience },
@@ -504,7 +511,7 @@ app.put("/upload/:url", cors(corsOptions), async (req, res) => {
   });
 });
 
-app.delete("/:id", authMiddleware({}), async (req, res) => {
+app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const asset = await db.asset.get(id);
   if (!asset) {
@@ -521,7 +528,7 @@ app.delete("/:id", authMiddleware({}), async (req, res) => {
 // TODO: Delete this API as well?
 app.patch(
   "/:id",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("asset"),
   async (req, res) => {
     // update a specific asset

@@ -1,6 +1,6 @@
 import Router from "express/lib/router";
 import fetch from "node-fetch";
-import { authMiddleware, geolocateMiddleware } from "../middleware";
+import { authorizer, geolocateMiddleware } from "../middleware";
 import { shuffle } from "../util";
 
 const app = Router();
@@ -54,7 +54,7 @@ export async function getBroadcasterHandler(req, res) {
 
 app.get("/", geolocateMiddleware({}), getBroadcasterHandler);
 
-app.get("/status", authMiddleware({}), async (req, res, next) => {
+app.get("/status", authorizer({}), async (req, res, next) => {
   const statuses = await getBroadcasterStatuses(req);
   res.json(statuses);
 });

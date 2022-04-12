@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@livepeer.com/www",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
@@ -21,8 +21,9 @@
     "@emotion/core": "^10.0.17",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^10.0.23",
-    "@livepeer.com/api": "^0.3.0",
-    "@livepeer.com/design-system": "^0.3.0",
+    "@livepeer.com/api": "^0.4.0",
+    "@livepeer.com/design-system": "^0.4.0",
+    "@livepeer/video-nft": "^0.3.2",
     "@mdx-js/loader": "^1.6.16",
     "@mdx-js/mdx": "^1.6.16",
     "@mdx-js/react": "^1.6.16",
@@ -42,7 +43,6 @@
     "@theme-ui/presets": "0.3.0",
     "codesandbox": "^2.2.3",
     "date-fns": "^2.16.1",
-    "ethers": "^5.6.1",
     "eventsource": "^1.1.0",
     "filenamify": "^4.3.0",
     "fs": "^0.0.1-security",

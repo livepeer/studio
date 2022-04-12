@@ -30,7 +30,7 @@ export default class WebhookCannon {
   frontendDomain: string;
   sendgridTemplateId: string;
   sendgridApiKey: string;
-  supportAddr: string;
+  supportAddr: [string, string];
   taskScheduler: TaskScheduler;
   vodObjectStoreId: string;
   resolver: any;

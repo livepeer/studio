@@ -10,6 +10,9 @@ import {
   StreamPatchPayload,
   ObjectStore,
   MultistreamTargetPatchPayload,
+  Asset,
+  Task,
+  SuspendUserPayload,
 } from "@livepeer.com/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -84,7 +87,7 @@ const trackPageView = (email, path = null) => {
 };
 
 const getStoredToken = () => {
-  if (!process.browser) {
+  if (!("browser" in process)) {
     return null;
   }
   try {
@@ -138,23 +141,22 @@ const getCursor = (link?: string): string => {
 const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
+  const endpoint = isDevelopment()
+    ? `http://localhost:3004`
+    : isStaging()
+    ? `https://livepeer.monster`
+    : ``;
   const context = {
     ...state,
-    async fetch(url, opts: RequestInit = {}) {
+    endpoint,
+    async fetch(url: string, opts: RequestInit = {}) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
 
-      let endpoint = isStaging()
-        ? `https://livepeer.monster/api${url}`
-        : `/api${url}`;
-
-      if (isDevelopment()) {
-        endpoint = `http://localhost:3004/api${url}`;
-      }
-
-      const res = await fetch(endpoint, {
+      url = `${endpoint}/api${url}`;
+      const res = await fetch(url, {
         ...opts,
         headers,
       });
@@ -372,11 +374,11 @@ const makeContext = (state: ApiState, setState) => {
 
     async setUserSuspended(
       userId: string,
-      suspended: boolean
+      payload: SuspendUserPayload
     ): Promise<[Response, ApiError]> {
       const [res, body] = await context.fetch(`/user/${userId}/suspended`, {
         method: "PATCH",
-        body: JSON.stringify({ suspended }),
+        body: JSON.stringify(payload),
         headers: {
           "content-type": "application/json",
         },
@@ -821,6 +823,85 @@ const makeContext = (state: ApiState, setState) => {
         throw new HttpError(res.status, body);
       }
       return res;
+    },
+
+    async createAsset(params): Promise<Asset> {
+      const [res, asset] = await context.fetch(`/asset/import`, {
+        method: "POST",
+        body: JSON.stringify(params),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      if (res.status !== 201) {
+        throw new Error(asset.errors.join(", "));
+      }
+      return asset;
+    },
+
+    async getAssets(
+      userId: string,
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
+        count?: boolean;
+      }
+    ): Promise<[Asset[], string, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
+      const [res, assets] = await context.fetch(
+        `/asset?${qs.stringify({
+          userId,
+          filters,
+          active: opts?.active,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
+          streamsonly: 1,
+        })}`
+      );
+      if (res.status !== 200) {
+        throw new Error(assets);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [assets, nextCursor, count];
+    },
+
+    async getTasks(
+      userId,
+      opts?: {
+        filters?: Array<{ id: string; value: string | object }>;
+        limit?: number | string;
+        cursor?: string;
+        order?: string;
+        active?: boolean;
+        count?: boolean;
+      }
+    ): Promise<[Array<Task>, string, number]> {
+      const filters = opts?.filters ? JSON.stringify(opts?.filters) : undefined;
+
+      const [res, tasks] = await context.fetch(
+        `/task?${qs.stringify({
+          userId,
+          filters,
+          order: opts?.order,
+          limit: opts?.limit,
+          cursor: opts?.cursor,
+          count: opts?.count,
+        })}`
+      );
+
+      if (res.status !== 200) {
+        throw new Error(tasks);
+      }
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [tasks, nextCursor, count];
     },
 
     async getObjectStore(

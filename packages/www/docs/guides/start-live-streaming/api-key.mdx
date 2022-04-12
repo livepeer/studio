@@ -8,15 +8,219 @@ metaDescription: Get a Livepeer.com API key
 # Get an API key
 
 You need an API key to make requests of the Livepeer.com API. You do not need to
-create an API key if you are creating and configuring live streams using the
-Livepeer.com Dashboard only.
+create an API key if you are creating and configuring live streams using only
+the Livepeer.com Dashboard.
 
-Login to the Livepeer.com Dashboard, and navigate to the Developers tab,
-[livepeer.com/dashboard/developers/api-keys](https://livepeer.com/dashboard/developers/api-keys).
-On this page, you can create, delete and find out the most recent usage of your
-API keys.
+Login to the Livepeer.com Dashboard, and navigate to
+[the API keys page within the Developers tab](https://livepeer.com/dashboard/developers/api-keys).
+On this page, you can manage your API keys including creating or deleting them
+and monitoring their usage.
 
-When you create a new API key, copy and secure the API key. This key is a
-secret, and for your security, Livepeer.com will not show it to you again.
+When you create a new API key, copy and secure the value displayed to you. This
+is the sole secret you will have to use when making requests to the Livepeer.com
+API, so share and store it with caution. We currently allow you to reveal the
+secret of any existing API key but this behavior may change in the future, so
+make sure to persist the API key safely. If you ever forget an API key you'll
+always be able to delete it and create a new one anyway.
 
-If you forget your API key, delete the forgotten key, and create a new API key.
+## Usage
+
+To use an API key, simply add an `Authorization` header to your request with the
+`Bearer` scheme and the API key as the value. Example:
+
+```bash
+curl -X GET \
+  -H 'Authorization: Bearer {api_key}'
+  https://livepeer.com/api/user/me
+```
+
+## CORS
+
+By default, API keys can only be used from a backend server. This is to ensure
+maximum security and prevent that you accidentally expose your account by
+including the secret API key in some public web page.
+
+However, if you are developing a frontend application and want to get started
+quickly with the Livepeer API, you can also create an API key with CORS access
+enabled. API keys created with that option can be used from the browser, from
+any origin that you configure it for.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: An origin is just a combination of a scheme, like
+    <code>https</code>, with a domain like <code>example.com</code>. You will also
+    need to include the port number if you are using a non-standard port. <br />
+    e.g.: <code>http://localhost:8080</code> when developing locally on port
+    8080 or <code>https://my.app.io</code> after deploying it on a public
+    domain.
+  </Text>
+</Alert>
+
+To enable CORS, simply tick the `Allow CORS access` checkbox when creating your
+API key. You will then be prompted to add all the origins that you would like
+the API key to be used from:
+
+![image](https://ipfs.livepeer.com/ipfs/QmTCaxyntJoKdRQ8Pnbcn3D1WdRgM7SLioQyRG1YTT67Pm)
+
+We recommend that you add the minimal list of origins to your API key. Ideally
+also creating separate API keys to be used for development or production. At
+your own discretion, you can use the same API key for all your environments and
+allow all the origins for it. You can also just add the `*` special value to
+allow the key to be used from any origin.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: CORS is only a client-side check that browsers make and sometimes does
+    not prevent the API from being called. It also does not prevent the API key
+    from being used from other places like a backend or a custom client. <br />
+  </Text>
+</Alert>
+
+For an additional layer of security, we also limit the access of the
+CORS-enabled keys to the API. Continue reading for more information.
+
+### API access
+
+CORS-enabled API keys have restricted access to the API by default. This means
+that they are only allowed to call some specific endpoints of the API.
+
+This is another intermediate security measure, so that even if a malicious actor
+snoops the API key from your web page they still won't be able access the most
+sensitive data in your account. For example, APIs that expose PIIs, payment
+information or list API resources created by other users are disallowed.
+
+These are the main API endpoints that a restricted CORS API key will have
+access:
+
+<Table
+  data={[
+    {
+      "API Group": "Live",
+      API: (
+        <Link href={"/docs/api-reference/stream/post-stream"} target="_blank">
+          <code>POST /api/stream</code>
+        </Link>
+      ),
+      description: "Create a new stream",
+    },
+    {
+      "API Group": "Live",
+      API: (
+        <Link href={"/docs/api-reference/stream/get-stream"} target="_blank">
+          <code>{"GET /api/stream/{id}"}</code>
+        </Link>
+      ),
+      description: "Retrieve a stream by ID",
+    },
+    {
+      "API Group": "Live",
+      API: (
+        <Link
+          href={"/docs/api-reference/session/list-sessions"}
+          target="_blank">
+          <code>{"GET /api/stream/{id}/sessions"}</code>
+        </Link>
+      ),
+      description: "List sessions from a specific parent stream ID",
+    },
+    {
+      "API Group": "Live",
+      API: (
+        <Link href={"/docs/api-reference/session/get-session"} target="_blank">
+          <code>{"GET /api/session/{id}"}</code>
+        </Link>
+      ),
+      description: "Retrieve a session by ID",
+    },
+    {
+      "API Group": "Live",
+      API: (
+        <Link href={"/docs/api-reference/stream/update-stream"} target="_blank">
+          <code>{"PATCH /api/stream/{id}"}</code>
+        </Link>
+      ),
+      description: "Update a specific stream by ID",
+    },
+    {
+      "API Group": "VOD",
+      API: (
+        <Link href={"/docs/api-reference/vod/upload"} target="_blank">
+          <code>POST /api/asset/request-upload</code>
+        </Link>
+      ),
+      description: "Create an asset via direct upload",
+    },
+    {
+      "API Group": "VOD",
+      API: (
+        <Link
+          href={"/docs/api-reference/vod/list#retrieve-an-asset"}
+          target="_blank">
+          <code>{"GET /api/asset/{id}"}</code>
+        </Link>
+      ),
+      description: "Retrieve an asset by ID",
+    },
+    {
+      "API Group": "VOD",
+      API: (
+        <Link href={"/docs/api-reference/vod/export"} target="_blank">
+          <code>{"POST /api/asset/{id}/export"}</code>
+        </Link>
+      ),
+      description: "Export an asset (e.g. to IPFS)",
+    },
+    {
+      "API Group": "VOD",
+      API: <code>{"POST /api/asset/{id}/transcode"}</code>,
+      description: "Transcode an asset to another rendition",
+    },
+    {
+      "API Group": "VOD",
+      API: (
+        <Link
+          href={"/docs/api-reference/vod/list-tasks#retrieve-a-task"}
+          target="_blank">
+          <code>{"GET /api/task/{id}"}</code>
+        </Link>
+      ),
+      description: "Monitor the progress of a specific task by ID",
+    },
+  ]}
+/>
+
+These endpoints allow you to use all the features of the
+[Video NFT SDK](https://www.npmjs.com/package/@livepeer/video-nft) from the
+browser. If you still have any issues using it let us know through any of the
+support channels.
+
+#### Full Access
+
+If your application needs further access to the API, it is strongly recommended
+that you run a backend to secure an API key and call the API privately. From it
+you can also perform any custom authentication with your frontend and validate
+the API calls to protect your Livepeer.com account. Check the
+[livepeer-web-api-proxy](https://github.com/victorges/livepeer-web-api-proxy)
+for a sample project with such a backend.
+
+If you are aware of the implications but still want to create an API key with
+full access to your account, you can do so by ticking the `Full API access`
+checkbox when creating your API key.
+
+An API key with `Full API access` will be able to access and manage every
+information in your account, including: all your contact info provided on
+registratin; change your billing plan, and; list and delete all the streams and
+assets stored in your account.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    If you plan on deploying a production application with a{" "}
+    <code>Full API Access</code>
+    CORS API key, get in touch first and we may be able to help you. Find us at <Link
+      href={
+        "mailto:hello@livepeer.org?subject=Full%20access%20API%20key%20with%20CORS&body=Hello%2C%0D%0A%0D%0AI%20am%20creating%20an%20application%20with%20Livepeer%20and%20plan%20on%20using%20a%20CORS-enabled%20API%20key%20with%20full%20access%20to%20the%20API.%0D%0A%0D%0AMy%20application%20does%20%7Bplease%20describe%20what%20your%20app%20does%20here%7D%0D%0A%0D%0AAnd%20it%20needs%20to%20call%20these%20APIs%20from%20the%20browser%3A%0D%0A-%20%7Blist%20the%20API%20endpoints%20you'll%20need%20to%20call%7D%0D%0A%0D%0AGlad%20for%20any%20help.%0D%0A"
+      }>
+      hello@livepeer.com
+    </Link>
+  </Text>
+</Alert>

@@ -51,10 +51,10 @@ describe("controllers/user", () => {
     it("should not get all users without authorization", async () => {
       client.jwtAuth = "";
       let res = await client.get(`/user/${adminUser.id}`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
 
       res = await client.get(`/user`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
     it("should get all users with admin authorization", async () => {
@@ -383,6 +383,14 @@ describe("controllers/user", () => {
       client.apiKey = uuid();
     });
 
+    it("should return personal user info", async () => {
+      client.apiKey = nonAdminApiKey;
+      let res = await client.get("/user/me");
+      let resJson = await res.json();
+      expect(resJson.email).toBe(nonAdminUser.email);
+      expect(res.status).toBe(200);
+    });
+
     it("should not get all users", async () => {
       // should return nonverified error
       client.apiKey = nonAdminApiKey;
@@ -390,7 +398,7 @@ describe("controllers/user", () => {
       let resJson = await res.json();
       expect(res.status).toBe(403);
       expect(resJson.errors[0]).toBe(
-        `useremail ${nonAdminUser.email} has not been verified. Please check your inbox for verification email.`
+        `user ${nonAdminUser.email} has not been verified. please check your inbox for verification email.`
       );
 
       client.apiKey = adminApiKey;
@@ -398,7 +406,7 @@ describe("controllers/user", () => {
       resJson = await res.json();
       expect(res.status).toBe(403);
       expect(resJson.errors[0]).toBe(
-        `useremail ${adminUser.email} has not been verified. Please check your inbox for verification email.`
+        `user ${adminUser.email} has not been verified. please check your inbox for verification email.`
       );
 
       // adding emailValid true to user

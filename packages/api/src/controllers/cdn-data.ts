@@ -1,4 +1,4 @@
-import { authMiddleware } from "../middleware";
+import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
 import { Response, Router } from "express";
 import { db } from "../store";
@@ -8,7 +8,7 @@ import { CdnUsageRowReq } from "../store/cdn-usage-table";
 
 const app = Router();
 
-app.get("/region/:region", authMiddleware({}), async (req, res) => {
+app.get("/region/:region", authorizer({}), async (req, res) => {
   const { region } = req.params;
   if (!region) {
     res.status(400);
@@ -25,7 +25,7 @@ app.get("/region/:region", authMiddleware({}), async (req, res) => {
 
 app.post(
   "/",
-  authMiddleware({}),
+  authorizer({}),
   validatePost("cdn-data-payload"),
   async (req, res) => {
     const usersCache = new Map();

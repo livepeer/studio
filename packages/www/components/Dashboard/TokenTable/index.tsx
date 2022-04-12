@@ -1,3 +1,4 @@
+import { ApiToken } from "@livepeer.com/api";
 import {
   styled,
   Heading,
@@ -16,6 +17,8 @@ import {
   HoverCardTrigger,
   useSnackbar,
   Text,
+  Tooltip,
+  Label,
 } from "@livepeer.com/design-system";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
@@ -39,6 +42,7 @@ type TokenTableData = {
   token: TextCellProps;
   lastUsed: DateCellProps;
   createdAt: DateCellProps;
+  cors: TextCellProps;
 };
 
 const Copy = styled(CopyIcon, {
@@ -90,6 +94,12 @@ const TokenTable = ({
         Cell: DateCell,
         sortType: (...params: SortTypeArgs) =>
           dateSort("original.createdAt.date", ...params),
+      },
+      {
+        Header: "CORS Access",
+        accessor: "cors",
+        Cell: TextCell,
+        disableSortBy: true,
       },
     ],
     []
@@ -143,6 +153,35 @@ const TokenTable = ({
     );
   };
 
+  const CorsCell = (params: { cors: ApiToken["access"]["cors"] }) => {
+    const { cors } = params;
+    if (!cors?.allowedOrigins?.length) {
+      return (
+        <Tooltip
+          content="This is the most secure mode for API keys, blocking access from any webpage."
+          multiline>
+          <Label>None</Label>
+        </Tooltip>
+      );
+    }
+    const accessLevel = cors.fullAccess ? "Full" : "Restricted";
+    return (
+      <Tooltip
+        content={
+          cors.allowedOrigins.includes("*")
+            ? `${accessLevel} access allowed from any origin`
+            : `${accessLevel} access allowed from: ${cors.allowedOrigins.join(
+                ", "
+              )}`
+        }
+        multiline>
+        <Label>
+          <i>{accessLevel}</i>
+        </Label>
+      </Tooltip>
+    );
+  };
+
   const fetcher: Fetcher<TokenTableData> = useCallback(async () => {
     const [tokens, nextCursor, resp, count] = await getApiTokens(userId, {
       count: true,
@@ -171,6 +210,9 @@ const TokenTable = ({
           lastUsed: {
             date: new Date(token.lastSeen),
             fallback: <i>unused</i>,
+          },
+          cors: {
+            children: <CorsCell cors={token.access?.cors} />,
           },
         };
       }),
