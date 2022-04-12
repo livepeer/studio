@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@livepeer.com/www",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
     "dev": "next",
