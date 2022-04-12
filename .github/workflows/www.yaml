@@ -1,20 +1,35 @@
-name: Build web service docker image
+name: Build www docker image
 
-on: push
+on:
+  pull_request:
+  push:
+    paths:
+      - "packages/www/*"
+      - "packages/admin/*"
+      - "packages/design-system/*"
+    branches-ignore:
+      - latest
+
+defaults:
+  run:
+    working-directory: packages/www
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
-
+    name: Publish web service docker image
+    runs-on: ubuntu-20.04
     steps:
       - name: checkout
         uses: actions/checkout@master
         with:
           fetch-depth: 0
+          # Check https://github.com/livepeer/go-livepeer/pull/1891
+          # for ref value discussion
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Tags
         id: tags
-        uses: livepeer/action-gh-release-tags@v0
+        uses: livepeer/action-gh-release-tags@latest
 
       - name: docker login
         env:
@@ -33,7 +48,6 @@ jobs:
           CF_EMAIL: ${{ secrets.CF_EMAIL }}
           DOCKER_BUILDKIT: 1
         run: |
-          cd packages/www
           yarn run docker:build
           yarn run docker:push
 

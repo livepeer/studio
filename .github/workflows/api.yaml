@@ -1,7 +1,10 @@
 name: Build API service docker image
 
 on:
+  pull_request:
   push:
+    paths:
+      - "packages/api/*"
     branches-ignore:
       - latest
 
@@ -11,7 +14,8 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Publish API server docker image
+    runs-on: ubuntu-20.04
     services:
       postgres:
         image: postgres
@@ -23,6 +27,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+
       rabbitmq:
         image: rabbitmq:3.9-management
         env:
@@ -36,23 +41,22 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 0
+          # Check https://github.com/livepeer/go-livepeer/pull/1891
+          # for ref value discussion
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: "yarn"
 
       - name: Tags
         id: tags
-        uses: livepeer/action-gh-release-tags@v0
+        uses: livepeer/action-gh-release-tags@latest
 
       - name: yarn install
-        run: |
-          yarn install --frozen-lockfile
-
-      - name: yarn test
-        run: |
-          yarn test
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn install --frozen-lockfile
 
       - name: docker login
         env:
