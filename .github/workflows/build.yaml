@@ -34,21 +34,21 @@ jobs:
         id: cache-lerna
         uses: actions/cache@v3
         with:
-          path: **/node_modules
+          path: "**/node_modules"
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: restore pkg cache
         id: cache-pkg
         uses: actions/cache@v3
         with:
-          path: ~/.pkg-cache
+          path: "~/.pkg-cache"
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: yarn install
         run: |
-          ls -lh
+          ls -lha
           find packages/ -maxdepth 2 -type d -name 'node_modules'
-          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --silent
 
       - name: build pkgs
         # I want to do --parallel here, but the binary downloads conflict with each other
