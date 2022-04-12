@@ -178,46 +178,52 @@ function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
   };
 }
 
-const corsApiKeyAccessRules: AuthRule[] = [
+export const corsApiKeyAccessRules: AuthRule[] = [
+  // Live-streaming
   {
     methods: ["get"],
     resources: [
-      "/stream/:id",
-      "/stream/:parentId/sessions",
+      "/stream/:id/sessions",
       "/stream/sessions/:parentId",
       "/session/:id",
-      "/multistream/target/:id",
-      "/asset/:id",
-      "/task/:id",
     ],
+  },
+  {
+    methods: ["get", "patch"],
+    resources: ["/stream/:id/", "/multistream/target/:id"],
+  },
+  {
+    methods: ["post"],
+    resources: ["/stream", "/multistream/target"],
+  },
+  // VOD
+  {
+    methods: ["get"],
+    resources: ["/asset/:id", "/task/:id"],
   },
   {
     methods: ["post"],
     resources: [
-      "/stream",
-      "/multistream/target",
       "/asset/request-upload",
       "/asset/:id/transcode",
       "/asset/transcode", // legacy, remove
       "/asset/:id/export",
     ],
   },
-  {
-    methods: ["patch"],
-    resources: ["/stream/:id", "/multistream/target/:id"],
-  },
 ];
 
-function tokenAccessRules(token?: ApiToken) {
-  if (!token?.access) {
-    return null;
+function isRestrictedCors(token?: ApiToken) {
+  if (!token || token.access?.rules) {
+    // explicit access rules override any default restriction
+    return false;
   }
-  if (token.access.rules || !token.access.cors) {
-    return token.access.rules;
-  }
-  const { allowedOrigins, fullAccess } = token.access.cors;
+  const { allowedOrigins, fullAccess } = token.access?.cors ?? {};
   const hasCors = allowedOrigins?.length > 0;
-  return hasCors && !fullAccess ? corsApiKeyAccessRules : null;
+  return hasCors && !fullAccess;
+}
+
+function tokenAccessRules(token?: ApiToken) {
+  return isRestrictedCors(token) ? corsApiKeyAccessRules : token?.access?.rules;
 }
 
 interface AuthzParams {
@@ -292,7 +298,11 @@ function authorizer(params: AuthzParams): RequestHandler {
         httpPrefix = null;
       }
       if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
-        throw new ForbiddenError(`credential has insufficent privileges`);
+        throw new ForbiddenError(
+          isRestrictedCors(token)
+            ? "access forbidden to CORS-enabled API key with restricted access"
+            : "credential has insufficent privileges"
+        );
       }
     }
     return next();

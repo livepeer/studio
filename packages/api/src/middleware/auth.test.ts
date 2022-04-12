@@ -11,7 +11,8 @@ import {
   TestClient,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
-import { authenticator } from "./auth";
+import { authenticator, corsApiKeyAccessRules } from "./auth";
+import { AuthPolicy } from "./authPolicy";
 import errorHandler from "./errorHandler";
 
 let server: TestServer;
@@ -151,6 +152,11 @@ describe("auth middleware", () => {
 
       client = new TestClient({ server: testServer });
       client.apiKey = nonAdminApiKey;
+    });
+
+    it("shoul have valid CORS API key access rules", async () => {
+      const policy = new AuthPolicy(corsApiKeyAccessRules);
+      expect(policy).not.toBeNull();
     });
 
     it("should allow any route by default", async () => {
