@@ -1,10 +1,12 @@
-name: Build web service docker image
+name: Build www docker image
 
 on:
   pull_request:
   push:
     paths:
       - "packages/www/*"
+      - "packages/admin/*"
+      - "packages/design-system/*"
     branches-ignore:
       - latest
 
