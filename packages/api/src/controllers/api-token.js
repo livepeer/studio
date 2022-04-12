@@ -138,6 +138,12 @@ app.post("/", validatePost("api-token"), async (req, res) => {
   const userId =
     req.body.userId && req.user.admin ? req.body.userId : req.user.id;
 
+  if (req.body.access?.cors && req.user.admin) {
+    res.status(403);
+    return res.json({
+      errors: ["cors api keys are not available to admins"],
+    });
+  }
   if (req.body.access?.rules) {
     try {
       new AuthPolicy(req.body.access.rules);

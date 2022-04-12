@@ -238,9 +238,14 @@ function authorizer(params: AuthzParams): RequestHandler {
       if (!isAuthorized(req.method, fullPath, access?.rules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
-    } else {
-      const cors = access?.cors;
-      if (cors && !cors.fullAccess && !params.allowCorsApiKey) {
+    } else if (access?.cors) {
+      const cors = access.cors;
+      if (req.user.admin) {
+        throw new ForbiddenError(
+          `cors access is not available to admins (how did you get an API key?)`
+        );
+      }
+      if (!cors.fullAccess && !params.allowCorsApiKey) {
         throw new ForbiddenError(
           `access forbidden for restricted CORS API tokens`
         );
