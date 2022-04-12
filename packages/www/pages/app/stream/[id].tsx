@@ -305,7 +305,7 @@ const ID = () => {
   const playbackId = (stream || {}).playbackId || "";
   const domain = isStaging() ? "monster" : "com";
   const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
-  const globalPlaybackUrl = `https://cdn.livepeer.${domain}/hls/${playbackId}/index.m3u8`;
+  const globalPlaybackUrl = `https://livepeercdn.${domain}/hls/${playbackId}/index.m3u8`;
 
   if (stream && stream.region && !lastSession) {
     broadcasterPlaybackUrl = `https://${stream.region}.livepeer.${domain}/stream/${stream.id}.m3u8`;

@@ -8,7 +8,7 @@ metaDescription: Playback a Livepeer.com live stream
 # Playback a live stream
 
 This is how a Livepeer.com playback URL is formatted:
-`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+`https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
 All sessions for a stream have the same playback URL.
 
@@ -19,7 +19,7 @@ click on a stream name. The playback URL is listed on the page.
 
 You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
 note the value of `playbackId` in the response. The playback URL is
-`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8`.
+`https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
 ## Video player
 
@@ -52,4 +52,4 @@ Lastly, check that your playback URL is correct.
 
 You can use `?video=false` at the end of an `.m3u8` URL to get an audio-only
 stream. For example,
-`https://cdn.livepeer.com/hls/{playbackId}/index.m3u8?video=false`.
+`https://livepeercdn.com/hls/{playbackId}/index.m3u8?video=false`.
