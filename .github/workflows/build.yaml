@@ -45,10 +45,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: yarn install
-        run: |
-          ls -lha
-          find packages/ -maxdepth 2 -type d -name 'node_modules'
-          yarn install --frozen-lockfile --silent
+        run: yarn install --frozen-lockfile --silent
 
       - name: build pkgs
         # I want to do --parallel here, but the binary downloads conflict with each other
