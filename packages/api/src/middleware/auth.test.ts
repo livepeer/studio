@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Response } from "node-fetch";
 import { authorizer } from ".";
 
 import { ApiToken, User } from "../schema/types";
@@ -152,11 +153,6 @@ describe("auth middleware", () => {
 
       client = new TestClient({ server: testServer });
       client.apiKey = nonAdminApiKey;
-    });
-
-    it("shoul have valid CORS API key access rules", async () => {
-      const policy = new AuthPolicy(corsApiKeyAccessRules);
-      expect(policy).not.toBeNull();
     });
 
     it("should allow any route by default", async () => {
@@ -355,6 +351,73 @@ describe("auth middleware", () => {
 
       await expectStatus("get", "/gus").toBe(204);
       await expectStatus("head", "/admin/foo").toBe(202);
+    });
+  });
+
+  describe("cors", () => {
+    let adminUser: User;
+    let adminApiKey: string;
+    let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let client: TestClient;
+
+    beforeEach(async () => {
+      ({
+        client,
+        adminUser,
+        adminApiKey,
+        adminToken,
+        nonAdminUser,
+        nonAdminApiKey,
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      client.apiKey = nonAdminApiKey;
+    });
+
+    const setAccess = (token: string, access?: ApiToken["access"]) =>
+      db.apiToken.update(token, { access });
+
+    const expectResponse = (res: Response) =>
+      expect(res.json().then((body) => ({ status: res.status, body })))
+        .resolves;
+
+    it("shoul have valid CORS API key access rules", async () => {
+      const policy = new AuthPolicy(corsApiKeyAccessRules);
+      expect(policy).not.toBeNull();
+    });
+
+    it("should disallow admins from creating CORS API keys", async () => {
+      client.apiKey = null;
+      client.jwtAuth = adminToken;
+      let res = await client.post("/api-token", {
+        name: "test",
+        access: { cors: {} },
+      });
+      expectResponse(res).toEqual({
+        status: 403,
+        body: {
+          errors: ["cors api keys are not available to admins"],
+        },
+      });
+    });
+
+    it("should disallow CORS access on existing admin API keys", async () => {
+      client.apiKey = adminApiKey;
+      let res = await client.get("/stream");
+      expectResponse(res).toEqual({ status: 200, body: [] });
+
+      await setAccess(adminApiKey, {
+        cors: { allowedOrigins: ["http://localhost:3000"] },
+      });
+      res = await client.get("/stream");
+      expectResponse(res).toEqual({
+        status: 403,
+        body: {
+          errors: [
+            expect.stringMatching("cors access is not available to admins"),
+          ],
+        },
+      });
     });
   });
 });
