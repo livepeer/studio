@@ -49,3 +49,10 @@ jobs:
 
       - name: yarn tests with coverage
         run: yarn run coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          name: livepeer-com
+          verbose: true
