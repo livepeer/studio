@@ -1,5 +1,5 @@
 import { useToggleState } from "hooks/use-toggle-state";
-import { useApi } from "hooks";
+import { useApi, useLoggedIn } from "hooks";
 import { useMetaMask } from "metamask-react";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
@@ -174,6 +174,9 @@ export default function MintNFT() {
     return connect();
   }, [setLogs, connect]);
 
+  if (!initState.tokenUri) {
+    useLoggedIn();
+  }
   return (
     <Layout {...Content.metaData} css={{ minHeight: "100vh" }}>
       <Guides backgroundColor="$mauve2" />
@@ -212,7 +215,7 @@ export default function MintNFT() {
                     return onClickMint();
                   }}>
                   <Flex direction="column" gap="2">
-                    {state?.tokenUri ? undefined : (
+                    {state?.tokenUri || !user ? undefined : (
                       <>
                         <Label htmlFor="file">File {state?.tokenUri}</Label>
                         <Flex direction="row" gap="2">
