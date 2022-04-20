@@ -23,7 +23,7 @@ import {
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
-import { Asset, NewAssetPayload } from "../schema/types";
+import { Asset, ExportTaskParams, NewAssetPayload } from "../schema/types";
 import { WithID } from "../store/types";
 
 const app = Router();
@@ -307,13 +307,25 @@ app.post(
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
+    const params = req.body as ExportTaskParams;
     const task = await req.taskScheduler.scheduleTask(
       "export",
       {
-        export: req.body,
+        export: params,
       },
       asset
     );
+    if ("ipfs" in params) {
+      const storageProviders = asset.storageProviders ?? {
+        objectStoreId: asset.objectStoreId,
+      };
+      await db.asset.update(assetId, {
+        storageProviders: {
+          ...storageProviders,
+          ipfs: { params: params.ipfs, status: { taskId: task.id } },
+        },
+      });
+    }
 
     res.status(201);
     res.json({ task });
