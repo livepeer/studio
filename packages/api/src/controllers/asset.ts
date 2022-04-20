@@ -315,7 +315,7 @@ app.post(
       },
       asset
     );
-    if ("ipfs" in params) {
+    if ("ipfs" in params && !params.ipfs.pinata) {
       const storageProviders = asset.storageProviders ?? {
         objectStoreId: asset.objectStoreId,
       };
@@ -546,32 +546,59 @@ app.delete("/:id", authorizer({}), async (req, res) => {
 });
 
 // TODO: Delete this API as well?
-app.patch(
-  "/:id",
-  authorizer({ anyAdmin: true }),
-  validatePost("asset"),
-  async (req, res) => {
-    // update a specific asset
-    const asset = await db.asset.get(req.body.id);
-    if (!asset) {
-      throw new NotFoundError(`asset not found`);
-    }
-
-    const { id, playbackId, userId, createdAt, objectStoreId } = asset;
-    await db.asset.update(req.body.id, {
-      ...req.body,
-      // these fields are not updateable
-      id,
-      playbackId,
-      userId,
-      createdAt,
-      updatedAt: Date.now(),
-      objectStoreId,
-    });
-
-    res.status(200);
-    res.json({ id: req.body.id });
+app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
+  // update a specific asset
+  const asset = await db.asset.get(req.body.id);
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
   }
-);
+
+  // these are the only updateable fields
+  let { name = asset.name, storageProviders } = req.body as Asset;
+  if (storageProviders?.ipfs?.params?.pinata) {
+    throw new UnprocessableEntityError(
+      "Custom pinata not allowed in asset storage provider"
+    );
+  }
+  const currObjStoreId =
+    asset.storageProviders.objectStoreId || asset.objectStoreId;
+  storageProviders = {
+    objectStoreId: currObjStoreId,
+    ...asset.storageProviders,
+    ...storageProviders,
+  };
+  if (storageProviders.objectStoreId !== currObjStoreId) {
+    throw new UnprocessableEntityError("Changing object store is not allowed");
+  }
+
+  const ipfsParamsEq =
+    JSON.stringify(storageProviders.ipfs) ===
+    JSON.stringify(asset.storageProviders?.ipfs ?? null);
+  if (storageProviders.ipfs && !ipfsParamsEq) {
+    const { id: taskId } = await req.taskScheduler.scheduleTask(
+      "export",
+      { export: { ipfs: storageProviders.ipfs.params } },
+      asset
+    );
+    storageProviders = {
+      ...storageProviders,
+      ipfs: {
+        ...storageProviders.ipfs,
+        status: {
+          ...storageProviders.ipfs.status,
+          taskId,
+        },
+      },
+    };
+  }
+  await db.asset.update(req.body.id, {
+    ...asset,
+    name,
+    storageProviders,
+  });
+
+  res.status(200);
+  res.json({ id: req.body.id });
+});
 
 export default app;

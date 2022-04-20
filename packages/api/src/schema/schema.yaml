@@ -925,6 +925,7 @@ components:
                   $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
                 status:
                   additionalProperties: false
+                  readOnly: true
                   required: [taskId]
                   properties:
                     taskId:
