@@ -68,42 +68,45 @@ export default class TaskScheduler {
       return true;
     }
 
-    if (event.task.type === "import") {
-      const assetSpec = event.output?.import?.assetSpec;
-      if (!assetSpec) {
-        const error = "bad task output: missing assetSpec";
-        console.error(
-          `task event process error: err=${error} taskId=${event.task.id}`
-        );
-        await this.failTask(task, error, event.output);
-        return true;
-      }
-      await db.asset.update(task.outputAssetId, {
-        size: assetSpec.size,
-        hash: assetSpec.hash,
-        videoSpec: assetSpec.videoSpec,
-        playbackRecordingId: assetSpec.playbackRecordingId,
-        status: "ready",
-        updatedAt: Date.now(),
-      });
-    } else if (event.task.type === "transcode") {
-      const assetSpec = event.output?.transcode?.asset?.assetSpec;
-      if (!assetSpec) {
-        const error = "bad task output: missing assetSpec";
-        console.error(
-          `task event process error: err=${error} taskId=${event.task.id}`
-        );
-        await this.failTask(task, error, event.output);
-        return true;
-      }
-      await db.asset.update(task.outputAssetId, {
-        size: assetSpec.size,
-        hash: assetSpec.hash,
-        videoSpec: assetSpec.videoSpec,
-        playbackRecordingId: assetSpec.playbackRecordingId,
-        status: "ready",
-        updatedAt: Date.now(),
-      });
+    switch (event.task.type) {
+      case "import":
+        let assetSpec = event.output?.import?.assetSpec;
+        if (!assetSpec) {
+          const error = "bad task output: missing assetSpec";
+          console.error(
+            `task event process error: err=${error} taskId=${event.task.id}`
+          );
+          await this.failTask(task, error, event.output);
+          return true;
+        }
+        await db.asset.update(task.outputAssetId, {
+          size: assetSpec.size,
+          hash: assetSpec.hash,
+          videoSpec: assetSpec.videoSpec,
+          playbackRecordingId: assetSpec.playbackRecordingId,
+          status: "ready",
+          updatedAt: Date.now(),
+        });
+        break;
+      case "transcode":
+        assetSpec = event.output?.transcode?.asset?.assetSpec;
+        if (!assetSpec) {
+          const error = "bad task output: missing assetSpec";
+          console.error(
+            `task event process error: err=${error} taskId=${event.task.id}`
+          );
+          await this.failTask(task, error, event.output);
+          return true;
+        }
+        await db.asset.update(task.outputAssetId, {
+          size: assetSpec.size,
+          hash: assetSpec.hash,
+          videoSpec: assetSpec.videoSpec,
+          playbackRecordingId: assetSpec.playbackRecordingId,
+          status: "ready",
+          updatedAt: Date.now(),
+        });
+        break;
     }
     await db.task.update(task.id, {
       status: {
