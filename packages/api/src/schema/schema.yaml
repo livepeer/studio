@@ -903,9 +903,37 @@ components:
           description: Set to true when the asset is deleted
         objectStoreId:
           type: string
-          description: Object store ID where the asset is stored
+          deprecated: true
+          description:
+            "@deprecated Use storageProviders.[].objectStoreId instead"
           writeOnly: true
-          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        storageProviders:
+          required: [objectStoreId]
+          additionalProperties: false
+          properties:
+            objectStoreId:
+              type: string
+              description: Object store ID where the asset is stored
+              writeOnly: true
+              example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+            ipfs:
+              type: object
+              additionalProperties: false
+              required: [params]
+              properties:
+                params:
+                  $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+                status:
+                  additionalProperties: false
+                  required: [taskId]
+                  properties:
+                    taskId:
+                      type: string
+                      description:
+                        ID of the task responsible for saving this asset in
+                        IPFS.
+                    addresses:
+                      $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
         name:
           type: string
           description:
