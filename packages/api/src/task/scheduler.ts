@@ -107,6 +107,23 @@ export default class TaskScheduler {
           updatedAt: Date.now(),
         });
         break;
+      case "export":
+        const inputAsset = await db.asset.get(task.inputAssetId);
+        if (inputAsset.storageProviders?.ipfs?.status?.taskId === task.id) {
+          await db.asset.update(inputAsset.id, {
+            storageProviders: {
+              ...inputAsset.storageProviders,
+              ipfs: {
+                ...inputAsset.storageProviders.ipfs,
+                status: {
+                  taskId: task.id,
+                  addresses: task.output.export.ipfs,
+                },
+              },
+            },
+          });
+        }
+        break;
     }
     await db.task.update(task.id, {
       status: {
