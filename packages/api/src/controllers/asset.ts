@@ -87,6 +87,19 @@ async function validateAssetPayload(
   };
 }
 
+const assetStatus = (asset: Asset) =>
+  typeof asset.status === "object"
+    ? asset.status
+    : {
+        phase: asset.status,
+        updatedAt: asset.updatedAt,
+      };
+
+const assetStorage = (asset: Asset) =>
+  asset.storage ?? {
+    objectStoreId: asset.objectStoreId,
+  };
+
 function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.status !== "ready") {
     return asset;
@@ -300,7 +313,8 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
-    if (asset.status !== "ready") {
+    const status = assetStatus(asset);
+    if (status.phase !== "ready") {
       res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
     }
@@ -316,13 +330,20 @@ app.post(
       asset
     );
     if ("ipfs" in params && !params.ipfs.pinata) {
-      const storageProviders = asset.storageProviders ?? {
-        objectStoreId: asset.objectStoreId,
-      };
       await db.asset.update(assetId, {
-        storageProviders: {
-          ...storageProviders,
-          ipfs: { params: params.ipfs, status: { taskId: task.id } },
+        storage: {
+          ...assetStorage(asset),
+          ipfs: params.ipfs,
+        },
+        status: {
+          ...status,
+          storage: {
+            ...status.storage,
+            ipfs: {
+              ...status.storage?.ipfs,
+              taskId: task.id,
+            },
+          },
         },
       });
     }
@@ -554,47 +575,42 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   }
 
   // these are the only updateable fields
-  let { name = asset.name, storageProviders } = req.body as Asset;
-  if (storageProviders?.ipfs?.params?.pinata) {
-    throw new UnprocessableEntityError(
-      "Custom pinata not allowed in asset storage provider"
-    );
+  const { name, storage } = req.body as Asset;
+  if (storage?.ipfs?.pinata) {
+    throw new BadRequestError("Custom pinata not allowed in asset storage");
   }
-  const currObjStoreId =
-    asset.storageProviders.objectStoreId || asset.objectStoreId;
-  storageProviders = {
-    objectStoreId: currObjStoreId,
-    ...asset.storageProviders,
-    ...storageProviders,
-  };
-  if (storageProviders.objectStoreId !== currObjStoreId) {
-    throw new UnprocessableEntityError("Changing object store is not allowed");
+  const currStorage = assetStorage(asset);
+  if (
+    storage.objectStoreId !== undefined &&
+    storage.objectStoreId !== currStorage.objectStoreId
+  ) {
+    throw new BadRequestError("Changing object store is not allowed");
   }
 
+  let status = assetStatus(asset);
   const ipfsParamsEq =
-    JSON.stringify(storageProviders.ipfs) ===
-    JSON.stringify(asset.storageProviders?.ipfs ?? null);
-  if (storageProviders.ipfs && !ipfsParamsEq) {
+    JSON.stringify(storage.ipfs) === JSON.stringify(currStorage.ipfs);
+  if (storage.ipfs && !ipfsParamsEq) {
     const { id: taskId } = await req.taskScheduler.scheduleTask(
       "export",
-      { export: { ipfs: storageProviders.ipfs.params } },
+      { export: { ipfs: storage.ipfs } },
       asset
     );
-    storageProviders = {
-      ...storageProviders,
-      ipfs: {
-        ...storageProviders.ipfs,
-        status: {
-          ...storageProviders.ipfs.status,
+    status = {
+      ...status,
+      storage: {
+        ...status.storage,
+        ipfs: {
+          ...status.storage?.ipfs,
           taskId,
         },
       },
     };
   }
   await db.asset.update(req.body.id, {
-    ...asset,
     name,
-    storageProviders,
+    storage: { ...currStorage, ...storage },
+    status,
   });
 
   res.status(200);

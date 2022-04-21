@@ -904,10 +904,9 @@ components:
         objectStoreId:
           type: string
           deprecated: true
-          description:
-            "@deprecated Use storageProviders.[].objectStoreId instead"
+          description: "@deprecated Use storage.objectStoreId instead"
           writeOnly: true
-        storageProviders:
+        storage:
           required: [objectStoreId]
           additionalProperties: false
           properties:
@@ -917,24 +916,50 @@ components:
               writeOnly: true
               example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
             ipfs:
-              type: object
+              $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+        status:
+          oneOf:
+            - type: string
+              deprecated: true
+              description: "@deprecated use status.phase instead"
+              enum:
+                - waiting
+                - ready
+                - failed
+            - type: object
               additionalProperties: false
-              required: [params]
+              required: [phase]
+              description: Status of the asset
               properties:
-                params:
-                  $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
-                status:
+                phase:
+                  type: string
+                  description: Phase of the asset
+                  enum:
+                    - waiting
+                    - ready
+                    - failed
+                updatedAt:
+                  type: number
+                  description:
+                    Timestamp (in milliseconds) at which the asset was last
+                    updated
+                  example: 1587667174725
+                storage:
+                  type: object
                   additionalProperties: false
-                  readOnly: true
-                  required: [taskId]
                   properties:
-                    taskId:
-                      type: string
-                      description:
-                        ID of the task responsible for saving this asset in
-                        IPFS.
-                    addresses:
-                      $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
+                    ipfs:
+                      additionalProperties: false
+                      readOnly: true
+                      required: [taskId]
+                      properties:
+                        taskId:
+                          type: string
+                          description:
+                            ID of the task responsible for saving this asset in
+                            IPFS.
+                        addresses:
+                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
         name:
           type: string
           description:
@@ -954,9 +979,8 @@ components:
             }
         updatedAt:
           type: number
-          description:
-            Timestamp (in milliseconds) at which the asset was last updated
-          example: 1587667174725
+          deprecated: true
+          description: "@deprecated Use status.updatedAt instead"
         createdAt:
           type: number
           readOnly: true
@@ -1066,13 +1090,6 @@ components:
                     type: number
                     description: Bit depth of the track - only for audio tracks
                     example: 16
-        status:
-          type: string
-          description: Status of the asset
-          enum:
-            - waiting
-            - ready
-            - failed
         sourceAssetId:
           type: string
           index: true
