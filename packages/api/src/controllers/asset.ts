@@ -97,6 +97,21 @@ function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   };
 }
 
+function withRecordingUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+  if (asset.status !== "ready") {
+    return asset;
+  }
+  return {
+    ...asset,
+    playbackUrl: pathJoin(
+      ingest,
+      "asset",
+      asset.playbackRecordingId,
+      "index.m3u8"
+    ),
+  };
+}
+
 async function genUploadUrl(
   playbackId: string,
   objectStoreId: string,
@@ -213,6 +228,7 @@ app.get("/", authorizer({}), async (req, res) => {
         }
         return {
           ...withDownloadUrl(data, ingest),
+          ...withRecordingUrl(data, ingest),
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },

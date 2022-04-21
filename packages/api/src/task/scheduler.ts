@@ -82,6 +82,7 @@ export default class TaskScheduler {
         size: assetSpec.size,
         hash: assetSpec.hash,
         videoSpec: assetSpec.videoSpec,
+        playbackRecordingId: assetSpec.playbackRecordingId,
         status: "ready",
         updatedAt: Date.now(),
       });
