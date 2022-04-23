@@ -111,7 +111,7 @@ export default class TaskScheduler {
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (
           typeof inputAsset.status === "object" &&
-          inputAsset.status?.storage?.ipfs?.taskId === task.id
+          inputAsset.status?.storage?.ipfs?.pendingTaskId === task.id
         ) {
           await db.asset.update(inputAsset.id, {
             status: {
@@ -119,9 +119,9 @@ export default class TaskScheduler {
               storage: {
                 ...inputAsset.status.storage,
                 ipfs: {
-                  ...inputAsset.status.storage.ipfs,
-                  taskId: task.id,
-                  addresses: task.output.export.ipfs,
+                  pendingTaskId: null,
+                  lastTaskId: task.id,
+                  data: task.output.export.ipfs,
                 },
               },
             },

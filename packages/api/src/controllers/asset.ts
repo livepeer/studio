@@ -95,11 +95,6 @@ const assetStatus = (asset: Asset) =>
         updatedAt: asset.updatedAt,
       };
 
-const assetStorage = (asset: Asset) =>
-  asset.storage ?? {
-    objectStoreId: asset.objectStoreId,
-  };
-
 function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.status !== "ready") {
     return asset;
@@ -332,7 +327,7 @@ app.post(
     if ("ipfs" in params && !params.ipfs.pinata) {
       await db.asset.update(assetId, {
         storage: {
-          ...assetStorage(asset),
+          ...asset.storage,
           ipfs: params.ipfs,
         },
         status: {
@@ -341,7 +336,7 @@ app.post(
             ...status.storage,
             ipfs: {
               ...status.storage?.ipfs,
-              taskId: task.id,
+              pendingTaskId: task.id,
             },
           },
         },
@@ -579,17 +574,10 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   if (storage?.ipfs?.pinata) {
     throw new BadRequestError("Custom pinata not allowed in asset storage");
   }
-  const currStorage = assetStorage(asset);
-  if (
-    storage.objectStoreId !== undefined &&
-    storage.objectStoreId !== currStorage.objectStoreId
-  ) {
-    throw new BadRequestError("Changing object store is not allowed");
-  }
 
   let status = assetStatus(asset);
   const ipfsParamsEq =
-    JSON.stringify(storage.ipfs) === JSON.stringify(currStorage.ipfs);
+    JSON.stringify(storage.ipfs) === JSON.stringify(asset.storage?.ipfs);
   if (storage.ipfs && !ipfsParamsEq) {
     const { id: taskId } = await req.taskScheduler.scheduleTask(
       "export",
@@ -602,14 +590,14 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
         ...status.storage,
         ipfs: {
           ...status.storage?.ipfs,
-          taskId,
+          pendingTaskId: taskId,
         },
       },
     };
   }
   await db.asset.update(req.body.id, {
     name,
-    storage: { ...currStorage, ...storage },
+    storage: { ...asset.storage, ...storage },
     status,
   });
 
