@@ -561,10 +561,9 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-// TODO: Delete this API as well?
 app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   // update a specific asset
-  const asset = await db.asset.get(req.body.id);
+  const asset = await db.asset.get(req.params.id);
   if (!asset) {
     throw new NotFoundError(`asset not found`);
   }
@@ -595,14 +594,15 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
       },
     };
   }
-  await db.asset.update(req.body.id, {
+  const patch = {
     name,
     storage: { ...asset.storage, ...storage },
     status,
-  });
+  };
+  await db.asset.update(req.body.id, patch);
 
   res.status(200);
-  res.json({ id: req.body.id });
+  res.json({ ...asset, ...patch });
 });
 
 export default app;
