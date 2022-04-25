@@ -336,7 +336,10 @@ app.post(
             ...status.storage,
             ipfs: {
               ...status.storage?.ipfs,
-              pendingTaskId: task.id,
+              taskIds: {
+                ...status.storage?.ipfs?.taskIds,
+                pending: task.id,
+              },
             },
           },
         },
@@ -563,7 +566,8 @@ app.delete("/:id", authorizer({}), async (req, res) => {
 
 app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   // update a specific asset
-  const asset = await db.asset.get(req.params.id);
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
   if (!asset) {
     throw new NotFoundError(`asset not found`);
   }
@@ -589,20 +593,21 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
         ...status.storage,
         ipfs: {
           ...status.storage?.ipfs,
-          pendingTaskId: taskId,
+          taskIds: {
+            ...status.storage?.ipfs?.taskIds,
+            pending: taskId,
+          },
         },
       },
     };
   }
-  const patch = {
+  await db.asset.update(id, {
     name,
     storage: { ...asset.storage, ...storage },
     status,
-  };
-  await db.asset.update(req.body.id, patch);
-
-  res.status(200);
-  res.json({ ...asset, ...patch });
+  });
+  const updated = await db.asset.get(id, { useReplica: false });
+  res.status(200).json(updated);
 });
 
 export default app;

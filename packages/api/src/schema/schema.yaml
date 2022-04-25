@@ -922,6 +922,7 @@ components:
                 - failed
             - type: object
               additionalProperties: false
+              readOnly: true
               required: [phase]
               description: Status of the asset
               properties:
@@ -944,19 +945,26 @@ components:
                   properties:
                     ipfs:
                       additionalProperties: false
-                      readOnly: true
-                      required: [taskId]
+                      required: [taskIds]
                       properties:
-                        pendingTaskId:
-                          type: string
-                          description:
-                            ID of any currently running task that is exporting
-                            this asset to IPFS.
-                        lastTaskId:
-                          type: string
-                          description:
-                            ID of the last task to run successfully, that the
-                            currently saved data.
+                        taskIds:
+                          type: object
+                          additionalProperties: false
+                          properties:
+                            pending:
+                              type: string
+                              description:
+                                ID of any currently running task that is
+                                exporting this asset to IPFS.
+                            last:
+                              type: string
+                              description:
+                                ID of the last task to run successfully, that
+                                the currently saved data.
+                            failed:
+                              type: string
+                              description:
+                                ID of the last task to fail execution.
                         data:
                           $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
         name:
