@@ -158,6 +158,33 @@ export default class TaskScheduler {
         updatedAt: Date.now(),
       });
     }
+    switch (task.type) {
+      case "export":
+        const inputAsset = await db.asset.get(task.inputAssetId);
+        if (
+          typeof inputAsset.status === "object" &&
+          inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id
+        ) {
+          const { storage } = inputAsset.status;
+          await db.asset.update(inputAsset.id, {
+            status: {
+              ...inputAsset.status,
+              storage: {
+                ...storage,
+                ipfs: {
+                  ...storage.ipfs,
+                  taskIds: {
+                    ...storage.ipfs.taskIds,
+                    pending: null,
+                    failed: task.id,
+                  },
+                },
+              },
+            },
+          });
+        }
+        break;
+    }
   }
 
   async scheduleTask(
