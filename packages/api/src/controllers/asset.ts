@@ -98,7 +98,7 @@ function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
 }
 
 function withRecordingUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
-  if (asset.status !== "ready" || !asset.playbackUrl) {
+  if (asset.status !== "ready" || !asset.playbackRecordingId) {
     return asset;
   }
   return {

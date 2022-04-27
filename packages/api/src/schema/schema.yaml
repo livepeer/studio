@@ -877,6 +877,7 @@ components:
           description: Used to form playback URL and storage folder
         playbackRecordingId:
           type: string
+          writeOnly: true
           example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
           index: true
           description: Used to form recording URL for HLS playback
