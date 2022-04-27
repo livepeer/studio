@@ -98,7 +98,7 @@ function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
 }
 
 function withRecordingUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
-  if (asset.status !== "ready") {
+  if (asset.status !== "ready" || !asset.playbackUrl) {
     return asset;
   }
   return {
@@ -264,7 +264,10 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withDownloadUrl(data, ingest);
+      return {
+        ...withDownloadUrl(data, ingest),
+        ...withRecordingUrl(data, ingest),
+      };
     },
   });
   res.status(200);
@@ -295,7 +298,10 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     );
   }
 
-  res.json(withDownloadUrl(asset, ingest));
+  res.json({
+    ...withDownloadUrl(asset, ingest),
+    ...withRecordingUrl(asset, ingest),
+  });
 });
 
 app.post(
