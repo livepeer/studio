@@ -60,9 +60,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             maxWidth: "700px",
             mx: "auto",
           }}>
-          Create a free account to get 1,000 transcoding minutes a month... for
-          free! Contact us anytime about custom pricing or use cases for your
-          business.
+          Contact us anytime about custom pricing for your business.
         </Text>
         <Flex
           css={{
