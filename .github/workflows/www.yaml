@@ -4,9 +4,9 @@ on:
   pull_request:
   push:
     paths:
-      - "packages/www/*"
-      - "packages/admin/*"
-      - "packages/design-system/*"
+      - "packages/www/**"
+      - "packages/admin/**"
+      - "packages/design-system/**"
     branches-ignore:
       - latest
 
