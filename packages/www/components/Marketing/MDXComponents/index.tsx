@@ -109,7 +109,7 @@ export const components = {
       return (
         <DS.Link
           {...props}
-          variant="violet"
+          variant="primary"
           href={href}
           css={{ fontSize: "inherit" }}
           target="_blank"
@@ -185,7 +185,7 @@ export const components = {
       <DS.Code {...props} />
     ) : (
       <DocCodeBlock
-        variant="violet"
+        variant="primary"
         isHighlightingLines={line !== undefined}
         className={className}
         isHero={hero !== undefined}

@@ -236,13 +236,15 @@ const SaveTargetDialog = ({
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <AlertDialogTitle as={Heading} size="1">
-          {`${action} multistream target`}
-          {action === Action.Create ? (
-            <Badge size="2" variant="violet" css={{ ml: "$2" }}>
-              Beta
-            </Badge>
-          ) : null}
+        <AlertDialogTitle asChild>
+          <Heading size="1">
+            {`${action} multistream target`}
+            {action === Action.Create ? (
+              <Badge size="2" variant="primary" css={{ ml: "$2" }}>
+                Beta
+              </Badge>
+            ) : null}
+          </Heading>
         </AlertDialogTitle>
 
         <Box
@@ -316,7 +318,7 @@ const SaveTargetDialog = ({
               }}
             >
               <RadioGroup
-                onValueChange={(e) => setStateProp("profile", e.target.value)}
+                onValueChange={(value) => setStateProp("profile", value)}
               >
                 <Box css={{ display: "flex", flexDirection: "column" }}>
                   {profileOpts.map((p) => (
@@ -344,8 +346,8 @@ const SaveTargetDialog = ({
               <Checkbox
                 id="videoOnly"
                 checked={state.videoOnly}
-                onCheckedChange={(e) =>
-                  setStateProp("videoOnly", e.target.checked)
+                onCheckedChange={(checked) =>
+                  setStateProp("videoOnly", checked == true ? true : false)
                 }
               />
               <Tooltip content="Mute audio and multistream a silent video.">
@@ -380,7 +382,7 @@ const SaveTargetDialog = ({
               type="submit"
               size="2"
               disabled={saving || (action === Action.Update && !target)}
-              variant="violet"
+              variant="primary"
             >
               {saving && (
                 <Spinner

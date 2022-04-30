@@ -127,7 +127,7 @@ const UsageSummary = () => {
             </Box>
             <Badge
               size="1"
-              variant="violet"
+              variant="primary"
               css={{ letterSpacing: 0, mt: "7px" }}
             >
               {user?.stripeProductId
@@ -187,7 +187,7 @@ const UsageSummary = () => {
           </Box>
         </Text>
         <Link href="/dashboard/billing" passHref>
-          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

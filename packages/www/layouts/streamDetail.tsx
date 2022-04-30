@@ -474,7 +474,7 @@ const StreamDetail = ({
                         ) : (
                           <Button
                             type="button"
-                            variant="violet"
+                            variant="primary"
                             onClick={() => setKeyRevealed(true)}
                           >
                             Reveal stream key
@@ -622,7 +622,7 @@ const StreamDetail = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          variant="violet"
+                          variant="primary"
                           size="2"
                           css={{ display: "flex", ai: "center", mr: "$1" }}
                         >

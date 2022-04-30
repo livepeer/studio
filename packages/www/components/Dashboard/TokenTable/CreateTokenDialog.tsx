@@ -241,7 +241,9 @@ const CreateTokenDialog = ({
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}
-                    onCheckedChange={(e) => setAllowCors(e.target.checked)}
+                    onCheckedChange={(checked) =>
+                      setAllowCors(checked == true ? true : false)
+                    }
                   />
                   <Tooltip
                     content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
@@ -292,7 +294,7 @@ const CreateTokenDialog = ({
                       <Button
                         css={{ ml: "$1" }}
                         size="3"
-                        variant="violet"
+                        variant="primary"
                         disabled={!isNewOriginValid}
                         onClick={(e) => {
                           e.preventDefault();
@@ -363,8 +365,11 @@ const CreateTokenDialog = ({
                       <Checkbox
                         id="corsFullAccess"
                         checked={cors.fullAccess ?? false}
-                        onCheckedChange={(e) =>
-                          setCors({ ...cors, fullAccess: e.target.checked })
+                        onCheckedChange={(checked) =>
+                          setCors({
+                            ...cors,
+                            fullAccess: checked == true ? true : false,
+                          })
                         }
                       />
                       <Tooltip
@@ -405,7 +410,7 @@ const CreateTokenDialog = ({
                   size="2"
                   disabled={creating}
                   type="submit"
-                  variant="violet"
+                  variant="primary"
                 >
                   {creating && (
                     <Spinner

@@ -205,18 +205,19 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             onSubmit={handleSubmit(onSubmit)}
             id="plan-stripe-form"
           >
-            <AlertDialogTitle as={Heading} size="1">
-              {!user.stripeCustomerPaymentMethodId
-                ? "Enter card details"
-                : "Change plan"}
+            <AlertDialogTitle asChild>
+              <Heading size="1">
+                {!user.stripeCustomerPaymentMethodId
+                  ? "Enter card details"
+                  : "Change plan"}
+              </Heading>
             </AlertDialogTitle>
 
-            <AlertDialogDescription
-              as="div"
-              css={{ mt: "$4", lineHeight: "22px" }}
-            >
+            <AlertDialogDescription asChild>
               {!user.stripeCustomerPaymentMethodId ? (
-                <Box css={{ color: "$hiContrast", mt: "$4" }}>
+                <Box
+                  css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}
+                >
                   <Box>
                     <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
                       Full name
@@ -447,7 +448,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
                 }
-                variant="violet"
+                variant="primary"
               >
                 {status === "processing" && (
                   <Spinner

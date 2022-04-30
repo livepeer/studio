@@ -198,7 +198,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 disabled={
                   dashboard && stripeProductId === "prod_0" ? true : false
                 }
-                variant="violet"
+                variant="primary"
                 stripeProductId="prod_0"
                 onClick={() => {
                   if (!dashboard) {
@@ -263,7 +263,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 disabled={
                   dashboard && stripeProductId === "prod_1" ? true : false
                 }
-                variant="violet"
+                variant="primary"
                 stripeProductId="prod_1"
                 onClick={() => {
                   if (dashboard) {

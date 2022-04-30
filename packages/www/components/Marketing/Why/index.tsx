@@ -60,7 +60,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
           >
             <Flex direction="column">
               <Text
-                variant="violet"
+                variant="primary"
                 size="5"
                 css={{ fontWeight: 600, mb: "$4" }}
               >

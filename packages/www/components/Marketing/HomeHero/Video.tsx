@@ -113,7 +113,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           <Badge variant="red" size="2" css={{ fontWeight: 700, mr: "$2" }}>
             Live
           </Badge>
-          <Badge variant="violet" size="2" css={{ fontWeight: 700 }}>
+          <Badge variant="primary" size="2" css={{ fontWeight: 700 }}>
             <Box
               as="i"
               css={{ display: "flex", alignItems: "center", mr: "$1" }}

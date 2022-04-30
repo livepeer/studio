@@ -24,7 +24,6 @@ import {
 } from "components/Dashboard/Table/filters";
 import { Stream } from "@livepeer.com/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { Column } from "react-table";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
@@ -196,7 +195,7 @@ const StreamsTable = ({
     tableId,
   });
 
-  const columns: Column<StreamsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",
@@ -254,7 +253,7 @@ const StreamsTable = ({
             id: stream.id,
             value: stream.name,
             children: (
-              <A as="div" variant="violet">
+              <A as="div" variant="primary">
                 {stream.name}
               </A>
             ),
@@ -323,7 +322,7 @@ const StreamsTable = ({
         your live stream with Livepeer.com.
       </Text>
       <Link href="/docs/guides" passHref>
-        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>
@@ -332,7 +331,7 @@ const StreamsTable = ({
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet"
+        variant="primary"
       >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>

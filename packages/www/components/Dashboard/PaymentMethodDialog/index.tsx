@@ -111,7 +111,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
       <Flex css={{ ai: "center" }}>
         <Button
           size="2"
-          variant="violet"
+          variant="primary"
           onClick={() => {
             setOpen(true);
           }}
@@ -129,10 +129,12 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           onSubmit={handleSubmit(onSubmit)}
           id="billing-stripe-form"
         >
-          <AlertDialogTitle as={Heading} size="1">
-            {!user.stripeCustomerPaymentMethodId
-              ? "Add payment method"
-              : "Change payment method"}
+          <AlertDialogTitle asChild>
+            <Heading size="1">
+              {!user.stripeCustomerPaymentMethodId
+                ? "Add payment method"
+                : "Change payment method"}
+            </Heading>
           </AlertDialogTitle>
 
           <AlertDialogDescription css={{ mt: "$4" }}>
@@ -341,7 +343,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
               disabled={
                 !["initial", "succeeded", "error"].includes(status) || !stripe
               }
-              variant="violet"
+              variant="primary"
             >
               {status === "processing" && (
                 <Spinner

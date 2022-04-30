@@ -38,7 +38,7 @@ const JobsSection = ({ jobs }) => {
             </A>
           </Link>
           <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
-            <A variant="violet">Apply</A>
+            <A variant="primary">Apply</A>
           </Link>
         </Flex>
       ))}

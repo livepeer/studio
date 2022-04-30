@@ -173,7 +173,7 @@ const Billing = () => {
               You are currently on the
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}
               >
                 {user?.stripeProductId
@@ -184,7 +184,7 @@ const Billing = () => {
             </Text>
             <Link href="/dashboard/billing/plans" passHref>
               <A
-                variant="violet"
+                variant="primary"
                 css={{ display: "flex", alignItems: "center" }}
               >
                 View Plans & Upgrade <ArrowRightIcon />

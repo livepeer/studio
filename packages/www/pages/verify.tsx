@@ -131,7 +131,7 @@ const Verify = ({
                       as="a"
                       size="2"
                       css={{ cursor: "default" }}
-                      variant="violet"
+                      variant="primary"
                       onClick={() => resendVerificationEmail()}
                     >
                       {loading && (

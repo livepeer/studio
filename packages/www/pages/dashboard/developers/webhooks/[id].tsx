@@ -224,7 +224,7 @@ const WebhookDetail = () => {
                 <Cell css={{ display: "flex", fw: "wrap" }}>
                   {data.events.map((e) => (
                     <Badge
-                      variant="violet"
+                      variant="primary"
                       size="2"
                       css={{ fontWeight: 600, mr: "$1", mb: "$1" }}
                     >

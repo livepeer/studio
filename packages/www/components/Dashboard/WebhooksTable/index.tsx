@@ -51,7 +51,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     tableId: "webhooksTable",
   });
 
-  const columns: Column<WebhooksTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "URL",
@@ -112,7 +112,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             url: {
               value: webhook.url,
               children: (
-                <A as="div" variant="violet">
+                <A as="div" variant="primary">
                   {webhook.url}
                 </A>
               ),
@@ -204,7 +204,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         automatically trigger reactions.
       </Text>
       {/* <Link href="/docs" passHref>
-        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>
@@ -213,7 +213,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet"
+        variant="primary"
       >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>

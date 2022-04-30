@@ -53,7 +53,7 @@ const downloadUrlCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DownloadUrlCellProps>) => (
   <A
-    variant="violet"
+    variant="primary"
     target="_blank"
     href={cell.value.children as string}
     id={`mp4-link-dropdown-${cell.value.id}`}
@@ -83,7 +83,7 @@ const AssetsTable = ({
     tableId,
   });
 
-  const columns: Column<AssetsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",
@@ -215,7 +215,7 @@ const AssetsTable = ({
           <Link href="/docs/api-reference/vod/import" passHref>
             <A
               target="_blank"
-              variant="violet"
+              variant="primary"
               css={{ display: "flex", ai: "center", mb: "$5" }}
             >
               <Box>Learn more</Box>
@@ -227,7 +227,7 @@ const AssetsTable = ({
           onClick={() => createDialogState.onOn()}
           css={{ alignSelf: "flex-start" }}
           size="2"
-          variant="violet"
+          variant="primary"
         >
           <PlusIcon />{" "}
           <Box as="span" css={{ ml: "$2" }}>

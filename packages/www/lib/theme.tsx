@@ -389,7 +389,7 @@ export const theme = {
   },
 };
 
-const ThemeProvider = memo(({ children, ...props }) => (
+const ThemeProvider = memo(({ children, ...props }: any) => (
   <TP theme={theme} {...props}>
     <Styled.root>{children}</Styled.root>
   </TP>

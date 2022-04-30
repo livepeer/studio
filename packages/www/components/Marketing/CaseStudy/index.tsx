@@ -35,7 +35,11 @@ const CaseStudy = ({
               },
             }}
           >
-            <Text variant="violet" size="5" css={{ fontWeight: 600, mb: "$4" }}>
+            <Text
+              variant="primary"
+              size="5"
+              css={{ fontWeight: 600, mb: "$4" }}
+            >
               Case Study
             </Text>
             <Grid
@@ -154,7 +158,7 @@ const CaseStudy = ({
                   </Text>
                   {internalLink && (
                     <Link href={`/blog/${internalLink.slug.current}`} passHref>
-                      <A css={{ fontSize: "$3" }} variant="violet">
+                      <A css={{ fontSize: "$3" }} variant="primary">
                         Read the full story
                       </A>
                     </Link>

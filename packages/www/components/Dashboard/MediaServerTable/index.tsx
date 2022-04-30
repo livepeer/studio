@@ -37,7 +37,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           <Link href="/docs/guides/media-server/introduction" passHref>
             <A
               target="_blank"
-              variant="violet"
+              variant="primary"
               css={{ display: "flex", ai: "center", mb: "$5" }}
             >
               <Box>Learn more</Box>
@@ -48,7 +48,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           <Link href="/docs/guides/media-server/downloads" passHref>
             <A
               target="_blank"
-              variant="violet"
+              variant="primary"
               css={{
                 display: "flex",
                 ai: "center",

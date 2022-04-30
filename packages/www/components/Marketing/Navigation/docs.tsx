@@ -109,7 +109,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
             </Box>
           </Flex>
           <Dialog>
-            <DialogTrigger as={Flex}>
+            <DialogTrigger asChild>
               <Flex
                 css={{
                   color: "$hiContrast",
@@ -137,7 +137,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                   cursor: "pointer",
                 }}
               >
-                <DialogClose as={Box}>
+                <DialogClose asChild>
                   <Cross1Icon />
                 </DialogClose>
               </Box>

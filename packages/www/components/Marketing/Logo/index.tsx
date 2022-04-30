@@ -24,7 +24,7 @@ const Logo = ({ badge = null }) => (
       </A>
     </Link>
     {badge && (
-      <Badge variant="violet" css={{ fontWeight: 700, ml: "$2", mt: "2px" }}>
+      <Badge variant="primary" css={{ fontWeight: 700, ml: "$2", mt: "2px" }}>
         {badge}
       </Badge>
     )}

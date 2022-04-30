@@ -194,11 +194,7 @@ const WebhookDialog = ({
                 </Box>
               </DropdownMenuTrigger>
               <Box css={{ position: "relative" }}>
-                <StyledContent
-                  disableOutsidePointerEvents={false}
-                  css={{ transform: "none" }}
-                  portalled={false}
-                >
+                <StyledContent css={{ transform: "none" }} portalled={false}>
                   <DropdownMenuGroup>
                     {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
@@ -286,7 +282,7 @@ const WebhookDialog = ({
                 type="submit"
                 size="2"
                 disabled={saving}
-                variant="violet"
+                variant="primary"
               >
                 {saving && (
                   <Spinner

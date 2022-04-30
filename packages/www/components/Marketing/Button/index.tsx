@@ -6,7 +6,7 @@ export const Button = React.forwardRef(
   ({ arrow = false, children, css = {}, ...props }: any, forwardedRef) => (
     <ButtonBase
       ref={forwardedRef}
-      variant="violet"
+      variant="primary"
       css={{
         display: "flex",
         ai: "center",

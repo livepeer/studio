@@ -76,7 +76,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet"
+                variant="primary"
               >
                 <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
@@ -123,7 +123,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet"
+                variant="primary"
               >
                 <Box css={{ mr: "$1" }}>Explore the API</Box>
                 <ArrowRightIcon />
@@ -161,7 +161,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet"
+                variant="primary"
               >
                 <Box css={{ mr: "$1" }}>Clone and create</Box>
                 <ArrowRightIcon />
@@ -201,7 +201,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet"
+                variant="primary"
               >
                 <Box css={{ mr: "$1" }}>Downloads</Box>
                 <ArrowRightIcon />

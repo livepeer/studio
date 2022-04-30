@@ -65,7 +65,7 @@ const TokenTable = ({
   const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const [openSnackbar] = useSnackbar();
 
-  const columns: Column<TokenTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",
@@ -239,7 +239,7 @@ const TokenTable = ({
         API keys allow you to authenticate API requests in your app
       </Text>
       <Link href="/docs/guides/api" passHref>
-        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>
@@ -248,7 +248,7 @@ const TokenTable = ({
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet"
+        variant="primary"
       >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>

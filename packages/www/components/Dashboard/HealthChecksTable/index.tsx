@@ -45,7 +45,7 @@ const HealthChecksTable = ({
     tableId: "HealthChecksTable",
   });
 
-  const columns: Column<HealthChecksTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",

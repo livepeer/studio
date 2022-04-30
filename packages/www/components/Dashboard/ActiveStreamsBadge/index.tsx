@@ -18,7 +18,7 @@ const ActiveStreamsBadge = () => {
     return null;
   }
   return (
-    <Badge size="1" variant="violet" css={{ letterSpacing: 0, mt: "7px" }}>
+    <Badge size="1" variant="primary" css={{ letterSpacing: 0, mt: "7px" }}>
       {data?.count} active right now
     </Badge>
   );

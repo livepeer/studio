@@ -109,7 +109,7 @@ const CreateAssetDialog = ({
               type="submit"
               size="2"
               disabled={creating}
-              variant="violet"
+              variant="primary"
             >
               {creating && (
                 <Spinner

@@ -97,15 +97,13 @@ const ShowURL = ({ text, url, urlToCopy, anchor = false }: ShowURLProps) => {
               as="a"
               sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}
               href={url}
-              target="_blank"
-            >
+              target="_blank">
               {url}
             </Box>
           ) : (
             <Box
               as="span"
-              sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}
-            >
+              sx={{ fontSize: 12, fontFamily: "monospace", mr: 1 }}>
               {url}
             </Box>
           )}
@@ -147,8 +145,7 @@ const ClipBut = ({ text }) => {
           cursor: "pointer",
           ml: 0,
           mr: 0,
-        }}
-      >
+        }}>
         <Box sx={{ mr: 2 }}>{text}</Box>
         <Copy
           sx={{
@@ -334,13 +331,18 @@ const ID = () => {
                   console.error(e);
                 })
                 .finally(close);
-            }}
-          >
-            {!stream.suspended
-              ? `Are you sure you want to suspend and block this stream? 
-            Any active stream sessions will immediately end. 
-            New sessions will be prevented from starting until unchecked.`
-              : `Are you sure you want to allow new stream sessions again?`}
+            }}>
+            {!stream.suspended ? (
+              <div>
+                Are you sure you want to suspend and block this stream? Any
+                active stream sessions will immediately end. New sessions will
+                be prevented from starting until unchecked.
+              </div>
+            ) : (
+              <div>
+                Are you sure you want to allow new stream sessions again?
+              </div>
+            )}
           </ConfirmationModal>
         )}
         {terminateModal && stream && (
@@ -357,11 +359,12 @@ const ID = () => {
                   setAlertText(`${e}`);
                 })
                 .finally(close);
-            }}
-          >
-            Are you sure you want to terminate (stop running live) stream{" "}
-            <b>{stream.name}</b>? Terminating a stream will break RTMP
-            connection.
+            }}>
+            <div>
+              Are you sure you want to terminate (stop running live) stream{" "}
+              <b>{stream.name}</b>? Terminating a stream will break RTMP
+              connection.
+            </div>
           </ConfirmationModal>
         )}
         {deleteModal && stream && (
@@ -386,8 +389,7 @@ const ID = () => {
                 type="button"
                 variant="outlineSmall"
                 onClick={close}
-                sx={{ mr: 2 }}
-              >
+                sx={{ mr: 2 }}>
                 Cancel
               </Button>
               <Button
@@ -396,8 +398,7 @@ const ID = () => {
                 onClick={() => {
                   close();
                   doSetRecord(stream, false);
-                }}
-              >
+                }}>
                 Turn off recording
               </Button>
             </Flex>
@@ -411,8 +412,7 @@ const ID = () => {
               mb: 3,
               color: "text",
               display: "block",
-            }}
-          >
+            }}>
             {"← stream list"}
           </A>
         </Link>
@@ -423,8 +423,7 @@ const ID = () => {
                 justifyContent: "flex-start",
                 alignItems: "baseline",
                 flexDirection: "column",
-              }}
-            >
+              }}>
               <Heading as="h3" sx={{ mb: "0.5em" }}>
                 {stream.name}
               </Heading>
@@ -436,8 +435,7 @@ const ID = () => {
                   width: "100%",
                   fontSize: 0,
                   position: "relative",
-                }}
-              >
+                }}>
                 <Cell>Stream name</Cell>
                 <Cell>{stream.name}</Cell>
                 <Cell>Stream ID</Cell>
@@ -451,15 +449,13 @@ const ID = () => {
                       {stream.streamKey}
                       <CopyToClipboard
                         text={stream.streamKey}
-                        onCopy={() => setCopied(2000)}
-                      >
+                        onCopy={() => setCopied(2000)}>
                         <Flex
                           sx={{
                             alignItems: "center",
                             cursor: "pointer",
                             ml: 1,
-                          }}
-                        >
+                          }}>
                           <Copy
                             sx={{
                               mr: 1,
@@ -481,8 +477,7 @@ const ID = () => {
                       type="button"
                       variant="outlineSmall"
                       onClick={() => setKeyRevealed(true)}
-                      sx={{ mr: 0, py: "4px", fontSize: 0 }}
-                    >
+                      sx={{ mr: 0, py: "4px", fontSize: 0 }}>
                       Show secret stream key
                     </Button>
                   )}
@@ -501,8 +496,7 @@ const ID = () => {
                     mt: "0.4em",
                     mb: "0",
                     gridColumn: "1/-1",
-                  }}
-                >
+                  }}>
                   <Box
                     onClick={() => setRegionalUrlsVisible(!regionalUrlsVisible)}
                     sx={{
@@ -512,8 +506,7 @@ const ID = () => {
                         ? "rotate(90deg)"
                         : "rotate(0deg)",
                       transition: "transform 0.4s ease",
-                    }}
-                  >
+                    }}>
                     ▶
                   </Box>{" "}
                   Regional ingest and playback URL pairs
@@ -524,8 +517,7 @@ const ID = () => {
                     position: "relative",
                     overflow: "hidden",
                     mb: "0.8em",
-                  }}
-                >
+                  }}>
                   <Box
                     sx={{
                       position: "relative",
@@ -535,23 +527,20 @@ const ID = () => {
                       display: "grid",
                       alignItems: "center",
                       gridTemplateColumns: "10em auto",
-                    }}
-                  >
+                    }}>
                     <Box
                       sx={{
                         mx: "0.4em",
                         mt: "0.4em",
                         gridColumn: "1/-1",
                         width: ["100%", "100%", "75%", "50%"],
-                      }}
-                    >
+                      }}>
                       The global RTMP ingest and playback URL pair above auto
                       detects livestreamer and viewer locations to provide the
                       optimal Livepeer.com experience.
                       <Link
                         href="/docs/guides/dashboard/ingest-playback-url-pair"
-                        passHref
-                      >
+                        passHref>
                         <A target="_blank">
                           <i>
                             Learn more about forgoing the global ingest and
@@ -579,16 +568,14 @@ const ID = () => {
                             sx={{
                               m: "0.4em",
                               mb: "1.4em",
-                            }}
-                          >
+                            }}>
                             Playback URL {i + 1}
                           </Box>
                           <Box
                             sx={{
                               m: "0.4em",
                               mb: "1.4em",
-                            }}
-                          >
+                            }}>
                             <ShowURL
                               text=""
                               url={getPlaybackURL(stream, i)}
@@ -609,21 +596,18 @@ const ID = () => {
                     m: "0.4em",
                     justifySelf: "flex-start",
                     cursor: "pointer",
-                  }}
-                >
+                  }}>
                   <Flex
                     sx={{
                       alignItems: "flex-start",
                       justifyItems: "center",
-                    }}
-                  >
+                    }}>
                     <Label
                       onClick={() => {
                         if (!stream.record) {
                           doSetRecord(stream, true);
                         }
-                      }}
-                    >
+                      }}>
                       <Radio
                         autocomplete="off"
                         name="record-mode"
@@ -652,8 +636,7 @@ const ID = () => {
                         minWidth: "24px",
                         height: "24px",
                         alignItems: "center",
-                      }}
-                    >
+                      }}>
                       <Help
                         data-tip
                         data-for={`tooltip-record-${stream.id}`}
@@ -672,8 +655,7 @@ const ID = () => {
                     className="tooltip"
                     place="top"
                     type="dark"
-                    effect="solid"
-                  >
+                    effect="solid">
                     <p>
                       When checked, transcoded streaming sessions will be
                       recorded and stored by Livepeer.com.
@@ -693,21 +675,18 @@ const ID = () => {
                     m: "0.4em",
                     justifySelf: "flex-start",
                     cursor: "pointer",
-                  }}
-                >
+                  }}>
                   <Flex
                     sx={{
                       alignItems: "flex-start",
                       justifyItems: "center",
-                    }}
-                  >
+                    }}>
                     <Label
                       onClick={() => {
                         if (!stream.suspended) {
                           setSuspendModal(true);
                         }
-                      }}
-                    >
+                      }}>
                       <Radio
                         autocomplete="off"
                         name="suspend-mode"
@@ -736,8 +715,7 @@ const ID = () => {
                         minWidth: "24px",
                         height: "24px",
                         alignItems: "center",
-                      }}
-                    >
+                      }}>
                       <Help
                         data-tip
                         data-for={`tooltip-suspend-${stream.id}`}
@@ -756,8 +734,7 @@ const ID = () => {
                     className="tooltip"
                     place="top"
                     type="dark"
-                    effect="solid"
-                  >
+                    effect="solid">
                     <p>
                       When turned on, any active stream sessions will
                       immediately end.
@@ -857,8 +834,7 @@ const ID = () => {
                         as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.streamKey}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.streamKey}
                       </Box>
                     </Cell>
@@ -868,8 +844,7 @@ const ID = () => {
                         as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.playbackId}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.playbackId}
                       </Box>
                     </Cell>
@@ -879,8 +854,7 @@ const ID = () => {
                         as="a"
                         target="_blank"
                         href={`https://papertrailapp.com/groups/16613582/events?q=${stream.id}`}
-                        sx={{ userSelect: "all" }}
-                      >
+                        sx={{ userSelect: "all" }}>
                         {stream.id}
                       </Box>
                     </Cell>
@@ -897,8 +871,7 @@ const ID = () => {
                             as="a"
                             target="_blank"
                             href={broadcasterPlaybackUrl}
-                            sx={{ userSelect: "all" }}
-                          >
+                            sx={{ userSelect: "all" }}>
                             {broadcasterPlaybackUrl}
                           </Box>
                         </Cell>
@@ -922,16 +895,14 @@ const ID = () => {
               sx={{
                 justifyContent: "flex-end",
                 mb: 3,
-              }}
-            >
+              }}>
               {userIsAdmin ? (
                 <Flex>
                   <Button
                     sx={{ mr: 3 }}
                     type="button"
                     variant="outlineSmall"
-                    onClick={() => setTerminateModal(true)}
-                  >
+                    onClick={() => setTerminateModal(true)}>
                     Terminate
                   </Button>
                 </Flex>
@@ -939,8 +910,7 @@ const ID = () => {
               <Button
                 type="button"
                 variant="outlineSmall"
-                onClick={() => setDeleteModal(true)}
-              >
+                onClick={() => setDeleteModal(true)}>
                 Delete
               </Button>
             </Flex>

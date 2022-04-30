@@ -46,7 +46,7 @@ const Hero = ({
             <Flex direction="column" css={{ maxWidth: 700 }}>
               {tagline && (
                 <Text
-                  variant="violet"
+                  variant="primary"
                   size="5"
                   css={{ fontWeight: 600, mb: "$5" }}
                 >

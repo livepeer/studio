@@ -14,6 +14,7 @@ import {
 } from "components/Dashboard/Table/sorts";
 import Link from "next/link";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
+import { Column } from "react-table";
 import {
   CellComponentProps,
   TableData,

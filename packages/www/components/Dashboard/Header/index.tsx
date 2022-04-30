@@ -104,7 +104,7 @@ const Header = ({ breadcrumbs = [] }) => {
             if (breadcrumb?.href) {
               return (
                 <Link key={i} href={breadcrumb.href} passHref>
-                  <A variant="violet">{breadcrumb.title}</A>
+                  <A variant="primary">{breadcrumb.title}</A>
                 </Link>
               );
             }

@@ -66,7 +66,7 @@ const Table = ({
               >
                 {key === "link" ? (
                   <Link href={value as string} passHref>
-                    <A variant="violet">{value}</A>
+                    <A variant="primary">{value}</A>
                   </Link>
                 ) : (
                   <Text>{value}</Text>

@@ -4,7 +4,6 @@ import {
   SnackbarProvider,
   DesignSystemProvider,
 } from "@livepeer/design-system";
-
 import { DEFAULT_THEME } from "./theme";
 
 const themeMap = {};
@@ -14,20 +13,18 @@ Object.keys(themes).map(
 
 const Providers = ({ children }) => {
   return (
-    <DesignSystemProvider>
-      <ThemeProvider
-        disableTransitionOnChange
-        attribute="class"
-        defaultTheme={DEFAULT_THEME}
-        value={{
-          ...themeMap,
-          dark: "dark-theme-violet",
-          light: "light-theme-violet",
-        }}
-      >
-        <SnackbarProvider>{children}</SnackbarProvider>
-      </ThemeProvider>
-    </DesignSystemProvider>
+    <ThemeProvider
+      disableTransitionOnChange
+      attribute="class"
+      defaultTheme={DEFAULT_THEME}
+      value={{
+        ...themeMap,
+        dark: "dark-theme-violet",
+        light: "light-theme-violet",
+      }}
+    >
+      <SnackbarProvider>{children}</SnackbarProvider>
+    </ThemeProvider>
   );
 };
 

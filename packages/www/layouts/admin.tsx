@@ -13,13 +13,6 @@ import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router from "next/router";
 import { Reset, ThemeProvider } from "../lib/theme";
 import Head from "next/head";
-import { ThemeProvider as StitchesThemeProvider } from "next-themes";
-import {
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  SnackbarProvider,
-} from "@livepeer/design-system";
 import { hotjar } from "react-hotjar";
 import Providers from "@lib/Providers";
 

@@ -208,8 +208,8 @@ export default function MintNFT() {
                 css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
                 onOpenAutoFocus={(e) => e.preventDefault()}
               >
-                <AlertDialogTitle as={Heading} size="1">
-                  Mint a Video NFT
+                <AlertDialogTitle asChild>
+                  <Heading size="1">Mint a Video NFT</Heading>
                 </AlertDialogTitle>
 
                 <Box
@@ -230,7 +230,7 @@ export default function MintNFT() {
                             css={{ display: "flex", ai: "center" }}
                             type="button"
                             size="2"
-                            variant="violet"
+                            variant="primary"
                             onClick={async () => {
                               setStateProp(
                                 "file",
@@ -288,7 +288,7 @@ export default function MintNFT() {
                     />
                   </Flex>
 
-                  <AlertDialogDescription asChid>
+                  <AlertDialogDescription asChild>
                     <Text
                       size="3"
                       variant="gray"
@@ -369,7 +369,7 @@ export default function MintNFT() {
                         type="button"
                         size="2"
                         disabled={status !== "notConnected"}
-                        variant="violet"
+                        variant="primary"
                         onClick={onClickConnect}
                       >
                         Connect to MetaMask
@@ -381,7 +381,7 @@ export default function MintNFT() {
                           css={{ display: "flex", ai: "center" }}
                           type="button"
                           size="2"
-                          variant="violet"
+                          variant="primary"
                           onClick={onClickSwitchNetwork("0x13881")}
                         >
                           Polygon Testnet
@@ -390,7 +390,7 @@ export default function MintNFT() {
                           css={{ display: "flex", ai: "center" }}
                           type="button"
                           size="2"
-                          variant="violet"
+                          variant="primary"
                           onClick={onClickSwitchNetwork("0x89")}
                         >
                           Polygon Mainnet
@@ -402,7 +402,7 @@ export default function MintNFT() {
                         type="button"
                         size="2"
                         disabled={isUploading.on}
-                        variant="violet"
+                        variant="primary"
                         onClick={async () => {
                           isUploading.onOn();
                           try {
@@ -444,7 +444,7 @@ export default function MintNFT() {
                         type="submit"
                         size="2"
                         disabled={isMinting.on || status !== "connected"}
-                        variant="violet"
+                        variant="primary"
                       >
                         {isMinting.on && (
                           <Spinner

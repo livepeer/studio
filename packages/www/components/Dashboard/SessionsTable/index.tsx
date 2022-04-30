@@ -59,8 +59,7 @@ const RecordingUrlCell = <D extends TableData>({
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
               <A
-                css={{}}
-                variant="violet"
+                variant="primary"
                 target="_blank"
                 href={makeMP4Url(cell.value.mp4Url, "source")}
               >
@@ -107,7 +106,7 @@ const defaultEmptyState = (
       Sessions belong to parent streams.
     </Text>
     <Link href="/docs/api-reference/session/overview" passHref>
-      <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+      <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
         <Box>Learn more</Box>
         <ArrowRightIcon />
       </A>
@@ -134,7 +133,7 @@ const StreamSessionsTable = ({
   });
   const [openSnackbar] = useSnackbar();
 
-  const columns: Column<SessionsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Created at",

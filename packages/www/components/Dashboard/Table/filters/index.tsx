@@ -159,7 +159,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
             <Text size="2" css={{ margin: "0px" }}>
               Filters
             </Text>
-            <Button size="1" variant="violet" onClick={handleDone}>
+            <Button size="1" variant="primary" onClick={handleDone}>
               Done
             </Button>
           </Flex>
