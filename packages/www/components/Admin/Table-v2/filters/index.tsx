@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Box, Flex, Input } from "@theme-ui/components";
 import Checkbox from "@components/Admin/Checkbox";
@@ -68,7 +68,8 @@ const CheckboxFilter = <Table extends Record<string, unknown>>({
   return (
     <Flex
       sx={{ display: "inline-flex", alignItems: "baseline" }}
-      onClick={handleClick}>
+      onClick={handleClick}
+    >
       <Checkbox value={value === valueIfTrue} onClick={() => undefined} />
       <Box sx={{ ml: "0.5rem", userSelect: "none", cursor: "default" }}>
         {label}

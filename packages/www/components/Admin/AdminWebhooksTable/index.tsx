@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useState, useMemo } from "react";
 import { useApi } from "hooks";
@@ -37,7 +37,8 @@ const DeleteWebhookModal = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}>
+          sx={{ mr: 2 }}
+        >
           Cancel
         </Button>
         <Button type="button" variant="primarySmall" onClick={onDelete}>
@@ -184,7 +185,8 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}>
+      }}
+    >
       {createModal && (
         <Modal onClose={close} maxWidth="1000px">
           <h3>Create webhook</h3>
@@ -193,7 +195,8 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
             columns={[3, "1fr 3fr 3fr"]}
             sx={{
               alignItems: "center",
-            }}>
+            }}
+          >
             <Box>Name</Box>
             <Box>
               <Input
@@ -206,7 +209,8 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
                   borderRadius: "0px",
                 }}
                 onChange={(e) => setWebhookName(e.target.value)}
-                placeholder="new-wehbook-name-123"></Input>
+                placeholder="new-wehbook-name-123"
+              ></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>URL</Box>
@@ -221,7 +225,8 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
                   borderRadius: "0px",
                 }}
                 onChange={(e) => setWebhookUrl(e.target.value)}
-                placeholder="https://own.site/hook1"></Input>
+                placeholder="https://own.site/hook1"
+              ></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>Blocking</Box>
@@ -236,13 +241,15 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2, mt: 2 }}>
+              sx={{ mr: 2, mt: 2 }}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               variant="primarySmall"
-              onClick={doCreateWebhook}>
+              onClick={doCreateWebhook}
+            >
               Create
             </Button>
           </Flex>
@@ -275,14 +282,16 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
         rowsPerPage={ROWS_PER_PAGE}
         err={loadingError}
         columns={columns}
-        filtersDesc={filtersDesc}>
+        filtersDesc={filtersDesc}
+      >
         <Button
           variant="outlineSmall"
           sx={{ margin: 2 }}
           onClick={() => {
             setMessage("");
             setCreateModal(true);
-          }}>
+          }}
+        >
           Create
         </Button>
         <Button
@@ -290,7 +299,8 @@ const AdminWebhookTable = ({ id }: { id: string }) => {
           aria-label="Delete Stream button"
           disabled={!selectedWebhook}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedWebhook && setDeleteModal(true)}>
+          onClick={() => selectedWebhook && setDeleteModal(true)}
+        >
           Delete
         </Button>
       </CommonAdminTable>

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Modal from "../Modal";
 import { Box, Button, Flex, Spinner } from "@theme-ui/components";
@@ -29,7 +29,8 @@ const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}>
+          sx={{ mr: 2 }}
+        >
           Cancel
         </Button>
         {showWheel ? (
@@ -41,7 +42,8 @@ const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({
             onClick={() => {
               setShowWheel(true);
               onAction();
-            }}>
+            }}
+          >
             {actionText}
           </Button>
         )}

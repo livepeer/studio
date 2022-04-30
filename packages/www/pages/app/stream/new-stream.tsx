@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useState } from "react";
 import Link from "next/link";
@@ -33,7 +33,8 @@ const NewStream = () => {
         sx={{
           mb: 5,
           mt: 3,
-        }}>
+        }}
+      >
         <Box sx={{ mb: 3 }}>
           <Link href={backLink}>
             <a>{"← stream list"}</a>
@@ -96,7 +97,8 @@ const NewStream = () => {
               .catch((e) => {
                 setCreating(false);
               });
-          }}>
+          }}
+        >
           <Box sx={{ mb: 2, fontWeight: "500" }}>Stream name</Box>
           <Input
             sx={{ mb: 2 }}

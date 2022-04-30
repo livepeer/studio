@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import {
   Column,
@@ -163,7 +163,8 @@ const Table = <T extends Record<string, unknown>>({
             alignItems: "center",
             justifyContent: "space-between",
             mb: 3,
-          }}>
+          }}
+        >
           <div>{header}</div>
           {filters ? (
             <Box
@@ -172,7 +173,8 @@ const Table = <T extends Record<string, unknown>>({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "flex-end",
-              }}>
+              }}
+            >
               {filters.map((f) => {
                 let filter: JSX.Element;
                 switch (f.type) {
@@ -200,7 +202,8 @@ const Table = <T extends Record<string, unknown>>({
                 return (
                   <Box
                     key={`${f.type}-${f.props.columnId}`}
-                    sx={{ ":not(:last-of-type)": { mr: 3 } }}>
+                    sx={{ ":not(:last-of-type)": { mr: 3 } }}
+                  >
                     {filter}
                   </Box>
                 );
@@ -218,13 +221,15 @@ const Table = <T extends Record<string, unknown>>({
               minWidth: "100%",
               borderCollapse: "separate",
               borderSpacing: 0,
-            }}>
+            }}
+          >
             <thead>
               {headerGroups.map((headerGroup) => (
                 <Box
                   as="tr"
                   {...headerGroup.getHeaderGroupProps()}
-                  sx={{ borderRadius: "8px" }}>
+                  sx={{ borderRadius: "8px" }}
+                >
                   {headerGroup.headers.map((column, i) => {
                     const withHelpTooltip =
                       someColumnCanSort && i === headerGroup.headers.length - 1;
@@ -261,13 +266,15 @@ const Table = <T extends Record<string, unknown>>({
                             borderTopRightRadius: 6,
                             borderBottomRightRadius: 6,
                           },
-                        }}>
+                        }}
+                      >
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
                             mr: withHelpTooltip ? 3 : 0,
-                          }}>
+                          }}
+                        >
                           <Box as="span" sx={{ whiteSpace: "nowrap" }}>
                             {column.render("Header")}
                           </Box>
@@ -293,13 +300,15 @@ const Table = <T extends Record<string, unknown>>({
                               right: 3,
                               top: "50%",
                               transform: "translateY(-50%)",
-                            }}>
+                            }}
+                          >
                             <ReactTooltip
                               id={`tooltip-multiorder`}
                               className="tooltip"
                               place="top"
                               type="dark"
-                              effect="solid">
+                              effect="solid"
+                            >
                               To multi-sort (sort by two column simultaneously)
                               hold shift while clicking on second column name.
                             </ReactTooltip>
@@ -336,7 +345,8 @@ const Table = <T extends Record<string, unknown>>({
                           borderBottomColor: "muted",
                           bg: "background",
                           fontSize: 1,
-                        }}>
+                        }}
+                      >
                         {cell.render("Cell")}
                       </Box>
                     ))}

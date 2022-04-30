@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
@@ -23,7 +23,8 @@ const TextCell = <D extends TableData>({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid">
+          effect="solid"
+        >
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Button as ThemeUIButton } from "@theme-ui/components";
 import Ink from "react-ink";
@@ -44,7 +44,8 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
           isLink={undefined}
           isExternal={undefined}
           as="a"
-          sx={{ ...baseSx, ...sx }}>
+          sx={{ ...baseSx, ...sx }}
+        >
           {ink && <Ink />}
           {children}
         </ThemeUIButton>
@@ -59,7 +60,8 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
           href={undefined}
           asPath={undefined}
           as="a"
-          sx={{ ...baseSx, ...sx }}>
+          sx={{ ...baseSx, ...sx }}
+        >
           {ink && <Ink />}
           {children}
         </ThemeUIButton>

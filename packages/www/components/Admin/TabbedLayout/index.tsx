@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Layout from "layouts/admin";
 import { Flex } from "@theme-ui/components";
@@ -21,7 +21,8 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
           flexDirection: "column",
           flexGrow: 1,
           alignItems: "center",
-        }}>
+        }}
+      >
         <Tabs tabs={tabs} />
         {children}
       </Flex>

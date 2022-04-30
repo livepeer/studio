@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
@@ -131,7 +131,8 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}>
+      }}
+    >
       {deleteModal && selectedStream && (
         <DeleteStreamModal
           streamName={selectedStream.name}
@@ -157,10 +158,12 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         initialSortBy={[
           { id: "lastSeen", desc: true },
           { id: "createdAt", desc: true },
-        ]}>
+        ]}
+      >
         <Link
           href={{ pathname: "/app/stream/new-stream", query: { admin: true } }}
-          as="/app/stream/new-stream">
+          as="/app/stream/new-stream"
+        >
           <a>
             <Button variant="outlineSmall" sx={{ margin: 2 }}>
               Create
@@ -172,18 +175,21 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
           aria-label="Delete Stream button"
           disabled={!selectedStream}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => selectedStream && setDeleteModal(true)}>
+          onClick={() => selectedStream && setDeleteModal(true)}
+        >
           Delete
         </Button>
         <Flex
           sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
-          onClick={() => setActiveOnly(!activeOnly)}>
+          onClick={() => setActiveOnly(!activeOnly)}
+        >
           <Checkbox value={activeOnly} />
           <Box sx={{ ml: "0.5em" }}> Show active only</Box>
         </Flex>
         <Flex
           sx={{ display: "inline-flex", alignItems: "baseline", margin: 2 }}
-          onClick={() => setNonLivepeerOnly(!nonLivepeerOnly)}>
+          onClick={() => setNonLivepeerOnly(!nonLivepeerOnly)}
+        >
           <Checkbox value={nonLivepeerOnly} />
           <Box sx={{ ml: "0.5em" }}>
             {" "}

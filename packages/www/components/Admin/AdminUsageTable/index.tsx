@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
@@ -64,12 +64,14 @@ const Index = ({ id }: { id: string }) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}>
+      }}
+    >
       <Box sx={{ mt: "2em" }}>{message}</Box>
       <Box sx={{ mt: "2em" }}>
         <Select
           sx={{ mt: "1em" }}
-          onChange={(e) => setSelectedUser(e.target.value)}>
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
           {users.map((user) => (
             <option value={user.id}>{user.email}</option>
           ))}
@@ -78,18 +80,21 @@ const Index = ({ id }: { id: string }) => {
           label="fromTime"
           value={fromTime}
           onChange={(e) => setFromTime(e.target.value)}
-          placeholder="2020-09-01"></Input>
+          placeholder="2020-09-01"
+        ></Input>
         <Input
           label="toTime"
           value={toTime}
           onChange={(e) => setToTime(e.target.value)}
-          placeholder="2020-09-02"></Input>
+          placeholder="2020-09-02"
+        ></Input>
         <Button
           variant="secondarySmall"
           aria-label="Get usage button"
           disabled={!selectedUser || !fromTime || !toTime}
           sx={{ margin: 2, mb: 4 }}
-          onClick={() => doGetUsage(fromTime, toTime, selectedUser)}>
+          onClick={() => doGetUsage(fromTime, toTime, selectedUser)}
+        >
           Get usage
         </Button>
       </Box>

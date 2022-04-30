@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { format } from "date-fns";
 import { CellComponentProps, TableData } from "../types";

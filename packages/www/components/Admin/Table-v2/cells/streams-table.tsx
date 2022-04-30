@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Stream } from "@livepeer.com/api";
 import { Box } from "@theme-ui/components";
@@ -35,7 +35,8 @@ const Profile = ({
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",
-      }}>
+      }}
+    >
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -96,7 +97,8 @@ const RenditionsDetailsCell = <D extends TableData>({
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid">
+              effect="solid"
+            >
               {detailsTooltip}
             </ReactTooltip>
             <Help

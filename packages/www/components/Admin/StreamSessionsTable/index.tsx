@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "hooks";
@@ -87,7 +87,8 @@ const RecordingUrlCell = <D extends TableData>({
                   cell.value.streamName,
                   cell.value.createdAt
                 )}
-                sx={{ p: 1 }}>
+                sx={{ p: 1 }}
+              >
                 Download&nbsp;mp4&nbsp;beta
               </A>
             </Box>

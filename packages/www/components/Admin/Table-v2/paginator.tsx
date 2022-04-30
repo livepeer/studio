@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Button from "@components/Admin/Button";
 import { Box } from "@theme-ui/components";
@@ -20,18 +20,21 @@ const Paginator = ({
     <Box
       as="nav"
       aria-label="Pagination"
-      sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+      sx={{ display: "flex", justifyContent: "center", mt: 3 }}
+    >
       <Button
         variant="outlineSmall"
         onClick={onPreviousPage}
         disabled={!canPreviousPage}
-        sx={{ mr: 3 }}>
+        sx={{ mr: 3 }}
+      >
         Previous page
       </Button>
       <Button
         variant="outlineSmall"
         onClick={onNextPage}
-        disabled={!canNextPage}>
+        disabled={!canNextPage}
+      >
         Next page
       </Button>
     </Box>

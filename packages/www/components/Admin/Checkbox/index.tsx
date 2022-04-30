@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Box, Flex } from "@theme-ui/components";
 
@@ -12,7 +12,8 @@ const Checkbox = ({
   return (
     <Flex
       sx={{ height: "100%", alignItems: "center", justifyContent: "center" }}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <Box
         sx={{
           width: "12px",

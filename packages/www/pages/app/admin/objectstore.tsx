@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import useApi from "hooks/use-api";
 import Layout from "layouts/admin";

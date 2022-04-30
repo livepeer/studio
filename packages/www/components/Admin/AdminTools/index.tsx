@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -78,7 +78,8 @@ const AdminTools = ({ id }: { id: string }) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}>
+      }}
+    >
       <Box sx={{ mt: "2em" }}>{message}</Box>
       <Box
         as="form"
@@ -95,18 +96,21 @@ const AdminTools = ({ id }: { id: string }) => {
             return;
           }
           doGetInfo(idInput);
-        }}>
+        }}
+      >
         <Input
           sx={{ width: "30em" }}
           label="idInput"
           value={idInput}
           onChange={(e) => setIdInput(e.target.value)}
-          placeholder="streamKey/playbackId/manifestId"></Input>
+          placeholder="streamKey/playbackId/manifestId"
+        ></Input>
         <Button
           variant="secondarySmall"
           aria-label="Get info button"
           disabled={loading || !idInput}
-          sx={{ ml: "1em" }}>
+          sx={{ ml: "1em" }}
+        >
           Get info
         </Button>
       </Box>
@@ -117,28 +121,32 @@ const AdminTools = ({ id }: { id: string }) => {
             Stream link:
             <Link
               href={{ pathname: "/app/stream/[id]", query }}
-              as={`/app/stream/${ginfo.stream.id}`}>
+              as={`/app/stream/${ginfo.stream.id}`}
+            >
               <a>{ginfo.stream.name}</a>
             </Link>
           </Box>
           <Box>
             <a
               target="_blank"
-              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.streamKey}`}>
+              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.streamKey}`}
+            >
               Papertrail link to stream key ({ginfo.stream.streamKey})
             </a>
           </Box>
           <Box>
             <a
               target="_blank"
-              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.playbackId}`}>
+              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.playbackId}`}
+            >
               Papertrail link to playback id ({ginfo.stream.playbackId})
             </a>
           </Box>
           <Box>
             <a
               target="_blank"
-              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.id}`}>
+              href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.stream.id}`}
+            >
               Papertrail link to stream id ({ginfo.stream.id})
             </a>
           </Box>
@@ -146,7 +154,8 @@ const AdminTools = ({ id }: { id: string }) => {
             <Box>
               <a
                 target="_blank"
-                href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.session.id}`}>
+                href={`https://papertrailapp.com/groups/16613582/events?q=${ginfo.session.id}`}
+              >
                 Papertrail link to session id ({ginfo.session.id})
               </a>
             </Box>
@@ -161,7 +170,8 @@ const AdminTools = ({ id }: { id: string }) => {
                 <Box>
                   <a
                     target="_blank"
-                    href={`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`}>
+                    href={`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`}
+                  >
                     Playback link (
                     {`${ingestPoint.playback}/${ginfo.stream.playbackId}/index.m3u8`}
                     )

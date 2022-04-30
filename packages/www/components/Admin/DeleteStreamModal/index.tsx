@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Modal from "@components/Admin/Modal";
 import { Box, Button, Flex } from "@theme-ui/components";
@@ -31,7 +31,8 @@ const DeleteStreamModal = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}>
+          sx={{ mr: 2 }}
+        >
           Cancel
         </Button>
         <Button type="button" variant="primarySmall" onClick={onDelete}>

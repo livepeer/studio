@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Input, Box } from "@theme-ui/components";
 import CopyBoxIcon from "./CopyBoxIcon";
@@ -22,7 +22,8 @@ const Index = ({ copy, onCopy = () => {} }) => {
         alignItems: "center",
         justifyItems: "flex-end",
         cursor: "pointer",
-      }}>
+      }}
+    >
       <Input
         value={copy}
         spellCheck={false}
