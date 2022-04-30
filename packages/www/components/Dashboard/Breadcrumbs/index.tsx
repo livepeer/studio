@@ -1,4 +1,4 @@
-import { styled, Box } from "@livepeer.com/design-system";
+import { styled, Box } from "@livepeer/design-system";
 import { Children, isValidElement } from "react";
 
 const BreadcrumbsOl = styled("ol", {
@@ -50,7 +50,8 @@ const Breadcrumbs = ({ children }) => {
           fontSize: "$3",
           lineHeight: 1.5,
         }}
-        key={`child-${index}`}>
+        key={`child-${index}`}
+      >
         <Box css={{ display: "inline-flex" }}>{child}</Box>
       </Box>
     ));

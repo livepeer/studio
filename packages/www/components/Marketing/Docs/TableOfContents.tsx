@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Box, Flex, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Link as A } from "@livepeer/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 type TableOfContentsProps = {
@@ -53,7 +53,8 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
         pl: "$4",
         my: "$2",
         position: "relative",
-      }}>
+      }}
+    >
       <Box
         css={{
           position: "absolute",
@@ -73,7 +74,8 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           fontSize: "$3",
           letterSpacing: "-0.02em",
           color: "$hiContrast",
-        }}>
+        }}
+      >
         {label}
       </Box>
       <Box
@@ -82,7 +84,8 @@ const Trigger = ({ label, isOpen, isSelected }: TriggerProps) => {
           transition: "all 0.1s",
           mt: "3px",
           color: "$hiContrast",
-        }}>
+        }}
+      >
         <ChevronDownIcon />
       </Box>
     </Box>
@@ -115,7 +118,8 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
           label={route.title}
           isSelected={currentPathSection === `/${route.slug}`}
         />
-      }>
+      }
+    >
       <Box css={{ pt: 0, pb: "$4", background: "none" }}>
         {route.children.map((child, idx2) => (
           <Link href={`/${child.slug}`} key={idx2} passHref>
@@ -136,7 +140,8 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
                   textDecoration: "none",
                   color: "$violet11",
                 },
-              }}>
+              }}
+            >
               {child.title}
             </A>
           </Link>
@@ -178,7 +183,8 @@ const Menu = ({ menu }: MenuProps) => {
                   fontWeight: currentPath === `/${route.slug}` ? 600 : 400,
                   pl: "$4",
                   my: "$2",
-                }}>
+                }}
+              >
                 <Box
                   css={{
                     position: "absolute",
@@ -221,13 +227,15 @@ const TableOfContents = ({
         "@bp2": {
           display: "flex",
         },
-      }}>
+      }}
+    >
       <Box
         css={{
           width: 220,
           minWidth: 220,
           maxWidth: 220,
-        }}>
+        }}
+      >
         <Box
           css={{
             pt: 30,
@@ -238,7 +246,8 @@ const TableOfContents = ({
             color: "$mauve9",
             letterSpacing: "-.5px",
             mb: "$3",
-          }}>
+          }}
+        >
           DOCUMENTATION
         </Box>
         <Menu menu={menu} />
@@ -253,7 +262,8 @@ const TableOfContents = ({
           minWidth: "60px",
           display: "flex",
           justifyContent: "center",
-        }}>
+        }}
+      >
         <Box
           onClick={() => setHideTableOfContents(!hideTableOfContents)}
           css={{
@@ -268,14 +278,16 @@ const TableOfContents = ({
             transform: hideTableOfContents
               ? "rotate(-270deg)"
               : "rotate(-90deg)",
-          }}>
+          }}
+        >
           <Box
             as="svg"
             width="20"
             height="20"
             viewBox="0 0 20 20"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <Box
               as="path"
               d="M4.16732 2.5L15.834 2.5M14.1673 11.6667L10.0007 7.5M10.0007 7.5L5.83398 11.6667M10.0007 7.5L10.0006 17.5"
@@ -303,7 +315,8 @@ export const MobileTableOfContents = ({ menu }) => {
         borderRadius: 10,
         width: "calc(100vw - 72px)",
         overflow: "scroll",
-      }}>
+      }}
+    >
       <Menu menu={menu} />
     </Box>
   );

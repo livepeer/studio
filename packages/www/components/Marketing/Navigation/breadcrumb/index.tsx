@@ -1,6 +1,6 @@
 import Logo from "@components/Marketing/Logo";
 import { useState } from "react";
-import { Box, Link as A } from "@livepeer.com/design-system";
+import { Box, Link as A } from "@livepeer/design-system";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
 import Link from "next/link";
@@ -30,7 +30,8 @@ const Divider = () => (
       "@bp3": {
         fontSize: "$2",
       },
-    }}>
+    }}
+  >
     /
   </Box>
 );
@@ -51,7 +52,8 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                 display: "inline-flex",
                 alignItems: "center",
                 height: "33px",
-              }}>
+              }}
+            >
               <Divider />
               <Box
                 css={{
@@ -65,7 +67,8 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                   "@bp3": {
                     fontSize: "$3",
                   },
-                }}>
+                }}
+              >
                 {slugify(item.children.toString())}
               </Box>
             </Box>
@@ -83,7 +86,8 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                   "@bp3": {
                     fontSize: "none",
                   },
-                }}>
+                }}
+              >
                 <Divider />
                 {(() => {
                   const { children, ...selectedProps } =
@@ -105,7 +109,8 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                           "@bp3": {
                             fontSize: "$3",
                           },
-                        }}>
+                        }}
+                      >
                         {slugify(
                           children.toString() === "API Reference"
                             ? "API"
@@ -125,14 +130,16 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                     "@bp2": {
                       right: "15px",
                     },
-                  }}>
+                  }}
+                >
                   {item.mobileDropdownLinks
                     .filter((l) => !l.isSelected)
                     .map((link) => (
                       <Link
                         href={link.href}
                         passHref
-                        key={`dropdown-link-${link.href}`}>
+                        key={`dropdown-link-${link.href}`}
+                      >
                         <A
                           css={{
                             display: "block",
@@ -142,7 +149,8 @@ const NavigationBreadcrumb = ({ breadcrumb }: Props) => {
                             ":not(:last-of-type)": {
                               mb: "$3",
                             },
-                          }}>
+                          }}
+                        >
                           {link.children === "API Reference"
                             ? "API"
                             : link.children}

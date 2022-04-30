@@ -1,4 +1,4 @@
-import { Box, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Text, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 import TableContainer from "./TableContainer";
 
@@ -30,7 +30,8 @@ const Table = ({
         borderCollapse: "collapse",
       }}
       aria-label={hasAriaLabel ? ariaLabel : "Component Props"}
-      aria-labelledby={ariaLabelledBy}>
+      aria-labelledby={ariaLabelledBy}
+    >
       <Box as="thead">
         <Box as="tr">
           {rows.map((row, i) => (
@@ -41,7 +42,8 @@ const Table = ({
                 borderBottom: "1px solid $gray6",
                 py: "$3",
                 pr: "$4",
-              }}>
+              }}
+            >
               <Text size="2" css={{ textTransform: "capitalize" }}>
                 {row}
               </Text>
@@ -60,7 +62,8 @@ const Table = ({
                   borderBottom: "1px solid $gray6",
                   py: "$3",
                   pr: "$4",
-                }}>
+                }}
+              >
                 {key === "link" ? (
                   <Link href={value as string} passHref>
                     <A variant="violet">{value}</A>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import { justifyContent } from "styled-system";
 
@@ -40,13 +40,15 @@ export const PricingCardContent = ({
         borderTop: `1px solid`,
         borderColor: "rgba(255,255,255, .15)",
         color,
-      }}>
+      }}
+    >
       {children}
       {comingSoon ? (
         <Box
           css={{
             fontSize: "$5",
-          }}>
+          }}
+        >
           Coming soon
         </Box>
       ) : customPricing ? (
@@ -55,7 +57,8 @@ export const PricingCardContent = ({
             css={{
               fontSize: "$5",
               color,
-            }}>
+            }}
+          >
             Custom pricing
           </Box>
         </Box>
@@ -84,14 +87,16 @@ const PricingCard = ({
         paddingTop: "25px",
         borderRadius: "16px",
         background: cardBg,
-      }}>
+      }}
+    >
       <Flex direction="column">
         <Text
           size="7"
           css={{
             fontWeight: 600,
             color,
-          }}>
+          }}
+        >
           {pricingTitle}
         </Text>
         <Text
@@ -99,7 +104,8 @@ const PricingCard = ({
           css={{
             mb: "$4",
             color,
-          }}>
+          }}
+        >
           {pricingDescription}
         </Text>
         <Link href={btn.href} passHref>
@@ -116,7 +122,8 @@ const PricingCard = ({
                 background: btn.bg,
                 color: btn.color,
               },
-            }}>
+            }}
+          >
             {btn.display}
           </Button>
         </Link>

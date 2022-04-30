@@ -6,7 +6,7 @@ import {
   Heading,
   Container,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
@@ -42,7 +42,8 @@ const ForgotPasswordPage = () => {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1,
-          }}>
+          }}
+        >
           Password reset link sent to your email.
         </Box>
       ) : (
@@ -57,14 +58,16 @@ const ForgotPasswordPage = () => {
                 py: "$8",
                 px: "$4",
               },
-            }}>
+            }}
+          >
             <Flex
               align="center"
               justify="center"
               css={{
                 flexGrow: 1,
                 flexDirection: "column",
-              }}>
+              }}
+            >
               <Heading size="3" as="h1" css={{ mb: "$5" }}>
                 Reset your password
               </Heading>

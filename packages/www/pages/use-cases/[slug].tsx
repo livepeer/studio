@@ -7,7 +7,7 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allUseCases from "../../queries/allUseCases.gql";
 import { useRouter } from "next/router";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import client from "../../lib/client";
 import imageUrlBuilder from "@sanity/image-url";
 
@@ -34,7 +34,8 @@ const UseCase = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}>
+          }}
+        >
           Loading
         </Box>
       </Layout>
@@ -55,7 +56,8 @@ const UseCase = ({
           : null
       }
       url={metaUrl}
-      preview={preview}>
+      preview={preview}
+    >
       <Hero
         tagline="Use cases"
         heading={hero.heading}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, IconButton, Tooltip } from "@livepeer.com/design-system";
+import { Box, Button, IconButton, Tooltip } from "@livepeer/design-system";
 import copy from "copy-to-clipboard";
 import { getParameters } from "codesandbox/lib/api/define";
 import {
@@ -52,10 +52,12 @@ const DocCodeBlock = ({
               "@bp4": { mx: "-$8" },
             }
           : {}),
-      }}>
+      }}
+    >
       <Collapsible.Root
         open={!isCollapsed}
-        onOpenChange={(isOpen) => setIsCollapsed(!isOpen)}>
+        onOpenChange={(isOpen) => setIsCollapsed(!isOpen)}
+      >
         {isCollapsible && (
           <Box
             css={{
@@ -66,14 +68,16 @@ const DocCodeBlock = ({
               gap: "$1",
               top: "-$6",
               right: "$2",
-            }}>
+            }}
+          >
             <Collapsible.Trigger
               as={Button}
               ghost
               css={{
                 color: "$whiteA12",
                 textShadow: "0 2px 2px rgb(0 0 0 / 12%)",
-              }}>
+              }}
+            >
               {isCollapsed ? "Show" : "Hide"} code
             </Collapsible.Trigger>
 
@@ -87,7 +91,8 @@ const DocCodeBlock = ({
                 }}
                 action="https://codesandbox.io/api/v1/sandboxes/define"
                 method="POST"
-                target="_blank">
+                target="_blank"
+              >
                 <input type="hidden" name="query" value="module=App.js" />
                 <input
                   type="hidden"
@@ -110,7 +115,8 @@ const DocCodeBlock = ({
               position: "relative",
               ...(isCollapsed ? { display: "none" } : {}),
               ...(isCollapsible ? { top: "$2" } : { my: "$5" }),
-            }}>
+            }}
+          >
             <Box
               css={{
                 overflow: "auto",
@@ -129,14 +135,16 @@ const DocCodeBlock = ({
                 },
                 // end hacks
                 ...(isHero || isScrollable ? { maxHeight: 400 } : {}),
-              }}>
+              }}
+            >
               <Pre
                 ref={preRef}
                 data-invert-line-highlight={isHighlightingLines}
                 data-line-numbers={showLineNumbers}
                 variant={variant}
                 className={className}
-                id={id}>
+                id={id}
+              >
                 <code className={className} children={children} />
               </Pre>
             </Box>
@@ -153,7 +161,8 @@ const DocCodeBlock = ({
                   transition: "150ms linear",
                 },
               }}
-              onClick={() => setHasCopied(true)}>
+              onClick={() => setHasCopied(true)}
+            >
               {hasCopied ? <CheckIcon /> : <ClipboardIcon />}
             </IconButton>
           </Box>

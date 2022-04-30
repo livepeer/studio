@@ -1,4 +1,4 @@
-import { Container, Grid, Box, global } from "@livepeer.com/design-system";
+import { Container, Grid, Box, globalCss } from "@livepeer/design-system";
 import DocsNav from "@components/Marketing/Navigation/docs";
 import TableOfContents from "@components/Marketing/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
@@ -10,7 +10,7 @@ import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
 import { components } from "@components/Marketing/MDXComponents";
-import { ContextProviders } from "layouts/main";
+import Providers from "@lib/Providers";
 
 const categories = [
   {
@@ -48,7 +48,7 @@ const defaultSEO: NextSeoProps = {
   },
 };
 
-const globalStyles = global({
+const globalStyles = globalCss({
   body: {
     margin: 0,
     backgroundColor: "$loContrast",
@@ -115,7 +115,7 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <ContextProviders>
+    <Providers>
       <NextSeo {...resolvedSEO} />
       <Box
         css={{
@@ -126,7 +126,8 @@ const DocsIndex = ({ doc, menu }) => {
           "@bp2": {
             display: "grid",
           },
-        }}>
+        }}
+      >
         <DocsNav menu={currentMenu} categories={categories} />
         <TableOfContents
           menu={currentMenu}
@@ -146,7 +147,8 @@ const DocsIndex = ({ doc, menu }) => {
               "@bp2": {
                 justifyItems: "center",
               },
-            }}>
+            }}
+          >
             <Box
               css={{
                 width: "100%",
@@ -156,7 +158,8 @@ const DocsIndex = ({ doc, menu }) => {
                 "@bp2": {
                   px: "$5",
                 },
-              }}>
+              }}
+            >
               <Box
                 css={{
                   display: "flex",
@@ -166,7 +169,8 @@ const DocsIndex = ({ doc, menu }) => {
                   letterSpacing: "-0.02em",
                   mb: "$3",
                 }}
-                className="breadcrumb">
+                className="breadcrumb"
+              >
                 {breadCrumb.slice(2, 5).map((a, idx) => (
                   <Fragment key={idx}>
                     {title(a.split("-").join(" "))}
@@ -181,7 +185,7 @@ const DocsIndex = ({ doc, menu }) => {
           </Grid>
         </Container>
       </Box>
-    </ContextProviders>
+    </Providers>
   );
 };
 

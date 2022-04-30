@@ -8,7 +8,7 @@ import {
   AlertDialogCancel,
   Heading,
   Text,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 const ErrorDialog = ({
   description,
@@ -22,20 +22,20 @@ const ErrorDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Error
+        <AlertDialogTitle asChild>
+          <Heading size="1">Error</Heading>
         </AlertDialogTitle>
-        <AlertDialogDescription
-          as={Text}
-          size="3"
-          variant="gray"
-          css={{ mt: "$2", lineHeight: "22px" }}>
-          {description}
+        <AlertDialogDescription asChild>
+          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+            {description}
+          </Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel size="2" as={Button} ghost>
-            Ok
+          <AlertDialogCancel asChild>
+            <Button size="2" ghost>
+              Ok
+            </Button>
           </AlertDialogCancel>
         </Flex>
       </AlertDialogContent>

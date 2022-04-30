@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Box, Badge, Status, Tooltip } from "@livepeer.com/design-system";
+import { Box, Badge, Status, Tooltip } from "@livepeer/design-system";
 import { useMemo } from "react";
 
 // TODO: Make this an actual variant somehow? Maybe semantic variants like good/bad/warning

@@ -4,7 +4,7 @@ import {
   Container,
   Box,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 
 const JobsSection = ({ jobs }) => {
@@ -24,12 +24,14 @@ const JobsSection = ({ jobs }) => {
               boxShadow: "0 0 30px 0 $colors$mauve4",
               borderRadius: "8px",
             },
-          }}>
+          }}
+        >
           <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
             <A
               css={{
                 textDecoration: "none",
-              }}>
+              }}
+            >
               <Heading as="h2" size="1">
                 {j.title}
               </Heading>

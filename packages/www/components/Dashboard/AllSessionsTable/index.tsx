@@ -30,7 +30,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
@@ -63,7 +63,8 @@ const RecordingUrlCell = <D extends TableData>({
             <A
               variant="violet"
               target="_blank"
-              href={makeMP4Url(cell.value.mp4Url, "source")}>
+              href={makeMP4Url(cell.value.mp4Url, "source")}
+            >
               Download mp4
             </A>
           ) : null}
@@ -185,13 +186,15 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                       <Flex css={{ ai: "center" }}>
                         <CopyToClipboard
                           text={stream.recordingUrl}
-                          onCopy={() => openSnackbar("Copied to clipboard")}>
+                          onCopy={() => openSnackbar("Copied to clipboard")}
+                        >
                           <Flex
                             css={{
                               cursor: "pointer",
                               fontSize: "$1",
                               ai: "center",
-                            }}>
+                            }}
+                          >
                             <Box css={{ mr: "$1" }}>
                               {truncate(stream.recordingUrl, 24)}
                             </Box>
@@ -211,7 +214,8 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                           fontSize: "$1",
                           display: "flex",
                           ai: "center",
-                        }}>
+                        }}
+                      >
                         <Box css={{ ml: "$2" }}>{stream.recordingUrl}</Box>
                       </Text>
                     </HoverCardContent>
@@ -244,7 +248,8 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}>
+      }}
+    >
       <Heading css={{ fontWeight: 500, mb: "$3" }}>No sessions</Heading>
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         Stream sessions belong to parent streams.

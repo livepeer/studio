@@ -13,7 +13,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
@@ -114,7 +114,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           variant="violet"
           onClick={() => {
             setOpen(true);
-          }}>
+          }}
+        >
           <MdCreditCard style={{ marginRight: "8px" }} />
           {!user.stripeCustomerPaymentMethodId
             ? "Add Payment Method"
@@ -126,7 +127,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
         <Box
           as="form"
           onSubmit={handleSubmit(onSubmit)}
-          id="billing-stripe-form">
+          id="billing-stripe-form"
+        >
           <AlertDialogTitle as={Heading} size="1">
             {!user.stripeCustomerPaymentMethodId
               ? "Add payment method"
@@ -157,7 +159,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   width: "100%",
                   alignItems: "center",
                   mb: "$2",
-                }}>
+                }}
+              >
                 <Box>
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="email">
                     Email
@@ -211,7 +214,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   width: "100%",
                   alignItems: "center",
                   mb: "$2",
-                }}>
+                }}
+              >
                 <Box>
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="city">
                     City
@@ -245,7 +249,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 <Box>
                   <Label
                     css={{ mb: "$1", display: "block" }}
-                    htmlFor="postalCode">
+                    htmlFor="postalCode"
+                  >
                     ZIP
                   </Label>
                   <TextField
@@ -267,7 +272,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   color: "$hiContrast",
                   fontWeight: 500,
                   mb: "$1",
-                }}>
+                }}
+              >
                 Card
               </Box>
               <Box
@@ -276,7 +282,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   borderRadius: 6,
                   background: "$loContrast",
                   px: "$2",
-                }}>
+                }}
+              >
                 <CardElement
                   options={{
                     iconStyle: "solid",
@@ -316,14 +323,16 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={() => {
-                setOpen(false);
-              }}
-              as={Button}
-              ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button
+                size="2"
+                onClick={() => {
+                  setOpen(false);
+                }}
+                ghost
+              >
+                Cancel
+              </Button>
             </AlertDialogCancel>
             <Button
               size="2"
@@ -332,7 +341,8 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
               disabled={
                 !["initial", "succeeded", "error"].includes(status) || !stripe
               }
-              variant="violet">
+              variant="violet"
+            >
               {status === "processing" && (
                 <Spinner
                   css={{

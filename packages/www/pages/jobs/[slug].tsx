@@ -1,4 +1,4 @@
-import { Box, Container, Heading, Grid } from "@livepeer.com/design-system";
+import { Box, Container, Heading, Grid } from "@livepeer/design-system";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
@@ -27,7 +27,8 @@ const Page = ({
       url={metaUrl}
       canonical={metaUrl}
       noindex={noindex}
-      preview={preview}>
+      preview={preview}
+    >
       <Guides />
       <Box css={{ position: "relative" }}>
         <Container
@@ -40,7 +41,8 @@ const Page = ({
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Heading
             size="4"
             as="h1"
@@ -48,7 +50,8 @@ const Page = ({
               my: "$5",
               fontWeight: 600,
               lineHeight: "1.2 !important",
-            }}>
+            }}
+          >
             {title}
           </Heading>
           <Grid
@@ -59,7 +62,8 @@ const Page = ({
               "@bp2": {
                 gridTemplateColumns: "repeat(2,1fr)",
               },
-            }}>
+            }}
+          >
             <Box
               css={{
                 "p, div, ul, li": {
@@ -85,7 +89,8 @@ const Page = ({
                 a: {
                   color: "$violet9",
                 },
-              }}>
+              }}
+            >
               <div dangerouslySetInnerHTML={{ __html: body }} />
             </Box>
             <Box
@@ -99,7 +104,8 @@ const Page = ({
                 "@bp2": {
                   mr: "0",
                 },
-              }}>
+              }}
+            >
               <JobApplicationForm
                 id={slug}
                 name={name}

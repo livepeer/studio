@@ -1,12 +1,4 @@
-import { ThemeProvider } from "next-themes";
-import {
-  global,
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  Box,
-  SnackbarProvider,
-} from "@livepeer.com/design-system";
+import { globalCss, Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
@@ -19,6 +11,7 @@ import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
+import Providers from "@lib/Providers";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -36,7 +29,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const globalStyles = global({
+const globalStyles = globalCss({
   body: {
     margin: 0,
     backgroundColor: "$loContrast",
@@ -78,22 +71,6 @@ interface Props {
   image?: any;
   url?: string;
   canonical?: string;
-}
-
-function ContextProviders({ children }) {
-  return (
-    <Elements stripe={getStripe()}>
-      <DesignSystemProvider>
-        <ThemeProvider
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme="system"
-          value={{ dark: darkTheme.className, light: lightTheme.className }}>
-          <SnackbarProvider>{children}</SnackbarProvider>
-        </ThemeProvider>
-      </DesignSystemProvider>
-    </Elements>
-  );
 }
 
 function DashboardLayout({
@@ -143,23 +120,26 @@ function DashboardLayout({
   return (
     <>
       {requireLoggedIn && <DashboardRedirect />}
-      <ContextProviders>
-        <Head>
-          <meta name="viewport" content="width=1023" />
-        </Head>
-        <NextSeo {...seo} />
-        <Sidebar id={id} />
-        <Box css={{ pl: 270, width: "100%" }}>
-          <Header breadcrumbs={breadcrumbs} />
-          <Box
-            css={{
-              margin: "0 auto",
-              maxWidth: "1520px",
-            }}>
-            {children}
+      <Elements stripe={getStripe()}>
+        <Providers>
+          <Head>
+            <meta name="viewport" content="width=1023" />
+          </Head>
+          <NextSeo {...seo} />
+          <Sidebar id={id} />
+          <Box css={{ pl: 270, width: "100%" }}>
+            <Header breadcrumbs={breadcrumbs} />
+            <Box
+              css={{
+                margin: "0 auto",
+                maxWidth: "1520px",
+              }}
+            >
+              {children}
+            </Box>
           </Box>
-        </Box>
-      </ContextProviders>
+        </Providers>
+      </Elements>
     </>
   );
 }

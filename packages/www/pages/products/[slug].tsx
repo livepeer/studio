@@ -6,7 +6,7 @@ import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allProducts from "../../queries/allProducts.gql";
 import { useRouter } from "next/router";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import client from "../../lib/client";
 import imageUrlBuilder from "@sanity/image-url";
 
@@ -32,7 +32,8 @@ const Product = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}>
+          }}
+        >
           Loading
         </Box>
       </Layout>
@@ -53,7 +54,8 @@ const Product = ({
           : null
       }
       url={metaUrl}
-      preview={preview}>
+      preview={preview}
+    >
       <Hero
         centered={hero.centered}
         tagline="Products"

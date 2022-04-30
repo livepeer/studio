@@ -1,4 +1,4 @@
-import { Box, Grid, Container } from "@livepeer.com/design-system";
+import { Box, Grid, Container } from "@livepeer/design-system";
 import Card, { CardProps } from "./Card";
 import Guides from "@components/Marketing/Guides";
 import CBSIcon from "../../../public/img/testimonials/cbs-interactive/logo.svg";
@@ -53,14 +53,16 @@ const Testimonials = () => (
         "@bp2": {
           py: 140,
         },
-      }}>
+      }}
+    >
       <Box
         css={{
           px: "$6",
           "@bp3": {
             px: "$3",
           },
-        }}>
+        }}
+      >
         <Grid
           css={{
             justifyContent: "center",
@@ -70,7 +72,8 @@ const Testimonials = () => (
               gridTemplateColumns: "repeat(3,1fr)",
             },
           }}
-          gap="4">
+          gap="4"
+        >
           {testimonials.map((testimonial, i) => (
             <Card key={i} {...testimonial} />
           ))}

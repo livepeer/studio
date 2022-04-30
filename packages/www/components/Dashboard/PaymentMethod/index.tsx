@@ -1,5 +1,5 @@
 import Cards from "react-credit-cards";
-import { Flex } from "@livepeer.com/design-system";
+import { Flex } from "@livepeer/design-system";
 import "react-credit-cards/es/styles-compiled.css";
 
 const PaymentMethod = ({ data }) => {

@@ -1,4 +1,4 @@
-import { Box, Heading, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Heading, Text, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,13 +18,15 @@ const Card = ({ description, title, image, href }) => {
             transition: ".3s all",
             boxShadow: "0px 8px 32px rgb(0 0 0 / 12%)",
           },
-        }}>
+        }}
+      >
         <Box
           css={{
             borderTopRightRadius: 16,
             borderTopLeftRadius: 16,
             overflow: "hidden",
-          }}>
+          }}
+        >
           {image && (
             <Image
               src={image}

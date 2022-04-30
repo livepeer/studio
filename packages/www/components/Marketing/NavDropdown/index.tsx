@@ -6,7 +6,7 @@ import {
   Box,
   styled,
   keyframes,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },

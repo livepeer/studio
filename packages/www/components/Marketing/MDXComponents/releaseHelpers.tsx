@@ -1,5 +1,5 @@
 import React from "react";
-import { Paragraph, Badge, Link, Text } from "@livepeer.com/design-system";
+import { Paragraph, Badge, Link, Text } from "@livepeer/design-system";
 
 export function PackageRelease({
   name,
@@ -31,7 +31,8 @@ export function PRLink({ id }: { id: number | number[] }) {
             href={`https://github.com/radix-ui/primitives/pull/${id}`}
             target="_blank"
             rel="noopener"
-            css={{ fontFamily: "$mono" }}>
+            css={{ fontFamily: "$mono" }}
+          >
             #{id}
           </Link>
           {i < arr.length - 1 ? " " : null}

@@ -1,6 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import * as snippet from "@segment/snippet";
-import { getCssString } from "@livepeer.com/design-system";
+import { getCssText } from "@livepeer/design-system";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -31,7 +31,7 @@ class MyDocument extends Document {
           />
           <style
             id="stitches"
-            dangerouslySetInnerHTML={{ __html: getCssString() }}
+            dangerouslySetInnerHTML={{ __html: getCssText() }}
           />
           {/* Inject the Segment snippet into the <head> of the document  */}
           {process.env.NODE_ENV === "production" && (

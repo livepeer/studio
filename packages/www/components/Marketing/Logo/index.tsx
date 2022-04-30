@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Box, Badge, Flex, Link as A } from "@livepeer.com/design-system";
+import { Box, Badge, Flex, Link as A } from "@livepeer/design-system";
 
 const Logo = ({ badge = null }) => (
   <Flex align="center">
@@ -18,7 +18,8 @@ const Logo = ({ badge = null }) => (
           "@bp3": {
             fontSize: "20px",
           },
-        }}>
+        }}
+      >
         Livepeer Video Services
       </A>
     </Link>

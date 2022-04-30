@@ -1,13 +1,7 @@
 import readingTime from "reading-time";
 import { blocksToText } from "lib/utils";
 import Link from "next/link";
-import {
-  Flex,
-  Box,
-  Text,
-  Heading,
-  Link as A,
-} from "@livepeer.com/design-system";
+import { Flex, Box, Text, Heading, Link as A } from "@livepeer/design-system";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "lib/client";
 import Image from "next/image";
@@ -41,7 +35,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             boxShadow:
               "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
           },
-        }}>
+        }}
+      >
         {post.mainImage && (
           <Box
             css={{
@@ -49,7 +44,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               width: "33%",
               height: 400,
               bc: "$panel",
-            }}>
+            }}
+          >
             <Image
               alt={post.mainImage?.alt}
               layout="fill"
@@ -66,7 +62,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             justifyContent: "space-between",
             height: "100%",
             width: "66%",
-          }}>
+          }}
+        >
           <Box>
             <Text
               variant="gray"
@@ -74,7 +71,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               css={{
                 textTransform: "uppercase",
                 fontWeight: 600,
-              }}>
+              }}
+            >
               {post.category.title}
             </Text>
             <Flex
@@ -82,14 +80,16 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 alignItems: "center",
                 pt: "$4",
                 pb: "$5",
-              }}>
+              }}
+            >
               <Box
                 css={{
                   position: "relative",
                   width: 30,
                   height: 30,
                   mr: "$2",
-                }}>
+                }}
+              >
                 <Image
                   alt={post.author.image?.alt}
                   layout="fill"
@@ -103,7 +103,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
-                }}>
+                }}
+              >
                 {post.author.name}
               </Box>
               <Box
@@ -114,7 +115,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
-                }}>
+                }}
+              >
                 {stats.text}
               </Box>
             </Flex>
@@ -125,7 +127,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 fontWeight: 500,
                 pb: "$3",
                 transition: "color .3s",
-              }}>
+              }}
+            >
               {post.title}
             </Heading>
             <Box
@@ -134,7 +137,8 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               size="4"
               css={{
                 mb: "$3",
-              }}>
+              }}
+            >
               <TextTruncate
                 line={5}
                 element="span"

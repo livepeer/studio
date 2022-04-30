@@ -1,13 +1,4 @@
-import { ThemeProvider } from "next-themes";
-import {
-  global,
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  Flex,
-  Box,
-  SnackbarProvider,
-} from "@livepeer.com/design-system";
+import { globalCss, Flex, Box } from "@livepeer/design-system";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
 import ReactGA from "react-ga";
@@ -15,8 +6,8 @@ import Router from "next/router";
 import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
-
-const DEFAULT_THEME = "system";
+import { DEFAULT_THEME } from "@lib/theme";
+import Providers from "@lib/Providers";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -34,7 +25,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const globalStyles = global({
+const globalStyles = globalCss({
   body: {
     margin: 0,
     backgroundColor: "$loContrast",
@@ -73,20 +64,6 @@ interface Props {
   preview?: boolean;
   theme?: string;
   css?: Record<string, any>;
-}
-
-export function ContextProviders({ theme = DEFAULT_THEME, children }) {
-  return (
-    <DesignSystemProvider>
-      <ThemeProvider
-        disableTransitionOnChange
-        attribute="class"
-        defaultTheme={theme}
-        value={{ dark: darkTheme.className, light: lightTheme.className }}>
-        <SnackbarProvider>{children}</SnackbarProvider>
-      </ThemeProvider>
-    </DesignSystemProvider>
-  );
 }
 
 function Layout({
@@ -134,7 +111,7 @@ function Layout({
   }
 
   return (
-    <ContextProviders theme={theme}>
+    <Providers>
       <Flex
         css={{
           flexGrow: 1,
@@ -143,7 +120,8 @@ function Layout({
           zIndex: 1,
           position: "relative",
           ...css,
-        }}>
+        }}
+      >
         <NextSeo {...seo} />
         {preview && (
           <Box
@@ -157,7 +135,8 @@ function Layout({
               backgroundColor: "$violet9",
               color: "white",
               lineHeight: "32px",
-            }}>
+            }}
+          >
             Preview Mode
           </Box>
         )}
@@ -165,7 +144,7 @@ function Layout({
         {children}
         <Footer />
       </Flex>
-    </ContextProviders>
+    </Providers>
   );
 }
 

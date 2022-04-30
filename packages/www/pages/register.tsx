@@ -8,7 +8,7 @@ import {
   Text,
   Container,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
@@ -105,7 +105,8 @@ const RegisterPage = () => {
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Flex
             css={{
               alignItems: "center",
@@ -113,7 +114,8 @@ const RegisterPage = () => {
               flexGrow: 1,
               flexDirection: "column",
               py: "$5",
-            }}>
+            }}
+          >
             <Heading size="3" as="h1" css={{ mb: "$3" }}>
               Create an account
             </Heading>
@@ -125,7 +127,8 @@ const RegisterPage = () => {
                 textAlign: "center",
                 maxWidth: 630,
                 mx: "auto",
-              }}>
+              }}
+            >
               Get free access to our streaming API and open source media server.
             </Text>
             <Login

@@ -6,7 +6,7 @@ import {
   Grid,
   Heading,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 import Link from "next/link";
 
@@ -33,7 +33,8 @@ const CaseStudy = ({
                 px: "$4",
                 mx: "auto",
               },
-            }}>
+            }}
+          >
             <Text variant="violet" size="5" css={{ fontWeight: 600, mb: "$4" }}>
               Case Study
             </Text>
@@ -44,7 +45,8 @@ const CaseStudy = ({
                 "@bp2": {
                   grid: "1fr/repeat(2,1fr)",
                 },
-              }}>
+              }}
+            >
               <Heading
                 size="3"
                 as="h2"
@@ -53,7 +55,8 @@ const CaseStudy = ({
                   lineHeight: 1.4,
                   fontWeight: 700,
                   "@bp2": { lineHeight: 1.4, letterSpacing: 0, mb: "$7" },
-                }}>
+                }}
+              >
                 {heading}
               </Heading>
               <Text variant="gray" size="5" css={{ mt: "$1", mb: "$7" }}>
@@ -71,13 +74,15 @@ const CaseStudy = ({
               "@bp2": {
                 grid: "1fr/repeat(2,1fr)",
               },
-            }}>
+            }}
+          >
             <Flex direction="column">
               <Box
                 css={{
                   position: "relative",
                   height: "100%",
-                }}>
+                }}
+              >
                 <Box
                   css={{
                     mb: "$6",
@@ -87,7 +92,8 @@ const CaseStudy = ({
                     "@bp3": {
                       px: 0,
                     },
-                  }}>
+                  }}
+                >
                   <Text
                     css={{
                       position: "relative",
@@ -102,14 +108,16 @@ const CaseStudy = ({
                         backgroundColor: "$violet9",
                         content: '""',
                       },
-                    }}>
+                    }}
+                  >
                     Problem
                   </Text>
                   <Text
                     variant="gray"
                     css={{
                       lineHeight: 1.6,
-                    }}>
+                    }}
+                  >
                     {problem}
                   </Text>
                 </Box>
@@ -121,7 +129,8 @@ const CaseStudy = ({
                     "@bp3": {
                       px: 0,
                     },
-                  }}>
+                  }}
+                >
                   <Text
                     css={{
                       position: "relative",
@@ -136,7 +145,8 @@ const CaseStudy = ({
                         backgroundColor: "$violet9",
                         content: '""',
                       },
-                    }}>
+                    }}
+                  >
                     Solution
                   </Text>
                   <Text variant="gray" css={{ lineHeight: 1.6, mb: "$3" }}>
@@ -168,7 +178,8 @@ const CaseStudy = ({
                   pl: 0,
                   mr: 0,
                 },
-              }}>
+              }}
+            >
               <Flex
                 direction="column"
                 css={{
@@ -180,7 +191,8 @@ const CaseStudy = ({
                   position: "relative",
                   p: "$7",
                   backgroundColor: "$panel",
-                }}>
+                }}
+              >
                 <Text
                   size="4"
                   css={{
@@ -198,7 +210,8 @@ const CaseStudy = ({
                       fontFamily: "serif",
                       transform: "translateX(2px)",
                     },
-                  }}>
+                  }}
+                >
                   {testimonial.quote}
                 </Text>
                 <Flex css={{ ai: "center" }}>

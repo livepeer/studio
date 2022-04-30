@@ -1,5 +1,5 @@
 import { useTheme } from "next-themes";
-import { styled } from "@livepeer.com/design-system";
+import { styled } from "@livepeer/design-system";
 import * as Switch from "@radix-ui/react-switch";
 import Sun from "../../../public/img/icons/sun.svg";
 import Moon from "../../../public/img/icons/moon.svg";

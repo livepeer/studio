@@ -1,6 +1,6 @@
 import Layout from "layouts/main";
 import Button from "components/Marketing/Button";
-import { Container, Heading, Box, Text } from "@livepeer.com/design-system";
+import { Container, Heading, Box, Text } from "@livepeer/design-system";
 import Link from "next/link";
 import Image from "next/image";
 import Guides from "components/Marketing/Guides";
@@ -24,7 +24,8 @@ const DefaultError = () => {
         />
         <Container
           size="3"
-          css={{ position: "relative", px: "$4", py: "250px", my: "auto" }}>
+          css={{ position: "relative", px: "$4", py: "250px", my: "auto" }}
+        >
           <Box
             css={{
               display: "flex",
@@ -33,7 +34,8 @@ const DefaultError = () => {
               justifyContent: "center",
               textAlign: "center",
               position: "relative",
-            }}>
+            }}
+          >
             <Heading as="h1" size="4" css={{ fontWeight: 700, mb: "$4" }}>
               Something went wrong.
             </Heading>

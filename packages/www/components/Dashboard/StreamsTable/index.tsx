@@ -13,7 +13,7 @@ import {
   AlertDialogAction,
   Link as A,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import ReactTooltip from "react-tooltip";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "hooks";
@@ -89,7 +89,8 @@ const Profile = ({
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",
-      }}>
+      }}
+    >
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -142,7 +143,8 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid">
+              effect="solid"
+            >
               {detailsTooltip}
             </ReactTooltip>
             <StyledQuestionMarkIcon
@@ -311,7 +313,8 @@ const StreamsTable = ({
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}>
+      }}
+    >
       <Heading css={{ fontWeight: 500, mb: "$3" }}>
         Create your first stream
       </Heading>
@@ -329,7 +332,8 @@ const StreamsTable = ({
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet">
+        variant="violet"
+      >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>
           Create stream
@@ -388,63 +392,69 @@ const StreamsTable = ({
       {/* Delete streams dialog */}
       <AlertDialog
         open={deleteDialogState.on}
-        onOpenChange={deleteDialogState.onOff}>
+        onOpenChange={deleteDialogState.onOff}
+      >
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-          <AlertDialogTitle as={Heading} size="1">
-            Delete {state.selectedRows.length} stream
-            {state.selectedRows.length > 1 && "s"}?
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
+        >
+          <AlertDialogTitle asChild>
+            <Heading size="1">
+              Delete {state.selectedRows.length} stream
+              {state.selectedRows.length > 1 && "s"}?
+            </Heading>
           </AlertDialogTitle>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the stream
-            {state.selectedRows.length > 1 && "s"}. This action cannot be
-            undone.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$2", lineHeight: "22px" }}
+            >
+              This will permanently remove the stream
+              {state.selectedRows.length > 1 && "s"}. This action cannot be
+              undone.
+            </Text>
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={deleteDialogState.onOff}
-              as={Button}
-              ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button size="2" onClick={deleteDialogState.onOff} ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
-            <AlertDialogAction
-              as={Button}
-              size="2"
-              disabled={savingDeleteDialog}
-              onClick={async (e) => {
-                try {
-                  e.preventDefault();
-                  setSavingDeleteDialog(true);
-                  await onDeleteStreams();
-                  openSnackbar(
-                    `${state.selectedRows.length} stream${
-                      state.selectedRows.length > 1 ? "s" : ""
-                    } deleted.`
-                  );
-                  setSavingDeleteDialog(false);
-                  deleteDialogState.onOff();
-                } catch (e) {
-                  setSavingDeleteDialog(false);
-                }
-              }}
-              variant="red">
-              {savingDeleteDialog && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Delete
+            <AlertDialogAction asChild>
+              <Button
+                size="2"
+                disabled={savingDeleteDialog}
+                onClick={async (e) => {
+                  try {
+                    e.preventDefault();
+                    setSavingDeleteDialog(true);
+                    await onDeleteStreams();
+                    openSnackbar(
+                      `${state.selectedRows.length} stream${
+                        state.selectedRows.length > 1 ? "s" : ""
+                      } deleted.`
+                    );
+                    setSavingDeleteDialog(false);
+                    deleteDialogState.onOff();
+                  } catch (e) {
+                    setSavingDeleteDialog(false);
+                  }
+                }}
+                variant="red"
+              >
+                {savingDeleteDialog && (
+                  <Spinner
+                    css={{
+                      color: "$hiContrast",
+                      width: 16,
+                      height: 16,
+                      mr: "$2",
+                    }}
+                  />
+                )}
+                Delete
+              </Button>
             </AlertDialogAction>
           </Flex>
         </AlertDialogContent>

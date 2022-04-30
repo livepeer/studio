@@ -7,7 +7,7 @@ import {
   Tr,
   Th,
   Td,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { products } from "@livepeer.com/api/src/config";
 import { FiArrowUpRight } from "react-icons/fi";
 
@@ -19,7 +19,8 @@ const PastInvoicesTable = ({ invoices }) => {
         borderCollapse: "separate",
         borderSpacing: 0,
         tableLayout: "initial",
-      }}>
+      }}
+    >
       <Thead>
         <Tr>
           <Th>Date</Th>
@@ -57,7 +58,8 @@ const PastInvoicesTable = ({ invoices }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   href={invoice.hosted_invoice_url}
-                  css={{ display: "flex", alignItems: "center" }}>
+                  css={{ display: "flex", alignItems: "center" }}
+                >
                   Invoice
                   <FiArrowUpRight css={{ ml: 1 }} />
                 </A>

@@ -7,7 +7,7 @@ import {
   Container,
   Heading,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
@@ -47,7 +47,8 @@ const ResetPasswordPage = () => {
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Flex
             css={{
               alignItems: "center",
@@ -55,7 +56,8 @@ const ResetPasswordPage = () => {
               flexGrow: 1,
               flexDirection: "column",
               py: "$5",
-            }}>
+            }}
+          >
             <Heading size="3" as="h1" css={{ mb: "$5" }}>
               Reset your password
             </Heading>

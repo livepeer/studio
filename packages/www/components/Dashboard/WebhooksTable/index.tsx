@@ -21,7 +21,7 @@ import {
   Button,
   Text,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
@@ -194,7 +194,8 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}>
+      }}
+    >
       <Heading css={{ fontWeight: 500, mb: "$3" }}>
         Create your first webhook
       </Heading>
@@ -212,7 +213,8 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet">
+        variant="violet"
+      >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>
           Create webhook
@@ -264,65 +266,71 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
 
       <AlertDialog
         open={deleteDialogState.on}
-        onOpenChange={deleteDialogState.onOff}>
+        onOpenChange={deleteDialogState.onOff}
+      >
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-          <AlertDialogTitle as={Heading} size="1">
-            Delete{" "}
-            {state.selectedRows.length > 1 ? state.selectedRows.length : ""}{" "}
-            webhook
-            {state.selectedRows.length > 1 && "s"}?
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
+        >
+          <AlertDialogTitle asChild>
+            <Heading size="1">
+              Delete{" "}
+              {state.selectedRows.length > 1 ? state.selectedRows.length : ""}{" "}
+              webhook
+              {state.selectedRows.length > 1 && "s"}?
+            </Heading>
           </AlertDialogTitle>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the webhook
-            {state.selectedRows.length > 1 && "s"}. This action cannot be
-            undone.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$2", lineHeight: "22px" }}
+            >
+              This will permanently remove the webhook
+              {state.selectedRows.length > 1 && "s"}. This action cannot be
+              undone.
+            </Text>
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={deleteDialogState.onOff}
-              as={Button}
-              ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button size="2" onClick={deleteDialogState.onOff} ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
-            <AlertDialogAction
-              as={Button}
-              size="2"
-              disabled={savingDeleteDialog}
-              onClick={async (e) => {
-                try {
-                  e.preventDefault();
-                  setSavingDeleteDialog(true);
-                  await onDeleteWebhooks();
-                  openSnackbar(
-                    `${state.selectedRows.length} webhook${
-                      state.selectedRows.length > 1 ? "s" : ""
-                    } deleted.`
-                  );
-                  setSavingDeleteDialog(false);
-                  deleteDialogState.onOff();
-                } catch (e) {
-                  setSavingDeleteDialog(false);
-                }
-              }}
-              variant="red">
-              {savingDeleteDialog && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Delete
+            <AlertDialogAction asChild>
+              <Button
+                size="2"
+                disabled={savingDeleteDialog}
+                onClick={async (e) => {
+                  try {
+                    e.preventDefault();
+                    setSavingDeleteDialog(true);
+                    await onDeleteWebhooks();
+                    openSnackbar(
+                      `${state.selectedRows.length} webhook${
+                        state.selectedRows.length > 1 ? "s" : ""
+                      } deleted.`
+                    );
+                    setSavingDeleteDialog(false);
+                    deleteDialogState.onOff();
+                  } catch (e) {
+                    setSavingDeleteDialog(false);
+                  }
+                }}
+                variant="red"
+              >
+                {savingDeleteDialog && (
+                  <Spinner
+                    css={{
+                      color: "$hiContrast",
+                      width: 16,
+                      height: 16,
+                      mr: "$2",
+                    }}
+                  />
+                )}
+                Delete
+              </Button>
             </AlertDialogAction>
           </Flex>
         </AlertDialogContent>

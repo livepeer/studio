@@ -19,7 +19,7 @@ import {
   Text,
   Tooltip,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
@@ -116,13 +116,15 @@ const TokenTable = ({
               <Flex css={{ height: 25, ai: "center" }}>
                 <CopyToClipboard
                   text={token.id}
-                  onCopy={() => openSnackbar("Copied to clipboard")}>
+                  onCopy={() => openSnackbar("Copied to clipboard")}
+                >
                   <Box
                     css={{
                       fontFamily: "monospace",
                       cursor: "pointer",
                       fontSize: "$1",
-                    }}>
+                    }}
+                  >
                     {token.id}
                   </Box>
                 </CopyToClipboard>
@@ -139,7 +141,8 @@ const TokenTable = ({
                   fontSize: "$1",
                   display: "flex",
                   ai: "center",
-                }}>
+                }}
+              >
                 <CopyIcon /> <Box css={{ ml: "$2" }}>Click to copy</Box>
               </Text>
             </HoverCardContent>
@@ -159,7 +162,8 @@ const TokenTable = ({
       return (
         <Tooltip
           content="This is the most secure mode for API keys, blocking access from any webpage."
-          multiline>
+          multiline
+        >
           <Label>None</Label>
         </Tooltip>
       );
@@ -174,7 +178,8 @@ const TokenTable = ({
                 ", "
               )}`
         }
-        multiline>
+        multiline
+      >
         <Label>
           <i>{accessLevel}</i>
         </Label>
@@ -227,7 +232,8 @@ const TokenTable = ({
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}>
+      }}
+    >
       <Heading css={{ fontWeight: 500, mb: "$3" }}>Create an API key</Heading>
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         API keys allow you to authenticate API requests in your app
@@ -242,7 +248,8 @@ const TokenTable = ({
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="violet">
+        variant="violet"
+      >
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>
           Create API key
@@ -294,68 +301,74 @@ const TokenTable = ({
       {/* Delete dialog */}
       <AlertDialog
         open={deleteDialogState.on}
-        onOpenChange={deleteDialogState.onOff}>
+        onOpenChange={deleteDialogState.onOff}
+      >
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-          <AlertDialogTitle as={Heading} size="1">
-            Delete {tableProps.state.selectedRows.length} API token
-            {tableProps.state.selectedRows.length > 1 && "s"}?
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
+        >
+          <AlertDialogTitle asChild>
+            <Heading size="1">
+              Delete {tableProps.state.selectedRows.length} API token
+              {tableProps.state.selectedRows.length > 1 && "s"}?
+            </Heading>
           </AlertDialogTitle>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the API token
-            {tableProps.state.selectedRows.length > 1 && "s"}. This action
-            cannot be undone.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$2", lineHeight: "22px" }}
+            >
+              This will permanently remove the API token
+              {tableProps.state.selectedRows.length > 1 && "s"}. This action
+              cannot be undone.
+            </Text>
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={deleteDialogState.onOff}
-              as={Button}
-              ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button size="2" onClick={deleteDialogState.onOff} ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
-            <AlertDialogAction
-              as={Button}
-              size="2"
-              disabled={savingDeleteDialog}
-              onClick={async (e) => {
-                try {
-                  e.preventDefault();
-                  setSavingDeleteDialog(true);
-                  const promises = tableProps.state.selectedRows.map(
-                    async (row) => {
-                      return deleteApiToken(row.original.id as string);
-                    }
-                  );
-                  await Promise.all(promises);
-                  await tableProps.state.invalidate();
-                  openSnackbar(
-                    `${tableProps.state.selectedRows.length} stream${
-                      tableProps.state.selectedRows.length > 1 ? "s" : ""
-                    } deleted.`
-                  );
-                  deleteDialogState.onOff();
-                } finally {
-                  setSavingDeleteDialog(false);
-                }
-              }}
-              variant="red">
-              {savingDeleteDialog && (
-                <Spinner
-                  css={{
-                    color: "$hiContrast",
-                    width: 16,
-                    height: 16,
-                    mr: "$2",
-                  }}
-                />
-              )}
-              Delete
+            <AlertDialogAction asChild>
+              <Button
+                size="2"
+                disabled={savingDeleteDialog}
+                onClick={async (e) => {
+                  try {
+                    e.preventDefault();
+                    setSavingDeleteDialog(true);
+                    const promises = tableProps.state.selectedRows.map(
+                      async (row) => {
+                        return deleteApiToken(row.original.id as string);
+                      }
+                    );
+                    await Promise.all(promises);
+                    await tableProps.state.invalidate();
+                    openSnackbar(
+                      `${tableProps.state.selectedRows.length} stream${
+                        tableProps.state.selectedRows.length > 1 ? "s" : ""
+                      } deleted.`
+                    );
+                    deleteDialogState.onOff();
+                  } finally {
+                    setSavingDeleteDialog(false);
+                  }
+                }}
+                variant="red"
+              >
+                {savingDeleteDialog && (
+                  <Spinner
+                    css={{
+                      color: "$hiContrast",
+                      width: 16,
+                      height: 16,
+                      mr: "$2",
+                    }}
+                  />
+                )}
+                Delete
+              </Button>
             </AlertDialogAction>
           </Flex>
         </AlertDialogContent>

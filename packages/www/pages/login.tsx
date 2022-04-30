@@ -6,7 +6,7 @@ import {
   Heading,
   Container,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
@@ -43,14 +43,16 @@ const LoginPage = () => {
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Flex
             css={{
               alignItems: "center",
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
-            }}>
+            }}
+          >
             <Heading size="3" as="h1" css={{ mb: "$5" }}>
               Log in
             </Heading>

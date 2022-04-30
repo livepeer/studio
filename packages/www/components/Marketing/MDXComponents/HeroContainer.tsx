@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 const HeroContainer = ({
   css,
@@ -25,7 +25,8 @@ const HeroContainer = ({
 
         "@bp3": { mx: "-$7" },
         "@bp4": { mx: "-$8" },
-      }}>
+      }}
+    >
       {children}
     </Box>
   );

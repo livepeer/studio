@@ -1,6 +1,6 @@
 import * as React from "react";
 import NextLink from "next/link";
-import * as DS from "@livepeer.com/design-system";
+import * as DS from "@livepeer/design-system";
 import { Link2Icon } from "@radix-ui/react-icons";
 import { IdProvider } from "@radix-ui/react-id";
 import Table from "./Table";
@@ -76,7 +76,8 @@ export const components = {
         id={id}
         as={"h2" as any}
         css={{ fontWeight: 600, scrollMarginTop: "$8" }}
-        data-heading>
+        data-heading
+      >
         {children}
       </DS.Heading>
     </LinkHeading>
@@ -88,7 +89,8 @@ export const components = {
         id={id}
         as={"h3" as any}
         css={{ fontWeight: 600, scrollMarginTop: "$8" }}
-        data-heading>
+        data-heading
+      >
         {children}
       </DS.Heading>
     </LinkHeading>
@@ -256,7 +258,8 @@ const LinkHeading = ({
         "&:hover svg": {
           opacity: 1,
         },
-      }}>
+      }}
+    >
       {children}
       <DS.Box as="span" css={{ ml: "$2", color: "$slate10" }}>
         <Link2Icon aria-hidden />

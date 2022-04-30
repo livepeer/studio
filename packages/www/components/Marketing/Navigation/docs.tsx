@@ -8,7 +8,7 @@ import {
   Dialog,
   DialogContent,
   DialogClose,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import Logo from "@components/Marketing/Logo";
 import { useApi } from "hooks";
@@ -52,7 +52,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
           top: 0,
           zIndex: 100,
           bc: "$loContrast",
-        }}>
+        }}
+      >
         <Flex justify="between" align="center">
           <Flex align="center">
             <Flex align="center">
@@ -77,7 +78,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                 "@bp2": {
                   display: "flex",
                 },
-              }}>
+              }}
+            >
               <Flex css={{ alignItems: "center" }}>
                 <MagnifyingGlassIcon />
                 <Text variant="gray" css={{ ml: "$2" }}>
@@ -90,7 +92,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                   p: "$1",
                   borderRadius: "4px",
                   color: "$mauve11",
-                }}>
+                }}
+              >
                 <Box css={{ fontSize: "10px" }}>⌘ K</Box>
               </Box>
             </Box>
@@ -100,7 +103,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                 "@bp2": {
                   ml: "$6",
                 },
-              }}>
+              }}
+            >
               <ThemeSwitch />
             </Box>
           </Flex>
@@ -119,7 +123,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                   "@bp2": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 <ListBulletIcon />
               </Flex>
             </DialogTrigger>
@@ -130,7 +135,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                   right: 20,
                   top: 20,
                   cursor: "pointer",
-                }}>
+                }}
+              >
                 <DialogClose as={Box}>
                   <Cross1Icon />
                 </DialogClose>
@@ -146,7 +152,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
               "@bp2": {
                 display: "flex",
               },
-            }}>
+            }}
+          >
             <Flex align="center" justify="between">
               <Flex align="center" justify="center">
                 {categories.map((each, idx) => {
@@ -172,7 +179,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                               textDecoration: "none",
                               color: "$hiContrast",
                             },
-                          }}>
+                          }}
+                        >
                           {each.name}
                         </A>
                       )}
@@ -194,7 +202,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
           "@bp2": {
             display: "none",
           },
-        }}>
+        }}
+      >
         <Flex align="center" justify="between" css={{ width: "100%" }}>
           <Flex align="center" justify="center">
             {categories.map((each, idx) => {
@@ -212,7 +221,8 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                         textDecoration: "none",
                         color: "$hiContrast",
                       },
-                    }}>
+                    }}
+                  >
                     {each.name}
                   </A>
                 </Link>

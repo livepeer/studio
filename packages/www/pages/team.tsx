@@ -1,6 +1,6 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
-import { Container, Box, Heading, Text } from "@livepeer.com/design-system";
+import { Container, Box, Heading, Text } from "@livepeer/design-system";
 import Prefooter from "@components/Marketing/Prefooter";
 import TeamSection from "../components/Marketing/TeamSection";
 import Guides from "@components/Marketing/Guides";
@@ -25,7 +25,8 @@ const TeamPage = ({ content }) => {
               py: "$9",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Box css={{ maxWidth: 768, mx: "auto", textAlign: "center" }}>
             <Heading size="4" css={{ fontWeight: 600, mb: "$4" }}>
               We’re building the future of video infrastructure services.

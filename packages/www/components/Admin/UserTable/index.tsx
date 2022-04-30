@@ -6,7 +6,7 @@ import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.com/api/src/config";
 import CommonAdminTable from "@components/Admin/CommonAdminTable";
-import { Box, Checkbox, Label, Tooltip } from "@livepeer.com/design-system";
+import { Box, Checkbox, Label, Tooltip } from "@livepeer/design-system";
 
 type UserTableProps = {
   userId: string;
@@ -93,7 +93,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
           return (
             <Select
               sx={{ ml: "1em", width: "8em" }}
-              onChange={(e) => setValue(e.target.value)}>
+              onChange={(e) => setValue(e.target.value)}
+            >
               <option id="empty" value="">
                 —
               </option>
@@ -149,7 +150,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       id={id}
       sx={{
         my: 2,
-      }}>
+      }}
+    >
       {suspendModal && selectedUser && (
         <Modal onClose={close}>
           <h3>Suspend user</h3>
@@ -167,7 +169,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             />
             <Tooltip
               content="Checking this will send the copyright infringiment email instead of the default one."
-              multiline>
+              multiline
+            >
               <Label sx={{ ml: 2 }} htmlFor="isCopyrightInfringiment">
                 Copyright infringiment
               </Label>
@@ -179,7 +182,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}>
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
             <Button
@@ -194,7 +198,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 })
                   .then(refecth)
                   .finally(close);
-              }}>
+              }}
+            >
               Suspend User
             </Button>
           </Flex>
@@ -212,7 +217,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}>
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
             <Button
@@ -222,7 +228,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 setUserSuspended(selectedUser.id, { suspended: false })
                   .then(refecth)
                   .finally(close);
-              }}>
+              }}
+            >
               Unsuspend User
             </Button>
           </Flex>
@@ -239,7 +246,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}>
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
             <Button
@@ -249,7 +257,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 makeUserAdmin(selectedUser.email, true)
                   .then(refecth)
                   .finally(close);
-              }}>
+              }}
+            >
               Make User Admin
             </Button>
           </Flex>
@@ -267,7 +276,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}>
+              sx={{ mr: 2 }}
+            >
               Cancel
             </Button>
             <Button
@@ -277,7 +287,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
                 makeUserAdmin(selectedUser.email, false)
                   .then(refecth)
                   .finally(close);
-              }}>
+              }}
+            >
               Remove Admin Rights
             </Button>
           </Flex>
@@ -294,33 +305,38 @@ const UserTable = ({ userId, id }: UserTableProps) => {
         err={loadingError}
         columns={columns}
         filtersDesc={filtersDesc}
-        initialSortBy={[{ id: "email", desc: false }]}>
+        initialSortBy={[{ id: "email", desc: false }]}
+      >
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || selectedUser.admin}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setAdminModal(true)}>
+          onClick={() => selectedUser && setAdminModal(true)}
+        >
           Make User Admin
         </Button>
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || !selectedUser.admin}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setRemoveAdminModal(true)}>
+          onClick={() => selectedUser && setRemoveAdminModal(true)}
+        >
           Remove Admin Rights
         </Button>
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || selectedUser.suspended}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setSuspendModal(true)}>
+          onClick={() => selectedUser && setSuspendModal(true)}
+        >
           Suspend User
         </Button>
         <Button
           variant="outlineSmall"
           disabled={!selectedUser || !selectedUser.suspended}
           sx={{ ml: "1em" }}
-          onClick={() => selectedUser && setUnsuspendModal(true)}>
+          onClick={() => selectedUser && setUnsuspendModal(true)}
+        >
           Unsuspend User
         </Button>
       </CommonAdminTable>

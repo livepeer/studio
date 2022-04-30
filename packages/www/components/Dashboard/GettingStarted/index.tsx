@@ -8,7 +8,7 @@ import {
   Button,
   Box,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 
@@ -30,7 +30,8 @@ const GettingStarted = ({ firstName = "" }) => {
               <Text
                 variant="gray"
                 size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
+                css={{ mb: "$3", lineHeight: "23px" }}
+              >
                 No code required! All you need to do is create a RTMP stream
                 with broadcasting software like{" "}
                 <Link passHref href="https://obsproject.com/">
@@ -45,7 +46,8 @@ const GettingStarted = ({ firstName = "" }) => {
               <Text
                 variant="gray"
                 size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
+                css={{ mb: "$3", lineHeight: "23px" }}
+              >
                 1. Navigate to the streams view, tap "Create stream", and give
                 your stream a name.
                 <br />
@@ -58,7 +60,8 @@ const GettingStarted = ({ firstName = "" }) => {
               <Text
                 variant="gray"
                 size="3"
-                css={{ mb: "$3", lineHeight: "23px" }}>
+                css={{ mb: "$3", lineHeight: "23px" }}
+              >
                 Need more help? Read our step-by-step getting started tutorial.
               </Text>
             </Box>
@@ -73,7 +76,8 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="violet"
+              >
                 <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
               </Button>
@@ -90,7 +94,8 @@ const GettingStarted = ({ firstName = "" }) => {
             <Text
               variant="gray"
               size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
+              css={{ mb: "$3", lineHeight: "23px" }}
+            >
               Ready to code? The Livepeer API is nimble and designed for
               customization. All you need to do is create an RTMP stream with
               broadcasting software like{" "}
@@ -118,7 +123,8 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="violet"
+              >
                 <Box css={{ mr: "$1" }}>Explore the API</Box>
                 <ArrowRightIcon />
               </Button>
@@ -135,14 +141,16 @@ const GettingStarted = ({ firstName = "" }) => {
             <Text
               variant="gray"
               size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
+              css={{ mb: "$3", lineHeight: "23px" }}
+            >
               Livepeer video infrastructure is designed to serve your app, from
               the ground up and at scale. Get started by reviewing and cloning
               one of our sample apps.
             </Text>
             <Link
               href="/docs/guides/application-development/example-app"
-              passHref>
+              passHref
+            >
               <Button
                 as="a"
                 target="_blank"
@@ -153,7 +161,8 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="violet"
+              >
                 <Box css={{ mr: "$1" }}>Clone and create</Box>
                 <ArrowRightIcon />
               </Button>
@@ -171,7 +180,8 @@ const GettingStarted = ({ firstName = "" }) => {
             <Text
               variant="gray"
               size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
+              css={{ mb: "$3", lineHeight: "23px" }}
+            >
               MistServer is a free, full-featured streaming media toolkit. It
               enables you to take any media from any location, using any method,
               and deliver it seamlessly to anyone, anywhere, in any format.
@@ -191,7 +201,8 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="violet"
+              >
                 <Box css={{ mr: "$1" }}>Downloads</Box>
                 <ArrowRightIcon />
               </Button>

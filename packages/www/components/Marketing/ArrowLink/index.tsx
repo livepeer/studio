@@ -1,4 +1,4 @@
-import { Box, Link as A } from "@livepeer.com/design-system";
+import { Box, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 
 const ArrowLink = ({
@@ -50,14 +50,16 @@ const ArrowLink = ({
           },
           ...css,
         }}
-        target={target}>
+        target={target}
+      >
         <Box>{children}</Box>
         <svg
           className="HoverArrow"
           width="10"
           height="10"
           viewBox="0 0 10 10"
-          aria-hidden="true">
+          aria-hidden="true"
+        >
           <g fillRule="evenodd">
             <path className="HoverArrow__linePath" d="M0 5h7" />
             <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />

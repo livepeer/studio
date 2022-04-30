@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Column } from "react-table";
-import { Box, Heading } from "@livepeer.com/design-system";
+import { Box, Heading } from "@livepeer/design-system";
 import { Stream } from "@livepeer.com/api";
 
 import {

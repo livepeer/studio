@@ -1,4 +1,4 @@
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 const Guides = ({ backgroundColor = "$loContrast" }) => {
   return (
@@ -7,7 +7,8 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
         position: "absolute",
         width: "100%",
         height: "100%",
-      }}>
+      }}
+    >
       <Box
         css={{
           position: "relative",
@@ -17,7 +18,8 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
           left: "0",
           overflow: "hidden",
           backgroundColor,
-        }}>
+        }}
+      >
         <Box
           css={{
             position: "absolute",
@@ -27,7 +29,8 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
             left: "0",
             px: "$4",
             pointerEvents: "none",
-          }}>
+          }}
+        >
           <Box
             css={{
               display: "grid",
@@ -39,7 +42,8 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
               "@bp2": {
                 grid: "1fr/repeat(4,1fr)",
               },
-            }}>
+            }}
+          >
             <Box
               css={{
                 width: "1px",

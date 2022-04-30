@@ -21,7 +21,7 @@ import {
   RadioGroup,
   Radio,
   Tooltip,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 import Spinner from "components/Dashboard/Spinner";
 import { useApi } from "hooks";
@@ -234,7 +234,8 @@ const SaveTargetDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-        onOpenAutoFocus={(e) => e.preventDefault()}>
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <AlertDialogTitle as={Heading} size="1">
           {`${action} multistream target`}
           {action === Action.Create ? (
@@ -250,7 +251,8 @@ const SaveTargetDialog = ({
           onSubmit={(e) => {
             e.preventDefault();
             return saveMultistreamTarget();
-          }}>
+          }}
+        >
           <Flex direction="column" gap="2">
             <Label htmlFor="targetName">Name</Label>
             <TextField
@@ -311,9 +313,11 @@ const SaveTargetDialog = ({
                 alignItems: "center",
                 justifyContent: "flex-start",
                 margin: "0px",
-              }}>
+              }}
+            >
               <RadioGroup
-                onValueChange={(e) => setStateProp("profile", e.target.value)}>
+                onValueChange={(e) => setStateProp("profile", e.target.value)}
+              >
                 <Box css={{ display: "flex", flexDirection: "column" }}>
                   {profileOpts.map((p) => (
                     <Box key={p.name} css={{ display: "flex", mb: "$2" }}>
@@ -325,7 +329,8 @@ const SaveTargetDialog = ({
                       <Tooltip multiline content={p.tooltip}>
                         <Label
                           css={{ pl: "$2", cursor: "default" }}
-                          htmlFor={`profile-${p.name}`}>
+                          htmlFor={`profile-${p.name}`}
+                        >
                           {p.displayName || p.name}
                         </Label>
                       </Tooltip>
@@ -350,28 +355,33 @@ const SaveTargetDialog = ({
               </Tooltip>
             </Box>
           </Flex>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-            {`${
-              action === Action.Create
-                ? "Addition of new multistream targets"
-                : "Updating a multistream target"
-            } will take effect when the next stream session is started.`}
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$2", fontSize: "$2", mb: "$4" }}
+            >
+              {`${
+                action === Action.Create
+                  ? "Addition of new multistream targets"
+                  : "Updating a multistream target"
+              } will take effect when the next stream session is started.`}
+            </Text>
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel disabled={saving} size="2" as={Button} ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button disabled={saving} size="2" ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
               disabled={saving || (action === Action.Update && !target)}
-              variant="violet">
+              variant="violet"
+            >
               {saving && (
                 <Spinner
                   css={{

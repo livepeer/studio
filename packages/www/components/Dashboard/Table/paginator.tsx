@@ -1,4 +1,4 @@
-import { Button } from "@livepeer.com/design-system";
+import { Button } from "@livepeer/design-system";
 
 interface Props {
   canPreviousPage: boolean;
@@ -16,11 +16,13 @@ const Paginator = ({
   canPreviousPage || canNextPage ? (
     <nav
       aria-label="Pagination"
-      css={{ display: "flex", justifyContent: "center", mt: 3 }}>
+      css={{ display: "flex", justifyContent: "center", mt: 3 }}
+    >
       <Button
         onClick={onPreviousPage}
         disabled={!canPreviousPage}
-        css={{ mr: 3 }}>
+        css={{ mr: 3 }}
+      >
         Previous page
       </Button>
       <Button onClick={onNextPage} disabled={!canNextPage}>

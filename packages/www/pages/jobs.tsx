@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Fade from "react-reveal/Fade";
 import { Element } from "react-scroll";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import Hero from "components/Marketing/Hero";
 import Layout from "layouts/main";
 
@@ -20,7 +20,8 @@ const JobsPage = ({ allJobs }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}>
+          }}
+        >
           Loading...
         </Box>
       </Layout>

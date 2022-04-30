@@ -1,5 +1,5 @@
 import SimpleBlockContent from "../SimpleBlockContent";
-import { Container, Box } from "@livepeer.com/design-system";
+import { Container, Box } from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 
 const TextSection = ({ text }) => (
@@ -16,7 +16,8 @@ const TextSection = ({ text }) => (
             px: "$4",
             mx: "auto",
           },
-        }}>
+        }}
+      >
         <Box css={{ maxWidth: 768, mx: "auto" }}>
           <Box css={{ p: { mb: "$4" } }}>
             <SimpleBlockContent blocks={text} />

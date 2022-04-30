@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 import Spinner from "components/Dashboard/Spinner";
 
@@ -42,43 +42,45 @@ const DisableDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Disable multistream target?
+        <AlertDialogTitle asChild>
+          <Heading size="1">Disable multistream target?</Heading>
         </AlertDialogTitle>
-        <AlertDialogDescription
-          as={Text}
-          size="3"
-          variant="gray"
-          css={{ mt: "$2", lineHeight: "22px" }}>
-          Changes will take effect when the next stream session is started.
+        <AlertDialogDescription asChild>
+          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+            Changes will take effect when the next stream session is started.
+          </Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel size="2" disabled={saving} as={Button} ghost>
-            Cancel
+          <AlertDialogCancel asChild>
+            <Button size="2" disabled={saving} ghost>
+              Cancel
+            </Button>
           </AlertDialogCancel>
-          <AlertDialogAction
-            size="2"
-            as={Button}
-            disabled={saving}
-            onClick={async (e) => {
-              e.preventDefault();
-              setSaving(true);
-              await onDialogAction();
-              setSaving(false);
-              setOpen(false);
-            }}
-            variant="red">
-            {saving && (
-              <Spinner
-                css={{
-                  width: 16,
-                  height: 16,
-                  mr: "$2",
-                }}
-              />
-            )}
-            Disable target
+          <AlertDialogAction asChild>
+            <Button
+              size="2"
+              disabled={saving}
+              onClick={async (e) => {
+                e.preventDefault();
+                setSaving(true);
+                await onDialogAction();
+                setSaving(false);
+                setOpen(false);
+              }}
+              variant="red"
+            >
+              {saving && (
+                <Spinner
+                  css={{
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Disable target
+            </Button>
           </AlertDialogAction>
         </Flex>
       </AlertDialogContent>
@@ -105,54 +107,56 @@ const DeleteDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Delete multistream target?
+        <AlertDialogTitle asChild>
+          <Heading size="1">Delete multistream target?</Heading>
         </AlertDialogTitle>
-        <AlertDialogDescription
-          as={Text}
-          size="3"
-          variant="gray"
-          css={{ mt: "$2", lineHeight: "22px" }}>
-          Deleting a target cannot be undone. Any active sessions will continue
-          to be multistreamed to this destination.
+        <AlertDialogDescription asChild>
+          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+            Deleting a target cannot be undone. Any active sessions will
+            continue to be multistreamed to this destination.
+          </Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel size="2" as={Button} ghost>
-            Cancel
+          <AlertDialogCancel asChild>
+            <Button size="2" ghost>
+              Cancel
+            </Button>
           </AlertDialogCancel>
-          <AlertDialogAction
-            as={Button}
-            size="2"
-            disabled={saving}
-            onClick={async (e) => {
-              e.preventDefault();
-              setSaving(true);
-              try {
-                const targets = stream.multistream.targets.filter(
-                  (t) => t.id !== target.id
-                );
-                const patch = { multistream: { targets } };
-                await patchStream(stream.id, patch);
-                await deleteMultistreamTarget(target.id);
-                setOpen(false);
-                await invalidateStream({ ...stream, ...patch });
-              } finally {
-                setSaving(false);
-              }
-            }}
-            variant="red">
-            {saving && (
-              <Spinner
-                css={{
-                  color: "$hiContrast",
-                  width: 16,
-                  height: 16,
-                  mr: "$2",
-                }}
-              />
-            )}
-            Delete
+          <AlertDialogAction asChild>
+            <Button
+              size="2"
+              disabled={saving}
+              onClick={async (e) => {
+                e.preventDefault();
+                setSaving(true);
+                try {
+                  const targets = stream.multistream.targets.filter(
+                    (t) => t.id !== target.id
+                  );
+                  const patch = { multistream: { targets } };
+                  await patchStream(stream.id, patch);
+                  await deleteMultistreamTarget(target.id);
+                  setOpen(false);
+                  await invalidateStream({ ...stream, ...patch });
+                } finally {
+                  setSaving(false);
+                }
+              }}
+              variant="red"
+            >
+              {saving && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Delete
+            </Button>
           </AlertDialogAction>
         </Flex>
       </AlertDialogContent>
@@ -221,16 +225,18 @@ const Toolbox = ({
         }, [target?.disabled, setTargetDisabled])}
       />
       <DropdownMenu>
-        <DropdownMenuTrigger
-          as={Button}
-          ghost
-          size="1"
-          css={{
-            display: "flex",
-            ai: "center",
-            "&:hover": { boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)" },
-          }}>
-          <Overflow />
+        <DropdownMenuTrigger asChild>
+          <Button
+            ghost
+            size="1"
+            css={{
+              display: "flex",
+              ai: "center",
+              "&:hover": { boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)" },
+            }}
+          >
+            <Overflow />
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
@@ -240,7 +246,8 @@ const Toolbox = ({
                 stream.isActive
                   ? errorRecordDialogState.onOn()
                   : setSaveDialogOpen(true)
-              }>
+              }
+            >
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -250,7 +257,8 @@ const Toolbox = ({
                   ? errorRecordDialogState.onOn()
                   : setDeleteDialogOpen(true)
               }
-              color="red">
+              color="red"
+            >
               Delete
             </DropdownMenuItem>
           </DropdownMenuGroup>

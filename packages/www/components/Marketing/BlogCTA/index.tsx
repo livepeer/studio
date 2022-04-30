@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Flex } from "@livepeer.com/design-system";
+import { Flex } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import Link from "next/link";
 
@@ -31,7 +31,8 @@ const BlogCTA = ({
         "@bp2": {
           my: "40px",
         },
-      }}>
+      }}
+    >
       {document && (
         <Link href={`/${document?.slug?.current}`} passHref>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
@@ -47,7 +48,8 @@ const BlogCTA = ({
           css={{ mr: "$4" }}
           variant={variant}
           target="_blank"
-          href={externalLink}>
+          href={externalLink}
+        >
           {title}
         </Button>
       )}

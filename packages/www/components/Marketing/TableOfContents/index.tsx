@@ -1,4 +1,4 @@
-import { Box, Flex } from "@livepeer.com/design-system";
+import { Box, Flex } from "@livepeer/design-system";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -38,7 +38,8 @@ const IconContainer = ({ children }) => (
       mr: "$4",
       width: "16px",
       height: "16px",
-    }}>
+    }}
+  >
     {children}
   </Box>
 );
@@ -68,7 +69,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             display: "flex",
             pl: "0",
             py: "12px",
-          }}>
+          }}
+        >
           <IconContainer>
             <Icon />
           </IconContainer>
@@ -106,7 +108,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             "&:hover": {
               color: "$violet9",
             },
-          }}>
+          }}
+        >
           <IconContainer>
             <Icon />
           </IconContainer>
@@ -128,7 +131,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
                 bc: "orange",
                 ...labelStyles,
               }),
-            }}>
+            }}
+          >
             {heading.content}
           </Box>
         </Box>
@@ -167,7 +171,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             cursor: "pointer",
             alignItems: "center",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <Box>{renderHeading(heading, hasChildren, isChildren)}</Box>
           {hasChildren && (
             <>
@@ -189,7 +194,8 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
               display: isOpen || isActive ? "block" : "none",
               my: 0,
               pl: "8px",
-            }}>
+            }}
+          >
             {renderChildren(children)}
           </Box>
         )}

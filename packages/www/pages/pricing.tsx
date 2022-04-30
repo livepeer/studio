@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import { Box, Heading, Text, Container } from "@livepeer.com/design-system";
+import { Box, Heading, Text, Container } from "@livepeer/design-system";
 import Prefooter from "@components/Marketing/Prefooter";
 import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
 import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
@@ -21,7 +21,8 @@ const PricingPage = () => {
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Box css={{ textAlign: "center", mb: "$5" }}>
             <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
               Start free.
@@ -46,7 +47,8 @@ const PricingPage = () => {
                   py: "$8",
                   px: "$4",
                 },
-              }}>
+              }}
+            >
               <PricingCalculator />
             </Container>
           </Box>

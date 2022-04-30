@@ -1,4 +1,4 @@
-import { Box, Container } from "@livepeer.com/design-system";
+import { Box, Container } from "@livepeer/design-system";
 
 const TableContainer = ({
   "aria-label": ariaLabel,
@@ -15,7 +15,8 @@ const TableContainer = ({
         "&:focus": {
           outline: 0,
         },
-      }}>
+      }}
+    >
       <Box as="table" {...props} />
     </Box>
   );

@@ -1,5 +1,5 @@
 import Layout from "layouts/dashboard";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import StreamsTable from "components/Dashboard/StreamsTable";
 import { DashboardStream as Content } from "content";
@@ -16,7 +16,8 @@ const Streams = () => {
     <Layout
       id="streams"
       breadcrumbs={[{ title: "Streams" }]}
-      {...Content.metaData}>
+      {...Content.metaData}
+    >
       <Box
         css={{
           pb: "$9",
@@ -25,7 +26,8 @@ const Streams = () => {
           "@bp4": {
             p: "$6",
           },
-        }}>
+        }}
+      >
         <StreamsTable
           title="Streams"
           userId={user.id}

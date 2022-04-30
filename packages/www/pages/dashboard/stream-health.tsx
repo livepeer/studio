@@ -6,7 +6,7 @@ import {
   Text,
   TextField,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Layout from "../../layouts/dashboard";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
@@ -29,7 +29,8 @@ const Arrow = ({ active }: Props) => {
       height="48"
       viewBox="0 0 48 48"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <circle
         cx="24"
         cy="24"
@@ -123,20 +124,23 @@ const Health = () => {
     <Layout
       id="streamHealth"
       breadcrumbs={[{ title: "Stream Health" }]}
-      {...Content.metaData}>
+      {...Content.metaData}
+    >
       <Box css={{ padding: "$6" }}>
         <Flex
           css={{
             borderBottom: "1px solid $colors$mauve6",
             paddingBottom: "$4",
-          }}>
+          }}
+        >
           <Text size="7" as="h1" css={{ fontWeight: 600 }}>
             Stream Health
           </Text>
         </Flex>
         <Label
           css={{ display: "block", mt: "$4", mb: "$2" }}
-          htmlFor="playbackUrl">
+          htmlFor="playbackUrl"
+        >
           Playback URL
         </Label>
         <TextField
@@ -157,24 +161,28 @@ const Health = () => {
             width: "100%",
             gap: "24px",
             marginTop: "34px",
-          }}>
+          }}
+        >
           <Box>
             <Heading
               as="h2"
               size="1"
-              css={{ fontWeight: 600, marginBottom: "$2" }}>
+              css={{ fontWeight: 600, marginBottom: "$2" }}
+            >
               Source Stream
             </Heading>
             <Text
               as="p"
-              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}>
+              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}
+            >
               Only the source.
             </Text>
             <Box
               css={{
                 borderRadius: "$3",
                 overflow: "hidden",
-              }}>
+              }}
+            >
               <Player src={playbackUrl} />
             </Box>
           </Box>
@@ -183,19 +191,22 @@ const Health = () => {
             <Heading
               as="h2"
               size="1"
-              css={{ fontWeight: 600, marginBottom: "$2" }}>
+              css={{ fontWeight: 600, marginBottom: "$2" }}
+            >
               Source + Transcoded Renditions
             </Heading>
             <Text
               as="p"
-              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}>
+              css={{ color: "$gray9", fontSize: "$3", marginBottom: "$5" }}
+            >
               Adaptive bitrate streaming
             </Text>
             <Box
               css={{
                 borderRadius: "$3",
                 overflow: "hidden",
-              }}>
+              }}
+            >
               <Player src={playbackUrl} />
             </Box>
           </Box>
@@ -204,12 +215,14 @@ const Health = () => {
           <Heading
             as="h2"
             size="1"
-            css={{ fontWeight: 600, marginBottom: "$2" }}>
+            css={{ fontWeight: 600, marginBottom: "$2" }}
+          >
             Session ingest rate
           </Heading>
           <Text
             as="p"
-            css={{ color: "$gray9", fontSize: "$3", marginBottom: "$7" }}>
+            css={{ color: "$gray9", fontSize: "$3", marginBottom: "$7" }}
+          >
             After the stream loads, ingest rate updates every 10 seconds.
           </Text>
           <Chart data={dataChart} />

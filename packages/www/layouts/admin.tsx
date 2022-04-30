@@ -19,8 +19,9 @@ import {
   lightTheme,
   DesignSystemProvider,
   SnackbarProvider,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { hotjar } from "react-hotjar";
+import Providers from "@lib/Providers";
 
 interface Props {
   title?: string;
@@ -93,22 +94,8 @@ const Layout = ({
     seo["canonical"] = canonical;
   }
 
-  function ContextProviders({ children }) {
-    return (
-      <DesignSystemProvider>
-        <StitchesThemeProvider
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme="light"
-          value={{ dark: darkTheme.className, light: lightTheme.className }}>
-          <SnackbarProvider>{children}</SnackbarProvider>
-        </StitchesThemeProvider>
-      </DesignSystemProvider>
-    );
-  }
-
   return (
-    <ContextProviders>
+    <Providers>
       <IdProvider>
         <Head>
           <link rel="stylesheet" href="/reset.css" />
@@ -126,7 +113,8 @@ const Layout = ({
                   justifyContent: "flex-start",
                   zIndex: 1,
                   position: "relative",
-                }}>
+                }}
+              >
                 {preview && (
                   <Box
                     sx={{
@@ -140,7 +128,8 @@ const Layout = ({
                       bg: "primary",
                       color: "white",
                       lineHeight: "32px",
-                    }}>
+                    }}
+                  >
                     Preview Mode
                   </Box>
                 )}
@@ -156,7 +145,7 @@ const Layout = ({
           </Box>
         </ThemeProvider>
       </IdProvider>
-    </ContextProviders>
+    </Providers>
   );
 };
 

@@ -6,7 +6,7 @@ import {
   Button,
   Text,
   styled,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/Dashboard/PlanForm";
 import { products } from "@livepeer.com/api/src/config";
@@ -32,7 +32,8 @@ const steps = [
           borderRadius: 6,
           color: "$hiContrast",
           lineHeight: 1.5,
-        }}>
+        }}
+      >
         Welcome to Livepeer.com! You're currently subscribed to the free plan.
         Click "Upgrade" to enter your credit card information and switch over to
         the pay-as-you-go plan for unlimited transcoding minutes.
@@ -64,7 +65,8 @@ const Item = ({
       letterSpacing: -0.3,
       borderColor: "$mauve5",
       ...css,
-    }}>
+    }}
+  >
     {displayCheck && (
       <StyledIcon icon={CheckIcon} css={{ mr: "$3", color: color }} />
     )}
@@ -123,19 +125,22 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
           position: "relative",
           py: 5,
           mb: 100,
-        }}>
+        }}
+      >
         <Flex
           css={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <Box
             css={{
               pl: 4,
               width: "25%",
               maxWidth: 174,
-            }}>
+            }}
+          >
             <Flex
               css={{
                 mb: "$4",
@@ -143,7 +148,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 justifyContent: "flex-end",
                 height: 116,
                 fontWeight: 500,
-              }}>
+              }}
+            >
               Usage
             </Flex>
             <List>
@@ -167,14 +173,16 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               borderRadius: 16,
               width: "25%",
               minWidth: 300,
-            }}>
+            }}
+          >
             <Flex
               css={{
                 mb: "$4",
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
-              }}>
+              }}
+            >
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_0"].name}
               </Heading>
@@ -228,14 +236,16 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               background: "$panel",
               p: "$4",
               minWidth: 300,
-            }}>
+            }}
+          >
             <Flex
               css={{
                 mb: "$4",
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
-              }}>
+              }}
+            >
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_1"].name}
               </Heading>
@@ -290,21 +300,24 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               p: "$4",
               width: "25%",
               minWidth: 300,
-            }}>
+            }}
+          >
             <Flex
               css={{
                 mb: "$4",
                 flexDirection: "column",
                 justifyContent: "space-between",
                 height: 116,
-              }}>
+              }}
+            >
               <Heading as="h3" size="2" css={{ mb: "$3" }}>
                 {products["prod_2"].name}
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
               <Link
                 href="/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
-                passHref>
+                passHref
+              >
                 <Button
                   as="a"
                   size="3"
@@ -313,7 +326,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                       "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
                     );
                   }}
-                  variant="indigo">
+                  variant="indigo"
+                >
                   Contact Us
                 </Button>
               </Link>
@@ -342,7 +356,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
             mx: "auto",
             fontStyle: "italic",
             color: "$hiContrast",
-          }}>
+          }}
+        >
           *Currently, we are not charging for this feature. We'll be sure to
           reach out before we do.
         </Container>

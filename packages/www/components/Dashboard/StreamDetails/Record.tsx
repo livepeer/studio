@@ -3,7 +3,7 @@ import {
   DropdownMenuItem,
   Switch,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "../../../hooks";
 import ErrorDialog from "../ErrorDialog";
@@ -13,8 +13,7 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
   const [openSnackbar] = useSnackbar();
   const errorRecordDialogState = useToggleState();
 
-  const onCheckedChange = async (e) => {
-    e.preventDefault();
+  const onCheckedChange = async () => {
     if (stream.isActive) {
       errorRecordDialogState.onOn();
     } else if (!stream.record) {
@@ -35,10 +34,10 @@ const Record = ({ stream, invalidate, isSwitch = true }) => {
           checked={!!stream.record}
           name="record-mode"
           value={`${!!stream.record}`}
-          onCheckedChange={(e) => onCheckedChange(e)}
+          onCheckedChange={() => onCheckedChange()}
         />
       ) : (
-        <Box as={DropdownMenuItem} onSelect={(e) => onCheckedChange(e)}>
+        <Box as={DropdownMenuItem} onSelect={() => onCheckedChange()}>
           <Box>{!stream.record ? "Enable recording" : "Disable recording"}</Box>
         </Box>
       )}

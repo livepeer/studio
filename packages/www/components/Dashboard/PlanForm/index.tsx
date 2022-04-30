@@ -14,7 +14,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
 import { products } from "@livepeer.com/api/src/config";
@@ -191,17 +191,20 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             onClick={() => {
               onClick();
               setOpen(true);
-            }}>
+            }}
+          >
             {text}
           </Button>
         </Flex>
 
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
+        >
           <Box
             as="form"
             onSubmit={handleSubmit(onSubmit)}
-            id="plan-stripe-form">
+            id="plan-stripe-form"
+          >
             <AlertDialogTitle as={Heading} size="1">
               {!user.stripeCustomerPaymentMethodId
                 ? "Enter card details"
@@ -210,7 +213,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
 
             <AlertDialogDescription
               as="div"
-              css={{ mt: "$4", lineHeight: "22px" }}>
+              css={{ mt: "$4", lineHeight: "22px" }}
+            >
               {!user.stripeCustomerPaymentMethodId ? (
                 <Box css={{ color: "$hiContrast", mt: "$4" }}>
                   <Box>
@@ -235,11 +239,13 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       width: "100%",
                       alignItems: "center",
                       mb: "$2",
-                    }}>
+                    }}
+                  >
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="email">
+                        htmlFor="email"
+                      >
                         Email
                       </Label>
                       <TextField
@@ -256,7 +262,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="phone">
+                        htmlFor="phone"
+                      >
                         Phone
                       </Label>
                       <TextField
@@ -274,7 +281,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   <Box>
                     <Label
                       css={{ mb: "$1", display: "block" }}
-                      htmlFor="address">
+                      htmlFor="address"
+                    >
                       Address
                     </Label>
                     <TextField
@@ -295,11 +303,13 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       width: "100%",
                       alignItems: "center",
                       mb: "$2",
-                    }}>
+                    }}
+                  >
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="city">
+                        htmlFor="city"
+                      >
                         City
                       </Label>
                       <TextField
@@ -316,7 +326,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="State">
+                        htmlFor="State"
+                      >
                         State
                       </Label>
                       <TextField
@@ -333,7 +344,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="postalCode">
+                        htmlFor="postalCode"
+                      >
                         ZIP
                       </Label>
                       <TextField
@@ -355,7 +367,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       color: "$hiContrast",
                       fontWeight: 500,
                       mb: "$1",
-                    }}>
+                    }}
+                  >
                     Card
                   </Box>
                   <Box
@@ -364,7 +377,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       borderRadius: 6,
                       background: "$loContrast",
                       px: "$2",
-                    }}>
+                    }}
+                  >
                     <CardElement
                       options={{
                         iconStyle: "solid",
@@ -415,14 +429,16 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             </AlertDialogDescription>
 
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-              <AlertDialogCancel
-                size="2"
-                onClick={() => {
-                  setOpen(false);
-                }}
-                as={Button}
-                ghost>
-                Cancel
+              <AlertDialogCancel asChild>
+                <Button
+                  size="2"
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  ghost
+                >
+                  Cancel
+                </Button>
               </AlertDialogCancel>
               <Button
                 size="2"
@@ -431,7 +447,8 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
                 }
-                variant="violet">
+                variant="violet"
+              >
                 {status === "processing" && (
                   <Spinner
                     css={{

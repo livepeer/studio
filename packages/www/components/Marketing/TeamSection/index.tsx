@@ -1,4 +1,4 @@
-import { Container, Grid } from "@livepeer.com/design-system";
+import { Container, Grid } from "@livepeer/design-system";
 import TeamMember from "@components/Marketing/TeamMember";
 
 const TeamSection = ({ teamMembers }) => {
@@ -16,7 +16,8 @@ const TeamSection = ({ teamMembers }) => {
         "@bp3": {
           gridTemplateColumns: "repeat(4,1fr)",
         },
-      }}>
+      }}
+    >
       {teamMembers.map((t, i) => (
         <TeamMember
           key={i}

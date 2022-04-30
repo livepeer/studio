@@ -1,4 +1,4 @@
-import { TextField, Grid, Box, Container } from "@livepeer.com/design-system";
+import { TextField, Grid, Box, Container } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
 import { useRouter } from "next/router";
@@ -63,7 +63,8 @@ const Login = ({
       css={{
         position: "relative",
         width: "100%",
-      }}>
+      }}
+    >
       <Box
         as="form"
         onSubmit={submit}
@@ -78,7 +79,8 @@ const Login = ({
           mr: "auto",
           maxWidth: 500,
         }}
-        id={id}>
+        id={id}
+      >
         {showName && (
           <Grid
             gap={3}
@@ -86,7 +88,8 @@ const Login = ({
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
               alignItems: "center",
-            }}>
+            }}
+          >
             <TextField
               size="3"
               id="firstName"
@@ -118,7 +121,8 @@ const Login = ({
               gridTemplateColumns: "1fr 1fr",
               width: "100%",
               alignItems: "center",
-            }}>
+            }}
+          >
             <TextField
               size="3"
               id="organization"

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { MetaMaskProvider } from "metamask-react";
 import "../css/algolia-docsearch.css";
 import "../css/recaptcha.css";
+import React from "react";
 
 const queryClient = new QueryClient();
 

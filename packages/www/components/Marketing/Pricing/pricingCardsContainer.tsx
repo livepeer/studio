@@ -1,5 +1,5 @@
 import PricingCard, { PricingCardContent } from "./pricingCard";
-import { Box, Grid, Flex, Text, Badge } from "@livepeer.com/design-system";
+import { Box, Grid, Flex, Text, Badge } from "@livepeer/design-system";
 
 const PricingCardsContainer = () => {
   return (
@@ -14,7 +14,8 @@ const PricingCardsContainer = () => {
         "@bp3": {
           px: "12px",
         },
-      }}>
+      }}
+    >
       <Grid
         css={{
           gap: "22px",
@@ -26,7 +27,8 @@ const PricingCardsContainer = () => {
           "@bp3": {
             grid: "1fr/repeat(4,1fr)",
           },
-        }}>
+        }}
+      >
         <Box
           css={{
             alignSelf: "flex-end",
@@ -36,7 +38,8 @@ const PricingCardsContainer = () => {
             "@bp3": {
               display: "block",
             },
-          }}>
+          }}
+        >
           <Box css={{ fontSize: "16px", mb: "16px" }}>Usage</Box>
           <PricingCardContent>
             <Text
@@ -44,7 +47,8 @@ const PricingCardsContainer = () => {
               css={{
                 fontWeight: 600,
                 mb: "$1",
-              }}>
+              }}
+            >
               Transcoding
             </Text>
             <Text size="2" variant="gray">
@@ -58,7 +62,8 @@ const PricingCardsContainer = () => {
               css={{
                 fontWeight: 600,
                 mb: "$1",
-              }}>
+              }}
+            >
               Recording Storage
             </Text>
             <Text size="2" variant="gray">
@@ -71,7 +76,8 @@ const PricingCardsContainer = () => {
               css={{
                 fontWeight: 600,
                 mb: "$1",
-              }}>
+              }}
+            >
               Stream Delivery via CDN
             </Text>
             <Text size="2" variant="gray">
@@ -84,7 +90,8 @@ const PricingCardsContainer = () => {
               css={{
                 fontWeight: 600,
                 mb: "$1",
-              }}>
+              }}
+            >
               Multistreaming*
             </Text>
             <Text size="2" variant="gray">
@@ -103,7 +110,8 @@ const PricingCardsContainer = () => {
             href: "/register",
             color: "$loContrast",
             bg: "$hiContrast",
-          }}>
+          }}
+        >
           <Box css={{ mt: "20px" }}>
             <PricingCardContent>
               <Badge
@@ -115,21 +123,24 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Transcoding
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 1000
               </Box>
               <Box
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 minutes/month
               </Box>
             </PricingCardContent>
@@ -143,13 +154,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Recording storage
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Coming soon
               </Box>
             </PricingCardContent>
@@ -163,21 +176,24 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Stream delivery via CDN
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 10
               </Box>
               <Box
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 current viewers
               </Box>
             </PricingCardContent>
@@ -191,21 +207,24 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Multistreaming
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 3
               </Box>
               <Box
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 stream destinations
               </Box>
             </PricingCardContent>
@@ -220,7 +239,8 @@ const PricingCardsContainer = () => {
             href: "/register",
             color: "$loContrast",
             bg: "$hiContrast",
-          }}>
+          }}
+        >
           <Box css={{ mt: "20px" }}>
             <PricingCardContent>
               <Badge
@@ -232,14 +252,16 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Transcoding
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 $0.005
                 <Box
                   as="span"
@@ -247,7 +269,8 @@ const PricingCardsContainer = () => {
                     fontSize: "16px",
                     fontWeight: "normal",
                     ml: "4px",
-                  }}>
+                  }}
+                >
                   USD
                 </Box>
               </Box>
@@ -255,7 +278,8 @@ const PricingCardsContainer = () => {
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 / min video ingested
               </Box>
             </PricingCardContent>
@@ -269,13 +293,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Recording storage
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Coming soon
               </Box>
             </PricingCardContent>
@@ -289,14 +315,16 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Stream delivery via CDN
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 $0.015
                 <Box
                   as="span"
@@ -304,7 +332,8 @@ const PricingCardsContainer = () => {
                     fontSize: "16px",
                     fontWeight: "normal",
                     ml: "4px",
-                  }}>
+                  }}
+                >
                   USD
                 </Box>
               </Box>
@@ -312,7 +341,8 @@ const PricingCardsContainer = () => {
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 / GB video streamed
               </Box>
             </PricingCardContent>
@@ -326,14 +356,16 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Multistreaming
               </Badge>
               <Box
                 css={{
                   fontSize: "32px",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 $0.002
                 <Box
                   as="span"
@@ -341,7 +373,8 @@ const PricingCardsContainer = () => {
                     fontSize: "16px",
                     fontWeight: "normal",
                     ml: "4px",
-                  }}>
+                  }}
+                >
                   USD
                 </Box>
               </Box>
@@ -349,7 +382,8 @@ const PricingCardsContainer = () => {
                 css={{
                   fontSize: "16px",
                   lineHeight: "24px",
-                }}>
+                }}
+              >
                 / min per destination*
               </Box>
             </PricingCardContent>
@@ -364,7 +398,8 @@ const PricingCardsContainer = () => {
             href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
             color: "$loContrast",
             bg: "$hiContrast",
-          }}>
+          }}
+        >
           <Box css={{ mt: "20px" }}>
             <PricingCardContent>
               <Badge
@@ -376,13 +411,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Transcoding
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Custom pricing
               </Box>
             </PricingCardContent>
@@ -396,13 +433,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Recording storage
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Coming soon
               </Box>
             </PricingCardContent>
@@ -416,13 +455,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Stream delivery via CDN
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Custom pricing
               </Box>
             </PricingCardContent>
@@ -436,13 +477,15 @@ const PricingCardsContainer = () => {
                   "@bp3": {
                     display: "none",
                   },
-                }}>
+                }}
+              >
                 Multistreaming
               </Badge>
               <Box
                 css={{
                   fontSize: "$5",
-                }}>
+                }}
+              >
                 Custom pricing
               </Box>
             </PricingCardContent>
@@ -455,7 +498,8 @@ const PricingCardsContainer = () => {
         css={{
           mt: "$8",
           textAlign: "center",
-        }}>
+        }}
+      >
         *Currently, we are not charging for this feature. We'll be sure to reach
         out before we do.
       </Text>

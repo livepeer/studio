@@ -10,7 +10,7 @@ import {
   TextArea,
   Heading,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
 import Button from "@components/Marketing/Button";
 import Prefooter from "@components/Marketing/Prefooter";
@@ -57,7 +57,8 @@ const ContactPage = () => {
               py: "$8",
               px: "$4",
             },
-          }}>
+          }}
+        >
           <Box css={{ mb: "$5", textAlign: "center" }}>
             <Heading as="h1" size="3" css={{ fontWeight: 600, mb: "$3" }}>
               Get in touch
@@ -70,7 +71,8 @@ const ContactPage = () => {
               Or email us at{" "}
               <A
                 href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry"
-                target="_blank">
+                target="_blank"
+              >
                 hello@livepeer.com
               </A>
               .
@@ -81,7 +83,8 @@ const ContactPage = () => {
             id="contact-form"
             ref={formEl}
             onSubmit={handleSubmit}
-            css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}>
+            css={{ maxWidth: 630, mx: "auto", textAlign: "center" }}
+          >
             <Grid
               css={{
                 mb: "$4",
@@ -92,7 +95,8 @@ const ContactPage = () => {
                   gridTemplateColumns: "repeat(2,1fr)",
                 },
               }}
-              gap="5">
+              gap="5"
+            >
               <TextField
                 size="3"
                 id="firstname"
@@ -119,7 +123,8 @@ const ContactPage = () => {
                   gridTemplateColumns: "repeat(2,1fr)",
                 },
               }}
-              gap="5">
+              gap="5"
+            >
               <TextField
                 size="3"
                 id="email"

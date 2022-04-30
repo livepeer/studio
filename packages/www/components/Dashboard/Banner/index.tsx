@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Promo } from "@livepeer.com/design-system";
+import { Box, Flex, Text, Promo } from "@livepeer/design-system";
 
 const Banner = ({
   title,

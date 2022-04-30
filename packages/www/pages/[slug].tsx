@@ -8,7 +8,7 @@ import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
 import { getComponent } from "lib/utils";
 import { useRouter } from "next/router";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 const Page = ({
   title,
@@ -33,7 +33,8 @@ const Page = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}>
+          }}
+        >
           Loading...
         </Box>
       </Layout>
@@ -54,7 +55,8 @@ const Page = ({
         alt: openGraphImage?.asset?.altText,
       }}
       url={metaUrl}
-      preview={preview}>
+      preview={preview}
+    >
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}

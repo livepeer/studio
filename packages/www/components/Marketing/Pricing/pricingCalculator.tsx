@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
-import { Box, Grid, Heading, Text } from "@livepeer.com/design-system";
+import { Box, Grid, Heading, Text } from "@livepeer/design-system";
 
 const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(600);
@@ -25,7 +25,8 @@ const PricingCalculator = () => {
           mb: "$4",
           textAlign: "center",
           fontWeight: 600,
-        }}>
+        }}
+      >
         Estimate your monthly costs
       </Heading>
       <Text
@@ -35,7 +36,8 @@ const PricingCalculator = () => {
           mb: "$9",
           alignSelf: "center",
           textAlign: "center",
-        }}>
+        }}
+      >
         Add details about your content and audience
       </Text>
       <Grid
@@ -47,7 +49,8 @@ const PricingCalculator = () => {
           "@bp3": {
             gridTemplateColumns: "repeat(2,1fr)",
           },
-        }}>
+        }}
+      >
         <Calculator
           streamLength={streamLength}
           monthlyStreams={monthlyStreams}

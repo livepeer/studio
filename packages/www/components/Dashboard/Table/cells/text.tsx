@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
-import { Box, Link as A } from "@livepeer.com/design-system";
+import { Box, Link as A } from "@livepeer/design-system";
 
 export type TextCellProps = {
   children?: React.ReactNode;
@@ -22,7 +22,8 @@ const TextCell = <D extends TableData>({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid">
+          effect="solid"
+        >
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}

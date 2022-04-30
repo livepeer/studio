@@ -11,7 +11,7 @@ import {
   Heading,
   Text,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import Spinner from "components/Dashboard/Spinner";
 
@@ -31,8 +31,8 @@ const CreateAssetDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Create a new asset
+        <AlertDialogTitle asChild>
+          <Heading size="1">Create a new asset</Heading>
         </AlertDialogTitle>
 
         <Box
@@ -51,7 +51,8 @@ const CreateAssetDialog = ({
             } finally {
               setCreating(false);
             }
-          }}>
+          }}
+        >
           <Flex direction="column" gap="2">
             <Label htmlFor="assetName">Asset name</Label>
             <TextField
@@ -65,12 +66,14 @@ const CreateAssetDialog = ({
               placeholder="e.g. My video asset"
             />
           </Flex>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
-            The name of the `Asset` containing a custom human-readable title.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}
+            >
+              The name of the `Asset` containing a custom human-readable title.
+            </Text>
           </AlertDialogDescription>
           <Flex direction="column" gap="2">
             <Label htmlFor="ingestUrl">Asset URL</Label>
@@ -86,24 +89,28 @@ const CreateAssetDialog = ({
               placeholder="e.g. https://example.com/play.mp4"
             />
           </Flex>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
-            The URL of the file that Livepeer should download and use.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}
+            >
+              The URL of the file.
+            </Text>
           </AlertDialogDescription>
-
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel disabled={creating} size="2" as={Button} ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button disabled={creating} size="2" ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
               disabled={creating}
-              variant="violet">
+              variant="violet"
+            >
               {creating && (
                 <Spinner
                   css={{

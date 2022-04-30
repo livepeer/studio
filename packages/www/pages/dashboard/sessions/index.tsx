@@ -1,5 +1,5 @@
 import Layout from "layouts/dashboard";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import AllSessionsTable from "components/Dashboard/AllSessionsTable";
 
@@ -21,7 +21,8 @@ const Sessions = () => {
           "@bp4": {
             p: "$6",
           },
-        }}>
+        }}
+      >
         <AllSessionsTable />
       </Box>
     </Layout>

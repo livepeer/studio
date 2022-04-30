@@ -1,4 +1,4 @@
-import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer.com/design-system";
+import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer/design-system";
 
 const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
   const transcodingPrice = prices[0].price;
@@ -10,7 +10,8 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
         borderCollapse: "separate",
         borderSpacing: 0,
         tableLayout: "initial",
-      }}>
+      }}
+    >
       <Thead>
         <Tr>
           <Th>Item</Th>
@@ -41,7 +42,8 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
               textTransform: "uppercase",
               fontSize: "$2",
               fontWeight: 600,
-            }}>
+            }}
+          >
             Total
           </Th>
           <Td css={{ fontSize: "$2" }}>
