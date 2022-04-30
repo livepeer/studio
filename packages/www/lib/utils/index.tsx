@@ -15,7 +15,8 @@ export const getComponent = (component) => {
         offset={-20}
         key={component._type}
         id={component._type}
-        name={component._type}>
+        name={component._type}
+      >
         <Component {...component} />
       </Element>
     );

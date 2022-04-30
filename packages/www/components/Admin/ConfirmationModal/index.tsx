@@ -10,6 +10,7 @@ type ConfirmationModalProps = {
   onClose: Function;
   onAction: Function;
   numStreamsToDelete?: number;
+  children?: JSX.Element;
 };
 
 const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({

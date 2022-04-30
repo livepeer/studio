@@ -163,8 +163,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             <Checkbox
               id="isCopyrightInfringiment"
               checked={isCopyrightInfringiment}
-              onCheckedChange={(e) =>
-                setIsCopyrightInfringiment(e.target.checked)
+              onCheckedChange={(checked) =>
+                setIsCopyrightInfringiment(checked == true ? true : false)
               }
             />
             <Tooltip

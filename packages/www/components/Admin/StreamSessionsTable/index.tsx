@@ -146,7 +146,7 @@ const StreamSessionsTable = ({
     return () => clearInterval(interval);
   }, [streamId, isVisible]);
 
-  const columns: Column<SessionsTableData>[] = useMemo(
+  const columns: any = useMemo(
     () => [
       {
         Header: "Created at",

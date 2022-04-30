@@ -46,7 +46,8 @@ export const CodeBlock = React.forwardRef<HTMLPreElement, CodeBlockProps>(
         css={css}
         variant={variant}
         data-line-numbers={showLineNumbers}
-        {...props}>
+        {...props}
+      >
         <code
           className={classes}
           dangerouslySetInnerHTML={{ __html: result }}

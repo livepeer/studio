@@ -52,7 +52,8 @@ const StreamDetails = () => {
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name },
-      ]}>
+      ]}
+    >
       {currentTab === "Overview" ? (
         <StreamOverviewTab
           id={id}
