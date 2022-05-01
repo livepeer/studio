@@ -6,7 +6,6 @@ on:
     paths:
       - "packages/www/**"
       - "packages/admin/**"
-      - "packages/design-system/**"
     branches-ignore:
       - latest
 

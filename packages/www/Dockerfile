@@ -1,4 +1,4 @@
-# To be run from the root of the repository so that we can pick up design-system too
+# To be run from the root of the repository so that we can pick up other packages
 
 FROM node:14
 
