@@ -341,8 +341,8 @@ const SaveTargetDialog = ({
               <Checkbox
                 id="videoOnly"
                 checked={state.videoOnly}
-                onCheckedChange={(checked) =>
-                  setStateProp("videoOnly", checked == true ? true : false)
+                onCheckedChange={(checked: boolean) =>
+                  setStateProp("videoOnly", checked)
                 }
               />
               <Tooltip content="Mute audio and multistream a silent video.">

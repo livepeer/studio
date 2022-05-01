@@ -236,8 +236,8 @@ const CreateTokenDialog = ({
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}
-                    onCheckedChange={(checked) =>
-                      setAllowCors(checked == true ? true : false)
+                    onCheckedChange={(checked: boolean) =>
+                      setAllowCors(checked)
                     }
                   />
                   <Tooltip
@@ -353,10 +353,10 @@ const CreateTokenDialog = ({
                       <Checkbox
                         id="corsFullAccess"
                         checked={cors.fullAccess ?? false}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean) =>
                           setCors({
                             ...cors,
-                            fullAccess: checked == true ? true : false,
+                            fullAccess: checked,
                           })
                         }
                       />
