@@ -125,6 +125,18 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
+app.get("/subscribed/:event", authorizer({}), async (req, res) => {
+  let event = req.params.event;
+
+  let userId =
+    req.user.admin && req.query.userId ? req.query.userId : req.user.id;
+
+  const { data } = await db.webhook.listSubscribed(userId, event);
+
+  res.status(200);
+  return res.json(data);
+});
+
 app.post("/", authorizer({}), validatePost("webhook"), async (req, res) => {
   const id = uuid();
   const doc = validateWebhookPayload(id, req.user.id, Date.now(), req.body);
