@@ -11,6 +11,9 @@ import { GetStaticPathsContext } from "next";
 import title from "title";
 import Providers from "@lib/Providers";
 
+const MDXComponents = require("@components/Marketing/MDXComponents");
+const { components } = MDXComponents;
+
 const categories = [
   {
     name: "Guides",
@@ -74,8 +77,6 @@ const globalStyles = globalCss({
   },
 });
 
-const components = require("@components/Marketing/MDXComponents");
-
 const DocsIndex = ({ doc, menu }) => {
   const [hideTableOfContents, setHideTableOfContents] = useState(false);
   const router = useRouter();
@@ -127,8 +128,7 @@ const DocsIndex = ({ doc, menu }) => {
           "@bp2": {
             display: "grid",
           },
-        }}
-      >
+        }}>
         <DocsNav menu={currentMenu} categories={categories} />
         <TableOfContents
           menu={currentMenu}
@@ -148,8 +148,7 @@ const DocsIndex = ({ doc, menu }) => {
               "@bp2": {
                 justifyItems: "center",
               },
-            }}
-          >
+            }}>
             <Box
               css={{
                 width: "100%",
@@ -159,8 +158,7 @@ const DocsIndex = ({ doc, menu }) => {
                 "@bp2": {
                   px: "$5",
                 },
-              }}
-            >
+              }}>
               <Box
                 css={{
                   display: "flex",
@@ -170,8 +168,7 @@ const DocsIndex = ({ doc, menu }) => {
                   letterSpacing: "-0.02em",
                   mb: "$3",
                 }}
-                className="breadcrumb"
-              >
+                className="breadcrumb">
                 {breadCrumb.slice(2, 5).map((a, idx) => (
                   <Fragment key={idx}>
                     {title(a.split("-").join(" "))}

@@ -120,8 +120,7 @@ function Layout({
           zIndex: 1,
           position: "relative",
           ...css,
-        }}
-      >
+        }}>
         <NextSeo {...seo} />
         {preview && (
           <Box
@@ -135,8 +134,7 @@ function Layout({
               backgroundColor: "$violet9",
               color: "white",
               lineHeight: "32px",
-            }}
-          >
+            }}>
             Preview Mode
           </Box>
         )}
