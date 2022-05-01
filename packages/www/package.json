@@ -148,9 +148,6 @@
       "pre-commit": "lint-staged"
     }
   },
-  "nohoist": [
-    "@livepeer/design-system"
-  ],
   "lint-staged": {
     "*.js": [
       "prettier --write",
