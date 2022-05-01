@@ -1,5 +1,5 @@
 import Router from "express/lib/router";
-import { authMiddleware, validatePost } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 import { db } from "../store";
 
 const defaultScore = 1;
@@ -43,7 +43,7 @@ app.get("/:region", async (req, res, next) => {
 
 app.put(
   "/:region",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   validatePost("region"),
   async (req, res, next) => {
     let region = {
@@ -70,7 +70,7 @@ app.put(
 
 app.delete(
   "/:region",
-  authMiddleware({ anyAdmin: true }),
+  authorizer({ anyAdmin: true }),
   async (req, res, next) => {
     await db.region.delete(req.params.region);
     return res.status(204);

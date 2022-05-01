@@ -2,7 +2,7 @@
   "private": true,
   "name": "@livepeer.com/api",
   "description": "Livepeer API node for controlling streams",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "src/index.js",
@@ -37,7 +37,7 @@
     "test": "jest \"${PWD}/src\" -i --silent",
     "test:build": "parcel build --no-autoinstall --no-minify --bundle-node-modules -t browser --out-dir ../dist-worker ../src/worker.js",
     "coverage": "yarn run test --coverage",
-    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip",
+    "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
     "pkg:local": "yarn run prepare && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')"
   },
   "dependencies": {
@@ -47,12 +47,12 @@
     "@cloudflare/kv-asset-handler": "^0.0.11",
     "@cloudflare/wrangler": "^1.8.4",
     "@kubernetes/client-node": "^0.10.2",
-    "@livepeer/axios": "^0.19.2",
     "@livepeer/sdk": "1.0.0-alpha.7",
     "@peculiar/webcrypto": "^1.2.3",
     "@sendgrid/client": "^7.6.0",
     "@sendgrid/mail": "^7.6.0",
     "@types/amqp-connection-manager": "^2.0.10",
+    "@types/cors": "^2.8.12",
     "ajv": "^6.10.0",
     "ajv-cli": "^3.1.0",
     "amqp-connection-manager": "^3.2.2",
@@ -86,7 +86,6 @@
     "level": "^5.0.1",
     "m3u8-parser": "^4.4.0",
     "minio": "^7.0.12",
-    "mkdirp": "^0.5.1",
     "morgan": "^1.9.1",
     "mqtt": "^4.2.6",
     "ms": "^2.1.2",
@@ -159,8 +158,7 @@
   "alias": {
     "pg-native": "./src/empty.js",
     "level": "./src/empty.js",
-    "@kubernetes/client-node": "./src/empty.js",
-    "axios": "@livepeer/axios"
+    "@kubernetes/client-node": "./src/empty.js"
   },
   "types": "src/schema/types.d.ts",
   "nodemonConfig": {
@@ -169,10 +167,10 @@
   "pkg": {
     "targets": [
       "node16-macos-arm64",
-      "node16-macos-x86_64",
+      "node16-macos-x64",
       "node16-linux-arm64",
-      "node16-linux-x86_64",
-      "node16-windows-x86_64"
+      "node16-linux-x64",
+      "node16-windows-x64"
     ]
   }
 }

@@ -3,13 +3,13 @@ import uuid from "uuid/v4";
 import sql from "sql-template-strings";
 
 import { makeNextHREF, parseOrder, parseFilters } from "./helpers";
-import { authMiddleware, validatePost } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 import { AuthPolicy } from "../middleware/authPolicy";
 import { db } from "../store";
 
 const app = Router();
 
-app.use(authMiddleware({ noApiToken: true }));
+app.use(authorizer({ noApiToken: true }));
 
 app.get("/:id", async (req, res) => {
   const { id } = req.params;

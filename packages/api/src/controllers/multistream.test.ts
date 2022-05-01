@@ -73,7 +73,7 @@ describe("controllers/multistream-target", () => {
       expect(await res.json()).toEqual([{ ...userMsTarget, url: undefined }]);
     });
 
-    it("should throw 403 error if JWT is not verified", async () => {
+    it("should throw 401 error if JWT is not verified", async () => {
       client.jwtAuth = "random_value";
       const input = {
         ...mockTargetInput,
@@ -82,7 +82,7 @@ describe("controllers/multistream-target", () => {
       const created = await db.multistreamTarget.fillAndCreate(input);
 
       const res = await client.get(`/multistream/target/${created.id}`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
       const resJson = await res.json();
       expect(resJson.errors[0]).toBe("jwt malformed");
     });
@@ -343,15 +343,15 @@ describe("controllers/multistream-target", () => {
       expect(res.status).toBe(200);
     });
 
-    it("should throw forbidden error when using invalid API key", async () => {
+    it("should throw unauthorized error when using invalid API key", async () => {
       client.apiKey = "random_key";
       const res = await client.get(
         `/multistream/target?userId=${nonAdminUser.id}`
       );
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
-    it("should throw 500 internal server error if user does not exist", async () => {
+    it("should return 401 if user does not exist", async () => {
       // create token with no user
       const tokenId = uuid();
       await server.store.create({
@@ -364,7 +364,7 @@ describe("controllers/multistream-target", () => {
       const res = await client.get(
         `/multistream/target?userId=${nonAdminUser.id}`
       );
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(401);
       const errJson = await res.json();
       expect(errJson.errors[0]).toEqual(
         `no user found from authorization header: Bearer ${tokenId}`

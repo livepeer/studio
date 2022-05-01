@@ -14,13 +14,24 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
+  Label,
+  Link,
+  Tooltip,
+  Checkbox,
+  styled,
 } from "@livepeer.com/design-system";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ApiToken } from "../../../../api/src/schema/types";
-import { CopyIcon as Copy } from "@radix-ui/react-icons";
+import {
+  CopyIcon as Copy,
+  ExclamationTriangleIcon as Warning,
+  QuestionMarkCircledIcon as Help,
+  Cross1Icon as Cross,
+  PlusIcon as Plus,
+} from "@radix-ui/react-icons";
 
 type Props = {
   isOpen: boolean;
@@ -91,6 +102,14 @@ const ClipBut = ({ text }) => {
   );
 };
 
+const initialCorsOpts: ApiToken["access"]["cors"] = {
+  allowedOrigins: ["http://localhost:3000"],
+};
+
+const StyledCross = styled(Cross, {
+  cursor: "pointer",
+});
+
 const CreateTokenDialog = ({
   isOpen,
   onOpenChange,
@@ -99,9 +118,20 @@ const CreateTokenDialog = ({
 }: Props) => {
   const [creating, setCreating] = useState(false);
   const [tokenName, setTokenName] = useState("");
+  const [allowCors, setAllowCors] = useState(false);
+  const [cors, setCors] = useState(initialCorsOpts);
+  const [newAllowedOrigin, setNewAllowedOrigin] = useState("");
   const { createApiToken } = useApi();
   const [isCopied, setCopied] = useState(0);
   const [newToken, setNewToken] = useState<ApiToken | null>(null);
+
+  useEffect(() => {
+    setNewToken(null);
+    setTokenName("");
+    setAllowCors(false);
+    setCors(initialCorsOpts);
+    setNewAllowedOrigin("");
+  }, [isOpen]);
 
   useEffect(() => {
     if (isCopied) {
@@ -111,6 +141,48 @@ const CreateTokenDialog = ({
       return () => clearTimeout(interval);
     }
   }, [isCopied]);
+
+  const toggleOrigin = useCallback(
+    (origin) => {
+      setCors((cors) => {
+        let allowedOrigins = cors.allowedOrigins?.includes(origin)
+          ? cors.allowedOrigins.filter((item) => item !== origin)
+          : [...cors.allowedOrigins, origin];
+        if (allowedOrigins.includes("*")) {
+          allowedOrigins = ["*"];
+        }
+        return {
+          ...cors,
+          allowedOrigins,
+        };
+      });
+    },
+    [setCors]
+  );
+
+  const isNewOriginValid = useMemo(() => {
+    if (newAllowedOrigin === "*") {
+      return true;
+    }
+    try {
+      const url = new URL(newAllowedOrigin);
+      return url.origin === newAllowedOrigin;
+    } catch (err) {
+      return false;
+    }
+  }, [newAllowedOrigin]);
+
+  const onSubmitNewOrigin = useCallback(() => {
+    if (!isNewOriginValid) {
+      return;
+    }
+    setNewAllowedOrigin((value) => {
+      if (value !== "") {
+        toggleOrigin(value);
+      }
+      return "";
+    });
+  }, [toggleOrigin, setNewAllowedOrigin, isNewOriginValid]);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -129,7 +201,10 @@ const CreateTokenDialog = ({
                 }
                 setCreating(true);
                 try {
-                  const _newToken = await createApiToken({ name: tokenName });
+                  const _newToken = await createApiToken({
+                    name: tokenName,
+                    access: allowCors ? { cors } : undefined,
+                  });
                   setNewToken(_newToken);
                   onCreateSuccess?.();
                 } finally {
@@ -155,6 +230,153 @@ const CreateTokenDialog = ({
                   onChange={(e) => setTokenName(e.target.value)}
                   placeholder="e.g. New key"
                 />
+
+                <Box css={{ display: "flex", mt: "$2" }}>
+                  <Checkbox
+                    id="allowCors"
+                    checked={allowCors}
+                    onCheckedChange={(e) => setAllowCors(e.target.checked)}
+                  />
+                  <Tooltip
+                    content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
+                    multiline>
+                    <Flex
+                      direction="row"
+                      css={{ ml: "$2" }}
+                      gap="1"
+                      align="center">
+                      <Label htmlFor="allowCors">Allow CORS access</Label>
+                      <Link
+                        href={"/docs/guides/start-live-streaming/api-key#cors"}
+                        target="_blank">
+                        <Warning />
+                      </Link>
+                    </Flex>
+                  </Tooltip>
+                </Box>
+
+                {allowCors && (
+                  <>
+                    <Label htmlFor="addAllowedOrigin" css={{ mt: "$1" }}>
+                      Add an origin
+                    </Label>
+                    <Box css={{ display: "flex", alignItems: "stretch" }}>
+                      <TextField
+                        size="2"
+                        type="text"
+                        id="addAllowedOrigin"
+                        value={newAllowedOrigin}
+                        state={
+                          newAllowedOrigin !== "" && !isNewOriginValid
+                            ? "invalid"
+                            : null
+                        }
+                        onChange={(e) => setNewAllowedOrigin(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            onSubmitNewOrigin();
+                          }
+                        }}
+                        placeholder="e.g. * for all origins; https://example.com for one"
+                      />
+                      <Button
+                        css={{ ml: "$1" }}
+                        size="3"
+                        variant="violet"
+                        disabled={!isNewOriginValid}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSubmitNewOrigin();
+                        }}>
+                        <Plus />
+                      </Button>
+                    </Box>
+
+                    <Flex
+                      align="center"
+                      direction="column"
+                      justify={
+                        cors.allowedOrigins.length > 0 ? "start" : "center"
+                      }
+                      css={{
+                        width: "100%",
+                        borderRadius: 6,
+                        height: 120,
+                        overflowX: "hidden",
+                        overflowY: "auto",
+                        border: "1px solid $colors$mauve7",
+                        backgroundColor: "$mauve2",
+                        mt: "-3px",
+                        zIndex: 1,
+                      }}>
+                      {cors.allowedOrigins.length > 0 ? (
+                        cors.allowedOrigins.map((origin, i) => (
+                          <Flex
+                            key={i}
+                            justify="between"
+                            align="center"
+                            css={{
+                              width: "100%",
+                              borderBottom: "1px solid $colors$mauve5",
+                              p: "$2",
+                              fontSize: "$2",
+                              color: "$hiContrast",
+                            }}>
+                            {origin}
+                            <StyledCross
+                              onClick={() => {
+                                toggleOrigin(origin);
+                              }}
+                            />
+                          </Flex>
+                        ))
+                      ) : (
+                        <Flex
+                          direction="column"
+                          css={{ just: "center" }}
+                          align="center">
+                          <Text css={{ fontWeight: 600 }}>
+                            No origins allowed
+                          </Text>
+                          <Text variant="gray">
+                            Add origins with the input field above.
+                          </Text>
+                        </Flex>
+                      )}
+                    </Flex>
+
+                    <Box css={{ display: "flex", mt: "$2" }}>
+                      <Checkbox
+                        id="corsFullAccess"
+                        checked={cors.fullAccess ?? false}
+                        onCheckedChange={(e) =>
+                          setCors({ ...cors, fullAccess: e.target.checked })
+                        }
+                      />
+                      <Tooltip
+                        content="This will give access to the entire API for the CORS-enabled API key. Resources in your account will be fully exposed to anyone that grabs the API key from your web page. Only check this if you know what you are doing."
+                        multiline>
+                        <Flex
+                          direction="row"
+                          css={{ ml: "$2" }}
+                          gap="1"
+                          align="center">
+                          <Label htmlFor="corsFullAccess">
+                            Full API access (not recommended)
+                          </Label>
+                          <Link
+                            href={
+                              "/docs/guides/start-live-streaming/api-key#api-access"
+                            }
+                            target="_blank">
+                            <Help />
+                          </Link>
+                        </Flex>
+                      </Tooltip>
+                    </Box>
+                  </>
+                )}
               </Flex>
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
@@ -201,13 +423,7 @@ const CreateTokenDialog = ({
               </Box>
             </AlertDialogDescription>
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button
-                onClick={() => {
-                  setNewToken(null);
-                  setTokenName("");
-                  onClose();
-                }}
-                size="2">
+              <Button onClick={() => onClose()} size="2">
                 Close
               </Button>
             </Flex>

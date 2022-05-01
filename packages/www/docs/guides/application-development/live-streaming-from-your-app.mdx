@@ -7,17 +7,56 @@ metaDescription: Live streaming from your app to Livepeer.com
 
 # Live streaming from your app
 
-There are many 3rd party encoders that allow streamers to push RTMP to the
 Livepeer.com global-optimized ingest URL is `rtmp://rtmp.livepeer.com/live/`.
-These include [OBS](https://obsproject.com/), [ffmpeg](https://ffmpeg.org/),
-[Larix](https://softvelum.com/larix/) for iOS and Android, Streamlabs OBS for
-[Desktop](https://streamlabs.com/),
-[Android](https://play.google.com/store/apps/details?id=com.streamlabs&hl=en_US&gl=US),
-and
-[iOS](https://apps.apple.com/us/app/streamlabs-live-streaming-app/id1294578643).
-You can also use any RTMP library, for example
-[Streamaxia](https://www.streamaxia.com/) in iOS.
+
+There are many 3rd party applications that allow streamers to push video in the
+RTMP protocol. These include:
+
+- For desktop: [OBS](https://obsproject.com/), [ffmpeg](https://ffmpeg.org/),
+  [Streamlabs OBS](https://streamlabs.com/)
+- For iOS: [Larix](https://softvelum.com/larix/),
+  [Streamlabs](https://apps.apple.com/us/app/streamlabs-live-streaming-app/id1294578643)
+- For Android:
+  [Streamlabs](https://play.google.com/store/apps/details?id=com.streamlabs&hl=en_US&gl=US)
+
+For building your own streaming application you can also use any RTMP library
+available out there. For example, [Streamaxia](https://www.streamaxia.com/) is
+available both for iOS and Android.
 
 Livepeer.com is currently working on additional recommendations for mobile SDKs.
 Fill out a [contact form](https://livepeer.com/contact) if you have more urgent
 needs.
+
+## Browser streaming
+
+Streaming from the browser is non-trivial since the RTMP protocol has a
+dedicated wire protocol on top of TCP. Browsers do not allow applications to use
+TCP directly, so you can't do RTMP directly from a web app.
+
+To make things a little easier, Livepeer provides the
+[@livepeer/webrtmp-sdk](https://www.npmjs.com/package/@livepeer/webrtmp-sdk)
+which can be used for streaming from the browser. It doesn't use RTMP but a
+wrapped version of it on top of WebSockets.
+
+Check the package documentation on NPM to get started, it also contains a couple
+sample projects that you can get started with. To see a production application
+with it check out [justcast.it](https://justcast.it/).
+
+### Codecs
+
+Livepeer hosts its own WebSocket to RTMP server, which the SDK uses by default.
+Not all browsers support the video codec
+[supported by the Livepeer network](https://livepeer.com/docs/guides/start-live-streaming/support-matrix)
+though, currently only H.264. So this default hosted server will only work well
+in Chrome Desktop for now.
+
+If you want to take your browser-streaming application to production and support
+users in non-Chrome or non-desktop browsers, you can deploy your own
+[webrtmp-server](https://github.com/livepeer/webrtmp-server). All you need to
+set is the `LP_STRICT_PROTOCOL=false` flag so it does transcoding of the video
+in case the user browser does not support H.264. For an example of such setup
+check the
+[justcast.it deployment spec on fly.io](https://github.com/victorges/justcast.it/blob/9aab5648d876be13db5330c2d4806ac025281349/webrtmp/fly.toml#L17).
+
+Keep in mind that this transcoding can get unperformant or expensive if you have
+a lot of users sending video not in H.264.

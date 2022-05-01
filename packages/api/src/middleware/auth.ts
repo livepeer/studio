@@ -1,12 +1,13 @@
 import { URL } from "url";
 import basicAuth from "basic-auth";
-import { RequestHandler } from "express";
+import corsLib, { CorsOptions } from "cors";
+import { Request, RequestHandler, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { pathJoin2, trimPathPrefix } from "../controllers/helpers";
 import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
-import { InternalServerError, ForbiddenError } from "../store/errors";
+import { ForbiddenError, UnauthorizedError } from "../store/errors";
 import { WithID } from "../store/types";
 import { AuthRule, AuthPolicy } from "./authPolicy";
 import tracking from "./tracking";
@@ -41,21 +42,29 @@ function isAuthorized(
   }
 }
 
-interface AuthParams {
-  allowUnverified?: boolean;
-  admin?: boolean;
-  anyAdmin?: boolean;
-  noApiToken?: boolean;
-  originalUriHeader?: string;
-}
-
 /**
- * creates an authentication middleware that can be customized.
- * @param {Object} params auth middleware params, to be defined later
+ * Creates a middleware that parses and verifies the authentication method from
+ * the request and populates the `express.Request` object.
+ *
+ * @remarks
+ * The only auth method supported is the `Authorization` header. It can use:
+ *  * the `Bearer` scheme with an API key (used by external applications);
+ *  * the `JWT` scheme with a JWT token (used by the dashboard), or;
+ *  * the `Basic` scheme with an `userId` as the username and an API key from
+ *    that user as the `password` (used by `go-livepeer` that only supports a
+ *    URL to specify some endpoints like the stream auth webhook).
+ *
+ * @remarks
+ * It is supposed to be used as a global middleware that runs for every request
+ * and should be used in conjunction with the `authorizer` middleware below.
+ *
+ * As such it allows requests without any authentication method to pass through.
+ * If the specific API requires a user, it must add an {@link authorizer}
+ * middleware which will fail if the request is not authenticated.
  */
-function authFactory(params: AuthParams): RequestHandler {
+function authenticator(): RequestHandler {
   return async (req, res, next) => {
-    // must have either an API key (starts with 'Bearer') or a JWT token
+    res.vary("Authorization");
     const authHeader = req.headers.authorization;
     const { authScheme, authToken, rawAuthScheme } =
       parseAuthHeader(authHeader);
@@ -65,17 +74,17 @@ function authFactory(params: AuthParams): RequestHandler {
     let userId: string;
 
     if (!authScheme) {
-      throw new ForbiddenError(`no authorization header provided`);
-    } else if (["bearer", "basic"].includes(authScheme) && !params.noApiToken) {
+      return next();
+    } else if (["bearer", "basic"].includes(authScheme)) {
       const isBasic = authScheme === "basic";
       const tokenId = isBasic ? basicUser?.pass : authToken;
       if (!tokenId) {
-        throw new ForbiddenError(`no authorization token provided`);
+        throw new UnauthorizedError(`no authorization token provided`);
       }
       tokenObject = await db.apiToken.get(tokenId);
       const matchesBasicUser = tokenObject?.userId === basicUser?.name;
       if (!tokenObject || (isBasic && !matchesBasicUser)) {
-        throw new ForbiddenError(`no token ${tokenId} found`);
+        throw new UnauthorizedError(`no token ${tokenId} found`);
       }
 
       userId = tokenObject.userId;
@@ -89,17 +98,17 @@ function authFactory(params: AuthParams): RequestHandler {
         userId = verified.sub;
         tracking.recordUser(db, userId);
       } catch (err) {
-        throw new ForbiddenError(err.message);
+        throw new UnauthorizedError(err.message);
       }
     } else {
-      throw new ForbiddenError(
+      throw new UnauthorizedError(
         `unsupported authorization header scheme: ${rawAuthScheme}`
       );
     }
 
     user = await db.user.get(userId);
     if (!user) {
-      throw new InternalServerError(
+      throw new UnauthorizedError(
         `no user found from authorization header: ${authHeader}`
       );
     }
@@ -107,21 +116,109 @@ function authFactory(params: AuthParams): RequestHandler {
       throw new ForbiddenError(`user is suspended`);
     }
 
+    req.user = user;
+    // UI admins must have a JWT
+    req.isUIAdmin = user.admin && authScheme === "jwt";
+    req.token = tokenObject;
+    return next();
+  };
+}
+
+type CorsParams = {
+  baseOpts: CorsOptions;
+  anyOriginPathPrefixes: string[];
+  jwtOrigin: (string | RegExp)[];
+};
+
+function cors(params: CorsParams): RequestHandler {
+  const { baseOpts, anyOriginPathPrefixes, jwtOrigin } = params;
+  const anyOriginOpts = { ...baseOpts, origin: true };
+  const jwtOpts = { ...baseOpts, origin: jwtOrigin };
+  const getCorsOpts = (req: Request) => {
+    const { method, path, token } = req;
+    const allowAny =
+      anyOriginPathPrefixes.some((p) => path.startsWith(p)) ||
+      (!token && method === "OPTIONS");
+    if (allowAny) {
+      return anyOriginOpts;
+    } else if (!token) {
+      return jwtOpts;
+    }
+    const allowedOrigins = token.access?.cors?.allowedOrigins ?? [];
+    return allowedOrigins.includes("*")
+      ? anyOriginOpts
+      : {
+          ...baseOpts,
+          origin: allowedOrigins,
+        };
+  };
+
+  return corsLib((req, callback) => callback(null, getCorsOpts(req)));
+}
+
+function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
+  const auth = authenticator();
+  const _cors = cors(params.cors);
+  return async (req, res, next) => {
+    const corsNext = (err1: any) => {
+      const joinedNext = (err2: any) => next(err1 ?? err2);
+      try {
+        _cors(req, res, joinedNext);
+      } catch (err) {
+        joinedNext(err);
+      }
+    };
+    try {
+      // we know that auth middleware is async
+      await auth(req, res, corsNext);
+    } catch (err) {
+      // make sure we call cors even on thrown auth errs
+      corsNext(err);
+    }
+  };
+}
+
+interface AuthzParams {
+  allowUnverified?: boolean;
+  admin?: boolean;
+  anyAdmin?: boolean;
+  noApiToken?: boolean;
+  originalUriHeader?: string;
+  allowCorsApiKey?: boolean;
+}
+
+/**
+ * Creates a customizable authorization middleware that ensures any access
+ * restrictions are met for the request to go through.
+ *
+ * @remarks
+ * This has a strict dependency on the {@link authenticator} middleware above.
+ * If that middleware hasn't run in the request before this one, all requests
+ * will be rejected.
+ */
+function authorizer(params: AuthzParams): RequestHandler {
+  return async (req, res, next) => {
+    const { user, isUIAdmin, token } = req;
+    if (!user) {
+      throw new UnauthorizedError(`request is not authenticated`);
+    }
+    if (token && params.noApiToken) {
+      throw new ForbiddenError(`access forbidden for API keys`);
+    }
+
     const verifyEmail =
       req.config.requireEmailVerification && !params.allowUnverified;
     if (verifyEmail && !user.emailValid) {
       throw new ForbiddenError(
-        `useremail ${user.email} has not been verified. Please check your inbox for verification email.`
+        `user ${user.email} has not been verified. please check your inbox for verification email.`
       );
     }
 
-    // UI admins must have a JWT
-    const isUIAdmin = user.admin && authScheme === "jwt";
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const accessRules = tokenObject?.access?.rules;
-    if (accessRules) {
+    const access = token?.access;
+    if (access?.rules) {
       let fullPath = pathJoin2(req.baseUrl, req.path);
       let { httpPrefix } = req.config;
       if (params.originalUriHeader) {
@@ -130,22 +227,19 @@ function authFactory(params: AuthParams): RequestHandler {
         fullPath = originalUri.pathname;
         httpPrefix = null;
       }
-      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
+      if (!isAuthorized(req.method, fullPath, access?.rules, httpPrefix)) {
         throw new ForbiddenError(`credential has insufficent privileges`);
       }
-    }
-
-    req.user = user;
-    req.isUIAdmin = isUIAdmin;
-    if (tokenObject && tokenObject.name) {
-      req.tokenName = tokenObject.name;
-    }
-    if (tokenObject && tokenObject.id) {
-      req.tokenId = tokenObject.id;
+    } else {
+      const cors = access?.cors;
+      if (cors && !cors.fullAccess && !params.allowCorsApiKey) {
+        throw new ForbiddenError(
+          `access forbidden for restricted CORS API tokens`
+        );
+      }
     }
     return next();
   };
 }
 
-// export default router
-export default authFactory;
+export { authenticator, cors, authenticateWithCors, authorizer };

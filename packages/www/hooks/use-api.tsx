@@ -87,7 +87,7 @@ const trackPageView = (email, path = null) => {
 };
 
 const getStoredToken = () => {
-  if (!process.browser) {
+  if (!("browser" in process)) {
     return null;
   }
   try {
@@ -141,23 +141,22 @@ const getCursor = (link?: string): string => {
 const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
+  const endpoint = isDevelopment()
+    ? `http://localhost:3004`
+    : isStaging()
+    ? `https://livepeer.monster`
+    : ``;
   const context = {
     ...state,
-    async fetch(url, opts: RequestInit = {}) {
+    endpoint,
+    async fetch(url: string, opts: RequestInit = {}) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
 
-      let endpoint = isStaging()
-        ? `https://livepeer.monster/api${url}`
-        : `/api${url}`;
-
-      if (isDevelopment()) {
-        endpoint = `http://localhost:3004/api${url}`;
-      }
-
-      const res = await fetch(endpoint, {
+      url = `${endpoint}/api${url}`;
+      const res = await fetch(url, {
         ...opts,
         headers,
       });

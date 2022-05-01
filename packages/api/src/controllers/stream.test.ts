@@ -110,7 +110,7 @@ describe("controllers/stream", () => {
   });
 
   describe("basic CRUD with JWT authorization", () => {
-    it("should not get all streams without admin authorization", async () => {
+    it("should not get streams with no authorization", async () => {
       client.jwtAuth = "";
       for (let i = 0; i < 10; i += 1) {
         const document = {
@@ -119,10 +119,10 @@ describe("controllers/stream", () => {
         };
         await server.store.create(document);
         const res = await client.get(`/stream/${document.id}`);
-        expect(res.status).toBe(403);
+        expect(res.status).toBe(401);
       }
       const res = await client.get("/stream");
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
 
     it("should get all streams with admin authorization", async () => {
@@ -819,7 +819,7 @@ describe("controllers/stream", () => {
         };
 
         it("should parse basic auth", async () => {
-          await testBasic("hey:basic", 403, "no token basic found");
+          await testBasic("hey:basic", 401, "no token basic found");
         });
 
         it("should accept valid token in basic auth", async () => {
@@ -829,7 +829,7 @@ describe("controllers/stream", () => {
         it("should only accept token with corresponding user id", async () => {
           await testBasic(
             `${nonAdminUser.id}:${adminApiKey}`,
-            403,
+            401,
             expect.stringMatching(/no token .+ found/)
           );
         });

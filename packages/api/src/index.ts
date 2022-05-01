@@ -4,8 +4,6 @@ import { Server } from "http";
 import morgan from "morgan";
 import { AddressInfo } from "net";
 import "source-map-support/register";
-import cors from "cors";
-import promBundle from "express-prom-bundle";
 import { collectDefaultMetrics } from "prom-client";
 
 import appRouter from "./app-router";
@@ -79,33 +77,6 @@ export default async function makeApp(params: CliArgs) {
   const { db, queue, router, store, webhookCannon: webhook } = appRoute;
 
   const app = express();
-  const metricsMiddleware = promBundle({
-    includeUp: false,
-    includeMethod: true,
-    includePath: true,
-    httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
-    urlValueParser: {
-      extraMasks: [/[\da-z]{4}(?:\-[\da-z]{4}){3}/, /[\da-z]{16}/],
-    },
-  });
-  const whitelist = [
-    "https://livepeer.com",
-    "https://livepeer.monster",
-    "https://explorer.livepeer.org",
-    "http://localhost:3000",
-    /livepeer.vercel\.app$/,
-    /livepeerorg.vercel\.app$/,
-    /\.livepeerorg.now\.sh$/,
-  ];
-  app.use(
-    cors({
-      origin: whitelist,
-      credentials: true,
-      exposedHeaders: ["*"],
-    })
-  );
-  app.use(metricsMiddleware);
-
   const isSilentTest =
     process.env.NODE_ENV === "test" && process.argv.indexOf("--silent") > 0;
   app.use(

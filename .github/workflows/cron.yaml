@@ -1,7 +1,9 @@
 name: 1-hour-cron
+
 on:
   schedule:
     - cron: "0 * * * *" # run every hour
+
 jobs:
   cron:
     runs-on: ubuntu-latest

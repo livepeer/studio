@@ -1,5 +1,9 @@
 // import 'express-async-errors' // it monkeypatches, i guess
-import Router from "express/lib/router";
+import { Router } from "express";
+import promBundle from "express-prom-bundle";
+import proxy from "http-proxy-middleware";
+import Stripe from "stripe";
+
 import makeStore from "./store";
 import {
   errorHandler,
@@ -9,24 +13,25 @@ import {
   hardcodedNodes,
   insecureTest,
   geolocateMiddleware,
+  authenticateWithCors,
 } from "./middleware";
 import controllers from "./controllers";
 import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
-import proxy from "http-proxy-middleware";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
 import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
-import Stripe from "stripe";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
+import { pathJoin } from "./controllers/helpers";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
   subgraph = "subgraph",
   region = "region",
 }
+
 // Routes that should be whitelisted even when `apiRegion` is set
 const GEOLOCATION_ENDPOINTS = [
   "broadcaster",
@@ -34,6 +39,16 @@ const GEOLOCATION_ENDPOINTS = [
   "ingest",
   "geolocate",
 ];
+
+const PROM_BUNDLE_OPTS: promBundle.Opts = {
+  includeUp: false,
+  includeMethod: true,
+  includePath: true,
+  httpDurationMetricName: "livepeer_api_http_request_duration_seconds",
+  urlValueParser: {
+    extraMasks: [/[\da-z]{4}(?:\-[\da-z]{4}){3}/, /[\da-z]{16}/],
+  },
+};
 
 export default async function makeApp(params: CliArgs) {
   const {
@@ -57,6 +72,7 @@ export default async function makeApp(params: CliArgs) {
     broadcasters = "[]",
     ingest = "[]",
     prices = "[]",
+    corsJwtAllowlist = [`https://${frontendDomain}`],
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,
@@ -127,12 +143,8 @@ export default async function makeApp(params: CliArgs) {
 
   const app = Router();
   app.use(healthCheck);
+  app.use(promBundle(PROM_BUNDLE_OPTS));
 
-  // stripe webhook requires raw body
-  // https://github.com/stripe/stripe-node/issues/331
-  app.use("/api/stripe/webhook", bodyParser.raw({ type: "*/*" }));
-
-  app.use(bodyParser.json());
   app.use((req, res, next) => {
     req.orchestratorsGetters = [];
     req.store = store;
@@ -143,6 +155,24 @@ export default async function makeApp(params: CliArgs) {
     req.stripe = stripe;
     next();
   });
+  app.use(
+    authenticateWithCors({
+      cors: {
+        anyOriginPathPrefixes: [pathJoin("/", httpPrefix, "/asset/upload/")],
+        jwtOrigin: corsJwtAllowlist,
+        baseOpts: {
+          credentials: true,
+          exposedHeaders: ["*"],
+        },
+      },
+    })
+  );
+
+  // stripe webhook requires raw body
+  // https://github.com/stripe/stripe-node/issues/331
+  app.use("/api/stripe/webhook", bodyParser.raw({ type: "*/*" }));
+  app.use(bodyParser.json());
+
   if (insecureTestToken) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("tried to set insecureTestToken in production!");

@@ -304,6 +304,11 @@ const config = {
         destination: "/jobs/1496214",
         permanent: false,
       },
+      {
+        source: "/catalyst",
+        destination: "/products/media-server",
+        permanent: false,
+      },
     ];
   },
 };

@@ -2,7 +2,7 @@ import yargs from "yargs";
 import yargsToMist from "./yargs-to-mist";
 import { CamelKeys } from "./types/common";
 
-function coerceArr(arg) {
+function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
     const arr = [];
     for (const [key, value] of Object.entries(arg)) {
@@ -11,6 +11,38 @@ function coerceArr(arg) {
     return arr;
   }
   return arg;
+}
+
+function coerceJsonStrArr(arg: string): string[] {
+  if (!arg) {
+    return undefined;
+  }
+  const arr = JSON.parse(arg);
+  const isStrArr =
+    Array.isArray(arr) && arr.every((str) => typeof str === "string");
+  if (!isStrArr) {
+    throw new Error("not a JSON array of strings");
+  }
+  return arr;
+}
+
+function coerceCorsList(flagName: string) {
+  return (arg: string): (string | RegExp)[] => {
+    try {
+      const arr = coerceJsonStrArr(arg);
+      if (!arr) {
+        return undefined;
+      }
+      return arr.map((str) => {
+        if (str.startsWith("/") && str.endsWith("/")) {
+          return new RegExp(str.slice(1, -1));
+        }
+        return str;
+      });
+    } catch (err) {
+      throw new Error(`Error in CLI flag --${flagName}: ${err.message}`);
+    }
+  };
 }
 
 export type CliArgs = ReturnType<typeof parseCli>;
@@ -110,6 +142,14 @@ export default function parseCli(argv?: string | readonly string[]) {
       "jwt-audience": {
         describe: "identifies the recipients that the JWT is intended for",
         type: "string",
+      },
+      "cors-jwt-allowlist": {
+        describe:
+          "comma-separated list of domains to allow CORS for requests authenticated with a JWT. " +
+          "add a / prefix and suffix to an element to have it parsed as a regex",
+        type: "string",
+        default: undefined,
+        coerce: coerceCorsList("cors-jwt-allowlist"),
       },
       broadcasters: {
         describe:

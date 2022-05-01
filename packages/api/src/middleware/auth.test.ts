@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authMiddleware } from ".";
+import { authorizer } from ".";
 
 import { ApiToken, User } from "../schema/types";
 import { db } from "../store";
@@ -11,6 +11,7 @@ import {
   TestClient,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
+import { authenticator } from "./auth";
 import errorHandler from "./errorHandler";
 
 let server: TestServer;
@@ -42,20 +43,21 @@ beforeAll(async () => {
     } as any;
     next();
   });
+  app.use(authenticator());
 
-  app.all("/admin/*", authMiddleware({ anyAdmin: true }), (_req, res) =>
+  app.all("/admin/*", authorizer({ anyAdmin: true }), (_req, res) =>
     res.status(202).end()
   );
 
   const router = Router();
   router.use(
     "/nested",
-    Router().all("/*", authMiddleware({}), (_req, res) => res.status(203).end())
+    Router().all("/*", authorizer({}), (_req, res) => res.status(203).end())
   );
-  router.all("/*", authMiddleware({}), (_req, res) => res.status(203).end());
+  router.all("/*", authorizer({}), (_req, res) => res.status(203).end());
   app.use("/router", router);
 
-  app.all("/*", authMiddleware({}), (_req, res) => res.status(204).end());
+  app.all("/*", authorizer({}), (_req, res) => res.status(204).end());
   app.use(errorHandler());
 });
 
@@ -97,8 +99,8 @@ describe("auth middleware", () => {
       client = new TestClient({ server: testServer });
     });
 
-    it("should forbid without auth", async () => {
-      await expectStatus().toBe(403);
+    it("should 401 without auth", async () => {
+      await expectStatus().toBe(401);
     });
 
     it("should auth by bearer api key", async () => {

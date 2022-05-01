@@ -1,4 +1,4 @@
-import { authMiddleware, geolocateMiddleware } from "../middleware";
+import { geolocateMiddleware } from "../middleware";
 import Router from "express/lib/router";
 
 const app = Router();

@@ -85,7 +85,7 @@ suggest that your encoder is configured improperly or that the streamer internet
 connection isn't as strong as it should be to deliver high quality streams to
 your viewers.
 
-## Stream Health API <Badge size="2" variant="violet" css={{ ml: "$2" }}>Beta</Badge>
+## Stream Health API
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
@@ -113,23 +113,14 @@ information. The API consists of the following endpoints:
   subscribing via SSE to receive new events as they happen, and is useful for
   debugging. This API powers the log feed in the dashboard.
 
-<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
-  <Text size="3" variant="gray">
-    Heads up! The Stream Health API uses <code>origin.livepeer.com</code>{" "}
-    instead of <code>livepeer.com</code> as the hostname. We’d like to keep them
-    consistent so we’re working on supporting the <code>livepeer.com</code>{" "}
-    domain as well soon.
-  </Text>
-</Alert>
-
 Now let's go into more detail about each of the mentioned API endpoints.
 
 ### Health Status
 
-##### Request: `GET origin.livepeer.com/data/stream/{id}/health`
+##### Request: `GET livepeer.com/data/stream/{id}/health`
 
 ```bash
-curl 'https://origin.livepeer.com/data/stream/{id}/health' \
+curl 'https://livepeer.com/data/stream/{id}/health' \
 -H 'authorization: Bearer {api-key}'
 ```
 
@@ -236,10 +227,10 @@ In the above response payload:
 
 ### Events
 
-##### Request: `GET origin.livepeer.com/data/stream/{id}/events`
+##### Request: `GET livepeer.com/data/stream/{id}/events`
 
 ```bash
-curl 'https://origin.livepeer.com/data/stream/{id}/events' \
+curl 'https://livepeer.com/data/stream/{id}/events' \
 -H 'authorization: Bearer {api-key}'
 ```
 

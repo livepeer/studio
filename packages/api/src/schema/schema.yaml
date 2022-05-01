@@ -209,7 +209,7 @@ components:
               - multistream.connected
               - multistream.error
               - multistream.disconnected
-              - user.new
+              - playback.user.new
         url:
           type: string
           format: uri
@@ -615,6 +615,19 @@ components:
           minItems: 1
           items:
             type: string
+
+    stream-set-active-payload:
+      type: object
+      required: [active]
+      properties:
+        active:
+          $ref: "#/components/schemas/stream/properties/isActive"
+        hostName:
+          $ref: "#/components/schemas/stream/properties/mistHost"
+        startedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the stream started.
+          example: 1587667174725
 
     stream-patch-payload:
       type: object
@@ -1063,12 +1076,12 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
-    new-transcode-payload:
-      additionalProperties: true
+
+    transcode-asset-payload:
+      additionalProperties: false
       required:
         - name
         - profile
-        - assetId
       properties:
         assetId:
           type: string
@@ -1352,6 +1365,27 @@ components:
           type: object
           additionalProperties: false
           properties:
+            cors:
+              type: object
+              additionalProperties: false
+              properties:
+                fullAccess:
+                  type: boolean
+                  description:
+                    Whether the token grants full access to the API. If false,
+                    the token will only have access to some pre-defined
+                    endpoints, not expose the whole account from the webpage.
+                  default: false
+                allowedOrigins:
+                  type: array
+                  description:
+                    Origins from which the token can be used. If empty, CORS
+                    will be prohibited by default (safest). To allow all origin
+                    values set this to `[*]`.
+                  default: []
+                  items:
+                    type: string
+                    example: https://example.com
             rules:
               type: array
               default: [{ resources: ["*"] }]

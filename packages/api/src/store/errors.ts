@@ -35,6 +35,14 @@ export class NotFoundError extends APIError {
   }
 }
 
+export class UnauthorizedError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "UnauthorizedError";
+    this.status = 401;
+  }
+}
+
 export class ForbiddenError extends APIError {
   constructor(message) {
     super(message);
