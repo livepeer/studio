@@ -85,8 +85,7 @@ const Post = ({
         alt: openGraphImage?.alt,
       }}
       url={metaUrl}
-      preview={preview}
-    >
+      preview={preview}>
       <Guides backgroundColor="$mauve2" />
       <Box css={{ position: "relative" }}>
         <Container
@@ -99,8 +98,7 @@ const Post = ({
               py: "$8",
               px: "$3",
             },
-          }}
-        >
+          }}>
           <Box css={{ maxWidth: 768, mx: "auto" }}>
             <Flex
               css={{
@@ -108,16 +106,14 @@ const Post = ({
                 alignItems: "center",
                 fontSize: "$2",
                 justifyContent: "space-between",
-              }}
-            >
+              }}>
               <Box
                 css={{
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
                   mr: "$2",
-                }}
-              >
+                }}>
                 {new Date(_createdAt).toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
@@ -134,15 +130,13 @@ const Post = ({
                     ? "/blog"
                     : `/blog/category/${category.slug.current}`
                 }
-                passHref
-              >
+                passHref>
                 <A
                   css={{
                     color: "$hiContrast",
                     textTransform: "uppercase",
                     fontWeight: 600,
-                  }}
-                >
+                  }}>
                   {category.title}
                 </A>
               </Link>
@@ -154,8 +148,7 @@ const Post = ({
                 mt: "$3",
                 mb: "$6",
                 fontWeight: 600,
-              }}
-            >
+              }}>
               {title}
             </Heading>
             <Flex align="center" css={{ fontSize: "$3", mb: "$6" }}>
@@ -170,8 +163,7 @@ const Post = ({
                     width: 32,
                     height: 32,
                     overflow: "hidden",
-                  }}
-                >
+                  }}>
                   <Image
                     alt={author.image?.alt}
                     layout="fill"
@@ -186,8 +178,7 @@ const Post = ({
                     textOverflow: "ellipsis",
                     overflow: "hidden",
                     whiteSpace: "nowrap",
-                  }}
-                >
+                  }}>
                   {author.name}
                 </Box>
               </Flex>
@@ -199,8 +190,7 @@ const Post = ({
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
-                }}
-              >
+                }}>
                 {stats.text}
               </Box>
             </Flex>
@@ -213,8 +203,7 @@ const Post = ({
                 borderRadius: 16,
                 overflow: "hidden",
                 mb: "$7",
-              }}
-            >
+              }}>
               <Image
                 alt={mainImage?.alt}
                 layout="fill"
@@ -247,8 +236,7 @@ const Post = ({
                 a: {
                   color: "$violet9",
                 },
-              }}
-            >
+              }}>
               <BlockContent
                 blocks={contentRaw}
                 serializers={serializers}
@@ -276,8 +264,7 @@ const Post = ({
                     "@bp2": {
                       gridTemplateColumns: "repeat(2,1fr)",
                     },
-                  }}
-                >
+                  }}>
                   {furtherReading.map((p, i) => (
                     <BlogPostCard post={p} key={`post-${i}`} />
                   ))}

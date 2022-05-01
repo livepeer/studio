@@ -27,8 +27,7 @@ const Suspend = ({ stream, invalidate }) => {
         onSelect={(e) => {
           e.preventDefault();
           setOpen(true);
-        }}
-      >
+        }}>
         {!stream.suspended ? "Suspend stream" : "Unsuspend stream"}
       </DropdownMenuItem>
 
@@ -66,8 +65,7 @@ const Suspend = ({ stream, invalidate }) => {
                 await invalidate();
                 setSaving(false);
                 setOpen(false);
-              }}
-            >
+              }}>
               {saving && (
                 <Spinner
                   css={{

@@ -16,8 +16,7 @@ const ApiKeys = () => {
       breadcrumbs={[
         { title: "Developers", href: "/dashboard/developers/webhooks" },
         { title: "Webhooks" },
-      ]}
-    >
+      ]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <WebhooksTable />

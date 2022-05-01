@@ -19,8 +19,7 @@ export const Table: FunctionComponent<TableProps> = ({
         display: "grid",
         alignItems: "space-around",
       }}
-      className={className}
-    >
+      className={className}>
       {children}
     </Box>
   );
@@ -146,8 +145,7 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
             borderBottomStyle: "none",
           },
         },
-      }}
-    >
+      }}>
       {Array.isArray(children) ? (
         children.map((child, i) => (
           <TableCell selected={selected} key={i} variant={variant}>
@@ -167,8 +165,7 @@ export const TableRow: FunctionComponent<TableRowProps> = ({
 export const Checkbox = ({ value }: { value: boolean }) => {
   return (
     <Flex
-      sx={{ height: "100%", alignItems: "center", justifyContent: "center" }}
-    >
+      sx={{ height: "100%", alignItems: "center", justifyContent: "center" }}>
       <Box
         sx={{
           width: "12px",
@@ -178,8 +175,7 @@ export const Checkbox = ({ value }: { value: boolean }) => {
           borderRadius: "3px",
           borderStyle: "solid",
           borderColor: "primary",
-        }}
-      ></Box>
+        }}></Box>
     </Flex>
   );
 };

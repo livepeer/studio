@@ -28,8 +28,7 @@ const Hero = ({
               px: "$4",
               mx: "auto",
             },
-          }}
-        >
+          }}>
           <Flex
             align="center"
             justify={centered ? "center" : "between"}
@@ -41,15 +40,13 @@ const Hero = ({
               "@bp2": {
                 height: skinny ? 300 : "calc(100vh - 180px)",
               },
-            }}
-          >
+            }}>
             <Flex direction="column" css={{ maxWidth: 700 }}>
               {tagline && (
                 <Text
                   variant="primary"
                   size="5"
-                  css={{ fontWeight: 600, mb: "$5" }}
-                >
+                  css={{ fontWeight: 600, mb: "$5" }}>
                   {tagline}
                 </Text>
               )}
@@ -65,15 +62,13 @@ const Hero = ({
                     lineHeight: "68px",
                     letterSpacing: "-2px",
                   },
-                }}
-              >
+                }}>
                 {heading}
               </Box>
               <Text
                 size="5"
                 variant="gray"
-                css={{ mb: "$6", lineHeight: 1.6, maxWidth: 540 }}
-              >
+                css={{ mb: "$6", lineHeight: 1.6, maxWidth: 540 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (
@@ -97,16 +92,14 @@ const Hero = ({
                   "@bp2": {
                     display: "block",
                   },
-                }}
-              >
+                }}>
                 {imageType === "rectangle" ? (
                   <Box
                     css={{
                       position: "absolute",
                       transform: "translate(-50%)",
                       left: "50%",
-                    }}
-                  >
+                    }}>
                     <Image src={image} width={542 / 2} height={1096 / 2} />
                   </Box>
                 ) : (
@@ -118,8 +111,7 @@ const Hero = ({
                       top: "-5%",
                       width: "110%",
                       height: "110%",
-                    }}
-                  >
+                    }}>
                     <Image src={image} objectFit="cover" layout="fill" />
                   </Box>
                 )}

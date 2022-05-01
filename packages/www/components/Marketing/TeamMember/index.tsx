@@ -35,8 +35,7 @@ const TeamMember = ({
         },
         ...css,
       }}
-      {...props}
-    >
+      {...props}>
       <Box>
         <Box
           as={Image}
@@ -56,8 +55,7 @@ const TeamMember = ({
               mt: "$3",
               fontWeight: 500,
               fontSize: "20px",
-            }}
-          >
+            }}>
             {fullname}
           </Heading>
           <Text size="3" variant="gray" css={{ color: "$mauve9" }}>
@@ -71,8 +69,7 @@ const TeamMember = ({
           mx: "auto",
           justifyContent: "center",
           alignItems: "center",
-        }}
-      >
+        }}>
         {twitter && (
           <A
             css={{
@@ -84,8 +81,7 @@ const TeamMember = ({
             }}
             href={twitter}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaTwitter />
           </A>
         )}
@@ -100,8 +96,7 @@ const TeamMember = ({
             }}
             href={linkedin}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaLinkedin />
           </A>
         )}
@@ -116,8 +111,7 @@ const TeamMember = ({
             }}
             href={medium}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaMedium />
           </A>
         )}
@@ -132,8 +126,7 @@ const TeamMember = ({
             }}
             href={github}
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             <FaGithub />
           </A>
         )}

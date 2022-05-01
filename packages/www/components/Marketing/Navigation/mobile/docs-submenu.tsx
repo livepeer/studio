@@ -49,8 +49,7 @@ const DocsMobileSubMenu = ({
           opacity: mobileSubmenuVisible || isOpen ? 1 : 0,
           visibility: mobileSubmenuVisible || isOpen ? "visible" : "hidden",
           transition: "opacity .2s",
-        }}
-      >
+        }}>
         <Container>
           <Flex
             onClick={() => setIsOpen(!isOpen)}
@@ -73,8 +72,7 @@ const DocsMobileSubMenu = ({
               "@bp3": {
                 display: "none",
               },
-            }}
-          >
+            }}>
             {pathname.includes("/docs/api") ? (
               <Box>API Reference</Box>
             ) : (
@@ -95,15 +93,13 @@ const DocsMobileSubMenu = ({
             overflow: "hidden",
             transition: "height .2s",
           }}
-          onClick={handleClick}
-        >
+          onClick={handleClick}>
           <Container
             css={{
               backgroundColor: "$panel",
               height: "calc(100vh - 228px)",
               overflow: "auto",
-            }}
-          >
+            }}>
             <TableOfContents
               onClose={() => setIsOpen(false)}
               tree={tree}

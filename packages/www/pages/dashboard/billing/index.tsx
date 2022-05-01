@@ -87,8 +87,7 @@ const Billing = () => {
     <Layout
       id="billing"
       breadcrumbs={[{ title: "Billing" }]}
-      {...Content.metaData}
-    >
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$7" }}>
           <Flex
@@ -100,8 +99,7 @@ const Billing = () => {
               pb: "$4",
               mb: "$5",
               width: "100%",
-            }}
-          >
+            }}>
             <Heading size="2">
               <Flex>
                 <Box
@@ -109,8 +107,7 @@ const Billing = () => {
                     mr: "$3",
                     fontWeight: 600,
                     letterSpacing: "0",
-                  }}
-                >
+                  }}>
                   Billing
                 </Box>
               </Flex>
@@ -148,8 +145,7 @@ const Billing = () => {
               pb: "$3",
               mb: "$4",
               width: "100%",
-            }}
-          >
+            }}>
             <Heading size="1">
               <Flex align="center">
                 <Box
@@ -157,8 +153,7 @@ const Billing = () => {
                     mr: "$3",
                     fontWeight: 600,
                     letterSpacing: "0",
-                  }}
-                >
+                  }}>
                   Current Plan
                 </Box>
               </Flex>
@@ -167,15 +162,13 @@ const Billing = () => {
           <Flex
             justify="between"
             align="center"
-            css={{ fontSize: "$3", color: "$hiContrast" }}
-          >
+            css={{ fontSize: "$3", color: "$hiContrast" }}>
             <Text variant="gray">
               You are currently on the
               <Badge
                 size="1"
                 variant="primary"
-                css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}
-              >
+                css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name
                   : products["prod_0"]?.name}
@@ -185,8 +178,7 @@ const Billing = () => {
             <Link href="/dashboard/billing/plans" passHref>
               <A
                 variant="primary"
-                css={{ display: "flex", alignItems: "center" }}
-              >
+                css={{ display: "flex", alignItems: "center" }}>
                 View Plans & Upgrade <ArrowRightIcon />
               </A>
             </Link>
@@ -202,8 +194,7 @@ const Billing = () => {
               pb: "$3",
               mb: "$5",
               width: "100%",
-            }}
-          >
+            }}>
             <Heading size="1">
               <Flex align="center" justify="between">
                 <Box
@@ -211,8 +202,7 @@ const Billing = () => {
                     mr: "$3",
                     fontWeight: 600,
                     letterSpacing: "0",
-                  }}
-                >
+                  }}>
                   Payment Method
                 </Box>
               </Flex>
@@ -228,8 +218,7 @@ const Billing = () => {
               ".rccs__card--front": {
                 color: "white !important",
               },
-            }}
-          >
+            }}>
             {user?.stripeCustomerPaymentMethodId ? (
               <>
                 <PaymentMethod data={data} />
@@ -246,8 +235,7 @@ const Billing = () => {
             css={{
               mb: "$4",
               width: "100%",
-            }}
-          >
+            }}>
             <Heading size="1">
               <Flex align="center">
                 <Box
@@ -255,8 +243,7 @@ const Billing = () => {
                     mr: "$3",
                     fontWeight: 600,
                     letterSpacing: "0",
-                  }}
-                >
+                  }}>
                   Upcoming Invoice
                 </Box>
               </Flex>
@@ -287,8 +274,7 @@ const Billing = () => {
               css={{
                 mb: "$4",
                 width: "100%",
-              }}
-            >
+              }}>
               <Heading size="1">
                 <Flex align="center">
                   <Box
@@ -296,8 +282,7 @@ const Billing = () => {
                       mr: "$3",
                       fontWeight: 600,
                       letterSpacing: "0",
-                    }}
-                  >
+                    }}>
                     Past Invoices
                   </Box>
                 </Flex>

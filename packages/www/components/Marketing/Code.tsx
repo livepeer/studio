@@ -140,8 +140,7 @@ const Code = ({
       code={value ?? children}
       language={language}
       // @ts-ignore
-      theme={theme}
-    >
+      theme={theme}>
       {({ tokens, getLineProps, getTokenProps }) => (
         <Box
           as="pre"
@@ -156,8 +155,7 @@ const Code = ({
             marginBottom: custom ? "56px" : "",
             padding: custom ? "24px 16px 60px 24px" : "",
             position: "relative",
-          }}
-        >
+          }}>
           <Box css={{ maxWidth: "100%", overflowX: "auto" }}>
             {tokens.map((line, i) => {
               // Workaround for MDX rendering trailing lines on everything
@@ -201,8 +199,7 @@ const Code = ({
                 ":focus": {
                   outline: "none",
                 },
-              }}
-            >
+              }}>
               {copied ? "Copied" : "Copy"}
             </Box>
           )}

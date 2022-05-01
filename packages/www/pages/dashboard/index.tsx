@@ -49,8 +49,7 @@ const Dashboard = () => {
               as="a"
               size="2"
               css={{ cursor: "default" }}
-              onClick={() => resendVerificationEmail()}
-            >
+              onClick={() => resendVerificationEmail()}>
               {loading && (
                 <Spinner
                   css={{

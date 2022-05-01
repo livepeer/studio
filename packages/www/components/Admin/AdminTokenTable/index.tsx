@@ -133,8 +133,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}
-    >
+      }}>
       {createModal && (
         <Modal onClose={close}>
           {!newToken && (
@@ -156,8 +155,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                     console.error(e);
                     setCreating(false);
                   });
-              }}
-            >
+              }}>
               <h3>Create token</h3>
               <p>
                 Enter a name for your token to differentiate it from other
@@ -167,12 +165,10 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                 label="Name"
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
-                placeholder="New Token"
-              ></Input>
+                placeholder="New Token"></Input>
               <Select
                 sx={{ mt: "1em" }}
-                onChange={(e) => setNewTokenUserId(e.target.value)}
-              >
+                onChange={(e) => setNewTokenUserId(e.target.value)}>
                 <option key="empty" value="">
                   --
                 </option>
@@ -187,8 +183,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                   type="button"
                   variant="outlineSmall"
                   onClick={close}
-                  sx={{ mr: 2 }}
-                >
+                  sx={{ mr: 2 }}>
                   Cancel
                 </Button>
                 <Button type="submit" variant="primarySmall">
@@ -217,8 +212,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   py: 3,
-                }}
-              >
+                }}>
                 <Box>{copyTime !== null && <strong>Copied!</strong>}</Box>
                 <Button type="button" variant="primarySmall" onClick={close}>
                   Close
@@ -237,8 +231,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2 }}
-            >
+              sx={{ mr: 2 }}>
               Cancel
             </Button>
             <Button
@@ -249,8 +242,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
                   refecth();
                   close();
                 });
-              }}
-            >
+              }}>
               Delete
             </Button>
           </Flex>
@@ -267,16 +259,14 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
         err={loadingError}
         columns={columns}
         filtersDesc={filtersDesc}
-        initialSortBy={[{ id: "lastSeen", desc: true }]}
-      >
+        initialSortBy={[{ id: "lastSeen", desc: true }]}>
         <Button
           key="createBut"
           variant="outlineSmall"
           sx={{ ml: "1em" }}
           onClick={() => {
             setCreateModal(true);
-          }}
-        >
+          }}>
           Create
         </Button>
         <Button
@@ -284,8 +274,7 @@ const AdminTokenTable = ({ id }: TokenTableProps) => {
           variant="outlineSmall"
           disabled={!selectedRow}
           sx={{ ml: "1em" }}
-          onClick={() => setDeleteModal(true)}
-        >
+          onClick={() => setDeleteModal(true)}>
           Delete
         </Button>
       </CommonAdminTable>

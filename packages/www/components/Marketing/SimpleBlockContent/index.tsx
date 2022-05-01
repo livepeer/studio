@@ -36,8 +36,7 @@ const SimpleBlockContent = (props) => {
         a: {
           color: "$violet9",
         },
-      }}
-    >
+      }}>
       <BlockContent blocks={blocks} serializers={Serializers} />
     </Box>
   );

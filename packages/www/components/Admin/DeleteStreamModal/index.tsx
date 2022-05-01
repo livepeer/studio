@@ -31,8 +31,7 @@ const DeleteStreamModal = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}
-        >
+          sx={{ mr: 2 }}>
           Cancel
         </Button>
         <Button type="button" variant="primarySmall" onClick={onDelete}>

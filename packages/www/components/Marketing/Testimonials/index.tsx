@@ -53,16 +53,14 @@ const Testimonials = () => (
         "@bp2": {
           py: 140,
         },
-      }}
-    >
+      }}>
       <Box
         css={{
           px: "$6",
           "@bp3": {
             px: "$3",
           },
-        }}
-      >
+        }}>
         <Grid
           css={{
             justifyContent: "center",
@@ -72,8 +70,7 @@ const Testimonials = () => (
               gridTemplateColumns: "repeat(3,1fr)",
             },
           }}
-          gap="4"
-        >
+          gap="4">
           {testimonials.map((testimonial, i) => (
             <Card key={i} {...testimonial} />
           ))}

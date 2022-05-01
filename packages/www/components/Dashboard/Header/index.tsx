@@ -86,8 +86,7 @@ const Header = ({ breadcrumbs = [] }) => {
         width: "100%",
         borderBottom: "1px solid",
         borderColor: "$mauve6",
-      }}
-    >
+      }}>
       <Flex
         align="center"
         justify="between"
@@ -97,8 +96,7 @@ const Header = ({ breadcrumbs = [] }) => {
           width: "100%",
           margin: "0 auto",
           maxWidth: "1520px",
-        }}
-      >
+        }}>
         <Breadcrumbs aria-label="breadcrumb">
           {breadcrumbs.map((breadcrumb, i) => {
             if (breadcrumb?.href) {
@@ -120,8 +118,7 @@ const Header = ({ breadcrumbs = [] }) => {
               background: "transparent",
               appearance: "none",
               border: "none",
-            }}
-          >
+            }}>
             <StyledDocumentationIcon />
             <Link href="/docs/guides" passHref>
               <A
@@ -132,8 +129,7 @@ const Header = ({ breadcrumbs = [] }) => {
                   "&:hover": {
                     textDecoration: "none",
                   },
-                }}
-              >
+                }}>
                 <Box>Documentation</Box>
               </A>
             </Link>
@@ -148,8 +144,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 background: "transparent",
                 appearance: "none",
                 border: "none",
-              }}
-            >
+              }}>
               <StyledHornIcon />
               <Box css={{ fontSize: "$3", color: "$hiContrast" }}>Feedback</Box>
             </Flex>
@@ -166,8 +161,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-              }}
-            >
+              }}>
               <Box css={{ position: "absolute", right: "12px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
@@ -180,8 +174,7 @@ const Header = ({ breadcrumbs = [] }) => {
                       display: "flex",
                       ai: "center",
                       jc: "space-between",
-                    }}
-                  >
+                    }}>
                     Feedback
                     {errorMessage && (
                       <Text variant="red" size="2">
@@ -231,8 +224,7 @@ const Header = ({ breadcrumbs = [] }) => {
                               ":last-of-type": {
                                 marginRight: "0px",
                               },
-                            }}
-                          >
+                            }}>
                             {reaction}
                           </Box>
                         ))}
@@ -262,8 +254,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 <Flex
                   align="center"
                   justify="center"
-                  css={{ flexDirection: "column" }}
-                >
+                  css={{ flexDirection: "column" }}>
                   <StyledCheckedIcon />
                   <Text css={{ textALign: "center", margin: "$3 0 $2" }}>
                     Your feedback has been received!
@@ -282,8 +273,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 WebkitAppearance: "none",
                 border: "none",
                 p: 0,
-              }}
-            >
+              }}>
               <StyledQuestionMarkIcon />
             </Box>
             <DropdownMenuContent
@@ -295,8 +285,7 @@ const Header = ({ breadcrumbs = [] }) => {
                   "0px 5px 14px rgba(0, 0, 0, 0.22), 0px 0px 2px rgba(0, 0, 0, 0.2)",
                 background: "$panel",
                 right: "-13px",
-              }}
-            >
+              }}>
               <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
@@ -311,8 +300,7 @@ const Header = ({ breadcrumbs = [] }) => {
                     textDecoration: "none",
                     mb: "$3",
                     cursor: "pointer",
-                  }}
-                >
+                  }}>
                   <StyledDocumentationIcon />
                   <Text css={{ margin: "0 $2" }}>Documentation</Text>
                   <StyledHyperlinkIcon />

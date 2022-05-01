@@ -42,8 +42,7 @@ const Post = ({ href, title, label }) => (
         "&:hover": {
           textDecoration: "none",
         },
-      }}
-    >
+      }}>
       <Text variant="gray">{title}</Text>
       <Flex align="center" css={{ mt: "$2" }}>
         <Box>{label ?? "Read guide"}</Box>
@@ -52,8 +51,7 @@ const Post = ({ href, title, label }) => (
           width="10"
           height="10"
           viewBox="0 0 10 10"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <g fillRule="evenodd">
             <path className="HoverArrow__linePath" d="M0 5h7" />
             <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />

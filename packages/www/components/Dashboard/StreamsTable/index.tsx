@@ -88,8 +88,7 @@ const Profile = ({
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",
-      }}
-    >
+      }}>
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -142,8 +141,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid"
-            >
+              effect="solid">
               {detailsTooltip}
             </ReactTooltip>
             <StyledQuestionMarkIcon
@@ -312,8 +310,7 @@ const StreamsTable = ({
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}
-    >
+      }}>
       <Heading css={{ fontWeight: 500, mb: "$3" }}>
         Create your first stream
       </Heading>
@@ -331,8 +328,7 @@ const StreamsTable = ({
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="primary"
-      >
+        variant="primary">
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>
           Create stream
@@ -391,11 +387,9 @@ const StreamsTable = ({
       {/* Delete streams dialog */}
       <AlertDialog
         open={deleteDialogState.on}
-        onOpenChange={deleteDialogState.onOff}
-      >
+        onOpenChange={deleteDialogState.onOff}>
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-        >
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle asChild>
             <Heading size="1">
               Delete {state.selectedRows.length} stream
@@ -406,8 +400,7 @@ const StreamsTable = ({
             <Text
               size="3"
               variant="gray"
-              css={{ mt: "$2", lineHeight: "22px" }}
-            >
+              css={{ mt: "$2", lineHeight: "22px" }}>
               This will permanently remove the stream
               {state.selectedRows.length > 1 && "s"}. This action cannot be
               undone.
@@ -440,8 +433,7 @@ const StreamsTable = ({
                     setSavingDeleteDialog(false);
                   }
                 }}
-                variant="red"
-              >
+                variant="red">
                 {savingDeleteDialog && (
                   <Spinner
                     css={{

@@ -33,14 +33,12 @@ const CustomTooltip = ({ active, payload }: any) => {
           background: "rgba(0, 0, 0, 0.9)",
           padding: "8px",
           borderRadius: "4px",
-        }}
-      >
+        }}>
         <Text
           css={{
             fontSize: "12px",
             color: "white",
-          }}
-        >
+          }}>
           {payload.map((item) => (
             <div>
               {item.dataKey}: <b>{item.value} kbps</b>
@@ -72,8 +70,7 @@ const Chart = ({
         ".recharts-cartesian-axis-tick": {
           fontSize: "$2",
         },
-      }}
-    >
+      }}>
       <Text
         variant="gray"
         size="1"
@@ -82,8 +79,7 @@ const Chart = ({
           position: "absolute",
           left: "-70px",
           bottom: "70px",
-        }}
-      >
+        }}>
         kbps (multiplied by 1000)
       </Text>
       <Text
@@ -93,8 +89,7 @@ const Chart = ({
           position: "absolute",
           bottom: "-30px",
           left: "50px",
-        }}
-      >
+        }}>
         Seconds since stream loaded
       </Text>
       <ResponsiveContainer width="99%" height={300}>

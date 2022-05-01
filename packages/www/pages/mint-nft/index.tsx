@@ -42,8 +42,7 @@ async function richMintNft(
         Mint transaction sent:{" "}
         <Link
           href={`${chain.spec.blockExplorerUrls[0]}/tx/${tx.hash}`}
-          passHref
-        >
+          passHref>
           <A target="_blank">{displayAddr(tx.hash)}</A>
         </Link>
       </>
@@ -62,8 +61,7 @@ async function richMintNft(
         )}
         <Link
           href={info?.opensea?.tokenUrl ?? info?.opensea?.contractUrl}
-          passHref
-        >
+          passHref>
           <A target="_blank">OpenSea</A>
         </Link>
       </>
@@ -193,21 +191,18 @@ export default function MintNFT() {
               py: "$8",
               px: "$4",
             },
-          }}
-        >
+          }}>
           <Flex
             css={{
               alignItems: "center",
               justifyContent: "center",
               flexGrow: 1,
               flexDirection: "column",
-            }}
-          >
+            }}>
             <AlertDialog open={true}>
               <AlertDialogContent
                 css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-                onOpenAutoFocus={(e) => e.preventDefault()}
-              >
+                onOpenAutoFocus={(e) => e.preventDefault()}>
                 <AlertDialogTitle asChild>
                   <Heading size="1">Mint a Video NFT</Heading>
                 </AlertDialogTitle>
@@ -218,8 +213,7 @@ export default function MintNFT() {
                   onSubmit={(e) => {
                     e.preventDefault();
                     return onClickMint();
-                  }}
-                >
+                  }}>
                   <Flex direction="column" gap="2">
                     {state?.tokenUri || !user ? undefined : (
                       <>
@@ -236,8 +230,7 @@ export default function MintNFT() {
                                 "file",
                                 await videoNft.uploader.pickFile()
                               );
-                            }}
-                          >
+                            }}>
                             Pick a file
                           </Button>
                         </Flex>
@@ -292,16 +285,14 @@ export default function MintNFT() {
                     <Text
                       size="3"
                       variant="gray"
-                      css={{ mt: "$2", fontSize: "$2", mb: "$4" }}
-                    >
+                      css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
                       <Box
                         css={{
                           overflow: "scroll",
                           p: "$4",
                           height: 200,
                           borderRadius: 6,
-                        }}
-                      >
+                        }}>
                         {(() => {
                           switch (status) {
                             case "initializing":
@@ -316,8 +307,7 @@ export default function MintNFT() {
                                   MetaMask not available. Install it at{" "}
                                   <a
                                     href="https://metamask.io/download"
-                                    target="_blank"
-                                  >
+                                    target="_blank">
                                     metamask.io
                                   </a>
                                 </div>
@@ -370,8 +360,7 @@ export default function MintNFT() {
                         size="2"
                         disabled={status !== "notConnected"}
                         variant="primary"
-                        onClick={onClickConnect}
-                      >
+                        onClick={onClickConnect}>
                         Connect to MetaMask
                       </Button>
                     ) : status === "connected" &&
@@ -382,8 +371,7 @@ export default function MintNFT() {
                           type="button"
                           size="2"
                           variant="primary"
-                          onClick={onClickSwitchNetwork("0x13881")}
-                        >
+                          onClick={onClickSwitchNetwork("0x13881")}>
                           Polygon Testnet
                         </Button>
                         <Button
@@ -391,8 +379,7 @@ export default function MintNFT() {
                           type="button"
                           size="2"
                           variant="primary"
-                          onClick={onClickSwitchNetwork("0x89")}
-                        >
+                          onClick={onClickSwitchNetwork("0x89")}>
                           Polygon Mainnet
                         </Button>
                       </>
@@ -424,8 +411,7 @@ export default function MintNFT() {
                           } finally {
                             isUploading.onOff();
                           }
-                        }}
-                      >
+                        }}>
                         {isUploading.on && (
                           <Spinner
                             css={{
@@ -444,8 +430,7 @@ export default function MintNFT() {
                         type="submit"
                         size="2"
                         disabled={isMinting.on || status !== "connected"}
-                        variant="primary"
-                      >
+                        variant="primary">
                         {isMinting.on && (
                           <Spinner
                             css={{

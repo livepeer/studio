@@ -44,8 +44,7 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
           isLink={undefined}
           isExternal={undefined}
           as="a"
-          sx={{ ...baseSx, ...sx }}
-        >
+          sx={{ ...baseSx, ...sx }}>
           {ink && <Ink />}
           {children}
         </ThemeUIButton>
@@ -60,8 +59,7 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
           href={undefined}
           asPath={undefined}
           as="a"
-          sx={{ ...baseSx, ...sx }}
-        >
+          sx={{ ...baseSx, ...sx }}>
           {ink && <Ink />}
           {children}
         </ThemeUIButton>

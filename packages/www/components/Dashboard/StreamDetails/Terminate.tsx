@@ -33,8 +33,7 @@ const Terminate = ({ stream, invalidate, ...props }) => {
         onSelect={(e) => {
           e.preventDefault();
           setOpen(true);
-        }}
-      >
+        }}>
         Terminate
       </Box>
 
@@ -55,8 +54,7 @@ const Terminate = ({ stream, invalidate, ...props }) => {
                 setMessage(initialMessage);
                 setOpen(false);
               }}
-              ghost
-            >
+              ghost>
               Cancel
             </Button>
           </AlertDialogCancel>
@@ -77,8 +75,7 @@ const Terminate = ({ stream, invalidate, ...props }) => {
                   setSaving(false);
                 }
               }}
-              variant="red"
-            >
+              variant="red">
               {saving && (
                 <Spinner
                   css={{

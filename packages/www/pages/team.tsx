@@ -25,8 +25,7 @@ const TeamPage = ({ content }) => {
               py: "$9",
               px: "$4",
             },
-          }}
-        >
+          }}>
           <Box css={{ maxWidth: 768, mx: "auto", textAlign: "center" }}>
             <Heading size="4" css={{ fontWeight: 600, mb: "$4" }}>
               We’re building the future of video infrastructure services.

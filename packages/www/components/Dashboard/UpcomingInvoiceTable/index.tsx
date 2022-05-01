@@ -10,8 +10,7 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
         borderCollapse: "separate",
         borderSpacing: 0,
         tableLayout: "initial",
-      }}
-    >
+      }}>
       <Thead>
         <Tr>
           <Th>Item</Th>
@@ -42,8 +41,7 @@ const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
               textTransform: "uppercase",
               fontSize: "$2",
               fontWeight: 600,
-            }}
-          >
+            }}>
             Total
           </Th>
           <Td css={{ fontSize: "$2" }}>

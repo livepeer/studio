@@ -19,8 +19,7 @@ const PastInvoicesTable = ({ invoices }) => {
         borderCollapse: "separate",
         borderSpacing: 0,
         tableLayout: "initial",
-      }}
-    >
+      }}>
       <Thead>
         <Tr>
           <Th>Date</Th>
@@ -58,8 +57,7 @@ const PastInvoicesTable = ({ invoices }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   href={invoice.hosted_invoice_url}
-                  css={{ display: "flex", alignItems: "center" }}
-                >
+                  css={{ display: "flex", alignItems: "center" }}>
                   Invoice
                   <FiArrowUpRight css={{ ml: 1 }} />
                 </A>

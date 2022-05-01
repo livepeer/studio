@@ -39,8 +39,7 @@ export const Button = React.forwardRef(
         ...css,
       }}
       size="3"
-      {...props}
-    >
+      {...props}>
       <Box
         css={{
           px: "$3",
@@ -72,8 +71,7 @@ export const Button = React.forwardRef(
               transform: "translateX(3px)",
             },
           },
-        }}
-      >
+        }}>
         {children}
         {arrow && (
           <svg
@@ -81,8 +79,7 @@ export const Button = React.forwardRef(
             width="10"
             height="10"
             viewBox="0 0 10 10"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <g fillRule="evenodd">
               <path className="HoverArrow__linePath" d="M0 5h7" />
               <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />

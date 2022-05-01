@@ -21,8 +21,7 @@ const Providers = ({ children }) => {
         ...themeMap,
         dark: "dark-theme-violet",
         light: "light-theme-violet",
-      }}
-    >
+      }}>
       <SnackbarProvider>{children}</SnackbarProvider>
     </ThemeProvider>
   );

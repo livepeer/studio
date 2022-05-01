@@ -16,8 +16,7 @@ const TeamSection = ({ teamMembers }) => {
         "@bp3": {
           gridTemplateColumns: "repeat(4,1fr)",
         },
-      }}
-    >
+      }}>
       {teamMembers.map((t, i) => (
         <TeamMember
           key={i}

@@ -43,8 +43,7 @@ const Log = ({ timestamp, level, text }: LogData) => {
   return (
     <Flex
       align="center"
-      css={{ mb: "$3", fontSize: "$1", fontFamily: "$mono" }}
-    >
+      css={{ mb: "$3", fontSize: "$1", fontFamily: "$mono" }}>
       <Badge css={{ mr: "$4" }} variant={levelColorMap[level] as any}>
         {level}
       </Badge>
@@ -177,8 +176,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
           pb: "$1",
           mb: "$4",
           width: "100%",
-        }}
-      >
+        }}>
         <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
           Logs
         </Heading>
@@ -190,8 +188,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
           bc: "$mauve3",
           height: 300,
           borderRadius: 6,
-        }}
-      >
+        }}>
         {!logs.length ? (
           <Box css={{ fontSize: "$1", fontFamily: "$mono" }}>
             Waiting for events...

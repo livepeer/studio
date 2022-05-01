@@ -40,16 +40,14 @@ const Contact = () => {
       <Guides backgroundColor="$panel" />
       <Container
         size="3"
-        css={{ py: 88, px: 0, width: "100%", position: "relative" }}
-      >
+        css={{ py: 88, px: 0, width: "100%", position: "relative" }}>
         <Box
           css={{
             px: "$6",
             "@bp2": {
               px: "$3",
             },
-          }}
-        >
+          }}>
           <Box css={{ mb: 48, textAlign: "center" }}>
             <Heading
               size="3"
@@ -59,15 +57,13 @@ const Contact = () => {
                 color: "$hiContrast",
                 fontSize: "$8",
                 mb: "$5",
-              }}
-            >
+              }}>
               Get in touch
             </Heading>
             <Text
               size="4"
               variant="gray"
-              css={{ maxWidth: 512, margin: "0 auto" }}
-            >
+              css={{ maxWidth: 512, margin: "0 auto" }}>
               Learn more about Livepeer Video Service's streaming API and media
               server. Leave us a message and we’ll get back to you.
               <br />
@@ -75,8 +71,7 @@ const Contact = () => {
               Or email us at{" "}
               <A
                 href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry"
-                target="_blank"
-              >
+                target="_blank">
                 hello@livepeer.com
               </A>
               .
@@ -86,8 +81,7 @@ const Contact = () => {
             as="form"
             ref={formEl}
             onSubmit={handleSubmit}
-            css={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}
-          >
+            css={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
             <Grid
               css={{
                 mb: "$4",
@@ -98,8 +92,7 @@ const Contact = () => {
                   gridTemplateColumns: "repeat(2,1fr)",
                 },
               }}
-              gap="5"
-            >
+              gap="5">
               <TextField
                 size="3"
                 id="firstname"
@@ -125,8 +118,7 @@ const Contact = () => {
                   gridTemplateColumns: "repeat(2,1fr)",
                 },
               }}
-              gap="5"
-            >
+              gap="5">
               <TextField
                 size="3"
                 id="email"

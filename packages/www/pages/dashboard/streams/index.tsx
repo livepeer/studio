@@ -16,8 +16,7 @@ const Streams = () => {
     <Layout
       id="streams"
       breadcrumbs={[{ title: "Streams" }]}
-      {...Content.metaData}
-    >
+      {...Content.metaData}>
       <Box
         css={{
           pb: "$9",
@@ -26,8 +25,7 @@ const Streams = () => {
           "@bp4": {
             p: "$6",
           },
-        }}
-      >
+        }}>
         <StreamsTable
           title="Streams"
           userId={user.id}

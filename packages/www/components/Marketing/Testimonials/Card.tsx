@@ -31,8 +31,7 @@ const Card = ({ id, logo, quote, author }: CardProps) => {
         "@bp2": {
           minHeight: 380,
         },
-      }}
-    >
+      }}>
       {logo}
       <Text variant="gray" css={{ fontWeight: 400, my: "$5" }}>
         "{quote}"
@@ -47,8 +46,7 @@ const Card = ({ id, logo, quote, author }: CardProps) => {
           "@bp2": {
             height: 90,
           },
-        }}
-      >
+        }}>
         <Box
           as="img"
           alt={`${author.name} avatar`}

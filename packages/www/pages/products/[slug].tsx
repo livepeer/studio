@@ -32,8 +32,7 @@ const Product = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}
-        >
+          }}>
           Loading
         </Box>
       </Layout>
@@ -54,8 +53,7 @@ const Product = ({
           : null
       }
       url={metaUrl}
-      preview={preview}
-    >
+      preview={preview}>
       <Hero
         centered={hero.centered}
         tagline="Products"

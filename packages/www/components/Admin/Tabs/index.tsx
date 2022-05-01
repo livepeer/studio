@@ -27,8 +27,7 @@ const Tabs = ({ tabs }: TabsProps) => {
         borderBottom: "1px solid",
         borderColor: "muted",
         pb: 2,
-      }}
-    >
+      }}>
       <Container>
         {tabs.map((tab: TabType, i: number) => (
           <Link key={i} href={tab.href} as={tab.as} passHref>
@@ -42,8 +41,7 @@ const Tabs = ({ tabs }: TabsProps) => {
                 borderBottom: "3px solid",
                 textDecoration: "none",
                 borderColor: tab.isActive ? "primary" : "transparent",
-              }}
-            >
+              }}>
               {tab.name}
             </Box>
           </Link>

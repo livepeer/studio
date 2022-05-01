@@ -33,8 +33,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
           "@bp2": {
             py: 120,
           },
-        }}
-      >
+        }}>
         <Container
           size="3"
           css={{
@@ -43,8 +42,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
             "@bp3": {
               px: "$3",
             },
-          }}
-        >
+          }}>
           <Flex
             css={{
               ai: "flex-start",
@@ -56,14 +54,12 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                 ai: "center",
                 flexDirection: "row",
               },
-            }}
-          >
+            }}>
             <Flex direction="column">
               <Text
                 variant="primary"
                 size="5"
-                css={{ fontWeight: 600, mb: "$4" }}
-              >
+                css={{ fontWeight: 600, mb: "$4" }}>
                 {title}
               </Text>
               <Heading
@@ -76,8 +72,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                   mb: "$6",
                   mr: "$6",
                   "@bp2": { lineHeight: 1.4 },
-                }}
-              >
+                }}>
                 {heading}
               </Heading>
             </Flex>
@@ -102,8 +97,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
             "@bp3": {
               grid: "1fr/repeat(4,1fr)",
             },
-          }}
-        >
+          }}>
           {reasons.map((reason, i) => {
             return (
               <Box
@@ -124,8 +118,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                       pl: "$3",
                     },
                   },
-                }}
-              >
+                }}>
                 {reason?.icon?.provider && (
                   <Box
                     css={{
@@ -141,8 +134,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                       jc: "center",
                       background:
                         "linear-gradient(90deg, rgba(107, 87, 214, 0.1) 0%, rgba(183, 167, 245, 0.1) 100%)",
-                    }}
-                  >
+                    }}>
                     {getIconProvider(reason.icon.provider)[reason.icon.name]()}
                   </Box>
                 )}
@@ -160,8 +152,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                       backgroundColor: "$violet9",
                       content: '""',
                     },
-                  }}
-                >
+                  }}>
                   {reason.title}
                 </Text>
                 <Text variant="gray" css={{ lineHeight: 1.6 }}>

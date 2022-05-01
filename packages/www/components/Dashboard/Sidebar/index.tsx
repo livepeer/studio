@@ -55,8 +55,7 @@ const Sidebar = ({ id }) => {
         position: "fixed",
         justifyContent: "flex-end",
         bottom: 0,
-      }}
-    >
+      }}>
       <Flex align="center" justify="between" css={{ p: "$3", mb: "$3" }}>
         <DropdownMenu>
           <Flex
@@ -67,8 +66,7 @@ const Sidebar = ({ id }) => {
               background: "transparent",
               p: 0,
               cursor: "pointer",
-            }}
-          >
+            }}>
             <Avatar
               size="3"
               alt={user?.firstName}
@@ -90,8 +88,7 @@ const Sidebar = ({ id }) => {
                 onSelect={(e) => {
                   e.preventDefault();
                   Router.push("/dashboard/billing");
-                }}
-              >
+                }}>
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -99,8 +96,7 @@ const Sidebar = ({ id }) => {
                 onSelect={(e) => {
                   e.preventDefault();
                   logout();
-                }}
-              >
+                }}>
                 Logout
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -120,8 +116,7 @@ const Sidebar = ({ id }) => {
                 backgroundClip: "text",
                 ml: "$2",
                 lineHeight: 1.2,
-              }}
-            >
+              }}>
               Home
             </Text>
           </NavLink>
@@ -138,8 +133,7 @@ const Sidebar = ({ id }) => {
                   backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
-                }}
-              >
+                }}>
                 Streams
               </Text>
             </NavLink>
@@ -151,8 +145,7 @@ const Sidebar = ({ id }) => {
                 "> :first-child": {
                   mt: "$1",
                 },
-              }}
-            >
+              }}>
               <Link href="/dashboard/sessions" passHref>
                 <NavLink>
                   <Text
@@ -164,8 +157,7 @@ const Sidebar = ({ id }) => {
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
-                    }}
-                  >
+                    }}>
                     Sessions
                   </Text>
                 </NavLink>
@@ -185,8 +177,7 @@ const Sidebar = ({ id }) => {
                 backgroundClip: "text",
                 ml: "$2",
                 lineHeight: 1.2,
-              }}
-            >
+              }}>
               Assets
             </Text>
           </NavLink>
@@ -202,8 +193,7 @@ const Sidebar = ({ id }) => {
                   backgroundClip: "text",
                   ml: "$2",
                   lineHeight: 1.2,
-                }}
-              >
+                }}>
                 Developers
               </Text>
             </NavLink>
@@ -215,8 +205,7 @@ const Sidebar = ({ id }) => {
                 "> :first-child": {
                   mt: "$1",
                 },
-              }}
-            >
+              }}>
               <Link href="/dashboard/developers/api-keys" passHref>
                 <NavLink>
                   <Text
@@ -229,8 +218,7 @@ const Sidebar = ({ id }) => {
                       mt: "$1",
                       mb: "$1",
                       lineHeight: 1.2,
-                    }}
-                  >
+                    }}>
                     API Keys
                   </Text>
                 </NavLink>
@@ -247,8 +235,7 @@ const Sidebar = ({ id }) => {
                       mt: "$1",
                       mb: "$1",
                       lineHeight: 1.2,
-                    }}
-                  >
+                    }}>
                     Webhooks
                   </Text>
                 </NavLink>
@@ -265,8 +252,7 @@ const Sidebar = ({ id }) => {
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
-                    }}
-                  >
+                    }}>
                     Media Server
                   </Text>
                 </NavLink>
@@ -289,8 +275,7 @@ const Sidebar = ({ id }) => {
                   WebkitTextFillColor: "initial",
                   ml: "$2",
                   lineHeight: 1.2,
-                }}
-              >
+                }}>
                 Billing
               </Text>
             </NavLink>
@@ -302,8 +287,7 @@ const Sidebar = ({ id }) => {
                 "> :first-child": {
                   mt: "$1",
                 },
-              }}
-            >
+              }}>
               <Link href="/dashboard/billing/plans" passHref>
                 <NavLink>
                   <Text
@@ -315,8 +299,7 @@ const Sidebar = ({ id }) => {
                       ml: 31,
                       mt: "$1",
                       lineHeight: 1.2,
-                    }}
-                  >
+                    }}>
                     Plans
                   </Text>
                 </NavLink>

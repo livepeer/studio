@@ -26,8 +26,7 @@ const Notch = () => (
       width: "4%",
       left: "3%",
       maxWidth: "27px",
-    }}
-  >
+    }}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
@@ -41,8 +40,7 @@ const Notch = () => (
       x="2"
       y="77"
       width="8"
-      height="48"
-    >
+      height="48">
       <rect x="2" y="77" width="8" height="48" rx="4" fill="#F5F5F5" />
     </mask>
     <g mask="url(#phone-notch-mask0)">
@@ -212,8 +210,7 @@ const Frame = () => (
       right: 0,
       left: 0,
       maxWidth: "100%",
-    }}
-  >
+    }}>
     <g clipPath="url(#clip0)">
       <path
         d="M57 392.5H109.5C109.5 393.052 109.948 393.5 110.5 393.5H139.5C140.052 393.5 140.5 393.052 140.5 392.5H174C174 393.052 174.448 393.5 175 393.5H234C234.552 393.5 235 393.052 235 392.5H252C252.276 392.5 252.5 392.724 252.5 393C252.5 393.276 252.724 393.5 253 393.5H312.5C312.776 393.5 313 393.276 313 393C313 392.724 313.224 392.5 313.5 392.5H731C762.48 392.5 788 366.98 788 335.5V254.5C788 223.02 788 197.5 788 197.5H1.14441e-05C1.14441e-05 197.5 0 201.52 0 233V335.5C0 366.98 25.5198 392.5 57 392.5Z"
@@ -249,8 +246,7 @@ const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
       width: "100%",
       maxWidth: phoneFrameMaxWidth,
       mx: "auto",
-    }}
-  >
+    }}>
     <Box
       css={{
         position: "relative",
@@ -258,8 +254,7 @@ const PhoneSvg = forwardRef((_, ref: React.Ref<HTMLDivElement>) => (
         width: "100%",
         maxWidth: phoneFrameMaxWidth,
         pb: phoneAspectRatio,
-      }}
-    >
+      }}>
       <Notch />
       <Frame />
     </Box>

@@ -165,8 +165,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
       sx={{
         mb: 5,
         mt: 2,
-      }}
-    >
+      }}>
       {createModal && (
         <Modal onClose={close} maxWidth="1000px">
           <h3>Create object store</h3>
@@ -175,8 +174,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
             columns={[3, "1fr 3fr 3fr"]}
             sx={{
               alignItems: "center",
-            }}
-          >
+            }}>
             <Box>Name</Box>
             <Box>
               <Input
@@ -189,8 +187,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
                   borderRadius: "0px",
                 }}
                 onChange={(e) => setObjectStoreName(e.target.value)}
-                placeholder="new object store name"
-              ></Input>
+                placeholder="new object store name"></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>URL</Box>
@@ -205,8 +202,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
                   borderRadius: "0px",
                 }}
                 onChange={(e) => setObjectStoreUrl(e.target.value)}
-                placeholder="gs://bucket"
-              ></Input>
+                placeholder="gs://bucket"></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
             <Box>Public URL</Box>
@@ -221,8 +217,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
                   borderRadius: "0px",
                 }}
                 onChange={(e) => setObjectStorePubUrl(e.target.value)}
-                placeholder="https://public.domain"
-              ></Input>
+                placeholder="https://public.domain"></Input>
             </Box>
             <Box>(a-z, A-Z, 0-9, -, _, ~ only)</Box>
           </Grid>
@@ -232,15 +227,13 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
               type="button"
               variant="outlineSmall"
               onClick={close}
-              sx={{ mr: 2, mt: 2 }}
-            >
+              sx={{ mr: 2, mt: 2 }}>
               Cancel
             </Button>
             <Button
               type="button"
               variant="primarySmall"
-              onClick={doCreateObjectStore}
-            >
+              onClick={doCreateObjectStore}>
               Create
             </Button>
           </Flex>
@@ -257,16 +250,14 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
         rowsPerPage={ROWS_PER_PAGE}
         err={loadingError}
         columns={columns}
-        filtersDesc={filtersDesc}
-      >
+        filtersDesc={filtersDesc}>
         <Button
           variant="outlineSmall"
           sx={{ margin: 2 }}
           onClick={() => {
             setMessage("");
             setCreateModal(true);
-          }}
-        >
+          }}>
           Create
         </Button>
         <Button
@@ -279,8 +270,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
           sx={{ margin: 2, mb: 4 }}
           onClick={() =>
             selectedObjectStore && disableOS(selectedObjectStore.id, true)
-          }
-        >
+          }>
           Disable
         </Button>
         <Button
@@ -293,8 +283,7 @@ const AdminObjectStoreTable = ({ id }: { id: string }) => {
           sx={{ margin: 2, mb: 4 }}
           onClick={() =>
             selectedObjectStore && disableOS(selectedObjectStore.id, false)
-          }
-        >
+          }>
           Enable
         </Button>
       </CommonAdminTable>

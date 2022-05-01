@@ -14,8 +14,7 @@ const Investors = ({ backgroundColor }) => {
       css={{
         position: "relative",
         backgroundColor,
-      }}
-    >
+      }}>
       <Container
         size="3"
         css={{
@@ -25,24 +24,21 @@ const Investors = ({ backgroundColor }) => {
           "@bp2": {
             py: 128,
           },
-        }}
-      >
+        }}>
         <Box
           css={{
             px: "$6",
             "@bp3": {
               px: "$3",
             },
-          }}
-        >
+          }}>
           <Text
             size="6"
             css={{
               color: "$mauve9",
               textAlign: "center",
               mb: "$8",
-            }}
-          >
+            }}>
             Trusted by video industry and Web3 leaders
           </Text>
 
@@ -58,8 +54,7 @@ const Investors = ({ backgroundColor }) => {
                 gridTemplateColumns: "repeat(5,1fr)",
               },
             }}
-            gap="5"
-          >
+            gap="5">
             {investorIds.map((id) => (
               <Box
                 as="img"

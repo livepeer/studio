@@ -31,8 +31,7 @@ export function PRLink({ id }: { id: number | number[] }) {
             href={`https://github.com/radix-ui/primitives/pull/${id}`}
             target="_blank"
             rel="noopener"
-            css={{ fontFamily: "$mono" }}
-          >
+            css={{ fontFamily: "$mono" }}>
             #{id}
           </Link>
           {i < arr.length - 1 ? " " : null}

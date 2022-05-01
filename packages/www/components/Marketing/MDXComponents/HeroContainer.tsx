@@ -25,8 +25,7 @@ const HeroContainer = ({
 
         "@bp3": { mx: "-$7" },
         "@bp4": { mx: "-$8" },
-      }}
-    >
+      }}>
       {children}
     </Box>
   );

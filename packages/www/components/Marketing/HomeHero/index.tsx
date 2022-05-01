@@ -95,8 +95,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
       css={{
         position: "relative",
         overflow: "hidden",
-      }}
-    >
+      }}>
       <Guides backgroundColor={backgroundColor} />
       <Container>
         <Box
@@ -110,14 +109,12 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
             "@bp2": {
               pt: 90,
             },
-          }}
-        >
+          }}>
           <Box
             css={{
               zIndex: notchZIndex + 1,
               position: "relative",
-            }}
-          >
+            }}>
             <Box
               as="h1"
               css={{
@@ -138,8 +135,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                   fontSize: 72,
                   lineHeight: 1.1,
                 },
-              }}
-            >
+              }}>
               Video development made{" "}
               <Typical
                 steps={[
@@ -163,8 +159,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 mb: "$7",
                 maxWidth: 700,
                 mx: "auto",
-              }}
-            >
+              }}>
               Accessible APIs and infrastructure to build video streaming
               applications — big and small. Powered by{" "}
               <Box
@@ -185,8 +180,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                     "linear-gradient(to right, $colors$green9, $colors$green9 4%, $colors$green5)",
                   WebkitBoxDecorationBreak: "clone",
                   boxDecorationBreak: "clone",
-                }}
-              >
+                }}>
                 <Text size="5" css={{ lineHeight: 1.2 }}>
                   Livepeer
                 </Text>
@@ -242,8 +236,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
               "@bp4": {
                 mt: "$6",
               },
-            }}
-          >
+            }}>
             <Box
               ref={videoContainerRef}
               css={{
@@ -252,8 +245,7 @@ const HomeHero = ({ backgroundColor = "$loContrast" }) => {
                 justifyContent: "center",
                 width: "100vw",
                 zIndex: notchZIndex - 1,
-              }}
-            >
+              }}>
               <HeroVideo ref={videoRef} />
             </Box>
             <PhoneSvg ref={phoneRef} />

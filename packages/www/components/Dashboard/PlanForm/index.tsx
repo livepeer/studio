@@ -191,20 +191,17 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             onClick={() => {
               onClick();
               setOpen(true);
-            }}
-          >
+            }}>
             {text}
           </Button>
         </Flex>
 
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-        >
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <Box
             as="form"
             onSubmit={handleSubmit(onSubmit)}
-            id="plan-stripe-form"
-          >
+            id="plan-stripe-form">
             <AlertDialogTitle asChild>
               <Heading size="1">
                 {!user.stripeCustomerPaymentMethodId
@@ -216,8 +213,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             <AlertDialogDescription asChild>
               {!user.stripeCustomerPaymentMethodId ? (
                 <Box
-                  css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}
-                >
+                  css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}>
                   <Box>
                     <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
                       Full name
@@ -240,13 +236,11 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       width: "100%",
                       alignItems: "center",
                       mb: "$2",
-                    }}
-                  >
+                    }}>
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="email"
-                      >
+                        htmlFor="email">
                         Email
                       </Label>
                       <TextField
@@ -263,8 +257,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="phone"
-                      >
+                        htmlFor="phone">
                         Phone
                       </Label>
                       <TextField
@@ -282,8 +275,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   <Box>
                     <Label
                       css={{ mb: "$1", display: "block" }}
-                      htmlFor="address"
-                    >
+                      htmlFor="address">
                       Address
                     </Label>
                     <TextField
@@ -304,13 +296,11 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       width: "100%",
                       alignItems: "center",
                       mb: "$2",
-                    }}
-                  >
+                    }}>
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="city"
-                      >
+                        htmlFor="city">
                         City
                       </Label>
                       <TextField
@@ -327,8 +317,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="State"
-                      >
+                        htmlFor="State">
                         State
                       </Label>
                       <TextField
@@ -345,8 +334,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                     <Box>
                       <Label
                         css={{ mb: "$1", display: "block" }}
-                        htmlFor="postalCode"
-                      >
+                        htmlFor="postalCode">
                         ZIP
                       </Label>
                       <TextField
@@ -368,8 +356,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       color: "$hiContrast",
                       fontWeight: 500,
                       mb: "$1",
-                    }}
-                  >
+                    }}>
                     Card
                   </Box>
                   <Box
@@ -378,8 +365,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                       borderRadius: 6,
                       background: "$loContrast",
                       px: "$2",
-                    }}
-                  >
+                    }}>
                     <CardElement
                       options={{
                         iconStyle: "solid",
@@ -436,8 +422,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                   onClick={() => {
                     setOpen(false);
                   }}
-                  ghost
-                >
+                  ghost>
                   Cancel
                 </Button>
               </AlertDialogCancel>
@@ -448,8 +433,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
                 }
-                variant="primary"
-              >
+                variant="primary">
                 {status === "processing" && (
                   <Spinner
                     css={{

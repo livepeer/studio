@@ -225,20 +225,17 @@ const JobApplicationForm = ({
           "@bp2": {
             width: 380,
           },
-        }}
-      >
+        }}>
         <Text
           size="5"
-          css={{ mb: "$2", textAlign: "center", fontWeight: "bold" }}
-        >
+          css={{ mb: "$2", textAlign: "center", fontWeight: "bold" }}>
           Apply for this job
         </Text>
         <Box
           css={{
             position: "relative",
             width: "100%",
-          }}
-        >
+          }}>
           <Box
             as="div"
             css={{
@@ -252,8 +249,7 @@ const JobApplicationForm = ({
               mr: "auto",
               maxWidth: 500,
             }}
-            id={id}
-          >
+            id={id}>
             {name !== "off" && (
               <Grid
                 gap={3}
@@ -261,8 +257,7 @@ const JobApplicationForm = ({
                   gridTemplateColumns: "1fr 1fr",
                   width: "100%",
                   alignItems: "center",
-                }}
-              >
+                }}>
                 <TextField
                   size="3"
                   id="firstName"
@@ -332,8 +327,7 @@ const JobApplicationForm = ({
                 css={{
                   mb: "$3",
                   width: "100%",
-                }}
-              >
+                }}>
                 <Box
                   css={{
                     width: "100%",
@@ -344,8 +338,7 @@ const JobApplicationForm = ({
                     border: "1px solid $colors$mauve7",
                     borderRadius: "$1",
                   }}
-                  {...getRootProps({ style })}
-                >
+                  {...getRootProps({ style })}>
                   <Box as="input" {...getInputProps()} />
                   <Box
                     as="p"
@@ -364,8 +357,7 @@ const JobApplicationForm = ({
                       justifyContent: "center",
                       alignItems: "center",
                       color: "$mauve9",
-                    }}
-                  >
+                    }}>
                     {loadingPdf
                       ? "Uploading..."
                       : "Drag and Drop your CV file or upload file here"}
@@ -381,8 +373,7 @@ const JobApplicationForm = ({
                       fontSize: "$1",
                       overflowWrap: "break-word",
                       pl: "0",
-                    }}
-                  >
+                    }}>
                     {resumeFile.name}
                   </Box>
                 )}
@@ -412,8 +403,7 @@ const JobApplicationForm = ({
                       color: "$mauve9",
                       fontSize: "$1",
                       lineHeight: "1.5",
-                    }}
-                  >
+                    }}>
                     {a.title}
                   </Box>
                   <TextField
@@ -440,8 +430,7 @@ const JobApplicationForm = ({
             <Button
               css={{ mt: "$2", px: "$5" }}
               onClick={onClick}
-              disabled={loading}
-            >
+              disabled={loading}>
               Submit Application
             </Button>
           </Box>

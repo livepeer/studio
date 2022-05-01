@@ -22,8 +22,7 @@ const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({
           flexDirection: "column",
           flexGrow: 1,
           alignItems: "center",
-        }}
-      >
+        }}>
         <Tabs tabs={tabs} />
         {children}
       </Flex>

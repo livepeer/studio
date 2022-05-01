@@ -35,8 +35,7 @@ const Profile = ({
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",
-      }}
-    >
+      }}>
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -97,8 +96,7 @@ const RenditionsDetailsCell = <D extends TableData>({
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid"
-            >
+              effect="solid">
               {detailsTooltip}
             </ReactTooltip>
             <Help

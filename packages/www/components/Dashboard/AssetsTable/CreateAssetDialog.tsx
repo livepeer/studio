@@ -51,8 +51,7 @@ const CreateAssetDialog = ({
             } finally {
               setCreating(false);
             }
-          }}
-        >
+          }}>
           <Flex direction="column" gap="2">
             <Label htmlFor="assetName">Asset name</Label>
             <TextField
@@ -70,8 +69,7 @@ const CreateAssetDialog = ({
             <Text
               size="3"
               variant="gray"
-              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}
-            >
+              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               The name of the `Asset` containing a custom human-readable title.
             </Text>
           </AlertDialogDescription>
@@ -93,8 +91,7 @@ const CreateAssetDialog = ({
             <Text
               size="3"
               variant="gray"
-              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}
-            >
+              css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               The URL of the file.
             </Text>
           </AlertDialogDescription>
@@ -109,8 +106,7 @@ const CreateAssetDialog = ({
               type="submit"
               size="2"
               disabled={creating}
-              variant="primary"
-            >
+              variant="primary">
               {creating && (
                 <Spinner
                   css={{

@@ -26,22 +26,19 @@ const KeyboardTable = ({
         mt: "$2",
       }}
       aria-label={hasAriaLabel ? ariaLabel : "Keyboard Interactions"}
-      aria-labelledby={ariaLabelledBy}
-    >
+      aria-labelledby={ariaLabelledBy}>
       <thead>
         <tr>
           <Box
             as="th"
-            css={{ borderBottom: "1px solid $gray6", py: "$3", pr: "$4" }}
-          >
+            css={{ borderBottom: "1px solid $gray6", py: "$3", pr: "$4" }}>
             <Text size="2" css={{ color: "$gray11" }}>
               Key
             </Text>
           </Box>
           <Box
             as="th"
-            css={{ borderBottom: "1px solid $gray6", py: "$3", pr: "$4" }}
-          >
+            css={{ borderBottom: "1px solid $gray6", py: "$3", pr: "$4" }}>
             <Text size="2" css={{ color: "$gray11" }}>
               Description
             </Text>
@@ -58,8 +55,7 @@ const KeyboardTable = ({
                 py: "$3",
                 pr: "$4",
                 whiteSpace: "nowrap",
-              }}
-            >
+              }}>
               {keys.map((k) => (
                 <Kbd key={k} css={{ "& + &": { ml: "4px" } }}>
                   {k}

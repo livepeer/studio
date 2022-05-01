@@ -87,8 +87,7 @@ const RecordingUrlCell = <D extends TableData>({
                   cell.value.streamName,
                   cell.value.createdAt
                 )}
-                sx={{ p: 1 }}
-              >
+                sx={{ p: 1 }}>
                 Download&nbsp;mp4&nbsp;beta
               </A>
             </Box>

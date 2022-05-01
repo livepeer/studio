@@ -24,14 +24,12 @@ const JobsSection = ({ jobs }) => {
               boxShadow: "0 0 30px 0 $colors$mauve4",
               borderRadius: "8px",
             },
-          }}
-        >
+          }}>
           <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
             <A
               css={{
                 textDecoration: "none",
-              }}
-            >
+              }}>
               <Heading as="h2" size="1">
                 {j.title}
               </Heading>

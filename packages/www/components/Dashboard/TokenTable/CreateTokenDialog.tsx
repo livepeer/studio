@@ -62,16 +62,14 @@ const ClipBut = ({ text }) => {
             onCopy={() => {
               openSnackbar("Copied to clipboard");
               setCopied(2000);
-            }}
-          >
+            }}>
             <Flex
               css={{
                 alignItems: "center",
                 cursor: "pointer",
                 ml: 0,
                 mr: 0,
-              }}
-            >
+              }}>
               <Box css={{ mr: "$1" }}>{text}</Box>
               <Copy
                 css={{
@@ -96,8 +94,7 @@ const ClipBut = ({ text }) => {
             fontSize: "$1",
             display: "flex",
             ai: "center",
-          }}
-        >
+          }}>
           <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
         </Text>
       </HoverCardContent>
@@ -213,14 +210,12 @@ const CreateTokenDialog = ({
                 } finally {
                   setCreating(false);
                 }
-              }}
-            >
+              }}>
               <AlertDialogDescription asChild>
                 <Text
                   size="3"
                   variant="gray"
-                  css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}
-                >
+                  css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                   Enter a name for your key to differentiate it from other keys.
                 </Text>
               </AlertDialogDescription>
@@ -247,19 +242,16 @@ const CreateTokenDialog = ({
                   />
                   <Tooltip
                     content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
-                    multiline
-                  >
+                    multiline>
                     <Flex
                       direction="row"
                       css={{ ml: "$2" }}
                       gap="1"
-                      align="center"
-                    >
+                      align="center">
                       <Label htmlFor="allowCors">Allow CORS access</Label>
                       <Link
                         href={"/docs/guides/start-live-streaming/api-key#cors"}
-                        target="_blank"
-                      >
+                        target="_blank">
                         <Warning />
                       </Link>
                     </Flex>
@@ -299,8 +291,7 @@ const CreateTokenDialog = ({
                         onClick={(e) => {
                           e.preventDefault();
                           onSubmitNewOrigin();
-                        }}
-                      >
+                        }}>
                         <Plus />
                       </Button>
                     </Box>
@@ -321,8 +312,7 @@ const CreateTokenDialog = ({
                         backgroundColor: "$mauve2",
                         mt: "-3px",
                         zIndex: 1,
-                      }}
-                    >
+                      }}>
                       {cors.allowedOrigins.length > 0 ? (
                         cors.allowedOrigins.map((origin, i) => (
                           <Flex
@@ -335,8 +325,7 @@ const CreateTokenDialog = ({
                               p: "$2",
                               fontSize: "$2",
                               color: "$hiContrast",
-                            }}
-                          >
+                            }}>
                             {origin}
                             <StyledCross
                               onClick={() => {
@@ -349,8 +338,7 @@ const CreateTokenDialog = ({
                         <Flex
                           direction="column"
                           css={{ just: "center" }}
-                          align="center"
-                        >
+                          align="center">
                           <Text css={{ fontWeight: 600 }}>
                             No origins allowed
                           </Text>
@@ -374,14 +362,12 @@ const CreateTokenDialog = ({
                       />
                       <Tooltip
                         content="This will give access to the entire API for the CORS-enabled API key. Resources in your account will be fully exposed to anyone that grabs the API key from your web page. Only check this if you know what you are doing."
-                        multiline
-                      >
+                        multiline>
                         <Flex
                           direction="row"
                           css={{ ml: "$2" }}
                           gap="1"
-                          align="center"
-                        >
+                          align="center">
                           <Label htmlFor="corsFullAccess">
                             Full API access (not recommended)
                           </Label>
@@ -389,8 +375,7 @@ const CreateTokenDialog = ({
                             href={
                               "/docs/guides/start-live-streaming/api-key#api-access"
                             }
-                            target="_blank"
-                          >
+                            target="_blank">
                             <Help />
                           </Link>
                         </Flex>
@@ -410,8 +395,7 @@ const CreateTokenDialog = ({
                   size="2"
                   disabled={creating}
                   type="submit"
-                  variant="primary"
-                >
+                  variant="primary">
                   {creating && (
                     <Spinner
                       css={{
@@ -437,8 +421,7 @@ const CreateTokenDialog = ({
               <Text
                 size="3"
                 variant="gray"
-                css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}
-              >
+                css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
                   <Button variant="gray" size="2" css={{ cursor: "pointer" }}>

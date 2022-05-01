@@ -23,8 +23,7 @@ const TextCell = <D extends TableData>({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid"
-        >
+          effect="solid">
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}

@@ -27,8 +27,7 @@ const StyledEcommerceIcon = ({ active = false, ...props }) => {
       height="16"
       viewBox="0 0 16 16"
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+      {...props}>
       <Box
         as="path"
         fill="currentColor"
@@ -46,8 +45,7 @@ const StyledPlatformsIcon = ({ ...props }) => (
     height="16"
     viewBox="0 0 14 16"
     xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
+    {...props}>
     <path
       d="M6.98 0a.52.52 0 0 0-.25.08L.24 4.03a.5.5 0 0 0-.24.43c0 .17.1.33.24.42l6.49 3.95c.17.1.37.1.54 0l6.49-3.95a.5.5 0 0 0 .24-.42.5.5 0 0 0-.24-.43L7.27.08a.52.52 0 0 0-.3-.08zm-5.5 6.82l-1.24.76A.5.5 0 0 0 0 8c0 .17.1.33.24.42l6.49 3.96c.17.1.37.1.54 0l6.49-3.96A.5.5 0 0 0 14 8a.5.5 0 0 0-.24-.42l-1.25-.76-4.7 2.86a1.58 1.58 0 0 1-1.62 0l-4.7-2.86zm0 3.54l-1.24.76a.5.5 0 0 0-.24.43c0 .17.1.33.24.42l6.49 3.95c.17.1.37.1.54 0l6.49-3.95a.5.5 0 0 0 .24-.42.5.5 0 0 0-.24-.43l-1.25-.76-4.7 2.87a1.58 1.58 0 0 1-1.62 0l-4.7-2.87z"
       fill="currentColor"
@@ -124,8 +122,7 @@ const NavigationBase = ({
             content: '""',
           },
           ...css,
-        }}
-      >
+        }}>
         <Container
           size="3"
           css={{
@@ -135,22 +132,19 @@ const NavigationBase = ({
               px: "$4",
               mx: "auto",
             },
-          }}
-        >
+          }}>
           <Flex
             css={{
               py: "$4",
               justifyContent: "space-between",
               ai: "center",
-            }}
-          >
+            }}>
             <Box
               css={{
                 minWidth: sidesWidth,
                 display: "flex",
                 alignItems: "center",
-              }}
-            >
+              }}>
               <NavigationBreadcrumb breadcrumb={breadcrumb} />
             </Box>
             <Flex
@@ -162,8 +156,7 @@ const NavigationBase = ({
                 "@bp2": {
                   display: "flex",
                 },
-              }}
-            >
+              }}>
               <NavDropdown
                 trigger={
                   <Box
@@ -174,12 +167,10 @@ const NavigationBase = ({
                       mx: "$3",
                       cursor: "pointer",
                       color: "$hiContrast",
-                    }}
-                  >
+                    }}>
                     Products
                   </Box>
-                }
-              >
+                }>
                 <Box css={{ mb: "$3" }}>
                   <Flex>
                     <StyledPlatformsIcon
@@ -189,8 +180,7 @@ const NavigationBase = ({
                       <ArrowLink
                         hideArrow
                         href="/products/streaming-service"
-                        css={{ fontWeight: 500, mb: "$2" }}
-                      >
+                        css={{ fontWeight: 500, mb: "$2" }}>
                         Streaming Service
                       </ArrowLink>
 
@@ -198,8 +188,7 @@ const NavigationBase = ({
                         <ArrowLink
                           hideArrow
                           color="$mauve9"
-                          href="/use-cases/creator-platforms"
-                        >
+                          href="/use-cases/creator-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For creator apps
                           </Text>
@@ -207,8 +196,7 @@ const NavigationBase = ({
                         <ArrowLink
                           hideArrow
                           color="$mauve9"
-                          href="/use-cases/game-streaming-platforms"
-                        >
+                          href="/use-cases/game-streaming-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For live gaming apps
                           </Text>
@@ -216,8 +204,7 @@ const NavigationBase = ({
                         <ArrowLink
                           hideArrow
                           color="$mauve9"
-                          href="/use-cases/music-streaming-platforms"
-                        >
+                          href="/use-cases/music-streaming-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For live music apps
                           </Text>
@@ -225,8 +212,7 @@ const NavigationBase = ({
                         <ArrowLink
                           hideArrow
                           color="$mauve9"
-                          href="/use-cases/24x7-channels"
-                        >
+                          href="/use-cases/24x7-channels">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For 24x7 video apps
                           </Text>
@@ -235,8 +221,7 @@ const NavigationBase = ({
                         <ArrowLink
                           hideArrow
                           color="$mauve9"
-                          href="/use-cases/ecommerce"
-                        >
+                          href="/use-cases/ecommerce">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For e-commerce apps
                           </Text>
@@ -258,8 +243,7 @@ const NavigationBase = ({
                     <ArrowLink
                       hideArrow
                       href="/products/media-server"
-                      css={{ fontWeight: 500, fontSize: "$3" }}
-                    >
+                      css={{ fontWeight: 500, fontSize: "$3" }}>
                       Media Server
                     </ArrowLink>
                   </Flex>
@@ -275,8 +259,7 @@ const NavigationBase = ({
                         fontWeight: 500,
                         textDecoration: "none",
                         mx: "$3",
-                      }}
-                    >
+                      }}>
                       {link.children}
                     </A>
                   </Link>
@@ -292,8 +275,7 @@ const NavigationBase = ({
                 ai: "center",
                 justifyContent: "flex-end",
                 minWidth: sidesWidth,
-              }}
-            >
+              }}>
               {!loggedIn && (
                 <>
                   <Link href="/login" passHref>
@@ -303,8 +285,7 @@ const NavigationBase = ({
                         fontWeight: 500,
                         textDecoration: "none",
                         mr: "$4",
-                      }}
-                    >
+                      }}>
                       Log in
                     </A>
                   </Link>
@@ -325,8 +306,7 @@ const NavigationBase = ({
                           fontWeight: 500,
                           textDecoration: "none",
                           mr: "$4",
-                        }}
-                      >
+                        }}>
                         Admin
                       </A>
                     </Link>
@@ -365,8 +345,7 @@ const NavigationBase = ({
                   display: "none",
                 },
               }}
-              onClick={() => setMobileMenuIsOpen(true)}
-            >
+              onClick={() => setMobileMenuIsOpen(true)}>
               <HamburgerMenuIcon />
             </Flex>
           </Flex>

@@ -18,8 +18,7 @@ const ApiKeys = () => {
         { title: "Developers", href: "/dashboard/developers/api-keys" },
         { title: "API Keys" },
       ]}
-      {...Content.metaData}
-    >
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <TokenTable userId={user.id} />

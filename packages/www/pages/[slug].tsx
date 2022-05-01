@@ -33,8 +33,7 @@ const Page = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}
-        >
+          }}>
           Loading...
         </Box>
       </Layout>
@@ -55,8 +54,7 @@ const Page = ({
         alt: openGraphImage?.asset?.altText,
       }}
       url={metaUrl}
-      preview={preview}
-    >
+      preview={preview}>
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}

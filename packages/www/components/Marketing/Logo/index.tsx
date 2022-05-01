@@ -18,8 +18,7 @@ const Logo = ({ badge = null }) => (
           "@bp3": {
             fontSize: "20px",
           },
-        }}
-      >
+        }}>
         Livepeer Video Services
       </A>
     </Link>

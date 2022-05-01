@@ -18,8 +18,7 @@ const LinksList = ({ heading, links }: LinksListProps) => (
     {links.map((link, i) => (
       <Box
         key={`link-${link.href}-${i}`}
-        css={{ "&:not(:last-of-type)": { mb: "$3" } }}
-      >
+        css={{ "&:not(:last-of-type)": { mb: "$3" } }}>
         <Link href={link.href} passHref>
           <A target={link.target ? link.target : "_self"}>{link.children}</A>
         </Link>

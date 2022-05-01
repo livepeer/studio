@@ -106,8 +106,7 @@ const Layout = ({
                   justifyContent: "flex-start",
                   zIndex: 1,
                   position: "relative",
-                }}
-              >
+                }}>
                 {preview && (
                   <Box
                     sx={{
@@ -121,8 +120,7 @@ const Layout = ({
                       bg: "primary",
                       color: "white",
                       lineHeight: "32px",
-                    }}
-                  >
+                    }}>
                     Preview Mode
                   </Box>
                 )}

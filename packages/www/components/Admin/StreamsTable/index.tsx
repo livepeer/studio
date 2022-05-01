@@ -47,8 +47,7 @@ const Profile = ({
         display: "grid",
         alignItems: "space-around",
         gridTemplateColumns: "auto auto",
-      }}
-    >
+      }}>
       <Box>name:</Box>
       <Box>{name}</Box>
       <Box>fps:</Box>
@@ -101,8 +100,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid"
-            >
+              effect="solid">
               {detailsTooltip}
             </ReactTooltip>
             <Help
@@ -260,16 +258,14 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
             variant="primarySmall"
             aria-label="Delete Stream button"
             disabled={!selectedStreams.length}
-            onClick={() => selectedStreams.length && setDeleteModal(true)}
-          >
+            onClick={() => selectedStreams.length && setDeleteModal(true)}>
             Delete
           </Button>
           <Box
             sx={{
               ml: "1.4em",
               display: ["none", "none", "none", "inline-block"],
-            }}
-          >
+            }}>
             <b>New beta feature</b>: Record your live streams. Send feedback to
             help@livepeer.com.
             <Box
@@ -283,8 +279,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
                 color: "primary",
                 cursor: "pointer",
                 ":hover": { textDecoration: "underline" },
-              }}
-            >
+              }}>
               <b>Read more ⬈</b>
             </Box>
           </Box>

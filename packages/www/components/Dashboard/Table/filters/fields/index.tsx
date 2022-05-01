@@ -121,8 +121,7 @@ const ConditionSelect = ({
         justifyContent: "flex-end",
         margin: "0px",
         background: "$loContrast",
-      }}
-    >
+      }}>
       <Select onChange={handleChange} value={condition.type}>
         {options[type].map((option, i) => {
           return (
@@ -165,8 +164,7 @@ const ConditionValue = ({
             alignItems: "center",
             justifyContent: "flex-start",
             margin: "0px",
-          }}
-        >
+          }}>
           {/* @ts-ignore */}
           <TextField
             id={filter.label}
@@ -200,8 +198,7 @@ const ConditionValue = ({
             alignItems: "center",
             justifyContent: "flex-start",
             margin: "0px",
-          }}
-        >
+          }}>
           <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
             <CalendarIcon />
           </Box>
@@ -223,8 +220,7 @@ const ConditionValue = ({
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-          }}
-        >
+          }}>
           <Box
             as="label"
             htmlFor={filter.label}
@@ -236,8 +232,7 @@ const ConditionValue = ({
               alignItems: "center",
               justifyContent: "flex-start",
               margin: "0px",
-            }}
-          >
+            }}>
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
             </Box>
@@ -265,8 +260,7 @@ const ConditionValue = ({
               alignItems: "center",
               justifyContent: "flex-start",
               margin: "0px",
-            }}
-          >
+            }}>
             <Box css={{ zIndex: 1, marginLeft: "10px", display: "flex" }}>
               <CalendarIcon />
             </Box>
@@ -298,8 +292,7 @@ const ConditionValue = ({
             alignItems: "center",
             justifyContent: "flex-start",
             margin: "0px",
-          }}
-        >
+          }}>
           {/* @ts-ignore */}
           <TextField
             type="number"
@@ -333,8 +326,7 @@ const ConditionValue = ({
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "2px",
-          }}
-        >
+          }}>
           <Box
             as="label"
             htmlFor={filter.label}
@@ -345,8 +337,7 @@ const ConditionValue = ({
               alignItems: "center",
               justifyContent: "flex-start",
               margin: "0px",
-            }}
-          >
+            }}>
             {/* @ts-ignore */}
             <TextField
               id={filter.label}
@@ -381,8 +372,7 @@ const ConditionValue = ({
               alignItems: "center",
               justifyContent: "flex-start",
               margin: "0px",
-            }}
-          >
+            }}>
             {/* @ts-ignore */}
             <TextField
               id={filter.label}
@@ -419,13 +409,11 @@ const ConditionValue = ({
             alignItems: "center",
             justifyContent: "flex-start",
             margin: "0px",
-          }}
-        >
+          }}>
           <RadioGroup
             onValueChange={() => {
               onChange({ type: condition.type, value: !condition.value });
-            }}
-          >
+            }}>
             <Box css={{ display: "flex", flexDirection: "column" }}>
               <Box css={{ display: "flex", mb: "$2" }}>
                 <Radio
@@ -436,8 +424,7 @@ const ConditionValue = ({
                 <Box
                   as="label"
                   css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
-                  htmlFor={`${filter.label}-on`}
-                >
+                  htmlFor={`${filter.label}-on`}>
                   {filter.type === "boolean" && filter.labelOn}
                 </Box>
               </Box>
@@ -450,8 +437,7 @@ const ConditionValue = ({
                 <Box
                   as="label"
                   css={{ pl: "$2", fontSize: "12px", fontWeight: 500 }}
-                  htmlFor={`${filter.label}-off`}
-                >
+                  htmlFor={`${filter.label}-off`}>
                   {filter.type === "boolean" && filter.labelOff}
                 </Box>
               </Box>
@@ -531,8 +517,7 @@ const FieldContent = ({ filter, onConditionChange }: FieldContentProps) => {
         htmlFor={filter.label}
         css={{
           marginTop: shouldNotRenderSelect ? "0" : "10px",
-        }}
-      >
+        }}>
         {!shouldNotRenderNextIcon && (
           <Flex css={{ marginTop: "8px" }}>
             <NextIcon />
@@ -542,8 +527,7 @@ const FieldContent = ({ filter, onConditionChange }: FieldContentProps) => {
           css={{
             marginLeft: shouldNotRenderNextIcon ? 0 : "11px",
             width: "100%",
-          }}
-        >
+          }}>
           <ConditionValue
             filter={filter}
             condition={filter.condition}

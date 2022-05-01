@@ -18,8 +18,7 @@ const MediaServer = () => {
         { title: "Developers", href: "/dashboard/developers/media-server" },
         { title: "Media Server" },
       ]}
-      {...Content.metaData}
-    >
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           <MediaServerTable />

@@ -80,15 +80,13 @@ const CalculatorItem = ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-      }}
-    >
+      }}>
       <Text
         size="5"
         css={{
           color: "$hiContrast",
           mb: "$4",
-        }}
-      >
+        }}>
         {title}
       </Text>
       <Grid
@@ -99,8 +97,7 @@ const CalculatorItem = ({
           "@bp2": {
             gridTemplateColumns: "repeat(2,1fr)",
           },
-        }}
-      >
+        }}>
         {children}
         <Box
           as="input"
@@ -163,15 +160,13 @@ const ScaleCalculator = ({
         "&:hover": {
           borderColor: "$violet9",
         },
-      }}
-    >
+      }}>
       <Box
         css={{
           fontSize: "14px",
           color: percentageWatched === value ? "$violet9" : "$mauve9",
           fontWeight: percentageWatched === value ? 600 : 400,
-        }}
-      >
+        }}>
         {value}%
       </Box>
     </Flex>
@@ -232,14 +227,12 @@ const Calculator = ({
         flexDirection: "column",
         pt: "32px",
         width: "100%",
-      }}
-    >
+      }}>
       <Text
         size="4"
         css={{
           mb: "$2",
-        }}
-      >
+        }}>
         Usage
       </Text>
       <CalculatorItem
@@ -249,15 +242,13 @@ const Calculator = ({
         min={0}
         max={43200}
         step={900}
-        value={streamLength}
-      >
+        value={streamLength}>
         <Box
           css={{
             display: "flex",
             flexDirection: "column",
             width: "100%",
-          }}
-        >
+          }}>
           <Box
             css={{
               height: 48,
@@ -279,8 +270,7 @@ const Calculator = ({
               "@bp2": {
                 width: 250,
               },
-            }}
-          >
+            }}>
             <TextField
               maxLength={2}
               name="hours"
@@ -333,8 +323,7 @@ const Calculator = ({
               mt: "$1",
               px: "$4",
               width: "100%",
-            }}
-          >
+            }}>
             <Text variant="gray" size="1">
               hours
             </Text>
@@ -353,8 +342,7 @@ const Calculator = ({
         min={0}
         max={10000}
         step={50}
-        value={monthlyStreams}
-      >
+        value={monthlyStreams}>
         <TextField
           size="3"
           value={monthlyStreams}
@@ -371,8 +359,7 @@ const Calculator = ({
         min={0}
         max={10000}
         step={50}
-        value={viewCount}
-      >
+        value={viewCount}>
         <TextField
           size="3"
           value={viewCount}
@@ -392,22 +379,19 @@ const Calculator = ({
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-        }}
-      >
+        }}>
         <Text
           size="5"
           css={{
             mb: "24px",
-          }}
-        >
+          }}>
           What percentage of the stream does the average viewer watch?
         </Text>
         <Grid
           gap={3}
           css={{
             gridTemplateColumns: "repeat(4, 1fr)",
-          }}
-        >
+          }}>
           {scaleCalculatorValues.map((each, idx) => (
             <ScaleCalculator
               key={idx}
@@ -447,8 +431,7 @@ const PreviewItem = ({
           flexDirection: "row",
           alignItems: "center",
         },
-      }}
-    >
+      }}>
       <Box
         css={{
           display: "flex",
@@ -461,16 +444,14 @@ const PreviewItem = ({
             mr: "$4",
             mb: 0,
           },
-        }}
-      >
+        }}>
         <Box css={{ display: "flex", flexDirection: "column", mb: "$3" }}>
           <Text
             size="5"
             css={{
               minWidth: "fit-content",
               color: "$hiContrast",
-            }}
-          >
+            }}>
             {title}
           </Text>
         </Box>
@@ -488,15 +469,13 @@ const PreviewItem = ({
           "@bp2": {
             alignItems: "flex-end",
           },
-        }}
-      >
+        }}>
         <Text
           size="7"
           css={{
             fontWeight: 600,
             color: "$hiContrast",
-          }}
-        >
+          }}>
           {value}
         </Text>
         <Box
@@ -505,8 +484,7 @@ const PreviewItem = ({
             lineHeight: "24px",
             alignSelf: "flex-end",
             textAlign: "right",
-          }}
-        >
+          }}>
           {valueClarification}
           {children}
         </Box>
@@ -531,16 +509,14 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         padding: "32px",
         width: "100%",
         bc: "$loContrast",
-      }}
-    >
+      }}>
       <Box
         css={{
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
           pb: "$2",
-        }}
-      >
+        }}>
         <Text size="4">Monthly cost</Text>
         <Text size="3" variant="gray" css={{ fontStyle: "italic" }}>
           Prices listed in USD
@@ -589,8 +565,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
         disabled={streaming + transcoding === 0}
         onClick={() => {
           router.push(token ? "/dashboard/billing/plans" : "/register");
-        }}
-      >
+        }}>
         {totalValue > 3000 ? "Contact us" : "Get Started"}
       </Button>
     </Box>

@@ -16,8 +16,7 @@ const TextSection = ({ text }) => (
             px: "$4",
             mx: "auto",
           },
-        }}
-      >
+        }}>
         <Box css={{ maxWidth: 768, mx: "auto" }}>
           <Box css={{ p: { mb: "$4" } }}>
             <SimpleBlockContent blocks={text} />

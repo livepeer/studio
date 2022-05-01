@@ -71,22 +71,19 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
             onCopy={() => {
               openSnackbar("Copied to clipboard");
               setCopied(2000);
-            }}
-          >
+            }}>
             <Flex
               css={{
                 alignItems: "center",
                 cursor: "pointer",
                 ml: 0,
                 mr: 0,
-              }}
-            >
+              }}>
               {anchor ? (
                 <A
                   css={{ fontSize: "$2", mr: "$1" }}
                   href={url}
-                  target="_blank"
-                >
+                  target="_blank">
                   {shortendUrl ? shortendUrl : url}
                 </A>
               ) : (
@@ -117,8 +114,7 @@ const ShowURL = ({ url, shortendUrl, anchor = false }: ShowURLProps) => {
             fontSize: "$1",
             display: "flex",
             ai: "center",
-          }}
-        >
+          }}>
           <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
         </Text>
       </HoverCardContent>
@@ -156,16 +152,14 @@ const ClipBut = ({ text }) => {
             onCopy={() => {
               openSnackbar("Copied to clipboard");
               setCopied(2000);
-            }}
-          >
+            }}>
             <Flex
               css={{
                 alignItems: "center",
                 cursor: "pointer",
                 ml: 0,
                 mr: 0,
-              }}
-            >
+              }}>
               <Box css={{ mr: "$1" }}>{text}</Box>
               <Copy
                 css={{
@@ -190,8 +184,7 @@ const ClipBut = ({ text }) => {
             fontSize: "$1",
             display: "flex",
             ai: "center",
-          }}
-        >
+          }}>
           <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
         </Text>
       </HoverCardContent>
@@ -310,8 +303,7 @@ const StreamDetail = ({
                 css={{
                   minWidth: 424,
                   flex: "0 0 33%",
-                }}
-              >
+                }}>
                 <Flex
                   justify="between"
                   align="end"
@@ -319,8 +311,7 @@ const StreamDetail = ({
                     pb: "$3",
                     mb: "$5",
                     width: "100%",
-                  }}
-                >
+                  }}>
                   <Heading size="2">
                     <Flex css={{ ai: "center" }}>
                       <Box
@@ -328,8 +319,7 @@ const StreamDetail = ({
                           fontWeight: 600,
                           letterSpacing: "0",
                           mr: "$2",
-                        }}
-                      >
+                        }}>
                         {stream.name}
                       </Box>
                       {!healthState ? null : (
@@ -347,8 +337,7 @@ const StreamDetail = ({
                             ml: "$1",
                             mt: "$1",
                             letterSpacing: 0,
-                          }}
-                        >
+                          }}>
                           <Box css={{ mr: 5 }}>
                             <PauseIcon />
                           </Box>
@@ -365,16 +354,14 @@ const StreamDetail = ({
                       maxWidth: "470px",
                       justifySelf: "flex-end",
                       width: "100%",
-                    }}
-                  >
+                    }}>
                     <Box
                       css={{
                         borderRadius: "$3",
                         overflow: "hidden",
                         position: "relative",
                         mb: "$7",
-                      }}
-                    >
+                      }}>
                       {stream.isActive ? (
                         <>
                           <Badge
@@ -386,8 +373,7 @@ const StreamDetail = ({
                               left: 10,
                               top: 10,
                               letterSpacing: 0,
-                            }}
-                          >
+                            }}>
                             <Box css={{ mr: 5 }}>
                               <Status size="1" variant="green" />
                             </Box>
@@ -404,8 +390,7 @@ const StreamDetail = ({
                             overflow: "hidden",
                             position: "relative",
                             bc: "#28282c",
-                          }}
-                        >
+                          }}>
                           <Badge
                             size="2"
                             css={{
@@ -415,8 +400,7 @@ const StreamDetail = ({
                               left: 10,
                               top: 10,
                               letterSpacing: 0,
-                            }}
-                          >
+                            }}>
                             <Box css={{ mr: 5 }}>
                               <Status
                                 css={{ backgroundColor: "$mauve9" }}
@@ -436,8 +420,7 @@ const StreamDetail = ({
                       pb: "$2",
                       mb: "$4",
                       width: "100%",
-                    }}
-                  >
+                    }}>
                     <Heading size="1" css={{ fontWeight: 600 }}>
                       Details
                     </Heading>
@@ -447,8 +430,7 @@ const StreamDetail = ({
                       justifyContent: "flex-start",
                       alignItems: "baseline",
                       flexDirection: "column",
-                    }}
-                  >
+                    }}>
                     <Box
                       css={{
                         display: "grid",
@@ -457,8 +439,7 @@ const StreamDetail = ({
                         width: "100%",
                         fontSize: "$2",
                         position: "relative",
-                      }}
-                    >
+                      }}>
                       <Cell css={{ color: "$mauve11" }}>Stream name</Cell>
                       <Cell>{stream.name}</Cell>
                       <Cell css={{ color: "$mauve11" }}>Stream ID</Cell>
@@ -475,8 +456,7 @@ const StreamDetail = ({
                           <Button
                             type="button"
                             variant="primary"
-                            onClick={() => setKeyRevealed(true)}
-                          >
+                            onClick={() => setKeyRevealed(true)}>
                             Reveal stream key
                           </Button>
                         )}
@@ -512,8 +492,7 @@ const StreamDetail = ({
                               We changed our playback domain, but
                               cdn.livepeer.com is still working.
                             </Box>
-                          }
-                        >
+                          }>
                           <Help />
                         </Tooltip>
                       </Cell>
@@ -536,8 +515,7 @@ const StreamDetail = ({
                                 for playback and an MP4 download link. This
                                 feature is currently free.
                               </Box>
-                            }
-                          >
+                            }>
                             <Help />
                           </Tooltip>
                         </Flex>
@@ -576,8 +554,7 @@ const StreamDetail = ({
                     borderColor: "$mauve6",
                     mb: "$4",
                     width: "100%",
-                  }}
-                >
+                  }}>
                   <Box css={{ display: "flex" }}>
                     <Box
                       as="div"
@@ -594,8 +571,7 @@ const StreamDetail = ({
                         "&:hover": {
                           textDecoration: "none",
                         },
-                      }}
-                    >
+                      }}>
                       Overview
                     </Box>
 
@@ -613,8 +589,7 @@ const StreamDetail = ({
                         "&:hover": {
                           textDecoration: "none",
                         },
-                      }}
-                    >
+                      }}>
                       Health
                     </Box>
                   </Box>
@@ -624,8 +599,7 @@ const StreamDetail = ({
                         <Button
                           variant="primary"
                           size="2"
-                          css={{ display: "flex", ai: "center", mr: "$1" }}
-                        >
+                          css={{ display: "flex", ai: "center", mr: "$1" }}>
                           Actions
                           <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
                         </Button>
@@ -672,8 +646,7 @@ const StreamDetail = ({
               height: "calc(100vh - 300px)",
               justifyContent: "center",
               alignItems: "center",
-            }}
-          >
+            }}>
             <Spinner />
           </Flex>
         )}

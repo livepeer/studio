@@ -23,8 +23,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
           px: "$3",
           py: 120,
         },
-      }}
-    >
+      }}>
       <Box
         css={{
           px: 32,
@@ -41,8 +40,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             px: 72,
             py: 126,
           },
-        }}
-      >
+        }}>
         <Heading
           size="4"
           as="h2"
@@ -50,8 +48,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             color: "white",
             fontWeight: 700,
             mb: "$6",
-          }}
-        >
+          }}>
           Ready to get started?
         </Heading>
         <Text
@@ -62,8 +59,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             mb: "$7",
             maxWidth: "700px",
             mx: "auto",
-          }}
-        >
+          }}>
           Contact us anytime about custom pricing for your business.
         </Text>
         <Flex
@@ -74,8 +70,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
             "@bp2": {
               flexDirection: "row",
             },
-          }}
-        >
+          }}>
           <Link href="/register" passHref>
             <Button
               size="4"
@@ -87,8 +82,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
                 "@bp2": {
                   mb: 0,
                 },
-              }}
-            >
+              }}>
               Sign up for free
             </Button>
           </Link>
@@ -125,16 +119,14 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
                     transform: "translateX(3px)",
                   },
                 },
-              }}
-            >
+              }}>
               <Box>Contact us</Box>
               <svg
                 className="HoverArrow"
                 width="10"
                 height="10"
                 viewBox="0 0 10 10"
-                aria-hidden="true"
-              >
+                aria-hidden="true">
                 <g fillRule="evenodd">
                   <path className="HoverArrow__linePath" d="M0 5h7" />
                   <path className="HoverArrow__tipPath" d="M1 1l4 4-4 4" />

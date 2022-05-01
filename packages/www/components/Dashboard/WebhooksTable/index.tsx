@@ -194,8 +194,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}
-    >
+      }}>
       <Heading css={{ fontWeight: 500, mb: "$3" }}>
         Create your first webhook
       </Heading>
@@ -213,8 +212,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}
         size="2"
-        variant="primary"
-      >
+        variant="primary">
         <PlusIcon />{" "}
         <Box as="span" css={{ ml: "$2" }}>
           Create webhook
@@ -266,11 +264,9 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
 
       <AlertDialog
         open={deleteDialogState.on}
-        onOpenChange={deleteDialogState.onOff}
-      >
+        onOpenChange={deleteDialogState.onOff}>
         <AlertDialogContent
-          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-        >
+          css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
           <AlertDialogTitle asChild>
             <Heading size="1">
               Delete{" "}
@@ -283,8 +279,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
             <Text
               size="3"
               variant="gray"
-              css={{ mt: "$2", lineHeight: "22px" }}
-            >
+              css={{ mt: "$2", lineHeight: "22px" }}>
               This will permanently remove the webhook
               {state.selectedRows.length > 1 && "s"}. This action cannot be
               undone.
@@ -317,8 +312,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
                     setSavingDeleteDialog(false);
                   }
                 }}
-                variant="red"
-              >
+                variant="red">
                 {savingDeleteDialog && (
                   <Spinner
                     css={{

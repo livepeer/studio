@@ -33,16 +33,14 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
         color: "$hiContrast",
         mb: "$6",
         minHeight: 92,
-      }}
-    >
+      }}>
       {loading ? (
         <Box
           css={{
             display: "flex",
             fd: "column",
             gap: "$3",
-          }}
-        >
+          }}>
           <Skeleton variant="title" css={{ width: "50%" }} />
           <Skeleton variant="heading" css={{ width: "25%" }} />
         </Box>
@@ -112,8 +110,7 @@ const UsageSummary = () => {
           pb: "$4",
           mb: "$5",
           width: "100%",
-        }}
-      >
+        }}>
         <Heading size="2">
           <Flex>
             <Box
@@ -121,15 +118,13 @@ const UsageSummary = () => {
                 mr: "$3",
                 fontWeight: 600,
                 letterSpacing: "0",
-              }}
-            >
+              }}>
               Usage
             </Box>
             <Badge
               size="1"
               variant="primary"
-              css={{ letterSpacing: 0, mt: "7px" }}
-            >
+              css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
                 ? products[user.stripeProductId].name
                 : products["prod_0"].name}{" "}
@@ -173,8 +168,7 @@ const UsageSummary = () => {
       <Flex
         justify="between"
         align="center"
-        css={{ fontSize: "$3", color: "$hiContrast" }}
-      >
+        css={{ fontSize: "$3", color: "$hiContrast" }}>
         <Text variant="gray" css={{ display: "flex", ai: "center" }}>
           <StyledUpcomingIcon />
           Upcoming invoice:{" "}

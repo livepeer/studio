@@ -25,8 +25,7 @@ const PricingCalculator = () => {
           mb: "$4",
           textAlign: "center",
           fontWeight: 600,
-        }}
-      >
+        }}>
         Estimate your monthly costs
       </Heading>
       <Text
@@ -36,8 +35,7 @@ const PricingCalculator = () => {
           mb: "$9",
           alignSelf: "center",
           textAlign: "center",
-        }}
-      >
+        }}>
         Add details about your content and audience
       </Text>
       <Grid
@@ -49,8 +47,7 @@ const PricingCalculator = () => {
           "@bp3": {
             gridTemplateColumns: "repeat(2,1fr)",
           },
-        }}
-      >
+        }}>
         <Calculator
           streamLength={streamLength}
           monthlyStreams={monthlyStreams}

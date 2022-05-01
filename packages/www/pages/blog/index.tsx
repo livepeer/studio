@@ -97,8 +97,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
               py: "$8",
               px: "$4",
             },
-          }}
-        >
+          }}>
           <Box css={{ textAlign: "center", mb: "$8" }}>
             <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
               Blog
@@ -116,8 +115,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                 "@bp2": {
                   display: "block",
                 },
-              }}
-            >
+              }}>
               <FeaturedBlogPostCard post={featuredPost} />
             </Box>
           )}
@@ -127,8 +125,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
               alignItems: "center",
               mb: "$6",
               overflow: "auto",
-            }}
-          >
+            }}>
             {categories.map((c, i) => {
               const isSelected =
                 slug === c.slug.current || (!slug && c.title === "All");
@@ -141,8 +138,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                       ? "/blog"
                       : `/blog/category/${c.slug.current}`
                   }
-                  passHref
-                >
+                  passHref>
                   <A
                     css={{
                       display: "block",
@@ -150,8 +146,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                       ":hover": {
                         textDecoration: "none",
                       },
-                    }}
-                  >
+                    }}>
                     <Box
                       key={i + 1}
                       css={{
@@ -161,8 +156,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                         fontWeight: isSelected ? 600 : 500,
                         pb: "$3",
                         mr: "$6",
-                      }}
-                    >
+                      }}>
                       {c.title}
                     </Box>
                   </A>
@@ -181,8 +175,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
               "@bp3": {
                 gridTemplateColumns: "repeat(3,1fr)",
               },
-            }}
-          >
+            }}>
             {posts.map((p, i) => (
               <BlogPostCard
                 post={p}

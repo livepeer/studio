@@ -15,8 +15,7 @@ const TableContainer = ({
         "&:focus": {
           outline: 0,
         },
-      }}
-    >
+      }}>
       <Box as="table" {...props} />
     </Box>
   );

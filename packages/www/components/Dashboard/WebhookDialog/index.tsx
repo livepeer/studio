@@ -104,8 +104,7 @@ const WebhookDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
       <AlertDialogContent
-        css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-      >
+        css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">
             {action === Action.Create
@@ -141,8 +140,7 @@ const WebhookDialog = ({
             } finally {
               setSaving(false);
             }
-          }}
-        >
+          }}>
           <Flex css={{ my: "$3" }} direction="column" gap="2">
             <Label htmlFor="name">Name</Label>
             <TextField
@@ -182,8 +180,7 @@ const WebhookDialog = ({
               css={{
                 width: "100%",
                 top: 50,
-              }}
-            >
+              }}>
               <DropdownMenuTrigger asChild>
                 <Box>
                   <Select disabled css={{ fontSize: "$3", p: "$1" }}>
@@ -208,8 +205,7 @@ const WebhookDialog = ({
                             setEvents([...events, event]);
                           }
                           return;
-                        }}
-                      >
+                        }}>
                         {event}
                       </DropdownMenuCheckboxItem>
                     ))}
@@ -232,8 +228,7 @@ const WebhookDialog = ({
                 backgroundColor: "$mauve2",
                 mt: "-3px",
                 zIndex: 1,
-              }}
-            >
+              }}>
               {events.length > 0 ? (
                 events.map((event, i) => (
                   <Flex
@@ -246,8 +241,7 @@ const WebhookDialog = ({
                       p: "$2",
                       fontSize: "$2",
                       color: "$hiContrast",
-                    }}
-                  >
+                    }}>
                     {event}
                     <StyledCrossIcon
                       onClick={() => {
@@ -260,8 +254,7 @@ const WebhookDialog = ({
                 <Flex
                   direction="column"
                   css={{ just: "center" }}
-                  align="center"
-                >
+                  align="center">
                   <Text css={{ fontWeight: 600 }}>No events selected</Text>
                   <Text variant="gray">
                     Search for events with the dropdown above.
@@ -282,8 +275,7 @@ const WebhookDialog = ({
                 type="submit"
                 size="2"
                 disabled={saving}
-                variant="primary"
-              >
+                variant="primary">
                 {saving && (
                   <Spinner
                     css={{

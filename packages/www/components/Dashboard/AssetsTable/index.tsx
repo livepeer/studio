@@ -56,8 +56,7 @@ const downloadUrlCell = <D extends TableData>({
     variant="primary"
     target="_blank"
     href={cell.value.children as string}
-    id={`mp4-link-dropdown-${cell.value.id}`}
-  >
+    id={`mp4-link-dropdown-${cell.value.id}`}>
     {cell.value.children}
   </A>
 );
@@ -183,8 +182,7 @@ const AssetsTable = ({
         margin: "0 auto",
         height: "calc(100vh - 400px)",
         maxWidth: 450,
-      }}
-    >
+      }}>
       <Flex
         direction="column"
         justify="center"
@@ -192,8 +190,7 @@ const AssetsTable = ({
           margin: "0 auto",
           height: "calc(100vh - 400px)",
           maxWidth: 450,
-        }}
-      >
+        }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
           Create Video on Demand Assets
         </Heading>
@@ -210,14 +207,12 @@ const AssetsTable = ({
             "@bp1": {
               display: "flex",
             },
-          }}
-        >
+          }}>
           <Link href="/docs/api-reference/vod/import" passHref>
             <A
               target="_blank"
               variant="primary"
-              css={{ display: "flex", ai: "center", mb: "$5" }}
-            >
+              css={{ display: "flex", ai: "center", mb: "$5" }}>
               <Box>Learn more</Box>
               <ArrowRightIcon />
             </A>
@@ -227,8 +222,7 @@ const AssetsTable = ({
           onClick={() => createDialogState.onOn()}
           css={{ alignSelf: "flex-start" }}
           size="2"
-          variant="primary"
-        >
+          variant="primary">
           <PlusIcon />{" "}
           <Box as="span" css={{ ml: "$2" }}>
             Create asset

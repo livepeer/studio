@@ -29,8 +29,7 @@ const Delete = ({ total, onUnselect, onDelete }) => {
           <Box css={{ height: 18, width: "1px", bc: "$mauve7", mx: "$3" }} />
           <Box
             css={{ cursor: "pointer", fontSize: "$2", color: "$violet11" }}
-            onClick={onUnselect}
-          >
+            onClick={onUnselect}>
             Deselect
           </Box>
         </Flex>
@@ -39,8 +38,7 @@ const Delete = ({ total, onUnselect, onDelete }) => {
           onClick={() => {
             setOpen(true);
           }}
-          css={{ display: "flex", alignItems: "center" }}
-        >
+          css={{ display: "flex", alignItems: "center" }}>
           <Cross1Icon /> <Box css={{ ml: "$2" }}>Delete</Box>
         </Button>
       </Flex>
@@ -82,8 +80,7 @@ const Delete = ({ total, onUnselect, onDelete }) => {
                   setSaving(false);
                 }
               }}
-              variant="red"
-            >
+              variant="red">
               {saving && (
                 <Spinner
                   css={{

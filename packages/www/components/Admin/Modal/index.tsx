@@ -29,8 +29,7 @@ const Index = ({ children, onClose, maxWidth = "500px" }) => {
         justifyContent: "center",
         zIndex: 100,
       }}
-      onClick={onClose}
-    >
+      onClick={onClose}>
       <Box
         sx={{
           borderRadius: 6,
@@ -39,8 +38,7 @@ const Index = ({ children, onClose, maxWidth = "500px" }) => {
           width: "100%",
           maxWidth,
         }}
-        onClick={(e) => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
         {children}
       </Box>
     </Flex>

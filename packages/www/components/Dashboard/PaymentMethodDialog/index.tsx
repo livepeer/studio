@@ -114,8 +114,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           variant="primary"
           onClick={() => {
             setOpen(true);
-          }}
-        >
+          }}>
           <MdCreditCard style={{ marginRight: "8px" }} />
           {!user.stripeCustomerPaymentMethodId
             ? "Add Payment Method"
@@ -127,8 +126,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
         <Box
           as="form"
           onSubmit={handleSubmit(onSubmit)}
-          id="billing-stripe-form"
-        >
+          id="billing-stripe-form">
           <AlertDialogTitle asChild>
             <Heading size="1">
               {!user.stripeCustomerPaymentMethodId
@@ -161,8 +159,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   width: "100%",
                   alignItems: "center",
                   mb: "$2",
-                }}
-              >
+                }}>
                 <Box>
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="email">
                     Email
@@ -216,8 +213,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   width: "100%",
                   alignItems: "center",
                   mb: "$2",
-                }}
-              >
+                }}>
                 <Box>
                   <Label css={{ mb: "$1", display: "block" }} htmlFor="city">
                     City
@@ -251,8 +247,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 <Box>
                   <Label
                     css={{ mb: "$1", display: "block" }}
-                    htmlFor="postalCode"
-                  >
+                    htmlFor="postalCode">
                     ZIP
                   </Label>
                   <TextField
@@ -274,8 +269,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   color: "$hiContrast",
                   fontWeight: 500,
                   mb: "$1",
-                }}
-              >
+                }}>
                 Card
               </Box>
               <Box
@@ -284,8 +278,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                   borderRadius: 6,
                   background: "$loContrast",
                   px: "$2",
-                }}
-              >
+                }}>
                 <CardElement
                   options={{
                     iconStyle: "solid",
@@ -331,8 +324,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
                 onClick={() => {
                   setOpen(false);
                 }}
-                ghost
-              >
+                ghost>
                 Cancel
               </Button>
             </AlertDialogCancel>
@@ -343,8 +335,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
               disabled={
                 !["initial", "succeeded", "error"].includes(status) || !stripe
               }
-              variant="primary"
-            >
+              variant="primary">
               {status === "processing" && (
                 <Spinner
                   css={{

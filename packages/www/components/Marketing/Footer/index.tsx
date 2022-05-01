@@ -76,8 +76,7 @@ const MailchimpResponse = ({
         whiteSpace: "nowrap",
         overflow: "hidden",
         width: "90%",
-      }}
-    >
+      }}>
       {message}
     </Text>
   );
@@ -123,8 +122,7 @@ const Footer = ({ hideGuides = false }) => {
           backgroundSize: "8px 1px",
           content: '""',
         },
-      }}
-    >
+      }}>
       {!hideGuides && <Guides backgroundColor="$loContrast" />}
       <Box css={{ position: "relative", py: 120 }}>
         <Container size="3" css={{ px: 0, width: "100%" }}>
@@ -143,13 +141,11 @@ const Footer = ({ hideGuides = false }) => {
                 px: "$3",
                 gridTemplateColumns: "repeat(4,1fr)",
               },
-            }}
-          >
+            }}>
             <Box
               as="form"
               onSubmit={handleSubmit}
-              css={{ position: "relative" }}
-            >
+              css={{ position: "relative" }}>
               <Logo />
               <Text
                 variant="gray"
@@ -159,8 +155,7 @@ const Footer = ({ hideGuides = false }) => {
                   mt: "$4",
                   maxWidth: "276px",
                   mx: 0,
-                }}
-              >
+                }}>
                 Join our newsletter to stay up to date on features and new
                 releases.
               </Text>
@@ -169,8 +164,7 @@ const Footer = ({ hideGuides = false }) => {
                   position: "relative",
                   width: "fit-content",
                   mx: 0,
-                }}
-              >
+                }}>
                 <TextField
                   size="2"
                   placeholder="Enter your email"
@@ -200,8 +194,7 @@ const Footer = ({ hideGuides = false }) => {
                       boxShadow: "none",
                     },
                   }}
-                  type="submit"
-                >
+                  type="submit">
                   <ArrowRightIcon />
                 </Button>
               </Box>
@@ -237,8 +230,7 @@ const Footer = ({ hideGuides = false }) => {
                       viewBox="0 0 32 32"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      css={{ display: "inline-block", mr: "$2" }}
-                    >
+                      css={{ display: "inline-block", mr: "$2" }}>
                       <Box
                         css={{ color: "$violet9" }}
                         as="path"
@@ -259,8 +251,7 @@ const Footer = ({ hideGuides = false }) => {
                       viewBox="0 0 32 32"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      css={{ display: "inline-block", borderRadius: "50%" }}
-                    >
+                      css={{ display: "inline-block", borderRadius: "50%" }}>
                       <Box
                         css={{ color: "$violet9" }}
                         as="path"
@@ -285,8 +276,7 @@ const Footer = ({ hideGuides = false }) => {
                 {user && user.admin && version && version.commit && (
                   <Link
                     passHref
-                    href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}
-                  >
+                    href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}>
                     <A>version {version.commit.substring(0, 8)}</A>
                   </Link>
                 )}

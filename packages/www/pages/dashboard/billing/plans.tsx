@@ -18,8 +18,7 @@ const PlansPage = () => {
         { title: "Billing", href: "/dashboard/billing" },
         { title: "Plans" },
       ]}
-      {...Content.metaData}
-    >
+      {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$6" }}>
           <Flex
@@ -31,8 +30,7 @@ const PlansPage = () => {
               pb: "$4",
               mb: "$5",
               width: "100%",
-            }}
-          >
+            }}>
             <Heading size="2">
               <Flex>
                 <Box
@@ -40,8 +38,7 @@ const PlansPage = () => {
                     mr: "$3",
                     fontWeight: 600,
                     letterSpacing: "0",
-                  }}
-                >
+                  }}>
                   Plans
                 </Box>
               </Flex>

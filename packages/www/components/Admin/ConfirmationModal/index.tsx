@@ -30,8 +30,7 @@ const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({
           type="button"
           variant="outlineSmall"
           onClick={onClose}
-          sx={{ mr: 2 }}
-        >
+          sx={{ mr: 2 }}>
           Cancel
         </Button>
         {showWheel ? (
@@ -43,8 +42,7 @@ const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({
             onClick={() => {
               setShowWheel(true);
               onAction();
-            }}
-          >
+            }}>
             {actionText}
           </Button>
         )}

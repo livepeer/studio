@@ -56,8 +56,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
         "@bp3": {
           borderRadius: "36px",
         },
-      }}
-    >
+      }}>
       <Box as="figure" css={{ margin: 0, width: "100%", position: "relative" }}>
         <Box
           css={{
@@ -68,8 +67,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             right: 0,
             height: "100%",
             width: "100%",
-          }}
-        >
+          }}>
           <Image
             layout="fill"
             objectFit="cover"
@@ -108,16 +106,14 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             display: "flex",
             alignItems: "center",
             width: "fit-content",
-          }}
-        >
+          }}>
           <Badge variant="red" size="2" css={{ fontWeight: 700, mr: "$2" }}>
             Live
           </Badge>
           <Badge variant="primary" size="2" css={{ fontWeight: 700 }}>
             <Box
               as="i"
-              css={{ display: "flex", alignItems: "center", mr: "$1" }}
-            >
+              css={{ display: "flex", alignItems: "center", mr: "$1" }}>
               <FiEye />
             </Box>
             {currentVideo !== undefined ? videos[currentVideo].views : "..."}
@@ -131,8 +127,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             right: "$3",
             display: "flex",
             alignItems: "center",
-          }}
-        >
+          }}>
           <Box
             as="input"
             placeholder="Write a comment..."
@@ -167,8 +162,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <FiHeart />
           </Box>
         </Box>

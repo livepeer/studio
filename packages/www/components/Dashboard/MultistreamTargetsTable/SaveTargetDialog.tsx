@@ -234,8 +234,7 @@ const SaveTargetDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent
         css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
+        onOpenAutoFocus={(e) => e.preventDefault()}>
         <AlertDialogTitle asChild>
           <Heading size="1">
             {`${action} multistream target`}
@@ -253,8 +252,7 @@ const SaveTargetDialog = ({
           onSubmit={(e) => {
             e.preventDefault();
             return saveMultistreamTarget();
-          }}
-        >
+          }}>
           <Flex direction="column" gap="2">
             <Label htmlFor="targetName">Name</Label>
             <TextField
@@ -315,11 +313,9 @@ const SaveTargetDialog = ({
                 alignItems: "center",
                 justifyContent: "flex-start",
                 margin: "0px",
-              }}
-            >
+              }}>
               <RadioGroup
-                onValueChange={(value) => setStateProp("profile", value)}
-              >
+                onValueChange={(value) => setStateProp("profile", value)}>
                 <Box css={{ display: "flex", flexDirection: "column" }}>
                   {profileOpts.map((p) => (
                     <Box key={p.name} css={{ display: "flex", mb: "$2" }}>
@@ -331,8 +327,7 @@ const SaveTargetDialog = ({
                       <Tooltip multiline content={p.tooltip}>
                         <Label
                           css={{ pl: "$2", cursor: "default" }}
-                          htmlFor={`profile-${p.name}`}
-                        >
+                          htmlFor={`profile-${p.name}`}>
                           {p.displayName || p.name}
                         </Label>
                       </Tooltip>
@@ -361,8 +356,7 @@ const SaveTargetDialog = ({
             <Text
               size="3"
               variant="gray"
-              css={{ mt: "$2", fontSize: "$2", mb: "$4" }}
-            >
+              css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
               {`${
                 action === Action.Create
                   ? "Addition of new multistream targets"
@@ -382,8 +376,7 @@ const SaveTargetDialog = ({
               type="submit"
               size="2"
               disabled={saving || (action === Action.Update && !target)}
-              variant="primary"
-            >
+              variant="primary">
               {saving && (
                 <Spinner
                   css={{

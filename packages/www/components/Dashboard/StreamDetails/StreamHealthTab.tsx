@@ -140,8 +140,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
           pb: "$2",
           mb: "$7",
           width: "100%",
-        }}
-      >
+        }}>
         <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
           Session bitrate
         </Heading>

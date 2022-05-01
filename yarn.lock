@@ -3995,10 +3995,10 @@
     react-transition-group "4.4.2"
     tslib "^2.3.1"
 
-"@livepeer/prettier-config@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.1.tgz#69923de8a530ceda2d458f5c7746ffaf0592ba66"
-  integrity sha512-GvfEEbt/CU6VfXM+ZJ1v4MeDtVQbj3dwupoyR/43JwIqV0yl4IH4Q5vlgK8fvtpl7gIolOg8AiQepdPVwWB0wA==
+"@livepeer/prettier-config@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
+  integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
 "@livepeer/sdk@1.0.0-alpha.7":
   version "1.0.0-alpha.7"
@@ -21981,7 +21981,7 @@ preserve@^0.2.0:
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
 
-prettier@^2.0.5, prettier@^2.2.1:
+prettier@^2.0.5, prettier@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.2.tgz#e26d71a18a74c3d0f0597f55f01fb6c06c206032"
   integrity sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==

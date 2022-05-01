@@ -20,8 +20,7 @@ const JobsPage = ({ allJobs }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-          }}
-        >
+          }}>
           Loading...
         </Box>
       </Layout>

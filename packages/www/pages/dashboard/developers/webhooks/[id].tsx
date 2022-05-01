@@ -70,8 +70,7 @@ const WebhookDetail = () => {
         { title: "Developers" },
         { title: "Webhooks", href: "/dashboard/developers/webhooks" },
         { title: data?.name },
-      ]}
-    >
+      ]}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
           {data && (
@@ -79,8 +78,7 @@ const WebhookDetail = () => {
               css={{
                 borderRadius: 6,
                 border: "1px solid $colors$mauve7",
-              }}
-            >
+              }}>
               <Flex
                 css={{
                   p: "$3",
@@ -90,8 +88,7 @@ const WebhookDetail = () => {
                   fd: "row",
                   ai: "center",
                   jc: "space-between",
-                }}
-              >
+                }}>
                 <Heading
                   size="2"
                   css={{
@@ -100,8 +97,7 @@ const WebhookDetail = () => {
                     textOverflow: "ellipsis",
                     width: "100%",
                     ai: "flex-start",
-                  }}
-                >
+                  }}>
                   {data.url}
                 </Heading>
                 <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
@@ -112,14 +108,12 @@ const WebhookDetail = () => {
                       }}
                       size="2"
                       css={{ mr: "$2", display: "flex", ai: "center" }}
-                      variant="red"
-                    >
+                      variant="red">
                       <StyledCross />
                       Delete
                     </Button>
                     <AlertDialogContent
-                      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
-                    >
+                      css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
                       <AlertDialogTitle asChild>
                         <Heading size="1">Delete Webhook</Heading>
                       </AlertDialogTitle>
@@ -127,8 +121,7 @@ const WebhookDetail = () => {
                         <Text
                           size="3"
                           variant="gray"
-                          css={{ mt: "$2", lineHeight: "22px" }}
-                        >
+                          css={{ mt: "$2", lineHeight: "22px" }}>
                           Are you sure you want to delete this webhook?
                         </Text>
                       </AlertDialogDescription>
@@ -136,8 +129,7 @@ const WebhookDetail = () => {
                         <Button
                           onClick={() => setDeleteDialogOpen(false)}
                           size="2"
-                          ghost
-                        >
+                          ghost>
                           Cancel
                         </Button>
                         <AlertDialogAction asChild>
@@ -152,8 +144,7 @@ const WebhookDetail = () => {
                               setDeleteDialogOpen(false);
                               router.push("/dashboard/developers/webhooks");
                             }}
-                            variant="red"
-                          >
+                            variant="red">
                             {deleting && (
                               <Spinner
                                 css={{
@@ -174,8 +165,7 @@ const WebhookDetail = () => {
                       <Button
                         size="2"
                         css={{ display: "flex", ai: "center" }}
-                        onClick={() => dialogState.onToggle()}
-                      >
+                        onClick={() => dialogState.onToggle()}>
                         <StyledPencil />
                         Update details
                       </Button>
@@ -210,8 +200,7 @@ const WebhookDetail = () => {
                   borderBottomLeftRadius: 6,
                   borderBottomRightRadius: 6,
                   backgroundColor: "$panel",
-                }}
-              >
+                }}>
                 <Cell variant="gray">URL</Cell>
                 <Cell>{data.url}</Cell>
                 <Cell variant="gray">Name</Cell>
@@ -226,8 +215,7 @@ const WebhookDetail = () => {
                     <Badge
                       variant="primary"
                       size="2"
-                      css={{ fontWeight: 600, mr: "$1", mb: "$1" }}
-                    >
+                      css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
                       {e}
                     </Badge>
                   ))}
@@ -267,8 +255,7 @@ const WebhookDetail = () => {
                       <Cell
                         css={{
                           fontFamily: "monospace",
-                        }}
-                      >
+                        }}>
                         {data.status.lastFailure.error ?? "unknown"}
                       </Cell>
                     </>
@@ -284,8 +271,7 @@ const WebhookDetail = () => {
                     <Cell
                       css={{
                         fontFamily: "monospace",
-                      }}
-                    >
+                      }}>
                       {data.status.lastFailure.response}
                     </Cell>
                   </>

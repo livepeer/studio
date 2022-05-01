@@ -30,8 +30,7 @@ const Delete = ({ stream, invalidate, ...props }) => {
           e.preventDefault();
           setOpen(true);
         }}
-        color="red"
-      >
+        color="red">
         Delete
       </Box>
 
@@ -69,8 +68,7 @@ const Delete = ({ stream, invalidate, ...props }) => {
                   setSaving(false);
                 }
               }}
-              variant="red"
-            >
+              variant="red">
               {saving && (
                 <Spinner
                   css={{

@@ -48,8 +48,7 @@ const defaultEmptyState = (
       margin: "0 auto",
       height: "calc(100vh - 400px)",
       maxWidth: 450,
-    }}
-  >
+    }}>
     <Heading css={{ fontWeight: 500, mb: "$3" }}>No targets</Heading>
     <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
       Multistream targets are sent the live media from the stream.

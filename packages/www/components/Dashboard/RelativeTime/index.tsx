@@ -27,8 +27,7 @@ const RelativeTime = ({ id, prefix, tm, swap = false }: RelativeTimeProps) => {
             className="tooltip"
             place="top"
             type="dark"
-            effect="solid"
-          >
+            effect="solid">
             {toolTip}
           </ReactTooltip>
           <Box as="span" data-tip data-for={`tooltip-${idpref}`}>

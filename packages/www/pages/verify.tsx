@@ -95,15 +95,13 @@ const Verify = ({
             py: "$9",
             px: "$4",
           },
-        }}
-      >
+        }}>
         <Flex
           css={{
             flexGrow: 1,
             alignItems: "center",
             justifyContent: "center",
-          }}
-        >
+          }}>
           <Flex
             css={{
               flexDirection: "column",
@@ -112,8 +110,7 @@ const Verify = ({
               textAlign: "center",
               height: "calc(100vh - 280px)",
               mb: 65,
-            }}
-          >
+            }}>
             {email && emailValidToken ? (
               <>
                 {errors ? (
@@ -132,8 +129,7 @@ const Verify = ({
                       size="2"
                       css={{ cursor: "default" }}
                       variant="primary"
-                      onClick={() => resendVerificationEmail()}
-                    >
+                      onClick={() => resendVerificationEmail()}>
                       {loading && (
                         <Spinner
                           css={{
@@ -164,8 +160,7 @@ const Verify = ({
                     Please check your inbox at
                     <Box
                       as="span"
-                      css={{ color: "$hiContrast", fontWeight: 600 }}
-                    >
+                      css={{ color: "$hiContrast", fontWeight: 600 }}>
                       {" "}
                       {user?.email}.
                     </Box>

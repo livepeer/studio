@@ -21,8 +21,7 @@ const Sessions = () => {
           "@bp4": {
             p: "$6",
           },
-        }}
-      >
+        }}>
         <AllSessionsTable />
       </Box>
     </Layout>

@@ -15,8 +15,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           margin: "0 auto",
           height: "calc(100vh - 400px)",
           maxWidth: 450,
-        }}
-      >
+        }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
           MistServer, Livepeer's open source media server
         </Heading>
@@ -32,14 +31,12 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
             "@bp1": {
               display: "flex",
             },
-          }}
-        >
+          }}>
           <Link href="/docs/guides/media-server/introduction" passHref>
             <A
               target="_blank"
               variant="primary"
-              css={{ display: "flex", ai: "center", mb: "$5" }}
-            >
+              css={{ display: "flex", ai: "center", mb: "$5" }}>
               <Box>Learn more</Box>
               <ArrowRightIcon />
             </A>
@@ -57,8 +54,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
                 "@bp1": {
                   ml: "$3",
                 },
-              }}
-            >
+              }}>
               <Box>Downloads</Box>
               <ArrowRightIcon />
             </A>

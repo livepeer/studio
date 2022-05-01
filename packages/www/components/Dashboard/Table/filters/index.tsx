@@ -142,8 +142,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
             borderRadius: "4px",
             overflow: "hidden",
             boxShadow: "0px 5px 15px -5px hsl(206deg 22% 7% / 15%)",
-          }}
-        >
+          }}>
           <Flex
             css={{
               width: "100%",
@@ -151,8 +150,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
               alignItems: "center",
               padding: "6px 7px",
               background: "$panel",
-            }}
-          >
+            }}>
             <Button onClick={handleClear} size="1" variant="gray">
               Clear
             </Button>
@@ -165,8 +163,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
           </Flex>
           <StyledAccordion
             type="multiple"
-            value={filters.map((f) => (f.isOpen ? f.label : undefined))}
-          >
+            value={filters.map((f) => (f.isOpen ? f.label : undefined))}>
             {filters.map((filter, i) => {
               const onToggleOpen = () => {
                 setFilters((p) => {
@@ -241,8 +238,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                         cursor: "default",
                         marginLeft: "$2",
                         fontWeight: 500,
-                      }}
-                    >
+                      }}>
                       {filter.label}
                     </Text>
                   </StyledHeader>

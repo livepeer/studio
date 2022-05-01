@@ -133,8 +133,7 @@ function DashboardLayout({
               css={{
                 margin: "0 auto",
                 maxWidth: "1520px",
-              }}
-            >
+              }}>
               {children}
             </Box>
           </Box>

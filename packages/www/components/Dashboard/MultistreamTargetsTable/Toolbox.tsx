@@ -68,8 +68,7 @@ const DisableDialog = ({
                 setSaving(false);
                 setOpen(false);
               }}
-              variant="red"
-            >
+              variant="red">
               {saving && (
                 <Spinner
                   css={{
@@ -143,8 +142,7 @@ const DeleteDialog = ({
                   setSaving(false);
                 }
               }}
-              variant="red"
-            >
+              variant="red">
               {saving && (
                 <Spinner
                   css={{
@@ -233,8 +231,7 @@ const Toolbox = ({
               display: "flex",
               ai: "center",
               "&:hover": { boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.5)" },
-            }}
-          >
+            }}>
             <Overflow />
           </Button>
         </DropdownMenuTrigger>
@@ -246,8 +243,7 @@ const Toolbox = ({
                 stream.isActive
                   ? errorRecordDialogState.onOn()
                   : setSaveDialogOpen(true)
-              }
-            >
+              }>
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -257,8 +253,7 @@ const Toolbox = ({
                   ? errorRecordDialogState.onOn()
                   : setDeleteDialogOpen(true)
               }
-              color="red"
-            >
+              color="red">
               Delete
             </DropdownMenuItem>
           </DropdownMenuGroup>

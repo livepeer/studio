@@ -266,8 +266,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           borderBottom: "1px solid",
           borderColor: border ? "$mauve5" : "transparent",
           pb: border ? "$2" : 0,
-        }}
-      >
+        }}>
         <Box>{header}</Box>
         <Flex css={{ alignItems: "center" }}>
           {state.selectedRows.length ? (
@@ -285,8 +284,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                     fontSize: "$2",
                     color: "$violet11",
                   }}
-                  onClick={() => toggleAllRowsSelected(false)}
-                >
+                  onClick={() => toggleAllRowsSelected(false)}>
                   Deselect
                 </Box>
               </Flex>
@@ -327,8 +325,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
         <Flex
           align="center"
           justify="center"
-          css={{ height: "calc(100vh - 400px)" }}
-        >
+          css={{ height: "calc(100vh - 400px)" }}>
           <Spinner />
         </Flex>
       ) : !data?.count ? (
@@ -342,8 +339,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               margin: "0 auto",
               height: "calc(100vh - 400px)",
               maxWidth: 300,
-            }}
-          >
+            }}>
             <Heading css={{ fontWeight: 500, mb: "$3" }}>
               No results found
             </Heading>
@@ -377,14 +373,12 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           {...column.getHeaderProps(
                             // @ts-ignore
                             column.getSortByToggleProps()
-                          )}
-                        >
+                          )}>
                           <Flex
                             css={{
                               ai: "center",
                               mr: withHelpTooltip ? "$3" : 0,
-                            }}
-                          >
+                            }}>
                             <Box css={{ fontSize: "$2", whiteSpace: "nowrap" }}>
                               {column.render("Header")}
                             </Box>
@@ -418,8 +412,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           cursor,
                         },
                       }}
-                      {...row.getRowProps()}
-                    >
+                      {...row.getRowProps()}>
                       {row.cells.map((cell, i) => (
                         <Td
                           as={i === 0 ? Th : Td}
@@ -431,8 +424,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                                 : "auto",
                             ...cell.value?.css,
                           }}
-                          {...cell.getCellProps()}
-                        >
+                          {...cell.getCellProps()}>
                           {cell.value?.href ? (
                             <Link href={cell.value.href} passHref>
                               <A
@@ -444,8 +436,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                                   "&:hover": {
                                     textDecoration: "none",
                                   },
-                                }}
-                              >
+                                }}>
                                 {cell.render("Cell")}
                               </A>
                             </Link>
@@ -478,8 +469,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                   <Button
                     css={{ marginRight: "6px" }}
                     onClick={handlePreviousPage}
-                    disabled={state.prevCursors.length <= 0}
-                  >
+                    disabled={state.prevCursors.length <= 0}>
                     Previous
                   </Button>
                   <Button
@@ -488,8 +478,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                       state.nextCursor === "" ||
                       // @ts-ignore
                       state.pageSize >= parseFloat(data?.count)
-                    }
-                  >
+                    }>
                     Next
                   </Button>
                 </Flex>

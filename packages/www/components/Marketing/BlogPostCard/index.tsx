@@ -34,8 +34,7 @@ const BlogPostCard = ({ post, css = {} }) => {
             boxShadow:
               "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.04)",
           },
-        }}
-      >
+        }}>
         {post.mainImage && (
           <Box
             css={{
@@ -44,8 +43,7 @@ const BlogPostCard = ({ post, css = {} }) => {
               height: 200,
               minHeight: 200,
               bc: "$panel",
-            }}
-          >
+            }}>
             <Image
               alt={post.mainImage?.alt}
               layout="fill"
@@ -62,8 +60,7 @@ const BlogPostCard = ({ post, css = {} }) => {
             py: "$4",
             height: "100%",
             color: "$hiContrast",
-          }}
-        >
+          }}>
           <Box>
             <Text
               variant="gray"
@@ -71,8 +68,7 @@ const BlogPostCard = ({ post, css = {} }) => {
               css={{
                 textTransform: "uppercase",
                 fontWeight: 500,
-              }}
-            >
+              }}>
               {post.category.title}
             </Text>
             <Flex
@@ -80,8 +76,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                 alignItems: "center",
                 pt: "$4",
                 pb: "$5",
-              }}
-            >
+              }}>
               <Box
                 css={{
                   mr: "$2",
@@ -90,8 +85,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                   height: 30,
                   borderRadius: 1000,
                   overflow: "hidden",
-                }}
-              >
+                }}>
                 <Image
                   alt={post.author.image?.alt}
                   layout="fill"
@@ -105,8 +99,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
-                }}
-              >
+                }}>
                 {post.author.name}
               </Box>
               <Box
@@ -117,8 +110,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                   textOverflow: "ellipsis",
                   overflow: "hidden",
                   whiteSpace: "nowrap",
-                }}
-              >
+                }}>
                 {stats.text}
               </Box>
             </Flex>
@@ -129,8 +121,7 @@ const BlogPostCard = ({ post, css = {} }) => {
                 fontWeight: 500,
                 pb: "$3",
                 transition: "color .3s",
-              }}
-            >
+              }}>
               <TextTruncate
                 line={4}
                 element="span"
@@ -143,8 +134,7 @@ const BlogPostCard = ({ post, css = {} }) => {
               size="4"
               css={{
                 mb: "$5",
-              }}
-            >
+              }}>
               <TextTruncate
                 line={3}
                 element="span"
