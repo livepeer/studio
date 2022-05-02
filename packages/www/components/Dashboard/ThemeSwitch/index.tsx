@@ -11,17 +11,17 @@ const StyledSwitch = styled(Switch.Root, {
   padding: 0,
   width: 25,
   height: 12,
-  backgroundColor: "$colors$mauve6",
+  bc: "$mauve6",
   borderRadius: 25,
   position: "relative",
   display: "flex",
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px $colors$violet9",
+    boxShadow: "0 0 0 2px $violet9",
   },
   '&[data-state="checked"]': {
-    linearGradient: "to right, $colors$violet8, $colors$violet5",
+    background: "linear-gradient(to right, $violet8, $violet5)",
   },
 });
 
@@ -40,7 +40,7 @@ const StyledThumb = styled(Switch.Thumb, {
     display: "none",
   },
   '&[data-state="checked"]': {
-    backgroundColor: "$colors$mauve6",
+    bc: "$mauve6",
     transform: "translateX(12px)",
     "> :nth-child(1)": {
       display: "none",
@@ -53,7 +53,7 @@ const StyledThumb = styled(Switch.Thumb, {
 });
 
 const ThemeSwitch = () => {
-  const { resolvedTheme, setTheme, theme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
