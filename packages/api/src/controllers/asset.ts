@@ -87,9 +87,17 @@ async function validateAssetPayload(
   };
 }
 
-function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.status !== "ready") {
     return asset;
+  }
+  if (asset.playbackRecordingId) {
+    asset.playbackUrl = pathJoin(
+      ingest,
+      "asset",
+      asset.playbackRecordingId,
+      "index.m3u8"
+    );
   }
   return {
     ...asset,
@@ -212,7 +220,7 @@ app.get("/", authorizer({}), async (req, res) => {
           res.set("X-Total-Count", c);
         }
         return {
-          ...withDownloadUrl(data, ingest),
+          ...withPlaybackUrls(data, ingest),
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },
@@ -248,7 +256,7 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withDownloadUrl(data, ingest);
+      return withPlaybackUrls(data, ingest);
     },
   });
   res.status(200);
@@ -279,7 +287,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     );
   }
 
-  res.json(withDownloadUrl(asset, ingest));
+  res.json(withPlaybackUrls(asset, ingest));
 });
 
 app.post(

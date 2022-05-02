@@ -876,10 +876,21 @@ components:
           example: eaw4nk06ts2d0mzb
           index: true
           description: Used to form playback URL and storage folder
+        playbackRecordingId:
+          type: string
+          writeOnly: true
+          example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
+          index: true
+          description: Used to form recording URL for HLS playback
+        playbackUrl:
+          type: string
+          readOnly: true
+          example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
+          description: URL for HLS playback
         downloadUrl:
           type: string
           readOnly: true
-          example: https://cdn.livepeer.com/asset/eaw4nk06ts2d0mzb/video
+          example: https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video
           description: URL to manually download the asset if desired
         userId:
           type: string
