@@ -94,7 +94,7 @@ function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.playbackRecordingId) {
     asset.playbackUrl = pathJoin(
       ingest,
-      "asset",
+      "recordings",
       asset.playbackRecordingId,
       "index.m3u8"
     );
