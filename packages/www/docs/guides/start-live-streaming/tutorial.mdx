@@ -56,33 +56,83 @@ broadcasting software in step 2 and playing back your live stream in step 3.
 
 ## Step 2 (option 1): Go live using OBS
 
-OBS is free and open source software for live streaming.
-[Download and install OBS.](https://obsproject.com/download)
+### Getting started
 
-Before streaming, we need to configure OBS. Click on Settings in the lower right
-corner.
+[OBS](https://obsproject.com/) is the way that most users stream into Livepeer
+because it is easy to use and offers a high degree of customization. OBS is open
+source and free to use. Livepeer also works with similar video encoders such as
+[Streamlabs](https://streamlabs.com/).
 
-First, let’s set the keyframe interval.
 
-1. In the Settings sidebar menu, select Output.
-2. At the top, select Advanced from the Output Mode dropdown.
-3. In the Keyframe Interval row, input 2 in the text field.
+### What you'll need to get started:
 
-Next, let’s configure OBS to point to Livepeer.com’s RTMP ingest data centers.
+- [ ] Livepeer Video Services account
 
-1. In the Setting sidebar menu, select Stream.
-2. At the top, select Custom from the Service dropdown menu.
-3. Input `rtmp://rtmp.livepeer.com/live` in the Server text field.
-4. Navigate to the stream detail page, click the “Reveal stream key” button, and
-   copy the stream key.
-5. Navigate back to OBS, and paste your stream key into the Stream Key text
-   field.
-6. Confirm the Use Authentication checkbox is unchecked.
-7. Click OK in the lower right corner to save your updated server and keyframe
-   interval settings.
+- [ ] An ingest URL and a stream key
 
-When you are ready to start your live stream, click Start Streaming in the lower
-right corner of OBS.
+- [ ] OBS software
+
+### Livepeer Video Services
+
+Visit our guide
+[Create a stream](https://livepeer.com/docs/guides/start-live-streaming/create-a-stream#no-code-stream-creation-with-the-livepeercom-dashboard)
+to learn how to create a video stream.
+
+### OBS
+
+**Step 1:** Download the version of [OBS](https://obsproject.com/) for your
+operating system
+
+_In this example, macOS will be used_
+
+**Step 2:** Open OBS and create a source
+
+Click the **+ icon** under sources and select **Video Capture Device** if you’d
+like to stream using a camera or webcam. If you’d like to stream a browser
+window, select **Window Capture**.
+
+_Give the device a name_
+
+![OBS1](/img/docs/obs/OBS1.png) ![OBS2](/img/docs/obs/OBS2.png)
+![OBS3](/img/docs/obs/OBS3.png)
+
+**Step 3:** Go to the settings
+
+- Select **Stream** settings
+- Select **custom** for services
+- Copy and paste the **RTMP ingest URL** and **Stream Key** and paste it into
+  the **“Server”** and **“Stream Key”** fields.
+
+  - RTMP ingest URL and Stream Key can be found on the dashboard on the Stream
+    Detail page after creating a stream or in the API.
+
+  ![OBS4](/img/docs/obs/OBS4.png)
+
+**Step 4:** Select the Output settings and the Streaming tab
+
+- In the Output Mode select Advance
+- Set the keyframe interval to 2 seconds
+- Save your settings
+
+![OBS5](/img/docs/obs/OBS5.png)
+
+**Step 5:** Stream and check output
+
+After saving your settings, OBS will return to the stream console. Press start
+streaming from the output you selected in Step 2.
+
+![LVS4](/img/docs/obs/LVS4.png)
+
+Navigate to the Livepeer Dashboard, login, and select the stream name that
+you’re currently using, which should now be marked as “Active.” Under the Health
+tab, the video you’re streaming in through OBS should be visible.
+
+![LVS5](/img/docs/obs/LVS5.png)
+
+To preview the stream in the browser, a video player is required. There are
+several options to display the live stream in the browser.
+[Visit our tutorial on Video playback in your app](https://livepeer.com/docs/guides/application-development/video-playback-in-your-app)
+to learn more.
 
 ## Step 2 (option 2): Go live using in-browser broadcaster
 
