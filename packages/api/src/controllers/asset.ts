@@ -375,12 +375,12 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   }
   const assetId = req.params?.id || req.body.assetId;
 
-  const asset = await db.asset.get(assetId);
-  if (!asset) {
+  const inputAsset = await db.asset.get(assetId);
+  if (!inputAsset) {
     throw new NotFoundError(`asset not found`);
   }
 
-  const os = await db.objectStore.get(asset.objectStoreId);
+  const os = await db.objectStore.get(inputAsset.objectStoreId);
   if (!os) {
     throw new UnprocessableEntityError("Asset has invalid objectStoreId");
   }
@@ -393,10 +393,10 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     Date.now(),
     req.config.vodObjectStoreId,
     {
-      name: req.body.name ?? asset.name,
+      name: req.body.name ?? inputAsset.name,
     }
   );
-  outputAsset.sourceAssetId = asset.id;
+  outputAsset.sourceAssetId = inputAsset.id;
   outputAsset = await db.asset.create(outputAsset);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -406,11 +406,11 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
         profile: req.body.profile,
       },
     },
-    asset,
+    inputAsset,
     outputAsset
   );
   res.status(201);
-  res.json({ asset, task });
+  res.json({ asset: outputAsset, task });
 };
 app.post(
   "/:id/transcode",
