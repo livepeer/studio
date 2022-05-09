@@ -21,7 +21,7 @@ const useHubspotForm = ({ portalId, formId }) => {
         fields: [],
       };
       for (var pair of formData.entries()) {
-        if (pair[0] !== "password" && !pair[0].includes("TICKET")) {
+        if (pair[0] !== "password") {
           data.fields.push({ name: pair[0], value: pair[1] });
         }
       }
@@ -34,31 +34,6 @@ const useHubspotForm = ({ portalId, formId }) => {
         },
       });
       const body = await result.json();
-
-      const test = {
-        properties: {
-          subject: "test-live",
-          product: "Streaming Services",
-          user_s_plan: "Pro",
-          hs_ticket_category: "BILLING_ISSUE",
-          content: "postman content",
-          hs_pipeline_stage: "1",
-        },
-      };
-
-      const result1 = await fetch(
-        "https://api.hubapi.com/crm/v3/objects/tickets?hapikey=21b15961-0ae0-4e98-b6e0-8c11a962410b",
-        {
-          method: "post",
-          body: JSON.stringify(test),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const testres = await result1.json();
-      console.log(testres);
       setData(body);
       setForm(false);
     } catch (e) {

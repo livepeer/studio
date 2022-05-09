@@ -54,8 +54,7 @@ const ContactPage = () => {
   const formEl = useRef(null);
   const { data, handleSubmit } = useHubspotForm({
     portalId: process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID,
-    formId: process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID,
-    // data:
+    formId: process.env.NEXT_PUBLIC_HUBSPOT_CONTACT_FORM_ID,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -166,12 +165,14 @@ const ContactPage = () => {
                 name="firstname"
                 type="text"
                 placeholder="First Name*"
+                required
                 css={{ py: "$4" }}
               />
               <TextField
                 size="3"
                 id="lastname"
                 name="lastname"
+                required
                 type="text"
                 placeholder="Last Name*"
               />
@@ -183,6 +184,7 @@ const ContactPage = () => {
               name="email"
               type="email"
               placeholder="Email*"
+              required
             />
             <input name="utm_source" type="hidden" value={query?.utm_source} />
             <input name="utm_medium" type="hidden" value={query?.utm_medium} />
@@ -198,6 +200,7 @@ const ContactPage = () => {
               name="TICKET.subject"
               type="text"
               placeholder="Ticket subject*"
+              required
             />
             <Grid
               css={{
@@ -216,7 +219,8 @@ const ContactPage = () => {
                   flexDirection: "column",
                   alignItems: "flex-start",
                   mb: "$4",
-                }}>
+                }}
+                required>
                 <Box css={{ color: "$hiContrast", mb: "$2" }}>Product*</Box>
                 <Box
                   css={{
@@ -267,7 +271,7 @@ const ContactPage = () => {
               </RadioGroup>
               <Box css={{ textAlign: "left" }}>
                 <Box css={{ color: "$hiContrast", mb: "$2" }}>User's Plan</Box>
-                <Select id="user_s_plan" name="TICKET.user_s_plan">
+                <Select id="user_s_plan" name="TICKET.user_s_plan" required>
                   <option value="Free">Free</option>
                   <option value="Pro">Pro</option>
                   <option value="Paid Plan 1">Paid Plan 1</option>
@@ -391,7 +395,7 @@ const ContactPage = () => {
                 <Box
                   as="input"
                   {...getInputProps()}
-                  name="TICKET.hs_file_upload"
+                  // name="TICKET.hs_file_upload"
                 />
                 <Box
                   as="p"
@@ -417,7 +421,7 @@ const ContactPage = () => {
                   Drag and Drop your screenshots or logs or upload here
                 </Box>
               </Box>
-              {acceptedFiles.map((file) => (
+              {/* {acceptedFiles.map((file) => (
                 <Box
                   as="p"
                   key={file?.path}
@@ -431,7 +435,7 @@ const ContactPage = () => {
                   }}>
                   {file?.path} - {file.size} bytes
                 </Box>
-              ))}
+              ))} */}
             </Box>
 
             <Box css={{ textAlign: "center" }}>
