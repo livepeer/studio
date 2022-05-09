@@ -1,7 +1,6 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
 import {
   Box,
   Text,
@@ -22,18 +21,6 @@ import Prefooter from "@components/Marketing/Prefooter";
 import { useRouter } from "next/router";
 import Guides from "@components/Marketing/Guides";
 import { Contact as Content } from "content";
-
-const activeStyle = {
-  borderColor: "white",
-};
-
-const acceptStyle = {
-  borderColor: "#5842c3",
-};
-
-const rejectStyle = {
-  borderColor: "red",
-};
 
 const StyledCircleRadio = styled(Radio, {
   marginRight: "$1",
@@ -72,42 +59,6 @@ const ContactPage = () => {
       };
     }
   }, [data]);
-
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-
-      reader.onabort = () => console.log("file reading was aborted");
-      reader.onerror = () => console.log("file reading has failed");
-      reader.onload = () => {
-        // Do whatever you want with the file contents
-        const binaryStr = reader.result;
-        console.log(binaryStr);
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  }, []);
-
-  const {
-    acceptedFiles,
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
-    accept: "image/jpeg,image/png",
-    onDrop,
-  });
-
-  const style = useMemo(
-    () => ({
-      ...(isDragActive ? activeStyle : {}),
-      ...(isDragAccept ? acceptStyle : {}),
-      ...(isDragReject ? rejectStyle : {}),
-    }),
-    [isDragActive, isDragReject, isDragAccept]
-  );
 
   return (
     <Layout {...Content.metaData}>
@@ -220,7 +171,7 @@ const ContactPage = () => {
                   alignItems: "flex-start",
                   mb: "$4",
                 }}
-                required>
+                defaultValue="Streaming Services">
                 <Box css={{ color: "$hiContrast", mb: "$2" }}>Product*</Box>
                 <Box
                   css={{
@@ -271,7 +222,11 @@ const ContactPage = () => {
               </RadioGroup>
               <Box css={{ textAlign: "left" }}>
                 <Box css={{ color: "$hiContrast", mb: "$2" }}>User's Plan</Box>
-                <Select id="user_s_plan" name="TICKET.user_s_plan" required>
+                <Select
+                  id="user_s_plan"
+                  name="TICKET.user_s_plan"
+                  defaultValue="Free"
+                  required>
                   <option value="Free">Free</option>
                   <option value="Pro">Pro</option>
                   <option value="Paid Plan 1">Paid Plan 1</option>
@@ -289,7 +244,8 @@ const ContactPage = () => {
                     flexDirection: "column",
                     alignItems: "flex-start",
                     mb: "$4",
-                  }}>
+                  }}
+                  defaultValue="PRODUCT_ERROR">
                   <Box css={{ color: "$hiContrast", mb: "$2" }}>
                     Ticket category*
                   </Box>
@@ -375,74 +331,12 @@ const ContactPage = () => {
               css={{ width: "100%", boxSizing: "border-box", mb: "$4" }}
               name="TICKET.content"
               placeholder="Tell us what's happening*"
+              required
             />
-            <Box
-              css={{
-                mb: "$6",
-                width: "100%",
-              }}>
-              <Box
-                css={{
-                  width: "100%",
-                  cursor: "pointer",
-                  p: "$1",
-                  mb: "$0",
-                  height: "auto",
-                  border: "1px solid $colors$mauve7",
-                  borderRadius: "$1",
-                }}
-                {...getRootProps({ style })}>
-                <Box
-                  as="input"
-                  {...getInputProps()}
-                  // name="TICKET.hs_file_upload"
-                />
-                <Box
-                  as="p"
-                  css={{
-                    width: "100%",
-                    height: "100%",
-                    border: "1px dotted $colors$mauve7",
-                    borderRadius: "$1",
-                    m: 0,
-                    fontSize: "$2",
-                    p: "$2",
-                    transition: "border .24s ease-in-out",
-                    minWidth: "296px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    color: "$mauve9",
-                  }}>
-                  <b>
-                    Provide any images that would assist in resolving the issue.
-                  </b>
-                  Drag and Drop your screenshots or logs or upload here
-                </Box>
-              </Box>
-              {/* {acceptedFiles.map((file) => (
-                <Box
-                  as="p"
-                  key={file?.path}
-                  css={{
-                    my: "$1",
-                    width: "100%",
-                    textAlign: "left",
-                    fontSize: "$1",
-                    overflowWrap: "break-word",
-                    pl: "0",
-                  }}>
-                  {file?.path} - {file.size} bytes
-                </Box>
-              ))} */}
-            </Box>
-
             <Box css={{ textAlign: "center" }}>
               <Button arrow css={{ mx: "auto", mt: "$4", px: "$4" }}>
                 Submit
               </Button>
-
               <Fade in={submitted}>
                 <Text variant="gray" css={{ mt: "$3" }}>
                   Thank you for getting in touch. Our team will get back to you
@@ -453,7 +347,6 @@ const ContactPage = () => {
           </Box>
         </Container>
       </Box>
-
       <Fade key={0}>
         <Prefooter />
       </Fade>
