@@ -142,7 +142,7 @@ const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const makeContext = (state: ApiState, setState) => {
   const endpoint = isDevelopment()
-    ? `https://livepeer.monster`
+    ? `http://localhost:3004`
     : isStaging()
     ? `https://livepeer.monster`
     : ``;
