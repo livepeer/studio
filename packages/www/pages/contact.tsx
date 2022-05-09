@@ -195,12 +195,12 @@ const ContactPage = () => {
                     justifyContent: "flex-start",
                     mb: "$2",
                   }}>
-                  <StyledCircleRadio value="Project Aqueduct" id="r2" />
+                  <StyledCircleRadio value="Catalyst" id="r2" />
                   <Box
                     as="label"
                     htmlFor="r2"
                     css={{ color: "$slate11", fontSize: "$2" }}>
-                    Project Aqueduct
+                    Catalyst
                   </Box>
                 </Box>
 
