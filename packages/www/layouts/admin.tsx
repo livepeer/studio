@@ -4,7 +4,6 @@ import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
-import { IdProvider } from "@radix-ui/react-id";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -87,7 +86,7 @@ const Layout = ({
   }
 
   return (
-    <IdProvider>
+    <>
       <Head>
         <link rel="stylesheet" href="/reset.css" />
         <link rel="stylesheet" href="/markdown.css" />
@@ -133,7 +132,7 @@ const Layout = ({
           </Flex>
         </Box>
       </ThemeProvider>
-    </IdProvider>
+    </>
   );
 };
 
