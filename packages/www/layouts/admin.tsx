@@ -14,7 +14,6 @@ import Router from "next/router";
 import { Reset, ThemeProvider } from "../lib/theme";
 import Head from "next/head";
 import { hotjar } from "react-hotjar";
-import Providers from "@lib/Providers";
 
 interface Props {
   title?: string;
@@ -88,55 +87,53 @@ const Layout = ({
   }
 
   return (
-    <Providers>
-      <IdProvider>
-        <Head>
-          <link rel="stylesheet" href="/reset.css" />
-          <link rel="stylesheet" href="/markdown.css" />
-        </Head>
-        <ThemeProvider>
-          <Reset />
-          <Box sx={{ minHeight: "100vh" }}>
-            <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-              <NextSeo {...seo} />
-              <Flex
-                sx={{
-                  flexGrow: 1,
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  zIndex: 1,
-                  position: "relative",
-                }}>
-                {preview && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      textDecoration: "none",
-                      justifyContent: "center",
-                      height: 24,
-                      fontSize: 12,
-                      fontWeight: "500",
-                      bg: "primary",
-                      color: "white",
-                      lineHeight: "32px",
-                    }}>
-                    Preview Mode
-                  </Box>
-                )}
-                {customNav ? (
-                  customNav
-                ) : (
-                  <DefaultNav backgroundColor={backgroundColor} />
-                )}
-                <Box css={{ position: "relative" }}>{children}</Box>
-              </Flex>
-              <Footer />
+    <IdProvider>
+      <Head>
+        <link rel="stylesheet" href="/reset.css" />
+        <link rel="stylesheet" href="/markdown.css" />
+      </Head>
+      <ThemeProvider>
+        <Reset />
+        <Box sx={{ minHeight: "100vh" }}>
+          <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
+            <NextSeo {...seo} />
+            <Flex
+              sx={{
+                flexGrow: 1,
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                zIndex: 1,
+                position: "relative",
+              }}>
+              {preview && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    justifyContent: "center",
+                    height: 24,
+                    fontSize: 12,
+                    fontWeight: "500",
+                    bg: "primary",
+                    color: "white",
+                    lineHeight: "32px",
+                  }}>
+                  Preview Mode
+                </Box>
+              )}
+              {customNav ? (
+                customNav
+              ) : (
+                <DefaultNav backgroundColor={backgroundColor} />
+              )}
+              <Box css={{ position: "relative" }}>{children}</Box>
             </Flex>
-          </Box>
-        </ThemeProvider>
-      </IdProvider>
-    </Providers>
+            <Footer />
+          </Flex>
+        </Box>
+      </ThemeProvider>
+    </IdProvider>
   );
 };
 

@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
-import Providers from "@lib/Providers";
 
 const MDXComponents = require("@components/Marketing/MDXComponents");
 const { components } = MDXComponents;
@@ -117,7 +116,7 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <Providers>
+    <>
       <NextSeo {...resolvedSEO} />
       <Box
         css={{
@@ -183,7 +182,7 @@ const DocsIndex = ({ doc, menu }) => {
           </Grid>
         </Container>
       </Box>
-    </Providers>
+    </>
   );
 };
 

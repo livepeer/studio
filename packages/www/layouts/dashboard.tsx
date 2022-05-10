@@ -11,7 +11,6 @@ import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
-import Providers from "@lib/Providers";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -92,23 +91,21 @@ function DashboardLayout({
     <>
       {requireLoggedIn && <DashboardRedirect />}
       <Elements stripe={getStripe()}>
-        <Providers>
-          <Head>
-            <meta name="viewport" content="width=1023" />
-          </Head>
-          <NextSeo {...seo} />
-          <Sidebar id={id} />
-          <Box css={{ pl: 270, width: "100%" }}>
-            <Header breadcrumbs={breadcrumbs} />
-            <Box
-              css={{
-                margin: "0 auto",
-                maxWidth: "1520px",
-              }}>
-              {children}
-            </Box>
+        <Head>
+          <meta name="viewport" content="width=1023" />
+        </Head>
+        <NextSeo {...seo} />
+        <Sidebar id={id} />
+        <Box css={{ pl: 270, width: "100%" }}>
+          <Header breadcrumbs={breadcrumbs} />
+          <Box
+            css={{
+              margin: "0 auto",
+              maxWidth: "1520px",
+            }}>
+            {children}
           </Box>
-        </Providers>
+        </Box>
       </Elements>
     </>
   );
