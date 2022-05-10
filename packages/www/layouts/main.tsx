@@ -1,4 +1,4 @@
-import { globalCss, Flex, Box } from "@livepeer/design-system";
+import { Flex, Box } from "@livepeer/design-system";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
 import ReactGA from "react-ga";
@@ -24,34 +24,6 @@ if (process.env.NODE_ENV === "production") {
     _hsq.push(["trackPageView"]);
   });
 }
-
-const globalStyles = globalCss({
-  body: {
-    margin: 0,
-    backgroundColor: "$loContrast",
-    fontFamily: "$untitled",
-    color: "$hiContrast",
-  },
-
-  "h1, h2, h3, h4, h5": { fontWeight: 500 },
-
-  "body, button": {
-    fontFamily: "$untitled",
-  },
-
-  svg: { display: "block" },
-
-  "pre, code": { margin: 0, fontFamily: "$mono" },
-
-  "#__next": {
-    position: "relative",
-    zIndex: 0,
-  },
-
-  "#hubspot-messages-iframe-container iframe": {
-    colorScheme: "auto",
-  },
-});
 
 interface Props {
   title?: string;
@@ -84,8 +56,6 @@ function Layout({
       hotjar.initialize(2525106, 6);
     }
   }, []);
-
-  globalStyles();
 
   let seo = {
     title,

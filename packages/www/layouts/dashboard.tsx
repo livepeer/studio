@@ -1,4 +1,4 @@
-import { globalCss, Box } from "@livepeer/design-system";
+import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
@@ -28,33 +28,6 @@ if (process.env.NODE_ENV === "production") {
     _hsq.push(["trackPageView"]);
   });
 }
-
-const globalStyles = globalCss({
-  body: {
-    margin: 0,
-    backgroundColor: "$loContrast",
-    fontFamily: "$untitled",
-  },
-
-  "h1, h2, h3, h4, h5": { fontWeight: 500 },
-
-  "body, button": {
-    fontFamily: "$untitled",
-  },
-
-  svg: { display: "block" },
-
-  "pre, code": { margin: 0, fontFamily: "$mono" },
-
-  "#__next": {
-    position: "relative",
-    zIndex: 0,
-  },
-
-  "#hubspot-messages-iframe-container iframe": {
-    colorScheme: "auto",
-  },
-});
 
 type Breadcrumb = {
   title: string;
@@ -91,8 +64,6 @@ function DashboardLayout({
       hotjar.initialize(2525106, 6);
     }
   }, []);
-
-  globalStyles();
 
   let seo = {
     title,

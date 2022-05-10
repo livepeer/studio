@@ -9,30 +9,44 @@ import { MetaMaskProvider } from "metamask-react";
 import "../css/algolia-docsearch.css";
 import "../css/recaptcha.css";
 import React from "react";
+import { globalCss } from "@livepeer/design-system";
 
 const queryClient = new QueryClient();
+
+const globalStyles = globalCss({
+  body: {
+    margin: 0,
+    backgroundColor: "$loContrast",
+    fontFamily: "$untitled",
+    color: "$hiContrast",
+  },
+
+  "h1, h2, h3, h4, h5": { fontWeight: 500 },
+
+  "body, button": {
+    fontFamily: "$untitled",
+  },
+
+  svg: { display: "block" },
+
+  "pre, code": { margin: 0, fontFamily: "$mono" },
+
+  "#__next": {
+    position: "relative",
+    zIndex: 0,
+  },
+
+  "#hubspot-messages-iframe-container iframe": {
+    colorScheme: "auto",
+  },
+});
 
 export default class MyApp extends App {
   render() {
     const { Component, pageProps }: any = this.props;
-
+    globalStyles();
     return (
       <>
-        <Head>
-          <link
-            href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
-            rel="stylesheet"
-          />
-          <title>Live Video Transcoding - Livepeer.com</title>
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
-            rel="stylesheet"
-          />
-        </Head>
         <QueryClientProvider client={queryClient}>
           <MetaMaskProvider>
             <ApiProvider>

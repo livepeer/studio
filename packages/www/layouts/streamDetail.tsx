@@ -38,7 +38,6 @@ import Record from "components/Dashboard/StreamDetails/Record";
 import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
-import Link from "next/link";
 import StatusBadge, {
   Variant as StatusVariant,
 } from "@components/Dashboard/StatusBadge";

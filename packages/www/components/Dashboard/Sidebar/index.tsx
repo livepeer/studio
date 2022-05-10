@@ -26,7 +26,6 @@ import { useApi } from "../../../hooks";
 import Router from "next/router";
 
 const NavLink = styled(A, {
-  textDecoration: "none",
   fontSize: "$3",
   display: "flex",
   alignItems: "center",
@@ -104,7 +103,7 @@ const Sidebar = ({ id }) => {
         </DropdownMenu>
         <ThemeSwitch />
       </Flex>
-      <Grid css={{ px: "$4" }} gap="3">
+      <Grid css={{ px: "$4", a: { textDecoration: "none" } }} gap="3">
         <Link href="/dashboard" passHref>
           <NavLink>
             <HomeIcon active={id === "home"} />
