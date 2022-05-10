@@ -1,4 +1,4 @@
-import { Box, Flex } from "@livepeer.com/design-system";
+import { Box, Flex } from "@livepeer/design-system";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";

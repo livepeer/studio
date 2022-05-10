@@ -1,10 +1,4 @@
-import {
-  Container,
-  Box,
-  Flex,
-  Text,
-  Heading,
-} from "@livepeer.com/design-system";
+import { Container, Box, Flex, Text, Heading } from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 import Button from "@components/Marketing/Button";
 import Link from "next/link";
@@ -63,7 +57,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
             }}>
             <Flex direction="column">
               <Text
-                variant="violet"
+                variant="primary"
                 size="5"
                 css={{ fontWeight: 600, mb: "$4" }}>
                 {title}

@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import {
-  Flex,
-  Heading,
-  Link as A,
-  Text,
-  Box,
-} from "@livepeer.com/design-system";
+import { Flex, Heading, Link as A, Text, Box } from "@livepeer/design-system";
 
 const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
   return (
@@ -41,7 +35,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           <Link href="/docs/guides/media-server/introduction" passHref>
             <A
               target="_blank"
-              variant="violet"
+              variant="primary"
               css={{ display: "flex", ai: "center", mb: "$5" }}>
               <Box>Learn more</Box>
               <ArrowRightIcon />
@@ -51,7 +45,7 @@ const MediaServerTable = ({ title = "Media Server" }: { title?: string }) => {
           <Link href="/docs/guides/media-server/downloads" passHref>
             <A
               target="_blank"
-              variant="violet"
+              variant="primary"
               css={{
                 display: "flex",
                 ai: "center",

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
@@ -177,40 +177,46 @@ const Index = ({ userId, id }: TokenTableProps) => {
         whole account. Treat them like you would a password.
       </Box>
       <Table sx={{ gridTemplateColumns: "auto 1fr auto" }}>
-        <TableRow variant={TableRowVariant.Header}>
-          <Box></Box>
-          <Box>Name</Box>
-          <Box>Last Active</Box>
-        </TableRow>
-        {tokens.map((token) => {
-          const { id, name, lastSeen } = token;
-          let formattedLastSeen = <em>unused</em>;
-          if (lastSeen) {
-            formattedLastSeen = (
-              <span>
-                {new Date(lastSeen).toLocaleDateString()}&nbsp;
-                {new Date(lastSeen).toLocaleTimeString()}
-              </span>
+        <>
+          <TableRow variant={TableRowVariant.Header}>
+            <>
+              <Box></Box>
+              <Box>Name</Box>
+              <Box>Last Active</Box>
+            </>
+          </TableRow>
+          {tokens.map((token) => {
+            const { id, name, lastSeen } = token;
+            let formattedLastSeen = <em>unused</em>;
+            if (lastSeen) {
+              formattedLastSeen = (
+                <span>
+                  {new Date(lastSeen).toLocaleDateString()}&nbsp;
+                  {new Date(lastSeen).toLocaleTimeString()}
+                </span>
+              );
+            }
+            const selected = selectedToken && selectedToken.id === id;
+            return (
+              <TableRow
+                selected={selected}
+                key={id}
+                onClick={() => {
+                  if (selected) {
+                    setSelectedToken(null);
+                  } else {
+                    setSelectedToken(token);
+                  }
+                }}>
+                <>
+                  <Checkbox value={selected} />
+                  <Box>{name}</Box>
+                  <Box>{formattedLastSeen}</Box>
+                </>
+              </TableRow>
             );
-          }
-          const selected = selectedToken && selectedToken.id === id;
-          return (
-            <TableRow
-              selected={selected}
-              key={id}
-              onClick={() => {
-                if (selected) {
-                  setSelectedToken(null);
-                } else {
-                  setSelectedToken(token);
-                }
-              }}>
-              <Checkbox value={selected} />
-              <Box>{name}</Box>
-              <Box>{formattedLastSeen}</Box>
-            </TableRow>
-          );
-        })}
+          })}
+        </>
       </Table>
     </Container>
   );

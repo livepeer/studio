@@ -8,7 +8,7 @@ import {
   Text,
   Container,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";

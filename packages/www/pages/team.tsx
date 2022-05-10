@@ -1,6 +1,6 @@
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
-import { Container, Box, Heading, Text } from "@livepeer.com/design-system";
+import { Container, Box, Heading, Text } from "@livepeer/design-system";
 import Prefooter from "@components/Marketing/Prefooter";
 import TeamSection from "../components/Marketing/TeamSection";
 import Guides from "@components/Marketing/Guides";

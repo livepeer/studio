@@ -1,13 +1,4 @@
-import { ThemeProvider } from "next-themes";
-import {
-  global,
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  Flex,
-  Box,
-  SnackbarProvider,
-} from "@livepeer.com/design-system";
+import { Flex, Box } from "@livepeer/design-system";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
 import ReactGA from "react-ga";
@@ -15,8 +6,7 @@ import Router from "next/router";
 import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
-
-const DEFAULT_THEME = "system";
+import { DEFAULT_THEME } from "@lib/theme";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -34,34 +24,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const globalStyles = global({
-  body: {
-    margin: 0,
-    backgroundColor: "$loContrast",
-    fontFamily: "$untitled",
-    color: "$hiContrast",
-  },
-
-  "h1, h2, h3, h4, h5": { fontWeight: 500 },
-
-  "body, button": {
-    fontFamily: "$untitled",
-  },
-
-  svg: { display: "block" },
-
-  "pre, code": { margin: 0, fontFamily: "$mono" },
-
-  "#__next": {
-    position: "relative",
-    zIndex: 0,
-  },
-
-  "#hubspot-messages-iframe-container iframe": {
-    colorScheme: "auto",
-  },
-});
-
 interface Props {
   title?: string;
   children?: JSX.Element[] | JSX.Element;
@@ -73,20 +35,6 @@ interface Props {
   preview?: boolean;
   theme?: string;
   css?: Record<string, any>;
-}
-
-export function ContextProviders({ theme = DEFAULT_THEME, children }) {
-  return (
-    <DesignSystemProvider>
-      <ThemeProvider
-        disableTransitionOnChange
-        attribute="class"
-        defaultTheme={theme}
-        value={{ dark: darkTheme.className, light: lightTheme.className }}>
-        <SnackbarProvider>{children}</SnackbarProvider>
-      </ThemeProvider>
-    </DesignSystemProvider>
-  );
 }
 
 function Layout({
@@ -107,8 +55,6 @@ function Layout({
       hotjar.initialize(2525106, 6);
     }
   }, []);
-
-  globalStyles();
 
   let seo = {
     title,
@@ -134,38 +80,36 @@ function Layout({
   }
 
   return (
-    <ContextProviders theme={theme}>
-      <Flex
-        css={{
-          flexGrow: 1,
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          zIndex: 1,
-          position: "relative",
-          ...css,
-        }}>
-        <NextSeo {...seo} />
-        {preview && (
-          <Box
-            css={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 24,
-              fontSize: 12,
-              fontWeight: 500,
-              backgroundColor: "$violet9",
-              color: "white",
-              lineHeight: "32px",
-            }}>
-            Preview Mode
-          </Box>
-        )}
-        <DefaultNav />
-        {children}
-        <Footer />
-      </Flex>
-    </ContextProviders>
+    <Flex
+      css={{
+        flexGrow: 1,
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        zIndex: 1,
+        position: "relative",
+        ...css,
+      }}>
+      <NextSeo {...seo} />
+      {preview && (
+        <Box
+          css={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 24,
+            fontSize: 12,
+            fontWeight: 500,
+            backgroundColor: "$violet9",
+            color: "white",
+            lineHeight: "32px",
+          }}>
+          Preview Mode
+        </Box>
+      )}
+      <DefaultNav />
+      {children}
+      <Footer />
+    </Flex>
   );
 }
 

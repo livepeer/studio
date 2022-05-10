@@ -13,7 +13,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
@@ -111,7 +111,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
       <Flex css={{ ai: "center" }}>
         <Button
           size="2"
-          variant="violet"
+          variant="primary"
           onClick={() => {
             setOpen(true);
           }}>
@@ -127,10 +127,12 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           as="form"
           onSubmit={handleSubmit(onSubmit)}
           id="billing-stripe-form">
-          <AlertDialogTitle as={Heading} size="1">
-            {!user.stripeCustomerPaymentMethodId
-              ? "Add payment method"
-              : "Change payment method"}
+          <AlertDialogTitle asChild>
+            <Heading size="1">
+              {!user.stripeCustomerPaymentMethodId
+                ? "Add payment method"
+                : "Change payment method"}
+            </Heading>
           </AlertDialogTitle>
 
           <AlertDialogDescription css={{ mt: "$4" }}>
@@ -316,14 +318,15 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-            <AlertDialogCancel
-              size="2"
-              onClick={() => {
-                setOpen(false);
-              }}
-              as={Button}
-              ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button
+                size="2"
+                onClick={() => {
+                  setOpen(false);
+                }}
+                ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
             <Button
               size="2"
@@ -332,7 +335,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
               disabled={
                 !["initial", "succeeded", "error"].includes(status) || !stripe
               }
-              variant="violet">
+              variant="primary">
               {status === "processing" && (
                 <Spinner
                   css={{

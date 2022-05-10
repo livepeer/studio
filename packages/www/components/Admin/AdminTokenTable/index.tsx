@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useState, useMemo } from "react";
 import { useApi } from "hooks";

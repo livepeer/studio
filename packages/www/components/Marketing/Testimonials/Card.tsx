@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@livepeer.com/design-system";
+import { Box, Flex, Text } from "@livepeer/design-system";
 
 export type CardProps = {
   id: string;

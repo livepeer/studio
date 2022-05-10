@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, Kbd } from "@livepeer.com/design-system";
+import { Box, Text, Kbd } from "@livepeer/design-system";
 import TableContainer from "./TableContainer";
 
 type KeyboardDef = {

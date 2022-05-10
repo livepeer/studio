@@ -8,7 +8,7 @@ import {
   TextField,
   Button,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import LinksList, { LinksListProps } from "./LinksList";
 import { useState, useEffect } from "react";
 import { useApi, useMailchimp } from "hooks";

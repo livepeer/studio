@@ -1,6 +1,6 @@
 import * as React from "react";
 import NextLink from "next/link";
-import * as DS from "@livepeer.com/design-system";
+import * as DS from "@livepeer/design-system";
 import { Link2Icon } from "@radix-ui/react-icons";
 import { IdProvider } from "@radix-ui/react-id";
 import Table from "./Table";
@@ -107,7 +107,7 @@ export const components = {
       return (
         <DS.Link
           {...props}
-          variant="violet"
+          variant="primary"
           href={href}
           css={{ fontSize: "inherit" }}
           target="_blank"
@@ -183,7 +183,7 @@ export const components = {
       <DS.Code {...props} />
     ) : (
       <DocCodeBlock
-        variant="violet"
+        variant="primary"
         isHighlightingLines={line !== undefined}
         className={className}
         isHero={hero !== undefined}

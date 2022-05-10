@@ -1,5 +1,5 @@
 import Layout from "../../../layouts/dashboard";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import TokenTable from "components/Dashboard/TokenTable";
 import { DashboardAPIkeys as Content } from "content";

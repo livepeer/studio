@@ -1,4 +1,4 @@
-import { Box, Grid, Text, Container } from "@livepeer.com/design-system";
+import { Box, Grid, Text, Container } from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 
 const investorIds = [

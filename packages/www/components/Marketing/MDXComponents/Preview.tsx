@@ -1,4 +1,4 @@
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 const Preview = ({ css, ...props }) => (
   <Box

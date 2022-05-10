@@ -1,10 +1,9 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import { DefaultNav } from "@components/Marketing/Navigation";
 import Footer from "@components/Marketing/Footer";
-import { IdProvider } from "@radix-ui/react-id";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -13,13 +12,6 @@ import "lazysizes/plugins/attrchange/ls.attrchange";
 import Router from "next/router";
 import { Reset, ThemeProvider } from "../lib/theme";
 import Head from "next/head";
-import { ThemeProvider as StitchesThemeProvider } from "next-themes";
-import {
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  SnackbarProvider,
-} from "@livepeer.com/design-system";
 import { hotjar } from "react-hotjar";
 
 interface Props {
@@ -93,70 +85,54 @@ const Layout = ({
     seo["canonical"] = canonical;
   }
 
-  function ContextProviders({ children }) {
-    return (
-      <DesignSystemProvider>
-        <StitchesThemeProvider
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme="light"
-          value={{ dark: darkTheme.className, light: lightTheme.className }}>
-          <SnackbarProvider>{children}</SnackbarProvider>
-        </StitchesThemeProvider>
-      </DesignSystemProvider>
-    );
-  }
-
   return (
-    <ContextProviders>
-      <IdProvider>
-        <Head>
-          <link rel="stylesheet" href="/reset.css" />
-          <link rel="stylesheet" href="/markdown.css" />
-        </Head>
-        <ThemeProvider>
-          <Reset />
-          <Box sx={{ minHeight: "100vh" }}>
-            <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
-              <NextSeo {...seo} />
-              <Flex
-                sx={{
-                  flexGrow: 1,
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  zIndex: 1,
-                  position: "relative",
-                }}>
-                {preview && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      textDecoration: "none",
-                      justifyContent: "center",
-                      height: 24,
-                      fontSize: 12,
-                      fontWeight: "500",
-                      bg: "primary",
-                      color: "white",
-                      lineHeight: "32px",
-                    }}>
-                    Preview Mode
-                  </Box>
-                )}
-                {customNav ? (
-                  customNav
-                ) : (
-                  <DefaultNav backgroundColor={backgroundColor} />
-                )}
-                <Box css={{ position: "relative" }}>{children}</Box>
-              </Flex>
-              <Footer />
+    <>
+      <Head>
+        <link rel="stylesheet" href="/reset.css" />
+        <link rel="stylesheet" href="/markdown.css" />
+      </Head>
+      <ThemeProvider>
+        <Reset />
+        <Box sx={{ minHeight: "100vh" }}>
+          <Flex sx={{ flexDirection: "column", minHeight: "100vh" }}>
+            <NextSeo {...seo} />
+            <Flex
+              sx={{
+                flexGrow: 1,
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                zIndex: 1,
+                position: "relative",
+              }}>
+              {preview && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    textDecoration: "none",
+                    justifyContent: "center",
+                    height: 24,
+                    fontSize: 12,
+                    fontWeight: "500",
+                    bg: "primary",
+                    color: "white",
+                    lineHeight: "32px",
+                  }}>
+                  Preview Mode
+                </Box>
+              )}
+              {customNav ? (
+                customNav
+              ) : (
+                <DefaultNav backgroundColor={backgroundColor} />
+              )}
+              <Box css={{ position: "relative" }}>{children}</Box>
             </Flex>
-          </Box>
-        </ThemeProvider>
-      </IdProvider>
-    </ContextProviders>
+            <Footer />
+          </Flex>
+        </Box>
+      </ThemeProvider>
+    </>
   );
 };
 

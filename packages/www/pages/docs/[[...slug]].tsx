@@ -1,4 +1,4 @@
-import { Container, Grid, Box, global } from "@livepeer.com/design-system";
+import { Container, Grid, Box, globalCss } from "@livepeer/design-system";
 import DocsNav from "@components/Marketing/Navigation/docs";
 import TableOfContents from "@components/Marketing/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
@@ -9,8 +9,9 @@ import { useRouter } from "next/router";
 import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
-import { components } from "@components/Marketing/MDXComponents";
-import { ContextProviders } from "layouts/main";
+
+const MDXComponents = require("@components/Marketing/MDXComponents");
+const { components } = MDXComponents;
 
 const categories = [
   {
@@ -48,7 +49,7 @@ const defaultSEO: NextSeoProps = {
   },
 };
 
-const globalStyles = global({
+const globalStyles = globalCss({
   body: {
     margin: 0,
     backgroundColor: "$loContrast",
@@ -115,7 +116,7 @@ const DocsIndex = ({ doc, menu }) => {
   }, [router.asPath, doc.frontMatter]);
 
   return (
-    <ContextProviders>
+    <>
       <NextSeo {...resolvedSEO} />
       <Box
         css={{
@@ -181,7 +182,7 @@ const DocsIndex = ({ doc, menu }) => {
           </Grid>
         </Container>
       </Box>
-    </ContextProviders>
+    </>
   );
 };
 

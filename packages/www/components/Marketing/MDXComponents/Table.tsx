@@ -1,4 +1,4 @@
-import { Box, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Text, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 import TableContainer from "./TableContainer";
 
@@ -63,7 +63,7 @@ const Table = ({
                 }}>
                 {key === "link" ? (
                   <Link href={value as string} passHref>
-                    <A variant="violet">{value}</A>
+                    <A variant="primary">{value}</A>
                   </Link>
                 ) : (
                   <Text>{value}</Text>

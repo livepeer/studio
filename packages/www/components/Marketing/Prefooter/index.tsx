@@ -5,7 +5,7 @@ import {
   Flex,
   Box,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import Guides from "@components/Marketing/Guides";
 import Link from "next/link";

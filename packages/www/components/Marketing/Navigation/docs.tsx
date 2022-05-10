@@ -8,7 +8,7 @@ import {
   Dialog,
   DialogContent,
   DialogClose,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import Logo from "@components/Marketing/Logo";
 import { useApi } from "hooks";
@@ -105,7 +105,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
             </Box>
           </Flex>
           <Dialog>
-            <DialogTrigger as={Flex}>
+            <DialogTrigger asChild>
               <Flex
                 css={{
                   color: "$hiContrast",
@@ -131,7 +131,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                   top: 20,
                   cursor: "pointer",
                 }}>
-                <DialogClose as={Box}>
+                <DialogClose asChild>
                   <Cross1Icon />
                 </DialogClose>
               </Box>

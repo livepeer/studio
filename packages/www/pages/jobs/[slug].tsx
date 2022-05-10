@@ -1,4 +1,4 @@
-import { Box, Container, Heading, Grid } from "@livepeer.com/design-system";
+import { Box, Container, Heading, Grid } from "@livepeer/design-system";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Button as ThemeUIButton } from "@theme-ui/components";
 import Ink from "react-ink";

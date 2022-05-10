@@ -1,13 +1,7 @@
 import readingTime from "reading-time";
 import { blocksToText } from "lib/utils";
 import Link from "next/link";
-import {
-  Flex,
-  Box,
-  Text,
-  Heading,
-  Link as A,
-} from "@livepeer.com/design-system";
+import { Flex, Box, Text, Heading, Link as A } from "@livepeer/design-system";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "lib/client";
 import Image from "next/image";

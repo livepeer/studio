@@ -19,7 +19,7 @@ import {
   Tooltip,
   Checkbox,
   styled,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
@@ -189,8 +189,8 @@ const CreateTokenDialog = ({
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         {!newToken && (
           <>
-            <AlertDialogTitle as={Heading} size="1">
-              Create key
+            <AlertDialogTitle asChild>
+              <Heading size="1">Create key</Heading>
             </AlertDialogTitle>
             <Box
               as="form"
@@ -211,12 +211,13 @@ const CreateTokenDialog = ({
                   setCreating(false);
                 }
               }}>
-              <AlertDialogDescription
-                as={Text}
-                size="3"
-                variant="gray"
-                css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
-                Enter a name for your key to differentiate it from other keys.
+              <AlertDialogDescription asChild>
+                <Text
+                  size="3"
+                  variant="gray"
+                  css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
+                  Enter a name for your key to differentiate it from other keys.
+                </Text>
               </AlertDialogDescription>
 
               <Flex direction="column" gap="2">
@@ -235,7 +236,9 @@ const CreateTokenDialog = ({
                   <Checkbox
                     id="allowCors"
                     checked={allowCors}
-                    onCheckedChange={(e) => setAllowCors(e.target.checked)}
+                    onCheckedChange={(checked: boolean) =>
+                      setAllowCors(checked)
+                    }
                   />
                   <Tooltip
                     content="This will allow the API key to be used directly from the browser. It is recommended only for development purposes since including your API key in web pages will expose it to the world."
@@ -283,7 +286,7 @@ const CreateTokenDialog = ({
                       <Button
                         css={{ ml: "$1" }}
                         size="3"
-                        variant="violet"
+                        variant="primary"
                         disabled={!isNewOriginValid}
                         onClick={(e) => {
                           e.preventDefault();
@@ -350,8 +353,11 @@ const CreateTokenDialog = ({
                       <Checkbox
                         id="corsFullAccess"
                         checked={cors.fullAccess ?? false}
-                        onCheckedChange={(e) =>
-                          setCors({ ...cors, fullAccess: e.target.checked })
+                        onCheckedChange={(checked: boolean) =>
+                          setCors({
+                            ...cors,
+                            fullAccess: checked,
+                          })
                         }
                       />
                       <Tooltip
@@ -380,14 +386,16 @@ const CreateTokenDialog = ({
               </Flex>
 
               <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-                <AlertDialogCancel size="2" as={Button} ghost>
-                  Cancel
+                <AlertDialogCancel asChild>
+                  <Button size="2" ghost>
+                    Cancel
+                  </Button>
                 </AlertDialogCancel>
                 <Button
                   size="2"
                   disabled={creating}
                   type="submit"
-                  variant="violet">
+                  variant="primary">
                   {creating && (
                     <Spinner
                       css={{
@@ -406,21 +414,21 @@ const CreateTokenDialog = ({
         )}
         {newToken && (
           <Box>
-            <AlertDialogTitle as={Heading} size="1">
-              Token Created
+            <AlertDialogTitle asChild>
+              <Heading size="1">Token Created</Heading>
             </AlertDialogTitle>
-            <AlertDialogDescription
-              as={Text}
-              size="3"
-              variant="gray"
-              css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
-              <Box>
-                <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-
-                <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
-                  <ClipBut text={newToken.id} />
-                </Button>
-              </Box>
+            <AlertDialogDescription asChild>
+              <Text
+                size="3"
+                variant="gray"
+                css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
+                <Box>
+                  <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
+                  <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
+                    <ClipBut text={newToken.id} />
+                  </Button>
+                </Box>
+              </Text>
             </AlertDialogDescription>
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
               <Button onClick={() => onClose()} size="2">

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Modal from "../Modal";
 import { Box, Button, Flex, Spinner } from "@theme-ui/components";
@@ -10,6 +10,7 @@ type ConfirmationModalProps = {
   onClose: Function;
   onAction: Function;
   numStreamsToDelete?: number;
+  children?: JSX.Element;
 };
 
 const ConfirmationModal: FunctionComponent<ConfirmationModalProps> = ({

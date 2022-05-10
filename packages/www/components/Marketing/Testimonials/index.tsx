@@ -1,4 +1,4 @@
-import { Box, Grid, Container } from "@livepeer.com/design-system";
+import { Box, Grid, Container } from "@livepeer/design-system";
 import Card, { CardProps } from "./Card";
 import Guides from "@components/Marketing/Guides";
 import CBSIcon from "../../../public/img/testimonials/cbs-interactive/logo.svg";

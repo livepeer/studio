@@ -5,7 +5,7 @@ import { StreamInfo } from "hooks/use-api";
 import Logger from "@components/Dashboard/Logger";
 import Chart from "@components/Dashboard/Chart";
 import HealthChecksTable from "@components/Dashboard/HealthChecksTable";
-import { Text, Box, Heading } from "@livepeer.com/design-system";
+import { Text, Box, Heading } from "@livepeer/design-system";
 
 const ingestInterval = 10 * 1000;
 const maxItems = 6;

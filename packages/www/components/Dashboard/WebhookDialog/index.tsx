@@ -18,13 +18,12 @@ import {
   Heading,
   styled,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import Spinner from "components/Dashboard/Spinner";
 import { Webhook } from "@livepeer.com/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
-import urlBuilder from "@sanity/image-url";
-import uuid from "uuid/v4";
+import { v4 as uuid } from "uuid";
 
 const StyledCrossIcon = styled(Cross1Icon, {
   cursor: "pointer",
@@ -104,13 +103,15 @@ const WebhookDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       {button}
-      <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          {action === Action.Create
-            ? "Add a webhook endpoint"
-            : "Update webhook endpoint"}
+      <AlertDialogContent
+        css={{ width: 450, maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
+        <AlertDialogTitle asChild>
+          <Heading size="1">
+            {action === Action.Create
+              ? "Add a webhook endpoint"
+              : "Update webhook endpoint"}
+          </Heading>
         </AlertDialogTitle>
-
         <Box
           as="form"
           css={{
@@ -180,18 +181,17 @@ const WebhookDialog = ({
                 width: "100%",
                 top: 50,
               }}>
-              <DropdownMenuTrigger as={Box}>
-                <Select disabled css={{ fontSize: "$3", p: "$1" }}>
-                  <Box as="option" value="" disabled selected>
-                    Select events...
-                  </Box>
-                </Select>
+              <DropdownMenuTrigger asChild>
+                <Box>
+                  <Select disabled css={{ fontSize: "$3", p: "$1" }}>
+                    <Box as="option" value="" disabled selected>
+                      Select events...
+                    </Box>
+                  </Select>
+                </Box>
               </DropdownMenuTrigger>
               <Box css={{ position: "relative" }}>
-                <StyledContent
-                  disableOutsidePointerEvents={false}
-                  css={{ transform: "none" }}
-                  portalled={false}>
+                <StyledContent css={{ transform: "none" }} portalled={false}>
                   <DropdownMenuGroup>
                     {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
@@ -265,19 +265,17 @@ const WebhookDialog = ({
           </Flex>
           <Box>
             <Flex css={{ ai: "center", jc: "flex-end" }}>
-              <AlertDialogCancel
-                disabled={saving}
-                as={Button}
-                size="2"
-                css={{ mr: "$2" }}>
-                Cancel
+              <AlertDialogCancel asChild>
+                <Button disabled={saving} size="2" css={{ mr: "$2" }}>
+                  Cancel
+                </Button>
               </AlertDialogCancel>
               <Button
                 css={{ display: "flex", ai: "center" }}
                 type="submit"
                 size="2"
                 disabled={saving}
-                variant="violet">
+                variant="primary">
                 {saving && (
                   <Spinner
                     css={{

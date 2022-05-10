@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { Badge } from "@livepeer.com/design-system";
+import { Badge } from "@livepeer/design-system";
 import { useApi } from "hooks";
 import { useCallback } from "react";
 
@@ -18,7 +18,7 @@ const ActiveStreamsBadge = () => {
     return null;
   }
   return (
-    <Badge size="1" variant="violet" css={{ letterSpacing: 0, mt: "7px" }}>
+    <Badge size="1" variant="primary" css={{ letterSpacing: 0, mt: "7px" }}>
       {data?.count} active right now
     </Badge>
   );

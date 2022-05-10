@@ -12,7 +12,7 @@ import {
   Link as A,
   Tooltip,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.com/api";
 
 import {
@@ -54,7 +54,7 @@ const defaultEmptyState = (
       Multistream targets are sent the live media from the stream.
     </Text>
     <Link href="/docs/api-reference/session/overview" passHref>
-      <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+      <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
         <Box>Learn more</Box>
         <ArrowRightIcon />
       </A>
@@ -88,7 +88,7 @@ const MultistreamTargetsTable = ({
   const saveDialogState = useToggleState();
   const errorRecordDialogState = useToggleState();
 
-  const columns: Column<TargetsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Name",

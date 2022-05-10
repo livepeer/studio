@@ -1,4 +1,4 @@
-import { styled, Box } from "@livepeer.com/design-system";
+import { styled, Box } from "@livepeer/design-system";
 import { Children, isValidElement } from "react";
 
 const BreadcrumbsOl = styled("ol", {

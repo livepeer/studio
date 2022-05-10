@@ -10,7 +10,7 @@ import {
   Heading,
   Text,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
@@ -128,7 +128,7 @@ const Verify = ({
                       as="a"
                       size="2"
                       css={{ cursor: "default" }}
-                      variant="violet"
+                      variant="primary"
                       onClick={() => resendVerificationEmail()}>
                       {loading && (
                         <Spinner

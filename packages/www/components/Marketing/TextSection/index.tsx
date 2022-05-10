@@ -1,5 +1,5 @@
 import SimpleBlockContent from "../SimpleBlockContent";
-import { Container, Box } from "@livepeer.com/design-system";
+import { Container, Box } from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 
 const TextSection = ({ text }) => (

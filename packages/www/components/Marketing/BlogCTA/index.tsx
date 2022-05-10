@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Flex } from "@livepeer.com/design-system";
+import { Flex } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import Link from "next/link";
 

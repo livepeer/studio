@@ -8,7 +8,7 @@ import {
   Button,
   Box,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 
@@ -73,7 +73,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="primary">
                 <Box css={{ mr: "$1" }}>Getting started tutorial</Box>
                 <ArrowRightIcon />
               </Button>
@@ -118,7 +118,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="primary">
                 <Box css={{ mr: "$1" }}>Explore the API</Box>
                 <ArrowRightIcon />
               </Button>
@@ -153,7 +153,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="primary">
                 <Box css={{ mr: "$1" }}>Clone and create</Box>
                 <ArrowRightIcon />
               </Button>
@@ -191,7 +191,7 @@ const GettingStarted = ({ firstName = "" }) => {
                   ai: "center",
                 }}
                 size="2"
-                variant="violet">
+                variant="primary">
                 <Box css={{ mr: "$1" }}>Downloads</Box>
                 <ArrowRightIcon />
               </Button>

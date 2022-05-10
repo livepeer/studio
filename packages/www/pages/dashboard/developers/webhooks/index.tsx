@@ -1,6 +1,6 @@
 import Layout from "layouts/dashboard";
 import { useApi, useLoggedIn } from "hooks";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import WebhooksTable from "components/Dashboard/WebhooksTable";
 
 const ApiKeys = () => {

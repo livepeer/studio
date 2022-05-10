@@ -6,7 +6,7 @@ import {
   Button,
   Text,
   styled,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/Dashboard/PlanForm";
 import { products } from "@livepeer.com/api/src/config";
@@ -190,7 +190,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 disabled={
                   dashboard && stripeProductId === "prod_0" ? true : false
                 }
-                variant="violet"
+                variant="primary"
                 stripeProductId="prod_0"
                 onClick={() => {
                   if (!dashboard) {
@@ -253,7 +253,7 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
                 disabled={
                   dashboard && stripeProductId === "prod_1" ? true : false
                 }
-                variant="violet"
+                variant="primary"
                 stripeProductId="prod_1"
                 onClick={() => {
                   if (dashboard) {

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Post from "../../blog/[slug]";
 import { GraphQLClient } from "graphql-request";

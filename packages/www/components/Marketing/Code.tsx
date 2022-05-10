@@ -1,6 +1,6 @@
 import Highlight, { defaultProps } from "prism-react-renderer";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 const Code = ({
   language,

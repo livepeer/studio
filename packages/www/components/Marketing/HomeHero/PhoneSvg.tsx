@@ -1,6 +1,6 @@
 import { getAspectRatio } from "lib/utils";
 import { forwardRef } from "react";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 export const phoneFrameMaxWidth = 788;
 export const phoneFrameMaxHeight = 394;

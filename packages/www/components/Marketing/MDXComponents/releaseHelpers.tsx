@@ -1,5 +1,5 @@
 import React from "react";
-import { Paragraph, Badge, Link, Text } from "@livepeer.com/design-system";
+import { Paragraph, Badge, Link, Text } from "@livepeer/design-system";
 
 export function PackageRelease({
   name,

@@ -11,7 +11,7 @@ import {
   Heading,
   Text,
   DropdownMenuItem,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
@@ -38,56 +38,56 @@ const Terminate = ({ stream, invalidate, ...props }) => {
       </Box>
 
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Terminate stream?
+        <AlertDialogTitle asChild>
+          <Heading size="1">Terminate stream?</Heading>
         </AlertDialogTitle>
-        <AlertDialogDescription
-          as={Text}
-          size="3"
-          variant="gray"
-          css={{ mt: "$2", lineHeight: "22px" }}>
-          {message}
+        <AlertDialogDescription asChild>
+          <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
+            {message}
+          </Text>
         </AlertDialogDescription>
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-          <AlertDialogCancel
-            size="2"
-            onClick={() => {
-              setMessage(initialMessage);
-              setOpen(false);
-            }}
-            as={Button}
-            ghost>
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction
-            size="2"
-            as={Button}
-            disabled={saving}
-            onClick={async (e) => {
-              e.preventDefault();
-              try {
-                setSaving(true);
-                await terminateStream(stream.id);
-                await invalidate();
-                setSaving(false);
+          <AlertDialogCancel asChild>
+            <Button
+              size="2"
+              onClick={() => {
+                setMessage(initialMessage);
                 setOpen(false);
-              } catch (e) {
-                setMessage(e.toString());
-                setSaving(false);
-              }
-            }}
-            variant="red">
-            {saving && (
-              <Spinner
-                css={{
-                  color: "$hiContrast",
-                  width: 16,
-                  height: 16,
-                  mr: "$2",
-                }}
-              />
-            )}
-            Terminate
+              }}
+              ghost>
+              Cancel
+            </Button>
+          </AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button
+              size="2"
+              disabled={saving}
+              onClick={async (e) => {
+                e.preventDefault();
+                try {
+                  setSaving(true);
+                  await terminateStream(stream.id);
+                  await invalidate();
+                  setSaving(false);
+                  setOpen(false);
+                } catch (e) {
+                  setMessage(e.toString());
+                  setSaving(false);
+                }
+              }}
+              variant="red">
+              {saving && (
+                <Spinner
+                  css={{
+                    color: "$hiContrast",
+                    width: 16,
+                    height: 16,
+                    mr: "$2",
+                  }}
+                />
+              )}
+              Terminate
+            </Button>
           </AlertDialogAction>
         </Flex>
       </AlertDialogContent>

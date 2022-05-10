@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
@@ -13,7 +13,7 @@ function dur2str(dur?: number) {
   return `${dur} sec (${min} min)`;
 }
 
-const Index = ({ id }: { id: string }) => {
+const Index = ({ id }: { id: string }, children) => {
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [fromTime, setFromTime] = useState("");
@@ -94,20 +94,26 @@ const Index = ({ id }: { id: string }) => {
         </Button>
       </Box>
       <Table sx={{ gridTemplateColumns: "auto auto auto auto auto" }}>
-        <TableRow variant={TableRowVariant.Header} key="usage header">
-          <Box></Box>
-          <Box>Source seconds</Box>
-          <Box>Transcoded seconds</Box>
-          <Box>Source segments</Box>
-          <Box>Transcoded segments</Box>
-        </TableRow>
-        <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
-          <Box></Box>
-          <Box>{dur2str(usage && usage.sourceSegmentsDuration)}</Box>
-          <Box>{dur2str(usage && usage.transcodedSegmentsDuration)}</Box>
-          <Box>{usage && usage.sourceSegments}</Box>
-          <Box>{usage && usage.transcodedSegments}</Box>
-        </TableRow>
+        <>
+          <TableRow variant={TableRowVariant.Header} key="usage header">
+            <>
+              <Box></Box>
+              <Box>Source seconds</Box>
+              <Box>Transcoded seconds</Box>
+              <Box>Source segments</Box>
+              <Box>Transcoded segments</Box>
+            </>
+          </TableRow>
+          <TableRow key="just one row for now" variant={TableRowVariant.Normal}>
+            <>
+              <Box></Box>
+              <Box>{dur2str(usage && usage.sourceSegmentsDuration)}</Box>
+              <Box>{dur2str(usage && usage.transcodedSegmentsDuration)}</Box>
+              <Box>{usage && usage.sourceSegments}</Box>
+              <Box>{usage && usage.transcodedSegments}</Box>
+            </>
+          </TableRow>
+        </>
       </Table>
     </Container>
   );

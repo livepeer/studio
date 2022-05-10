@@ -8,7 +8,7 @@ import {
   Heading,
   TextArea,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
 import Button from "@components/Marketing/Button";
 import Fade from "react-reveal/Fade";

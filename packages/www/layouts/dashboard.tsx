@@ -1,12 +1,4 @@
-import { ThemeProvider } from "next-themes";
-import {
-  global,
-  darkTheme,
-  lightTheme,
-  DesignSystemProvider,
-  Box,
-  SnackbarProvider,
-} from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
@@ -36,33 +28,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const globalStyles = global({
-  body: {
-    margin: 0,
-    backgroundColor: "$loContrast",
-    fontFamily: "$untitled",
-  },
-
-  "h1, h2, h3, h4, h5": { fontWeight: 500 },
-
-  "body, button": {
-    fontFamily: "$untitled",
-  },
-
-  svg: { display: "block" },
-
-  "pre, code": { margin: 0, fontFamily: "$mono" },
-
-  "#__next": {
-    position: "relative",
-    zIndex: 0,
-  },
-
-  "#hubspot-messages-iframe-container iframe": {
-    colorScheme: "auto",
-  },
-});
-
 type Breadcrumb = {
   title: string;
   href?: string;
@@ -78,22 +43,6 @@ interface Props {
   image?: any;
   url?: string;
   canonical?: string;
-}
-
-function ContextProviders({ children }) {
-  return (
-    <Elements stripe={getStripe()}>
-      <DesignSystemProvider>
-        <ThemeProvider
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme="system"
-          value={{ dark: darkTheme.className, light: lightTheme.className }}>
-          <SnackbarProvider>{children}</SnackbarProvider>
-        </ThemeProvider>
-      </DesignSystemProvider>
-    </Elements>
-  );
 }
 
 function DashboardLayout({
@@ -114,8 +63,6 @@ function DashboardLayout({
       hotjar.initialize(2525106, 6);
     }
   }, []);
-
-  globalStyles();
 
   let seo = {
     title,
@@ -143,7 +90,7 @@ function DashboardLayout({
   return (
     <>
       {requireLoggedIn && <DashboardRedirect />}
-      <ContextProviders>
+      <Elements stripe={getStripe()}>
         <Head>
           <meta name="viewport" content="width=1023" />
         </Head>
@@ -159,7 +106,7 @@ function DashboardLayout({
             {children}
           </Box>
         </Box>
-      </ContextProviders>
+      </Elements>
     </>
   );
 }

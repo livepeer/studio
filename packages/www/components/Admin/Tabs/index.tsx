@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import { Box, Container } from "@theme-ui/components";

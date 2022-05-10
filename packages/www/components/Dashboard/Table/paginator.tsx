@@ -1,4 +1,4 @@
-import { Button } from "@livepeer.com/design-system";
+import { Button } from "@livepeer/design-system";
 
 interface Props {
   canPreviousPage: boolean;

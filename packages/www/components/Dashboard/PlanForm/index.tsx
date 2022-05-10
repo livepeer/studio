@@ -14,7 +14,7 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
 import { products } from "@livepeer.com/api/src/config";
@@ -202,17 +202,18 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             as="form"
             onSubmit={handleSubmit(onSubmit)}
             id="plan-stripe-form">
-            <AlertDialogTitle as={Heading} size="1">
-              {!user.stripeCustomerPaymentMethodId
-                ? "Enter card details"
-                : "Change plan"}
+            <AlertDialogTitle asChild>
+              <Heading size="1">
+                {!user.stripeCustomerPaymentMethodId
+                  ? "Enter card details"
+                  : "Change plan"}
+              </Heading>
             </AlertDialogTitle>
 
-            <AlertDialogDescription
-              as="div"
-              css={{ mt: "$4", lineHeight: "22px" }}>
+            <AlertDialogDescription asChild>
               {!user.stripeCustomerPaymentMethodId ? (
-                <Box css={{ color: "$hiContrast", mt: "$4" }}>
+                <Box
+                  css={{ mt: "$4", lineHeight: "22px", color: "$hiContrast" }}>
                   <Box>
                     <Label css={{ mb: "$1", display: "block" }} htmlFor="name">
                       Full name
@@ -415,14 +416,15 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
             </AlertDialogDescription>
 
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
-              <AlertDialogCancel
-                size="2"
-                onClick={() => {
-                  setOpen(false);
-                }}
-                as={Button}
-                ghost>
-                Cancel
+              <AlertDialogCancel asChild>
+                <Button
+                  size="2"
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  ghost>
+                  Cancel
+                </Button>
               </AlertDialogCancel>
               <Button
                 size="2"
@@ -431,7 +433,7 @@ const PlanForm = ({ stripeProductId, text, variant, disabled, onClick }) => {
                 disabled={
                   !["initial", "succeeded", "error"].includes(status) || !stripe
                 }
-                variant="violet">
+                variant="primary">
                 {status === "processing" && (
                   <Spinner
                     css={{

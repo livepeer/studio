@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Input, Box } from "@theme-ui/components";
 import CopyBoxIcon from "./CopyBoxIcon";

@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
@@ -332,11 +332,17 @@ const ID = () => {
                 })
                 .finally(close);
             }}>
-            {!stream.suspended
-              ? `Are you sure you want to suspend and block this stream? 
-            Any active stream sessions will immediately end. 
-            New sessions will be prevented from starting until unchecked.`
-              : `Are you sure you want to allow new stream sessions again?`}
+            {!stream.suspended ? (
+              <div>
+                Are you sure you want to suspend and block this stream? Any
+                active stream sessions will immediately end. New sessions will
+                be prevented from starting until unchecked.
+              </div>
+            ) : (
+              <div>
+                Are you sure you want to allow new stream sessions again?
+              </div>
+            )}
           </ConfirmationModal>
         )}
         {terminateModal && stream && (
@@ -354,9 +360,11 @@ const ID = () => {
                 })
                 .finally(close);
             }}>
-            Are you sure you want to terminate (stop running live) stream{" "}
-            <b>{stream.name}</b>? Terminating a stream will break RTMP
-            connection.
+            <div>
+              Are you sure you want to terminate (stop running live) stream{" "}
+              <b>{stream.name}</b>? Terminating a stream will break RTMP
+              connection.
+            </div>
           </ConfirmationModal>
         )}
         {deleteModal && stream && (

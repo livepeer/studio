@@ -1,4 +1,4 @@
-import { Box, Text } from "@livepeer.com/design-system";
+import { Box, Text } from "@livepeer/design-system";
 import {
   LineChart,
   Line,

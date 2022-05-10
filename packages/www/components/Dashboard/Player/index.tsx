@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 import videojs from "video.js";
 import "videojs-contrib-quality-levels";
 import "videojs-hls-quality-selector";

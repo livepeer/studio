@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Calculator, Preview } from "./pricingCalculatorComponents";
-import { Box, Grid, Heading, Text } from "@livepeer.com/design-system";
+import { Box, Grid, Heading, Text } from "@livepeer/design-system";
 
 const PricingCalculator = () => {
   const [streamLength, setStreamLength] = useState<number>(600);

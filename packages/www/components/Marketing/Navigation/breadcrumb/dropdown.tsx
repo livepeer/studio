@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Box } from "@livepeer.com/design-system";
+import { Box } from "@livepeer/design-system";
 
 type Props = {
   children: React.ReactNode;

@@ -1,5 +1,5 @@
 import { Stream } from "@livepeer.com/api";
-import { Box, Flex, styled } from "@livepeer.com/design-system";
+import { Box, Flex, styled } from "@livepeer/design-system";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";

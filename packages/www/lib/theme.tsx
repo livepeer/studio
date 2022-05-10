@@ -2,6 +2,8 @@ import { Global } from "@emotion/core";
 import React, { memo } from "react";
 import { useThemeUI, ThemeProvider as TP, Styled } from "theme-ui";
 
+export const DEFAULT_THEME = "system";
+
 export const theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
   fonts: {
@@ -387,7 +389,7 @@ export const theme = {
   },
 };
 
-const ThemeProvider = memo(({ children, ...props }) => (
+const ThemeProvider = memo(({ children, ...props }: any) => (
   <TP theme={theme} {...props}>
     <Styled.root>{children}</Styled.root>
   </TP>

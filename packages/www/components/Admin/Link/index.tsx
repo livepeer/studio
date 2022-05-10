@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Link as A } from "@theme-ui/components";
 import NextLink from "next/link";

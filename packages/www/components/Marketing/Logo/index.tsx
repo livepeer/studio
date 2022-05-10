@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Box, Badge, Flex, Link as A } from "@livepeer.com/design-system";
+import { Box, Badge, Flex, Link as A } from "@livepeer/design-system";
 
 const Logo = ({ badge = null }) => (
   <Flex align="center">
@@ -23,7 +23,7 @@ const Logo = ({ badge = null }) => (
       </A>
     </Link>
     {badge && (
-      <Badge variant="violet" css={{ fontWeight: 700, ml: "$2", mt: "2px" }}>
+      <Badge variant="primary" css={{ fontWeight: 700, ml: "$2", mt: "2px" }}>
         {badge}
       </Badge>
     )}

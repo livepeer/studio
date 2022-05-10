@@ -1,12 +1,20 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useState, useMemo } from "react";
 import { useApi } from "hooks";
-import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.com/api/src/config";
 import CommonAdminTable from "@components/Admin/CommonAdminTable";
-import { Box, Checkbox, Label, Tooltip } from "@livepeer.com/design-system";
+import {
+  Button,
+  Flex,
+  Container,
+  Select,
+  Box,
+  Checkbox,
+  Label,
+  Tooltip,
+} from "@livepeer/design-system";
 
 type UserTableProps = {
   userId: string;
@@ -161,8 +169,8 @@ const UserTable = ({ userId, id }: UserTableProps) => {
             <Checkbox
               id="isCopyrightInfringiment"
               checked={isCopyrightInfringiment}
-              onCheckedChange={(e) =>
-                setIsCopyrightInfringiment(e.target.checked)
+              onCheckedChange={(checked: boolean) =>
+                setIsCopyrightInfringiment(checked)
               }
             />
             <Tooltip

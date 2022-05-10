@@ -6,7 +6,7 @@ import {
   Heading,
   Grid,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { blocksToText } from "lib/utils";
 import { GraphQLClient } from "graphql-request";
 import { print } from "graphql/language/printer";

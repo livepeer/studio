@@ -1,6 +1,6 @@
 import Logo from "@components/Marketing/Logo";
 import { useState } from "react";
-import { Box, Link as A } from "@livepeer.com/design-system";
+import { Box, Link as A } from "@livepeer/design-system";
 import BreadcrumbDropdown from "./dropdown";
 import slugify from "@sindresorhus/slugify";
 import Link from "next/link";

@@ -1,4 +1,4 @@
-import { Box, Heading, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Heading, Text, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 import Image from "next/image";
 

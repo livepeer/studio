@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Breadcrumbs from "../Breadcrumbs";
 import Link from "next/link";
 import HornIcon from "../../../public/img/icons/horn.svg";
@@ -102,7 +102,7 @@ const Header = ({ breadcrumbs = [] }) => {
             if (breadcrumb?.href) {
               return (
                 <Link key={i} href={breadcrumb.href} passHref>
-                  <A variant="violet">{breadcrumb.title}</A>
+                  <A variant="primary">{breadcrumb.title}</A>
                 </Link>
               );
             }

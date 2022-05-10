@@ -11,7 +11,7 @@ import {
   Heading,
   Text,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import Spinner from "components/Dashboard/Spinner";
 
@@ -30,8 +30,8 @@ const CreateStreamDialog = ({
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-        <AlertDialogTitle as={Heading} size="1">
-          Create a new stream
+        <AlertDialogTitle asChild>
+          <Heading size="1">Create a new stream</Heading>
         </AlertDialogTitle>
 
         <Box
@@ -67,25 +67,28 @@ const CreateStreamDialog = ({
               A-Z, a-z, 0-9, -, _, ~ only
             </Text> */}
           </Flex>
-          <AlertDialogDescription
-            as={Text}
-            size="3"
-            variant="gray"
-            css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-            Newly created streams are assigned a special key and RTMP ingest URL
-            to stream into.
+          <AlertDialogDescription asChild>
+            <Text
+              size="3"
+              variant="gray"
+              css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
+              Newly created streams are assigned a special key and RTMP ingest
+              URL to stream into.
+            </Text>
           </AlertDialogDescription>
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-            <AlertDialogCancel disabled={creating} size="2" as={Button} ghost>
-              Cancel
+            <AlertDialogCancel asChild>
+              <Button disabled={creating} size="2" ghost>
+                Cancel
+              </Button>
             </AlertDialogCancel>
             <Button
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
               disabled={creating}
-              variant="violet">
+              variant="primary">
               {creating && (
                 <Spinner
                   css={{

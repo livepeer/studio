@@ -1,10 +1,4 @@
-import {
-  Box,
-  Flex,
-  Text,
-  Container,
-  Link as A,
-} from "@livepeer.com/design-system";
+import { Box, Flex, Text, Container, Link as A } from "@livepeer/design-system";
 import { useApi } from "hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import Menu from "./mobile/menu";

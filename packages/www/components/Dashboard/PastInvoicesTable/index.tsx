@@ -7,7 +7,7 @@ import {
   Tr,
   Th,
   Td,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { products } from "@livepeer.com/api/src/config";
 import { FiArrowUpRight } from "react-icons/fi";
 
@@ -52,7 +52,7 @@ const PastInvoicesTable = ({ invoices }) => {
               <Td>${(invoice.total / 100).toFixed(2)}</Td>
               <Td>
                 <A
-                  variant="violet"
+                  variant="primary"
                   download
                   target="_blank"
                   rel="noopener noreferrer"

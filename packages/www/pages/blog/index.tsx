@@ -7,7 +7,7 @@ import {
   Heading,
   Link as A,
   Text,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { print } from "graphql/language/printer";
 import { request } from "graphql-request";
 import { useRouter } from "next/router";

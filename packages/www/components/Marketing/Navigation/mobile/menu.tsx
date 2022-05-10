@@ -5,7 +5,7 @@ import {
   Container,
   Link as A,
   Button as StyledButton,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { User } from "@livepeer.com/api";
 import Link from "next/link";
 import { BreadcrumbItem } from "../breadcrumb";

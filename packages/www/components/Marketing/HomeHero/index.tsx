@@ -1,10 +1,4 @@
-import {
-  Link as A,
-  Text,
-  Flex,
-  Container,
-  Box,
-} from "@livepeer.com/design-system";
+import { Link as A, Text, Flex, Container, Box } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import HeroVideo from "./Video";
 import PhoneSvg from "./PhoneSvg";

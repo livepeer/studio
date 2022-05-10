@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Button from "@components/Admin/Button";
 import { Box } from "@theme-ui/components";

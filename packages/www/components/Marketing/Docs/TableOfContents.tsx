@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Collapsible from "react-collapsible";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Box, Flex, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Link as A } from "@livepeer/design-system";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 type TableOfContentsProps = {

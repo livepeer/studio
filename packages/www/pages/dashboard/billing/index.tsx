@@ -7,7 +7,7 @@ import {
   Flex,
   Text,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { products } from "@livepeer.com/api/src/config";
@@ -167,7 +167,7 @@ const Billing = () => {
               You are currently on the
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name
@@ -177,7 +177,7 @@ const Billing = () => {
             </Text>
             <Link href="/dashboard/billing/plans" passHref>
               <A
-                variant="violet"
+                variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>
                 View Plans & Upgrade <ArrowRightIcon />
               </A>

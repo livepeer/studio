@@ -1,5 +1,5 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Box, Button, Flex, Text, Checkbox } from "@livepeer.com/design-system";
+import { Box, Button, Flex, Text, Checkbox } from "@livepeer/design-system";
 import { useCallback, useState, useEffect } from "react";
 import {
   FilterIcon,
@@ -107,29 +107,27 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={handleOpenChange}>
-      <DropdownMenu.Trigger
-        as={Button}
-        css={{ display: "flex", ai: "center" }}
-        size="2"
-        variant="gray">
-        <Flex css={{ mr: "$2" }}>
-          <FilterIcon />
-        </Flex>
-        Filter
-        {getActiveFiltersCount(filters) > 0 && (
-          <>
-            <Box
-              as="span"
-              css={{
-                mx: "$2",
-                height: "16px",
-                width: "1px",
-                background: "$mauve6",
-              }}
-            />
-            <Box as="span">{getActiveFiltersCount(filters)}</Box>
-          </>
-        )}
+      <DropdownMenu.Trigger asChild>
+        <Button css={{ display: "flex", ai: "center" }} size="2" variant="gray">
+          <Flex css={{ mr: "$2" }}>
+            <FilterIcon />
+          </Flex>
+          Filter
+          {getActiveFiltersCount(filters) > 0 && (
+            <>
+              <Box
+                as="span"
+                css={{
+                  mx: "$2",
+                  height: "16px",
+                  width: "1px",
+                  background: "$mauve6",
+                }}
+              />
+              <Box as="span">{getActiveFiltersCount(filters)}</Box>
+            </>
+          )}
+        </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content align="end" sideOffset={5}>
         <Box
@@ -159,7 +157,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
             <Text size="2" css={{ margin: "0px" }}>
               Filters
             </Text>
-            <Button size="1" variant="violet" onClick={handleDone}>
+            <Button size="1" variant="primary" onClick={handleDone}>
               Done
             </Button>
           </Flex>

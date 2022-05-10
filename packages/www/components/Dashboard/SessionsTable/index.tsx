@@ -25,7 +25,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -59,8 +59,7 @@ const RecordingUrlCell = <D extends TableData>({
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>
               <A
-                css={{}}
-                variant="violet"
+                variant="primary"
                 target="_blank"
                 href={makeMP4Url(cell.value.mp4Url, "source")}>
                 Download mp4
@@ -105,7 +104,7 @@ const defaultEmptyState = (
       Sessions belong to parent streams.
     </Text>
     <Link href="/docs/api-reference/session/overview" passHref>
-      <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+      <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
         <Box>Learn more</Box>
         <ArrowRightIcon />
       </A>
@@ -132,7 +131,7 @@ const StreamSessionsTable = ({
   });
   const [openSnackbar] = useSnackbar();
 
-  const columns: Column<SessionsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Created at",

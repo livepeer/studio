@@ -30,7 +30,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
@@ -61,7 +61,7 @@ const RecordingUrlCell = <D extends TableData>({
           {cell.value.children}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <A
-              variant="violet"
+              variant="primary"
               target="_blank"
               href={makeMP4Url(cell.value.mp4Url, "source")}>
               Download mp4
@@ -99,7 +99,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   });
   const [openSnackbar] = useSnackbar();
 
-  const columns: Column<SessionsTableData>[] = useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Stream",
@@ -158,7 +158,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
               id: stream.parentId,
               name: stream.parentStream.name,
               children: (
-                <A variant="violet" as={Box}>
+                <A variant="primary" as={Box}>
                   {stream.parentStream.name}
                 </A>
               ),
@@ -250,7 +250,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
         Stream sessions belong to parent streams.
       </Text>
       <Link href="/docs/api-reference/session/overview" passHref>
-        <A variant="violet" css={{ display: "flex", ai: "center", mb: "$5" }}>
+        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>

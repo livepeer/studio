@@ -6,7 +6,7 @@ import {
   Text,
   TextField,
   Label,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Layout from "../../layouts/dashboard";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";

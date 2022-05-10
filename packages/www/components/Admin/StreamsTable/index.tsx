@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
@@ -159,7 +159,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
     return () => clearInterval(interval);
   }, [userId, isVisible]);
 
-  const columns: Column<StreamsTableData>[] = useMemo(
+  const columns: any = useMemo(
     () => [
       {
         Header: "Name",

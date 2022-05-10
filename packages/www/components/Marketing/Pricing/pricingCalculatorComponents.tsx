@@ -1,6 +1,6 @@
 import { ReactNode, useCallback } from "react";
 import { useApi } from "hooks";
-import { Box, Grid, Flex, Text, TextField } from "@livepeer.com/design-system";
+import { Box, Grid, Flex, Text, TextField } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import { useRouter } from "next/router";
 

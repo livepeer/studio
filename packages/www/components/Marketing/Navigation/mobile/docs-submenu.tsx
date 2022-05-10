@@ -1,4 +1,4 @@
-import { Box, Container, Flex } from "@livepeer.com/design-system";
+import { Box, Container, Flex } from "@livepeer/design-system";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import _throttle from "lodash/throttle";

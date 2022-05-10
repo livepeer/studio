@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Modal from "@components/Admin/Modal";
 import { Box, Button, Flex } from "@theme-ui/components";

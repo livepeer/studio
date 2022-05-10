@@ -1,6 +1,6 @@
 import Layout from "layouts/main";
 import Button from "components/Marketing/Button";
-import { Container, Heading, Box, Text } from "@livepeer.com/design-system";
+import { Container, Heading, Box, Text } from "@livepeer/design-system";
 import Link from "next/link";
 import Image from "next/image";
 import Guides from "components/Marketing/Guides";

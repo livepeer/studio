@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, IconButton, Tooltip } from "@livepeer.com/design-system";
+import { Box, Button, IconButton, Tooltip } from "@livepeer/design-system";
 import copy from "copy-to-clipboard";
 import { getParameters } from "codesandbox/lib/api/define";
 import {
@@ -67,14 +67,15 @@ const DocCodeBlock = ({
               top: "-$6",
               right: "$2",
             }}>
-            <Collapsible.Trigger
-              as={Button}
-              ghost
-              css={{
-                color: "$whiteA12",
-                textShadow: "0 2px 2px rgb(0 0 0 / 12%)",
-              }}>
-              {isCollapsed ? "Show" : "Hide"} code
+            <Collapsible.Trigger asChild>
+              <Button
+                ghost
+                css={{
+                  color: "$whiteA12",
+                  textShadow: "0 2px 2px rgb(0 0 0 / 12%)",
+                }}>
+                {isCollapsed ? "Show" : "Hide"} code
+              </Button>
             </Collapsible.Trigger>
 
             {isHero && (

@@ -1,4 +1,4 @@
-import { Container, Grid } from "@livepeer.com/design-system";
+import { Container, Grid } from "@livepeer/design-system";
 import TeamMember from "@components/Marketing/TeamMember";
 
 const TeamSection = ({ teamMembers }) => {

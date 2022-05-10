@@ -4,7 +4,7 @@ import {
   Container,
   Box,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 
 const JobsSection = ({ jobs }) => {
@@ -36,7 +36,7 @@ const JobsSection = ({ jobs }) => {
             </A>
           </Link>
           <Link href="/jobs/[slug]" as={`/jobs/${j.id}`} passHref>
-            <A variant="violet">Apply</A>
+            <A variant="primary">Apply</A>
           </Link>
         </Flex>
       ))}

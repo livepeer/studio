@@ -1,4 +1,4 @@
-import { Box, Flex, Container, Text } from "@livepeer.com/design-system";
+import { Box, Flex, Container, Text } from "@livepeer/design-system";
 import Guides from "@components/Marketing/Guides";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,7 +44,7 @@ const Hero = ({
             <Flex direction="column" css={{ maxWidth: 700 }}>
               {tagline && (
                 <Text
-                  variant="violet"
+                  variant="primary"
                   size="5"
                   css={{ fontWeight: 600, mb: "$5" }}>
                   {tagline}

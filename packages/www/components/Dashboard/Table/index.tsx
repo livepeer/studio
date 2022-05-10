@@ -22,7 +22,7 @@ import {
   Text,
   Heading,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import TableFilter, {
   FilterItem,
   Filter as TFilter,
@@ -72,7 +72,7 @@ export type TableData<T extends Record<string, unknown>> = {
 };
 
 type Props<T extends Record<string, unknown>> = {
-  columns: Column<T>[];
+  columns: any;
   header: React.ReactNode;
   rowSelection?: "individual" | "all" | null;
   initialSortBy?: Sort<T>[];
@@ -310,6 +310,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               )}
               {createAction && (
                 <Button
+                  variant="primary"
                   size="2"
                   // @ts-ignore
                   css={{ display: "flex", alignItems: "center" }}
@@ -350,16 +351,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
       ) : (
         <Box css={{ overflow: showOverflow ? "visible" : "hidden" }}>
           <Box css={{ overflowX: showOverflow ? "visible" : "auto" }}>
-            <Table
-              {...getTableProps()}
-              css={{
-                width: "100%",
-                minWidth: "100%",
-                borderCollapse: "collapse",
-                borderSpacing: "$3",
-                // @ts-ignore
-                tableLayout,
-              }}>
+            <Table {...getTableProps()}>
               <Thead>
                 {headerGroups.map((headerGroup) => (
                   <Tr {...headerGroup.getHeaderGroupProps()}>
@@ -468,7 +460,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
               </Text>
               {viewAll ? (
                 <Link href={viewAll} passHref>
-                  <A variant="violet" css={{ display: "flex", ai: "center" }}>
+                  <A variant="primary" css={{ display: "flex", ai: "center" }}>
                     <Box>View all</Box> <ArrowRightIcon />
                   </A>
                 </Link>

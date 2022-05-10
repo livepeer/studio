@@ -6,7 +6,7 @@ import {
   Box,
   styled,
   keyframes,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },
@@ -58,7 +58,9 @@ const Flex = styled("div", { display: "flex" });
 
 const NavDropdown = ({ trigger, children }) => (
   <HoverCardRoot openDelay={0}>
-    <HoverCardTrigger as={Box}>{trigger}</HoverCardTrigger>
+    <HoverCardTrigger asChild>
+      <Box>{trigger}</Box>
+    </HoverCardTrigger>
     <StyledContent sideOffset={5}>
       <Flex css={{ flexDirection: "column", gap: 7 }}>{children}</Flex>
       <HoverCardArrow />

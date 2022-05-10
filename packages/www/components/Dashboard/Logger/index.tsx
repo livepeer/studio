@@ -2,7 +2,7 @@ import { useAnalyzer, useApi } from "hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Stream } from "@livepeer.com/api";
-import { Box, Heading, Flex, Badge } from "@livepeer.com/design-system";
+import { Box, Heading, Flex, Badge } from "@livepeer/design-system";
 import { events } from "hooks/use-analyzer";
 
 const maxLogs = 8192;

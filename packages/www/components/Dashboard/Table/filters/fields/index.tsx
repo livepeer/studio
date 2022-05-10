@@ -6,7 +6,7 @@ import {
   Checkbox,
   RadioGroup,
   Radio,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { SelectIcon, NextIcon, CalendarIcon } from "../helpers";
 import { useCallback } from "react";
 import { Filter, FilterType } from "..";

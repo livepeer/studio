@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Layout from "layouts/admin";
 import { Flex } from "@theme-ui/components";
@@ -8,6 +8,7 @@ import { FunctionComponent } from "react";
 type TabbedLayoutProps = {
   tabs: Array<TabType>;
   logout?: Function;
+  children?: JSX.Element;
 };
 
 const TabbedLayout: FunctionComponent<TabbedLayoutProps> = ({

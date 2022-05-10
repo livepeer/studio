@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useApi, usePageVisibility } from "hooks";
@@ -145,7 +145,7 @@ const StreamSessionsTable = ({
     return () => clearInterval(interval);
   }, [streamId, isVisible]);
 
-  const columns: Column<SessionsTableData>[] = useMemo(
+  const columns: any = useMemo(
     () => [
       {
         Header: "Created at",

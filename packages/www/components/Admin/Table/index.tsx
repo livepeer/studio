@@ -1,4 +1,4 @@
-/** @jsx jsx */
+/** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import { Box, Flex } from "@theme-ui/components";
 import { SxStyleProp } from "theme-ui";
@@ -6,6 +6,7 @@ import { FunctionComponent } from "react";
 
 type TableProps = {
   className?: string;
+  children?: JSX.Element;
 };
 
 export const Table: FunctionComponent<TableProps> = ({
@@ -28,6 +29,7 @@ type TableCellProps = {
   selected: boolean;
   variant: string;
   sx?: SxStyleProp;
+  children?: JSX.Element;
 };
 
 export const TableCell: FunctionComponent<TableCellProps> = (props) => {
@@ -116,6 +118,7 @@ type TableRowProps = {
   textSelectable?: boolean;
   sx?: SxStyleProp;
   onClick?: Function;
+  children?: JSX.Element;
 };
 
 export const TableRow: FunctionComponent<TableRowProps> = ({

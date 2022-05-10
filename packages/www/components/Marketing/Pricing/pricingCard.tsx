@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Box, Flex, Text, Link as A } from "@livepeer.com/design-system";
+import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
 import { justifyContent } from "styled-system";
 

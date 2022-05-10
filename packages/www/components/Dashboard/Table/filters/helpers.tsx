@@ -1,9 +1,9 @@
 import { useTheme } from "next-themes";
 import * as Accordion from "@radix-ui/react-accordion";
-import { styled } from "@livepeer.com/design-system/stitches.config";
+import { styled } from "@livepeer/design-system";
 
 const StyledAccordion = styled(Accordion.Root, {
-  border: "0px",
+  border: 0,
 });
 
 const StyledItem = styled(Accordion.Item, {

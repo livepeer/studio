@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Layout from "../../layouts/dashboard";
-import { Box, Button, useSnackbar } from "@livepeer.com/design-system";
+import { Box, Button, useSnackbar } from "@livepeer/design-system";
 
 import { products } from "@livepeer.com/api/src/config";
 

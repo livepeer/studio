@@ -1,4 +1,4 @@
-import { Box, Link as A } from "@livepeer.com/design-system";
+import { Box, Link as A } from "@livepeer/design-system";
 import Link from "next/link";
 
 const ArrowLink = ({

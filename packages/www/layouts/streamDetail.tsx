@@ -18,7 +18,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Layout from "layouts/dashboard";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
@@ -38,7 +38,6 @@ import Record from "components/Dashboard/StreamDetails/Record";
 import Terminate from "components/Dashboard/StreamDetails/Terminate";
 import Suspend from "components/Dashboard/StreamDetails/Suspend";
 import Delete from "components/Dashboard/StreamDetails/Delete";
-import Link from "next/link";
 import StatusBadge, {
   Variant as StatusVariant,
 } from "@components/Dashboard/StatusBadge";
@@ -455,7 +454,7 @@ const StreamDetail = ({
                         ) : (
                           <Button
                             type="button"
-                            variant="violet"
+                            variant="primary"
                             onClick={() => setKeyRevealed(true)}>
                             Reveal stream key
                           </Button>
@@ -595,13 +594,14 @@ const StreamDetail = ({
                   </Box>
                   <Box css={{ position: "relative", top: "-8px" }}>
                     <DropdownMenu>
-                      <DropdownMenuTrigger
-                        as={Button}
-                        variant="violet"
-                        size="2"
-                        css={{ display: "flex", ai: "center" }}>
-                        <Box css={{ mr: "$1" }}>Actions</Box>{" "}
-                        <ChevronDownIcon />
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="primary"
+                          size="2"
+                          css={{ display: "flex", ai: "center", mr: "$1" }}>
+                          Actions
+                          <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuGroup>

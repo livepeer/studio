@@ -1,5 +1,5 @@
 import PricingCard, { PricingCardContent } from "./pricingCard";
-import { Box, Grid, Flex, Text, Badge } from "@livepeer.com/design-system";
+import { Box, Grid, Flex, Text, Badge } from "@livepeer/design-system";
 
 const PricingCardsContainer = () => {
   return (
@@ -108,7 +108,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -136,7 +136,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -156,7 +156,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -184,7 +184,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -225,7 +225,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -262,7 +262,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -282,7 +282,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -319,7 +319,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="violet"
+                variant="primary"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",

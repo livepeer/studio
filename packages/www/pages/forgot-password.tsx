@@ -6,7 +6,7 @@ import {
   Heading,
   Container,
   Link as A,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";

@@ -12,7 +12,7 @@ import {
   AlertDialogAction,
   Badge,
   styled,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
@@ -114,15 +114,16 @@ const WebhookDetail = () => {
                     </Button>
                     <AlertDialogContent
                       css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-                      <AlertDialogTitle as={Heading} size="1">
-                        Delete Webhook
+                      <AlertDialogTitle asChild>
+                        <Heading size="1">Delete Webhook</Heading>
                       </AlertDialogTitle>
-                      <AlertDialogDescription
-                        as={Text}
-                        size="3"
-                        variant="gray"
-                        css={{ mt: "$2", lineHeight: "22px" }}>
-                        Are you sure you want to delete this webhook?
+                      <AlertDialogDescription asChild>
+                        <Text
+                          size="3"
+                          variant="gray"
+                          css={{ mt: "$2", lineHeight: "22px" }}>
+                          Are you sure you want to delete this webhook?
+                        </Text>
                       </AlertDialogDescription>
                       <Flex css={{ jc: "flex-end", gap: "$2", mt: "$5" }}>
                         <Button
@@ -131,29 +132,30 @@ const WebhookDetail = () => {
                           ghost>
                           Cancel
                         </Button>
-                        <AlertDialogAction
-                          size="2"
-                          as={Button}
-                          disabled={deleting}
-                          onClick={async () => {
-                            setDeleting(true);
-                            await deleteWebhook(data.id);
-                            await invalidateQuery();
-                            setDeleting(false);
-                            setDeleteDialogOpen(false);
-                            router.push("/dashboard/developers/webhooks");
-                          }}
-                          variant="red">
-                          {deleting && (
-                            <Spinner
-                              css={{
-                                width: 16,
-                                height: 16,
-                                mr: "$2",
-                              }}
-                            />
-                          )}
-                          Delete
+                        <AlertDialogAction asChild>
+                          <Button
+                            size="2"
+                            disabled={deleting}
+                            onClick={async () => {
+                              setDeleting(true);
+                              await deleteWebhook(data.id);
+                              await invalidateQuery();
+                              setDeleting(false);
+                              setDeleteDialogOpen(false);
+                              router.push("/dashboard/developers/webhooks");
+                            }}
+                            variant="red">
+                            {deleting && (
+                              <Spinner
+                                css={{
+                                  width: 16,
+                                  height: 16,
+                                  mr: "$2",
+                                }}
+                              />
+                            )}
+                            Delete
+                          </Button>
                         </AlertDialogAction>
                       </Flex>
                     </AlertDialogContent>
@@ -211,7 +213,7 @@ const WebhookDetail = () => {
                 <Cell css={{ display: "flex", fw: "wrap" }}>
                   {data.events.map((e) => (
                     <Badge
-                      variant="violet"
+                      variant="primary"
                       size="2"
                       css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
                       {e}

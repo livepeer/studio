@@ -8,7 +8,7 @@ import {
   Text,
   styled,
   Skeleton,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import Link from "next/link";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../../public/img/icons/upcoming.svg";
@@ -123,7 +123,7 @@ const UsageSummary = () => {
             </Box>
             <Badge
               size="1"
-              variant="violet"
+              variant="primary"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
                 ? products[user.stripeProductId].name
@@ -181,7 +181,7 @@ const UsageSummary = () => {
           </Box>
         </Text>
         <Link href="/dashboard/billing" passHref>
-          <A variant="violet" css={{ display: "flex", alignItems: "center" }}>
+          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>
         </Link>

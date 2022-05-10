@@ -1,7 +1,6 @@
 # Package to build
 packages/*
 !packages/api
-!packages/design-system
 !packages/www
 
 # General git and node frameworks files

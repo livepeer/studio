@@ -1,4 +1,4 @@
-import { TextField, Grid, Box, Container } from "@livepeer.com/design-system";
+import { TextField, Grid, Box, Container } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.com/api/dist/hash";
 import { useRouter } from "next/router";

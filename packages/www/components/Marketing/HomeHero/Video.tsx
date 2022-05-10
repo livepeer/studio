@@ -1,4 +1,4 @@
-import { Text, Box, Badge } from "@livepeer.com/design-system";
+import { Text, Box, Badge } from "@livepeer/design-system";
 import { FiEye, FiHeart } from "react-icons/fi";
 import { forwardRef, useRef, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
@@ -110,7 +110,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
           <Badge variant="red" size="2" css={{ fontWeight: 700, mr: "$2" }}>
             Live
           </Badge>
-          <Badge variant="violet" size="2" css={{ fontWeight: 700 }}>
+          <Badge variant="primary" size="2" css={{ fontWeight: 700 }}>
             <Box
               as="i"
               css={{ display: "flex", alignItems: "center", mr: "$1" }}>

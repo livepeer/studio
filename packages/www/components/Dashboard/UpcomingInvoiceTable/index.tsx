@@ -1,4 +1,4 @@
-import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer.com/design-system";
+import { Table, Thead, Tbody, Tr, Th, Td } from "@livepeer/design-system";
 
 const UpcomingInvoiceTable = ({ subscription, usage, prices }) => {
   const transcodingPrice = prices[0].price;

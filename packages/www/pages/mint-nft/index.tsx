@@ -22,7 +22,7 @@ import {
   Text,
   TextField,
   Tooltip,
-} from "@livepeer.com/design-system";
+} from "@livepeer/design-system";
 import { MintNFT as Content } from "content";
 import Layout from "layouts/main";
 
@@ -203,8 +203,8 @@ export default function MintNFT() {
               <AlertDialogContent
                 css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}
                 onOpenAutoFocus={(e) => e.preventDefault()}>
-                <AlertDialogTitle as={Heading} size="1">
-                  Mint a Video NFT
+                <AlertDialogTitle asChild>
+                  <Heading size="1">Mint a Video NFT</Heading>
                 </AlertDialogTitle>
 
                 <Box
@@ -224,7 +224,7 @@ export default function MintNFT() {
                             css={{ display: "flex", ai: "center" }}
                             type="button"
                             size="2"
-                            variant="violet"
+                            variant="primary"
                             onClick={async () => {
                               setStateProp(
                                 "file",
@@ -281,74 +281,75 @@ export default function MintNFT() {
                     />
                   </Flex>
 
-                  <AlertDialogDescription
-                    as={Text}
-                    size="3"
-                    variant="gray"
-                    css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-                    <Box
-                      css={{
-                        overflow: "scroll",
-                        p: "$4",
-                        height: 200,
-                        borderRadius: 6,
-                      }}>
-                      {(() => {
-                        switch (status) {
-                          case "initializing":
-                            return (
-                              <div>
-                                Synchronisation with MetaMask ongoing...
-                              </div>
-                            );
-                          case "unavailable":
-                            return (
-                              <div>
-                                MetaMask not available. Install it at{" "}
-                                <a
-                                  href="https://metamask.io/download"
-                                  target="_blank">
-                                  metamask.io
-                                </a>
-                              </div>
-                            );
-                          case "notConnected":
-                            return (
-                              <div>Connect your MetaMask wallet below.</div>
-                            );
-                          case "connecting":
-                            return <div>Connecting to MetaMask...</div>;
-                          default:
-                            return (
-                              <div>Unknown MetaMask status: ${status}.</div>
-                            );
-                          case "connected":
-                            if (!chains.isChainBuiltin(chainId)) {
+                  <AlertDialogDescription asChild>
+                    <Text
+                      size="3"
+                      variant="gray"
+                      css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
+                      <Box
+                        css={{
+                          overflow: "scroll",
+                          p: "$4",
+                          height: 200,
+                          borderRadius: 6,
+                        }}>
+                        {(() => {
+                          switch (status) {
+                            case "initializing":
                               return (
                                 <div>
-                                  Only Polygon network is supported right now.
-                                  Click below to switch or add it to MetaMask.
+                                  Synchronisation with MetaMask ongoing...
                                 </div>
                               );
-                            }
-                            return (
-                              <>
-                                <Box css={{ mb: "$2" }}>
-                                  Connected to {displayAddr(account)} on{" "}
-                                  {
-                                    chains.getBuiltinChain(chainId).spec
-                                      .chainName
-                                  }{" "}
-                                  (<code>{parseInt(chainId, 16)}</code>)
-                                </Box>
-                                {logs.map((log, idx) => (
-                                  <Box key={`log-${idx}`}>{log}</Box>
-                                ))}
-                              </>
-                            );
-                        }
-                      })()}
-                    </Box>
+                            case "unavailable":
+                              return (
+                                <div>
+                                  MetaMask not available. Install it at{" "}
+                                  <a
+                                    href="https://metamask.io/download"
+                                    target="_blank">
+                                    metamask.io
+                                  </a>
+                                </div>
+                              );
+                            case "notConnected":
+                              return (
+                                <div>Connect your MetaMask wallet below.</div>
+                              );
+                            case "connecting":
+                              return <div>Connecting to MetaMask...</div>;
+                            default:
+                              return (
+                                <div>Unknown MetaMask status: ${status}.</div>
+                              );
+                            case "connected":
+                              if (!chains.isChainBuiltin(chainId)) {
+                                return (
+                                  <div>
+                                    Only Polygon network is supported right now.
+                                    Click below to switch or add it to MetaMask.
+                                  </div>
+                                );
+                              }
+                              return (
+                                <>
+                                  <Box css={{ mb: "$2" }}>
+                                    Connected to {displayAddr(account)} on{" "}
+                                    {
+                                      chains.getBuiltinChain(chainId).spec
+                                        .chainName
+                                    }{" "}
+                                    (<code>{parseInt(chainId, 16)}</code>)
+                                  </Box>
+                                  {logs.map((log, idx) => (
+                                    <Box key={`log-${idx}`}>{log}</Box>
+                                  ))}
+                                </>
+                              );
+                          }
+                        })()}
+                      </Box>
+                    </Text>
                   </AlertDialogDescription>
 
                   <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
@@ -358,7 +359,7 @@ export default function MintNFT() {
                         type="button"
                         size="2"
                         disabled={status !== "notConnected"}
-                        variant="violet"
+                        variant="primary"
                         onClick={onClickConnect}>
                         Connect to MetaMask
                       </Button>
@@ -369,7 +370,7 @@ export default function MintNFT() {
                           css={{ display: "flex", ai: "center" }}
                           type="button"
                           size="2"
-                          variant="violet"
+                          variant="primary"
                           onClick={onClickSwitchNetwork("0x13881")}>
                           Polygon Testnet
                         </Button>
@@ -377,7 +378,7 @@ export default function MintNFT() {
                           css={{ display: "flex", ai: "center" }}
                           type="button"
                           size="2"
-                          variant="violet"
+                          variant="primary"
                           onClick={onClickSwitchNetwork("0x89")}>
                           Polygon Mainnet
                         </Button>
@@ -388,7 +389,7 @@ export default function MintNFT() {
                         type="button"
                         size="2"
                         disabled={isUploading.on}
-                        variant="violet"
+                        variant="primary"
                         onClick={async () => {
                           isUploading.onOn();
                           try {
@@ -429,7 +430,7 @@ export default function MintNFT() {
                         type="submit"
                         size="2"
                         disabled={isMinting.on || status !== "connected"}
-                        variant="violet">
+                        variant="primary">
                         {isMinting.on && (
                           <Spinner
                             css={{

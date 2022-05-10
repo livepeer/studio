@@ -1,11 +1,5 @@
 import Fade from "react-reveal/Fade";
-import {
-  TextField,
-  Grid,
-  Box,
-  Text,
-  TextArea,
-} from "@livepeer.com/design-system";
+import { TextField, Grid, Box, Text, TextArea } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
