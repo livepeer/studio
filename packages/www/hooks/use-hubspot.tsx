@@ -21,9 +21,11 @@ const useHubspotForm = ({ portalId, formId }) => {
         fields: [],
       };
       for (var pair of formData.entries()) {
-        if (pair[0] !== "password")
-          data.fields.push({ name: pair[0].toLowerCase(), value: pair[1] });
+        if (pair[0] !== "password") {
+          data.fields.push({ name: pair[0], value: pair[1] });
+        }
       }
+
       const result = await fetch(url, {
         method: "post",
         body: JSON.stringify(data),

@@ -87,9 +87,17 @@ async function validateAssetPayload(
   };
 }
 
-function withDownloadUrl(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.status !== "ready") {
     return asset;
+  }
+  if (asset.playbackRecordingId) {
+    asset.playbackUrl = pathJoin(
+      ingest,
+      "recordings",
+      asset.playbackRecordingId,
+      "index.m3u8"
+    );
   }
   return {
     ...asset,
@@ -212,7 +220,7 @@ app.get("/", authorizer({}), async (req, res) => {
           res.set("X-Total-Count", c);
         }
         return {
-          ...withDownloadUrl(data, ingest),
+          ...withPlaybackUrls(data, ingest),
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },
@@ -248,7 +256,7 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withDownloadUrl(data, ingest);
+      return withPlaybackUrls(data, ingest);
     },
   });
   res.status(200);
@@ -279,7 +287,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     );
   }
 
-  res.json(withDownloadUrl(asset, ingest));
+  res.json(withPlaybackUrls(asset, ingest));
 });
 
 app.post(
@@ -367,12 +375,12 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   }
   const assetId = req.params?.id || req.body.assetId;
 
-  const asset = await db.asset.get(assetId);
-  if (!asset) {
+  const inputAsset = await db.asset.get(assetId);
+  if (!inputAsset) {
     throw new NotFoundError(`asset not found`);
   }
 
-  const os = await db.objectStore.get(asset.objectStoreId);
+  const os = await db.objectStore.get(inputAsset.objectStoreId);
   if (!os) {
     throw new UnprocessableEntityError("Asset has invalid objectStoreId");
   }
@@ -385,10 +393,10 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     Date.now(),
     req.config.vodObjectStoreId,
     {
-      name: req.body.name ?? asset.name,
+      name: req.body.name ?? inputAsset.name,
     }
   );
-  outputAsset.sourceAssetId = asset.id;
+  outputAsset.sourceAssetId = inputAsset.id;
   outputAsset = await db.asset.create(outputAsset);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -398,11 +406,11 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
         profile: req.body.profile,
       },
     },
-    asset,
+    inputAsset,
     outputAsset
   );
   res.status(201);
-  res.json({ asset, task });
+  res.json({ asset: outputAsset, task });
 };
 app.post(
   "/:id/transcode",
