@@ -73,6 +73,9 @@ async function generateUniqueKey(shardBase: string, otherKeys: string[] = []) {
     if (!exists) {
       return shardedKey;
     }
+    console.warn(
+      `Generated conflicting database key. key=${shardedKey} otherKeys="${otherKeys}"`
+    );
   }
 }
 
