@@ -274,7 +274,7 @@ const PaymentMethodDialog = ({ invalidateQuery }) => {
               </Box>
               <Box
                 css={{
-                  border: "1px solid $colors$mauve7",
+                  border: "1px solid $colors$primary7",
                   borderRadius: 6,
                   background: "$loContrast",
                   px: "$2",

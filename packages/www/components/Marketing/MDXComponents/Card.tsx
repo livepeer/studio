@@ -8,7 +8,7 @@ const Post = ({ href, title, label }) => (
         textDecoration: "none",
         p: "$4",
         borderRadius: 16,
-        border: "1px solid $mauve5",
+        border: "1px solid $neutral5",
         "&:hover *": {
           color: "$hiContrast",
         },

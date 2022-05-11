@@ -93,7 +93,7 @@ const RegisterPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$mauve2" />
+      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"

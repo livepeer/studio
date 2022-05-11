@@ -225,7 +225,7 @@ const StreamSessionsTable = ({
                     </HoverCardContent>
                   </HoverCardRoot>
                 ) : (
-                  <Box css={{ color: "$mauve8" }}>—</Box>
+                  <Box css={{ color: "$primary8" }}>—</Box>
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
@@ -235,7 +235,7 @@ const StreamSessionsTable = ({
             },
             createdAt: {
               date: new Date(stream.createdAt),
-              fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+              fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             },
           };
         }),

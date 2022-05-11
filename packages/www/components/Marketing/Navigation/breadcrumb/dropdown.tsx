@@ -36,7 +36,7 @@ const BreadcrumbDropdown = ({ children, isOpen, close, id, css }: Props) => {
           "0px 24px 40px rgba(0, 0, 0, 0.24), 0px 30px 30px rgba(0, 0, 0, 0.02)",
         borderRadius: 8,
         p: "$3",
-        border: "1px solid $colors$mauve5",
+        border: "1px solid $colors$neutral5",
       }}>
       <Box css={{ position: "absolute", right: "15px", top: "-8px", ...css }}>
         <svg

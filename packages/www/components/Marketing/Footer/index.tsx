@@ -118,7 +118,7 @@ const Footer = ({ hideGuides = false }) => {
           margin: 0,
           border: "none",
           background:
-            "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)",
+            "linear-gradient(90deg,$colors$neutral4,$colors$neutral4 50%,transparent 0,transparent)",
           backgroundSize: "8px 1px",
           content: '""',
         },
@@ -261,7 +261,7 @@ const Footer = ({ hideGuides = false }) => {
                         fill="currentColor"
                       />
                       <Box
-                        css={{ color: "$mauve1" }}
+                        css={{ color: "$primary1" }}
                         as="path"
                         fillRule="evenodd"
                         clipRule="evenodd"

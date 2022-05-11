@@ -95,7 +95,7 @@ const Billing = () => {
             align="end"
             css={{
               borderBottom: "1px solid",
-              borderColor: "$mauve6",
+              borderColor: "$neutral6",
               pb: "$4",
               mb: "$5",
               width: "100%",
@@ -112,7 +112,7 @@ const Billing = () => {
                 </Box>
               </Flex>
             </Heading>
-            <Flex css={{ fontSize: "$3", color: "$mauve9" }}>
+            <Flex css={{ fontSize: "$3", color: "$primary9" }}>
               Current billing period (
               {subscription && (
                 <Flex>
@@ -141,7 +141,7 @@ const Billing = () => {
             align="end"
             css={{
               borderBottom: "1px solid",
-              borderColor: "$mauve6",
+              borderColor: "$neutral6",
               pb: "$3",
               mb: "$4",
               width: "100%",
@@ -190,7 +190,7 @@ const Billing = () => {
             align="end"
             css={{
               borderBottom: "1px solid",
-              borderColor: "$mauve6",
+              borderColor: "$neutral6",
               pb: "$3",
               mb: "$5",
               width: "100%",

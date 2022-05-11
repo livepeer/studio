@@ -11,7 +11,7 @@ const StyledSwitch = styled(Switch.Root, {
   padding: 0,
   width: 25,
   height: 12,
-  bc: "$mauve6",
+  bc: "$neutral6",
   borderRadius: 25,
   position: "relative",
   display: "flex",
@@ -40,7 +40,7 @@ const StyledThumb = styled(Switch.Thumb, {
     display: "none",
   },
   '&[data-state="checked"]': {
-    bc: "$mauve6",
+    bc: "$neutral6",
     transform: "translateX(12px)",
     "> :nth-child(1)": {
       display: "none",

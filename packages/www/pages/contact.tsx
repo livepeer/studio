@@ -30,7 +30,7 @@ const StyledCircleRadio = styled(Radio, {
     },
   },
   "&:focus": {
-    boxShadow: "inset 0 0 0 1px $colors$mauve8, 0 0 0 1px $colors$mauve8",
+    boxShadow: "inset 0 0 0 1px $colors$primary8, 0 0 0 1px $colors$primary8",
     color: "white",
   },
 });
@@ -62,7 +62,7 @@ const ContactPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$mauve2" />
+      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"

@@ -17,7 +17,7 @@ const Card = ({ id, logo, quote, author }: CardProps) => {
       css={{
         position: "relative",
         backgroundColor: "$panel",
-        border: "1px solid $mauve4",
+        border: "1px solid $neutral4",
         py: 32,
         px: 24,
         borderRadius: 24,

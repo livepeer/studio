@@ -26,7 +26,7 @@ const PlansPage = () => {
             align="end"
             css={{
               borderBottom: "1px solid",
-              borderColor: "$mauve6",
+              borderColor: "$neutral6",
               pb: "$4",
               mb: "$5",
               width: "100%",

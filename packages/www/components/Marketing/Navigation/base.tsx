@@ -117,7 +117,7 @@ const NavigationBase = ({
             margin: 0,
             border: "none",
             background:
-              "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)",
+              "linear-gradient(90deg,$colors$neutral4,$colors$neutral4 50%,transparent 0,transparent)",
             backgroundSize: "8px 1px",
             content: '""',
           },
@@ -184,10 +184,10 @@ const NavigationBase = ({
                         Streaming Service
                       </ArrowLink>
 
-                      <Box css={{ color: "$mauve5" }}>
+                      <Box css={{ color: "$neutral5" }}>
                         <ArrowLink
                           hideArrow
-                          color="$mauve9"
+                          color="$primary9"
                           href="/use-cases/creator-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For creator apps
@@ -195,7 +195,7 @@ const NavigationBase = ({
                         </ArrowLink>
                         <ArrowLink
                           hideArrow
-                          color="$mauve9"
+                          color="$primary9"
                           href="/use-cases/game-streaming-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For live gaming apps
@@ -203,7 +203,7 @@ const NavigationBase = ({
                         </ArrowLink>
                         <ArrowLink
                           hideArrow
-                          color="$mauve9"
+                          color="$primary9"
                           href="/use-cases/music-streaming-platforms">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For live music apps
@@ -211,7 +211,7 @@ const NavigationBase = ({
                         </ArrowLink>
                         <ArrowLink
                           hideArrow
-                          color="$mauve9"
+                          color="$primary9"
                           href="/use-cases/24x7-channels">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For 24x7 video apps
@@ -220,7 +220,7 @@ const NavigationBase = ({
 
                         <ArrowLink
                           hideArrow
-                          color="$mauve9"
+                          color="$primary9"
                           href="/use-cases/ecommerce">
                           <Text variant="gray" css={{ py: "$1" }}>
                             For e-commerce apps

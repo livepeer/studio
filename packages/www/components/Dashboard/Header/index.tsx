@@ -85,7 +85,7 @@ const Header = ({ breadcrumbs = [] }) => {
       css={{
         width: "100%",
         borderBottom: "1px solid",
-        borderColor: "$mauve6",
+        borderColor: "$neutral6",
       }}>
       <Flex
         align="center"
@@ -214,7 +214,7 @@ const Header = ({ breadcrumbs = [] }) => {
                               border:
                                 reaction === form.reaction
                                   ? "1px solid $violet9"
-                                  : "1px solid $mauve7",
+                                  : "1px solid $primary7",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -289,7 +289,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
-              <Text size="2" css={{ mb: "$3", color: "$mauve9" }}>
+              <Text size="2" css={{ mb: "$3", color: "$primary9" }}>
                 HELP
               </Text>
               <Link href="/docs/guides" passHref>

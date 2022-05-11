@@ -25,7 +25,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           cursor: "pointer",
           borderRadius: 24,
           border: "1px solid",
-          borderColor: "$mauve5",
+          borderColor: "$neutral5",
           overflow: "hidden",
           height: 400,
           transition: "box-shadow .2s",
@@ -101,7 +101,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 {post.author.name}
               </Box>
               <Box
-                css={{ mx: "$3", width: "1px", height: 16, bc: "$mauve9" }}
+                css={{ mx: "$3", width: "1px", height: 16, bc: "$primary9" }}
               />
               <Box
                 css={{

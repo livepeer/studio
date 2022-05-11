@@ -8,7 +8,7 @@ const Card = ({ description, title, image, href }) => {
       <A
         css={{
           borderRadius: 16,
-          border: "1px solid $colors$mauve5",
+          border: "1px solid $colors$neutral5",
           textDecoration: "none",
           transition: ".3s all",
           boxShadow:

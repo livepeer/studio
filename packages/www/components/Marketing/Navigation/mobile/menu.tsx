@@ -82,7 +82,7 @@ const Menu = ({
         zIndex: 1,
         visibility: mobileMenuIsOpen ? "visible" : "hidden",
         background: mobileMenuIsOpen
-          ? "linear-gradient(90deg,$colors$mauve4,$colors$mauve4 50%,transparent 0,transparent)"
+          ? "linear-gradient(90deg,$colors$neutral4,$colors$neutral4 50%,transparent 0,transparent)"
           : "transparent",
         boxShadow: mobileMenuIsOpen
           ? "0px 2px 1px rgba(0, 0, 0, 0.04), 0px 16px 40px rgba(0, 0, 0, 0.14)"
@@ -130,7 +130,7 @@ const Menu = ({
         css={{
           p: "$5",
           backgroundColor: "$panel",
-          borderTop: "1px solid $mauve5",
+          borderTop: "1px solid $neutral5",
         }}>
         <Text
           variant="gray"
@@ -150,10 +150,10 @@ const Menu = ({
                 css={{ fontWeight: 600, mb: "$2" }}>
                 Streaming Service
               </ArrowLink>
-              <Box css={{ color: "$mauve5" }}>
+              <Box css={{ color: "$neutral5" }}>
                 <ArrowLink
                   hideArrow
-                  color="$mauve9"
+                  color="$primary9"
                   href="/use-cases/creator-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
                     For creator apps
@@ -161,7 +161,7 @@ const Menu = ({
                 </ArrowLink>
                 <ArrowLink
                   hideArrow
-                  color="$mauve9"
+                  color="$primary9"
                   href="/use-cases/game-streaming-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
                     For live gaming apps
@@ -169,7 +169,7 @@ const Menu = ({
                 </ArrowLink>
                 <ArrowLink
                   hideArrow
-                  color="$mauve9"
+                  color="$primary9"
                   href="/use-cases/music-streaming-platforms">
                   <Text variant="gray" css={{ py: "$1" }}>
                     For live music apps
@@ -177,7 +177,7 @@ const Menu = ({
                 </ArrowLink>
                 <ArrowLink
                   hideArrow
-                  color="$mauve9"
+                  color="$primary9"
                   href="/use-cases/24x7-channels">
                   <Text variant="gray" css={{ py: "$1" }}>
                     For 24x7 video apps
@@ -186,7 +186,7 @@ const Menu = ({
 
                 <ArrowLink
                   hideArrow
-                  color="$mauve9"
+                  color="$primary9"
                   href="/use-cases/ecommerce">
                   <Text variant="gray" css={{ py: "$1" }}>
                     For e-commerce apps
@@ -221,7 +221,7 @@ const Menu = ({
           ai: "center",
           justifyContent: "center",
           backgroundColor: "$panel",
-          borderTop: "1px solid $mauve5",
+          borderTop: "1px solid $neutral5",
         }}>
         {!!token ? (
           <>

@@ -214,8 +214,8 @@ const JobApplicationForm = ({
           py: "$5",
           borderRadius: 24,
           border: "1px solid",
-          borderColor: "$mauve5",
-          bc: "$mauve2",
+          borderColor: "$neutral5",
+          bc: "$neutral2",
           transition: "box-shadow .2s",
           "&:hover": {
             textDecoration: "none",
@@ -335,7 +335,7 @@ const JobApplicationForm = ({
                     p: "$1",
                     mb: "$0",
                     height: "auto",
-                    border: "1px solid $colors$mauve7",
+                    border: "1px solid $colors$primary7",
                     borderRadius: "$1",
                   }}
                   {...getRootProps({ style })}>
@@ -345,7 +345,7 @@ const JobApplicationForm = ({
                     css={{
                       width: "100%",
                       height: "100%",
-                      border: "1px dotted $colors$mauve7",
+                      border: "1px dotted $colors$primary7",
                       borderRadius: "$1",
                       m: 0,
                       fontSize: "$3",
@@ -356,7 +356,7 @@ const JobApplicationForm = ({
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      color: "$mauve9",
+                      color: "$primary9",
                     }}>
                     {loadingPdf
                       ? "Uploading..."
@@ -400,7 +400,7 @@ const JobApplicationForm = ({
                     css={{
                       textAlign: "left",
                       mb: "$1",
-                      color: "$mauve9",
+                      color: "$primary9",
                       fontSize: "$1",
                       lineHeight: "1.5",
                     }}>

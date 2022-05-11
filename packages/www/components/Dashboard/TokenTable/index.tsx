@@ -205,7 +205,7 @@ const TokenTable = ({
           },
           createdAt: {
             date: new Date(token.createdAt),
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           lastUsed: {
             date: new Date(token.lastSeen),

@@ -155,7 +155,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
             css={{
               background: "linear-gradient(180deg, #BD90F2 0%, #6e56cf 100%)",
               borderRadius: "50%",
-              color: "$mauve7",
+              color: "$primary7",
               height: "42px",
               width: "42px",
               minWidth: "42px",

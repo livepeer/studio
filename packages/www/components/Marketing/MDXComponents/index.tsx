@@ -2,7 +2,6 @@ import * as React from "react";
 import NextLink from "next/link";
 import * as DS from "@livepeer/design-system";
 import { Link2Icon } from "@radix-ui/react-icons";
-import { IdProvider } from "@radix-ui/react-id";
 import Table from "./Table";
 import KeyboardTable from "./KeyboardTable";
 import Preview from "./Preview";

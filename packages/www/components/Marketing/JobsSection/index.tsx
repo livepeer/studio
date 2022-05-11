@@ -16,12 +16,12 @@ const JobsSection = ({ jobs }) => {
           css={{
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: "0 -1px 0 0 $colors$mauve4",
+            boxShadow: "0 -1px 0 0 $colors$neutral4",
             padding: 35,
             transition: "all 200ms ease-in-out",
             "&:hover": {
               bc: "$loContrast",
-              boxShadow: "0 0 30px 0 $colors$mauve4",
+              boxShadow: "0 0 30px 0 $colors$neutral4",
               borderRadius: "8px",
             },
           }}>

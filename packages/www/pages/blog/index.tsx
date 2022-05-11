@@ -121,7 +121,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
           )}
           <Flex
             css={{
-              borderBottom: "1px solid $colors$mauve5",
+              borderBottom: "1px solid $colors$neutral5",
               alignItems: "center",
               mb: "$6",
               overflow: "auto",

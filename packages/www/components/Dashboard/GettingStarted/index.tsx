@@ -20,7 +20,7 @@ const GettingStarted = ({ firstName = "" }) => {
       </Heading>
       <Accordion type="single" defaultValue="accordion-one">
         <AccordionItem value="accordion-one">
-          <AccordionButton css={{ color: "$mauve12" }}>
+          <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first live stream
             </Text>
@@ -81,7 +81,7 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-two">
-          <AccordionButton css={{ color: "$mauve12" }}>
+          <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Build with the Livepeer API
             </Text>
@@ -126,7 +126,7 @@ const GettingStarted = ({ firstName = "" }) => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="accordion-three">
-          <AccordionButton css={{ color: "$mauve12" }}>
+          <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your own app
             </Text>
@@ -162,7 +162,7 @@ const GettingStarted = ({ firstName = "" }) => {
         </AccordionItem>
 
         <AccordionItem value="accordion-four">
-          <AccordionButton css={{ color: "$mauve12" }}>
+          <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Deploy MistServer, Livepeer's media server
             </Text>

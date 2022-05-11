@@ -86,7 +86,7 @@ const Post = ({
       }}
       url={metaUrl}
       preview={preview}>
-      <Guides backgroundColor="$mauve2" />
+      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -183,7 +183,7 @@ const Post = ({
                 </Box>
               </Flex>
               <Box
-                css={{ mx: "$2", width: "1px", height: 16, bc: "$mauve2" }}
+                css={{ mx: "$2", width: "1px", height: 16, bc: "$neutral2" }}
               />
               <Box
                 css={{
@@ -247,7 +247,7 @@ const Post = ({
               <>
                 <Box
                   css={{
-                    bc: "$mauve5",
+                    bc: "$neutral5",
                     height: "1px",
                     width: "100%",
                     my: "$8",

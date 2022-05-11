@@ -116,7 +116,7 @@ const Verify = ({
                 {errors ? (
                   <Heading>
                     Email verification failed:{" "}
-                    <Box as="span" css={{ color: "$mauve11" }}>
+                    <Box as="span" css={{ color: "$primary11" }}>
                       {errors}.
                     </Box>
                     <br /> Please access the link you received by email again.

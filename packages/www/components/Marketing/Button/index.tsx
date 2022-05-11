@@ -27,12 +27,12 @@ export const Button = React.forwardRef(
         },
         "&:disabled": {
           background: "none",
-          color: "$mauve8",
+          color: "$primary8",
           pointerEvents: "none",
-          boxShadow: "inset 0 0 0 1px $colors$mauve7",
+          boxShadow: "inset 0 0 0 1px $colors$primary7",
           "&:hover": {
-            boxShadow: "inset 0 0 0 1px $colors$mauve7",
-            color: "$mauve8",
+            boxShadow: "inset 0 0 0 1px $colors$primary7",
+            color: "$primary8",
             background: "none",
           },
         },

@@ -153,15 +153,15 @@ const AssetsTable = ({
                   : "Import"}
               </Box>
             ),
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           createdAt: {
             date: new Date(asset.createdAt),
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           updatedAt: {
             date: asset.updatedAt ? new Date(asset.updatedAt) : null,
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           downloadUrl: {
             id: asset.id,
