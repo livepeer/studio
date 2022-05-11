@@ -23,7 +23,7 @@ import {
   InternalServerError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
-import { generateStreamKey } from "./generate-stream-key";
+import { generateStreamKey } from "./generate-keys";
 import {
   Asset,
   ExportTaskParams,

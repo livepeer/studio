@@ -23,7 +23,7 @@ import { WithID } from "../store/types";
 import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
-import { generateStreamKey } from "./generate-stream-key";
+import { generateStreamKey } from "./generate-keys";
 import {
   makeNextHREF,
   parseFilters,
