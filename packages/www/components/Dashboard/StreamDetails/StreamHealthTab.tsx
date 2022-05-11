@@ -136,7 +136,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
       <Box
         css={{
           borderBottom: "1px solid",
-          borderColor: "$mauve6",
+          borderColor: "$neutral6",
           pb: "$2",
           mb: "$7",
           width: "100%",

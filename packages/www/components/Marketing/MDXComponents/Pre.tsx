@@ -196,8 +196,8 @@ const Pre = styled("pre", {
         $$outline: "inset 0 0 0 1px $colors$violet4",
         $$syntax1: "$colors$blue10",
         $$syntax2: "$colors$pink11",
-        $$comment: "$colors$mauve9",
-        $$fadedLines: "$colors$mauveA8",
+        $$comment: "$colors$primary9",
+        $$fadedLines: "$colors$primaryA8",
       },
       violetOld: {
         $$background: theme.colors.mauve12.value,

@@ -43,7 +43,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
             <Box
               css={{
                 width: "1px",
-                background: "$mauve3",
+                background: "$neutral3",
                 backgroundSize: "1px 8px",
               }}
             />
@@ -51,7 +51,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$neutral4, $colors$neutral4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
                 display: "none",
                 "@bp2": {
@@ -63,7 +63,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$neutral4, $colors$neutral4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
                 display: "none",
                 "@bp1": {
@@ -75,7 +75,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
               css={{
                 width: "1px",
                 background:
-                  "linear-gradient(180deg, $colors$mauve4, $colors$mauve4 50%,transparent 0,transparent)",
+                  "linear-gradient(180deg, $colors$neutral4, $colors$neutral4 50%,transparent 0,transparent)",
                 backgroundSize: "1px 8px",
                 display: "none",
                 "@bp2": {
@@ -86,7 +86,7 @@ const Guides = ({ backgroundColor = "$loContrast" }) => {
             <Box
               css={{
                 width: "1px",
-                background: "$mauve3",
+                background: "$neutral3",
                 backgroundSize: "1px 8px",
                 position: "absolute",
                 top: "0",

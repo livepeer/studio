@@ -148,7 +148,7 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
               data-tip
               data-for={`tooltip-details-${stream.id}`}
               css={{
-                color: "$mauve7",
+                color: "$primary7",
                 cursor: "pointer",
                 ml: 1,
               }}
@@ -265,12 +265,12 @@ const StreamsTable = ({
           details: { stream },
           createdAt: {
             date: new Date(stream.createdAt),
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             href: `/dashboard/streams/${stream.id}`,
           },
           lastSeen: {
             date: stream.lastSeen ? new Date(stream.lastSeen) : null,
-            fallback: <Box css={{ color: "$mauve8" }}>—</Box>,
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             href: `/dashboard/streams/${stream.id}`,
           },
           status: {

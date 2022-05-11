@@ -179,7 +179,7 @@ export default function MintNFT() {
   }
   return (
     <Layout {...Content.metaData} css={{ minHeight: "100vh" }}>
-      <Guides backgroundColor="$mauve2" />
+      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative", flex: 1 }}>
         <Container
           size="3"

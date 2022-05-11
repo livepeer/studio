@@ -264,7 +264,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
         css={{
           mb: "$3",
           borderBottom: "1px solid",
-          borderColor: border ? "$mauve5" : "transparent",
+          borderColor: border ? "$neutral5" : "transparent",
           pb: border ? "$2" : 0,
         }}>
         <Box>{header}</Box>
@@ -272,11 +272,11 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
               <Flex css={{ ai: "center", mr: "$3" }}>
-                <Box css={{ fontSize: "$2", color: "$mauve9" }}>
+                <Box css={{ fontSize: "$2", color: "$primary9" }}>
                   {state.selectedRows.length} selected
                 </Box>
                 <Box
-                  css={{ height: 18, width: "1px", bc: "$mauve7", mx: "$3" }}
+                  css={{ height: 18, width: "1px", bc: "$primary7", mx: "$3" }}
                 />
                 <Box
                   css={{
@@ -408,7 +408,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                     <Tr
                       css={{
                         "&:hover": {
-                          backgroundColor: "$mauve2",
+                          backgroundColor: "$neutral2",
                           cursor,
                         },
                       }}

@@ -217,7 +217,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                     </HoverCardContent>
                   </HoverCardRoot>
                 ) : (
-                  <Box css={{ color: "$mauve8" }}>—</Box>
+                  <Box css={{ color: "$primary8" }}>—</Box>
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },

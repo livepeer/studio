@@ -74,7 +74,7 @@ const CalculatorItem = ({
   return (
     <Box
       css={{
-        borderTop: "1px solid $colors$mauve5",
+        borderTop: "1px solid $colors$neutral5",
         py: "32px",
         width: "100%",
         display: "flex",
@@ -152,9 +152,9 @@ const ScaleCalculator = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        border: "1px solid $mauve5",
+        border: "1px solid $neutral5",
         bc: "transparent",
-        borderColor: percentageWatched === value ? "$violet9" : "$mauve7",
+        borderColor: percentageWatched === value ? "$violet9" : "$primary7",
         cursor: "pointer",
         transition: "all 0.2s",
         "&:hover": {
@@ -164,7 +164,7 @@ const ScaleCalculator = ({
       <Box
         css={{
           fontSize: "14px",
-          color: percentageWatched === value ? "$violet9" : "$mauve9",
+          color: percentageWatched === value ? "$violet9" : "$primary9",
           fontWeight: percentageWatched === value ? 600 : 400,
         }}>
         {value}%
@@ -255,7 +255,7 @@ const Calculator = ({
               width: "100%",
               maxWidth: "100%",
               borderRadius: "6px",
-              border: "1px solid $colors$mauve5",
+              border: "1px solid $colors$neutral5",
               fontSize: "20px",
               letterSpacing: "-0.02em",
               display: "flex",
@@ -265,7 +265,7 @@ const Calculator = ({
               px: "16px",
               transition: "all 0.2s",
               "::placeholder": {
-                color: "$mauve9",
+                color: "$primary9",
               },
               "@bp2": {
                 width: 250,
@@ -285,7 +285,7 @@ const Calculator = ({
                 borderRadius: "6px",
               }}
             />
-            <Box css={{ color: "$mauve9" }}>:</Box>
+            <Box css={{ color: "$primary9" }}>:</Box>
             <TextField
               maxLength={2}
               name="minutes"
@@ -300,7 +300,7 @@ const Calculator = ({
                 borderRadius: "6px",
               }}
             />
-            <Box css={{ color: "$mauve9" }}>:</Box>
+            <Box css={{ color: "$primary9" }}>:</Box>
             <TextField
               maxLength={2}
               name="seconds"
@@ -373,7 +373,7 @@ const Calculator = ({
       </CalculatorItem>
       <Box
         css={{
-          borderTop: "1px solid $colors$mauve5",
+          borderTop: "1px solid $colors$neutral5",
           pt: "32px",
           width: "100%",
           display: "flex",
@@ -416,7 +416,7 @@ const PreviewItem = ({
   return (
     <Box
       css={{
-        borderTop: "1px solid $colors$mauve5",
+        borderTop: "1px solid $colors$neutral5",
         minHeight: 104,
         pt: "$5",
         pb: "$3",
@@ -501,7 +501,7 @@ const Preview = ({ transcoding, streaming }: PreviewProps) => {
   return (
     <Box
       css={{
-        border: "1px solid $colors$mauve5",
+        border: "1px solid $colors$neutral5",
         boxSizing: "border-box",
         borderRadius: "16px",
         display: "flex",

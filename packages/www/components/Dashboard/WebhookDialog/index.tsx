@@ -224,8 +224,8 @@ const WebhookDialog = ({
                 height: 200,
                 overflowX: "hidden",
                 overflowY: "auto",
-                border: "1px solid $colors$mauve7",
-                backgroundColor: "$mauve2",
+                border: "1px solid $colors$neutral7",
+                backgroundColor: "$neutral2",
                 mt: "-3px",
                 zIndex: 1,
               }}>
@@ -237,7 +237,7 @@ const WebhookDialog = ({
                     align="center"
                     css={{
                       width: "100%",
-                      borderBottom: "1px solid $colors$mauve5",
+                      borderBottom: "1px solid $colors$neutral5",
                       p: "$2",
                       fontSize: "$2",
                       color: "$hiContrast",

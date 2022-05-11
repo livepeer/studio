@@ -27,9 +27,9 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
       css={{
         px: "$5",
         py: "$4",
-        boxShadow: "0 0 0 1px $colors$mauve6",
+        boxShadow: "0 0 0 1px $colors$neutral6",
         borderRadius: "$1",
-        backgroundColor: "$mauve2",
+        backgroundColor: "$neutral2",
         color: "$hiContrast",
         mb: "$6",
         minHeight: 92,
@@ -46,7 +46,7 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
         </Box>
       ) : (
         <>
-          <Box css={{ mb: "$2", color: "$mauve9" }}>{title}</Box>
+          <Box css={{ mb: "$2", color: "$primary9" }}>{title}</Box>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
             {limit && <Box css={{ mx: "$1" }}>/</Box>}
@@ -106,7 +106,7 @@ const UsageSummary = () => {
         align="end"
         css={{
           borderBottom: "1px solid",
-          borderColor: "$mauve6",
+          borderColor: "$neutral6",
           pb: "$4",
           mb: "$5",
           width: "100%",
@@ -132,7 +132,7 @@ const UsageSummary = () => {
             </Badge>
           </Flex>
         </Heading>
-        <Flex css={{ fontSize: "$3", color: "$mauve9" }}>
+        <Flex css={{ fontSize: "$3", color: "$primary9" }}>
           Current billing period (
           {subscription && (
             <Flex>

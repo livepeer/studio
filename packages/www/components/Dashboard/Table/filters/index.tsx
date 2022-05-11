@@ -121,7 +121,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                   mx: "$2",
                   height: "16px",
                   width: "1px",
-                  background: "$mauve6",
+                  background: "$neutral6",
                 }}
               />
               <Box as="span">{getActiveFiltersCount(filters)}</Box>
@@ -137,7 +137,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
             maxWidth: "284px",
             display: "flex",
             flexDirection: "column",
-            border: "1px solid $colors$mauve5",
+            border: "1px solid $colors$neutral5",
             marginRight: "6px",
             borderRadius: "4px",
             overflow: "hidden",

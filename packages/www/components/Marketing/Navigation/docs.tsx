@@ -43,7 +43,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
     <>
       <Box
         css={{
-          borderBottom: "1px solid $colors$mauve4",
+          borderBottom: "1px solid $colors$neutral4",
           gridColumn: "1 / 16",
           position: "sticky",
           py: "$3",
@@ -66,13 +66,13 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                 display: "none",
                 alignItems: "center",
                 justifyContent: "space-between",
-                border: "1px solid $colors$mauve6",
+                border: "1px solid $colors$neutral6",
                 borderRadius: "8px",
                 px: "$2",
                 py: "$1",
                 width: "215px",
                 ml: "$6",
-                color: "$mauve11",
+                color: "$primary11",
                 cursor: "pointer",
                 "@bp2": {
                   display: "flex",
@@ -86,10 +86,10 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
               </Flex>
               <Box
                 css={{
-                  border: "1px solid $colors$mauve7",
+                  border: "1px solid $colors$primary7",
                   p: "$1",
                   borderRadius: "4px",
-                  color: "$mauve11",
+                  color: "$primary11",
                 }}>
                 <Box css={{ fontSize: "10px" }}>⌘ K</Box>
               </Box>
@@ -167,7 +167,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                             color:
                               each?.slug === currentPath
                                 ? "$hiContrast"
-                                : "$mauve11",
+                                : "$primary11",
                             "&:hover": {
                               textDecoration: "none",
                               color: "$hiContrast",
@@ -187,7 +187,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
       <Flex
         align="center"
         css={{
-          borderBottom: "1px solid $colors$mauve5",
+          borderBottom: "1px solid $colors$neutral5",
           display: "flex",
           px: "$5",
           py: "$2",
@@ -207,7 +207,9 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
                       textDecoration: "none",
                       mr: "$3",
                       color:
-                        each?.slug === currentPath ? "$hiContrast" : "$mauve9",
+                        each?.slug === currentPath
+                          ? "$hiContrast"
+                          : "$primary9",
                       "&:hover": {
                         textDecoration: "none",
                         color: "$hiContrast",

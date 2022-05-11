@@ -33,7 +33,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$mauve2" />
+      <Guides backgroundColor="$neutral2" />
       {success ? (
         <Box
           css={{

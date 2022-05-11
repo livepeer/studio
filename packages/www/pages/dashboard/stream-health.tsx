@@ -23,7 +23,7 @@ const Arrow = ({ active }: Props) => {
         marginTop: "80px",
         justifySelf: "center",
         transform: "rotate(360deg)",
-        color: "$mauve6",
+        color: "$neutral6",
       }}
       width="48"
       height="48"
@@ -127,7 +127,7 @@ const Health = () => {
       <Box css={{ padding: "$6" }}>
         <Flex
           css={{
-            borderBottom: "1px solid $colors$mauve6",
+            borderBottom: "1px solid $colors$neutral6",
             paddingBottom: "$4",
           }}>
           <Text size="7" as="h1" css={{ fontWeight: 600 }}>

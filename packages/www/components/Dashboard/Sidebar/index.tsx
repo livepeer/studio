@@ -29,7 +29,7 @@ const NavLink = styled(A, {
   fontSize: "$3",
   display: "flex",
   alignItems: "center",
-  color: "$mauve12",
+  color: "$primary12",
   "&:hover": {
     textDecoration: "none",
   },
@@ -46,7 +46,7 @@ const Sidebar = ({ id }) => {
       css={{
         backgroundColor: "$panel",
         borderRight: "1px solid",
-        borderColor: "$mauve6",
+        borderColor: "$neutral6",
         zIndex: 10,
         maxWidth: 270,
         width: 270,
@@ -80,7 +80,7 @@ const Sidebar = ({ id }) => {
             </Text>
             <ChevronDownIcon width={20} height={20} />
           </Flex>
-          <DropdownMenuContent css={{ border: "1px solid $colors$mauve6" }}>
+          <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
             <DropdownMenuGroup>
               <DropdownMenuItem
                 key="billing-dropdown-item"

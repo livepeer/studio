@@ -62,7 +62,7 @@ const Item = ({
       alignItems: "center",
       borderBottom: "1px solid",
       letterSpacing: -0.3,
-      borderColor: "$mauve5",
+      borderColor: "$neutral5",
       ...css,
     }}>
     {displayCheck && (
@@ -267,19 +267,19 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
 
             <List>
               <Item
-                css={{ borderColor: "$mauve5" }}
+                css={{ borderColor: "$neutral5" }}
                 title={<span>$0.005 USD / min video ingested</span>}
               />
               <Item
-                css={{ borderColor: "$mauve5" }}
+                css={{ borderColor: "$neutral5" }}
                 title={<span>Coming soon</span>}
               />
               <Item
-                css={{ borderColor: "$mauve5", borderBottom: 0 }}
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={<span>$0.015 USD / gb video streamed</span>}
               />
               <Item
-                css={{ borderColor: "$mauve5", borderBottom: 0 }}
+                css={{ borderColor: "$neutral5", borderBottom: 0 }}
                 title={<span>$0.002 USD / min per destination</span>}
               />
             </List>

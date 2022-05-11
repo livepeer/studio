@@ -22,9 +22,9 @@ const TeamMember = ({
       css={{
         textAlign: "center",
         borderRadius: 24,
-        border: "1px solid $colors$mauve5",
+        border: "1px solid $colors$neutral5",
         p: 40,
-        bc: "$mauve2",
+        bc: "$neutral2",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -58,7 +58,7 @@ const TeamMember = ({
             }}>
             {fullname}
           </Heading>
-          <Text size="3" variant="gray" css={{ color: "$mauve9" }}>
+          <Text size="3" variant="gray" css={{ color: "$primary9" }}>
             {role}
           </Text>
         </Box>

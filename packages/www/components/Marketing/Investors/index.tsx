@@ -35,7 +35,7 @@ const Investors = ({ backgroundColor }) => {
           <Text
             size="6"
             css={{
-              color: "$mauve9",
+              color: "$primary9",
               textAlign: "center",
               mb: "$8",
             }}>

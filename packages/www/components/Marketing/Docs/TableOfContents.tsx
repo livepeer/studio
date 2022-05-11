@@ -129,7 +129,7 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
                 letterSpacing: "-0.02em",
                 transition: "color .3s",
                 color:
-                  currentPath === `/${child.slug}` ? "$violet11" : "$mauve11",
+                  currentPath === `/${child.slug}` ? "$violet11" : "$primary11",
                 ml: "$7",
                 cursor: "pointer",
                 "&:hover": {
@@ -235,7 +235,7 @@ const TableOfContents = ({
             textTransform: "uppercase",
             fontSize: "$1",
             fontWeight: 700,
-            color: "$mauve9",
+            color: "$primary9",
             letterSpacing: "-.5px",
             mb: "$3",
           }}>
@@ -246,7 +246,7 @@ const TableOfContents = ({
       <Box
         css={{
           height: "100vh",
-          borderRight: "1px solid $colors$mauve5",
+          borderRight: "1px solid $colors$neutral5",
           pt: "$5",
           transition: "all 0.2s",
           width: "60px",

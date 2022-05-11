@@ -47,8 +47,8 @@ const Log = ({ timestamp, level, text }: LogData) => {
       <Badge css={{ mr: "$4" }} variant={levelColorMap[level] as any}>
         {level}
       </Badge>
-      <Box css={{ color: "$mauve9", maxWidth: 100, mr: "$4" }}>{dateStr}</Box>
-      <Box css={{ color: "$mauve9" }}>{text}</Box>
+      <Box css={{ color: "$primary9", maxWidth: 100, mr: "$4" }}>{dateStr}</Box>
+      <Box css={{ color: "$primary9" }}>{text}</Box>
     </Flex>
   );
 };
@@ -172,7 +172,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
       <Box
         css={{
           borderBottom: "1px solid",
-          borderColor: "$mauve6",
+          borderColor: "$neutral6",
           pb: "$1",
           mb: "$4",
           width: "100%",
@@ -185,7 +185,7 @@ const Logger = ({ stream, ...props }: { stream: Stream }) => {
         css={{
           overflow: "scroll",
           p: "$4",
-          bc: "$mauve3",
+          bc: "$neutral3",
           height: 300,
           borderRadius: 6,
         }}>

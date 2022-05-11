@@ -97,7 +97,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             borderColor: isChildren
               ? isActive
                 ? "$violet9"
-                : "$mauve9"
+                : "$primary9"
               : "transparent",
             alignItems: "center",
             py: isChildren ? "8px" : "12px",
