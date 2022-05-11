@@ -33,22 +33,3 @@ export function generateStreamKey() {
     });
   });
 }
-
-// Hidden functionality - run this file directly with `ts-node -r esm generate-keys.ts` to generate shard keys!
-if (!module.parent) {
-  if (process.argv[2]) {
-    const shardCount = parseInt(process.argv[2]);
-    const shards = [...new Array(shardCount)].map(() => "");
-    let remainingLetters = BASE_36.split("");
-    let shardIdx = 0;
-    while (remainingLetters.length > 0) {
-      shards[shardIdx] += remainingLetters.shift();
-      shardIdx = (shardIdx + 1) % shardCount;
-    }
-    for (const shard of shards) {
-      console.log(shard);
-    }
-  } else {
-    generateStreamKey().then((x) => console.log(x));
-  }
-}
