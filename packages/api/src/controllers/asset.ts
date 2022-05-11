@@ -361,7 +361,7 @@ app.post(
   authorizer({}),
   async (req, res) => {
     const id = uuid();
-    const playbackId = await generateUniquePlaybackId(req.store, id);
+    const playbackId = await generateUniquePlaybackId(id);
     let asset = await validateAssetPayload(
       id,
       playbackId,
@@ -420,7 +420,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     throw new UnprocessableEntityError("Asset has invalid objectStoreId");
   }
   const id = uuid();
-  const playbackId = await generateUniquePlaybackId(req.store, id);
+  const playbackId = await generateUniquePlaybackId(id);
   let outputAsset = await validateAssetPayload(
     id,
     playbackId,
@@ -467,7 +467,7 @@ app.post(
   authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const id = uuid();
-    let playbackId = await generateUniquePlaybackId(req.store, id);
+    let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(

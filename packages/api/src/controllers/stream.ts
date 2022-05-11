@@ -20,7 +20,6 @@ import { DBSession } from "../store/db";
 import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
 import { generateUniqueStreamKey } from "./generate-keys";
@@ -806,11 +805,12 @@ app.post(
     }
     const id = uuid();
     const createdAt = Date.now();
-    let streamKey = await generateUniqueStreamKey(req.store, []);
+    let streamKey = await generateUniqueStreamKey();
     // Mist doesn't allow dashes in the URLs
-    let playbackId = (
-      await generateUniqueStreamKey(req.store, [streamKey])
-    ).replace(/-/g, "");
+    let playbackId = (await generateUniqueStreamKey([streamKey])).replace(
+      /-/g,
+      ""
+    );
 
     // use the first four characters of the id as the "shard key" across all identifiers
     const shardKey = id.slice(0, 4);

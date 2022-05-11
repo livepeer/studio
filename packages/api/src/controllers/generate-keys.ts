@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import anyBase from "any-base";
+import { db } from "../store";
 import { IStore } from "../types/common";
 
 const BASE_36 = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -35,33 +36,49 @@ export function generateStreamKey() {
   });
 }
 
-export async function generateUniqueStreamKey(
-  store: IStore,
-  otherKeys: string[]
-) {
+function formatPlaybackId(key: string): string {
+  return key.replace(/-/g, "");
+}
+
+/**
+ * Returns whether the given key exists in the database or matches any of the
+ * other keys sent.
+ */
+export async function keyExists(key: string, otherKeys: string[]) {
+  const playbackId = formatPlaybackId(key);
+  if (otherKeys.includes(key) || otherKeys.includes(playbackId)) {
+    return true;
+  }
+
+  const streamByKey = db.stream.find({ streamKey: key });
+  const streamByPid = db.stream.find({ playbackId });
+  const assetByPid = db.asset.find({ playbackId });
+
+  const results = await Promise.all([streamByKey, streamByPid, assetByPid]);
+  return results.some((r) => r[0].length > 0);
+}
+
+export async function generateUniqueStreamKey(otherKeys: string[] = []) {
   while (true) {
     const streamKey: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "stream",
-      query: { streamKey },
-    });
-    if (!qres.data.length && !otherKeys.includes(streamKey)) {
+    const exists = await keyExists(streamKey, otherKeys);
+    if (!exists) {
       return streamKey;
     }
   }
 }
 
-export async function generateUniquePlaybackId(store: IStore, assetId: string) {
-  const shardKey = assetId.substring(0, 4);
+export async function generateUniquePlaybackId(
+  shardBase: string,
+  otherKeys: string[] = []
+) {
+  const shardKey = shardBase.slice(0, 4);
   while (true) {
-    const playbackId: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "asset",
-      query: { playbackId },
-    });
-    if (!qres.data.length && playbackId != assetId) {
-      const shardedId = shardKey + playbackId.slice(shardKey.length);
-      return shardedId.replace(/-/g, "");
+    const key: string = await generateStreamKey();
+    const shardedKey = shardKey + key.slice(shardKey.length);
+    const exists = await keyExists(shardedKey, otherKeys);
+    if (!exists && shardedKey !== shardBase) {
+      return formatPlaybackId(shardedKey);
     }
   }
 }
