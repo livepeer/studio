@@ -332,24 +332,29 @@ export default class Table<T extends DBObject> {
 
   // on startup: auto-create indices if they don't exist
   async ensureIndex(propName, prop) {
-    // if (!prop.index && !prop.unique) {
-    //   return;
-    // }
-    // let unique = "";
-    // if (prop.unique) {
-    //   unique = "unique";
-    // }
-    // const indexName = `${this.name}_${propName}`;
-    // try {
-    //   await this.db.query(`
-    //       CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((data->>'${propName}'));
-    //     `);
-    // } catch (e) {
-    //   if (!e.message.includes("already exists")) {
-    //     throw e;
-    //   }
-    //   return;
-    // }
-    // logger.info(`Created ${unique} index ${indexName} on ${this.name}`);
+    if (process.env.NODE_ENV !== "test") {
+      // avoid creating indexes in production right now...
+      return;
+    }
+
+    if (!prop.index && !prop.unique) {
+      return;
+    }
+    let unique = "";
+    if (prop.unique) {
+      unique = "unique";
+    }
+    const indexName = `${this.name}_${propName}`;
+    try {
+      await this.db.query(`
+          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((data->>'${propName}'));
+        `);
+    } catch (e) {
+      if (!e.message.includes("already exists")) {
+        throw e;
+      }
+      return;
+    }
+    logger.info(`Created ${unique} index ${indexName} on ${this.name}`);
   }
 }
