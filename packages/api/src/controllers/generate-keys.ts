@@ -12,8 +12,8 @@ const hexToBase36 = anyBase(anyBase.HEX, BASE_36);
  *
  * Returns stream keys of the form XXXX-XXXX-XXXX in Base36. 62-ish bits of entropy.
  */
-export async function generateStreamKey() {
-  return new Promise((resolve, reject) => {
+export function generateStreamKey() {
+  return new Promise<string>((resolve, reject) => {
     randomBytes(128, (err, buf) => {
       if (err) {
         return reject(err);
@@ -34,7 +34,7 @@ export async function generateStreamKey() {
   });
 }
 
-// Hidden functionality - run this file directly with `node -r esm generate-stream-key.js` to generate shard keys!
+// Hidden functionality - run this file directly with `ts-node -r esm generate-keys.ts` to generate shard keys!
 if (!module.parent) {
   if (process.argv[2]) {
     const shardCount = parseInt(process.argv[2]);
