@@ -37,6 +37,7 @@ export function generateStreamKey() {
 }
 
 function formatPlaybackId(key: string): string {
+  // Mist doesn't allow dashes in the URLs
   return key.replace(/-/g, "");
 }
 
@@ -44,7 +45,7 @@ function formatPlaybackId(key: string): string {
  * Returns whether the given key exists in the database or matches any of the
  * other keys sent.
  */
-export async function keyExists(key: string, otherKeys: string[]) {
+async function keyExists(key: string, otherKeys: string[]) {
   const playbackId = formatPlaybackId(key);
   if (otherKeys.includes(key) || otherKeys.includes(playbackId)) {
     return true;
@@ -58,27 +59,24 @@ export async function keyExists(key: string, otherKeys: string[]) {
   return results.some((r) => r[0].length > 0);
 }
 
-export async function generateUniqueStreamKey(otherKeys: string[] = []) {
-  while (true) {
-    const streamKey: string = await generateStreamKey();
-    const exists = await keyExists(streamKey, otherKeys);
-    if (!exists) {
-      return streamKey;
-    }
-  }
-}
-
-export async function generateUniquePlaybackId(
-  shardBase: string,
-  otherKeys: string[] = []
-) {
+async function generateUniqueKey(shardBase: string, otherKeys: string[] = []) {
   const shardKey = shardBase.slice(0, 4);
   while (true) {
     const key: string = await generateStreamKey();
     const shardedKey = shardKey + key.slice(shardKey.length);
+    if (shardedKey === shardBase) {
+      continue;
+    }
     const exists = await keyExists(shardedKey, otherKeys);
-    if (!exists && shardedKey !== shardBase) {
-      return formatPlaybackId(shardedKey);
+    if (!exists) {
+      return shardedKey;
     }
   }
 }
+
+export const generateUniqueStreamKey = generateUniqueKey;
+
+export const generateUniquePlaybackId = async (
+  shardBase: string,
+  otherKeys: string[] = []
+) => formatPlaybackId(await generateUniqueKey(shardBase, otherKeys));
