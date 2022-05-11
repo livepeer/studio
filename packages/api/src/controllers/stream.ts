@@ -23,7 +23,7 @@ import { WithID } from "../store/types";
 import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
-import { generateStreamKey } from "./generate-keys";
+import { generateUniqueStreamKey } from "./generate-keys";
 import {
   makeNextHREF,
   parseFilters,
@@ -600,19 +600,6 @@ app.get(
   geolocateMiddleware({}),
   getBroadcasterHandler
 );
-
-async function generateUniqueStreamKey(store: IStore, otherKeys: string[]) {
-  while (true) {
-    const streamKey: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "stream",
-      query: { streamKey },
-    });
-    if (!qres.data.length && !otherKeys.includes(streamKey)) {
-      return streamKey;
-    }
-  }
-}
 
 app.post(
   "/:streamId/stream",

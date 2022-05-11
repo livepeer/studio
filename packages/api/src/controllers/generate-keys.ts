@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import anyBase from "any-base";
+import { IStore } from "../types/common";
 
 const BASE_36 = "0123456789abcdefghijklmnopqrstuvwxyz";
 const SEGMENT_COUNT = 4;
@@ -32,4 +33,35 @@ export function generateStreamKey() {
       resolve(result);
     });
   });
+}
+
+export async function generateUniqueStreamKey(
+  store: IStore,
+  otherKeys: string[]
+) {
+  while (true) {
+    const streamKey: string = await generateStreamKey();
+    const qres = await store.query({
+      kind: "stream",
+      query: { streamKey },
+    });
+    if (!qres.data.length && !otherKeys.includes(streamKey)) {
+      return streamKey;
+    }
+  }
+}
+
+export async function generateUniquePlaybackId(store: IStore, assetId: string) {
+  const shardKey = assetId.substring(0, 4);
+  while (true) {
+    const playbackId: string = await generateStreamKey();
+    const qres = await store.query({
+      kind: "asset",
+      query: { playbackId },
+    });
+    if (!qres.data.length && playbackId != assetId) {
+      const shardedId = shardKey + playbackId.slice(shardKey.length);
+      return shardedId.replace(/-/g, "");
+    }
+  }
 }

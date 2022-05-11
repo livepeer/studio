@@ -23,7 +23,7 @@ import {
   InternalServerError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
-import { generateStreamKey } from "./generate-keys";
+import { generateUniquePlaybackId } from "./generate-keys";
 import {
   Asset,
   ExportTaskParams,
@@ -36,21 +36,6 @@ import { mergeAssetStatus } from "../store/asset-table";
 const app = Router();
 
 const META_MAX_SIZE = 1024;
-
-export async function generateUniquePlaybackId(store: any, assetId: string) {
-  const shardKey = assetId.substring(0, 4);
-  while (true) {
-    const playbackId: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "asset",
-      query: { playbackId },
-    });
-    if (!qres.data.length && playbackId != assetId) {
-      const shardedId = shardKey + playbackId.slice(shardKey.length);
-      return shardedId.replace(/-/g, "");
-    }
-  }
-}
 
 async function validateAssetPayload(
   id: string,
