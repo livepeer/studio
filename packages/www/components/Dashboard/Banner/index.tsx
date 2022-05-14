@@ -14,7 +14,13 @@ const Banner = ({
   css?: any;
 }) => {
   return (
-    <Promo size="2" css={{ ...css }}>
+    <Promo
+      size="2"
+      css={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, auto)",
+        ...css,
+      }}>
       <Flex>
         <Box>
           <Text size="2" css={{ fontSize: "14px", mb: "$1", fontWeight: 500 }}>
