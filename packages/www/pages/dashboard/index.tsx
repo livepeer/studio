@@ -46,6 +46,7 @@ const Dashboard = () => {
         your email."
           button={
             <Button
+              variant="primary"
               as="a"
               size="2"
               css={{ cursor: "default" }}
@@ -72,7 +73,11 @@ const Dashboard = () => {
           description="Upgrade to the Pro plan and enjoy unlimited transcoding and streaming minutes."
           button={
             <Link href="/dashboard/billing/plans" passHref>
-              <Button as="a" size="2" css={{ cursor: "default" }}>
+              <Button
+                variant="primary"
+                as="a"
+                size="2"
+                css={{ cursor: "default" }}>
                 Upgrade to Pro
               </Button>
             </Link>
