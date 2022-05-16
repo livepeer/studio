@@ -581,7 +581,10 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   let status = assetStatus(asset);
   const ipfsParamsEq =
     JSON.stringify(storage.ipfs) === JSON.stringify(asset.storage?.ipfs);
-  if (storage.ipfs && !ipfsParamsEq) {
+  if (!ipfsParamsEq) {
+    if (!storage.ipfs) {
+      throw new BadRequestError("Cannot remove asset from IPFS");
+    }
     const { id: taskId } = await req.taskScheduler.scheduleTask(
       "export",
       { export: { ipfs: storage.ipfs } },
