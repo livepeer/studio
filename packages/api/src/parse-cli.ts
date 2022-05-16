@@ -247,6 +247,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: false,
         type: "boolean",
       },
+      "half-region-orchestrators-untrusted": {
+        describe:
+          "mark half of the orchestrators returned by /api/region as untrusted. For use in staging!",
+        default: false,
+        type: "boolean",
+      },
       json: {
         describe: "print MistController-compatible json description",
         default: false,
