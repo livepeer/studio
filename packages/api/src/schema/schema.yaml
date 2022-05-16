@@ -912,61 +912,51 @@ components:
             ipfs:
               $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
         status:
-          oneOf:
-            - type: string
-              deprecated: true
-              description: "@deprecated use status.phase instead"
+          type: object
+          additionalProperties: false
+          readOnly: true
+          required: [phase, updatedAt]
+          description: Status of the asset
+          properties:
+            phase:
+              type: string
+              description: Phase of the asset
               enum:
                 - waiting
                 - ready
                 - failed
-            - type: object
+            updatedAt:
+              type: number
+              description:
+                Timestamp (in milliseconds) at which the asset was last updated
+              example: 1587667174725
+            storage:
+              type: object
               additionalProperties: false
-              readOnly: true
-              required: [phase]
-              description: Status of the asset
               properties:
-                phase:
-                  type: string
-                  description: Phase of the asset
-                  enum:
-                    - waiting
-                    - ready
-                    - failed
-                updatedAt:
-                  type: number
-                  description:
-                    Timestamp (in milliseconds) at which the asset was last
-                    updated
-                  example: 1587667174725
-                storage:
-                  type: object
+                ipfs:
                   additionalProperties: false
+                  required: [taskIds]
                   properties:
-                    ipfs:
+                    taskIds:
+                      type: object
                       additionalProperties: false
-                      required: [taskIds]
                       properties:
-                        taskIds:
-                          type: object
-                          additionalProperties: false
-                          properties:
-                            pending:
-                              type: string
-                              description:
-                                ID of any currently running task that is
-                                exporting this asset to IPFS.
-                            last:
-                              type: string
-                              description:
-                                ID of the last task to run successfully, that
-                                the currently saved data.
-                            failed:
-                              type: string
-                              description:
-                                ID of the last task to fail execution.
-                        data:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
+                        pending:
+                          type: string
+                          description:
+                            ID of any currently running task that is exporting
+                            this asset to IPFS.
+                        last:
+                          type: string
+                          description:
+                            ID of the last task to run successfully, that the
+                            currently saved data.
+                        failed:
+                          type: string
+                          description: ID of the last task to fail execution.
+                    data:
+                      $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
         name:
           type: string
           description:
@@ -984,10 +974,6 @@ components:
               "description": "This is a video of my awesome life",
               "tags": ["awesome", "life", "video"],
             }
-        updatedAt:
-          type: number
-          deprecated: true
-          description: "@deprecated Use status.updatedAt instead"
         createdAt:
           type: number
           readOnly: true

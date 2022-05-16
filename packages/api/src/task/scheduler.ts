@@ -84,8 +84,10 @@ export default class TaskScheduler {
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
           playbackRecordingId: assetSpec.playbackRecordingId,
-          status: "ready",
-          updatedAt: Date.now(),
+          status: {
+            phase: "ready",
+            updatedAt: Date.now(),
+          },
         });
         break;
       case "transcode":
@@ -103,8 +105,10 @@ export default class TaskScheduler {
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
           playbackRecordingId: assetSpec.playbackRecordingId,
-          status: "ready",
-          updatedAt: Date.now(),
+          status: {
+            phase: "ready",
+            updatedAt: Date.now(),
+          },
         });
         break;
       case "export":
@@ -154,8 +158,10 @@ export default class TaskScheduler {
     });
     if (task.outputAssetId) {
       await db.asset.update(task.outputAssetId, {
-        status: "failed",
-        updatedAt: Date.now(),
+        status: {
+          phase: "failed",
+          updatedAt: Date.now(),
+        },
       });
     }
     switch (task.type) {

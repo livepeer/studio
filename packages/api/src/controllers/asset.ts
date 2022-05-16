@@ -80,23 +80,18 @@ async function validateAssetPayload(
     playbackId,
     userId,
     createdAt,
-    status: "waiting",
+    status: {
+      phase: "waiting",
+      updatedAt: createdAt,
+    },
     name: payload.name,
     meta: payload.meta,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
 
-const assetStatus = (asset: Asset) =>
-  typeof asset.status === "object"
-    ? asset.status
-    : {
-        phase: asset.status,
-        updatedAt: asset.updatedAt,
-      };
-
 function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
-  if (asset.status !== "ready") {
+  if (asset.status.phase !== "ready") {
     return asset;
   }
   if (asset.playbackRecordingId) {
@@ -308,8 +303,7 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
-    const status = assetStatus(asset);
-    if (status.phase !== "ready") {
+    if (asset.status.phase !== "ready") {
       res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
     }
@@ -331,13 +325,13 @@ app.post(
           ipfs: params.ipfs,
         },
         status: {
-          ...status,
+          ...asset.status,
           storage: {
-            ...status.storage,
+            ...asset.status.storage,
             ipfs: {
-              ...status.storage?.ipfs,
+              ...asset.status.storage?.ipfs,
               taskIds: {
-                ...status.storage?.ipfs?.taskIds,
+                ...asset.status.storage?.ipfs?.taskIds,
                 pending: task.id,
               },
             },
@@ -372,7 +366,7 @@ app.post(
       });
     }
 
-    asset = await db.asset.create(asset);
+    asset = (await db.asset.create(asset)) as WithID<Asset>;
 
     const task = await req.taskScheduler.scheduleTask(
       "import",
@@ -428,7 +422,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     }
   );
   outputAsset.sourceAssetId = inputAsset.id;
-  outputAsset = await db.asset.create(outputAsset);
+  outputAsset = (await db.asset.create(outputAsset)) as WithID<Asset>;
 
   const task = await req.taskScheduler.scheduleTask(
     "transcode",
@@ -515,7 +509,7 @@ app.put("/upload/:url", async (req, res) => {
     throw new NotFoundError(`asset not found`);
   }
   let asset = assets[0][0];
-  if (asset.status !== "waiting") {
+  if (asset.status.phase !== "waiting") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
 
@@ -578,7 +572,7 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
     throw new BadRequestError("Custom pinata not allowed in asset storage");
   }
 
-  let status = assetStatus(asset);
+  let status = asset.status;
   const ipfsParamsEq =
     JSON.stringify(storage.ipfs) === JSON.stringify(asset.storage?.ipfs);
   if (!ipfsParamsEq) {

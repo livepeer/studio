@@ -9,10 +9,7 @@ import {
   ObjectStore,
   ApiToken,
   User,
-  Webhook,
   PasswordResetToken,
-  MultistreamTarget,
-  Asset,
   Task,
   Usage,
   Region,
@@ -27,6 +24,7 @@ import { QueryOptions, WithID } from "./types";
 import MultistreamTargetTable from "./multistream-table";
 import WebhookTable from "./webhook-table";
 import { CdnUsageTable } from "./cdn-usage-table";
+import AssetTable from "./asset-table";
 
 // Should be configurable, perhaps?
 const CONNECT_TIMEOUT = 5000;
@@ -64,7 +62,7 @@ export class DB {
   stream: StreamTable;
   objectStore: Table<ObjectStore>;
   multistreamTarget: MultistreamTargetTable;
-  asset: Table<Asset>;
+  asset: AssetTable;
   task: Table<Task>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
@@ -147,7 +145,7 @@ export class DB {
       db: this,
       schema: schemas["api-token"],
     });
-    this.asset = makeTable<Asset>({
+    this.asset = new AssetTable({
       db: this,
       schema: schemas["asset"],
     });
