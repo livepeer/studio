@@ -37,9 +37,29 @@ Retrieves the details of an `Asset` that has previously been imported or
 uploaded. Supply the unique `Asset` ID that was returned from your previous
 request, and Livepeer will return the corresponding `Asset` information.
 
+## curl
+
 ```jsx
 curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
 --header 'Authorization: Bearer $API_TOKEN'
+```
+
+## JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/asset", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### Response Example
@@ -88,6 +108,7 @@ curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
         "duration": 309.986393
     },
     "playbackId": "$PLAYBACK_ID",
-    "downloadUrl": "https://livepeercdn.com/asset/$PLAYBACK_ID/video"
+    "downloadUrl": "https://livepeercdn.com/asset/$PLAYBACK_ID/video",
+    "playbackUrl": "https://cdn.livepeer.com/asset/$PLAYBACKURL_ID/index.m3u8"
 }
 ```
