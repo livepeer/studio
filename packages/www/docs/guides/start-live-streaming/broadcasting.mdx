@@ -19,6 +19,19 @@ Here are several ways to find your stream key:
   the value of the `streamKey` in the response.
 - Make a `GET` request to `/api/stream/[id]`, and note the value of the
   `streamKey` in the response.
+- JavaScript + axios
+ ```javascript
+//Getting stream key from stream ID
+const axios = require('axios');
+
+axios.get("https://livepeer.com/api/{id}", )
+.then(res => {
+  console.log(JSON.stringify(res.data));
+})
+.catch(error => {
+  console.log(error);
+});
+```
 
 When configuring broadcast software to push streams, use the secret `streamKey`
 and the Livepeer.com RTMP ingest URL, `rtmp://rtmp.livepeer.com/live`.
