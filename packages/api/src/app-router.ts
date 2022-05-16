@@ -59,6 +59,7 @@ export default async function makeApp(params: CliArgs) {
     stripeSecretKey,
     amqpUrl,
     returnRegionInOrchestrator,
+    halfRegionOrchestratorsUntrusted,
   } = params;
 
   if (supportAddr || sendgridTemplateId || sendgridApiKey) {
@@ -151,7 +152,9 @@ export default async function makeApp(params: CliArgs) {
 
   if (returnRegionInOrchestrator) {
     app.use((req, res, next) => {
-      req.orchestratorsGetters.push(regionsGetter);
+      req.orchestratorsGetters.push(
+        regionsGetter(halfRegionOrchestratorsUntrusted)
+      );
       return next();
     });
   }
