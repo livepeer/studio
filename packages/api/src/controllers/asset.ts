@@ -20,6 +20,7 @@ import {
   UnprocessableEntityError,
   NotFoundError,
   BadRequestError,
+  InternalServerError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
@@ -152,21 +153,31 @@ function parseUploadUrl(
 }
 
 app.use(
-  mung.json(function cleanWriteOnlyResponses(
+  mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
-    if (req.user.admin) {
-      return data;
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      throw new InternalServerError("Ingest not configured");
     }
+    const ingest = ingests[0].base;
+    const toExternalAsset = (a: WithID<Asset>) =>
+      req.user.admin
+        ? withPlaybackUrls(a, ingest)
+        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(a, ingest));
+
     if (Array.isArray(data)) {
-      return db.asset.cleanWriteOnlyResponses(data);
+      return data.map(toExternalAsset);
     }
     if ("id" in data) {
-      return db.asset.cleanWriteOnlyResponse(data);
+      return toExternalAsset(data);
     }
     if ("asset" in data) {
-      return { ...data, asset: db.asset.cleanWriteOnlyResponse(data.asset) };
+      return {
+        ...data,
+        asset: toExternalAsset(data.asset),
+      };
     }
     return data;
   })
@@ -193,12 +204,6 @@ app.get("/", authorizer({}), async (req, res) => {
   if (!order) {
     order = "updatedAt-true,createdAt-true";
   }
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
 
   if (req.user.admin && allUsers && allUsers !== "false") {
     const query = parseFilters(fieldsMap, filters);
@@ -223,7 +228,7 @@ app.get("/", authorizer({}), async (req, res) => {
           res.set("X-Total-Count", c);
         }
         return {
-          ...withPlaybackUrls(data, ingest),
+          ...data,
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },
@@ -259,7 +264,7 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withPlaybackUrls(data, ingest);
+      return data;
     },
   });
   res.status(200);
@@ -272,13 +277,6 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-
-  const ingest = ingests[0].base;
   const asset = await db.asset.get(req.params.id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
@@ -290,7 +288,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     );
   }
 
-  res.json(withPlaybackUrls(asset, ingest));
+  res.json(asset);
 });
 
 app.post(
