@@ -1225,6 +1225,7 @@ components:
         status:
           type: object
           additionalProperties: false
+          readOnly: true
           description: Status of the task
           properties:
             phase:
