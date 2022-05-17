@@ -50,10 +50,10 @@ curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export'
       description: "Will be added to the `pinata_secret_api_key` header.",
     },
     {
-      parameter: <code>ipfs.erc1155Metadata</code>,
+      parameter: <code>ipfs.nftMetadata</code>,
       type: <code>object</code>,
       description:
-        "Additional data to add to the automatic ERC-1155 default export. Will be deep merged with the default metadata regularly exported.",
+        "Additional data to add to the NFT metadata also exported to IPFS. Will be deep merged with the default metadata regularly exported.",
     },
     {
       parameter: <code>custom</code>,
