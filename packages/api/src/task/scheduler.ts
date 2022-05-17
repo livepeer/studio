@@ -5,6 +5,7 @@ import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
+import { mergeAssetStatus } from "../store/asset-table";
 export default class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -113,26 +114,19 @@ export default class TaskScheduler {
         break;
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
-        if (
-          typeof inputAsset.status === "object" &&
-          inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id
-        ) {
-          const ipfs = inputAsset.status.storage.ipfs;
+        if (inputAsset.status.storage?.ipfs?.taskIds?.pending === task.id) {
           await db.asset.update(inputAsset.id, {
-            status: {
-              ...inputAsset.status,
+            status: mergeAssetStatus(inputAsset.status, {
               storage: {
-                ...inputAsset.status.storage,
                 ipfs: {
                   taskIds: {
-                    ...ipfs.taskIds,
-                    pending: null,
+                    pending: undefined,
                     last: task.id,
                   },
                   data: task.output.export.ipfs,
                 },
               },
-            },
+            }),
           });
         }
         break;
@@ -163,26 +157,18 @@ export default class TaskScheduler {
     switch (task.type) {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
-        if (
-          typeof inputAsset.status === "object" &&
-          inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id
-        ) {
-          const { storage } = inputAsset.status;
+        if (inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id) {
           await db.asset.update(inputAsset.id, {
-            status: {
-              ...inputAsset.status,
+            status: mergeAssetStatus(inputAsset.status, {
               storage: {
-                ...storage,
                 ipfs: {
-                  ...storage.ipfs,
                   taskIds: {
-                    ...storage.ipfs.taskIds,
-                    pending: null,
+                    pending: undefined,
                     failed: task.id,
                   },
                 },
               },
-            },
+            }),
           });
         }
         break;

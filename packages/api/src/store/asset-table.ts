@@ -37,6 +37,27 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
         },
       };
 
+export const mergeAssetStatus = (
+  s1: Asset["status"],
+  s2: Partial<Asset["status"]>
+): Asset["status"] => ({
+  ...s1,
+  ...s2,
+  storage: {
+    ...s1?.storage,
+    ...s2?.storage,
+    ipfs: {
+      ...s1?.storage?.ipfs,
+      ...s2?.storage?.ipfs,
+      taskIds: {
+        ...s1?.storage?.ipfs?.taskIds,
+        ...s2?.storage?.ipfs?.taskIds,
+      },
+      // data is not mergeable, just keep the result of the spread above (s2>s1)
+    },
+  },
+});
+
 // This is mostly a compatibility helper which transforms assets read from the
 // database into the new schema (with status object instead of status string).
 //

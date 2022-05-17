@@ -31,6 +31,7 @@ import {
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
+import { mergeAssetStatus } from "../store/asset-table";
 
 const app = Router();
 
@@ -135,19 +136,15 @@ async function reconcileAssetStorage(
       );
     }
     storage = { ...storage, ipfs: newStorage.ipfs };
-    status = {
-      ...status,
+    status = mergeAssetStatus(status, {
       storage: {
-        ...status.storage,
         ipfs: {
-          ...status.storage?.ipfs,
           taskIds: {
-            ...status.storage?.ipfs?.taskIds,
             pending: task.id,
           },
         },
       },
-    };
+    });
   }
   return { storage, status };
 }
