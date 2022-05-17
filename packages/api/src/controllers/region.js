@@ -9,7 +9,7 @@ const app = Router();
 function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
   return regions.flatMap((reg) =>
     reg.orchestrators.map((orch, i) => ({
-      score: halfUntrusted && i % 2 == 0 ? 0 : defaultScore,
+      score: halfRegionOrchestratorsUntrusted && i % 2 == 0 ? 0 : defaultScore,
       region: reg.region,
       ...orch,
     }))
