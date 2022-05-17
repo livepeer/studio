@@ -74,6 +74,10 @@
     {
       "source": "/docs/api-keys/delete-an-api-key",
       "destination": "/docs/guides/api-keys/delete-an-api-key"
+    },
+    {
+      "source": "/docs/guides/video-nft",
+      "destination": "/docs/guides/video-nfts/mint-a-video-nft"
     }
   ]
 }
