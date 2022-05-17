@@ -16,10 +16,12 @@ function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
   );
 }
 
-export async function regionsGetter(halfRegionOrchestratorsUntrusted = false) {
-  const [regions, cursor] = await db.region.find({}, { limit: 100 });
+export function regionsGetter(halfRegionOrchestratorsUntrusted = false) {
+  return async function regionsGetter2() {
+    const [regions, cursor] = await db.region.find({}, { limit: 100 });
 
-  return flatRegions(regions, halfRegionOrchestratorsUntrusted);
+    return flatRegions(regions, halfRegionOrchestratorsUntrusted);
+  };
 }
 
 app.get("/", async (req, res, next) => {
