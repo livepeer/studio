@@ -228,7 +228,7 @@ const fieldsMap: FieldsMap = {
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
-  updatedAt: { val: `asset.data->'updatedAt'`, type: "int" },
+  updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
@@ -236,8 +236,9 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    toStringValues(req.query);
+  let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
+    req.query
+  );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -600,5 +601,41 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   const updated = await db.asset.get(id, { useReplica: false });
   res.status(200).json(updated);
 });
+
+// TODO: Call this in production until there are no assets left in old format.
+// Then remove compatibility code and this API.
+app.post(
+  "/migrate-status",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    let { limit, cursor } = toStringValues(req.query);
+    if (isNaN(parseInt(limit))) {
+      limit = "100";
+    }
+
+    const query = [sql`asset.data->'status'->>'phase' IS NULL`];
+    const fields = " asset.id as id, asset.data as data";
+    const [toUpdate, nextCursor] = await db.asset.find(query, {
+      limit,
+      cursor,
+      fields,
+    });
+
+    for (const asset of toUpdate) {
+      // the db.asset will actually already return the asset transformed to the
+      // updated format. All we need to do is re-save it as returned here.
+      await db.asset.update(asset.id, asset);
+    }
+
+    if (toUpdate.length > 0 && nextCursor) {
+      res.links({ next: makeNextHREF(req, nextCursor) });
+    }
+    return res.status(200).json({
+      count: toUpdate.length,
+      nextCursor,
+      updated: toUpdate,
+    });
+  }
+);
 
 export default app;
