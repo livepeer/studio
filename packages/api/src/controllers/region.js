@@ -6,20 +6,22 @@ const defaultScore = 1;
 
 const app = Router();
 
-function flatRegions(regions = []) {
+function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
   return regions.flatMap((reg) =>
-    reg.orchestrators.map((orch) => ({
-      score: defaultScore,
+    reg.orchestrators.map((orch, i) => ({
+      score: halfRegionOrchestratorsUntrusted && i % 2 == 0 ? 0 : defaultScore,
       region: reg.region,
       ...orch,
     }))
   );
 }
 
-export async function regionsGetter() {
-  const [regions, cursor] = await db.region.find({}, { limit: 100 });
+export function regionsGetter(halfRegionOrchestratorsUntrusted = false) {
+  return async function regionsGetter2() {
+    const [regions, cursor] = await db.region.find({}, { limit: 100 });
 
-  return flatRegions(regions);
+    return flatRegions(regions, halfRegionOrchestratorsUntrusted);
+  };
 }
 
 app.get("/", async (req, res, next) => {
@@ -28,7 +30,9 @@ app.get("/", async (req, res, next) => {
     return res.json(regions);
   }
 
-  return res.json(flatRegions(regions));
+  return res.json(
+    flatRegions(regions, req.config.halfRegionOrchestratorsUntrusted)
+  );
 });
 
 app.get("/:region", async (req, res, next) => {
