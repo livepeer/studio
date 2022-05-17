@@ -578,13 +578,6 @@ app.delete("/:id", authorizer({}), async (req, res) => {
 });
 
 app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
-  // update a specific asset
-  const { id } = req.params;
-  const asset = await db.asset.get(id);
-  if (!asset) {
-    throw new NotFoundError(`asset not found`);
-  }
-
   // these are the only updateable fields
   let { name, storage, ...rest } = req.body as Asset;
   if (storage?.ipfs?.pinata) {
@@ -593,6 +586,13 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
     );
   } else if (Object.keys(rest).length) {
     throw new BadRequestError("Only asset name and storage can be updated");
+  }
+
+  // update a specific asset
+  const { id } = req.params;
+  const asset = await db.asset.get(id);
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
   }
 
   const storageUpdates = await reconcileAssetStorage(req, asset, storage);
