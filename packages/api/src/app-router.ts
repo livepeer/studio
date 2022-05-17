@@ -198,7 +198,7 @@ export default async function makeApp(params: CliArgs) {
 
   if (returnRegionInOrchestrator) {
     app.use((req, res, next) => {
-      req.orchestratorsGetters.push(
+      req.orchestratorsGetters.push(() =>
         regionsGetter(halfRegionOrchestratorsUntrusted)
       );
       return next();
