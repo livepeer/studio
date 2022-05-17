@@ -27,9 +27,31 @@ epoch will be close to the current time.
 
 Here is an example request:
 
+## curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{id}"
+```
+
+## JavaScript + axios
+
+```javascript
+//Verifying the stream status
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 ```
 
 This is an example response:
@@ -56,9 +78,37 @@ This is an example response:
 This example shows a decoded JSON object. But, remember that anything passed as
 a parameter in a `GET` request URL must be URL encoded.
 
+## curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": true}]"
+```
+
+## JavaScript + axios
+
+```javascript
+//Return all active live streams
+const axios = require('axios');
+
+axios.get("https://livepeer.com/api/stream/{id}", {
+  headers: {
+    'Authorization': 'Bearer {api_key}',
+    'Content-Type': 'application/json'
+  },
+  data: JSON.stringify({
+    "id": "isActive",
+    "value": true
+  });
+
+  }
+  })
+  .then(res => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch(error => {
+    console.log(error);
+  });
 ```
 
 ## Return all idle live streams
@@ -66,7 +116,32 @@ curl -H 'authorization: Bearer {api-key}' \
 This example shows a decoded JSON object. Remember that anything passed as a
 parameter in a `GET` request URL must be URL encoded.
 
+## curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1&filters=[{"id": "isActive", "value": false}]"
+```
+
+## JavaScript + axios
+
+```javascript
+//Return all idle streams
+const axios = require('axios');
+
+axios.get("https://livepeer.com/api/stream/{id}", {
+  headers: {
+    'Authorization': 'Bearer {stream_key}',
+    'Content-Type': 'application/json'
+  },
+  data: {
+    JSON.stringify({'id': 'isActive',
+    'value': 'false'
+    });
+  }
+})
+.then(res => {console.log(JSON.stringify(res.data));
+})
+.catch(error => console.log(error));
+})
 ```
