@@ -1,6 +1,6 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import { RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
@@ -24,7 +24,12 @@ import {
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
-import { Asset, ExportTaskParams, NewAssetPayload } from "../schema/types";
+import {
+  Asset,
+  ExportTaskParams,
+  NewAssetPayload,
+  Task,
+} from "../schema/types";
 import { WithID } from "../store/types";
 
 const app = Router();
@@ -107,6 +112,44 @@ function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
     ...asset,
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
+}
+
+async function reconcileAssetStorage(
+  { taskScheduler }: Request,
+  asset: WithID<Asset>,
+  newStorage: Asset["storage"],
+  task?: WithID<Task>
+): Promise<{ storage: Asset["storage"]; status: Asset["status"] }> {
+  let { storage, status } = asset;
+  const ipfsParamsEq =
+    JSON.stringify(newStorage.ipfs) === JSON.stringify(storage?.ipfs);
+  if (!ipfsParamsEq) {
+    if (!newStorage.ipfs) {
+      throw new BadRequestError("Cannot remove asset from IPFS");
+    }
+    if (!task) {
+      task = await taskScheduler.scheduleTask(
+        "export",
+        { export: { ipfs: newStorage.ipfs } },
+        asset
+      );
+    }
+    storage = { ...storage, ipfs: newStorage.ipfs };
+    status = {
+      ...status,
+      storage: {
+        ...status.storage,
+        ipfs: {
+          ...status.storage?.ipfs,
+          taskIds: {
+            ...status.storage?.ipfs?.taskIds,
+            pending: task.id,
+          },
+        },
+      },
+    };
+  }
+  return { storage, status };
 }
 
 async function genUploadUrl(
@@ -311,31 +354,12 @@ app.post(
     const params = req.body as ExportTaskParams;
     const task = await req.taskScheduler.scheduleTask(
       "export",
-      {
-        export: params,
-      },
+      { export: params },
       asset
     );
-    if ("ipfs" in params && !params.ipfs.pinata) {
-      await db.asset.update(assetId, {
-        storage: {
-          ...asset.storage,
-          ipfs: params.ipfs,
-        },
-        status: {
-          ...asset.status,
-          storage: {
-            ...asset.status.storage,
-            ipfs: {
-              ...asset.status.storage?.ipfs,
-              taskIds: {
-                ...asset.status.storage?.ipfs?.taskIds,
-                pending: task.id,
-              },
-            },
-          },
-        },
-      });
+    if ("ipfs" in params && !params.ipfs?.pinata) {
+      const updates = await reconcileAssetStorage(req, asset, params, task);
+      await db.asset.update(assetId, updates);
     }
 
     res.status(201);
@@ -565,42 +589,17 @@ app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
   }
 
   // these are the only updateable fields
-  const { name, storage } = req.body as Asset;
+  let { name, storage, ...rest } = req.body as Asset;
   if (storage?.ipfs?.pinata) {
-    throw new BadRequestError("Custom pinata not allowed in asset storage");
+    throw new BadRequestError(
+      "Custom pinata not allowed in asset storage. Call export API explicitly instead"
+    );
+  } else if (Object.keys(rest).length) {
+    throw new BadRequestError("Only asset name and storage can be updated");
   }
 
-  let status = asset.status;
-  const ipfsParamsEq =
-    JSON.stringify(storage.ipfs) === JSON.stringify(asset.storage?.ipfs);
-  if (!ipfsParamsEq) {
-    if (!storage.ipfs) {
-      throw new BadRequestError("Cannot remove asset from IPFS");
-    }
-    const { id: taskId } = await req.taskScheduler.scheduleTask(
-      "export",
-      { export: { ipfs: storage.ipfs } },
-      asset
-    );
-    status = {
-      ...status,
-      storage: {
-        ...status.storage,
-        ipfs: {
-          ...status.storage?.ipfs,
-          taskIds: {
-            ...status.storage?.ipfs?.taskIds,
-            pending: taskId,
-          },
-        },
-      },
-    };
-  }
-  await db.asset.update(id, {
-    name,
-    storage: { ...asset.storage, ...storage },
-    status,
-  });
+  const storageUpdates = await reconcileAssetStorage(req, asset, storage);
+  await db.asset.update(id, { name, ...storageUpdates });
   const updated = await db.asset.get(id, { useReplica: false });
   res.status(200).json(updated);
 });

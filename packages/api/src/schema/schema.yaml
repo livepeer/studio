@@ -950,8 +950,8 @@ components:
                         last:
                           type: string
                           description:
-                            ID of the last task to run successfully, that the
-                            currently saved data.
+                            ID of the last task to run successfully, that
+                            created the currently saved data.
                         failed:
                           type: string
                           description: ID of the last task to fail execution.
