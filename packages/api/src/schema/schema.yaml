@@ -930,6 +930,9 @@ components:
               description:
                 Timestamp (in milliseconds) at which the asset was last updated
               example: 1587667174725
+            errorMessage:
+              type: string
+              description: Error message if the asset creation failed.
             storage:
               type: object
               additionalProperties: false

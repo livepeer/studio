@@ -148,21 +148,17 @@ export default class TaskScheduler {
   }
 
   private async failTask(task: Task, error: string, output?: Task["output"]) {
+    const status = {
+      phase: "failed",
+      updatedAt: Date.now(),
+      errorMessage: error,
+    } as const;
     await db.task.update(task.id, {
       output,
-      status: {
-        phase: "failed",
-        updatedAt: Date.now(),
-        errorMessage: error,
-      },
+      status,
     });
     if (task.outputAssetId) {
-      await db.asset.update(task.outputAssetId, {
-        status: {
-          phase: "failed",
-          updatedAt: Date.now(),
-        },
-      });
+      await db.asset.update(task.outputAssetId, { status });
     }
     switch (task.type) {
       case "export":
