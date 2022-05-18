@@ -19,6 +19,8 @@ Webhook endpoints are specific for each `event`. Once the event is registered,
 all streams for this account will be triggering the specific event. Here is an
 example of registering for the `stream.started` and `stream.idle` events:
 
+### curl
+
 ```bash
 curl \
     -X POST \
@@ -30,6 +32,31 @@ curl \
       "name": "test webhooks"
   }' \
   https://livepeer.com/api/webhook
+```
+
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/webhook", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "applcation/json",
+    },
+    data: JSON.stringify({
+      events: ["stream.started", "stream.idle"],
+      url: "{webhook_url}",
+      name: "test webhooks",
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 ```
 
 This request should return:
