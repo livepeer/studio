@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "hooks";
 import Modal from "../Modal";
 import { Button, Flex } from "@theme-ui/components";
@@ -16,6 +16,10 @@ type Props = {
 const SuspendUserModal = ({ user, isOpen, onClose, onSuspend }: Props) => {
   const [isCopyrightInfringiment, setIsCopyrightInfringiment] = useState(true);
   const { setUserSuspended } = useApi();
+
+  useEffect(() => {
+    setIsCopyrightInfringiment(true);
+  }, [isOpen]);
 
   return !(user && isOpen) ? null : (
     <Modal onClose={onClose}>
