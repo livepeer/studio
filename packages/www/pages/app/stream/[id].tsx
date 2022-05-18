@@ -235,7 +235,10 @@ const ID = () => {
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
-  const fetchStream = useCallback(async (id: string) => {
+  const fetchStream = useCallback(async () => {
+    if (!id) {
+      return;
+    }
     try {
       const [res, info] = await getStreamInfo(id);
       if (res.status === 404) {
@@ -248,20 +251,18 @@ const ID = () => {
     } catch (err) {
       console.error(err); // todo: surface this
     }
-  }, []);
+  }, [id]);
   useEffect(() => {
-    if (id) {
-      fetchStream(id);
-    }
-  }, [id, fetchStream]);
+    fetchStream();
+  }, [fetchStream]);
   const isVisible = usePageVisibility();
   useEffect(() => {
-    if (!isVisible || !id || notFound) {
+    if (!isVisible || notFound) {
       return;
     }
-    const interval = setInterval(() => fetchStream(id), 5000);
+    const interval = setInterval(fetchStream, 5000);
     return () => clearInterval(interval);
-  }, [id, fetchStream, isVisible]);
+  }, [fetchStream, isVisible, notFound]);
   const userField = useMemo(() => {
     let value = streamOwner?.email;
     if (streamOwner?.admin) {
