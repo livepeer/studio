@@ -2,19 +2,11 @@
 import { jsx } from "theme-ui";
 import { useState, useMemo } from "react";
 import { useApi } from "hooks";
+import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.com/api/src/config";
 import CommonAdminTable from "@components/Admin/CommonAdminTable";
-import {
-  Button,
-  Flex,
-  Container,
-  Select,
-  Box,
-  Checkbox,
-  Label,
-  Tooltip,
-} from "@livepeer/design-system";
+import { Box, Checkbox, Label, Tooltip } from "@livepeer/design-system";
 
 type UserTableProps = {
   userId: string;
