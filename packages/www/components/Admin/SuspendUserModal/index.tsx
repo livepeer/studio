@@ -10,7 +10,7 @@ type Props = {
   user: User;
   isOpen: boolean;
   onClose: () => void;
-  onSuspend: () => PromiseLike<void>;
+  onSuspend: () => PromiseLike<void> | void;
 };
 
 const SuspendUserModal = ({ user, isOpen, onClose, onSuspend }: Props) => {
