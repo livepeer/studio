@@ -22,7 +22,7 @@ import Copy from "../../../public/img/copy.svg";
 import { useRouter } from "next/router";
 import Router from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import TabbedLayout from "@components/Admin/TabbedLayout";
 import StreamSessionsTable from "@components/Admin/StreamSessionsTable";
 import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
@@ -262,6 +262,16 @@ const ID = () => {
     const interval = setInterval(() => fetchStream(id), 5000);
     return () => clearInterval(interval);
   }, [id, fetchStream, isVisible]);
+  const userField = useMemo(() => {
+    let value = streamOwner?.email;
+    if (streamOwner?.admin) {
+      value = `${value} (admin)`;
+    }
+    if (streamOwner?.suspended) {
+      value = `${value} (suspended)`;
+    }
+    return value;
+  }, [streamOwner?.email, streamOwner?.admin, streamOwner?.suspended]);
   const [keyRevealed, setKeyRevealed] = useState(false);
   const close = () => {
     setSuspendModal(false);
@@ -757,6 +767,8 @@ const ID = () => {
                 <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                   <hr />
                 </Box>
+                <Cell>User</Cell>
+                <Cell>{userField}</Cell>
                 <Cell>Renditions</Cell>
                 <Cell>
                   <RenditionsDetails stream={stream} />
@@ -782,7 +794,7 @@ const ID = () => {
                 <Cell>Status</Cell>
                 <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
                 <Cell>Suspended</Cell>
-                <Cell>{stream.suspended ? "Suspended" : "Normal"}</Cell>
+                <Cell>{stream.suspended ? "Yes" : " No"}</Cell>
                 {user.admin || isStaging() || isDevelopment() ? (
                   <>
                     <Cell> </Cell>
