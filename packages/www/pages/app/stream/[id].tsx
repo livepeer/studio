@@ -1,5 +1,4 @@
 /** @jsxImportSource @emotion/react */
-import { jsx } from "theme-ui";
 import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import {
@@ -17,13 +16,13 @@ import {
 } from "@theme-ui/components";
 import Layout from "../../../layouts/admin";
 import useLoggedIn from "../../../hooks/use-logged-in";
-import { Stream } from "@livepeer.com/api";
+import { Stream, User } from "@livepeer.com/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../../public/img/copy.svg";
 import { useRouter } from "next/router";
 import Router from "next/router";
 import { useApi, usePageVisibility } from "../../../hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TabbedLayout from "@components/Admin/TabbedLayout";
 import StreamSessionsTable from "@components/Admin/StreamSessionsTable";
 import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
@@ -39,6 +38,7 @@ import {
 import { RenditionsDetails } from "@components/Admin/StreamsTable";
 import { RelativeTime } from "@components/Admin/CommonAdminTable";
 import { getTabs as getTabsAdmin } from "../admin";
+import SuspendUserModal from "@components/Admin/SuspendUserModal";
 
 type TimedAlertProps = {
   text: string;
@@ -168,7 +168,7 @@ const ID = () => {
   const {
     user,
     logout,
-    getStream,
+    getStreamInfo,
     deleteStream,
     getIngest,
     patchStream,
@@ -178,11 +178,13 @@ const ID = () => {
   const userIsAdmin = user && user.admin;
   const router = useRouter();
   const { query } = router;
-  const id = query.id;
-  const [stream, setStream] = useState(null);
+  const id = query.id?.toString();
+  const [stream, setStream] = useState<Stream>(null);
+  const [streamOwner, setStreamOwner] = useState<User>(null);
   const [ingest, setIngest] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [terminateModal, setTerminateModal] = useState(false);
+  const [suspendUserModal, setSuspendUserModal] = useState(false);
   const [suspendModal, setSuspendModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [recordOffModal, setRecordOffModal] = useState(false);
@@ -233,35 +235,38 @@ const ID = () => {
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
-  useEffect(() => {
-    if (!id) {
-      return;
+  const fetchStream = useCallback(async (id: string) => {
+    try {
+      const [res, info] = await getStreamInfo(id);
+      if (res.status === 404) {
+        return setNotFound(true);
+      } else if ("errors" in info) {
+        throw new Error(info.errors.toString());
+      }
+      setStream(info.stream);
+      setStreamOwner(info.user);
+    } catch (err) {
+      console.error(err); // todo: surface this
     }
-    getStream(id)
-      .then((stream) => setStream(stream))
-      .catch((err) => {
-        if (err && err.status === 404) {
-          setNotFound(true);
-        }
-        console.error(err);
-      }); // todo: surface this
-  }, [id]);
+  }, []);
+  useEffect(() => {
+    if (id) {
+      fetchStream(id);
+    }
+  }, [id, fetchStream]);
   const isVisible = usePageVisibility();
   useEffect(() => {
     if (!isVisible || !id || notFound) {
       return;
     }
-    const interval = setInterval(() => {
-      getStream(id)
-        .then((stream) => setStream(stream))
-        .catch((err) => console.error(err)); // todo: surface this
-    }, 5000);
+    const interval = setInterval(() => fetchStream(id), 5000);
     return () => clearInterval(interval);
-  }, [id, isVisible]);
+  }, [id, fetchStream, isVisible]);
   const [keyRevealed, setKeyRevealed] = useState(false);
   const close = () => {
     setSuspendModal(false);
     setTerminateModal(false);
+    setSuspendUserModal(false);
     setDeleteModal(false);
     setRecordOffModal(false);
   };
@@ -293,8 +298,7 @@ const ID = () => {
   const isAdmin = query.admin === "true";
   const tabs = getTabsAdmin(2);
   const backLink = isAdmin ? "/app/admin/streams" : "/app/user";
-  const _stream = stream || {};
-  let { broadcasterHost, region } = _stream;
+  let { broadcasterHost, region } = stream || {};
   if (!broadcasterHost && lastSession && lastSession.broadcasterHost) {
     broadcasterHost = lastSession.broadcasterHost;
   }
@@ -367,6 +371,12 @@ const ID = () => {
             </div>
           </ConfirmationModal>
         )}
+        <SuspendUserModal
+          user={streamOwner}
+          isOpen={suspendUserModal}
+          onClose={close}
+          onSuspend={fetchStream}
+        />
         {deleteModal && stream && (
           <DeleteStreamModal
             streamName={stream.name}
@@ -904,6 +914,21 @@ const ID = () => {
                     variant="outlineSmall"
                     onClick={() => setTerminateModal(true)}>
                     Terminate
+                  </Button>
+                </Flex>
+              ) : null}
+              {userIsAdmin ? (
+                <Flex>
+                  <Button
+                    sx={{ mr: 3 }}
+                    type="button"
+                    variant="outlineSmall"
+                    disabled={
+                      streamOwner?.id === user?.id ||
+                      streamOwner?.suspended === true
+                    }
+                    onClick={() => setSuspendUserModal(true)}>
+                    Suspend User
                   </Button>
                 </Flex>
               ) : null}
