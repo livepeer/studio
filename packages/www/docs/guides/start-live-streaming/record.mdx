@@ -93,6 +93,8 @@ equivalent to `record: false`.
 **`POST /stream` to create a parent `stream` object with recording turned on.
 All sessions will be recorded.**
 
+### curl
+
 ```bash
 curl -X POST \
 -H 'content-type: application/json' \
@@ -102,6 +104,29 @@ curl -X POST \
   "record": true
 }' \
 https://livepeer.com/api/stream
+```
+
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios.post("https://livepeer.com/api/stream", {
+  headers: {
+    Authorization: "Bearer {api_key}",
+    "Content-Type": "application/json",
+  },
+  data: JSON.stringify({
+    name: "test_stream",
+    record: "true",
+  })
+    .then((res) => {
+      console.log(JSON.stringify(res.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    }),
+});
 ```
 
 201 created
@@ -127,6 +152,8 @@ https://livepeer.com/api/stream
 Turn recording on. All new sessions will be recorded. In progress sessions will
 not be recorded.
 
+### curl
+
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -H 'content-type: application/json' \
@@ -134,8 +161,27 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -d '{"record":true}'
 ```
 
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios.patch("https://livepeer.com/api/stream/{id}/record"),
+  {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: true,
+    }),
+  };
+```
+
 Turn recording off. All new sessions will not be recorded. In progress sessions
 will still be recorded.
+
+### curl
 
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
@@ -144,19 +190,78 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -d '{"record":false}'
 ```
 
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios.patch("https://livepeer.com/api/stream/{id}/record"),
+  {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: false,
+    }),
+  };
+```
+
 **`GET /stream/{id}` to retrieve a `stream` and `record` value**
+
+### curl
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{id}"
 ```
 
+### JavaScritp + axios
+
+```javascript
+
+const axios = require('axios');
+
+axios.get("https://livepeer.com/api/stream/{id}", {
+  headers: {
+    'Authorization': 'Bearer {api_key}',
+    'Content-Type': 'application/json'
+  }
+})
+.then(res => {
+  console.log(JSON.stringify(res.data))}
+.catch(error => {
+  console.log(error)
+})
+```
+
 **`GET /session/{id}` to retrieve a `session`, `recordingStatus` and
 `recordingUrl` value**
+
+### curl
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/session/{id}"
+```
+
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("http://livepeer.com/api/session/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data)).catch((error) => {
+      console.log(error);
+    });
+  });
 ```
 
 200 OK
