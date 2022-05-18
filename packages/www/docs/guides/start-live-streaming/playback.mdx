@@ -21,6 +21,33 @@ You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
 note the value of `playbackId` in the response. The playback URL is
 `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
+### curl
+
+```bash
+curl --location --request GET 'https://livepeer.com/api/stream/{id}' \
+--header 'Authorization: Bearer {api_key}'
+```
+
+### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+```
+
 ## Video player
 
 Users can view the live stream with any HLS video player (for example
