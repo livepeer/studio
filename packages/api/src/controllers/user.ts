@@ -75,21 +75,14 @@ const frontendUrl = (
 
 const unsubscribeUrl = (req: Request) => frontendUrl(req, "/contact");
 
-export async function suspendUserStreams(
+export async function terminateUserStreams(
   req: Request,
-  userId: string,
-  suspended: boolean
+  userId: string
 ): Promise<void> {
   const [streams] = await db.stream.find({ userId });
   for (const stream of streams) {
     try {
-      const promises: Promise<any>[] = [
-        db.stream.update(stream.id, { suspended }),
-      ];
-      if (suspended) {
-        promises.push(terminateStreamReq(req, stream));
-      }
-      await Promise.all(promises);
+      await terminateStreamReq(req, stream);
     } catch (err) {
       logger.error(
         `error suspending stream id=${stream.id} userId=${userId} err=${err}`
@@ -389,11 +382,13 @@ app.patch(
     logger.info(`set user ${id} (${email}) suspended ${suspended}`);
     await db.user.update(id, { suspended });
 
-    suspendUserStreams(req, id, suspended).catch((err) => {
-      logger.error(
-        `error suspending user streams id=${id} email=${email} err=${err}`
-      );
-    });
+    if (suspended) {
+      terminateUserStreams(req, id).catch((err) => {
+        logger.error(
+          `error terminating user streams id=${id} email=${email} err=${err}`
+        );
+      });
+    }
 
     if (suspended && !wasSuspended) {
       const {

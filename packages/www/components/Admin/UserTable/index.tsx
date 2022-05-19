@@ -1,12 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import { jsx } from "theme-ui";
 import { useState, useMemo } from "react";
 import { useApi } from "hooks";
 import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.com/api/src/config";
 import CommonAdminTable from "@components/Admin/CommonAdminTable";
-import { Box, Checkbox, Label, Tooltip } from "@livepeer/design-system";
+import SuspendUserModal from "../SuspendUserModal";
 
 type UserTableProps = {
   userId: string;
@@ -21,7 +20,6 @@ const UserTable = ({ userId, id }: UserTableProps) => {
   const [adminModal, setAdminModal] = useState(false);
   const [removeAdminModal, setRemoveAdminModal] = useState(false);
   const [suspendModal, setSuspendModal] = useState(false);
-  const [isCopyrightInfringiment, setIsCopyrightInfringiment] = useState(true);
   const [unsuspendModal, setUnsuspendModal] = useState(false);
   const [nextCursor, setNextCursor] = useState("");
   const [lastCursor, setLastCursor] = useState("");
@@ -137,7 +135,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       .finally(() => setLoading(false));
   };
 
-  const refecth = () => {
+  const refetch = () => {
     fetchData(
       { order: lastOrder, cursor: lastCursor, filters: lastFilters },
       true
@@ -150,56 +148,12 @@ const UserTable = ({ userId, id }: UserTableProps) => {
       sx={{
         my: 2,
       }}>
-      {suspendModal && selectedUser && (
-        <Modal onClose={close}>
-          <h3>Suspend user</h3>
-          <p>
-            Are you sure you want to <b>suspend</b> user "{selectedUser.email}"?
-          </p>
-
-          <Box sx={{ display: "flex", mt: 2, mb: 2 }}>
-            <Checkbox
-              id="isCopyrightInfringiment"
-              checked={isCopyrightInfringiment}
-              onCheckedChange={(checked: boolean) =>
-                setIsCopyrightInfringiment(checked)
-              }
-            />
-            <Tooltip
-              content="Checking this will send the copyright infringiment email instead of the default one."
-              multiline>
-              <Label sx={{ ml: 2 }} htmlFor="isCopyrightInfringiment">
-                Copyright infringiment
-              </Label>
-            </Tooltip>
-          </Box>
-
-          <Flex sx={{ justifyContent: "flex-end" }}>
-            <Button
-              type="button"
-              variant="outlineSmall"
-              onClick={close}
-              sx={{ mr: 2 }}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="primarySmall"
-              onClick={() => {
-                setUserSuspended(selectedUser.id, {
-                  suspended: true,
-                  emailTemplate: isCopyrightInfringiment
-                    ? "copyright"
-                    : undefined,
-                })
-                  .then(refecth)
-                  .finally(close);
-              }}>
-              Suspend User
-            </Button>
-          </Flex>
-        </Modal>
-      )}
+      <SuspendUserModal
+        user={selectedUser}
+        isOpen={suspendModal}
+        onClose={close}
+        onSuspend={refetch}
+      />
       {unsuspendModal && selectedUser && (
         <Modal onClose={close}>
           <h3>Unsuspend user</h3>
@@ -220,7 +174,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               variant="primarySmall"
               onClick={() => {
                 setUserSuspended(selectedUser.id, { suspended: false })
-                  .then(refecth)
+                  .then(refetch)
                   .finally(close);
               }}>
               Unsuspend User
@@ -247,7 +201,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               variant="primarySmall"
               onClick={() => {
                 makeUserAdmin(selectedUser.email, true)
-                  .then(refecth)
+                  .then(refetch)
                   .finally(close);
               }}>
               Make User Admin
@@ -275,7 +229,7 @@ const UserTable = ({ userId, id }: UserTableProps) => {
               variant="primarySmall"
               onClick={() => {
                 makeUserAdmin(selectedUser.email, false)
-                  .then(refecth)
+                  .then(refetch)
                   .finally(close);
               }}>
               Remove Admin Rights
