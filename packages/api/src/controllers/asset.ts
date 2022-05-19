@@ -97,20 +97,25 @@ async function validateAssetPayload(
   };
 }
 
+export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
+  if (!asset.playbackRecordingId) {
+    return undefined;
+  }
+  return pathJoin(
+    ingest,
+    "recordings",
+    asset.playbackRecordingId,
+    "index.m3u8"
+  );
+}
+
 function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
   if (asset.status.phase !== "ready") {
     return asset;
   }
-  if (asset.playbackRecordingId) {
-    asset.playbackUrl = pathJoin(
-      ingest,
-      "recordings",
-      asset.playbackRecordingId,
-      "index.m3u8"
-    );
-  }
   return {
     ...asset,
+    playbackUrl: getPlaybackUrl(ingest, asset),
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
 }

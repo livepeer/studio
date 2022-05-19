@@ -158,6 +158,10 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
+export function getPlaybackUrl(ingest: string, stream: DBStream) {
+  return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
+}
+
 export function getRecordingUrl(
   ingest: string,
   session: DBSession,
@@ -168,7 +172,7 @@ export function getRecordingUrl(
     `recordings`,
     session.lastSessionId ? session.lastSessionId : session.id,
     mp4 ? `source.mp4` : `index.m3u8`
-  ) as string;
+  );
 }
 
 function isActuallyNotActive(stream: DBStream) {
