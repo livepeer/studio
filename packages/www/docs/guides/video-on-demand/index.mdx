@@ -1,0 +1,687 @@
+---
+title: Video On Demand
+description: Livepeer's Video on Demand Guide
+metaTitle: Video on Demand Guide - Livepeer.com
+metaDescription: Livepeer's Video on Demand Guide
+---
+
+# Video on Demand
+
+This is a good tutorial for someone who want to upload video to livepeer using
+the VOD API using NodeJS.
+
+### Installation
+
+- Install [Node.js](https://nodejs.org/en/)
+- Install package manager with
+  [NPM](https://docs.npmjs.com/cli/v8/configuring-npm/install) or
+  [Yarn](https://classic.yarnpkg.com/en/docs/install#mac-stable)
+- Install [Axios](https://axios-http.com/)
+  - Using npm
+  ```bash
+  npm axios
+  ```
+  - Using yarn
+  ```bash
+  yarn add axios
+  ```
+- Get a
+  [Livepeer Video Service API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
+
+## Assets
+
+When providing an asset for VOD, there are two options, either
+
+1. Import the asset - **only MP4 file format**
+2. Upload the asset - gets transcoded to MP4(H.264 + AAC)
+
+### **Importing assets**
+
+When using the importing asset method:
+
+- Provide the name of the asset
+- Provide the URL link of the asset that is to be downloaded
+
+JS + axios
+
+```jsx
+const axios = require('axios');
+
+axios.post("https://livepeer.com/api/asset/import", {
+  headers: {
+    'Authorization': 'Bearer {api_key}',
+    'Content-Type': 'application/json'
+  },
+    data: JSON.stringify({
+      "url": "$EXTERNAL_URL",
+      "name": "Example name"
+    })
+  }
+})
+.then(res => {
+  console.log(JSON.stringify(res.data))
+})
+.catch(error => console.log(error))
+```
+
+Response
+
+```json
+{
+  "asset": {
+    "id": "87289307-b60f-432b-984a-8ede174fa152",
+    "playbackId": "8728n2iaziowj67d",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "createdAt": 1652894665364,
+    "status": "waiting",
+    "name": "Waterfall"
+  },
+  "task": {
+    "id": "77588656-ab08-4dd2-a244-0ff8df7ce664",
+    "createdAt": 1652894665451,
+    "type": "import",
+    "outputAssetId": "87289307-b60f-432b-984a-8ede174fa152",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "params": {
+      "import": {
+        "url": "https://www.pexels.com/video/6394054/download/"
+      }
+    },
+    "status": {
+      "phase": "pending",
+      "updatedAt": 1652894665451
+    }
+  }
+}
+```
+
+> _Note that the status is pending, it might take a few minutes for it to be
+> imported, to verify use
+> [`https://livepeer.com/api/asset/$ASSET_ID/`](https://livepeer.com/api/asset/$ASSET_ID/)
+> with provided [asset.id](http://asset.id) in the response from above_
+
+Response
+
+```json
+{
+  "id": "87289307-b60f-432b-984a-8ede174fa152",
+  "hash": [
+    {
+      "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
+      "algorithm": "md5"
+    },
+    {
+      "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
+      "algorithm": "sha256"
+    }
+  ],
+  "name": "Waterfall",
+  "size": 32407849,
+  "status": "ready",
+  "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+  "createdAt": 1652894665364,
+  "updatedAt": 1652894675275,
+  "videoSpec": {
+    "format": "mp4",
+    "tracks": [
+      {
+        "fps": 23.976023976023978,
+        "type": "video",
+        "codec": "h264",
+        "width": 4096,
+        "height": 2048,
+        "bitrate": 21324821,
+        "duration": 12.011667,
+        "pixelFormat": "yuv420p"
+      },
+      {
+        "type": "audio",
+        "codec": "aac",
+        "bitrate": 253375,
+        "channels": 2,
+        "duration": 12.031667,
+        "sampleRate": 48000
+      }
+    ],
+    "duration": 12.031667
+  },
+  "playbackId": "8728n2iaziowj67d",
+  "playbackUrl": "https://livepeercdn.com/recordings/e605988e-e8d3-4e14-b5b0-10b01ff94a8b/index.m3u8",
+  "downloadUrl": "https://livepeercdn.com/asset/8728n2iaziowj67d/video"
+}
+```
+
+### **Uploading assets**
+
+When using the upload asset method it will transcode the video, it is a two-step
+process:
+
+> _Only MP4 files encoded with H.264 and AAC are supported at the moment_
+
+> At the moment o*nly videos uploaded in landscape mode will return a*
+> `playbackUrl`
+
+> _File size limit under 1Gb is fine, anything greater will time out with
+> NETWORK CHANGED error in API_
+
+**Step 1**
+
+Generate the URL to upload assets
+
+Js + axios
+
+```jsx
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/asset/request-upload", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      name: "Example name",
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
+Response
+
+```json
+{
+  "url": "https://origin.livepeer.com/api/asset/upload/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmVzaWduZWRVcmwiOiJodHRwczovL3N0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vbHAtdXMtdm9kLWNvbS9kaXJlY3RVcGxvYWQvNGMyMWs3ejJ0amNkZzh3dC9zb3VyY2U_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ29udGVudC1TaGEyNTY9VU5TSUdORUQtUEFZTE9BRCZYLUFtei1DcmVkZW50aWFsPUdPT0cxRVlVTldOVjZSWUlLNTQySFdBM1JMN1JCN0pVT0VRM1lMMjNRWUI2Q0hQRzVITzJRQzMzTUpWVVklMkYyMDIyMDUxOCUyRnVzJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDIyMDUxOFQxOTIyMDVaJlgtQW16LUV4cGlyZXM9OTAwJlgtQW16LVNpZ25hdHVyZT0wZWJmNmMwNWFlZTA2ZGVhOGZmM2U1MzNmNjMxZjk1ZTY3M2I4ZWRiOTI3MWJlOWQzYjdhZWQ4YjI1YTUzZTM3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZ4LWlkPVB1dE9iamVjdCIsImF1ZCI6Imh0dHBzOi8vbGl2ZXBlZXIuY29tIiwiaWF0IjoxNjUyOTAxNzI1fQ.2wSQMC3s6QFFkmyhQZuecbQF2R8E_j3VGTg9tblc0Dc",
+  "asset": {
+    "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
+    "playbackId": "4c21k7z2tjcdg8wt",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "createdAt": 1652901725324,
+    "status": "waiting",
+    "name": "Waterfall"
+  },
+  "task": {
+    "id": "58a9b4dc-89d8-40f5-8372-cacaec49024b",
+    "createdAt": 1652901725741,
+    "type": "import",
+    "outputAssetId": "4c21895e-2488-4c0a-9377-3369ff586ddd",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "params": {
+      "import": {
+        "uploadedObjectKey": "directUpload/4c21k7z2tjcdg8wt/source"
+      }
+    },
+    "status": {
+      "phase": "pending",
+      "updatedAt": 1652901725741
+    }
+  }
+}
+```
+
+**Step 2**
+
+Upload the asset to the generated URL
+
+- Get the `“url”: “https://origin.livepeer.com/api/assets/…“` from the response
+- Check the status of the generated url
+
+  - _`https://livepeer.com/api/asset/$ASSET_ID/` with provided asset.id_
+
+  ```json
+  {
+    "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
+    "name": "Waterfall",
+    "status": "waiting",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "createdAt": 1652895834393,
+    "playbackId": "4c21k7z2tjcdg8wt"
+  }
+  ```
+
+- Upload the video
+
+JS + axios
+
+```jsx
+// 2) Upload the contents
+
+axios
+  .put("${url}", {
+    headers: {
+      "Content-Type": "video/mp4",
+    },
+    data: "@$VIDEO_FILE_PATH",
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
+Response
+
+- When the video is uploaded, it should return a 200 response
+- Use the `*https://livepeer.com/api/asset/$ASSET_ID/` with the provided
+  asset.id\* to check that the video is uploaded, the status should be
+  `"status": "ready"`
+
+```json
+{
+  "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
+  "hash": [
+    {
+      "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
+      "algorithm": "md5"
+    },
+    {
+      "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
+      "algorithm": "sha256"
+    }
+  ],
+  "name": "Waterfall",
+  "size": 32407849,
+  "status": "ready",
+  "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+  "createdAt": 1652901725324,
+  "updatedAt": 1652901778931,
+  "videoSpec": {
+    "format": "mp4",
+    "tracks": [
+      {
+        "fps": 23.976023976023978,
+        "type": "video",
+        "codec": "h264",
+        "width": 4096,
+        "height": 2048,
+        "bitrate": 21324821,
+        "duration": 12.011667,
+        "pixelFormat": "yuv420p"
+      },
+      {
+        "type": "audio",
+        "codec": "aac",
+        "bitrate": 253375,
+        "channels": 2,
+        "duration": 12.031667,
+        "sampleRate": 48000
+      }
+    ],
+    "duration": 12.031667
+  },
+  "playbackId": "4c21k7z2tjcdg8wt",
+  "playbackUrl": "https://livepeercdn.com/recordings/54aeff83-404c-490a-9afa-99296a932401/index.m3u8",
+  "downloadUrl": "https://livepeercdn.com/asset/4c21k7z2tjcdg8wt/video"
+}
+```
+
+### **List Assets**
+
+When listing assets, look for the **status** in the response body, it should
+return `status:“ready”`. If it is `status:“waiting”`, then wait a little longer
+and repeat this step until the status is **ready** before moving to the
+exporting step.
+
+The response will return information on the uploaded asset including the video
+spec, the `playbackUrl` for the uploaded asset as well as the `playbackId`
+
+JS + axios
+
+```bash
+const axios = require('axios');
+
+axios.get("https://livepeer.com/api/asset", {
+  headers: {
+    'Authorization': 'Bearer {api_key}'
+  }
+})
+.then(res => {
+  console.log(JSON.stringify(res.data))
+})
+.catch(error => console.log(error))
+```
+
+Response
+
+```json
+[
+  {
+    // Uploaded asset
+    "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
+    "hash": [
+      {
+        "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
+        "algorithm": "md5"
+      },
+      {
+        "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
+        "algorithm": "sha256"
+      }
+    ],
+    "name": "Waterfall",
+    "size": 32407849,
+    "status": "ready",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "createdAt": 1652901725324,
+    "updatedAt": 1652901778931,
+    "videoSpec": {
+      "format": "mp4",
+      "tracks": [
+        {
+          "fps": 23.976023976023978,
+          "type": "video",
+          "codec": "h264",
+          "width": 4096,
+          "height": 2048,
+          "bitrate": 21324821,
+          "duration": 12.011667,
+          "pixelFormat": "yuv420p"
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "bitrate": 253375,
+          "channels": 2,
+          "duration": 12.031667,
+          "sampleRate": 48000
+        }
+      ],
+      "duration": 12.031667
+    },
+    "playbackId": "4c21k7z2tjcdg8wt",
+    "playbackUrl": "https://livepeercdn.com/recordings/54aeff83-404c-490a-9afa-99296a932401/index.m3u8",
+    "downloadUrl": "https://livepeercdn.com/asset/4c21k7z2tjcdg8wt/video"
+  },
+  {
+    //Imported asset
+    "id": "87289307-b60f-432b-984a-8ede174fa152",
+    "hash": [
+      {
+        "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
+        "algorithm": "md5"
+      },
+      {
+        "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
+        "algorithm": "sha256"
+      }
+    ],
+    "name": "Waterfall",
+    "size": 32407849,
+    "status": "ready",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "createdAt": 1652894665364,
+    "updatedAt": 1652894675275,
+    "videoSpec": {
+      "format": "mp4",
+      "tracks": [
+        {
+          "fps": 23.976023976023978,
+          "type": "video",
+          "codec": "h264",
+          "width": 4096,
+          "height": 2048,
+          "bitrate": 21324821,
+          "duration": 12.011667,
+          "pixelFormat": "yuv420p"
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "bitrate": 253375,
+          "channels": 2,
+          "duration": 12.031667,
+          "sampleRate": 48000
+        }
+      ],
+      "duration": 12.031667
+    },
+    "playbackId": "8728n2iaziowj67d",
+    "playbackUrl": "https://livepeercdn.com/recordings/e605988e-e8d3-4e14-b5b0-10b01ff94a8b/index.m3u8",
+    "downloadUrl": "https://livepeercdn.com/asset/8728n2iaziowj67d/video"
+  }
+]
+```
+
+### **Export an asset to IPFS**
+
+This method allows for exporting an asset imported or uploaded from Livepeer to
+IPFS
+
+Provide the `$ASSET_ID` of the asset, this can be found using the List Asset
+method
+
+Js + axios
+
+```jsx
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/asset/$ASSET_ID/export", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      ipfs: {},
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
+Response
+
+The response shows that is it pending
+
+```json
+{
+  "task": {
+    "id": "8b0cd796-8be1-412b-b1dc-8251a35ad2e7",
+    "createdAt": 1652903903963,
+    "type": "export",
+    "inputAssetId": "87289307-b60f-432b-984a-8ede174fa152",
+    "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+    "params": {
+      "export": {
+        "ipfs": {}
+      }
+    },
+    "status": {
+      "phase": "pending",
+      "updatedAt": 1652903903963
+    }
+  }
+}
+```
+
+Check back with `https://livepeer.com/api/task/$TASK_ID` to get the status
+update
+
+```json
+{
+  "id": "8b0cd796-8be1-412b-b1dc-8251a35ad2e7",
+  "type": "export",
+  "output": {
+    "export": {
+      "ipfs": {
+        "videoFileCid": "QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+        "nftMetadataCid": "QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
+        "videoFileUrl": "ipfs://QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+        "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+        "nftMetadataUrl": "ipfs://QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
+        "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi"
+      }
+    }
+  },
+  "params": {
+    "export": {
+      "ipfs": {}
+    }
+  },
+  "status": {
+    "phase": "completed",
+    "updatedAt": 1652903908984
+  },
+  "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+  "createdAt": 1652903903963,
+  "inputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
+}
+```
+
+### **List Tasks**
+
+When listing tasks, it will provide information on imported or exported
+information on the asset
+
+Use the list tasks method to get CID and metadata -
+
+To Get the CID and metadata URL for the asset that was just exported,  you can
+get it by retrieving the task until it is finished (check the **status**  the
+field in the response). That finished task will have an output with all the
+information about that asset, and the CID information is located under the
+output.export.ipfs path
+
+curl
+
+```bash
+curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
+--header 'Authorization: Bearer $API_TOKEN'
+```
+
+JS + axios
+
+```jsx
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/task/$TASK_ID", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
+Response
+
+Pass in the task ID for the exported video and the response will show
+`“type”: “export”`
+
+```json
+{
+				//Import asset
+        "id": "8b0cd796-8be1-412b-b1dc-8251a35ad2e7",
+        "type": "export",
+        "output": {
+            "export": {
+                "ipfs": {
+                    "videoFileCid": "QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+                    "nftMetadataCid": "QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
+                    "videoFileUrl": "ipfs://QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+                    "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+                    "nftMetadataUrl": "ipfs://QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
+                    "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi"
+                }
+            }
+        },
+        "params": {
+            "export": {
+                "ipfs": {}
+            }
+        },
+        "status": {
+            "phase": "completed",
+            "updatedAt": 1652903908984
+        },
+        "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+        "createdAt": 1652903903963,
+        "inputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
+    },
+
+```
+
+Pass in the task ID for the imported video and the response will show
+`“type”: “import”`
+
+```json
+{
+  //Import Asset
+  "id": "77588656-ab08-4dd2-a244-0ff8df7ce664",
+  "type": "import",
+  "output": {
+    "import": {
+      "assetSpec": {
+        "hash": [
+          {
+            "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
+            "algorithm": "md5"
+          },
+          {
+            "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
+            "algorithm": "sha256"
+          }
+        ],
+        "name": "pexels-peter-fowler-6394054.mp4",
+        "size": 32407849,
+        "type": "video",
+        "videoSpec": {
+          "format": "mp4",
+          "tracks": [
+            {
+              "fps": 23.976023976023978,
+              "type": "video",
+              "codec": "h264",
+              "width": 4096,
+              "height": 2048,
+              "bitrate": 21324821,
+              "duration": 12.011667,
+              "pixelFormat": "yuv420p"
+            },
+            {
+              "type": "audio",
+              "codec": "aac",
+              "bitrate": 253375,
+              "channels": 2,
+              "duration": 12.031667,
+              "sampleRate": 48000
+            }
+          ],
+          "duration": 12.031667
+        }
+      }
+    }
+  },
+  "params": {
+    "import": {
+      "url": "https://www.pexels.com/video/6394054/download/"
+    }
+  },
+  "status": {
+    "phase": "completed",
+    "updatedAt": 1652894675639
+  },
+  "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
+  "createdAt": 1652894665451,
+  "outputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
+}
+```
+
+Caveats
+
+- At the moment, cannot edit or delete assets
+- Have to manually check the status of the file using `List Task` method to see
+  if it has finished uploading
+- Only videos uploaded in landscape mode return an HSL playback URL at the
+  moment
+- No limit to the size of assets uploaded but will time out with anything
+  greater than 1Gb
+- Only assets that use the Upload method will be transcoded
+- Only MP4 files encoded with H.264 and AAC are supported at the moment for
+  Import files
