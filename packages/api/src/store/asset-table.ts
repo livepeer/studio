@@ -1,11 +1,13 @@
 import { QueryResult } from "pg";
-import { SQLStatement } from "sql-template-strings";
+import sql, { SQLStatement } from "sql-template-strings";
 import { Asset } from "../schema/types";
 import Table from "./table";
 import {
+  DBLegacyObject,
   FindOptions,
   FindQuery,
   GetOptions,
+  QueryOptions,
   UpdateOptions,
   WithID,
 } from "./types";
@@ -91,5 +93,18 @@ export default class AssetTable extends Table<DBAsset> {
     opts?: UpdateOptions
   ): Promise<QueryResult<unknown>> {
     return super.update(query, doc, opts);
+  }
+
+  async getByPlaybackId(
+    playbackId: string,
+    opts?: QueryOptions
+  ): Promise<WithID<Asset>> {
+    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
+      sql`SELECT id, data FROM ${this.name} WHERE data->>'playbackId'=${playbackId}`.setName(
+        `${this.name}_by_playbackid`
+      ),
+      opts
+    );
+    return res.rowCount < 1 ? null : (res.rows[0].data as WithID<Asset>);
   }
 }
