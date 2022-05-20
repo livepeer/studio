@@ -119,9 +119,28 @@ Now let's go into more detail about each of the mentioned API endpoints.
 
 ##### Request: `GET livepeer.com/data/stream/{id}/health`
 
+##### curl
+
 ```bash
 curl 'https://livepeer.com/data/stream/{id}/health' \
 -H 'authorization: Bearer {api-key}'
+```
+
+##### JavaScript + axios
+
+```javascript
+const axios = require("Axios");
+
+axios
+  .get("https://livepeer.com/data/strea/{id}/health", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 The stream ID is the same one as used in the regular API.
@@ -229,9 +248,27 @@ In the above response payload:
 
 ##### Request: `GET livepeer.com/data/stream/{id}/events`
 
+##### curl
+
 ```bash
 curl 'https://livepeer.com/data/stream/{id}/events' \
 -H 'authorization: Bearer {api-key}'
+```
+
+##### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+axios
+  .get("https://livepeer.com/data/stream/{id}/events", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ##### Response
