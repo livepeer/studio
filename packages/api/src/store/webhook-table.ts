@@ -21,18 +21,24 @@ export default class WebhookTable extends Table<DBWebhook> {
   async listSubscribed(
     userId: string,
     event: EventKey,
+    streamId?: string,
     limit = 100,
     cursor?: string,
     includeDeleted = false
   ) {
     const query = [sql`data->>'userId' = ${userId}`];
+    if (streamId) {
+      query.push(sql`data->>'streamId' = ${streamId}`);
+    }
     if (event) {
       const jsonEvent = JSON.stringify(event);
       query.push(sql`data->'events' @> ${jsonEvent}`);
     }
+
     if (!includeDeleted) {
       query.push(sql`data->>'deleted' IS NULL`);
     }
+
     const [webhooks, nextCursor] = await this.find(query, {
       limit,
       cursor,

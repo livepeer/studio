@@ -221,6 +221,9 @@ components:
           type: string
           writeOnly: true
           description: shared secret used to sign the webhook payload
+        streamId:
+          type: string
+          description: streamId of the stream on which the webhook is applied
         status:
           type: object
           description: status of webhook
@@ -655,6 +658,11 @@ components:
 
     multistream-target-patch-payload:
       $ref: "#/components/schemas/multistream-target"
+      required: []
+      table: null
+
+    webhook-patch-payload:
+      $ref: "#/components/schemas/webhook"
       required: []
       table: null
 
