@@ -28,7 +28,9 @@ export default class WebhookTable extends Table<DBWebhook> {
   ) {
     const query = [sql`data->>'userId' = ${userId}`];
     if (streamId) {
-      query.push(sql`data->>'streamId' = ${streamId}`);
+      query.push(
+        sql`data->>'streamId' = ${streamId} OR data->>'streamId' IS NULL`
+      );
     }
     if (event) {
       const jsonEvent = JSON.stringify(event);
