@@ -2,10 +2,12 @@ import { Router } from "express";
 import { db } from "../store";
 import {
   getPlaybackUrl as streamPlaybackUrl,
-  getRecordingUrl as recordingPlaybackUrl,
+  setRecordingStatus as setRecordingPlaybackUrl,
 } from "./stream";
 import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
+import { DBSession } from "../store/db";
+import Table from "../store/table";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
@@ -53,11 +55,23 @@ async function getPlaybackInfo(
   }
   const asset = await db.asset.getByPlaybackId(id);
   if (asset && !asset.deleted) {
-    return newPlaybackInfo("vod", assetPlaybackUrl(ingest, asset));
+    const url = assetPlaybackUrl(ingest, asset);
+    if (url) {
+      return newPlaybackInfo("vod", url);
+    }
   }
-  const session = (await db.session.get(id)) ?? (await db.stream.get(id));
-  if (session?.record && !session.deleted) {
-    return newPlaybackInfo("recording", recordingPlaybackUrl(ingest, session));
+
+  const recordingPlaybackUrl = async (table: Table<DBSession>) => {
+    const session = await table.get(id);
+    if (!session || session.deleted) return null;
+    setRecordingPlaybackUrl(ingest, session, false);
+    return session.recordingUrl;
+  };
+  const recordingUrl =
+    (await recordingPlaybackUrl(db.session)) ??
+    (await recordingPlaybackUrl(db.stream));
+  if (recordingUrl) {
+    return newPlaybackInfo("recording", recordingUrl);
   }
   throw new NotFoundError(`No playback URL found for ${id}`);
 }

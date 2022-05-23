@@ -318,8 +318,7 @@ app.get("/", authorizer({}), async (req, res) => {
   );
 });
 
-function setRecordingStatus(
-  req: Request,
+export function setRecordingStatus(
   ingest: string,
   session: DBSession,
   forceUrl: boolean
@@ -386,7 +385,7 @@ app.get(
 
     const olderThen = Date.now() - USER_SESSION_TIMEOUT;
     sessions = sessions.map((session) => {
-      setRecordingStatus(req, ingest, session, !!forceUrl);
+      setRecordingStatus(ingest, session, !!forceUrl);
       if (!raw) {
         if (session.previousSessions && session.previousSessions.length) {
           session.id = session.previousSessions[0]; // return id of the first session object so
@@ -530,7 +529,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     const ingests = await req.getIngest();
     if (ingests.length) {
       const ingest = ingests[0].base;
-      setRecordingStatus(req, ingest, stream, false);
+      setRecordingStatus(ingest, stream, false);
     }
   }
   res.status(200);

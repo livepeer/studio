@@ -100,11 +100,14 @@ export default class AssetTable extends Table<DBAsset> {
     opts?: QueryOptions
   ): Promise<WithID<Asset>> {
     const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
-      sql`SELECT id, data FROM ${this.name} WHERE data->>'playbackId'=${playbackId}`.setName(
+      sql`SELECT id, data FROM asset WHERE data->>'playbackId' = ${playbackId}`.setName(
         `${this.name}_by_playbackid`
       ),
       opts
     );
-    return res.rowCount < 1 ? null : (res.rows[0].data as WithID<Asset>);
+    if (res.rowCount < 1) {
+      return null;
+    }
+    return assetStatusCompat(res.rows[0].data as WithID<Asset>);
   }
 }
