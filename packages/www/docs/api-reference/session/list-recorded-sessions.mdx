@@ -10,9 +10,29 @@ metaDescription: Livepeer.com API Reference | GET a list of recorded sessions
 Use `/stream/{parentId}/sessions?record=1` to a return list of recorded sessions
 with the same `parentId`
 
+#### curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{parentId}/sessions?record=1"
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api//stream/{parentId}/session?record=1", {
+    headers: {
+      Autorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK

@@ -9,9 +9,29 @@ metaDescription: Livepeer.com API Reference | GET retrieve a session
 
 You can retrieve a session with its ID.
 
+#### curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/session/{id}"
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/session/{id}", {
+    headers: {
+      Autorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK

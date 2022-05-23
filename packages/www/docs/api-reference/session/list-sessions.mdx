@@ -10,17 +10,57 @@ metaDescription: Livepeer.com API Reference | GET a list of sessions
 Use `/session` to a return list of sessions with the same `userId`. This will
 return a list of sessions created by the same Livepeer.com user.
 
+#### curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/session"
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/session/", {
+    headers: {
+      Autorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 Use `/stream/{parentId}/sessions` to a return list of sessions with the same
 `parentId`
+
+#### curl
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream/{parentId}/sessions"
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/stream/{parentId}sessions/", {
+    headers: {
+      Autorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK
