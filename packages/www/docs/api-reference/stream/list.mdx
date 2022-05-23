@@ -17,9 +17,30 @@ in an upcoming version of the API in favor of the `session` object.
 `userId` and exclude the historic `stream` objects with a `parentId` (`stream`
 objects representing a single live stream session).
 
+#### curl
+
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
 "https://livepeer.com/api/stream?streamsonly=1"
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/stream?streamonly=1", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 ```
 
 ## Quick filters

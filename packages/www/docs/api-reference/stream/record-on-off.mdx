@@ -16,6 +16,8 @@ session objects are read-only.
 
 ### Turn recording on
 
+#### curl
+
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -H 'content-type: application/json' \
@@ -23,13 +25,57 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -d '{"record":true}'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://livepeer.com/api/stream/{id}/record", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: true,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Turn recording off
+
+#### curl
 
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{"record":false}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://liveper.com/api/stream/{id}/record", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: false,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 A `204` no content success status response indicates the `record` value was

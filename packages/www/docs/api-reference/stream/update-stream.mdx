@@ -26,6 +26,8 @@ updated.
 
 ### Turn recording on
 
+#### curl
+
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id} \
 -H 'content-type: application/json' \
@@ -33,7 +35,30 @@ curl -X PATCH https://livepeer.com/api/stream/{id} \
 -d '{ "record": true }'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://livepeer.com/api/stream/{id}/", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: true,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Suspend stream
+
+#### curl
 
 ```bash
 curl -X PATCH https://livepeer.com/api/stream/{id} \
@@ -42,7 +67,30 @@ curl -X PATCH https://livepeer.com/api/stream/{id} \
 -d '{ "suspended": true }'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://liveper.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      suspend: true,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Edit Multistream Targets
+
+#### curl
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
@@ -58,7 +106,39 @@ curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
     }'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://liveper.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      multistream: {
+        targets: [
+          { id: "0bf161f3-95bd-4971-a7b1-4dcb5d39e78a", profile: "source" },
+          {
+            id: "95bd0bf1-61f3-a7b1-4971-39e78a4dcb5d",
+            profile: "720p",
+            videoOnly: true,
+          },
+        ],
+      },
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Update all fields
+
+#### curl
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
@@ -71,4 +151,29 @@ curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
         "targets":  []
       }
     }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://liveper.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      record: false,
+      suspend: false,
+      multistream: {
+        targets: [],
+      },
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```

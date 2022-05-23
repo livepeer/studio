@@ -14,9 +14,28 @@ the stream has finished. To explicitly interrupt an active session, consider
 instead updating the `suspended` field in the `stream` using the
 [`PATCH stream` API](/docs/api-reference/stream/update-stream).
 
+#### curl
+
 ```bash
 curl -X DELETE 'https://livepeer.com/api/stream/{id}' \
 -H 'authorization: Bearer {api-key}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .delete("https//livepeer.com/api/stream/{id}", {
+    headers: {
+      Authoization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 204 No Content
