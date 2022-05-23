@@ -159,7 +159,10 @@ export default async function makeApp(params: CliArgs) {
   app.use(
     authenticateWithCors({
       cors: {
-        anyOriginPathPrefixes: [pathJoin("/", httpPrefix, "/asset/upload/")],
+        anyOriginPathPrefixes: [
+          pathJoin("/", httpPrefix, "/asset/upload/"),
+          pathJoin("/", httpPrefix, "/playback/"),
+        ],
         jwtOrigin: corsJwtAllowlist,
         baseOpts: {
           credentials: true,

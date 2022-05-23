@@ -6,7 +6,6 @@ import {
 } from "./stream";
 import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
-import { SSEKMS } from "@aws-sdk/client-s3";
 
 // This should be compatible with the Mist format: https://gist.github.com/iameli/3e9d20c2b7f11365ea8785c5a8aa6aa6
 type PlaybackInfo = {
