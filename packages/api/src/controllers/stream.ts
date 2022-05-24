@@ -333,7 +333,7 @@ export function getRecordingFields(
       };
 }
 
-function withRecordingFields(
+export function withRecordingFields(
   ingest: string,
   session: DBSession,
   forceUrl: boolean

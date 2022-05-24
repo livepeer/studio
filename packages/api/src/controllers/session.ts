@@ -17,7 +17,7 @@ import {
 import {
   USER_SESSION_TIMEOUT,
   getCombinedStats,
-  getRecordingUrl,
+  withRecordingFields,
 } from "./stream";
 
 const app = Router();
@@ -128,20 +128,12 @@ app.get("/", authorizer({}), async (req, res, next) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  output.forEach((session) => {
-    if (session.record && session.recordObjectStoreId) {
-      const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
-      session.recordingStatus = isReady ? "ready" : "waiting";
-      if (isReady || (req.user.admin && forceUrl)) {
-        session.recordingUrl = getRecordingUrl(ingest, session);
-        session.mp4Url = getRecordingUrl(ingest, session, true);
-      }
-    }
-  });
-  const sessions = req.user.admin
-    ? output
-    : removePrivateFieldsMany(output, req.user.admin);
+  let sessions = output.map((session) =>
+    withRecordingFields(ingest, session, !!forceUrl)
+  );
+  if (!req.user.admin) {
+    sessions = removePrivateFieldsMany(sessions, false);
+  }
   res.json(sessions);
 });
 
@@ -249,15 +241,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  if (session.record && session.recordObjectStoreId) {
-    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
-    session.recordingStatus = isReady ? "ready" : "waiting";
-    if (isReady) {
-      session.recordingUrl = getRecordingUrl(ingest, session);
-      session.mp4Url = getRecordingUrl(ingest, session, true);
-    }
-  }
+  session = withRecordingFields(ingest, session, false);
   if (!req.user.admin) {
     removePrivateFields(session, req.user.admin);
   }
