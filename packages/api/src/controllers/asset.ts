@@ -109,7 +109,7 @@ export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
   );
 }
 
-function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
+function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   if (asset.status.phase !== "ready") {
     return asset;
   }
@@ -209,8 +209,8 @@ app.use(
     const ingest = ingests[0].base;
     const toExternalAsset = (a: WithID<Asset>) =>
       req.user.admin
-        ? withPlaybackUrls(a, ingest)
-        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(a, ingest));
+        ? withPlaybackUrls(ingest, a)
+        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(ingest, a));
 
     if (Array.isArray(data)) {
       return data.map(toExternalAsset);
