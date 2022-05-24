@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db } from "../store";
 import {
   getPlaybackUrl as streamPlaybackUrl,
-  setRecordingStatus as setRecordingPlaybackUrl,
+  getRecordingFields,
 } from "./stream";
 import { getPlaybackUrl as assetPlaybackUrl } from "./asset";
 import { NotFoundError } from "@cloudflare/kv-asset-handler";
@@ -63,9 +63,11 @@ async function getPlaybackInfo(
 
   const recordingPlaybackUrl = async (table: Table<DBSession>) => {
     const session = await table.get(id);
-    if (!session || session.deleted) return null;
-    setRecordingPlaybackUrl(ingest, session, false);
-    return session.recordingUrl;
+    if (!session || session.deleted) {
+      return null;
+    }
+    const { recordingUrl } = getRecordingFields(ingest, session, false);
+    return recordingUrl;
   };
   const recordingUrl =
     (await recordingPlaybackUrl(db.session)) ??
