@@ -19,6 +19,8 @@ information.
 
 Here is an example request:
 
+#### curl
+
 ```bash
 curl -X POST 'https://livepeer.com/api/multistream/target' \
 -H 'content-type: application/json' \
@@ -27,6 +29,28 @@ curl -X POST 'https://livepeer.com/api/multistream/target' \
     "name": "My Multistream Target",
     "url": "rtmp://rtmp.streaming.tv/live/SECRET"
 }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/multistream/target", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.strigify({
+      name: "My Multistream Target",
+      url: "rtmp://rtmp.streaming.tv/live/SECRET",
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 201 Created

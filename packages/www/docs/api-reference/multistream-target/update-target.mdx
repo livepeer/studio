@@ -25,6 +25,8 @@ successfully updated.
 
 ### Disabling a target
 
+#### curl
+
 ```bash
 curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'content-type: application/json' \
@@ -34,7 +36,30 @@ curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 }'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://livepeer.com/api/multistream/target/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      disable: true,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Changing the target URL
+
+#### curl
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
@@ -45,7 +70,30 @@ curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
 }'
 ```
 
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://livepeer.com/api/multistream/target/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      url: "srt://rtmp.service.com/live?streamId=SECRET",
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
+```
+
 ### Updating all fields
+
+#### curl
 
 ```bash
 curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
@@ -56,4 +104,27 @@ curl -X PATCH 'https://livepeer.com/api/multistream/target/{id}' \
     "url": "rtmp://rtmp.real.service.com/SECRET"
     "disabled": false
 }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .patch("https://livepeer.com/api/multistream/target/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      name: "Not My Original Target Anymore",
+      url: "srt://rtmp.service.com/SECRET",
+      disable: false,
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```

@@ -9,9 +9,29 @@ metaDescription: Livepeer.com API Reference | GET retrieve a target
 
 You can retrieve a multistream target with its ID on `/multistream/target{id}`.
 
+#### curl
+
 ```bash
 curl 'https://livepeer.com/api/multistream/target/{id}' \
 -H 'authorization: Bearer {api-key}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/multistream/target/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK

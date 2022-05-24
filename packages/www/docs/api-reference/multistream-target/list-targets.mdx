@@ -10,9 +10,28 @@ metaDescription: Livepeer.com API Reference | GET a list of targets
 Use `/multistream/target` to a return a list of your existing multistream
 targets.
 
+#### curl
+
 ```bash
 curl 'https://livepeer.com/api/multistream/target' \
 -H 'authorization: Bearer {api-key}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/multistream/target", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK
