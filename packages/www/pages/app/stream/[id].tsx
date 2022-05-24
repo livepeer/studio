@@ -269,7 +269,7 @@ const ID = () => {
       value += " (admin)";
     }
     if (streamOwner?.suspended) {
-      value = " (suspended)";
+      value += " (suspended)";
     }
     return value;
   }, [streamOwner?.email, streamOwner?.admin, streamOwner?.suspended]);
