@@ -14,15 +14,53 @@ letters, the airport code of the server location.
 Use `/ingest` to discover which ingest data center is closest. Ingest and
 playback URLs for each livestream session must be from the same region.
 
+#### curl
+
 ```bash
 curl "https://livepeer.com/api/ingest"`
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/ingest", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 Use `/ingest` with `?first=false` appended to discover all available ingest and
 playback URL pairs.
 
+#### curl
+
 ```bash
 `curl "https://livepeer.com/api/ingest?first=false"`
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/ingest?first=false", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 200 OK
