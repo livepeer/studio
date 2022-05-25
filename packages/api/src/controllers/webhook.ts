@@ -219,22 +219,21 @@ app.patch(
 
     if (req.body.streamId) {
       const stream = await db.stream.get(req.body.streamId);
-      if (!stream) {
+      if (!stream || stream.deleted || stream.userId !== webhook.userId) {
         throw new NotFoundError(`stream not found`);
       }
     }
 
+    const { name, events, url, sharedSecret, streamId } = req.body;
     await db.webhook.update(req.params.id, {
-      ...req.body,
-      // non editable fields
-      id,
-      userId,
-      createdAt,
-      kind,
+      name,
+      events,
+      url,
+      sharedSecret,
+      streamId,
     });
 
-    res.status(200);
-    res.json({ id: req.params.id });
+    res.status(204).end();
   }
 );
 

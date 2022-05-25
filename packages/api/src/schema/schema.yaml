@@ -662,9 +662,19 @@ components:
       table: null
 
     webhook-patch-payload:
-      $ref: "#/components/schemas/webhook"
-      required: []
-      table: null
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/webhook/properties/name"
+        url:
+          $ref: "#/components/schemas/webhook/properties/url"
+        events:
+          $ref: "#/components/schemas/webhook/properties/events"
+        sharedSecret:
+          $ref: "#/components/schemas/webhook/properties/sharedSecret"
+        streamId:
+          $ref: "#/components/schemas/webhook/properties/streamId"
 
     session:
       type: object
