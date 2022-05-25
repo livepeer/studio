@@ -252,6 +252,7 @@ export default async function makeApp(params: CliArgs) {
   return {
     router: app,
     webhookCannon,
+    taskScheduler,
     store,
     db,
     queue,

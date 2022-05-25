@@ -67,6 +67,7 @@ async function setupServer() {
     db: server.db,
     queue: server.queue,
     webhook: server.webhook,
+    taskScheduler: server.taskScheduler,
   };
 }
 
