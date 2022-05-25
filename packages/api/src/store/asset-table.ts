@@ -39,10 +39,12 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
 
 export const mergeAssetStatus = (
   s1: Asset["status"],
-  s2: Partial<Asset["status"]>
+  s2: Partial<Asset["status"]>,
+  updatedAt: number = Date.now()
 ): Asset["status"] => ({
   ...s1,
   ...s2,
+  updatedAt,
   storage: {
     ...s1?.storage,
     ...s2?.storage,

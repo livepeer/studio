@@ -629,6 +629,15 @@ components:
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
 
+    asset-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/asset/properties/name"
+        storage:
+          $ref: "#/components/schemas/asset/properties/storage"
+
     stream-patch-payload:
       type: object
       additionalProperties: false

@@ -123,7 +123,7 @@ export default class TaskScheduler {
                     pending: undefined,
                     last: task.id,
                   },
-                  data: task.output.export.ipfs,
+                  data: event.output.export.ipfs,
                 },
               },
             }),

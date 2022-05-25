@@ -123,7 +123,7 @@ async function reconcileAssetStorage(
 ): Promise<{ storage: Asset["storage"]; status: Asset["status"] }> {
   let { storage, status } = asset;
   const ipfsParamsEq =
-    JSON.stringify(newStorage.ipfs) === JSON.stringify(storage?.ipfs);
+    JSON.stringify(newStorage?.ipfs) === JSON.stringify(storage?.ipfs);
   if (!ipfsParamsEq) {
     if (!newStorage.ipfs) {
       throw new BadRequestError("Cannot remove asset from IPFS");
@@ -578,29 +578,32 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-app.patch("/:id", authorizer({}), validatePost("asset"), async (req, res) => {
-  // these are the only updateable fields
-  let { name, storage, ...rest } = req.body as Asset;
-  if (storage?.ipfs?.pinata) {
-    throw new BadRequestError(
-      "Custom pinata not allowed in asset storage. Call export API explicitly instead"
-    );
-  } else if (Object.keys(rest).length) {
-    throw new BadRequestError("Only asset name and storage can be updated");
-  }
+app.patch(
+  "/:id",
+  authorizer({}),
+  validatePost("asset-patch-payload"),
+  async (req, res) => {
+    // these are the only updateable fields
+    let { name, storage } = req.body as Asset;
+    if (storage?.ipfs?.pinata) {
+      throw new BadRequestError(
+        "Custom pinata not allowed in asset storage. Call export API explicitly instead"
+      );
+    }
 
-  // update a specific asset
-  const { id } = req.params;
-  const asset = await db.asset.get(id);
-  if (!asset) {
-    throw new NotFoundError(`asset not found`);
-  }
+    // update a specific asset
+    const { id } = req.params;
+    const asset = await db.asset.get(id);
+    if (!asset) {
+      throw new NotFoundError(`asset not found`);
+    }
 
-  const storageUpdates = await reconcileAssetStorage(req, asset, storage);
-  await db.asset.update(id, { name, ...storageUpdates });
-  const updated = await db.asset.get(id, { useReplica: false });
-  res.status(200).json(updated);
-});
+    const storageUpdates = await reconcileAssetStorage(req, asset, storage);
+    await db.asset.update(id, { name, ...storageUpdates });
+    const updated = await db.asset.get(id, { useReplica: false });
+    res.status(200).json(updated);
+  }
+);
 
 // TODO: Call this in production until there are no assets left in old format.
 // Then remove compatibility code and this API.
