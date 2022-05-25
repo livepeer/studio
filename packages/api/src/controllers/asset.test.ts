@@ -1,16 +1,25 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { Asset, MultistreamTarget, User } from "../schema/types";
+import { Asset, User } from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
-import { ConsumeMessage } from "amqplib";
+import Table from "../store/table";
+import schema from "../schema/schema.json";
 
-// includes auth file tests
+// repeat the type here so we don't need to export it from store/asset-table.ts
+type DBAsset =
+  | Omit<Asset, "status"> & {
+      id: string;
+      updatedAt?: Asset["status"]["updatedAt"];
+      status?: Asset["status"] | Asset["status"]["phase"];
+    };
 
 let server: TestServer;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
+// db.asset migrates the objects on read, gotta go raw
+let rawAssetTable: Table<DBAsset>;
 
 // jest.setTimeout(70000)
 
@@ -26,6 +35,11 @@ beforeAll(async () => {
     email: "user_non_admin@gmail.com",
     password: "y".repeat(64),
   };
+
+  rawAssetTable = new Table<DBAsset>({
+    db,
+    schema: schema.components.schemas["asset"],
+  });
 });
 
 afterEach(async () => {
@@ -35,7 +49,7 @@ afterEach(async () => {
 describe("controllers/asset", () => {
   let client: TestClient;
   let adminUser: User;
-  let adminToken: string;
+  let adminApiKey: string;
   let nonAdminUser: User;
   let nonAdminToken: string;
 
@@ -44,7 +58,7 @@ describe("controllers/asset", () => {
       id: "mock_vod_store",
       url: "http://user:password@localhost:8080/us-east-1/vod",
     });
-    ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
+    ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     client.jwtAuth = nonAdminToken;
   });
@@ -60,28 +74,61 @@ describe("controllers/asset", () => {
         status: { phase: "waiting", updatedAt: expect.any(Number) },
       };
       expect(asset).toMatchObject(expected);
-      const dbAsset = await db.asset.get(asset.id);
+      const dbAsset = await rawAssetTable.get(asset.id);
       expect(dbAsset).toMatchObject(expected);
     });
 
     it("should support assets in the old format in database", async () => {
-      const asset: any = await db.asset.create({
+      const asset = await rawAssetTable.create({
         id: uuid(),
         name: "test2",
         createdAt: Date.now(),
         updatedAt: Date.now(),
         status: "ready",
         userId: nonAdminUser.id,
-      } as any);
+      });
+
+      let { updatedAt, ...expected } = asset;
+      expected = {
+        ...expected,
+        downloadUrl: "https://test/asset/video",
+        status: { phase: "ready", updatedAt: asset.updatedAt },
+      };
+
       const res = await client.get(`/asset/${asset.id}`);
       expect(res.status).toBe(200);
-      const assetRes = await res.json();
+      expect(res.json()).resolves.toEqual(expected);
+    });
 
-      const { updatedAt, ...expected } = asset;
-      expect(assetRes).toMatchObject({
+    it("should disallow non-admins from calling migrate API", async () => {
+      const res = await client.post("/asset/migrate-status");
+      expect(res.status).toBe(403);
+    });
+
+    it("should migrate assets to the new format", async () => {
+      client.jwtAuth = null;
+      client.apiKey = adminApiKey;
+      const asset = await rawAssetTable.create({
+        id: uuid(),
+        name: "test2",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        status: "ready",
+        userId: nonAdminUser.id,
+      });
+
+      let { updatedAt, ...expected } = asset;
+      expected = {
         ...expected,
         status: { phase: "ready", updatedAt: asset.updatedAt },
-      });
+      };
+
+      expect(rawAssetTable.get(asset.id)).resolves.not.toEqual(expected);
+
+      const res = await client.post("/asset/migrate-status");
+      expect(res.status).toBe(200);
+
+      expect(rawAssetTable.get(asset.id)).resolves.toEqual(expected);
     });
   });
 

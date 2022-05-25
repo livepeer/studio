@@ -627,7 +627,7 @@ app.post(
     for (const asset of toUpdate) {
       // the db.asset will actually already return the asset transformed to the
       // updated format. All we need to do is re-save it as returned here.
-      await db.asset.update(asset.id, asset);
+      await db.asset.replace(asset);
     }
 
     if (toUpdate.length > 0 && nextCursor) {
