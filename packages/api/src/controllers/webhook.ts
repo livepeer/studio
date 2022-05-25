@@ -4,17 +4,22 @@ import { validatePost } from "../middleware";
 import Router from "express/lib/router";
 import logger from "../logger";
 import uuid from "uuid/v4";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
+import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { UnprocessableEntityError } from "../store/errors";
+import {
+  UnprocessableEntityError,
+  NotFoundError,
+  BadRequestError,
+} from "../store/errors";
+import { Webhook, WebhookPatchPayload } from "../schema/types";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
     new URL(payload.url);
   } catch (e) {
     console.error(`couldn't parse the provided url: ${payload.url}`);
-    throw new UnprocessableEntityError(`bad url: ${url}`);
+    throw new UnprocessableEntityError(`bad url: ${payload.url}`);
   }
 
   if (!payload.events && !payload.event) {
@@ -32,12 +37,13 @@ function validateWebhookPayload(id, userId, createdAt, payload) {
     events: payload.events ?? [payload.event],
     url: payload.url,
     sharedSecret: payload.sharedSecret,
+    streamId: payload.streamId,
   };
 }
 
 const app = Router();
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `webhook.ID`,
   name: { val: `webhook.data->>'name'`, type: "full-text" },
   url: `webhook.data->>'url'`,
@@ -131,7 +137,9 @@ app.get("/subscribed/:event", authorizer({}), async (req, res) => {
   let userId =
     req.user.admin && req.query.userId ? req.query.userId : req.user.id;
 
-  const { data } = await db.webhook.listSubscribed(userId, event);
+  let streamId = req.query.streamId;
+
+  const { data } = await db.webhook.listSubscribed(userId, event, streamId);
 
   res.status(200);
   return res.json(data);
@@ -187,6 +195,47 @@ app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
   res.status(200);
   res.json({ id: req.body.id });
 });
+
+app.patch(
+  "/:id",
+  authorizer({}),
+  validatePost("webhook-patch-payload"),
+  async (req, res) => {
+    const webhook = await db.webhook.get(req.params.id);
+
+    if (!webhook) {
+      throw new NotFoundError(`webhook not found`);
+    }
+
+    if (
+      (webhook.userId !== req.user.id || webhook.deleted) &&
+      !req.user.admin
+    ) {
+      // do not reveal that webhooks exists
+      throw new NotFoundError(`webhook not found`);
+    }
+
+    const { id, userId, createdAt, kind } = webhook;
+
+    if (req.body.streamId) {
+      const stream = await db.stream.get(req.body.streamId);
+      if (!stream || stream.deleted || stream.userId !== webhook.userId) {
+        throw new NotFoundError(`stream not found`);
+      }
+    }
+
+    const { name, events, url, sharedSecret, streamId } = req.body;
+    await db.webhook.update(req.params.id, {
+      name,
+      events,
+      url,
+      sharedSecret,
+      streamId,
+    });
+
+    res.status(204).end();
+  }
+);
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   // delete a specific webhook
