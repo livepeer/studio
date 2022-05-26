@@ -9,7 +9,7 @@ const app = Router();
 function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
   let count = 0;
   return regions.flatMap((reg) =>
-    reg == "ber"
+    reg == "ber" || reg == "rkv"
       ? []
       : reg.orchestrators.map((orch) => ({
           score:
