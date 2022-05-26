@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 import anyBase from "any-base";
 import { db } from "../store";
-import { IStore } from "../types/common";
 
 const BASE_36 = "0123456789abcdefghijklmnopqrstuvwxyz";
 const SEGMENT_COUNT = 4;
@@ -21,22 +20,25 @@ function randomBytesAsync(size: number) {
  * but also easy to type if necessary. Base36 facilitates this.
  *
  * Returns stream keys of the form XXXX-XXXX-XXXX in Base36. 62-ish bits of entropy.
+ * It is wrapped in an object so it's mockable, check __mocks__/generate-keys.ts
  */
-export async function generateStreamKey() {
-  const buf = await randomBytesAsync(128);
-  const raw = hexToBase36(buf.toString("hex"));
-  let result = "";
-  const TOTAL_LENGTH = SEGMENT_COUNT * SEGMENT_LENGTH;
-  for (let i = 0; i < TOTAL_LENGTH; i += 1) {
-    // Pull from the end of the raw string, the start has least siginificant bits
-    // and isn't likely to be fully random.
-    result += raw[raw.length - 1 - i];
-    if ((i + 1) % SEGMENT_LENGTH === 0 && i < TOTAL_LENGTH - 1) {
-      result += "-";
+export const randomKey = {
+  async generate() {
+    const buf = await randomBytesAsync(128);
+    const raw = hexToBase36(buf.toString("hex"));
+    let result = "";
+    const TOTAL_LENGTH = SEGMENT_COUNT * SEGMENT_LENGTH;
+    for (let i = 0; i < TOTAL_LENGTH; i += 1) {
+      // Pull from the end of the raw string, the start has least siginificant bits
+      // and isn't likely to be fully random.
+      result += raw[raw.length - 1 - i];
+      if ((i + 1) % SEGMENT_LENGTH === 0 && i < TOTAL_LENGTH - 1) {
+        result += "-";
+      }
     }
-  }
-  return result;
-}
+    return result;
+  },
+};
 
 function formatPlaybackId(key: string): string {
   // Mist doesn't allow dashes in the URLs
@@ -64,7 +66,7 @@ async function keyExists(key: string, otherKeys: string[]) {
 async function generateUniqueKey(shardBase: string, otherKeys: string[] = []) {
   const shardKey = shardBase.slice(0, 4);
   while (true) {
-    const key: string = await generateStreamKey();
+    const key: string = await randomKey.generate();
     const shardedKey = shardKey + key.slice(shardKey.length);
     if (shardedKey === shardBase) {
       continue;
