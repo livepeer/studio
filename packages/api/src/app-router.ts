@@ -110,7 +110,6 @@ export default async function makeApp(params: CliArgs) {
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({
     db,
-    store,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,

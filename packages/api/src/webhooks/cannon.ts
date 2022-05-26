@@ -7,13 +7,12 @@ import { parse as parseUrl } from "url";
 import { DB } from "../store/db";
 import messages from "../store/messages";
 import Queue from "../store/queue";
-import Model from "../store/model";
 import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
 import TaskScheduler from "../task/scheduler";
-import { generateUniquePlaybackId } from "../controllers/asset";
+import { generateUniquePlaybackId } from "../controllers/generate-keys";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -24,7 +23,6 @@ const SIGNATURE_HEADER = "Livepeer-Signature";
 
 export default class WebhookCannon {
   db: DB;
-  store: Model;
   running: boolean;
   verifyUrls: boolean;
   frontendDomain: string;
@@ -37,7 +35,6 @@ export default class WebhookCannon {
   queue: Queue;
   constructor({
     db,
-    store,
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
@@ -48,7 +45,6 @@ export default class WebhookCannon {
     queue,
   }) {
     this.db = db;
-    this.store = store;
     this.running = true;
     this.verifyUrls = verifyUrls;
     this.frontendDomain = frontendDomain;
@@ -510,7 +506,7 @@ export default class WebhookCannon {
     sessionId: string
   ) {
     const id = uuid();
-    const playbackId = await generateUniquePlaybackId(this.store, sessionId);
+    const playbackId = await generateUniquePlaybackId(sessionId);
 
     const createdAt = Date.now();
     const asset = await this.db.asset.create({

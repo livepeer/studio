@@ -23,7 +23,7 @@ import {
   InternalServerError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
-import { generateStreamKey } from "./generate-stream-key";
+import { generateUniquePlaybackId } from "./generate-keys";
 import {
   Asset,
   ExportTaskParams,
@@ -36,21 +36,6 @@ import { mergeAssetStatus } from "../store/asset-table";
 const app = Router();
 
 const META_MAX_SIZE = 1024;
-
-export async function generateUniquePlaybackId(store: any, assetId: string) {
-  const shardKey = assetId.substring(0, 4);
-  while (true) {
-    const playbackId: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "asset",
-      query: { playbackId },
-    });
-    if (!qres.data.length && playbackId != assetId) {
-      const shardedId = shardKey + playbackId.slice(shardKey.length);
-      return shardedId.replace(/-/g, "");
-    }
-  }
-}
 
 async function validateAssetPayload(
   id: string,
@@ -376,7 +361,7 @@ app.post(
   authorizer({}),
   async (req, res) => {
     const id = uuid();
-    const playbackId = await generateUniquePlaybackId(req.store, id);
+    const playbackId = await generateUniquePlaybackId(id);
     let asset = await validateAssetPayload(
       id,
       playbackId,
@@ -435,7 +420,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     throw new UnprocessableEntityError("Asset has invalid objectStoreId");
   }
   const id = uuid();
-  const playbackId = await generateUniquePlaybackId(req.store, id);
+  const playbackId = await generateUniquePlaybackId(id);
   let outputAsset = await validateAssetPayload(
     id,
     playbackId,
@@ -482,7 +467,7 @@ app.post(
   authorizer({ allowCorsApiKey: true }),
   async (req, res) => {
     const id = uuid();
-    let playbackId = await generateUniquePlaybackId(req.store, id);
+    let playbackId = await generateUniquePlaybackId(id);
 
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(

@@ -20,10 +20,12 @@ import { DBSession } from "../store/db";
 import { BadRequestError } from "../store/errors";
 import { DBStream, StreamStats } from "../store/stream-table";
 import { WithID } from "../store/types";
-import { IStore } from "../types/common";
 import messages from "../store/messages";
 import { getBroadcasterHandler } from "./broadcaster";
-import { generateStreamKey } from "./generate-stream-key";
+import {
+  generateUniquePlaybackId,
+  generateUniqueStreamKey,
+} from "./generate-keys";
 import {
   makeNextHREF,
   parseFilters,
@@ -601,19 +603,6 @@ app.get(
   getBroadcasterHandler
 );
 
-async function generateUniqueStreamKey(store: IStore, otherKeys: string[]) {
-  while (true) {
-    const streamKey: string = await generateStreamKey();
-    const qres = await store.query({
-      kind: "stream",
-      query: { streamKey },
-    });
-    if (!qres.data.length && !otherKeys.includes(streamKey)) {
-      return streamKey;
-    }
-  }
-}
-
 app.post(
   "/:streamId/stream",
   authorizer({}),
@@ -819,16 +808,8 @@ app.post(
     }
     const id = uuid();
     const createdAt = Date.now();
-    let streamKey = await generateUniqueStreamKey(req.store, []);
-    // Mist doesn't allow dashes in the URLs
-    let playbackId = (
-      await generateUniqueStreamKey(req.store, [streamKey])
-    ).replace(/-/g, "");
-
-    // use the first four characters of the id as the "shard key" across all identifiers
-    const shardKey = id.slice(0, 4);
-    streamKey = shardKey + streamKey.slice(4);
-    playbackId = shardKey + playbackId.slice(4);
+    const streamKey = await generateUniqueStreamKey(id);
+    const playbackId = await generateUniquePlaybackId(id, [streamKey]);
 
     let objectStoreId;
     if (req.body.objectStoreId) {
