@@ -5,6 +5,7 @@ import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
+import { mergeAssetStatus } from "../store/asset-table";
 export default class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -68,42 +69,67 @@ export default class TaskScheduler {
       return true;
     }
 
-    if (event.task.type === "import") {
-      const assetSpec = event.output?.import?.assetSpec;
-      if (!assetSpec) {
-        const error = "bad task output: missing assetSpec";
-        console.error(
-          `task event process error: err=${error} taskId=${event.task.id}`
-        );
-        await this.failTask(task, error, event.output);
-        return true;
-      }
-      await db.asset.update(task.outputAssetId, {
-        size: assetSpec.size,
-        hash: assetSpec.hash,
-        videoSpec: assetSpec.videoSpec,
-        playbackRecordingId: assetSpec.playbackRecordingId,
-        status: "ready",
-        updatedAt: Date.now(),
-      });
-    } else if (event.task.type === "transcode") {
-      const assetSpec = event.output?.transcode?.asset?.assetSpec;
-      if (!assetSpec) {
-        const error = "bad task output: missing assetSpec";
-        console.error(
-          `task event process error: err=${error} taskId=${event.task.id}`
-        );
-        await this.failTask(task, error, event.output);
-        return true;
-      }
-      await db.asset.update(task.outputAssetId, {
-        size: assetSpec.size,
-        hash: assetSpec.hash,
-        videoSpec: assetSpec.videoSpec,
-        playbackRecordingId: assetSpec.playbackRecordingId,
-        status: "ready",
-        updatedAt: Date.now(),
-      });
+    switch (event.task.type) {
+      case "import":
+        let assetSpec = event.output?.import?.assetSpec;
+        if (!assetSpec) {
+          const error = "bad task output: missing assetSpec";
+          console.error(
+            `task event process error: err=${error} taskId=${event.task.id}`
+          );
+          await this.failTask(task, error, event.output);
+          return true;
+        }
+        await db.asset.update(task.outputAssetId, {
+          size: assetSpec.size,
+          hash: assetSpec.hash,
+          videoSpec: assetSpec.videoSpec,
+          playbackRecordingId: assetSpec.playbackRecordingId,
+          status: {
+            phase: "ready",
+            updatedAt: Date.now(),
+          },
+        });
+        break;
+      case "transcode":
+        assetSpec = event.output?.transcode?.asset?.assetSpec;
+        if (!assetSpec) {
+          const error = "bad task output: missing assetSpec";
+          console.error(
+            `task event process error: err=${error} taskId=${event.task.id}`
+          );
+          await this.failTask(task, error, event.output);
+          return true;
+        }
+        await db.asset.update(task.outputAssetId, {
+          size: assetSpec.size,
+          hash: assetSpec.hash,
+          videoSpec: assetSpec.videoSpec,
+          playbackRecordingId: assetSpec.playbackRecordingId,
+          status: {
+            phase: "ready",
+            updatedAt: Date.now(),
+          },
+        });
+        break;
+      case "export":
+        const inputAsset = await db.asset.get(task.inputAssetId);
+        if (inputAsset.status.storage?.ipfs?.taskIds?.pending === task.id) {
+          await db.asset.update(inputAsset.id, {
+            status: mergeAssetStatus(inputAsset.status, {
+              storage: {
+                ipfs: {
+                  taskIds: {
+                    pending: undefined,
+                    last: task.id,
+                  },
+                  data: event.output.export.ipfs,
+                },
+              },
+            }),
+          });
+        }
+        break;
     }
     await db.task.update(task.id, {
       status: {
@@ -116,19 +142,36 @@ export default class TaskScheduler {
   }
 
   private async failTask(task: Task, error: string, output?: Task["output"]) {
+    const status = {
+      phase: "failed",
+      updatedAt: Date.now(),
+      errorMessage: error,
+    } as const;
     await db.task.update(task.id, {
       output,
-      status: {
-        phase: "failed",
-        updatedAt: Date.now(),
-        errorMessage: error,
-      },
+      status,
     });
     if (task.outputAssetId) {
-      await db.asset.update(task.outputAssetId, {
-        status: "failed",
-        updatedAt: Date.now(),
-      });
+      await db.asset.update(task.outputAssetId, { status });
+    }
+    switch (task.type) {
+      case "export":
+        const inputAsset = await db.asset.get(task.inputAssetId);
+        if (inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id) {
+          await db.asset.update(inputAsset.id, {
+            status: mergeAssetStatus(inputAsset.status, {
+              storage: {
+                ipfs: {
+                  taskIds: {
+                    pending: undefined,
+                    failed: task.id,
+                  },
+                },
+              },
+            }),
+          });
+        }
+        break;
     }
   }
 

@@ -74,7 +74,14 @@ export default async function makeApp(params: CliArgs) {
     throw e;
     // process.exit(1)
   });
-  const { db, queue, router, store, webhookCannon: webhook } = appRoute;
+  const {
+    db,
+    queue,
+    router,
+    store,
+    webhookCannon: webhook,
+    taskScheduler,
+  } = appRoute;
 
   const app = express();
   const isSilentTest =
@@ -125,6 +132,7 @@ export default async function makeApp(params: CliArgs) {
     store,
     db,
     webhook,
+    taskScheduler,
     queue,
   };
 }

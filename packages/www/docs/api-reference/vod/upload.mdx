@@ -49,14 +49,37 @@ curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
     "url": "https://origin.livepeer.com/api/asset/upload/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2xwLW55Yy12b2QtbW9uc3Rlci9kaXJlY3RVcGxvYWQvNjI3OHQyZWlrY2JqZXUxNC9zb3VyY2U%2F...",
     "asset": {
         "id": "$ASSET_ID",
+        "name": "Example name",
         "playbackId": "$PLAYBACK_ID",
         "userId": "$USER_ID",
         "createdAt": 1644595454248,
-        "status": "waiting",
-        "name": "Example name"
+        "status": {
+          "phase": "waiting",
+          "updatedAt": 1644595454248
+        }
+    },
+    "task": {
+        "id": "$TASK_ID",
+        "type": "import",
+        "outputAssetId": "$ASSET_ID",
+        "params": {
+          "import": {
+            "uploadedObjectKey": "directUpload/$PLAYBACK_ID/source"
+          }
+        },
+        "createdAt": 1652813126031,
+        "status": {
+            "phase": "pending",
+            "updatedAt": 1652813126031
+        }
     }
 }
 ```
+
+You can use the returned `task` object to monitor the progress of processing the
+asset after the contents have been uploaded. Check the
+[Retrieve a Task](/docs/api-reference/vod/list-tasks#retrieve-a-task) API for
+more information.
 
 ## Step 2: Upload the contents
 

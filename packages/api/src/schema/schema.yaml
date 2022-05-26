@@ -632,6 +632,15 @@ components:
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
 
+    asset-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/asset/properties/name"
+        storage:
+          $ref: "#/components/schemas/asset/properties/storage"
+
     stream-patch-payload:
       type: object
       additionalProperties: false
@@ -924,6 +933,60 @@ components:
           description: Object store ID where the asset is stored
           writeOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        storage:
+          additionalProperties: false
+          properties:
+            ipfs:
+              $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+        status:
+          type: object
+          additionalProperties: false
+          readOnly: true
+          required: [phase, updatedAt]
+          description: Status of the asset
+          properties:
+            phase:
+              type: string
+              description: Phase of the asset
+              enum:
+                - waiting
+                - ready
+                - failed
+            updatedAt:
+              type: number
+              description:
+                Timestamp (in milliseconds) at which the asset was last updated
+              example: 1587667174725
+            errorMessage:
+              type: string
+              description: Error message if the asset creation failed.
+            storage:
+              type: object
+              additionalProperties: false
+              properties:
+                ipfs:
+                  additionalProperties: false
+                  required: [taskIds]
+                  properties:
+                    taskIds:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        pending:
+                          type: string
+                          description:
+                            ID of any currently running task that is exporting
+                            this asset to IPFS.
+                        last:
+                          type: string
+                          description:
+                            ID of the last task to run successfully, that
+                            created the currently saved data.
+                        failed:
+                          type: string
+                          description: ID of the last task to fail execution.
+                    data:
+                      $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
         name:
           type: string
           description:
@@ -941,11 +1004,6 @@ components:
               "description": "This is a video of my awesome life",
               "tags": ["awesome", "life", "video"],
             }
-        updatedAt:
-          type: number
-          description:
-            Timestamp (in milliseconds) at which the asset was last updated
-          example: 1587667174725
         createdAt:
           type: number
           readOnly: true
@@ -1055,13 +1113,6 @@ components:
                     type: number
                     description: Bit depth of the track - only for audio tracks
                     example: 16
-        status:
-          type: string
-          description: Status of the asset
-          enum:
-            - waiting
-            - ready
-            - failed
         sourceAssetId:
           type: string
           index: true
@@ -1201,6 +1252,7 @@ components:
         status:
           type: object
           additionalProperties: false
+          readOnly: true
           description: Status of the task
           properties:
             phase:

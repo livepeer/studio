@@ -160,7 +160,11 @@ const AssetsTable = ({
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           updatedAt: {
-            date: asset.updatedAt ? new Date(asset.updatedAt) : null,
+            date:
+              asset.status.updatedAt &&
+              asset.status.updatedAt !== asset.createdAt
+                ? new Date(asset.status.updatedAt)
+                : null,
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           },
           downloadUrl: {

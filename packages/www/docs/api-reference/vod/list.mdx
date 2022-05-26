@@ -59,10 +59,12 @@ curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
     ],
     "name": "Example name",
     "size": 52615193,
-    "status": "ready",
+    "status": {
+      "phase": "ready",
+      "updatedAt": 1644546541218
+    },
     "userId": "$USER_ID",
     "createdAt": 1644546528636,
-    "updatedAt": 1644546541218,
     "videoSpec": {
         "format": "mp4",
         "tracks": [

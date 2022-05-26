@@ -39,6 +39,7 @@ params.sendgridTemplateId = sendgridTemplateId;
 params.sendgridApiKey = sendgridApiKey;
 params.postgresUrl = `postgresql://postgres@127.0.0.1/${testId}`;
 params.recordObjectStoreId = "mock_store";
+params.vodObjectStoreId = "mock_vod_store";
 params.ingest =
   '[{"ingest": "rtmp://test/live","playback": "https://test/hls","base": "https://test"}]';
 params.amqpUrl = `amqp://localhost:5672/${testId}`;
@@ -66,6 +67,7 @@ async function setupServer() {
     db: server.db,
     queue: server.queue,
     webhook: server.webhook,
+    taskScheduler: server.taskScheduler,
   };
 }
 

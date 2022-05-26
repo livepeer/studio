@@ -1,6 +1,6 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import { RequestHandler, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
@@ -20,11 +20,18 @@ import {
   UnprocessableEntityError,
   NotFoundError,
   BadRequestError,
+  InternalServerError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateStreamKey } from "./generate-stream-key";
-import { Asset, NewAssetPayload } from "../schema/types";
+import {
+  Asset,
+  ExportTaskParams,
+  NewAssetPayload,
+  Task,
+} from "../schema/types";
 import { WithID } from "../store/types";
+import { mergeAssetStatus } from "../store/asset-table";
 
 const app = Router();
 
@@ -80,7 +87,10 @@ async function validateAssetPayload(
     playbackId,
     userId,
     createdAt,
-    status: "waiting",
+    status: {
+      phase: "waiting",
+      updatedAt: createdAt,
+    },
     name: payload.name,
     meta: payload.meta,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
@@ -88,7 +98,7 @@ async function validateAssetPayload(
 }
 
 function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
-  if (asset.status !== "ready") {
+  if (asset.status.phase !== "ready") {
     return asset;
   }
   if (asset.playbackRecordingId) {
@@ -103,6 +113,40 @@ function withPlaybackUrls(asset: WithID<Asset>, ingest: string): WithID<Asset> {
     ...asset,
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
+}
+
+async function reconcileAssetStorage(
+  { taskScheduler }: Request,
+  asset: WithID<Asset>,
+  newStorage: Asset["storage"],
+  task?: WithID<Task>
+): Promise<{ storage: Asset["storage"]; status: Asset["status"] }> {
+  let { storage, status } = asset;
+  const ipfsParamsEq =
+    JSON.stringify(newStorage?.ipfs) === JSON.stringify(storage?.ipfs);
+  if (!ipfsParamsEq) {
+    if (!newStorage.ipfs) {
+      throw new BadRequestError("Cannot remove asset from IPFS");
+    }
+    if (!task) {
+      task = await taskScheduler.scheduleTask(
+        "export",
+        { export: { ipfs: newStorage.ipfs } },
+        asset
+      );
+    }
+    storage = { ...storage, ipfs: newStorage.ipfs };
+    status = mergeAssetStatus(status, {
+      storage: {
+        ipfs: {
+          taskIds: {
+            pending: task.id,
+          },
+        },
+      },
+    });
+  }
+  return { storage, status };
 }
 
 async function genUploadUrl(
@@ -149,21 +193,31 @@ function parseUploadUrl(
 }
 
 app.use(
-  mung.json(function cleanWriteOnlyResponses(
+  mung.jsonAsync(async function cleanWriteOnlyResponses(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
-    if (req.user.admin) {
-      return data;
+    const ingests = await req.getIngest();
+    if (!ingests.length) {
+      throw new InternalServerError("Ingest not configured");
     }
+    const ingest = ingests[0].base;
+    const toExternalAsset = (a: WithID<Asset>) =>
+      req.user.admin
+        ? withPlaybackUrls(a, ingest)
+        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(a, ingest));
+
     if (Array.isArray(data)) {
-      return db.asset.cleanWriteOnlyResponses(data);
+      return data.map(toExternalAsset);
     }
     if ("id" in data) {
-      return db.asset.cleanWriteOnlyResponse(data);
+      return toExternalAsset(data);
     }
     if ("asset" in data) {
-      return { ...data, asset: db.asset.cleanWriteOnlyResponse(data.asset) };
+      return {
+        ...data,
+        asset: toExternalAsset(data.asset),
+      };
     }
     return data;
   })
@@ -174,7 +228,7 @@ const fieldsMap: FieldsMap = {
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },
-  updatedAt: { val: `asset.data->'updatedAt'`, type: "int" },
+  updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
@@ -182,20 +236,15 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, event, allUsers, order, filters, count } =
-    toStringValues(req.query);
+  let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
+    req.query
+  );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
   if (!order) {
     order = "updatedAt-true,createdAt-true";
   }
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
 
   if (req.user.admin && allUsers && allUsers !== "false") {
     const query = parseFilters(fieldsMap, filters);
@@ -220,7 +269,7 @@ app.get("/", authorizer({}), async (req, res) => {
           res.set("X-Total-Count", c);
         }
         return {
-          ...withPlaybackUrls(data, ingest),
+          ...data,
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },
@@ -256,7 +305,7 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withPlaybackUrls(data, ingest);
+      return data;
     },
   });
   res.status(200);
@@ -269,13 +318,6 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-
-  const ingest = ingests[0].base;
   const asset = await db.asset.get(req.params.id);
   if (!asset) {
     throw new NotFoundError(`Asset not found`);
@@ -287,7 +329,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     );
   }
 
-  res.json(withPlaybackUrls(asset, ingest));
+  res.json(asset);
 });
 
 app.post(
@@ -300,20 +342,23 @@ app.post(
     if (!asset) {
       throw new NotFoundError(`Asset not found with id ${assetId}`);
     }
-    if (asset.status !== "ready") {
+    if (asset.status.phase !== "ready") {
       res.status(412);
       return res.json({ errors: ["asset is not ready to be exported"] });
     }
     if (req.user.id !== asset.userId) {
       throw new ForbiddenError(`User can only export their own assets`);
     }
+    const params = req.body as ExportTaskParams;
     const task = await req.taskScheduler.scheduleTask(
       "export",
-      {
-        export: req.body,
-      },
+      { export: params },
       asset
     );
+    if ("ipfs" in params && !params.ipfs?.pinata) {
+      const updates = await reconcileAssetStorage(req, asset, params, task);
+      await db.asset.update(assetId, updates);
+    }
 
     res.status(201);
     res.json({ task });
@@ -341,7 +386,7 @@ app.post(
       });
     }
 
-    asset = await db.asset.create(asset);
+    asset = (await db.asset.create(asset)) as WithID<Asset>;
 
     const task = await req.taskScheduler.scheduleTask(
       "import",
@@ -397,7 +442,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     }
   );
   outputAsset.sourceAssetId = inputAsset.id;
-  outputAsset = await db.asset.create(outputAsset);
+  outputAsset = (await db.asset.create(outputAsset)) as WithID<Asset>;
 
   const task = await req.taskScheduler.scheduleTask(
     "transcode",
@@ -484,7 +529,7 @@ app.put("/upload/:url", async (req, res) => {
     throw new NotFoundError(`asset not found`);
   }
   let asset = assets[0][0];
-  if (asset.status !== "waiting") {
+  if (asset.status.phase !== "waiting") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
 
@@ -533,32 +578,66 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-// TODO: Delete this API as well?
 app.patch(
   "/:id",
-  authorizer({ anyAdmin: true }),
-  validatePost("asset"),
+  authorizer({}),
+  validatePost("asset-patch-payload"),
   async (req, res) => {
+    // these are the only updateable fields
+    let { name, storage } = req.body as Asset;
+    if (storage?.ipfs?.pinata) {
+      throw new BadRequestError(
+        "Custom pinata not allowed in asset storage. Call export API explicitly instead"
+      );
+    }
+
     // update a specific asset
-    const asset = await db.asset.get(req.body.id);
+    const { id } = req.params;
+    const asset = await db.asset.get(id);
     if (!asset) {
       throw new NotFoundError(`asset not found`);
     }
 
-    const { id, playbackId, userId, createdAt, objectStoreId } = asset;
-    await db.asset.update(req.body.id, {
-      ...req.body,
-      // these fields are not updateable
-      id,
-      playbackId,
-      userId,
-      createdAt,
-      updatedAt: Date.now(),
-      objectStoreId,
+    const storageUpdates = await reconcileAssetStorage(req, asset, storage);
+    await db.asset.update(id, { name, ...storageUpdates });
+    const updated = await db.asset.get(id, { useReplica: false });
+    res.status(200).json(updated);
+  }
+);
+
+// TODO: Call this in production until there are no assets left in old format.
+// Then remove compatibility code and this API.
+app.post(
+  "/migrate-status",
+  authorizer({ anyAdmin: true }),
+  async (req, res) => {
+    let { limit, cursor } = toStringValues(req.query);
+    if (isNaN(parseInt(limit))) {
+      limit = "100";
+    }
+
+    const query = [sql`asset.data->'status'->>'phase' IS NULL`];
+    const fields = " asset.id as id, asset.data as data";
+    const [toUpdate, nextCursor] = await db.asset.find(query, {
+      limit,
+      cursor,
+      fields,
     });
 
-    res.status(200);
-    res.json({ id: req.body.id });
+    for (const asset of toUpdate) {
+      // the db.asset will actually already return the asset transformed to the
+      // updated format. All we need to do is re-save it as returned here.
+      await db.asset.replace(asset);
+    }
+
+    if (toUpdate.length > 0 && nextCursor) {
+      res.links({ next: makeNextHREF(req, nextCursor) });
+    }
+    return res.status(200).json({
+      count: toUpdate.length,
+      nextCursor,
+      updated: toUpdate,
+    });
   }
 );
 

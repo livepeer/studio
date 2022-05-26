@@ -512,12 +512,13 @@ export default class WebhookCannon {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(this.store, sessionId);
 
+    const createdAt = Date.now();
     const asset = await this.db.asset.create({
       id,
       playbackId,
       userId,
-      createdAt: Date.now(),
-      status: "waiting",
+      createdAt,
+      status: { phase: "waiting", updatedAt: createdAt },
       name: `live-to-vod-${sessionId}`,
       objectStoreId: this.vodObjectStoreId,
     });
