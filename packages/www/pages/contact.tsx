@@ -127,15 +127,6 @@ const ContactPage = () => {
               type="hidden"
               value={query?.utm_campaign}
             />
-            <TextField
-              css={{ width: "100%", boxSizing: "border-box", mb: "$4" }}
-              size="3"
-              id="subject"
-              name="TICKET.subject"
-              type="text"
-              placeholder="What's the topic?*"
-              required
-            />
 
             <TextArea
               size="3"
