@@ -158,17 +158,17 @@ async function triggerManyIdleStreamsWebhook(ids: string[], queue: Queue) {
   );
 }
 
-export function getRecordingUrl(
-  ingest: string,
-  session: DBSession,
-  mp4 = false
-) {
+export function getPlaybackUrl(ingest: string, stream: DBStream) {
+  return pathJoin(ingest, `hls`, stream.playbackId, `index.m3u8`);
+}
+
+function getRecordingUrl(ingest: string, session: DBSession, mp4 = false) {
   return pathJoin(
     ingest,
     `recordings`,
     session.lastSessionId ? session.lastSessionId : session.id,
     mp4 ? `source.mp4` : `index.m3u8`
-  ) as string;
+  );
 }
 
 function isActuallyNotActive(stream: DBStream) {
@@ -314,21 +314,34 @@ app.get("/", authorizer({}), async (req, res) => {
   );
 });
 
-function setRecordingStatus(
-  req: Request,
+export function getRecordingFields(
   ingest: string,
   session: DBSession,
   forceUrl: boolean
-) {
-  const olderThen = Date.now() - USER_SESSION_TIMEOUT;
-  if (session.record && session.recordObjectStoreId && session.lastSeen > 0) {
-    const isReady = session.lastSeen > 0 && session.lastSeen < olderThen;
-    session.recordingStatus = isReady ? "ready" : "waiting";
-    if (isReady || forceUrl) {
-      session.recordingUrl = getRecordingUrl(ingest, session);
-      session.mp4Url = getRecordingUrl(ingest, session, true);
-    }
+): Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url"> {
+  if (!session.record || !session.recordObjectStoreId || !session.lastSeen) {
+    return {};
   }
+  const readyThreshold = Date.now() - USER_SESSION_TIMEOUT;
+  const isReady = session.lastSeen > 0 && session.lastSeen < readyThreshold;
+  return !isReady && !forceUrl
+    ? { recordingStatus: "waiting" }
+    : {
+        recordingStatus: isReady ? "ready" : "waiting",
+        recordingUrl: getRecordingUrl(ingest, session),
+        mp4Url: getRecordingUrl(ingest, session, true),
+      };
+}
+
+export function withRecordingFields(
+  ingest: string,
+  session: DBSession,
+  forceUrl: boolean
+): DBSession {
+  return {
+    ...session,
+    ...getRecordingFields(ingest, session, forceUrl),
+  };
 }
 
 // returns only 'user' sessions and adds
@@ -380,9 +393,8 @@ app.get(
       cursor,
     });
 
-    const olderThen = Date.now() - USER_SESSION_TIMEOUT;
     sessions = sessions.map((session) => {
-      setRecordingStatus(req, ingest, session, !!forceUrl);
+      session = withRecordingFields(ingest, session, !!forceUrl);
       if (!raw) {
         if (session.previousSessions && session.previousSessions.length) {
           session.id = session.previousSessions[0]; // return id of the first session object so
@@ -526,7 +538,7 @@ app.get("/:id", authorizer({ allowCorsApiKey: true }), async (req, res) => {
     const ingests = await req.getIngest();
     if (ingests.length) {
       const ingest = ingests[0].base;
-      setRecordingStatus(req, ingest, stream, false);
+      stream = withRecordingFields(ingest, stream, false);
     }
   }
   res.status(200);
