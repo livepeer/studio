@@ -263,7 +263,7 @@ function authorizer(params: AuthzParams): RequestHandler {
       throw new ForbiddenError(`access forbidden for API keys`);
     }
     const reqOrigin = req.headers["origin"];
-    // cors middleware before will set the header (check func comment for ctx)
+    // cors middleware before will set the header (check func remark for ctx)
     const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
     if (reqOrigin && reqOrigin !== resOrigin) {
       throw new ForbiddenError(
