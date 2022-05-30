@@ -382,8 +382,7 @@ describe("auth middleware", () => {
         .resolves;
 
     it("shoul have valid CORS API key access rules", async () => {
-      const policy = new AuthPolicy(corsApiKeyAccessRules);
-      expect(policy).not.toBeNull();
+      expect(() => new AuthPolicy(corsApiKeyAccessRules)).not.toThrow();
     });
 
     it("should disallow admins from creating CORS API keys", async () => {
