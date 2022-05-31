@@ -1,16 +1,16 @@
 ---
-title: Video On Demand
-description: Livepeer's Video on Demand Guide
-metaTitle: Video on Demand Guide - Livepeer.com
-metaDescription: Livepeer's Video on Demand Guide
+title: Upload a Video
+description: Livepeer's Upload a Video Guide
+metaTitle: Upload a Video Guide - Livepeer.com
+metaDescription: Livepeer's Upload a Video Guide
 ---
 
-# Video on Demand
+# Upload a Video
 
-This is a good tutorial for someone who want to upload video to livepeer using
-the VOD API using NodeJS.
+This tutorial covers how to upload the video to Livepeer to allow viewers to
+playback stored video assets in your application.
 
-### Installation
+## Installation
 
 - Install [Node.js](https://nodejs.org/en/)
 - Install package manager with
@@ -30,14 +30,15 @@ the VOD API using NodeJS.
 
 ## Assets
 
-When providing an asset for VOD, there are two options, either
+There are two methods to upload a video to Livepeer:
 
-1. Import the asset - **only MP4 file format**
-2. Upload the asset - gets transcoded to MP4(H.264 + AAC)
+- Upload via URL, with an `.mp4` file format
 
-### **Importing assets**
+- Upload locally
 
-When using the importing asset method:
+### Upload from URL
+
+When using the upload via URL method:
 
 - Provide the name of the asset
 - Provide the URL link of the asset that is to be downloaded
@@ -151,22 +152,21 @@ Response
 }
 ```
 
-### **Uploading assets**
+### Upload Locally
 
 When using the upload asset method it will transcode the video, it is a two-step
 process:
 
-> _Only MP4 files encoded with H.264 and AAC are supported at the moment_
+> _Only MP4 files encoded with H.264 and AAC are supported_
 
-> At the moment o*nly videos uploaded in landscape mode will return a*
-> `playbackUrl`
+> _Only videos uploaded in landscape mode will return a_ > `playbackUrl`
 
-> _File size limit under 1Gb is fine, anything greater will time out with
-> NETWORK CHANGED error in API_
+> _File size limited to 1GB. Any files greater than 1GB will error with NETWORK
+> CHANGED_
 
-**Step 1**
+## Step 1
 
-Generate the URL to upload assets
+### Generate the URL to upload assets
 
 Js + axios
 
@@ -221,7 +221,7 @@ Response
 }
 ```
 
-**Step 2**
+## Step 2
 
 Upload the asset to the generated URL
 
@@ -264,7 +264,7 @@ axios
 Response
 
 - When the video is uploaded, it should return a 200 response
-- Use the `*https://livepeer.com/api/asset/$ASSET_ID/` with the provided
+- Use the `https://livepeer.com/api/asset/$ASSET_ID/` with the provided
   asset.id\* to check that the video is uploaded, the status should be
   `"status": "ready"`
 
@@ -320,9 +320,9 @@ Response
 ### **List Assets**
 
 When listing assets, look for the **status** in the response body, it should
-return `status:“ready”`. If it is `status:“waiting”`, then wait a little longer
-and repeat this step until the status is **ready** before moving to the
-exporting step.
+return `status:“ready”`. If the response returns `status:“waiting”`, then wait a
+little longer and repeat this step until the status is **ready** before moving
+to the exporting step.
 
 The response will return information on the uploaded asset including the video
 spec, the `playbackUrl` for the uploaded asset as well as the `playbackId`
@@ -348,7 +348,7 @@ Response
 ```json
 [
   {
-    // Uploaded asset
+    // Uploaded asset locally
     "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
     "hash": [
       {
@@ -395,7 +395,7 @@ Response
     "downloadUrl": "https://livepeercdn.com/asset/4c21k7z2tjcdg8wt/video"
   },
   {
-    //Imported asset
+    //Uploaded asset via URL
     "id": "87289307-b60f-432b-984a-8ede174fa152",
     "hash": [
       {
@@ -534,10 +534,10 @@ update
 
 ### **List Tasks**
 
-When listing tasks, it will provide information on imported or exported
-information on the asset
+When listing tasks, the response will provide information on imported or
+exported information on the asset
 
-Use the list tasks method to get CID and metadata -
+Use the list tasks method to get CID and metadata
 
 To Get the CID and metadata URL for the asset that was just exported,  you can
 get it by retrieving the task until it is finished (check the **status**  the
@@ -576,7 +576,7 @@ Pass in the task ID for the exported video and the response will show
 
 ```json
 {
-				//Import asset
+				//Uploaded asset via URL
         "id": "8b0cd796-8be1-412b-b1dc-8251a35ad2e7",
         "type": "export",
         "output": {
@@ -612,7 +612,7 @@ Pass in the task ID for the imported video and the response will show
 
 ```json
 {
-  //Import Asset
+  //Uploaded asset via URL
   "id": "77588656-ab08-4dd2-a244-0ff8df7ce664",
   "type": "import",
   "output": {
