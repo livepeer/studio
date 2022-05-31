@@ -638,6 +638,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
+        meta:
+          $ref: "#/components/schemas/asset/properties/meta"
         storage:
           $ref: "#/components/schemas/asset/properties/storage"
 

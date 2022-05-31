@@ -26,6 +26,7 @@ import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
 import {
   Asset,
+  AssetPatchPayload,
   ExportTaskParams,
   NewAssetPayload,
   Task,
@@ -37,6 +38,22 @@ const app = Router();
 
 const META_MAX_SIZE = 1024;
 
+function validateAssetMeta(meta: Record<string, string>) {
+  try {
+    if (meta && JSON.stringify(meta).length > META_MAX_SIZE) {
+      console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
+      throw new UnprocessableEntityError(
+        `the provided meta exceeds max size of ${META_MAX_SIZE} characters`
+      );
+    }
+  } catch (e) {
+    console.error(`couldn't parse the provided meta ${meta}`);
+    throw new UnprocessableEntityError(
+      `the provided meta is not in a valid json format`
+    );
+  }
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
@@ -45,19 +62,7 @@ async function validateAssetPayload(
   defaultObjectStoreId: string,
   payload: NewAssetPayload
 ): Promise<WithID<Asset>> {
-  try {
-    if (payload.meta && JSON.stringify(payload.meta).length > META_MAX_SIZE) {
-      console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
-      throw new UnprocessableEntityError(
-        `the provided meta exceeds max size of ${META_MAX_SIZE} characters`
-      );
-    }
-  } catch (e) {
-    console.error(`couldn't parse the provided meta ${payload.meta}`);
-    throw new UnprocessableEntityError(
-      `the provided meta is not in a valid json format`
-    );
-  }
+  validateAssetMeta(payload.meta);
   if (payload.objectStoreId) {
     const os = await db.objectStore.get(payload.objectStoreId);
     if (os.userId !== userId) {
@@ -574,7 +579,8 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, storage } = req.body as Asset;
+    let { name, meta, storage } = req.body as AssetPatchPayload;
+    validateAssetMeta(meta);
     if (storage?.ipfs?.pinata) {
       throw new BadRequestError(
         "Custom pinata not allowed in asset storage. Call export API explicitly instead"
@@ -589,7 +595,7 @@ app.patch(
     }
 
     const storageUpdates = await reconcileAssetStorage(req, asset, storage);
-    await db.asset.update(id, { name, ...storageUpdates });
+    await db.asset.update(id, { name, meta, ...storageUpdates });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }
