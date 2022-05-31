@@ -26,6 +26,7 @@ import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
 import {
   Asset,
+  AssetPatchPayload,
   ExportTaskParams,
   NewAssetPayload,
   Task,
@@ -574,7 +575,7 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, storage } = req.body as Asset;
+    let { name, meta, storage } = req.body as AssetPatchPayload;
     if (storage?.ipfs?.pinata) {
       throw new BadRequestError(
         "Custom pinata not allowed in asset storage. Call export API explicitly instead"
@@ -589,7 +590,7 @@ app.patch(
     }
 
     const storageUpdates = await reconcileAssetStorage(req, asset, storage);
-    await db.asset.update(id, { name, ...storageUpdates });
+    await db.asset.update(id, { name, meta, ...storageUpdates });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }
