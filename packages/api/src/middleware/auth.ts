@@ -178,13 +178,60 @@ function authenticateWithCors(params: { cors: CorsParams }): RequestHandler {
   };
 }
 
+export const corsApiKeyAccessRules: AuthRule[] = [
+  // Live-streaming
+  {
+    methods: ["get"],
+    resources: [
+      "/stream/:id/sessions",
+      "/stream/sessions/:parentId",
+      "/session/:id",
+    ],
+  },
+  {
+    methods: ["get", "patch"],
+    resources: ["/stream/:id", "/multistream/target/:id"],
+  },
+  {
+    methods: ["post"],
+    resources: ["/stream", "/multistream/target"],
+  },
+  // VOD
+  {
+    methods: ["get"],
+    resources: ["/asset/:id", "/task/:id"],
+  },
+  {
+    methods: ["post"],
+    resources: [
+      "/asset/request-upload",
+      "/asset/:id/transcode",
+      "/asset/transcode", // legacy, remove
+      "/asset/:id/export",
+    ],
+  },
+];
+
+function isRestrictedCors(token?: ApiToken) {
+  if (!token || token.access?.rules) {
+    // explicit access rules override any default restriction
+    return false;
+  }
+  const { allowedOrigins, fullAccess } = token.access?.cors ?? {};
+  const hasCors = allowedOrigins?.length > 0;
+  return hasCors && !fullAccess;
+}
+
+function tokenAccessRules(token?: ApiToken) {
+  return isRestrictedCors(token) ? corsApiKeyAccessRules : token?.access?.rules;
+}
+
 interface AuthzParams {
   allowUnverified?: boolean;
   admin?: boolean;
   anyAdmin?: boolean;
   noApiToken?: boolean;
   originalUriHeader?: string;
-  allowCorsApiKey?: boolean;
 }
 
 /**
@@ -195,6 +242,16 @@ interface AuthzParams {
  * This has a strict dependency on the {@link authenticator} middleware above.
  * If that middleware hasn't run in the request before this one, all requests
  * will be rejected.
+ *
+ * @remarks
+ * This middleware will also do a CORS check on the `Origin` header. This is
+ * necessary here, apart from only letting the browser do its thing, because we
+ * do a non-standard thing on the pre-flight OPTIONS request. That is to allow
+ * all pre-flight requests to pass through (check CORS middleware above) and
+ * only do any actual filtering on the real/"post-flight" request. We need that
+ * because we change the CORS policy based on the API key in the `Authorization`
+ * header and the browser does not send it on the pre-flight. Then to disallow
+ * the actual request to go through we need the explicit check and block here.
  */
 function authorizer(params: AuthzParams): RequestHandler {
   return async (req, res, next) => {
@@ -204,6 +261,14 @@ function authorizer(params: AuthzParams): RequestHandler {
     }
     if (token && params.noApiToken) {
       throw new ForbiddenError(`access forbidden for API keys`);
+    }
+    const reqOrigin = req.headers["origin"];
+    // cors middleware before will set the header (check func remark for ctx)
+    const resOrigin = res.getHeader("access-control-allow-origin")?.toString();
+    if (reqOrigin && reqOrigin !== resOrigin) {
+      throw new ForbiddenError(
+        `credential disallows CORS access from origin ${reqOrigin}`
+      );
     }
 
     const verifyEmail =
@@ -217,8 +282,13 @@ function authorizer(params: AuthzParams): RequestHandler {
     if ((params.admin && !isUIAdmin) || (params.anyAdmin && !user.admin)) {
       throw new ForbiddenError(`user does not have admin priviledges`);
     }
-    const access = token?.access;
-    if (access?.rules) {
+    if (token?.access?.cors && req.user.admin) {
+      throw new ForbiddenError(
+        `cors access is not available to admins (how did you get this API key?)`
+      );
+    }
+    const accessRules = tokenAccessRules(token);
+    if (accessRules) {
       let fullPath = pathJoin2(req.baseUrl, req.path);
       let { httpPrefix } = req.config;
       if (params.originalUriHeader) {
@@ -227,14 +297,11 @@ function authorizer(params: AuthzParams): RequestHandler {
         fullPath = originalUri.pathname;
         httpPrefix = null;
       }
-      if (!isAuthorized(req.method, fullPath, access?.rules, httpPrefix)) {
-        throw new ForbiddenError(`credential has insufficent privileges`);
-      }
-    } else {
-      const cors = access?.cors;
-      if (cors && !cors.fullAccess && !params.allowCorsApiKey) {
+      if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(
-          `access forbidden for restricted CORS API tokens`
+          isRestrictedCors(token)
+            ? "access forbidden for CORS-enabled API key with restricted access"
+            : "credential has insufficent privileges"
         );
       }
     }

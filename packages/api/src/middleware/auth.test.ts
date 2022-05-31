@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Response } from "node-fetch";
 import { authorizer } from ".";
 
 import { ApiToken, User } from "../schema/types";
@@ -11,7 +12,8 @@ import {
   TestClient,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
-import { authenticator } from "./auth";
+import { authenticator, corsApiKeyAccessRules } from "./auth";
+import { AuthPolicy } from "./authPolicy";
 import errorHandler from "./errorHandler";
 
 let server: TestServer;
@@ -226,6 +228,7 @@ describe("auth middleware", () => {
         await expectStatus("put", "/fra").toBe(403);
         await expectStatus("post", "/bar").toBe(403);
         await expectStatus("patch", "/gus").toBe(403);
+        await expectStatus("patch", "/gus/bar/fra").toBe(403);
       });
 
       it("should allow matching paths", async () => {
@@ -348,6 +351,292 @@ describe("auth middleware", () => {
 
       await expectStatus("get", "/gus").toBe(204);
       await expectStatus("head", "/admin/foo").toBe(202);
+    });
+  });
+
+  describe("cors", () => {
+    let adminUser: User;
+    let adminApiKey: string;
+    let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let nonAdminToken: string;
+    let client: TestClient;
+
+    beforeEach(async () => {
+      ({
+        client,
+        adminUser,
+        adminApiKey,
+        adminToken,
+        nonAdminUser,
+        nonAdminApiKey,
+        nonAdminToken,
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+    });
+
+    const setAccess = (token: string, access?: ApiToken["access"]) =>
+      db.apiToken.update(token, { access });
+
+    const expectResponse = (res: Response) =>
+      expect(res.json().then((body) => ({ status: res.status, body })))
+        .resolves;
+
+    it("shoul have valid CORS API key access rules", async () => {
+      expect(() => new AuthPolicy(corsApiKeyAccessRules)).not.toThrow();
+    });
+
+    it("should disallow admins from creating CORS API keys", async () => {
+      client.jwtAuth = adminToken;
+      let res = await client.post("/api-token", {
+        name: "test",
+        access: { cors: {} },
+      });
+      expectResponse(res).toEqual({
+        status: 403,
+        body: {
+          errors: ["cors api keys are not available to admins"],
+        },
+      });
+    });
+
+    it("should disallow CORS access on existing admin API keys", async () => {
+      client.apiKey = adminApiKey;
+      let res = await client.get("/stream");
+      expectResponse(res).toEqual({ status: 200, body: [] });
+
+      await setAccess(adminApiKey, {
+        cors: { allowedOrigins: ["http://localhost:3000"] },
+      });
+      res = await client.get("/stream");
+      expectResponse(res).toEqual({
+        status: 403,
+        body: {
+          errors: [
+            expect.stringMatching("cors access is not available to admins"),
+          ],
+        },
+      });
+    });
+
+    const testMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+
+    const testOrigins = [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://example.com",
+      "http://test.com",
+      "http://mydomain.io:420",
+      "https://other.domain.net:8989",
+      "https://staging.wetube.com",
+      "http://blockflix.io:69",
+    ];
+
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://staging.wetube.com",
+      "http://blockflix.io:69",
+    ];
+
+    const fetchCors = async (method: string, path: string, origin: string) => {
+      const res = await client.fetch(path, { method, headers: { origin } });
+      if (method === "OPTIONS") {
+        expect(res.status).toEqual(204);
+        expect(res.headers.get("access-control-allow-methods")).toEqual(
+          "GET,HEAD,PUT,PATCH,POST,DELETE"
+        );
+      }
+      expect(res.headers.get("access-control-allow-credentials")).toEqual(
+        "true"
+      );
+      const corsAllowed =
+        res.headers.get("access-control-allow-origin") === origin;
+      return {
+        corsAllowed,
+        status: res.status,
+        body: await res.json().catch((err) => null),
+      };
+    };
+
+    const isAllowed = async (method: string, path: string, origin: string) => {
+      const { corsAllowed } = await fetchCors(method, path, origin);
+      return corsAllowed;
+    };
+
+    const expectAllowed = (method: string, path: string, origin: string) =>
+      expect(isAllowed(method, path, origin)).resolves;
+
+    it("should allow any origin on pre-flight requests", async () => {
+      for (const origin of testOrigins) {
+        await expectAllowed("OPTIONS", "/stream", origin).toBe(true);
+        await expectAllowed(
+          "OPTIONS",
+          "/asset/upload/eyJhbG.eyJzdWI.SflKx",
+          origin
+        ).toBe(true);
+        await expectAllowed("OPTIONS", "/playback/1234", origin).toBe(true);
+        await expectAllowed("OPTIONS", "/user", origin).toBe(true);
+      }
+    });
+
+    it("should allow requests from any origin on always-allowed paths", async () => {
+      for (const method of testMethods) {
+        for (const origin of testOrigins) {
+          await expectAllowed(
+            method,
+            "/asset/upload/eyJhbG.eyJzdWI.SflKx",
+            origin
+          ).toBe(true);
+          await expectAllowed(method, "/playback/1234", origin).toBe(true);
+        }
+      }
+    });
+
+    it("should NOT allow requests from custom origins on regular paths", async () => {
+      for (const method of testMethods) {
+        for (const origin of testOrigins) {
+          await expectAllowed(method, "/asset/upload", origin).toBe(false);
+          await expectAllowed(method, "/asset/request-upload", origin).toBe(
+            false
+          );
+          await expectAllowed(method, "/playback", origin).toBe(false);
+          await expectAllowed(method, "/stream", origin).toBe(false);
+          await expectAllowed(method, "/stream/abcd", origin).toBe(false);
+          await expectAllowed(method, "/user", origin).toBe(false);
+        }
+      }
+    });
+
+    it("should allow CORS from frontend domain", async () => {
+      client.jwtAuth = nonAdminToken;
+      for (const method of testMethods) {
+        await expectAllowed(method, "/stream", "https://livepeer.com").toBe(
+          true
+        );
+        await expectAllowed(method, "/asset", "https://livepeer.com").toBe(
+          true
+        );
+        await expectAllowed(
+          method,
+          "/api-token/1234",
+          "https://livepeer.com"
+        ).toBe(true);
+      }
+    });
+
+    const createApiToken = async (cors: ApiToken["access"]["cors"]) => {
+      client.jwtAuth = nonAdminToken;
+      let res = await client.post("/api-token", {
+        name: "test",
+        access: { cors },
+      });
+      client.jwtAuth = null;
+      expect(res.status).toBe(201);
+      const apiKeyObj = await res.json();
+      expect(apiKeyObj).toMatchObject({
+        id: expect.any(String),
+        access: { cors },
+      });
+      return apiKeyObj.id;
+    };
+
+    it("should allow only the allowed origins", async () => {
+      client.apiKey = await createApiToken({ allowedOrigins });
+      for (const method of testMethods) {
+        for (const origin of testOrigins) {
+          const expected = allowedOrigins.includes(origin);
+
+          await expectAllowed(method, "/asset/request-upload", origin).toBe(
+            expected
+          );
+          await expectAllowed(method, "/asset", origin).toBe(expected);
+          await expectAllowed(method, "/asset/abcd", origin).toBe(expected);
+          await expectAllowed(method, "/stream", origin).toBe(expected);
+          await expectAllowed(method, "/stream/1234", origin).toBe(expected);
+          await expectAllowed(method, "/user", origin).toBe(expected);
+          await expectAllowed(method, "/api-token", origin).toBe(expected);
+        }
+      }
+    });
+
+    const forbiddenApis = [
+      ["GET", "/stream"],
+      ["DELETE", "/stream/1234"],
+      ["GET", "/user/1234"],
+      ["POST", "/object-store"],
+      ["GET", "/object-store/1234"],
+    ];
+
+    it("should allow only specific APIs to be called with CORS key", async () => {
+      client.apiKey = await createApiToken({ allowedOrigins });
+      // control case
+      await expect(
+        fetchCors("GET", "/stream/1234", allowedOrigins[0])
+      ).resolves.toMatchObject({
+        corsAllowed: true,
+        status: 404,
+      });
+
+      for (const [method, path] of forbiddenApis) {
+        await expect(
+          fetchCors(method, path, allowedOrigins[0])
+        ).resolves.toMatchObject({
+          corsAllowed: true,
+          status: 403,
+          body: {
+            errors: [
+              "access forbidden for CORS-enabled API key with restricted access",
+            ],
+          },
+        });
+      }
+    });
+
+    it("should allow any API to be called by a full access key", async () => {
+      client.apiKey = await createApiToken({
+        allowedOrigins,
+        fullAccess: true,
+      });
+      for (const [method, path] of forbiddenApis) {
+        const { corsAllowed, status, body } = await fetchCors(
+          method,
+          path,
+          allowedOrigins[0]
+        );
+        expect(corsAllowed).toBe(true);
+        expect([200, 403, 404, 422]).toContain(status);
+        if (status === 403) {
+          expect(body).toMatchObject({
+            errors: [
+              "user can only request information on their own user object",
+            ],
+          });
+        }
+      }
+    });
+
+    it("should actually block requests from a disallowed origin (not only a soft CORS block)", async () => {
+      client.apiKey = await createApiToken({ allowedOrigins });
+      const apis = [
+        ["POST", "/stream"],
+        ["GET", "/stream/1234"],
+        ["POST", "/asset/request-upload"],
+      ];
+      for (const [method, path] of apis) {
+        await expect(
+          fetchCors(method, path, "https://not.allowed.com")
+        ).resolves.toMatchObject({
+          corsAllowed: false,
+          status: 403,
+          body: {
+            errors: [
+              expect.stringMatching(
+                /credential disallows CORS access from origin .+/
+              ),
+            ],
+          },
+        });
+      }
     });
   });
 });
