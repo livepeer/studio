@@ -1417,6 +1417,14 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
+                nftMetadataTemplate:
+                  type: string
+                  enum: [player, file]
+                  default: player
+                  description:
+                    Name of the NFT metadata template to export. 'player' will
+                    embed the Livepeer Player on the NFT while 'file' will
+                    reference only the immutable MP4 files.
                 nftMetadata:
                   type: object
                   description:
