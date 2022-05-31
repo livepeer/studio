@@ -190,7 +190,7 @@ export const corsApiKeyAccessRules: AuthRule[] = [
   },
   {
     methods: ["get", "patch"],
-    resources: ["/stream/:id/", "/multistream/target/:id"],
+    resources: ["/stream/:id", "/multistream/target/:id"],
   },
   {
     methods: ["post"],
