@@ -329,8 +329,8 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
 app.post(
   "/:id/export",
-  validatePost("export-task-params"),
   authorizer({}),
+  validatePost("export-task-params"),
   async (req, res) => {
     const assetId = req.params.id;
     const asset = await db.asset.get(assetId);
@@ -362,8 +362,8 @@ app.post(
 
 app.post(
   "/import",
-  validatePost("new-asset-payload"),
   authorizer({}),
+  validatePost("new-asset-payload"),
   async (req, res) => {
     const id = uuid();
     const playbackId = await generateUniquePlaybackId(id);
@@ -454,22 +454,22 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
 };
 app.post(
   "/:id/transcode",
-  validatePost("transcode-asset-payload"),
   authorizer({}),
+  validatePost("transcode-asset-payload"),
   transcodeAssetHandler
 );
 // TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/transcode",
-  validatePost("transcode-asset-payload"),
   authorizer({}),
+  validatePost("transcode-asset-payload"),
   transcodeAssetHandler
 );
 
 app.post(
   "/request-upload",
-  validatePost("new-asset-payload"),
   authorizer({}),
+  validatePost("new-asset-payload"),
   async (req, res) => {
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
