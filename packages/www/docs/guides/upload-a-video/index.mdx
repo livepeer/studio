@@ -10,6 +10,14 @@ metaDescription: Livepeer's Upload a Video Guide
 This tutorial covers how to upload the video to Livepeer to allow viewers to
 playback stored video assets in your application.
 
+## Caveats
+
+- Have to manually check the status of the file using `List Task` method to see
+  if it has finished uploading
+- File size is limited to 1GB. Any files greater than 1GB will error with
+  NETWORK CHANGED
+- Only MP4 files encoded with H.264 and AAC are supported
+
 ## Installation
 
 - Install [Node.js](https://nodejs.org/en/)
@@ -672,16 +680,3 @@ Pass in the task ID for the imported video and the response will show
   "outputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
 }
 ```
-
-Caveats
-
-- At the moment, cannot edit or delete assets
-- Have to manually check the status of the file using `List Task` method to see
-  if it has finished uploading
-- Only videos uploaded in landscape mode return an HSL playback URL at the
-  moment
-- No limit to the size of assets uploaded but will time out with anything
-  greater than 1Gb
-- Only assets that use the Upload method will be transcoded
-- Only MP4 files encoded with H.264 and AAC are supported at the moment for
-  Import files
