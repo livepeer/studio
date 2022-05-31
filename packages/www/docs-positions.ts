@@ -3,6 +3,7 @@ export const docsPositions = [
   "docs/guides/index.mdx",
   "docs/guides/start-live-streaming/index.mdx",
   "docs/guides/start-live-streaming/tutorial.mdx",
+  "docs/guides/start-live-streaming/obs.mdx",
   "docs/guides/start-live-streaming/broadcasting.mdx",
   "docs/guides/start-live-streaming/api-key.mdx",
   "docs/guides/start-live-streaming/verify.mdx",

@@ -1,0 +1,62 @@
+---
+title: How to use OBS
+description: How to use OBS with Livepeer.com
+metaTitle: How to use OBS - Livepeer.com
+metaDescription: How to use OBS with Livepeer.com
+---
+
+# Using OBS with Livepeer
+
+**Step 1:** Download the version of [OBS](https://obsproject.com/) for your
+operating system
+
+_In this example, macOS will be used_
+
+**Step 2:** Open OBS and create a source
+
+Click the `+` icon under sources and select **Video Capture Device** if you’d
+like to stream using a camera or webcam. If you’d like to stream a browser
+window, select **Window Capture**.
+
+_Give the device a name_
+
+![OBS1](/img/docs/obs/OBS1.png) ![OBS2](/img/docs/obs/OBS2.png)
+![OBS3](/img/docs/obs/OBS3.png)
+
+**Step 3:** Go to the settings
+
+- Select **Stream** settings
+- Select **custom** for services
+- Copy and paste the **RTMP ingest URL** and **Stream Key** and paste it into
+  the **“Server”** and **“Stream Key”** fields.
+
+  - RTMP ingest URL and Stream Key can be found on the dashboard on the Stream
+    Detail page after creating a stream or in the API.
+
+  ![OBS4](/img/docs/obs/OBS4.png)
+
+**Step 4:** Select the Output settings and the Streaming tab
+
+- In the Output Mode select Advance
+- Set the keyframe interval to 2 seconds
+- Save your settings
+
+![OBS5](/img/docs/obs/OBS5.png)
+
+**Step 5:** Stream and check output
+
+After saving your settings, OBS will return to the stream console. Press start
+streaming from the output you selected in Step 2.
+
+![LVS4](/img/docs/obs/LVS4.png)
+
+Navigate to the Livepeer Dashboard, login, and select the stream name that
+you’re currently using, which should now be marked as “Active.” Under the Health
+tab, the video you’re streaming in through OBS should be visible.
+
+![LVS5](/img/docs/obs/LVS5.png)
+
+To preview the stream in the browser, a video player is required. There are
+several options to display the live stream in the browser.
+[Visit our tutorial on Video playback in your app](https://livepeer.com/docs/guides/application-development/video-playback-in-your-app)
+to learn more.
