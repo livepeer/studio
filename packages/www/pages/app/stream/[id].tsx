@@ -944,7 +944,7 @@ const ID = () => {
                     style={{ width: "100%", aspectRatio: "4 / 3" }}
                     frameBorder="0"
                     allowFullScreen
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allow="autoplay; encrypted-media; picture-in-picture"
                     sandbox="allow-scripts"></iframe>
                 </Box>
               </Flex>
