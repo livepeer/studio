@@ -12,14 +12,91 @@ This is how a Livepeer.com playback URL is formatted:
 
 All sessions for a stream have the same playback URL.
 
-The easiest way to the stream playback URL is to login to the Livepeer.com
+The easiest way to the stream a playback URL is to login to the Livepeer.com
 Dashboard, navigate to the Streams page,
 [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
 click on a stream name. The playback URL is listed on the page.
 
+If you already know the playback ID of a stream (or VOD asset), you can also
+visit `https://lvpr.tv/?v={playbackId}` to quickly view the content.
+
+## Video player
+
+To build an application that plays a Livepeer livestream or VOD asset, you need
+to use some sort of video player compatible with the HLS protocol. There are
+many HLS video players out there, for example [video.js](https://videojs.com/)
+or [JW Player](https://www.jwplayer.com/) which either have built-in support or
+have plugins to support HLS.
+
+### Embeddable Player
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: The embeddable player is currently in <code>beta</code>
+    and some elements may change as we mature the product. For a production-grade
+    application consider using your own player, like the ones suggested above. You
+    can also check or copy the <a
+      href="https://github.com/livepeer/player"
+      target="_blank">
+      Livepeer Player source code
+    </a> to get started quickly.
+  </Text>
+</Alert>
+
+To make getting started easier, you can also use the Livepeer embeddable player
+in your page. To use it, you just need to create an `<iframe>` element in your
+application with the URL pointing to the hosted player.
+
+You only need to send it some information about what content it is supposed to
+play, which is made via the `?v` query-string parameter, which should be set to
+the `playbackId`. Notice that this playback ID can be either of a livestream or
+a VOD asset and the player will figure out where to find the content to play.
+
+#### Example Code
+
+```html
+<iframe
+  src="https://lvpr.tv?v={playbackId}"
+  frameborder="0"
+  allowfullscreen
+  allow="autoplay; encrypted-media; picture-in-picture"
+  sandbox="allow-scripts">
+</iframe>
+```
+
+#### Customization
+
+There are some options that can be changed in the player for a better
+integration on your application. Those are also configured through the
+query-string. Some examples are:
+
+- `autoplay`: By default the player starts playing the video automatically. This
+  also means that the video has to start muted due to browser restrictions. To
+  disable that use the `?autoplay=0` option. To still start the video muted, you
+  can include `&muted=1` as well.
+- `loop`: To repeatedly play the video in a loop use `?loop=1`. This is useful
+  for short videos to create a continuous experience for the user.
+- `theme` (experimental): Use this to change the theme of the player. We
+  currently provide the default
+  [videojs themes](https://github.com/videojs/themes#usage) as options (`city`,
+  `fantasy`, `forest` and `sea`). The default theme is `fantasy` and you can set
+  a custom one with e.g. `?theme=sea`. Set it to any other value (like `default`
+  or `none`) to use the default player theme.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    ❗ The <code>theme</code> option is the most subject to stop working in the
+    future as we change the underlying technology used in the player. Consider
+    setting up your own player if you need to customize that on a production
+    app.
+  </Text>
+</Alert>
+
+## Getting the playback ID
+
 You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
-note the value of `playbackId` in the response. The playback URL is
-`https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
+get the value of `playbackId` in the response. The playback URL can then be
+formatted as above: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
 ### Example code
 
@@ -49,21 +126,16 @@ axios
   });
 ```
 
-## Video player
-
-Users can view the live stream with any HLS video player (for example
-[video.js](https://videojs.com/) or [JW Player](https://www.jwplayer.com/)).
-
 ## Stream delivery via CDN
 
 Playback for all Pro plan streams is delivered via a content delivery network
 (CDN). The transcoded video stream automatically switches between the transcoded
-renditions based on the viewers’ available bandwidth, device performance, and
+renditions based on the viewers' available bandwidth, device performance, and
 network conditions.
 
 Non-CDN delivery for free tier users is limited to 10 viewers per account.
 
-## What if playback isn’t working?
+## What if playback isn't working?
 
 Look at the `lastSeen` and `isActive` (Status row on the Livepeer.com Dashboard)
 values. If ingest was properly configured for playback, `lastSeen` will show the
