@@ -61,9 +61,14 @@ have plugins to support HLS.
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
-    Note: The embedded player is currently in <code>beta</code> and some
-    elements may change as we mature the product. For a production-level
-    application consider using your own player, like one of the suggested above.
+    Note: The embeddable player is currently in <code>beta</code>
+    and some elements may change as we mature the product. For a production-grade
+    application consider using your own player, like the ones suggested above. You
+    can also use the <a
+      href="https://github.com/livepeer/player"
+      target="_blank">
+      Livepeer Player source code
+    </a> as sample code.
   </Text>
 </Alert>
 
@@ -87,6 +92,34 @@ a VOD asset and the player will figure out where to find the content to play.
   sandbox="allow-scripts">
 </iframe>
 ```
+
+#### Customization
+
+There are some options that can be changed in the player for a better
+integration on your application. Those are also configured through the
+query-string. Some examples are:
+
+- `autoplay`: By default the player starts playing the video automatically. This
+  also means that the video has to start muted due to browser restrictions. To
+  disable that use the `?autoplay=0` option. To still start the video muted, you
+  can include `&muted=1` as well.
+- `loop`: To repeatedly play the video in a loop use `?loop=1`. This is useful
+  for short videos to create a continuous experience for the user.
+- `theme` (experimental): Use this to change the theme of the player. We
+  currently provide the default
+  [videojs themes](https://github.com/videojs/themes#usage) as options (`city`,
+  `fantasy`, `forest` and `sea`). The default theme is `fantasy` and you can set
+  a custom one with e.g. `?theme=sea`. Set it to any other value (like `default`
+  or `none`) to use the default player theme.
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    ❗ The <code>theme</code> option is the most subject to stop working in the
+    future as we change the underlying technology used in the player. Consider
+    setting up your own player if you need to customize that on a production
+    app.
+  </Text>
+</Alert>
 
 ## Stream delivery via CDN
 
