@@ -13,10 +13,10 @@ playback stored video assets in your application.
 ## Caveats
 
 - Have to manually check the status of the file using `List Task` method to see
-  if it has finished uploading.
+  if it has finished uploading
 - File size is limited to 1GB. Any files greater than 1GB will error with
-  NETWORK CHANGED.
-- Only MP4 files encoded with H.264 and AAC are supported.
+  NETWORK CHANGED
+- Only MP4 files encoded with H.264 and AAC are supported
 
 ## Installation
 
@@ -40,13 +40,13 @@ playback stored video assets in your application.
 
 There are two methods to upload a video to Livepeer:
 
-- Upload via URL, with an `.mp4` file format
+- `Upload via URL`, with an `.mp4` file format
 
-- Upload locally
+- `Upload locally`
 
 ### Upload from URL
 
-When using the upload via URL method:
+When using the `upload via URL` method:
 
 - Provide the name of the asset
 - Provide the URL link of the asset that is to be downloaded
@@ -105,7 +105,7 @@ Response
 ```
 
 > _Note that the status is `pending`, it might take a few minutes for it to be
-> imported, to verify that the status is `ready`, use
+> imported. To verify that the status is `ready`, use
 > `https://livepeer.com/api/asset/$ASSET_ID/` with the provided `asset.id` in
 > the response above_.
 
@@ -162,18 +162,18 @@ Response
 
 ### Upload Locally
 
-When using the upload locally method, this is a two-step process:
+When using the `upload locally` method, this is a two-step process:
 
-> _Only MP4 files encoded with H.264 and AAC are supported_.
+> _Only MP4 files encoded with H.264 and AAC are supported_
 
 > _File size limited to 1GB. Any files greater than 1GB will error with NETWORK
-> CHANGED_.
+> CHANGED_
 
 ## Step 1
 
 ### Generate the URL to upload assets
 
-Js + axios
+JS + axios
 
 ```jsx
 const axios = require("axios");
@@ -268,10 +268,10 @@ axios
 
 Response
 
-- When the video is uploaded, the result should return a 200 response.
+- When the video is uploaded, the result should return a 200 response
 - Use the `https://livepeer.com/api/asset/$ASSET_ID/` with the provided
   asset.id\* to check that the video is uploaded, the status should be
-  `"status": "ready"`.
+  `"status": "ready"`
 
 ```json
 {
