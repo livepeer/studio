@@ -17,38 +17,6 @@ Dashboard, navigate to the Streams page,
 [livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
 click on a stream name. The playback URL is listed on the page.
 
-You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
-get the value of `playbackId` in the response. The playback URL can then be
-formatted as above: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
-
-### Example code
-
-#### cURL Method
-
-```bash
-curl --location --request GET 'https://livepeer.com/api/stream/{id}' \
---header 'Authorization: Bearer {api_key}'
-```
-
-#### Node.js with Axios Method
-
-```javascript
-const axios = require("axios");
-
-axios
-  .get("https://livepeer.com/api/stream/{id}", {
-    headers: {
-      Authorization: "Bearer {api_key}",
-    },
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-```
-
 ## Video player
 
 To build an application that plays a Livepeer livestream or VOD asset, you need
@@ -120,6 +88,40 @@ query-string. Some examples are:
     app.
   </Text>
 </Alert>
+
+## Getting the playback ID
+
+You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
+get the value of `playbackId` in the response. The playback URL can then be
+formatted as above: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
+
+### Example code
+
+#### cURL Method
+
+```bash
+curl --location --request GET 'https://livepeer.com/api/stream/{id}' \
+--header 'Authorization: Bearer {api_key}'
+```
+
+#### Node.js with Axios Method
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/stream/{id}", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+```
 
 ## Stream delivery via CDN
 
