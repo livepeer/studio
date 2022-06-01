@@ -51,8 +51,42 @@ axios
 
 ## Video player
 
-Users can view the live stream with any HLS video player (for example
-[video.js](https://videojs.com/) or [JW Player](https://www.jwplayer.com/)).
+To build an application that plays a Livepeer livestream or VOD asset, you need
+to use some sort of video player compatible with the HLS protocol. There are
+many HLS video players out there, for example [video.js](https://videojs.com/)
+or [JW Player](https://www.jwplayer.com/) which either have built-in support or
+have plugins to support HLS.
+
+### Embeddable Player
+
+<Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
+  <Text size="3" variant="gray">
+    Note: The embedded player is currently in <code>beta</code> and some
+    elements may change as we mature the product. For a production-level
+    application consider using your own player, like one of the suggested above.
+  </Text>
+</Alert>
+
+To make getting started easier, you can also use the Livepeer embeddable player
+in your page. To use it, you just need to create an `<iframe>` element in your
+application with the URL pointing to the hosted player.
+
+You only need to send it some information about what content it is supposed to
+play, which is made via the `?v` query-string parameter, which should be set to
+the `playbackId`. Notice that this playback ID can be either of a livestream or
+a VOD asset and the player will figure out where to find the content to play.
+
+#### Example Code
+
+```html
+<iframe
+  src="https://lvpr.tv?v={playbackId}"
+  frameborder="0"
+  allowfullscreen
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+  sandbox="allow-scripts">
+</iframe>
+```
 
 ## Stream delivery via CDN
 
