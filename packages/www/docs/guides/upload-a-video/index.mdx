@@ -7,21 +7,26 @@ metaDescription: Livepeer's Upload a Video Guide
 
 # Upload a Video
 
-The Video-on-Demand (VOD) API allows you to send video files to Livepeer and get them ready for optimized playback. This tutorial covers how to use it to upload videos and play them back in your application. 
+The Video-on-Demand (VOD) API allows you to send video files to Livepeer and get
+them ready for optimized playback. This tutorial covers how to use it to upload
+videos and play them back in your application.
 
-Those videos can be provided either by you (static content) or your users, given your application offers an interface for them to do so.
+Those videos can be provided either by you (static content) or your users, given
+your application offers an interface for them to do so.
 
 ## Caveats
 
-- Have to manually check the status of the file using `List Task` method to see
-  if it has finished uploading
 - File size is limited to 1GB. Any files greater than 1GB will error with
   NETWORK CHANGED
 - Only MP4 files encoded with H.264 and AAC are supported
 
 ## Dependencies
 
-In this tutorial, we will be using [Node.js](https://nodejs.org/en/) and [Axios](https://axios-http.com/) so make sure to set that up in your project. You will also need to [Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key) to call the VOD API.
+In this tutorial, we will be using [Node.js](https://nodejs.org/en/) and
+[Axios](https://axios-http.com/) so make sure to set that up in your project.
+You will also need to
+[Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
+to call the VOD API.
 
 ## Assets
 
@@ -40,7 +45,7 @@ When using the `upload via URL` method:
 
 JS + axios
 
-```jsx
+```js
 const axios = require('axios');
 
 axios.post("https://livepeer.com/api/asset/import", {
@@ -162,7 +167,7 @@ When using the `upload locally` method, this is a two-step process:
 
 JS + axios
 
-```jsx
+```js
 const axios = require("axios");
 
 axios
@@ -237,7 +242,7 @@ Upload the asset to the generated URL
 
 JS + axios
 
-```jsx
+```js
 // 2) Upload the contents
 
 axios
@@ -256,9 +261,6 @@ axios
 Response
 
 - When the video is uploaded, the result should return a 200 response
-- Use the `https://livepeer.com/api/asset/$ASSET_ID/` with the provided
-  asset.id\* to check that the video is uploaded, the status should be
-  `"status": "ready"`
 
 ```json
 {
@@ -321,18 +323,19 @@ spec, the `playbackUrl` for the uploaded asset as well as the `playbackId`.
 
 JS + axios
 
-```bash
-const axios = require('axios');
+```js
+const axios = require("axios");
 
-axios.get("https://livepeer.com/api/asset", {
-  headers: {
-    'Authorization': 'Bearer {api_key}'
-  }
-})
-.then(res => {
-  console.log(JSON.stringify(res.data))
-})
-.catch(error => console.log(error))
+axios
+  .get("https://livepeer.com/api/asset", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 Response
@@ -443,7 +446,7 @@ is provided in the response when an asset is uploaded.
 
 JS + axios
 
-```jsx
+```js
 axios
   .patch("https://livepeer.com/api/asset/$ASSET_ID", {
     headers: {
@@ -518,7 +521,7 @@ Response
 
 JS + axios
 
-```jsx
+```js
 axios
   .delete("https://livepeer.com/api/asset/{id}", {
     headers: {
@@ -543,7 +546,7 @@ method.
 
 JS + axios
 
-```jsx
+```js
 const axios = require("axios");
 
 axios
@@ -633,16 +636,9 @@ task until it is completed. To do this, check the status field in the response.
 This finished task will have an output with all the information about that asst,
 and the CID information is located under the `output.export.ipfs` path.
 
-curl
-
-```bash
-curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
---header 'Authorization: Bearer $API_TOKEN'
-```
-
 JS + axios
 
-```jsx
+```js
 const axios = require("axios");
 
 axios
@@ -655,108 +651,4 @@ axios
     console.log(JSON.stringify(res.data));
   })
   .catch((error) => console.log(error));
-```
-
-Response
-
-Pass in the task ID for the exported video and the response will show
-`“type”: “export”`.
-
-```json
-{
-				//Uploaded asset via URL
-        "id": "8b0cd796-8be1-412b-b1dc-8251a35ad2e7",
-        "type": "export",
-        "output": {
-            "export": {
-                "ipfs": {
-                    "videoFileCid": "QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
-                    "nftMetadataCid": "QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
-                    "videoFileUrl": "ipfs://QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
-                    "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
-                    "nftMetadataUrl": "ipfs://QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
-                    "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi"
-                }
-            }
-        },
-        "params": {
-            "export": {
-                "ipfs": {}
-            }
-        },
-        "status": {
-            "phase": "completed",
-            "updatedAt": 1652903908984
-        },
-        "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
-        "createdAt": 1652903903963,
-        "inputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
-    },
-
-```
-
-Pass in the task ID for the imported video and the response will show
-`“type”: “import”`
-
-```json
-{
-  //Uploaded asset via URL
-  "id": "77588656-ab08-4dd2-a244-0ff8df7ce664",
-  "type": "import",
-  "output": {
-    "import": {
-      "assetSpec": {
-        "hash": [
-          {
-            "hash": "6dad0a8e7a92d537c6305fe6ae1e1881",
-            "algorithm": "md5"
-          },
-          {
-            "hash": "6132f4e43472b56b4047b7ad018147056c0c2dba9306cd04504e9c8208e72257",
-            "algorithm": "sha256"
-          }
-        ],
-        "name": "pexels-peter-fowler-6394054.mp4",
-        "size": 32407849,
-        "type": "video",
-        "videoSpec": {
-          "format": "mp4",
-          "tracks": [
-            {
-              "fps": 23.976023976023978,
-              "type": "video",
-              "codec": "h264",
-              "width": 4096,
-              "height": 2048,
-              "bitrate": 21324821,
-              "duration": 12.011667,
-              "pixelFormat": "yuv420p"
-            },
-            {
-              "type": "audio",
-              "codec": "aac",
-              "bitrate": 253375,
-              "channels": 2,
-              "duration": 12.031667,
-              "sampleRate": 48000
-            }
-          ],
-          "duration": 12.031667
-        }
-      }
-    }
-  },
-  "params": {
-    "import": {
-      "url": "https://www.pexels.com/video/6394054/download/"
-    }
-  },
-  "status": {
-    "phase": "completed",
-    "updatedAt": 1652894675639
-  },
-  "userId": "eada599f-3d58-499b-ba24-c7f3faf988de",
-  "createdAt": 1652894665451,
-  "outputAssetId": "87289307-b60f-432b-984a-8ede174fa152"
-}
 ```
