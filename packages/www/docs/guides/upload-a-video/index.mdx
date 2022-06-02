@@ -16,8 +16,8 @@ your application offers an interface for them to do so.
 
 ## Caveats
 
-- File size is limited to 1GB. Any files greater than 1GB will error with
-  NETWORK CHANGED
+- Files are currently limited to 1GB in size. Any files greater than that will
+  likely error out during the upload or processing steps.
 - Only MP4 files encoded with H.264 and AAC are supported
 
 ## Dependencies
@@ -28,7 +28,39 @@ You will also need to
 [Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
 to call the VOD API.
 
-## Assets
+## Asset Resources
+
+When adding a video file, this is an asynchronous process that requires
+processing the file. Here are resources for this process:
+
+### Listing the assets
+
+Once an asset is uploaded `/request-upload`, the response will return the `id`
+of that asset. Use `GET /api/asset/$ASSET_ID` to retrieve the status of that
+asset. The response will indicate the status of the uploaded assets as
+`status: "waiting"` or `status: "ready"`. If `status: "waiting"` is returned in
+the response, the asset is not available, make the API call again until
+`status: "ready"`. Once the status indicates that it is `ready`, it is now
+available.
+
+### Lisitng the tasks
+
+To check the status on an asset imported `/import` to Livepeer or exported
+`/export` to IPFS, get the `task.id` from the response of the uploaded asset.
+Use the `GET /api/task/$TASK_ID` to retrieve the status.
+
+### Monitoring progress of the task
+
+If the asset is available, then the response will return
+`status.phase.complete`, otherwise the value will be `status.phase.pending` and
+the API call will need to be made again until it is `complete`. Depending on
+whether the asset is imported or exported using the `GET /api/task/$TASK_ID`
+provides information different information. For `imported` assets, information
+on video specs such as codec and formats are present. If the assest is
+`exported` to IPFS, then the response will provide information such as the
+metadat and CID.
+
+## Uploading
 
 There are two methods to upload a video to Livepeer:
 
@@ -36,33 +68,36 @@ There are two methods to upload a video to Livepeer:
 
 - `Upload locally`
 
-### Upload from URL
+### Upload via URL
 
 When using the `upload via URL` method:
 
 - Provide the name of the asset
 - Provide the URL of the asset that should be imported
 
-JS + axios
+JavaScript
 
 ```js
 const axios = require('axios');
+const fs = require('fs');
 
-axios.post("https://livepeer.com/api/asset/import", {
+var url = "https://example.com";
+
+const importAsset = async () => {
+
+const response = await axios.post("https://livepeer.com/api/asset/import", {
   headers: {
-    'Authorization': 'Bearer {api_key}',
+    'Authorization': `Bearer ${process.env.LP_API_KEY}`,
     'Content-Type': 'application/json'
   },
     data: JSON.stringify({
       "url": "$EXTERNAL_URL",
       "name": "Example name"
-    })
-  }
-})
-.then(res => {
-  console.log(JSON.stringify(res.data))
-})
-.catch(error => console.log(error))
+      })
+    }
+  });
+   console.log(JSON.stringify(response.data))
+};
 ```
 
 Response
@@ -158,32 +193,31 @@ When using the `upload locally` method, this is a two-step process:
 
 > _Only MP4 files encoded with H.264 and AAC are supported_
 
-> _File size limited to 1GB. Any files greater than 1GB will error with NETWORK
-> CHANGED_
+> _Files are currently limited to 1GB in size. Any files greater than that will
+> likely error out during the upload or processing steps_
 
 ## Step 1
 
 ### Generate the URL to upload assets
 
-JS + axios
+JavaScript
 
 ```js
-const axios = require("axios");
-
-axios
-  .post("https://livepeer.com/api/asset/request-upload", {
-    headers: {
-      Authorization: `Bearer ${process.env.LP_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    data: JSON.stringify({
-      name: "Example name",
-    }),
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+const uploadAsset = async () => {
+  const response = await axios.post(
+    "https://livepeer.com/api/asset/request-upload",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.LP_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        name: "Example name",
+      }),
+    }
+  );
+  console.log(JSON.stringify(response.data));
+};
 ```
 
 Response
@@ -240,20 +274,21 @@ Upload the asset to the generated URL
 
 - Upload the video
 
-JS + axios
+JavaScript
 
 ```js
-axios
+const uploadAsset = async () => {
+
+const response = await axios
   .put("${url}", {
     headers: {
-      "Content-Type": "video/mp4",
+      Authorization: `Bearer ${process.env.LP_API_KEY}`
+      "Content-Type": "video/mp4"
     },
-    data: "@$VIDEO_FILE_PATH",
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+    data: fs.createReadStream(path)
+  });
+    console.log(JSON.stringify(response.data));
+  };
 ```
 
 Response
@@ -319,21 +354,17 @@ to the exporting step.
 The response will return information on the uploaded asset including the video
 spec, the `playbackUrl` for the uploaded asset as well as the `playbackId`.
 
-JS + axios
+JavaScript
 
 ```js
-const axios = require("axios");
-
-axios
-  .get("https://livepeer.com/api/asset", {
+const listAsset = async () => {
+  const response = await axios.get("https://livepeer.com/api/asset", {
     headers: {
-      Authorization: "Bearer {api_key}",
+      Authorization: `Bearer ${process.env.LP_API_KEY}`,
     },
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+  });
+  console.log(JSON.stringify(response.data));
+};
 ```
 
 Response
@@ -442,23 +473,24 @@ Response
 When updating an asset, make sure to have the `asset.id` available. The asset ID
 is provided in the response when an asset is uploaded.
 
-JS + axios
+JavaScript
 
 ```js
-axios
-  .patch("https://livepeer.com/api/asset/$ASSET_ID", {
-    headers: {
-      Authorization: "Bearer {api_key}",
-      "Content-Type": "application/json",
-    },
-    data: JSON.strinify({
-      name: "Example name",
-    }),
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+const updateAsset = async () => {
+  const response = await axios.patch(
+    "https://livepeer.com/api/asset/$ASSET_ID",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.LP_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      data: JSON.strinify({
+        name: "Example name",
+      }),
+    }
+  );
+  console.log(JSON.stringify(response.data));
+};
 ```
 
 Response
@@ -517,19 +549,17 @@ Response
 
 ### Delete an asset
 
-JS + axios
+JavaScript
 
 ```js
-axios
-  .delete("https://livepeer.com/api/asset/{id}", {
+const deleteAsset = async () => {
+  const response = await axios.delete("https://livepeer.com/api/asset/{id}", {
     headers: {
-      Authorization: "Bearer {api_key}",
+      Authorization: `Bearer ${process.env.LP_API_KEY}`,
     },
-  })
-  .then((res) => {
-    JSON.stringify(res.data);
-  })
-  .catch((error) => console.log(error));
+  });
+  JSON.stringify(response.data);
+};
 ```
 
 When the asset has been successfully deleted, the response should return a `204`
@@ -542,25 +572,24 @@ IPFS.
 Provide the `$ASSET_ID` of the asset, this can be found using the List Asset
 method.
 
-JS + axios
+JavaScript
 
 ```js
-const axios = require("axios");
-
-axios
-  .post("https://livepeer.com/api/asset/$ASSET_ID/export", {
-    headers: {
-      Authorization: "Bearer {api_key}",
-      "Content-Type": "application/json",
-    },
-    data: JSON.stringify({
-      ipfs: {},
-    }),
-  })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+const exportAsset = async () => {
+  const response = await axios.post(
+    "https://livepeer.com/api/asset/$ASSET_ID/export",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.LP_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        ipfs: {},
+      }),
+    }
+  );
+  console.log(JSON.stringify(res.data));
+};
 ```
 
 Response
@@ -629,24 +658,23 @@ exported information on the asset.
 
 Use the list tasks method to get CID and metadata.
 
-To get the CID and metadata URL for the new, just created asset, retrieve the
-task until it is completed. To do this, check the status field in the response.
-This finished task will have an output with all the information about that asst,
-and the CID information is located under the `output.export.ipfs` path.
+To get the CID and metadata URL for the created asset, retrieve the task until
+it is completed. To do this, check the status field in the response. This
+finished task will have an output with all the information about that asst, and
+the CID information is located under the `output.export.ipfs` path.
 
-JS + axios
+JavaScript
 
 ```js
-const axios = require("axios");
 
-axios
+const list Task = async () => {
+
+const response = await axios
   .get("https://livepeer.com/api/task/$TASK_ID", {
     headers: {
-      Authorization: "Bearer {api_key}",
+      Authorization: `Bearer ${process.env.LP_API_KEY}`,
     },
   })
-  .then((res) => {
-    console.log(JSON.stringify(res.data));
-  })
-  .catch((error) => console.log(error));
+    console.log(JSON.stringify(response.data));
+};
 ```
