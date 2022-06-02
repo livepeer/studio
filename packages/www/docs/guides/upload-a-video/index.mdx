@@ -173,7 +173,7 @@ const axios = require("axios");
 axios
   .post("https://livepeer.com/api/asset/request-upload", {
     headers: {
-      Authorization: "Bearer {api_key}",
+      Authorization: `Bearer ${process.env.LP_API_KEY}`,
       "Content-Type": "application/json",
     },
     data: JSON.stringify({
