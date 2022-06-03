@@ -33,6 +33,7 @@ import {
 } from "../schema/types";
 import { WithID } from "../store/types";
 import { mergeAssetStatus } from "../store/asset-table";
+import Queue from "../store/queue";
 
 const app = Router();
 
@@ -108,6 +109,24 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
     playbackUrl: getPlaybackUrl(ingest, asset),
     downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
   };
+}
+
+export async function createAsset(asset: WithID<Asset>, queue: Queue) {
+  asset = await db.asset.create(asset);
+  await queue.publishWebhook("events.asset.created", {
+    type: "webhook_event",
+    id: uuid(),
+    timestamp: asset.createdAt,
+    event: "asset.created",
+    userId: asset.userId,
+    payload: {
+      asset: {
+        id: asset.id,
+        snapshot: asset,
+      },
+    },
+  });
+  return asset;
 }
 
 async function reconcileAssetStorage(
@@ -381,7 +400,7 @@ app.post(
       });
     }
 
-    asset = (await db.asset.create(asset)) as WithID<Asset>;
+    asset = await createAsset(asset, req.queue);
 
     const task = await req.taskScheduler.scheduleTask(
       "import",
@@ -437,7 +456,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     }
   );
   outputAsset.sourceAssetId = inputAsset.id;
-  outputAsset = (await db.asset.create(outputAsset)) as WithID<Asset>;
+  outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
     "transcode",
@@ -498,7 +517,7 @@ app.post(
     const baseUrl = ingests[0].origin;
     const url = `${baseUrl}/api/asset/upload/${signedUploadUrl}`;
 
-    asset = await db.asset.create(asset);
+    asset = await createAsset(asset, req.queue);
     const task = await req.taskScheduler.createTask(
       "import",
       {
