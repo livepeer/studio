@@ -54,6 +54,11 @@ const eventOptions = [
   "multistream.connected",
   "multistream.error",
   "multistream.disconnected",
+  "asset.created",
+  "asset.status",
+  "task.created",
+  "task.status",
+  "task.finished",
   // "playback.user.new",
 ];
 
