@@ -47,7 +47,7 @@ namespace messages {
     lastInterval?: number;
   }
 
-  type TaskInfo = {
+  export type TaskInfo = {
     id: string;
     type: ApiTask["type"];
     snapshot: ApiTask;

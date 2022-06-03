@@ -6,6 +6,13 @@ import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
 import { mergeAssetStatus } from "../store/asset-table";
+
+const taskInfo = (task: Task): messages.TaskInfo => ({
+  id: task.id,
+  type: task.type,
+  snapshot: task,
+});
+
 export default class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -186,13 +193,13 @@ export default class TaskScheduler {
     return task;
   }
 
-  createTask(
+  async createTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    return db.task.create({
+    const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
@@ -205,21 +212,39 @@ export default class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
+    await this.queue.publishWebhook("events.task.created", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp: task.createdAt,
+      event: "task.created",
+      userId: task.userId,
+      payload: {
+        task: taskInfo(task),
+      },
+    });
+    return task;
   }
 
   async enqueueTask(task: WithID<Task>) {
+    const timestamp = Date.now();
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
-      timestamp: Date.now(),
-      task: {
-        id: task.id,
-        type: task.type,
-        snapshot: task,
-      },
+      timestamp,
+      task: taskInfo(task),
     });
     await db.task.update(task.id, {
-      status: { phase: "waiting", updatedAt: Date.now() },
+      status: { phase: "waiting", updatedAt: timestamp },
+    });
+    await this.queue.publishWebhook("events.task.status", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "task.status",
+      userId: task.userId,
+      payload: {
+        task: taskInfo(task),
+      },
     });
   }
 }
