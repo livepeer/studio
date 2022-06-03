@@ -352,7 +352,7 @@ app.post(
     );
     if ("ipfs" in params && !params.ipfs?.pinata) {
       const updates = await reconcileAssetStorage(req, asset, params, task);
-      await db.asset.update(assetId, updates);
+      await req.taskScheduler.updateAsset(asset, updates);
     }
 
     res.status(201);
@@ -595,7 +595,11 @@ app.patch(
     }
 
     const storageUpdates = await reconcileAssetStorage(req, asset, storage);
-    await db.asset.update(id, { name, meta, ...storageUpdates });
+    await req.taskScheduler.updateAsset(asset, {
+      name,
+      meta,
+      ...storageUpdates,
+    });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }

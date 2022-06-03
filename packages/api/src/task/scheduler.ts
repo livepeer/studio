@@ -87,7 +87,7 @@ export default class TaskScheduler {
           await this.failTask(task, error, event.output);
           return true;
         }
-        await db.asset.update(task.outputAssetId, {
+        await this.updateAsset(task.outputAssetId, {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
@@ -108,7 +108,7 @@ export default class TaskScheduler {
           await this.failTask(task, error, event.output);
           return true;
         }
-        await db.asset.update(task.outputAssetId, {
+        await this.updateAsset(task.outputAssetId, {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
@@ -122,7 +122,7 @@ export default class TaskScheduler {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (inputAsset.status.storage?.ipfs?.taskIds?.pending === task.id) {
-          await db.asset.update(inputAsset.id, {
+          await this.updateAsset(inputAsset, {
             status: mergeAssetStatus(inputAsset.status, {
               storage: {
                 ipfs: {
@@ -159,13 +159,13 @@ export default class TaskScheduler {
       status,
     });
     if (task.outputAssetId) {
-      await db.asset.update(task.outputAssetId, { status });
+      await this.updateAsset(task.outputAssetId, { status });
     }
     switch (task.type) {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id) {
-          await db.asset.update(inputAsset.id, {
+          await this.updateAsset(inputAsset, {
             status: mergeAssetStatus(inputAsset.status, {
               storage: {
                 ipfs: {
@@ -266,5 +266,36 @@ export default class TaskScheduler {
         },
       });
     }
+  }
+
+  async updateAsset(
+    asset: string | Asset,
+    updates: Partial<Asset> & Required<Pick<Asset, "status">>
+  ) {
+    if (typeof asset === "string") {
+      asset = await db.asset.get(asset);
+    }
+    await db.asset.update(asset.id, updates);
+    if (!updates.status || updates.status === asset.status) {
+      return;
+    }
+    asset = {
+      ...asset,
+      ...updates,
+    };
+    const timestamp = asset.status.updatedAt;
+    await this.queue.publishWebhook("events.asset.status", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "asset.status",
+      userId: asset.userId,
+      payload: {
+        asset: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      },
+    });
   }
 }
