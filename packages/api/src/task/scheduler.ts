@@ -242,15 +242,29 @@ export default class TaskScheduler {
       ...task,
       ...updates,
     };
+    const timestamp = task.status.updatedAt;
     await this.queue.publishWebhook("events.task.status", {
       type: "webhook_event",
       id: uuid(),
-      timestamp: task.status.updatedAt,
+      timestamp,
       event: "task.status",
       userId: task.userId,
       payload: {
         task: taskInfo(task),
       },
     });
+    if (task.status.phase === "completed" || task.status.phase === "failed") {
+      await this.queue.publishWebhook("events.task.finished", {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp,
+        event: "task.finished",
+        userId: task.userId,
+        payload: {
+          success: task.status.phase === "completed",
+          task: taskInfo(task),
+        },
+      });
+    }
   }
 }
