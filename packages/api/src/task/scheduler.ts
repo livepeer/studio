@@ -138,7 +138,7 @@ export default class TaskScheduler {
         }
         break;
     }
-    await db.task.update(task.id, {
+    await this.updateTask(task, {
       status: {
         phase: "completed",
         updatedAt: Date.now(),
@@ -154,7 +154,7 @@ export default class TaskScheduler {
       updatedAt: Date.now(),
       errorMessage: error,
     } as const;
-    await db.task.update(task.id, {
+    await this.updateTask(task, {
       output,
       status,
     });
@@ -226,20 +226,26 @@ export default class TaskScheduler {
   }
 
   async enqueueTask(task: WithID<Task>) {
-    const timestamp = Date.now();
+    const status: Task["status"] = { phase: "waiting", updatedAt: Date.now() };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
-      timestamp,
+      timestamp: status.updatedAt,
       task: taskInfo(task),
     });
-    await db.task.update(task.id, {
-      status: { phase: "waiting", updatedAt: timestamp },
-    });
+    await this.updateTask(task, { status });
+  }
+
+  async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
+    await db.task.update(task.id, updates);
+    task = {
+      ...task,
+      ...updates,
+    };
     await this.queue.publishWebhook("events.task.status", {
       type: "webhook_event",
       id: uuid(),
-      timestamp,
+      timestamp: task.status.updatedAt,
       event: "task.status",
       userId: task.userId,
       payload: {
