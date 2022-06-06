@@ -14,7 +14,7 @@ Import a video `Asset` to Livepeer from an external URL through the
 
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/import' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "url":"$EXTERNAL_URL",

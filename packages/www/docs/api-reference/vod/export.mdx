@@ -15,7 +15,7 @@ task.
 
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "ipfs": {}

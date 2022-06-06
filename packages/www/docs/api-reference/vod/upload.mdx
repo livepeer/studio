@@ -24,7 +24,7 @@ First generate a URL to directly upload a video `Asset` to Livepeer on
 
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name":"Example name"
@@ -100,7 +100,7 @@ curl --location --request PUT "${url}" \
 const axios = require("axios");
 
 axios
-  .put("${url}", {
+  .put(`${url}`, {
     headers: {
       "Content-Type": "video/mp4",
     },
