@@ -69,9 +69,10 @@ export default class TaskScheduler {
       return true;
     }
 
+    let assetSpec: Asset;
     switch (event.task.type) {
       case "import":
-        let assetSpec = event.output?.import?.assetSpec;
+        assetSpec = event.output?.import?.assetSpec;
         if (!assetSpec) {
           const error = "bad task output: missing assetSpec";
           console.error(
