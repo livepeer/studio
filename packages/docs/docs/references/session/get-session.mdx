@@ -1,0 +1,29 @@
+---
+title: "GET retrieve a session"
+description: Livepeer Studio API Reference | GET retrieve a session
+metaTitle: GET retrieve a session - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | GET retrieve a session
+---
+
+# `GET` retrieve a session
+
+You can retrieve a session with its ID.
+
+```bash
+curl -H 'authorization: Bearer {api-key}' \
+"https://livepeer.com/api/session/{id}"
+```
+
+200 OK
+
+```bash
+{
+    "id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+    "sourceSegmentsDuration":250,
+    "record":true,
+    "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
+    "recordingStatus":"ready",
+    "recordingUrl":"https://livepeercdn.com/recordings/aaaaaaaa-aaaa-aaaa-aaaa-aaaa/index.m3u8"},
+    {other asset object keys, like createdAt and profiles}
+}
+```

@@ -18,7 +18,6 @@
     "cz": "git-cz",
     "coverage": "lerna run coverage --ignore @livepeer.com/www --ignore @livepeer.com/admin && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
     "depcheck": "lerna exec --no-sort --concurrency=1 --stream 'depcheck --specials=bin --ignores='babel-*' .'",
-    "docs": "lerna run docs && lerna run copy-docs && cp README.md docs/README.md",
     "prepare": "run-s prettier:check prepare:lerna",
     "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.com/www --ignore @livepeer.com/admin && lerna run build --stream",
     "lerna-run": "lerna run --stream",
