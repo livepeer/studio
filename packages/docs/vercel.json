@@ -1,0 +1,24 @@
+{
+  "redirects": [
+    {
+      "source": "/video-miners/how-to-guides/:path",
+      "destination": "/video-miners/guides/:path",
+      "permanent": true
+    },
+    {
+      "source": "/video-developers/:path",
+      "destination": "/developers/:path",
+      "permanent": true
+    },
+    {
+      "source": "/static/docs-assets/video-miners/how-to-guides/:path",
+      "destination": "/static/docs-assets/video-miners/guides/:path",
+      "permanent": true
+    },
+    {
+      "source": "/installation/connect-to-ethereum",
+      "destination": "/installation/connect-to-arbitrum",
+      "permanent": true
+    }
+  ]
+}

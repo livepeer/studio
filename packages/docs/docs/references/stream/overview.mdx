@@ -1,0 +1,224 @@
+---
+title: Overview
+description: Livepeer Studio API Reference | The stream Object
+metaTitle: Overview - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | The stream Object
+---
+
+# The `stream` object
+
+The `stream` object is the core building block of the Livepeer Studio API.
+
+A Livepeer Studio `stream` is a unique object with configuration data and
+metadata about all live stream sessions associated with it.
+
+The `stream` object parameters associated with configuration settings are
+read-write, for example changing the `record` value to turn recording on or off
+for future sessions.
+
+Other `stream` object parameters are read only. These include the unique `id`,
+ingested `sourceSegments` and duration data, among others.
+
+    Note: historically, a <code>stream</code> object with a{" "}
+    <code>parentId</code> represented a single live stream session. This type of
+    "child-session" stream object will be deprecated in an upcoming version of
+    the API in favor of the <code>session</code> object.
+
+## Attributes
+
+<!--
+<Table
+  data={[
+    {
+      parameter: <code>createdAt</code>,
+      type: <code>number</code>,
+      description:
+        "Timestamp when the asset was created. Reported in Unix epoch time.",
+    },
+    {
+      parameter: <code>createdByTokenName</code>,
+      type: <code>string</code>,
+      description:
+        "Livepeer Studio user-assigned name for the API key that created the stream object.",
+    },
+    {
+      parameter: <code>id</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier for the stream. Historically, this could also represent a single live stream session. This type of child-session stream object will be deprecated in an upcoming version of the API in favor of the session object.",
+    },
+    {
+      parameter: <code>isActive</code>,
+      type: <code>boolean</code>,
+      description:
+        "True if the asset is active. An active livestream means segments are being ingested.",
+    },
+    {
+      parameter: <code>kind</code>,
+      type: <code>string</code>,
+      description: "Livepeer Studio API object type.",
+    },
+    {
+      parameter: <code>lastSeen</code>,
+      type: <code>number</code>,
+      description:
+        "Timestamp when the asset was last active. Reported in Unix epoch time. An active livestream means segments are being ingested.",
+    },
+    {
+      parameter: <code>name</code>,
+      type: <code>string</code>,
+      description:
+        "Additional identifier for the asset. Often set to a human readable string. This identifier does not need to be unique. Required with POST",
+    },
+    {
+      parameter: <code>parentId</code>,
+      type: <code>string</code>,
+      description:
+        "Only used on stream objects that represent a single live stream session. Points to a parent stream object. This type of child-session stream object will be deprecated in an upcoming version of the API in favor of the session object.",
+    },
+    {
+      parameter: <code>playbackId</code>,
+      type: <code>string</code>,
+      description: "Unique identifier used to form the playback URL.",
+    },
+    {
+      parameter: <code>profiles</code>,
+      type: <code>array</code>,
+      description:
+        "Transcoding rendition settings. The source will be delivered with the renditions in the HLS and does not need to be redefined in the profiles parameter. If no profiles are defined, only the source will be delivered for playback.",
+    },
+    {
+      parameter: <code>profiles.bitrate</code>,
+      type: <code>integer</code>,
+      description: "bit/s setting for the transcoded rendition (minimum: 400).",
+    },
+    {
+      parameter: <code>profiles.fps</code>,
+      type: <code>integer</code>,
+      description:
+        "Framerate setting for the transcoded rendition. When set to 0, the source framerate is adopted for the transcoded rendition framerate. All profiles for a source object must be configured with the same fps (minimum: 0).",
+    },
+    {
+      parameter: <code>profiles.height</code>,
+      type: <code>integer</code>,
+      description:
+        "Pixel height setting for the transcoded rendition (minimum: 128).",
+    },
+    {
+      parameter: <code>profiles.name</code>,
+      type: <code>string</code>,
+      description:
+        "Identifier for the transcoded rendition settings (minLength: 1, maxLength: 500).",
+    },
+    {
+      parameter: <code>profiles.width</code>,
+      type: <code>integer</code>,
+      description:
+        "Pixel width setting for the transcoded rendition. (minimum: 128).",
+    },
+    {
+      parameter: <code>multistream</code>,
+      type: <code>object</code>,
+      description: "Multistream configuration.",
+    },
+    {
+      parameter: <code>multistream.targets</code>,
+      type: <code>array</code>,
+      description:
+        "List of Multistream Targets where this stream should be simultaneously pushed to.",
+    },
+    {
+      parameter: <code>multistream.targets.profile</code>,
+      type: <code>string</code>,
+      description: (
+        <>
+          Name of profile that should be pushed to the referenced Multistream
+          Target. Use <code>"source"</code> to push original media as ingested.
+        </>
+      ),
+    },
+    {
+      parameter: <code>multistream.targets.videoOnly</code>,
+      type: <code>boolean</code>,
+      description: (
+        <>
+          If <code>true</code>, the stream audio will be muted and only silent
+          video will be pushed to the target.
+        </>
+      ),
+    },
+    {
+      parameter: <code>multistream.targets.id</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier of the Multistream Target object from its own API.",
+    },
+    {
+      parameter: <code>multistream.targets.spec</code>,
+      type: <code>object</code>,
+      description:
+        "This field is write-only, allowed only in mutation request payloads. It specifies an inline Multistream Target object to be created on the same time as the stream creation or update. Reference the specific Multistream Target API for schema.",
+    },
+    {
+      parameter: <code>record</code>,
+      type: <code>boolean</code>,
+      description: (
+        <>
+          <code>true</code> means that new sessions are recorded and{" "}
+          <code>false</code> means they are not. The value is also inherited by
+          all future child <code>session</code> objects, which are read-only.
+          Historically, <code>stream</code> objects can also represent a single
+          live stream session, in which case they have a <code>parentId</code>.
+          In that case, <code>true</code> means that the session is actively
+          being recorded or was recorded, and <code>false</code> means that the
+          session is not being recorded or was not recorded.
+        </>
+      ),
+    },
+    {
+      parameter: <code>suspended</code>,
+      type: <code>boolean</code>,
+      description: (
+        <>
+          Default value is <code>false</code>. Can be used to forcefully stop
+          any live stream sessions happening in the current stream resource. Set
+          to <code>true</code> to immediately suspend any running stream and
+          prohibit new streams from starting.
+        </>
+      ),
+    },
+    {
+      parameter: <code>sourceSegments</code>,
+      type: <code>number</code>,
+      description: "Number of asset source segments processed.",
+    },
+    {
+      parameter: <code>sourceSegmentsDuration</code>,
+      type: <code>number</code>,
+      description: "Duration in seconds of asset source processed.",
+    },
+    {
+      parameter: <code>streamKey</code>,
+      type: <code>string</code>,
+      description: "Unique secret key used to form the RTMP ingest URL.",
+    },
+    {
+      parameter: <code>transcodedSegments</code>,
+      type: <code>number</code>,
+      description:
+        "Number of transcoded rendition segments processed. Should be (sourceSegments * number of profiles).",
+    },
+    {
+      parameter: <code>transcodedSegmentsDuration</code>,
+      type: <code>number</code>,
+      description:
+        "Duration in seconds of transcoded renditions processed. Should be (sourceSegmentsDuration * number of profiles).",
+    },
+    {
+      parameter: <code>userId</code>,
+      type: <code>string</code>,
+      description:
+        "Unique identifier for the Livepeer Studio user account that created the stream object.",
+    },
+  ]}
+/> -->

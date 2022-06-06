@@ -1,0 +1,25 @@
+---
+title: "GET retrieve a target"
+description: Livepeer Studio API Reference | GET retrieve a target
+metaTitle: GET retrieve a target - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | GET retrieve a target
+---
+
+# `GET` retrieve a multistream target
+
+You can retrieve a multistream target with its ID on `/multistream/target{id}`.
+
+```bash
+curl 'https://livepeer.com/api/multistream/target/{id}' \
+-H 'authorization: Bearer {api-key}'
+```
+
+200 OK
+
+```json
+{
+  "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaa",
+  "userId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbb",
+  "name": "My Multistream Target"
+}
+```

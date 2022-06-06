@@ -1,0 +1,125 @@
+---
+title: Selecting a video player for your app
+description: Selecting a video player for your app with Livepeer Studio
+metaTitle: Selecting a video player for your app - Livepeer Studio
+metaDescription: Selecting a video player for your app with Livepeer Studio
+---
+
+# Tutorial: How to implement a player into your front end application using Video.js
+
+In this tutorial, we’ll show you how to setup a player using video.js and
+[Livepeer Studio](http://livepeer.com) into your front end application for live
+streaming and video-on-demand.
+
+Although we’re using Video.js in this tutorial, there are lots of players that
+you can choose from that are compatible with Livepeer — .Video.js is designed to
+be a reliable and consistent base to build on top of. The player looks great out
+of the box, but can be easily styled with a little bit of extra CSS.
+
+### What you’ll need to get started:
+
+1. [Create an Account on Livepeer Studio](https://www.notion.so/How-to-Create-an-Account-014abcb50f42473089bf844190af61e5)
+2. [Retrieve a playback URL from a stream or an asset]
+3. [Choose how you’d like to stream: OBS or In-Browser]
+
+## How to build a player using just HTML, CSS, JavaScript
+
+### Method 1: Copy and Paste
+
+Check out [codepen](https://codepen.io/codentell/pen/XWVGwjV) full source code —
+drop in a playback URL (should look like
+`https://livepeercdn.com/hls/1fcae6n18ljto86h/index.m3u8`) in the
+`src attribute` field.
+
+![](/docs-assets/player/codepen-player.png)
+
+Example:
+
+```html
+<video-js
+  id="example-video"
+  width="960"
+  height="540"
+  class="vjs-default-skin"
+  controls>
+  <source
+    src="<https://livepeercdn.com/hls/1fcae6n18ljto86h/index.m3u8>"
+    type="application/x-mpegURL" />
+</video-js>
+```
+
+### Method 2: Build step-by-step
+
+- Create a folder for your project. Example: `livepeer-player-sample`
+
+```
+mkdir livepeer-player-sample
+
+```
+
+- Create an `index.html` inside the project folder
+
+```
+cd livepeer-player-sample
+touch index.html
+
+```
+
+- Using the code below, replace the `{{ENTER YOUR PLAYBACK URL }}` with your own
+  Playback URL. It should look similar to this:
+  `https://livepeercdn.com/hls/1fcae6n18ljto86h/index.m3u8`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video.js with Livepeer</title>
+    <link
+      href="<https://vjs.zencdn.net/7.18.1/video-js.css>"
+      rel="stylesheet" />
+  </head>
+
+  <body>
+    <video-js
+      id="livepeer-sample-videojs-player"
+      width="960"
+      height="540"
+      class="vjs-default-skin"
+      controls>
+      <source src="{{ENTER YOUR PLAYBACK URL}}" type="application/x-mpegURL" />
+    </video-js>
+  </body>
+  <script src="<https://vjs.zencdn.net/7.18.1/video.min.js>"></script>
+  <script src="<https://unpkg.com/@videojs/http-streaming@2.14.2/dist/videojs-http-streaming.min.js>"></script>
+  <script>
+    var player = videojs("livepeer-sample-videojs-player");
+    player.play();
+  </script>
+</html>
+```
+
+⚠️ Head’s up! ⚠️ If you’re using a playback URL for a stream, it will only show
+while a stream is active.
+
+### 🎉 Congrats! You now have a player! 🎉
+
+# Check out some more resources
+
+[Livepeer Player](https://www.npmjs.com/package/livepeer-player)
+
+<!--
+[How to Create an Account ](https://www.notion.so/How-to-Create-an-Account-014abcb50f42473089bf844190af61e5) -->
+<!--
+[Choosing how to stream: OBS or In-Browser](https://www.notion.so/Choosing-how-to-stream-OBS-or-In-Browser-61203ee994104ad4a4a5aeac33747de5) -->
+
+Note: Livepeer Studio works with any video player that supports HLS live
+streams. Other considerations are if the player provides analytics out of the
+box and if you can easily style the player.
+
+You can use these other video players
+
+- [Shaka Player](https://opensource.google/projects/shaka-player).
+- [JWPlayer](https://www.jwplayer.com/)
+- [TheoPlayer](https://www.theoplayer.com/).
