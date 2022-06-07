@@ -44,7 +44,7 @@ const StyledContent = styled(DropdownMenuContent, {
   boxShadow: "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
 });
 
-const eventOptions = [
+const eventOptions: Webhook["events"] = [
   "stream.started",
   // "stream.detection", // not yet...
   "stream.idle",
