@@ -6,6 +6,13 @@ import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
 import { mergeAssetStatus } from "../store/asset-table";
+
+const taskInfo = (task: Task): messages.TaskInfo => ({
+  id: task.id,
+  type: task.type,
+  snapshot: task,
+});
+
 export default class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -81,7 +88,7 @@ export default class TaskScheduler {
           await this.failTask(task, error, event.output);
           return true;
         }
-        await db.asset.update(task.outputAssetId, {
+        await this.updateAsset(task.outputAssetId, {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
@@ -102,7 +109,7 @@ export default class TaskScheduler {
           await this.failTask(task, error, event.output);
           return true;
         }
-        await db.asset.update(task.outputAssetId, {
+        await this.updateAsset(task.outputAssetId, {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
@@ -116,7 +123,7 @@ export default class TaskScheduler {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (inputAsset.status.storage?.ipfs?.taskIds?.pending === task.id) {
-          await db.asset.update(inputAsset.id, {
+          await this.updateAsset(inputAsset, {
             status: mergeAssetStatus(inputAsset.status, {
               storage: {
                 ipfs: {
@@ -132,7 +139,7 @@ export default class TaskScheduler {
         }
         break;
     }
-    await db.task.update(task.id, {
+    await this.updateTask(task, {
       status: {
         phase: "completed",
         updatedAt: Date.now(),
@@ -148,18 +155,18 @@ export default class TaskScheduler {
       updatedAt: Date.now(),
       errorMessage: error,
     } as const;
-    await db.task.update(task.id, {
+    await this.updateTask(task, {
       output,
       status,
     });
     if (task.outputAssetId) {
-      await db.asset.update(task.outputAssetId, { status });
+      await this.updateAsset(task.outputAssetId, { status });
     }
     switch (task.type) {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
         if (inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id) {
-          await db.asset.update(inputAsset.id, {
+          await this.updateAsset(inputAsset, {
             status: mergeAssetStatus(inputAsset.status, {
               storage: {
                 ipfs: {
@@ -187,13 +194,13 @@ export default class TaskScheduler {
     return task;
   }
 
-  createTask(
+  async createTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    return db.task.create({
+    const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
@@ -206,21 +213,90 @@ export default class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
+    await this.queue.publishWebhook("events.task.created", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp: task.createdAt,
+      event: "task.created",
+      userId: task.userId,
+      payload: {
+        task: taskInfo(task),
+      },
+    });
+    return task;
   }
 
   async enqueueTask(task: WithID<Task>) {
+    const status: Task["status"] = { phase: "waiting", updatedAt: Date.now() };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
-      timestamp: Date.now(),
-      task: {
-        id: task.id,
-        type: task.type,
-        snapshot: task,
+      timestamp: status.updatedAt,
+      task: taskInfo(task),
+    });
+    await this.updateTask(task, { status });
+  }
+
+  async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
+    await db.task.update(task.id, updates);
+    task = {
+      ...task,
+      ...updates,
+    };
+    const timestamp = task.status.updatedAt;
+    await this.queue.publishWebhook("events.task.status", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "task.status",
+      userId: task.userId,
+      payload: {
+        task: taskInfo(task),
       },
     });
-    await db.task.update(task.id, {
-      status: { phase: "waiting", updatedAt: Date.now() },
+    if (task.status.phase === "completed" || task.status.phase === "failed") {
+      await this.queue.publishWebhook("events.task.finished", {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp,
+        event: "task.finished",
+        userId: task.userId,
+        payload: {
+          success: task.status.phase === "completed",
+          task: taskInfo(task),
+        },
+      });
+    }
+  }
+
+  async updateAsset(
+    asset: string | Asset,
+    updates: Partial<Asset> & Required<Pick<Asset, "status">>
+  ) {
+    if (typeof asset === "string") {
+      asset = await db.asset.get(asset);
+    }
+    await db.asset.update(asset.id, updates);
+    if (!updates.status || updates.status === asset.status) {
+      return;
+    }
+    asset = {
+      ...asset,
+      ...updates,
+    };
+    const timestamp = asset.status.updatedAt;
+    await this.queue.publishWebhook("events.asset.status", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "asset.status",
+      userId: asset.userId,
+      payload: {
+        asset: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      },
     });
   }
 }

@@ -210,6 +210,11 @@ components:
               - multistream.error
               - multistream.disconnected
               - playback.user.new
+              - asset.created
+              - asset.status
+              - task.created
+              - task.status
+              - task.finished
         url:
           type: string
           format: uri

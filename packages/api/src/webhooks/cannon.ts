@@ -13,6 +13,7 @@ import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
 import TaskScheduler from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
+import { createAsset } from "../controllers/asset";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -509,15 +510,18 @@ export default class WebhookCannon {
     const playbackId = await generateUniquePlaybackId(sessionId);
 
     const createdAt = Date.now();
-    const asset = await this.db.asset.create({
-      id,
-      playbackId,
-      userId,
-      createdAt,
-      status: { phase: "waiting", updatedAt: createdAt },
-      name: `live-to-vod-${sessionId}`,
-      objectStoreId: this.vodObjectStoreId,
-    });
+    const asset = await createAsset(
+      {
+        id,
+        playbackId,
+        userId,
+        createdAt,
+        status: { phase: "waiting", updatedAt: createdAt },
+        name: `live-to-vod-${sessionId}`,
+        objectStoreId: this.vodObjectStoreId,
+      },
+      this.queue
+    );
 
     const task = await this.taskScheduler.scheduleTask(
       "import",

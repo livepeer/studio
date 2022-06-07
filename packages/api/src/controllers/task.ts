@@ -227,7 +227,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     progress: doc.progress,
     updatedAt: Date.now(),
   };
-  await db.task.update(id, { status });
+  await req.taskScheduler.updateTask(task, { status });
 
   res.status(200);
   res.json({ id, status });
