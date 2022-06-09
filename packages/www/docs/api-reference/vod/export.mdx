@@ -11,13 +11,36 @@ Export a video `Asset` from Livepeer to IPFS on the
 `POST /api/asset/$ASSET_ID/export` endpoint. This request spawns an `export`
 task.
 
+#### curl
+
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "ipfs": {}
 }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/asset/$ASSET_ID/export", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      ipfs: {},
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 <Table

@@ -9,9 +9,28 @@ metaDescription: Livepeer.com API Reference | List Assets
 
 To list all assets in your account call `GET /api/asset`:
 
+#### curl
+
 ```jsx
 curl --location --request GET 'https://livepeer.com/api/asset' \
---header 'Authorization: Bearer $API_TOKEN'
+--header 'Authorization: Bearer {api_key}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/asset", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### **Request path & query params**
@@ -37,9 +56,28 @@ Retrieves the details of an `Asset` that has previously been imported or
 uploaded. Supply the unique `Asset` ID that was returned from your previous
 request, and Livepeer will return the corresponding `Asset` information.
 
+#### curl
+
 ```jsx
 curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
 --header 'Authorization: Bearer $API_TOKEN'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/asset/$ASSET_ID", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### Response Example

@@ -20,13 +20,36 @@ though, from which an API token is available.
 First generate a URL to directly upload a video `Asset` to Livepeer on
 `POST /api/asset/request-upload`:
 
+#### curl
+
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name":"Example name"
 }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/asset/request-upload", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      name: "Example name",
+    }),
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### Request body parameters
@@ -86,10 +109,30 @@ more information.
 Now upload (`PUT`) a video file on the exact URL in the `url` field of the
 response above:
 
+#### curl
+
 ```jsx
 curl --location --request PUT "${url}" \
 --header 'Content-Type: video/mp4' \
 --data-binary '@$VIDEO_FILE_PATH'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .put(`${url}`, {
+    headers: {
+      "Content-Type": "video/mp4",
+    },
+    data: "@$VIDEO_FILE_PATH",
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 Notice that we only support mp4 files encoded with H264 video and AAC audio for

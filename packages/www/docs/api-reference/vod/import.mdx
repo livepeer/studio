@@ -10,14 +10,36 @@ metaDescription: Livepeer.com API Reference | Import
 Import a video `Asset` to Livepeer from an external URL through the
 `POST /api/asset/import` API.
 
+#### curl
+
 ```jsx
 curl --location --request POST 'https://livepeer.com/api/asset/import' \
---header 'Authorization: Bearer $API_TOKEN' \
+--header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "url":"$EXTERNAL_URL",
     "name":"Example name"
 }'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .post("https://livepeer.com/api/asset/import", {
+    headers: {
+      data: JSON.stringify({
+        url: "$EXTERNAL_URL",
+        name: "Example name",
+      }),
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### Request body parameters

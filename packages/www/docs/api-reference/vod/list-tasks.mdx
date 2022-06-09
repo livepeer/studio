@@ -14,9 +14,28 @@ API.
 
 List all tasks in the account, most recent first.
 
+#### curl
+
 ```jsx
 curl --location --request GET 'https://livepeer.com/api/task' \
---header 'Authorization: Bearer $API_TOKEN'
+--header 'Authorization: Bearer {api_key}'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/task", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### **Request path & query params**
@@ -42,9 +61,28 @@ Retrieves the details of a `Task`, including progress updates and status. Supply
 the unique `Task` ID that was returned from your previous request or from an
 `Asset` import or export.
 
+#### curl
+
 ```jsx
 curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
 --header 'Authorization: Bearer $API_TOKEN'
+```
+
+#### JavaScript + axios
+
+```javascript
+const axios = require("axios");
+
+axios
+  .get("https://livepeer.com/api/task/$TASK_ID", {
+    headers: {
+      Authorization: "Bearer {api_key}",
+    },
+  })
+  .then((res) => {
+    console.log(JSON.stringify(res.data));
+  })
+  .catch((error) => console.log(error));
 ```
 
 ### Response example
