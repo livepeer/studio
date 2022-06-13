@@ -181,22 +181,33 @@ const WebhookDialog = ({
             />
             <Label htmlFor="events">Event types</Label>
 
-            <DropdownMenu
-              css={{
-                width: "100%",
-                top: 50,
-              }}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Box>
-                  <Select disabled css={{ fontSize: "$3", p: "$1" }}>
+                  <Select disabled css={{ fontSize: "$3", p: "$2" }}>
                     <Box as="option" value="" disabled selected>
                       Select events...
                     </Box>
                   </Select>
                 </Box>
               </DropdownMenuTrigger>
-              <Box css={{ position: "relative" }}>
-                <StyledContent css={{ transform: "none" }} portalled={false}>
+              <DropdownMenuContent>
+                <Box
+                  css={{
+                    position: "relative",
+                    minWidth: 450,
+                    top: -10,
+                    borderLeft: "1px solid $colors$slate7",
+                    borderRight: "1px solid $colors$slate7",
+                    borderBottom: "1px solid $colors$slate7",
+                    backgroundColor: "$loContrast",
+                    borderBottomLeftRadius: 6,
+                    borderBottomRightRadius: 6,
+                    borderTopRightRadius: 0,
+                    borderTopLeftRadius: 0,
+                    boxShadow:
+                      "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
+                  }}>
                   <DropdownMenuGroup>
                     {eventOptions.map((event, i) => (
                       <DropdownMenuCheckboxItem
@@ -215,8 +226,8 @@ const WebhookDialog = ({
                       </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuGroup>
-                </StyledContent>
-              </Box>
+                </Box>
+              </DropdownMenuContent>
             </DropdownMenu>
 
             <Flex
@@ -227,11 +238,11 @@ const WebhookDialog = ({
                 width: "100%",
                 borderRadius: 6,
                 height: 200,
+                mt: "$1",
                 overflowX: "hidden",
                 overflowY: "auto",
                 border: "1px solid $colors$neutral7",
                 backgroundColor: "$neutral2",
-                mt: "-3px",
                 zIndex: 1,
               }}>
               {events.length > 0 ? (
