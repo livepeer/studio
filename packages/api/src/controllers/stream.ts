@@ -168,7 +168,7 @@ function getRecordingUrl(ingest: string, session: DBSession, mp4 = false) {
   return pathJoin(
     ingest,
     `recordings`,
-    session.lastSessionId ? session.lastSessionId : session.id,
+    session.lastSessionId ?? session.id,
     mp4 ? `source.mp4` : `index.m3u8`
   );
 }
@@ -968,7 +968,7 @@ const sendSetActiveHooks = async (
             streamId: stream.id,
             event: "recording.ready",
             userId: stream.userId,
-            sessionId: session.id,
+            sessionId: session.lastSessionId ?? session.id,
             payload: {
               recordingUrl,
               mp4Url,
