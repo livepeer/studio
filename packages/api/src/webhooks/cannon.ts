@@ -522,12 +522,12 @@ export default class WebhookCannon {
       },
       this.queue
     );
-
-    const task = await this.taskScheduler.scheduleTask(
+    await this.taskScheduler.scheduleTask(
       "import",
       {
         import: {
           url: mp4RecordingUrl,
+          recordedSessionId: sessionId,
         },
       },
       undefined,
