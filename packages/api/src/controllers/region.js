@@ -9,7 +9,7 @@ const app = Router();
 function flatRegions(regions = [], halfRegionOrchestratorsUntrusted = false) {
   let count = 0;
   return regions.flatMap((reg) =>
-    reg.region != "ber" && reg.region != "rkv"
+    reg.region != "nyc"
       ? []
       : reg.orchestrators.map((orch) => ({
           score:
