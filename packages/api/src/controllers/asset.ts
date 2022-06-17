@@ -527,7 +527,7 @@ app.post(
       asset
     );
 
-    res.json({ url, tusEndpoint, uploadToken, asset, task });
+    res.json({ url, tusEndpoint, asset, task });
   }
 );
 
@@ -585,20 +585,8 @@ type TusFileMetadata = {
   upload_metadata: string;
 };
 
-server.on(
-  tus.EVENTS.EVENT_UPLOAD_COMPLETE,
-  async ({ file }: { file: TusFileMetadata }) => {
-    const playbackId = file.id;
-    const { task } = await getPendingAssetAndTask(playbackId);
-    await taskScheduler.enqueueTask(task);
-  }
-);
-
 app.post("/upload/tus", async (req, res) => {
-  const uploadToken =
-    req.query.uploadToken?.toString() ||
-    req.headers["livepeer-upload-token"]?.toString() ||
-    getTusMetadata(req).get("uploadToken");
+  const uploadToken = req.query.uploadToken?.toString();
   if (!uploadToken) {
     throw new UnauthorizedError(
       "Missing uploadToken metadata from /request-upload API"
@@ -611,6 +599,15 @@ app.post("/upload/tus", async (req, res) => {
   return server.handle(req, res);
 });
 app.all("/upload/tus/*", server.handle.bind(server));
+
+server.on(
+  tus.EVENTS.EVENT_UPLOAD_COMPLETE,
+  async ({ file }: { file: TusFileMetadata }) => {
+    const playbackId = file.id;
+    const { task } = await getPendingAssetAndTask(playbackId);
+    await taskScheduler.enqueueTask(task);
+  }
+);
 
 app.put("/upload/:url", async (req, res) => {
   const {
