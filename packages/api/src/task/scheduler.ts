@@ -13,14 +13,20 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
-export default class TaskScheduler {
+export class TaskScheduler {
   queue: Queue;
   running: boolean;
-  constructor({ queue }) {
+
+  constructor() {
+    // initialized through start to allow for singleton instance
+  }
+
+  async start({ queue }) {
+    if (this.running) {
+      throw new Error("task scheduler already running");
+    }
     this.running = true;
     this.queue = queue;
-  }
-  async start() {
     await this.queue.consume("task", this.handleTaskQueue.bind(this));
   }
 
@@ -300,3 +306,6 @@ export default class TaskScheduler {
     });
   }
 }
+
+const taskScheduler = new TaskScheduler();
+export default taskScheduler;

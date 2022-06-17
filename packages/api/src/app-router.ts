@@ -20,11 +20,11 @@ import streamProxy from "./controllers/stream-proxy";
 import apiProxy from "./controllers/api-proxy";
 import { getBroadcasterHandler } from "./controllers/broadcaster";
 import WebhookCannon from "./webhooks/cannon";
-import TaskScheduler from "./task/scheduler";
 import Queue, { NoopQueue, RabbitQueue } from "./store/queue";
 import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
+import taskScheduler from "./task/scheduler";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -102,10 +102,7 @@ export default async function makeApp(params: CliArgs) {
     : new NoopQueue();
 
   // Task Scheduler
-  const taskScheduler = new TaskScheduler({
-    queue,
-  });
-  await taskScheduler.start();
+  await taskScheduler.start({ queue });
 
   // Webhooks Cannon
   const webhookCannon = new WebhookCannon({
