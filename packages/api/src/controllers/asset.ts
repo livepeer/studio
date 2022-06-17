@@ -5,7 +5,7 @@ import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
-import tus from "tus-node-server";
+import tus, { GCSDataStore } from "tus-node-server";
 import {
   makeNextHREF,
   parseFilters,
@@ -531,18 +531,27 @@ app.post(
   }
 );
 
+const namingFunction = (req: Request) => {
+  const playbackId = req.res.getHeader("livepeer-playback-id").toString();
+  if (!playbackId) {
+    throw new InternalServerError("Missing playbackId in response headers");
+  }
+  return playbackId;
+};
+
 const server = new tus.Server();
 server.datastore = new tus.FileStore({
   path: "/upload/tus",
   directory: "./data/directUpload",
-  namingFunction: (req: Request) => {
-    const playbackId = req.res.getHeader("livepeer-playback-id").toString();
-    if (!playbackId) {
-      throw new InternalServerError("Missing playbackId in response headers");
-    }
-    return playbackId;
-  },
+  namingFunction,
 });
+export function setTusGcsDataStore(opts: Omit<tus.GCStoreOptions, "path">) {
+  server.datastore = new GCSDataStore({
+    path: "/upload/tus",
+    namingFunction,
+    ...opts,
+  });
+}
 
 const getTusMetadata = (req: http.IncomingMessage) => {
   const uploadMetadata = req.headers["upload-metadata"]?.toString();

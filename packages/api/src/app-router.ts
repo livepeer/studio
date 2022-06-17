@@ -25,6 +25,7 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
+import { setTusGcsDataStore } from "./controllers/asset";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -117,6 +118,19 @@ export default async function makeApp(params: CliArgs) {
     queue,
   });
   await webhookCannon.start();
+
+  if (vodObjectStoreId) {
+    const os = await db.objectStore.get(vodObjectStoreId);
+    const gcsOptions = (os as any)?.gcsOptions; // as any only since the field doesnt exist yet
+    if (gcsOptions) {
+      const keyFilename = ""; // TODO: magic
+      setTusGcsDataStore({
+        projectId: gcsOptions.projectId,
+        bucket: gcsOptions.bucket,
+        keyFilename,
+      });
+    }
+  }
 
   process.on("beforeExit", (code) => {
     queue.close();
