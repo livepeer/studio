@@ -143,11 +143,11 @@ const Post = ({
             </Flex>
             <Heading
               as="h1"
-              size="3"
+              size="4"
               css={{
                 mt: "$3",
                 mb: "$6",
-                fontWeight: 600,
+                fontWeight: 500,
               }}>
               {title}
             </Heading>
@@ -234,7 +234,7 @@ const Post = ({
                   width: "100%",
                 },
                 a: {
-                  color: "$violet9",
+                  color: "$indigo9",
                 },
               }}>
               <BlockContent

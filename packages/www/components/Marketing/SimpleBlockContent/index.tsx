@@ -34,7 +34,16 @@ const SimpleBlockContent = (props) => {
           width: "100%",
         },
         a: {
-          color: "$violet9",
+          color: "$indigo9",
+        },
+        h1: {
+          fontSize: "$9",
+        },
+        h2: {
+          fontSize: "$8",
+        },
+        h3: {
+          fontSize: "$7",
         },
       }}>
       <BlockContent blocks={blocks} serializers={Serializers} />

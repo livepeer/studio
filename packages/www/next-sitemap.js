@@ -1,5 +1,5 @@
 module.exports = {
-  siteUrl: "https://livepeer.com",
+  siteUrl: "https://livepeer.studio",
   generateRobotsTxt: true,
   exclude: ["/home"],
   transform: (config, url) => {

@@ -1,18 +1,18 @@
 ---
 title: "GET a list of sessions"
-description: Livepeer.com API Reference | GET a list of sessions
-metaTitle: GET a list of sessions - Livepeer.com
-metaDescription: Livepeer.com API Reference | GET a list of sessions
+description: Livepeer Studio API Reference | GET a list of sessions
+metaTitle: GET a list of sessions - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | GET a list of sessions
 ---
 
 # `GET` a list of sessions
 
 Use `/session` to a return list of sessions with the same `userId`. This will
-return a list of sessions created by the same Livepeer.com user.
+return a list of sessions created by the same Livepeer Studio user.
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/session"
+"https://livepeer.studio/api/session"
 ```
 
 Use `/stream/{parentId}/sessions` to a return list of sessions with the same
@@ -20,7 +20,7 @@ Use `/stream/{parentId}/sessions` to a return list of sessions with the same
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/stream/{parentId}/sessions"
+"https://livepeer.studio/api/stream/{parentId}/sessions"
 ```
 
 200 OK
@@ -39,7 +39,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "record":true,
     "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
     "recordingStatus":"ready",
-    "recordingUrl":"https://fra-cdn.livepeer.com/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
+    "recordingUrl":"https://fra-cdn.livepeer.studio/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
     {other asset object keys, like createdAt and profiles}
   }
 ]

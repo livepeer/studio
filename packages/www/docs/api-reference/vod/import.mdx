@@ -1,8 +1,8 @@
 ---
 title: Import an Asset
-description: Livepeer.com API Reference | Import
-metaTitle: Import - Livepeer.com
-metaDescription: Livepeer.com API Reference | Import
+description: Livepeer Studio API Reference | Import
+metaTitle: Import - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | Import
 ---
 
 # Import an Asset
@@ -13,7 +13,7 @@ Import a video `Asset` to Livepeer from an external URL through the
 #### curl
 
 ```jsx
-curl --location --request POST 'https://livepeer.com/api/asset/import' \
+curl --location --request POST 'https://livepeer.studio/api/asset/import' \
 --header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -28,7 +28,7 @@ curl --location --request POST 'https://livepeer.com/api/asset/import' \
 const axios = require("axios");
 
 axios
-  .post("https://livepeer.com/api/asset/import", {
+  .post("https://livepeer.studio/api/asset/import", {
     headers: {
       data: JSON.stringify({
         url: "$EXTERNAL_URL",

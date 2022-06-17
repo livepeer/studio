@@ -77,7 +77,7 @@ const TeamMember = ({
               color: "$hiContrast",
               fontSize: "$3",
               transition: "color .15s",
-              "&:hover": { color: "$violet9" },
+              "&:hover": { color: "$indigo9" },
             }}
             href={twitter}
             target="_blank"
@@ -92,7 +92,7 @@ const TeamMember = ({
               color: "$hiContrast",
               fontSize: "$3",
               transition: "color .15s",
-              "&:hover": { color: "$violet9" },
+              "&:hover": { color: "$indigo9" },
             }}
             href={linkedin}
             target="_blank"
@@ -107,7 +107,7 @@ const TeamMember = ({
               color: "$hiContrast",
               fontSize: "$3",
               transition: "color .15s",
-              "&:hover": { color: "$violet9" },
+              "&:hover": { color: "$indigo9" },
             }}
             href={medium}
             target="_blank"
@@ -122,7 +122,7 @@ const TeamMember = ({
               color: "$hiContrast",
               fontSize: "$3",
               transition: "color .15s",
-              "&:hover": { color: "$violet9" },
+              "&:hover": { color: "$indigo9" },
             }}
             href={github}
             target="_blank"

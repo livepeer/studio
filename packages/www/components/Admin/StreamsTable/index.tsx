@@ -267,11 +267,11 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               display: ["none", "none", "none", "inline-block"],
             }}>
             <b>New beta feature</b>: Record your live streams. Send feedback to
-            help@livepeer.com.
+            help@livepeer.studio.
             <Box
               as="a"
               target="_blank"
-              href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
+              href="https://livepeer.studio/blog/record-every-video-livestream-with-livepeer"
               sx={{
                 display: "inline-block",
                 ml: "0.2em",

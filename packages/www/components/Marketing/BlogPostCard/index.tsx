@@ -23,12 +23,10 @@ const BlogPostCard = ({ post, css = {} }) => {
           textDecoration: "none",
           color: "initial",
           marginRight: "auto",
-          borderRadius: 24,
-          border: "1px solid",
-          borderColor: "$neutral5",
+          borderRadius: 18,
           overflow: "hidden",
           transition: "box-shadow .2s",
-          height: 540,
+          height: 600,
           "&:hover": {
             textDecoration: "none",
             boxShadow:
@@ -59,13 +57,14 @@ const BlogPostCard = ({ post, css = {} }) => {
             px: "$4",
             py: "$4",
             height: "100%",
-            color: "$hiContrast",
+            color: "$loContrast",
+            bc: "$hiContrast",
           }}>
           <Box>
             <Text
-              variant="gray"
-              size="1"
+              size="2"
               css={{
+                color: "$loContrast",
                 textTransform: "uppercase",
                 fontWeight: 500,
               }}>
@@ -116,7 +115,7 @@ const BlogPostCard = ({ post, css = {} }) => {
             </Flex>
             <Heading
               as="h2"
-              size="1"
+              size="2"
               css={{
                 fontWeight: 500,
                 pb: "$3",
@@ -130,9 +129,9 @@ const BlogPostCard = ({ post, css = {} }) => {
               />
             </Heading>
             <Text
-              variant="gray"
               size="4"
               css={{
+                color: "$loContrast",
                 mb: "$5",
               }}>
               <TextTruncate
@@ -143,7 +142,16 @@ const BlogPostCard = ({ post, css = {} }) => {
               />
             </Text>
           </Box>
-          <Text css={{ fontWeight: 600, margin: 0 }}>Read more</Text>
+          <A
+            as={Box}
+            css={{
+              textDecoration: "none",
+              fontWeight: 500,
+              margin: 0,
+              color: "$loContrast",
+            }}>
+            Read more
+          </A>
         </Flex>
       </A>
     </Link>

@@ -147,7 +147,7 @@ const HeroVideo = forwardRef((_props, ref: React.Ref<HTMLDivElement>) => {
               "&:focus": {
                 outline: "none",
                 boxShadow: "0px 0px 0px 3px rgba(148, 60, 255, 0.3)",
-                borderColor: "$violet9",
+                borderColor: "$indigo9",
               },
             }}
           />

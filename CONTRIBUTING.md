@@ -1,4 +1,4 @@
-# Contributing to Livepeer.com
+# Contributing to Livepeer Studio
 
 Hey there, potential contributor!
 
@@ -16,8 +16,8 @@ First off, here are a few important notes:
 - **Read the
   [Code of Conduct](https://github.com/livepeer/livepeer-com/blob/master/CODE_OF_CONDUCT.md).**
   For most, this will be common sense. But please take a couple minutes to
-  understand your responsibilities as a member of the Livepeer.com community and
-  how you are expected to treat others.
+  understand your responsibilities as a member of the Livepeer Studio community
+  and how you are expected to treat others.
 - **[Yarn](https://yarnpkg.com/en/) is the npm client used in this project.**
   Please do not use `npm` or you will encounter issues.
 - **This is a monorepo.** This means several public and private packages are
@@ -46,7 +46,7 @@ First off, here are a few important notes:
 
 ### How You Can Help
 
-Livepeer.com contributions will generally fall into one of the following
+Livepeer Studio contributions will generally fall into one of the following
 categories:
 
 #### 📖 Updating documentation
@@ -86,7 +86,7 @@ on a file-by-file basis. Whatever you do, be sure to check out the section about
 
 #### 🛠️ Updating scripts and tooling
 
-We want to make sure Livepeer.com contributors have a pleasant developer
+We want to make sure Livepeer Studio contributors have a pleasant developer
 experience (DX). The tools we use to code continually change and improve. If you
 see ways to reduce the amount of repetition or stress when it comes to coding in
 this project, feel free to create an issue and/or PR to discuss. Let's continue
@@ -99,9 +99,9 @@ to improve this codebase for everyone.
 
 ## FAQ
 
-### How can I run Livepeer.com on Windows?
+### How can I run Livepeer Studio on Windows?
 
-You need a unix shell to run Livepeer.com. You can get one on Windows by
+You need a unix shell to run Livepeer Studio. You can get one on Windows by
 installing the Linux on Windows subsystem on Windows 10. You can find
 instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 

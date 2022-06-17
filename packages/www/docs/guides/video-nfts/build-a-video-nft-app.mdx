@@ -1,8 +1,8 @@
 ---
 title: Build a Video NFT app
-description: How to build an app that mints Video NFTs with Livepeer.com
-metaTitle: Build a Video NFT app - Livepeer.com
-metaDescription: How to build an app that mints Video NFTs with Livepeer.com
+description: How to build an app that mints Video NFTs with Livepeer Studio
+metaTitle: Build a Video NFT app - Livepeer Studio
+metaDescription: How to build an app that mints Video NFTs with Livepeer Studio
 ---
 
 # Build a Video NFT app
@@ -12,7 +12,7 @@ Livepeer provides a
 building Video NFT apps. You can use it from any part of your application stack,
 like your backend and/or your frontend. It includes utilities for:
 
-- Opening a file from your users device and uploading it to the Livepeer API;
+- Opening a file from your users device and uploading it to the API;
 - Interacting with the Livepeer VOD API, including requesting an upload URL,
   transcoding the video for an optimized NFT and exporting it to IPFS;
 - Minting the actual NFT on an Ethereum/EVM-compatible blockchain.
@@ -23,8 +23,8 @@ detailed documentation on [GitHub pages](https://livepeer.github.io/video-nft/).
 
 When building applications with the SDK, you might also find it useful to learn
 and make use of
-[CORS-enabled API keys](https://livepeer.com/docs/guides/start-live-streaming/api-key#cors),
-in case you want to get started without a backend to talk with the Livepeer API.
+[CORS-enabled API keys](https://livepeer.studio/docs/guides/start-live-streaming/api-key#cors),
+in case you want to get started without a backend to talk with the API.
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">
@@ -48,16 +48,16 @@ in case you want to get started without a backend to talk with the Livepeer API.
 The first application to use the SDK was the Video NFT CLI provided by the same
 `npm` package. Although it shares the project with the SDK, it is just a regular
 user of it like any other application. You can learn more how to use it in our
-[Mint a Video NFT](https://livepeer.com/docs/guides/video-nfts/mint-a-video-nft)
+[Mint a Video NFT](https://livepeer.studio/docs/guides/video-nfts/mint-a-video-nft)
 guide, and check
 [its source code on GitHub](https://github.com/livepeer/video-nft/blob/fc10dbc5b758c864b26e81f7e031268eb174f01c/src/cli/index.ts#L10).
 
 ### Mint NFT page
 
-Livepeer also provides the [Mint NFT page](https://livepeer.com/mint-nft) which
-uses this SDK. It complements the CLI in the sense of connecting to MetaMask to
-mint the file uploaded by the CLI, but it can also be used standalone by
-uploading the file directly on the UI as wel.
+Livepeer also provides the [Mint NFT page](https://livepeer.studio/mint-nft)
+which uses this SDK. It complements the CLI in the sense of connecting to
+MetaMask to mint the file uploaded by the CLI, but it can also be used
+standalone by uploading the file directly on the UI as wel.
 
 The source code is inside the code for our dashboard. It is built in React with
 next.js and you can check

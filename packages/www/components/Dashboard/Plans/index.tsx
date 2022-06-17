@@ -33,9 +33,9 @@ const steps = [
           color: "$hiContrast",
           lineHeight: 1.5,
         }}>
-        Welcome to Livepeer.com! You're currently subscribed to the free plan.
-        Click "Upgrade" to enter your credit card information and switch over to
-        the pay-as-you-go plan for unlimited transcoding minutes.
+        Welcome to Livepeer Studio! You're currently subscribed to the free
+        plan. Click "Upgrade" to enter your credit card information and switch
+        over to the pay-as-you-go plan for unlimited transcoding minutes.
       </Text>
     ),
   },
@@ -303,17 +303,17 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               </Heading>
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
               <Link
-                href="/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
+                href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
                 passHref>
                 <Button
                   as="a"
                   size="3"
                   onClick={() => {
                     router.push(
-                      "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan"
+                      "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
                     );
                   }}
-                  variant="indigo">
+                  variant="blue">
                   Contact Us
                 </Button>
               </Link>

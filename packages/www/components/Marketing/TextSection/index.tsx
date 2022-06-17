@@ -1,10 +1,8 @@
 import SimpleBlockContent from "../SimpleBlockContent";
 import { Container, Box } from "@livepeer/design-system";
-import Guides from "@components/Marketing/Guides";
 
 const TextSection = ({ text }) => (
   <Box css={{ position: "relative" }}>
-    <Guides backgroundColor="$loContrast" />
     <Box css={{ position: "relative" }}>
       <Container
         size="3"

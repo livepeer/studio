@@ -15,7 +15,6 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Register as Content } from "content";
 import useApi from "../hooks/use-api";
 import Link from "next/link";
-import Guides from "@components/Marketing/Guides";
 
 const emailVerificationMode =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_MODE === "true";
@@ -93,7 +92,6 @@ const RegisterPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -114,7 +112,7 @@ const RegisterPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$3" }}>
+            <Heading size="4" as="h1" css={{ mb: "$4" }}>
               Create an account
             </Heading>
             <Text

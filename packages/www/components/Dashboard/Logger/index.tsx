@@ -34,7 +34,7 @@ const errorLog = (evt: events.Any, text: string, key?: string) =>
   newLog(evt, "error", text, key);
 
 const levelColorMap = {
-  info: "violet",
+  info: "blue",
   error: "red",
 };
 

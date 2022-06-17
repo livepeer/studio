@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { minter, chains } from "@livepeer/video-nft";
 
-import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
 import {
   Link as A,
@@ -179,7 +178,6 @@ export default function MintNFT() {
   }
   return (
     <Layout {...Content.metaData} css={{ minHeight: "100vh" }}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative", flex: 1 }}>
         <Container
           size="3"

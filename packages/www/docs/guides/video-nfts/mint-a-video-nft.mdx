@@ -1,8 +1,8 @@
 ---
 title: Mint a Video NFT
-description: Learn how to mint a Video NFT with Livepeer.com
-metaTitle: Mint a Video NFT - Livepeer.com
-metaDescription: Learn how to mint a Video NFT with Livepeer.com
+description: Learn how to mint a Video NFT with Livepeer Studio
+metaTitle: Mint a Video NFT - Livepeer Studio
+metaDescription: Learn how to mint a Video NFT with Livepeer Studio
 ---
 
 # How to Mint a Video NFT
@@ -18,7 +18,7 @@ metaDescription: Learn how to mint a Video NFT with Livepeer.com
 </Alert>
 
 If you're building your own application for minting Video NFTs, check our
-[Build a Video NFT app](https://livepeer.com/docs/guides/video-nfts/build-a-video-nft-app)
+[Build a Video NFT app](https://livepeer.studio/docs/guides/video-nfts/build-a-video-nft-app)
 guide instead.
 
 ## **Step 1: Upload the Video and configure the metadata for your NFT**
@@ -30,8 +30,8 @@ Alternatively, if you don't have `node` installed you can use
 [this script](https://gist.github.com/victorges/3369cc04c0002a63b2fab33079d8827e)
 (`bash`) which works in a similar way.
 
-Start by getting a Livepeer API key to use from the tool:
-[Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
+Start by getting an API key to use from the tool:
+[Get an API key](https://livepeer.studio/docs/guides/start-live-streaming/api-key)
 
 Then simply run `npx @livepeer/video-nft` . The CLI will ask you for any
 information it needs and in the end will give you a URL for a simple page for
@@ -57,7 +57,7 @@ $ npx @livepeer/video-nft
 Need to install the following packages:
   @livepeer/video-nft@0.1.3
 Ok to proceed? (y) y
-? Enter your Livepeer API key (learn more at http://bit.ly/lp-api-key): ********
+? Enter your API key (learn more at http://bit.ly/lp-api-key): ********
 ****************************
 Tip: You can set the LP_API_KEY environment variable to avoid this prompt.
 ? What file do you want to use? nasa25.mp4
@@ -80,12 +80,12 @@ Waiting for export task completion... id=b008532d-839b-4925-9833-094d2d6a1cc3
   "videoFileCid": "QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
   "nftMetadataCid": "QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h",
   "videoFileUrl": "ipfs://QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
-  "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
+  "videoFileGatewayUrl": "https://ipfs.livepeer.studio/ipfs/QmcEZYeH2QxySWqHFcQbSovb43NGST4JaDBpeG1Tk4aXmA",
   "nftMetadataUrl": "ipfs://QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h",
-  "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h"
+  "nftMetadataGatewayUrl": "https://ipfs.livepeer.studio/ipfs/QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h"
 }
 5. Mint your NFT at:
-https://livepeer.com/mint-nft?tokenUri=ipfs://QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h
+https://livepeer.studio/mint-nft?tokenUri=ipfs://QmR2SaapDATg7q9vVG2NSaGbSE3KUBLfUN49Lb737HY88h
 ```
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
@@ -112,7 +112,7 @@ You will be taken to a minimal UI where all you have to do is connect your
 MetaMask wallet (currently the only supported one) and click the `Mint NFT`
 button to get your NFT setup.
 
-![image](https://ipfs.livepeer.com/ipfs/QmVqrWFnHi1WkJYQYNAmcVngEWMPsvZdibUFdNC4QNqXW6)
+![image](https://ipfs.livepeer.studio/ipfs/QmVqrWFnHi1WkJYQYNAmcVngEWMPsvZdibUFdNC4QNqXW6)
 
 <Alert css={{ mt: "$5", mb: "$5" }} variant="loContrast">
   <Text size="3" variant="gray">

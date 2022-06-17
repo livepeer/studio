@@ -199,8 +199,8 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         Create your first webhook
       </Heading>
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-        Listen for events on your Livepeer.com account so your integration can
-        automatically trigger reactions.
+        Listen for events on your Livepeer Studio account so your integration
+        can automatically trigger reactions.
       </Text>
       {/* <Link href="/docs" passHref>
         <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>

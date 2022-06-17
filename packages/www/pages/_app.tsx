@@ -18,9 +18,14 @@ const queryClient = new QueryClient();
 const globalStyles = globalCss({
   body: {
     margin: 0,
-    backgroundColor: "$loContrast",
+    bc: "$loContrast",
     fontFamily: "$untitled",
     color: "$hiContrast",
+  },
+
+  ".main": {
+    bc: "$loContrast",
+    fontFamily: "Matter",
   },
 
   "h1, h2, h3, h4, h5": { fontWeight: 500 },
@@ -54,7 +59,7 @@ export default class MyApp extends App {
     globalStyles();
     return (
       <>
-        <title>Livepeer Video Services</title>
+        <title>Livepeer Studio</title>
         <Head>
           <meta
             name="viewport"
@@ -68,8 +73,8 @@ export default class MyApp extends App {
           defaultTheme={DEFAULT_THEME}
           value={{
             ...themeMap,
-            dark: "dark-theme-violet",
-            light: "light-theme-violet",
+            dark: "dark-theme-indigo",
+            light: "light-theme-indigo",
           }}>
           <SnackbarProvider>
             <QueryClientProvider client={queryClient}>

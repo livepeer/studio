@@ -32,10 +32,10 @@ const Select = styled("select", {
     border: "none",
     outline: "none",
     boxShadow:
-      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+      "inset 0px 0px 0px 1px $colors$indigo8, 0px 0px 0px 1px $colors$indigo8",
     "&:-webkit-autofill": {
       boxShadow:
-        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+        "inset 0px 0px 0px 1px $colors$indigo8, 0px 0px 0px 1px $colors$indigo8, inset 0 0 0 100px $colors$indigo3",
     },
   },
 });
@@ -65,10 +65,10 @@ const DateInput = styled("input", {
     border: "none",
     outline: "none",
     boxShadow:
-      "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8",
+      "inset 0px 0px 0px 1px $colors$indigo8, 0px 0px 0px 1px $colors$indigo8",
     "&:-webkit-autofill": {
       boxShadow:
-        "inset 0px 0px 0px 1px $colors$violet8, 0px 0px 0px 1px $colors$violet8, inset 0 0 0 100px $colors$violet3",
+        "inset 0px 0px 0px 1px $colors$indigo8, 0px 0px 0px 1px $colors$indigo8, inset 0 0 0 100px $colors$indigo3",
     },
   },
 });

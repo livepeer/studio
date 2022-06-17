@@ -75,7 +75,7 @@ const UseCase = ({
       />
       <Why
         backgroundColor="$panel"
-        title="Why Livepeer.com"
+        title="Why Livepeer Studio"
         heading={why.heading}
         reasons={why.reasons}
       />

@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Livepeer.com API Reference
+  title: Livepeer Studio API Reference
   version: 0.0.1-alpha.0
 
 tags:

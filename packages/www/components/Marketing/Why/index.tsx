@@ -149,7 +149,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                       left: "-$space$3",
                       width: "1px",
                       height: "$3",
-                      backgroundColor: "$violet9",
+                      backgroundColor: "$indigo9",
                       content: '""',
                     },
                   }}>

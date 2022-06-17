@@ -119,7 +119,7 @@ const CalculatorItem = ({
               width: 16,
               height: 16,
               borderRadius: "12px",
-              bc: "$violet9",
+              bc: "$indigo9",
               cursor: "grabbing",
             },
           }}
@@ -154,17 +154,17 @@ const ScaleCalculator = ({
         justifyContent: "center",
         border: "1px solid $neutral5",
         bc: "transparent",
-        borderColor: percentageWatched === value ? "$violet9" : "$primary7",
+        borderColor: percentageWatched === value ? "$indigo9" : "$primary7",
         cursor: "pointer",
         transition: "all 0.2s",
         "&:hover": {
-          borderColor: "$violet9",
+          borderColor: "$indigo9",
         },
       }}>
       <Box
         css={{
           fontSize: "14px",
-          color: percentageWatched === value ? "$violet9" : "$primary9",
+          color: percentageWatched === value ? "$indigo9" : "$primary9",
           fontWeight: percentageWatched === value ? 600 : 400,
         }}>
         {value}%

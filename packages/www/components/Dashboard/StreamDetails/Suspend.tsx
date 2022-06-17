@@ -55,7 +55,7 @@ const Suspend = ({ stream, invalidate }) => {
           <AlertDialogAction asChild>
             <Button
               size="2"
-              variant={stream.suspended ? "violet" : "red"}
+              variant={stream.suspended ? "blue" : "red"}
               disabled={saving}
               onClick={async (e) => {
                 e.preventDefault();

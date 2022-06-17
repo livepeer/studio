@@ -1,21 +1,21 @@
 ---
 title: Playback a live stream
-description: Playback a Livepeer.com live stream
-metaTitle: Playback a live stream - Livepeer.com
-metaDescription: Playback a Livepeer.com live stream
+description: Playback a Livepeer Studio live stream
+metaTitle: Playback a live stream - Livepeer Studio
+metaDescription: Playback a Livepeer Studio live stream
 ---
 
 # Playback a live stream
 
-This is how a Livepeer.com playback URL is formatted:
+This is how a Livepeer Studio playback URL is formatted:
 `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
 All sessions for a stream have the same playback URL.
 
-The easiest way to the stream a playback URL is to login to the Livepeer.com
+The easiest way to the stream a playback URL is to login to the Livepeer Studio
 Dashboard, navigate to the Streams page,
-[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams), and
-click on a stream name. The playback URL is listed on the page.
+[livepeer.studio/dashboard/streams](https://livepeer.studio/dashboard/streams),
+and click on a stream name. The playback URL is listed on the page.
 
 If you already know the playback ID of a stream (or VOD asset), you can also
 visit `https://lvpr.tv/?v={playbackId}` to quickly view the content.
@@ -93,8 +93,8 @@ query-string. Some examples are:
 
 ## Getting the playback ID
 
-You can also make a `GET` request to `https://livepeer.com/api/stream/{id}`, and
-get the value of `playbackId` in the response. The playback URL can then be
+You can also make a `GET` request to `https://livepeer.studio/api/stream/{id}`,
+and get the value of `playbackId` in the response. The playback URL can then be
 formatted as above: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 
 ### Example code
@@ -102,7 +102,7 @@ formatted as above: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`.
 #### cURL Method
 
 ```bash
-curl --location --request GET 'https://livepeer.com/api/stream/{id}' \
+curl --location --request GET 'https://livepeer.studio/api/stream/{id}' \
 --header 'Authorization: Bearer {api_key}'
 ```
 
@@ -112,7 +112,7 @@ curl --location --request GET 'https://livepeer.com/api/stream/{id}' \
 const axios = require("axios");
 
 axios
-  .get("https://livepeer.com/api/stream/{id}", {
+  .get("https://livepeer.studio/api/stream/{id}", {
     headers: {
       Authorization: "Bearer {api_key}",
     },
@@ -136,13 +136,13 @@ Non-CDN delivery for free tier users is limited to 10 viewers per account.
 
 ## What if playback isn't working?
 
-Look at the `lastSeen` and `isActive` (Status row on the Livepeer.com Dashboard)
-values. If ingest was properly configured for playback, `lastSeen` will show the
-current date and time and `isActive` will be `true` (Status row on the
-Livepeer.com Dashboard will be Active).
+Look at the `lastSeen` and `isActive` (Status row on the Livepeer Studio
+Dashboard) values. If ingest was properly configured for playback, `lastSeen`
+will show the current date and time and `isActive` will be `true` (Status row on
+the Livepeer Studio Dashboard will be Active).
 
 If this isn't the case, confirm the `streamKey` and RTMP ingest URL,
-`rtmp://rtmp.livepeer.com/live`, are configured correctly in your broadcast
+`rtmp://rtmp.livepeer.studio/live`, are configured correctly in your broadcast
 software.
 
 Lastly, check that your playback URL is correct.

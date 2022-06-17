@@ -117,7 +117,7 @@ const DocCodeBlock = ({
                 overflow: "auto",
                 borderRadius: "$3",
                 // hacks
-                backgroundColor: "$violet2",
+                backgroundColor: "$indigo2",
                 py: "$4",
                 "& > pre": {
                   backgroundColor: "transparent",

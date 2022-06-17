@@ -1,13 +1,13 @@
 ---
 title: Record a live stream session
-description: Record a Livepeer.com live stream session
-metaTitle: Record a live stream session - Livepeer.com
-metaDescription: Record a Livepeer.com live stream session
+description: Record a Livepeer Studio live stream session
+metaTitle: Record a live stream session - Livepeer Studio
+metaDescription: Record a Livepeer Studio live stream session
 ---
 
 # Record a live stream session
 
-Here is how recording works in Livepeer.com.
+Here is how recording works in Livepeer Studio.
 
 - Recording is turned off by default. Recording OFF means that _new_ sessions
   are not recorded.
@@ -18,35 +18,35 @@ Here is how recording works in Livepeer.com.
 - The adaptive bitrate (ABR) settings for the recording are inherited from the
   transcoding profiles set for the livestream. At this time you cannot set
   recording-specific ABR settings.
-- Recording playback is delivered via Livepeer.com's CDN by default.
+- Recording playback is delivered via Livepeer Studio's CDN by default.
 
-_Please note if you are using OBS, set your keyframe interval to 2 for
-Livepeer.com recording to work best._
+_Please note if you are using OBS, set your keyframe interval to 2 for Livepeer
+Studio recording to work best._
 
-## Recording settings in the Livepeer.com Dashboard
+## Recording settings in the Livepeer Studio Dashboard
 
 The easiest way to turn recording on or off for a stream is to login to the
-Livepeer.com Dashboard, navigate to the Streams page (
-[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams)) and
-click on a stream name. On the stream detail page, you can toggle the recording
-setting or use the Actions button in the top right hand corner and select
-Enable/Disable recording. All new sessions will adopt the updated recording
-setting, but changing the settings will not change the recording preference for
-any active sessions.
+Livepeer Studio Dashboard, navigate to the Streams page (
+[livepeer.studio/dashboard/streams](https://livepeer.studio/dashboard/streams))
+and click on a stream name. On the stream detail page, you can toggle the
+recording setting or use the Actions button in the top right hand corner and
+select Enable/Disable recording. All new sessions will adopt the updated
+recording setting, but changing the settings will not change the recording
+preference for any active sessions.
 
 The session recording playback URL will be available about 5 minutes after the
 live stream ends and will appear in the session table at the bottom of the
 stream’s page. Note the session table only appears after you start your first
 live stream.
 
-## Recording live stream sessions with the Livepeer.com API
+## Recording live stream sessions with the Livepeer Studio API
 
-Make requests of the Livepeer.com API to turn recording on/off, find out if a
+Make requests of the Livepeer Studio API to turn recording on/off, find out if a
 recording is ready for playback, and get the recording playback URL.
 
 ### The `record` parameter
 
-First, it’s important to understand the relationship between a Livepeer.com
+First, it’s important to understand the relationship between a Livepeer Studio
 `stream` and `session`.
 
 > Every `session` has a parent `stream`. The `session` `parentId` value is the
@@ -101,7 +101,7 @@ curl -X POST \
   "name": "test_stream_recording_on",
   "record": true
 }' \
-https://livepeer.com/api/stream
+https://livepeer.studio/api/stream
 ```
 
 201 created
@@ -128,7 +128,7 @@ Turn recording on. All new sessions will be recorded. In progress sessions will
 not be recorded.
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+curl -X PATCH https://livepeer.studio/api/stream/{id}/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{"record":true}'
@@ -138,7 +138,7 @@ Turn recording off. All new sessions will not be recorded. In progress sessions
 will still be recorded.
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+curl -X PATCH https://livepeer.studio/api/stream/{id}/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{"record":false}'
@@ -148,7 +148,7 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/stream/{id}"
+"https://livepeer.studio/api/stream/{id}"
 ```
 
 **`GET /session/{id}` to retrieve a `session`, `recordingStatus` and
@@ -156,7 +156,7 @@ curl -H 'authorization: Bearer {api-key}' \
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/session/{id}"
+"https://livepeer.studio/api/session/{id}"
 ```
 
 200 OK
@@ -175,7 +175,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "playbackId":"efghb2mxupongp5k",
     "recordingStatus":"ready",
     "recordingURL":"https://mdw-cdn.livepeer.monster/recordings/mnopa1c9-1775-4797-919e-40d21099d02b/index.m3u8",
-    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/mnopa1c9-1775-4797-919e-40d21099d02b/2021_05_04_02_00_31-source.mp4",
+    "mp4URL":"https://mdw-cdn.livepeer.studio/recordings/mnopa1c9-1775-4797-919e-40d21099d02b/2021_05_04_02_00_31-source.mp4",
     {other asset object keys}
 }
 ```

@@ -1,5 +1,4 @@
 import { Box, Flex, Container, Text } from "@livepeer/design-system";
-import Guides from "@components/Marketing/Guides";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@components/Marketing/Button";
@@ -17,7 +16,6 @@ const Hero = ({
 }) => {
   return (
     <Box>
-      <Guides backgroundColor="$loContrast" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -41,7 +39,7 @@ const Hero = ({
                 height: skinny ? 300 : "calc(100vh - 180px)",
               },
             }}>
-            <Flex direction="column" css={{ maxWidth: 700 }}>
+            <Flex direction="column" css={{ maxWidth: 768 }}>
               {tagline && (
                 <Text
                   variant="primary"
@@ -52,23 +50,20 @@ const Hero = ({
               )}
               <Box
                 css={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: "$8",
                   lineHeight: 1.3,
                   color: "$hiContrast",
                   mb: "$6",
                   "@bp2": {
-                    fontSize: "$9",
-                    lineHeight: "68px",
+                    fontSize: 80,
+                    lineHeight: "80px",
                     letterSpacing: "-2px",
                   },
                 }}>
                 {heading}
               </Box>
-              <Text
-                size="5"
-                variant="gray"
-                css={{ mb: "$6", lineHeight: 1.6, maxWidth: 540 }}>
+              <Text variant="gray" size="4" css={{ mb: "$6", lineHeight: 1.6 }}>
                 {description}
               </Text>
               {ctas?.length > 0 && (

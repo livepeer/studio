@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
-import Guides from "@components/Marketing/Guides";
 import { Login as Content } from "content";
 
 const LoginPage = () => {
@@ -31,7 +30,6 @@ const LoginPage = () => {
   };
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -40,7 +38,8 @@ const LoginPage = () => {
             py: "$7",
             width: "100%",
             "@bp3": {
-              py: "$8",
+              pt: 100,
+              pb: 140,
               px: "$4",
             },
           }}>
@@ -51,8 +50,8 @@ const LoginPage = () => {
               flexGrow: 1,
               flexDirection: "column",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
-              Log in
+            <Heading size="4" as="h1" css={{ mb: "$6" }}>
+              Sign in
             </Heading>
             <Login
               id="login"

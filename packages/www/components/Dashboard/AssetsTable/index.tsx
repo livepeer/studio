@@ -148,7 +148,7 @@ const AssetsTable = ({
               <Box>
                 {sourceUrl &&
                 (sourceUrl.indexOf("https://livepeercdn.com") === 0 ||
-                  sourceUrl.indexOf("https://cdn.livepeer.com") === 0)
+                  sourceUrl.indexOf("https://cdn.livepeer.studio") === 0)
                   ? "Live Stream"
                   : "Import"}
               </Box>
@@ -199,9 +199,9 @@ const AssetsTable = ({
           Create Video on Demand Assets
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Video Services now supports Video on Demand which allows you
-          to import video assets, store them on decentralized storage, and
-          easily mint a video NFT. This functionality is currently in beta and
+          Livepeer Studio now supports Video on Demand which allows you to
+          import video assets, store them on decentralized storage, and easily
+          mint a video NFT. This functionality is currently in beta and
           available only on the API.
         </Text>
 

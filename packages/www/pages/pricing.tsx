@@ -3,13 +3,11 @@ import { Box, Heading, Text, Container } from "@livepeer/design-system";
 import Prefooter from "@components/Marketing/Prefooter";
 import PricingCalculator from "@components/Marketing/Pricing/pricingCalculator";
 import PricingCardsContainer from "@components/Marketing/Pricing/pricingCardsContainer";
-import Guides from "@components/Marketing/Guides";
 import { Pricing as Content } from "content";
 
 const PricingPage = () => {
   return (
     <Layout {...Content.metaData}>
-      <Guides />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -34,7 +32,6 @@ const PricingPage = () => {
         </Container>
         <PricingCardsContainer />
         <Box>
-          <Guides backgroundColor="$neutral2" />
           <Box css={{ position: "relative" }}>
             <Container
               size="3"
@@ -52,7 +49,6 @@ const PricingPage = () => {
           </Box>
         </Box>
       </Box>
-      <Prefooter />
     </Layout>
   );
 };

@@ -18,10 +18,10 @@ const StyledSwitch = styled(Switch.Root, {
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px $violet9",
+    boxShadow: "0 0 0 2px $indigo9",
   },
   '&[data-state="checked"]': {
-    background: "linear-gradient(to right, $violet8, $violet5)",
+    background: "linear-gradient(to right, $indigo8, $indigo5)",
   },
 });
 

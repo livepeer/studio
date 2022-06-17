@@ -83,7 +83,7 @@ const GettingStarted = ({ firstName = "" }) => {
         <AccordionItem value="accordion-two">
           <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
-              Build with the Livepeer API
+              Build with the API
             </Text>
           </AccordionButton>
           <AccordionPanel>
@@ -91,9 +91,9 @@ const GettingStarted = ({ firstName = "" }) => {
               variant="gray"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
-              Ready to code? The Livepeer API is nimble and designed for
-              customization. All you need to do is create an RTMP stream with
-              broadcasting software like{" "}
+              Ready to code? The API is nimble and designed for customization.
+              All you need to do is create an RTMP stream with broadcasting
+              software like{" "}
               <Link passHref href="https://obsproject.com/">
                 <A target="_blank">OBS Studio</A>
               </Link>

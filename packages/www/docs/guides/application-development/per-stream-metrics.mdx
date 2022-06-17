@@ -1,8 +1,8 @@
 ---
 title: Per stream metrics
-description: Livepeer.com per stream metrics
-metaTitle: Per stream metrics - Livepeer.com
-metaDescription: Livepeer.com per stream metrics
+description: Livepeer Studio per stream metrics
+metaTitle: Per stream metrics - Livepeer Studio
+metaDescription: Livepeer Studio per stream metrics
 ---
 
 # Per stream metrics
@@ -14,23 +14,23 @@ duration of a "child" stream session.
 ## sourceSegmentsDuration
 
 The value of sourceSegmentsDuration returned is the duration in seconds of the
-asset source processed by Livepeer.com. On the parent stream object, this value
-equates to the total amount of source video ingested by Livepeer.com all time.
-On the session object, this value is the length of the live stream session (or
-the session recording).
+asset source processed by Livepeer Studio. On the parent stream object, this
+value equates to the total amount of source video ingested by Livepeer Studio
+all time. On the session object, this value is the length of the live stream
+session (or the session recording).
 
 **`GET /stream/{id}` to retrieve a stream object**
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/stream/{id}"
+"https://livepeer.studio/api/stream/{id}"
 ```
 
 **`GET /session/{id}` to retrieve a session object**
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/session/{id}"
+"https://livepeer.studio/api/session/{id}"
 ```
 
 200 OK example response

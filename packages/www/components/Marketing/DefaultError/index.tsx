@@ -1,15 +1,19 @@
 import Layout from "layouts/main";
 import Button from "components/Marketing/Button";
-import { Container, Heading, Box, Text } from "@livepeer/design-system";
+import {
+  Container,
+  Heading,
+  Box,
+  Text,
+  Link as A,
+} from "@livepeer/design-system";
 import Link from "next/link";
 import Image from "next/image";
-import Guides from "components/Marketing/Guides";
 
 const DefaultError = () => {
   return (
     <Layout>
       <Box css={{ position: "relative" }}>
-        <Guides />
         <Image
           src="/img/404.png"
           alt="404"
@@ -24,7 +28,13 @@ const DefaultError = () => {
         />
         <Container
           size="3"
-          css={{ position: "relative", px: "$4", py: "250px", my: "auto" }}>
+          css={{
+            position: "relative",
+            px: "$4",
+            pt: 250,
+            pb: 250,
+            my: "auto",
+          }}>
           <Box
             css={{
               display: "flex",
@@ -34,14 +44,19 @@ const DefaultError = () => {
               textAlign: "center",
               position: "relative",
             }}>
-            <Heading as="h1" size="4" css={{ fontWeight: 700, mb: "$4" }}>
+            <Heading
+              as="h1"
+              css={{
+                fontWeight: 700,
+                mb: "$8",
+                lineHeight: "80px",
+                fontSize: 80,
+              }}>
               Something went wrong.
             </Heading>
             <Text size="5">The page you requested could not be found.</Text>
             <Link href="/" passHref>
-              <Button arrow css={{ my: "30px" }}>
-                Go to the homepage
-              </Button>
+              <A css={{ mt: "$4" }}>Go to the homepage</A>
             </Link>
           </Box>
         </Container>

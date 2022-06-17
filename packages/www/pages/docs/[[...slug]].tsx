@@ -27,21 +27,21 @@ const categories = [
   {
     name: "Dashboard",
     slug: "/dashboard",
-    type: "button",
+    type: "link",
   },
 ];
 
 const defaultSEO: NextSeoProps = {
-  title: "Docs - Livepeer.com",
+  title: "Docs - Livepeer Studio",
   description: "Explore guides, tutorials and sample code.",
   openGraph: {
-    title: "Docs - Livepeer.com",
+    title: "Docs - Livepeer Studio",
     description: "Explore guides, tutorials and sample code.",
-    url: "https://livepeer.com/docs/guides",
+    url: "https://livepeer.studio/docs/guides",
     images: [
       {
-        url: "https://livepeer.com/img/OG.png",
-        alt: "Livepeer.com",
+        url: "https://livepeer.studio/img/OG.png",
+        alt: "Livepeer Studio",
         width: 1200,
         height: 642,
       },
@@ -100,7 +100,7 @@ const DocsIndex = ({ doc, menu }) => {
     const title = doc.frontMatter.metaTitle || defaultSEO.title;
     const description =
       doc.frontMatter.metaDescription || defaultSEO.description;
-    const url = `https://livepeer.com${router.asPath}`;
+    const url = `https://livepeer.studio${router.asPath}`;
     return {
       ...defaultSEO,
       title,

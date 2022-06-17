@@ -1,8 +1,8 @@
 ---
 title: Export to IPFS
-description: Livepeer.com API Reference | Export
-metaTitle: Export - Livepeer.com
-metaDescription: Livepeer.com API Reference | Export
+description: Livepeer Studio API Reference | Export
+metaTitle: Export - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | Export
 ---
 
 # Export an Asset to IPFS
@@ -14,7 +14,7 @@ task.
 #### curl
 
 ```jsx
-curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export' \
+curl --location --request POST 'https://livepeer.studio/api/asset/$ASSET_ID/export' \
 --header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -28,7 +28,7 @@ curl --location --request POST 'https://livepeer.com/api/asset/$ASSET_ID/export'
 const axios = require("axios");
 
 axios
-  .post("https://livepeer.com/api/asset/$ASSET_ID/export", {
+  .post("https://livepeer.studio/api/asset/$ASSET_ID/export", {
     headers: {
       Authorization: "Bearer {api_key}",
       "Content-Type": "application/json",

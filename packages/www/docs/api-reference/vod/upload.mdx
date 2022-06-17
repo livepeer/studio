@@ -1,8 +1,8 @@
 ---
 title: Upload an Asset
-description: Livepeer.com API Reference | Upload
-metaTitle: Upload - Livepeer.com
-metaDescription: Livepeer.com API Reference | Upload
+description: Livepeer Studio API Reference | Upload
+metaTitle: Upload - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | Upload
 ---
 
 # Directly Upload an Asset
@@ -23,7 +23,7 @@ First generate a URL to directly upload a video `Asset` to Livepeer on
 #### curl
 
 ```jsx
-curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
+curl --location --request POST 'https://livepeer.studio/api/asset/request-upload' \
 --header 'Authorization: Bearer {api_key}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -37,7 +37,7 @@ curl --location --request POST 'https://livepeer.com/api/asset/request-upload' \
 const axios = require("axios");
 
 axios
-  .post("https://livepeer.com/api/asset/request-upload", {
+  .post("https://livepeer.studio/api/asset/request-upload", {
     headers: {
       Authorization: "Bearer {api_key}",
       "Content-Type": "application/json",
@@ -69,7 +69,7 @@ axios
 
 ```jsx
 {
-    "url": "https://origin.livepeer.com/api/asset/upload/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2xwLW55Yy12b2QtbW9uc3Rlci9kaXJlY3RVcGxvYWQvNjI3OHQyZWlrY2JqZXUxNC9zb3VyY2U%2F...",
+    "url": "https://origin.livepeer.studio/api/asset/upload/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2xwLW55Yy12b2QtbW9uc3Rlci9kaXJlY3RVcGxvYWQvNjI3OHQyZWlrY2JqZXUxNC9zb3VyY2U%2F...",
     "asset": {
         "id": "$ASSET_ID",
         "name": "Example name",

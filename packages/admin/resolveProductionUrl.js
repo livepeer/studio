@@ -1,6 +1,6 @@
 const projectUrl =
   process.env.NODE_ENV === "production"
-    ? "https://livepeer.com"
+    ? "https://livepeer.studio"
     : "http://localhost:3004";
 
 export default function resolveProductionUrl(document) {

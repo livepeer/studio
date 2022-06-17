@@ -1,4 +1,4 @@
-# Livepeer.com API Reference
+# Livepeer Studio API Reference
 
 ## Version: 0.0.1-alpha.0
 

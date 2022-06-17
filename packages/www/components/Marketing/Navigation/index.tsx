@@ -10,31 +10,28 @@ type NavProps = React.ComponentProps<typeof NavigationBase>;
 const defaultNavProps: NavProps = {
   links: [
     {
-      href: "/docs/guides",
-      children: "Docs",
+      href: "/#featured",
+      children: "Featured",
     },
+
     {
       href: "/blog",
       children: "Blog",
     },
     {
-      href: "/pricing",
-      children: "Pricing",
+      href: "/docs/guides",
+      children: "Docs",
     },
     {
-      href: "/contact",
-      children: "Contact",
+      href: "https://discord.gg/7D6hGG6dCZ",
+      children: "Join Discord",
     },
   ],
 };
 
-const DefaultNav = ({
-  backgroundColor = "$loContrast",
-  hideGuides = false,
-}) => (
+const DefaultNav = ({ navBackgroundColor = "$loContrast" }) => (
   <NavigationBase
-    backgroundColor={backgroundColor}
-    hideGuides={hideGuides}
+    navBackgroundColor={navBackgroundColor}
     {...defaultNavProps}
   />
 );

@@ -13,10 +13,10 @@ const Pre = styled("pre", {
   $$added: "$colors$green11",
   $$lineNumbers: "$colors$indigo5",
   $$fadedLines: "$colors$slate10",
-  $$highlightedLineBg: "$colors$violet3",
-  $$highlightedWord1Bg: "$colors$violet4",
-  $$highlightedWord1BgActive: "$colors$violet6",
-  $$highlightedWord1Text: "$colors$violet11",
+  $$highlightedLineBg: "$colors$indigo3",
+  $$highlightedWord1Bg: "$colors$indigo4",
+  $$highlightedWord1BgActive: "$colors$indigo6",
+  $$highlightedWord1Text: "$colors$indigo11",
   $$highlightedWord2Bg: "$colors$red3",
   $$highlightedWord2BgActive: "$colors$red5",
   $$highlightedWord2Text: "$colors$red11",
@@ -190,21 +190,21 @@ const Pre = styled("pre", {
 
   variants: {
     variant: {
-      violet: {
-        $$background: "$colors$violet2",
-        $$text: "$colors$violet11",
-        $$outline: "inset 0 0 0 1px $colors$violet4",
+      indigo: {
+        $$background: "$colors$indigo2",
+        $$text: "$colors$indigo11",
+        $$outline: "inset 0 0 0 1px $colors$indigo4",
         $$syntax1: "$colors$blue10",
         $$syntax2: "$colors$pink11",
         $$comment: "$colors$primary9",
         $$fadedLines: "$colors$primaryA8",
       },
-      violetOld: {
+      indigoOld: {
         $$background: theme.colors.mauve12.value,
         $$text: theme.colors.gray5.value,
         $$outline: "none",
         $$syntax1: theme.colors.cyan8.value,
-        $$syntax2: theme.colors.violet8.value,
+        $$syntax2: theme.colors.indigo8.value,
         $$syntax3: theme.colors.cyan8.value,
         $$syntax4: theme.colors.cyan8.value,
         $$comment: theme.colors.mauve9.value,

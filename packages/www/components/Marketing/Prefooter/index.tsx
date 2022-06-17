@@ -34,7 +34,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
           borderRadius: 24,
           color: "white",
           background:
-            "linear-gradient(90deg, $colors$blue9 0%, $colors$violet10 33%,  $colors$violet11 66%, $colors$violet11 100%);",
+            "linear-gradient(90deg, $colors$blue9 0%, $colors$indigo10 33%,  $colors$indigo11 66%, $colors$indigo11 100%);",
           backgroundSize: "cover",
           "@bp2": {
             px: 72,

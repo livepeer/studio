@@ -96,7 +96,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Personal"
           pricingDescription="Free"
-          cardBg="$violet6"
+          cardBg="$indigo6"
           titleColor="black"
           btn={{
             display: "Sign up",
@@ -214,7 +214,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Pro"
           pricingDescription="Pay as you go"
-          cardBg="$violet8"
+          cardBg="$indigo8"
           btn={{
             display: "Sign up",
             href: "/register",
@@ -361,7 +361,7 @@ const PricingCardsContainer = () => {
           cardBg="$indigo8"
           btn={{
             display: "Contact us",
-            href: "/contact?utm_source=livepeer.com&utm_medium=internal_page&utm_campaign=business_plan",
+            href: "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan",
             color: "$loContrast",
             bg: "$hiContrast",
           }}>

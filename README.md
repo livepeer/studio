@@ -1,4 +1,4 @@
-# Livepeer.com
+# Livepeer Studio
 
 ## Table of Contents
 
@@ -29,10 +29,10 @@ yarn
 
 ## Contributing
 
-Thanks for your interest in Livepeer.com. There are many ways you can
+Thanks for your interest in Livepeer Studio. There are many ways you can
 contribute. To start, take a few minutes to look over the official guide:
 
-**[Read the "Contributing to Livepeer.com" Guide &raquo;](https://github.com/livepeer/livepeer-com/blob/master/CONTRIBUTING.md)**
+**[Read the "Contributing to Livepeer Studio" Guide &raquo;](https://github.com/livepeer/livepeer-com/blob/master/CONTRIBUTING.md)**
 
 We happily await your pull requests and/or involvement in our
 [issues page](https://github.com/livepeer/livepeer-com/issues) and hope to see
@@ -42,8 +42,8 @@ your username on our
 
 ## Packages
 
-| Name                                                                                         | Description                              |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| [`@livepeer.com/api`](https://github.com/livepeer/livepeer-com/tree/master/packages/api)     | Livepeer.com API for controlling streams |
-| [`@livepeer.com/www`](https://github.com/livepeer/livepeer-com/tree/master/packages/www)     | The Livepeer.com frontend                |
-| [`@livepeer.com/admin`](https://github.com/livepeer/livepeer-com/tree/master/packages/admin) | The Livepeer.com Sanity CMS              |
+| Name                                                                                         | Description                                 |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [`@livepeer.com/api`](https://github.com/livepeer/livepeer-com/tree/master/packages/api)     | Livepeer Studio API for controlling streams |
+| [`@livepeer.com/www`](https://github.com/livepeer/livepeer-com/tree/master/packages/www)     | The Livepeer Studio frontend                |
+| [`@livepeer.com/admin`](https://github.com/livepeer/livepeer-com/tree/master/packages/admin) | The Livepeer Studio Sanity CMS              |

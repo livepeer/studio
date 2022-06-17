@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@livepeer.com/www",
+  "name": "@livepeer.studio/www",
   "version": "0.5.3",
   "scripts": {
     "prepare": "cd ../api && yarn run prepare",
@@ -85,6 +85,7 @@
     "react-ga": "^2.7.0",
     "react-google-recaptcha-v3": "^1.9.7",
     "react-hook-form": "^6.9.0",
+    "react-horizontal-scrolling-menu": "^2.8.2",
     "react-hotjar": "^3.0.1",
     "react-icons": "^4.2.0",
     "react-ink": "^6.4.0",

@@ -576,7 +576,7 @@ const ID = () => {
                         }}>
                         The global RTMP ingest and playback URL pair above auto
                         detects livestreamer and viewer locations to provide the
-                        optimal Livepeer.com experience.
+                        optimal Livepeer Studio experience.
                         <Link
                           href="/docs/guides/dashboard/ingest-playback-url-pair"
                           passHref>
@@ -698,7 +698,7 @@ const ID = () => {
                       effect="solid">
                       <p>
                         When checked, transcoded streaming sessions will be
-                        recorded and stored by Livepeer.com.
+                        recorded and stored by Livepeer Studio.
                         <br /> Each recorded session will have a recording .m3u8
                         URL for playback and an MP4 download link.
                         <br />

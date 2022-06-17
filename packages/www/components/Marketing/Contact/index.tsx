@@ -12,7 +12,6 @@ import {
 import { useHubspotForm } from "hooks";
 import Button from "@components/Marketing/Button";
 import Fade from "react-reveal/Fade";
-import Guides from "@components/Marketing/Guides";
 
 const Contact = () => {
   const formEl = useRef(null);
@@ -37,7 +36,6 @@ const Contact = () => {
 
   return (
     <Box css={{ position: "relative" }}>
-      <Guides backgroundColor="$panel" />
       <Container
         size="3"
         css={{ py: 88, px: 0, width: "100%", position: "relative" }}>
@@ -50,7 +48,7 @@ const Contact = () => {
           }}>
           <Box css={{ mb: 48, textAlign: "center" }}>
             <Heading
-              size="3"
+              size="4"
               as="h2"
               css={{
                 fontWeight: 700,
@@ -60,22 +58,6 @@ const Contact = () => {
               }}>
               Get in touch
             </Heading>
-            <Text
-              size="4"
-              variant="gray"
-              css={{ maxWidth: 512, margin: "0 auto" }}>
-              Learn more about Livepeer Video Service's streaming API and media
-              server. Leave us a message and we’ll get back to you.
-              <br />
-              <br />
-              Or email us at{" "}
-              <A
-                href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry"
-                target="_blank">
-                hello@livepeer.com
-              </A>
-              .
-            </Text>
           </Box>
           <Box
             as="form"

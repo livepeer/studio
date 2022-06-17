@@ -1,34 +1,34 @@
 ---
 title: Tips for reducing latency
-description: Tips for reducing latency with Livepeer.com
-metaTitle: Tips for reducing latency - Livepeer.com
-metaDescription: Tips for reducing latency with Livepeer.com
+description: Tips for reducing latency with Livepeer Studio
+metaTitle: Tips for reducing latency - Livepeer Studio
+metaDescription: Tips for reducing latency with Livepeer Studio
 ---
 
 # Tips for reducing latency
 
-Livepeer.com routes your live streams to the nearest available datacenter to
+Livepeer Studio routes your live streams to the nearest available datacenter to
 ensure your streamers and live stream viewers have a consistent, high quality
-experience with the minimum latency Livepeer.com can provide.
+experience with the minimum latency Livepeer Studio can provide.
 
-These globally-optimized URLs are the best option for nearly all Livepeer.com
+These globally-optimized URLs are the best option for nearly all Livepeer Studio
 users.
 
-- Stream into: `rtmp://rtmp.livepeer.com/live/{stream-key}`
+- Stream into: `rtmp://rtmp.livepeer.studio/live/{stream-key}`
 - Playback from: `https://livepeercdn.com/hls/{playbackId}/index.m3u8`
 
-Also, If you created your stream via the Livepeer.com API, confirm your profile
-bitrate settings are
+Also, If you created your stream via the Livepeer Studio API, confirm your
+profile bitrate settings are
 [reasonable](https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices).
 
 Lastly, sometimes, the source stream is causing poor playback performance even
 though you are using the globally-optimized URLs above and good bitrate
 settings. The source stream is the stream sent from your broadcast software.
-Livepeer.com serves the source stream with the transcoded renditions via the
+Livepeer Studio serves the source stream with the transcoded renditions via the
 playback URL.
 
 One way to test if the source stream is causing problems is by inputting the
-playback URL in the Livepeer.com [Test Player](/app/test-player). The Test
+playback URL in the Livepeer Studio [Test Player](/app/test-player). The Test
 Player is only available to logged in users.
 
 First take a look at the Session Ingest Rate graph at the bottom of the page. If
@@ -38,9 +38,9 @@ server has problems. Try ensuring a stronger internet connection at the source
 via a wired ethernet connection or by broadcasting on a more reliable network.
 
 Next, take a look at the left player which shows your source stream, as served
-by the Livepeer.com CDN. This player is configured to only playback the highest
-resolution available. Except for rare occasions, the highest resolution is the
-non-transcoded source stream.
+by the Livepeer Studio CDN. This player is configured to only playback the
+highest resolution available. Except for rare occasions, the highest resolution
+is the non-transcoded source stream.
 
 Compare the source in the left player with the transcoded renditions in the
 player on the right (ABR). You can manually switch between transcoded renditions

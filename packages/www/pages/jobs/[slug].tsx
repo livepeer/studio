@@ -2,7 +2,6 @@ import { Box, Container, Heading, Grid } from "@livepeer/design-system";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Prefooter from "@components/Marketing/Prefooter";
-import Guides from "@components/Marketing/Guides";
 import JobApplicationForm from "@components/Marketing/JobApplicationForm";
 
 const Page = ({
@@ -28,7 +27,6 @@ const Page = ({
       canonical={metaUrl}
       noindex={noindex}
       preview={preview}>
-      <Guides />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -83,7 +81,7 @@ const Page = ({
                   width: "100%",
                 },
                 a: {
-                  color: "$violet9",
+                  color: "$indigo9",
                 },
               }}>
               <div dangerouslySetInnerHTML={{ __html: body }} />

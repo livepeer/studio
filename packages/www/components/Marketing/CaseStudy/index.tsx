@@ -102,7 +102,7 @@ const CaseStudy = ({
                         left: "-20px",
                         width: "1px",
                         height: "$3",
-                        backgroundColor: "$violet9",
+                        backgroundColor: "$indigo9",
                         content: '""',
                       },
                     }}>
@@ -136,7 +136,7 @@ const CaseStudy = ({
                         left: "-20px",
                         width: "1px",
                         height: "$3",
-                        backgroundColor: "$violet9",
+                        backgroundColor: "$indigo9",
                         content: '""',
                       },
                     }}>

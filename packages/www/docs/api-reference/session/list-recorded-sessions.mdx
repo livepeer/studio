@@ -1,8 +1,8 @@
 ---
 title: "GET a list of recorded sessions"
-description: Livepeer.com API Reference | GET a list of recorded sessions
-metaTitle: GET a list of recorded sessions - Livepeer.com
-metaDescription: Livepeer.com API Reference | GET a list of recorded sessions
+description: Livepeer Studio API Reference | GET a list of recorded sessions
+metaTitle: GET a list of recorded sessions - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | GET a list of recorded sessions
 ---
 
 # `GET` a list of recorded sessions
@@ -12,7 +12,7 @@ with the same `parentId`
 
 ```bash
 curl -H 'authorization: Bearer {api-key}' \
-"https://livepeer.com/api/stream/{parentId}/sessions?record=1"
+"https://livepeer.studio/api/stream/{parentId}/sessions?record=1"
 ```
 
 200 OK
@@ -26,7 +26,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
     "recordingStatus":"ready",
     "recordingUrl":"https://livepeercdn.com/recordings/aaaaaaaa-aaaa-aaaa-aaaa-aaaa/index.m3u8"},
-    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/ccccccc-cccc-cccc-cccc-cccccccccccccc/2021_01_01_01_00_01-source.mp4",
+    "mp4URL":"https://mdw-cdn.livepeer.studio/recordings/ccccccc-cccc-cccc-cccc-cccccccccccccc/2021_01_01_01_00_01-source.mp4",
     {other asset object keys, like createdAt and profiles},
   {
     "sourceSegmentsDuration":30.266,
@@ -35,7 +35,7 @@ curl -H 'authorization: Bearer {api-key}' \
     "parentId":"nnnnnnnn-nnnn-nnnn-nnnn-nnnn",
     "recordingStatus":"ready",
     "recordingUrl":"https://livepeercdn.com/recordings/bbbbbbbb-bbbb-bbbb-bbbb-bbbb/index.m3u8",
-    "mp4URL":"https://mdw-cdn.livepeer.com/recordings/eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee/2021_01_01_01_00_01-source.mp4",
+    "mp4URL":"https://mdw-cdn.livepeer.studio/recordings/eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee/2021_01_01_01_00_01-source.mp4",
     {other asset object keys, like createdAt and profiles}
   }
 ]

@@ -318,8 +318,8 @@ app.post("/", validatePost("user"), async (req, res) => {
         supportAddr,
         sendgridTemplateId,
         sendgridApiKey,
-        subject: "Verify your Livepeer.com Email",
-        preheader: "Welcome to Livepeer.com!",
+        subject: "Verify your Livepeer Studio Email",
+        preheader: "Welcome to Livepeer Studio!",
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
@@ -511,8 +511,8 @@ app.post("/verify-email", validatePost("verify-email"), async (req, res) => {
         supportAddr,
         sendgridTemplateId,
         sendgridApiKey,
-        subject: "Verify your Livepeer.com Email",
-        preheader: "Welcome to Livepeer.com!",
+        subject: "Verify your Livepeer Studio Email",
+        preheader: "Welcome to Livepeer Studio!",
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
@@ -614,7 +614,7 @@ app.post(
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [
-          "Let's change your password so you can log into the Livepeer API.",
+          "Let's change your password so you can log into Livepeer Studio.",
           "Your link is active for 48 hours. After that, you will need to resend the password reset email.",
         ].join("\n\n"),
       });

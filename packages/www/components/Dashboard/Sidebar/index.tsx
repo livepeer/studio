@@ -112,7 +112,7 @@ const Sidebar = ({ id }) => {
             <HomeIcon active={id === "home"} />
             <Text
               gradient={id === "home"}
-              variant={id === "home" ? "violet" : null}
+              variant={id === "home" ? "indigo" : null}
               css={{
                 fontWeight: id === "home" ? 700 : 400,
                 backgroundClip: "text",
@@ -129,7 +129,7 @@ const Sidebar = ({ id }) => {
               <StreamIcon active={id === "streams"} />
               <Text
                 gradient={id === "streams"}
-                variant={id === "streams" ? "violet" : null}
+                variant={id === "streams" ? "indigo" : null}
                 css={{
                   fontWeight: id === "streams" ? 700 : 400,
                   backgroundClip: "text",
@@ -152,7 +152,7 @@ const Sidebar = ({ id }) => {
                 <NavLink>
                   <Text
                     gradient={id === "streams/sessions"}
-                    variant={id === "streams/sessions" ? "violet" : null}
+                    variant={id === "streams/sessions" ? "indigo" : null}
                     css={{
                       fontWeight: id === "streams/sessions" ? 700 : 400,
                       backgroundClip: "text",
@@ -173,7 +173,7 @@ const Sidebar = ({ id }) => {
             <AssetsIcon active={id === "assets"} />
             <Text
               gradient={id === "assets"}
-              variant={id === "assets" ? "violet" : null}
+              variant={id === "assets" ? "indigo" : null}
               css={{
                 fontWeight: id === "assets" ? 700 : 400,
                 backgroundClip: "text",
@@ -212,7 +212,7 @@ const Sidebar = ({ id }) => {
                 <NavLink>
                   <Text
                     gradient={id === "developers"}
-                    variant={id === "developers" ? "violet" : null}
+                    variant={id === "developers" ? "indigo" : null}
                     css={{
                       fontWeight: id === "developers" ? 700 : 400,
                       backgroundClip: "text",
@@ -229,7 +229,7 @@ const Sidebar = ({ id }) => {
                 <NavLink>
                   <Text
                     gradient={id === "developers/webhooks"}
-                    variant={id === "developers/webhooks" ? "violet" : null}
+                    variant={id === "developers/webhooks" ? "indigo" : null}
                     css={{
                       fontWeight: id === "developers/webhooks" ? 700 : 400,
                       backgroundClip: "text",
@@ -247,7 +247,7 @@ const Sidebar = ({ id }) => {
                 <NavLink>
                   <Text
                     gradient={id === "developers/media-server"}
-                    variant={id === "developers/media-server" ? "violet" : null}
+                    variant={id === "developers/media-server" ? "indigo" : null}
                     css={{
                       fontWeight: id === "developers/media-server" ? 700 : 400,
                       backgroundClip: "text",
@@ -269,7 +269,7 @@ const Sidebar = ({ id }) => {
               <BillingIcon active={id === "billing"} />
               <Text
                 gradient={id === "billing"}
-                variant={id === "billing" ? "violet" : null}
+                variant={id === "billing" ? "indigo" : null}
                 css={{
                   display: "flex",
                   fontWeight: id === "billing" ? 700 : 400,
@@ -294,7 +294,7 @@ const Sidebar = ({ id }) => {
                 <NavLink>
                   <Text
                     gradient={id === "billing/plans"}
-                    variant={id === "billing/plans" ? "violet" : null}
+                    variant={id === "billing/plans" ? "indigo" : null}
                     css={{
                       fontWeight: id === "billing/plans" ? 700 : 400,
                       backgroundClip: "text",

@@ -11,7 +11,6 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import { useRouter } from "next/router";
-import Guides from "@components/Marketing/Guides";
 import { Register as Content } from "content";
 
 const ResetPasswordPage = () => {
@@ -35,7 +34,6 @@ const ResetPasswordPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -56,7 +54,7 @@ const ResetPasswordPage = () => {
               flexDirection: "column",
               py: "$5",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
+            <Heading size="4" as="h1" css={{ mb: "$5" }}>
               Reset your password
             </Heading>
             <Login

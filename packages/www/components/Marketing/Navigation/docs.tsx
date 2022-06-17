@@ -26,9 +26,14 @@ import Link from "next/link";
 type DocsNavProps = {
   categories: { name: string; slug: string; type: string }[];
   menu: MenuProps;
+  navBackgroundColor?: string;
 };
 
-const DocsNav = ({ categories, menu }: DocsNavProps) => {
+const DocsNav = ({
+  categories,
+  menu,
+  navBackgroundColor = "transparent",
+}: DocsNavProps) => {
   const { token } = useApi();
   const router = useRouter();
   const currentPath = router.asPath
@@ -56,7 +61,7 @@ const DocsNav = ({ categories, menu }: DocsNavProps) => {
         <Flex justify="between" align="center">
           <Flex align="center">
             <Flex align="center">
-              <Logo badge="docs" />
+              <Logo navBackgroundColor={navBackgroundColor} badge="docs" />
             </Flex>
             <Box
               onClick={onSearchOpen}

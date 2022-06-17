@@ -1,290 +1,396 @@
-import Logo from "@components/Marketing/Logo";
-import {
-  Container,
-  Text,
-  Box,
-  Grid,
-  Flex,
-  TextField,
-  Button,
-  Link as A,
-} from "@livepeer/design-system";
-import LinksList, { LinksListProps } from "./LinksList";
-import { useState, useEffect } from "react";
-import { useApi, useMailchimp } from "hooks";
+import { Heading, Text, Box, Flex, Link as A } from "@livepeer/design-system";
+import Button from "@components/Marketing/Button";
 import Link from "next/link";
-import Guides from "@components/Marketing/Guides";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
-import ThemeSwitch from "@components/Dashboard/ThemeSwitch";
+import CutOut from "@components/Marketing/CutOut";
 
-const linksLists: LinksListProps[] = [
-  {
-    heading: "Company",
-    links: [
-      { children: "Home", href: "/" },
-      { children: "Contact", href: "/contact" },
-      { children: "Team", href: "/team" },
-      { children: "Jobs", href: "/jobs" },
-    ],
-  },
-  {
-    heading: "Resources",
-    links: [
-      { children: "Documentation", href: "/docs/guides" },
-      {
-        children: "Status Page",
-        href: "https://livepeer.statuspage.io/",
-        target: "_blank",
-      },
-      { children: "Blog", href: "/blog" },
-      {
-        children: "Media Server",
-        href: "/products/media-server",
-      },
-      { children: "Privacy Policy", href: "/privacy-policy" },
-      { children: "Terms of Service", href: "/terms-of-service" },
-    ],
-  },
-];
-
-const MailchimpResponse = ({
-  result,
-  msg,
-}: {
-  result?: string;
-  msg?: string;
-}) => {
-  if (!result || !msg) return null;
-
-  const message = msg.includes("is already subscribed to list")
-    ? msg.split(" <a href=")[0]
-    : msg;
-
-  return (
-    <Text
-      css={{
-        fontWeight: 500,
-        fontSize: "$2",
-        ml: "$2",
-        mr: "auto",
-        color: "$hiContrast",
-        position: "absolute",
-        transform: "none",
-        left: 0,
-        bottom: "-32px",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        width: "90%",
-      }}>
-      {message}
-    </Text>
-  );
-};
-
-const Footer = ({ hideGuides = false }) => {
-  const [version, setVersion] = useState({ tag: "", commit: "" });
-  const { user, getVersion } = useApi();
-  const [email, setEmail] = useState("");
-  const [mailchimp, subscribe] = useMailchimp({
-    url: "https://livepeer.us16.list-manage.com/subscribe/post?u=57807e9b74db375864b2c4c68&id=5b12d9c158",
-  });
-
-  // @ts-ignore
-  const { data: mailchimpResponseData } = mailchimp;
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
-      getVersion().then((v) => setVersion(v));
-    }
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // @ts-ignore
-    subscribe({ EMAIL: email });
-  };
-
+const Footer = () => {
   return (
     <Box
       css={{
         position: "relative",
-        "&:after": {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "1px",
-          margin: 0,
-          border: "none",
-          background:
-            "linear-gradient(90deg,$colors$neutral4,$colors$neutral4 50%,transparent 0,transparent)",
-          backgroundSize: "8px 1px",
-          content: '""',
-        },
+        overflow: "hidden",
+        color: "$loContrast",
+        mx: "$3",
+        mb: "$3",
+        zIndex: 1,
       }}>
-      {!hideGuides && <Guides backgroundColor="$loContrast" />}
-      <Box css={{ position: "relative", py: 120 }}>
-        <Container size="3" css={{ px: 0, width: "100%" }}>
-          <Grid
-            gap={6}
+      <Flex
+        css={{
+          flexDirection: "column",
+          "@bp2": {
+            flexDirection: "row",
+          },
+        }}>
+        <Flex
+          css={{
+            width: "100%",
+            flexDirection: "column",
+            "@bp2": {
+              flexDirection: "row",
+              width: "64%",
+            },
+          }}>
+          <Box css={{ width: "100%" }}>
+            <Box
+              css={{
+                position: "relative",
+                borderRadius: 40,
+                height: 40,
+                width: "100%",
+              }}>
+              <CutOut orientation="left" backgroundColor="$hiContrast" />
+            </Box>
+            <Box
+              css={{
+                bc: "$hiContrast",
+                width: "100%",
+                borderTopLeftRadius: 18,
+                borderBottomLeftRadius: 18,
+                pl: "$3",
+                pb: "$3",
+                pt: "$7",
+                zIndex: 4,
+                height: "calc(100% - 40px)",
+                "@bp2": {
+                  pt: "$9",
+                },
+              }}>
+              <Box
+                css={{
+                  fontSize: 96,
+                  fontWeight: 600,
+                  lineHeight: 0.8,
+                  letterSpacing: "-4px",
+                  mb: 80,
+                  "@bp1": {
+                    mb: 120,
+                    maxWidth: 400,
+                    fontSize: 120,
+                  },
+                  "@bp2": {
+                    mb: 120,
+                    maxWidth: 400,
+                    fontSize: 140,
+                  },
+                  "@bp3": {
+                    fontSize: 210,
+                  },
+                }}>
+                <Box>
+                  Get
+                  <br />
+                  Started
+                </Box>
+              </Box>
+              <Box css={{ mt: "$9", maxWidth: 600 }}>
+                <Box css={{ mb: "$7", fontSize: "$4" }}>
+                  Join the next-gen, creator-owned video ecosystem. From
+                  “decentralized YouTube” to video NFT marketplaces, Livepeer
+                  Studio empowers developers to build video-enabled applications
+                  that give creators total control over their content with no
+                  middlemen.
+                </Box>
+                <Flex align="center">
+                  <Button
+                    css={{
+                      mr: "$3",
+                      backgroundColor: "transparent",
+                      color: "$loContrast",
+                      borderColor: "$loContrast",
+                      fontSize: 20,
+                      fontWeight: 500,
+                      borderRadius: "$1",
+                      px: "6px",
+                      py: 0,
+                      "@bp2": {
+                        fontSize: 34,
+                        px: "4px",
+                        py: "2px",
+                        mr: "$3",
+                      },
+                      "&:hover": {
+                        bc: "$loContrast",
+                        color: "white",
+                      },
+                    }}>
+                    Contact
+                  </Button>
+                  <Button
+                    small
+                    variant="blue"
+                    css={{
+                      bc: "#0A5CD8",
+                      fontSize: 20,
+                      fontWeight: 500,
+                      borderRadius: "$1",
+                      px: "6px",
+                      py: 0,
+                      "@bp2": {
+                        fontSize: 34,
+                        px: "4px",
+                        py: "2px",
+                        mr: "$3",
+                      },
+                    }}>
+                    Let's Go
+                  </Button>
+                </Flex>
+              </Box>
+            </Box>
+          </Box>
+          <Flex
             css={{
-              px: "$6",
-              ai: "flex-start",
-              justifyContent: "center",
-              textAlign: "left",
-              gridTemplateColumns: "repeat(1,1fr)",
-              "@bp1": {
-                gridTemplateColumns: "repeat(2,1fr)",
-              },
-              "@bp3": {
-                px: "$3",
-                gridTemplateColumns: "repeat(4,1fr)",
+              mt: 1,
+              bc: "#0001AE",
+              position: "relative",
+              height: "100%",
+              flexDirection: "column",
+              "@bp2": {
+                flexDirection: "row",
               },
             }}>
             <Box
-              as="form"
-              onSubmit={handleSubmit}
-              css={{ position: "relative" }}>
-              <Logo />
-              <Text
-                variant="gray"
+              css={{
+                borderBottomRightRadius: "18px",
+                borderBottomLeftRadius: "18px",
+                bc: "$hiContrast",
+                height: 34,
+                width: "100%",
+                zIndex: 3,
+                mt: -16,
+                "@bp2": {
+                  mt: 0,
+                  ml: -16,
+                  height: "100%",
+                  width: 34,
+                  borderBottomRightRadius: "18px",
+                  borderTopRightRadius: "18px",
+                  borderBottomLeftRadius: 0,
+                },
+              }}
+            />
+            <Box
+              css={{
+                borderBottomRightRadius: "18px",
+                borderBottomLeftRadius: "18px",
+                bc: "#37B8EE",
+                height: 34,
+                mt: -16,
+                width: "100%",
+                zIndex: 2,
+                "@bp2": {
+                  mt: 0,
+                  ml: -16,
+                  height: "100%",
+                  width: 34,
+                  borderBottomRightRadius: "18px",
+                  borderTopRightRadius: "18px",
+                  borderBottomLeftRadius: 0,
+                },
+              }}
+            />
+            <Box
+              css={{
+                borderBottomRightRadius: "18px",
+                borderBottomLeftRadius: "18px",
+                bc: "#0197D5",
+                height: 34,
+                mt: -16,
+                width: "100%",
+                zIndex: 1,
+                "@bp2": {
+                  mt: 0,
+                  ml: -16,
+                  height: "100%",
+                  width: 34,
+                  borderBottomRightRadius: "18px",
+                  borderTopRightRadius: "18px",
+                  borderBottomLeftRadius: 0,
+                },
+              }}
+            />
+            <Box
+              css={{
+                borderBottomRightRadius: "18px",
+                borderBottomLeftRadius: "18px",
+                bc: "#0A5CD8",
+                height: 34,
+                mt: -16,
+                width: "100%",
+                zIndex: 0,
+                "@bp2": {
+                  mt: 0,
+                  ml: -16,
+                  height: "100%",
+                  width: 34,
+                  borderBottomRightRadius: "18px",
+                  borderTopRightRadius: "18px",
+                  borderBottomLeftRadius: 0,
+                },
+              }}
+            />
+          </Flex>
+        </Flex>
+        <Flex
+          direction="column"
+          justify="between"
+          css={{
+            px: "$4",
+            py: "$5",
+            mt: 1,
+            width: "100%",
+            bc: "#0001AE",
+            borderBottomLeftRadius: 18,
+            borderBottomRightRadius: 18,
+            "@bp2": {
+              borderTopRightRadius: 18,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 18,
+              width: "36%",
+            },
+          }}>
+          <Box>
+            <Box css={{ mb: "$5" }}>
+              <Heading
                 css={{
-                  pb: "$3",
-                  display: "block",
-                  mt: "$4",
-                  maxWidth: "276px",
-                  mx: 0,
+                  fontWeight: 600,
+                  mb: "$1",
+                  fontSize: 15,
+                  letterSpacing: 0,
+                  color: "white",
                 }}>
-                Join our newsletter to stay up to date on features and new
-                releases.
+                Why Livepeer Studio
+              </Heading>
+              <Text
+                css={{
+                  color: "white",
+                  fontWeight: 300,
+                  lineHeight: "18px",
+                  opacity: ".8",
+                }}>
+                Livepeer Studio is a powerful suite of web3 tools that make it
+                easy for builders to create new video experiences and access the
+                decentralized Livepeer network. More than a product, Livepeer
+                Studio is a growing community of web3 developers and creators
+                creating the future of web3 video.
               </Text>
+            </Box>
+            <Box css={{ mb: "$9" }}>
+              <Heading
+                css={{
+                  fontWeight: 600,
+                  mb: "$1",
+                  fontSize: 15,
+                  letterSpacing: 0,
+                  color: "white",
+                }}>
+                Why Livepeer
+              </Heading>
+              <Text
+                css={{
+                  color: "white",
+                  fontWeight: 300,
+                  lineHeight: "18px",
+                  opacity: ".8",
+                }}>
+                Livepeer is the world's open video infrastructure. Founded in
+                2017, Livepeer provides cost efficient, secure, scalable, and
+                reliable infrastructure that can handle today's high demand for
+                video processing. Livepeer's decentralized network includes over
+                70,000 GPUs and currently processes millions of minutes a week.
+              </Text>
+            </Box>
+            <Heading
+              css={{
+                color: "white",
+                mb: "$6",
+                fontSize: 75,
+                letterSpacing: "-3px",
+              }}>
+              Social
+            </Heading>
+            <Flex gap="2" align="center" css={{ mb: "$6" }}>
               <Box
                 css={{
-                  position: "relative",
-                  width: "fit-content",
-                  mx: 0,
+                  fontSize: 54,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
                 }}>
-                <TextField
-                  size="2"
-                  placeholder="Enter your email"
-                  name="email"
-                  id="email-footer"
-                  css={{ py: "$4", pr: 60 }}
-                  type="email"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEmail(e.target.value)
-                  }
-                  value={email}
-                  required
-                />
-                <Button
-                  css={{
-                    position: "absolute",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    right: "1px",
-                    height: 38,
-                    width: 38,
-                    border: 0,
-                    boxShadow: "none",
-                    color: "$hiContrast",
-                    cursor: "pointer",
-                    "&:hover": {
-                      boxShadow: "none",
-                    },
-                  }}
-                  type="submit">
-                  <ArrowRightIcon />
-                </Button>
+                IG
               </Box>
-              {mailchimpResponseData && (
-                <MailchimpResponse {...mailchimpResponseData} />
-              )}
-            </Box>
-            {linksLists.map((list) => (
-              <LinksList key={`links-list-${list.heading}`} {...list} />
-            ))}
-            <Box css={{ color: "$hiContrast" }}>
-              <Flex align="center" css={{ mb: "$3" }}>
-                <Box css={{ fontWeight: 600, mr: "$4" }}>Livepeer, Inc.</Box>
-                <ThemeSwitch />
-              </Flex>
-              <Box css={{ lineHeight: 1.5 }}>
-                223 Bedford Ave PMB 530
-                <br />
-                Brooklyn, NY 11211
+              <Box
+                css={{
+                  fontSize: 54,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
+                }}>
+                TW
               </Box>
-              <Box css={{ mt: "$4", mb: "$5" }}>
-                <Link href="mailto:hello@livepeer.com" passHref>
-                  <A>hello@livepeer.com</A>
-                </Link>
+              <Box
+                css={{
+                  fontSize: 54,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
+                }}>
+                TIK
               </Box>
-              <Box>
-                <Link href="https://twitter.com/livepeervs">
-                  <a target="_blank">
-                    <Box
-                      as="svg"
-                      width="32"
-                      height="32"
-                      viewBox="0 0 32 32"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      css={{ display: "inline-block", mr: "$2" }}>
-                      <Box
-                        css={{ color: "$violet9" }}
-                        as="path"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32ZM21.3503 11.8976C21.9313 11.8243 22.4849 11.6615 23 11.4205C22.6149 12.028 22.1279 12.5616 21.5668 12.9887C21.5723 13.1186 21.5751 13.2493 21.5751 13.3806C21.5751 17.3839 18.6861 22 13.4029 22C11.7809 22 10.2711 21.4985 9 20.639C9.2247 20.667 9.45335 20.6813 9.68517 20.6813C11.0308 20.6813 12.2693 20.197 13.2523 19.3845C11.9955 19.36 10.9347 18.4842 10.5692 17.2806C10.7446 17.316 10.9245 17.3349 11.1096 17.3349C11.3716 17.3349 11.6253 17.2979 11.8664 17.2287C10.5524 16.9504 9.56232 15.726 9.56232 14.2582C9.56232 14.2455 9.56232 14.2328 9.56253 14.2201C9.94982 14.447 10.3927 14.5833 10.8635 14.599C10.0928 14.0558 9.58573 13.1285 9.58573 12.0775C9.58573 11.5223 9.72737 11.002 9.97461 10.5545C11.3913 12.3873 13.5077 13.5934 15.8948 13.7197C15.8459 13.498 15.8204 13.2668 15.8204 13.0294C15.8204 11.3564 17.1065 10 18.6928 10C19.5189 10 20.2653 10.3679 20.7893 10.9567C21.4436 10.8208 22.0583 10.5687 22.6132 10.2216C22.3988 10.9289 21.9434 11.5226 21.3503 11.8976Z"
-                        fill="currentColor"
-                      />
-                    </Box>
-                  </a>
-                </Link>
-                <Link href="https://forum.livepeer.com">
-                  <a target="_blank">
-                    <Box
-                      as="svg"
-                      width="32"
-                      height="32"
-                      viewBox="0 0 32 32"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      css={{ display: "inline-block", borderRadius: "50%" }}>
-                      <Box
-                        css={{ color: "$violet9" }}
-                        as="path"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M26,32H6c-3.314,0-6-2.686-6-6V6c0-3.314,2.686-6,6-6h20c3.314,0,6,2.686,6,6v20C32,29.314,29.314,32,26,32z"
-                        fill="currentColor"
-                      />
-                      <Box
-                        css={{ color: "$primary1" }}
-                        as="path"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M24,15.997c0-4.343-3.55-7.996-7.933-7.996V8C11.689,8,8,11.518,8,15.861C8,16,8.003,24,8.003,24l8.064-0.007C20.451,23.993,24,20.34,24,15.997z M11.16,20.857l0.818-2.679c-0.35-0.646-0.55-1.389-0.55-2.178c0-2.525,2.047-4.571,4.572-4.571s4.572,2.046,4.572,4.571c0,2.525-2.046,4.571-4.571,4.571c-0.692,0-1.354-0.154-1.943-0.432L11.16,20.857z"
-                        fill="currentColor"
-                      />
-                    </Box>
-                  </a>
-                </Link>
+              <Box
+                css={{
+                  fontSize: 54,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
+                }}>
+                GH
               </Box>
-              <Box>
-                {user && user.admin && version && version.commit && (
-                  <Link
-                    passHref
-                    href={`https://github.com/livepeer/livepeer-com/commit/${version.commit}`}>
-                    <A>version {version.commit.substring(0, 8)}</A>
-                  </Link>
-                )}
-              </Box>
-            </Box>
-          </Grid>
-        </Container>
-      </Box>
+            </Flex>
+          </Box>
+          <Box
+            css={{
+              a: {
+                fontSize: "$4",
+                display: "block",
+                color: "#F7F7F7",
+                opacity: 0.6,
+                transition: ".15s",
+                textDecoration: "none",
+                "&:hover": {
+                  opacity: 1,
+                  transition: ".15s",
+                  textDecoration: "none",
+                },
+              },
+            }}>
+            <Link href="/pricing-faq" passHref>
+              <A>Pricing</A>
+            </Link>
+            <A href="https://livepeer.org/jobs" target="_blank">
+              Jobs
+            </A>
+            <Link href="/privacy-policy" passHref>
+              <A>Privacy Policy</A>
+            </Link>
+            <Link href="/terms-of-service" passHref>
+              <A>Terms of Service</A>
+            </Link>
+          </Box>
+        </Flex>
+      </Flex>
     </Box>
   );
 };

@@ -20,16 +20,14 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           display: "inline-flex",
           alignItems: "flex-start",
           textDecoration: "none",
-          color: "initial",
           marginRight: "auto",
           cursor: "pointer",
-          borderRadius: 24,
-          border: "1px solid",
-          borderColor: "$neutral5",
+          borderRadius: 18,
           overflow: "hidden",
           height: 400,
           transition: "box-shadow .2s",
-          bc: "$loContrast",
+          bc: "$hiContrast",
+          color: "$loContrast",
           "&:hover": {
             textDecoration: "none",
             boxShadow:
@@ -63,11 +61,11 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           }}>
           <Box>
             <Text
-              variant="gray"
-              size="1"
+              size="2"
               css={{
                 textTransform: "uppercase",
                 fontWeight: 600,
+                color: "$loContrast",
               }}>
               {post.category.title}
             </Text>
@@ -122,11 +120,11 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               }}>
               {post.title}
             </Heading>
-            <Box
+            <Text
               as={Text}
-              variant="gray"
               size="4"
               css={{
+                color: "$loContrast",
                 mb: "$3",
               }}>
               <TextTruncate
@@ -135,9 +133,16 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                 truncateText="…"
                 text={post.excerpt}
               />
-            </Box>
+            </Text>
           </Box>
-          <A as={Box} css={{ fontWeight: 600, margin: 0 }}>
+          <A
+            as={Box}
+            css={{
+              textDecoration: "none",
+              fontWeight: 500,
+              margin: 0,
+              color: "$loContrast",
+            }}>
             Read more
           </A>
         </Flex>
