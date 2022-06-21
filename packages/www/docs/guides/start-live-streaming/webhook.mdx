@@ -1,17 +1,17 @@
 ---
 title: Using webhooks
 description: Use webhooks to listen for video lifecycle events
-metaTitle: Using webhooks - Livepeer.com
+metaTitle: Using webhooks - Livepeer Studio
 metaDescription: Use webhooks to listen for video lifecycle events
 ---
 
 # **Using Webhooks**
 
-Livepeer.com uses webhooks to communicate with your application asynchronously
-when events for your stream occur. For example, you may want to know when a
-stream has become active or idle, so that you can surface this information to
-viewers. When these events happen, we’ll make a `POST` request to a URL that you
-specify.
+Livepeer Studio uses webhooks to communicate with your application
+asynchronously when events for your stream occur. For example, you may want to
+know when a stream has become active or idle, so that you can surface this
+information to viewers. When these events happen, we’ll make a `POST` request to
+a URL that you specify.
 
 ### How to configure endpoints
 
@@ -29,7 +29,7 @@ curl \
       "url": "{webhook_url}",
       "name": "test webhooks"
   }' \
-  https://livepeer.com/api/webhook
+  https://livepeer.studio/api/webhook
 ```
 
 This request should return:

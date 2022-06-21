@@ -8,7 +8,7 @@ import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import TableV2 from "@components/Admin/Table-v2";
 import Help from "../../../public/img/help.svg";
-import { Stream } from "@livepeer.com/api";
+import { Stream } from "@livepeer.studio/api";
 import TextCell, { TextCellProps } from "@components/Admin/Table-v2/cells/text";
 import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "@components/Admin/Table-v2/cells/date";
@@ -267,11 +267,11 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
               display: ["none", "none", "none", "inline-block"],
             }}>
             <b>New beta feature</b>: Record your live streams. Send feedback to
-            help@livepeer.com.
+            help@livepeer.studio.
             <Box
               as="a"
               target="_blank"
-              href="https://livepeer.com/blog/record-every-video-livestream-with-livepeer"
+              href="https://livepeer.studio/blog/record-every-video-livestream-with-livepeer"
               sx={{
                 display: "inline-block",
                 ml: "0.2em",

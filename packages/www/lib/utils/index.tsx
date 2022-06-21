@@ -1,6 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
-import { Tree } from "components/Marketing/TableOfContents";
+import { Tree } from "@components/Site/TableOfContents";
 import { Stripe, loadStripe } from "@stripe/stripe-js";
 import { theme } from "../theme";
 
@@ -8,7 +8,7 @@ export const getComponent = (component) => {
   const componentName = pascalCase(component._type);
 
   try {
-    const Component = require(`components/Marketing/${componentName}`).default;
+    const Component = require(`components/Site/${componentName}`).default;
 
     return (
       <Element

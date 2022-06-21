@@ -1,21 +1,21 @@
 ---
 title: Getting started tutorial
-description: Start live streaming with Livepeer.com
-metaTitle: Getting started tutorial - Livepeer.com
-metaDescription: Start live streaming with Livepeer.com
+description: Start live streaming with Livepeer Studio
+metaTitle: Getting started tutorial - Livepeer Studio
+metaDescription: Start live streaming with Livepeer Studio
 ---
 
-# Start live streaming with Livepeer.com
+# Start live streaming with Livepeer Studio
 
-There are multiple ways to livestream with Livepeer.com. The only prerequisite
-for using Livepeer.com is to be able to create an RTMP stream.
+There are multiple ways to livestream with Livepeer Studio. The only
+prerequisite for using Livepeer Studio is to be able to create an RTMP stream.
 
-You can integrate your streaming application directly with the Livepeer.com API.
-Or you can use the Livepeer.com Dashboard to live stream without writing any
-code.
+You can integrate your streaming application directly with the Livepeer Studio
+API. Or you can use the Livepeer Studio Dashboard to live stream without writing
+any code.
 
 In this quick tutorial, you will learn how to create a unique stream object,
-broadcast live video content and playback your live stream with Livepeer.com.
+broadcast live video content and playback your live stream with Livepeer Studio.
 
 <Grid
   gap={3}
@@ -44,8 +44,8 @@ broadcast live video content and playback your live stream with Livepeer.com.
 
 ## Step 1: Create a stream
 
-Login to the Livepeer.com Dashboard, and navigate to the Streams page,
-[livepeer.com/dashboard/streams](https://livepeer.com/dashboard/streams),
+Login to the Livepeer Studio Dashboard, and navigate to the Streams page,
+[livepeer.studio/dashboard/streams](https://livepeer.studio/dashboard/streams),
 located in the left-hand menu. Click on the "+ Create stream" button on the top
 right corner. When you name your stream, pick a unique name and include URL
 compatible characters only.
@@ -68,11 +68,12 @@ First, let’s set the keyframe interval.
 2. At the top, select Advanced from the Output Mode dropdown.
 3. In the Keyframe Interval row, input 2 in the text field.
 
-Next, let’s configure OBS to point to Livepeer.com’s RTMP ingest data centers.
+Next, let’s configure OBS to point to Livepeer Studio’s RTMP ingest data
+centers.
 
 1. In the Setting sidebar menu, select Stream.
 2. At the top, select Custom from the Service dropdown menu.
-3. Input `rtmp://rtmp.livepeer.com/live` in the Server text field.
+3. Input `rtmp://rtmp.livepeer.studio/live` in the Server text field.
 4. Navigate to the stream detail page, click the “Reveal stream key” button, and
    copy the stream key.
 5. Navigate back to OBS, and paste your stream key into the Stream Key text
@@ -87,7 +88,7 @@ right corner of OBS.
 ## Step 2 (option 2): Go live using in-browser broadcaster
 
 If downloading OBS feels cumbersome, there are a few in-browser broadcaster
-options. Livepeer.com users have had success with
+options. Livepeer Studio users have had success with
 [Streamyard](https://streamyard.com/) or
 [Restream Studio](https://restream.io/).
 
@@ -96,7 +97,7 @@ To use Streamyard with Livepeer:
 1. Pick "Destinations"
 2. Click "Add a destination"
 3. Pick "Custom RTMP"
-4. Input `rtmp://rtmp.livepeer.com/live` in the "RTMP Server URL" text field.
+4. Input `rtmp://rtmp.livepeer.studio/live` in the "RTMP Server URL" text field.
 5. Copy your stream key into the "Stream key" field
 6. Input a name for the stream in "Nickname"
 7. Click "Add RTMP server"
@@ -108,18 +109,18 @@ To use Restream.io studio with Livepeer:
 
 1. Click "Add channel"
 2. Pick "Custom RTMP"
-3. Input `rtmp://rtmp.livepeer.com/live` in the "RTMP URL" text field.
+3. Input `rtmp://rtmp.livepeer.studio/live` in the "RTMP URL" text field.
 4. Copy your stream key into the "Stream key" field
 5. Click "Enter Live Studio"
 6. When you are ready to start your live stream, click the "Go Live" button.
 
 ## Step 3: Playback your live stream
 
-Navigate to your stream detail page in the Livepeer.com Dashboard, and copy the
-Playback URL. The playback URL is an M3U8 file, the basis for the HTTP Live
+Navigate to your stream detail page in the Livepeer Studio Dashboard, and copy
+the Playback URL. The playback URL is an M3U8 file, the basis for the HTTP Live
 Streaming (HLS) format.
 
-Livepeer.com doesn’t have it’s own player, but works with open source and 3rd
+Livepeer Studio doesn’t have it’s own player, but works with open source and 3rd
 party players. For this tutorial, we will use
 [Theo Player’s demo player](https://demo.theoplayer.com/test-your-stream-with-statistics).
 
@@ -127,7 +128,7 @@ Paste your playback URL in the text field at the top of Theo Player’s demo
 player and click to load your stream. You may need to also press the Play button
 in the player.
 
-That’s it! Streaming with Livepeer.com is that simple. To get in touch, fill out
-a [contact form](/contact).
+That’s it! Streaming with Livepeer Studio is that simple. To get in touch, fill
+out a [contact form](/contact).
 
-_[Video Tutorial : Stream into Livepeer.com for the First Time](https://livepeer.com/blog/video-tutorial-stream-into-livepeer-for-the-first-time)_
+_[Video Tutorial : Stream into Livepeer Studio for the First Time](https://livepeer.studio/blog/video-tutorial-stream-into-livepeer-for-the-first-time)_

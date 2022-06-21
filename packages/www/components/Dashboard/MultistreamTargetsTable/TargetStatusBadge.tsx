@@ -1,4 +1,4 @@
-import { MultistreamTarget, Stream } from "@livepeer.com/api";
+import { MultistreamTarget, Stream } from "@livepeer.studio/api";
 
 import { MultistreamStatus } from "hooks/use-analyzer";
 import { useMemo } from "react";

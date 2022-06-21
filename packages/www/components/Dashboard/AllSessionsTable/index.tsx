@@ -31,7 +31,7 @@ import {
   HoverCardTrigger,
   useSnackbar,
 } from "@livepeer/design-system";
-import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, CopyIcon, DownloadIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
@@ -60,11 +60,8 @@ const RecordingUrlCell = <D extends TableData>({
         <Flex css={{ ai: "center", justifyContent: "space-between" }}>
           {cell.value.children}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
-            <A
-              variant="primary"
-              target="_blank"
-              href={makeMP4Url(cell.value.mp4Url, "source")}>
-              Download mp4
+            <A target="_blank" href={makeMP4Url(cell.value.mp4Url, "source")}>
+              <DownloadIcon />
             </A>
           ) : null}
         </Flex>
@@ -217,7 +214,7 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
                     </HoverCardContent>
                   </HoverCardRoot>
                 ) : (
-                  <Box css={{ color: "$primary8" }}>—</Box>
+                  <Box>—</Box>
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },

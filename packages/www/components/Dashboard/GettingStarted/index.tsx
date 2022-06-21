@@ -83,7 +83,7 @@ const GettingStarted = ({ firstName = "" }) => {
         <AccordionItem value="accordion-two">
           <AccordionButton css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
-              Build with the Livepeer API
+              Build with the API
             </Text>
           </AccordionButton>
           <AccordionPanel>
@@ -91,9 +91,9 @@ const GettingStarted = ({ firstName = "" }) => {
               variant="gray"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
-              Ready to code? The Livepeer API is nimble and designed for
-              customization. All you need to do is create an RTMP stream with
-              broadcasting software like{" "}
+              Ready to code? The API is nimble and designed for customization.
+              All you need to do is create an RTMP stream with broadcasting
+              software like{" "}
               <Link passHref href="https://obsproject.com/">
                 <A target="_blank">OBS Studio</A>
               </Link>
@@ -136,9 +136,9 @@ const GettingStarted = ({ firstName = "" }) => {
               variant="gray"
               size="3"
               css={{ mb: "$3", lineHeight: "23px" }}>
-              Livepeer video infrastructure is designed to serve your app, from
-              the ground up and at scale. Get started by reviewing and cloning
-              one of our sample apps.
+              Livepeer Studio is designed to serve your app, from the ground up
+              and at scale. Get started by reviewing and cloning one of our
+              sample apps.
             </Text>
             <Link
               href="/docs/guides/application-development/example-app"
@@ -155,44 +155,6 @@ const GettingStarted = ({ firstName = "" }) => {
                 size="2"
                 variant="primary">
                 <Box css={{ mr: "$1" }}>Clone and create</Box>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem value="accordion-four">
-          <AccordionButton css={{ color: "$primary12" }}>
-            <Text size="3" css={{ color: "inherit" }}>
-              Deploy MistServer, Livepeer's media server
-            </Text>
-          </AccordionButton>
-          <AccordionPanel>
-            <Text
-              variant="gray"
-              size="3"
-              css={{ mb: "$3", lineHeight: "23px" }}>
-              MistServer is a free, full-featured streaming media toolkit. It
-              enables you to take any media from any location, using any method,
-              and deliver it seamlessly to anyone, anywhere, in any format.
-              <br />
-              It's open source and integrates with Livepeer's streaming API to
-              transcode video at scale.
-              <br />
-            </Text>
-            <Link href="/docs/guides/media-server/downloads" passHref>
-              <Button
-                as="a"
-                target="_blank"
-                rel="noopener noreferrer"
-                css={{
-                  cursor: "default",
-                  display: "inline-flex",
-                  ai: "center",
-                }}
-                size="2"
-                variant="primary">
-                <Box css={{ mr: "$1" }}>Downloads</Box>
                 <ArrowRightIcon />
               </Button>
             </Link>

@@ -489,7 +489,7 @@ const StreamDetail = ({
                           content={
                             <Box>
                               We changed our playback domain, but
-                              cdn.livepeer.com is still working.
+                              cdn.livepeer.studio is still working.
                             </Box>
                           }>
                           <Help />
@@ -509,7 +509,7 @@ const StreamDetail = ({
                             content={
                               <Box>
                                 When enabled, transcoded streaming sessions will
-                                be recorded and stored by Livepeer.com. Each
+                                be recorded and stored by Livepeer Studio. Each
                                 recorded session will have a recording .m3u8 URL
                                 for playback and an MP4 download link. This
                                 feature is currently free.
@@ -565,7 +565,7 @@ const StreamDetail = ({
                         textDecoration: "none",
                         borderBottom: "2px solid",
                         borderColor:
-                          activeTab === "Overview" ? "$violet9" : "transparent",
+                          activeTab === "Overview" ? "$blue9" : "transparent",
                         mr: "$5",
                         "&:hover": {
                           textDecoration: "none",
@@ -584,7 +584,7 @@ const StreamDetail = ({
                         cursor: "pointer",
                         borderBottom: "2px solid",
                         borderColor:
-                          activeTab === "Health" ? "$violet9" : "transparent",
+                          activeTab === "Health" ? "$blue9" : "transparent",
                         "&:hover": {
                           textDecoration: "none",
                         },

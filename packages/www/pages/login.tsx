@@ -1,5 +1,6 @@
 import Layout from "layouts/main";
-import Login from "@components/Marketing/Login";
+import Login from "@components/Site/Login";
+import Button from "@components/Site/Button";
 import {
   Flex,
   Box,
@@ -10,7 +11,6 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "../hooks";
 import Link from "next/link";
-import Guides from "@components/Marketing/Guides";
 import { Login as Content } from "content";
 
 const LoginPage = () => {
@@ -31,7 +31,6 @@ const LoginPage = () => {
   };
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -40,7 +39,8 @@ const LoginPage = () => {
             py: "$7",
             width: "100%",
             "@bp3": {
-              py: "$8",
+              pt: 100,
+              pb: 140,
               px: "$4",
             },
           }}>
@@ -51,8 +51,8 @@ const LoginPage = () => {
               flexGrow: 1,
               flexDirection: "column",
             }}>
-            <Heading size="3" as="h1" css={{ mb: "$5" }}>
-              Log in
+            <Heading size="4" as="h1" css={{ mb: "$6" }}>
+              Sign in
             </Heading>
             <Login
               id="login"
@@ -63,9 +63,44 @@ const LoginPage = () => {
               errors={errors}
               loading={loading}
             />
-            <Box>
-              <Link href="/forgot-password" passHref>
-                <A>Forgot your password?</A>
+            <Box css={{ maxWidth: 500, width: "100%" }}>
+              <Box css={{ textAlign: "center" }}>
+                <Link href="/forgot-password" passHref>
+                  <A css={{ textDecoration: "none" }}>Forgot your password?</A>
+                </Link>
+              </Box>
+              <Box
+                css={{
+                  width: "100%",
+                  height: "1px",
+                  mt: "$5",
+                  mb: "$3",
+                  bc: "$neutral6",
+                }}
+              />
+              <Link href="/register" passHref>
+                <Button
+                  href="/register"
+                  as={A}
+                  css={{
+                    width: "100%",
+                    fontSize: "$3",
+                    mt: "$2",
+                    px: "$3",
+                    backgroundColor: "$transparent",
+                    color: "$hiContrast",
+                    borderColor: "$hiContrast",
+                    textDecoration: "none",
+                    transition: ".15s",
+                    "&:hover": {
+                      transition: ".15s",
+                      bc: "$hiContrast",
+                      color: "$loContrast",
+                      textDecoration: "none",
+                    },
+                  }}>
+                  Create new account
+                </Button>
               </Link>
             </Box>
           </Flex>
@@ -75,4 +110,5 @@ const LoginPage = () => {
   );
 };
 
+LoginPage.theme = "dark-theme-blue";
 export default LoginPage;

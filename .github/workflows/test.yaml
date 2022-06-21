@@ -54,5 +54,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
-          name: livepeer-com
+          name: livepeer-studio
           verbose: true

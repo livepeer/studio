@@ -27,7 +27,7 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
-import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
+import { ArrowRightIcon, CopyIcon, DownloadIcon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 function makeMP4Url(hlsUrl: string, profileName: string): string {
@@ -57,12 +57,9 @@ const RecordingUrlCell = <D extends TableData>({
         <Flex css={{ justifyContent: "space-between", ai: "center" }}>
           {truncate(cell.value.children, 20)}
           {cell.value.showMP4 && cell.value.profiles?.length ? (
-            <Box>
-              <A
-                variant="primary"
-                target="_blank"
-                href={makeMP4Url(cell.value.mp4Url, "source")}>
-                Download mp4
+            <Box css={{ pr: "$1" }}>
+              <A target="_blank" href={makeMP4Url(cell.value.mp4Url, "source")}>
+                <DownloadIcon />
               </A>
             </Box>
           ) : null}
@@ -225,7 +222,7 @@ const StreamSessionsTable = ({
                     </HoverCardContent>
                   </HoverCardRoot>
                 ) : (
-                  <Box css={{ color: "$primary8" }}>—</Box>
+                  <Box>—</Box>
                 ),
               mp4Url: stream.recordingUrl ? stream.recordingUrl : undefined,
             },
@@ -235,7 +232,7 @@ const StreamSessionsTable = ({
             },
             createdAt: {
               date: new Date(stream.createdAt),
-              fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+              fallback: <Box>—</Box>,
             },
           };
         }),

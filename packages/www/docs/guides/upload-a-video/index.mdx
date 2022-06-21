@@ -1,7 +1,7 @@
 ---
 title: Upload a Video
 description: Livepeer's Upload a Video Guide
-metaTitle: Upload a Video Guide - Livepeer.com
+metaTitle: Upload a Video Guide - Livepeer Studio
 metaDescription: Livepeer's Upload a Video Guide
 ---
 
@@ -25,7 +25,7 @@ your application offers an interface for them to do so.
 In this tutorial, we will be using [Node.js](https://nodejs.org/en/) and
 [Axios](https://axios-http.com/) so make sure to set that up in your project.
 You will also need to
-[Get an API key](https://livepeer.com/docs/guides/start-live-streaming/api-key)
+[Get an API key](https://livepeer.studio/docs/guides/start-live-streaming/api-key)
 to call the VOD API.
 
 ## Asset Resources
@@ -85,7 +85,7 @@ var url = "https://example.com";
 
 const importAsset = async () => {
 
-const response = await axios.post("https://livepeer.com/api/asset/import", {
+const response = await axios.post("https://livepeer.studio/api/asset/import", {
   headers: {
     'Authorization': `Bearer ${process.env.LP_API_KEY}`,
     'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ Response
 
 > _Note that the status is `pending`, it might take a few minutes for it to be
 > imported. To verify that the status is `ready`, use
-> `https://livepeer.com/api/asset/$ASSET_ID/` with the provided `asset.id` in
+> `https://livepeer.studio/api/asset/$ASSET_ID/` with the provided `asset.id` in
 > the response above_.
 
 Response
@@ -205,7 +205,7 @@ JavaScript
 ```js
 const uploadAsset = async () => {
   const response = await axios.post(
-    "https://livepeer.com/api/asset/request-upload",
+    "https://livepeer.studio/api/asset/request-upload",
     {
       headers: {
         Authorization: `Bearer ${process.env.LP_API_KEY}`,
@@ -224,7 +224,7 @@ Response
 
 ```json
 {
-  "url": "https://origin.livepeer.com/api/asset/upload/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmVzaWduZWRVcmwiOiJodHRwczovL3N0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vbHAtdXMtdm9kLWNvbS9kaXJlY3RVcGxvYWQvNGMyMWs3ejJ0amNkZzh3dC9zb3VyY2U_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ29udGVudC1TaGEyNTY9VU5TSUdORUQtUEFZTE9BRCZYLUFtei1DcmVkZW50aWFsPUdPT0cxRVlVTldOVjZSWUlLNTQySFdBM1JMN1JCN0pVT0VRM1lMMjNRWUI2Q0hQRzVITzJRQzMzTUpWVVklMkYyMDIyMDUxOCUyRnVzJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDIyMDUxOFQxOTIyMDVaJlgtQW16LUV4cGlyZXM9OTAwJlgtQW16LVNpZ25hdHVyZT0wZWJmNmMwNWFlZTA2ZGVhOGZmM2U1MzNmNjMxZjk1ZTY3M2I4ZWRiOTI3MWJlOWQzYjdhZWQ4YjI1YTUzZTM3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZ4LWlkPVB1dE9iamVjdCIsImF1ZCI6Imh0dHBzOi8vbGl2ZXBlZXIuY29tIiwiaWF0IjoxNjUyOTAxNzI1fQ.2wSQMC3s6QFFkmyhQZuecbQF2R8E_j3VGTg9tblc0Dc",
+  "url": "https://origin.livepeer.studio/api/asset/upload/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmVzaWduZWRVcmwiOiJodHRwczovL3N0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vbHAtdXMtdm9kLWNvbS9kaXJlY3RVcGxvYWQvNGMyMWs3ejJ0amNkZzh3dC9zb3VyY2U_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ29udGVudC1TaGEyNTY9VU5TSUdORUQtUEFZTE9BRCZYLUFtei1DcmVkZW50aWFsPUdPT0cxRVlVTldOVjZSWUlLNTQySFdBM1JMN1JCN0pVT0VRM1lMMjNRWUI2Q0hQRzVITzJRQzMzTUpWVVklMkYyMDIyMDUxOCUyRnVzJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDIyMDUxOFQxOTIyMDVaJlgtQW16LUV4cGlyZXM9OTAwJlgtQW16LVNpZ25hdHVyZT0wZWJmNmMwNWFlZTA2ZGVhOGZmM2U1MzNmNjMxZjk1ZTY3M2I4ZWRiOTI3MWJlOWQzYjdhZWQ4YjI1YTUzZTM3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZ4LWlkPVB1dE9iamVjdCIsImF1ZCI6Imh0dHBzOi8vbGl2ZXBlZXIuY29tIiwiaWF0IjoxNjUyOTAxNzI1fQ.2wSQMC3s6QFFkmyhQZuecbQF2R8E_j3VGTg9tblc0Dc",
   "asset": {
     "id": "4c21895e-2488-4c0a-9377-3369ff586ddd",
     "playbackId": "4c21k7z2tjcdg8wt",
@@ -256,10 +256,11 @@ Response
 
 Upload the asset to the generated URL
 
-- Get the `“url”: “https://origin.livepeer.com/api/assets/…“` from the response.
+- Get the `“url”: “https://origin.livepeer.studio/api/assets/…“` from the
+  response.
 - Check the status of the generated url.
 
-  - _`https://livepeer.com/api/asset/$ASSET_ID/` with provided asset.id_
+  - _`https://livepeer.studio/api/asset/$ASSET_ID/` with provided asset.id_
 
   ```json
   {
@@ -358,7 +359,7 @@ JavaScript
 
 ```js
 const listAsset = async () => {
-  const response = await axios.get("https://livepeer.com/api/asset", {
+  const response = await axios.get("https://livepeer.studio/api/asset", {
     headers: {
       Authorization: `Bearer ${process.env.LP_API_KEY}`,
     },
@@ -478,7 +479,7 @@ JavaScript
 ```js
 const updateAsset = async () => {
   const response = await axios.patch(
-    "https://livepeer.com/api/asset/$ASSET_ID",
+    "https://livepeer.studio/api/asset/$ASSET_ID",
     {
       headers: {
         Authorization: `Bearer ${process.env.LP_API_KEY}`,
@@ -553,11 +554,14 @@ JavaScript
 
 ```js
 const deleteAsset = async () => {
-  const response = await axios.delete("https://livepeer.com/api/asset/{id}", {
-    headers: {
-      Authorization: `Bearer ${process.env.LP_API_KEY}`,
-    },
-  });
+  const response = await axios.delete(
+    "https://livepeer.studio/api/asset/{id}",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.LP_API_KEY}`,
+      },
+    }
+  );
   JSON.stringify(response.data);
 };
 ```
@@ -577,7 +581,7 @@ JavaScript
 ```js
 const exportAsset = async () => {
   const response = await axios.post(
-    "https://livepeer.com/api/asset/$ASSET_ID/export",
+    "https://livepeer.studio/api/asset/$ASSET_ID/export",
     {
       headers: {
         Authorization: `Bearer ${process.env.LP_API_KEY}`,
@@ -617,7 +621,7 @@ The this example has the response show that the status is pending.
 }
 ```
 
-Check back with `https://livepeer.com/api/task/$TASK_ID` to get the status
+Check back with `https://livepeer.studio/api/task/$TASK_ID` to get the status
 update.
 
 ```json
@@ -630,9 +634,9 @@ update.
         "videoFileCid": "QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
         "nftMetadataCid": "QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
         "videoFileUrl": "ipfs://QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
-        "videoFileGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
+        "videoFileGatewayUrl": "https://ipfs.livepeer.studio/ipfs/QmaMvRNEwvCHuwEZjX9NzFTJtBUrbk7j5D7ngP8xATHwXK",
         "nftMetadataUrl": "ipfs://QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi",
-        "nftMetadataGatewayUrl": "https://ipfs.livepeer.com/ipfs/QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi"
+        "nftMetadataGatewayUrl": "https://ipfs.livepeer.studio/ipfs/QmaY8HqYV3kVxwsCQahMYisQiZnjZg2bRVjb6XspTmYMFi"
       }
     }
   },
@@ -670,7 +674,7 @@ JavaScript
 const list Task = async () => {
 
 const response = await axios
-  .get("https://livepeer.com/api/task/$TASK_ID", {
+  .get("https://livepeer.studio/api/task/$TASK_ID", {
     headers: {
       Authorization: `Bearer ${process.env.LP_API_KEY}`,
     },

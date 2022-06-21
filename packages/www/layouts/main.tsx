@@ -1,6 +1,6 @@
 import { Flex, Box } from "@livepeer/design-system";
-import { DefaultNav } from "@components/Marketing/Navigation";
-import Footer from "@components/Marketing/Footer";
+import { DefaultNav } from "@components/Site/Navigation";
+import Footer from "@components/Site/Footer";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -34,6 +34,7 @@ interface Props {
   noindex?: boolean;
   preview?: boolean;
   theme?: string;
+  navBackgroundColor?: string;
   css?: Record<string, any>;
 }
 
@@ -48,9 +49,10 @@ function Layout({
   noindex = false,
   preview = false,
   css = {},
+  navBackgroundColor = "transparent",
 }: Props) {
   useEffect(() => {
-    if (window.location.hostname === "livepeer.com") {
+    if (window.location.hostname === "livepeer.studio") {
       ReactGA.pageview(window.location.pathname + window.location.search);
       hotjar.initialize(2525106, 6);
     }
@@ -66,8 +68,8 @@ function Layout({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.com/img/OG.png",
-          alt: image ? image.alt : "Livepeer.com",
+          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,
         },
@@ -81,6 +83,7 @@ function Layout({
 
   return (
     <Flex
+      className="main"
       css={{
         flexGrow: 1,
         flexDirection: "column",
@@ -99,14 +102,14 @@ function Layout({
             height: 24,
             fontSize: 12,
             fontWeight: 500,
-            backgroundColor: "$violet9",
+            backgroundColor: "$blue9",
             color: "white",
             lineHeight: "32px",
           }}>
           Preview Mode
         </Box>
       )}
-      <DefaultNav />
+      <DefaultNav navBackgroundColor={navBackgroundColor} />
       {children}
       <Footer />
     </Flex>

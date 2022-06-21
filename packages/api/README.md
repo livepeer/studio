@@ -1,4 +1,4 @@
-# @livepeer.com/api
+# @livepeer.studio/api
 
 ## How to dev
 

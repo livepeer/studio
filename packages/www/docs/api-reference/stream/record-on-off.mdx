@@ -1,8 +1,8 @@
 ---
 title: "PATCH toggle recording"
-description: Livepeer.com API Reference | PATCH toggle recording
-metaTitle: PATCH toggle recording - Livepeer.com
-metaDescription: Livepeer.com API Reference | PATCH toggle recording
+description: Livepeer Studio API Reference | PATCH toggle recording
+metaTitle: PATCH toggle recording - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | PATCH toggle recording
 ---
 
 # `PATCH` toggle recording
@@ -17,7 +17,7 @@ session objects are read-only.
 ### Turn recording on
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+curl -X PATCH https://livepeer.studio/api/stream/{id}/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{"record":true}'
@@ -26,7 +26,7 @@ curl -X PATCH https://livepeer.com/api/stream/{id}/record \
 ### Turn recording off
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id}/record \
+curl -X PATCH https://livepeer.studio/api/stream/{id}/record \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{"record":false}'

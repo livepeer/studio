@@ -1,8 +1,8 @@
 ---
 title: List Assets
-description: Livepeer.com API Reference | List Assets
-metaTitle: List Assets - Livepeer.com
-metaDescription: Livepeer.com API Reference | List Assets
+description: Livepeer Studio API Reference | List Assets
+metaTitle: List Assets - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | List Assets
 ---
 
 # List Assets
@@ -12,7 +12,7 @@ To list all assets in your account call `GET /api/asset`:
 #### curl
 
 ```jsx
-curl --location --request GET 'https://livepeer.com/api/asset' \
+curl --location --request GET 'https://livepeer.studio/api/asset' \
 --header 'Authorization: Bearer {api_key}'
 ```
 
@@ -22,7 +22,7 @@ curl --location --request GET 'https://livepeer.com/api/asset' \
 const axios = require("axios");
 
 axios
-  .get("https://livepeer.com/api/asset", {
+  .get("https://livepeer.studio/api/asset", {
     headers: {
       Authorization: "Bearer {api_key}",
     },
@@ -59,7 +59,7 @@ request, and Livepeer will return the corresponding `Asset` information.
 #### curl
 
 ```jsx
-curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
+curl --location --request GET 'https://livepeer.studio/api/asset/$ASSET_ID' \
 --header 'Authorization: Bearer $API_TOKEN'
 ```
 
@@ -69,7 +69,7 @@ curl --location --request GET 'https://livepeer.com/api/asset/$ASSET_ID' \
 const axios = require("axios");
 
 axios
-  .get("https://livepeer.com/api/asset/$ASSET_ID", {
+  .get("https://livepeer.studio/api/asset/$ASSET_ID", {
     headers: {
       Authorization: "Bearer {api_key}",
     },

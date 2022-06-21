@@ -58,7 +58,7 @@ function DashboardLayout({
   requireLoggedIn = true,
 }: Props) {
   useEffect(() => {
-    if (window.location.hostname === "livepeer.com") {
+    if (window.location.hostname === "livepeer.studio") {
       ReactGA.pageview(window.location.pathname + window.location.search);
       hotjar.initialize(2525106, 6);
     }
@@ -74,8 +74,8 @@ function DashboardLayout({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.com/img/OG.png",
-          alt: image ? image.alt : "Livepeer.com",
+          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,
         },

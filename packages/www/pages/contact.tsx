@@ -12,10 +12,8 @@ import {
   Link as A,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import Button from "@components/Marketing/Button";
-import Prefooter from "@components/Marketing/Prefooter";
+import Button from "@components/Site/Button";
 import { useRouter } from "next/router";
-import Guides from "@components/Marketing/Guides";
 import { Contact as Content } from "content";
 
 const ContactPage = () => {
@@ -45,7 +43,6 @@ const ContactPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
@@ -54,27 +51,15 @@ const ContactPage = () => {
             py: "$7",
             width: "100%",
             "@bp3": {
-              py: "$8",
+              pt: 100,
+              pb: 120,
               px: "$4",
             },
           }}>
           <Box css={{ mb: "$5", textAlign: "center" }}>
-            <Heading as="h1" size="3" css={{ fontWeight: 600, mb: "$3" }}>
+            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$7" }}>
               Get in touch
             </Heading>
-            <Text size="4" variant="gray" css={{ maxWidth: 630, mx: "auto" }}>
-              Learn more about Livepeer Video Service's streaming API and media
-              server. Leave us a message and we’ll get back to you.
-              <br />
-              <br />
-              Or email us at{" "}
-              <A
-                href="mailto:hello@livepeer.com?subject=Livepeer%20Video%20Services%20inquiry"
-                target="_blank">
-                hello@livepeer.com
-              </A>
-              .
-            </Text>
           </Box>
           <Box
             as="form"
@@ -98,7 +83,7 @@ const ContactPage = () => {
                 id="firstname"
                 name="firstname"
                 type="text"
-                placeholder="First Name*"
+                placeholder="First Name"
                 required
                 css={{ py: "$4" }}
               />
@@ -108,7 +93,7 @@ const ContactPage = () => {
                 name="lastname"
                 required
                 type="text"
-                placeholder="Last Name*"
+                placeholder="Last Name"
               />
             </Grid>
             <TextField
@@ -117,7 +102,7 @@ const ContactPage = () => {
               id="email"
               name="email"
               type="email"
-              placeholder="Email*"
+              placeholder="Email"
               required
             />
             <input name="utm_source" type="hidden" value={query?.utm_source} />
@@ -134,11 +119,14 @@ const ContactPage = () => {
               css={{ width: "100%", boxSizing: "border-box", mb: "$4" }}
               name="TICKET.content"
               placeholder="How can we help you? To guide the discussion, please give us specific details on
-your interest in speaking with our team. The more information, the better.*"
+your interest in speaking with our team. The more information, the better."
               required
             />
             <Box css={{ textAlign: "center" }}>
-              <Button arrow css={{ mx: "auto", mt: "$4", px: "$4" }}>
+              <Button
+                small
+                arrow
+                css={{ width: "100%", mx: "auto", mt: "$2", px: "$4" }}>
                 Submit
               </Button>
               <Fade in={submitted}>
@@ -151,11 +139,9 @@ your interest in speaking with our team. The more information, the better.*"
           </Box>
         </Container>
       </Box>
-      <Fade key={0}>
-        <Prefooter />
-      </Fade>
     </Layout>
   );
 };
 
+ContactPage.theme = "dark-theme-blue";
 export default ContactPage;

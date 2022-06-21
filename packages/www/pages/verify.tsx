@@ -12,7 +12,6 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 
-import Guides from "components/Marketing/Guides";
 import Spinner from "components/Dashboard/Spinner";
 
 const VerifyPage = () => {
@@ -48,12 +47,12 @@ const VerifyPage = () => {
 
   return (
     <Layout>
-      <Guides />
       <Verify errors={errors} email={email} emailValidToken={emailValidToken} />
     </Layout>
   );
 };
 
+VerifyPage.theme = "dark-theme-blue";
 export default VerifyPage;
 
 const Verify = ({

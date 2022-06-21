@@ -15,12 +15,12 @@ import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
 import BlogPostCard, {
   FeaturedBlogPostCard,
-} from "@components/Marketing/BlogPostCard";
+} from "@components/Site/BlogPostCard";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Prefooter from "@components/Marketing/Prefooter";
-import Guides from "@components/Marketing/Guides";
+import Prefooter from "@components/Site/Prefooter";
+import Guides from "@components/Site/Guides";
 import { Blog as BlogContent } from "content";
 
 type Category = {
@@ -45,7 +45,7 @@ type Props = {
   posts: Post[];
 };
 
-const BlogIndex: FC<Props> = ({ categories, posts }) => {
+const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
   const {
     query: { slug },
@@ -85,26 +85,41 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
 
   return (
     <Layout {...seoData}>
-      <Guides />
       <Box css={{ position: "relative" }}>
         <Container
-          size="3"
+          size="4"
           css={{
-            px: "$6",
-            py: "$7",
+            px: "$3",
+            py: "$2",
             width: "100%",
-            "@bp3": {
-              py: "$8",
+            "@bp2": {
               px: "$4",
             },
           }}>
-          <Box css={{ textAlign: "center", mb: "$8" }}>
-            <Heading as="h1" size="4" css={{ fontWeight: 600, mb: "$5" }}>
+          <Box
+            css={{
+              textAlign: "left",
+              mt: 60,
+              mb: 60,
+              "@bp2": {
+                mt: 110,
+                mb: 120,
+              },
+            }}>
+            <Box
+              as="h1"
+              css={{
+                textTransform: "uppercase",
+                fontSize: 70,
+                fontWeight: 500,
+                lineHeight: "82px",
+                mx: 0,
+                mt: 0,
+                letterSpacing: "-4px",
+                "@bp2": { fontSize: 130 },
+              }}>
               Blog
-            </Heading>
-            <Text as="h2" variant="gray" size="6">
-              Welcome to the Livepeer.com blog.
-            </Text>
+            </Box>
           </Box>
 
           {featuredPost && (
@@ -151,8 +166,8 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                       key={i + 1}
                       css={{
                         borderBottom: "2px solid",
-                        borderColor: isSelected ? "$violet9" : "transparent",
-                        color: isSelected ? "$violet9" : "$hiContrast",
+                        borderColor: isSelected ? "$blue9" : "transparent",
+                        color: isSelected ? "$blue9" : "$hiContrast",
                         fontWeight: isSelected ? 600 : 500,
                         pb: "$3",
                         mr: "$6",
@@ -167,7 +182,7 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
           <Grid
             gap={4}
             css={{
-              mb: "$5",
+              mb: 100,
               gridTemplateColumns: "repeat(1,1fr)",
               "@bp2": {
                 gridTemplateColumns: "repeat(2,1fr)",
@@ -190,9 +205,6 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
             ))}
           </Grid>
         </Container>
-        <Fade key={0}>
-          <Prefooter />
-        </Fade>
       </Box>
     </Layout>
   );
@@ -219,4 +231,5 @@ export async function getStaticProps({ params }) {
   };
 }
 
+BlogIndex.theme = "dark-theme-blue";
 export default BlogIndex;

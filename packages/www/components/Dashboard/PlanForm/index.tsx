@@ -17,7 +17,7 @@ import {
 } from "@livepeer/design-system";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useApi, useHubspotForm } from "hooks";
-import { products } from "@livepeer.com/api/src/config";
+import { products } from "@livepeer.studio/api/src/config";
 import { useForm } from "react-hook-form";
 import Spinner from "components/Dashboard/Spinner";
 import { useTheme } from "next-themes";

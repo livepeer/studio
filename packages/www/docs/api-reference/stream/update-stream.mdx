@@ -1,8 +1,8 @@
 ---
 title: "PATCH update a stream"
-description: Livepeer.com API Reference | PATCH update a stream
-metaTitle: PATCH update a stream - Livepeer.com
-metaDescription: Livepeer.com API Reference | PATCH update a stream
+description: Livepeer Studio API Reference | PATCH update a stream
+metaTitle: PATCH update a stream - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | PATCH update a stream
 ---
 
 # `PATCH` update a stream
@@ -27,7 +27,7 @@ updated.
 ### Turn recording on
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id} \
+curl -X PATCH https://livepeer.studio/api/stream/{id} \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{ "record": true }'
@@ -36,7 +36,7 @@ curl -X PATCH https://livepeer.com/api/stream/{id} \
 ### Suspend stream
 
 ```bash
-curl -X PATCH https://livepeer.com/api/stream/{id} \
+curl -X PATCH https://livepeer.studio/api/stream/{id} \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{ "suspended": true }'
@@ -45,7 +45,7 @@ curl -X PATCH https://livepeer.com/api/stream/{id} \
 ### Edit Multistream Targets
 
 ```bash
-curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
+curl -X PATCH 'https://livepeer.studio/api/stream/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{
@@ -61,7 +61,7 @@ curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
 ### Update all fields
 
 ```bash
-curl -X PATCH 'https://livepeer.com/api/stream/{id}' \
+curl -X PATCH 'https://livepeer.studio/api/stream/{id}' \
 -H 'content-type: application/json' \
 -H 'authorization: Bearer {api-key}' \
 -d '{

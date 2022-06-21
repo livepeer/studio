@@ -6,144 +6,144 @@
 
 export const Home = {
   metaData: {
-    title: "Livepeer Video Services",
+    title: "Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const Login = {
   metaData: {
-    title: "Login - Livepeer Video Services",
+    title: "Login - Livepeer Studio",
     description: `Login to your account to manage streams, get an API key, view health metrics, or manage billing.`,
-    url: "https://livepeer.com/login",
+    url: "https://livepeer.studio/login",
   },
 };
 
 export const Pricing = {
   metaData: {
-    title: "Pricing - Livepeer Video Services",
+    title: "Pricing - Livepeer Studio",
     description: `Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.`,
-    url: "https://livepeer.com/pricing",
+    url: "https://livepeer.studio/pricing",
   },
 };
 
 export const Register = {
   metaData: {
-    title: "Register - Livepeer Video Services",
+    title: "Register - Livepeer Studio",
     description: `Start for free with 1,000 streaming minutes a month. Build with affordable, reliable, decentralized video infrastructure.`,
-    url: "https://livepeer.com/register",
+    url: "https://livepeer.studio/register",
   },
 };
 
 export const ResetPassword = {
   metaData: {
-    title: "Reset Password - Livepeer Video Services",
+    title: "Reset Password - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/reset-password",
+    url: "https://livepeer.studio/reset-password",
   },
 };
 
 export const ForgotPassword = {
   metaData: {
-    title: "Forgot Password - Livepeer Video Services",
+    title: "Forgot Password - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/forgot-password",
+    url: "https://livepeer.studio/forgot-password",
   },
 };
 
 export const Team = {
   metaData: {
-    title: "Team - Livepeer Video Services",
+    title: "Team - Livepeer Studio",
     description: `Learn about the team behind Livepeer. We're building the world's open video infrastructure and software.`,
-    url: "https://livepeer.com/team",
+    url: "https://livepeer.studio/team",
   },
 };
 
 export const MintNFT = {
   metaData: {
-    title: "Mint NFT - Livepeer Video Services",
+    title: "Mint NFT - Livepeer Studio",
     description: `Mint NFTs on Ethereum-compatible networks`,
-    url: "https://livepeer.com/mint-nft",
+    url: "https://livepeer.studio/mint-nft",
   },
 };
 
 export const Contact = {
   metaData: {
-    title: "Contact - Livepeer Video Services",
+    title: "Contact - Livepeer Studio",
     description: `Get in touch. We're eager to help you take advantage of our accessible, decentralized video infrastructure and software.`,
-    url: `https://livepeer.com/contact`,
+    url: `https://livepeer.studio/contact`,
   },
 };
 
 export const Blog = {
   metaData: {
-    title: "Blog - Livepeer Video Services",
-    description: `Discover the latest in video streaming technology. Learn what we're building next and about our vision for Livepeer Video Services.`,
-    url: "https://livepeer.com/blog",
+    title: "Blog - Livepeer Studio",
+    description: `Discover the latest in video streaming technology. Learn what we're building next and about our vision for Livepeer Studio.`,
+    url: "https://livepeer.studio/blog",
   },
 };
 
 export const Dashboard = {
   metaData: {
-    title: "Dashboard - Livepeer Video Services",
+    title: "Dashboard - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardBilling = {
   metaData: {
-    title: "Billing - Livepeer Video Services",
+    title: "Billing - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardPlans = {
   metaData: {
-    title: "Plans - Livepeer Video Services",
+    title: "Plans - Livepeer Studio",
     description: `Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardAPIkeys = {
   metaData: {
-    title: "API Keys - Livepeer Video Services",
+    title: "API Keys - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardStream = {
   metaData: {
-    title: "Stream - Livepeer Video Services",
+    title: "Stream - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardStreamHealth = {
   metaData: {
-    title: "Stream Health - Livepeer Video Services",
+    title: "Stream Health - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const DashboardAssets = {
   metaData: {
-    title: "Assets - Livepeer Video Services",
+    title: "Assets - Livepeer Studio",
     description: `Video streaming infrastructure and software that is affordable, reliable, and decentralized. Built on the Livepeer network, the world’s open video infrastructure.`,
-    url: "https://livepeer.com/",
+    url: "https://livepeer.studio/",
   },
 };
 
 export const Jobs = {
   metaData: {
-    title: "Jobs - Livepeer Video Services",
+    title: "Jobs - Livepeer Studio",
     description: `Join the team building Livepeer. We're fully remote and on a mission to make open video infrastructure and software accessible to everyone.`,
-    url: "https://livepeer.com/jobs",
+    url: "https://livepeer.studio/jobs",
   },
 };

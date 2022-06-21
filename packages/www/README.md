@@ -1,7 +1,7 @@
-# @livepeer.com/www
+# @livepeer.studio/www
 
 This package is a Next.js application and contains all the pages and components
-for the Livepeer.com user interface.
+for the Livepeer Studio user interface.
 
 ## Local Development
 
@@ -13,7 +13,7 @@ yarn && yarn dev
 
 ## Accessing the Dashboard Locally
 
-In order to access the Livepeer.com Dashboard locally, you'll need to run the
+In order to access the Livepeer Studio Dashboard locally, you'll need to run the
 API server.
 
 ### Step 1

@@ -1,8 +1,8 @@
 ---
 title: List Tasks
-description: Livepeer.com API Reference | List Tasks
-metaTitle: List Tasks - Livepeer.com
-metaDescription: Livepeer.com API Reference | List Tasks
+description: Livepeer Studio API Reference | List Tasks
+metaTitle: List Tasks - Livepeer Studio
+metaDescription: Livepeer Studio API Reference | List Tasks
 ---
 
 # Tasks
@@ -17,7 +17,7 @@ List all tasks in the account, most recent first.
 #### curl
 
 ```jsx
-curl --location --request GET 'https://livepeer.com/api/task' \
+curl --location --request GET 'https://livepeer.studio/api/task' \
 --header 'Authorization: Bearer {api_key}'
 ```
 
@@ -27,7 +27,7 @@ curl --location --request GET 'https://livepeer.com/api/task' \
 const axios = require("axios");
 
 axios
-  .get("https://livepeer.com/api/task", {
+  .get("https://livepeer.studio/api/task", {
     headers: {
       Authorization: "Bearer {api_key}",
     },
@@ -64,7 +64,7 @@ the unique `Task` ID that was returned from your previous request or from an
 #### curl
 
 ```jsx
-curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
+curl --location --request GET 'https://livepeer.studio/api/task/$TASK_ID' \
 --header 'Authorization: Bearer $API_TOKEN'
 ```
 
@@ -74,7 +74,7 @@ curl --location --request GET 'https://livepeer.com/api/task/$TASK_ID' \
 const axios = require("axios");
 
 axios
-  .get("https://livepeer.com/api/task/$TASK_ID", {
+  .get("https://livepeer.studio/api/task/$TASK_ID", {
     headers: {
       Authorization: "Bearer {api_key}",
     },
@@ -88,7 +88,7 @@ axios
 ### Response example
 
 ```jsx
-curl --location --request GET 'https://livepeer.com/api/asset' \
+curl --location --request GET 'https://livepeer.studio/api/asset' \
 --header 'Authorization: Bearer $API_TOKEN'{
         "id": "$TASK_ID",
         "type": "import",

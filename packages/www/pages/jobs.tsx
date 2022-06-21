@@ -2,11 +2,11 @@ import { useRouter } from "next/router";
 import Fade from "react-reveal/Fade";
 import { Element } from "react-scroll";
 import { Box } from "@livepeer/design-system";
-import Hero from "components/Marketing/Hero";
+import Hero from "@components/Site/Hero";
 import Layout from "layouts/main";
 
 import { Jobs as Content } from "content";
-import JobsSection from "@components/Marketing/JobsSection";
+import JobsSection from "@components/Site/JobsSection";
 
 const JobsPage = ({ allJobs }) => {
   const router = useRouter();
@@ -67,4 +67,5 @@ export async function getStaticProps() {
   };
 }
 
+JobsPage.theme = "dark-theme-blue";
 export default JobsPage;

@@ -13,19 +13,19 @@ import { print } from "graphql/language/printer";
 import { useRouter } from "next/router";
 import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
-import BlogPostCard from "@components/Marketing/BlogPostCard";
+import BlogPostCard from "@components/Site/BlogPostCard";
 import client from "lib/client";
-import Guides from "@components/Marketing/Guides";
+import Guides from "@components/Site/Guides";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "@components/Marketing/BlogVideoPlayer";
-import Prefooter from "@components/Marketing/Prefooter";
+import Player from "@components/Site/BlogVideoPlayer";
+import Prefooter from "@components/Site/Prefooter";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import BlogCTA from "@components/Marketing/BlogCTA";
+import BlogCTA from "@components/Site/BlogCTA";
 
 const serializers = {
   types: {
@@ -143,11 +143,11 @@ const Post = ({
             </Flex>
             <Heading
               as="h1"
-              size="3"
+              size="4"
               css={{
                 mt: "$3",
                 mb: "$6",
-                fontWeight: 600,
+                fontWeight: 500,
               }}>
               {title}
             </Heading>
@@ -234,7 +234,7 @@ const Post = ({
                   width: "100%",
                 },
                 a: {
-                  color: "$violet9",
+                  color: "$blue9",
                 },
               }}>
               <BlockContent

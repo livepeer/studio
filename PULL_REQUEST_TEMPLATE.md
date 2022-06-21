@@ -1,7 +1,7 @@
 <!-------------------------------------------------------------------------
  | Thanks for send a pull request! 🎉
  | First, please make sure you familiar with the contribution guidelines
- | https://github.com/livepeer/livepeer.com/blob/master/CONTRIBUTING.md
+ | https://github.com/livepeer/livepeer.studio/blob/master/CONTRIBUTING.md
  -------------------------------------------------------------------------->
 
 **What does this pull request do? Explain your changes. (required)**

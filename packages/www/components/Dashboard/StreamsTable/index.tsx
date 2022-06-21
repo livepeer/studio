@@ -22,7 +22,7 @@ import {
   FilterItem,
   formatFiltersForApiRequest,
 } from "components/Dashboard/Table/filters";
-import { Stream } from "@livepeer.com/api";
+import { Stream } from "@livepeer.studio/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
@@ -316,7 +316,7 @@ const StreamsTable = ({
       </Heading>
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         Create a unique stream object, broadcast live video content and playback
-        your live stream with Livepeer.com.
+        your live stream with Livepeer Studio.
       </Text>
       <Link href="/docs/guides" passHref>
         <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>

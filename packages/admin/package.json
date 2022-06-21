@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@livepeer.com/admin",
+  "name": "@livepeer.studio/admin",
   "version": "0.5.0",
   "main": "package.json",
   "scripts": {

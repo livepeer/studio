@@ -1,4 +1,4 @@
-import { ApiToken } from "@livepeer.com/api";
+import { ApiToken } from "@livepeer.studio/api";
 import {
   styled,
   Heading,

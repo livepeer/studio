@@ -8,7 +8,7 @@ export const originURL = isDev
   : `https://${
       process.env.VERCEL_URL ??
       process.env.NEXT_PUBLIC_VERCEL_URL ??
-      "livepeer.com"
+      "livepeer.studio"
     }`;
 
 export type QueryParams = { [key: string]: string | null };

@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import Login from "@components/Marketing/Login";
+import Login from "@components/Site/Login";
 import {
   Flex,
   Box,
@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 import { useApi, useLoggedIn } from "hooks";
 import Link from "next/link";
-import Guides from "@components/Marketing/Guides";
 import { ForgotPassword as Content } from "content";
 
 const ForgotPasswordPage = () => {
@@ -33,7 +32,6 @@ const ForgotPasswordPage = () => {
 
   return (
     <Layout {...Content.metaData}>
-      <Guides backgroundColor="$neutral2" />
       {success ? (
         <Box
           css={{
@@ -91,4 +89,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
+ForgotPasswordPage.theme = "dark-theme-blue";
 export default ForgotPasswordPage;

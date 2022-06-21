@@ -313,7 +313,7 @@ export default class WebhookCannon {
         `${err}`,
         //`We disabled your webhook, please check your configuration and try again.`,
         //`If you want to try yourself the call we are making, here is a curl command for that:`,
-        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.com" ${signatureHeader} -d '${payload}' ${trigger.webhook.url}</code>`,
+        //`<code>curl -X POST -H "Content-Type: application/json" -H "user-agent: livepeer.studio" ${signatureHeader} -d '${payload}' ${trigger.webhook.url}</code>`,
 
         // TODO: Uncomment the additional information here once we get access to Sendgrid to change the tempalte
       ].join("\n\n"),
@@ -375,7 +375,7 @@ export default class WebhookCannon {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "user-agent": "livepeer.com",
+          "user-agent": "livepeer.studio",
         },
         timeout: WEBHOOK_TIMEOUT,
         body: JSON.stringify({

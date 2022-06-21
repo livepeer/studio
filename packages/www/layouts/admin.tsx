@@ -2,8 +2,8 @@
 import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import { DefaultNav } from "@components/Marketing/Navigation";
-import Footer from "@components/Marketing/Footer";
+import { DefaultNav } from "@components/Site/Navigation";
+import Footer from "@components/Site/Footer";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -56,7 +56,7 @@ const Layout = ({
   customNav,
 }: Props) => {
   useEffect(() => {
-    if (window.location.hostname === "livepeer.com") {
+    if (window.location.hostname === "livepeer.studio") {
       ReactGA.pageview(window.location.pathname + window.location.search);
       hotjar.initialize(2525106, 6);
     }
@@ -72,8 +72,8 @@ const Layout = ({
       url,
       images: [
         {
-          url: image ? image.url : "https://livepeer.com/img/OG.png",
-          alt: image ? image.alt : "Livepeer.com",
+          url: image ? image.url : "https://livepeer.studio/img/OG.png",
+          alt: image ? image.alt : "Livepeer Studio",
           width: 1200,
           height: 642,
         },
@@ -124,7 +124,7 @@ const Layout = ({
               {customNav ? (
                 customNav
               ) : (
-                <DefaultNav backgroundColor={backgroundColor} />
+                <DefaultNav navBackgroundColor={backgroundColor} />
               )}
               <Box css={{ position: "relative" }}>{children}</Box>
             </Flex>

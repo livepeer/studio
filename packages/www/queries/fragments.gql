@@ -30,6 +30,7 @@ fragment cta on Cta {
 fragment hero on Hero {
   _type
   heading
+  description
   tagline
   centered
   skinny

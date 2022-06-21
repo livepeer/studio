@@ -1,6 +1,6 @@
-# @livepeer.com/admin
+# @livepeer.studio/admin
 
-Livepeer.com Sanity CMS
+Livepeer Studio Sanity CMS
 
 ## Local Development
 

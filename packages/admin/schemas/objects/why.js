@@ -1,7 +1,7 @@
 export default {
   type: "object",
   name: "why",
-  title: "Why Livepeer.com",
+  title: "Why Livepeer Studio",
   fields: [
     {
       name: "heading",
@@ -28,7 +28,7 @@ export default {
     prepare({ title, media }) {
       return {
         title,
-        subtitle: "Why Livepeer.com",
+        subtitle: "Why Livepeer Studio",
         media,
       };
     },
