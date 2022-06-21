@@ -123,7 +123,10 @@ your interest in speaking with our team. The more information, the better."
               required
             />
             <Box css={{ textAlign: "center" }}>
-              <Button arrow css={{ mx: "auto", mt: "$4", px: "$4" }}>
+              <Button
+                small
+                arrow
+                css={{ width: "100%", mx: "auto", mt: "$2", px: "$4" }}>
                 Submit
               </Button>
               <Fade in={submitted}>

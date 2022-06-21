@@ -82,7 +82,7 @@ const Footer = () => {
                   Started
                 </Box>
               </Box>
-              <Box css={{ mt: "$9", maxWidth: 600 }}>
+              <Box css={{ mt: "$9", maxWidth: 600, pb: "$2" }}>
                 <Box css={{ mb: "$7", fontSize: "$4" }}>
                   Join the next-gen, creator-owned video ecosystem. From
                   “decentralized YouTube” to video NFT marketplaces, Livepeer
@@ -91,61 +91,73 @@ const Footer = () => {
                   middlemen.
                 </Box>
                 <Flex align="center">
-                  <Button
-                    css={{
-                      mr: "$3",
-                      backgroundColor: "transparent",
-                      color: "$loContrast",
-                      borderColor: "$loContrast",
-                      fontSize: 20,
-                      fontWeight: 500,
-                      borderRadius: "$1",
-                      px: "6px",
-                      py: 0,
-                      "@bp2": {
-                        fontSize: 34,
-                        px: "4px",
-                        py: "2px",
+                  <Link href="/contact" passHref>
+                    <Button
+                      as={A}
+                      css={{
                         mr: "$3",
-                      },
-                      "&:hover": {
-                        bc: "$loContrast",
-                        color: "white",
-                      },
-                    }}>
-                    Contact
-                  </Button>
-                  <Button
-                    small
-                    variant="blue"
-                    css={{
-                      bc: "#0A5CD8",
-                      fontSize: 20,
-                      fontWeight: 500,
-                      borderRadius: "$1",
-                      px: "6px",
-                      py: 0,
-                      "@bp2": {
-                        fontSize: 34,
-                        px: "4px",
-                        py: "2px",
-                        mr: "$3",
-                      },
-                    }}>
-                    Let's Go
-                  </Button>
+                        backgroundColor: "transparent",
+                        color: "$loContrast",
+                        borderColor: "$loContrast",
+                        fontSize: 20,
+                        fontWeight: 500,
+                        borderRadius: "$1",
+                        px: "6px",
+                        py: 0,
+                        textDecoration: "none",
+                        "@bp2": {
+                          fontSize: 34,
+                          px: "4px",
+                          py: "2px",
+                          mr: "$3",
+                        },
+                        "&:hover": {
+                          bc: "$loContrast",
+                          color: "white",
+                          textDecoration: "none",
+                        },
+                      }}>
+                      Contact
+                    </Button>
+                  </Link>
+                  <Link href="/login" passHref>
+                    <Button
+                      as={A}
+                      small
+                      variant="blue"
+                      css={{
+                        bc: "#0A5CD8",
+                        fontSize: 20,
+                        fontWeight: 500,
+                        borderRadius: "$1",
+                        px: "6px",
+                        py: 0,
+                        textDecoration: "none",
+                        "&:hover": {
+                          textDecoration: "none",
+                        },
+                        "@bp2": {
+                          fontSize: 34,
+                          px: "4px",
+                          py: "2px",
+                          mr: "$3",
+                        },
+                      }}>
+                      Let's Go
+                    </Button>
+                  </Link>
                 </Flex>
               </Box>
             </Box>
           </Box>
           <Flex
             css={{
-              mt: 1,
               bc: "#0001AE",
               position: "relative",
               height: "100%",
               flexDirection: "column",
               "@bp2": {
+                mt: 1,
                 flexDirection: "row",
               },
             }}>
