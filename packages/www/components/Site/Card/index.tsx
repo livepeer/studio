@@ -216,9 +216,9 @@ export const Card = ({
                     <path
                       d="M3.50195 47.4194L47.4214 3.5M47.4214 3.5V47.4194M47.4214 3.5H3.50195"
                       stroke="#000116"
-                      stroke-width="6"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
                 </Box>

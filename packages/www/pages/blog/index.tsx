@@ -1,13 +1,4 @@
-import { FC } from "react";
-import {
-  Box,
-  Container,
-  Flex,
-  Grid,
-  Heading,
-  Link as A,
-  Text,
-} from "@livepeer/design-system";
+import { Box, Container, Flex, Grid, Link as A } from "@livepeer/design-system";
 import { print } from "graphql/language/printer";
 import { request } from "graphql-request";
 import { useRouter } from "next/router";
@@ -19,31 +10,7 @@ import BlogPostCard, {
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Prefooter from "@components/Site/Prefooter";
-import Guides from "@components/Site/Guides";
 import { Blog as BlogContent } from "content";
-
-type Category = {
-  title: string;
-  metaTitle: string;
-  metaDescription: string;
-  metaUrl: string;
-  slug: {
-    current: string;
-  };
-};
-
-type Post = {
-  _id: string;
-  title: string;
-  _createdAt: string;
-  featured: boolean;
-};
-
-type Props = {
-  categories: Category[];
-  posts: Post[];
-};
 
 const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
@@ -210,7 +177,7 @@ const BlogIndex = ({ categories, posts }) => {
   );
 };
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps() {
   const { allCategory: categories } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allCategories)
@@ -219,7 +186,7 @@ export async function getStaticProps({ params }) {
   const { allPost: posts } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
-    { where: {} }
+    { where: { hide: { neq: true } } }
   );
 
   return {
