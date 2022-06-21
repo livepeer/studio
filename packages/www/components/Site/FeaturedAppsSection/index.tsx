@@ -13,7 +13,7 @@ const getItems = () => {
     {
       title: "Huddle01",
       description:
-        "The world's first web3-native video meeting solution integrated with Livepeer Studio to deliver low-latency video meetings.",
+        "The world's first web3 native video meeting solution integrated with Livepeer Studio to deliver low-latency video meetings.",
       href: "https://livepeer.studio/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
     },
     {
@@ -55,12 +55,13 @@ function FeaturedAppCard({ onClick, title, description, href }) {
           cursor: "grabbing",
         },
         ".featuredAppCard__arrow": {
-          bc: "#0A5CD8",
+          bc: "$loContrast",
           transition: ".15s",
           color: "$hiContrast",
           transform: "translateX(0px)",
         },
         "&:hover": {
+          opacity: 1,
           transition: ".15s",
           ".featuredAppCard__arrow": {
             bc: "#0A5CD8",
@@ -81,7 +82,11 @@ function FeaturedAppCard({ onClick, title, description, href }) {
               fontSize: 45,
             },
           }}>
-          <Box css={{ mr: "$2", color: "inherit" }}>{title}</Box>
+          <Box
+            className="featuredAppCard__title"
+            css={{ mr: "$2", color: "inherit" }}>
+            {title}
+          </Box>
           <Box
             className="featuredAppCard__arrow"
             css={{
