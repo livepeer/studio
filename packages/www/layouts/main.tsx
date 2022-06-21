@@ -1,6 +1,6 @@
 import { Flex, Box } from "@livepeer/design-system";
-import { DefaultNav } from "@components/Marketing/Navigation";
-import Footer from "@components/Marketing/Footer";
+import { DefaultNav } from "@components/Site/Navigation";
+import Footer from "@components/Site/Footer";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";

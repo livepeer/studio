@@ -1,6 +1,6 @@
 import { Container, Grid, Box, globalCss } from "@livepeer/design-system";
-import DocsNav from "@components/Marketing/Navigation/docs";
-import TableOfContents from "@components/Marketing/Docs/TableOfContents";
+import DocsNav from "@components/Site/Navigation/docs";
+import TableOfContents from "@components/Site/Docs/TableOfContents";
 import { getMdxNode, getMdxPaths, getAllMdxNodes } from "next-mdx/server";
 import { useHydrate } from "next-mdx/client";
 import { Fragment, useMemo, useState } from "react";
@@ -10,7 +10,7 @@ import { NextSeo, NextSeoProps } from "next-seo";
 import { GetStaticPathsContext } from "next";
 import title from "title";
 
-const MDXComponents = require("@components/Marketing/MDXComponents");
+const MDXComponents = require("@components/Site/MDXComponents");
 const { components } = MDXComponents;
 
 const categories = [

@@ -1,10 +1,10 @@
 import Layout from "layouts/main";
 import { Home as Content } from "content";
-import HomeHero from "@components/Marketing/HomeHero";
-import ToolkitSection from "@components/Marketing/ToolkitSection";
-import GuideSection from "@components/Marketing/GuideSection";
-import FeaturedAppsSection from "@components/Marketing/FeaturedAppsSection";
-import PrinciplesSection from "@components/Marketing/PrinciplesSection";
+import HomeHero from "@components/Site/HomeHero";
+import ToolkitSection from "@components/Site/ToolkitSection";
+import GuideSection from "@components/Site/GuideSection";
+import FeaturedAppsSection from "@components/Site/FeaturedAppsSection";
+import PrinciplesSection from "@components/Site/PrinciplesSection";
 
 const HomePage = () => {
   return (

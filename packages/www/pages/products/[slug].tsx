@@ -1,7 +1,7 @@
 import Layout from "layouts/main";
-import Hero from "@components/Marketing/Hero";
-import Why from "@components/Marketing/Why";
-import Prefooter from "@components/Marketing/Prefooter";
+import Hero from "@components/Site/Hero";
+import Why from "@components/Site/Why";
+import Prefooter from "@components/Site/Prefooter";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allProducts from "../../queries/allProducts.gql";

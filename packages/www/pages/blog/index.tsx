@@ -15,12 +15,12 @@ import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
 import BlogPostCard, {
   FeaturedBlogPostCard,
-} from "@components/Marketing/BlogPostCard";
+} from "@components/Site/BlogPostCard";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Prefooter from "@components/Marketing/Prefooter";
-import Guides from "@components/Marketing/Guides";
+import Prefooter from "@components/Site/Prefooter";
+import Guides from "@components/Site/Guides";
 import { Blog as BlogContent } from "content";
 
 type Category = {

@@ -12,7 +12,7 @@ import {
   Link as A,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import Button from "@components/Marketing/Button";
+import Button from "@components/Site/Button";
 import { useRouter } from "next/router";
 import { Contact as Content } from "content";
 

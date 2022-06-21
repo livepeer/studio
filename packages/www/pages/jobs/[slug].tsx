@@ -1,8 +1,8 @@
 import { Box, Container, Heading, Grid } from "@livepeer/design-system";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
-import Prefooter from "@components/Marketing/Prefooter";
-import JobApplicationForm from "@components/Marketing/JobApplicationForm";
+import Prefooter from "@components/Site/Prefooter";
+import JobApplicationForm from "@components/Site/JobApplicationForm";
 
 const Page = ({
   slug,
