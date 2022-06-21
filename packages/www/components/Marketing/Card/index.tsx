@@ -1,6 +1,11 @@
-import { Box, Flex, Text, Heading } from "@livepeer/design-system";
+import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
 import CutOut from "@components/Marketing/CutOut";
 import Badge from "@components/Marketing/Badge";
+
+type Cta = {
+  href?: string;
+  isExternal?: boolean;
+};
 
 interface Props {
   bc?: string;
@@ -11,6 +16,8 @@ interface Props {
   label?: string;
   title?: string;
   description: string;
+  arrow: boolean;
+  cta?: Cta;
 }
 
 export const Card = ({
@@ -22,8 +29,22 @@ export const Card = ({
   label = "",
   title = "",
   description = "",
+  arrow = false,
+  cta = {
+    href: null,
+    isExternal: false,
+  },
 }: Props) => (
-  <Box>
+  <Box
+    as={cta ? A : Box}
+    href={cta ? cta.href : null}
+    target={cta.isExternal ? "_blank" : null}
+    css={{
+      textDecoration: "none",
+      "&:hover": {
+        textDecoration: "none",
+      },
+    }}>
     <Box css={{ position: "relative", height: 32 }}>
       <CutOut backgroundColor={bc} />
     </Box>
@@ -67,7 +88,7 @@ export const Card = ({
               color,
               fontSize: "$3",
               "@bp2": {
-                fontSize: "$4",
+                fontSize: "$5",
               },
             }}>
             {description}
@@ -176,6 +197,33 @@ export const Card = ({
                   }}
                 />
               )}
+              {arrow && (
+                <Box
+                  css={{
+                    bc,
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    pl: "7px",
+                    pt: "7px",
+                  }}>
+                  <svg
+                    width="51"
+                    height="51"
+                    viewBox="0 0 51 51"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M3.50195 47.4194L47.4214 3.5M47.4214 3.5V47.4194M47.4214 3.5H3.50195"
+                      stroke="#000116"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </Box>
+              )}
+
               <Box
                 css={{
                   borderRadius: "8px",
@@ -185,7 +233,7 @@ export const Card = ({
                   mt: -8,
                   "@bp2": {
                     height: `calc(100% - ${
-                      lineCount === 5 ? "110px" : "90px"
+                      lineCount === 5 ? "112px" : "92px"
                     })`,
                   },
                 }}>
@@ -196,7 +244,7 @@ export const Card = ({
                     color,
                     fontSize: "$3",
                     "@bp2": {
-                      fontSize: "$4",
+                      fontSize: "$5",
                     },
                   }}>
                   {description}

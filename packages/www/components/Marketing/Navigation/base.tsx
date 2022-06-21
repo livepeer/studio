@@ -16,7 +16,7 @@ export const StyledServerIcon = ({ ...props }) => (
 );
 
 type Props = {
-  links: React.ComponentProps<typeof Link>[];
+  links;
   breadcrumb?: BreadcrumbItem[];
   withShadow?: boolean;
   navBackgroundColor?: string;
@@ -107,6 +107,7 @@ const NavigationBase = ({
                   return (
                     <Link href={link.href} key={`nav-link-${i}`} passHref>
                       <A
+                        target={link.isExternal ? "_blank" : null}
                         css={{
                           display: "block",
                           fontSize: "$4",

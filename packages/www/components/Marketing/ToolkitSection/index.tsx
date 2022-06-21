@@ -62,6 +62,10 @@ const ToolkitSection = () => {
               height={690}
               bc="white"
               color="$loContrast"
+              // cta={{
+              //   href: "https://livepeer.studio/docs/guides/start-live-streaming/tutorial",
+              //   isExternal: true,
+              // }}
             />
           </Box>
           <Flex
@@ -76,18 +80,26 @@ const ToolkitSection = () => {
             <Card
               label="F.02"
               title="On Demand"
-              description="Process live video on the Livepeer network at a fraction of the cost of traditional cloud providers."
+              description="Store video on web3 storage networks for permanent access and global delivery."
               height={320}
               bc="#0A5CD8"
               color="white"
+              // cta={{
+              //   href: "https://livepeer.studio/docs/guides/upload-a-video",
+              //   isExternal: true,
+              // }}
             />
             <Card
               label="F.03"
               title="Mint"
-              description="Mint NFTs on popular blockchains and optimize playback in NFT marketplaces, web3 apps, and wallets."
+              description="Mint video NFTs on popular blockchains using Livepeer Studio for optimized playback in NFT marketplaces, web3 apps, and wallets."
               height={320}
               bc="#BFE7F8"
               color="$loContrast"
+              // cta={{
+              //   href: "https://livepeer.studio/docs/guides/video-nfts/mint-a-video-nft",
+              //   isExternal: true,
+              // }}
             />
           </Flex>
         </Flex>

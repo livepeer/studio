@@ -13,37 +13,25 @@ const getItems = () => {
   return [
     {
       title: "Livestream Quick Start",
-      description: "Start live streaming with Livepeer Studio",
-      href: "",
+      description:
+        "An easy tutorial on how to get started livestreaming with or without writing code.",
+      href: "https://livepeer.studio/docs/guides/start-live-streaming/tutorial",
     },
     {
-      title: "Record a Livestream",
+      title: "Upload a Video",
       description:
-        "A web3 music platform aims to disrupt the industry by offering live music concerts and events to award-winning artists and their fans.",
-      href: "",
+        "This tutorial covers how to upload a video and play it back in your application using the Video-on-Demand (VOD) API.",
+      href: "https://livepeer.studio/docs/guides/upload-a-video",
     },
     {
-      title: "Guide 3",
-      description:
-        "A live shopping platform aiming to become the next top sales channel for forward-looking ecommerce brands.",
-      href: "",
-    },
-    {
-      title: "Guide 4",
-      description:
-        "A web3 music platform aims to disrupt the industry by offering live music concerts and events to award-winning artists and their fans.",
-      href: "",
-    },
-    {
-      title: "Guide 5",
-      description:
-        "A live shopping platform aiming to become the next top sales channel for forward-looking ecommerce brands.",
-      href: "",
+      title: "Mint a Video NFT",
+      description: "Learn how to mint a video-optimized NFT on a blockchain.",
+      href: "https://livepeer.studio/docs/guides/video-nfts/mint-a-video-nft",
     },
   ];
 };
 
-function GuideCard({ onClick, title, description, href }) {
+function GuideCard({ onClick, title, description, href, number }) {
   const visibility = useContext(VisibilityContext);
 
   return (
@@ -59,10 +47,11 @@ function GuideCard({ onClick, title, description, href }) {
       }}>
       <Card
         lines="tomato"
-        label="G.01"
+        label={`G.${number}`}
         title={title}
         description={description}
         height={570}
+        arrow
       />
     </Box>
   );
@@ -101,7 +90,7 @@ const GuideSection = () => {
     if (dragging) {
       return false;
     }
-    window.open("https://www.google.com", "_ blank");
+    window.open(href, "_ blank");
   };
   return (
     <Box
@@ -120,8 +109,20 @@ const GuideSection = () => {
           "@bp2": {
             px: "$2",
           },
+          ".react-horizontal-scrolling-menu--scroll-container": {
+            gap: 10,
+          },
+          ".react-horizontal-scrolling-menu--item": {
+            minWidth: 300,
+            "@bp2": {
+              width: "33%",
+            },
+          },
         }}>
-        <Box css={{ maxWidth: 1000 }}>
+        <Box
+          css={{
+            maxWidth: 1000,
+          }}>
           <BulletedTitle css={{ mb: "$4", color: "$hiContrast" }}>
             Guides
           </BulletedTitle>
@@ -169,21 +170,11 @@ const GuideSection = () => {
           onMouseUp={() => dragStop}
           onMouseMove={handleDrag}>
           {items.map(({ title, description, href }, i) => (
-            <Box
-              key={title + i}
-              css={{
-                minWidth: 280,
-                mr: "$4",
-                "@bp1": {
-                  minWidth: 340,
-                },
-                "@bp2": {
-                  minWidth: 453,
-                },
-              }}>
+            <Box key={title + i}>
               <GuideCard
                 title={title}
                 href={href}
+                number={"0" + (i + 1)}
                 description={description}
                 key={title}
                 onClick={handleItemClick(href)}

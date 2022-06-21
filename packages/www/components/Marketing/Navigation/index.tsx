@@ -5,9 +5,7 @@ import DocsMobileSubMenu from "./mobile/docs-submenu";
 import { Tree } from "@components/Marketing/TableOfContents";
 import { isMobile } from "react-device-detect";
 
-type NavProps = React.ComponentProps<typeof NavigationBase>;
-
-const defaultNavProps: NavProps = {
+const defaultNavProps = {
   links: [
     {
       href: "/#featured",
@@ -21,10 +19,12 @@ const defaultNavProps: NavProps = {
     {
       href: "/docs/guides",
       children: "Docs",
+      isExternal: true,
     },
     {
       href: "https://discord.gg/7D6hGG6dCZ",
       children: "Join Discord",
+      isExternal: true,
     },
   ],
 };
@@ -62,7 +62,7 @@ const DocsNav = ({ tree, ignoreList }: DocsNavProps) => {
     return () => document.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const docsNavProps: NavProps = useMemo(
+  const docsNavProps = useMemo(
     () => ({
       links: [
         {
