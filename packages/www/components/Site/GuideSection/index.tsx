@@ -12,7 +12,7 @@ type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;
 const getItems = () => {
   return [
     {
-      title: "Livestream Quick Start",
+      title: "Start Livestreaming",
       description:
         "An easy tutorial on how to get started livestreaming with or without writing code.",
       href: "https://livepeer.studio/docs/guides/start-live-streaming/tutorial",
@@ -20,7 +20,7 @@ const getItems = () => {
     {
       title: "Upload a Video",
       description:
-        "This tutorial covers how to upload a video and play it back in your application using the Video-on-Demand (VOD) API.",
+        "This tutorial covers how to upload a video and play it back in your application.",
       href: "https://livepeer.studio/docs/guides/upload-a-video",
     },
     {

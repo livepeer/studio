@@ -44,23 +44,31 @@ function FeaturedAppCard({ onClick, title, description, href }) {
         borderColor: "rgba(0, 1, 22, 15%)",
         px: "$4",
         pb: "$6",
-        color: "$neutral11",
+        color: "$loContrast",
         cursor: "pointer",
         transition: ".15s",
         height: 300,
+        opacity: 0.5,
         "@bp2": {
           minWidth: 380,
         },
         "&:active": {
           cursor: "grabbing",
         },
+        ".featuredAppCard__arrow": {
+          bc: "#0A5CD8",
+          transition: ".15s",
+          color: "$hiContrast",
+          transform: "translateX(0px)",
+        },
         "&:hover": {
           transition: ".15s",
-          color: "$loContrast",
+          opacity: 1,
           ".featuredAppCard__arrow": {
             bc: "#0A5CD8",
             transition: ".15s",
             color: "$hiContrast",
+            transform: "translateX(3px)",
           },
         },
       }}
@@ -163,8 +171,8 @@ const FeaturedAppsSection = () => {
           </Heading>
           <Text size="5" css={{ mb: 120, color: "$loContrast" }}>
             Disrupting the way creators own and monetize their content,
-            developers are building new types of experiences with web3 video
-            apps across decentralized social, music, live entertainment,
+            developers are building new types of video experiences with web3
+            video apps across decentralized social, music, live entertainment,
             shopping, and gaming.
           </Text>
         </Box>
