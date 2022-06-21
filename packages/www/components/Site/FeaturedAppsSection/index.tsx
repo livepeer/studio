@@ -14,19 +14,19 @@ const getItems = () => {
       title: "Huddle01",
       description:
         "The world's first web3-native video meeting solution integrated with Livepeer Studio to deliver low-latency video meetings.",
-      href: "http://localhost:3000/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
+      href: "https://livepeer.studio/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
     },
     {
       title: "InFlow Music",
       description:
         "A web3 music platform aims to disrupt the industry by offering live music concerts and events to award-winning artists and their fans.",
-      href: "http://localhost:3000/blog/how-inflow-created-first-music-platform-web3-economy",
+      href: "https://livepeer.studio/blog/how-inflow-created-first-music-platform-web3-economy",
     },
     {
       title: "Korkuma",
       description:
         "A live shopping platform aiming to become the next top sales channel for forward-looking ecommerce brands.",
-      href: "http://localhost:3000/blog/livepeer-helps-korkuma-bring-immersive-commerce-to-the-masses",
+      href: "https://livepeer.studio/blog/livepeer-helps-korkuma-bring-immersive-commerce-to-the-masses",
     },
   ];
 };
