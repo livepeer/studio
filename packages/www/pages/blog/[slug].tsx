@@ -15,7 +15,6 @@ import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
 import BlogPostCard from "@components/Site/BlogPostCard";
 import client from "lib/client";
-import Guides from "@components/Site/Guides";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
@@ -85,12 +84,11 @@ const Post = ({
       }}
       url={metaUrl}
       preview={preview}>
-      <Guides backgroundColor="$neutral2" />
       <Box css={{ position: "relative" }}>
         <Container
           size="3"
           css={{
-            px: "$6",
+            px: "$3",
             py: "$7",
             width: "100%",
             "@bp3": {
@@ -162,11 +160,16 @@ const Post = ({
                     width: 32,
                     height: 32,
                     overflow: "hidden",
+                    img: {
+                      objectPosition: "left",
+                    },
                   }}>
                   <Image
                     alt={author.image?.alt}
                     layout="fill"
                     objectFit="cover"
+                    width={mainImage.asset.metadata.dimensions.width}
+                    height={mainImage.asset.metadata.dimensions.width}
                     src={builder.image(author.image).url()}
                   />
                 </Box>
@@ -196,17 +199,19 @@ const Post = ({
             <Box
               css={{
                 position: "relative",
-                maxHeight: 300,
-                height: 500,
                 width: "100%",
-                borderRadius: 16,
+                borderRadius: 12,
                 overflow: "hidden",
-                mb: "$7",
+                mb: "$2",
+                "@bp2": {
+                  mb: "$7",
+                },
               }}>
               <Image
                 alt={mainImage?.alt}
-                layout="fill"
-                objectFit="cover"
+                layout="responsive"
+                width={mainImage.asset.metadata.dimensions.width}
+                height={mainImage.asset.metadata.dimensions.height}
                 src={builder.image(mainImage).url()}
               />
             </Box>
@@ -242,7 +247,7 @@ const Post = ({
                 {...client.config()}
               />
             </Box>
-            {!!furtherReading && (
+            {/* {!!furtherReading && (
               <>
                 <Box
                   css={{
@@ -269,7 +274,7 @@ const Post = ({
                   ))}
                 </Grid>
               </>
-            )}
+            )} */}
           </Box>
         </Container>
       </Box>
@@ -277,6 +282,7 @@ const Post = ({
   );
 };
 
+Post.theme = "dark-theme-blue";
 export default Post;
 
 export async function getStaticPaths() {

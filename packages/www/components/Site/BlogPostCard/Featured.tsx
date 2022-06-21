@@ -38,14 +38,19 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
           <Box
             css={{
               position: "relative",
-              width: "33%",
+              width: "50%",
               height: 400,
-              bc: "$panel",
+              bc: "$hiContrast",
+              img: {
+                objectPosition: "left",
+              },
             }}>
             <Image
               alt={post.mainImage?.alt}
               layout="fill"
               objectFit="cover"
+              width={post.mainImage.asset.metadata.dimensions.width}
+              height={post.mainImage.asset.metadata.dimensions.height}
               src={builder.image(post.mainImage).url()}
             />
           </Box>
@@ -57,7 +62,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
-            width: "66%",
+            width: "50%",
           }}>
           <Box>
             <Text
