@@ -118,25 +118,27 @@ const Post = ({
                   day: "numeric",
                 })}
               </Box>
-              <Link
-                href={
-                  category.title === "All" ? "/blog" : `/blog/category/[slug]`
-                }
-                as={
-                  category.title === "All"
-                    ? "/blog"
-                    : `/blog/category/${category.slug.current}`
-                }
-                passHref>
-                <A
-                  css={{
-                    color: "$hiContrast",
-                    textTransform: "uppercase",
-                    fontWeight: 600,
-                  }}>
-                  {category.title}
-                </A>
-              </Link>
+              {category?.title && (
+                <Link
+                  href={
+                    category.title === "All" ? "/blog" : `/blog/category/[slug]`
+                  }
+                  as={
+                    category.title === "All"
+                      ? "/blog"
+                      : `/blog/category/${category.slug.current}`
+                  }
+                  passHref>
+                  <A
+                    css={{
+                      color: "$hiContrast",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                    }}>
+                    {category.title}
+                  </A>
+                </Link>
+              )}
             </Flex>
             <Heading
               as="h1"
