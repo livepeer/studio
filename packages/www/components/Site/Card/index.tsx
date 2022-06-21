@@ -64,7 +64,7 @@ export const Card = ({
       }}>
       {!lines ? (
         <Box css={{ mt: -16 }}>
-          <Badge css={{ mb: "$1" }} color={color}>
+          <Badge css={{ mb: "$2" }} color={color}>
             {label}
           </Badge>
           <Box
@@ -73,9 +73,12 @@ export const Card = ({
               fontSize: 51,
               color,
               lineHeight: 1,
-              mb: "$2",
+              mb: "$3",
               letterSpacing: "-2px",
               "@bp2": {
+                fontSize: 56,
+              },
+              "@bp3": {
                 fontSize: 76,
               },
             }}>
@@ -98,7 +101,7 @@ export const Card = ({
         <Box css={{ mt: -2, height: "100%" }}>
           <Flex direction="column" css={{ height: "100%" }}>
             <Box css={{ ml: "$2", mt: -16 }}>
-              <Badge css={{ mb: "$1" }} color={color}>
+              <Badge css={{ mb: "$2" }} color={color}>
                 {label}
               </Badge>
               <Box
@@ -107,9 +110,12 @@ export const Card = ({
                   fontSize: 51,
                   color,
                   lineHeight: 1,
-                  mb: "$2",
+                  mb: "$3",
                   letterSpacing: "-2px",
                   "@bp2": {
+                    fontSize: 56,
+                  },
+                  "@bp3": {
                     fontSize: 76,
                   },
                 }}>

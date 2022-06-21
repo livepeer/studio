@@ -42,7 +42,7 @@ const Menu = ({
         borderRadius: "$3",
         overflow: "hidden",
         width: "calc(100% - $space$3 * 2)",
-        zIndex: 1,
+        zIndex: 2,
         visibility: mobileMenuIsOpen ? "visible" : "hidden",
         background: mobileMenuIsOpen
           ? "linear-gradient(90deg,$colors$neutral4,$colors$neutral4 50%,transparent 0,transparent)"

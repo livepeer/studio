@@ -27,7 +27,7 @@ const Footer = () => {
             flexDirection: "column",
             "@bp2": {
               flexDirection: "row",
-              width: "64%",
+              width: "62%",
             },
           }}>
           <Box css={{ width: "100%" }}>
@@ -73,7 +73,7 @@ const Footer = () => {
                     fontSize: 140,
                   },
                   "@bp3": {
-                    fontSize: 210,
+                    fontSize: 190,
                   },
                 }}>
                 <Box>
@@ -156,6 +156,7 @@ const Footer = () => {
               position: "relative",
               height: "100%",
               flexDirection: "column",
+              mt: 0,
               "@bp2": {
                 mt: 1,
                 flexDirection: "row",
@@ -249,16 +250,17 @@ const Footer = () => {
           css={{
             px: "$4",
             py: "$5",
-            mt: 1,
+            mt: 0,
             width: "100%",
             bc: "#0001AE",
             borderBottomLeftRadius: 18,
             borderBottomRightRadius: 18,
             "@bp2": {
+              mt: 1,
               borderTopRightRadius: 18,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 18,
-              width: "36%",
+              width: "38%",
             },
           }}>
           <Box>
@@ -323,10 +325,10 @@ const Footer = () => {
             </Heading>
             <Flex gap="2" align="center" css={{ mb: "$6" }}>
               <A
-                href="https://instagram.com/livepeerstudio"
+                href="https://twitter.com/livepeerstudio"
                 target="_blank"
                 css={{
-                  fontSize: 54,
+                  fontSize: 40,
                   fontWeight: 500,
                   border: "2px solid white",
                   borderRadius: "4px",
@@ -338,52 +340,20 @@ const Footer = () => {
                   "&:hover": {
                     textDecoration: "none",
                   },
-                }}>
-                IG
-              </A>
-              <A
-                href="https://twitter.com/livepeerstudio"
-                target="_blank"
-                css={{
-                  fontSize: 54,
-                  fontWeight: 500,
-                  border: "2px solid white",
-                  borderRadius: "4px",
-                  lineHeight: 0.9,
-                  px: "3px",
-                  color: "white",
-                  display: "block",
-                  textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "none",
+                  "@bp2": {
+                    fontSize: 40,
+                  },
+                  "@bp3": {
+                    fontSize: 54,
                   },
                 }}>
                 TW
               </A>
               <A
-                href="https://tiktok.com/@livepeerstudio"
-                target="_blank"
-                css={{
-                  fontSize: 54,
-                  fontWeight: 500,
-                  border: "2px solid white",
-                  borderRadius: "4px",
-                  lineHeight: 0.9,
-                  px: "3px",
-                  color: "white",
-                  display: "block",
-                  textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "none",
-                  },
-                }}>
-                TIK
-              </A>
-              <A
                 href="https://github.com/livepeer/livepeer-studio"
                 target="_blank"
                 css={{
-                  fontSize: 54,
+                  fontSize: 40,
                   fontWeight: 500,
                   border: "2px solid white",
                   borderRadius: "4px",
@@ -395,8 +365,64 @@ const Footer = () => {
                   "&:hover": {
                     textDecoration: "none",
                   },
+                  "@bp2": {
+                    fontSize: 40,
+                  },
+                  "@bp3": {
+                    fontSize: 54,
+                  },
                 }}>
                 GH
+              </A>
+              <A
+                href="https://www.youtube.com/channel/UCRbqO1sU_wXMEIJoY9mNDyw"
+                target="_blank"
+                css={{
+                  fontSize: 40,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
+                  "@bp2": {
+                    fontSize: 40,
+                  },
+                  "@bp3": {
+                    fontSize: 54,
+                  },
+                }}>
+                YT
+              </A>
+              <A
+                href="https://tiktok.com/@livepeerstudio"
+                target="_blank"
+                css={{
+                  fontSize: 40,
+                  fontWeight: 500,
+                  border: "2px solid white",
+                  borderRadius: "4px",
+                  lineHeight: 0.9,
+                  px: "3px",
+                  color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
+                  "@bp2": {
+                    fontSize: 40,
+                  },
+                  "@bp3": {
+                    fontSize: 54,
+                  },
+                }}>
+                TIK
               </A>
             </Flex>
           </Box>
