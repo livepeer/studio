@@ -31,7 +31,7 @@ const ToolkitSection = () => {
           <Heading size="4" css={{ mb: "$5", letterSpacing: "-1px" }}>
             Build next-gen, creator-owned video experiences
           </Heading>
-          <Text size="5" css={{ fontWeight: 300, mb: 60 }}>
+          <Text size="5" css={{ fontWeight: 400, mb: 60 }}>
             Livepeer Studio provides all the tools needed to build web3 video
             apps with livestreaming, video on demand, and video NFT minting
             features - web3-native, open infrastructure, affordable.

@@ -55,7 +55,7 @@ export default async function makeApp(params: CliArgs) {
     httpPrefix = "/api",
     postgresUrl,
     postgresReplicaUrl,
-    frontendDomain = "livepeer.com",
+    frontendDomain = "livepeer.studio",
     supportAddr,
     sendgridTemplateId,
     sendgridApiKey,
@@ -149,7 +149,7 @@ export default async function makeApp(params: CliArgs) {
     req.orchestratorsGetters = [];
     req.store = store;
     req.config = params;
-    req.frontendDomain = frontendDomain; // defaults to livepeer.com
+    req.frontendDomain = frontendDomain; // defaults to livepeer.studio
     req.queue = queue;
     req.taskScheduler = taskScheduler;
     req.stripe = stripe;

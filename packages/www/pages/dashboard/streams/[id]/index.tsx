@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "react-query";
-import { Stream } from "@livepeer.com/api";
+import { Stream } from "@livepeer.studio/api";
 import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "@components/Dashboard/StreamDetails/StreamHealthTab";

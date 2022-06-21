@@ -26,11 +26,11 @@ const TeamPage = ({ content }) => {
           }}>
           <Box css={{ maxWidth: 768, mx: "auto", textAlign: "center" }}>
             <Heading size="4" css={{ fontWeight: 600, mb: "$4" }}>
-              We’re building the future of video infrastructure services.
+              We’re building the future of video.
             </Heading>
             <Text variant="gray" size="5">
               We're comprised of team members dedicated to building affordable,
-              scalable, reliable, and easy-to-use video infrastructure services.
+              scalable, reliable, and easy-to-use video developer tools.
             </Text>
           </Box>
           <Box css={{ pt: "$9" }}>
@@ -65,4 +65,5 @@ export async function getStaticProps() {
   };
 }
 
+TeamPage.theme = "dark-theme-blue";
 export default TeamPage;

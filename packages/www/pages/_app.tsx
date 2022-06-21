@@ -73,8 +73,8 @@ export default class MyApp extends App {
           defaultTheme={DEFAULT_THEME}
           value={{
             ...themeMap,
-            dark: "dark-theme-indigo",
-            light: "light-theme-indigo",
+            dark: "dark-theme-blue",
+            light: "light-theme-blue",
           }}>
           <SnackbarProvider>
             <QueryClientProvider client={queryClient}>

@@ -41,4 +41,5 @@ export async function getStaticProps({ params }) {
   };
 }
 
+BlogIndex.theme = "dark-theme-blue";
 export default BlogIndex;

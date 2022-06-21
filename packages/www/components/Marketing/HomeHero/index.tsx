@@ -1,5 +1,6 @@
 import { Container, Box, Flex, Link as A } from "@livepeer/design-system";
 import Button from "@components/Marketing/Button";
+import Link from "next/link";
 
 const HomeHero = () => {
   return (
@@ -124,24 +125,29 @@ const HomeHero = () => {
                 }}>
                 Join Discord
               </Button>
-              <Button
-                small
-                variant="blue"
-                css={{
-                  bc: "#0A5CD8",
-                  fontSize: 20,
-                  fontWeight: 500,
-                  borderRadius: "$1",
-                  px: "6px",
-                  py: 0,
-                  "@bp2": {
-                    fontSize: 34,
-                    px: "4px",
-                    py: "2px",
-                  },
-                }}>
-                Let's Go
-              </Button>
+              <Link href="/login" passHref>
+                <Button
+                  as={A}
+                  css={{
+                    bc: "#0A5CD8",
+                    fontSize: 20,
+                    fontWeight: 500,
+                    borderRadius: "$1",
+                    px: "6px",
+                    py: 0,
+                    textDecoration: "none",
+                    "&hover": {
+                      textDecoration: "none",
+                    },
+                    "@bp2": {
+                      fontSize: 34,
+                      px: "4px",
+                      py: "2px",
+                    },
+                  }}>
+                  Let's Go
+                </Button>
+              </Link>
             </Flex>
           </Flex>
         </Flex>

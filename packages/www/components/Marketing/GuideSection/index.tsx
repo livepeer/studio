@@ -168,8 +168,9 @@ const GuideSection = () => {
           onMouseDown={() => dragStart}
           onMouseUp={() => dragStop}
           onMouseMove={handleDrag}>
-          {items.map(({ title, description, href }) => (
+          {items.map(({ title, description, href }, i) => (
             <Box
+              key={title + i}
               css={{
                 minWidth: 280,
                 mr: "$4",

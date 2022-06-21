@@ -27,7 +27,7 @@ import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
 import { useRouter } from "next/router";
-import { Webhook } from "@livepeer.com/api";
+import { Webhook } from "@livepeer.studio/api";
 
 type WebhooksTableData = {
   name: TextCellProps;

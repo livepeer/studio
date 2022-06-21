@@ -510,16 +510,16 @@ describe("auth middleware", () => {
     it("should allow CORS from frontend domain", async () => {
       client.jwtAuth = nonAdminToken;
       for (const method of testMethods) {
-        await expectAllowed(method, "/stream", "https://livepeer.com").toBe(
+        await expectAllowed(method, "/stream", "https://livepeer.studio").toBe(
           true
         );
-        await expectAllowed(method, "/asset", "https://livepeer.com").toBe(
+        await expectAllowed(method, "/asset", "https://livepeer.studio").toBe(
           true
         );
         await expectAllowed(
           method,
           "/api-token/1234",
-          "https://livepeer.com"
+          "https://livepeer.studio"
         ).toBe(true);
       }
     });

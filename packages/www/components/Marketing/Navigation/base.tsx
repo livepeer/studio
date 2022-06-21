@@ -101,7 +101,7 @@ const NavigationBase = ({
                   justifyContent: "flex-end",
                   minWidth: sidesWidth,
                   lineHeight: 1,
-                  mr: 68,
+                  mr: 42,
                 }}>
                 {links.map((link, i) => {
                   return (
@@ -140,7 +140,6 @@ const NavigationBase = ({
                           position: "relative",
                           "@bp2": {
                             display: "block",
-                            mr: 26,
                           },
                           "&:hover": {
                             textDecoration: "none",
@@ -148,7 +147,7 @@ const NavigationBase = ({
                           "&:after": {
                             content: '""',
                             position: "absolute",
-                            left: -44,
+                            left: -14,
                             borderTopLeftRadius: 10,
                             borderTopRightRadius: 12,
                             borderBottomLeftRadius: 4,
@@ -167,7 +166,7 @@ const NavigationBase = ({
                           "&:before": {
                             content: '""',
                             position: "absolute",
-                            left: 0,
+                            left: 22,
                             borderTopLeftRadius: 10,
                             borderTopRightRadius: 12,
                             borderBottomLeftRadius: 4,
@@ -191,6 +190,8 @@ const NavigationBase = ({
                                 : "$hiContrast",
                             position: "relative",
                             zIndex: 2,
+                            width: 122,
+                            textAlign: "center",
                           }}>
                           Let's go
                         </Box>
@@ -199,24 +200,13 @@ const NavigationBase = ({
                   </>
                 )}
                 {loggedIn && (
-                  <>
-                    {user && user.admin && !isDashboard && (
-                      <Link href="/app/admin" passHref>
-                        <A
-                          css={{
-                            fontSize: "$3",
-                            fontWeight: 500,
-                            textDecoration: "none",
-                            mr: "$4",
-                            color:
-                              navBackgroundColor === "$loContrast"
-                                ? "$hiContrast"
-                                : "$loContrast",
-                          }}>
-                          Admin
-                        </A>
-                      </Link>
-                    )}
+                  <Box
+                    css={{
+                      display: "none",
+                      "@bp2": {
+                        display: "block",
+                      },
+                    }}>
                     {isDashboard && (
                       <Link href="/docs/guides" passHref>
                         <A>Docs</A>
@@ -230,10 +220,75 @@ const NavigationBase = ({
 
                     {!isDashboard && (
                       <Link href="/dashboard" passHref>
-                        <A>Dashboard</A>
+                        <A
+                          css={{
+                            fontSize: "$4",
+                            fontWeight: 500,
+                            textDecoration: "none",
+                            textTransform: "uppercase",
+                            display: "none",
+                            position: "relative",
+                            "@bp2": {
+                              display: "block",
+                            },
+                            "&:hover": {
+                              textDecoration: "none",
+                            },
+                            "&:after": {
+                              content: '""',
+                              position: "absolute",
+                              left: -14,
+                              borderTopLeftRadius: 10,
+                              borderTopRightRadius: 12,
+                              borderBottomLeftRadius: 4,
+                              borderBottomRightRadius: 4,
+                              zIndex: 1,
+                              top: -14,
+                              bc: "#fff",
+                              height: 48,
+                              width: 80,
+                              transform: "skew(35deg)",
+                              display:
+                                navBackgroundColor === "transparent"
+                                  ? "block"
+                                  : "none",
+                            },
+                            "&:before": {
+                              content: '""',
+                              position: "absolute",
+                              left: 22,
+                              borderTopLeftRadius: 10,
+                              borderTopRightRadius: 12,
+                              borderBottomLeftRadius: 4,
+                              borderBottomRightRadius: 4,
+                              zIndex: 1,
+                              top: -14,
+                              bc: "#fff",
+                              height: 48,
+                              width: 110,
+                              display:
+                                navBackgroundColor === "transparent"
+                                  ? "block"
+                                  : "none",
+                            },
+                          }}>
+                          <Box
+                            css={{
+                              color:
+                                navBackgroundColor === "transparent"
+                                  ? "$loContrast"
+                                  : "$hiContrast",
+                              position: "relative",
+                              zIndex: 2,
+                              width: 122,
+                              textAlign: "center",
+                            }}>
+                            Dashboard
+                          </Box>
+                        </A>
                       </Link>
                     )}
-                  </>
+                  </Box>
                 )}
               </Flex>
               <Flex

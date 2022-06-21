@@ -8,7 +8,7 @@ import {
   Th,
   Td,
 } from "@livepeer/design-system";
-import { products } from "@livepeer.com/api/src/config";
+import { products } from "@livepeer.studio/api/src/config";
 import { FiArrowUpRight } from "react-icons/fi";
 
 const PastInvoicesTable = ({ invoices }) => {

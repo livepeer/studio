@@ -34,7 +34,7 @@ const SimpleBlockContent = (props) => {
           width: "100%",
         },
         a: {
-          color: "$indigo9",
+          color: "$blue9",
         },
         h1: {
           fontSize: "$9",

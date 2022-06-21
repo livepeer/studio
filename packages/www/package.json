@@ -21,7 +21,7 @@
     "@emotion/core": "^10.0.17",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^10.0.23",
-    "@livepeer.com/api": "^0.5.3",
+    "@livepeer.studio/api": "^0.5.3",
     "@livepeer/design-system": "0.0.0-beta.5",
     "@livepeer/video-nft": "^0.3.2",
     "@mdx-js/loader": "^1.6.16",

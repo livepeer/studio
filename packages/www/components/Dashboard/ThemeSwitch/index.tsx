@@ -18,10 +18,10 @@ const StyledSwitch = styled(Switch.Root, {
   alignItems: "center",
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 2px $indigo9",
+    boxShadow: "0 0 0 2px $blue9",
   },
   '&[data-state="checked"]': {
-    background: "linear-gradient(to right, $indigo8, $indigo5)",
+    background: "linear-gradient(to right, $blue8, $blue5)",
   },
 });
 
@@ -57,7 +57,7 @@ const ThemeSwitch = () => {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (resolvedTheme === "dark") {
+    if (resolvedTheme?.includes("dark")) {
       setChecked(true);
     } else {
       setChecked(false);
@@ -65,8 +65,8 @@ const ThemeSwitch = () => {
   }, [resolvedTheme]);
 
   const handleChange = () => {
-    resolvedTheme === "dark" ? setTheme("light") : setTheme("dark");
-    setChecked(resolvedTheme === "dark" ? true : false);
+    resolvedTheme?.includes("dark") ? setTheme("light") : setTheme("dark");
+    setChecked(resolvedTheme?.includes("dark") ? true : false);
   };
 
   return (

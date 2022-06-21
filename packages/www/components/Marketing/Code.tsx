@@ -183,7 +183,7 @@ const Code = ({
                 alignSelf: "flex-end",
                 bottom: "16px",
                 right: "16px",
-                bc: "$indigo9",
+                bc: "$blue9",
                 borderRadius: "6px",
                 width: "60px",
                 height: "32px",

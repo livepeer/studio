@@ -16,7 +16,7 @@ import {
 } from "@theme-ui/components";
 import Layout from "../../../layouts/admin";
 import useLoggedIn from "../../../hooks/use-logged-in";
-import { Stream, User } from "@livepeer.com/api";
+import { Stream, User } from "@livepeer.studio/api";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Copy from "../../../public/img/copy.svg";
 import { useRouter } from "next/router";

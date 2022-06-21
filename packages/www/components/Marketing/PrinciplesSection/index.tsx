@@ -65,14 +65,14 @@ const PrinciplesSection = () => {
           </Box>
           <Box
             css={{
-              fontWeight: 300,
+              fontWeight: 400,
               height: 380,
               pt: "$3",
               fontSize: 32,
               lineHeight: "44px",
               "@bp2": {
                 height: 460,
-                lineHeight: "50px",
+                lineHeight: "56px",
                 fontSize: 45,
               },
             }}>

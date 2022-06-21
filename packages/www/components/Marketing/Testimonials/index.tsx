@@ -8,7 +8,7 @@ import PlayDJIcon from "../../../public/img/testimonials/playdj-tv/logo.svg";
 const testimonials: CardProps[] = [
   {
     quote:
-      "Livepeer Studio is an exciting video infrastructure solution that’s highly reliable and price disruptive.",
+      "Livepeer Studio is an exciting video solution that’s highly reliable and price disruptive.",
     id: "cbs-interactive",
     logo: <CBSIcon css={{ color: "$hiContrast" }} />,
     author: {
@@ -19,7 +19,7 @@ const testimonials: CardProps[] = [
   },
   {
     quote:
-      "Livepeer Studio is an incredible team building the future of video infrastructure services.",
+      "Livepeer Studio is an incredible team building the future of video services.",
     id: "houseparty",
     logo: <HousePartyIcon css={{ color: "$hiContrast" }} />,
     author: {

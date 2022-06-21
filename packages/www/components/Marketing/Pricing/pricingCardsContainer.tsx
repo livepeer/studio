@@ -96,7 +96,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Personal"
           pricingDescription="Free"
-          cardBg="$indigo6"
+          cardBg="$blue6"
           titleColor="black"
           btn={{
             display: "Sign up",
@@ -214,7 +214,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Pro"
           pricingDescription="Pay as you go"
-          cardBg="$indigo8"
+          cardBg="$blue8"
           btn={{
             display: "Sign up",
             href: "/register",
@@ -358,7 +358,7 @@ const PricingCardsContainer = () => {
         <PricingCard
           pricingTitle="Business"
           pricingDescription="Custom pricing"
-          cardBg="$indigo8"
+          cardBg="$blue8"
           btn={{
             display: "Contact us",
             href: "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan",
@@ -369,7 +369,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="indigo"
+                variant="blue"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -389,7 +389,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="indigo"
+                variant="blue"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -409,7 +409,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="indigo"
+                variant="blue"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",
@@ -429,7 +429,7 @@ const PricingCardsContainer = () => {
             <PricingCardContent>
               <Badge
                 size="1"
-                variant="indigo"
+                variant="blue"
                 css={{
                   alignSelf: "flex-start",
                   mb: "$2",

@@ -14,7 +14,7 @@ import {
 } from "react-table";
 import Help from "../../../public/img/help.svg";
 import ReactTooltip from "react-tooltip";
-import { User, Stream } from "@livepeer.com/api";
+import { User, Stream } from "@livepeer.studio/api";
 
 const loadingAnim = keyframes`
 0% {

@@ -79,4 +79,5 @@ const ResetPasswordPage = () => {
   );
 };
 
+ResetPasswordPage.theme = "dark-theme-blue";
 export default ResetPasswordPage;

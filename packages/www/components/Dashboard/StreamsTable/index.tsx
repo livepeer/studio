@@ -22,7 +22,7 @@ import {
   FilterItem,
   formatFiltersForApiRequest,
 } from "components/Dashboard/Table/filters";
-import { Stream } from "@livepeer.com/api";
+import { Stream } from "@livepeer.studio/api";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";

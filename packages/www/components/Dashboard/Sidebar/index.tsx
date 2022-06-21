@@ -81,7 +81,10 @@ const Sidebar = ({ id }) => {
               title={user?.email}>
               {user?.firstName}
             </Text>
-            <ChevronDownIcon width={20} height={20} />
+            <Box
+              as={ChevronDownIcon}
+              css={{ width: 20, height: 20, color: "$hiContrast" }}
+            />
           </Flex>
           <DropdownMenuContent css={{ border: "1px solid $colors$neutral6" }}>
             <DropdownMenuGroup>
@@ -111,8 +114,7 @@ const Sidebar = ({ id }) => {
           <NavLink>
             <HomeIcon active={id === "home"} />
             <Text
-              gradient={id === "home"}
-              variant={id === "home" ? "indigo" : null}
+              variant={id === "home" ? "blue" : null}
               css={{
                 fontWeight: id === "home" ? 700 : 400,
                 backgroundClip: "text",
@@ -128,8 +130,7 @@ const Sidebar = ({ id }) => {
             <NavLink>
               <StreamIcon active={id === "streams"} />
               <Text
-                gradient={id === "streams"}
-                variant={id === "streams" ? "indigo" : null}
+                variant={id === "streams" ? "blue" : null}
                 css={{
                   fontWeight: id === "streams" ? 700 : 400,
                   backgroundClip: "text",
@@ -151,8 +152,7 @@ const Sidebar = ({ id }) => {
               <Link href="/dashboard/sessions" passHref>
                 <NavLink>
                   <Text
-                    gradient={id === "streams/sessions"}
-                    variant={id === "streams/sessions" ? "indigo" : null}
+                    variant={id === "streams/sessions" ? "blue" : null}
                     css={{
                       fontWeight: id === "streams/sessions" ? 700 : 400,
                       backgroundClip: "text",
@@ -172,8 +172,7 @@ const Sidebar = ({ id }) => {
           <NavLink>
             <AssetsIcon active={id === "assets"} />
             <Text
-              gradient={id === "assets"}
-              variant={id === "assets" ? "indigo" : null}
+              variant={id === "assets" ? "blue" : null}
               css={{
                 fontWeight: id === "assets" ? 700 : 400,
                 backgroundClip: "text",
@@ -211,8 +210,7 @@ const Sidebar = ({ id }) => {
               <Link href="/dashboard/developers/api-keys" passHref>
                 <NavLink>
                   <Text
-                    gradient={id === "developers"}
-                    variant={id === "developers" ? "indigo" : null}
+                    variant={id === "developers" ? "blue" : null}
                     css={{
                       fontWeight: id === "developers" ? 700 : 400,
                       backgroundClip: "text",
@@ -228,8 +226,7 @@ const Sidebar = ({ id }) => {
               <Link href="/dashboard/developers/webhooks" passHref>
                 <NavLink>
                   <Text
-                    gradient={id === "developers/webhooks"}
-                    variant={id === "developers/webhooks" ? "indigo" : null}
+                    variant={id === "developers/webhooks" ? "blue" : null}
                     css={{
                       fontWeight: id === "developers/webhooks" ? 700 : 400,
                       backgroundClip: "text",
@@ -242,23 +239,6 @@ const Sidebar = ({ id }) => {
                   </Text>
                 </NavLink>
               </Link>
-
-              <Link href="/dashboard/developers/media-server" passHref>
-                <NavLink>
-                  <Text
-                    gradient={id === "developers/media-server"}
-                    variant={id === "developers/media-server" ? "indigo" : null}
-                    css={{
-                      fontWeight: id === "developers/media-server" ? 700 : 400,
-                      backgroundClip: "text",
-                      ml: 31,
-                      mt: "$1",
-                      lineHeight: 1.2,
-                    }}>
-                    Media Server
-                  </Text>
-                </NavLink>
-              </Link>
             </Box>
           )}
         </Box>
@@ -268,8 +248,7 @@ const Sidebar = ({ id }) => {
             <NavLink>
               <BillingIcon active={id === "billing"} />
               <Text
-                gradient={id === "billing"}
-                variant={id === "billing" ? "indigo" : null}
+                variant={id === "billing" ? "blue" : null}
                 css={{
                   display: "flex",
                   fontWeight: id === "billing" ? 700 : 400,
@@ -293,8 +272,7 @@ const Sidebar = ({ id }) => {
               <Link href="/dashboard/billing/plans" passHref>
                 <NavLink>
                   <Text
-                    gradient={id === "billing/plans"}
-                    variant={id === "billing/plans" ? "indigo" : null}
+                    variant={id === "billing/plans" ? "blue" : null}
                     css={{
                       fontWeight: id === "billing/plans" ? 700 : 400,
                       backgroundClip: "text",

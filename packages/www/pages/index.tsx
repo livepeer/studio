@@ -18,5 +18,5 @@ const HomePage = () => {
   );
 };
 
-HomePage.theme = "dark-theme-indigo";
+HomePage.theme = "dark-theme-blue";
 export default HomePage;

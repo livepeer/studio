@@ -45,7 +45,7 @@ type Props = {
   posts: Post[];
 };
 
-const BlogIndex: FC<Props> = ({ categories, posts }) => {
+const BlogIndex = ({ categories, posts }) => {
   const router = useRouter();
   const {
     query: { slug },
@@ -120,9 +120,6 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
               }}>
               Blog
             </Box>
-            {/* <Text as="h2" css={{ fontWeight: 300 }} size="7">
-              Updates from the Livepeer Studio team
-            </Text> */}
           </Box>
 
           {featuredPost && (
@@ -169,8 +166,8 @@ const BlogIndex: FC<Props> = ({ categories, posts }) => {
                       key={i + 1}
                       css={{
                         borderBottom: "2px solid",
-                        borderColor: isSelected ? "$indigo9" : "transparent",
-                        color: isSelected ? "$indigo9" : "$hiContrast",
+                        borderColor: isSelected ? "$blue9" : "transparent",
+                        color: isSelected ? "$blue9" : "$hiContrast",
                         fontWeight: isSelected ? 600 : 500,
                         pb: "$3",
                         mr: "$6",
@@ -234,4 +231,5 @@ export async function getStaticProps({ params }) {
   };
 }
 
+BlogIndex.theme = "dark-theme-blue";
 export default BlogIndex;

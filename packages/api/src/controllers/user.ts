@@ -454,7 +454,7 @@ app.post("/verify", validatePost("user-verification"), async (req, res) => {
     // alert sales of new verified user
     const { supportAddr, sendgridTemplateId, sendgridApiKey } = req.config;
 
-    if (req.headers.host.includes("livepeer.com")) {
+    if (req.headers.host.includes("livepeer.studio")) {
       try {
         // send sales@livepeer.org user verification message using SendGrid
         await sendgridEmail({

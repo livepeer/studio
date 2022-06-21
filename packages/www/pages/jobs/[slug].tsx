@@ -81,7 +81,7 @@ const Page = ({
                   width: "100%",
                 },
                 a: {
-                  color: "$indigo9",
+                  color: "$blue9",
                 },
               }}>
               <div dangerouslySetInnerHTML={{ __html: body }} />

@@ -14,7 +14,7 @@ import { ArrowRightIcon } from "@radix-ui/react-icons";
 import UpcomingIcon from "../../../public/img/icons/upcoming.svg";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
-import { products } from "@livepeer.com/api/src/config";
+import { products } from "@livepeer.studio/api/src/config";
 
 const StyledUpcomingIcon = styled(UpcomingIcon, {
   mr: "$2",

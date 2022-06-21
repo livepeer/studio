@@ -1,6 +1,6 @@
-import { TextField, Grid, Box, Container } from "@livepeer/design-system";
+import { TextField, Grid, Box, Link as A } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
-import hash from "@livepeer.com/api/dist/hash";
+import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
 import Button from "@components/Marketing/Button";
 import { useHubspotForm } from "hooks";
@@ -182,7 +182,9 @@ const Login = ({
         )}
         <Box>{errors.join(", ")}&nbsp;</Box>
 
-        <Button css={{ mt: "$2", px: "$5" }}>
+        <Button
+          small
+          css={{ width: "100%", mb: "$1", px: "$3", fontSize: "$3" }}>
           {loading ? "Loading..." : buttonText}
         </Button>
       </Box>

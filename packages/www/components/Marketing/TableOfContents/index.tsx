@@ -96,7 +96,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             borderLeft: "1px solid",
             borderColor: isChildren
               ? isActive
-                ? "$indigo9"
+                ? "$blue9"
                 : "$primary9"
               : "transparent",
             alignItems: "center",
@@ -104,7 +104,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
             pl: isChildren ? "12px" : "0",
             display: "flex",
             "&:hover": {
-              color: "$indigo9",
+              color: "$blue9",
             },
           }}>
           <IconContainer>

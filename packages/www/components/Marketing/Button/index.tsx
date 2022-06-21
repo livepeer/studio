@@ -9,7 +9,7 @@ export const Button = React.forwardRef(
   ) => (
     <ButtonBase
       ref={forwardedRef}
-      variant="indigo"
+      variant="blue"
       css={{
         bc: "#0a5cd8",
         color: "white",

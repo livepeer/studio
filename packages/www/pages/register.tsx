@@ -115,17 +115,6 @@ const RegisterPage = () => {
             <Heading size="4" as="h1" css={{ mb: "$4" }}>
               Create an account
             </Heading>
-            <Text
-              size="4"
-              variant="gray"
-              css={{
-                mb: "$6",
-                textAlign: "center",
-                maxWidth: 630,
-                mx: "auto",
-              }}>
-              Get free access to our streaming API and open source media server.
-            </Text>
             <Login
               id="register"
               onSubmit={onSubmit}
@@ -151,4 +140,7 @@ const RegisterPage = () => {
   );
 };
 
-export default withRecaptcha(RegisterPage);
+const RegisterPageWithRecaptcha: any = withRecaptcha(RegisterPage);
+RegisterPageWithRecaptcha.theme = "dark-theme-blue";
+
+export default RegisterPageWithRecaptcha;

@@ -1242,7 +1242,7 @@ components:
                 url:
                   type: string
                   description: URL of the asset to import
-                  example: https://cdn.livepeer.com/ABC123/filename.mp4
+                  example: https://cdn.livepeer.studio/ABC123/filename.mp4
                 recordedSessionId:
                   type: string
                   description:

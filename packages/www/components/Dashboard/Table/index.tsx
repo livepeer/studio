@@ -282,7 +282,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                   css={{
                     cursor: "pointer",
                     fontSize: "$2",
-                    color: "$indigo11",
+                    color: "$blue11",
                   }}
                   onClick={() => toggleAllRowsSelected(false)}>
                   Deselect

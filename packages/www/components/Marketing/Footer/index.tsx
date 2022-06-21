@@ -264,7 +264,7 @@ const Footer = () => {
               <Text
                 css={{
                   color: "white",
-                  fontWeight: 300,
+                  fontWeight: 400,
                   lineHeight: "18px",
                   opacity: ".8",
                 }}>
@@ -289,7 +289,7 @@ const Footer = () => {
               <Text
                 css={{
                   color: "white",
-                  fontWeight: 300,
+                  fontWeight: 400,
                   lineHeight: "18px",
                   opacity: ".8",
                 }}>
@@ -310,7 +310,9 @@ const Footer = () => {
               Social
             </Heading>
             <Flex gap="2" align="center" css={{ mb: "$6" }}>
-              <Box
+              <A
+                href="https://instagram.com/livepeerstudio"
+                target="_blank"
                 css={{
                   fontSize: 54,
                   fontWeight: 500,
@@ -319,10 +321,17 @@ const Footer = () => {
                   lineHeight: 0.9,
                   px: "3px",
                   color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
                 }}>
                 IG
-              </Box>
-              <Box
+              </A>
+              <A
+                href="https://twitter.com/livepeerstudio"
+                target="_blank"
                 css={{
                   fontSize: 54,
                   fontWeight: 500,
@@ -331,10 +340,17 @@ const Footer = () => {
                   lineHeight: 0.9,
                   px: "3px",
                   color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
                 }}>
                 TW
-              </Box>
-              <Box
+              </A>
+              <A
+                href="https://tiktok.com/@livepeerstudio"
+                target="_blank"
                 css={{
                   fontSize: 54,
                   fontWeight: 500,
@@ -343,10 +359,17 @@ const Footer = () => {
                   lineHeight: 0.9,
                   px: "3px",
                   color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
                 }}>
                 TIK
-              </Box>
-              <Box
+              </A>
+              <A
+                href="https://github.com/livepeer/livepeer-studio"
+                target="_blank"
                 css={{
                   fontSize: 54,
                   fontWeight: 500,
@@ -355,9 +378,14 @@ const Footer = () => {
                   lineHeight: 0.9,
                   px: "3px",
                   color: "white",
+                  display: "block",
+                  textDecoration: "none",
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
                 }}>
                 GH
-              </Box>
+              </A>
             </Flex>
           </Box>
           <Box

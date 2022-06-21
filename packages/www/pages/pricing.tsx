@@ -53,4 +53,5 @@ const PricingPage = () => {
   );
 };
 
+PricingPage.theme = "dark-theme-blue";
 export default PricingPage;

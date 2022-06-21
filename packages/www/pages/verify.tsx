@@ -52,6 +52,7 @@ const VerifyPage = () => {
   );
 };
 
+VerifyPage.theme = "dark-theme-blue";
 export default VerifyPage;
 
 const Verify = ({

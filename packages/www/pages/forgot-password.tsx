@@ -89,4 +89,5 @@ const ForgotPasswordPage = () => {
   );
 };
 
+ForgotPasswordPage.theme = "dark-theme-blue";
 export default ForgotPasswordPage;

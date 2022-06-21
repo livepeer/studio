@@ -67,4 +67,5 @@ export async function getStaticProps() {
   };
 }
 
+JobsPage.theme = "dark-theme-blue";
 export default JobsPage;

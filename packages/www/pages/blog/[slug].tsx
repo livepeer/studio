@@ -234,7 +234,7 @@ const Post = ({
                   width: "100%",
                 },
                 a: {
-                  color: "$indigo9",
+                  color: "$blue9",
                 },
               }}>
               <BlockContent

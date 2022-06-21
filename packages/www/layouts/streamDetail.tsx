@@ -565,7 +565,7 @@ const StreamDetail = ({
                         textDecoration: "none",
                         borderBottom: "2px solid",
                         borderColor:
-                          activeTab === "Overview" ? "$indigo9" : "transparent",
+                          activeTab === "Overview" ? "$blue9" : "transparent",
                         mr: "$5",
                         "&:hover": {
                           textDecoration: "none",
@@ -584,7 +584,7 @@ const StreamDetail = ({
                         cursor: "pointer",
                         borderBottom: "2px solid",
                         borderColor:
-                          activeTab === "Health" ? "$indigo9" : "transparent",
+                          activeTab === "Health" ? "$blue9" : "transparent",
                         "&:hover": {
                           textDecoration: "none",
                         },

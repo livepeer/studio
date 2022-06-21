@@ -5,7 +5,7 @@
     "dataset": "production"
   },
   "project": {
-    "name": "livepeer.com",
+    "name": "livepeer.studio",
     "basePath": "/admin"
   },
   "plugins": [

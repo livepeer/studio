@@ -10,7 +10,7 @@ import {
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { products } from "@livepeer.com/api/src/config";
+import { products } from "@livepeer.studio/api/src/config";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
 import PaymentMethod from "components/Dashboard/PaymentMethod";
@@ -213,7 +213,7 @@ const Billing = () => {
             css={{
               ".rccs__card__background": {
                 background:
-                  "linear-gradient(to right, $colors$indigo11, $colors$indigo11) !important",
+                  "linear-gradient(to right, $colors$blue11, $colors$blue11) !important",
               },
               ".rccs__card--front": {
                 color: "white !important",

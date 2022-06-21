@@ -1,7 +1,7 @@
 import { useAnalyzer, useApi } from "hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Stream } from "@livepeer.com/api";
+import { Stream } from "@livepeer.studio/api";
 import { Box, Heading, Flex, Badge } from "@livepeer/design-system";
 import { events } from "hooks/use-analyzer";
 

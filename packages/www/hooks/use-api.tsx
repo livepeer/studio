@@ -13,11 +13,11 @@ import {
   Asset,
   Task,
   SuspendUserPayload,
-} from "@livepeer.com/api";
+} from "@livepeer.studio/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
-import { products } from "@livepeer.com/api/src/config";
+import { products } from "@livepeer.studio/api/src/config";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some

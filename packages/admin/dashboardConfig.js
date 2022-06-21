@@ -6,12 +6,12 @@ export default {
         data: [
           {
             title: "GitHub repo",
-            value: "https://github.com/livepeer/livepeer.com",
+            value: "https://github.com/livepeer/livepeer.studio",
             category: "Code",
           },
           {
             title: "Frontend",
-            value: "https://livepeer.com",
+            value: "https://livepeer.studio",
             category: "apps",
           },
         ],
