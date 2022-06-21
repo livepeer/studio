@@ -12,7 +12,7 @@ type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;
 const getItems = () => {
   return [
     {
-      title: "Start Livestreaming",
+      title: "Start a Livestream",
       description:
         "An easy tutorial on how to get started livestreaming with or without writing code.",
       href: "https://livepeer.studio/docs/guides/start-live-streaming/tutorial",
