@@ -19,7 +19,7 @@ const globalStyles = globalCss({
   body: {
     margin: 0,
     bc: "$loContrast",
-    fontFamily: "$untitled",
+    fontFamily: "Matter",
     color: "$hiContrast",
   },
 
@@ -31,7 +31,7 @@ const globalStyles = globalCss({
   "h1, h2, h3, h4, h5": { fontWeight: 500 },
 
   "body, button": {
-    fontFamily: "$untitled",
+    fontFamily: "Matter",
   },
 
   svg: { display: "block" },

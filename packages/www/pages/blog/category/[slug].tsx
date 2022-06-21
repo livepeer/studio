@@ -29,7 +29,12 @@ export async function getStaticProps({ params }) {
   const { allPost: posts } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPosts),
-    { where: { category: { slug: { current: { eq: slug } } } } }
+    {
+      where: {
+        hide: { neq: true },
+        category: { slug: { current: { eq: slug } } },
+      },
+    }
   );
 
   return {
