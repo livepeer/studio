@@ -21,7 +21,6 @@ import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
 import Player from "@components/Site/BlogVideoPlayer";
-import Prefooter from "@components/Site/Prefooter";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -274,9 +273,6 @@ const Post = ({
           </Box>
         </Container>
       </Box>
-      <Fade key={0}>
-        <Prefooter />
-      </Fade>
     </Layout>
   );
 };
