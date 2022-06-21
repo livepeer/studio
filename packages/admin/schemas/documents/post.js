@@ -43,16 +43,23 @@ export default {
       title: "Main image",
     },
     {
-      name: "featured",
-      type: "boolean",
-      title: "Featured",
-    },
-    {
       name: "excerpt",
       type: "text",
       title: "Excerpt",
       description:
         "This ends up on summary pages, on Google, when people share your post in social media.",
+    },
+    {
+      name: "featured",
+      type: "boolean",
+      title: "Featured",
+    },
+    {
+      name: "hide",
+      type: "boolean",
+      title: "Hide",
+      description:
+        "When enabled the post will be hidden from the site but still be accessible if you have a link.",
     },
     {
       name: "body",

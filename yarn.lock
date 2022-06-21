@@ -3952,10 +3952,10 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
-"@livepeer/design-system@0.0.0-beta.6":
-  version "0.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-0.0.0-beta.6.tgz#a1f0fe0945e0787006ae7cc8a1d349ed18a5ad1b"
-  integrity sha512-RykNhTdFzyVmkTN0b/EbVPUFleUYbKLcKfPTVmYrCsZ8K8CN8IpAkfKllj3tnqSj/csfKwF8e3acuptMXybQ7Q==
+"@livepeer/design-system@0.0.0-beta.7":
+  version "0.0.0-beta.7"
+  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-0.0.0-beta.7.tgz#4f12f4ffbe371d59e6516e349d9a8429575ce230"
+  integrity sha512-YXn3QPcOvjcoO99YztCQ3DKrDtwIO8CqzgL/nbADGfoYiyes/elOVWfPuur8GUFRrVvCdTVqeyqDV15R4RzB8w==
   dependencies:
     "@modulz/design-system" "0.6.1"
     "@radix-ui/colors" "0.1.7"

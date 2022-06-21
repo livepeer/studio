@@ -37,13 +37,6 @@ class MyDocument extends Document {
             id="stitches"
             dangerouslySetInnerHTML={{ __html: getCssText() }}
           />
-          <link
-            rel="preload"
-            href="/fonts/suisse/SuisseIntl-Book.woff"
-            as="font"
-            type="font/woff"
-            crossOrigin="anonymous"
-          />
           <style
             dangerouslySetInnerHTML={{
               __html: `
