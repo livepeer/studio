@@ -48,7 +48,6 @@ function FeaturedAppCard({ onClick, title, description, href }) {
         cursor: "pointer",
         transition: ".15s",
         height: 300,
-        opacity: 0.5,
         "@bp2": {
           minWidth: 380,
         },
@@ -63,7 +62,6 @@ function FeaturedAppCard({ onClick, title, description, href }) {
         },
         "&:hover": {
           transition: ".15s",
-          opacity: 1,
           ".featuredAppCard__arrow": {
             bc: "#0A5CD8",
             transition: ".15s",

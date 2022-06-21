@@ -8,7 +8,6 @@ import {
 import { User } from "@livepeer.studio/api";
 import Link from "next/link";
 import { BreadcrumbItem } from "../breadcrumb";
-import { Cross1Icon } from "@radix-ui/react-icons";
 import Button from "@components/Site/Button";
 
 type Props = {
@@ -80,6 +79,7 @@ const Menu = ({
             return (
               <Link href={link.href} key={`menu-link-${link.href}`} passHref>
                 <A
+                  onClick={() => setMobileMenuIsOpen(false)}
                   css={{
                     mb: "$4",
                     fontSize: "$8",
@@ -112,7 +112,10 @@ const Menu = ({
           ) : (
             <>
               <Link href="/login" passHref>
-                <Button arrow css={{ mt: "$7", mr: "$3" }}>
+                <Button
+                  onClick={() => setMobileMenuIsOpen(false)}
+                  arrow
+                  css={{ mt: "$7", mr: "$3" }}>
                   Let's Go
                 </Button>
               </Link>

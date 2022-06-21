@@ -41,11 +41,16 @@ const BlogPostCard = ({ post, css = {} }) => {
               height: 200,
               minHeight: 200,
               bc: "$panel",
+              img: {
+                objectPosition: "left",
+              },
             }}>
             <Image
               alt={post.mainImage?.alt}
               layout="fill"
               objectFit="cover"
+              width={post.mainImage.asset.metadata.dimensions.width}
+              height={post.mainImage.asset.metadata.dimensions.height}
               src={builder.image(post.mainImage).url()}
             />
           </Box>

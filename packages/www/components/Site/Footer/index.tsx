@@ -47,12 +47,14 @@ const Footer = () => {
                 borderTopLeftRadius: 18,
                 borderBottomLeftRadius: 18,
                 pl: "$3",
+                pr: "$3",
                 pb: "$3",
                 pt: "$7",
                 zIndex: 4,
                 height: "calc(100% - 40px)",
                 "@bp2": {
                   pt: "$9",
+                  pr: 0,
                 },
               }}>
               <Box

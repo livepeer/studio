@@ -61,7 +61,7 @@ const HomeHero = () => {
             <Box>The video</Box>
             <Box
               css={{
-                ml: "$3",
+                ml: 0,
                 "@bp1": {
                   ml: "$5",
                 },
