@@ -90,23 +90,25 @@ function DashboardLayout({
   return (
     <>
       {requireLoggedIn && <DashboardRedirect />}
-      <Elements stripe={getStripe()}>
-        <Head>
-          <meta name="viewport" content="width=1023" />
-        </Head>
-        <NextSeo {...seo} />
-        <Sidebar id={id} />
-        <Box css={{ pl: 270, width: "100%" }}>
-          <Header breadcrumbs={breadcrumbs} />
-          <Box
-            css={{
-              margin: "0 auto",
-              maxWidth: "1520px",
-            }}>
-            {children}
+      <Box className="dashboard">
+        <Elements stripe={getStripe()}>
+          <Head>
+            <meta name="viewport" content="width=1023" />
+          </Head>
+          <NextSeo {...seo} />
+          <Sidebar id={id} />
+          <Box css={{ pl: 270, width: "100%" }}>
+            <Header breadcrumbs={breadcrumbs} />
+            <Box
+              css={{
+                margin: "0 auto",
+                maxWidth: "1520px",
+              }}>
+              {children}
+            </Box>
           </Box>
-        </Box>
-      </Elements>
+        </Elements>
+      </Box>
     </>
   );
 }

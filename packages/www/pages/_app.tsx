@@ -28,6 +28,10 @@ const globalStyles = globalCss({
     fontFamily: "Matter",
   },
 
+  ".dashboard": {
+    fontFamily: "$untitled",
+  },
+
   "h1, h2, h3, h4, h5": { fontWeight: 500 },
 
   "body, button": {
