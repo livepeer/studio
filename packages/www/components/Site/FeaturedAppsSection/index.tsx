@@ -20,13 +20,13 @@ const getItems = () => {
       title: "InFlow Music",
       description:
         "A web3 music platform aims to disrupt the industry by offering live music concerts and events to award-winning artists and their fans.",
-      href: "https://livepeer.studio/blog/how-inflow-created-first-music-platform-web3-economy",
+      href: "https://livepeer.studio/blog/how-inflow-first-music-platform-web3-economy",
     },
     {
       title: "Korkuma",
       description:
         "A live shopping platform aiming to become the next top sales channel for forward-looking ecommerce brands.",
-      href: "https://livepeer.studio/blog/livepeer-helps-korkuma-bring-immersive-commerce-to-the-masses",
+      href: "https://livepeer.studio/blog/korkuma-immersive-commerce",
     },
   ];
 };

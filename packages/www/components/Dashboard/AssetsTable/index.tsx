@@ -12,7 +12,6 @@ import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
-import { Column } from "react-table";
 import {
   CellComponentProps,
   TableData,
