@@ -450,7 +450,7 @@ const Footer = () => {
             <A href="https://livepeer.org/jobs" target="_blank">
               Jobs
             </A>
-            <A href="https://livepeer-studio.statuspage.io/" target="_blank">
+            <A href="https://status.livepeer.studio/" target="_blank">
               Status Page
             </A>
             <Link href="/privacy-policy" passHref>
