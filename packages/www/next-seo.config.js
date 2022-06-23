@@ -22,7 +22,7 @@ export default {
     site_name: "Livepeer Studio",
   },
   twitter: {
-    handle: "@livepeerdotcom",
+    handle: "@livepeerstudio",
     site: "@site",
     cardType: "summary_large_image",
   },
