@@ -13,10 +13,11 @@ const PrinciplesSection = () => {
         pt: 60,
       }}>
       <Container
+        size="5"
         css={{
           px: 0,
           "@bp2": {
-            px: "$4",
+            px: "$3",
           },
         }}>
         <Box css={{ maxWidth: 1100 }}>

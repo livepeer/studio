@@ -104,11 +104,9 @@ const GuideSection = () => {
         pb: "$4",
       }}>
       <Container
+        size="5"
         css={{
           px: 0,
-          "@bp2": {
-            px: "$2",
-          },
           ".react-horizontal-scrolling-menu--scroll-container": {
             gap: 10,
           },
@@ -122,6 +120,7 @@ const GuideSection = () => {
         <Box
           css={{
             maxWidth: 1000,
+            px: "$3",
           }}>
           <BulletedTitle css={{ mb: "$4", color: "$hiContrast" }}>
             Guides

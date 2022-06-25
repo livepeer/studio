@@ -148,16 +148,14 @@ const FeaturedAppsSection = () => {
     <Box
       id="featured"
       css={{
-        bc: "$hiContrast",
-        pt: "$6",
         m: "$3",
-        borderRadius: "$4",
-        "@bp2": {
-          m: "$5",
-        },
       }}>
       <Container
+        size="5"
         css={{
+          bc: "$hiContrast",
+          borderRadius: "$4",
+          pt: "$6",
           px: "$3",
           "@bp2": {
             px: "$4",
