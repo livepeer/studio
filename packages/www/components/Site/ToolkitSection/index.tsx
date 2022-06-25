@@ -18,13 +18,11 @@ const ToolkitSection = () => {
         },
       }}>
       <Container
+        size="5"
         css={{
           px: 0,
-          "@bp2": {
-            px: "$2",
-          },
         }}>
-        <Box css={{ maxWidth: 600 }}>
+        <Box css={{ maxWidth: 600, px: "$3" }}>
           <BulletedTitle css={{ mb: "$4", color: "$hiContrast" }}>
             Toolkit
           </BulletedTitle>

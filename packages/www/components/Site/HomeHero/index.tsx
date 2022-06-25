@@ -8,23 +8,20 @@ const HomeHero = () => {
       css={{
         position: "relative",
         overflow: "hidden",
-        bc: "$hiContrast",
-        color: "$loContrast",
-        ml: "$3",
-        mr: "$3",
-        borderTopRightRadius: "$2",
-        pt: "$7",
-        pb: "$4",
-        height: 500,
-        "@bp2": {
-          height: "initial",
-        },
+        mx: "$3",
       }}>
       <Container
+        size="5"
         css={{
-          height: "100%",
+          bc: "$hiContrast",
+          color: "$loContrast",
+          borderTopRightRadius: "$2",
+          pt: "$7",
+          pb: "$4",
+          height: 500,
           px: "$3",
           "@bp2": {
+            height: "initial",
             px: "$5",
           },
         }}>
@@ -112,10 +109,13 @@ const HomeHero = () => {
                   py: 0,
                   textDecoration: "none",
                   "@bp2": {
-                    fontSize: 34,
+                    fontSize: 24,
                     px: "4px",
                     py: "2px",
                     mr: "$3",
+                  },
+                  "@bp3": {
+                    fontSize: 34,
                   },
                   "&:hover": {
                     bc: "$loContrast",
@@ -140,9 +140,12 @@ const HomeHero = () => {
                       textDecoration: "none",
                     },
                     "@bp2": {
-                      fontSize: 34,
+                      fontSize: 24,
                       px: "4px",
                       py: "2px",
+                    },
+                    "@bp3": {
+                      fontSize: 34,
                     },
                   }}>
                   Let's Go
