@@ -5,6 +5,7 @@ import createSchema from "part:@sanity/base/schema-creator";
 import schemaTypes from "all:part:@sanity/base/schema-type";
 
 // Document types
+import home from "./documents/home";
 import page from "./documents/page";
 import job from "./documents/job";
 import post from "./documents/post";
@@ -12,6 +13,7 @@ import author from "./documents/author";
 import category from "./documents/category";
 import product from "./documents/product";
 import useCase from "./documents/useCase";
+import app from "./documents/app";
 import route from "./documents/route";
 import siteConfig from "./documents/siteConfig";
 
@@ -29,6 +31,12 @@ import imageExtended from "./objects/imageExtended";
 import testimonial from "./objects/testimonial";
 import markdownSection from "./objects/markdownSection";
 import teamMember from "./objects/teamMember";
+import homeHeroSection from "./objects/home/heroSection";
+import homeToolkitSection from "./objects/home/toolkitSection";
+import homeGuideSection from "./objects/home/guideSection";
+import homeFeaturedAppSection from "./objects/home/featuredAppSection";
+import homePrinciplesSection from "./objects/home/principlesSection";
+import card from "./objects/card";
 
 // Landing page sections
 import hero from "./objects/hero";
@@ -50,6 +58,13 @@ export default createSchema({
   // Then proceed to concatenate our our document type
   // to the ones provided by any plugins that are installed
   types: schemaTypes.concat([
+    home,
+    homeHeroSection,
+    homeToolkitSection,
+    homeGuideSection,
+    homeFeaturedAppSection,
+    homePrinciplesSection,
+    app,
     cta,
     embedHTML,
     figure,
@@ -84,5 +99,6 @@ export default createSchema({
     why,
     caseStudy,
     reason,
+    card,
   ]),
 });

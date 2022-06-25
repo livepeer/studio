@@ -5,6 +5,8 @@ import {
   MdWork,
   MdDescription,
   MdPerson,
+  MdHome,
+  MdApps,
 } from "react-icons/md";
 
 // We filter document types defined in structure to prevent
@@ -16,6 +18,12 @@ export default () =>
   S.list()
     .title("Site")
     .items([
+      S.listItem()
+        .title("Home")
+        .icon(MdHome)
+        .child(S.document().schemaType("home").documentId("home")),
+      S.divider(),
+
       S.listItem()
         .title("Site config")
         .icon(MdSettings)
@@ -46,10 +54,10 @@ export default () =>
         .schemaType("author")
         .child(S.documentTypeList("author").title("Authors")),
       S.listItem()
-        .title("Jobs")
-        .icon(MdWork)
-        .schemaType("job")
-        .child(S.documentTypeList("job").title("Jobs")),
+        .title("Apps")
+        .icon(MdApps)
+        .schemaType("app")
+        .child(S.documentTypeList("app").title("Apps")),
       S.listItem()
         .title("Use Cases")
         .icon(MdDescription)
