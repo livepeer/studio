@@ -17,6 +17,12 @@ export default {
           scheme: ["https", "http", "mailto", "tel"],
         }),
     },
+    { title: "External", name: "isExternal", type: "boolean" },
+    {
+      title: "Title",
+      name: "title",
+      type: "string",
+    },
   ],
   blockEditor: {
     icon: () => "🌍",
