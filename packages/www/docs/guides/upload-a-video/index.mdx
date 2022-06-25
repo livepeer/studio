@@ -26,7 +26,7 @@ In this tutorial, we will be using [Node.js](https://nodejs.org/en/) and
 [Axios](https://axios-http.com/) so make sure to set that up in your project.
 You will also need to
 [Get an API key](https://livepeer.studio/docs/guides/start-live-streaming/api-key)
-to call the VOD API.
+to call the VOD API. If you're planning on calling the API from the frontend, create an API key with [CORS access allowed](https://livepeer.studio/docs/guides/start-live-streaming/api-key#cors). 
 
 ## Asset Resources
 
@@ -43,7 +43,7 @@ the response, the asset is not available, make the API call again until
 `status: "ready"`. Once the status indicates that it is `ready`, it is now
 available.
 
-### Lisitng the tasks
+### Listing the tasks
 
 To check the status on an asset imported `/import` to Livepeer or exported
 `/export` to IPFS, get the `task.id` from the response of the uploaded asset.
