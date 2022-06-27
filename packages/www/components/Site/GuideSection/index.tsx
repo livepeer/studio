@@ -122,7 +122,9 @@ const GuideSection = ({ content }) => {
                 mb: 140,
               },
             }}>
-            {String(content.Headline).replaceAll(" in Discord", "")}{" "}
+            {String(content.Headline).endsWith(" in Discord")
+              ? String(content.Headline).replace(" in Discord", "")
+              : content.Headline}{" "}
             {String(content.Headline).endsWith(" in Discord") && (
               <A
                 href="https://discord.gg/7D6hGG6dCZ"
