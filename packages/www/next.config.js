@@ -305,8 +305,8 @@ const config = {
         permanent: false,
       },
       {
-        source: "/catalyst",
-        destination: "/products/media-server",
+        source: "/blog/category/customer",
+        destination: "/blog/category/case-study",
         permanent: false,
       },
     ];
