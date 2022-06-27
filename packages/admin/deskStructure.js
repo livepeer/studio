@@ -63,9 +63,4 @@ export default () =>
         .icon(MdDescription)
         .schemaType("useCase")
         .child(S.documentTypeList("useCase").title("Use Cases")),
-      S.listItem()
-        .title("Products")
-        .icon(MdDescription)
-        .schemaType("product")
-        .child(S.documentTypeList("product").title("Products")),
     ]);
