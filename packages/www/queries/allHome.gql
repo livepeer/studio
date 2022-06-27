@@ -1,0 +1,105 @@
+fragment link on Link {
+  href
+  isExternal
+  title
+}
+
+fragment card on Card {
+  numeronym
+  title
+  description
+  link {
+    ...link
+  }
+}
+
+query allHome {
+  allHome {
+    heroSection {
+      line1
+      line2
+      line3
+      description
+      primaryCallToAction {
+        ...link
+      }
+      secondaryCallToAction {
+        ...link
+      }
+    }
+    toolkitSection {
+      Headline
+      description
+      feature1 {
+        ...card
+      }
+      feature2 {
+        ...card
+      }
+      feature3 {
+        ...card
+      }
+    }
+    guideSection {
+      Headline
+      guides {
+        ...card
+      }
+    }
+    featuredAppSection {
+      Headline
+      description
+      apps {
+        name
+        description
+        caseStudy {
+          ... on Post {
+            title
+            slug {
+              current
+            }
+          }
+          ... on Route {
+            slug {
+              current
+            }
+          }
+        }
+        # caseStudy {
+        #   heading
+        #   about
+        #   problem
+        #   solution
+        #   internalLink {
+        #     slug {
+        #       current
+        #     }
+        #   }
+        #   image {
+        #     asset {
+        #       url
+        #     }
+        #   }
+        #   testimonial {
+        #     quote
+        #     name
+        #     company
+        #     role
+        #     image {
+        #       asset {
+        #         url
+        #       }
+        #     }
+        #   }
+        # }
+      }
+    }
+    principlesSection {
+      heading
+      body
+      principles
+    }
+  }
+}
+
+
