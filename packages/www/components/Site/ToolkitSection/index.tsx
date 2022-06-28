@@ -2,7 +2,7 @@ import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
 import Card from "@components/Site/Card";
 import BulletedTitle from "@components/Site/BulletedTitle";
 
-const ToolkitSection = () => {
+const ToolkitSection = ({ content }) => {
   return (
     <Box
       css={{
@@ -27,12 +27,10 @@ const ToolkitSection = () => {
             Toolkit
           </BulletedTitle>
           <Heading size="4" css={{ mb: "$5", letterSpacing: "-1px" }}>
-            Build next-gen, creator-owned video experiences
+            {content.Headline}
           </Heading>
           <Text size="5" css={{ fontWeight: 400, mb: 60 }}>
-            Livepeer Studio provides all the tools needed to build web3 video
-            apps with livestreaming, video on demand, and video NFT minting
-            features - web3 native, open infrastructure, affordable.
+            {content.description}
           </Text>
         </Box>
         <Flex
@@ -54,9 +52,9 @@ const ToolkitSection = () => {
             <Card
               lines="midnight"
               lineCount={5}
-              label="F.01"
-              title="Livestream"
-              description="Process live video on the Livepeer network at a fraction of the cost of traditional cloud providers."
+              label={content.feature1.numeronym}
+              title={content.feature1.title}
+              description={content.feature1.description}
               height={690}
               bc="white"
               color="$loContrast"
@@ -76,9 +74,9 @@ const ToolkitSection = () => {
               },
             }}>
             <Card
-              label="F.02"
-              title="On Demand"
-              description="Store video on web3 storage networks for permanent access and global delivery."
+              label={content.feature2.numeronym}
+              title={content.feature2.title}
+              description={content.feature2.description}
               height={320}
               bc="#0A5CD8"
               color="white"
@@ -88,9 +86,9 @@ const ToolkitSection = () => {
               // }}
             />
             <Card
-              label="F.03"
-              title="Mint"
-              description="Mint video NFTs on popular blockchains using Livepeer Studio for optimized playback in NFT marketplaces, web3 apps, and wallets."
+              label={content.feature3.numeronym}
+              title={content.feature3.title}
+              description={content.feature3.description}
               height={320}
               bc="#BFE7F8"
               color="$loContrast"

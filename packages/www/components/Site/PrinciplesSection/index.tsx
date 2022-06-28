@@ -1,7 +1,7 @@
 import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
 import BulletedTitle from "@components/Site/BulletedTitle";
 
-const PrinciplesSection = () => {
+const PrinciplesSection = ({ content }) => {
   return (
     <Box
       css={{
@@ -34,8 +34,7 @@ const PrinciplesSection = () => {
                 mb: 140,
               },
             }}>
-            Livepeer Studio is committed to the future of web3 and empowering
-            builders to realize the vision of a decentralized future.
+            {content.heading}
           </Heading>
         </Box>
         <Flex
@@ -61,7 +60,7 @@ const PrinciplesSection = () => {
               },
             }}>
             <Text size={4} css={{ pt: "$3", color: "inherit" }}>
-              These are the product principles that guide Livepeer Studio:
+              {content.body}
             </Text>
           </Box>
           <Box
@@ -77,11 +76,9 @@ const PrinciplesSection = () => {
                 fontSize: 45,
               },
             }}>
-            <Box>Open Source</Box>
-            <Box>Open infrastructure</Box>
-            <Box>Agency</Box>
-            <Box>Affordability</Box>
-            <Box>Reliability</Box>
+            {(content.principles ?? []).map((principle) => (
+              <Box>{principle}</Box>
+            ))}
           </Box>
         </Flex>
       </Container>

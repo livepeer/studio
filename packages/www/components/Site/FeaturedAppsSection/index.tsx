@@ -1,5 +1,5 @@
 import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
-import { useState, useContext, ContextType, WheelEvent } from "react";
+import { useState, useContext, ContextType, WheelEvent, useMemo } from "react";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import useDrag from "hooks/use-drag";
 import { useRouter } from "next/router";
@@ -122,9 +122,20 @@ function onWheel(apiObj: scrollVisibilityApiType, ev: WheelEvent): void {
   }
 }
 
-const FeaturedAppsSection = () => {
+const FeaturedAppsSection = ({ content }) => {
   const router = useRouter();
-  const [items] = useState(getItems);
+
+  const items = useMemo(
+    () =>
+      content.apps.map((app) => ({
+        description: app.description,
+        title: app.name,
+        href: app?.caseStudy?.title
+          ? `/blog/${app?.caseStudy?.slug?.current ?? ""}`
+          : `/${app?.caseStudy?.slug?.current ?? "blog"}`,
+      })),
+    [content]
+  );
 
   // NOTE: for drag by mouse
   const { dragStart, dragStop, dragMove, dragging } = useDrag();
@@ -168,13 +179,10 @@ const FeaturedAppsSection = () => {
           <Heading
             size="4"
             css={{ color: "$loContrast", mb: "$4", letterSpacing: "-1px" }}>
-            Web3 video apps built with Livepeer Studio
+            {content.Headline}
           </Heading>
           <Text size="5" css={{ mb: 120, color: "$loContrast" }}>
-            Disrupting the way creators own and monetize their content,
-            developers are building new types of video experiences with web3
-            video apps across decentralized social, music, live entertainment,
-            shopping, and gaming.
+            {content.description}
           </Text>
         </Box>
         <Box
