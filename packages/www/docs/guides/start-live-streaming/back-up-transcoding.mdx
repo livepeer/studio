@@ -14,7 +14,7 @@ experience with the minimum latency Livepeer Studio can provide.
 These globally-optimized URLs are the best option for nearly all Livepeer Studio
 users.
 
-- Stream into: `rtmp://rtmp.livepeer.studio/live/[stream-key]`
+- Stream into: `rtmp://rtmp.livepeer.com/live/[stream-key]`
 - Playback from: `https://livepeercdn.com/hls/[playbackId]/index.m3u8`
 
 ## Back-up transcoding with regional ingest and playback URLs
@@ -31,7 +31,7 @@ ingest and playback URLs and selecting a regional URL pair.
   Studio routes the stream to that region's datacenter for ingest. Playback also
   originates in that datacenter. If the livestreamer is far away from that
   datacenter region, this will introduce latency that could have been avoided if
-  they streamed into the global ingest URL, `rtmp://rtmp.livepeer.studio/live/`.
+  they streamed into the global ingest URL, `rtmp://rtmp.livepeer.com/live/`.
   Additionally, very distant livestream viewers will have a more latent
   experience than if the stream was ingested via the global ingest URL.
 - **Riskier during unforseen outages**: On the rare occasional that a Livepeer
@@ -40,7 +40,7 @@ ingest and playback URLs and selecting a regional URL pair.
   different regional ingest URL ... and send all their livestream viewers a
   different regional playback URL. This could be a bad user experience for your
   stream viewers. the stream was ingested via the global ingest URL,
-  `rtmp://rtmp.livepeer.studio/live/`, the playback URL would stay the same even
+  `rtmp://rtmp.livepeer.com/live/`, the playback URL would stay the same even
   if the livestream had to reconnect.
 
 If you decide to opt out of the global ingest and playback URLs and use regional
@@ -49,7 +49,7 @@ URL pairs, here's what you need to know.
 1. You can not use the same stream key to connect to multiple regional ingest
    URLs simultaneously. For simultaneous, back-up stream transcoding, create
    multiple unique stream keys.
-2. Stream into: `rtmp://[region]-rtmp.livepeer.studio/live/[stream-key]`.
+2. Stream into: `rtmp://[region]-rtmp.livepeer.com/live/[stream-key]`.
 3. Playback from:
    `https://[region]-cdn.livepeer.studio/hls/[playbackId]/index.m3u8`.
 
@@ -73,7 +73,7 @@ And you should get results like this:
 ```bash
 [
   {
-    ingest: "rtmp://{nearbyRegion}-rtmp.livepeer.studio/live",
+    ingest: "rtmp://{nearbyRegion}-rtmp.livepeer.com/live",
     playback: "https://{nearbyRegion}-cdn.livepeer.studio/hls"
   }
 ];
@@ -94,17 +94,17 @@ And you should get a result similar to this:
 ```bash
 [
    {
-      "ingest":"rtmp://{region-1}-rtmp.livepeer.studio/live",
+      "ingest":"rtmp://{region-1}-rtmp.livepeer.com/live",
       "playback":"https://{region-1}-cdn.livepeer.studio/hls",
       "base":"https://{region-1}-cdn.livepeer.studio"
    },
    {
-      "ingest":"rtmp://{region-2}-rtmp.livepeer.studio/live",
+      "ingest":"rtmp://{region-2}-rtmp.livepeer.com/live",
       "playback":"https://{region-2}-cdn.livepeer.studio/hls",
       "base":"https://{region-2}-cdn.livepeer.studio"
    },
    {
-      "ingest":"rtmp://{region-3}-rtmp.livepeer.studio/live",
+      "ingest":"rtmp://{region-3}-rtmp.livepeer.com/live",
       "playback":"https://{region-3}-cdn.livepeer.studio/hls",
       "base":"https://{region-3}-cdn.livepeer.studio"
    }
