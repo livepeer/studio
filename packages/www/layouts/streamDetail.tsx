@@ -489,7 +489,7 @@ const StreamDetail = ({
                           content={
                             <Box>
                               We changed our playback domain, but
-                              cdn.livepeer.studio is still working.
+                              cdn.livepeer.com is still working.
                             </Box>
                           }>
                           <Help />
