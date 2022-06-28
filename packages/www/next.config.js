@@ -309,6 +309,41 @@ const config = {
         destination: "/blog/category/case-study",
         permanent: false,
       },
+      {
+        source: "/blog/video-tutorial-stream-into-livepeer-for-the-first-time",
+        destination: "/blog/stream-into-livepeer-studio-first-time",
+        permanent: false,
+      },
+      {
+        source: "/blog/first-livepeer-stream-in-five-minutes",
+        destination: "/blog/stream-into-livepeer-studio-first-time",
+        permanent: false,
+      },
+      {
+        source: "/blog/stream-into-livepeer-video-services-first-time",
+        destination: "/blog/stream-into-livepeer-studio-first-time",
+        permanent: false,
+      },
+      {
+        source: "/blog/what-is-transcoding",
+        destination: "/blog/video-transcoding-what-why-how-get-started",
+        permanent: false,
+      },
+      {
+        source: "/blog/category/opinion",
+        destination: "/blog",
+        permanent: false,
+      },
+      {
+        source: "/blog/how-inflow-created-first-music-platform-web3-economy",
+        destination: "/blog/how-inflow-first-music-platform-web3-economy",
+        permanent: false,
+      },
+      {
+        source: "/blog/how-inflow-created-first-music-platform-web3-economy",
+        destination: "/blog/korkuma-immersive-commerce",
+        permanent: false,
+      },
     ];
   },
 };
