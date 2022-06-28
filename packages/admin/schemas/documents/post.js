@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 export default {
   name: "post",
   type: "document",
@@ -66,7 +64,10 @@ export default {
       type: "date",
       title: "Published Date",
       description: "Editable date which the blog post is listed as published.",
-      initialValue: new Date().toISOString(),
+      initialValue: () => {
+        const currentDate = new Date().toISOString();
+        return currentDate.slice(0, currentDate.lastIndexOf("T"));
+      },
     },
     {
       name: "body",
