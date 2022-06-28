@@ -50,7 +50,7 @@ const Post = ({
   mainImage,
   author,
   category,
-  _createdAt,
+  publishedDate,
   excerpt,
   noindex = false,
   preview,
@@ -111,7 +111,7 @@ const Post = ({
                   whiteSpace: "nowrap",
                   mr: "$2",
                 }}>
-                {new Date(_createdAt).toLocaleDateString("en-US", {
+                {new Date(publishedDate).toLocaleDateString("en-US", {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
