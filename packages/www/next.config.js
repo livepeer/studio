@@ -340,7 +340,8 @@ const config = {
         permanent: false,
       },
       {
-        source: "/blog/how-inflow-created-first-music-platform-web3-economy",
+        source:
+          "/blog/livepeer-helps-korkuma-bring-immersive-commerce-to-the-masses",
         destination: "/blog/korkuma-immersive-commerce",
         permanent: false,
       },
