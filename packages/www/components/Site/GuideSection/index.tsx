@@ -1,6 +1,6 @@
 import { Container, Box, Link as A, Heading } from "@livepeer/design-system";
 import Card from "@components/Site/Card";
-import { useState, useContext, ContextType, WheelEvent } from "react";
+import { useState, useContext, ContextType, WheelEvent, useMemo } from "react";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import useDrag from "hooks/use-drag";
 import { useRouter } from "next/router";
@@ -8,28 +8,6 @@ import BulletedTitle from "@components/Site/BulletedTitle";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 
 type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;
-
-const getItems = () => {
-  return [
-    {
-      title: "Start a Livestream",
-      description:
-        "An easy tutorial on how to get started livestreaming with or without writing code.",
-      href: "https://livepeer.studio/docs/guides/start-live-streaming/tutorial",
-    },
-    {
-      title: "Upload a Video",
-      description:
-        "This tutorial covers how to upload a video and play it back in your application.",
-      href: "https://livepeer.studio/docs/guides/upload-a-video",
-    },
-    {
-      title: "Mint a Video NFT",
-      description: "Learn how to mint a video-optimized NFT on a blockchain.",
-      href: "https://livepeer.studio/docs/guides/video-nfts/mint-a-video-nft",
-    },
-  ];
-};
 
 function GuideCard({ onClick, title, description, href, number }) {
   const visibility = useContext(VisibilityContext);
@@ -71,9 +49,17 @@ function onWheel(apiObj: scrollVisibilityApiType, ev: WheelEvent): void {
     apiObj.scrollPrev();
   }
 }
-const GuideSection = () => {
-  const router = useRouter();
-  const [items] = useState(getItems);
+const GuideSection = ({ content }) => {
+  const items = useMemo(
+    () =>
+      content.guides.map((guide) => ({
+        numeronym: guide.numeronym,
+        title: guide.title,
+        description: guide.description,
+        href: guide.link.href,
+      })),
+    [content]
+  );
 
   // NOTE: for drag by mouse
   const { dragStart, dragStop, dragMove, dragging } = useDrag();
@@ -136,30 +122,33 @@ const GuideSection = () => {
                 mb: 140,
               },
             }}>
-            Get started building with Livepeer Studio today with these guides.
-            Still have questions? Try asking the community{" "}
-            <A
-              href="https://discord.gg/7D6hGG6dCZ"
-              css={{
-                display: "inline-flex",
-                alignItems: "center",
-                color: "$loContrast",
-                position: "relative",
-                px: "$1",
-                borderRadius: "4px",
-                bc: "$hiContrast",
-                cursor: "pointer",
-                textDecoration: "none",
-                "&:hover": {
+            {String(content.Headline).endsWith(" in Discord")
+              ? String(content.Headline).replace(" in Discord", "")
+              : content.Headline}{" "}
+            {String(content.Headline).endsWith(" in Discord") && (
+              <A
+                href="https://discord.gg/7D6hGG6dCZ"
+                css={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  color: "$loContrast",
+                  position: "relative",
+                  px: "$1",
+                  borderRadius: "4px",
+                  bc: "$hiContrast",
+                  cursor: "pointer",
                   textDecoration: "none",
-                },
-              }}>
-              in Discord{" "}
-              <Box
-                as={ArrowTopRightIcon}
-                css={{ ml: "$1", height: 32, width: 32 }}
-              />
-            </A>
+                  "&:hover": {
+                    textDecoration: "none",
+                  },
+                }}>
+                in Discord{" "}
+                <Box
+                  as={ArrowTopRightIcon}
+                  css={{ ml: "$1", height: 32, width: 32 }}
+                />
+              </A>
+            )}
           </Heading>
         </Box>
 

@@ -2,7 +2,7 @@ import { Container, Box, Flex, Link as A } from "@livepeer/design-system";
 import Button from "@components/Site/Button";
 import Link from "next/link";
 
-const HomeHero = () => {
+const HomeHero = ({ content }) => {
   return (
     <Box
       css={{
@@ -55,7 +55,7 @@ const HomeHero = () => {
                 fontSize: 130,
               },
             }}>
-            <Box>The video</Box>
+            <Box>{content.line1}</Box>
             <Box
               css={{
                 ml: 0,
@@ -66,9 +66,9 @@ const HomeHero = () => {
                   ml: "$8",
                 },
               }}>
-              toolkit for
+              {content.line2}
             </Box>
-            <Box>web3 apps</Box>
+            <Box>{content.line3}</Box>
           </Box>
           <Flex
             css={{
@@ -89,14 +89,17 @@ const HomeHero = () => {
                   mb: 0,
                 },
               }}>
-              Developer tools for building web3 video experiences powered by the
-              Livepeer network - the world's open video infrastructure.
+              {content.description}
             </Box>
             <Flex align="center">
               <Button
                 as={A}
-                href="https://discord.gg/7D6hGG6dCZ"
-                target="_blank"
+                href={content.secondaryCallToAction.href}
+                target={
+                  content.secondaryCallToAction.isExternal
+                    ? "_blank"
+                    : undefined
+                }
                 css={{
                   mr: "$2",
                   backgroundColor: "transparent",
@@ -123,11 +126,16 @@ const HomeHero = () => {
                     textDecoration: "none",
                   },
                 }}>
-                Join Discord
+                {content.secondaryCallToAction.title}
               </Button>
-              <Link href="/login" passHref>
+              <Link href={content.primaryCallToAction.href} passHref>
                 <Button
                   as={A}
+                  target={
+                    content.primaryCallToAction.isExternal
+                      ? "_blank"
+                      : undefined
+                  }
                   css={{
                     bc: "#0A5CD8",
                     fontSize: 20,
@@ -148,7 +156,7 @@ const HomeHero = () => {
                       fontSize: 34,
                     },
                   }}>
-                  Let's Go
+                  {content.primaryCallToAction.title}
                 </Button>
               </Link>
             </Flex>
