@@ -62,6 +62,13 @@ export default {
         "When enabled the post will be hidden from the site but still be accessible if you have a link.",
     },
     {
+      name: "publishedDate",
+      type: "date",
+      title: "Published Date",
+      description: "Editable date which the blog post is listed as published.",
+      initialValue: new Date().toISOString(),
+    },
+    {
       name: "body",
       type: "markdown",
       title: "Body",
