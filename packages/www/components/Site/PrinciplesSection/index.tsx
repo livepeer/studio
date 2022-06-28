@@ -2,7 +2,6 @@ import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
 import BulletedTitle from "@components/Site/BulletedTitle";
 
 const PrinciplesSection = ({ content }) => {
-  console.log(content);
   return (
     <Box
       css={{
