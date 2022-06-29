@@ -21,6 +21,7 @@ query allPost($where: PostFilter) {
     _createdAt
     _updatedAt
     title
+    publishedDate
     slug {
       current
     }
