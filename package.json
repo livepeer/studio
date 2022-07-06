@@ -7,9 +7,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/livepeer/livepeer.studio.git"
+    "url": "https://github.com/livepeer/studio.git"
   },
-  "bugs": "https://github.com/livepeer/livepeer.studio/issues",
+  "bugs": "https://github.com/livepeer/studio/issues",
   "homepage": "https://livepeer.studio",
   "scripts": {
     "build": "lerna run --stream --no-sort --concurrency=999 build",
