@@ -345,6 +345,23 @@ const config = {
         destination: "/blog/korkuma-immersive-commerce",
         permanent: false,
       },
+      {
+        source: "/blog/export-to-ipfs-with-livepeer-video-services",
+        destination: "/blog/export-ipfs-livepeer-studio",
+        permanent: false,
+      },
+      {
+        source:
+          "/blog/how-to-make-api-calls-with-postman-and-livepeer-video-services",
+        destination: "/blog/api-calls-postman-livepeer-studio",
+        permanent: false,
+      },
+      {
+        source:
+          "/blog/how-to-mint-a-video-nft-using-livepeer-video-services-polygon",
+        destination: "/blog/mint-video-nft-livepeer-studio-polygon",
+        permanent: false,
+      },
     ];
   },
 };
