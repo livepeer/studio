@@ -365,7 +365,7 @@ const Footer = () => {
                   TW
                 </A>
                 <A
-                  href="https://github.com/livepeer/livepeer-studio"
+                  href="https://github.com/livepeer/studio"
                   target="_blank"
                   css={{
                     fontSize: 40,
