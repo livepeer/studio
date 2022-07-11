@@ -27,7 +27,6 @@ import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
 import { namingFunction, tusEventsHandler } from "./controllers/asset";
 import tus from "tus-node-server";
-import { DB } from "./store/db";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
