@@ -194,14 +194,16 @@ function parseUploadUrl(
   audience: string
 ) {
   let urlJwt: JwtPayload;
+  let uploadUrl: string;
   try {
     urlJwt = jwt.verify(signedUploadUrl, jwtSecret, {
       audience,
     }) as JwtPayload;
+    uploadUrl = urlJwt.presignedUrl;
   } catch (err) {
     throw new ForbiddenError(`Invalid signed upload URL: ${err}`);
   }
-  const { playbackId, uploadUrl } = urlJwt;
+  const { playbackId } = urlJwt;
   return { playbackId, uploadUrl };
 }
 
@@ -531,27 +533,13 @@ app.post(
   }
 );
 
-const namingFunction = (req: Request) => {
+export const namingFunction = (req: Request) => {
   const playbackId = req.res.getHeader("livepeer-playback-id").toString();
   if (!playbackId) {
     throw new InternalServerError("Missing playbackId in response headers");
   }
   return playbackId;
 };
-
-const server = new tus.Server();
-server.datastore = new tus.FileStore({
-  path: "/upload/tus",
-  directory: "./data/directUpload",
-  namingFunction,
-});
-export function setTusGcsDataStore(opts: Omit<tus.GCStoreOptions, "path">) {
-  server.datastore = new GCSDataStore({
-    path: "/upload/tus",
-    namingFunction,
-    ...opts,
-  });
-}
 
 const getTusMetadata = (req: http.IncomingMessage) => {
   const uploadMetadata = req.headers["upload-metadata"]?.toString();
@@ -561,6 +549,17 @@ const getTusMetadata = (req: http.IncomingMessage) => {
       const value = Buffer.from(encodedValue, "base64").toString();
       return [key, value];
     })
+  );
+};
+
+export const tusEventsHandler = (tusServer: tus.Server) => {
+  tusServer.on(
+    tus.EVENTS.EVENT_UPLOAD_COMPLETE,
+    async ({ file }: { file: TusFileMetadata }) => {
+      const playbackId = file.id;
+      const { task } = await getPendingAssetAndTask(playbackId);
+      await taskScheduler.enqueueTask(task);
+    }
   );
 };
 
@@ -601,24 +600,22 @@ app.post("/upload/tus", async (req, res) => {
       "Missing uploadToken metadata from /request-upload API"
     );
   }
+
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
   const { asset } = await getPendingAssetAndTask(playbackId);
   const metadata = getTusMetadata(req);
   // TODO: Consider updating asset name with the metadata.filename?
   res.setHeader("livepeer-playback-id", playbackId);
-  return server.handle(req, res);
+  console.log(`Tus upload for ${playbackId}`);
+  let response = await req.tusServer.handle(req, res);
+  console.log("TUS RESPONSE ", response);
+  return response;
 });
-app.all("/upload/tus/*", server.handle.bind(server));
 
-server.on(
-  tus.EVENTS.EVENT_UPLOAD_COMPLETE,
-  async ({ file }: { file: TusFileMetadata }) => {
-    const playbackId = file.id;
-    const { task } = await getPendingAssetAndTask(playbackId);
-    await taskScheduler.enqueueTask(task);
-  }
-);
+app.all("/upload/tus/*", async (req, res) => {
+  return req.tusServer.handle(req, res);
+});
 
 app.put("/upload/:url", async (req, res) => {
   const {

@@ -8,8 +8,10 @@ if (!process.env.LP_API_KEY) {
   throw new Error("Must set LP_API_KEY env var for calling /request-upload");
 }
 
-const base = `/Users/victorges/workspace/test-videos/`;
-const filename = `rtm.mp4`;
+//const base = `/Users/victorges/workspace/test-videos/`;
+//const filename = `rtm.mp4`;
+const base = `/home/gioele/Downloads/`;
+const filename = `bbb_sunflower_1080p_30fps_normal_2min.mp4`;
 const path = base + filename;
 const file = fs.createReadStream(path);
 const { size } = fs.statSync(path);
@@ -37,6 +39,7 @@ async function doUpload() {
     },
     uploadSize: size,
     onError(error) {
+      console.log(error);
       throw error;
     },
     onProgress(bytesUploaded, bytesTotal) {

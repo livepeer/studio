@@ -3,7 +3,7 @@ import { Router } from "express";
 import promBundle from "express-prom-bundle";
 import proxy from "http-proxy-middleware";
 import Stripe from "stripe";
-
+import fs from "fs/promises";
 import makeStore from "./store";
 import {
   errorHandler,
@@ -25,7 +25,9 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
-import { setTusGcsDataStore } from "./controllers/asset";
+import { namingFunction, tusEventsHandler } from "./controllers/asset";
+import tus from "tus-node-server";
+import { DB } from "./store/db";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -119,16 +121,25 @@ export default async function makeApp(params: CliArgs) {
   });
   await webhookCannon.start();
 
+  let tusServer = new tus.Server();
   if (vodObjectStoreId) {
     const os = await db.objectStore.get(vodObjectStoreId);
-    const gcsOptions = (os as any)?.gcsOptions; // as any only since the field doesnt exist yet
+    const gcsOptions = os.gcsOptions;
+
     if (gcsOptions) {
-      const keyFilename = ""; // TODO: magic
-      setTusGcsDataStore({
-        projectId: gcsOptions.projectId,
+      const keyFilename = "/tmp/keyfile.json";
+      const keyFileContent = JSON.stringify(gcsOptions.keyfile);
+      await fs.writeFile(keyFilename, keyFileContent);
+
+      tusServer.datastore = await new tus.GCSDataStore({
         bucket: gcsOptions.bucket,
+        projectId: gcsOptions.projectId,
+        namingFunction: namingFunction,
+        path: gcsOptions.path,
         keyFilename,
-      });
+      }); // TODO - Promise erro handling
+      gcsOptions.keyFilename = keyFilename;
+      tusEventsHandler(tusServer);
     }
   }
 
@@ -162,6 +173,7 @@ export default async function makeApp(params: CliArgs) {
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.studio
     req.queue = queue;
+    req.tusServer = tusServer;
     req.taskScheduler = taskScheduler;
     req.stripe = stripe;
     next();

@@ -5,6 +5,7 @@ import Queue from "../store/queue";
 import TaskScheduler from "../task/scheduler";
 import { CliArgs } from "../parse-cli";
 import Stripe from "stripe";
+import tus, { Server } from "tus-node-server";
 
 export interface NodeAddress {
   address: string;
@@ -25,7 +26,7 @@ declare global {
       taskScheduler?: TaskScheduler;
       stripe?: Stripe;
       frontendDomain: string;
-
+      tusServer?: Server;
       user?: User;
       isUIAdmin?: boolean;
       token?: WithID<ApiToken>;

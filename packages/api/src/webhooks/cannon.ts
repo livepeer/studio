@@ -31,7 +31,7 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: [string, string];
-  taskScheduler: TaskScheduler;
+  taskScheduler: typeof TaskScheduler;
   vodObjectStoreId: string;
   resolver: any;
   queue: Queue;

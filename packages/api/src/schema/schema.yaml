@@ -846,6 +846,28 @@ components:
           description:
             Timestamp (in milliseconds) at which object store object was created
           example: 1587667174725
+        gcsOptions:
+          type: object
+          required:
+            - bucket
+            - projectId
+            - path
+            - keyfile
+          description: Options for the Google Storage Client library.
+          properties:
+            keyfile:
+              type: object
+              description:
+                JSON containing the Google Storage Client credentials.
+            projectId:
+              type: string
+              description: Google Cloud Project ID.
+            bucket:
+              type: string
+              description: Google Cloud Storage bucket name.
+            path:
+              type: string
+              description: Path inside the bucket where the data will be stored.
 
     multistream-target:
       type: object
