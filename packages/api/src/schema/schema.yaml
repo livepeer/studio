@@ -993,7 +993,17 @@ components:
                           type: string
                           description: ID of the last task to fail execution.
                     data:
-                      $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs"
+                      type: object
+                      additionalProperties: false
+                      required: [videoFileCid]
+                      properties:
+                        $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties"
+                        videoFileCid:
+                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/videoFileCid"
+                          index: true
+                        nftMetadataCid:
+                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/nftMetadataCid"
+                          index: true
         name:
           type: string
           description:
