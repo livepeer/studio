@@ -344,7 +344,7 @@ export default class Table<T extends DBObject> {
     }
 
     if (!prop.index && !prop.unique) {
-      if (prop.properties) {
+      if (prop.properties && this.name === "asset") {
         return Promise.all(
           Object.entries(prop.properties).map(([childName, childProp]) =>
             this.ensureIndex(childName, childProp, [...parents, propName])
