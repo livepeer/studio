@@ -210,8 +210,8 @@ const NavigationBase = ({
                         },
                       }}>
                       {isDashboard && (
-                        <Link href="/docs/guides" passHref>
-                          <A>Docs</A>
+                        <Link href="https://docs.livepeer.studio" passHref>
+                          <A target="_blank">Docs</A>
                         </Link>
                       )}
                       {isDashboard && (

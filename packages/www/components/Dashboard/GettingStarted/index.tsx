@@ -62,7 +62,9 @@ const GettingStarted = ({ firstName = "" }) => {
                 Need more help? Read our step-by-step getting started tutorial.
               </Text>
             </Box>
-            <Link href="/docs/guides/start-live-streaming/tutorial" passHref>
+            <Link
+              href="https://docs.livepeer.studio/guides/livestreaming/"
+              passHref>
               <Button
                 as="a"
                 target="_blank"
@@ -107,7 +109,7 @@ const GettingStarted = ({ firstName = "" }) => {
               </Link>
               .
             </Text>
-            <Link href="/docs/api-reference" passHref>
+            <Link href="https://docs.livepeer.studio/references" passHref>
               <Button
                 as="a"
                 target="_blank"
