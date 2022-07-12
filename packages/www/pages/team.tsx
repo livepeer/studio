@@ -37,9 +37,6 @@ const TeamPage = ({ content }) => {
             <TeamSection teamMembers={teamMembers} />
           </Box>
         </Container>
-        <Fade key={0}>
-          <Prefooter backgroundColor="$panel" />
-        </Fade>
       </Box>
     </Layout>
   );
