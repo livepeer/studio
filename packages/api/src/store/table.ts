@@ -338,7 +338,7 @@ export default class Table<T extends DBObject> {
 
   // on startup: auto-create indices if they don't exist
   async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
-    if (process.env.NODE_ENV !== "test") {
+    if (process.env.NODE_ENV !== "test" && this.name !== "asset") {
       // avoid creating indexes in production right now...
       return;
     }
