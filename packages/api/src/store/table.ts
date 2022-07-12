@@ -357,10 +357,9 @@ export default class Table<T extends DBObject> {
     if (prop.unique) {
       unique = "unique";
     }
-    const fullPropName = (prefix: string, finalPrefix = prefix) =>
-      parents.map((p) => prefix + p).join("") + finalPrefix + propName;
-    const indexName = `${this.name}${fullPropName("_")}`;
-    const propAccessor = `data${fullPropName("->", "->>")}`;
+    const indexName = `${this.name}_${[...parents, propName].join("_")}`;
+    const parentsAcc = parents.map((p) => `->'${p}'`).join("");
+    const propAccessor = `data${parentsAcc}->>'${propName}'`;
     try {
       await this.db.query(`
           CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((${propAccessor}));
