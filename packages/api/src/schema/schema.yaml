@@ -212,7 +212,7 @@ components:
               - playback.user.new
               - asset.created
               - asset.status
-              - task.created
+              - task.spawned
               - task.status
               - task.finished
         url:

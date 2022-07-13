@@ -63,6 +63,15 @@ function validateAssetMeta(meta: Record<string, string>) {
   }
 }
 
+function cleanAssetResponse(assets: WithID<Asset>[]) {
+  let cleanedAssets = [];
+  for (var i = 0; i < assets.length; i++) {
+    delete assets[i].videoSpec;
+    cleanedAssets.push(assets[i]);
+  }
+  return cleanedAssets;
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
@@ -298,8 +307,17 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
-    toStringValues(req.query);
+  let {
+    limit,
+    cursor,
+    all,
+    allUsers,
+    order,
+    filters,
+    count,
+    details,
+    ...otherQs
+  } = toStringValues(req.query);
   const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
@@ -369,7 +387,12 @@ app.get("/", authorizer({}), async (req, res) => {
   if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  return res.json(output);
+
+  if (details) {
+    return res.json(output);
+  } else {
+    return res.json(cleanAssetResponse(output));
+  }
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
@@ -384,7 +407,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     );
   }
 
-  res.json(asset);
+  res.json(db.asset.cleanWriteOnlyResponse(asset));
 });
 
 app.post(
@@ -578,7 +601,7 @@ app.post(
     const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
     asset = await createAsset(asset, req.queue);
-    const task = await req.taskScheduler.createTask(
+    const task = await req.taskScheduler.spawnTask(
       "import",
       {
         import: { uploadedObjectKey },
@@ -587,7 +610,7 @@ app.post(
       asset
     );
 
-    res.json({ url, tusEndpoint, asset, task });
+    res.json({ url, tusEndpoint, asset, task: { id: task.id } });
   }
 );
 

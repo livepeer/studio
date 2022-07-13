@@ -214,12 +214,12 @@ export class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    const task = await this.createTask(type, params, inputAsset, outputAsset);
+    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
     await this.enqueueTask(task);
     return task;
   }
 
-  async createTask(
+  async spawnTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
@@ -238,11 +238,11 @@ export class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
-    await this.queue.publishWebhook("events.task.created", {
+    await this.queue.publishWebhook("events.task.spawned", {
       type: "webhook_event",
       id: uuid(),
       timestamp: task.createdAt,
-      event: "task.created",
+      event: "task.spawned",
       userId: task.userId,
       payload: {
         task: taskInfo(task),
