@@ -556,9 +556,16 @@ export const tusEventsHandler = (tusServer: tus.Server) => {
   tusServer.on(
     tus.EVENTS.EVENT_UPLOAD_COMPLETE,
     async ({ file }: { file: TusFileMetadata }) => {
-      const playbackId = file.id;
-      const { task } = await getPendingAssetAndTask(playbackId);
-      await taskScheduler.enqueueTask(task);
+      try {
+        const playbackId = file.id;
+        const { task } = await getPendingAssetAndTask(playbackId);
+        await taskScheduler.enqueueTask(task);
+      } catch (err) {
+        console.error(
+          `error processing finished upload fileId=${file.id} err=`,
+          err
+        );
+      }
     }
   );
 };
@@ -603,8 +610,8 @@ app.post("/upload/tus", async (req, res) => {
 
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
-  const { asset } = await getPendingAssetAndTask(playbackId);
-  const metadata = getTusMetadata(req);
+  await getPendingAssetAndTask(playbackId);
+  // const metadata = getTusMetadata(req);
   // TODO: Consider updating asset name with the metadata.filename?
   res.setHeader("livepeer-playback-id", playbackId);
   let response = await req.tusServer.handle(req, res);

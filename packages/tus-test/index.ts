@@ -54,7 +54,12 @@ async function doUpload() {
     onProgress(bytesUploaded, bytesTotal) {
       console.log(upload.url);
       const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+
       console.log(bytesUploaded, bytesTotal, `${percentage}%`);
+      if (!process.env.LP_URI && bytesUploaded > bytesTotal / 2) {
+        console.log("Half upload, aborting now to resume!");
+        process.exit(0);
+      }
     },
     onSuccess() {
       console.log("Upload finished:", upload.url);
@@ -67,13 +72,11 @@ async function doUpload() {
     // Found previous uploads so we select the first one.
     if (previousUploads.length) {
       console.log(previousUploads);
-      //upload.resumeFromPreviousUpload(previousUploads[0])
-    } else {
-      upload.start();
+      upload.resumeFromPreviousUpload(previousUploads[0]);
     }
 
     // Start the upload
-    //upload.start();
+    upload.start();
   });
 }
 

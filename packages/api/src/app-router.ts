@@ -25,8 +25,9 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
-import { tusEventsHandler } from "./controllers/asset";
+import { namingFunction, tusEventsHandler } from "./controllers/asset";
 import tus from "tus-node-server";
+import { S3ClientConfig } from "@aws-sdk/client-s3";
 import { parse as parseUrl } from "url";
 
 enum OrchestratorSource {
@@ -133,7 +134,7 @@ export default async function makeApp(params: CliArgs) {
       protocol = protocol.split("+")[1];
     }
 
-    tusServer.datastore = new tus.S3Store({
+    const opts: tus.S3StoreOptions | S3ClientConfig = {
       path: "/upload/tus",
       bucket: vodBucket,
       accessKeyId: vodAccessKey,
@@ -141,8 +142,10 @@ export default async function makeApp(params: CliArgs) {
       region: vodRegion,
       partSize: 8 * 1024 * 1024, // each uploaded part will have ~8MB,
       tmpDirPrefix: "directUpload",
-      endpoint: "https://storage.googleapis.com", // typescript complains, not in tus store struct
-    }); // TODO - Promise error handling
+      endpoint: "https://storage.googleapis.com",
+      namingFunction,
+    };
+    tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
 
     tusEventsHandler(tusServer);
   }
