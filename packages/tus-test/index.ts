@@ -17,22 +17,31 @@ const file = fs.createReadStream(path);
 const { size } = fs.statSync(path);
 
 async function doUpload() {
-  const res = await axios({
-    method: "POST",
-    url: "http://localhost:3004/api/asset/request-upload",
-    data: { name: "tus-test" },
-    headers: {
-      authorization: `Bearer ${process.env.LP_API_KEY}`,
-    },
-  });
-  if (res.status !== 200) {
-    throw new Error(
-      `Failed to request upload status=${res.status} body=${res.data}`
-    );
+  let uploadUrl = null;
+  if (process.env.LP_URI) {
+    uploadUrl = process.env.LP_URI;
+  } else {
+    const res = await axios({
+      method: "POST",
+      url: "http://localhost:3004/api/asset/request-upload",
+      data: { name: "tus-test" },
+      headers: {
+        authorization: `Bearer ${process.env.LP_API_KEY}`,
+      },
+    });
+    if (res.status !== 200) {
+      throw new Error(
+        `Failed to request upload status=${res.status} body=${res.data}`
+      );
+    }
+    uploadUrl = res.data.tusEndpoint;
   }
 
+  console.log(uploadUrl);
+
   const upload = new tus.Upload(file, {
-    endpoint: res.data.tusEndpoint,
+    endpoint: uploadUrl,
+    urlStorage: new (tus as any).FileUrlStorage("/tmp/ustorage/file"),
     metadata: {
       filename,
       filetype: "video/mp4",
@@ -51,14 +60,21 @@ async function doUpload() {
       console.log("Upload finished:", upload.url);
     },
   });
-  // Start the upload
-  upload.start();
-  /*upload.findPreviousUploads().then(function (previousUploads) {
-      // Found previous uploads so we select the first one. 
-      if (previousUploads.length) {
-          upload.resumeFromPreviousUpload(previousUploads[0])
-      }
-  })*/
+
+  upload.findPreviousUploads().then(function (previousUploads) {
+    console.log("LOOKING FOR PREVIOUS UPLOADS");
+    console.log(previousUploads);
+    // Found previous uploads so we select the first one.
+    if (previousUploads.length) {
+      console.log(previousUploads);
+      //upload.resumeFromPreviousUpload(previousUploads[0])
+    } else {
+      upload.start();
+    }
+
+    // Start the upload
+    //upload.start();
+  });
 }
 
 doUpload().catch((err) => console.error("Error uploading:", err.message));
