@@ -51,6 +51,7 @@ async function doUpload() {
       console.log("Upload finished:", upload.url);
     },
   });
+  upload.start();
   /*upload.findPreviousUploads().then(function (previousUploads) {
       // Found previous uploads so we select the first one. 
       if (previousUploads.length) {
