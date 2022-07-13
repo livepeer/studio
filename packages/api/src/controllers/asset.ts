@@ -607,9 +607,7 @@ app.post("/upload/tus", async (req, res) => {
   const metadata = getTusMetadata(req);
   // TODO: Consider updating asset name with the metadata.filename?
   res.setHeader("livepeer-playback-id", playbackId);
-  console.log(`Tus upload for ${playbackId}`);
   let response = await req.tusServer.handle(req, res);
-  console.log("TUS RESPONSE ", response);
   return response;
 });
 

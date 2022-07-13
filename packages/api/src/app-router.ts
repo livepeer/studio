@@ -25,8 +25,9 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
-import { namingFunction, tusEventsHandler } from "./controllers/asset";
+import { tusEventsHandler } from "./controllers/asset";
 import tus from "tus-node-server";
+import { parse as parseUrl } from "url";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -123,23 +124,27 @@ export default async function makeApp(params: CliArgs) {
   let tusServer = new tus.Server();
   if (vodObjectStoreId) {
     const os = await db.objectStore.get(vodObjectStoreId);
-    const gcsOptions = os.gcsOptions;
 
-    if (gcsOptions) {
-      const keyFilename = "/tmp/keyfile.json";
-      const keyFileContent = JSON.stringify(gcsOptions.keyfile);
-      await fs.writeFile(keyFilename, keyFileContent);
-
-      tusServer.datastore = await new tus.GCSDataStore({
-        bucket: gcsOptions.bucket,
-        projectId: gcsOptions.projectId,
-        namingFunction: namingFunction,
-        path: gcsOptions.path,
-        keyFilename,
-      }); // TODO - Promise erro handling
-      gcsOptions.keyFilename = keyFilename;
-      tusEventsHandler(tusServer);
+    const parsed = parseUrl(os.url);
+    const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
+    const [_, vodRegion, vodBucket] = parsed.path.split("/");
+    let protocol = parsed.protocol;
+    if (protocol.includes("+")) {
+      protocol = protocol.split("+")[1];
     }
+
+    tusServer.datastore = new tus.S3Store({
+      path: "/upload/tus",
+      bucket: vodBucket,
+      accessKeyId: vodAccessKey,
+      secretAccessKey: vodSecretAccessKey,
+      region: vodRegion,
+      partSize: 8 * 1024 * 1024, // each uploaded part will have ~8MB,
+      tmpDirPrefix: "directUpload",
+      endpoint: "https://storage.googleapis.com", // typescript complains, not in tus store struct
+    }); // TODO - Promise error handling
+
+    tusEventsHandler(tusServer);
   }
 
   process.on("beforeExit", (code) => {

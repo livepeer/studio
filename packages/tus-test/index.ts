@@ -11,7 +11,7 @@ if (!process.env.LP_API_KEY) {
 //const base = `/Users/victorges/workspace/test-videos/`;
 //const filename = `rtm.mp4`;
 const base = `/home/gioele/Downloads/`;
-const filename = `bbb_sunflower_1080p_30fps_normal_2min.mp4`;
+const filename = `bbbx3_720_2s.mp4`;
 const path = base + filename;
 const file = fs.createReadStream(path);
 const { size } = fs.statSync(path);
@@ -43,6 +43,7 @@ async function doUpload() {
       throw error;
     },
     onProgress(bytesUploaded, bytesTotal) {
+      console.log(upload.url);
       const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
       console.log(bytesUploaded, bytesTotal, `${percentage}%`);
     },
@@ -50,7 +51,15 @@ async function doUpload() {
       console.log("Upload finished:", upload.url);
     },
   });
-  upload.start();
+  /*upload.findPreviousUploads().then(function (previousUploads) {
+      // Found previous uploads so we select the first one. 
+      if (previousUploads.length) {
+          upload.resumeFromPreviousUpload(previousUploads[0])
+      }
+
+      // Start the upload
+      upload.start()
+  })*/
 }
 
 doUpload().catch((err) => console.error("Error uploading:", err.message));

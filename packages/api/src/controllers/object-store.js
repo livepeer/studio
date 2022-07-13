@@ -112,7 +112,6 @@ app.post(
       name: req.body.name,
       publicUrl: req.body.publicUrl,
       userId: req.user.id,
-      gcsOptions: req.body.gcsOptions,
       createdAt: Date.now(),
     });
 
