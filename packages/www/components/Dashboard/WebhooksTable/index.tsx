@@ -202,12 +202,6 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         Listen for events on your Livepeer Studio account so your integration
         can automatically trigger reactions.
       </Text>
-      {/* <Link href="/docs" passHref>
-        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
-          <Box>Learn more</Box>
-          <ArrowRightIcon />
-        </A>
-      </Link> */}
       <Button
         onClick={() => createDialogState.onOn()}
         css={{ alignSelf: "flex-start" }}

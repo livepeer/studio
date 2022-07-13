@@ -53,8 +53,11 @@ const defaultEmptyState = (
     <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
       Multistream targets are sent the live media from the stream.
     </Text>
-    <Link href="/docs/api-reference/session/overview" passHref>
-      <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
+    <Link href="https://docs.livepeer.studio/references/session/" passHref>
+      <A
+        target="_blank"
+        variant="primary"
+        css={{ display: "flex", ai: "center", mb: "$5" }}>
         <Box>Learn more</Box>
         <ArrowRightIcon />
       </A>

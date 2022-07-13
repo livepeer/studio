@@ -232,8 +232,11 @@ const TokenTable = ({
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         API keys allow you to authenticate API requests in your app
       </Text>
-      <Link href="/docs/guides/api" passHref>
-        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
+      <Link href="https://docs.livepeer.studio/references" passHref>
+        <A
+          target="_blank"
+          variant="primary"
+          css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>

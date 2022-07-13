@@ -318,8 +318,11 @@ const StreamsTable = ({
         Create a unique stream object, broadcast live video content and playback
         your live stream with Livepeer Studio.
       </Text>
-      <Link href="/docs/guides" passHref>
-        <A variant="primary" css={{ display: "flex", ai: "center", mb: "$5" }}>
+      <Link href="https://docs.livepeer.studio/guides" passHref>
+        <A
+          target="_blank"
+          variant="primary"
+          css={{ display: "flex", ai: "center", mb: "$5" }}>
           <Box>Learn more</Box>
           <ArrowRightIcon />
         </A>

@@ -120,8 +120,9 @@ const Header = ({ breadcrumbs = [] }) => {
               border: "none",
             }}>
             <StyledDocumentationIcon />
-            <Link href="/docs/guides" passHref>
+            <Link href="https://docs.livepeer.studio" passHref>
               <A
+                target="_blank"
                 css={{
                   ml: "$2",
                   color: "$hiContrast",
@@ -292,8 +293,9 @@ const Header = ({ breadcrumbs = [] }) => {
               <Text size="2" css={{ mb: "$3", color: "$primary9" }}>
                 HELP
               </Text>
-              <Link href="/docs/guides" passHref>
+              <Link href="https://docs.livepeer.studio" passHref>
                 <A
+                  target="_blank"
                   css={{
                     display: "flex",
                     alignItems: "center",

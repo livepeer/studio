@@ -17,7 +17,7 @@ const defaultNavProps = {
       children: "Blog",
     },
     {
-      href: "/docs/guides",
+      href: "https://docs.livepeer.studio",
       children: "Docs",
       isExternal: true,
     },
