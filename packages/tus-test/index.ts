@@ -17,13 +17,14 @@ const file = fs.createReadStream(path);
 const { size } = fs.statSync(path);
 
 async function doUpload() {
-  let uploadUrl = null;
+  let uploadUrl: string;
   if (process.env.LP_URI) {
     uploadUrl = process.env.LP_URI;
   } else {
     const res = await axios({
       method: "POST",
       url: "http://localhost:3004/api/asset/request-upload",
+      // url: "https://livepeer.monster/api/asset/request-upload",
       data: { name: "tus-test" },
       headers: {
         authorization: `Bearer ${process.env.LP_API_KEY}`,
@@ -36,7 +37,6 @@ async function doUpload() {
     }
     uploadUrl = res.data.tusEndpoint;
   }
-
   console.log(uploadUrl);
 
   const upload = new tus.Upload(file, {
@@ -56,10 +56,10 @@ async function doUpload() {
       const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
 
       console.log(bytesUploaded, bytesTotal, `${percentage}%`);
-      if (!process.env.LP_URI && bytesUploaded > bytesTotal / 2) {
-        console.log("Half upload, aborting now to resume!");
-        process.exit(0);
-      }
+      // if (!process.env.LP_URI && bytesUploaded > bytesTotal / 2) {
+      //   console.log("Half upload, aborting now to resume!");
+      //   process.exit(0);
+      // }
     },
     onSuccess() {
       console.log("Upload finished:", upload.url);
@@ -71,7 +71,6 @@ async function doUpload() {
     console.log(previousUploads);
     // Found previous uploads so we select the first one.
     if (previousUploads.length) {
-      console.log(previousUploads);
       upload.resumeFromPreviousUpload(previousUploads[0]);
     }
 

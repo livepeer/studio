@@ -1,11 +1,10 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import http from "http";
 import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
-import tus, { GCSDataStore } from "tus-node-server";
+import tus from "tus-node-server";
 import {
   makeNextHREF,
   parseFilters,
@@ -535,18 +534,14 @@ app.post(
   }
 );
 
-const namingFunction = (req: Request) => {
-  const playbackId = req.res.getHeader("livepeer-playback-id").toString();
-  if (!playbackId) {
-    throw new InternalServerError("Missing playbackId in response headers");
-  }
-  return playbackId;
-};
-
 let tusServer: tus.Server;
 
-export async function setupTus(vodObjectStoreId: string) {
-  const os = await db.objectStore.get(vodObjectStoreId);
+export const setupTus = async (objectStoreId: string): Promise<void> => {
+  tusServer = await createTusServer(objectStoreId);
+};
+
+async function createTusServer(objectStoreId: string) {
+  const os = await db.objectStore.get(objectStoreId);
 
   const url = new URL(os.url);
   const [_, vodRegion, vodBucket] = url.pathname.split("/");
@@ -562,14 +557,23 @@ export async function setupTus(vodObjectStoreId: string) {
     secretAccessKey: url.password,
     region: vodRegion,
     partSize: 8 * 1024 * 1024,
-    tmpDirPrefix: "directUpload",
+    tmpDirPrefix: "tus-tmp-files",
     endpoint: "https://storage.googleapis.com",
     namingFunction,
   };
-  tusServer = new tus.Server();
+  const tusServer = new tus.Server();
   tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
   tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete);
+  return tusServer;
 }
+
+const namingFunction = (req: Request) => {
+  const playbackId = req.res.getHeader("livepeer-playback-id").toString();
+  if (!playbackId) {
+    throw new InternalServerError("Missing playbackId in response headers");
+  }
+  return `directUpload/${playbackId}`;
+};
 
 type TusFileMetadata = {
   id: string;
@@ -579,7 +583,7 @@ type TusFileMetadata = {
 
 const onTusUploadComplete = async ({ file }: { file: TusFileMetadata }) => {
   try {
-    const playbackId = file.id;
+    const playbackId = file.id.split("/")[1]; // `directUpload/${playbackId}`
     const { task } = await getPendingAssetAndTask(playbackId);
     await taskScheduler.enqueueTask(task);
   } catch (err) {
