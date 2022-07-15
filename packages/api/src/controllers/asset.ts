@@ -70,6 +70,12 @@ async function validateAssetPayload(
 ): Promise<WithID<Asset>> {
   validateAssetMeta(payload.meta);
   if (payload.objectStoreId) {
+    if (payload.objectStoreId !== defaultObjectStoreId) {
+      // TODO: Allow assets Object Store to be changed at some point.
+      throw new UnprocessableEntityError(
+        `Object store is not customizable right now`
+      );
+    }
     const os = await db.objectStore.get(payload.objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
