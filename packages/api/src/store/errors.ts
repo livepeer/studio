@@ -58,3 +58,11 @@ export class InternalServerError extends APIError {
     this.status = 500;
   }
 }
+
+export class NotImplementedError extends APIError {
+  constructor(message) {
+    super(message);
+    this.type = "NotImplementedError";
+    this.status = 501;
+  }
+}

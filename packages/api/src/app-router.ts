@@ -25,7 +25,7 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
-import { namingFunction, tusEventsHandler } from "./controllers/asset";
+import { setupTus } from "./controllers/asset";
 import tus from "tus-node-server";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import { parse as parseUrl } from "url";
@@ -122,32 +122,8 @@ export default async function makeApp(params: CliArgs) {
   });
   await webhookCannon.start();
 
-  let tusServer = new tus.Server();
   if (vodObjectStoreId) {
-    const os = await db.objectStore.get(vodObjectStoreId);
-
-    const parsed = parseUrl(os.url);
-    const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
-    const [_, vodRegion, vodBucket] = parsed.path.split("/");
-    let protocol = parsed.protocol;
-    if (protocol.includes("+")) {
-      protocol = protocol.split("+")[1];
-    }
-
-    const opts: tus.S3StoreOptions | S3ClientConfig = {
-      path: "/upload/tus",
-      bucket: vodBucket,
-      accessKeyId: vodAccessKey,
-      secretAccessKey: vodSecretAccessKey,
-      region: vodRegion,
-      partSize: 8 * 1024 * 1024, // each uploaded part will have ~8MB,
-      tmpDirPrefix: "directUpload",
-      endpoint: "https://storage.googleapis.com",
-      namingFunction,
-    };
-    tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
-
-    tusEventsHandler(tusServer);
+    await setupTus(vodObjectStoreId);
   }
 
   process.on("beforeExit", (code) => {
@@ -180,7 +156,6 @@ export default async function makeApp(params: CliArgs) {
     req.config = params;
     req.frontendDomain = frontendDomain; // defaults to livepeer.studio
     req.queue = queue;
-    req.tusServer = tusServer;
     req.taskScheduler = taskScheduler;
     req.stripe = stripe;
     next();

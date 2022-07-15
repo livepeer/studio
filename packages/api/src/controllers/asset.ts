@@ -24,6 +24,7 @@ import {
   BadRequestError,
   InternalServerError,
   UnauthorizedError,
+  NotImplementedError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -38,6 +39,7 @@ import { WithID } from "../store/types";
 import { mergeAssetStatus } from "../store/asset-table";
 import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
+import { S3ClientConfig } from "@aws-sdk/client-s3";
 
 const app = Router();
 
@@ -533,7 +535,7 @@ app.post(
   }
 );
 
-export const namingFunction = (req: Request) => {
+const namingFunction = (req: Request) => {
   const playbackId = req.res.getHeader("livepeer-playback-id").toString();
   if (!playbackId) {
     throw new InternalServerError("Missing playbackId in response headers");
@@ -541,33 +543,51 @@ export const namingFunction = (req: Request) => {
   return playbackId;
 };
 
-const getTusMetadata = (req: http.IncomingMessage) => {
-  const uploadMetadata = req.headers["upload-metadata"]?.toString();
-  return new Map(
-    uploadMetadata?.split(/,\s*/).map((kv) => {
-      const [key, encodedValue] = kv.split(" ", 2);
-      const value = Buffer.from(encodedValue, "base64").toString();
-      return [key, value];
-    })
-  );
+let tusServer: tus.Server;
+
+export async function setupTus(vodObjectStoreId: string) {
+  const os = await db.objectStore.get(vodObjectStoreId);
+
+  const url = new URL(os.url);
+  const [_, vodRegion, vodBucket] = url.pathname.split("/");
+  let protocol = url.protocol;
+  if (protocol.includes("+")) {
+    protocol = protocol.split("+")[1];
+  }
+
+  const opts: tus.S3StoreOptions | S3ClientConfig = {
+    path: "/upload/tus",
+    bucket: vodBucket,
+    accessKeyId: url.username,
+    secretAccessKey: url.password,
+    region: vodRegion,
+    partSize: 8 * 1024 * 1024,
+    tmpDirPrefix: "directUpload",
+    endpoint: "https://storage.googleapis.com",
+    namingFunction,
+  };
+  tusServer = new tus.Server();
+  tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
+  tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete);
+}
+
+type TusFileMetadata = {
+  id: string;
+  upload_length: `${number}`;
+  upload_metadata: string;
 };
 
-export const tusEventsHandler = (tusServer: tus.Server) => {
-  tusServer.on(
-    tus.EVENTS.EVENT_UPLOAD_COMPLETE,
-    async ({ file }: { file: TusFileMetadata }) => {
-      try {
-        const playbackId = file.id;
-        const { task } = await getPendingAssetAndTask(playbackId);
-        await taskScheduler.enqueueTask(task);
-      } catch (err) {
-        console.error(
-          `error processing finished upload fileId=${file.id} err=`,
-          err
-        );
-      }
-    }
-  );
+const onTusUploadComplete = async ({ file }: { file: TusFileMetadata }) => {
+  try {
+    const playbackId = file.id;
+    const { task } = await getPendingAssetAndTask(playbackId);
+    await taskScheduler.enqueueTask(task);
+  } catch (err) {
+    console.error(
+      `error processing finished upload fileId=${file.id} err=`,
+      err
+    );
+  }
 };
 
 const getPendingAssetAndTask = async (playbackId: string) => {
@@ -594,11 +614,12 @@ const getPendingAssetAndTask = async (playbackId: string) => {
   return { asset, task };
 };
 
-type TusFileMetadata = {
-  id: string;
-  upload_length: `${number}`;
-  upload_metadata: string;
-};
+app.use("/upload/tus/*", async (req, res, next) => {
+  if (!tusServer) {
+    throw new NotImplementedError("Tus server not configured");
+  }
+  return next();
+});
 
 app.post("/upload/tus", async (req, res) => {
   const uploadToken = req.query.uploadToken?.toString();
@@ -611,15 +632,13 @@ app.post("/upload/tus", async (req, res) => {
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
   await getPendingAssetAndTask(playbackId);
-  // const metadata = getTusMetadata(req);
-  // TODO: Consider updating asset name with the metadata.filename?
+  // TODO: Consider updating asset name and meta from metadata?
   res.setHeader("livepeer-playback-id", playbackId);
-  let response = await req.tusServer.handle(req, res);
-  return response;
+  return tusServer.handle(req, res);
 });
 
-app.all("/upload/tus/*", async (req, res) => {
-  return req.tusServer.handle(req, res);
+app.all("/upload/tus/*", (req, res) => {
+  return tusServer.handle(req, res);
 });
 
 app.put("/upload/:url", async (req, res) => {
