@@ -1009,7 +1009,7 @@ components:
             {
               "title": "My awesome video",
               "description": "This is a video of my awesome life",
-              "tags": ["awesome", "life", "video"],
+              "tags": "awesome,life,video",
             }
         createdAt:
           type: number
