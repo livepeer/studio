@@ -42,7 +42,7 @@ namespace messages {
     event: WebhookEvent;
     user: WithID<User>;
     webhook: DBWebhook;
-    stream: DBStream;
+    stream?: DBStream;
     retries?: number;
     lastInterval?: number;
   }

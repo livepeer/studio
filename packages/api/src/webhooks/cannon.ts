@@ -14,6 +14,7 @@ import { sign, sendgridEmail } from "../controllers/helpers";
 import TaskScheduler from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
+import { DBStream } from "../store/stream-table";
 
 const WEBHOOK_TIMEOUT = 5 * 1000;
 const MAX_BACKOFF = 60 * 60 * 1000;
@@ -139,20 +140,23 @@ export default class WebhookCannon {
       return true;
     }
 
-    let stream = await this.db.stream.get(event.streamId, {
-      useReplica: false,
-    });
-    if (!stream) {
-      // if stream isn't found. don't fire the webhook, log an error
-      throw new Error(
-        `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+    let stream: DBStream | undefined;
+    if (event.streamId) {
+      stream = await this.db.stream.get(event.streamId, {
+        useReplica: false,
+      });
+      if (!stream) {
+        // if stream isn't found. don't fire the webhook, log an error
+        throw new Error(
+          `webhook Cannon: onTrigger: Stream Not found , streamId: ${event.streamId}`
+        );
+      }
+      // basic sanitization.
+      stream = this.db.stream.addDefaultFields(
+        this.db.stream.removePrivateFields({ ...stream })
       );
+      delete stream.streamKey;
     }
-    // basic sanitization.
-    let sanitized = this.db.stream.addDefaultFields(
-      this.db.stream.removePrivateFields({ ...stream })
-    );
-    delete sanitized.streamKey;
 
     let user = await this.db.user.get(event.userId);
     if (!user || user.suspended) {
@@ -168,7 +172,7 @@ export default class WebhookCannon {
         timestamp: Date.now(),
         streamId: event.streamId,
         event,
-        stream: sanitized,
+        stream,
         user,
       };
       await Promise.all(
@@ -325,8 +329,8 @@ export default class WebhookCannon {
   }
 
   async _fireHook(trigger: messages.WebhookTrigger, verifyUrl = true) {
-    const { event, webhook, stream: sanitized, user } = trigger;
-    if (!event || !webhook || !sanitized || !user) {
+    const { event, webhook, stream, user } = trigger;
+    if (!event || !webhook || !user) {
       console.error(
         `invalid webhook trigger message received. type=${trigger.type} message=`,
         trigger
@@ -384,7 +388,7 @@ export default class WebhookCannon {
           createdAt: event.timestamp, // allows receiver to know how long ago event was emitted
           timestamp,
           event: event.event,
-          stream: sanitized,
+          stream,
           payload: event.payload,
         }),
       };
