@@ -587,7 +587,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
-  await db.asset.delete(id);
+  await db.asset.markDeleted(id);
   res.status(204);
   res.end();
 });
