@@ -211,10 +211,14 @@ components:
               - multistream.disconnected
               - playback.user.new
               - asset.created
-              - asset.status
+              - asset.updated
+              - asset.error
+              - asset.ready
+              - asset.deleted
               - task.spawned
-              - task.status
-              - task.finished
+              - task.updated
+              - task.succeeded
+              - task.failed
         url:
           type: string
           format: uri

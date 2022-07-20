@@ -19,7 +19,7 @@ const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
 type QueueName = keyof typeof QUEUES;
 type ExchangeName = keyof typeof EXCHANGES;
-type RoutingKey =
+export type RoutingKey =
   | `events.${EventKey}`
   | `webhooks.${string}`
   | `task.trigger.${string}.${string}`;

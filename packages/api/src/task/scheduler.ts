@@ -9,6 +9,8 @@ import {
   mergeStorageStatus,
   taskOutputToIpfsStorage,
 } from "../store/asset-table";
+import { RoutingKey } from "../store/queue";
+import { EventKey } from "../store/webhook-table";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -269,22 +271,27 @@ export class TaskScheduler {
       ...updates,
     };
     const timestamp = task.status.updatedAt;
-    await this.queue.publishWebhook("events.task.status", {
+    await this.queue.publishWebhook("events.task.updated", {
       type: "webhook_event",
       id: uuid(),
       timestamp,
-      event: "task.status",
+      event: "task.updated",
       userId: task.userId,
       payload: {
         task: taskInfo(task),
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
-      await this.queue.publishWebhook("events.task.finished", {
+      let task_event: EventKey = "task.succeeded";
+      if (task.status.phase === "failed") {
+        task_event = "task.failed";
+      }
+      let routingKey: RoutingKey = `events.${task_event}`;
+      await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
         id: uuid(),
         timestamp,
-        event: "task.finished",
+        event: task_event,
         userId: task.userId,
         payload: {
           success: task.status.phase === "completed",
@@ -311,11 +318,11 @@ export class TaskScheduler {
       ...updates,
     };
     const timestamp = asset.status.updatedAt;
-    await this.queue.publishWebhook("events.asset.status", {
+    await this.queue.publishWebhook("events.asset.updated", {
       type: "webhook_event",
       id: uuid(),
       timestamp,
-      event: "asset.status",
+      event: "asset.updated",
       userId: asset.userId,
       payload: {
         asset: {
