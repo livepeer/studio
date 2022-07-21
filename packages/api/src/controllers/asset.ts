@@ -134,8 +134,8 @@ async function reconcileAssetStorage(
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
   task?: WithID<Task>
-): Promise<{ storage: Asset["storage"]; status: Asset["status"] }> {
-  let { storage, status } = asset;
+): Promise<Asset["storage"]> {
+  let { storage } = asset;
   const ipfsParamsEq =
     JSON.stringify(newStorage?.ipfs) === JSON.stringify(storage?.ipfs);
   if (!ipfsParamsEq) {
@@ -145,22 +145,27 @@ async function reconcileAssetStorage(
     if (!task) {
       task = await taskScheduler.scheduleTask(
         "export",
-        { export: { ipfs: newStorage.ipfs } },
+        { export: { ipfs: newStorage.ipfs.spec } },
         asset
       );
     }
-    storage = { ...storage, ipfs: newStorage.ipfs };
-    status = mergeAssetStatus(status, {
-      storage: {
-        ipfs: {
-          taskIds: {
+    storage = {
+      ...storage,
+      ipfs: {
+        ...storage?.ipfs,
+        ...newStorage.ipfs,
+        status: {
+          ...storage?.ipfs?.status,
+          phase: "waiting",
+          tasks: {
+            ...storage?.ipfs?.status?.tasks,
             pending: task.id,
           },
         },
       },
-    });
+    };
   }
-  return { storage, status };
+  return storage;
 }
 
 async function genUploadUrl(
@@ -362,8 +367,20 @@ app.post(
       asset
     );
     if ("ipfs" in params && !params.ipfs?.pinata) {
-      const updates = await reconcileAssetStorage(req, asset, params, task);
-      await req.taskScheduler.updateAsset(asset, updates);
+      // TODO: Make this unsupported. PATCH should be the only way to change asset storage.
+      console.warn(
+        `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`
+      );
+      const storage = await reconcileAssetStorage(
+        req,
+        asset,
+        { ipfs: { spec: params.ipfs } },
+        task
+      );
+      await req.taskScheduler.updateAsset(asset, {
+        storage,
+        status: { ...asset.status, updatedAt: Date.now() },
+      });
     }
 
     res.status(201);
@@ -592,7 +609,7 @@ app.patch(
     // these are the only updateable fields
     let { name, meta, storage } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
-    if (storage?.ipfs?.pinata) {
+    if (storage?.ipfs?.spec.pinata) {
       throw new BadRequestError(
         "Custom pinata not allowed in asset storage. Call export API explicitly instead"
       );
@@ -605,11 +622,17 @@ app.patch(
       throw new NotFoundError(`asset not found`);
     }
 
-  const storageUpdates = storage ? await reconcileAssetStorage(req, asset, storage) : null;
+    if (storage) {
+      storage = await reconcileAssetStorage(req, asset, storage);
+    }
     await req.taskScheduler.updateAsset(asset, {
       name,
       meta,
-      ...storageUpdates,
+      storage,
+      status: {
+        ...asset.status,
+        updatedAt: Date.now(),
+      },
     });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
