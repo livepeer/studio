@@ -944,7 +944,60 @@ components:
           additionalProperties: false
           properties:
             ipfs:
-              $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+              type: object
+              required: [spec]
+              additionalProperties: false
+              properties:
+                spec:
+                  $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+                status:
+                  readOnly: true
+                  additionalProperties: false
+                  required: [taskIds]
+                  properties:
+                    phase:
+                      type: string
+                      description: Phase of the asset storage
+                      enum:
+                        - waiting
+                        - ready
+                        - failed
+                    errorMessage:
+                      type: string
+                      description:
+                        Error message if the last storage changed failed.
+                    taskIds:
+                      type: object
+                      additionalProperties: false
+                      properties:
+                        pending:
+                          type: string
+                          description:
+                            ID of any currently running task that is exporting
+                            this asset to IPFS.
+                        last:
+                          type: string
+                          description:
+                            ID of the last task to run successfully, that
+                            created the currently saved data.
+                        failed:
+                          type: string
+                          description: ID of the last task to fail execution.
+                    addresses:
+                      type: object
+                      description:
+                        Addresses of the asset in IPFS from the last successful
+                        task execution.
+                      additionalProperties: false
+                      required: [videoFileCid]
+                      properties:
+                        $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties"
+                        videoFileCid:
+                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/videoFileCid"
+                          index: true
+                        nftMetadataCid:
+                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/nftMetadataCid"
+                          index: true
         status:
           type: object
           additionalProperties: false
@@ -967,43 +1020,6 @@ components:
             errorMessage:
               type: string
               description: Error message if the asset creation failed.
-            storage:
-              type: object
-              additionalProperties: false
-              properties:
-                ipfs:
-                  additionalProperties: false
-                  required: [taskIds]
-                  properties:
-                    taskIds:
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        pending:
-                          type: string
-                          description:
-                            ID of any currently running task that is exporting
-                            this asset to IPFS.
-                        last:
-                          type: string
-                          description:
-                            ID of the last task to run successfully, that
-                            created the currently saved data.
-                        failed:
-                          type: string
-                          description: ID of the last task to fail execution.
-                    data:
-                      type: object
-                      additionalProperties: false
-                      required: [videoFileCid]
-                      properties:
-                        $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties"
-                        videoFileCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/videoFileCid"
-                          index: true
-                        nftMetadataCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/nftMetadataCid"
-                          index: true
         name:
           type: string
           description:
