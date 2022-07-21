@@ -953,7 +953,7 @@ components:
                 status:
                   readOnly: true
                   additionalProperties: false
-                  required: [taskIds]
+                  required: [tasks]
                   properties:
                     phase:
                       type: string
@@ -966,7 +966,7 @@ components:
                       type: string
                       description:
                         Error message if the last storage changed failed.
-                    taskIds:
+                    tasks:
                       type: object
                       additionalProperties: false
                       properties:
