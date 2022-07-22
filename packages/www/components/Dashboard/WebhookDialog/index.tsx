@@ -57,7 +57,7 @@ const eventOptions: Webhook["events"] = [
   "asset.created",
   "asset.updated",
   "asset.ready",
-  "asset.error",
+  "asset.failed",
   "asset.deleted",
   "task.spawned",
   "task.updated",

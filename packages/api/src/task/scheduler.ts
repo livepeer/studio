@@ -331,6 +331,24 @@ export class TaskScheduler {
         },
       },
     });
+    if (asset.status.phase == "ready" || asset.status.phase == "failed") {
+      let asset_event: EventKey = "asset.ready";
+      if (asset.status.phase === "failed") {
+        asset_event = "asset.failed";
+      }
+      let routingKey: RoutingKey = `events.${asset_event}`;
+      await this.queue.publishWebhook(routingKey, {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp,
+        event: asset_event,
+        userId: asset.userId,
+        payload: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      });
+    }
   }
 }
 
