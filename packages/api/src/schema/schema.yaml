@@ -950,10 +950,11 @@ components:
               properties:
                 spec:
                   $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+                  default: {}
                 status:
                   readOnly: true
                   additionalProperties: false
-                  required: [tasks]
+                  required: [phase, tasks]
                   properties:
                     phase:
                       type: string

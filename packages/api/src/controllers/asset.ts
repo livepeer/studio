@@ -137,15 +137,18 @@ async function reconcileAssetStorage(
 ): Promise<Asset["storage"]> {
   let { storage } = asset;
   const ipfsParamsEq =
-    JSON.stringify(newStorage?.ipfs) === JSON.stringify(storage?.ipfs);
+    JSON.stringify(newStorage.ipfs?.spec) ===
+    JSON.stringify(storage?.ipfs?.spec);
   if (!ipfsParamsEq) {
-    if (!newStorage.ipfs) {
+    let newIpfs = newStorage.ipfs;
+    if (!newIpfs) {
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
+    newIpfs = { spec: {}, ...newIpfs };
     if (!task) {
       task = await taskScheduler.scheduleTask(
         "export",
-        { export: { ipfs: newStorage.ipfs.spec } },
+        { export: { ipfs: newIpfs.spec } },
         asset
       );
     }
@@ -153,7 +156,7 @@ async function reconcileAssetStorage(
       ...storage,
       ipfs: {
         ...storage?.ipfs,
-        ...newStorage.ipfs,
+        ...newIpfs,
         status: {
           ...storage?.ipfs?.status,
           phase: "waiting",
@@ -611,7 +614,7 @@ app.patch(
     validateAssetMeta(meta);
     if (storage?.ipfs?.spec.pinata) {
       throw new BadRequestError(
-        "Custom pinata not allowed in asset storage. Call export API explicitly instead"
+        "Custom pinata not allowed in asset storage. Call /export API explicitly instead"
       );
     }
 
