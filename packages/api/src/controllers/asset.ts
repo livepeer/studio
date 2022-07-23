@@ -632,24 +632,38 @@ app.post(
   "/migrate-status",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    let { limit, cursor } = toStringValues(req.query);
+    let { limit, cursor, concurrency } = toStringValues(req.query);
     if (isNaN(parseInt(limit))) {
       limit = "100";
     }
 
-    const query = [sql`asset.data->'status'->>'phase' IS NULL`];
+    const query = [
+      sql`asset.data->'storage'->>'ipfs' IS NOT NULL`,
+      sql`asset.data->'storage'->'ipfs'->>'spec' IS NULL`,
+    ];
     const fields = " asset.id as id, asset.data as data";
     const [toUpdate, nextCursor] = await db.asset.find(query, {
       limit,
       cursor,
       fields,
+      order: "data->>'id' ASC",
     });
 
+    let promises: Promise<void>[] = [];
+    let batchSize = parseInt(concurrency);
+    if (isNaN(batchSize) || batchSize < 1) {
+      batchSize = 5;
+    }
     for (const asset of toUpdate) {
       // the db.asset will actually already return the asset transformed to the
       // updated format. All we need to do is re-save it as returned here.
-      await db.asset.replace(asset);
+      promises.push(db.asset.replace(asset));
+      if (promises.length >= batchSize) {
+        await Promise.all(promises);
+        promises = [];
+      }
     }
+    await Promise.all(promises);
 
     if (toUpdate.length > 0 && nextCursor) {
       res.links({ next: makeNextHREF(req, nextCursor) });
