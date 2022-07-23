@@ -5,7 +5,7 @@ import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
-import { mergeAssetStatus } from "../store/asset-table";
+import { mergeStorageStatus } from "../store/asset-table";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -122,19 +122,24 @@ export default class TaskScheduler {
         break;
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
-        if (inputAsset.status.storage?.ipfs?.taskIds?.pending === task.id) {
+        if (inputAsset.storage?.ipfs?.status?.tasks.pending === task.id) {
           await this.updateAsset(inputAsset, {
-            status: mergeAssetStatus(inputAsset.status, {
-              storage: {
-                ipfs: {
-                  taskIds: {
+            storage: {
+              ...inputAsset.storage,
+              ipfs: {
+                ...inputAsset.storage.ipfs,
+                status: mergeStorageStatus(inputAsset.storage.ipfs.status, {
+                  phase: "ready",
+                  errorMessage: undefined,
+                  tasks: {
                     pending: undefined,
+                    failed: undefined,
                     last: task.id,
                   },
-                  data: event.output.export.ipfs,
-                },
+                  addresses: event.output.export.ipfs,
+                }),
               },
-            }),
+            },
           });
         }
         break;
@@ -165,18 +170,28 @@ export default class TaskScheduler {
     switch (task.type) {
       case "export":
         const inputAsset = await db.asset.get(task.inputAssetId);
-        if (inputAsset.status?.storage?.ipfs?.taskIds?.pending === task.id) {
+        const ipfsStatus = inputAsset.storage?.ipfs?.status;
+        if (ipfsStatus?.tasks.pending === task.id) {
+          let prevSpec: Asset["storage"]["ipfs"]["spec"];
+          if (ipfsStatus.tasks.last) {
+            const prevTask = await db.task.get(ipfsStatus.tasks.last);
+            prevSpec = (prevTask.params?.export as any).ipfs;
+          }
           await this.updateAsset(inputAsset, {
-            status: mergeAssetStatus(inputAsset.status, {
-              storage: {
-                ipfs: {
-                  taskIds: {
+            storage: {
+              ...inputAsset.storage,
+              ipfs: {
+                spec: prevSpec ?? inputAsset.storage.ipfs.spec,
+                status: mergeStorageStatus(ipfsStatus, {
+                  phase: prevSpec ? "reverted" : "failed",
+                  errorMessage: error,
+                  tasks: {
                     pending: undefined,
                     failed: task.id,
                   },
-                },
+                }),
               },
-            }),
+            },
           });
         }
         break;
@@ -269,13 +284,14 @@ export default class TaskScheduler {
     }
   }
 
-  async updateAsset(
-    asset: string | Asset,
-    updates: Partial<Asset> & Required<Pick<Asset, "status">>
-  ) {
+  async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
+    updates = {
+      ...updates,
+      status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
+    };
     await db.asset.update(asset.id, updates);
     if (!updates.status || updates.status === asset.status) {
       return;

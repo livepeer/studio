@@ -945,7 +945,6 @@ components:
           properties:
             ipfs:
               type: object
-              required: [spec]
               additionalProperties: false
               properties:
                 spec:
@@ -963,6 +962,7 @@ components:
                         - waiting
                         - ready
                         - failed
+                        - reverted
                     errorMessage:
                       type: string
                       description:

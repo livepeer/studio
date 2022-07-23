@@ -32,7 +32,7 @@ import {
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
-import { mergeAssetStatus } from "../store/asset-table";
+import { mergeStorageStatus } from "../store/asset-table";
 import Queue from "../store/queue";
 
 const app = Router();
@@ -155,16 +155,11 @@ async function reconcileAssetStorage(
     storage = {
       ...storage,
       ipfs: {
-        ...storage?.ipfs,
-        ...newIpfs,
-        status: {
-          ...storage?.ipfs?.status,
+        spec: newIpfs.spec,
+        status: mergeStorageStatus(storage?.ipfs?.status, {
           phase: "waiting",
-          tasks: {
-            ...storage?.ipfs?.status?.tasks,
-            pending: task.id,
-          },
-        },
+          tasks: { pending: task.id },
+        }),
       },
     };
   }
@@ -380,10 +375,7 @@ app.post(
         { ipfs: { spec: params.ipfs } },
         task
       );
-      await req.taskScheduler.updateAsset(asset, {
-        storage,
-        status: { ...asset.status, updatedAt: Date.now() },
-      });
+      await req.taskScheduler.updateAsset(asset, { storage });
     }
 
     res.status(201);
@@ -628,15 +620,7 @@ app.patch(
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
-    await req.taskScheduler.updateAsset(asset, {
-      name,
-      meta,
-      storage,
-      status: {
-        ...asset.status,
-        updatedAt: Date.now(),
-      },
-    });
+    await req.taskScheduler.updateAsset(asset, { name, meta, storage });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }

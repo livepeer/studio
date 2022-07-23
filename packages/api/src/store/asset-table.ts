@@ -15,50 +15,72 @@ import {
 // Ideally this type should never be used outside of this file. It's only here
 // to fix some backward incompatible change we made on the asset.status field.
 type DBAsset =
-  | Omit<Asset, "status"> & {
+  | WithID<Asset>
+  | (Omit<Asset, "status" | "storage"> & {
       id: string;
 
-      // These are deprecated fields from when we didn't have the top-level
-      // status object in the asset resources.
-      updatedAt?: Asset["status"]["updatedAt"];
-      status?: Asset["status"] | Asset["status"]["phase"];
-    };
+      // These are deprecated fields from when we had a separate status.storage field.
+      status: Asset["status"] & {
+        storage: {
+          ipfs: {
+            taskIds: Asset["storage"]["ipfs"]["status"]["tasks"];
+            data?: Asset["storage"]["ipfs"]["status"]["addresses"];
+          };
+        };
+      };
+      storage: {
+        ipfs: Asset["storage"]["ipfs"]["spec"];
+      };
+    });
+
+const isUpdatedSchema = (asset: DBAsset): asset is WithID<Asset> => {
+  return !asset?.storage?.ipfs || "spec" in asset.storage.ipfs;
+};
+
+const ipfsStatusCompat = (
+  status: Exclude<DBAsset, WithID<Asset>>["status"]["storage"]["ipfs"]
+): StorageStatus => ({
+  phase: status.taskIds.pending
+    ? "waiting"
+    : status.taskIds.last
+    ? "ready"
+    : "failed",
+  tasks: status.taskIds,
+  addresses: status.data,
+});
 
 // Receives an asset from database and returns it in the new status schema.
 //
 // TODO: Update existing objects in DB with the new schema to remove this
 // compatibility code.
 const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
-  !asset || typeof asset.status === "object"
-    ? (asset as WithID<Asset>)
+  isUpdatedSchema(asset)
+    ? asset
     : {
-        ...{ ...asset, updatedAt: undefined },
+        ...asset,
+        storage: {
+          ipfs: {
+            spec: { ...asset.storage.ipfs },
+            status: ipfsStatusCompat(asset.status.storage.ipfs),
+          },
+        },
         status: {
-          phase: asset.status,
-          updatedAt: asset.updatedAt,
+          ...{ ...asset.status, storage: undefined },
         },
       };
 
-export const mergeAssetStatus = (
-  s1: Asset["status"],
-  s2: Partial<Asset["status"]>,
-  updatedAt: number = Date.now()
-): Asset["status"] => ({
+type FieldOf<T> = T[keyof T];
+type StorageStatus = FieldOf<Asset["storage"]>["status"];
+
+export const mergeStorageStatus = <S extends StorageStatus>(
+  s1: S,
+  s2: Partial<S>
+): S => ({
   ...s1,
   ...s2,
-  updatedAt,
-  storage: {
-    ...s1?.storage,
-    ...s2?.storage,
-    ipfs: {
-      ...s1?.storage?.ipfs,
-      ...s2?.storage?.ipfs,
-      taskIds: {
-        ...s1?.storage?.ipfs?.taskIds,
-        ...s2?.storage?.ipfs?.taskIds,
-      },
-      // data is not mergeable, just keep the result of the spread above (s2>s1)
-    },
+  tasks: {
+    ...s1?.tasks,
+    ...s2?.tasks,
   },
 });
 
