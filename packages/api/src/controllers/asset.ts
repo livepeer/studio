@@ -66,7 +66,9 @@ function validateAssetMeta(meta: Record<string, string>) {
 function cleanAssetResponse(assets: WithID<Asset>[]) {
   let cleanedAssets = [];
   for (var i = 0; i < assets.length; i++) {
-    delete assets[i].videoSpec;
+    if (assets[i].videoSpec) {
+      delete assets[i].videoSpec.tracks;
+    }
     cleanedAssets.push(assets[i]);
   }
   return cleanedAssets;
