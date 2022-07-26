@@ -3,7 +3,6 @@ import { Router } from "express";
 import promBundle from "express-prom-bundle";
 import proxy from "http-proxy-middleware";
 import Stripe from "stripe";
-import fs from "fs/promises";
 import makeStore from "./store";
 import {
   errorHandler,
@@ -25,10 +24,7 @@ import { CliArgs } from "./parse-cli";
 import { regionsGetter } from "./controllers/region";
 import { pathJoin } from "./controllers/helpers";
 import taskScheduler from "./task/scheduler";
-import { setupTus } from "./controllers/asset";
-import tus from "tus-node-server";
-import { S3ClientConfig } from "@aws-sdk/client-s3";
-import { parse as parseUrl } from "url";
+import { setupTus, setupTestTus } from "./controllers/asset";
 
 enum OrchestratorSource {
   hardcoded = "hardcoded",
@@ -122,7 +118,9 @@ export default async function makeApp(params: CliArgs) {
   });
   await webhookCannon.start();
 
-  if (vodObjectStoreId) {
+  if (process.env.NODE_ENV === "test") {
+    await setupTestTus();
+  } else if (vodObjectStoreId) {
     await setupTus(vodObjectStoreId);
   }
 

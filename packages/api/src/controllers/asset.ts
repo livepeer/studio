@@ -573,6 +573,18 @@ async function createTusServer(objectStoreId: string) {
   return tusServer;
 }
 
+export const setupTestTus = async (): Promise<void> => {
+  tusServer = await createTestTusServer();
+};
+
+async function createTestTusServer() {
+  const tusTestServer = new tus.Server();
+  tusTestServer.datastore = new tus.FileStore({
+    path: "/tmp",
+  });
+  return tusTestServer;
+}
+
 const namingFunction = (req: Request) => {
   const playbackId = req.res.getHeader("livepeer-playback-id").toString();
   if (!playbackId) {
