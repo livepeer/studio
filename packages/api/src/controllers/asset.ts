@@ -613,7 +613,7 @@ app.patch(
       throw new NotFoundError(`asset not found`);
     }
 
-    const storageUpdates = await reconcileAssetStorage(req, asset, storage);
+  const storageUpdates = storage ? await reconcileAssetStorage(req, asset, storage) : null;
     await req.taskScheduler.updateAsset(asset, {
       name,
       meta,
