@@ -4,6 +4,7 @@ import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
+import _ from "lodash";
 import {
   makeNextHREF,
   parseFilters,
@@ -136,9 +137,10 @@ async function reconcileAssetStorage(
   task?: WithID<Task>
 ): Promise<Asset["storage"]> {
   let { storage } = asset;
-  const ipfsParamsEq =
-    JSON.stringify(newStorage.ipfs?.spec) ===
-    JSON.stringify(storage?.ipfs?.spec ?? null);
+  const ipfsParamsEq = _.isEqual(
+    newStorage.ipfs?.spec,
+    storage?.ipfs?.spec ?? null
+  );
   if ("ipfs" in newStorage && !ipfsParamsEq) {
     let newSpec = newStorage.ipfs?.spec;
     if (!newSpec) {

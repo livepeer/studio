@@ -375,6 +375,7 @@ describe("controllers/asset", () => {
           errors: expect.arrayContaining(expectedErrors),
         });
       }
+      return data;
     };
 
     it("should allow specifying ipfs as a bool", async () => {
@@ -422,6 +423,38 @@ describe("controllers/asset", () => {
       await testStoragePatch({ ipfs: null }, null, [
         "Cannot remove asset from IPFS",
       ]);
+    });
+
+    it("should only spawn tasks if spec changes", async () => {
+      const patch = {
+        ipfs: { spec: { nftMetadata: { a: "b", b: "c" } as any } },
+      };
+      const expectedIpfs: Asset["storage"]["ipfs"] = {
+        spec: patch.ipfs.spec,
+        status: {
+          phase: "waiting",
+          tasks: { pending: expect.any(String) },
+        },
+      };
+      const {
+        storage: {
+          ipfs: { status },
+        },
+      } = await testStoragePatch(patch, { ipfs: expectedIpfs });
+      expectedIpfs.status.tasks.pending = status.tasks.pending;
+      await testStoragePatch(patch, { ipfs: expectedIpfs });
+
+      await testStoragePatch(
+        { ipfs: { spec: { nftMetadata: { b: "c", a: "b" } } } },
+        { ipfs: expectedIpfs }
+      );
+
+      patch.ipfs.spec.nftMetadata = { d: "e" };
+      expectedIpfs.spec = patch.ipfs.spec;
+      expectedIpfs.status.tasks.pending = expect.not.stringMatching(
+        status.tasks.pending
+      );
+      await testStoragePatch(patch, { ipfs: expectedIpfs });
     });
   });
 });
