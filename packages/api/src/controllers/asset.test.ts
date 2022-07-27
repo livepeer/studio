@@ -354,13 +354,13 @@ describe("controllers/asset", () => {
     const testStoragePatch = async (
       patchedStorage: AssetPatchPayload["storage"],
       expectedStorage?: Asset["storage"],
-      expectedError?: string
+      expectedErrors?: any[]
     ) => {
       let res = await client.patch(`/asset/${asset.id}`, {
         storage: patchedStorage,
       });
       const data = await res.json();
-      if (!expectedError) {
+      if (!expectedErrors) {
         // expect(res.status).toBe(200);
         expect(data).toMatchObject({
           ...asset,
@@ -372,7 +372,7 @@ describe("controllers/asset", () => {
       } else {
         expect(res.status).toBeGreaterThanOrEqual(400);
         expect(data).toMatchObject({
-          errors: [expectedError],
+          errors: expect.arrayContaining(expectedErrors),
         });
       }
     };
@@ -388,11 +388,37 @@ describe("controllers/asset", () => {
           },
         }
       );
+      await testStoragePatch({ ipfs: false }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+    });
+
+    it("should allow specifying ipfs as an empty object", async () => {
       await testStoragePatch(
-        { ipfs: false },
-        undefined,
-        "Cannot remove asset from IPFS"
+        { ipfs: { nftMetadata: { a: "b" } } } as any,
+        null,
+        [expect.stringContaining("should NOT have additional properties")]
       );
+      await testStoragePatch(
+        { ipfs: {} },
+        {
+          ipfs: {
+            spec: {},
+            status: expect.any(Object),
+          },
+        }
+      );
+      await testStoragePatch({ ipfs: null }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+    });
+
+    it("should handle each storage independently", async () => {
+      await testStoragePatch({ ipfs: true }, { ipfs: expect.any(Object) });
+      await testStoragePatch({}, { ipfs: expect.any(Object) });
+      await testStoragePatch({ ipfs: null }, null, [
+        "Cannot remove asset from IPFS",
+      ]);
     });
   });
 });

@@ -651,10 +651,10 @@ components:
             ipfs:
               oneOf:
                 - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs"
-                - type: boolean
+                - type: [boolean, "null"]
                   description:
-                    Set to true to make default export to IPFS. False means to
-                    unpin from IPFS, but is unsupported right now.
+                    Set to true to make default export to IPFS. False or null
+                    means to unpin from IPFS, but is unsupported right now.
 
     stream-patch-payload:
       type: object

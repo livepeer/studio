@@ -611,7 +611,7 @@ app.patch(
         ipfs:
           typeof ipfs === "boolean"
             ? { spec: ipfs ? {} : null }
-            : { spec: ipfs.spec ?? {} },
+            : { spec: !ipfs ? null : ipfs.spec ?? {} },
       };
     }
     if (storage?.ipfs?.spec?.pinata) {
