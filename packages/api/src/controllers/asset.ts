@@ -138,8 +138,8 @@ async function reconcileAssetStorage(
   let { storage } = asset;
   const ipfsParamsEq =
     JSON.stringify(newStorage.ipfs?.spec) ===
-    JSON.stringify(storage?.ipfs?.spec);
-  if (!ipfsParamsEq) {
+    JSON.stringify(storage?.ipfs?.spec ?? null);
+  if ("ipfs" in newStorage && !ipfsParamsEq) {
     let newSpec = newStorage.ipfs?.spec;
     if (!newSpec) {
       throw new BadRequestError("Cannot remove asset from IPFS");
@@ -604,7 +604,7 @@ app.patch(
     let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
     let storage: Asset["storage"];
-    if (storageInput?.ipfs) {
+    if (storageInput?.ipfs !== undefined) {
       const { ipfs } = storageInput;
       storage = {
         ...storageInput,

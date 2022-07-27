@@ -1,7 +1,7 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { Asset, User } from "../schema/types";
+import { Asset, AssetPatchPayload, User } from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
@@ -349,6 +349,50 @@ describe("controllers/asset", () => {
         },
         status: { phase: "ready", updatedAt: expect.any(Number) },
       });
+    });
+
+    const testStoragePatch = async (
+      patchedStorage: AssetPatchPayload["storage"],
+      expectedStorage?: Asset["storage"],
+      expectedError?: string
+    ) => {
+      let res = await client.patch(`/asset/${asset.id}`, {
+        storage: patchedStorage,
+      });
+      const data = await res.json();
+      if (!expectedError) {
+        // expect(res.status).toBe(200);
+        expect(data).toMatchObject({
+          ...asset,
+          ...(expectedStorage === undefined
+            ? {}
+            : { storage: expectedStorage }),
+          status: expect.any(Object),
+        });
+      } else {
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(data).toMatchObject({
+          errors: [expectedError],
+        });
+      }
+    };
+
+    it("should allow specifying ipfs as a bool", async () => {
+      await testStoragePatch({ ipfs: false }, undefined);
+      await testStoragePatch(
+        { ipfs: true },
+        {
+          ipfs: {
+            spec: {},
+            status: expect.any(Object),
+          },
+        }
+      );
+      await testStoragePatch(
+        { ipfs: false },
+        undefined,
+        "Cannot remove asset from IPFS"
+      );
     });
   });
 });
