@@ -646,7 +646,15 @@ components:
         meta:
           $ref: "#/components/schemas/asset/properties/meta"
         storage:
-          $ref: "#/components/schemas/asset/properties/storage"
+          additionalProperties: false
+          properties:
+            ipfs:
+              oneOf:
+                - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs"
+                - type: boolean
+                  description:
+                    Set to true to make default export to IPFS. False means to
+                    unpin from IPFS, but is unsupported right now.
 
     stream-patch-payload:
       type: object

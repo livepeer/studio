@@ -140,7 +140,7 @@ async function reconcileAssetStorage(
     JSON.stringify(newStorage.ipfs?.spec) ===
     JSON.stringify(storage?.ipfs?.spec);
   if (!ipfsParamsEq) {
-    let newSpec = newStorage.ipfs.spec;
+    let newSpec = newStorage.ipfs?.spec;
     if (!newSpec) {
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
@@ -601,14 +601,23 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, meta, storage } = req.body as AssetPatchPayload;
+    let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
+    let storage: Asset["storage"];
+    if (storageInput?.ipfs) {
+      const { ipfs } = storageInput;
+      storage = {
+        ...storageInput,
+        ipfs:
+          typeof ipfs === "boolean"
+            ? { spec: ipfs ? {} : null }
+            : { spec: ipfs.spec ?? {} },
+      };
+    }
     if (storage?.ipfs?.spec?.pinata) {
       throw new BadRequestError(
         "Custom pinata not allowed in asset storage. Call /export API explicitly instead"
       );
-    } else if (storage?.ipfs) {
-      storage.ipfs.spec ??= {};
     }
 
     // update a specific asset
