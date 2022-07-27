@@ -650,7 +650,13 @@ components:
           properties:
             ipfs:
               oneOf:
-                - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs"
+                - type: object
+                  additionalProperties: false
+                  properties:
+                    spec:
+                      oneOf:
+                        - type: "null"
+                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
                 - type: [boolean, "null"]
                   description:
                     Set to true to make default export to IPFS. False or null

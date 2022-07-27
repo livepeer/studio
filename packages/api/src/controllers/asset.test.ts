@@ -361,7 +361,7 @@ describe("controllers/asset", () => {
       });
       const data = await res.json();
       if (!expectedErrors) {
-        // expect(res.status).toBe(200);
+        expect(res.status).toBe(200);
         expect(data).toMatchObject({
           ...asset,
           ...(expectedStorage === undefined
@@ -409,6 +409,9 @@ describe("controllers/asset", () => {
         }
       );
       await testStoragePatch({ ipfs: null }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+      await testStoragePatch({ ipfs: { spec: null } }, undefined, [
         "Cannot remove asset from IPFS",
       ]);
     });

@@ -603,16 +603,16 @@ app.patch(
     // these are the only updateable fields
     let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
+
     let storage: Asset["storage"];
     if (storageInput?.ipfs !== undefined) {
-      const { ipfs } = storageInput;
-      storage = {
-        ...storageInput,
-        ipfs:
-          typeof ipfs === "boolean"
-            ? { spec: ipfs ? {} : null }
-            : { spec: !ipfs ? null : ipfs.spec ?? {} },
-      };
+      let { ipfs } = storageInput;
+      if (typeof ipfs === "boolean" || !ipfs) {
+        ipfs = { spec: ipfs ? {} : null };
+      } else if (typeof ipfs.spec === "undefined") {
+        ipfs = { spec: {} };
+      }
+      storage = { ...storageInput, ipfs };
     }
     if (storage?.ipfs?.spec?.pinata) {
       throw new BadRequestError(
