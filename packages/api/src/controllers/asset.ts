@@ -140,22 +140,21 @@ async function reconcileAssetStorage(
     JSON.stringify(newStorage.ipfs?.spec) ===
     JSON.stringify(storage?.ipfs?.spec);
   if (!ipfsParamsEq) {
-    let newIpfs = newStorage.ipfs;
-    if (!newIpfs) {
+    let newSpec = newStorage.ipfs.spec;
+    if (!newSpec) {
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
-    newIpfs = { spec: {}, ...newIpfs };
     if (!task) {
       task = await taskScheduler.scheduleTask(
         "export",
-        { export: { ipfs: newIpfs.spec } },
+        { export: { ipfs: newSpec } },
         asset
       );
     }
     storage = {
       ...storage,
       ipfs: {
-        spec: newIpfs.spec,
+        spec: newSpec,
         status: mergeStorageStatus(storage?.ipfs?.status, {
           phase: "waiting",
           tasks: { pending: task.id },
@@ -604,17 +603,21 @@ app.patch(
     // these are the only updateable fields
     let { name, meta, storage } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
-    if (storage?.ipfs?.spec.pinata) {
+    if (storage?.ipfs?.spec?.pinata) {
       throw new BadRequestError(
         "Custom pinata not allowed in asset storage. Call /export API explicitly instead"
       );
+    } else if (storage?.ipfs) {
+      storage.ipfs.spec ??= {};
     }
 
     // update a specific asset
     const { id } = req.params;
     const asset = await db.asset.get(id);
-    if (!asset) {
+    if (!asset || (asset.userId !== req.user.id && !req.user.admin)) {
       throw new NotFoundError(`asset not found`);
+    } else if (asset.status.phase !== "ready") {
+      throw new UnprocessableEntityError(`asset is not ready`);
     }
 
     if (storage) {

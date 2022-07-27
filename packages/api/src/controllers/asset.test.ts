@@ -9,11 +9,23 @@ import schema from "../schema/schema.json";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
 type DBAsset =
-  | Omit<Asset, "status"> & {
+  | WithID<Asset>
+  | (Omit<Asset, "status" | "storage"> & {
       id: string;
-      updatedAt?: Asset["status"]["updatedAt"];
-      status?: Asset["status"] | Asset["status"]["phase"];
-    };
+
+      // These are deprecated fields from when we had a separate status.storage field.
+      status: Asset["status"] & {
+        storage: {
+          ipfs: {
+            taskIds: Asset["storage"]["ipfs"]["status"]["tasks"];
+            data?: Asset["storage"]["ipfs"]["status"]["addresses"];
+          };
+        };
+      };
+      storage: {
+        ipfs: Asset["storage"]["ipfs"]["spec"];
+      };
+    });
 
 let server: TestServer;
 let mockAdminUserInput: User;
@@ -64,35 +76,73 @@ describe("controllers/asset", () => {
   });
 
   describe("assets status schema migration", () => {
-    it("should create assets in the new format", async () => {
-      const res = await client.post("/asset/request-upload", { name: "zoo" });
+    const mockOldAsset = () =>
+      ({
+        id: uuid(),
+        name: "test2",
+        createdAt: Date.now(),
+        storage: {
+          ipfs: {},
+        },
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+          storage: { ipfs: { taskIds: { pending: "123" } } },
+        },
+        userId: nonAdminUser.id,
+      } as const);
+    const toNewAsset = (old: DBAsset) => {
+      const { storage, ...newStatus } = old.status as any;
+      return {
+        ...old,
+        storage: {
+          ipfs: {
+            spec: {},
+            status: {
+              phase: "waiting",
+              tasks: (old.status as any).storage.ipfs.taskIds,
+            },
+          },
+        },
+        status: newStatus,
+      } as WithID<Asset>;
+    };
+
+    it("should accept and update assets in the new format", async () => {
+      let res = await client.post("/asset/request-upload", { name: "zoo" });
       expect(res.status).toBe(200);
-      const { asset } = await res.json();
+      let { asset } = await res.json();
+      expect(asset).toMatchObject({ id: expect.any(String) });
+      await rawAssetTable.update(asset.id, {
+        status: { ...asset.status, phase: "ready" },
+      });
+
+      res = await client.patch(`/asset/${asset.id}`, { storage: { ipfs: {} } });
+      expect(res.status).toBe(200);
+      asset = await res.json();
+      expect(asset).toMatchObject({ id: expect.any(String) });
       const expected = {
-        id: expect.any(String),
-        name: "zoo",
-        status: { phase: "waiting", updatedAt: expect.any(Number) },
+        storage: {
+          ipfs: {
+            spec: {},
+            status: {
+              phase: "waiting",
+              tasks: { pending: expect.any(String) },
+            },
+          },
+        },
       };
       expect(asset).toMatchObject(expected);
+
       const dbAsset = await rawAssetTable.get(asset.id);
       expect(dbAsset).toMatchObject(expected);
     });
 
     it("should support assets in the old format in database", async () => {
-      const asset = await rawAssetTable.create({
-        id: uuid(),
-        name: "test2",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        status: "ready",
-        userId: nonAdminUser.id,
-      });
-
-      let { updatedAt, ...expected } = asset;
-      expected = {
-        ...expected,
+      const asset = await rawAssetTable.create(mockOldAsset());
+      const expected = {
+        ...toNewAsset(asset),
         downloadUrl: "https://test/asset/video",
-        status: { phase: "ready", updatedAt: asset.updatedAt },
       };
 
       const res = await client.get(`/asset/${asset.id}`);
@@ -108,20 +158,8 @@ describe("controllers/asset", () => {
     it("should migrate assets to the new format", async () => {
       client.jwtAuth = null;
       client.apiKey = adminApiKey;
-      const asset = await rawAssetTable.create({
-        id: uuid(),
-        name: "test2",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        status: "ready",
-        userId: nonAdminUser.id,
-      });
-
-      let { updatedAt, ...expected } = asset;
-      expected = {
-        ...expected,
-        status: { phase: "ready", updatedAt: asset.updatedAt },
-      };
+      const asset = await rawAssetTable.create(mockOldAsset());
+      const expected = toNewAsset(asset);
 
       expect(rawAssetTable.get(asset.id)).resolves.not.toEqual(expected);
 
@@ -152,32 +190,34 @@ describe("controllers/asset", () => {
       const res = await client.patch(`/asset/${asset.id}`, { name: "zoo" });
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body).toMatchObject({ ...asset, name: "zoo" });
+      expect(body).toMatchObject({
+        ...asset,
+        name: "zoo",
+        status: { ...asset.status, updatedAt: expect.any(Number) },
+      });
     });
 
     it("should start export task when adding IPFS storage", async () => {
       let res = await client.patch(`/asset/${asset.id}`, {
-        storage: { ipfs: { nftMetadata: { a: "b" } } },
+        storage: { ipfs: { spec: { nftMetadata: { a: "b" } } } },
       });
       expect(res.status).toBe(200);
       const patched = await res.json();
       expect(patched).toMatchObject({
         ...asset,
-        storage: { ipfs: { nftMetadata: { a: "b" } } },
-        status: {
-          ...asset.status,
-          updatedAt: expect.any(Number),
-          storage: {
-            ipfs: {
-              taskIds: {
-                pending: expect.any(String),
-              },
+        storage: {
+          ipfs: {
+            spec: { nftMetadata: { a: "b" } },
+            status: {
+              phase: "waiting",
+              tasks: { pending: expect.any(String) },
             },
           },
         },
+        status: { ...asset.status, updatedAt: expect.any(Number) },
       });
 
-      const taskId = patched.status.storage.ipfs.taskIds.pending;
+      const taskId = patched.storage.ipfs.status.tasks.pending;
       res = await client.get("/task/" + taskId);
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toMatchObject({
@@ -211,18 +251,14 @@ describe("controllers/asset", () => {
       expect(res.json()).resolves.toMatchObject({
         ...asset,
         storage: {
-          ipfs: { nftMetadata: { a: "b" } },
+          ipfs: {
+            spec: { nftMetadata: { a: "b" } },
+            status: { tasks: { pending: task.id } },
+          },
         },
         status: {
           ...asset.status,
           updatedAt: expect.any(Number),
-          storage: {
-            ipfs: {
-              taskIds: {
-                pending: task.id,
-              },
-            },
-          },
         },
       });
     });
@@ -233,7 +269,7 @@ describe("controllers/asset", () => {
       });
       expect(res.status).toBe(200);
       const patched = await res.json();
-      const taskId = patched.status.storage.ipfs.taskIds.pending;
+      const taskId = patched.storage.ipfs.status.tasks.pending;
       await server.taskScheduler.processTaskEvent({
         id: uuid(),
         type: "task_result",
@@ -258,21 +294,17 @@ describe("controllers/asset", () => {
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toEqual({
         ...patched,
-        status: {
-          phase: "ready",
-          updatedAt: expect.any(Number),
-          storage: {
-            ipfs: {
-              taskIds: {
-                last: taskId,
-              },
-              data: {
-                videoFileCid: "QmX",
-                nftMetadataCid: "QmY",
-              },
+        storage: {
+          ipfs: {
+            spec: {},
+            status: {
+              phase: "ready",
+              tasks: { last: taskId },
+              addresses: { videoFileCid: "QmX", nftMetadataCid: "QmY" },
             },
           },
         },
+        status: { phase: "ready", updatedAt: expect.any(Number) },
       });
     });
 
@@ -282,7 +314,7 @@ describe("controllers/asset", () => {
       });
       expect(res.status).toBe(200);
       const patched = await res.json();
-      const taskId = patched.status.storage.ipfs.taskIds.pending;
+      const taskId = patched.storage.ipfs.status.tasks.pending;
       await server.taskScheduler.processTaskEvent({
         id: uuid(),
         type: "task_result",
@@ -293,7 +325,7 @@ describe("controllers/asset", () => {
           snapshot: await db.task.get(taskId),
         },
         error: {
-          message: "failed!",
+          message: "oh no it failed!",
           unretriable: true,
         },
         output: null,
@@ -303,17 +335,19 @@ describe("controllers/asset", () => {
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toEqual({
         ...patched,
-        status: {
-          phase: "ready",
-          updatedAt: expect.any(Number),
-          storage: {
-            ipfs: {
-              taskIds: {
+        storage: {
+          ipfs: {
+            spec: {},
+            status: {
+              phase: "failed",
+              errorMessage: "oh no it failed!",
+              tasks: {
                 failed: taskId,
               },
             },
           },
         },
+        status: { phase: "ready", updatedAt: expect.any(Number) },
       });
     });
   });
