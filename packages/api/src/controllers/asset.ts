@@ -460,7 +460,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
       name: req.body.name ?? inputAsset.name,
     }
   );
-  outputAsset.sourceAssetId = inputAsset.id;
+  outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
