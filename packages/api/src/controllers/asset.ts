@@ -261,9 +261,8 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
-    req.query
-  );
+  let { limit, cursor, all, allUsers, order, filters, playbackId, count } =
+    toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -271,19 +270,25 @@ app.get("/", authorizer({}), async (req, res) => {
     order = "updatedAt-true,createdAt-true";
   }
 
-  if (req.user.admin && allUsers && allUsers !== "false") {
-    const query = parseFilters(fieldsMap, filters);
-    if (!all || all === "false") {
-      query.push(sql`asset.data->>'deleted' IS NULL`);
-    }
+  const query = parseFilters(fieldsMap, filters);
+  if (playbackId) {
+    query.push(sql`asset.data->>'playbackId' = ${playbackId}`);
+  }
+  if (!all || all === "false") {
+    // TODO: Consider keeping this flag as admin-only
+    query.push(sql`asset.data->>'deleted' IS NULL`);
+  }
 
+  let output: WithID<Asset>[];
+  let newCursor: string;
+  if (req.user.admin && allUsers && allUsers !== "false") {
     let fields =
       " asset.id as id, asset.data as data, users.id as usersId, users.data as usersdata";
     if (count) {
       fields = fields + ", count(*) OVER() AS count";
     }
     const from = `asset left join users on asset.data->>'userId' = users.id`;
-    const [output, newCursor] = await db.asset.find(query, {
+    [output, newCursor] = await db.asset.find(query, {
       limit,
       cursor,
       fields,
@@ -299,46 +304,31 @@ app.get("/", authorizer({}), async (req, res) => {
         };
       },
     });
+  } else {
+    query.push(sql`asset.data->>'userId' = ${req.user.id}`);
 
-    res.status(200);
-
-    if (output.length > 0 && newCursor) {
-      res.links({ next: makeNextHREF(req, newCursor) });
+    let fields = " asset.id as id, asset.data as data";
+    if (count) {
+      fields = fields + ", count(*) OVER() AS count";
     }
-    return res.json(output);
+    [output, newCursor] = await db.asset.find(query, {
+      limit,
+      cursor,
+      fields,
+      order: parseOrder(fieldsMap, order),
+      process: ({ data, count: c }) => {
+        if (count) {
+          res.set("X-Total-Count", c);
+        }
+        return data;
+      },
+    });
   }
 
-  const query = parseFilters(fieldsMap, filters);
-  query.push(sql`asset.data->>'userId' = ${req.user.id}`);
-
-  if (!all || all === "false") {
-    query.push(sql`asset.data->>'deleted' IS NULL`);
-  }
-
-  let fields = " asset.id as id, asset.data as data";
-  if (count) {
-    fields = fields + ", count(*) OVER() AS count";
-  }
-  const from = `asset`;
-  const [output, newCursor] = await db.asset.find(query, {
-    limit,
-    cursor,
-    fields,
-    from,
-    order: parseOrder(fieldsMap, order),
-    process: ({ data, count: c }) => {
-      if (count) {
-        res.set("X-Total-Count", c);
-      }
-      return data;
-    },
-  });
   res.status(200);
-
   if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-
   return res.json(output);
 });
 
