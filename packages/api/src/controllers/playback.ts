@@ -53,15 +53,22 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
-  const asset = await db.asset.getByPlaybackId(id);
-  if (asset && !asset.deleted) {
-    const url = assetPlaybackUrl(ingest, asset);
-    if (url) {
-      return newPlaybackInfo("vod", url);
+  const getAssetPlaybackUrl = async (cid: boolean) => {
+    const asset = cid
+      ? await db.asset.getByIpfsCid(id)
+      : await db.asset.getByPlaybackId(id);
+    if (!asset || asset.deleted) {
+      return null;
     }
+    return assetPlaybackUrl(ingest, asset);
+  };
+  const assetUrl =
+    (await getAssetPlaybackUrl(false)) ?? (await getAssetPlaybackUrl(true));
+  if (assetUrl) {
+    return newPlaybackInfo("vod", assetUrl);
   }
 
-  const recordingPlaybackUrl = async (table: Table<DBSession>) => {
+  const getRecordingPlaybackUrl = async (table: Table<DBSession>) => {
     const session = await table.get(id);
     if (!session || session.deleted) {
       return null;
@@ -70,8 +77,8 @@ async function getPlaybackInfo(
     return recordingUrl;
   };
   const recordingUrl =
-    (await recordingPlaybackUrl(db.session)) ??
-    (await recordingPlaybackUrl(db.stream));
+    (await getRecordingPlaybackUrl(db.session)) ??
+    (await getRecordingPlaybackUrl(db.stream));
   if (recordingUrl) {
     return newPlaybackInfo("recording", recordingUrl);
   }

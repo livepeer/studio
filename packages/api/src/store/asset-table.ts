@@ -110,4 +110,19 @@ export default class AssetTable extends Table<DBAsset> {
     }
     return assetStatusCompat(res.rows[0].data as WithID<Asset>);
   }
+
+  async getByIpfsCid(cid: string): Promise<WithID<Asset>> {
+    const query = [
+      sql`asset.data->'status'->'storage'->'ipfs'->'data'->>'videoFileCid' = ${cid}`,
+      sql`asset.data->>'deleted' IS NULL`,
+    ];
+    const [assets] = await this.find(query, {
+      limit: 2,
+      order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
+    });
+    if (!assets || assets.length < 1) {
+      return null;
+    }
+    return assets[0];
+  }
 }
