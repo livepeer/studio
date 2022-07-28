@@ -34,7 +34,11 @@ type DBAsset =
     });
 
 const isUpdatedSchema = (asset: DBAsset): asset is WithID<Asset> => {
-  return !asset?.storage?.ipfs || "spec" in asset.storage.ipfs;
+  return (
+    !asset?.storage?.ipfs ||
+    "spec" in asset.storage.ipfs ||
+    "status" in asset.storage.ipfs
+  );
 };
 
 const ipfsStatusCompat = (
@@ -135,7 +139,7 @@ export default class AssetTable extends Table<DBAsset> {
 
   async getByIpfsCid(cid: string): Promise<WithID<Asset>> {
     const query = [
-      sql`asset.data->'status'->'storage'->'ipfs'->'data'->>'videoFileCid' = ${cid}`,
+      sql`asset.data->'storage'->'ipfs'->'status'->'addresses'->>'videoFileCid' = ${cid}`,
       sql`asset.data->>'deleted' IS NULL`,
     ];
     const [assets] = await this.find(query, {
