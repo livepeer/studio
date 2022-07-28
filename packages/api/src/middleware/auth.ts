@@ -199,7 +199,11 @@ export const corsApiKeyAccessRules: AuthRule[] = [
   // VOD
   {
     methods: ["get"],
-    resources: ["/asset/:id", "/task/:id"],
+    resources: ["/task/:id"],
+  },
+  {
+    methods: ["get", "patch"],
+    resources: ["/asset/:id"],
   },
   {
     methods: ["post"],
