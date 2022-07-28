@@ -112,6 +112,48 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   };
 }
 
+const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
+
+type IPFSAddresses = Asset["storage"]["ipfs"]["status"]["addresses"];
+
+export function withIpfsUrls(ipfs: IPFSAddresses): IPFSAddresses {
+  if (!ipfs?.videoFileCid) {
+    return ipfs;
+  }
+  ipfs = {
+    ...ipfs,
+    videoFileUrl: `ipfs://${ipfs.videoFileCid}`,
+    videoFileGatewayUrl: pathJoin(ipfsGateway, ipfs.videoFileCid),
+  };
+  if (ipfs.nftMetadataCid) {
+    ipfs = {
+      ...ipfs,
+      nftMetadataUrl: `ipfs://${ipfs.nftMetadataCid}`,
+      nftMetadataGatewayUrl: pathJoin(ipfsGateway, ipfs.nftMetadataCid),
+    };
+  }
+  return ipfs;
+}
+
+function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
+  if (!asset?.storage?.ipfs?.status?.addresses) {
+    return asset;
+  }
+  return {
+    ...asset,
+    storage: {
+      ...asset.storage,
+      ipfs: {
+        ...asset.storage.ipfs,
+        status: {
+          ...asset.storage.ipfs.status,
+          addresses: withIpfsUrls(asset.storage.ipfs.status.addresses),
+        },
+      },
+    },
+  };
+}
+
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
   asset = await db.asset.create(asset);
   await queue.publishWebhook("events.asset.created", {
@@ -220,10 +262,14 @@ app.use(
       throw new InternalServerError("Ingest not configured");
     }
     const ingest = ingests[0].base;
-    const toExternalAsset = (a: WithID<Asset>) =>
-      req.user.admin
-        ? withPlaybackUrls(ingest, a)
-        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(ingest, a));
+    let toExternalAsset = (a: WithID<Asset>) => {
+      a = withPlaybackUrls(ingest, a);
+      a = assetWithIpfsUrls(a);
+      if (!req.user.admin) {
+        a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      }
+      return a;
+    };
 
     if (Array.isArray(data)) {
       return data.map(toExternalAsset);

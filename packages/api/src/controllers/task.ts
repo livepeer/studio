@@ -15,8 +15,7 @@ import { db } from "../store";
 import sql from "sql-template-strings";
 import { Task } from "../schema/types";
 import { WithID } from "../store/types";
-
-const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
+import { withIpfsUrls } from "./asset";
 
 const app = Router();
 
@@ -35,22 +34,9 @@ function validateTaskPayload(
   };
 }
 
-function withIpfsUrls(task: WithID<Task>): WithID<Task> {
-  if (task?.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
+function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
-  }
-  let { ipfs } = task.output.export;
-  ipfs = {
-    ...ipfs,
-    videoFileUrl: `ipfs://${ipfs.videoFileCid}`,
-    videoFileGatewayUrl: pathJoin(ipfsGateway, ipfs.videoFileCid),
-  };
-  if (ipfs.nftMetadataCid) {
-    ipfs = {
-      ...ipfs,
-      nftMetadataUrl: `ipfs://${ipfs.nftMetadataCid}`,
-      nftMetadataGatewayUrl: pathJoin(ipfsGateway, ipfs.nftMetadataCid),
-    };
   }
   return {
     ...task,
@@ -58,7 +44,7 @@ function withIpfsUrls(task: WithID<Task>): WithID<Task> {
       ...task.output,
       export: {
         ...task.output.export,
-        ipfs,
+        ipfs: withIpfsUrls(task.output.export.ipfs),
       },
     },
   };
@@ -187,7 +173,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(withIpfsUrls(task));
+  res.json(taskWithIpfsUrls(task));
 });
 
 app.post(

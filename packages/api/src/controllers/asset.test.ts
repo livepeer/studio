@@ -6,6 +6,7 @@ import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
 import schema from "../schema/schema.json";
+import { withIpfsUrls } from "./asset";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
 type DBAsset =
@@ -300,7 +301,10 @@ describe("controllers/asset", () => {
             status: {
               phase: "ready",
               tasks: { last: taskId },
-              addresses: { videoFileCid: "QmX", nftMetadataCid: "QmY" },
+              addresses: withIpfsUrls({
+                videoFileCid: "QmX",
+                nftMetadataCid: "QmY",
+              }),
             },
           },
         },
