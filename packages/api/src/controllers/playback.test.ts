@@ -144,6 +144,37 @@ describe("controllers/playback", () => {
           },
         });
       });
+
+      it("should return playback URL assets from CID", async () => {
+        const cid = "bafyfoobar";
+        await db.asset.update(asset.id, {
+          playbackRecordingId: "mock_recording_id_2",
+          status: {
+            phase: "ready",
+            storage: {
+              ipfs: {
+                data: {
+                  videoFileCid: cid,
+                },
+              },
+            },
+          },
+        });
+        const res = await client.get(`/playback/${cid}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
     });
 
     describe("for recordings", () => {
