@@ -284,8 +284,8 @@ const fieldsMap: FieldsMap = {
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
-  ipfsVideoFileCid: `asset.data->'storage'->'ipfs'->'status'->'addresses'->>'videoFileCid'`,
-  ipfsNftMetadataCid: `asset.data->'storage'->'ipfs'->'status'->'addresses'->>'nftMetadataCid'`,
+  cid: `asset.data->'storage'->'ipfs'->>'cid'`,
+  nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadataCid'->>'cid'`,
 };
 
 app.get("/", authorizer({}), async (req, res) => {

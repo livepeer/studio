@@ -45,18 +45,21 @@ const isUpdatedSchema = (asset: DBAsset): asset is WithID<Asset> => {
 
 export const taskOutputToIpfsStorage = (
   out: Task["output"]["export"]["ipfs"]
-): Omit<Asset["storage"]["ipfs"], "spec"> => ({
-  cid: out.videoFileCid,
-  url: out.videoFileUrl,
-  gatewayUrl: out.videoFileGatewayUrl,
-  nftMetadata: !out.nftMetadataCid
-    ? undefined
+): Omit<Asset["storage"]["ipfs"], "spec"> =>
+  !out
+    ? null
     : {
-        cid: out.nftMetadataCid,
-        url: out.nftMetadataUrl,
-        gatewayUrl: out.nftMetadataGatewayUrl,
-      },
-});
+        cid: out.videoFileCid,
+        url: out.videoFileUrl,
+        gatewayUrl: out.videoFileGatewayUrl,
+        nftMetadata: !out.nftMetadataCid
+          ? undefined
+          : {
+              cid: out.nftMetadataCid,
+              url: out.nftMetadataUrl,
+              gatewayUrl: out.nftMetadataGatewayUrl,
+            },
+      };
 
 const ipfsStatusCompat = (
   status: Exclude<DBAsset, WithID<Asset>>["status"]["storage"]["ipfs"]
@@ -153,7 +156,7 @@ export default class AssetTable extends Table<DBAsset> {
 
   async getByIpfsCid(cid: string): Promise<WithID<Asset>> {
     const query = [
-      sql`asset.data->'storage'->'ipfs'->'status'->'addresses'->>'videoFileCid' = ${cid}`,
+      sql`asset.data->'storage'->'ipfs'->>'cid' = ${cid}`,
       sql`asset.data->>'deleted' IS NULL`,
     ];
     const [assets] = await this.find(query, {

@@ -121,15 +121,15 @@ describe("controllers/asset", () => {
       res = await client.patch(`/asset/${asset.id}`, { storage: { ipfs: {} } });
       expect(res.status).toBe(200);
       asset = await res.json();
-      expect(asset).toMatchObject({ id: expect.any(String) });
       const expected = {
+        id: expect.any(String),
         storage: {
           ipfs: {
             spec: {},
-            status: {
-              phase: "waiting",
-              tasks: { pending: expect.any(String) },
-            },
+          },
+          status: {
+            phase: "waiting",
+            tasks: { pending: expect.any(String) },
           },
         },
       };
@@ -209,16 +209,16 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: { nftMetadata: { a: "b" } },
-            status: {
-              phase: "waiting",
-              tasks: { pending: expect.any(String) },
-            },
+          },
+          status: {
+            phase: "waiting",
+            tasks: { pending: expect.any(String) },
           },
         },
         status: { ...asset.status, updatedAt: expect.any(Number) },
       });
 
-      const taskId = patched.storage.ipfs.status.tasks.pending;
+      const taskId = patched.storage.status.tasks.pending;
       res = await client.get("/task/" + taskId);
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toMatchObject({
@@ -254,8 +254,8 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: { nftMetadata: { a: "b" } },
-            status: { tasks: { pending: task.id } },
           },
+          status: { tasks: { pending: task.id } },
         },
         status: {
           ...asset.status,
@@ -270,7 +270,7 @@ describe("controllers/asset", () => {
       });
       expect(res.status).toBe(200);
       const patched = await res.json();
-      const taskId = patched.storage.ipfs.status.tasks.pending;
+      const taskId = patched.storage.status.tasks.pending;
       await server.taskScheduler.processTaskEvent({
         id: uuid(),
         type: "task_result",
@@ -316,7 +316,7 @@ describe("controllers/asset", () => {
       });
       expect(res.status).toBe(200);
       const patched = await res.json();
-      const taskId = patched.storage.ipfs.status.tasks.pending;
+      const taskId = patched.storage.status.tasks.pending;
       await server.taskScheduler.processTaskEvent({
         id: uuid(),
         type: "task_result",
@@ -340,12 +340,12 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: {},
-            status: {
-              phase: "failed",
-              errorMessage: "oh no it failed!",
-              tasks: {
-                failed: taskId,
-              },
+          },
+          status: {
+            phase: "failed",
+            errorMessage: "oh no it failed!",
+            tasks: {
+              failed: taskId,
             },
           },
         },
