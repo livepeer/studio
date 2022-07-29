@@ -964,55 +964,42 @@ components:
                 spec:
                   $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
                   default: {}
-                status:
-                  readOnly: true
+                $ref: "#/components/schemas/ipfs-file-info/properties"
+                nftMetadata:
+                  $ref: "#/components/schemas/ipfs-file-info"
+            status:
+              readOnly: true
+              additionalProperties: false
+              required: [phase, tasks]
+              properties:
+                phase:
+                  type: string
+                  description: Phase of the asset storage
+                  enum:
+                    - waiting
+                    - ready
+                    - failed
+                    - reverted
+                errorMessage:
+                  type: string
+                  description: Error message if the last storage changed failed.
+                tasks:
+                  type: object
                   additionalProperties: false
-                  required: [phase, tasks]
                   properties:
-                    phase:
-                      type: string
-                      description: Phase of the asset storage
-                      enum:
-                        - waiting
-                        - ready
-                        - failed
-                        - reverted
-                    errorMessage:
+                    pending:
                       type: string
                       description:
-                        Error message if the last storage changed failed.
-                    tasks:
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        pending:
-                          type: string
-                          description:
-                            ID of any currently running task that is exporting
-                            this asset to IPFS.
-                        last:
-                          type: string
-                          description:
-                            ID of the last task to run successfully, that
-                            created the currently saved data.
-                        failed:
-                          type: string
-                          description: ID of the last task to fail execution.
-                    addresses:
-                      type: object
+                        ID of any currently running task that is exporting this
+                        asset to IPFS.
+                    last:
+                      type: string
                       description:
-                        Addresses of the asset in IPFS from the last successful
-                        task execution.
-                      additionalProperties: false
-                      required: [videoFileCid]
-                      properties:
-                        $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties"
-                        videoFileCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/videoFileCid"
-                          index: true
-                        nftMetadataCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/nftMetadataCid"
-                          index: true
+                        ID of the last task to run successfully, that created
+                        the currently saved data.
+                    failed:
+                      type: string
+                      description: ID of the last task to fail execution.
         status:
           type: object
           additionalProperties: false
@@ -1168,6 +1155,23 @@ components:
           description:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+
+    ipfs-file-info:
+      type: object
+      required: [cid]
+      additionalProperties: false
+      properties:
+        cid:
+          type: string
+          description: CID of the file on IPFS
+        url:
+          type: string
+          readOnly: true
+          description: URL with IPFS scheme for the file
+        gatewayUrl:
+          type: string
+          readOnly: true
+          description: URL to access file via HTTP through an IPFS gateway
 
     new-asset-payload:
       additionalProperties: false
