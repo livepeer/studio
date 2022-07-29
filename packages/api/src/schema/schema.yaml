@@ -962,8 +962,24 @@ components:
               additionalProperties: false
               properties:
                 spec:
-                  $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+                  type: object
+                  additionalProperties: false
                   default: {}
+                  properties:
+                    nftMetadataTemplate:
+                      type: string
+                      enum: [player, file]
+                      default: player
+                      description:
+                        Name of the NFT metadata template to export. 'player'
+                        will embed the Livepeer Player on the NFT while 'file'
+                        will reference only the immutable MP4 files.
+                    nftMetadata:
+                      type: object
+                      description:
+                        Additional data to add to the NFT metadata exported to
+                        IPFS. Will be deep merged with the default metadata
+                        exported.
                 $ref: "#/components/schemas/ipfs-file-info/properties"
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
@@ -1447,6 +1463,7 @@ components:
               type: object
               additionalProperties: false
               properties:
+                $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties"
                 pinata:
                   description:
                     Custom credentials for the Piñata service. Must have either
@@ -1475,19 +1492,6 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
-                nftMetadataTemplate:
-                  type: string
-                  enum: [player, file]
-                  default: player
-                  description:
-                    Name of the NFT metadata template to export. 'player' will
-                    embed the Livepeer Player on the NFT while 'file' will
-                    reference only the immutable MP4 files.
-                nftMetadata:
-                  type: object
-                  description:
-                    Additional data to add to the NFT metadata exported to IPFS.
-                    Will be deep merged with the default metadata exported.
 
     api-token:
       type: object
