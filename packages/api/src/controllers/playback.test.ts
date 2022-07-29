@@ -151,13 +151,11 @@ describe("controllers/playback", () => {
           playbackRecordingId: "mock_recording_id_2",
           storage: {
             ipfs: {
-              status: {
-                phase: "ready",
-                tasks: {},
-                addresses: {
-                  videoFileCid: cid,
-                },
-              },
+              cid: cid,
+            },
+            status: {
+              phase: "ready",
+              tasks: {},
             },
           },
         });

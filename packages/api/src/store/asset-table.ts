@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { QueryResult } from "pg";
 import sql, { SQLStatement } from "sql-template-strings";
-import { Asset } from "../schema/types";
+import { Asset, Task } from "../schema/types";
 import Table from "./table";
 import {
   DBLegacyObject,
@@ -24,8 +24,8 @@ type DBAsset =
       status: Asset["status"] & {
         storage: {
           ipfs: {
-            taskIds: Asset["storage"]["ipfs"]["status"]["tasks"];
-            data?: Asset["storage"]["ipfs"]["status"]["addresses"];
+            taskIds: Asset["storage"]["status"]["tasks"];
+            data?: Task["output"]["export"]["ipfs"];
           };
         };
       };
@@ -37,10 +37,26 @@ type DBAsset =
 const isUpdatedSchema = (asset: DBAsset): asset is WithID<Asset> => {
   return (
     !asset?.storage?.ipfs ||
+    "status" in asset.storage ||
     "spec" in asset.storage.ipfs ||
-    "status" in asset.storage.ipfs
+    "cid" in asset.storage.ipfs
   );
 };
+
+export const taskOutputToIpfsStorage = (
+  out: Task["output"]["export"]["ipfs"]
+): Omit<Asset["storage"]["ipfs"], "spec"> => ({
+  cid: out.videoFileCid,
+  url: out.videoFileUrl,
+  gatewayUrl: out.videoFileGatewayUrl,
+  nftMetadata: !out.nftMetadataCid
+    ? undefined
+    : {
+        cid: out.nftMetadataCid,
+        url: out.nftMetadataUrl,
+        gatewayUrl: out.nftMetadataGatewayUrl,
+      },
+});
 
 const ipfsStatusCompat = (
   status: Exclude<DBAsset, WithID<Asset>>["status"]["storage"]["ipfs"]
@@ -51,7 +67,6 @@ const ipfsStatusCompat = (
     ? "ready"
     : "failed",
   tasks: status.taskIds,
-  addresses: status.data,
 });
 
 // Receives an asset from database and returns it in the new status schema.
@@ -65,15 +80,15 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
         ...asset,
         storage: {
           ipfs: {
-            spec: _.cloneDeep(asset.storage.ipfs),
-            status: ipfsStatusCompat(asset.status.storage.ipfs),
+            spec: asset.storage.ipfs,
+            ...taskOutputToIpfsStorage(asset.status.storage.ipfs.data),
           },
+          status: ipfsStatusCompat(asset.status.storage.ipfs),
         },
         status: _.omit(asset.status, "storage"),
       };
 
-type FieldOf<T> = T[keyof T];
-type StorageStatus = FieldOf<Asset["storage"]>["status"];
+type StorageStatus = Asset["storage"]["status"];
 
 export const mergeStorageStatus = <S extends StorageStatus>(
   s1: S,

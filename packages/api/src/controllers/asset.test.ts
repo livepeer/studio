@@ -1,7 +1,7 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { v4 as uuid } from "uuid";
-import { Asset, AssetPatchPayload, User } from "../schema/types";
+import { Asset, AssetPatchPayload, Task, User } from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
@@ -18,8 +18,8 @@ type DBAsset =
       status: Asset["status"] & {
         storage: {
           ipfs: {
-            taskIds: Asset["storage"]["ipfs"]["status"]["tasks"];
-            data?: Asset["storage"]["ipfs"]["status"]["addresses"];
+            taskIds: Asset["storage"]["status"]["tasks"];
+            data?: Task["output"]["export"]["ipfs"];
           };
         };
       };
@@ -99,10 +99,10 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: {},
-            status: {
-              phase: "waiting",
-              tasks: (old.status as any).storage.ipfs.taskIds,
-            },
+          },
+          status: {
+            phase: "waiting",
+            tasks: (old.status as any).storage.ipfs.taskIds,
           },
         },
         status: newStatus,
@@ -298,14 +298,12 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: {},
-            status: {
-              phase: "ready",
-              tasks: { last: taskId },
-              addresses: withIpfsUrls({
-                videoFileCid: "QmX",
-                nftMetadataCid: "QmY",
-              }),
-            },
+            ...withIpfsUrls({ cid: "QmX" }),
+            nftMetadata: withIpfsUrls({ cid: "QmY" }),
+          },
+          status: {
+            phase: "ready",
+            tasks: { last: taskId },
           },
         },
         status: { phase: "ready", updatedAt: expect.any(Number) },
@@ -389,8 +387,8 @@ describe("controllers/asset", () => {
         {
           ipfs: {
             spec: {},
-            status: expect.any(Object),
           },
+          status: expect.any(Object),
         }
       );
       await testStoragePatch({ ipfs: false }, undefined, [
@@ -409,8 +407,8 @@ describe("controllers/asset", () => {
         {
           ipfs: {
             spec: {},
-            status: expect.any(Object),
           },
+          status: expect.any(Object),
         }
       );
       await testStoragePatch({ ipfs: null }, undefined, [
@@ -433,32 +431,30 @@ describe("controllers/asset", () => {
       const patch = {
         ipfs: { spec: { nftMetadata: { a: "b", b: "c" } as any } },
       };
-      const expectedIpfs: Asset["storage"]["ipfs"] = {
-        spec: patch.ipfs.spec,
+      const expectedStorage: Asset["storage"] = {
+        ipfs: {
+          spec: patch.ipfs.spec,
+        },
         status: {
           phase: "waiting",
           tasks: { pending: expect.any(String) },
         },
       };
-      const {
-        storage: {
-          ipfs: { status },
-        },
-      } = await testStoragePatch(patch, { ipfs: expectedIpfs });
-      expectedIpfs.status.tasks.pending = status.tasks.pending;
-      await testStoragePatch(patch, { ipfs: expectedIpfs });
+      const { storage } = await testStoragePatch(patch, expectedStorage);
+      const firstTaskId = storage.status.tasks.pending;
+      expectedStorage.status.tasks.pending = firstTaskId;
+      await testStoragePatch(patch, expectedStorage);
 
       await testStoragePatch(
         { ipfs: { spec: { nftMetadata: { b: "c", a: "b" } } } },
-        { ipfs: expectedIpfs }
+        expectedStorage
       );
 
       patch.ipfs.spec.nftMetadata = { d: "e" };
-      expectedIpfs.spec = patch.ipfs.spec;
-      expectedIpfs.status.tasks.pending = expect.not.stringMatching(
-        status.tasks.pending
-      );
-      await testStoragePatch(patch, { ipfs: expectedIpfs });
+      expectedStorage.ipfs.spec = patch.ipfs.spec;
+      expectedStorage.status.tasks.pending =
+        expect.not.stringMatching(firstTaskId);
+      await testStoragePatch(patch, expectedStorage);
     });
   });
 });

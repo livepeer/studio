@@ -29,6 +29,7 @@ import {
   Asset,
   AssetPatchPayload,
   ExportTaskParams,
+  IpfsFileInfo,
   NewAssetPayload,
   Task,
 } from "../schema/types";
@@ -114,37 +115,26 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
 
 const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
 
-type IPFSAddresses = Asset["storage"]["ipfs"]["status"]["addresses"];
-
-export function withIpfsUrls(ipfs: IPFSAddresses): IPFSAddresses {
-  if (!ipfs?.videoFileCid) {
+export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(ipfs: T): T {
+  if (!ipfs?.cid) {
     return ipfs;
   }
-  ipfs = {
+  return {
     ...ipfs,
-    videoFileUrl: `ipfs://${ipfs.videoFileCid}`,
-    videoFileGatewayUrl: pathJoin(ipfsGateway, ipfs.videoFileCid),
+    url: `ipfs://${ipfs.cid}`,
+    gatewayUrl: pathJoin(ipfsGateway, ipfs.cid),
   };
-  if (ipfs.nftMetadataCid) {
-    ipfs = {
-      ...ipfs,
-      nftMetadataUrl: `ipfs://${ipfs.nftMetadataCid}`,
-      nftMetadataGatewayUrl: pathJoin(ipfsGateway, ipfs.nftMetadataCid),
-    };
-  }
-  return ipfs;
 }
 
 function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
-  if (!asset?.storage?.ipfs?.status?.addresses) {
+  if (!asset?.storage?.ipfs?.cid) {
     return asset;
   }
   return _.merge({}, asset, {
     storage: {
       ipfs: {
-        status: {
-          addresses: withIpfsUrls(asset.storage.ipfs.status.addresses),
-        },
+        ...withIpfsUrls(asset.storage.ipfs),
+        nftMetadata: withIpfsUrls(asset.storage.ipfs.nftMetadata),
       },
     },
   });
@@ -194,12 +184,13 @@ async function reconcileAssetStorage(
     storage = {
       ...storage,
       ipfs: {
+        ...storage?.ipfs,
         spec: newSpec,
-        status: mergeStorageStatus(storage?.ipfs?.status, {
-          phase: "waiting",
-          tasks: { pending: task.id },
-        }),
       },
+      status: mergeStorageStatus(storage?.status, {
+        phase: "waiting",
+        tasks: { pending: task.id },
+      }),
     };
   }
   return storage;

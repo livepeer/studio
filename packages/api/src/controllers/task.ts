@@ -13,9 +13,10 @@ import {
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { Task } from "../schema/types";
+import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { withIpfsUrls } from "./asset";
+import { taskOutputToIpfsStorage } from "../store/asset-table";
 
 const app = Router();
 
@@ -34,14 +35,29 @@ function validateTaskPayload(
   };
 }
 
+const ipfsStorageToTaskOutput = (
+  ipfs: Omit<Asset["storage"]["ipfs"], "spec">
+): Task["output"]["export"]["ipfs"] => ({
+  videoFileCid: ipfs.cid,
+  videoFileUrl: ipfs.url,
+  videoFileGatewayUrl: ipfs.gatewayUrl,
+  nftMetadataCid: ipfs.nftMetadata?.cid,
+  nftMetadataUrl: ipfs.nftMetadata?.url,
+  nftMetadataGatewayUrl: ipfs.nftMetadata?.gatewayUrl,
+});
+
 function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
   if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
   }
+  const assetIpfs = taskOutputToIpfsStorage(task.output.export.ipfs);
   return _.merge({}, task, {
     output: {
       export: {
-        ipfs: withIpfsUrls(task.output.export.ipfs),
+        ipfs: ipfsStorageToTaskOutput({
+          ...withIpfsUrls(assetIpfs),
+          nftMetadata: withIpfsUrls(assetIpfs.nftMetadata),
+        }),
       },
     },
   });
