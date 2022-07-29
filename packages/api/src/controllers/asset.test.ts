@@ -7,6 +7,7 @@ import { WithID } from "../store/types";
 import Table from "../store/table";
 import schema from "../schema/schema.json";
 import { withIpfsUrls } from "./asset";
+import { generateUniquePlaybackId } from "./generate-keys";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
 type DBAsset =
@@ -455,6 +456,84 @@ describe("controllers/asset", () => {
       expectedStorage.status.tasks.pending =
         expect.not.stringMatching(firstTaskId);
       await testStoragePatch(patch, expectedStorage);
+    });
+  });
+
+  describe("asset list", () => {
+    let asset: WithID<Asset>;
+
+    beforeEach(async () => {
+      await db.asset.create({
+        id: uuid(),
+        name: "dummy",
+        createdAt: Date.now(),
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+        userId: nonAdminUser.id,
+      });
+      const id = uuid();
+      asset = await db.asset.create({
+        id,
+        name: "test-storage",
+        createdAt: Date.now(),
+        playbackId: await generateUniquePlaybackId(id),
+        storage: {
+          ipfs: {
+            spec: {},
+            cid: "QmX123",
+            nftMetadata: { cid: "QmY321" },
+          },
+        },
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+        userId: nonAdminUser.id,
+      });
+    });
+
+    const expectFindAsset = async (qs: string, shouldFind: boolean) => {
+      const res = await client.get(`/asset?${qs}`);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      if (shouldFind) {
+        expect(data).toMatchObject([asset]);
+      } else {
+        expect(data.length).not.toEqual(1); // either empty or more than 1
+      }
+    };
+
+    it("should find asset by playbackId", async () => {
+      await expectFindAsset(`playbackId=somethingelse`, false);
+      await expectFindAsset(`playbackId=${asset.playbackId}`, true);
+    });
+
+    it("should find asset by CID", async () => {
+      await expectFindAsset(`cid=somethingelse`, false);
+      await expectFindAsset(`cid=${asset.storage.ipfs.cid}`, true);
+    });
+
+    it("should find asset by NFT metadata CID", async () => {
+      await expectFindAsset(`nftMetadataCid=somethingelse`, false);
+      await expectFindAsset(
+        `nftMetadataCid=${asset.storage.ipfs.nftMetadata.cid}`,
+        true
+      );
+    });
+
+    it("should not mix main and NFT metadata CIDs", async () => {
+      await expectFindAsset(`cid=${asset.storage.ipfs.nftMetadata.cid}`, false);
+      await expectFindAsset(`nftMetadataCid=${asset.storage.ipfs.cid}`, false);
+    });
+
+    it("should NOT allow finding by name through direct query string", async () => {
+      await expectFindAsset(`name=${asset.name}`, false);
+      await expectFindAsset(
+        `filters=[{"id":"name","value":"${asset.name}"}]`,
+        true
+      );
     });
   });
 });

@@ -285,12 +285,13 @@ const fieldsMap: FieldsMap = {
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
-  nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadataCid'->>'cid'`,
+  nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, playbackId, count } =
+  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
     toStringValues(req.query);
+  const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -298,10 +299,13 @@ app.get("/", authorizer({}), async (req, res) => {
     order = "updatedAt-true,createdAt-true";
   }
 
-  const query = parseFilters(fieldsMap, filters);
-  if (playbackId) {
-    query.push(sql`asset.data->>'playbackId' = ${playbackId}`);
-  }
+  const query = [
+    ...parseFilters(fieldsMap, filters),
+    ...parseFilters(
+      fieldsMap,
+      JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
+    ),
+  ];
   if (!all || all === "false") {
     // TODO: Consider keeping this flag as admin-only
     query.push(sql`asset.data->>'deleted' IS NULL`);
