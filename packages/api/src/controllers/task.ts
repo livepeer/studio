@@ -3,13 +3,13 @@ import { validatePost } from "../middleware";
 import { Router } from "express";
 import mung from "express-mung";
 import { v4 as uuid } from "uuid";
+import _ from "lodash";
 import {
   makeNextHREF,
   parseFilters,
   parseOrder,
   toStringValues,
   FieldsMap,
-  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -38,16 +38,13 @@ function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
   if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
   }
-  return {
-    ...task,
+  return _.merge({}, task, {
     output: {
-      ...task.output,
       export: {
-        ...task.output.export,
         ipfs: withIpfsUrls(task.output.export.ipfs),
       },
     },
-  };
+  });
 }
 
 const fieldsMap: FieldsMap = {

@@ -139,19 +139,15 @@ function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
   if (!asset?.storage?.ipfs?.status?.addresses) {
     return asset;
   }
-  return {
-    ...asset,
+  return _.merge({}, asset, {
     storage: {
-      ...asset.storage,
       ipfs: {
-        ...asset.storage.ipfs,
         status: {
-          ...asset.storage.ipfs.status,
           addresses: withIpfsUrls(asset.storage.ipfs.status.addresses),
         },
       },
     },
-  };
+  });
 }
 
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {

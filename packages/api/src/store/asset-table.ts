@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { QueryResult } from "pg";
 import sql, { SQLStatement } from "sql-template-strings";
 import { Asset } from "../schema/types";
@@ -64,13 +65,11 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
         ...asset,
         storage: {
           ipfs: {
-            spec: { ...asset.storage.ipfs },
+            spec: _.cloneDeep(asset.storage.ipfs),
             status: ipfsStatusCompat(asset.status.storage.ipfs),
           },
         },
-        status: {
-          ...{ ...asset.status, storage: undefined },
-        },
+        status: _.omit(asset.status, "storage"),
       };
 
 type FieldOf<T> = T[keyof T];
