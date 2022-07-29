@@ -653,11 +653,6 @@ app.patch(
       }
       storage = { ...storageInput, ipfs };
     }
-    if (storage?.ipfs?.spec?.pinata) {
-      throw new BadRequestError(
-        "Custom pinata not allowed in asset storage. Call /export API explicitly instead"
-      );
-    }
 
     // update a specific asset
     const { id } = req.params;
