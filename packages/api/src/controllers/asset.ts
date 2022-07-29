@@ -580,7 +580,8 @@ export const setupTestTus = async (): Promise<void> => {
 async function createTestTusServer() {
   const tusTestServer = new tus.Server();
   tusTestServer.datastore = new tus.FileStore({
-    path: "/tmp",
+    path: "/upload/tus",
+    directory: "/tmp",
   });
   return tusTestServer;
 }

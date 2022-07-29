@@ -238,3 +238,12 @@ export async function setupUsers(
     nonAdminApiKey,
   };
 }
+
+export async function resumeTestTusUpload(upload) {
+  upload.findPreviousUploads().then(function (previousUploads) {
+    if (previousUploads.length) {
+      upload.resumeFromPreviousUpload(previousUploads[0]);
+    }
+    upload.start();
+  });
+}

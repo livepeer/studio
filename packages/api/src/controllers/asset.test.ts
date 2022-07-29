@@ -1,11 +1,18 @@
 import serverPromise, { TestServer } from "../test-server";
-import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
+import {
+  TestClient,
+  clearDatabase,
+  setupUsers,
+  resumeTestTusUpload,
+} from "../test-helpers";
 import { v4 as uuid } from "uuid";
 import { Asset, User } from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
 import schema from "../schema/schema.json";
+import fs from "fs";
+import * as tus from "tus-js-client";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
 type DBAsset =
@@ -314,6 +321,57 @@ describe("controllers/asset", () => {
             },
           },
         },
+      });
+    });
+    describe("chunked upload", () => {
+      jest.setTimeout(10000);
+      it("should start upload, stop it, resume it on tus test server", async () => {
+        const base = `../tus-test/`;
+        const filename = `empty.mp4`;
+        const path = base + filename;
+        const file = fs.createReadStream(path);
+        const { size } = fs.statSync(path);
+        const res = await client.post("/asset/request-upload", {
+          name: "tus-test",
+        });
+        expect(res.status).toBe(200);
+        let { tusEndpoint } = await res.json();
+        tusEndpoint = tusEndpoint.split("/api/")[1];
+        tusEndpoint = `${client.server.host}/api/${tusEndpoint}`;
+        await new Promise<void>((resolve, reject) => {
+          let aborted = false;
+          const upload = new tus.Upload(file, {
+            endpoint: tusEndpoint,
+            urlStorage: new (tus as any).FileUrlStorage("/tmp/metadata"),
+            metadata: {
+              filename,
+              filetype: "video/mp4",
+            },
+            uploadSize: size,
+            onError(error) {
+              reject(error);
+              throw error;
+            },
+            onProgress(bytesUploaded, bytesTotal) {
+              const percentage = parseFloat(
+                ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+              );
+              if (!aborted && percentage > 0) {
+                async () => {
+                  await upload.abort(true);
+                  aborted = true;
+                };
+              }
+              async () => {
+                await resumeTestTusUpload(upload);
+              };
+            },
+            onSuccess() {
+              resolve();
+            },
+          });
+          upload.start();
+        });
       });
     });
   });
