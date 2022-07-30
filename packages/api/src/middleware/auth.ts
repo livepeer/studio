@@ -89,14 +89,14 @@ function authenticator(): RequestHandler {
 
       userId = tokenObject.userId;
       // track last seen
-      tracking.recordToken(db, tokenObject);
+      tracking.recordToken(tokenObject);
     } else if (authScheme === "jwt") {
       try {
         const verified = jwt.verify(authToken, req.config.jwtSecret, {
           audience: req.config.jwtAudience,
         }) as JwtPayload;
         userId = verified.sub;
-        tracking.recordUser(db, userId);
+        tracking.recordUser(userId);
       } catch (err) {
         throw new UnauthorizedError(err.message);
       }
