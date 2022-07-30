@@ -10,10 +10,10 @@ import { hostname } from "os";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";
 
-const pollInterval = 2 * 1000;
-const updateInterval = 2 * 1000;
-const deleteTimeout = 30 * 1000;
-const seenSegmentsTimeout = 2 * 60 * 1000; // should be at least two time longer than HTTP push timeout in go-livepeer
+const pollInterval = 4 * 1000; // 4s
+const updateInterval = 60 * 1000; // 60s
+const deleteTimeout = 5 * 60 * 1000; // 5m
+const seenSegmentsTimeout = 10 * 60 * 1000; // 10m. should be at least two time longer than HTTP push timeout in go-livepeer
 
 async function makeRouter(params) {
   const bodyParser = require("body-parser");
