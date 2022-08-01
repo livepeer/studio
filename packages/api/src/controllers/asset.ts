@@ -379,43 +379,52 @@ app.post(
   }
 );
 
+const uploadWithUrlHandler: RequestHandler = async (req, res) => {
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(id);
+  let asset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    req.body
+  );
+  if (!req.body.url) {
+    return res.status(422).json({
+      errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+
+  asset = await createAsset(asset, req.queue);
+
+  const task = await req.taskScheduler.scheduleTask(
+    "import",
+    {
+      import: {
+        url: req.body.url,
+      },
+    },
+    undefined,
+    asset
+  );
+
+  res.status(201);
+  res.json({ asset, task });
+};
+
+app.post(
+  "/upload/url",
+  authorizer({}),
+  validatePost("new-asset-payload"),
+  uploadWithUrlHandler
+);
+// TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/import",
   authorizer({}),
   validatePost("new-asset-payload"),
-  async (req, res) => {
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(id);
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      req.body
-    );
-    if (!req.body.url) {
-      return res.status(422).json({
-        errors: [`Must provide a "url" field for the asset contents`],
-      });
-    }
-
-    asset = await createAsset(asset, req.queue);
-
-    const task = await req.taskScheduler.scheduleTask(
-      "import",
-      {
-        import: {
-          url: req.body.url,
-        },
-      },
-      undefined,
-      asset
-    );
-
-    res.status(201);
-    res.json({ asset, task });
-  }
+  uploadWithUrlHandler
 );
 
 // /:id/transcode and /transcode routes registered right below
