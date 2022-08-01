@@ -239,7 +239,7 @@ class statusPoller {
       countSegments(si, manifest);
       if (needUpdate) {
         try {
-          await this.flushStreamMetrics(si, true);
+          await this.flushStreamMetrics(si, playback2session.has(mid));
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
@@ -271,7 +271,7 @@ class statusPoller {
         si.lastSeen !== si.lastSeenSavedToDb;
       if (needUpdate) {
         try {
-          await this.flushStreamMetrics(si, false);
+          await this.flushStreamMetrics(si, !!si.stream.parentId);
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
@@ -304,7 +304,7 @@ class statusPoller {
     }
   }
 
-  private async flushStreamMetrics(si: streamInfo, isActive?: boolean) {
+  private async flushStreamMetrics(si: streamInfo, hasSession?: boolean) {
     const storedInfo = si.stream;
     if (!storedInfo) {
       return;
@@ -337,7 +337,7 @@ class statusPoller {
       sourceBytesLastUpdated: si.sourceBytes,
       transcodedBytesLastUpdated: si.transcodedBytes,
     };
-    if (!storedInfo.parentId && typeof isActive !== "undefined" && !isActive) {
+    if (!storedInfo.parentId && hasSession !== undefined && !hasSession) {
       // this is not a session created by our Mist, so manage isActive field for this stream
       setObj.isActive = true;
       setObj.region = this.region;
