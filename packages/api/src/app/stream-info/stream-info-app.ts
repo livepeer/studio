@@ -8,7 +8,11 @@ import { Stream } from "../../schema/types";
 import fetch from "node-fetch";
 import { hostname } from "os";
 
-import { StatusResponse, MasterPlaylist } from "./livepeer-types";
+import {
+  StatusResponse,
+  MasterPlaylist,
+  MasterPlaylistDictionary,
+} from "./livepeer-types";
 
 const pollInterval = 2 * 1000; // 2s
 const updateInterval = 60 * 1000; // 60s
@@ -234,47 +238,7 @@ class statusPoller {
         }
       }
     }
-    for (const [mid, si] of this.seenStreams) {
-      const now = Date.now();
-
-      if (!(mid in status.Manifests)) {
-        const needUpdate =
-          now.valueOf() - si.lastUpdated.valueOf() > updateInterval &&
-          si.lastSeen !== si.lastSeenSavedToDb;
-        if (needUpdate) {
-          try {
-            await this.flushStreamMetrics(si, playback2session.has(mid));
-          } catch (err) {
-            console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
-          }
-        }
-        const notSeenFor: number = now - si.lastSeen.valueOf();
-        if (notSeenFor > deleteTimeout) {
-          this.seenStreams.delete(mid);
-          const storedInfo = si.stream;
-          if (storedInfo) {
-            const zeroRate = {
-              ingestRate: 0,
-              outgoingRate: 0,
-            } as Stream;
-            await db.stream.update(storedInfo.id, zeroRate);
-            if (storedInfo.parentId) {
-              await db.stream.update(storedInfo.parentId, zeroRate);
-              const userSessionId = getSessionId(storedInfo);
-              await db.session.update(userSessionId, zeroRate);
-            }
-            if (!storedInfo.parentId) {
-              // this is not a session created by our Mist, so manage isActive field for this stream
-              await db.stream.setActiveToFalse({
-                id: storedInfo.id,
-                lastSeen: si.lastSeenSavedToDb.valueOf(),
-              });
-            }
-          }
-        }
-        // console.log(`seen: `, this.seenStreams)
-      }
-    }
+    await this.housekeepSeenStreams(status.Manifests);
   }
 
   private async getStatus(broadcaster: string): Promise<StatusResponse> {
@@ -282,6 +246,52 @@ class statusPoller {
     const result = await fetch(uri);
     const json = await result.json();
     return json;
+  }
+
+  private async housekeepSeenStreams(activeStreams?: MasterPlaylistDictionary) {
+    for (const [mid, si] of this.seenStreams) {
+      if (activeStreams && mid in activeStreams) {
+        // active streams are already processed in the code calling this
+        continue;
+      }
+
+      const now = Date.now();
+      const needUpdate =
+        now.valueOf() - si.lastUpdated.valueOf() > updateInterval &&
+        si.lastSeen !== si.lastSeenSavedToDb;
+      if (needUpdate) {
+        try {
+          await this.flushStreamMetrics(si, false);
+        } catch (err) {
+          console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
+        }
+      }
+      const notSeenFor: number = now - si.lastSeen.valueOf();
+      if (notSeenFor > deleteTimeout) {
+        this.seenStreams.delete(mid);
+        const storedInfo = si.stream;
+        if (storedInfo) {
+          const zeroRate = {
+            ingestRate: 0,
+            outgoingRate: 0,
+          } as Stream;
+          await db.stream.update(storedInfo.id, zeroRate);
+          if (storedInfo.parentId) {
+            await db.stream.update(storedInfo.parentId, zeroRate);
+            const userSessionId = getSessionId(storedInfo);
+            await db.session.update(userSessionId, zeroRate);
+          }
+          if (!storedInfo.parentId) {
+            // this is not a session created by our Mist, so manage isActive field for this stream
+            await db.stream.setActiveToFalse({
+              id: storedInfo.id,
+              lastSeen: si.lastSeenSavedToDb.valueOf(),
+            });
+          }
+        }
+      }
+      // console.log(`seen: `, this.seenStreams)
+    }
   }
 
   private async flushStreamMetrics(si: streamInfo, isActive?: boolean) {
