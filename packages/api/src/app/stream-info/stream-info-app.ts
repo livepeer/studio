@@ -10,7 +10,7 @@ import { hostname } from "os";
 
 import { StatusResponse, MasterPlaylist } from "./livepeer-types";
 
-const pollInterval = 4 * 1000; // 4s
+const pollInterval = 2 * 1000; // 2s
 const updateInterval = 60 * 1000; // 60s
 const deleteTimeout = 5 * 60 * 1000; // 5m
 const seenSegmentsTimeout = 10 * 60 * 1000; // 10m. should be at least two time longer than HTTP push timeout in go-livepeer
@@ -83,6 +83,9 @@ function countSegments(si: streamInfo, mpl: MasterPlaylist) {
 }
 
 interface streamInfo {
+  mid: string;
+  stream?: Stream;
+
   lastSeen: Date;
   lastSeenSavedToDb: Date;
   lastUpdated: Date;
@@ -101,12 +104,13 @@ interface streamInfo {
   outgoingRate: number;
   sourceBytesLastUpdated: number;
   transcodedBytesLastUpdated: number;
-  objectId: string;
 }
 
-function newStreamInfo(): streamInfo {
+function newStreamInfo(mid: string, stream?: Stream): streamInfo {
   const now = new Date();
   return {
+    mid,
+    stream,
     lastSeen: now,
     lastSeenSavedToDb: now,
     lastUpdated: now,
@@ -125,7 +129,6 @@ function newStreamInfo(): streamInfo {
     ingestRate: 0.0,
     outgoingRate: 0.0,
     seenSegments: new Map(),
-    objectId: null,
   };
 }
 
@@ -170,7 +173,7 @@ class statusPoller {
     for (const k of Object.keys(status.InternalManifests || {})) {
       playback2session.set(status.InternalManifests[k], k);
     }
-    const getObjectByMid = async (mid: string): Promise<Stream | null> => {
+    const getStreamObject = async (mid: string): Promise<Stream | null> => {
       const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
       let storedInfo: Stream = await db.stream.get(sid);
       if (!storedInfo) {
@@ -181,66 +184,6 @@ class statusPoller {
       }
       return storedInfo;
     };
-
-    const flushStreamMetrics = async (mid: string, si: streamInfo) => {
-      const storedInfo = await getObjectByMid(mid);
-      if (!storedInfo) {
-        return;
-      }
-
-      si.objectId = storedInfo.id;
-      const setObj = {
-        lastSeen: si.lastSeen.valueOf(),
-        ingestRate: si.ingestRate,
-        outgoingRate: si.outgoingRate,
-        broadcasterHost: this.hostname,
-      } as Stream;
-      const incObj = {
-        sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
-        transcodedSegments:
-          si.transcodedSegments - si.transcodedSegmentsLastUpdated,
-        sourceSegmentsDuration:
-          si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated,
-        transcodedSegmentsDuration:
-          si.transcodedSegmentsDuration -
-          si.transcodedSegmentsDurationLastUpdated,
-        sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
-        transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
-      };
-      const lastSavedUpdates: Partial<streamInfo> = {
-        lastSeenSavedToDb: si.lastSeen,
-        sourceSegmentsLastUpdated: si.sourceSegments,
-        transcodedSegmentsLastUpdated: si.transcodedSegments,
-        sourceSegmentsDurationLastUpdated: si.sourceSegmentsDuration,
-        transcodedSegmentsDurationLastUpdated: si.transcodedSegmentsDuration,
-        sourceBytesLastUpdated: si.sourceBytes,
-        transcodedBytesLastUpdated: si.transcodedBytes,
-      };
-      if (!storedInfo.parentId && !playback2session.has(mid)) {
-        // this is not a session created by our Mist, so manage isActive field for this stream
-        setObj.isActive = true;
-        setObj.region = this.region;
-      }
-      // console.log(`---> setting`, setObj)
-      // console.log(`---> inc`, incObj)
-      await db.stream.update(storedInfo.id, setObj);
-      await db.stream.add(storedInfo.id, incObj as Stream);
-      if (storedInfo.parentId) {
-        await db.stream.add(storedInfo.parentId, incObj as Stream);
-        await db.stream.update(storedInfo.parentId, setObj);
-        const userSessionId = getSessionId(storedInfo);
-        // update session table
-        try {
-          await db.session.add(userSessionId, incObj as Stream);
-          await db.session.update(userSessionId, setObj);
-        } catch (e) {
-          console.log(`error updating session table:`, e);
-        }
-      }
-      si.lastUpdated = new Date();
-      Object.assign(si, lastSavedUpdates);
-    };
-
     const now = new Date();
     for (const mid of Object.keys(status.Manifests)) {
       let si,
@@ -249,7 +192,8 @@ class statusPoller {
       if (!this.seenStreams.has(mid)) {
         // new stream
         // console.log(`got new stream ${mid}`)
-        si = newStreamInfo();
+        const stream = await getStreamObject(mid);
+        si = newStreamInfo(mid, stream);
         this.seenStreams.set(mid, si);
         needUpdate = true;
       } else {
@@ -284,7 +228,7 @@ class statusPoller {
       countSegments(si, manifest);
       if (needUpdate) {
         try {
-          await flushStreamMetrics(mid, si);
+          await this.flushStreamMetrics(si, true);
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
@@ -299,7 +243,7 @@ class statusPoller {
           si.lastSeen !== si.lastSeenSavedToDb;
         if (needUpdate) {
           try {
-            await flushStreamMetrics(mid, si);
+            await this.flushStreamMetrics(si, playback2session.has(mid));
           } catch (err) {
             console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
           }
@@ -307,7 +251,7 @@ class statusPoller {
         const notSeenFor: number = now - si.lastSeen.valueOf();
         if (notSeenFor > deleteTimeout) {
           this.seenStreams.delete(mid);
-          const storedInfo: Stream = await getObjectByMid(si.objectId || mid);
+          const storedInfo = si.stream;
           if (storedInfo) {
             const zeroRate = {
               ingestRate: 0,
@@ -338,6 +282,64 @@ class statusPoller {
     const result = await fetch(uri);
     const json = await result.json();
     return json;
+  }
+
+  private async flushStreamMetrics(si: streamInfo, isActive?: boolean) {
+    const storedInfo = si.stream;
+    if (!storedInfo) {
+      return;
+    }
+
+    const setObj = {
+      lastSeen: si.lastSeen.valueOf(),
+      ingestRate: si.ingestRate,
+      outgoingRate: si.outgoingRate,
+      broadcasterHost: this.hostname,
+    } as Stream;
+    const incObj = {
+      sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
+      transcodedSegments:
+        si.transcodedSegments - si.transcodedSegmentsLastUpdated,
+      sourceSegmentsDuration:
+        si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated,
+      transcodedSegmentsDuration:
+        si.transcodedSegmentsDuration -
+        si.transcodedSegmentsDurationLastUpdated,
+      sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
+      transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
+    };
+    const lastSavedUpdates: Partial<streamInfo> = {
+      lastSeenSavedToDb: si.lastSeen,
+      sourceSegmentsLastUpdated: si.sourceSegments,
+      transcodedSegmentsLastUpdated: si.transcodedSegments,
+      sourceSegmentsDurationLastUpdated: si.sourceSegmentsDuration,
+      transcodedSegmentsDurationLastUpdated: si.transcodedSegmentsDuration,
+      sourceBytesLastUpdated: si.sourceBytes,
+      transcodedBytesLastUpdated: si.transcodedBytes,
+    };
+    if (!storedInfo.parentId && typeof isActive !== "undefined" && !isActive) {
+      // this is not a session created by our Mist, so manage isActive field for this stream
+      setObj.isActive = true;
+      setObj.region = this.region;
+    }
+    // console.log(`---> setting`, setObj)
+    // console.log(`---> inc`, incObj)
+    await db.stream.update(storedInfo.id, setObj);
+    await db.stream.add(storedInfo.id, incObj as Stream);
+    if (storedInfo.parentId) {
+      await db.stream.add(storedInfo.parentId, incObj as Stream);
+      await db.stream.update(storedInfo.parentId, setObj);
+      const userSessionId = getSessionId(storedInfo);
+      // update session table
+      try {
+        await db.session.add(userSessionId, incObj as Stream);
+        await db.session.update(userSessionId, setObj);
+      } catch (e) {
+        console.log(`error updating session table:`, e);
+      }
+    }
+    si.lastUpdated = new Date();
+    Object.assign(si, lastSavedUpdates);
   }
 
   startPoller() {
