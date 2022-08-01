@@ -64,14 +64,17 @@ function validateAssetMeta(meta: Record<string, string>) {
 }
 
 function cleanAssetResponse(assets: WithID<Asset>[]) {
-  let cleanedAssets = [];
-  for (var i = 0; i < assets.length; i++) {
-    if (assets[i].videoSpec) {
-      delete assets[i].videoSpec.tracks;
-    }
-    cleanedAssets.push(assets[i]);
-  }
-  return cleanedAssets;
+  return assets.map((a) =>
+    !a.videoSpec
+      ? a
+      : {
+          ...a,
+          videoSpec: {
+            ...a.videoSpec,
+            tracks: undefined,
+          },
+        }
+  );
 }
 
 async function validateAssetPayload(
@@ -485,7 +488,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   );
 
   res.status(201);
-  res.json({ asset, task });
+  res.json({ asset, task: { id: task.id } });
 };
 
 app.post(
@@ -553,7 +556,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     outputAsset
   );
   res.status(201);
-  res.json({ asset: outputAsset, task });
+  res.json({ asset: outputAsset, task: { id: task.id } });
 };
 app.post(
   "/:id/transcode",

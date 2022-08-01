@@ -61,7 +61,7 @@ const eventOptions: Webhook["events"] = [
   "asset.deleted",
   "task.spawned",
   "task.updated",
-  "task.succeeded",
+  "task.completed",
   "task.failed",
   // "playback.user.new",
 ];

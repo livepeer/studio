@@ -282,16 +282,13 @@ export class TaskScheduler {
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
-      let task_event: EventKey = "task.succeeded";
-      if (task.status.phase === "failed") {
-        task_event = "task.failed";
-      }
-      let routingKey: RoutingKey = `events.${task_event}`;
+      let taskEvent: EventKey = `task.${task.status.phase}`; // after changing the webhook to task.completed
+      let routingKey: RoutingKey = `events.${taskEvent}`;
       await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
         id: uuid(),
         timestamp,
-        event: task_event,
+        event: taskEvent,
         userId: task.userId,
         payload: {
           success: task.status.phase === "completed",
@@ -310,9 +307,6 @@ export class TaskScheduler {
       status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
     };
     await db.asset.update(asset.id, updates);
-    if (!updates.status || updates.status === asset.status) {
-      return;
-    }
     asset = {
       ...asset,
       ...updates,
@@ -331,17 +325,17 @@ export class TaskScheduler {
         },
       },
     });
+    if (!updates.status || updates.status === asset.status) {
+      return;
+    }
     if (asset.status.phase == "ready" || asset.status.phase == "failed") {
-      let asset_event: EventKey = "asset.ready";
-      if (asset.status.phase === "failed") {
-        asset_event = "asset.failed";
-      }
-      let routingKey: RoutingKey = `events.${asset_event}`;
+      let assetEvent: EventKey = `asset.${asset.status.phase}`;
+      let routingKey: RoutingKey = `events.${assetEvent}`;
       await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
         id: uuid(),
         timestamp,
-        event: asset_event,
+        event: assetEvent,
         userId: asset.userId,
         payload: {
           id: asset.id,

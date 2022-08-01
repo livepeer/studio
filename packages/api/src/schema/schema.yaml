@@ -217,7 +217,7 @@ components:
               - asset.deleted
               - task.spawned
               - task.updated
-              - task.succeeded
+              - task.completed
               - task.failed
         url:
           type: string
