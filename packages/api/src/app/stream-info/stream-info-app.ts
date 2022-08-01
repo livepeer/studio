@@ -344,16 +344,13 @@ class statusPoller {
     }
     // console.log(`---> setting`, setObj)
     // console.log(`---> inc`, incObj)
-    await db.stream.update(storedInfo.id, setObj);
-    await db.stream.add(storedInfo.id, incObj as Stream);
+    await db.stream.add(storedInfo.id, incObj, setObj);
     if (storedInfo.parentId) {
-      await db.stream.add(storedInfo.parentId, incObj as Stream);
-      await db.stream.update(storedInfo.parentId, setObj);
+      await db.stream.add(storedInfo.parentId, incObj, setObj);
       const userSessionId = getSessionId(storedInfo);
       // update session table
       try {
-        await db.session.add(userSessionId, incObj as Stream);
-        await db.session.update(userSessionId, setObj);
+        await db.session.add(userSessionId, incObj, setObj);
       } catch (e) {
         console.log(`error updating session table:`, e);
       }
