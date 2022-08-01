@@ -55,6 +55,15 @@ class Tracker {
       );
     }
   }
+
+  async flushAll() {
+    const all = this.pendingUpdates;
+    this.pendingUpdates = new Map();
+
+    for (const key of all.keys()) {
+      await this.flushLastSeen(key);
+    }
+  }
 }
 
 const tracking = new Tracker();
