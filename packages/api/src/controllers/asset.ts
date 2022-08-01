@@ -524,7 +524,7 @@ app.post(
       return res.json({ errors: ["Ingest not configured"] });
     }
     const baseUrl = ingests[0].origin;
-    const url = `${baseUrl}/api/asset/upload/${signedUploadUrl}`;
+    const url = `${baseUrl}/api/asset/upload/direct/${signedUploadUrl}`;
 
     asset = await createAsset(asset, req.queue);
     const task = await req.taskScheduler.createTask(
@@ -540,12 +540,16 @@ app.post(
   }
 );
 
-app.put("/upload/:url", async (req, res) => {
+app.put("/upload/direct/:urlToken", async (req, res) => {
   const {
-    params: { url },
+    params: { urlToken },
     config: { jwtSecret, jwtAudience },
   } = req;
-  const { uploadUrl, playbackId } = parseUploadUrl(url, jwtSecret, jwtAudience);
+  const { uploadUrl, playbackId } = parseUploadUrl(
+    urlToken,
+    jwtSecret,
+    jwtAudience
+  );
 
   const assets = await db.asset.find({ playbackId }, { useReplica: false });
   if (!assets?.length || !assets[0]?.length) {
