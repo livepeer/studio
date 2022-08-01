@@ -184,6 +184,9 @@ class statusPoller {
 
     const flushStreamMetrics = async (mid: string, si: streamInfo) => {
       const storedInfo = await getObjectByMid(mid);
+      if (!storedInfo) {
+        return;
+      }
 
       si.objectId = storedInfo.id;
       const setObj = {

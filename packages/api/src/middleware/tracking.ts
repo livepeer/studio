@@ -28,13 +28,14 @@ class Tracker {
       try {
         const lastSeen = this.updateLastSeenTasks.get(id);
         this.updateLastSeenTasks.delete(id);
+        if (!lastSeen) return;
 
         await table.update(
           [
             sql`id = ${id}`,
             sql`coalesce((data->'lastSeen'})::bigint, 0) < ${lastSeen}`,
           ],
-          { lastSeen } as any
+          { lastSeen }
         );
       } catch (err) {
         console.log(
