@@ -44,7 +44,7 @@ class Tracker {
       await table.update(
         [
           sql`id = ${id}`,
-          sql`coalesce((data->'lastSeen'})::bigint, 0) < ${lastSeen}`,
+          sql`coalesce((data->'lastSeen')::bigint, 0) < ${lastSeen}`,
         ],
         { lastSeen }
       );
