@@ -5,8 +5,14 @@ import Table from "../store/table";
 
 const flushDelay = 60 * 1000; // 60s
 
+type PendingLastSeen = {
+  table: Table<{ id: string; lastSeen?: number }>;
+  id: string;
+  lastSeen: number;
+};
+
 class Tracker {
-  updateLastSeenTasks: Map<string, number> = new Map();
+  pendingUpdates: Map<string, PendingLastSeen> = new Map();
 
   recordUser(userId: string) {
     this.recordLastSeen(db.user, userId);
@@ -20,30 +26,34 @@ class Tracker {
     table: Table<{ id: string; lastSeen?: number }>,
     id: string
   ) {
-    const alreadyScheduled = this.updateLastSeenTasks.has(id);
-    this.updateLastSeenTasks.set(id, Date.now());
+    const key = `${table.name}-${id}`;
+    const alreadyScheduled = this.pendingUpdates.has(key);
+    this.pendingUpdates.set(key, { table, id, lastSeen: Date.now() });
     if (alreadyScheduled) return;
 
-    setTimeout(async () => {
-      try {
-        const lastSeen = this.updateLastSeenTasks.get(id);
-        this.updateLastSeenTasks.delete(id);
-        if (!lastSeen) return;
+    setTimeout(() => this.flushLastSeen(key), flushDelay);
+  }
 
-        await table.update(
-          [
-            sql`id = ${id}`,
-            sql`coalesce((data->'lastSeen'})::bigint, 0) < ${lastSeen}`,
-          ],
-          { lastSeen }
-        );
-      } catch (err) {
-        console.log(
-          `error saving last seen: table=${table.name} id=${id} err=`,
-          err
-        );
-      }
-    }, flushDelay);
+  private async flushLastSeen(key: string) {
+    const { table, id, lastSeen } = this.pendingUpdates.get(key) ?? {};
+    this.pendingUpdates.delete(key);
+    if (!id) {
+      return;
+    }
+    try {
+      await table.update(
+        [
+          sql`id = ${id}`,
+          sql`coalesce((data->'lastSeen'})::bigint, 0) < ${lastSeen}`,
+        ],
+        { lastSeen }
+      );
+    } catch (err) {
+      console.log(
+        `error saving last seen: table=${table?.name} id=${id} err=`,
+        err
+      );
+    }
   }
 }
 
