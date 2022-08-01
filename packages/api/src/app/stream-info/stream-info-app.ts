@@ -16,8 +16,8 @@ import {
 
 const pollInterval = 2 * 1000; // 2s
 const updateInterval = 60 * 1000; // 60s
-const deleteTimeout = 5 * 60 * 1000; // 5m
-const seenSegmentsTimeout = 10 * 60 * 1000; // 10m. should be at least two time longer than HTTP push timeout in go-livepeer
+const deleteTimeout = 30 * 1000; // 30s
+const seenSegmentsTimeout = 2 * 60 * 1000; // 2m. should be at least two time longer than HTTP push timeout in go-livepeer
 
 async function makeRouter(params) {
   const bodyParser = require("body-parser");
@@ -269,15 +269,15 @@ class statusPoller {
       const needUpdate =
         (force || now.valueOf() - si.lastUpdated.valueOf() > updateInterval) &&
         si.lastSeen !== si.lastSeenSavedToDb;
-      if (needUpdate) {
+      const shouldDelete = now - si.lastSeen.valueOf() > deleteTimeout;
+      if (needUpdate || shouldDelete) {
         try {
           await this.flushStreamMetrics(si, !!si.stream.parentId);
         } catch (err) {
           console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
       }
-      const notSeenFor: number = now - si.lastSeen.valueOf();
-      if (notSeenFor > deleteTimeout) {
+      if (shouldDelete) {
         this.seenStreams.delete(mid);
         const storedInfo = si.stream;
         if (storedInfo) {
