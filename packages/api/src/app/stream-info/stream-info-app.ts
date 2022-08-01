@@ -148,17 +148,24 @@ function getSessionId(storedInfo: Stream): string {
 }
 
 class statusPoller {
-  broadcaster: string;
-  region: string;
-  hostname: string;
+  readonly broadcaster: string;
+  readonly region: string;
+  readonly hostname: string;
+  readonly pid: NodeJS.Timeout;
 
-  private seenStreams: Map<string, streamInfo>;
+  private readonly seenStreams: Map<string, streamInfo>;
 
   constructor(broadcaster: string, region: string) {
     this.broadcaster = broadcaster;
     this.region = region;
-    this.seenStreams = new Map<string, streamInfo>();
     this.hostname = hostname();
+    this.seenStreams = new Map<string, streamInfo>();
+    this.pid = setInterval(this.pollStatus.bind(this), pollInterval);
+  }
+
+  public async stop() {
+    clearInterval(this.pid);
+    await this.housekeepSeenStreams(null, true);
   }
 
   private async pollStatus() {
@@ -248,7 +255,10 @@ class statusPoller {
     return json;
   }
 
-  private async housekeepSeenStreams(activeStreams?: MasterPlaylistDictionary) {
+  private async housekeepSeenStreams(
+    activeStreams?: MasterPlaylistDictionary,
+    force?: boolean
+  ) {
     for (const [mid, si] of this.seenStreams) {
       if (activeStreams && mid in activeStreams) {
         // active streams are already processed in the code calling this
@@ -257,7 +267,7 @@ class statusPoller {
 
       const now = Date.now();
       const needUpdate =
-        now.valueOf() - si.lastUpdated.valueOf() > updateInterval &&
+        (force || now.valueOf() - si.lastUpdated.valueOf() > updateInterval) &&
         si.lastSeen !== si.lastSeenSavedToDb;
       if (needUpdate) {
         try {
@@ -351,11 +361,6 @@ class statusPoller {
     si.lastUpdated = new Date();
     Object.assign(si, lastSavedUpdates);
   }
-
-  startPoller() {
-    const pid = setInterval(this.pollStatus.bind(this), pollInterval);
-    return pid;
-  }
 }
 
 export default async function makeApp(params) {
@@ -387,13 +392,12 @@ export default async function makeApp(params) {
   }
 
   const poller = new statusPoller(broadcaster, ownRegion);
-  const pid = poller.startPoller();
 
   const close = async () => {
-    clearInterval(pid);
     process.off("SIGTERM", sigterm);
     process.off("SIGINT", sigterm);
     process.off("unhandledRejection", unhandledRejection);
+    await poller.stop();
     listener.close();
     await db.close();
   };
