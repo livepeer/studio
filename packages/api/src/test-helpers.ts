@@ -5,6 +5,8 @@ import { v4 as uuid } from "uuid";
 import schema from "./schema/schema.json";
 import { User } from "./schema/types";
 import { TestServer } from "./test-server";
+import fs from "fs";
+import * as tus from "tus-js-client";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
@@ -239,11 +241,20 @@ export async function setupUsers(
   };
 }
 
-export async function resumeTestTusUpload(upload) {
+export async function resumeTestTusUpload(upload: tus.Upload) {
   upload.findPreviousUploads().then(function (previousUploads) {
     if (previousUploads.length) {
       upload.resumeFromPreviousUpload(previousUploads[0]);
     }
     upload.start();
+  });
+}
+
+export async function createMockFile(fileName: string, size: number) {
+  return await new Promise((resolve, reject) => {
+    let fh = fs.openSync(fileName, "w");
+    fs.writeSync(fh, "ok", Math.max(0, size - 2));
+    fs.closeSync(fh);
+    resolve(true);
   });
 }

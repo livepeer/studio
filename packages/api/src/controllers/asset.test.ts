@@ -4,6 +4,7 @@ import {
   clearDatabase,
   setupUsers,
   resumeTestTusUpload,
+  createMockFile,
 } from "../test-helpers";
 import { v4 as uuid } from "uuid";
 import { Asset, User } from "../schema/types";
@@ -326,14 +327,15 @@ describe("controllers/asset", () => {
     describe("chunked upload", () => {
       jest.setTimeout(10000);
       it("should start upload, stop it, resume it on tus test server", async () => {
-        const base = `../tus-test/`;
-        const filename = `empty.mp4`;
-        const path = base + filename;
-        const file = fs.createReadStream(path);
-        const { size } = fs.statSync(path);
+        const filename = "test.mp4";
+        const path = "/tmp";
+        const filePath = `${path}/${filename}`;
         const res = await client.post("/asset/request-upload", {
           name: "tus-test",
         });
+        await createMockFile(filePath, 1024 * 1024 * 10);
+        const file = fs.createReadStream(filePath);
+        const { size } = fs.statSync(filePath);
         expect(res.status).toBe(200);
         let { tusEndpoint } = await res.json();
         tusEndpoint = tusEndpoint.split("/api/")[1];
@@ -372,6 +374,7 @@ describe("controllers/asset", () => {
           });
           upload.start();
         });
+        fs.unlinkSync(filePath);
       });
     });
   });
