@@ -5,6 +5,7 @@ import { v4 as uuid } from "uuid";
 import schema from "./schema/schema.json";
 import { User } from "./schema/types";
 import { TestServer } from "./test-server";
+import fs from "fs";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
@@ -237,4 +238,13 @@ export async function setupUsers(
     nonAdminToken,
     nonAdminApiKey,
   };
+}
+
+export async function createMockFile(fileName: string, size: number) {
+  return await new Promise((resolve, reject) => {
+    let fh = fs.openSync(fileName, "w");
+    fs.writeSync(fh, "ok", Math.max(0, size - 2));
+    fs.closeSync(fh);
+    resolve(true);
+  });
 }

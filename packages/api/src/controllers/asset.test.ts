@@ -1,11 +1,20 @@
 import serverPromise, { TestServer } from "../test-server";
-import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
+import {
+  TestClient,
+  clearDatabase,
+  setupUsers,
+  createMockFile,
+} from "../test-helpers";
 import { v4 as uuid } from "uuid";
 import { Asset, User } from "../schema/types";
 import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
 import schema from "../schema/schema.json";
+import fs from "fs/promises";
+import * as tus from "tus-js-client";
+import os from "os";
+import { sleep } from "../util";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
 type DBAsset =
@@ -314,6 +323,113 @@ describe("controllers/asset", () => {
             },
           },
         },
+      });
+    });
+
+    describe("chunked upload", () => {
+      const expectTaskStatus = async (
+        taskId: string,
+        expectedStatus: string
+      ) => {
+        const res = await client.get(`/task/${taskId}`);
+        expect(res.status).toBe(200);
+        const task = await res.json();
+        expect(task.status.phase).toBe(expectedStatus);
+      };
+
+      const uploadFile = async (
+        filename: string,
+        filePath: string,
+        tusEndpoint: string,
+        shouldAbort: boolean,
+        resumeFrom?: number
+      ) => {
+        const file = await fs.readFile(filePath);
+        const { size } = await fs.stat(filePath);
+        let uploadPercentage = await new Promise<number>(
+          async (resolve, reject) => {
+            const upload = new tus.Upload(file, {
+              endpoint: tusEndpoint,
+              urlStorage: new (tus as any).FileUrlStorage(
+                `${os.tmpdir()}/metadata`
+              ),
+              chunkSize: 1024 * 1024 * 1,
+              metadata: {
+                filename,
+                filetype: "video/mp4",
+              },
+              uploadSize: size,
+              onError(error) {
+                reject(error);
+              },
+              onProgress(bytesUploaded, bytesTotal) {
+                const percentage = parseFloat(
+                  ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+                );
+                if (resumeFrom) {
+                  expect(percentage).toBeGreaterThanOrEqual(resumeFrom);
+                }
+                if (shouldAbort && percentage > 1) {
+                  upload.abort().then(() => {
+                    resolve(percentage);
+                  });
+                }
+              },
+              onSuccess() {
+                resolve(100);
+              },
+            });
+            if (resumeFrom) {
+              const previousUploads = await upload.findPreviousUploads();
+              expect(previousUploads).toHaveLength(1);
+              upload.resumeFromPreviousUpload(previousUploads[0]);
+            }
+            upload.start();
+          }
+        );
+        if (shouldAbort) {
+          expect(uploadPercentage).toBeGreaterThan(0);
+          expect(uploadPercentage).toBeLessThan(100);
+        } else {
+          expect(uploadPercentage).toBe(100);
+        }
+        return uploadPercentage;
+      };
+
+      it("should start upload, stop it, resume it on tus test server", async () => {
+        const filename = "test.mp4";
+        const path = os.tmpdir();
+        const filePath = `${path}/${filename}`;
+        let res = await client.post("/asset/request-upload", {
+          name: "tus-test",
+        });
+        expect(res.status).toBe(200);
+        let {
+          tusEndpoint,
+          task: { id: taskId },
+        } = await res.json();
+        expect(
+          tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`)
+        ).toBe(true);
+        tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
+
+        await createMockFile(filePath, 1024 * 1024 * 10);
+        await expectTaskStatus(taskId, "pending");
+        let percentage = await uploadFile(
+          filename,
+          filePath,
+          tusEndpoint,
+          true
+        );
+        await expectTaskStatus(taskId, "pending");
+        await uploadFile(filename, filePath, tusEndpoint, false, percentage);
+
+        await sleep(100);
+
+        await expectTaskStatus(taskId, "waiting");
+
+        await fs.unlink(filePath);
+        await fs.unlink(`${path}/metadata`);
       });
     });
   });

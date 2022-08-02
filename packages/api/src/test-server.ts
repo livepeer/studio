@@ -41,7 +41,7 @@ params.postgresUrl = `postgresql://postgres@127.0.0.1/${testId}`;
 params.recordObjectStoreId = "mock_store";
 params.vodObjectStoreId = "mock_vod_store";
 params.ingest =
-  '[{"ingest": "rtmp://test/live","playback": "https://test/hls","base": "https://test"}]';
+  '[{"ingest": "rtmp://test/live","playback": "https://test/hls","base": "https://test","origin":"http://test"}]';
 params.amqpUrl = `amqp://localhost:5672/${testId}`;
 if (!params.insecureTestToken) {
   params.insecureTestToken = uuid();

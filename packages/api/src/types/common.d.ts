@@ -25,7 +25,6 @@ declare global {
       taskScheduler?: TaskScheduler;
       stripe?: Stripe;
       frontendDomain: string;
-
       user?: User;
       isUIAdmin?: boolean;
       token?: WithID<ApiToken>;

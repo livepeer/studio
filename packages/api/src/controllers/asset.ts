@@ -4,6 +4,7 @@ import { Request, RequestHandler, Router } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
+import tus from "tus-node-server";
 import {
   makeNextHREF,
   parseFilters,
@@ -21,6 +22,8 @@ import {
   NotFoundError,
   BadRequestError,
   InternalServerError,
+  UnauthorizedError,
+  NotImplementedError,
 } from "../store/errors";
 import httpProxy from "http-proxy";
 import { generateUniquePlaybackId } from "./generate-keys";
@@ -34,6 +37,9 @@ import {
 import { WithID } from "../store/types";
 import { mergeAssetStatus } from "../store/asset-table";
 import Queue from "../store/queue";
+import taskScheduler from "../task/scheduler";
+import { S3ClientConfig } from "@aws-sdk/client-s3";
+import os from "os";
 
 const app = Router();
 
@@ -65,6 +71,12 @@ async function validateAssetPayload(
 ): Promise<WithID<Asset>> {
   validateAssetMeta(payload.meta);
   if (payload.objectStoreId) {
+    if (payload.objectStoreId !== defaultObjectStoreId) {
+      // TODO: Allow assets Object Store to be changed at some point.
+      throw new UnprocessableEntityError(
+        `Object store is not customizable right now`
+      );
+    }
     const os = await db.objectStore.get(payload.objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
@@ -100,6 +112,10 @@ export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
   );
 }
 
+function getDownloadUrl(ingest: string, asset: WithID<Asset>): string {
+  return pathJoin(ingest, "asset", asset.playbackId, "video");
+}
+
 function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   if (asset.status.phase !== "ready") {
     return asset;
@@ -107,7 +123,7 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   return {
     ...asset,
     playbackUrl: getPlaybackUrl(ingest, asset),
-    downloadUrl: pathJoin(ingest, "asset", asset.playbackId, "video"),
+    downloadUrl: getDownloadUrl(ingest, asset),
   };
 }
 
@@ -169,15 +185,15 @@ async function genUploadUrl(
   jwtSecret: string,
   aud: string
 ) {
-  const uploadedObjectKey = `directUpload/${playbackId}/source`;
+  const uploadedObjectKey = `directUpload/${playbackId}`;
   const presignedUrl = await getS3PresignedUrl(
     objectStoreId,
     uploadedObjectKey
   );
-  const signedUploadUrl = jwt.sign({ presignedUrl, aud }, jwtSecret, {
+  const uploadToken = jwt.sign({ playbackId, presignedUrl, aud }, jwtSecret, {
     algorithm: "HS256",
   });
-  return { uploadedObjectKey, signedUploadUrl };
+  return { uploadedObjectKey, uploadToken };
 }
 
 function parseUploadUrl(
@@ -185,25 +201,18 @@ function parseUploadUrl(
   jwtSecret: string,
   audience: string
 ) {
+  let urlJwt: JwtPayload;
   let uploadUrl: string;
   try {
-    const urlJwt = jwt.verify(signedUploadUrl, jwtSecret, {
+    urlJwt = jwt.verify(signedUploadUrl, jwtSecret, {
       audience,
     }) as JwtPayload;
     uploadUrl = urlJwt.presignedUrl;
   } catch (err) {
     throw new ForbiddenError(`Invalid signed upload URL: ${err}`);
   }
-
-  // get playbackId from s3 url
-  const matches = uploadUrl.match(/\/directUpload\/([^/]+)\/source/);
-  if (!matches || matches.length < 2) {
-    throw new UnprocessableEntityError(
-      `the provided url for the upload is not valid or not supported: ${uploadUrl}`
-    );
-  }
-  const playbackId = matches[1];
-  return { uploadUrl, playbackId };
+  const { playbackId } = urlJwt;
+  return { playbackId, uploadUrl };
 }
 
 app.use(
@@ -511,7 +520,7 @@ app.post(
       vodObjectStoreId,
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { uploadedObjectKey, signedUploadUrl } = await genUploadUrl(
+    const { uploadedObjectKey, uploadToken } = await genUploadUrl(
       playbackId,
       asset.objectStoreId,
       jwtSecret,
@@ -524,7 +533,8 @@ app.post(
       return res.json({ errors: ["Ingest not configured"] });
     }
     const baseUrl = ingests[0].origin;
-    const url = `${baseUrl}/api/asset/upload/direct/${signedUploadUrl}`;
+    const url = `${baseUrl}/api/asset/upload/direct?token=${uploadToken}`;
+    const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
     asset = await createAsset(asset, req.queue);
     const task = await req.taskScheduler.createTask(
@@ -536,27 +546,95 @@ app.post(
       asset
     );
 
-    res.json({ url, asset, task });
+    res.json({ url, tusEndpoint, asset, task });
   }
 );
 
-app.put("/upload/direct/:urlToken", async (req, res) => {
-  const {
-    params: { urlToken },
-    config: { jwtSecret, jwtAudience },
-  } = req;
-  const { uploadUrl, playbackId } = parseUploadUrl(
-    urlToken,
-    jwtSecret,
-    jwtAudience
-  );
+let tusServer: tus.Server;
 
-  const assets = await db.asset.find({ playbackId }, { useReplica: false });
-  if (!assets?.length || !assets[0]?.length) {
-    throw new NotFoundError(`asset not found`);
+export const setupTus = async (objectStoreId: string): Promise<void> => {
+  tusServer = await createTusServer(objectStoreId);
+};
+
+async function createTusServer(objectStoreId: string) {
+  const os = await db.objectStore.get(objectStoreId);
+
+  const url = new URL(os.url);
+  const [_, vodRegion, vodBucket] = url.pathname.split("/");
+  let protocol = url.protocol;
+  if (protocol.includes("+")) {
+    protocol = protocol.split("+")[1];
   }
-  let asset = assets[0][0];
-  if (asset.status.phase !== "waiting") {
+
+  const opts: tus.S3StoreOptions | S3ClientConfig = {
+    path: "/upload/tus",
+    bucket: vodBucket,
+    accessKeyId: url.username,
+    secretAccessKey: url.password,
+    region: vodRegion,
+    partSize: 8 * 1024 * 1024,
+    tmpDirPrefix: "tus-tmp-files",
+    endpoint: `${protocol}//${url.host}`,
+    namingFunction,
+  };
+  const tusServer = new tus.Server();
+  tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
+  tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
+  return tusServer;
+}
+
+export const setupTestTus = async (): Promise<void> => {
+  tusServer = await createTestTusServer();
+};
+
+async function createTestTusServer() {
+  const tusTestServer = new tus.Server();
+  tusTestServer.datastore = new tus.FileStore({
+    path: "/upload/tus",
+    directory: os.tmpdir(),
+    namingFunction: (req: Request) =>
+      req.res.getHeader("livepeer-playback-id").toString(),
+  });
+  tusTestServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(true));
+  return tusTestServer;
+}
+
+const namingFunction = (req: Request) => {
+  const playbackId = req.res.getHeader("livepeer-playback-id").toString();
+  if (!playbackId) {
+    throw new InternalServerError("Missing playbackId in response headers");
+  }
+  return `directUpload/${playbackId}`;
+};
+
+type TusFileMetadata = {
+  id: string;
+  upload_length: `${number}`;
+  upload_metadata: string;
+};
+
+const onTusUploadComplete =
+  (isTest: boolean) =>
+  async ({ file }: { file: TusFileMetadata }) => {
+    try {
+      const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
+      const { task } = await getPendingAssetAndTask(playbackId);
+      await taskScheduler.enqueueTask(task);
+    } catch (err) {
+      console.error(
+        `error processing finished upload fileId=${file.id} err=`,
+        err
+      );
+    }
+  };
+
+const getPendingAssetAndTask = async (playbackId: string) => {
+  const asset = await db.asset.getByPlaybackId(playbackId, {
+    useReplica: false,
+  });
+  if (!asset) {
+    throw new NotFoundError(`asset not found`);
+  } else if (asset.status.phase !== "waiting") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
 
@@ -571,7 +649,48 @@ app.put("/upload/direct/:urlToken", async (req, res) => {
   if (task.status?.phase !== "pending") {
     throw new UnprocessableEntityError(`asset has already been uploaded`);
   }
+  return { asset, task };
+};
 
+app.use("/upload/tus/*", async (req, res, next) => {
+  if (!tusServer) {
+    throw new NotImplementedError("Tus server not configured");
+  }
+  return next();
+});
+
+app.post("/upload/tus", async (req, res) => {
+  const uploadToken = req.query.token?.toString();
+  if (!uploadToken) {
+    throw new UnauthorizedError(
+      "Missing uploadToken metadata from /request-upload API"
+    );
+  }
+
+  const { jwtSecret, jwtAudience } = req.config;
+  const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
+  await getPendingAssetAndTask(playbackId);
+  // TODO: Consider updating asset name and meta from metadata?
+  res.setHeader("livepeer-playback-id", playbackId);
+  return tusServer.handle(req, res);
+});
+
+app.all("/upload/tus/*", (req, res) => {
+  return tusServer.handle(req, res);
+});
+
+app.put("/upload/direct", async (req, res) => {
+  const {
+    query: { token },
+    config: { jwtSecret, jwtAudience },
+  } = req;
+  const { uploadUrl, playbackId } = parseUploadUrl(
+    token?.toString(),
+    jwtSecret,
+    jwtAudience
+  );
+
+  const { task } = await getPendingAssetAndTask(playbackId);
   var proxy = httpProxy.createProxyServer({});
   proxy.on("end", async function (proxyReq, _, res) {
     if (res.statusCode == 200) {

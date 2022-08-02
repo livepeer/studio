@@ -11,7 +11,7 @@ import { DBWebhook } from "../store/webhook-table";
 import { fetchWithTimeout, RequestInitWithTimeout } from "../util";
 import logger from "../logger";
 import { sign, sendgridEmail } from "../controllers/helpers";
-import TaskScheduler from "../task/scheduler";
+import taskScheduler from "../task/scheduler";
 import { generateUniquePlaybackId } from "../controllers/generate-keys";
 import { createAsset } from "../controllers/asset";
 import { DBStream } from "../store/stream-table";
@@ -31,7 +31,6 @@ export default class WebhookCannon {
   sendgridTemplateId: string;
   sendgridApiKey: string;
   supportAddr: [string, string];
-  taskScheduler: TaskScheduler;
   vodObjectStoreId: string;
   resolver: any;
   queue: Queue;
@@ -41,7 +40,6 @@ export default class WebhookCannon {
     sendgridTemplateId,
     sendgridApiKey,
     supportAddr,
-    taskScheduler,
     vodObjectStoreId,
     verifyUrls,
     queue,
@@ -53,7 +51,6 @@ export default class WebhookCannon {
     this.sendgridTemplateId = sendgridTemplateId;
     this.sendgridApiKey = sendgridApiKey;
     this.supportAddr = supportAddr;
-    this.taskScheduler = taskScheduler;
     this.vodObjectStoreId = vodObjectStoreId;
     this.resolver = new dns.Resolver();
     this.queue = queue;
@@ -526,7 +523,7 @@ export default class WebhookCannon {
       },
       this.queue
     );
-    await this.taskScheduler.scheduleTask(
+    await taskScheduler.scheduleTask(
       "import",
       {
         import: {
