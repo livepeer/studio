@@ -110,7 +110,6 @@ export default async function makeApp(params: CliArgs) {
     frontendDomain,
     sendgridTemplateId,
     sendgridApiKey,
-    taskScheduler,
     vodObjectStoreId,
     supportAddr,
     verifyUrls: true,
