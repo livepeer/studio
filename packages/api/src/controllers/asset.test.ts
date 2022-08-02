@@ -409,9 +409,7 @@ describe("controllers/asset", () => {
           task: { id: taskId },
         } = await res.json();
         expect(
-          tusEndpoint?.startsWith(
-            `http://test/api/asset/upload/tus?uploadToken=`
-          )
+          tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`)
         ).toBe(true);
         tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
 

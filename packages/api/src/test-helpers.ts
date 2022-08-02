@@ -6,7 +6,6 @@ import schema from "./schema/schema.json";
 import { User } from "./schema/types";
 import { TestServer } from "./test-server";
 import fs from "fs";
-import * as tus from "tus-js-client";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
