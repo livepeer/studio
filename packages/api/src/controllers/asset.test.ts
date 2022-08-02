@@ -333,13 +333,18 @@ describe("controllers/asset", () => {
         const res = await client.post("/asset/request-upload", {
           name: "tus-test",
         });
+        expect(res.status).toBe(200);
+        let { tusEndpoint } = await res.json();
+        expect(
+          tusEndpoint?.startsWith(
+            `http://test/api/asset/upload/tus?uploadToken=`
+          )
+        ).toBe(true);
+        tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
+
         await createMockFile(filePath, 1024 * 1024 * 10);
         const file = fs.createReadStream(filePath);
         const { size } = fs.statSync(filePath);
-        expect(res.status).toBe(200);
-        let { tusEndpoint } = await res.json();
-        tusEndpoint = tusEndpoint.split("/api/")[1];
-        tusEndpoint = `${client.server.host}/api/${tusEndpoint}`;
         await new Promise<void>((resolve, reject) => {
           let aborted = false;
           const upload = new tus.Upload(file, {
