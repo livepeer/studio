@@ -564,7 +564,7 @@ async function createTusServer(objectStoreId: string) {
     region: vodRegion,
     partSize: 8 * 1024 * 1024,
     tmpDirPrefix: "tus-tmp-files",
-    endpoint: "https://storage.googleapis.com",
+    endpoint: `${protocol}//${url.host}`,
     namingFunction,
   };
   const tusServer = new tus.Server();

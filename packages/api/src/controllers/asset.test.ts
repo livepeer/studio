@@ -12,7 +12,7 @@ import { db } from "../store";
 import { WithID } from "../store/types";
 import Table from "../store/table";
 import schema from "../schema/schema.json";
-import fs from "fs";
+import fs from "fs/promises";
 import * as tus from "tus-js-client";
 
 // repeat the type here so we don't need to export it from store/asset-table.ts
@@ -325,7 +325,6 @@ describe("controllers/asset", () => {
       });
     });
     describe("chunked upload", () => {
-      jest.setTimeout(10000);
       it("should start upload, stop it, resume it on tus test server", async () => {
         const filename = "test.mp4";
         const path = "/tmp";
@@ -343,8 +342,8 @@ describe("controllers/asset", () => {
         tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
 
         await createMockFile(filePath, 1024 * 1024 * 10);
-        const file = fs.createReadStream(filePath);
-        const { size } = fs.statSync(filePath);
+        const file = await fs.readFile(filePath);
+        const { size } = await fs.stat(filePath);
         await new Promise<void>((resolve, reject) => {
           let aborted = false;
           const upload = new tus.Upload(file, {
@@ -357,7 +356,6 @@ describe("controllers/asset", () => {
             uploadSize: size,
             onError(error) {
               reject(error);
-              throw error;
             },
             onProgress(bytesUploaded, bytesTotal) {
               const percentage = parseFloat(
@@ -379,7 +377,7 @@ describe("controllers/asset", () => {
           });
           upload.start();
         });
-        fs.unlinkSync(filePath);
+        await fs.unlink(filePath);
       });
     });
   });
