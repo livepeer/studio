@@ -238,7 +238,7 @@ app.use(
 );
 
 const fieldsMap: FieldsMap = {
-  id: `asset.data->>'id'`,
+  id: `asset.ID`,
   name: { val: `asset.data->>'name'`, type: "full-text" },
   objectStoreId: `asset.data->>'objectStoreId'`,
   createdAt: { val: `asset.data->'createdAt'`, type: "int" },

@@ -15,7 +15,7 @@ import {
   FieldSpec,
 } from "./types";
 
-const DEFAULT_SORT = "data->>'id' ASC";
+const DEFAULT_SORT = "id ASC";
 
 export interface TableOptions {
   db: DB;
