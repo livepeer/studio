@@ -388,43 +388,52 @@ app.post(
   }
 );
 
+const uploadWithUrlHandler: RequestHandler = async (req, res) => {
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(id);
+  let asset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    req.body
+  );
+  if (!req.body.url) {
+    return res.status(422).json({
+      errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+
+  asset = await createAsset(asset, req.queue);
+
+  const task = await req.taskScheduler.scheduleTask(
+    "import",
+    {
+      import: {
+        url: req.body.url,
+      },
+    },
+    undefined,
+    asset
+  );
+
+  res.status(201);
+  res.json({ asset, task });
+};
+
+app.post(
+  "/upload/url",
+  authorizer({}),
+  validatePost("new-asset-payload"),
+  uploadWithUrlHandler
+);
+// TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/import",
   authorizer({}),
   validatePost("new-asset-payload"),
-  async (req, res) => {
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(id);
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      req.body
-    );
-    if (!req.body.url) {
-      return res.status(422).json({
-        errors: [`Must provide a "url" field for the asset contents`],
-      });
-    }
-
-    asset = await createAsset(asset, req.queue);
-
-    const task = await req.taskScheduler.scheduleTask(
-      "import",
-      {
-        import: {
-          url: req.body.url,
-        },
-      },
-      undefined,
-      asset
-    );
-
-    res.status(201);
-    res.json({ asset, task });
-  }
+  uploadWithUrlHandler
 );
 
 // /:id/transcode and /transcode routes registered right below
@@ -524,8 +533,8 @@ app.post(
       return res.json({ errors: ["Ingest not configured"] });
     }
     const baseUrl = ingests[0].origin;
-    const url = `${baseUrl}/api/asset/upload/${uploadToken}`;
-    const tusEndpoint = `${baseUrl}/api/asset/upload/tus?uploadToken=${uploadToken}`;
+    const url = `${baseUrl}/api/asset/upload/direct?token=${uploadToken}`;
+    const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
     asset = await createAsset(asset, req.queue);
     const task = await req.taskScheduler.createTask(
@@ -651,7 +660,7 @@ app.use("/upload/tus/*", async (req, res, next) => {
 });
 
 app.post("/upload/tus", async (req, res) => {
-  const uploadToken = req.query.uploadToken?.toString();
+  const uploadToken = req.query.token?.toString();
   if (!uploadToken) {
     throw new UnauthorizedError(
       "Missing uploadToken metadata from /request-upload API"
@@ -670,12 +679,16 @@ app.all("/upload/tus/*", (req, res) => {
   return tusServer.handle(req, res);
 });
 
-app.put("/upload/:url", async (req, res) => {
+app.put("/upload/direct", async (req, res) => {
   const {
-    params: { url },
+    query: { token },
     config: { jwtSecret, jwtAudience },
   } = req;
-  const { uploadUrl, playbackId } = parseUploadUrl(url, jwtSecret, jwtAudience);
+  const { uploadUrl, playbackId } = parseUploadUrl(
+    token?.toString(),
+    jwtSecret,
+    jwtAudience
+  );
 
   const { task } = await getPendingAssetAndTask(playbackId);
   var proxy = httpProxy.createProxyServer({});
@@ -706,7 +719,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
-  await db.asset.delete(id);
+  await db.asset.markDeleted(id);
   res.status(204);
   res.end();
 });
@@ -732,7 +745,9 @@ app.patch(
       throw new NotFoundError(`asset not found`);
     }
 
-    const storageUpdates = await reconcileAssetStorage(req, asset, storage);
+    const storageUpdates = storage
+      ? await reconcileAssetStorage(req, asset, storage)
+      : null;
     await req.taskScheduler.updateAsset(asset, {
       name,
       meta,

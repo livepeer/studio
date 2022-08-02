@@ -8,12 +8,16 @@ import { Stream } from "../../schema/types";
 import fetch from "node-fetch";
 import { hostname } from "os";
 
-import { StatusResponse, MasterPlaylist } from "./livepeer-types";
+import {
+  StatusResponse,
+  MasterPlaylist,
+  MasterPlaylistDictionary,
+} from "./livepeer-types";
 
-const pollInterval = 2 * 1000;
-const updateInterval = 2 * 1000;
-const deleteTimeout = 30 * 1000;
-const seenSegmentsTimeout = 2 * 60 * 1000; // should be at least two time longer than HTTP push timeout in go-livepeer
+const pollInterval = 2 * 1000; // 2s
+const updateInterval = 60 * 1000; // 60s
+const deleteTimeout = 30 * 1000; // 30s
+const seenSegmentsTimeout = 2 * 60 * 1000; // 2m. should be at least two time longer than HTTP push timeout in go-livepeer
 
 async function makeRouter(params) {
   const bodyParser = require("body-parser");
@@ -83,6 +87,9 @@ function countSegments(si: streamInfo, mpl: MasterPlaylist) {
 }
 
 interface streamInfo {
+  mid: string;
+  stream?: Stream;
+
   lastSeen: Date;
   lastSeenSavedToDb: Date;
   lastUpdated: Date;
@@ -101,12 +108,13 @@ interface streamInfo {
   outgoingRate: number;
   sourceBytesLastUpdated: number;
   transcodedBytesLastUpdated: number;
-  objectId: string;
 }
 
-function newStreamInfo(): streamInfo {
+function newStreamInfo(mid: string, stream?: Stream): streamInfo {
   const now = new Date();
   return {
+    mid,
+    stream,
     lastSeen: now,
     lastSeenSavedToDb: now,
     lastUpdated: now,
@@ -125,7 +133,6 @@ function newStreamInfo(): streamInfo {
     ingestRate: 0.0,
     outgoingRate: 0.0,
     seenSegments: new Map(),
-    objectId: null,
   };
 }
 
@@ -141,17 +148,24 @@ function getSessionId(storedInfo: Stream): string {
 }
 
 class statusPoller {
-  broadcaster: string;
-  region: string;
-  hostname: string;
+  readonly broadcaster: string;
+  readonly region: string;
+  readonly hostname: string;
+  readonly pid: NodeJS.Timeout;
 
-  private seenStreams: Map<string, streamInfo>;
+  private readonly seenStreams: Map<string, streamInfo>;
 
   constructor(broadcaster: string, region: string) {
     this.broadcaster = broadcaster;
     this.region = region;
-    this.seenStreams = new Map<string, streamInfo>();
     this.hostname = hostname();
+    this.seenStreams = new Map<string, streamInfo>();
+    this.pid = setInterval(this.pollStatus.bind(this), pollInterval);
+  }
+
+  public async stop() {
+    clearInterval(this.pid);
+    await this.housekeepSeenStreams(null, true);
   }
 
   private async pollStatus() {
@@ -170,7 +184,7 @@ class statusPoller {
     for (const k of Object.keys(status.InternalManifests || {})) {
       playback2session.set(status.InternalManifests[k], k);
     }
-    const getObjectByMid = async (mid: string): Promise<Stream | null> => {
+    const getStreamObject = async (mid: string): Promise<Stream | null> => {
       const sid = playback2session.has(mid) ? playback2session.get(mid) : mid;
       let storedInfo: Stream = await db.stream.get(sid);
       if (!storedInfo) {
@@ -189,7 +203,8 @@ class statusPoller {
       if (!this.seenStreams.has(mid)) {
         // new stream
         // console.log(`got new stream ${mid}`)
-        si = newStreamInfo();
+        const stream = await getStreamObject(mid);
+        si = newStreamInfo(mid, stream);
         this.seenStreams.set(mid, si);
         needUpdate = true;
       } else {
@@ -223,93 +238,14 @@ class statusPoller {
       const manifest = status.Manifests[mid];
       countSegments(si, manifest);
       if (needUpdate) {
-        const storedInfo: Stream = await getObjectByMid(mid);
-        // console.log(`got stream info from store: `, storedInfo)
-        // console.log(`---> manifest`, JSON.stringify(manifest, null, 2))
-        // console.log(`---> si:`, si)
-        if (storedInfo) {
-          si.objectId = storedInfo.id;
-          si.lastSeenSavedToDb = si.lastSeen;
-          const setObj = {
-            lastSeen: si.lastSeen.valueOf(),
-            ingestRate: si.ingestRate,
-            outgoingRate: si.outgoingRate,
-            broadcasterHost: this.hostname,
-          } as Stream;
-          const incObj = {
-            sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
-            transcodedSegments:
-              si.transcodedSegments - si.transcodedSegmentsLastUpdated,
-            sourceSegmentsDuration:
-              si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated,
-            transcodedSegmentsDuration:
-              si.transcodedSegmentsDuration -
-              si.transcodedSegmentsDurationLastUpdated,
-            sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
-            transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
-          };
-          if (!storedInfo.parentId && !playback2session.has(mid)) {
-            // this is not a session created by our Mist, so manage isActive field for this stream
-            setObj.isActive = true;
-            setObj.region = this.region;
-          }
-          // console.log(`---> setting`, setObj)
-          // console.log(`---> inc`, incObj)
-          await db.stream.update(storedInfo.id, setObj);
-          await db.stream.add(storedInfo.id, incObj as Stream);
-          if (storedInfo.parentId) {
-            await db.stream.add(storedInfo.parentId, incObj as Stream);
-            await db.stream.update(storedInfo.parentId, setObj);
-            const userSessionId = getSessionId(storedInfo);
-            // update session table
-            try {
-              await db.session.add(userSessionId, incObj as Stream);
-              await db.session.update(userSessionId, setObj);
-            } catch (e) {
-              console.log(`error updating session table:`, e);
-            }
-          }
-          si.lastUpdated = new Date();
-          si.sourceSegmentsLastUpdated = si.sourceSegments;
-          si.transcodedSegmentsLastUpdated = si.transcodedSegments;
-          si.sourceSegmentsDurationLastUpdated = si.sourceSegmentsDuration;
-          si.transcodedSegmentsDurationLastUpdated =
-            si.transcodedSegmentsDuration;
-          si.sourceBytesLastUpdated = si.sourceBytes;
-          si.transcodedBytesLastUpdated = si.transcodedBytes;
+        try {
+          await this.flushStreamMetrics(si, playback2session.has(mid));
+        } catch (err) {
+          console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
         }
       }
     }
-    for (const [mid, si] of this.seenStreams) {
-      const now = Date.now();
-      if (!(mid in status.Manifests)) {
-        const notSeenFor: number = now - si.lastSeen.valueOf();
-        if (notSeenFor > deleteTimeout) {
-          this.seenStreams.delete(mid);
-          const storedInfo: Stream = await getObjectByMid(si.objectId || mid);
-          if (storedInfo) {
-            const zeroRate = {
-              ingestRate: 0,
-              outgoingRate: 0,
-            } as Stream;
-            await db.stream.update(storedInfo.id, zeroRate);
-            if (storedInfo.parentId) {
-              await db.stream.update(storedInfo.parentId, zeroRate);
-              const userSessionId = getSessionId(storedInfo);
-              await db.session.update(userSessionId, zeroRate);
-            }
-            if (!storedInfo.parentId) {
-              // this is not a session created by our Mist, so manage isActive field for this stream
-              await db.stream.setActiveToFalse({
-                id: storedInfo.id,
-                lastSeen: si.lastSeenSavedToDb.valueOf(),
-              });
-            }
-          }
-        }
-        // console.log(`seen: `, this.seenStreams)
-      }
-    }
+    await this.housekeepSeenStreams(status.Manifests);
   }
 
   private async getStatus(broadcaster: string): Promise<StatusResponse> {
@@ -319,9 +255,108 @@ class statusPoller {
     return json;
   }
 
-  startPoller() {
-    const pid = setInterval(this.pollStatus.bind(this), pollInterval);
-    return pid;
+  private async housekeepSeenStreams(
+    activeStreams?: MasterPlaylistDictionary,
+    force?: boolean
+  ) {
+    for (const [mid, si] of this.seenStreams) {
+      if (activeStreams && mid in activeStreams) {
+        // active streams are already processed in the code calling this
+        continue;
+      }
+
+      const now = Date.now();
+      const needUpdate =
+        (force || now.valueOf() - si.lastUpdated.valueOf() > updateInterval) &&
+        si.lastSeen !== si.lastSeenSavedToDb;
+      const shouldDelete = now - si.lastSeen.valueOf() > deleteTimeout;
+      if (needUpdate || shouldDelete) {
+        try {
+          await this.flushStreamMetrics(si, !!si.stream.parentId);
+        } catch (err) {
+          console.log(`error flushing stream metrics: mid=${mid}, err=`, err);
+        }
+      }
+      if (shouldDelete) {
+        this.seenStreams.delete(mid);
+        const storedInfo = si.stream;
+        if (storedInfo) {
+          const zeroRate = {
+            ingestRate: 0,
+            outgoingRate: 0,
+          } as Stream;
+          await db.stream.update(storedInfo.id, zeroRate);
+          if (storedInfo.parentId) {
+            await db.stream.update(storedInfo.parentId, zeroRate);
+            const userSessionId = getSessionId(storedInfo);
+            await db.session.update(userSessionId, zeroRate);
+          }
+          if (!storedInfo.parentId) {
+            // this is not a session created by our Mist, so manage isActive field for this stream
+            await db.stream.setActiveToFalse({
+              id: storedInfo.id,
+              lastSeen: si.lastSeenSavedToDb.valueOf(),
+            });
+          }
+        }
+      }
+      // console.log(`seen: `, this.seenStreams)
+    }
+  }
+
+  private async flushStreamMetrics(si: streamInfo, hasSession?: boolean) {
+    const storedInfo = si.stream;
+    if (!storedInfo) {
+      return;
+    }
+
+    const setObj = {
+      lastSeen: si.lastSeen.valueOf(),
+      ingestRate: si.ingestRate,
+      outgoingRate: si.outgoingRate,
+      broadcasterHost: this.hostname,
+    } as Stream;
+    const incObj = {
+      sourceSegments: si.sourceSegments - si.sourceSegmentsLastUpdated,
+      transcodedSegments:
+        si.transcodedSegments - si.transcodedSegmentsLastUpdated,
+      sourceSegmentsDuration:
+        si.sourceSegmentsDuration - si.sourceSegmentsDurationLastUpdated,
+      transcodedSegmentsDuration:
+        si.transcodedSegmentsDuration -
+        si.transcodedSegmentsDurationLastUpdated,
+      sourceBytes: si.sourceBytes - si.sourceBytesLastUpdated,
+      transcodedBytes: si.transcodedBytes - si.transcodedBytesLastUpdated,
+    };
+    const lastSavedUpdates: Partial<streamInfo> = {
+      lastSeenSavedToDb: si.lastSeen,
+      sourceSegmentsLastUpdated: si.sourceSegments,
+      transcodedSegmentsLastUpdated: si.transcodedSegments,
+      sourceSegmentsDurationLastUpdated: si.sourceSegmentsDuration,
+      transcodedSegmentsDurationLastUpdated: si.transcodedSegmentsDuration,
+      sourceBytesLastUpdated: si.sourceBytes,
+      transcodedBytesLastUpdated: si.transcodedBytes,
+    };
+    if (!storedInfo.parentId && hasSession !== undefined && !hasSession) {
+      // this is not a session created by our Mist, so manage isActive field for this stream
+      setObj.isActive = true;
+      setObj.region = this.region;
+    }
+    // console.log(`---> setting`, setObj)
+    // console.log(`---> inc`, incObj)
+    await db.stream.add(storedInfo.id, incObj, setObj);
+    if (storedInfo.parentId) {
+      await db.stream.add(storedInfo.parentId, incObj, setObj);
+      const userSessionId = getSessionId(storedInfo);
+      // update session table
+      try {
+        await db.session.add(userSessionId, incObj, setObj);
+      } catch (e) {
+        console.log(`error updating session table:`, e);
+      }
+    }
+    si.lastUpdated = new Date();
+    Object.assign(si, lastSavedUpdates);
   }
 }
 
@@ -354,13 +389,12 @@ export default async function makeApp(params) {
   }
 
   const poller = new statusPoller(broadcaster, ownRegion);
-  const pid = poller.startPoller();
 
   const close = async () => {
-    clearInterval(pid);
     process.off("SIGTERM", sigterm);
     process.off("SIGINT", sigterm);
     process.off("unhandledRejection", unhandledRejection);
+    await poller.stop();
     listener.close();
     await db.close();
   };

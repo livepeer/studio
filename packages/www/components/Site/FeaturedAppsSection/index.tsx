@@ -13,7 +13,7 @@ const getItems = () => {
     {
       title: "Huddle01",
       description:
-        "The world's first web3 native video meeting solution integrated with Livepeer Studio to deliver low-latency video meetings.",
+        "The world's first web3 native video meeting solution integrated with Livepeer Studio to deliver video meeting broadcasts and recordings.",
       href: "https://livepeer.studio/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
     },
     {
