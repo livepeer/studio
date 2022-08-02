@@ -10,6 +10,7 @@ import appRouter from "./app-router";
 import logger from "./logger";
 import { CliArgs } from "./parse-cli";
 import { UnboxPromise } from "./types/common";
+import tracking from "./middleware/tracking";
 
 export type AppServer = UnboxPromise<ReturnType<typeof makeApp>>;
 collectDefaultMetrics({ prefix: "livepeer_api_" });
@@ -53,6 +54,7 @@ export default async function makeApp(params: CliArgs) {
     process.off("SIGTERM", sigterm);
     process.off("unhandledRejection", unhandledRejection);
     listener.close();
+    await tracking.flushAll();
     await store.close();
   };
 
@@ -137,7 +139,7 @@ export default async function makeApp(params: CliArgs) {
   };
 }
 
-const handleSigterm = (close) => async () => {
+const handleSigterm = (close: () => Promise<void>) => async () => {
   // Handle SIGTERM gracefully. It's polite, and Kubernetes likes it.
   logger.info("Got SIGTERM. Graceful shutdown start");
   let timeout = setTimeout(() => {

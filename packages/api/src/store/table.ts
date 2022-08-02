@@ -218,18 +218,24 @@ export default class Table<T extends DBObject> {
     return res;
   }
 
-  // Takes in an object of {"field": number} and increases all the fields by the specified amounts
-  async add(id: string, doc: Partial<T>) {
+  // Takes in an object of {"field": number} and increases all the fields by the
+  // specified amounts. Also supports receiving a `set` object for fields that
+  // shouldn't be added but just set directly.
+  async add(id: string, add: Partial<T>, set?: Partial<T>) {
     const q = sql`UPDATE `.append(this.name).append(sql`
       SET data = data || jsonb_build_object(`);
-    Object.keys(doc).forEach((k, i) => {
+    Object.keys(add).forEach((k, i) => {
       if (i) {
         q.append(`, `);
       }
       q.append(`'${k}', COALESCE((data->>'${k}')::numeric, 0) + `);
-      q.append(sql` ${doc[k]}`);
+      q.append(sql` ${add[k]}`);
     });
-    q.append(sql`) WHERE id = ${id}`);
+    q.append(`)`);
+    if (set) {
+      q.append(sql` || ${JSON.stringify(set)}`);
+    }
+    q.append(sql` WHERE id = ${id}`);
 
     const res = await this.db.query(q);
 
