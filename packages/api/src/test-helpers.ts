@@ -241,14 +241,6 @@ export async function setupUsers(
   };
 }
 
-export async function resumeTestTusUpload(upload: tus.Upload) {
-  const previousUploads = await upload.findPreviousUploads();
-  if (previousUploads.length) {
-    upload.resumeFromPreviousUpload(previousUploads[0]);
-  }
-  return upload.start();
-}
-
 export async function createMockFile(fileName: string, size: number) {
   return await new Promise((resolve, reject) => {
     let fh = fs.openSync(fileName, "w");

@@ -39,6 +39,7 @@ import { mergeAssetStatus } from "../store/asset-table";
 import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
+import os from "os";
 
 const app = Router();
 
@@ -569,7 +570,7 @@ async function createTusServer(objectStoreId: string) {
   };
   const tusServer = new tus.Server();
   tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
-  tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete);
+  tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
   return tusServer;
 }
 
@@ -581,8 +582,11 @@ async function createTestTusServer() {
   const tusTestServer = new tus.Server();
   tusTestServer.datastore = new tus.FileStore({
     path: "/upload/tus",
-    directory: "/tmp",
+    directory: os.tmpdir(),
+    namingFunction: (req: Request) =>
+      req.res.getHeader("livepeer-playback-id").toString(),
   });
+  tusTestServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(true));
   return tusTestServer;
 }
 
@@ -600,18 +604,20 @@ type TusFileMetadata = {
   upload_metadata: string;
 };
 
-const onTusUploadComplete = async ({ file }: { file: TusFileMetadata }) => {
-  try {
-    const playbackId = file.id.split("/")[1]; // `directUpload/${playbackId}`
-    const { task } = await getPendingAssetAndTask(playbackId);
-    await taskScheduler.enqueueTask(task);
-  } catch (err) {
-    console.error(
-      `error processing finished upload fileId=${file.id} err=`,
-      err
-    );
-  }
-};
+const onTusUploadComplete =
+  (isTest: boolean) =>
+  async ({ file }: { file: TusFileMetadata }) => {
+    try {
+      const playbackId = isTest ? file.id : file.id.split("/")[1]; // `directUpload/${playbackId}`
+      const { task } = await getPendingAssetAndTask(playbackId);
+      await taskScheduler.enqueueTask(task);
+    } catch (err) {
+      console.error(
+        `error processing finished upload fileId=${file.id} err=`,
+        err
+      );
+    }
+  };
 
 const getPendingAssetAndTask = async (playbackId: string) => {
   const asset = await db.asset.getByPlaybackId(playbackId, {
