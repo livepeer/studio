@@ -379,43 +379,52 @@ app.post(
   }
 );
 
+const uploadWithUrlHandler: RequestHandler = async (req, res) => {
+  const id = uuid();
+  const playbackId = await generateUniquePlaybackId(id);
+  let asset = await validateAssetPayload(
+    id,
+    playbackId,
+    req.user.id,
+    Date.now(),
+    req.config.vodObjectStoreId,
+    req.body
+  );
+  if (!req.body.url) {
+    return res.status(422).json({
+      errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+
+  asset = await createAsset(asset, req.queue);
+
+  const task = await req.taskScheduler.scheduleTask(
+    "import",
+    {
+      import: {
+        url: req.body.url,
+      },
+    },
+    undefined,
+    asset
+  );
+
+  res.status(201);
+  res.json({ asset, task });
+};
+
+app.post(
+  "/upload/url",
+  authorizer({}),
+  validatePost("new-asset-payload"),
+  uploadWithUrlHandler
+);
+// TODO: Remove this at some point. Registered only for backward compatibility.
 app.post(
   "/import",
   authorizer({}),
   validatePost("new-asset-payload"),
-  async (req, res) => {
-    const id = uuid();
-    const playbackId = await generateUniquePlaybackId(id);
-    let asset = await validateAssetPayload(
-      id,
-      playbackId,
-      req.user.id,
-      Date.now(),
-      req.config.vodObjectStoreId,
-      req.body
-    );
-    if (!req.body.url) {
-      return res.status(422).json({
-        errors: [`Must provide a "url" field for the asset contents`],
-      });
-    }
-
-    asset = await createAsset(asset, req.queue);
-
-    const task = await req.taskScheduler.scheduleTask(
-      "import",
-      {
-        import: {
-          url: req.body.url,
-        },
-      },
-      undefined,
-      asset
-    );
-
-    res.status(201);
-    res.json({ asset, task });
-  }
+  uploadWithUrlHandler
 );
 
 // /:id/transcode and /transcode routes registered right below
@@ -515,7 +524,7 @@ app.post(
       return res.json({ errors: ["Ingest not configured"] });
     }
     const baseUrl = ingests[0].origin;
-    const url = `${baseUrl}/api/asset/upload/${signedUploadUrl}`;
+    const url = `${baseUrl}/api/asset/upload/direct/${signedUploadUrl}`;
 
     asset = await createAsset(asset, req.queue);
     const task = await req.taskScheduler.createTask(
@@ -531,12 +540,16 @@ app.post(
   }
 );
 
-app.put("/upload/:url", async (req, res) => {
+app.put("/upload/direct/:urlToken", async (req, res) => {
   const {
-    params: { url },
+    params: { urlToken },
     config: { jwtSecret, jwtAudience },
   } = req;
-  const { uploadUrl, playbackId } = parseUploadUrl(url, jwtSecret, jwtAudience);
+  const { uploadUrl, playbackId } = parseUploadUrl(
+    urlToken,
+    jwtSecret,
+    jwtAudience
+  );
 
   const assets = await db.asset.find({ playbackId }, { useReplica: false });
   if (!assets?.length || !assets[0]?.length) {
