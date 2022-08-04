@@ -271,6 +271,7 @@ app.use(
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
+    const query = toStringValues(req.query);
     const ingest = ingests[0].base;
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
@@ -281,16 +282,20 @@ app.use(
       return a;
     };
 
+    const cleanedAsset = (a: WithID<Asset>) =>
+      !query.details ? cleanAssetResponse([a])[0] : a;
+
     if (Array.isArray(data)) {
-      return data.map(toExternalAsset);
+      let a = data.map(cleanedAsset);
+      return a.map(toExternalAsset);
     }
     if ("id" in data) {
-      return toExternalAsset(data);
+      return toExternalAsset(cleanedAsset(data));
     }
     if ("asset" in data) {
       return {
         ...data,
-        asset: toExternalAsset(data.asset),
+        asset: toExternalAsset(cleanedAsset(data.asset)),
       };
     }
     return data;
@@ -393,11 +398,7 @@ app.get("/", authorizer({}), async (req, res) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
 
-  if (details) {
-    return res.json(output);
-  } else {
-    return res.json(cleanAssetResponse(output));
-  }
+  return res.json(output);
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
