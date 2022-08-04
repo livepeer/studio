@@ -108,15 +108,6 @@ function bytesToHexString(bytes: Uint8Array, separate = false) {
   return result;
 }
 
-export function cleanAdminOnlyFields(
-  fields: string[],
-  obj: Record<string, any>
-) {
-  for (const f of fields) {
-    delete obj[f];
-  }
-}
-
 export function makeNextHREF(req: express.Request, nextCursor: string) {
   let baseUrl = new URL(
     `${req.protocol}://${req.get("host")}${req.originalUrl}`

@@ -31,7 +31,6 @@ import {
   sendgridValidateEmail,
   toStringValues,
   FieldsMap,
-  cleanAdminOnlyFields,
 } from "./helpers";
 import { terminateStreamReq } from "./stream";
 
@@ -39,6 +38,12 @@ const adminOnlyFields = ["verifiedAt", "planChangedAt"];
 
 const salesEmail = "sales@livepeer.org";
 const infraEmail = "infraservice@livepeer.org";
+
+function cleanAdminOnlyFields(fields: string[], obj: Record<string, any>) {
+  for (const f of fields) {
+    delete obj[f];
+  }
+}
 
 function cleanUserFields(user: WithID<User>, isAdmin = false) {
   if (!user) return user;
