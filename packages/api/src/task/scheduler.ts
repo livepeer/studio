@@ -298,6 +298,27 @@ export class TaskScheduler {
     }
   }
 
+  async deleteAsset(asset: string | Asset) {
+    if (typeof asset === "string") {
+      asset = await db.asset.get(asset);
+    }
+    await db.asset.markDeleted(asset.id);
+    const timestamp = asset.status.updatedAt;
+    await this.queue.publishWebhook("events.asset.deleted", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "asset.deleted",
+      userId: asset.userId,
+      payload: {
+        asset: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      },
+    });
+  }
+
   async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);

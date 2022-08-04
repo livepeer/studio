@@ -412,7 +412,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     );
   }
 
-  res.json(db.asset.cleanWriteOnlyResponse(asset));
+  res.json(asset);
 });
 
 app.post(
@@ -788,7 +788,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
-  await db.asset.markDeleted(id);
+  await req.taskScheduler.deleteAsset(asset);
   res.status(204);
   res.end();
 });
