@@ -282,7 +282,7 @@ export class TaskScheduler {
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
-      let taskEvent: EventKey = `task.${task.status.phase}`; // after changing the webhook to task.completed
+      let taskEvent: EventKey = `task.${task.status.phase}`;
       let routingKey: RoutingKey = `events.${taskEvent}`;
       await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
@@ -349,7 +349,7 @@ export class TaskScheduler {
     if (!updates.status || updates.status === asset.status) {
       return;
     }
-    if (asset.status.phase == "ready" || asset.status.phase == "failed") {
+    if (asset.status.phase === "ready" || asset.status.phase === "failed") {
       let assetEvent: EventKey = `asset.${asset.status.phase}`;
       let routingKey: RoutingKey = `events.${assetEvent}`;
       await this.queue.publishWebhook(routingKey, {
