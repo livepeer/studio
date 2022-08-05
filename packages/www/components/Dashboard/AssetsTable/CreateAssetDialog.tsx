@@ -101,6 +101,7 @@ const CreateAssetDialog = ({
             if (creating || !videoFiles) {
               return;
             }
+            setVideoFiles({});
             setCreating(true);
             try {
               await onCreate({

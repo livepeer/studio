@@ -19,7 +19,9 @@ const FileUpload = () => {
     () =>
       Object.keys(currentFileUploads ?? {})
         .map((key) => currentFileUploads?.[key])
-        .filter((file) => file && !file.error && file.file.name),
+        .filter(
+          (file) => file && !file.error && file.file.name && file.progress < 1
+        ),
     [currentFileUploads]
   );
 
