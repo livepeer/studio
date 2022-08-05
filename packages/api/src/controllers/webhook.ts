@@ -7,13 +7,8 @@ import uuid from "uuid/v4";
 import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import {
-  UnprocessableEntityError,
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} from "../store/errors";
-import { Webhook, WebhookPatchPayload, WebhookResponse } from "../schema/types";
+import { UnprocessableEntityError, NotFoundError } from "../store/errors";
+import { WebhookResponse } from "../schema/types";
 import { WithID } from "../store/types";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
