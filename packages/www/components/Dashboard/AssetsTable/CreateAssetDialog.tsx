@@ -33,7 +33,7 @@ const rejectStyle = {
 };
 
 type VideoFiles = {
-  [key: name]: File;
+  [key: string]: File;
 };
 
 const CreateAssetDialog = ({

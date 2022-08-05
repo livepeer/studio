@@ -19,7 +19,7 @@ const FileUpload = () => {
     () =>
       Object.keys(currentFileUploads ?? {})
         .map((key) => currentFileUploads?.[key])
-        .filter((file) => file && !file.error && file.name),
+        .filter((file) => file && !file.error && file.file.name),
     [currentFileUploads]
   );
 
@@ -49,9 +49,9 @@ const FileUpload = () => {
             align="center"
             css={{ width: "100%", justifyContent: "space-between" }}>
             <Text variant="gray">
-              {file.name.length > MAX_FILENAME_LENGTH
-                ? `${file.name.slice(0, MAX_FILENAME_LENGTH)}...`
-                : file.name}
+              {file.file.name.length > MAX_FILENAME_LENGTH
+                ? `${file.file.name.slice(0, MAX_FILENAME_LENGTH)}...`
+                : file.file.name}
             </Text>
             <Flex align="center" css={{ ml: "$3" }}>
               <Box css={{ mr: "$2", width: 120 }}>
