@@ -1,4 +1,4 @@
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "@lib/api";
 import { Box, Flex, styled } from "@livepeer/design-system";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";

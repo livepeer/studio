@@ -13,7 +13,7 @@ import {
   Tooltip,
   Label,
 } from "@livepeer/design-system";
-import { MultistreamTarget, Stream } from "@livepeer.studio/api";
+import { MultistreamTarget, Stream } from "@lib/api";
 
 import {
   DataTableComponent as Table,

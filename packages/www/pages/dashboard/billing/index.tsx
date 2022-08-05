@@ -10,7 +10,7 @@ import {
 } from "@livepeer/design-system";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { products } from "@livepeer.studio/api/src/config";
+import { products } from "@lib/api";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import PaymentMethodDialog from "components/Dashboard/PaymentMethodDialog";
 import PaymentMethod from "components/Dashboard/PaymentMethod";

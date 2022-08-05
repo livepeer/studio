@@ -8,7 +8,7 @@ import { Box, Button, Flex, Container, Link as A } from "@theme-ui/components";
 import DeleteStreamModal from "../DeleteStreamModal";
 import TableV2 from "@components/Admin/Table-v2";
 import Help from "../../../public/img/help.svg";
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "@lib/api";
 import TextCell, { TextCellProps } from "@components/Admin/Table-v2/cells/text";
 import { Column, Row } from "react-table";
 import DateCell, { DateCellProps } from "@components/Admin/Table-v2/cells/date";

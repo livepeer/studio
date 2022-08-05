@@ -2,15 +2,17 @@ import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
+import FileUpload from "@components/Dashboard/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
 import Router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
+import { useApi } from "hooks";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -43,6 +45,7 @@ interface Props {
   image?: any;
   url?: string;
   canonical?: string;
+  filesUploading?: boolean;
 }
 
 function DashboardLayout({
@@ -107,6 +110,7 @@ function DashboardLayout({
               {children}
             </Box>
           </Box>
+          <FileUpload />
         </Elements>
       </Box>
     </>

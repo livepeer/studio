@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "@lib/api";
 import { Box } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
 import ReactTooltip from "react-tooltip";

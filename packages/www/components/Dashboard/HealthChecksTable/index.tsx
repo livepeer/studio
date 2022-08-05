@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Column } from "react-table";
 import { Box, Heading } from "@livepeer/design-system";
-import { Stream } from "@livepeer.studio/api";
+import { Stream } from "@lib/api";
 
 import {
   DataTableComponent as Table,

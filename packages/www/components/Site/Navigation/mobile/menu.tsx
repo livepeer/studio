@@ -5,7 +5,7 @@ import {
   Link as A,
   Button as StyledButton,
 } from "@livepeer/design-system";
-import { User } from "@livepeer.studio/api";
+import { User } from "@lib/api";
 import Link from "next/link";
 import { BreadcrumbItem } from "../breadcrumb";
 import Button from "@components/Site/Button";

@@ -9,7 +9,7 @@ import {
 } from "@livepeer/design-system";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import PlanForm from "components/Dashboard/PlanForm";
-import { products } from "@livepeer.studio/api/src/config";
+import { products } from "@lib/api";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";

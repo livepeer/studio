@@ -13,11 +13,12 @@ import {
   Asset,
   Task,
   SuspendUserPayload,
-} from "@livepeer.studio/api";
+} from "@lib/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 import Head from "next/head";
-import { products } from "@livepeer.studio/api/src/config";
+import { products } from "@lib/api";
+import * as tus from "tus-js-client";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
@@ -30,11 +31,20 @@ declare global {
   }
 }
 
+export type Files = {
+  [key: string]: {
+    file: File;
+    progress?: number;
+    error?: Error;
+  };
+};
+
 type ApiState = {
   user?: User;
   token?: string;
   userRefresh?: number;
   noStripe?: boolean;
+  currentFileUploads?: Files;
 };
 
 export interface UsageData {
@@ -140,7 +150,10 @@ const getCursor = (link?: string): string => {
 
 const hasStripe = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-const makeContext = (state: ApiState, setState) => {
+const makeContext = (
+  state: ApiState,
+  setState: React.Dispatch<React.SetStateAction<ApiState>>
+) => {
   const endpoint = isDevelopment()
     ? `http://localhost:3004`
     : isStaging()
@@ -840,6 +853,83 @@ const makeContext = (state: ApiState, setState) => {
       return asset;
     },
 
+    async uploadAssets(files: File[]): Promise<void> {
+      const requestAssetUpload = async (
+        params
+      ): Promise<{ tusEndpoint: string }> => {
+        const [res, assetUpload] = await context.fetch(
+          `/asset/request-upload`,
+          {
+            method: "POST",
+            body: JSON.stringify(params),
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(assetUpload.errors.join(", "));
+        }
+        return assetUpload;
+      };
+
+      const updateStateWithProgressOrError = (
+        file: File,
+        progress?: number,
+        error?: Error
+      ) => {
+        setState((state) => ({
+          ...state,
+          currentFileUploads: {
+            ...state.currentFileUploads,
+            [file.name]: { file, progress, error },
+          },
+        }));
+      };
+
+      const getTusUpload = (file: File, tusEndpoint?: string) =>
+        new tus.Upload(file, {
+          endpoint: tusEndpoint ?? undefined, // URL from `tusEndpoint` field in the `/request-upload` response
+          metadata: {
+            filetype: file.type,
+          },
+          uploadSize: file.size,
+          onError(err) {
+            updateStateWithProgressOrError(file, undefined, err);
+          },
+          onProgress(bytesUploaded, bytesTotal) {
+            const percentage = bytesUploaded / bytesTotal;
+            updateStateWithProgressOrError(file, percentage);
+          },
+          onSuccess() {
+            updateStateWithProgressOrError(file, 1);
+          },
+        });
+
+      for (const file of files) {
+        try {
+          updateStateWithProgressOrError(file, 0);
+
+          const uploadWithoutUrl = getTusUpload(file);
+          const previousUploads = await uploadWithoutUrl.findPreviousUploads();
+          if (previousUploads.length > 0) {
+            uploadWithoutUrl.resumeFromPreviousUpload(previousUploads[0]);
+
+            uploadWithoutUrl.start();
+          } else {
+            const assetUpload = await requestAssetUpload({ name: file.name });
+
+            const upload = getTusUpload(file, assetUpload.tusEndpoint);
+
+            upload.start();
+          }
+        } catch (e) {
+          updateStateWithProgressOrError(file, undefined, e);
+        }
+      }
+    },
+
     async getAssets(
       userId: string,
       opts?: {
@@ -1133,6 +1223,26 @@ export const ApiProvider = ({ children }) => {
       });
     }
   }, [state.token, state.userRefresh]);
+
+  // useEffect(() => {
+  //   setState((state) => ({
+  //     ...state,
+  //     currentFileUploads: {
+  //       "somefile.mp4": {
+  //         file: {},
+  //         progress: 0.7345789789,
+  //       },
+  //       "another_file1.mp4": {
+  //         file: {},
+  //         progress: 0.111239823,
+  //       },
+  //       "some-super-long-filename_that_should_have_ended_a_long_time_ago.mov": {
+  //         file: {},
+  //         progress: 0.4578934,
+  //       },
+  //     },
+  //   }));
+  // }, []);
 
   return <ApiContext.Provider value={context}>{children}</ApiContext.Provider>;
 };

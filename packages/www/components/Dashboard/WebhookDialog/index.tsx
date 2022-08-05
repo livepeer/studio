@@ -21,7 +21,7 @@ import {
 } from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import Spinner from "components/Dashboard/Spinner";
-import { Webhook } from "@livepeer.studio/api";
+import { Webhook } from "@lib/api";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { v4 as uuid } from "uuid";
 

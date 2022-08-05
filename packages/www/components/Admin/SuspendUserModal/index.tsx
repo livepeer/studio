@@ -4,7 +4,7 @@ import { useApi } from "hooks";
 import Modal from "../Modal";
 import { Button, Flex } from "@theme-ui/components";
 import { Box, Checkbox, Label, Tooltip } from "@livepeer/design-system";
-import { User } from "@livepeer.studio/api";
+import { User } from "@lib/api";
 
 type Props = {
   user: User;

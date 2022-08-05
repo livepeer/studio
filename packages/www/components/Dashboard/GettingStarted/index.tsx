@@ -1,9 +1,9 @@
 import {
   Heading,
   Accordion,
-  AccordionButton,
+  AccordionTrigger,
   AccordionItem,
-  AccordionPanel,
+  AccordionContent,
   Text,
   Button,
   Box,
@@ -20,12 +20,12 @@ const GettingStarted = ({ firstName = "" }) => {
       </Heading>
       <Accordion type="single" defaultValue="accordion-one">
         <AccordionItem value="accordion-one">
-          <AccordionButton css={{ color: "$primary12" }}>
+          <AccordionTrigger css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your first live stream
             </Text>
-          </AccordionButton>
-          <AccordionPanel>
+          </AccordionTrigger>
+          <AccordionContent>
             <Box>
               <Text
                 variant="gray"
@@ -80,15 +80,15 @@ const GettingStarted = ({ firstName = "" }) => {
                 <ArrowRightIcon />
               </Button>
             </Link>
-          </AccordionPanel>
+          </AccordionContent>
         </AccordionItem>
         <AccordionItem value="accordion-two">
-          <AccordionButton css={{ color: "$primary12" }}>
+          <AccordionTrigger css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Build with the API
             </Text>
-          </AccordionButton>
-          <AccordionPanel>
+          </AccordionTrigger>
+          <AccordionContent>
             <Text
               variant="gray"
               size="3"
@@ -125,15 +125,15 @@ const GettingStarted = ({ firstName = "" }) => {
                 <ArrowRightIcon />
               </Button>
             </Link>
-          </AccordionPanel>
+          </AccordionContent>
         </AccordionItem>
         <AccordionItem value="accordion-three">
-          <AccordionButton css={{ color: "$primary12" }}>
+          <AccordionTrigger css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your own app
             </Text>
-          </AccordionButton>
-          <AccordionPanel>
+          </AccordionTrigger>
+          <AccordionContent>
             <Text
               variant="gray"
               size="3"
@@ -160,7 +160,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 <ArrowRightIcon />
               </Button>
             </Link>
-          </AccordionPanel>
+          </AccordionContent>
         </AccordionItem>
       </Accordion>
     </>
