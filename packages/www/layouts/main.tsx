@@ -36,6 +36,7 @@ interface Props {
   theme?: string;
   navBackgroundColor?: string;
   css?: Record<string, any>;
+  globalData?: any;
 }
 
 function Layout({

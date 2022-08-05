@@ -15,6 +15,7 @@
     "@sanity/default-login",
     "@sanity/dashboard",
     "@sanity/desk-tool",
+    "@sanity/document-internationalization",
     "@sanity/production-preview",
     "dashboard-widget-structure-menu",
     "dashboard-widget-document-list",
@@ -23,9 +24,14 @@
     "@sanity/code-input",
     "mux-input",
     "seo-tools",
-    "icon-picker"
+    "icon-picker",
+    "@sanity/language-filter"
   ],
   "parts": [
+    {
+      "name": "part:@sanity/language-filter/config",
+      "path": "./parts/languageFilterConfig.js"
+    },
     {
       "implements": "part:@sanity/form-builder/input/image/asset-sources",
       "path": "./parts/assetSources.js"

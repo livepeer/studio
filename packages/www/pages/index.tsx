@@ -21,12 +21,21 @@ const HomePage = (props) => {
   );
 };
 
-export async function getStaticProps() {
+export async function getStaticProps({ locale }) {
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
-  const data: any = await graphQLClient.request(print(allHome));
+  const id = {
+    en: "home",
+    es: "home__i18n_es-ES",
+  };
+
+  const variables = {
+    where: { _id: { matches: id[locale] } },
+  };
+
+  const data: any = await graphQLClient.request(print(allHome), variables);
 
   return {
     props: {

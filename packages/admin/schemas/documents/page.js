@@ -1,7 +1,22 @@
+import { isSlugUnique } from "@sanity/document-internationalization/lib/validators";
+
 export default {
   name: "page",
   type: "document",
   title: "Page",
+  i18n: true,
+  initialValue: {
+    __i18n_lang: "en-US",
+  },
+  i18n: {
+    base: "en-US",
+    languages: ["en-US", "es-ES"],
+    fieldNames: {
+      lang: "__i18n_lang",
+      references: "__i18n_refs",
+      baseReference: "__i18n_base",
+    },
+  },
   fieldsets: [
     {
       title: "SEO & metadata",
@@ -25,6 +40,7 @@ export default {
       options: {
         source: "title",
         maxLength: 200, // will be ignored if slugify is set
+        isUnique: isSlugUnique,
         slugify: (input) =>
           input.toLowerCase().replace(/\s+/g, "-").slice(0, 200),
       },
