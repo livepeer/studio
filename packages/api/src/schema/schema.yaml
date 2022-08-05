@@ -692,6 +692,15 @@ components:
         streamId:
           $ref: "#/components/schemas/webhook/properties/streamId"
 
+    webhook-status-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/webhook/properties/status"
+        response:
+          $ref: "#/components/schemas/webhook-response"
+
     session:
       type: object
       table: session

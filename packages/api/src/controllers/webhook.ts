@@ -11,8 +11,10 @@ import {
   UnprocessableEntityError,
   NotFoundError,
   BadRequestError,
+  UnauthorizedError,
 } from "../store/errors";
-import { Webhook, WebhookPatchPayload } from "../schema/types";
+import { Webhook, WebhookPatchPayload, WebhookResponse } from "../schema/types";
+import { WithID } from "../store/types";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
@@ -232,6 +234,39 @@ app.patch(
       sharedSecret,
       streamId,
     });
+
+    res.status(204).end();
+  }
+);
+
+app.post(
+  "/:id/status",
+  authorizer({ anyAdmin: true }),
+  validatePost("webhook-status-payload"),
+  async (req, res) => {
+    const { id } = req.params;
+    const webhook = await db.webhook.get(id);
+    if (!webhook) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+
+    const doc = req.body.status;
+    const webhookResponse = req.body.response;
+
+    if (!doc) {
+      return res.status(422).json({ errors: ["missing status in payload"] });
+    }
+
+    await db.webhook.update(req.params.id, {
+      ...webhook,
+      status: doc,
+    });
+
+    if (webhookResponse) {
+      webhookResponse.id = uuid();
+      let w: WithID<WebhookResponse> = webhookResponse;
+      await db.webhookResponse.create(w);
+    }
 
     res.status(204).end();
   }
