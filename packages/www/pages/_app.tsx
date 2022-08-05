@@ -1,4 +1,3 @@
-import App from "next/app";
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import SEO from "../next-seo.config";
@@ -12,6 +11,7 @@ import React from "react";
 import { globalCss, themes, SnackbarProvider } from "@livepeer/design-system";
 import { ThemeProvider } from "next-themes";
 import { DEFAULT_THEME } from "../lib/theme";
+import { appWithTranslation } from "next-i18next";
 
 const queryClient = new QueryClient();
 
@@ -57,43 +57,39 @@ Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
-export default class MyApp extends App {
-  render() {
-    const { Component, pageProps }: any = this.props;
-    globalStyles();
-    return (
-      <>
-        <title>Livepeer Studio</title>
-        <Head>
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          />
-        </Head>
-        <ThemeProvider
-          forcedTheme={Component.theme || undefined}
-          disableTransitionOnChange
-          attribute="class"
-          defaultTheme={DEFAULT_THEME}
-          value={{
-            ...themeMap,
-            dark: "dark-theme-blue",
-            light: "light-theme-blue",
-          }}>
-          <SnackbarProvider>
-            <QueryClientProvider client={queryClient}>
-              <MetaMaskProvider>
-                <ApiProvider>
-                  <AnalyzerProvider>
-                    <DefaultSeo {...SEO} />
-                    <Component {...pageProps} />
-                  </AnalyzerProvider>
-                </ApiProvider>
-              </MetaMaskProvider>
-            </QueryClientProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </>
-    );
-  }
-}
+const App = ({ Component, pageProps }) => {
+  globalStyles();
+  return (
+    <>
+      <title>Livepeer Studio</title>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      <ThemeProvider
+        forcedTheme={Component.theme || undefined}
+        disableTransitionOnChange
+        attribute="class"
+        defaultTheme={DEFAULT_THEME}
+        value={{
+          ...themeMap,
+          dark: "dark-theme-blue",
+          light: "light-theme-blue",
+        }}>
+        <SnackbarProvider>
+          <QueryClientProvider client={queryClient}>
+            <MetaMaskProvider>
+              <ApiProvider>
+                <AnalyzerProvider>
+                  <DefaultSeo {...SEO} />
+                  <Component {...pageProps} />
+                </AnalyzerProvider>
+              </ApiProvider>
+            </MetaMaskProvider>
+          </QueryClientProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
+    </>
+  );
+};
+
+export default appWithTranslation(App);

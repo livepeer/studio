@@ -8,6 +8,7 @@ import PrinciplesSection from "@components/Site/PrinciplesSection";
 import { GraphQLClient } from "graphql-request";
 import allHome from "../queries/allHome.gql";
 import { print } from "graphql/language/printer";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 const HomePage = (props) => {
   return (
@@ -21,7 +22,7 @@ const HomePage = (props) => {
   );
 };
 
-export async function getStaticProps() {
+export async function getStaticProps({ locale }) {
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
@@ -32,6 +33,7 @@ export async function getStaticProps() {
     props: {
       ...data.allHome[0],
       preview: false,
+      ...(await serverSideTranslations(locale, ["common", "home"])),
     },
     revalidate: 1,
   };

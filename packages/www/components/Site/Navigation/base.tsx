@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
 import CutOut from "@components/Site/CutOut";
+import RegionSelector from "@components/Site/RegionSelector";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -91,6 +92,7 @@ const NavigationBase = ({
                   breadcrumb={breadcrumb}
                 />
               </Box>
+              <RegionSelector />
               <Flex align="center" css={{ mt: -6 }}>
                 <Flex
                   css={{
@@ -128,6 +130,7 @@ const NavigationBase = ({
                     );
                   })}
                 </Flex>
+
                 <Flex>
                   {!loggedIn && (
                     <>

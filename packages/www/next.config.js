@@ -1,4 +1,5 @@
 const withPlugins = require("next-compose-plugins");
+const { i18n } = require("./next-i18next.config");
 const emoji = require("remark-emoji");
 const withMDX = require("@next/mdx")({
   options: {
@@ -10,6 +11,7 @@ const config = {
   images: {
     domains: ["cdn.sanity.io"],
   },
+  i18n,
   async redirects() {
     return [
       {
