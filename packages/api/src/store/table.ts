@@ -361,7 +361,7 @@ export default class Table<T extends DBObject> {
     const parentsAcc = parents.map((p) => `->'${p}'`).join("");
     const propAccessor = `data${parentsAcc}->>'${propName}'`;
     try {
-      await this.db.query(`
+      await this.db.query(sql`
           CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((${propAccessor}));
         `);
     } catch (e) {
