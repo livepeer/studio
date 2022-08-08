@@ -303,11 +303,10 @@ export class TaskScheduler {
       asset = await db.asset.get(asset);
     }
     await db.asset.markDeleted(asset.id);
-    const timestamp = asset.status.updatedAt;
     await this.queue.publishWebhook("events.asset.deleted", {
       type: "webhook_event",
       id: uuid(),
-      timestamp,
+      timestamp: Date.now(),
       event: "asset.deleted",
       userId: asset.userId,
       payload: {
