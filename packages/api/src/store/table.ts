@@ -337,23 +337,32 @@ export default class Table<T extends DBObject> {
   }
 
   // on startup: auto-create indices if they don't exist
-  async ensureIndex(propName, prop) {
-    if (process.env.NODE_ENV !== "test") {
+  async ensureIndex(propName: string, prop: FieldSpec, parents: string[] = []) {
+    if (process.env.NODE_ENV !== "test" && this.name !== "asset") {
       // avoid creating indexes in production right now...
       return;
     }
 
     if (!prop.index && !prop.unique) {
+      if (prop.properties && this.name === "asset") {
+        return Promise.all(
+          Object.entries(prop.properties).map(([childName, childProp]) =>
+            this.ensureIndex(childName, childProp, [...parents, propName])
+          )
+        );
+      }
       return;
     }
     let unique = "";
     if (prop.unique) {
       unique = "unique";
     }
-    const indexName = `${this.name}_${propName}`;
+    const indexName = `${this.name}_${[...parents, propName].join("_")}`;
+    const parentsAcc = parents.map((p) => `->'${p}'`).join("");
+    const propAccessor = `data${parentsAcc}->>'${propName}'`;
     try {
-      await this.db.query(`
-          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((data->>'${propName}'));
+      await this.db.query(sql`
+          CREATE ${unique} INDEX "${indexName}" ON "${this.name}" USING BTREE ((${propAccessor}));
         `);
     } catch (e) {
       if (!e.message.includes("already exists")) {

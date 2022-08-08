@@ -41,6 +41,33 @@ const newPlaybackInfo = (
   },
 });
 
+const getAssetPlaybackUrl = async (
+  ingest: string,
+  id: string,
+  cid: boolean
+) => {
+  const asset = cid
+    ? await db.asset.getByIpfsCid(id)
+    : await db.asset.getByPlaybackId(id);
+  if (!asset || asset.deleted) {
+    return null;
+  }
+  return assetPlaybackUrl(ingest, asset);
+};
+
+const getRecordingPlaybackUrl = async (
+  ingest: string,
+  id: string,
+  table: Table<DBSession>
+) => {
+  const session = await table.get(id);
+  if (!session || session.deleted) {
+    return null;
+  }
+  const { recordingUrl } = getRecordingFields(ingest, session, false);
+  return recordingUrl;
+};
+
 async function getPlaybackInfo(
   ingest: string,
   id: string
@@ -53,25 +80,16 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
-  const asset = await db.asset.getByPlaybackId(id);
-  if (asset && !asset.deleted) {
-    const url = assetPlaybackUrl(ingest, asset);
-    if (url) {
-      return newPlaybackInfo("vod", url);
-    }
+  const assetUrl =
+    (await getAssetPlaybackUrl(ingest, id, false)) ??
+    (await getAssetPlaybackUrl(ingest, id, true));
+  if (assetUrl) {
+    return newPlaybackInfo("vod", assetUrl);
   }
 
-  const recordingPlaybackUrl = async (table: Table<DBSession>) => {
-    const session = await table.get(id);
-    if (!session || session.deleted) {
-      return null;
-    }
-    const { recordingUrl } = getRecordingFields(ingest, session, false);
-    return recordingUrl;
-  };
   const recordingUrl =
-    (await recordingPlaybackUrl(db.session)) ??
-    (await recordingPlaybackUrl(db.stream));
+    (await getRecordingPlaybackUrl(ingest, id, db.session)) ??
+    (await getRecordingPlaybackUrl(ingest, id, db.stream));
   if (recordingUrl) {
     return newPlaybackInfo("recording", recordingUrl);
   }
