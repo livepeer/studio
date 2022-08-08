@@ -149,14 +149,13 @@ describe("controllers/playback", () => {
         const cid = "bafyfoobar";
         await db.asset.update(asset.id, {
           playbackRecordingId: "mock_recording_id_2",
-          status: {
-            phase: "ready",
-            storage: {
-              ipfs: {
-                data: {
-                  videoFileCid: cid,
-                },
-              },
+          storage: {
+            ipfs: {
+              cid: cid,
+            },
+            status: {
+              phase: "ready",
+              tasks: {},
             },
           },
         });

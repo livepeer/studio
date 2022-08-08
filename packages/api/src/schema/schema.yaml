@@ -646,7 +646,21 @@ components:
         meta:
           $ref: "#/components/schemas/asset/properties/meta"
         storage:
-          $ref: "#/components/schemas/asset/properties/storage"
+          additionalProperties: false
+          properties:
+            ipfs:
+              oneOf:
+                - type: object
+                  additionalProperties: false
+                  properties:
+                    spec:
+                      oneOf:
+                        - type: "null"
+                        - $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec"
+                - type: [boolean, "null"]
+                  description:
+                    Set to true to make default export to IPFS. False or null
+                    means to unpin from IPFS, but is unsupported right now.
 
     stream-patch-payload:
       type: object
@@ -944,7 +958,64 @@ components:
           additionalProperties: false
           properties:
             ipfs:
-              $ref: "#/components/schemas/export-task-params/oneOf/1/properties/ipfs"
+              type: object
+              additionalProperties: false
+              properties:
+                spec:
+                  type: object
+                  additionalProperties: false
+                  default: {}
+                  properties:
+                    nftMetadataTemplate:
+                      type: string
+                      enum: [player, file]
+                      default: player
+                      description:
+                        Name of the NFT metadata template to export. 'player'
+                        will embed the Livepeer Player on the NFT while 'file'
+                        will reference only the immutable MP4 files.
+                    nftMetadata:
+                      type: object
+                      description:
+                        Additional data to add to the NFT metadata exported to
+                        IPFS. Will be deep merged with the default metadata
+                        exported.
+                $ref: "#/components/schemas/ipfs-file-info/properties"
+                nftMetadata:
+                  $ref: "#/components/schemas/ipfs-file-info"
+            status:
+              readOnly: true
+              additionalProperties: false
+              required: [phase, tasks]
+              properties:
+                phase:
+                  type: string
+                  description: Phase of the asset storage
+                  enum:
+                    - waiting
+                    - ready
+                    - failed
+                    - reverted
+                errorMessage:
+                  type: string
+                  description: Error message if the last storage changed failed.
+                tasks:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    pending:
+                      type: string
+                      description:
+                        ID of any currently running task that is exporting this
+                        asset to IPFS.
+                    last:
+                      type: string
+                      description:
+                        ID of the last task to run successfully, that created
+                        the currently saved data.
+                    failed:
+                      type: string
+                      description: ID of the last task to fail execution.
         status:
           type: object
           additionalProperties: false
@@ -967,43 +1038,6 @@ components:
             errorMessage:
               type: string
               description: Error message if the asset creation failed.
-            storage:
-              type: object
-              additionalProperties: false
-              properties:
-                ipfs:
-                  additionalProperties: false
-                  required: [taskIds]
-                  properties:
-                    taskIds:
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        pending:
-                          type: string
-                          description:
-                            ID of any currently running task that is exporting
-                            this asset to IPFS.
-                        last:
-                          type: string
-                          description:
-                            ID of the last task to run successfully, that
-                            created the currently saved data.
-                        failed:
-                          type: string
-                          description: ID of the last task to fail execution.
-                    data:
-                      type: object
-                      additionalProperties: false
-                      required: [videoFileCid]
-                      properties:
-                        $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties"
-                        videoFileCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/videoFileCid"
-                          index: true
-                        nftMetadataCid:
-                          $ref: "#/components/schemas/task/properties/output/properties/export/properties/ipfs/properties/nftMetadataCid"
-                          index: true
         name:
           type: string
           description:
@@ -1137,6 +1171,23 @@ components:
           description:
             ID of the source asset (root) - If missing, this is a root asset
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+
+    ipfs-file-info:
+      type: object
+      required: [cid]
+      additionalProperties: false
+      properties:
+        cid:
+          type: string
+          description: CID of the file on IPFS
+        url:
+          type: string
+          readOnly: true
+          description: URL with IPFS scheme for the file
+        gatewayUrl:
+          type: string
+          readOnly: true
+          description: URL to access file via HTTP through an IPFS gateway
 
     new-asset-payload:
       additionalProperties: false
@@ -1412,6 +1463,7 @@ components:
               type: object
               additionalProperties: false
               properties:
+                $ref: "#/components/schemas/asset/properties/storage/properties/ipfs/properties/spec/properties"
                 pinata:
                   description:
                     Custom credentials for the Piñata service. Must have either
@@ -1440,19 +1492,6 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
-                nftMetadataTemplate:
-                  type: string
-                  enum: [player, file]
-                  default: player
-                  description:
-                    Name of the NFT metadata template to export. 'player' will
-                    embed the Livepeer Player on the NFT while 'file' will
-                    reference only the immutable MP4 files.
-                nftMetadata:
-                  type: object
-                  description:
-                    Additional data to add to the NFT metadata exported to IPFS.
-                    Will be deep merged with the default metadata exported.
 
     api-token:
       type: object

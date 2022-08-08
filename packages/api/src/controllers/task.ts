@@ -3,20 +3,20 @@ import { validatePost } from "../middleware";
 import { Router } from "express";
 import mung from "express-mung";
 import { v4 as uuid } from "uuid";
+import _ from "lodash";
 import {
   makeNextHREF,
   parseFilters,
   parseOrder,
   toStringValues,
   FieldsMap,
-  pathJoin,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { Task } from "../schema/types";
+import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
-
-const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
+import { withIpfsUrls } from "./asset";
+import { taskOutputToIpfsStorage } from "../store/asset-table";
 
 const app = Router();
 
@@ -35,33 +35,32 @@ function validateTaskPayload(
   };
 }
 
-function withIpfsUrls(task: WithID<Task>): WithID<Task> {
-  if (task?.type !== "export" || !task?.output?.export?.ipfs?.videoFileCid) {
+const ipfsStorageToTaskOutput = (
+  ipfs: Omit<Asset["storage"]["ipfs"], "spec">
+): Task["output"]["export"]["ipfs"] => ({
+  videoFileCid: ipfs.cid,
+  videoFileUrl: ipfs.url,
+  videoFileGatewayUrl: ipfs.gatewayUrl,
+  nftMetadataCid: ipfs.nftMetadata?.cid,
+  nftMetadataUrl: ipfs.nftMetadata?.url,
+  nftMetadataGatewayUrl: ipfs.nftMetadata?.gatewayUrl,
+});
+
+function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
+  if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
   }
-  let { ipfs } = task.output.export;
-  ipfs = {
-    ...ipfs,
-    videoFileUrl: `ipfs://${ipfs.videoFileCid}`,
-    videoFileGatewayUrl: pathJoin(ipfsGateway, ipfs.videoFileCid),
-  };
-  if (ipfs.nftMetadataCid) {
-    ipfs = {
-      ...ipfs,
-      nftMetadataUrl: `ipfs://${ipfs.nftMetadataCid}`,
-      nftMetadataGatewayUrl: pathJoin(ipfsGateway, ipfs.nftMetadataCid),
-    };
-  }
-  return {
-    ...task,
+  const assetIpfs = taskOutputToIpfsStorage(task.output.export.ipfs);
+  return _.merge({}, task, {
     output: {
-      ...task.output,
       export: {
-        ...task.output.export,
-        ipfs,
+        ipfs: ipfsStorageToTaskOutput({
+          ...withIpfsUrls(assetIpfs),
+          nftMetadata: withIpfsUrls(assetIpfs.nftMetadata),
+        }),
       },
     },
-  };
+  });
 }
 
 const fieldsMap: FieldsMap = {
@@ -187,7 +186,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(withIpfsUrls(task));
+  res.json(taskWithIpfsUrls(task));
 });
 
 app.post(

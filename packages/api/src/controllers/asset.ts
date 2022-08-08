@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import mung from "express-mung";
 import tus from "tus-node-server";
+import _ from "lodash";
 import {
   makeNextHREF,
   parseFilters,
@@ -31,11 +32,12 @@ import {
   Asset,
   AssetPatchPayload,
   ExportTaskParams,
+  IpfsFileInfo,
   NewAssetPayload,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
-import { mergeAssetStatus } from "../store/asset-table";
+import { mergeStorageStatus } from "../store/asset-table";
 import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
@@ -127,6 +129,33 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   };
 }
 
+const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
+
+export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(ipfs: T): T {
+  if (!ipfs?.cid) {
+    return ipfs;
+  }
+  return {
+    ...ipfs,
+    url: `ipfs://${ipfs.cid}`,
+    gatewayUrl: pathJoin(ipfsGateway, ipfs.cid),
+  };
+}
+
+function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
+  if (!asset?.storage?.ipfs?.cid) {
+    return asset;
+  }
+  return _.merge({}, asset, {
+    storage: {
+      ipfs: {
+        ...withIpfsUrls(asset.storage.ipfs),
+        nftMetadata: withIpfsUrls(asset.storage.ipfs.nftMetadata),
+      },
+    },
+  });
+}
+
 export async function createAsset(asset: WithID<Asset>, queue: Queue) {
   asset = await db.asset.create(asset);
   await queue.publishWebhook("events.asset.created", {
@@ -150,33 +179,37 @@ async function reconcileAssetStorage(
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
   task?: WithID<Task>
-): Promise<{ storage: Asset["storage"]; status: Asset["status"] }> {
-  let { storage, status } = asset;
-  const ipfsParamsEq =
-    JSON.stringify(newStorage?.ipfs) === JSON.stringify(storage?.ipfs);
-  if (!ipfsParamsEq) {
-    if (!newStorage.ipfs) {
+): Promise<Asset["storage"]> {
+  let { storage } = asset;
+  const ipfsParamsEq = _.isEqual(
+    newStorage.ipfs?.spec,
+    storage?.ipfs?.spec ?? null
+  );
+  if ("ipfs" in newStorage && !ipfsParamsEq) {
+    let newSpec = newStorage.ipfs?.spec;
+    if (!newSpec) {
       throw new BadRequestError("Cannot remove asset from IPFS");
     }
     if (!task) {
       task = await taskScheduler.scheduleTask(
         "export",
-        { export: { ipfs: newStorage.ipfs } },
+        { export: { ipfs: newSpec } },
         asset
       );
     }
-    storage = { ...storage, ipfs: newStorage.ipfs };
-    status = mergeAssetStatus(status, {
-      storage: {
-        ipfs: {
-          taskIds: {
-            pending: task.id,
-          },
-        },
+    storage = {
+      ...storage,
+      ipfs: {
+        ...storage?.ipfs,
+        spec: newSpec,
       },
-    });
+      status: mergeStorageStatus(storage?.status, {
+        phase: "waiting",
+        tasks: { pending: task.id },
+      }),
+    };
   }
-  return { storage, status };
+  return storage;
 }
 
 async function genUploadUrl(
@@ -225,10 +258,14 @@ app.use(
       throw new InternalServerError("Ingest not configured");
     }
     const ingest = ingests[0].base;
-    const toExternalAsset = (a: WithID<Asset>) =>
-      req.user.admin
-        ? withPlaybackUrls(ingest, a)
-        : db.asset.cleanWriteOnlyResponse(withPlaybackUrls(ingest, a));
+    let toExternalAsset = (a: WithID<Asset>) => {
+      a = withPlaybackUrls(ingest, a);
+      a = assetWithIpfsUrls(a);
+      if (!req.user.admin) {
+        a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      }
+      return a;
+    };
 
     if (Array.isArray(data)) {
       return data.map(toExternalAsset);
@@ -256,13 +293,14 @@ const fieldsMap: FieldsMap = {
   playbackId: `asset.data->>'playbackId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
-  ipfsVideoFileCid: `asset.data->'status'->'storage'->'ipfs'->'data'->'videoFileCid'`,
-  ipfsNftMetadataCid: `asset.data->'status'->'storage'->'ipfs'->'data'->'nftMetadataCid'`,
+  cid: `asset.data->'storage'->'ipfs'->>'cid'`,
+  nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, all, allUsers, order, filters, playbackId, count } =
+  let { limit, cursor, all, allUsers, order, filters, count, ...otherQs } =
     toStringValues(req.query);
+  const fieldFilters = _.pick(otherQs, "playbackId", "cid", "nftMetadataCid");
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
@@ -270,10 +308,13 @@ app.get("/", authorizer({}), async (req, res) => {
     order = "updatedAt-true,createdAt-true";
   }
 
-  const query = parseFilters(fieldsMap, filters);
-  if (playbackId) {
-    query.push(sql`asset.data->>'playbackId' = ${playbackId}`);
-  }
+  const query = [
+    ...parseFilters(fieldsMap, filters),
+    ...parseFilters(
+      fieldsMap,
+      JSON.stringify(_.map(fieldFilters, (v, k) => ({ id: k, value: v })))
+    ),
+  ];
   if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
@@ -370,8 +411,17 @@ app.post(
       asset
     );
     if ("ipfs" in params && !params.ipfs?.pinata) {
-      const updates = await reconcileAssetStorage(req, asset, params, task);
-      await req.taskScheduler.updateAsset(asset, updates);
+      // TODO: Make this unsupported. PATCH should be the only way to change asset storage.
+      console.warn(
+        `Deprecated export to IPFS API used. userId=${req.user.id} assetId=${assetId}`
+      );
+      const storage = await reconcileAssetStorage(
+        req,
+        asset,
+        { ipfs: { spec: params.ipfs } },
+        task
+      );
+      await req.taskScheduler.updateAsset(asset, { storage });
     }
 
     res.status(201);
@@ -464,7 +514,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
       name: req.body.name ?? inputAsset.name,
     }
   );
-  outputAsset.sourceAssetId = inputAsset.id;
+  outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
   outputAsset = await createAsset(outputAsset, req.queue);
 
   const task = await req.taskScheduler.scheduleTask(
@@ -721,29 +771,33 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, meta, storage } = req.body as AssetPatchPayload;
+    let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
     validateAssetMeta(meta);
-    if (storage?.ipfs?.pinata) {
-      throw new BadRequestError(
-        "Custom pinata not allowed in asset storage. Call export API explicitly instead"
-      );
+
+    let storage: Asset["storage"];
+    if (storageInput?.ipfs !== undefined) {
+      let { ipfs } = storageInput;
+      if (typeof ipfs === "boolean" || !ipfs) {
+        ipfs = { spec: ipfs ? {} : null };
+      } else if (typeof ipfs.spec === "undefined") {
+        ipfs = { spec: {} };
+      }
+      storage = { ...storageInput, ipfs };
     }
 
     // update a specific asset
     const { id } = req.params;
     const asset = await db.asset.get(id);
-    if (!asset) {
+    if (!asset || (asset.userId !== req.user.id && !req.user.admin)) {
       throw new NotFoundError(`asset not found`);
+    } else if (asset.status.phase !== "ready") {
+      throw new UnprocessableEntityError(`asset is not ready`);
     }
 
-    const storageUpdates = storage
-      ? await reconcileAssetStorage(req, asset, storage)
-      : null;
-    await req.taskScheduler.updateAsset(asset, {
-      name,
-      meta,
-      ...storageUpdates,
-    });
+    if (storage) {
+      storage = await reconcileAssetStorage(req, asset, storage);
+    }
+    await req.taskScheduler.updateAsset(asset, { name, meta, storage });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }
@@ -755,24 +809,38 @@ app.post(
   "/migrate-status",
   authorizer({ anyAdmin: true }),
   async (req, res) => {
-    let { limit, cursor } = toStringValues(req.query);
+    let { limit, cursor, concurrency } = toStringValues(req.query);
     if (isNaN(parseInt(limit))) {
       limit = "100";
     }
 
-    const query = [sql`asset.data->'status'->>'phase' IS NULL`];
+    const query = [
+      sql`asset.data->'storage'->>'ipfs' IS NOT NULL`,
+      sql`asset.data->'storage'->'ipfs'->>'spec' IS NULL`,
+    ];
     const fields = " asset.id as id, asset.data as data";
     const [toUpdate, nextCursor] = await db.asset.find(query, {
       limit,
       cursor,
       fields,
+      order: "data->>'id' ASC",
     });
 
+    let promises: Promise<void>[] = [];
+    let batchSize = parseInt(concurrency);
+    if (isNaN(batchSize) || batchSize < 1) {
+      batchSize = 5;
+    }
     for (const asset of toUpdate) {
       // the db.asset will actually already return the asset transformed to the
       // updated format. All we need to do is re-save it as returned here.
-      await db.asset.replace(asset);
+      promises.push(db.asset.replace(asset));
+      if (promises.length >= batchSize) {
+        await Promise.all(promises);
+        promises = [];
+      }
     }
+    await Promise.all(promises);
 
     if (toUpdate.length > 0 && nextCursor) {
       res.links({ next: makeNextHREF(req, nextCursor) });
