@@ -63,18 +63,16 @@ function validateAssetMeta(meta: Record<string, string>) {
   }
 }
 
-function cleanAssetResponse(assets: WithID<Asset>[]) {
-  return assets.map((a) =>
-    !a.videoSpec
-      ? a
-      : {
-          ...a,
-          videoSpec: {
-            ...a.videoSpec,
-            tracks: undefined,
-          },
-        }
-  );
+function cleanAssetTracks(asset: WithID<Asset>) {
+  return !asset.videoSpec
+    ? asset
+    : {
+        ...asset,
+        videoSpec: {
+          ...asset.videoSpec,
+          tracks: undefined,
+        },
+      };
 }
 
 async function validateAssetPayload(
@@ -271,31 +269,31 @@ app.use(
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
-    const query = toStringValues(req.query);
+    const { details } = toStringValues(req.query);
     const ingest = ingests[0].base;
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
       a = assetWithIpfsUrls(a);
-      if (!req.user.admin) {
-        a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      if (req.user.admin) {
+        return a;
+      }
+      a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      if (!details) {
+        a = cleanAssetTracks(a);
       }
       return a;
     };
 
-    const cleanedAsset = (a: WithID<Asset>) =>
-      !query.details ? cleanAssetResponse([a])[0] : a;
-
     if (Array.isArray(data)) {
-      let a = data.map(cleanedAsset);
-      return a.map(toExternalAsset);
+      return data.map(toExternalAsset);
     }
     if ("id" in data) {
-      return toExternalAsset(cleanedAsset(data));
+      return toExternalAsset(data);
     }
     if ("asset" in data) {
       return {
         ...data,
-        asset: toExternalAsset(cleanedAsset(data.asset)),
+        asset: toExternalAsset(data.asset),
       };
     }
     return data;
