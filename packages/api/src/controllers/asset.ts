@@ -274,8 +274,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (playbackId) {
     query.push(sql`asset.data->>'playbackId' = ${playbackId}`);
   }
-  if (!all || all === "false") {
-    // TODO: Consider keeping this flag as admin-only
+  if (!req.user.admin || !all || all === "false") {
     query.push(sql`asset.data->>'deleted' IS NULL`);
   }
 
