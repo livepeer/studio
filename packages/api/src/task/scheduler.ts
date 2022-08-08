@@ -322,6 +322,8 @@ export class TaskScheduler {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
+    const statusChanged =
+      updates.status && asset.status.phase !== updates.status.phase;
     updates = {
       ...updates,
       status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
@@ -345,11 +347,9 @@ export class TaskScheduler {
         },
       },
     });
-    if (!updates.status || updates.status === asset.status) {
-      return;
-    }
-    if (asset.status.phase === "ready" || asset.status.phase === "failed") {
-      let assetEvent: EventKey = `asset.${asset.status.phase}`;
+    const newPhase = asset.status.phase;
+    if (statusChanged && (newPhase === "ready" || newPhase === "failed")) {
+      let assetEvent: EventKey = `asset.${newPhase}`;
       let routingKey: RoutingKey = `events.${assetEvent}`;
       await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
