@@ -361,300 +361,287 @@ describe("controllers/asset", () => {
         },
         status: { phase: "ready", updatedAt: expect.any(Number) },
       });
-      const testStoragePatch = async (
-        patchedStorage: AssetPatchPayload["storage"],
-        expectedStorage?: Asset["storage"],
-        expectedErrors?: any[]
-      ) => {
-        let res = await client.patch(`/asset/${asset.id}`, {
-          storage: patchedStorage,
+    });
+
+    const testStoragePatch = async (
+      patchedStorage: AssetPatchPayload["storage"],
+      expectedStorage?: Asset["storage"],
+      expectedErrors?: any[]
+    ) => {
+      let res = await client.patch(`/asset/${asset.id}`, {
+        storage: patchedStorage,
+      });
+      const data = await res.json();
+      if (!expectedErrors) {
+        expect(res.status).toBe(200);
+        expect(data).toMatchObject({
+          ...asset,
+          ...(expectedStorage === undefined
+            ? {}
+            : { storage: expectedStorage }),
+          status: expect.any(Object),
         });
-        const data = await res.json();
-        if (!expectedErrors) {
-          expect(res.status).toBe(200);
-          expect(data).toMatchObject({
-            ...asset,
-            ...(expectedStorage === undefined
-              ? {}
-              : { storage: expectedStorage }),
-            status: expect.any(Object),
-          });
-        } else {
-          expect(res.status).toBeGreaterThanOrEqual(400);
-          expect(data).toMatchObject({
-            errors: expect.arrayContaining(expectedErrors),
-          });
-        }
-        return data;
-      };
+      } else {
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(data).toMatchObject({
+          errors: expect.arrayContaining(expectedErrors),
+        });
+      }
+      return data;
+    };
 
-      it("should allow specifying ipfs as a bool", async () => {
-        await testStoragePatch({ ipfs: false }, undefined);
-        await testStoragePatch(
-          { ipfs: true },
-          {
-            ipfs: {
-              spec: {},
-            },
-            status: expect.any(Object),
-          }
-        );
-        await testStoragePatch({ ipfs: false }, undefined, [
-          "Cannot remove asset from IPFS",
-        ]);
-      });
-
-      it("should allow specifying ipfs as an empty object", async () => {
-        await testStoragePatch(
-          { ipfs: { nftMetadata: { a: "b" } } } as any,
-          null,
-          [expect.stringContaining("should NOT have additional properties")]
-        );
-        await testStoragePatch(
-          { ipfs: {} },
-          {
-            ipfs: {
-              spec: {},
-            },
-            status: expect.any(Object),
-          }
-        );
-        await testStoragePatch({ ipfs: null }, undefined, [
-          "Cannot remove asset from IPFS",
-        ]);
-        await testStoragePatch({ ipfs: { spec: null } }, undefined, [
-          "Cannot remove asset from IPFS",
-        ]);
-      });
-
-      it("should handle each storage independently", async () => {
-        await testStoragePatch({ ipfs: true }, { ipfs: expect.any(Object) });
-        await testStoragePatch({}, { ipfs: expect.any(Object) });
-        await testStoragePatch({ ipfs: null }, null, [
-          "Cannot remove asset from IPFS",
-        ]);
-      });
-
-      it("should only spawn tasks if spec changes", async () => {
-        const patch = {
-          ipfs: { spec: { nftMetadata: { a: "b", b: "c" } as any } },
-        };
-        const expectedStorage: Asset["storage"] = {
+    it("should allow specifying ipfs as a bool", async () => {
+      await testStoragePatch({ ipfs: false }, undefined);
+      await testStoragePatch(
+        { ipfs: true },
+        {
           ipfs: {
-            spec: patch.ipfs.spec,
+            spec: {},
           },
-          status: {
-            phase: "waiting",
-            tasks: { pending: expect.any(String) },
+          status: expect.any(Object),
+        }
+      );
+      await testStoragePatch({ ipfs: false }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+    });
+
+    it("should allow specifying ipfs as an empty object", async () => {
+      await testStoragePatch(
+        { ipfs: { nftMetadata: { a: "b" } } } as any,
+        null,
+        [expect.stringContaining("should NOT have additional properties")]
+      );
+      await testStoragePatch(
+        { ipfs: {} },
+        {
+          ipfs: {
+            spec: {},
           },
-        };
-        const { storage } = await testStoragePatch(patch, expectedStorage);
-        const firstTaskId = storage.status.tasks.pending;
-        expectedStorage.status.tasks.pending = firstTaskId;
-        await testStoragePatch(patch, expectedStorage);
+          status: expect.any(Object),
+        }
+      );
+      await testStoragePatch({ ipfs: null }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+      await testStoragePatch({ ipfs: { spec: null } }, undefined, [
+        "Cannot remove asset from IPFS",
+      ]);
+    });
 
-        await testStoragePatch(
-          { ipfs: { spec: { nftMetadata: { b: "c", a: "b" } } } },
-          expectedStorage
-        );
+    it("should handle each storage independently", async () => {
+      await testStoragePatch({ ipfs: true }, { ipfs: expect.any(Object) });
+      await testStoragePatch({}, { ipfs: expect.any(Object) });
+      await testStoragePatch({ ipfs: null }, null, [
+        "Cannot remove asset from IPFS",
+      ]);
+    });
 
-        patch.ipfs.spec.nftMetadata = { d: "e" };
-        expectedStorage.ipfs.spec = patch.ipfs.spec;
-        expectedStorage.status.tasks.pending =
-          expect.not.stringMatching(firstTaskId);
-        await testStoragePatch(patch, expectedStorage);
+    it("should only spawn tasks if spec changes", async () => {
+      const patch = {
+        ipfs: { spec: { nftMetadata: { a: "b", b: "c" } as any } },
+      };
+      const expectedStorage: Asset["storage"] = {
+        ipfs: {
+          spec: patch.ipfs.spec,
+        },
+        status: {
+          phase: "waiting",
+          tasks: { pending: expect.any(String) },
+        },
+      };
+      const { storage } = await testStoragePatch(patch, expectedStorage);
+      const firstTaskId = storage.status.tasks.pending;
+      expectedStorage.status.tasks.pending = firstTaskId;
+      await testStoragePatch(patch, expectedStorage);
+
+      await testStoragePatch(
+        { ipfs: { spec: { nftMetadata: { b: "c", a: "b" } } } },
+        expectedStorage
+      );
+
+      patch.ipfs.spec.nftMetadata = { d: "e" };
+      expectedStorage.ipfs.spec = patch.ipfs.spec;
+      expectedStorage.status.tasks.pending =
+        expect.not.stringMatching(firstTaskId);
+      await testStoragePatch(patch, expectedStorage);
+    });
+  });
+
+  describe("asset list", () => {
+    let asset: WithID<Asset>;
+
+    beforeEach(async () => {
+      await db.asset.create({
+        id: uuid(),
+        name: "dummy",
+        createdAt: Date.now(),
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+        userId: nonAdminUser.id,
+      });
+      const id = uuid();
+      asset = await db.asset.create({
+        id,
+        name: "test-storage",
+        createdAt: Date.now(),
+        playbackId: await generateUniquePlaybackId(id),
+        storage: {
+          ipfs: {
+            spec: {},
+            cid: "QmX123",
+            nftMetadata: { cid: "QmY321" },
+          },
+        },
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+        userId: nonAdminUser.id,
       });
     });
 
-    describe("asset list", () => {
-      let asset: WithID<Asset>;
+    const expectFindAsset = async (qs: string, shouldFind: boolean) => {
+      const res = await client.get(`/asset?${qs}`);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      if (shouldFind) {
+        expect(data).toMatchObject([asset]);
+      } else {
+        expect(data.length).not.toEqual(1); // either empty or more than 1
+      }
+    };
 
-      beforeEach(async () => {
-        await db.asset.create({
-          id: uuid(),
-          name: "dummy",
-          createdAt: Date.now(),
-          status: {
-            phase: "ready",
-            updatedAt: Date.now(),
-          },
-          userId: nonAdminUser.id,
-        });
-        const id = uuid();
-        asset = await db.asset.create({
-          id,
-          name: "test-storage",
-          createdAt: Date.now(),
-          playbackId: await generateUniquePlaybackId(id),
-          storage: {
-            ipfs: {
-              spec: {},
-              cid: "QmX123",
-              nftMetadata: { cid: "QmY321" },
+    it("should find asset by playbackId", async () => {
+      await expectFindAsset(`playbackId=somethingelse`, false);
+      await expectFindAsset(`playbackId=${asset.playbackId}`, true);
+    });
+
+    it("should find asset by CID", async () => {
+      await expectFindAsset(`cid=somethingelse`, false);
+      await expectFindAsset(`cid=${asset.storage.ipfs.cid}`, true);
+    });
+
+    it("should find asset by NFT metadata CID", async () => {
+      await expectFindAsset(`nftMetadataCid=somethingelse`, false);
+      await expectFindAsset(
+        `nftMetadataCid=${asset.storage.ipfs.nftMetadata.cid}`,
+        true
+      );
+    });
+
+    it("should not mix main and NFT metadata CIDs", async () => {
+      await expectFindAsset(`cid=${asset.storage.ipfs.nftMetadata.cid}`, false);
+      await expectFindAsset(`nftMetadataCid=${asset.storage.ipfs.cid}`, false);
+    });
+
+    it("should NOT allow finding by name through direct query string", async () => {
+      await expectFindAsset(`name=${asset.name}`, false);
+      await expectFindAsset(
+        `filters=[{"id":"name","value":"${asset.name}"}]`,
+        true
+      );
+    });
+  });
+
+  describe("chunked upload", () => {
+    const expectTaskStatus = async (taskId: string, expectedStatus: string) => {
+      const res = await client.get(`/task/${taskId}`);
+      expect(res.status).toBe(200);
+      const task = await res.json();
+      expect(task.status.phase).toBe(expectedStatus);
+    };
+
+    const uploadFile = async (
+      filename: string,
+      filePath: string,
+      tusEndpoint: string,
+      shouldAbort: boolean,
+      resumeFrom?: number
+    ) => {
+      const file = await fs.readFile(filePath);
+      const { size } = await fs.stat(filePath);
+      let uploadPercentage = await new Promise<number>(
+        async (resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: tusEndpoint,
+            urlStorage: new (tus as any).FileUrlStorage(
+              `${os.tmpdir()}/metadata`
+            ),
+            chunkSize: 1024 * 1024 * 1,
+            metadata: {
+              filename,
+              filetype: "video/mp4",
             },
-          },
-          status: {
-            phase: "ready",
-            updatedAt: Date.now(),
-          },
-          userId: nonAdminUser.id,
-        });
-      });
-
-      const expectFindAsset = async (qs: string, shouldFind: boolean) => {
-        const res = await client.get(`/asset?${qs}`);
-        expect(res.status).toBe(200);
-        const data = await res.json();
-        if (shouldFind) {
-          expect(data).toMatchObject([asset]);
-        } else {
-          expect(data.length).not.toEqual(1); // either empty or more than 1
-        }
-      };
-
-      it("should find asset by playbackId", async () => {
-        await expectFindAsset(`playbackId=somethingelse`, false);
-        await expectFindAsset(`playbackId=${asset.playbackId}`, true);
-      });
-
-      it("should find asset by CID", async () => {
-        await expectFindAsset(`cid=somethingelse`, false);
-        await expectFindAsset(`cid=${asset.storage.ipfs.cid}`, true);
-      });
-
-      it("should find asset by NFT metadata CID", async () => {
-        await expectFindAsset(`nftMetadataCid=somethingelse`, false);
-        await expectFindAsset(
-          `nftMetadataCid=${asset.storage.ipfs.nftMetadata.cid}`,
-          true
-        );
-      });
-
-      it("should not mix main and NFT metadata CIDs", async () => {
-        await expectFindAsset(
-          `cid=${asset.storage.ipfs.nftMetadata.cid}`,
-          false
-        );
-        await expectFindAsset(
-          `nftMetadataCid=${asset.storage.ipfs.cid}`,
-          false
-        );
-      });
-
-      it("should NOT allow finding by name through direct query string", async () => {
-        await expectFindAsset(`name=${asset.name}`, false);
-        await expectFindAsset(
-          `filters=[{"id":"name","value":"${asset.name}"}]`,
-          true
-        );
-      });
-    });
-
-    describe("chunked upload", () => {
-      const expectTaskStatus = async (
-        taskId: string,
-        expectedStatus: string
-      ) => {
-        const res = await client.get(`/task/${taskId}`);
-        expect(res.status).toBe(200);
-        const task = await res.json();
-        expect(task.status.phase).toBe(expectedStatus);
-      };
-
-      const uploadFile = async (
-        filename: string,
-        filePath: string,
-        tusEndpoint: string,
-        shouldAbort: boolean,
-        resumeFrom?: number
-      ) => {
-        const file = await fs.readFile(filePath);
-        const { size } = await fs.stat(filePath);
-        let uploadPercentage = await new Promise<number>(
-          async (resolve, reject) => {
-            const upload = new tus.Upload(file, {
-              endpoint: tusEndpoint,
-              urlStorage: new (tus as any).FileUrlStorage(
-                `${os.tmpdir()}/metadata`
-              ),
-              chunkSize: 1024 * 1024 * 1,
-              metadata: {
-                filename,
-                filetype: "video/mp4",
-              },
-              uploadSize: size,
-              onError(error) {
-                reject(error);
-              },
-              onProgress(bytesUploaded, bytesTotal) {
-                const percentage = parseFloat(
-                  ((bytesUploaded / bytesTotal) * 100).toFixed(2)
-                );
-                if (resumeFrom) {
-                  expect(percentage).toBeGreaterThanOrEqual(resumeFrom);
-                }
-                if (shouldAbort && percentage > 1) {
-                  upload.abort().then(() => {
-                    resolve(percentage);
-                  });
-                }
-              },
-              onSuccess() {
-                resolve(100);
-              },
-            });
-            if (resumeFrom) {
-              const previousUploads = await upload.findPreviousUploads();
-              expect(previousUploads).toHaveLength(1);
-              upload.resumeFromPreviousUpload(previousUploads[0]);
-            }
-            upload.start();
+            uploadSize: size,
+            onError(error) {
+              reject(error);
+            },
+            onProgress(bytesUploaded, bytesTotal) {
+              const percentage = parseFloat(
+                ((bytesUploaded / bytesTotal) * 100).toFixed(2)
+              );
+              if (resumeFrom) {
+                expect(percentage).toBeGreaterThanOrEqual(resumeFrom);
+              }
+              if (shouldAbort && percentage > 1) {
+                upload.abort().then(() => {
+                  resolve(percentage);
+                });
+              }
+            },
+            onSuccess() {
+              resolve(100);
+            },
+          });
+          if (resumeFrom) {
+            const previousUploads = await upload.findPreviousUploads();
+            expect(previousUploads).toHaveLength(1);
+            upload.resumeFromPreviousUpload(previousUploads[0]);
           }
-        );
-        if (shouldAbort) {
-          expect(uploadPercentage).toBeGreaterThan(0);
-          expect(uploadPercentage).toBeLessThan(100);
-        } else {
-          expect(uploadPercentage).toBe(100);
+          upload.start();
         }
-        return uploadPercentage;
-      };
+      );
+      if (shouldAbort) {
+        expect(uploadPercentage).toBeGreaterThan(0);
+        expect(uploadPercentage).toBeLessThan(100);
+      } else {
+        expect(uploadPercentage).toBe(100);
+      }
+      return uploadPercentage;
+    };
 
-      it("should start upload, stop it, resume it on tus test server", async () => {
-        const filename = "test.mp4";
-        const path = os.tmpdir();
-        const filePath = `${path}/${filename}`;
-        let res = await client.post("/asset/request-upload", {
-          name: "tus-test",
-        });
-        expect(res.status).toBe(200);
-        let {
-          tusEndpoint,
-          task: { id: taskId },
-        } = await res.json();
-        expect(
-          tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`)
-        ).toBe(true);
-        tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
-
-        await createMockFile(filePath, 1024 * 1024 * 10);
-        await expectTaskStatus(taskId, "pending");
-        let percentage = await uploadFile(
-          filename,
-          filePath,
-          tusEndpoint,
-          true
-        );
-        await expectTaskStatus(taskId, "pending");
-        await uploadFile(filename, filePath, tusEndpoint, false, percentage);
-
-        await sleep(100);
-
-        await expectTaskStatus(taskId, "waiting");
-
-        await fs.unlink(filePath);
-        await fs.unlink(`${path}/metadata`);
+    it("should start upload, stop it, resume it on tus test server", async () => {
+      const filename = "test.mp4";
+      const path = os.tmpdir();
+      const filePath = `${path}/${filename}`;
+      let res = await client.post("/asset/request-upload", {
+        name: "tus-test",
       });
+      expect(res.status).toBe(200);
+      let {
+        tusEndpoint,
+        task: { id: taskId },
+      } = await res.json();
+      expect(
+        tusEndpoint?.startsWith(`http://test/api/asset/upload/tus?token=`)
+      ).toBe(true);
+      tusEndpoint = tusEndpoint.replace("http://test", client.server.host);
+
+      await createMockFile(filePath, 1024 * 1024 * 10);
+      await expectTaskStatus(taskId, "pending");
+      let percentage = await uploadFile(filename, filePath, tusEndpoint, true);
+      await expectTaskStatus(taskId, "pending");
+      await uploadFile(filename, filePath, tusEndpoint, false, percentage);
+
+      await sleep(100);
+
+      await expectTaskStatus(taskId, "waiting");
+
+      await fs.unlink(filePath);
+      await fs.unlink(`${path}/metadata`);
     });
   });
 });
