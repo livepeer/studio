@@ -16,7 +16,6 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import Spinner from "components/Dashboard/Spinner";
 import { useDropzone } from "react-dropzone";
-import { useApi } from "hooks";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 
@@ -46,8 +45,6 @@ const CreateAssetDialog = ({
   onCreate: ({ videoFiles }: { videoFiles: File[] }) => Promise<void>;
 }) => {
   const [creating, setCreating] = useState(false);
-  const [assetName, setAssetName] = useState("");
-  const [assetUrl, setAssetUrl] = useState("");
 
   const [videoFiles, setVideoFiles] = useState<VideoFiles>({});
   const [error, setError] = useState<string | null>(null);

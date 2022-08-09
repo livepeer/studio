@@ -36,6 +36,7 @@ export type Files = {
     file: File;
     progress?: number;
     error?: Error;
+    completed: boolean;
   };
 };
 
@@ -876,14 +877,20 @@ const makeContext = (
 
       const updateStateWithProgressOrError = (
         file: File,
-        progress?: number,
+        progress: number,
+        completed: boolean,
         error?: Error
       ) => {
         setState((state) => ({
           ...state,
           currentFileUploads: {
             ...state.currentFileUploads,
-            [file.name]: { file, progress, error },
+            [file.name]: {
+              file,
+              progress,
+              error,
+              completed: Boolean(completed),
+            },
           },
         }));
       };
@@ -896,20 +903,20 @@ const makeContext = (
           },
           uploadSize: file.size,
           onError(err) {
-            updateStateWithProgressOrError(file, undefined, err);
+            updateStateWithProgressOrError(file, 0, false, err);
           },
           onProgress(bytesUploaded, bytesTotal) {
             const percentage = bytesUploaded / bytesTotal;
-            updateStateWithProgressOrError(file, percentage);
+            updateStateWithProgressOrError(file, percentage, false);
           },
           onSuccess() {
-            updateStateWithProgressOrError(file, 1);
+            updateStateWithProgressOrError(file, 1, true);
           },
         });
 
       for (const file of files) {
         try {
-          updateStateWithProgressOrError(file, 0);
+          updateStateWithProgressOrError(file, 0, false);
 
           const uploadWithoutUrl = getTusUpload(file);
           const previousUploads = await uploadWithoutUrl.findPreviousUploads();
@@ -925,7 +932,7 @@ const makeContext = (
             upload.start();
           }
         } catch (e) {
-          updateStateWithProgressOrError(file, undefined, e);
+          updateStateWithProgressOrError(file, 0, false, e);
         }
       }
     },
