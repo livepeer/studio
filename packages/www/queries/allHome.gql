@@ -13,8 +13,8 @@ fragment card on Card {
   }
 }
 
-query allHome {
-  allHome {
+query allHome($where: HomeFilter) {
+  allHome(where: $where) {
     heroSection {
       line1
       line2
@@ -74,5 +74,3 @@ query allHome {
     }
   }
 }
-
-

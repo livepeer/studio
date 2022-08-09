@@ -24,6 +24,8 @@
     "@sanity/default-layout": "^2.13.1",
     "@sanity/default-login": "^2.13.1",
     "@sanity/desk-tool": "^2.13.1",
+    "@sanity/document-internationalization": "^0.3.5",
+    "@sanity/language-filter": "^2.30.3",
     "@sanity/production-preview": "^2.13.0",
     "bcp47": "^1.1.2",
     "prop-types": "^15.7.2",

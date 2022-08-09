@@ -1,0 +1,42 @@
+{
+  SiteConfig(id: "global-config") {
+    _id
+    footer {
+      _type
+      heading {
+        en
+        es
+      }
+      description {
+        en
+        es
+      }
+      blurbTitle1 {
+        en
+        es
+      }
+      blurbDescription1 {
+        en
+        es
+      }
+      blurbTitle2 {
+        en
+        es
+      }
+      blurbDescription2 {
+        en
+        es
+      }
+      primaryCallToAction {
+        href
+        title
+        isExternal
+      }
+      secondaryCallToAction {
+        href
+        title
+        isExternal
+      }
+    }
+  }
+}
