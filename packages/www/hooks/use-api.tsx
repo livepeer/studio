@@ -939,6 +939,10 @@ const makeContext = (
       }
     },
 
+    async clearFileUploads() {
+      setState((state) => ({ ...state, currentFileUploads: {} }));
+    },
+
     async getAssets(
       userId: string,
       opts?: {

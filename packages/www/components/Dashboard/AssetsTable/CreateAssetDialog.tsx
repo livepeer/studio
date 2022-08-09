@@ -75,9 +75,9 @@ const CreateAssetDialog = ({
 
   const style = useMemo(
     () => ({
-      ...(isDragActive ? activeStyle : {}),
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
+      ...(isDragActive ? activeStyle : {}),
     }),
     [isDragActive, isDragReject, isDragAccept]
   );
@@ -156,7 +156,7 @@ const CreateAssetDialog = ({
             </Box>
             {videoFiles &&
               Object.keys(videoFiles).map((key) => (
-                <Flex align="center">
+                <Flex key={key} align="center">
                   <IconButton
                     onClick={() => setVideoFiles((prev) => omit(prev, key))}
                     css={{ color: "$whiteA12", mr: "$1", cursor: "pointer" }}>

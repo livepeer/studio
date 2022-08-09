@@ -90,12 +90,12 @@ const AssetsTable = ({
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.name.value", ...params),
       },
-      {
-        Header: "Source",
-        accessor: "source",
-        Cell: TextCell,
-        disableSortBy: true,
-      },
+      // {
+      //   Header: "Source",
+      //   accessor: "source",
+      //   Cell: TextCell,
+      //   disableSortBy: true,
+      // },
       {
         Header: "Created",
         accessor: "createdAt",
