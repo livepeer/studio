@@ -105,6 +105,7 @@ const CreateAssetDialog = ({
                   (key) => videoFiles[key]
                 ),
               });
+              setVideoFiles({});
             } catch (error) {
               console.error(error);
             } finally {
