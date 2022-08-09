@@ -1,4 +1,6 @@
-import { styled, theme } from "@modulz/design-system";
+import { styled, getThemes } from "@livepeer/design-system";
+
+const theme: any = getThemes();
 
 const Pre = styled("pre", {
   $$background: "$loContrast",

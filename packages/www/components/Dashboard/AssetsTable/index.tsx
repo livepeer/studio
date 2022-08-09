@@ -73,7 +73,7 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, createAsset, getTasks } = useApi();
+  const { getAssets, uploadAssets, getTasks } = useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -271,14 +271,14 @@ const AssetsTable = ({
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onCreate={async (assetData) => {
-          const newAsset = await createAsset({
-            name: assetData.name,
-            url: assetData.url,
-          });
-          await state.invalidate();
-          createDialogState.onOff();
-          openSnackbar(`${assetData.name} asset created.`);
+        onCreate={async ({ videoFiles }: { videoFiles: File[] }) => {
+          try {
+            await uploadAssets(videoFiles);
+            await state.invalidate();
+            createDialogState.onOff();
+          } catch (e) {
+            openSnackbar(`Error with uploading videos, please try again.`);
+          }
         }}
       />
     </>

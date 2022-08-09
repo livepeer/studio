@@ -2,6 +2,7 @@ import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import Sidebar from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
+import FileUpload from "@components/Dashboard/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
@@ -107,6 +108,7 @@ function DashboardLayout({
               {children}
             </Box>
           </Box>
+          <FileUpload />
         </Elements>
       </Box>
     </>

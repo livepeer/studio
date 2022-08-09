@@ -8,7 +8,12 @@ import { MetaMaskProvider } from "metamask-react";
 import "../css/algolia-docsearch.css";
 import "../css/recaptcha.css";
 import React from "react";
-import { globalCss, themes, SnackbarProvider } from "@livepeer/design-system";
+import {
+  globalCss,
+  getThemes,
+  SnackbarProvider,
+  DesignSystemProvider,
+} from "@livepeer/design-system";
 import { ThemeProvider } from "next-themes";
 import { DEFAULT_THEME } from "../lib/theme";
 
@@ -51,6 +56,7 @@ const globalStyles = globalCss({
   },
 });
 
+const themes: any = getThemes();
 const themeMap = {};
 Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
@@ -64,29 +70,31 @@ const App = ({ Component, pageProps }) => {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <ThemeProvider
-        forcedTheme={Component.theme || undefined}
-        disableTransitionOnChange
-        attribute="class"
-        defaultTheme={DEFAULT_THEME}
-        value={{
-          ...themeMap,
-          dark: "dark-theme-blue",
-          light: "light-theme-blue",
-        }}>
-        <SnackbarProvider>
-          <QueryClientProvider client={queryClient}>
-            <MetaMaskProvider>
-              <ApiProvider>
-                <AnalyzerProvider>
-                  <DefaultSeo {...SEO} />
-                  <Component {...pageProps} />
-                </AnalyzerProvider>
-              </ApiProvider>
-            </MetaMaskProvider>
-          </QueryClientProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
+      <DesignSystemProvider>
+        <ThemeProvider
+          forcedTheme={Component.theme || undefined}
+          disableTransitionOnChange
+          attribute="class"
+          defaultTheme={DEFAULT_THEME}
+          value={{
+            ...themeMap,
+            dark: "dark-theme-blue",
+            light: "light-theme-blue",
+          }}>
+          <SnackbarProvider>
+            <QueryClientProvider client={queryClient}>
+              <MetaMaskProvider>
+                <ApiProvider>
+                  <AnalyzerProvider>
+                    <DefaultSeo {...SEO} />
+                    <Component {...pageProps} />
+                  </AnalyzerProvider>
+                </ApiProvider>
+              </MetaMaskProvider>
+            </QueryClientProvider>
+          </SnackbarProvider>
+        </ThemeProvider>
+      </DesignSystemProvider>
     </>
   );
 };

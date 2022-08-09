@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   Button,
+  TextArea,
 } from "@livepeer/design-system";
 import Breadcrumbs from "../Breadcrumbs";
 import Link from "next/link";
@@ -18,7 +19,6 @@ import DocumentationIcon from "../../../public/img/icons/documentation.svg";
 import HyperlinkIcon from "../../../public/img/icons/hyperlink.svg";
 import PolygonIcon from "../../../public/img/icons/polygonWithoutBorderBottom.svg";
 import CheckedIcon from "../../../public/img/icons/checked.svg";
-import { TextArea } from "@modulz/design-system";
 import { useEffect, useState, useRef } from "react";
 import { useApi, useHubspotForm } from "hooks";
 
