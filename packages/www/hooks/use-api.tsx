@@ -889,7 +889,7 @@ const makeContext = (
               file,
               progress,
               error,
-              completed: Boolean(completed),
+              completed: state?..currentFileUploads?.[file.name]?.completed ?? Boolean(completed),
             },
           },
         }));
