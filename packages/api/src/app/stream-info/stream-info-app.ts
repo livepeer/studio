@@ -21,7 +21,7 @@ const updateInterval = 50 * 1000; // 50s, slightly lower than USER_SESSION_TIMEO
 const deleteTimeout = 30 * 1000; // 30s
 const seenSegmentsTimeout = 2 * 60 * 1000; // 2m. should be at least two time longer than HTTP push timeout in go-livepeer
 
-async function makeRouter(params) {
+async function makeRouter(params: CliArgs) {
   const bodyParser = require("body-parser");
 
   // Logging, JSON parsing, store injection
@@ -30,7 +30,7 @@ async function makeRouter(params) {
   app.use(healthCheck);
   app.use(bodyParser.json());
   app.use((req, res, next) => {
-    req.config = params;
+    req.config = params as any;
     next();
   });
 

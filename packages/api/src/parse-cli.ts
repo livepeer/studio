@@ -427,6 +427,16 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "boolean",
         default: true,
       },
+      "stream-info-service": {
+        describe: "start the Stream Info service instead of Studio API",
+        type: "boolean",
+      },
+      broadcaster: {
+        describe:
+          "stream-info-service: broadcaster host:port to fetch info from",
+        type: "string",
+        default: "localhost:7935",
+      },
     })
     .usage(
       `

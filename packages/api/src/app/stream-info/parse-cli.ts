@@ -23,11 +23,6 @@ export function parseCli() {
         demandOption: true,
         type: "number",
       },
-      host: {
-        describe: "host to bind to",
-        type: "string",
-        default: "localhost",
-      },
       "own-region": {
         describe: "identify region in which this service runs (fra, mdw, etc)",
         type: "string",
