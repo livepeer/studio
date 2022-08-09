@@ -8,7 +8,7 @@ import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { UnprocessableEntityError, NotFoundError } from "../store/errors";
-import { WebhookResponse } from "../schema/types";
+import { WebhookResponse, WebhookStatusPayload } from "../schema/types";
 import { WithID } from "../store/types";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
@@ -241,26 +241,26 @@ app.post(
   async (req, res) => {
     const { id } = req.params;
     const webhook = await db.webhook.get(id);
-    if (!webhook) {
+    if (!webhook || webhook.deleted) {
       return res.status(404).json({ errors: ["not found"] });
     }
 
-    const doc = req.body.status;
-    const webhookResponse = req.body.response;
+    const { status, response } = req.body as WebhookStatusPayload;
 
-    if (!doc) {
+    if (!status) {
       return res.status(422).json({ errors: ["missing status in payload"] });
     }
 
     await db.webhook.update(req.params.id, {
       ...webhook,
-      status: doc,
+      status: status,
     });
 
-    if (webhookResponse) {
-      webhookResponse.id = uuid();
-      let w: WithID<WebhookResponse> = webhookResponse;
-      await db.webhookResponse.create(w);
+    if (response) {
+      await db.webhookResponse.create({
+        ...response,
+        id: uuid(),
+      });
     }
 
     res.status(204).end();
