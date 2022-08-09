@@ -14,6 +14,7 @@ import {
   MasterPlaylistDictionary,
 } from "./livepeer-types";
 import { DBStream } from "../../store/stream-table";
+import { CliArgs } from "./parse-cli";
 
 const pollInterval = 2 * 1000; // 2s
 const updateInterval = 50 * 1000; // 50s, slightly lower than USER_SESSION_TIMEOUT in API
@@ -375,7 +376,7 @@ class statusPoller {
   }
 }
 
-export default async function makeApp(params) {
+export default async function makeApp(params: CliArgs) {
   const { port, postgresUrl, ownRegion, listen = true, broadcaster } = params;
   // Storage init
   await db.start({ postgresUrl, appName: "stream-info" });
