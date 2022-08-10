@@ -193,10 +193,15 @@ describe("controllers/webhook", () => {
     it("update the status of a webhook", async () => {
       const { id } = generatedWebhook;
       const payload = {
-        status: {
-          lastTriggeredAt: Date.now(),
-          lastFailure: { timestamp: Date.now() },
+        response: {
+          webhookId: id,
+          statusCode: 400,
+          response: {
+            body: "",
+            status: 400,
+          },
         },
+        errorMessage: "Error test",
       };
       const res = await client.post(`/webhook/${id}/status`, payload);
       expect(res.status).toBe(204);
