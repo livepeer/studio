@@ -281,7 +281,8 @@ app.post(
       );
     }
 
-    await db.webhookResponse.create({
+    // TODO : Change the response type and save the response making sure it's compatible object
+    /*await db.webhookResponse.create({
       id: uuid(),
       webhookId: webhook.id,
       createdAt: Date.now(),
@@ -290,7 +291,7 @@ app.post(
         body: response.response.body,
         status: response.statusCode,
       },
-    });
+    });*/
 
     res.status(204).end();
   }
