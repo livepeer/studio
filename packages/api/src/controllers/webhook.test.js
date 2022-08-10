@@ -190,6 +190,23 @@ describe("controllers/webhook", () => {
       expect(updated.name).toEqual("modified_name");
     });
 
+    it("update the status of a webhook", async () => {
+      const { id } = generatedWebhook;
+      const payload = {
+        response: {
+          webhookId: id,
+          statusCode: 400,
+          response: {
+            body: "",
+            status: 400,
+          },
+        },
+        errorMessage: "Error test",
+      };
+      const res = await client.post(`/webhook/${id}/status`, payload);
+      expect(res.status).toBe(204);
+    });
+
     it("disallows setting webhook for another user", async () => {
       const { id } = generatedWebhook;
       const modifiedHook = { ...generatedWebhook, userId: nonAdminUser.id };
