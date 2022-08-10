@@ -273,7 +273,6 @@ components:
       table: webhook_response
       required:
         - webhookId
-        - eventId
         - statusCode
       additionalProperties: false
       properties:
@@ -696,8 +695,9 @@ components:
       type: object
       additionalProperties: false
       properties:
-        status:
-          $ref: "#/components/schemas/webhook/properties/status"
+        errorMessage:
+          type: string
+          description: Error message if the webhook failed to process the event
         response:
           $ref: "#/components/schemas/webhook-response"
 
