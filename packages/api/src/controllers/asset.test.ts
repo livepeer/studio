@@ -89,7 +89,7 @@ describe("controllers/asset", () => {
   describe("assets table", () => {
     it("should create all indexes defined in the schema", async () => {
       const res = await db.query(
-        "SELECT indexname FROM pg_indexes WHERE tablename = 'asset' WHERE name != 'asset_pkey'"
+        "SELECT indexname FROM pg_indexes WHERE tablename = 'asset' AND indexname != 'asset_pkey'"
       );
       const indexes = res.rows?.map((r: any) => r.indexname).sort();
       expect(indexes).toEqual([
