@@ -25,7 +25,8 @@
     "mux-input",
     "seo-tools",
     "icon-picker",
-    "@sanity/language-filter"
+    "@sanity/language-filter",
+    "@sanity/orderable-document-list"
   ],
   "parts": [
     {
