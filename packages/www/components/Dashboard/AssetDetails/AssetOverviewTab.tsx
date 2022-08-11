@@ -3,6 +3,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
+  Link as A,
   Box,
   Button,
   Flex,
@@ -19,6 +20,8 @@ import { useCallback, useMemo, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import IpfsIcon from "../../../public/img/icons/ipfs-logo.svg";
+import CurlyBracesIcon from "../../../public/img/icons/curly-braces.svg";
+import DatabaseIcon from "../../../public/img/icons/database.svg";
 import { useApi } from "hooks";
 import Spinner from "../Spinner";
 
@@ -27,7 +30,23 @@ const StyledIpfsIcon = styled(IpfsIcon, {
   mr: "$2",
 });
 
-const AssetOverviewTab = ({ asset }: { asset?: Asset | null }) => {
+const StyledCurlyBracesIcon = styled(CurlyBracesIcon, {
+  color: "$gray",
+  mr: "$2",
+});
+
+const StyledDatabaseIcon = styled(DatabaseIcon, {
+  color: "$gray",
+  mr: "$2",
+});
+
+const AssetOverviewTab = ({
+  asset,
+  onEditAsset,
+}: {
+  asset?: Asset | null;
+  onEditAsset: () => void;
+}) => {
   const { patchAsset } = useApi();
 
   // uploading state will exist until the asset is refetched by polling & ipfs CID exists
@@ -55,58 +74,73 @@ const AssetOverviewTab = ({ asset }: { asset?: Asset | null }) => {
   return (
     <>
       <Box>
-        {metadataStringified && (
-          <>
-            <Box
-              css={{
-                borderBottom: "1px solid",
-                borderColor: "$neutral6",
-                pb: "$2",
-                mb: "$3",
-                width: "100%",
-              }}>
-              <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
-                Overview
-              </Heading>
-            </Box>
-            <Promo size="2" css={{ mb: "$5" }}>
-              <CopyToClipboard
-                text={metadataStringified}
-                onCopy={() => openSnackbar("Copied metadata to clipboard")}>
-                <Flex css={{ cursor: "pointer" }}>
-                  <Box>
-                    <Flex align="center">
-                      <Text
-                        size="2"
-                        css={{
-                          fontSize: "14px",
-                          mr: "$1",
-                          fontWeight: 500,
-                        }}>
-                        Metadata
-                      </Text>
-                      <CopyIcon />
-                    </Flex>
-                    <Text variant="gray" size="2" css={{ mt: "$1" }}>
-                      {metadataStringified}
-                    </Text>
-                  </Box>
-                </Flex>
-              </CopyToClipboard>
-            </Promo>
-          </>
-        )}
         <Box
           css={{
-            borderBottom: "1px solid",
-            borderColor: "$neutral6",
-            pb: "$2",
             mb: "$3",
             width: "100%",
           }}>
-          <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
-            Decentralized Storage Providers
-          </Heading>
+          <Flex css={{ mb: "$2" }} align="center">
+            <StyledCurlyBracesIcon />
+            <Heading size="1" css={{ fontWeight: 500 }}>
+              Metadata
+            </Heading>
+          </Flex>
+          <Text variant="gray" size="2">
+            A list of key value pairs that you use to provide metadata for your
+            video.{" "}
+            <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
+              Edit asset
+            </A>{" "}
+            to add metadata.
+          </Text>
+        </Box>
+        <Promo size="2" css={{ mb: "$5" }}>
+          {metadataStringified ? (
+            <CopyToClipboard
+              text={metadataStringified}
+              onCopy={() => openSnackbar("Copied metadata to clipboard")}>
+              <Flex
+                align="center"
+                css={{
+                  cursor: "pointer",
+                  justifyContent: "space-between",
+                }}>
+                <Text variant="gray" size="2">
+                  {metadataStringified}
+                </Text>
+
+                <Box>
+                  <CopyIcon />
+                </Box>
+              </Flex>
+            </CopyToClipboard>
+          ) : (
+            <Text
+              size="3"
+              css={{
+                mr: "$1",
+              }}>
+              No metadata yet
+            </Text>
+          )}
+        </Promo>
+
+        <Box
+          css={{
+            mb: "$3",
+            width: "100%",
+          }}>
+          <Flex css={{ mb: "$2" }} align="center">
+            <StyledDatabaseIcon />
+            <Heading size="1" css={{ fontWeight: 500 }}>
+              Decentralized Storage Providers
+            </Heading>
+          </Flex>
+          <Text variant="gray" size="2">
+            By default video assets are stored in the Livepeer Studio database,
+            but you may also upload them using the following decentralized
+            storage integrations.
+          </Text>
         </Box>
         <Promo size="2">
           <Flex css={{ justifyContent: "space-between" }}>

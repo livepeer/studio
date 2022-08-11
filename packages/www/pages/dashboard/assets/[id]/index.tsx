@@ -41,7 +41,10 @@ const AssetDetails = () => {
         { title: asset?.name },
       ]}>
       {currentTab === "Overview" ? (
-        <AssetOverviewTab asset={asset} />
+        <AssetOverviewTab
+          asset={asset}
+          onEditAsset={() => setEditAssetDialogOpen(true)}
+        />
       ) : (
         <AssetEventLogTab asset={asset} />
       )}

@@ -109,20 +109,20 @@ const EditAssetDialog = ({
               setEditing(false);
             }
           }}>
-          <Flex css={{ mt: "$2" }} direction="column" gap="2">
-            <Label htmlFor="metadata">Metadata</Label>
+          <Flex css={{ mt: "$2" }} direction="column" gap="1">
+            <Label htmlFor="name">Display Name</Label>
             <TextField
               size="2"
-              id="metadata"
+              id="name"
               type="text"
               autoFocus={true}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Name of the VOD content"
+              placeholder="Display name for the VOD asset"
             />
           </Flex>
 
-          <Flex css={{ mt: "$2" }} direction="column" gap="2">
+          <Flex css={{ mt: "$2" }} direction="column" gap="1">
             <Label htmlFor="metadata">Metadata</Label>
             <TextArea
               size="2"

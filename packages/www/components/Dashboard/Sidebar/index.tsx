@@ -42,6 +42,8 @@ export type SidebarId =
   | "home"
   | "streams"
   | "streams/sessions"
+  // /dashboard/stream-health - unhandled in the sidebar
+  | "streams/health"
   | "assets"
   | "developers"
   | "developers/webhooks"

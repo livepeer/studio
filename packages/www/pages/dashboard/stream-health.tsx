@@ -121,7 +121,7 @@ const Health = () => {
 
   return (
     <Layout
-      id="streamHealth"
+      id="streams/health"
       breadcrumbs={[{ title: "Stream Health" }]}
       {...Content.metaData}>
       <Box css={{ padding: "$6" }}>

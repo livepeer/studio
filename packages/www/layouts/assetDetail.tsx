@@ -12,11 +12,16 @@ import {
   HoverCardContent,
   HoverCardRoot,
   HoverCardTrigger,
+  Link as A,
   Status,
   Text,
   useSnackbar,
 } from "@livepeer/design-system";
-import { Pencil1Icon, CopyIcon as Copy } from "@radix-ui/react-icons";
+import {
+  CopyIcon as Copy,
+  DownloadIcon,
+  Pencil1Icon,
+} from "@radix-ui/react-icons";
 import Player from "components/Dashboard/Player";
 import RelativeTime from "components/Dashboard/RelativeTime";
 import Spinner from "components/Dashboard/Spinner";
@@ -124,7 +129,7 @@ const AssetDetail = ({
   activeTab = "Overview",
   editAssetDialogOpen,
   setEditAssetDialogOpen,
-  refetchAsset
+  refetchAsset,
 }: AssetDetailProps) => {
   useLoggedIn();
   const { user, patchAsset } = useApi();
@@ -186,7 +191,6 @@ const AssetDetail = ({
                     justify="between"
                     align="end"
                     css={{
-                      pb: "$3",
                       mb: "$5",
                       width: "100%",
                     }}>
@@ -216,7 +220,7 @@ const AssetDetail = ({
                           borderRadius: "$3",
                           overflow: "hidden",
                           position: "relative",
-                          mb: "$7",
+                          mb: "$5",
                         }}>
                         {asset?.status?.phase === "ready" &&
                         asset.playbackUrl ? (
@@ -458,20 +462,38 @@ const AssetDetail = ({
                       </Box>
                     </Box>
                     <Box css={{ position: "relative", top: "-8px" }}>
-                      <Button
-                        onClick={() => setEditAssetDialogOpen(true)}
-                        variant="primary">
-                        <Box
-                          as={Pencil1Icon}
-                          css={{
-                            mr: "$1",
-                          }}
-                        />
-                        Edit Asset
-                      </Button>
+                      <Flex align="center">
+                        {asset?.downloadUrl && (
+                          <A target="_blank" href={asset?.downloadUrl}>
+                            <Button
+                              css={{
+                                mr: "$1",
+                              }}>
+                              <Box
+                                as={DownloadIcon}
+                                css={{
+                                  mr: "$1",
+                                }}
+                              />
+                              Download
+                            </Button>
+                          </A>
+                        )}
+                        <Button
+                          onClick={() => setEditAssetDialogOpen(true)}
+                          variant="primary">
+                          <Box
+                            as={Pencil1Icon}
+                            css={{
+                              mr: "$1",
+                            }}
+                          />
+                          Edit Asset
+                        </Button>
+                      </Flex>
                     </Box>
                   </Flex>
-                  <Box css={{ py: "$4" }}>{children}</Box>
+                  <Box css={{ py: "$2" }}>{children}</Box>
                 </Box>
               </Flex>
             </>
