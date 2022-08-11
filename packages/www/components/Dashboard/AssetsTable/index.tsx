@@ -114,6 +114,7 @@ const AssetsTable = ({
       });
 
       const [tasks] = await getTasks(userId);
+
       const rows = assets.map((asset) => {
         const source =
           tasks && tasks.find((task) => task.outputAssetId === asset.id);
@@ -157,7 +158,9 @@ const AssetsTable = ({
           storageProviders: {
             children: (
               <Box>
-                {asset?.storage?.ipfs?.cid ? "IPFS" : "Centralized (Google Cloud)"}
+                {asset?.storage?.ipfs?.cid
+                  ? "IPFS"
+                  : "Centralized (Google Cloud)"}
               </Box>
             ),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
@@ -188,13 +191,12 @@ const AssetsTable = ({
           maxWidth: 450,
         }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Create Video on Demand Assets
+          Upload your first Video on Demand asset
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Studio now supports Video on Demand which allows you to
-          import video assets, store them on decentralized storage, and easily
-          mint a video NFT. This functionality is currently in beta and
-          available only on the API.
+          Livepeer Studio supports Video on Demand which allows you to import
+          video assets, store them on decentralized storage, and easily mint a
+          video NFT.
         </Text>
 
         <Box
@@ -221,7 +223,7 @@ const AssetsTable = ({
           variant="primary">
           <PlusIcon />{" "}
           <Box as="span" css={{ ml: "$2" }}>
-            Create asset
+            Upload asset
           </Box>
         </Button>
       </Flex>
@@ -256,7 +258,7 @@ const AssetsTable = ({
             <>
               <PlusIcon />{" "}
               <Box as="span" css={{ ml: "$2" }}>
-                Create asset
+                Upload asset
               </Box>
             </>
           ),

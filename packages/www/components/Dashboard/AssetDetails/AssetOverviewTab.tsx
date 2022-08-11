@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Flex,
+  styled,
   Heading,
   Promo,
   Text,
@@ -13,17 +14,37 @@ import {
 } from "@livepeer/design-system";
 
 import { Asset } from "@livepeer.studio/api";
-import { ArrowRightIcon, CopyIcon } from "@radix-ui/react-icons";
-import { useMemo } from "react";
+import { CopyIcon } from "@radix-ui/react-icons";
+import { useCallback, useMemo, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const AssetOverviewTab = ({
-  asset,
-  onClickEdit,
-}: {
-  asset?: Asset | null;
-  onClickEdit: () => void;
-}) => {
+import IpfsIcon from "../../../public/img/icons/ipfs-logo.svg";
+import { useApi } from "hooks";
+import Spinner from "../Spinner";
+
+const StyledIpfsIcon = styled(IpfsIcon, {
+  color: "$gray",
+  mr: "$2",
+});
+
+const AssetOverviewTab = ({ asset }: { asset?: Asset | null }) => {
+  const { patchAsset } = useApi();
+
+  // uploading state will exist until the asset is refetched by polling & ipfs CID exists
+  const [isUploading, setIsUploading] = useState(false);
+
+  const onClickUploadIpfs = useCallback(async () => {
+    setIsUploading(true);
+
+    if (asset?.id) {
+      await patchAsset(asset.id, {
+        storage: {
+          ipfs: true,
+        },
+      });
+    }
+  }, [asset, patchAsset]);
+
   const [openSnackbar] = useSnackbar();
 
   const metadataStringified = useMemo(
@@ -34,129 +55,126 @@ const AssetOverviewTab = ({
   return (
     <>
       <Box>
+        {metadataStringified && (
+          <>
+            <Box
+              css={{
+                borderBottom: "1px solid",
+                borderColor: "$neutral6",
+                pb: "$2",
+                mb: "$3",
+                width: "100%",
+              }}>
+              <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
+                Overview
+              </Heading>
+            </Box>
+            <Promo size="2" css={{ mb: "$5" }}>
+              <CopyToClipboard
+                text={metadataStringified}
+                onCopy={() => openSnackbar("Copied metadata to clipboard")}>
+                <Flex css={{ cursor: "pointer" }}>
+                  <Box>
+                    <Flex align="center">
+                      <Text
+                        size="2"
+                        css={{
+                          fontSize: "14px",
+                          mr: "$1",
+                          fontWeight: 500,
+                        }}>
+                        Metadata
+                      </Text>
+                      <CopyIcon />
+                    </Flex>
+                    <Text variant="gray" size="2" css={{ mt: "$1" }}>
+                      {metadataStringified}
+                    </Text>
+                  </Box>
+                </Flex>
+              </CopyToClipboard>
+            </Promo>
+          </>
+        )}
         <Box
           css={{
             borderBottom: "1px solid",
             borderColor: "$neutral6",
             pb: "$2",
-            mb: "$7",
+            mb: "$3",
             width: "100%",
           }}>
           <Heading size="1" css={{ fontWeight: 500, mb: "$1" }}>
             Decentralized Storage Providers
           </Heading>
         </Box>
-        <Accordion type="single" defaultValue="accordion-one">
-          <AccordionItem value="accordion-one">
-            <AccordionTrigger css={{ color: "$primary12" }}>
-              <Text size="3" css={{ color: "inherit" }}>
-                IPFS
-              </Text>
-            </AccordionTrigger>
-            <AccordionContent>
-              {!asset?.storage?.ipfs?.cid ? (
-                <>
-                  <Box>
-                    <Text variant="gray" size="3" css={{ mb: "$3" }}>
-                      Easily replicate your VOD content to IPFS. We host an IPFS
-                      node which pins your assets automatically, and provide the
-                      CID for portability to other pinning providers.
-                    </Text>
-                  </Box>
+        <Promo size="2">
+          <Flex css={{ justifyContent: "space-between" }}>
+            <Flex align="center">
+              <StyledIpfsIcon />
 
-                  <Button
-                    onClick={onClickEdit}
-                    css={{
-                      display: "inline-flex",
-                      ai: "center",
-                    }}
-                    size="2"
-                    disabled={Boolean(asset?.status?.phase !== "ready")}
-                    variant="primary">
-                    <Box css={{ mr: "$1" }}>Upload to IPFS</Box>
-                    <ArrowRightIcon />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <CopyToClipboard
-                    text={`ipfs://${asset.storage.ipfs.cid}`}
-                    onCopy={() => openSnackbar("Copied IPFS CID to clipboard")}>
-                    <Promo
-                      size="2"
+              <Text size="3">IPFS</Text>
+            </Flex>
+
+            {!asset?.storage?.ipfs?.cid && (
+              <>
+                <Button
+                  onClick={onClickUploadIpfs}
+                  css={{
+                    display: "inline-flex",
+                    ai: "center",
+                  }}
+                  size="2"
+                  disabled={
+                    Boolean(asset?.status?.phase !== "ready") || isUploading
+                  }
+                  variant="primary">
+                  {isUploading && (
+                    <Spinner
                       css={{
-                        display: "grid",
-                        cursor: "pointer",
-                        gridTemplateColumns: "repeat(2, auto)",
-                      }}>
-                      <Flex>
-                        <Box>
-                          <Flex align="center">
-                            <Text
-                              size="2"
-                              css={{
-                                fontSize: "14px",
-                                mr: "$1",
-                                fontWeight: 500,
-                              }}>
-                              Content Hash
-                            </Text>
-                            <CopyIcon />
-                          </Flex>
-                          <Text
-                            variant="gray"
-                            size="2"
-                            css={{ mt: "$1", lineHeight: 1.4 }}>
-                            ipfs://{asset?.storage?.ipfs?.cid}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    </Promo>
-                  </CopyToClipboard>
-                  {metadataStringified && (
-                    <CopyToClipboard
-                      text={metadataStringified}
-                      onCopy={() =>
-                        openSnackbar("Copied metadata to clipboard")
-                      }>
-                      <Promo
+                        color: "$hiContrast",
+                        width: 16,
+                        height: 16,
+                        mr: "$2",
+                      }}
+                    />
+                  )}
+                  <Box>Upload to IPFS</Box>
+                </Button>
+              </>
+            )}
+          </Flex>
+          {asset?.storage?.ipfs?.cid && (
+            <Box css={{ mt: "$3" }}>
+              <CopyToClipboard
+                text={`ipfs://${asset.storage.ipfs.cid}`}
+                onCopy={() => openSnackbar("Copied IPFS CID to clipboard")}>
+                <Flex css={{ cursor: "pointer" }}>
+                  <Box>
+                    <Flex align="center">
+                      <Text
                         size="2"
                         css={{
-                          mt: "$2",
-                          display: "grid",
-                          cursor: "pointer",
-                          gridTemplateColumns: "repeat(2, auto)",
+                          fontSize: "14px",
+                          mr: "$1",
+                          fontWeight: 500,
                         }}>
-                        <Flex>
-                          <Box>
-                            <Flex align="center">
-                              <Text
-                                size="2"
-                                css={{
-                                  fontSize: "14px",
-                                  mr: "$1",
-                                  fontWeight: 500,
-                                }}>
-                                Metadata
-                              </Text>
-                              <CopyIcon />
-                            </Flex>
-                            <Text
-                              variant="gray"
-                              size="2"
-                              css={{ mt: "$1" }}>
-                              {metadataStringified}
-                            </Text>
-                          </Box>
-                        </Flex>
-                      </Promo>
-                    </CopyToClipboard>
-                  )}
-                </>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+                        Content Hash
+                      </Text>
+                      <CopyIcon />
+                    </Flex>
+                    <Text
+                      variant="gray"
+                      size="2"
+                      css={{ mt: "$1", lineHeight: 1.4 }}>
+                      ipfs://{asset?.storage?.ipfs?.cid}
+                    </Text>
+                  </Box>
+                </Flex>
+              </CopyToClipboard>
+            </Box>
+          )}
+        </Promo>
       </Box>
     </>
   );

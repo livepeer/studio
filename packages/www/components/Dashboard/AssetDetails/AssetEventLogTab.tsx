@@ -1,7 +1,30 @@
 import { Asset } from "@livepeer.studio/api";
 import { Text, Box, Heading } from "@livepeer/design-system";
+import { useApi } from "hooks";
+import { useEffect } from "react";
+
+type AssetEvent = {
+  type: "uploaded";
+}
 
 const AssetEventLogTab = ({ asset }: { asset: Asset }) => {
+  const { getTasks, user } = useApi();
+
+  useEffect(() => {
+    async function fn() {
+      if (user?.id) {
+        const [tasks] = await getTasks(user.id);
+        console.log({
+          tasks: tasks.filter(
+            (task) =>
+              task.outputAssetId === asset.id || task.inputAssetId === asset.id
+          ),
+        });
+      }
+    }
+    fn();
+  }, [getTasks, user?.id]);
+
   return (
     <>
       <Box

@@ -110,6 +110,8 @@ export type AssetDetailProps = {
   activeTab: "Overview" | "Event Logs";
   setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
 
+  refetchAsset: () => void;
+
   editAssetDialogOpen: boolean;
   setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
 };
@@ -122,6 +124,7 @@ const AssetDetail = ({
   activeTab = "Overview",
   editAssetDialogOpen,
   setEditAssetDialogOpen,
+  refetchAsset
 }: AssetDetailProps) => {
   useLoggedIn();
   const { user, patchAsset } = useApi();
@@ -135,18 +138,17 @@ const AssetDetail = ({
 
   const onEditAsset = useCallback(
     async (v: EditAssetReturnValue) => {
-      if (asset?.id) {
+      if (asset?.id && (v?.name || v?.metadata)) {
         await patchAsset(asset.id, {
-          storage: {
-            ipfs: v.enableIpfs,
-          },
+          ...(v?.name ? { name: v.name } : {}),
           ...(v?.metadata
             ? { meta: v.metadata as Record<string, string> }
             : {}),
         });
+        await refetchAsset();
       }
     },
-    [asset, patchAsset]
+    [asset, patchAsset, refetchAsset]
   );
 
   useEffect(() => {

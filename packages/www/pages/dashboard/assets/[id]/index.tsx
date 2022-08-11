@@ -19,10 +19,14 @@ const AssetDetails = () => {
   const { query } = router;
   const id = query.id as string;
 
-  const { data: asset } = useQuery([id], () => getAsset(id), {
-    refetchInterval,
-    enabled: Boolean(id),
-  });
+  const { data: asset, refetch: refetchAsset } = useQuery(
+    [id],
+    () => getAsset(id),
+    {
+      refetchInterval,
+      enabled: Boolean(id),
+    }
+  );
 
   return (
     <AssetDetail
@@ -31,15 +35,13 @@ const AssetDetails = () => {
       setSwitchTab={setCurrentTab}
       editAssetDialogOpen={editAssetDialogOpen}
       setEditAssetDialogOpen={setEditAssetDialogOpen}
+      refetchAsset={() => refetchAsset()}
       breadcrumbs={[
         { title: "Assets", href: "/dashboard/assets" },
         { title: asset?.name },
       ]}>
       {currentTab === "Overview" ? (
-        <AssetOverviewTab
-          asset={asset}
-          onClickEdit={() => setEditAssetDialogOpen(true)}
-        />
+        <AssetOverviewTab asset={asset} />
       ) : (
         <AssetEventLogTab asset={asset} />
       )}

@@ -517,6 +517,8 @@ export const useTableState = <T extends Record<string, unknown>>({
     return JSON.stringify(formatted);
   }, [filters]);
 
+  console.log(stringifiedFilters)
+
   const stateSetter: StateSetter<T> = useMemo(
     () => ({
       setOrder,

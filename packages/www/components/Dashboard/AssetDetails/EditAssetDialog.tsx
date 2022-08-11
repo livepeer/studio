@@ -14,6 +14,7 @@ import {
   Label,
   Text,
   TextArea,
+  TextField,
 } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { useEffect, useMemo, useState } from "react";
@@ -25,7 +26,7 @@ const demoIpfsContent = {
 } as const;
 
 export type EditAssetReturnValue = {
-  enableIpfs: boolean;
+  name: string;
   metadata: Record<string, unknown> | null;
 };
 
@@ -41,12 +42,12 @@ const EditAssetDialog = ({
   asset: Asset;
 }) => {
   const [editing, setEditing] = useState(false);
+  const [name, setName] = useState("");
   const [metadata, setMetadata] = useState("");
   const [metadataError, setMetadataError] = useState("");
-  const [isIpfsEnabled, setIsIpfsEnabled] = useState(true);
 
   useEffect(() => {
-    setIsIpfsEnabled(Boolean(asset?.storage?.ipfs?.cid));
+    setName(asset?.name);
     if (asset?.meta) {
       setMetadata(JSON.stringify(asset?.meta ?? {}, null, 4));
     }
@@ -85,14 +86,14 @@ const EditAssetDialog = ({
           as="form"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (editing) {
+            if (editing || !name) {
               return;
             }
             setMetadataError("");
             setEditing(true);
             try {
               await onEdit({
-                enableIpfs: isIpfsEnabled,
+                name,
                 metadata: metadata ? JSON.parse(metadata) : null,
               });
               onOpenChange(false);
@@ -102,24 +103,23 @@ const EditAssetDialog = ({
                 (error as HttpError)?.status === 422 &&
                 (error as HttpError)?.message?.includes("should be string")
               ) {
-                setMetadataError("Metadata must only contain key value pairs.");
+                setMetadataError("Metadata must only contain string key value pairs.");
               }
             } finally {
               setEditing(false);
             }
           }}>
-          <Flex direction="column" gap="2">
-            <Label htmlFor="firstName">Storage options</Label>
-            <Flex align="center" gap="2">
-              <Checkbox
-                id="isIpfsEnabled"
-                checked={isIpfsEnabled}
-                onCheckedChange={(checked: boolean) =>
-                  setIsIpfsEnabled(checked)
-                }
-              />
-              <Text>IPFS</Text>
-            </Flex>
+          <Flex css={{ mt: "$2" }} direction="column" gap="2">
+            <Label htmlFor="metadata">Metadata</Label>
+            <TextField
+              size="2"
+              id="metadata"
+              type="text"
+              autoFocus={true}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name of the VOD content"
+            />
           </Flex>
 
           <Flex css={{ mt: "$2" }} direction="column" gap="2">
@@ -127,7 +127,6 @@ const EditAssetDialog = ({
             <TextArea
               size="2"
               id="metadata"
-              autoFocus={true}
               value={metadata}
               onChange={(e) => setMetadata(e.target.value)}
               placeholder={JSON.stringify(demoIpfsContent, null, 4)}
@@ -154,7 +153,7 @@ const EditAssetDialog = ({
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
-              disabled={editing || !isMetadataValid}
+              disabled={editing || !isMetadataValid || !name}
               variant="primary">
               {editing && (
                 <Spinner
