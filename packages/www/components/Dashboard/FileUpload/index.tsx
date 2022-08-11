@@ -1,15 +1,18 @@
-import { useMemo } from "react";
 import {
-  Heading,
-  Text,
   Box,
   Flex,
-  Link as A,
+  Heading,
   IconButton,
   ProgressBar,
+  Text,
 } from "@livepeer/design-system";
+import {
+  CheckIcon,
+  Cross2Icon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { useMemo } from "react";
 
 const MAX_FILENAME_LENGTH = 20;
 
@@ -38,8 +41,8 @@ const FileUpload = () => {
         bottom: "$4",
         right: "$6",
         p: "$4",
-        maxWidth: 450,
-        minWidth: 380,
+        maxWidth: 550,
+        minWidth: 420,
         border: "1px solid $neutral6",
         borderRadius: "$3",
         zIndex: 2,
@@ -59,40 +62,58 @@ const FileUpload = () => {
           {hasPendingFileUploads ? "Upload in progress" : "Upload complete"}
         </Heading>
         {hasPendingFileUploads && (
-          <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-            Do not close this page until upload is complete.
-          </Text>
+          <Box
+            css={{
+              borderRadius: "$3",
+              backgroundColor: "$red3",
+              mb: "$2",
+              p: "$2",
+            }}>
+            <Flex align="center">
+              <Box css={{ color: "$red11" }} as={ExclamationTriangleIcon} />
+              <Text css={{ fontWeight: 600, color: "$red11", ml: "$2" }}>
+                Do not close this page until upload is complete.
+              </Text>
+            </Flex>
+          </Box>
         )}
         {fileUploadsFiltered.map((file) => (
           <Flex
             key={file?.file?.name ?? ""}
             align="center"
-            css={{ width: "100%", justifyContent: "space-between" }}>
+            css={{
+              my: "$1",
+              width: "100%",
+              justifyContent: "space-between",
+            }}>
             <Text>
               {file?.file?.name?.length > MAX_FILENAME_LENGTH
                 ? `${file.file.name.slice(0, MAX_FILENAME_LENGTH)}...`
                 : file?.file?.name ?? ""}
             </Text>
             <Flex align="center" css={{ ml: "$3" }}>
-              {file?.completed ? (
-                <>
-                  <Text css={{}} variant="gray">
+              <Box css={{ mr: "$2", width: 120 }}>
+                {file?.completed ? (
+                  <Text size="2" css={{}} variant="gray">
                     {"100% uploaded"}
                   </Text>
-                </>
+                ) : (
+                  <ProgressBar
+                    variant="blue"
+                    value={(file?.progress ?? 0) * 100}
+                  />
+                )}
+              </Box>
+              {file?.completed ? (
+                <Box
+                  as={CheckIcon}
+                  css={{ align: "right", color: "$green9" }}
+                />
               ) : (
-                <>
-                  <Box css={{ mr: "$2", width: 120 }}>
-                    <ProgressBar
-                      variant="blue"
-                      value={(file?.progress ?? 0) * 100}
-                    />
-                  </Box>
-                  <Text css={{ mr: "$2", width: 25 }} variant="gray">
-                    {(Number(file?.progress ?? 0) * 100).toFixed(0)}
-                    {"%"}
-                  </Text>
-                </>
+                <Text size="2" css={{ mr: "$2", width: 25 }} variant="gray">
+                  {(Number(file?.progress ?? 0) * 100).toFixed(0)}
+                  {"%"}
+                </Text>
               )}
             </Flex>
           </Flex>

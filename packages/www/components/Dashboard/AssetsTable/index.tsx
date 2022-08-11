@@ -45,7 +45,7 @@ type AssetsTableData = {
 
 const AssetsTable = ({
   userId,
-  title = "Video on Demand Assets",
+  title = "Assets",
   pageSize = 20,
   tableId,
   viewAll,
@@ -125,7 +125,13 @@ const AssetsTable = ({
           name: {
             id: asset.id,
             value: asset.name,
-            children: asset.name,
+            children:
+              asset.name.length > 24
+                ? asset.name.replace(
+                    asset.name.slice(18, asset.name.length - 6),
+                    "..."
+                  )
+                : asset.name,
             href: `/dashboard/assets/${asset.id}`,
           },
           source: {
