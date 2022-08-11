@@ -38,7 +38,17 @@ const NavLink = styled(A, {
   },
 });
 
-const Sidebar = ({ id }) => {
+export type SidebarId =
+  | "home"
+  | "streams"
+  | "streams/sessions"
+  | "assets"
+  | "developers"
+  | "developers/webhooks"
+  | "billing"
+  | "billing/plans";
+
+const Sidebar = ({ id }: { id: SidebarId }) => {
   const { user, logout } = useApi();
 
   return (

@@ -40,25 +40,8 @@ type AssetsTableData = {
   source: TextCellProps;
   createdAt: DateCellProps;
   updatedAt: DateCellProps;
-  downloadUrl: TextCellProps;
+  storageProviders: TextCellProps;
 };
-
-export type DownloadUrlCellProps = {
-  children?: React.ReactNode;
-  id?: string;
-};
-
-const downloadUrlCell = <D extends TableData>({
-  cell,
-}: CellComponentProps<D, DownloadUrlCellProps>) => (
-  <A
-    variant="primary"
-    target="_blank"
-    href={cell.value.children as string}
-    id={`mp4-link-dropdown-${cell.value.id}`}>
-    {cell.value.children}
-  </A>
-);
 
 const AssetsTable = ({
   userId,
@@ -90,12 +73,6 @@ const AssetsTable = ({
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.name.value", ...params),
       },
-      // {
-      //   Header: "Source",
-      //   accessor: "source",
-      //   Cell: TextCell,
-      //   disableSortBy: true,
-      // },
       {
         Header: "Created",
         accessor: "createdAt",
@@ -111,9 +88,15 @@ const AssetsTable = ({
           dateSort("original.updatedAt.date", ...params),
       },
       {
-        Header: "Download URL",
-        accessor: "downloadUrl",
-        Cell: downloadUrlCell,
+        Header: "Source",
+        accessor: "source",
+        Cell: TextCell,
+        disableSortBy: true,
+      },
+      {
+        Header: "Storage Providers",
+        accessor: "storageProviders",
+        Cell: TextCell,
         disableSortBy: true,
       },
     ],
@@ -135,12 +118,14 @@ const AssetsTable = ({
         const source =
           tasks && tasks.find((task) => task.outputAssetId === asset.id);
         const sourceUrl = get(source, "params.import.url");
+
         return {
           id: asset.id,
           name: {
             id: asset.id,
             value: asset.name,
             children: asset.name,
+            href: `/dashboard/assets/${asset.id}`,
           },
           source: {
             children: (
@@ -149,14 +134,16 @@ const AssetsTable = ({
                 (sourceUrl.indexOf("https://livepeercdn.com") === 0 ||
                   sourceUrl.indexOf("https://cdn.livepeer.com") === 0)
                   ? "Live Stream"
-                  : "Import"}
+                  : "Upload"}
               </Box>
             ),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
           createdAt: {
             date: new Date(asset.createdAt),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
           updatedAt: {
             date:
@@ -165,10 +152,16 @@ const AssetsTable = ({
                 ? new Date(asset.status.updatedAt)
                 : null,
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
-          downloadUrl: {
-            id: asset.id,
-            children: asset.downloadUrl,
+          storageProviders: {
+            children: (
+              <Box>
+                {asset?.storage?.ipfs?.cid ? "IPFS" : "Centralized (Google Cloud)"}
+              </Box>
+            ),
+            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
         };
       });
@@ -240,6 +233,7 @@ const AssetsTable = ({
       <Table
         columns={columns}
         fetcher={fetcher}
+        fetcherOptions={{ refetchInterval: 15000 }}
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}

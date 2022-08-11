@@ -9,6 +9,7 @@ import {
   Webhook,
   StreamPatchPayload,
   ObjectStore,
+  AssetPatchPayload,
   MultistreamTargetPatchPayload,
   Asset,
   Task,
@@ -155,11 +156,12 @@ const makeContext = (
   state: ApiState,
   setState: React.Dispatch<React.SetStateAction<ApiState>>
 ) => {
-  const endpoint = isDevelopment()
-    ? `http://localhost:3004`
-    : isStaging()
-    ? `https://livepeer.monster`
-    : ``;
+  const endpoint = `https://livepeer.monster`;
+  //  isDevelopment()
+  //   ? `http://localhost:3004`
+  //   : isStaging()
+  //   ? `https://livepeer.monster`
+  //   : ``;
   const context = {
     ...state,
     endpoint,
@@ -973,6 +975,30 @@ const makeContext = (
       const nextCursor = getCursor(res.headers.get("link"));
       const count = res.headers.get("X-Total-Count");
       return [assets, nextCursor, count];
+    },
+
+    async getAsset(assetId): Promise<Asset> {
+      const [res, asset] = await context.fetch(`/asset/${assetId}`);
+      if (res.status !== 200) {
+        throw asset && typeof asset === "object"
+          ? { ...asset, status: res.status }
+          : new Error(asset);
+      }
+      return asset;
+    },
+
+    async patchAsset(assetId: string, patch: AssetPatchPayload): Promise<void> {
+      const [res, body] = await context.fetch(`/asset/${assetId}`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (res.status !== 200) {
+        throw new HttpError(res.status, body);
+      }
+      return res;
     },
 
     async getTasks(
