@@ -1,20 +1,18 @@
-import { useMemo } from "react";
 import {
-  Heading,
-  Text,
   Box,
   Flex,
-  Promo,
-  Link as A,
+  Heading,
   IconButton,
   ProgressBar,
+  Text,
 } from "@livepeer/design-system";
-import { useApi } from "hooks";
 import {
   CheckIcon,
   Cross2Icon,
   ExclamationTriangleIcon,
 } from "@radix-ui/react-icons";
+import { useApi } from "hooks";
+import { useMemo } from "react";
 
 const MAX_FILENAME_LENGTH = 20;
 
@@ -43,8 +41,8 @@ const FileUpload = () => {
         bottom: "$4",
         right: "$6",
         p: "$4",
-        maxWidth: 450,
-        minWidth: 400,
+        maxWidth: 550,
+        minWidth: 420,
         border: "1px solid $neutral6",
         borderRadius: "$3",
         zIndex: 2,
@@ -64,14 +62,20 @@ const FileUpload = () => {
           {hasPendingFileUploads ? "Upload in progress" : "Upload complete"}
         </Heading>
         {hasPendingFileUploads && (
-          <Promo css={{ backgroundColor: "$red3", mb: "$2" }}>
+          <Box
+            css={{
+              borderRadius: "$3",
+              backgroundColor: "$red3",
+              mb: "$2",
+              p: "$2",
+            }}>
             <Flex align="center">
               <Box css={{ color: "$red11" }} as={ExclamationTriangleIcon} />
               <Text css={{ fontWeight: 600, color: "$red11", ml: "$2" }}>
                 Do not close this page until upload is complete.
               </Text>
             </Flex>
-          </Promo>
+          </Box>
         )}
         {fileUploadsFiltered.map((file) => (
           <Flex
