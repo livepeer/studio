@@ -117,7 +117,10 @@ export default async function makeApp(params: CliArgs) {
   });
   await webhookCannon.start();
 
-  if (process.env.NODE_ENV === "test") {
+  if (
+    process.env.NODE_ENV === "test" ||
+    process.env.NODE_ENV === "development"
+  ) {
     await setupTestTus();
   } else if (vodObjectStoreId) {
     await setupTus(vodObjectStoreId);

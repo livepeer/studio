@@ -7,12 +7,9 @@ import uuid from "uuid/v4";
 import { makeNextHREF, parseFilters, parseOrder, FieldsMap } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import {
-  UnprocessableEntityError,
-  NotFoundError,
-  BadRequestError,
-} from "../store/errors";
-import { Webhook, WebhookPatchPayload } from "../schema/types";
+import { UnprocessableEntityError, NotFoundError } from "../store/errors";
+import { WebhookStatusPayload } from "../schema/types";
+import { DBWebhook } from "../store/webhook-table";
 
 function validateWebhookPayload(id, userId, createdAt, payload) {
   try {
@@ -232,6 +229,69 @@ app.patch(
       sharedSecret,
       streamId,
     });
+
+    res.status(204).end();
+  }
+);
+
+app.post(
+  "/:id/status",
+  authorizer({ anyAdmin: true }),
+  validatePost("webhook-status-payload"),
+  async (req, res) => {
+    const { id } = req.params;
+    const webhook = await db.webhook.get(id);
+    if (!webhook || webhook.deleted) {
+      return res.status(404).json({ errors: ["webhook not found or deleted"] });
+    }
+
+    const { response, errorMessage } = req.body as WebhookStatusPayload;
+
+    if (!response || !response.response) {
+      return res.status(422).json({ errors: ["missing response in payload"] });
+    }
+    if (!response.response.body && response.response.body !== "") {
+      return res
+        .status(400)
+        .json({ errors: ["missing body in payload response"] });
+    }
+
+    try {
+      const triggerTime = response.createdAt ?? Date.now();
+      let status: DBWebhook["status"] = { lastTriggeredAt: triggerTime };
+      if (
+        response.statusCode >= 300 ||
+        !response.statusCode ||
+        response.statusCode === 0
+      ) {
+        status = {
+          ...status,
+          lastFailure: {
+            error: errorMessage,
+            timestamp: triggerTime,
+            statusCode: response.statusCode,
+            response: response.response.body,
+          },
+        };
+      }
+      await db.webhook.updateStatus(webhook.id, status);
+    } catch (e) {
+      console.log(
+        `Unable to store status of webhook ${webhook.id} url: ${webhook.url}`
+      );
+    }
+
+    // TODO : Change the response type and save the response making sure it's compatible object
+    /*await db.webhookResponse.create({
+      id: uuid(),
+      webhookId: webhook.id,
+      createdAt: Date.now(),
+      statusCode: response.statusCode,
+      response: {
+        body: response.response.body,
+        status: response.statusCode,
+      },
+    });*/
 
     res.status(204).end();
   }
