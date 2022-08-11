@@ -156,12 +156,11 @@ const makeContext = (
   state: ApiState,
   setState: React.Dispatch<React.SetStateAction<ApiState>>
 ) => {
-  const endpoint = `https://livepeer.monster`;
-  //  isDevelopment()
-  //   ? `http://localhost:3004`
-  //   : isStaging()
-  //   ? `https://livepeer.monster`
-  //   : ``;
+  const endpoint = isDevelopment()
+    ? `http://localhost:3004`
+    : isStaging()
+    ? `https://livepeer.monster`
+    : ``;
   const context = {
     ...state,
     endpoint,
