@@ -13,16 +13,5 @@ export default {
       title: "Description",
       type: "string",
     },
-    {
-      name: "apps",
-      title: "Featured Apps",
-      type: "array",
-      of: [
-        {
-          type: "reference",
-          to: [{ type: "app" }],
-        },
-      ],
-    },
   ],
 };
