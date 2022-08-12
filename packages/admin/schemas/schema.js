@@ -52,6 +52,7 @@ import why from "./objects/why";
 import caseStudy from "./objects/caseStudy";
 import reason from "./objects/reason";
 import footer from "./objects/footer";
+import application from "./objects/application";
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -66,6 +67,7 @@ export default createSchema({
     homeFeaturedAppSection,
     homePrinciplesSection,
     app,
+    application,
     cta,
     embedHTML,
     figure,

@@ -8,7 +8,6 @@ import {
   MdHome,
   MdApps,
 } from "react-icons/md";
-import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 
 // We filter document types defined in structure to prevent
 // them from being listed twice

@@ -6084,7 +6084,7 @@
 
 "@sanity/orderable-document-list@^0.0.10":
   version "0.0.10"
-  resolved "https://registry.npmjs.org/@sanity/orderable-document-list/-/orderable-document-list-0.0.10.tgz#44d17b1f12dbbd2824363efb2e5555de5a708571"
+  resolved "https://registry.yarnpkg.com/@sanity/orderable-document-list/-/orderable-document-list-0.0.10.tgz#44d17b1f12dbbd2824363efb2e5555de5a708571"
   integrity sha512-CECPNVi98NKczBzyklv7v+Y44bqZsodviMXU5dq0jaJhmIGU6yrIErSPdOWwg7sotw9Aej/zYn8PD/VKUdCwkw==
   dependencies:
     "@sanity/icons" "^1.2.1"
