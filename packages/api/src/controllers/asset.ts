@@ -448,10 +448,15 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
 
   asset = await createAsset(asset, req.queue);
 
+  let taskType: Task["type"] = "import";
+  const { upload } = toStringValues(req.query);
+  if (req.user.admin && upload === "1") {
+    taskType = "upload" as any;
+  }
   const task = await req.taskScheduler.scheduleTask(
-    "import",
+    taskType,
     {
-      import: {
+      [taskType]: {
         url: req.body.url,
       },
     },
@@ -578,10 +583,15 @@ app.post(
     const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
     asset = await createAsset(asset, req.queue);
+    let taskType: Task["type"] = "import";
+    const { upload } = toStringValues(req.query);
+    if (req.user.admin && upload === "1") {
+      taskType = "upload" as any;
+    }
     const task = await req.taskScheduler.createTask(
-      "import",
+      taskType,
       {
-        import: { uploadedObjectKey },
+        [taskType]: { uploadedObjectKey },
       },
       null,
       asset
