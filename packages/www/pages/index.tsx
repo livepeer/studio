@@ -7,8 +7,6 @@ import FeaturedAppsSection from "@components/Site/FeaturedAppsSection";
 import PrinciplesSection from "@components/Site/PrinciplesSection";
 import { GraphQLClient } from "graphql-request";
 import allHome from "../queries/allHome.gql";
-import allApps from "../queries/allApps.gql";
-
 import { print } from "graphql/language/printer";
 
 const HomePage = (props) => {
@@ -37,20 +35,11 @@ export async function getStaticProps({ locale }) {
     where: { _id: { matches: id[locale] } },
   };
 
-  let homeData: any = await graphQLClient.request(print(allHome), variables);
-
-  // need to make a separate call for reference documentations to get localized version
-  const apps: any = await graphQLClient.request(print(allApps), variables);
-  homeData.allHome[0].featuredAppSection.apps = apps.allApp;
-  if (locale === "en") {
-    homeData.allHome[0].featuredAppSection.apps = apps.allApp.filter(
-      (app) => !app._id.includes("__i18n")
-    );
-  }
+  let data: any = await graphQLClient.request(print(allHome), variables);
 
   return {
     props: {
-      ...homeData.allHome[0],
+      ...data.allHome[0],
       preview: false,
     },
     revalidate: 1,
