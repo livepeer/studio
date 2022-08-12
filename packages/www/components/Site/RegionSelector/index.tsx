@@ -12,7 +12,6 @@ import { useState } from "react";
 
 const Item = ({ active = false, language, locale, flag, ...props }) => (
   <DropdownMenuCheckboxItem
-    checked={active}
     css={{
       borderRadius: 3,
       display: "flex",
