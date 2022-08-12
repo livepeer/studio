@@ -103,7 +103,9 @@ const EditAssetDialog = ({
                 (error as HttpError)?.status === 422 &&
                 (error as HttpError)?.message?.includes("should be string")
               ) {
-                setMetadataError("Metadata must only contain string key value pairs.");
+                setMetadataError(
+                  "Metadata must only contain string key value pairs."
+                );
               }
             } finally {
               setEditing(false);
