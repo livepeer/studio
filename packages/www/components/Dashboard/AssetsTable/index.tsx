@@ -40,7 +40,6 @@ type AssetsTableData = {
   source: TextCellProps;
   createdAt: DateCellProps;
   updatedAt: DateCellProps;
-  storageProviders: TextCellProps;
 };
 
 const AssetsTable = ({
@@ -90,12 +89,6 @@ const AssetsTable = ({
       {
         Header: "Source",
         accessor: "source",
-        Cell: TextCell,
-        disableSortBy: true,
-      },
-      {
-        Header: "Storage Providers",
-        accessor: "storageProviders",
         Cell: TextCell,
         disableSortBy: true,
       },
@@ -158,17 +151,6 @@ const AssetsTable = ({
               asset.status.updatedAt !== asset.createdAt
                 ? new Date(asset.status.updatedAt)
                 : null,
-            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-            href: `/dashboard/assets/${asset.id}`,
-          },
-          storageProviders: {
-            children: (
-              <Box>
-                {asset?.storage?.ipfs?.cid
-                  ? "IPFS"
-                  : "Centralized (Google Cloud)"}
-              </Box>
-            ),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             href: `/dashboard/assets/${asset.id}`,
           },
