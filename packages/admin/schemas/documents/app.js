@@ -1,6 +1,12 @@
+import {
+  orderRankField,
+  orderRankOrdering,
+} from "@sanity/orderable-document-list";
+
 export default {
   name: "app",
   type: "document",
+  orderings: [orderRankOrdering],
   title: "App",
   i18n: true,
   initialValue: {
@@ -16,6 +22,7 @@ export default {
     },
   },
   fields: [
+    orderRankField({ type: "app" }),
     {
       name: "name",
       type: "string",

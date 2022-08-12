@@ -59,16 +59,26 @@ export default () =>
         .icon(MdPerson)
         .schemaType("author")
         .child(S.documentTypeList("author").title("Authors")),
-      S.listItem()
-        .title(`App`)
-        .icon(MdApps)
-        .child(
-          S.documentList()
-            .title(`App`)
-            .schemaType("app")
-            .filter(`_type == "app" && !(_id match 'es-ES')`)
-            .canHandleIntent(S.documentTypeList("app").getCanHandleIntent())
-        ),
+      // S.listItem()
+      //   .title(`App`)
+      //   .icon(MdApps)
+      //   .child(
+      //     S.documentList()
+      //       .title(`App`)
+      //       .schemaType("app")
+      //       .filter(`_type == "app" && !(_id match 'es-ES')`)
+      //       .canHandleIntent(S.documentTypeList("app").getCanHandleIntent())
+      //   ),
+      // Optional configuration
+      orderableDocumentListDeskItem({
+        type: "app",
+        title: "Apps",
+        icon: MdApps,
+        // Required if using multiple lists of the same 'type'
+        id: "orderable-en-projects",
+        // See notes on adding a `filter` below
+        filter: `_type == "app" && !(_id match 'es-ES')`,
+      }),
       S.listItem()
         .title("Use Cases")
         .icon(MdDescription)
