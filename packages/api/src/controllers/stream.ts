@@ -1279,7 +1279,11 @@ export async function terminateStreamReq(
     const protocol =
       req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
 
-    const regionalUrl = `${protocol}://${stream.region}.${req.frontendDomain}/api/stream/${stream.id}/terminate`;
+    const backendDomain = req.frontendDomain.replace(
+      "livepeer.studio",
+      "livepeer.com"
+    );
+    const regionalUrl = `${protocol}://${stream.region}.${backendDomain}/api/stream/${stream.id}/terminate`;
     const redRes = await fetch(regionalUrl, {
       method: "DELETE",
       headers: {
