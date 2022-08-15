@@ -76,8 +76,8 @@ const PrinciplesSection = ({ content }) => {
                 fontSize: 45,
               },
             }}>
-            {(content.principles ?? []).map((principle) => (
-              <Box>{principle}</Box>
+            {(content.principles ?? []).map((principle, i) => (
+              <Box key={i}>{principle}</Box>
             ))}
           </Box>
         </Flex>

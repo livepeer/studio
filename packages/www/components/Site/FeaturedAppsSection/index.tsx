@@ -8,29 +8,6 @@ import BulletedTitle from "@components/Site/BulletedTitle";
 
 type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;
 
-const getItems = () => {
-  return [
-    {
-      title: "Huddle01",
-      description:
-        "The world's first web3 native video meeting solution integrated with Livepeer Studio to deliver video meeting broadcasts and recordings.",
-      href: "https://livepeer.studio/blog/how-huddle01-built-the-worlds-first-web3-meeting-app",
-    },
-    {
-      title: "InFlow Music",
-      description:
-        "A web3 music platform aims to disrupt the industry by offering live music concerts and events to award-winning artists and their fans.",
-      href: "https://livepeer.studio/blog/how-inflow-first-music-platform-web3-economy",
-    },
-    {
-      title: "Korkuma",
-      description:
-        "A live shopping platform aiming to become the next top sales channel for forward-looking ecommerce brands.",
-      href: "https://livepeer.studio/blog/korkuma-immersive-commerce",
-    },
-  ];
-};
-
 function FeaturedAppCard({ onClick, title, description, href }) {
   const visibility = useContext(VisibilityContext);
 

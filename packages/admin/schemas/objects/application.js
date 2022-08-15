@@ -1,20 +1,7 @@
 export default {
-  name: "app",
-  type: "document",
   title: "App",
-  i18n: true,
-  initialValue: {
-    __i18n_lang: "en-US",
-  },
-  i18n: {
-    base: "en-US",
-    languages: ["en-US", "es-ES"],
-    fieldNames: {
-      lang: "__i18n_lang",
-      references: "__i18n_refs",
-      baseReference: "__i18n_base",
-    },
-  },
+  name: "application",
+  type: "object",
   fields: [
     {
       name: "name",

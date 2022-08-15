@@ -37,7 +37,12 @@ export default () =>
         .title("Pages")
         .icon(MdDashboard)
         .schemaType("page")
-        .child(S.documentTypeList("page").title("Pages")),
+        .child(
+          S.documentTypeList("page")
+            .title("Pages")
+            .filter(`_type == "page" && !(_id match 'es-ES')`)
+            .canHandleIntent(S.documentTypeList("app").getCanHandleIntent())
+        ),
       S.listItem()
         .title("Blog Posts")
         .icon(MdDescription)
@@ -54,10 +59,15 @@ export default () =>
         .schemaType("author")
         .child(S.documentTypeList("author").title("Authors")),
       S.listItem()
-        .title("Apps")
+        .title(`App`)
         .icon(MdApps)
-        .schemaType("app")
-        .child(S.documentTypeList("app").title("Apps")),
+        .child(
+          S.documentList()
+            .title(`App`)
+            .schemaType("app")
+            .filter(`_type == "app" && !(_id match 'es-ES')`)
+            .canHandleIntent(S.documentTypeList("app").getCanHandleIntent())
+        ),
       S.listItem()
         .title("Use Cases")
         .icon(MdDescription)

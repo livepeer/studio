@@ -10,6 +10,10 @@ const config = {
   images: {
     domains: ["cdn.sanity.io"],
   },
+  i18n: {
+    locales: ["en", "es"],
+    defaultLocale: "en",
+  },
   async redirects() {
     return [
       {

@@ -36,6 +36,7 @@ import homeGuideSection from "./objects/home/guideSection";
 import homeFeaturedAppSection from "./objects/home/featuredAppSection";
 import homePrinciplesSection from "./objects/home/principlesSection";
 import card from "./objects/card";
+import localeString from "./objects/localeString";
 
 // Landing page sections
 import hero from "./objects/hero";
@@ -50,6 +51,8 @@ import jobsSection from "./objects/jobsSection";
 import why from "./objects/why";
 import caseStudy from "./objects/caseStudy";
 import reason from "./objects/reason";
+import footer from "./objects/footer";
+import application from "./objects/application";
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -64,6 +67,7 @@ export default createSchema({
     homeFeaturedAppSection,
     homePrinciplesSection,
     app,
+    application,
     cta,
     embedHTML,
     figure,
@@ -98,5 +102,7 @@ export default createSchema({
     caseStudy,
     reason,
     card,
+    footer,
+    localeString,
   ]),
 });

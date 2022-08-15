@@ -8,10 +8,16 @@ Ensure Docker is running.
 
 ### Step 2
 
-Start the postgres database.
+Start the postgres database:
 
 ```bash
 yarn run postgres:start
+```
+
+Then start RabbitMQ:
+
+```bash
+yarn run rabbitmq:start
 ```
 
 ### Step 3

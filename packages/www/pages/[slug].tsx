@@ -74,8 +74,7 @@ export async function getStaticPaths() {
   for (const page of allPage) {
     paths.push({ params: { slug: page.slug.current } });
   }
-  // TODO, next errors when it tries to build and /team and /jobs, a page that's already here.
-  // Remove from sanity maybe?
+
   paths = paths.filter(
     (p) => p.params.slug !== "jobs" && p.params.slug !== "team"
   );
@@ -85,20 +84,24 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params, locale }) {
+  const id = {
+    en: "",
+    es: "i18n_es-ES",
+  };
+
   const { slug } = params;
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
 
-  let data: any = await graphQLClient.request(print(allPages), {
-    where: {
-      slug: { current: { eq: slug } },
-    },
-  });
+  const variables = {
+    where: { slug: { current: { eq: slug } }, _id: { matches: id[locale] } },
+  };
+
+  let data: any = await graphQLClient.request(print(allPages), variables);
 
   let page = data.allPage.find((p) => p.slug.current === slug);
-
   return {
     props: {
       ...page,

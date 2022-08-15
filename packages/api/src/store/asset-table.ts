@@ -63,14 +63,17 @@ export const taskOutputToIpfsStorage = (
 
 const ipfsStatusCompat = (
   status: Exclude<DBAsset, WithID<Asset>>["status"]["storage"]["ipfs"]
-): StorageStatus => ({
-  phase: status.taskIds.pending
-    ? "waiting"
-    : status.taskIds.last
-    ? "ready"
-    : "failed",
-  tasks: status.taskIds,
-});
+): StorageStatus =>
+  !status?.taskIds
+    ? { phase: "failed", tasks: {} }
+    : {
+        phase: status.taskIds.pending
+          ? "waiting"
+          : status.taskIds.last
+          ? "ready"
+          : "failed",
+        tasks: status.taskIds,
+      };
 
 // Receives an asset from database and returns it in the new status schema.
 //
@@ -84,9 +87,9 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
         storage: {
           ipfs: {
             spec: asset.storage.ipfs,
-            ...taskOutputToIpfsStorage(asset.status.storage.ipfs.data),
+            ...taskOutputToIpfsStorage(asset.status.storage?.ipfs?.data),
           },
-          status: ipfsStatusCompat(asset.status.storage.ipfs),
+          status: ipfsStatusCompat(asset.status.storage?.ipfs),
         },
         status: _.omit(asset.status, "storage"),
       };
