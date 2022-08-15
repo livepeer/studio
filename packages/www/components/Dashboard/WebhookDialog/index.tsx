@@ -55,10 +55,14 @@ const eventOptions: Webhook["events"] = [
   "multistream.error",
   "multistream.disconnected",
   "asset.created",
-  "asset.status",
-  "task.created",
-  "task.status",
-  "task.finished",
+  "asset.updated",
+  "asset.ready",
+  "asset.failed",
+  "asset.deleted",
+  "task.spawned",
+  "task.updated",
+  "task.completed",
+  "task.failed",
   // "playback.user.new",
 ];
 

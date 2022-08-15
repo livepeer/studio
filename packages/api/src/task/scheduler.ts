@@ -9,6 +9,8 @@ import {
   mergeStorageStatus,
   taskOutputToIpfsStorage,
 } from "../store/asset-table";
+import { RoutingKey } from "../store/queue";
+import { EventKey } from "../store/webhook-table";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -214,12 +216,12 @@ export class TaskScheduler {
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    const task = await this.createTask(type, params, inputAsset, outputAsset);
+    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
     await this.enqueueTask(task);
     return task;
   }
 
-  async createTask(
+  async spawnTask(
     type: Task["type"],
     params: Task["params"],
     inputAsset?: Asset,
@@ -238,11 +240,11 @@ export class TaskScheduler {
         updatedAt: Date.now(),
       },
     });
-    await this.queue.publishWebhook("events.task.created", {
+    await this.queue.publishWebhook("events.task.spawned", {
       type: "webhook_event",
       id: uuid(),
       timestamp: task.createdAt,
-      event: "task.created",
+      event: "task.spawned",
       userId: task.userId,
       payload: {
         task: taskInfo(task),
@@ -269,22 +271,24 @@ export class TaskScheduler {
       ...updates,
     };
     const timestamp = task.status.updatedAt;
-    await this.queue.publishWebhook("events.task.status", {
+    await this.queue.publishWebhook("events.task.updated", {
       type: "webhook_event",
       id: uuid(),
       timestamp,
-      event: "task.status",
+      event: "task.updated",
       userId: task.userId,
       payload: {
         task: taskInfo(task),
       },
     });
     if (task.status.phase === "completed" || task.status.phase === "failed") {
-      await this.queue.publishWebhook("events.task.finished", {
+      let taskEvent: EventKey = `task.${task.status.phase}`;
+      let routingKey: RoutingKey = `events.${taskEvent}`;
+      await this.queue.publishWebhook(routingKey, {
         type: "webhook_event",
         id: uuid(),
         timestamp,
-        event: "task.finished",
+        event: taskEvent,
         userId: task.userId,
         payload: {
           success: task.status.phase === "completed",
@@ -294,28 +298,16 @@ export class TaskScheduler {
     }
   }
 
-  async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
+  async deleteAsset(asset: string | Asset) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
-    updates = {
-      ...updates,
-      status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
-    };
-    await db.asset.update(asset.id, updates);
-    if (!updates.status || updates.status === asset.status) {
-      return;
-    }
-    asset = {
-      ...asset,
-      ...updates,
-    };
-    const timestamp = asset.status.updatedAt;
-    await this.queue.publishWebhook("events.asset.status", {
+    await db.asset.markDeleted(asset.id);
+    await this.queue.publishWebhook("events.asset.deleted", {
       type: "webhook_event",
       id: uuid(),
-      timestamp,
-      event: "asset.status",
+      timestamp: Date.now(),
+      event: "asset.deleted",
       userId: asset.userId,
       payload: {
         asset: {
@@ -324,6 +316,53 @@ export class TaskScheduler {
         },
       },
     });
+  }
+
+  async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
+    if (typeof asset === "string") {
+      asset = await db.asset.get(asset);
+    }
+    const statusChanged =
+      updates.status && asset.status.phase !== updates.status.phase;
+    updates = {
+      ...updates,
+      status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
+    };
+    await db.asset.update(asset.id, updates);
+    asset = {
+      ...asset,
+      ...updates,
+    };
+    const timestamp = asset.status.updatedAt;
+    await this.queue.publishWebhook("events.asset.updated", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp,
+      event: "asset.updated",
+      userId: asset.userId,
+      payload: {
+        asset: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      },
+    });
+    const newPhase = asset.status.phase;
+    if (statusChanged && (newPhase === "ready" || newPhase === "failed")) {
+      let assetEvent: EventKey = `asset.${newPhase}`;
+      let routingKey: RoutingKey = `events.${assetEvent}`;
+      await this.queue.publishWebhook(routingKey, {
+        type: "webhook_event",
+        id: uuid(),
+        timestamp,
+        event: assetEvent,
+        userId: asset.userId,
+        payload: {
+          id: asset.id,
+          snapshot: asset,
+        },
+      });
+    }
   }
 }
 

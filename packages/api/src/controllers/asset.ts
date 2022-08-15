@@ -63,6 +63,18 @@ function validateAssetMeta(meta: Record<string, string>) {
   }
 }
 
+function cleanAssetTracks(asset: WithID<Asset>) {
+  return !asset.videoSpec
+    ? asset
+    : {
+        ...asset,
+        videoSpec: {
+          ...asset.videoSpec,
+          tracks: undefined,
+        },
+      };
+}
+
 async function validateAssetPayload(
   id: string,
   playbackId: string,
@@ -257,12 +269,17 @@ app.use(
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
+    const { details } = toStringValues(req.query);
     const ingest = ingests[0].base;
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
       a = assetWithIpfsUrls(a);
-      if (!req.user.admin) {
-        a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      if (req.user.admin) {
+        return a;
+      }
+      a = db.asset.cleanWriteOnlyResponse(a) as WithID<Asset>;
+      if (!details) {
+        a = cleanAssetTracks(a);
       }
       return a;
     };
@@ -369,6 +386,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (output.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
+
   return res.json(output);
 });
 
@@ -465,7 +483,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   );
 
   res.status(201);
-  res.json({ asset, task });
+  res.json({ asset, task: { id: task.id } });
 };
 
 app.post(
@@ -533,7 +551,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     outputAsset
   );
   res.status(201);
-  res.json({ asset: outputAsset, task });
+  res.json({ asset: outputAsset, task: { id: task.id } });
 };
 app.post(
   "/:id/transcode",
@@ -588,7 +606,7 @@ app.post(
     if (req.user.admin && upload === "1") {
       taskType = "upload" as any;
     }
-    const task = await req.taskScheduler.createTask(
+    const task = await req.taskScheduler.spawnTask(
       taskType,
       {
         [taskType]: { uploadedObjectKey },
@@ -597,7 +615,7 @@ app.post(
       asset
     );
 
-    res.json({ url, tusEndpoint, asset, task });
+    res.json({ url, tusEndpoint, asset, task: { id: task.id } });
   }
 );
 
@@ -770,7 +788,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (!req.user.admin && req.user.id !== asset.userId) {
     throw new ForbiddenError(`users may only delete their own assets`);
   }
-  await db.asset.markDeleted(id);
+  await req.taskScheduler.deleteAsset(asset);
   res.status(204);
   res.end();
 });
