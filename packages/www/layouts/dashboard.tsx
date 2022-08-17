@@ -1,7 +1,8 @@
 import { Box } from "@livepeer/design-system";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
-import Sidebar from "@components/Dashboard/Sidebar";
+import Sidebar, { SidebarId } from "@components/Dashboard/Sidebar";
 import Header from "@components/Dashboard/Header";
+import FileUpload from "@components/Dashboard/FileUpload";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
@@ -28,14 +29,14 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-type Breadcrumb = {
+export type Breadcrumb = {
   title: string;
   href?: string;
 };
-interface Props {
+export interface Props {
   children?: JSX.Element[] | JSX.Element;
   breadcrumbs?: Breadcrumb[];
-  id?: string;
+  id?: SidebarId;
   requireLoggedIn?: boolean;
   title?: string;
   description?: string;
@@ -107,6 +108,7 @@ function DashboardLayout({
               {children}
             </Box>
           </Box>
+          <FileUpload />
         </Elements>
       </Box>
     </>

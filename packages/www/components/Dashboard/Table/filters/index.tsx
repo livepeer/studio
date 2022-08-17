@@ -230,6 +230,7 @@ const TableFilter = ({ items, onDone }: TableFilterProps) => {
                     <Checkbox
                       checked={filter.isOpen}
                       onCheckedChange={onToggleOpen}
+                      onClick={onToggleOpen}
                     />
 
                     <Text

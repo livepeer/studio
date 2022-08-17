@@ -40,29 +40,11 @@ type AssetsTableData = {
   source: TextCellProps;
   createdAt: DateCellProps;
   updatedAt: DateCellProps;
-  downloadUrl: TextCellProps;
 };
-
-export type DownloadUrlCellProps = {
-  children?: React.ReactNode;
-  id?: string;
-};
-
-const downloadUrlCell = <D extends TableData>({
-  cell,
-}: CellComponentProps<D, DownloadUrlCellProps>) => (
-  <A
-    variant="primary"
-    target="_blank"
-    href={cell.value.children as string}
-    id={`mp4-link-dropdown-${cell.value.id}`}>
-    {cell.value.children}
-  </A>
-);
 
 const AssetsTable = ({
   userId,
-  title = "Video on Demand Assets",
+  title = "Assets",
   pageSize = 20,
   tableId,
   viewAll,
@@ -73,7 +55,7 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, createAsset, getTasks } = useApi();
+  const { getAssets, uploadAssets, getTasks } = useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -91,12 +73,6 @@ const AssetsTable = ({
           stringSort("original.name.value", ...params),
       },
       {
-        Header: "Source",
-        accessor: "source",
-        Cell: TextCell,
-        disableSortBy: true,
-      },
-      {
         Header: "Created",
         accessor: "createdAt",
         Cell: DateCell,
@@ -111,9 +87,9 @@ const AssetsTable = ({
           dateSort("original.updatedAt.date", ...params),
       },
       {
-        Header: "Download URL",
-        accessor: "downloadUrl",
-        Cell: downloadUrlCell,
+        Header: "Source",
+        accessor: "source",
+        Cell: TextCell,
         disableSortBy: true,
       },
     ],
@@ -131,16 +107,25 @@ const AssetsTable = ({
       });
 
       const [tasks] = await getTasks(userId);
+
       const rows = assets.map((asset) => {
         const source =
           tasks && tasks.find((task) => task.outputAssetId === asset.id);
         const sourceUrl = get(source, "params.import.url");
+
         return {
           id: asset.id,
           name: {
             id: asset.id,
             value: asset.name,
-            children: asset.name,
+            children:
+              asset.name.length > 24
+                ? asset.name.replace(
+                    asset.name.slice(18, asset.name.length - 6),
+                    "..."
+                  )
+                : asset.name,
+            href: `/dashboard/assets/${asset.id}`,
           },
           source: {
             children: (
@@ -149,14 +134,16 @@ const AssetsTable = ({
                 (sourceUrl.indexOf("https://livepeercdn.com") === 0 ||
                   sourceUrl.indexOf("https://cdn.livepeer.com") === 0)
                   ? "Live Stream"
-                  : "Import"}
+                  : "Upload"}
               </Box>
             ),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
           createdAt: {
             date: new Date(asset.createdAt),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+            href: `/dashboard/assets/${asset.id}`,
           },
           updatedAt: {
             date:
@@ -165,10 +152,7 @@ const AssetsTable = ({
                 ? new Date(asset.status.updatedAt)
                 : null,
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-          },
-          downloadUrl: {
-            id: asset.id,
-            children: asset.downloadUrl,
+            href: `/dashboard/assets/${asset.id}`,
           },
         };
       });
@@ -195,13 +179,12 @@ const AssetsTable = ({
           maxWidth: 450,
         }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Create Video on Demand Assets
+          Upload your first Video on Demand asset
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Studio now supports Video on Demand which allows you to
-          import video assets, store them on decentralized storage, and easily
-          mint a video NFT. This functionality is currently in beta and
-          available only on the API.
+          Livepeer Studio supports Video on Demand which allows you to import
+          video assets, store them on decentralized storage, and easily mint a
+          video NFT.
         </Text>
 
         <Box
@@ -228,7 +211,7 @@ const AssetsTable = ({
           variant="primary">
           <PlusIcon />{" "}
           <Box as="span" css={{ ml: "$2" }}>
-            Create asset
+            Upload asset
           </Box>
         </Button>
       </Flex>
@@ -240,6 +223,7 @@ const AssetsTable = ({
       <Table
         columns={columns}
         fetcher={fetcher}
+        fetcherOptions={{ refetchInterval: 15000 }}
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
@@ -262,7 +246,7 @@ const AssetsTable = ({
             <>
               <PlusIcon />{" "}
               <Box as="span" css={{ ml: "$2" }}>
-                Create asset
+                Upload asset
               </Box>
             </>
           ),
@@ -271,14 +255,14 @@ const AssetsTable = ({
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onCreate={async (assetData) => {
-          const newAsset = await createAsset({
-            name: assetData.name,
-            url: assetData.url,
-          });
-          await state.invalidate();
-          createDialogState.onOff();
-          openSnackbar(`${assetData.name} asset created.`);
+        onCreate={async ({ videoFiles }: { videoFiles: File[] }) => {
+          try {
+            await uploadAssets(videoFiles);
+            await state.invalidate();
+            createDialogState.onOff();
+          } catch (e) {
+            openSnackbar(`Error with uploading videos, please try again.`);
+          }
         }}
       />
     </>

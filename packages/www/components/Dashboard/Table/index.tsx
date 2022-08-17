@@ -1,5 +1,10 @@
 import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
-import { useQuery, useQueryClient, UseQueryResult } from "react-query";
+import {
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
+} from "react-query";
 import {
   useEffect,
   useMemo,
@@ -84,6 +89,7 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
+  fetcherOptions?: UseQueryOptions;
   noPagination?: boolean;
   emptyState?: React.ReactNode;
   viewAll?: string;
@@ -554,7 +560,7 @@ export const useTableState = <T extends Record<string, unknown>>({
 };
 
 const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
-  const { state, fetcher } = props;
+  const { state, fetcher, fetcherOptions } = props;
   const queryKey = [
     state.tableId,
     state.cursor,
