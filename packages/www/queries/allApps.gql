@@ -1,0 +1,20 @@
+query allApp($where: AppFilter) {
+  allApp(where: $where) {
+    _id
+    name
+    description
+    caseStudy {
+      ... on Post {
+        title
+        slug {
+          current
+        }
+      }
+      ... on Route {
+        slug {
+          current
+        }
+      }
+    }
+  }
+}

@@ -27,15 +27,15 @@ export async function getStaticProps({ locale }) {
   );
 
   const id = {
-    en: "home",
-    es: "home__i18n_es-ES",
+    en: "",
+    es: "i18n_es-ES",
   };
 
   const variables = {
     where: { _id: { matches: id[locale] } },
   };
 
-  const data: any = await graphQLClient.request(print(allHome), variables);
+  let data: any = await graphQLClient.request(print(allHome), variables);
 
   return {
     props: {

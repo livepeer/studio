@@ -7,6 +7,8 @@ on:
       - "packages/api/**"
     branches-ignore:
       - latest
+    tags:
+      - "v*"
 
 defaults:
   run:

@@ -19,8 +19,7 @@ export default {
       type: "array",
       of: [
         {
-          type: "reference",
-          to: [{ type: "app" }],
+          type: "application",
         },
       ],
     },
