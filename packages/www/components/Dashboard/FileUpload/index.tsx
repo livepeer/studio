@@ -68,7 +68,7 @@ const FileUpload = () => {
           <Box css={{ position: "absolute", top: "$3", right: "$2" }}>
             <IconButton
               onClick={() => clearFileUploads()}
-              css={{ color: "$whiteA12", cursor: "pointer" }}>
+              css={{ cursor: "pointer" }}>
               <Cross2Icon />
             </IconButton>
           </Box>
