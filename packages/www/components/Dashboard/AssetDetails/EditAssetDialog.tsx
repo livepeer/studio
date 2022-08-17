@@ -21,7 +21,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const demoIpfsContent = {
   name: "Singularity in Heritage - Chapter III #095",
-  tokenID: 316,
+  tokenID: "316",
   image: "ipfs://QmUrkCHzXHFE2DVucEcarXSe7po39mcKereN1wd9k6gQfw/316.jpg",
 } as const;
 

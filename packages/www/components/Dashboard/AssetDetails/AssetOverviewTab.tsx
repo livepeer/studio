@@ -138,7 +138,7 @@ const AssetOverviewTab = ({
           </Flex>
           <Text variant="gray" size="2">
             By default video assets are stored in the Livepeer Studio database,
-            but you may also upload them using the following decentralized
+            but you may also replicate them to the following decentralized
             storage integrations.
           </Text>
         </Box>
@@ -173,7 +173,7 @@ const AssetOverviewTab = ({
                       }}
                     />
                   )}
-                  <Box>Upload to IPFS</Box>
+                  <Box>Save to IPFS</Box>
                 </Button>
               </>
             )}

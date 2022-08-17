@@ -12,7 +12,7 @@ import {
   ExclamationTriangleIcon,
 } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 const MAX_FILENAME_LENGTH = 20;
 
@@ -31,6 +31,21 @@ const FileUpload = () => {
     () => fileUploadsFiltered.some((file) => !file.completed),
     [fileUploadsFiltered]
   );
+
+  useEffect(() => {
+    // if there are currently file uploads pending, show a warning when the user tries to close the tab
+    if (typeof window !== "undefined" && hasPendingFileUploads) {
+      const alertUser = (ev: BeforeUnloadEvent) => {
+        ev.preventDefault();
+        return (ev.returnValue = "Are you sure you want to close?");
+      };
+      window.addEventListener("beforeunload", alertUser);
+
+      return () => {
+        window.removeEventListener("beforeunload", alertUser);
+      };
+    }
+  }, [typeof window, hasPendingFileUploads]);
 
   return fileUploadsFiltered.length === 0 ? (
     <></>
@@ -65,13 +80,13 @@ const FileUpload = () => {
           <Box
             css={{
               borderRadius: "$3",
-              backgroundColor: "$red3",
+              backgroundColor: "$yellow3",
               mb: "$2",
               p: "$2",
             }}>
             <Flex align="center">
-              <Box css={{ color: "$red11" }} as={ExclamationTriangleIcon} />
-              <Text css={{ fontWeight: 600, color: "$red11", ml: "$2" }}>
+              <Box css={{ color: "$yellow11" }} as={ExclamationTriangleIcon} />
+              <Text css={{ fontWeight: 600, color: "$yellow11", ml: "$2" }}>
                 Do not close this page until upload is complete.
               </Text>
             </Flex>

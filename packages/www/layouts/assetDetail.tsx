@@ -202,7 +202,9 @@ const AssetDetail = ({
                             letterSpacing: "0",
                             mr: "$2",
                           }}>
-                          {asset.name}
+                          {asset.name.length > 30
+                            ? `${asset.name.slice(0, 30)}...`
+                            : asset.name}
                         </Box>
                       </Flex>
                     </Heading>
@@ -224,24 +226,7 @@ const AssetDetail = ({
                         }}>
                         {asset?.status?.phase === "ready" &&
                         asset.playbackUrl ? (
-                          <>
-                            <Badge
-                              size="2"
-                              variant="green"
-                              css={{
-                                position: "absolute",
-                                zIndex: 1,
-                                left: 10,
-                                top: 10,
-                                letterSpacing: 0,
-                              }}>
-                              <Box css={{ mr: 5 }}>
-                                <Status size="1" variant="green" />
-                              </Box>
-                              Ready
-                            </Badge>
-                            <Player autoplay={false} src={asset.playbackUrl} />
-                          </>
+                          <Player autoplay={false} src={asset.playbackUrl} />
                         ) : asset?.status?.phase === "failed" ? (
                           <Box
                             css={{
@@ -466,6 +451,7 @@ const AssetDetail = ({
                         {asset?.downloadUrl && (
                           <A target="_blank" href={asset?.downloadUrl}>
                             <Button
+                              size="2"
                               css={{
                                 mr: "$1",
                               }}>
@@ -480,6 +466,7 @@ const AssetDetail = ({
                           </A>
                         )}
                         <Button
+                          size="2"
                           onClick={() => setEditAssetDialogOpen(true)}
                           variant="primary">
                           <Box
