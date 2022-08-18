@@ -143,7 +143,7 @@ const GettingStarted = ({ firstName = "" }) => {
               sample apps.
             </Text>
             <Link
-              href="/docs/guides/application-development/example-app"
+              href="https://docs.livepeer.studio/guides/sampleslib"
               passHref>
               <Button
                 as="a"
