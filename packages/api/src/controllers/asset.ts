@@ -392,7 +392,7 @@ app.get("/", authorizer({}), async (req, res) => {
 
 app.get("/:id", authorizer({}), async (req, res) => {
   const asset = await db.asset.get(req.params.id);
-  if (!asset) {
+  if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }
 
