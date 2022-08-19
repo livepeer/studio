@@ -1118,7 +1118,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   if (
     !stream ||
     stream.deleted ||
-    (stream.userId !== req.user.id && !req.isUIAdmin)
+    (stream.userId !== req.user.id && !req.user.admin)
   ) {
     res.status(404);
     return res.json({ errors: ["not found"] });
