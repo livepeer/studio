@@ -501,7 +501,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   let stream = await db.stream.get(req.params.id);
   if (
     !stream ||
-    ((stream.userId !== req.user.id || stream.deleted) && !req.isUIAdmin)
+    ((stream.userId !== req.user.id || stream.deleted) && !req.user.admin)
   ) {
     // do not reveal that stream exists
     res.status(404);
