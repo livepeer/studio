@@ -277,7 +277,7 @@ export class TaskScheduler {
   }
 
   async retryTask(task: WithID<Task>, event?: messages.TaskResult) {
-    let attempts = task.status.attempts + 1 || 1;
+    let attempts = task.status.attempts + 1 ?? 1;
     if (attempts <= MAX_TASK_RETRIES) {
       const status: Task["status"] = {
         ...task.status,
