@@ -11,7 +11,6 @@ import {
 } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
-import { Console } from "winston/lib/winston/transports";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
