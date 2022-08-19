@@ -308,6 +308,7 @@ const fieldsMap: FieldsMap = {
   updatedAt: { val: `asset.data->'status'->'updatedAt'`, type: "int" },
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
+  playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
