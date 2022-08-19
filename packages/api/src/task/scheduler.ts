@@ -11,6 +11,7 @@ import {
 } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
+import { Console } from "winston/lib/winston/transports";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -18,6 +19,8 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
+const MAX_TASK_RETRIES = 3;
+const TASK_RETRY_DELAY_COEFFICIENT = 15 * 1000;
 export class TaskScheduler {
   queue: Queue;
   running: boolean;
@@ -79,8 +82,11 @@ export class TaskScheduler {
 
     // TODO: bundle all db updates in a single transaction
     if (event.error) {
-      await this.failTask(task, event.error.message);
-      // TODO: retry task
+      if (!event.error.unretriable) {
+        await this.retryTask(task, event);
+      } else {
+        await this.failTask(task, event.error.message);
+      }
       console.log(
         `task event process error: err="${event.error.message}" unretriable=${event.error.unretriable}`
       );
@@ -157,6 +163,7 @@ export class TaskScheduler {
     }
     await this.updateTask(task, {
       status: {
+        ...task.status,
         phase: "completed",
         updatedAt: Date.now(),
       },
@@ -167,11 +174,13 @@ export class TaskScheduler {
 
   private async failTask(task: Task, error: string, output?: Task["output"]) {
     const status = {
+      ...task.status,
       phase: "failed",
       updatedAt: Date.now(),
       errorMessage: error,
     } as const;
     await this.updateTask(task, {
+      ...task.status,
       output,
       status,
     });
@@ -254,7 +263,11 @@ export class TaskScheduler {
   }
 
   async enqueueTask(task: WithID<Task>) {
-    const status: Task["status"] = { phase: "waiting", updatedAt: Date.now() };
+    const status: Task["status"] = {
+      ...task.status,
+      phase: "waiting",
+      updatedAt: Date.now(),
+    };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
@@ -262,6 +275,36 @@ export class TaskScheduler {
       task: taskInfo(task),
     });
     await this.updateTask(task, { status });
+  }
+
+  async retryTask(task: WithID<Task>, event?: messages.TaskResult) {
+    let attempts = task.status.attempts + 1 || 1;
+    if (attempts <= MAX_TASK_RETRIES) {
+      const status: Task["status"] = {
+        ...task.status,
+        attempts: attempts,
+      };
+
+      await this.updateTask(task, { status });
+      task.status = status;
+
+      if (attempts > 1) {
+        // No timeout at first retry, 15 seconds * attempt after that
+        let retryDelay = attempts * TASK_RETRY_DELAY_COEFFICIENT;
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      }
+
+      await this.enqueueTask(task);
+      return true;
+    } else {
+      console.log(
+        `task retry process error: err=max retries reached taskId=${task.id}`
+      );
+      if (event) {
+        await this.failTask(task, event.error.message);
+      }
+      return false;
+    }
   }
 
   async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
