@@ -18,7 +18,7 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
-const MAX_TASK_RETRIES = 3;
+const MAX_RETRY_ATTEMPTS = 3;
 const TASK_RETRY_DELAY_COEFFICIENT = 15 * 1000;
 
 export class TaskScheduler {
@@ -279,7 +279,7 @@ export class TaskScheduler {
 
   async retryTask(task: WithID<Task>, event?: messages.TaskResult) {
     let attempts = task.status.attempts + 1 ?? 1;
-    if (attempts <= MAX_TASK_RETRIES) {
+    if (attempts <= MAX_RETRY_ATTEMPTS) {
       const status: Task["status"] = {
         ...task.status,
         attempts: attempts,
