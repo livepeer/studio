@@ -20,6 +20,7 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
 
 const MAX_TASK_RETRIES = 3;
 const TASK_RETRY_DELAY_COEFFICIENT = 15 * 1000;
+
 export class TaskScheduler {
   queue: Queue;
   running: boolean;
