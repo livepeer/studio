@@ -451,14 +451,10 @@ describe("auth middleware", () => {
       );
       const corsAllowed =
         res.headers.get("access-control-allow-origin") === origin;
-      let body = await res.text();
-      try {
-        body = JSON.parse(body);
-      } catch (e) {}
       return {
         corsAllowed,
         status: res.status,
-        body,
+        body: await res.json().catch((err) => null),
       };
     };
 
@@ -486,13 +482,11 @@ describe("auth middleware", () => {
     it("should allow requests from any origin on always-allowed paths", async () => {
       for (const method of testMethods) {
         for (const origin of testOrigins) {
-          const cors = await fetchCors(
+          await expectAllowed(
             method,
             "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
             origin
-          );
-          expect(cors.body).toBe({});
-          expect(cors.corsAllowed).toBe(true);
+          ).toBe(true);
           await expectAllowed(method, "/playback/1234", origin).toBe(true);
         }
       }
