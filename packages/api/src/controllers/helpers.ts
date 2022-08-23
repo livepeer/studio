@@ -7,7 +7,7 @@ import SendgridClient from "@sendgrid/client";
 import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
@@ -117,11 +117,14 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
-export async function getS3PresignedUrl(
-  vodObjectStoreId: string,
-  objectKey: string
-) {
-  const store = await db.objectStore.get(vodObjectStoreId);
+export interface OSS3Config extends S3ClientConfig {
+  bucket: string;
+}
+
+export async function getObjectStoreS3Config(
+  osId: string
+): Promise<OSS3Config> {
+  const store = await db.objectStore.get(osId);
   const parsed = parseUrl(store.url);
   const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
   const publicUrl = parsed.host;
@@ -131,20 +134,27 @@ export async function getS3PresignedUrl(
     protocol = protocol.split("+")[1];
   }
 
-  const s3Configuration = {
+  return {
     credentials: {
       accessKeyId: vodAccessKey,
       secretAccessKey: vodSecretAccessKey,
     },
     region: vodRegion,
+    bucket: vodBucket,
     signingRegion: vodRegion,
     endpoint: `${protocol}//${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
     forcePathStyle: true,
   };
+}
 
-  const s3 = new S3Client(s3Configuration);
+export async function getS3PresignedUrl(
+  vodObjectStoreId: string,
+  objectKey: string
+) {
+  const config = await getObjectStoreS3Config(vodObjectStoreId);
+  const s3 = new S3Client(config);
   const putCommand = new PutObjectCommand({
-    Bucket: vodBucket,
+    Bucket: config.bucket,
     Key: objectKey,
   });
   const url = await getSignedUrl(s3, putCommand, { expiresIn: 15 * 60 }); // expires in seconds
