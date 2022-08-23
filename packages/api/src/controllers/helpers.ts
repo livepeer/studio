@@ -128,19 +128,24 @@ export async function getObjectStoreS3Config(
   const url = new URL(store.url);
   let protocol = url.protocol;
   if (protocol !== "s3+http" && protocol !== "s3+https") {
-    throw new Error(`Unsupported OS protocol: ${protocol}`);
+    throw new Error(`Unsupported OS URL protocol: ${protocol}`);
   }
   protocol = protocol.substring(3);
-  const [_, vodRegion, vodBucket] = url.pathname.split("/");
+
+  const segs = url.pathname.split("/").slice(1);
+  if (!segs.length || segs.length > 2) {
+    throw new Error(`Invalid OS URL path: ${url.pathname}`);
+  }
+  const [region, bucket] = segs.length === 1 ? ["ignored", segs[0]] : segs;
 
   return {
     credentials: {
       accessKeyId: url.username,
       secretAccessKey: url.password,
     },
-    region: vodRegion,
-    bucket: vodBucket,
-    signingRegion: vodRegion,
+    region,
+    bucket,
+    signingRegion: region,
     endpoint: `${protocol}//${url.hostname}`,
     forcePathStyle: true,
   };
