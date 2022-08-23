@@ -471,7 +471,7 @@ describe("auth middleware", () => {
         await expectAllowed("OPTIONS", "/stream", origin).toBe(true);
         await expectAllowed(
           "OPTIONS",
-          "/asset/upload/eyJhbG.eyJzdWI.SflKx",
+          "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
           origin
         ).toBe(true);
         await expectAllowed("OPTIONS", "/playback/1234", origin).toBe(true);
@@ -484,7 +484,7 @@ describe("auth middleware", () => {
         for (const origin of testOrigins) {
           await expectAllowed(
             method,
-            "/asset/upload/eyJhbG.eyJzdWI.SflKx",
+            "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
             origin
           ).toBe(true);
           await expectAllowed(method, "/playback/1234", origin).toBe(true);
