@@ -132,9 +132,9 @@ export async function getObjectStoreS3Config(
   }
   protocol = protocol.substring(3);
 
-  const segs = url.pathname.split("/").slice(1);
+  const segs = url.pathname.split("/").filter((s, i) => i > 0 && !!s);
   if (!segs.length || segs.length > 2) {
-    throw new Error(`Invalid OS URL path: ${url.pathname}`);
+    throw new Error(`Invalid OS URL path: "${url.pathname}"`);
   }
   const [region, bucket] = segs.length === 1 ? ["ignored", segs[0]] : segs;
 
@@ -146,7 +146,7 @@ export async function getObjectStoreS3Config(
     region,
     bucket,
     signingRegion: region,
-    endpoint: `${protocol}//${url.hostname}`,
+    endpoint: `${protocol}//${url.host}`,
     forcePathStyle: true,
   };
 }
