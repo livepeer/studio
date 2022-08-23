@@ -1,6 +1,7 @@
 import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
 import CutOut from "@components/Site/CutOut";
 import Badge from "@components/Site/Badge";
+import { MdCheckBoxOutlineBlank } from "react-icons/md";
 
 type Cta = {
   href?: string;
@@ -84,8 +85,7 @@ export const Card = ({
             }}>
             {title}
           </Box>
-          <Text
-            size="6"
+          <Box
             css={{
               lineHeight: 1.2,
               color,
@@ -95,7 +95,7 @@ export const Card = ({
               },
             }}>
             {description}
-          </Text>
+          </Box>
         </Box>
       ) : (
         <Box css={{ mt: -2, height: "100%" }}>
@@ -243,7 +243,7 @@ export const Card = ({
                     })`,
                   },
                 }}>
-                <Text
+                <Box
                   css={{
                     lineHeight: 1.2,
                     p: "$4",
@@ -254,7 +254,7 @@ export const Card = ({
                     },
                   }}>
                   {description}
-                </Text>
+                </Box>
               </Box>
             </Box>
           </Flex>
