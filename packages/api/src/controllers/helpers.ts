@@ -125,24 +125,23 @@ export async function getObjectStoreS3Config(
   osId: string
 ): Promise<OSS3Config> {
   const store = await db.objectStore.get(osId);
-  const parsed = parseUrl(store.url);
-  const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
-  const publicUrl = parsed.host;
-  const [_, vodRegion, vodBucket] = parsed.path.split("/");
-  let protocol = parsed.protocol;
-  if (protocol.includes("+")) {
-    protocol = protocol.split("+")[1];
+  const url = new URL(store.url);
+  let protocol = url.protocol;
+  if (protocol !== "s3+http" && protocol !== "s3+https") {
+    throw new Error(`Unsupported OS protocol: ${protocol}`);
   }
+  protocol = protocol.substring(3);
+  const [_, vodRegion, vodBucket] = url.pathname.split("/");
 
   return {
     credentials: {
-      accessKeyId: vodAccessKey,
-      secretAccessKey: vodSecretAccessKey,
+      accessKeyId: url.username,
+      secretAccessKey: url.password,
     },
     region: vodRegion,
     bucket: vodBucket,
     signingRegion: vodRegion,
-    endpoint: `${protocol}//${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
+    endpoint: `${protocol}//${url.hostname}`,
     forcePathStyle: true,
   };
 }
