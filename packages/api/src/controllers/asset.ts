@@ -629,7 +629,7 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 
 async function createTusServer(objectStoreId: string) {
   const s3config = await getObjectStoreS3Config(objectStoreId);
-  const opts: tus.S3StoreOptions | S3ClientConfig = {
+  const opts: tus.S3StoreOptions & S3ClientConfig = {
     ...s3config,
     path: "/upload/tus",
     partSize: 8 * 1024 * 1024,
@@ -637,7 +637,7 @@ async function createTusServer(objectStoreId: string) {
     namingFunction,
   };
   const tusServer = new tus.Server();
-  tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
+  tusServer.datastore = new tus.S3Store(opts);
   tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
   return tusServer;
 }
