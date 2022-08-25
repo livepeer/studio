@@ -45,7 +45,7 @@ describe("controllers/playback", () => {
     beforeEach(async () => {
       await db.objectStore.create({
         id: "mock_vod_store",
-        url: "http://user:password@localhost:8080/us-east-1/vod",
+        url: "s3+http://user:password@localhost:8080/us-east-1/vod",
       });
 
       ({ client, nonAdminToken } = await setupUsers(

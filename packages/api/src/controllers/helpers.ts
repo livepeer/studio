@@ -1,13 +1,14 @@
 import { Crypto } from "@peculiar/webcrypto";
 import { TextEncoder } from "util";
-import { URL, parse as parseUrl } from "url";
+import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
 import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
+import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
@@ -117,39 +118,54 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
+export type OSS3Config = S3ClientConfig &
+  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
+
+export async function getObjectStoreS3Config(
+  osId: string
+): Promise<OSS3Config> {
+  const store = await db.objectStore.get(osId);
+  const url = new URL(store.url);
+  let protocol = url.protocol;
+  if (protocol !== "s3+http:" && protocol !== "s3+https:") {
+    throw new Error(`Unsupported OS URL protocol: ${protocol}`);
+  }
+  protocol = protocol.substring(3);
+
+  let segs = url.pathname.split("/").filter((s, i) => i > 0 && !!s);
+  if (segs.length === 1) {
+    segs = ["ignored", ...segs];
+  } else if (segs.length !== 2) {
+    throw new Error(`Invalid OS URL path: "${url.pathname}"`);
+  }
+  const [region, bucket] = segs;
+  const credentials = {
+    accessKeyId: url.username,
+    secretAccessKey: url.password,
+  };
+  return {
+    ...credentials, // inline credentials for tus config
+    credentials,
+    region,
+    bucket,
+    signingRegion: region,
+    endpoint: `${protocol}//${url.host}`,
+    forcePathStyle: true,
+  };
+}
+
 export async function getS3PresignedUrl(
   vodObjectStoreId: string,
   objectKey: string
 ) {
-  const store = await db.objectStore.get(vodObjectStoreId);
-  const parsed = parseUrl(store.url);
-  const [vodAccessKey, vodSecretAccessKey] = parsed.auth.split(":");
-  const publicUrl = parsed.host;
-  const [_, vodRegion, vodBucket] = parsed.path.split("/");
-  let protocol = parsed.protocol;
-  if (protocol.includes("+")) {
-    protocol = protocol.split("+")[1];
-  }
-
-  const s3Configuration = {
-    credentials: {
-      accessKeyId: vodAccessKey,
-      secretAccessKey: vodSecretAccessKey,
-    },
-    region: vodRegion,
-    signingRegion: vodRegion,
-    endpoint: `${protocol}//${vodAccessKey}:${vodSecretAccessKey}@${publicUrl}`,
-    forcePathStyle: true,
-  };
-
-  const s3 = new S3Client(s3Configuration);
+  const config = await getObjectStoreS3Config(vodObjectStoreId);
+  const s3 = new S3Client(config);
   const putCommand = new PutObjectCommand({
-    Bucket: vodBucket,
+    Bucket: config.bucket,
     Key: objectKey,
   });
-  const url = await getSignedUrl(s3, putCommand, { expiresIn: 15 * 60 }); // expires in seconds
-  console.log(`Signed URL: ${url}`);
-  return url;
+  const expiresIn = 12 * 60 * 60; // 12h in seconds
+  return getSignedUrl(s3, putCommand, { expiresIn });
 }
 
 type EmailParams = {

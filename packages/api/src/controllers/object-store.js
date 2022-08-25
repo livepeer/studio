@@ -158,12 +158,16 @@ app.patch("/:id", authorizer({}), async (req, res) => {
       errors: ["users may change only their own object stores"],
     });
   }
-  if (req.body.disabled === undefined) {
+  const { disabled, url } = req.body;
+  if (
+    (disabled === undefined && url === undefined) ||
+    typeof url !== "string"
+  ) {
     res.status(400);
-    return res.json({ errors: ["disabled field required"] });
+    return res.json({ errors: ["disabled or url fields required"] });
   }
-  console.log(`set object store ${id} disabled=${req.body.disabled}`);
-  await db.objectStore.update(id, { disabled: !!req.body.disabled });
+  console.log(`set object store ${id} disabled=${disabled} url=${url}`);
+  await db.objectStore.update(id, { disabled: !!disabled, url });
   res.status(204);
   res.end();
 });

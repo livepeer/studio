@@ -14,6 +14,7 @@ import {
   FieldsMap,
   toStringValues,
   pathJoin,
+  getObjectStoreS3Config,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -627,28 +628,16 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 };
 
 async function createTusServer(objectStoreId: string) {
-  const os = await db.objectStore.get(objectStoreId);
-
-  const url = new URL(os.url);
-  const [_, vodRegion, vodBucket] = url.pathname.split("/");
-  let protocol = url.protocol;
-  if (protocol.includes("+")) {
-    protocol = protocol.split("+")[1];
-  }
-
-  const opts: tus.S3StoreOptions | S3ClientConfig = {
+  const s3config = await getObjectStoreS3Config(objectStoreId);
+  const opts: tus.S3StoreOptions & S3ClientConfig = {
+    ...s3config,
     path: "/upload/tus",
-    bucket: vodBucket,
-    accessKeyId: url.username,
-    secretAccessKey: url.password,
-    region: vodRegion,
     partSize: 8 * 1024 * 1024,
     tmpDirPrefix: "tus-tmp-files",
-    endpoint: `${protocol}//${url.host}`,
     namingFunction,
   };
   const tusServer = new tus.Server();
-  tusServer.datastore = new tus.S3Store(opts as tus.S3StoreOptions);
+  tusServer.datastore = new tus.S3Store(opts);
   tusServer.on(tus.EVENTS.EVENT_UPLOAD_COMPLETE, onTusUploadComplete(false));
   return tusServer;
 }
