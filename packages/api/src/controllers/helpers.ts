@@ -163,7 +163,7 @@ export async function getS3PresignedUrl(
     Bucket: config.bucket,
     Key: objectKey,
   });
-  const expiresIn = 3 * 60 * 60; // 3h in seconds
+  const expiresIn = 12 * 60 * 60; // 12h in seconds
   return getSignedUrl(s3, putCommand, { expiresIn });
 }
 
