@@ -1,6 +1,6 @@
 import { Crypto } from "@peculiar/webcrypto";
 import { TextEncoder } from "util";
-import { URL, parse as parseUrl } from "url";
+import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
@@ -8,6 +8,7 @@ import express from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
+import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
@@ -117,9 +118,8 @@ export function makeNextHREF(req: express.Request, nextCursor: string) {
   return next.href;
 }
 
-export interface OSS3Config extends S3ClientConfig {
-  bucket: string;
-}
+export type OSS3Config = S3ClientConfig &
+  Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
 
 export async function getObjectStoreS3Config(
   osId: string
@@ -139,12 +139,13 @@ export async function getObjectStoreS3Config(
     throw new Error(`Invalid OS URL path: "${url.pathname}"`);
   }
   const [region, bucket] = segs;
-
+  const credentials = {
+    accessKeyId: url.username,
+    secretAccessKey: url.password,
+  };
   return {
-    credentials: {
-      accessKeyId: url.username,
-      secretAccessKey: url.password,
-    },
+    ...credentials, // inline credentials for tus config
+    credentials,
     region,
     bucket,
     signingRegion: region,
