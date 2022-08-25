@@ -132,11 +132,13 @@ export async function getObjectStoreS3Config(
   }
   protocol = protocol.substring(3);
 
-  const segs = url.pathname.split("/").filter((s, i) => i > 0 && !!s);
-  if (!segs.length || segs.length > 2) {
+  let segs = url.pathname.split("/").filter((s, i) => i > 0 && !!s);
+  if (segs.length === 1) {
+    segs = ["ignored", ...segs];
+  } else if (segs.length !== 2) {
     throw new Error(`Invalid OS URL path: "${url.pathname}"`);
   }
-  const [region, bucket] = segs.length === 1 ? ["ignored", segs[0]] : segs;
+  const [region, bucket] = segs;
 
   return {
     credentials: {
