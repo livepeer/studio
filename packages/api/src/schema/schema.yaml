@@ -1363,9 +1363,9 @@ components:
             errorMessage:
               type: string
               description: Error message if the task failed
-            attempts:
+            retries:
               type: number
-              description: Number of attemps done on the task
+              description: Number of retries done on the task
             step:
               type: string
               description: Step of the task processing

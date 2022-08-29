@@ -11,6 +11,7 @@ import {
 } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
+import { sleep } from "../util";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -18,8 +19,8 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
-const MAX_RETRY_ATTEMPTS = 3;
-const TASK_RETRY_DELAY_COEFFICIENT = 15 * 1000;
+const MAX_RETRIES = 4;
+const TASK_RETRY_BASE_DELAY = 15 * 1000;
 
 export class TaskScheduler {
   queue: Queue;
@@ -82,9 +83,17 @@ export class TaskScheduler {
 
     // TODO: bundle all db updates in a single transaction
     if (event.error) {
-      if (!event.error.unretriable) {
-        await this.retryTask(task, event);
+      if (
+        !event.error.unretriable &&
+        (task.status.retries ?? 0) < MAX_RETRIES
+      ) {
+        await this.retryTask(task);
       } else {
+        if (task.status.retries) {
+          console.log(
+            `task retry process error: err=max retries reached taskId=${task.id}`
+          );
+        }
         await this.failTask(task, event.error.message);
       }
       console.log(
@@ -277,34 +286,23 @@ export class TaskScheduler {
     await this.updateTask(task, { status });
   }
 
-  async retryTask(task: WithID<Task>, event?: messages.TaskResult) {
-    let attempts = task.status.attempts + 1 ?? 1;
-    if (attempts <= MAX_RETRY_ATTEMPTS) {
-      const status: Task["status"] = {
-        ...task.status,
-        attempts: attempts,
-      };
+  async retryTask(task: WithID<Task>) {
+    let retries = (task.status.retries ?? 0) + 1;
+    const status: Task["status"] = {
+      ...task.status,
+      retries: retries,
+    };
 
-      await this.updateTask(task, { status });
-      task.status = status;
+    await this.updateTask(task, { status });
+    task.status = status;
 
-      if (attempts > 1) {
-        // No timeout at first retry, 15 seconds * attempt after that
-        let retryDelay = attempts * TASK_RETRY_DELAY_COEFFICIENT;
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      }
-
-      await this.enqueueTask(task);
-      return true;
-    } else {
-      console.log(
-        `task retry process error: err=max retries reached taskId=${task.id}`
-      );
-      if (event) {
-        await this.failTask(task, event.error.message);
-      }
-      return false;
+    if (retries > 1) {
+      // No timeout at first retry, 15 seconds * attempt after that
+      let retryDelay = retries * TASK_RETRY_BASE_DELAY;
+      await sleep(retryDelay);
     }
+
+    await this.enqueueTask(task);
   }
 
   async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
