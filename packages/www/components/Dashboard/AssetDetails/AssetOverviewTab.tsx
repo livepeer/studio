@@ -139,7 +139,7 @@ const AssetOverviewTab = ({
           <Text variant="gray" size="2">
             By default video assets are stored in the Livepeer Studio database,
             but you may also replicate them to the following decentralized
-            storage integrations.
+            storage providers.
           </Text>
         </Box>
         <Promo size="2">
