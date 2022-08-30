@@ -1,4 +1,4 @@
-import amqp from "amqp-connection-manager";
+import * as amqp from "amqp-connection-manager";
 import { ChannelWrapper, AmqpConnectionManager } from "amqp-connection-manager";
 import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
@@ -152,8 +152,6 @@ export class RabbitQueue implements Queue {
   }
 
   public async close(): Promise<void> {
-    this.connection.removeAllListeners("connect");
-    this.connection.removeAllListeners("disconnect");
     await this.channel.close();
     await this.connection.close();
   }
@@ -207,7 +205,7 @@ export class RabbitQueue implements Queue {
         msg
       )}`
     );
-    await this.channel.publish(EXCHANGES[exchangeName], route, msg, {
+    await this._channelPublish(EXCHANGES[exchangeName], route, msg, {
       persistent: true,
     });
   }
@@ -224,7 +222,7 @@ export class RabbitQueue implements Queue {
     delay = Math.round(delay);
     const delayedQueueName = delayedWebhookQueue(delay);
     // TODO: Find a way to reimplement this without on-demand queues.
-    return this.withSetup(
+    return this._withSetup(
       async (channel: Channel) => {
         await Promise.all([
           channel.assertExchange(delayedQueueName, "topic", {
@@ -245,23 +243,37 @@ export class RabbitQueue implements Queue {
           `emitting delayed message: delay=${delay / 1000}s msg=`,
           msg
         );
-        return this.channel.publish(delayedQueueName, routingKey, msg, {
+        return this._channelPublish(delayedQueueName, routingKey, msg, {
           persistent: true,
         });
       }
     );
   }
 
-  public async withSetup(
+  private async _withSetup<T>(
     setup: amqp.SetupFunc,
-    action: () => Promise<void>
-  ): Promise<void> {
+    action: () => Promise<T>
+  ): Promise<T> {
     await this.channel.addSetup(setup);
     try {
-      await action();
+      return await action();
     } finally {
       // avoid accumulating duplicate setup funcs on the channel manager
       await this.channel.removeSetup(setup, () => {});
+    }
+  }
+
+  private async _channelPublish(
+    exchange: string,
+    routingKey: string,
+    msg: any,
+    opts: amqp.Options.Publish
+  ) {
+    const success = await this.channel.publish(exchange, routingKey, msg, opts);
+    if (!success) {
+      throw new Error(
+        `Failed to publish message ${routingKey}: publish buffer full`
+      );
     }
   }
 }
