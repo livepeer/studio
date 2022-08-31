@@ -181,7 +181,11 @@ export class TaskScheduler {
     return true;
   }
 
-  private async failTask(task: Task, error: string, output?: Task["output"]) {
+  private async failTask(
+    task: WithID<Task>,
+    error: string,
+    output?: Task["output"]
+  ) {
     const status = {
       ...task.status,
       phase: "failed",
@@ -293,11 +297,9 @@ export class TaskScheduler {
       retries: retries,
     };
 
-    await this.updateTask(task, { status });
-    task.status = status;
+    task = await this.updateTask(task, { status });
 
     if (retries > 1) {
-      // No timeout at first retry, 15 seconds * attempt after that
       let retryDelay = retries * TASK_RETRY_BASE_DELAY;
       await sleep(retryDelay);
     }
@@ -305,7 +307,10 @@ export class TaskScheduler {
     await this.enqueueTask(task);
   }
 
-  async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
+  async updateTask(
+    task: WithID<Task>,
+    updates: Pick<Task, "status" | "output">
+  ) {
     await db.task.update(task.id, updates);
     task = {
       ...task,
@@ -337,6 +342,7 @@ export class TaskScheduler {
         },
       });
     }
+    return task;
   }
 
   async deleteAsset(asset: string | Asset) {
