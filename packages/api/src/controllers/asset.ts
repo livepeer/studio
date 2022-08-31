@@ -310,6 +310,7 @@ const fieldsMap: FieldsMap = {
   userId: `asset.data->>'userId'`,
   playbackId: `asset.data->>'playbackId'`,
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
+  phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   meta: `asset.data->>'meta'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
