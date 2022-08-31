@@ -11,12 +11,16 @@ import {
 } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
+import { sleep } from "../util";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
   type: task.type,
   snapshot: task,
 });
+
+const MAX_RETRIES = 4;
+const TASK_RETRY_BASE_DELAY = 15 * 1000;
 
 export class TaskScheduler {
   queue: Queue;
@@ -79,8 +83,19 @@ export class TaskScheduler {
 
     // TODO: bundle all db updates in a single transaction
     if (event.error) {
-      await this.failTask(task, event.error.message);
-      // TODO: retry task
+      if (
+        !event.error.unretriable &&
+        (task.status.retries ?? 0) < MAX_RETRIES
+      ) {
+        await this.retryTask(task);
+      } else {
+        if (task.status.retries) {
+          console.log(
+            `task retry process error: err=max retries reached taskId=${task.id}`
+          );
+        }
+        await this.failTask(task, event.error.message);
+      }
       console.log(
         `task event process error: err="${event.error.message}" unretriable=${event.error.unretriable}`
       );
@@ -157,6 +172,7 @@ export class TaskScheduler {
     }
     await this.updateTask(task, {
       status: {
+        ...task.status,
         phase: "completed",
         updatedAt: Date.now(),
       },
@@ -165,13 +181,19 @@ export class TaskScheduler {
     return true;
   }
 
-  private async failTask(task: Task, error: string, output?: Task["output"]) {
+  private async failTask(
+    task: WithID<Task>,
+    error: string,
+    output?: Task["output"]
+  ) {
     const status = {
+      ...task.status,
       phase: "failed",
       updatedAt: Date.now(),
       errorMessage: error,
     } as const;
     await this.updateTask(task, {
+      ...task.status,
       output,
       status,
     });
@@ -254,7 +276,11 @@ export class TaskScheduler {
   }
 
   async enqueueTask(task: WithID<Task>) {
-    const status: Task["status"] = { phase: "waiting", updatedAt: Date.now() };
+    const status: Task["status"] = {
+      ...task.status,
+      phase: "waiting",
+      updatedAt: Date.now(),
+    };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
       id: uuid(),
@@ -264,7 +290,27 @@ export class TaskScheduler {
     await this.updateTask(task, { status });
   }
 
-  async updateTask(task: Task, updates: Pick<Task, "status" | "output">) {
+  async retryTask(task: WithID<Task>) {
+    let retries = (task.status.retries ?? 0) + 1;
+    const status: Task["status"] = {
+      ...task.status,
+      retries: retries,
+    };
+
+    task = await this.updateTask(task, { status });
+
+    if (retries > 1) {
+      let retryDelay = retries * TASK_RETRY_BASE_DELAY;
+      await sleep(retryDelay);
+    }
+
+    await this.enqueueTask(task);
+  }
+
+  async updateTask(
+    task: WithID<Task>,
+    updates: Pick<Task, "status" | "output">
+  ) {
     await db.task.update(task.id, updates);
     task = {
       ...task,
@@ -296,6 +342,7 @@ export class TaskScheduler {
         },
       });
     }
+    return task;
   }
 
   async deleteAsset(asset: string | Asset) {

@@ -1363,6 +1363,12 @@ components:
             errorMessage:
               type: string
               description: Error message if the task failed
+            retries:
+              type: number
+              description: Number of retries done on the task
+            step:
+              type: string
+              description: Step of the task processing
         output:
           type: object
           additionalProperties: false
