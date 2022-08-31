@@ -10,7 +10,7 @@ const refetchInterval = 5 * 1000;
 
 const AssetDetails = () => {
   const router = useRouter();
-  const { getAsset } = useApi();
+  const { getAsset, getTotalViews } = useApi();
   const [currentTab, setCurrentTab] = useState<"Overview" | "Event Logs">(
     "Overview"
   );
@@ -28,10 +28,20 @@ const AssetDetails = () => {
     }
   );
 
+  const { data: totalViews } = useQuery(
+    [asset?.playbackId],
+    () => getTotalViews(asset?.playbackId),
+    {
+      refetchInterval,
+      enabled: Boolean(asset?.playbackId),
+    }
+  );
+
   return (
     <AssetDetail
       activeTab={currentTab}
       asset={asset}
+      totalViews={totalViews}
       setSwitchTab={setCurrentTab}
       editAssetDialogOpen={editAssetDialogOpen}
       setEditAssetDialogOpen={setEditAssetDialogOpen}

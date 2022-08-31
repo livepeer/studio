@@ -170,7 +170,13 @@ const makeContext = (
         headers.set("authorization", `JWT ${state.token}`);
       }
 
-      url = `${endpoint}/api${url}`;
+      // TODO: remove conditional once we add a route for /api/data
+      if (url.includes("/data")) {
+        url = `${endpoint}${url}`;
+      } else {
+        url = `${endpoint}/api${url}`;
+      }
+
       const res = await fetch(url, {
         ...opts,
         headers,
@@ -1233,6 +1239,18 @@ const makeContext = (
         return info as Version;
       }
       return { tag: "unknown", commit: "unknowm" };
+    },
+
+    async getTotalViews(playbackId): Promise<number> {
+      const [res, totalViews] = await context.fetch(
+        `/data/views/${playbackId}/total`
+      );
+      if (res.status !== 200) {
+        throw totalViews && typeof totalViews === "object"
+          ? { ...totalViews, status: res.status }
+          : new Error(totalViews);
+      }
+      return totalViews[0].startViews;
     },
   };
   return context;
