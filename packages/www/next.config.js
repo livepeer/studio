@@ -209,6 +209,11 @@ const config = {
         destination: "/blog/mint-video-nft-livepeer-studio-polygon",
         permanent: false,
       },
+      {
+        source: "/jobs/:slug",
+        destination: "https://livepeer.org/jobs",
+        permanent: false,
+      },
     ];
   },
 };
