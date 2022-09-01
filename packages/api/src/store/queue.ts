@@ -184,11 +184,6 @@ export class RabbitQueue implements Queue {
     this.ack(data);
   }
 
-  public async sendToQueue(msg: messages.Any): Promise<void> {
-    console.log("emitting ", msg);
-    await this.channel.sendToQueue(QUEUES.events, msg);
-  }
-
   public async publishWebhook(
     route: RoutingKey,
     msg: messages.Any
@@ -270,11 +265,27 @@ export class RabbitQueue implements Queue {
     msg: any,
     opts: amqp.Options.Publish
   ) {
-    const success = await this.channel.publish(exchange, routingKey, msg, opts);
-    if (!success) {
-      throw new Error(
-        `Failed to publish message ${routingKey}: publish buffer full`
+    try {
+      const success = await this.channel.publish(
+        exchange,
+        routingKey,
+        msg,
+        opts
       );
+      if (!success) {
+        throw new Error(
+          `Failed to publish message ${routingKey}: publish buffer full`
+        );
+      }
+    } catch (err) {
+      console.error(
+        `Error publishing message: exchange="${exchange}" routingKey="${routingKey}" err=`,
+        err
+      );
+      if (err?.message?.includes("timeout")) {
+        throw new Error(`Timeout publishing message ${routingKey} to queue`);
+      }
+      throw err;
     }
   }
 }
