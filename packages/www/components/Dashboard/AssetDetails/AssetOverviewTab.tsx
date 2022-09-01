@@ -1,8 +1,4 @@
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
   Link as A,
   Box,
   Button,
@@ -146,7 +142,6 @@ const AssetOverviewTab = ({
           <Flex css={{ justifyContent: "space-between" }}>
             <Flex align="center">
               <StyledIpfsIcon />
-
               <Text size="3">IPFS</Text>
             </Flex>
 
