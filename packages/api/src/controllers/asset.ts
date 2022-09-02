@@ -218,6 +218,7 @@ async function reconcileAssetStorage(
       },
       status: mergeStorageStatus(storage?.status, {
         phase: "waiting",
+        progress: undefined,
         tasks: { pending: task.id },
       }),
     };

@@ -228,6 +228,30 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     updatedAt: Date.now(),
   };
   await req.taskScheduler.updateTask(task, { status });
+  if (task.outputAssetId) {
+    await req.taskScheduler.updateAsset(task.outputAssetId, {
+      status: {
+        phase: "processing",
+        progress: doc.progress,
+        updatedAt: Date.now(),
+      },
+    });
+  }
+  if (task.inputAssetId) {
+    const asset = await db.asset.get(task.inputAssetId);
+    if (task.id === asset?.storage?.status?.tasks.pending) {
+      await req.taskScheduler.updateAsset(asset.id, {
+        storage: {
+          ...asset.storage,
+          status: {
+            ...asset.storage.status,
+            phase: "processing",
+            progress: doc.progress,
+          },
+        },
+      });
+    }
+  }
 
   res.status(200);
   res.json({ id, status });

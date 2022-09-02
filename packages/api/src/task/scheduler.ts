@@ -121,6 +121,7 @@ export class TaskScheduler {
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
+            progress: undefined,
             updatedAt: Date.now(),
           },
         });
@@ -142,6 +143,7 @@ export class TaskScheduler {
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
+            progress: undefined,
             updatedAt: Date.now(),
           },
         });
@@ -158,6 +160,7 @@ export class TaskScheduler {
               },
               status: mergeStorageStatus(inputAsset.storage.status, {
                 phase: "ready",
+                progress: undefined,
                 errorMessage: undefined,
                 tasks: {
                   pending: undefined,
@@ -188,6 +191,7 @@ export class TaskScheduler {
   ) {
     const status = {
       ...task.status,
+      progress: undefined,
       phase: "failed",
       updatedAt: Date.now(),
       errorMessage: error,
@@ -219,6 +223,7 @@ export class TaskScheduler {
               },
               status: mergeStorageStatus(inputAsset.storage.status, {
                 phase: prevSpec ? "reverted" : "failed",
+                progress: undefined,
                 errorMessage: error,
                 tasks: {
                   pending: undefined,
