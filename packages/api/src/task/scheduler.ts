@@ -177,6 +177,8 @@ export class TaskScheduler {
       status: {
         ...task.status,
         phase: "completed",
+        progress: undefined,
+        step: undefined,
         updatedAt: Date.now(),
       },
       output: event.output,
@@ -191,8 +193,9 @@ export class TaskScheduler {
   ) {
     const status = {
       ...task.status,
-      progress: undefined,
       phase: "failed",
+      progress: undefined,
+      step: undefined,
       updatedAt: Date.now(),
       errorMessage: error,
     } as const;
@@ -284,6 +287,8 @@ export class TaskScheduler {
     const status: Task["status"] = {
       ...task.status,
       phase: "waiting",
+      progress: undefined,
+      step: undefined,
       updatedAt: Date.now(),
     };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
@@ -299,7 +304,10 @@ export class TaskScheduler {
     let retries = (task.status.retries ?? 0) + 1;
     const status: Task["status"] = {
       ...task.status,
+      phase: "waiting",
       retries: retries,
+      progress: undefined,
+      step: undefined,
     };
 
     task = await this.updateTask(task, { status });
