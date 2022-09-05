@@ -1351,6 +1351,7 @@ components:
           additionalProperties: false
           readOnly: true
           description: Status of the task
+          required: [phase, updatedAt]
           properties:
             phase:
               type: string

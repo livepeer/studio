@@ -175,10 +175,7 @@ export class TaskScheduler {
     }
     await this.updateTask(task, {
       status: {
-        ...task.status,
         phase: "completed",
-        progress: undefined,
-        step: undefined,
         updatedAt: Date.now(),
       },
       output: event.output,
@@ -191,21 +188,20 @@ export class TaskScheduler {
     error: string,
     output?: Task["output"]
   ) {
-    const status = {
-      ...task.status,
+    const baseStatus: Task["status"] & Asset["status"] = {
       phase: "failed",
-      progress: undefined,
-      step: undefined,
       updatedAt: Date.now(),
       errorMessage: error,
-    } as const;
+    };
     await this.updateTask(task, {
-      ...task.status,
       output,
-      status,
+      status: {
+        ...baseStatus,
+        retries: task.status.retries,
+      },
     });
     if (task.outputAssetId) {
-      await this.updateAsset(task.outputAssetId, { status });
+      await this.updateAsset(task.outputAssetId, { status: baseStatus });
     }
     switch (task.type) {
       case "export":
@@ -285,11 +281,9 @@ export class TaskScheduler {
 
   async enqueueTask(task: WithID<Task>) {
     const status: Task["status"] = {
-      ...task.status,
       phase: "waiting",
-      progress: undefined,
-      step: undefined,
       updatedAt: Date.now(),
+      retries: task.status.retries,
     };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
@@ -303,11 +297,9 @@ export class TaskScheduler {
   async retryTask(task: WithID<Task>) {
     let retries = (task.status.retries ?? 0) + 1;
     const status: Task["status"] = {
-      ...task.status,
       phase: "waiting",
+      updatedAt: Date.now(),
       retries: retries,
-      progress: undefined,
-      step: undefined,
     };
 
     task = await this.updateTask(task, { status });

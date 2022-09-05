@@ -221,11 +221,11 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
       .json({ errors: ["can only update phase to running"] });
   }
   const status: Task["status"] = {
-    ...task.status,
     phase: "running",
+    updatedAt: Date.now(),
+    retries: task.status.retries,
     progress: doc.progress,
     step: doc.step,
-    updatedAt: Date.now(),
   };
   await req.taskScheduler.updateTask(task, { status });
   if (task.outputAssetId) {
