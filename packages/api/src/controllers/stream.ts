@@ -498,6 +498,7 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
 
 app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
+  const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
   if (
     !stream ||
@@ -531,7 +532,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     const ingests = await req.getIngest();
     if (ingests.length) {
       const ingest = ingests[0].base;
-      stream = withRecordingFields(ingest, stream, false);
+      stream = withRecordingFields(ingest, stream, !!forceUrl);
     }
   }
   res.status(200);
