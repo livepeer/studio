@@ -5,10 +5,7 @@ import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
-import {
-  mergeStorageStatus,
-  taskOutputToIpfsStorage,
-} from "../store/asset-table";
+import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
@@ -121,7 +118,6 @@ export class TaskScheduler {
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
-            progress: undefined,
             updatedAt: Date.now(),
           },
         });
@@ -143,7 +139,6 @@ export class TaskScheduler {
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
-            progress: undefined,
             updatedAt: Date.now(),
           },
         });
@@ -158,16 +153,10 @@ export class TaskScheduler {
                 spec: inputAsset.storage.ipfs.spec,
                 ...taskOutputToIpfsStorage(event.output.export.ipfs),
               },
-              status: mergeStorageStatus(inputAsset.storage.status, {
+              status: {
                 phase: "ready",
-                progress: undefined,
-                errorMessage: undefined,
-                tasks: {
-                  pending: undefined,
-                  failed: undefined,
-                  last: task.id,
-                },
-              }),
+                tasks: { last: task.id },
+              },
             },
           });
         }
@@ -220,15 +209,14 @@ export class TaskScheduler {
                 ...inputAsset.storage.ipfs,
                 spec: prevSpec ?? inputAsset.storage.ipfs.spec,
               },
-              status: mergeStorageStatus(inputAsset.storage.status, {
+              status: {
                 phase: prevSpec ? "reverted" : "failed",
-                progress: undefined,
                 errorMessage: error,
                 tasks: {
-                  pending: undefined,
+                  last: inputAsset.storage.status.tasks.last,
                   failed: task.id,
                 },
-              }),
+              },
             },
           });
         }
@@ -376,10 +364,12 @@ export class TaskScheduler {
     }
     const statusChanged =
       updates.status && asset.status.phase !== updates.status.phase;
-    updates = {
-      ...updates,
-      status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
-    };
+    if (!updates.status) {
+      updates = {
+        ...updates,
+        status: { ...asset.status, updatedAt: Date.now() },
+      };
+    }
     await db.asset.update(asset.id, updates);
     asset = {
       ...asset,

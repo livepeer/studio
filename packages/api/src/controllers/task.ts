@@ -232,8 +232,8 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     await req.taskScheduler.updateAsset(task.outputAssetId, {
       status: {
         phase: "processing",
-        progress: doc.progress,
         updatedAt: Date.now(),
+        progress: doc.progress,
       },
     });
   }
@@ -244,9 +244,9 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
         storage: {
           ...asset.storage,
           status: {
-            ...asset.storage.status,
             phase: "processing",
             progress: doc.progress,
+            tasks: asset.storage.status.tasks,
           },
         },
       });

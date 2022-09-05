@@ -38,7 +38,6 @@ import {
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
-import { mergeStorageStatus } from "../store/asset-table";
 import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
@@ -216,11 +215,13 @@ async function reconcileAssetStorage(
         ...storage?.ipfs,
         spec: newSpec,
       },
-      status: mergeStorageStatus(storage?.status, {
+      status: {
         phase: "waiting",
-        progress: undefined,
-        tasks: { pending: task.id },
-      }),
+        tasks: {
+          ...storage?.status?.tasks,
+          pending: task.id,
+        },
+      },
     };
   }
   return storage;
