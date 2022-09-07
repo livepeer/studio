@@ -140,8 +140,8 @@ export async function getObjectStoreS3Config(
   }
   const [region, bucket] = segs;
   const credentials = {
-    accessKeyId: url.username,
-    secretAccessKey: url.password,
+    accessKeyId: decodeURIComponent(url.username),
+    secretAccessKey: decodeURIComponent(url.password),
   };
   return {
     ...credentials, // inline credentials for tus config
