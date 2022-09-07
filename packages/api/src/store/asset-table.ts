@@ -61,6 +61,8 @@ export const taskOutputToIpfsStorage = (
             },
       };
 
+type StorageStatus = Asset["storage"]["status"];
+
 const ipfsStatusCompat = (
   status: Exclude<DBAsset, WithID<Asset>>["status"]["storage"]["ipfs"]
 ): StorageStatus =>
@@ -93,20 +95,6 @@ const assetStatusCompat = (asset: DBAsset): WithID<Asset> =>
         },
         status: _.omit(asset.status, "storage"),
       };
-
-type StorageStatus = Asset["storage"]["status"];
-
-export const mergeStorageStatus = <S extends StorageStatus>(
-  s1: S,
-  s2: Partial<S>
-): S => ({
-  ...s1,
-  ...s2,
-  tasks: {
-    ...s1?.tasks,
-    ...s2?.tasks,
-  },
-});
 
 // This is mostly a compatibility helper which transforms assets read from the
 // database into the new schema (with status object instead of status string).

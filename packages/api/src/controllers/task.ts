@@ -221,13 +221,37 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
       .json({ errors: ["can only update phase to running"] });
   }
   const status: Task["status"] = {
-    ...task.status,
     phase: "running",
+    updatedAt: Date.now(),
+    retries: task.status.retries,
     progress: doc.progress,
     step: doc.step,
-    updatedAt: Date.now(),
   };
   await req.taskScheduler.updateTask(task, { status });
+  if (task.outputAssetId) {
+    await req.taskScheduler.updateAsset(task.outputAssetId, {
+      status: {
+        phase: "processing",
+        updatedAt: Date.now(),
+        progress: doc.progress,
+      },
+    });
+  }
+  if (task.inputAssetId) {
+    const asset = await db.asset.get(task.inputAssetId);
+    if (task.id === asset?.storage?.status?.tasks.pending) {
+      await req.taskScheduler.updateAsset(asset.id, {
+        storage: {
+          ...asset.storage,
+          status: {
+            phase: "processing",
+            progress: doc.progress,
+            tasks: asset.storage.status.tasks,
+          },
+        },
+      });
+    }
+  }
 
   res.status(200);
   res.json({ id, status });

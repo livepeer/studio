@@ -1006,9 +1006,14 @@ components:
                   description: Phase of the asset storage
                   enum:
                     - waiting
+                    - processing
                     - ready
                     - failed
                     - reverted
+                progress:
+                  type: number
+                  description:
+                    Current progress of the task updating the storage.
                 errorMessage:
                   type: string
                   description: Error message if the last storage changed failed.
@@ -1041,6 +1046,7 @@ components:
               description: Phase of the asset
               enum:
                 - waiting
+                - processing
                 - ready
                 - failed
             updatedAt:
@@ -1048,6 +1054,9 @@ components:
               description:
                 Timestamp (in milliseconds) at which the asset was last updated
               example: 1587667174725
+            progress:
+              type: number
+              description: Current progress of the task creating this asset.
             errorMessage:
               type: string
               description: Error message if the asset creation failed.
@@ -1342,6 +1351,7 @@ components:
           additionalProperties: false
           readOnly: true
           description: Status of the task
+          required: [phase, updatedAt]
           properties:
             phase:
               type: string
@@ -1359,7 +1369,7 @@ components:
               example: 1587667174725
             progress:
               type: number
-              description: Current progress of the task in a 0-100 percentage
+              description: Current progress of the task in a 0-1 ratio
             errorMessage:
               type: string
               description: Error message if the task failed

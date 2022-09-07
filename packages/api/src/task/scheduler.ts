@@ -5,10 +5,7 @@ import Queue from "../store/queue";
 import { Asset, Task } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
-import {
-  mergeStorageStatus,
-  taskOutputToIpfsStorage,
-} from "../store/asset-table";
+import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
@@ -19,8 +16,8 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
-const MAX_RETRIES = 4;
-const TASK_RETRY_BASE_DELAY = 15 * 1000;
+const MAX_RETRIES = 2;
+const TASK_RETRY_BASE_DELAY = 30 * 1000;
 
 export class TaskScheduler {
   queue: Queue;
@@ -87,7 +84,7 @@ export class TaskScheduler {
         !event.error.unretriable &&
         (task.status.retries ?? 0) < MAX_RETRIES
       ) {
-        await this.retryTask(task);
+        await this.retryTask(task, event.error.message);
       } else {
         if (task.status.retries) {
           console.log(
@@ -156,15 +153,10 @@ export class TaskScheduler {
                 spec: inputAsset.storage.ipfs.spec,
                 ...taskOutputToIpfsStorage(event.output.export.ipfs),
               },
-              status: mergeStorageStatus(inputAsset.storage.status, {
+              status: {
                 phase: "ready",
-                errorMessage: undefined,
-                tasks: {
-                  pending: undefined,
-                  failed: undefined,
-                  last: task.id,
-                },
-              }),
+                tasks: { last: task.id },
+              },
             },
           });
         }
@@ -172,7 +164,6 @@ export class TaskScheduler {
     }
     await this.updateTask(task, {
       status: {
-        ...task.status,
         phase: "completed",
         updatedAt: Date.now(),
       },
@@ -186,19 +177,20 @@ export class TaskScheduler {
     error: string,
     output?: Task["output"]
   ) {
-    const status = {
-      ...task.status,
+    const baseStatus: Task["status"] & Asset["status"] = {
       phase: "failed",
       updatedAt: Date.now(),
       errorMessage: error,
-    } as const;
+    };
     await this.updateTask(task, {
-      ...task.status,
       output,
-      status,
+      status: {
+        ...baseStatus,
+        retries: task.status.retries,
+      },
     });
     if (task.outputAssetId) {
-      await this.updateAsset(task.outputAssetId, { status });
+      await this.updateAsset(task.outputAssetId, { status: baseStatus });
     }
     switch (task.type) {
       case "export":
@@ -217,14 +209,14 @@ export class TaskScheduler {
                 ...inputAsset.storage.ipfs,
                 spec: prevSpec ?? inputAsset.storage.ipfs.spec,
               },
-              status: mergeStorageStatus(inputAsset.storage.status, {
+              status: {
                 phase: prevSpec ? "reverted" : "failed",
                 errorMessage: error,
                 tasks: {
-                  pending: undefined,
+                  last: inputAsset.storage.status.tasks.last,
                   failed: task.id,
                 },
-              }),
+              },
             },
           });
         }
@@ -277,9 +269,9 @@ export class TaskScheduler {
 
   async enqueueTask(task: WithID<Task>) {
     const status: Task["status"] = {
-      ...task.status,
       phase: "waiting",
       updatedAt: Date.now(),
+      retries: task.status.retries,
     };
     await this.queue.publish("task", `task.trigger.${task.type}.${task.id}`, {
       type: "task_trigger",
@@ -290,20 +282,17 @@ export class TaskScheduler {
     await this.updateTask(task, { status });
   }
 
-  async retryTask(task: WithID<Task>) {
+  async retryTask(task: WithID<Task>, errorMessage: string) {
     let retries = (task.status.retries ?? 0) + 1;
     const status: Task["status"] = {
-      ...task.status,
+      phase: "waiting",
+      updatedAt: Date.now(),
       retries: retries,
+      errorMessage,
     };
 
     task = await this.updateTask(task, { status });
-
-    if (retries > 1) {
-      let retryDelay = retries * TASK_RETRY_BASE_DELAY;
-      await sleep(retryDelay);
-    }
-
+    await sleep(retries * TASK_RETRY_BASE_DELAY);
     await this.enqueueTask(task);
   }
 
@@ -371,10 +360,12 @@ export class TaskScheduler {
     }
     const statusChanged =
       updates.status && asset.status.phase !== updates.status.phase;
-    updates = {
-      ...updates,
-      status: { ...asset.status, updatedAt: Date.now(), ...updates.status },
-    };
+    if (!updates.status) {
+      updates = {
+        ...updates,
+        status: { ...asset.status, updatedAt: Date.now() },
+      };
+    }
     await db.asset.update(asset.id, updates);
     asset = {
       ...asset,
