@@ -16,8 +16,8 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
-const MAX_RETRIES = 4;
-const TASK_RETRY_BASE_DELAY = 15 * 1000;
+const MAX_RETRIES = 2;
+const TASK_RETRY_BASE_DELAY = 30 * 1000;
 
 export class TaskScheduler {
   queue: Queue;
@@ -291,12 +291,7 @@ export class TaskScheduler {
     };
 
     task = await this.updateTask(task, { status });
-
-    if (retries > 1) {
-      let retryDelay = retries * TASK_RETRY_BASE_DELAY;
-      await sleep(retryDelay);
-    }
-
+    await sleep(retries * TASK_RETRY_BASE_DELAY);
     await this.enqueueTask(task);
   }
 
