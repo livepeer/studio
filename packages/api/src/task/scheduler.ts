@@ -84,7 +84,7 @@ export class TaskScheduler {
         !event.error.unretriable &&
         (task.status.retries ?? 0) < MAX_RETRIES
       ) {
-        await this.retryTask(task);
+        await this.retryTask(task, event.error.message);
       } else {
         if (task.status.retries) {
           console.log(
@@ -282,12 +282,13 @@ export class TaskScheduler {
     await this.updateTask(task, { status });
   }
 
-  async retryTask(task: WithID<Task>) {
+  async retryTask(task: WithID<Task>, errorMessage: string) {
     let retries = (task.status.retries ?? 0) + 1;
     const status: Task["status"] = {
       phase: "waiting",
       updatedAt: Date.now(),
       retries: retries,
+      errorMessage,
     };
 
     task = await this.updateTask(task, { status });
