@@ -397,6 +397,10 @@ const StreamDetail = ({
                           anchor={false}
                         />
                       </Cell>
+                      <Cell css={{ color: "$primary11" }}>Playback ID</Cell>
+                      <Cell>
+                        <ClipBut text={stream.playbackId} />
+                      </Cell>
                       <Cell css={{ color: "$primary11" }}>Playback URL</Cell>
                       <Cell css={{ cursor: "pointer" }}>
                         <ShowURL
@@ -407,15 +411,6 @@ const StreamDetail = ({
                           )}
                           anchor={false}
                         />
-                        <Tooltip
-                          content={
-                            <Box>
-                              We changed our playback domain, but
-                              cdn.livepeer.com is still working.
-                            </Box>
-                          }>
-                          <Help />
-                        </Tooltip>
                       </Cell>
                       <Cell css={{ color: "$primary11" }}>Record sessions</Cell>
                       <Cell>
