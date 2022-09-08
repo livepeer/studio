@@ -174,7 +174,9 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
 app.put("/:id", authorizer({}), validatePost("webhook"), async (req, res) => {
   // modify a specific webhook
-  const webhook = await req.store.get(`webhook/${req.body.id}`);
+  const webhook = await req.store.get(
+    `webhook/${req.params.id || req.body.id}`
+  );
   if ((webhook.userId !== req.user.id || webhook.deleted) && !req.user.admin) {
     // do not reveal that webhooks exists
     res.status(404);
