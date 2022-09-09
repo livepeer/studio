@@ -56,9 +56,7 @@ Object.keys(themes).map(
   (key, _index) => (themeMap[themes[key].className] = themes[key].className)
 );
 
-const livepeerClient = createReactClient({
-  provider: studioProvider({ apiKey: "b05094e0-05b6-4260-b462-bae581fdcf13" }), // TODO: replace with env var
-});
+const livepeerClient = createReactClient({ provider: studioProvider() });
 
 const App = ({ Component, pageProps }) => {
   globalStyles();
