@@ -253,7 +253,7 @@ const AssetDetail = ({
                         }}>
                         {asset?.status?.phase === "ready" &&
                         asset.playbackUrl ? (
-                          <Player autoplay={false} src={asset.playbackUrl} />
+                          <Player src={asset.playbackUrl} autoPlay={false} />
                         ) : asset?.status?.phase === "failed" ? (
                           <Box
                             css={{

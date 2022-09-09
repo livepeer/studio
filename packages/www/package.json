@@ -23,6 +23,7 @@
     "@emotion/styled": "^10.0.23",
     "@livepeer.studio/api": "^0.7.5",
     "@livepeer/design-system": "^1.0.3",
+    "@livepeer/react": "^0.3.0",
     "@livepeer/video-nft": "^0.3.2",
     "@mdx-js/loader": "^1.6.16",
     "@mdx-js/mdx": "^1.6.16",
@@ -46,6 +47,7 @@
     "@theme-ui/presets": "0.3.0",
     "codesandbox": "^2.2.3",
     "date-fns": "^2.16.1",
+    "ethers": "^5.7.0",
     "eventsource": "^1.1.0",
     "filenamify": "^4.3.0",
     "fs": "^0.0.1-security",
@@ -57,6 +59,7 @@
     "jsonp": "^0.2.1",
     "keen-slider": "^5.4.0",
     "lazysizes": "^5.2.0",
+    "livepeer": "^0.3.0",
     "lodash.omit": "^4.5.0",
     "markdown-it": "^11.0.0",
     "markdown-it-anchor": "^5.3.0",
@@ -119,9 +122,7 @@
     "url": "^0.11.0",
     "uslug": "^1.0.4",
     "uuid": "^8.3.2",
-    "video.js": "^7.15.4",
-    "videojs-contrib-quality-levels": "^2.1.0",
-    "videojs-hls-quality-selector": "^1.1.4"
+    "wagmi": "^0.6.5"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
