@@ -344,6 +344,12 @@ const AssetDetail = ({
                         {asset?.playbackUrl && (
                           <>
                             <Cell css={{ color: "$primary11" }}>
+                              Playback ID
+                            </Cell>
+                            <Cell>
+                              <ClipBut text={asset.playbackId} />
+                            </Cell>
+                            <Cell css={{ color: "$primary11" }}>
                               Playback URL
                             </Cell>
                             <Cell css={{ cursor: "pointer" }}>
