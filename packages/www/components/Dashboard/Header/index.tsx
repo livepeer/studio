@@ -290,7 +290,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Box css={{ position: "absolute", right: "6px", top: "-12px" }}>
                 <StyledPolygonIcon />
               </Box>
-              <Text size="2" css={{ mb: "$3", color: "$primary9" }}>
+              <Text size="2" css={{ mb: "$3", color: "$hiContrast" }}>
                 HELP
               </Text>
               <Link href="https://docs.livepeer.studio" passHref>

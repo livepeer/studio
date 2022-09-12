@@ -361,13 +361,13 @@ const StreamDetail = ({
                         fontSize: "$2",
                         position: "relative",
                       }}>
-                      <Cell css={{ color: "$primary11" }}>Stream name</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Stream name</Cell>
                       <Cell>{stream.name}</Cell>
-                      <Cell css={{ color: "$primary11" }}>Stream ID</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Stream ID</Cell>
                       <Cell>
                         <ClipBut text={stream.id} />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Stream key</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Stream key</Cell>
                       <Cell>
                         {keyRevealed ? (
                           <Flex>
@@ -382,11 +382,13 @@ const StreamDetail = ({
                           </Button>
                         )}
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>RTMP ingest URL</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>
+                        RTMP ingest URL
+                      </Cell>
                       <Cell css={{ cursor: "pointer" }}>
                         <ShowURL url={globalIngestUrl} anchor={false} />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>SRT ingest URL</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
                       <Cell css={{ cursor: "pointer" }}>
                         <ShowURL
                           url={globalSrtIngestUrl}
@@ -397,11 +399,11 @@ const StreamDetail = ({
                           anchor={false}
                         />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Playback ID</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Playback ID</Cell>
                       <Cell>
                         <ClipBut text={stream.playbackId} />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Playback URL</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
                       <Cell css={{ cursor: "pointer" }}>
                         <ShowURL
                           url={globalPlaybackUrl}
@@ -412,7 +414,9 @@ const StreamDetail = ({
                           anchor={false}
                         />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Record sessions</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>
+                        Record sessions
+                      </Cell>
                       <Cell>
                         <Flex css={{ position: "relative", top: "2px" }}>
                           <Box css={{ mr: "$2" }}>
@@ -436,7 +440,7 @@ const StreamDetail = ({
                           </Tooltip>
                         </Flex>
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Created at</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
                       <Cell>
                         <RelativeTime
                           id="cat"
@@ -445,7 +449,7 @@ const StreamDetail = ({
                           swap={true}
                         />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Last seen</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Last seen</Cell>
                       <Cell>
                         <RelativeTime
                           id="last"
@@ -454,9 +458,9 @@ const StreamDetail = ({
                           swap={true}
                         />
                       </Cell>
-                      <Cell css={{ color: "$primary11" }}>Status</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Status</Cell>
                       <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-                      <Cell css={{ color: "$primary11" }}>Suspended</Cell>
+                      <Cell css={{ color: "$hiContrast" }}>Suspended</Cell>
                       <Cell>{stream.suspended ? "Suspended" : "Normal"}</Cell>
                     </Box>
                   </Flex>

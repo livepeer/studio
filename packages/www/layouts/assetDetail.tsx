@@ -339,17 +339,17 @@ const AssetDetail = ({
                           fontSize: "$2",
                           position: "relative",
                         }}>
-                        <Cell css={{ color: "$primary11" }}>Name</Cell>
+                        <Cell css={{ color: "$hiContrast" }}>Name</Cell>
                         <Cell>{asset.name}</Cell>
                         {asset?.playbackUrl && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>
+                            <Cell css={{ color: "$hiContrast" }}>
                               Playback ID
                             </Cell>
                             <Cell>
                               <ClipBut text={asset.playbackId} />
                             </Cell>
-                            <Cell css={{ color: "$primary11" }}>
+                            <Cell css={{ color: "$hiContrast" }}>
                               Playback URL
                             </Cell>
                             <Cell css={{ cursor: "pointer" }}>
@@ -364,11 +364,11 @@ const AssetDetail = ({
                             </Cell>
                           </>
                         )}
-                        <Cell css={{ color: "$primary11" }}>Asset ID</Cell>
+                        <Cell css={{ color: "$hiContrast" }}>Asset ID</Cell>
                         <Cell>
                           <ClipBut text={asset.id} />
                         </Cell>
-                        <Cell css={{ color: "$primary11" }}>Created at</Cell>
+                        <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
                         <Cell>
                           <RelativeTime
                             id="cat"
@@ -379,19 +379,23 @@ const AssetDetail = ({
                         </Cell>
                         {videoTrack?.codec && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>Codec</Cell>
+                            <Cell css={{ color: "$hiContrast" }}>Codec</Cell>
                             <Cell>{videoTrack.codec}</Cell>
                           </>
                         )}
                         {asset?.videoSpec?.format && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>Container</Cell>
+                            <Cell css={{ color: "$hiContrast" }}>
+                              Container
+                            </Cell>
                             <Cell>{asset.videoSpec.format}</Cell>
                           </>
                         )}
                         {asset.size && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>File size</Cell>
+                            <Cell css={{ color: "$hiContrast" }}>
+                              File size
+                            </Cell>
                             <Cell>
                               {numeral(asset.size)
                                 .format("0,0.00 b")
@@ -402,7 +406,7 @@ const AssetDetail = ({
 
                         {(asset?.videoSpec?.format ?? videoTrack?.bitrate) && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>Bitrate</Cell>
+                            <Cell css={{ color: "$hiContrast" }}>Bitrate</Cell>
                             <Cell>
                               {numeral(
                                 asset?.videoSpec?.bitrate ?? videoTrack?.bitrate
@@ -415,7 +419,7 @@ const AssetDetail = ({
                         )}
                         {videoTrack?.width && videoTrack?.height && (
                           <>
-                            <Cell css={{ color: "$primary11" }}>
+                            <Cell css={{ color: "$hiContrast" }}>
                               Resolution
                             </Cell>
                             <Cell>

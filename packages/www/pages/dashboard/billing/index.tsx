@@ -112,7 +112,7 @@ const Billing = () => {
                 </Box>
               </Flex>
             </Heading>
-            <Flex css={{ fontSize: "$3", color: "$primary9" }}>
+            <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
               Current billing period (
               {subscription && (
                 <Flex>
@@ -167,7 +167,7 @@ const Billing = () => {
               You are currently on the
               <Badge
                 size="1"
-                variant="primary"
+                variant="neutral"
                 css={{ mx: "$1", fontWeight: 700, letterSpacing: 0 }}>
                 {user?.stripeProductId
                   ? products[user.stripeProductId]?.name
