@@ -40,7 +40,7 @@ const GettingStarted = ({ firstName = "" }) => {
                 <Link passHref href="https://streamlabs.com/">
                   <A target="_blank">streamlabs</A>
                 </Link>
-                . Here’s how.
+                . Here’s how:
               </Text>
               <Text
                 variant="gray"
@@ -63,7 +63,7 @@ const GettingStarted = ({ firstName = "" }) => {
               </Text>
             </Box>
             <Link
-              href="https://docs.livepeer.studio/guides/livestreaming/"
+              href="https://docs.livepeer.studio/guides/live/create-a-livestream"
               passHref>
               <Button
                 as="a"
@@ -109,7 +109,7 @@ const GettingStarted = ({ firstName = "" }) => {
               </Link>
               .
             </Text>
-            <Link href="https://docs.livepeer.studio/references" passHref>
+            <Link href="https://docs.livepeer.studio/category/api" passHref>
               <Button
                 as="a"
                 target="_blank"
@@ -142,9 +142,7 @@ const GettingStarted = ({ firstName = "" }) => {
               and at scale. Get started by reviewing and cloning one of our
               sample apps.
             </Text>
-            <Link
-              href="https://docs.livepeer.studio/guides/sampleslib"
-              passHref>
+            <Link href="https://docs.livepeer.studio/category/api" passHref>
               <Button
                 as="a"
                 target="_blank"
