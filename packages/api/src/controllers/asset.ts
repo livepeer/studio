@@ -35,6 +35,7 @@ import {
   ExportTaskParams,
   IpfsFileInfo,
   NewAssetPayload,
+  ObjectStore,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -42,6 +43,7 @@ import Queue from "../store/queue";
 import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
+import { CliArgs } from "../parse-cli";
 
 const app = Router();
 
@@ -126,18 +128,32 @@ export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
   );
 }
 
-function getDownloadUrl(ingest: string, asset: WithID<Asset>): string {
-  return pathJoin(ingest, "asset", asset.playbackId, "video");
+function getDownloadUrl(
+  ingest: string,
+  asset: WithID<Asset>,
+  os?: ObjectStore
+): string {
+  return os
+    ? pathJoin(os.publicUrl, asset.playbackId, "video")
+    : pathJoin(ingest, "asset", asset.playbackId, "video");
 }
 
-function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
+async function withPlaybackUrls(
+  { vodObjectStoreId }: CliArgs,
+  ingest: string,
+  asset: WithID<Asset>
+): Promise<WithID<Asset>> {
   if (asset.status.phase !== "ready") {
     return asset;
+  }
+  let os: ObjectStore;
+  if (asset.objectStoreId !== vodObjectStoreId) {
+    os = await db.objectStore.get(asset.objectStoreId);
   }
   return {
     ...asset,
     playbackUrl: getPlaybackUrl(ingest, asset),
-    downloadUrl: getDownloadUrl(ingest, asset),
+    downloadUrl: getDownloadUrl(ingest, asset, os),
   };
 }
 
@@ -274,8 +290,8 @@ app.use(
     }
     const { details } = toStringValues(req.query);
     const ingest = ingests[0].base;
-    let toExternalAsset = (a: WithID<Asset>) => {
-      a = withPlaybackUrls(ingest, a);
+    let toExternalAsset = async (a: WithID<Asset>) => {
+      a = await withPlaybackUrls(req.config, ingest, a);
       a = assetWithIpfsUrls(a);
       if (req.user.admin) {
         return a;
@@ -288,7 +304,7 @@ app.use(
     };
 
     if (Array.isArray(data)) {
-      return data.map(toExternalAsset);
+      return Promise.all(data.map(toExternalAsset));
     }
     if ("id" in data) {
       return toExternalAsset(data);
@@ -296,7 +312,7 @@ app.use(
     if ("asset" in data) {
       return {
         ...data,
-        asset: toExternalAsset(data.asset),
+        asset: await toExternalAsset(data.asset),
       };
     }
     return data;
