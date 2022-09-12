@@ -142,7 +142,9 @@ const GettingStarted = ({ firstName = "" }) => {
               and at scale. Get started by reviewing and cloning one of our
               sample apps.
             </Text>
-            <Link href="https://docs.livepeer.studio/category/api" passHref>
+            <Link
+              href="https://docs.livepeer.studio/reference/examples"
+              passHref>
               <Button
                 as="a"
                 target="_blank"

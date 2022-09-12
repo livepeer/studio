@@ -23,7 +23,7 @@ const config = {
       },
       {
         source: "/docs/api",
-        destination: "https://docs.livepeer.studio/references",
+        destination: "https://docs.livepeer.studio/category/api",
         permanent: false,
       },
       {

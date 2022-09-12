@@ -194,7 +194,9 @@ const AssetsTable = ({
               display: "flex",
             },
           }}>
-          <Link href="/docs/api-reference/vod/import" passHref>
+          <Link
+            href="https://docs.livepeer.studio/category/on-demand "
+            passHref>
             <A
               target="_blank"
               variant="primary"

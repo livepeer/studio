@@ -256,7 +256,7 @@ const CreateTokenDialog = ({
                       align="center">
                       <Label htmlFor="allowCors">Allow CORS access</Label>
                       <Link
-                        href="https://docs.livepeer.studio/guides/livestreaming/api-key#cors"
+                        href="https://docs.livepeer.studio/quickstart/#create-api-key"
                         target="_blank">
                         <Warning />
                       </Link>
