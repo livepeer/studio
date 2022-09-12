@@ -107,6 +107,7 @@ async function validateAssetPayload(
     name: payload.name,
     meta: payload.meta,
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
+    playbackRecordingObjectStoreId: payload.playbackRecordingObjectStoreId,
   };
 }
 
