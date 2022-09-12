@@ -246,7 +246,9 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
         Stream sessions belong to parent streams.
       </Text>
-      <Link href="https://docs.livepeer.studio/references/session/" passHref>
+      <Link
+        href="https://docs.livepeer.studio/reference/api/get-session"
+        passHref>
         <A
           target="_blank"
           variant="primary"

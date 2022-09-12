@@ -239,7 +239,7 @@ const SaveTargetDialog = ({
           <Heading size="1">
             {`${action} multistream target`}
             {action === Action.Create ? (
-              <Badge size="2" variant="primary" css={{ ml: "$2" }}>
+              <Badge size="2" variant="neutral" css={{ ml: "$2" }}>
                 Beta
               </Badge>
             ) : null}

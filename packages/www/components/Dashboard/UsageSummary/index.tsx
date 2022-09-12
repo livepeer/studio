@@ -46,7 +46,7 @@ const UsageCard = ({ title, usage, limit, loading = false }) => {
         </Box>
       ) : (
         <>
-          <Box css={{ mb: "$2", color: "$primary9" }}>{title}</Box>
+          <Box css={{ mb: "$2", color: "$hiContrast" }}>{title}</Box>
           <Flex align="center" css={{ fontSize: "$6" }}>
             <Box css={{ fontWeight: 700 }}>{usage}</Box>
             {limit && <Box css={{ mx: "$1" }}>/</Box>}
@@ -123,7 +123,7 @@ const UsageSummary = () => {
             </Box>
             <Badge
               size="1"
-              variant="primary"
+              variant="neutral"
               css={{ letterSpacing: 0, mt: "7px" }}>
               {user?.stripeProductId
                 ? products[user.stripeProductId].name
@@ -132,7 +132,7 @@ const UsageSummary = () => {
             </Badge>
           </Flex>
         </Heading>
-        <Flex css={{ fontSize: "$3", color: "$primary9" }}>
+        <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
           Current billing period (
           {subscription && (
             <Flex>
