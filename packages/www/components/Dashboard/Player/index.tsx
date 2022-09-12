@@ -22,6 +22,7 @@ export default function Player({
       autoPlay={autoPlay}
       controls={controls}
       width={width}
+      style={{ display: "flex" }}
     />
   );
 }
