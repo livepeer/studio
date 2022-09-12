@@ -86,11 +86,22 @@ async function validateAssetPayload(
   payload: NewAssetPayload
 ): Promise<WithID<Asset>> {
   validateAssetMeta(payload.meta);
-  if (payload.objectStoreId) {
-    const os = await db.objectStore.get(payload.objectStoreId);
+  let { objectStoreId, playbackRecordingObjectStoreId } = payload;
+  if (!objectStoreId) {
+    objectStoreId = defaultObjectStoreId;
+  } else {
+    const os = await db.objectStore.get(objectStoreId);
     if (os.userId !== userId) {
       throw new ForbiddenError(
         `the provided objectStoreId is not owned by the user`
+      );
+    }
+  }
+  if (playbackRecordingObjectStoreId) {
+    const os = await db.objectStore.get(playbackRecordingObjectStoreId);
+    if (os.userId !== userId) {
+      throw new ForbiddenError(
+        `the provided playbackRecordingObjectStoreId is not owned by the user`
       );
     }
   }
@@ -106,8 +117,8 @@ async function validateAssetPayload(
     },
     name: payload.name,
     meta: payload.meta,
-    objectStoreId: payload.objectStoreId || defaultObjectStoreId,
-    playbackRecordingObjectStoreId: payload.playbackRecordingObjectStoreId,
+    objectStoreId,
+    playbackRecordingObjectStoreId,
   };
 }
 
