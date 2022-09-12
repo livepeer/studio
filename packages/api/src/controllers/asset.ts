@@ -47,7 +47,16 @@ const app = Router();
 
 const META_MAX_SIZE = 1024;
 
-function validateAssetMeta(meta: Record<string, string>) {
+function validateAssetMeta(
+  meta: Record<string, string>,
+  asset?: WithID<Asset>
+) {
+  if (!meta) {
+    return meta;
+  }
+  meta = _({ ...asset?.meta, ...meta })
+    .omitBy(_.isNull)
+    .value();
   try {
     if (meta && JSON.stringify(meta).length > META_MAX_SIZE) {
       console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
@@ -61,6 +70,7 @@ function validateAssetMeta(meta: Record<string, string>) {
       `the provided meta is not in a valid json format`
     );
   }
+  return meta;
 }
 
 function cleanAssetTracks(asset: WithID<Asset>) {
@@ -83,7 +93,6 @@ async function validateAssetPayload(
   defaultObjectStoreId: string,
   payload: NewAssetPayload
 ): Promise<WithID<Asset>> {
-  validateAssetMeta(payload.meta);
   if (payload.objectStoreId) {
     if (payload.objectStoreId !== defaultObjectStoreId) {
       // TODO: Allow assets Object Store to be changed at some point.
@@ -109,7 +118,7 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
-    meta: payload.meta,
+    meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
@@ -793,7 +802,6 @@ app.patch(
   async (req, res) => {
     // these are the only updateable fields
     let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
-    validateAssetMeta(meta);
 
     let storage: Asset["storage"];
     if (storageInput?.ipfs !== undefined) {
@@ -815,9 +823,12 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
+    meta = validateAssetMeta(meta, asset);
+
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
+
     await req.taskScheduler.updateAsset(asset, { name, meta, storage });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
