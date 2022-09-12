@@ -967,6 +967,11 @@ components:
           description: Object store ID where the asset is stored
           writeOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        playbackRecordingObjectStoreId:
+          type: string
+          description: Object store ID where the asset HLS playlist is stored
+          writeOnly: true
+          example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         storage:
           additionalProperties: false
           properties:
