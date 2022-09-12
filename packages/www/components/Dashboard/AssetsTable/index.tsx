@@ -179,10 +179,10 @@ const AssetsTable = ({
           maxWidth: 450,
         }}>
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Upload your first Video on Demand asset
+          Upload your first On Demand asset
         </Heading>
         <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Studio supports Video on Demand which allows you to import
+          Livepeer Studio supports video on demand which allows you to import
           video assets, store them on decentralized storage, and easily mint a
           video NFT.
         </Text>
