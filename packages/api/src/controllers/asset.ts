@@ -484,9 +484,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const shouldUseCatalyst =
     (req.user.admin && upload === "1") ||
     100 * Math.random() < req.config.vodCatalystPipelineRolloutPercent;
-  const taskType: Task["type"] = shouldUseCatalyst
-    ? ("upload" as any)
-    : "import";
+  const taskType = shouldUseCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
@@ -623,9 +621,7 @@ app.post(
     const shouldUseCatalyst =
       (req.user.admin && upload === "1") ||
       100 * Math.random() < req.config.vodCatalystPipelineRolloutPercent;
-    const taskType: Task["type"] = shouldUseCatalyst
-      ? ("upload" as any)
-      : "import";
+    const taskType = shouldUseCatalyst ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
