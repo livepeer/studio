@@ -220,6 +220,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe: "s3 object store id for vod",
         type: "string",
       },
+      vodCatalystPipelineRolloutPercent: {
+        describe: "percentage of assets to test the new Catalyst VOD pipeline",
+        default: 0,
+        type: "number",
+      },
       "ingest-region": {
         describe:
           "list of ingest endpoints to use as servers to consult for /api/ingest",
