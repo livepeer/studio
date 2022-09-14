@@ -9,6 +9,7 @@ import {
   toStringValues,
 } from "./helpers";
 import { v4 as uuid } from "uuid";
+import sql from "sql-template-strings";
 import { db } from "../store";
 
 const app = Router();
@@ -25,13 +26,18 @@ const fieldsMap: FieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, userId, order, filters } = toStringValues(req.query);
+  let { limit, all, cursor, userId, order, filters } = toStringValues(
+    req.query
+  );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
 
   if (req.user.admin && !userId) {
     const query = parseFilters(fieldsMap, filters);
+    if (!all || all === "false") {
+      query.push(sql`object_store.data->>'deleted' IS NULL`);
+    }
 
     const fields =
       " object_store.id as id, object_store.data as data, users.id as usersId, users.data as usersdata";
@@ -54,50 +60,39 @@ app.get("/", authorizer({}), async (req, res) => {
     }
     return res.json(output);
   }
-
-  if (!userId) {
-    res.status(400);
-    return res.json({
-      errors: [`required query parameter: userId`],
-    });
+  if (!req.user.admin) {
+    userId = req.user.id;
   }
 
-  if (req.user.admin !== true && req.user.id !== userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own object stores"],
-    });
-  }
+  const query = parseFilters(fieldsMap, filters);
+  query.push(sql`object_store.data->>'userId' = ${userId}`);
+  query.push(sql`object_store.data->>'deleted' IS NULL`);
 
-  const { data, cursor: newCursor } = await req.store.queryObjects({
-    kind: "object-store",
-    query: { userId: userId },
-    limit,
+  let [data, newCursor] = await db.objectStore.find([query], {
     cursor,
+    limit,
   });
+  if (!req.user.admin) {
+    data = db.objectStore.cleanWriteOnlyResponses(data);
+  }
 
-  res.status(200);
   if (data.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(data);
+  res.status(200).json(data);
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const os = await req.store.get(
-    `object-store/${req.params.id}`,
-    !req.user.admin
-  );
-  if (!os) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
+  let os = await db.objectStore.get(req.params.id);
+  if (!req.user.admin) {
+    os = db.objectStore.cleanWriteOnlyResponse(os);
+  }
+  if (!os || os.deleted) {
+    return res.status(404).json({ errors: ["not found"] });
   }
 
   if (req.user.admin !== true && req.user.id !== os.userId) {
-    res.status(403);
-    return res.json({
+    return res.status(403).json({
       errors: ["user can only request information on their own object stores"],
     });
   }
@@ -146,7 +141,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
       errors: ["users may only delete their own object stores"],
     });
   }
-  await db.objectStore.delete(id);
+  await db.objectStore.markDeleted(id);
   res.status(204);
   res.end();
 });

@@ -858,6 +858,9 @@ components:
           description:
             If true then these object store will not be used for recording even
             if it is configured in the API command line.
+        deleted:
+          type: boolean
+          description: Set to true when the object store is deleted
         id:
           type: string
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
