@@ -12,6 +12,8 @@ import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
 import { generateKeyPairSync } from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
+import { SigningKey, SigningKeyResponsePayload } from "../schema/types";
+import { WithID } from "../store/types";
 
 const fieldsMap: FieldsMap = {
   id: `signing_key.ID`,
@@ -164,17 +166,17 @@ app.post("/", authorizer({}), async (req, res) => {
   const id = uuid();
   const keypair = generateSigningKeys();
 
-  var doc = {
+  var doc: WithID<SigningKey> = {
     id,
     userId: req.user.id,
     createdAt: Date.now(),
-    publickey: keypair.publicKey,
+    publicKey: keypair.publicKey,
   };
 
   await db.signingKey.create(doc);
 
-  var createdSigningKey = {
-    ...doc,
+  var createdSigningKey: SigningKeyResponsePayload = {
+    publicKey: doc,
     privateKey: keypair.privateKey,
   };
 

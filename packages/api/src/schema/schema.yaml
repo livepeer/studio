@@ -1552,6 +1552,15 @@ components:
           type: boolean
           default: false
 
+    signing-key-response-payload:
+      type: object
+      required: [publicKey, privateKey]
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/signing-key"
+        privateKey:
+          type: string
+
     api-token:
       type: object
       additionalProperties: false
