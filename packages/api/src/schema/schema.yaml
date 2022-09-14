@@ -28,6 +28,8 @@ tags:
     description: Asset Endpoints
   - name: task
     description: Task Endpoints
+  - name: signing-key
+    description: Signing Key Endpoints
   - name: webhook-response
     description: webhook client responses
   - name: verify-email
@@ -1526,7 +1528,7 @@ components:
     signing-key:
       type: object
       additionalProperties: false
-      table: signing-keys
+      table: signing_key
       properties:
         id:
           type: string
