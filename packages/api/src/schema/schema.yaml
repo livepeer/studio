@@ -1536,7 +1536,8 @@ components:
         createdAt:
           type: number
           readOnly: true
-          description: Timestamp (in milliseconds) at which task was created
+          description:
+            Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
         userId:
           type: string
