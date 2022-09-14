@@ -68,7 +68,7 @@ app.get("/", authorizer({}), async (req, res) => {
   query.push(sql`object_store.data->>'userId' = ${userId}`);
   query.push(sql`object_store.data->>'deleted' IS NULL`);
 
-  let [data, newCursor] = await db.objectStore.find([query], {
+  let [data, newCursor] = await db.objectStore.find(query, {
     cursor,
     limit,
   });
@@ -93,7 +93,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
 
   if (req.user.admin !== true && req.user.id !== os.userId) {
     return res.status(403).json({
-      errors: ["user can only request information on their own object stores"],
+      errors: ["user can only request information on their own user object"],
     });
   }
 
