@@ -676,6 +676,19 @@ components:
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
 
+    object-store-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/object-store/properties/name"
+        disabled:
+          $ref: "#/components/schemas/object-store/properties/disabled"
+        url:
+          $ref: "#/components/schemas/object-store/properties/url"
+        publicUrl:
+          $ref: "#/components/schemas/object-store/properties/publicUrl"
+
     suspend-user-payload:
       type: object
       additionalProperties: false

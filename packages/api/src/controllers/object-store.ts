@@ -11,6 +11,7 @@ import {
 import { v4 as uuid } from "uuid";
 import sql from "sql-template-strings";
 import { db } from "../store";
+import { ObjectStorePatchPayload } from "../schema/types";
 
 const app = Router();
 
@@ -146,31 +147,30 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-app.patch("/:id", authorizer({}), async (req, res) => {
-  const { id } = req.params;
-  const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+app.patch(
+  "/:id",
+  validatePost("object-store-patch-payload"),
+  authorizer({}),
+  async (req, res) => {
+    const { id } = req.params;
+    const objectStore = await db.objectStore.get(id);
+    if (!objectStore || objectStore.deleted) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+    if (!req.user.admin && req.user.id !== objectStore.userId) {
+      return res.status(403).json({
+        errors: ["users may change only their own object stores"],
+      });
+    }
+    const payload = req.body as ObjectStorePatchPayload;
+    console.log(
+      `patch object store id=${id} payload=${JSON.stringify(
+        JSON.stringify(payload)
+      )}`
+    );
+    await db.objectStore.update(id, payload);
+    res.status(204).end();
   }
-  if (!req.user.admin && req.user.id !== objectStore.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users may change only their own object stores"],
-    });
-  }
-  const { disabled, url } = req.body;
-  if (
-    (disabled === undefined && url === undefined) ||
-    typeof url !== "string"
-  ) {
-    res.status(400);
-    return res.json({ errors: ["disabled or url fields required"] });
-  }
-  console.log(`set object store ${id} disabled=${disabled} url=${url}`);
-  await db.objectStore.update(id, { disabled: !!disabled, url });
-  res.status(204);
-  res.end();
-});
+);
 
 export default app;
