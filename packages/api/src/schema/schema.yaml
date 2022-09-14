@@ -1530,9 +1530,18 @@ components:
       properties:
         id:
           type: string
+          readOnly: true
+          index: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which task was created
+          example: 1587667174725
         userId:
           type: string
+          readOnly: true
+          index: true
           example: 78df0075-b5f3-4683-a618-1086faca35dc
         publicKey:
           type: string
