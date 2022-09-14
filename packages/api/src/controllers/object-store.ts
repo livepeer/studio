@@ -1,13 +1,19 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
-import uuid from "uuid/v4";
+import { Router } from "express";
+import {
+  FieldsMap,
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
+import { v4 as uuid } from "uuid";
 import { db } from "../store";
 
 const app = Router();
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `object_store.ID`,
   name: { val: `object_store.data->>'name'`, type: "full-text" },
   url: `object_store.data->>'url'`,
@@ -19,7 +25,7 @@ const fieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, userId, order, filters } = req.query;
+  let { limit, cursor, userId, order, filters } = toStringValues(req.query);
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
