@@ -31,7 +31,7 @@ afterEach(async () => {
   await clearDatabase(server);
 });
 
-describe("controllers/multistream-target", () => {
+describe("controllers/signing-key", () => {
   describe("basic CRUD with JWT authorization", () => {
     let client: TestClient;
     let adminUser: User;
@@ -44,11 +44,10 @@ describe("controllers/multistream-target", () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       client.jwtAuth = nonAdminToken;
-      let signingKey: WithID<SigningKey>;
       let created: SigningKeyResponsePayload = await (
         await client.post("/signing-key")
       ).json();
-      let res = await client.get(`/signing-key/${created.publicKey.id}`);
+      let res = await client.get(`/signing-key/${created.id}`);
       signingKey = await res.json();
     });
 
@@ -59,22 +58,22 @@ describe("controllers/multistream-target", () => {
       const created = (await res.json()) as SigningKeyResponsePayload;
       expect(created.privateKey).toBeDefined();
       expect(created.publicKey).toBeDefined();
-      expect(created.publicKey.id).toBeDefined();
-      expect(created.publicKey.createdAt).toBeGreaterThanOrEqual(
-        preCreationTime
-      );
-      res = await client.get(`/signing-key/${created.publicKey.id}`);
+      expect(created.id).toBeDefined();
+      expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
+      res = await client.get(`/signing-key/${created.id}`);
       expect(res.status).toBe(200);
       const getResponse = await res.json();
       expect(getResponse.privateKey).toBeUndefined();
-      expect(getResponse.publicKey).toEqual(created.publicKey.publicKey);
+      expect(getResponse.publicKey).toEqual(created.publicKey);
     });
 
-    /* it("shoud delete the signing key", async () => {
+    it("shoud delete the signing key", async () => {
       let res = await client.delete(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(204);
       res = await client.get(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(404);
-    });*/
+    });
+
+    // Create JWT and verify it
   });
 });

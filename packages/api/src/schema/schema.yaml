@@ -1528,6 +1528,7 @@ components:
     signing-key:
       type: object
       additionalProperties: false
+      required: [publicKey]
       table: signing_key
       properties:
         id:
@@ -1556,8 +1557,7 @@ components:
       type: object
       required: [publicKey, privateKey]
       properties:
-        publicKey:
-          $ref: "#/components/schemas/signing-key"
+        $ref: "#/components/schemas/signing-key/properties"
         privateKey:
           type: string
 

@@ -90,10 +90,7 @@ app.get("/", authorizer({}), async (req, res) => {
 
   const query = parseFilters(fieldsMap, filters);
   query.push(sql`signing_key.data->>'userId' = ${req.user.id}`);
-
-  if (!all || all === "false") {
-    query.push(sql`signing_key.data->>'deleted' IS NULL`);
-  }
+  query.push(sql`signing_key.data->>'deleted' IS NULL`);
 
   let fields = " signing_key.id as id, signing_key.data as data";
   if (count) {
@@ -125,7 +122,7 @@ app.get("/", authorizer({}), async (req, res) => {
 
 app.get("/:id", authorizer({}), async (req, res) => {
   const signingKey = await db.signingKey.get(req.params.id);
-  if (!signingKey) {
+  if (!signingKey || signingKey.deleted) {
     res.status(404);
     return res.json({
       errors: ["not found"],
@@ -176,7 +173,7 @@ app.post("/", authorizer({}), async (req, res) => {
   await db.signingKey.create(doc);
 
   var createdSigningKey: SigningKeyResponsePayload = {
-    publicKey: doc,
+    ...doc,
     privateKey: keypair.privateKey,
   };
 
