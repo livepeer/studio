@@ -1523,6 +1523,23 @@ components:
                           description:
                             Will be added to the pinata_secret_api_key header.
 
+    signing-key:
+      type: object
+      additionalProperties: false
+      table: signing-keys
+      properties:
+        id:
+          type: string
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+        userId:
+          type: string
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+        publicKey:
+          type: string
+        deleted:
+          type: boolean
+          default: false
+
     api-token:
       type: object
       additionalProperties: false
