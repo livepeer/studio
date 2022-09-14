@@ -85,6 +85,48 @@ const GettingStarted = ({ firstName = "" }) => {
         <AccordionItem value="accordion-two">
           <AccordionTrigger css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
+              Upload your first video
+            </Text>
+          </AccordionTrigger>
+          <AccordionContent>
+            <Box>
+              <Text
+                variant="gray"
+                size="3"
+                css={{ mb: "$3", lineHeight: "23px" }}>
+                Easily add video assets to your application for on demand
+                playback. Navigate to the "Assets" view to get started.
+              </Text>
+              <Text
+                variant="gray"
+                size="3"
+                css={{ mb: "$3", lineHeight: "23px" }}>
+                Want to learn more?
+              </Text>
+            </Box>
+            <Link
+              href="https://docs.livepeer.studio/guides/on-demand/upload-video-asset/dashboard"
+              passHref>
+              <Button
+                as="a"
+                target="_blank"
+                rel="noopener noreferrer"
+                css={{
+                  display: "inline-flex",
+                  cursor: "default",
+                  ai: "center",
+                }}
+                size="2"
+                variant="primary">
+                <Box css={{ mr: "$1" }}>Check out our documentation</Box>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="accordion-three">
+          <AccordionTrigger css={{ color: "$primary12" }}>
+            <Text size="3" css={{ color: "inherit" }}>
               Build with the API
             </Text>
           </AccordionTrigger>
@@ -127,7 +169,7 @@ const GettingStarted = ({ firstName = "" }) => {
             </Link>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="accordion-three">
+        <AccordionItem value="accordion-four">
           <AccordionTrigger css={{ color: "$primary12" }}>
             <Text size="3" css={{ color: "inherit" }}>
               Create your own app
