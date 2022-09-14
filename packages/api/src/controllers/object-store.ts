@@ -132,19 +132,16 @@ app.post(
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+  if (!objectStore || objectStore.deleted) {
+    return res.status(404).json({ errors: ["not found"] });
   }
   if (!req.user.admin && req.user.id !== objectStore.userId) {
-    res.status(403);
-    return res.json({
+    return res.status(403).json({
       errors: ["users may only delete their own object stores"],
     });
   }
   await db.objectStore.markDeleted(id);
-  res.status(204);
-  res.end();
+  res.status(204).end();
 });
 
 app.patch(

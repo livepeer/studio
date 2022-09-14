@@ -802,10 +802,11 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
   let objectStoreId;
   if (req.body.objectStoreId) {
     const store = await db.objectStore.get(req.body.objectStoreId);
-    if (!store) {
-      res.status(400);
-      return res.json({
-        errors: [`object-store ${req.body.objectStoreId} does not exist`],
+    if (!store || store.deleted || store.disabled) {
+      return res.status(400).json({
+        errors: [
+          `object store ${req.body.objectStoreId} not found or disabled`,
+        ],
       });
     }
   }
@@ -1400,11 +1401,11 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     recordObjectStoreUrl: string;
   if (stream.objectStoreId) {
     const os = await db.objectStore.get(stream.objectStoreId);
-    if (!os) {
+    if (!os || os.deleted || os.disabled) {
       res.status(500);
       return res.json({
         errors: [
-          `data integity error: object store ${stream.objectStoreId} not found`,
+          `data integity error: object store ${stream.objectStoreId} not found or disabled`,
         ],
       });
     }
@@ -1418,7 +1419,7 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
     !stream.recordObjectStoreId
   ) {
     const ros = await db.objectStore.get(req.config.recordObjectStoreId);
-    if (ros && !ros.disabled) {
+    if (ros && !ros.deleted && !ros.disabled) {
       await db.stream.update(stream.id, {
         recordObjectStoreId: req.config.recordObjectStoreId,
       });
@@ -1432,11 +1433,11 @@ app.post("/hook", authorizer({ anyAdmin: true }), async (req, res) => {
   }
   if (stream.recordObjectStoreId && !req.config.supressRecordInHook) {
     const ros = await db.objectStore.get(stream.recordObjectStoreId);
-    if (!ros) {
+    if (!ros || ros.deleted || ros.disabled) {
       res.status(500);
       return res.json({
         errors: [
-          `data integity error: record object store ${stream.recordObjectStoreId} not found`,
+          `data integity error: record object store ${stream.recordObjectStoreId} not found or disabled`,
         ],
       });
     }
