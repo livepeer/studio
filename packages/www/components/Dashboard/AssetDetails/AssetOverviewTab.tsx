@@ -68,8 +68,6 @@ const AssetOverviewTab = ({
     [asset?.meta]
   );
 
-  console.log(asset)
-
   return (
     <>
       <Box>
