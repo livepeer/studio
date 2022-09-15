@@ -10,6 +10,9 @@ import Table from "../store/table";
 
 type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 
+// Grabs the ID from the provided request header, fetches the corresponding
+// object in the database table and checks that it is owned by the user making
+// the request. Throws a status code error if not.
 async function checkUserOwned(
   req: Request,
   headerName: string,
