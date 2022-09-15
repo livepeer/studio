@@ -214,6 +214,11 @@ export const corsApiKeyAccessRules: AuthRule[] = [
       "/asset/:id/export",
     ],
   },
+  // Data
+  {
+    methods: ["get"],
+    resources: ["/data/views/:id/total"],
+  },
 ];
 
 function isRestrictedCors(token?: ApiToken) {

@@ -576,6 +576,12 @@ describe("auth middleware", () => {
         corsAllowed: true,
         status: 404,
       });
+      await expect(
+        fetchCors("GET", "/data/views/1234/total", allowedOrigins[0])
+      ).resolves.toMatchObject({
+        corsAllowed: true,
+        status: 404,
+      });
 
       for (const [method, path] of forbiddenApis) {
         await expect(
