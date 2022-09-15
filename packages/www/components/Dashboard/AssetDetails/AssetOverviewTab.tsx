@@ -147,7 +147,12 @@ const AssetOverviewTab = ({
             </Flex>
 
             {asset?.storage?.ipfs?.updatedAt && (
-              <Text size="3" variant="gray">Uploaded on {moment.unix(asset?.storage?.ipfs?.updatedAt / 1000).format("LLL")}</Text>
+              <Text size="3" variant="gray">
+                Uploaded on{" "}
+                {moment
+                  .unix(asset?.storage?.ipfs?.updatedAt / 1000)
+                  .format("LLL")}
+              </Text>
             )}
 
             {!asset?.storage?.ipfs?.cid && (
