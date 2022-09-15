@@ -146,8 +146,8 @@ const AssetOverviewTab = ({
               <Text size="3">IPFS</Text>
             </Flex>
 
-            {asset?.storage?.ipfs?.createdAt && (
-              <Text size="3" variant="gray">Uploaded on {moment.unix(asset?.storage?.ipfs?.createdAt / 1000).format("LLL")}</Text>
+            {asset?.storage?.ipfs?.updatedAt && (
+              <Text size="3" variant="gray">Uploaded on {moment.unix(asset?.storage?.ipfs?.updatedAt / 1000).format("LLL")}</Text>
             )}
 
             {!asset?.storage?.ipfs?.cid && (
