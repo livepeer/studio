@@ -152,6 +152,7 @@ export class TaskScheduler {
               ipfs: {
                 spec: inputAsset.storage.ipfs.spec,
                 ...taskOutputToIpfsStorage(event.output.export.ipfs),
+                createdAt: task.createdAt,
               },
               status: {
                 phase: "ready",

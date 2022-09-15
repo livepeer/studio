@@ -1211,6 +1211,11 @@ components:
           type: string
           readOnly: true
           description: URL to access file via HTTP through an IPFS gateway
+        createdAt:
+          type: number
+          readOnly: true
+          description: Timestamp (in milliseconds) at which IPFS export task was created
+          example: 1587667174725
 
     new-asset-payload:
       additionalProperties: false
