@@ -5,6 +5,10 @@
 import { Router } from "express";
 import { authorizer } from "../middleware";
 import { db } from "../store";
+import { ForbiddenError, NotFoundError } from "../store/errors";
+import Table from "../store/table";
+
+type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
 
 const app = Router();
 
@@ -12,28 +16,25 @@ app.all(
   "/",
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
-    const streamId = req.headers["x-livepeer-stream-id"]?.toString();
-    if (streamId) {
-      const stream = await db.stream.get(streamId);
-      if (!stream || stream.deleted) {
-        return res.status(404).json({ errors: ["stream not found"] });
+    const checkUserOwned = async (
+      headerName: string,
+      table: Table<UserOwnedObj>
+    ) => {
+      if (!(headerName in req.headers)) {
+        return;
       }
-      const hasAccess = stream.userId === req.user.id || req.user.admin;
+      const id = req.headers[headerName]?.toString();
+      const obj = await table.get(id);
+      if (!obj || obj.deleted) {
+        throw new NotFoundError(`${table.name} not found`);
+      }
+      const hasAccess = obj.userId === req.user.id || req.user.admin;
       if (!hasAccess) {
-        return res.status(403).json({ errors: ["access forbidden"] });
+        throw new ForbiddenError(`access forbidden`);
       }
-    }
-    const assetId = req.headers["x-livepeer-asset-id"]?.toString();
-    if (assetId) {
-      const asset = await db.asset.get(assetId);
-      if (!asset || asset.deleted) {
-        return res.status(404).json({ errors: ["asset not found"] });
-      }
-      const hasAccess = asset.userId === req.user.id || req.user.admin;
-      if (!hasAccess) {
-        return res.status(403).json({ errors: ["access forbidden"] });
-      }
-    }
+    };
+    await checkUserOwned("x-livepeer-stream-id", db.stream);
+    await checkUserOwned("x-livepeer-asset-id", db.asset);
     res.status(204).end();
   }
 );
