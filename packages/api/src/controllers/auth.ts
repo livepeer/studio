@@ -18,10 +18,10 @@ async function checkUserOwned(
   headerName: string,
   table: Table<UserOwnedObj>
 ) {
-  const id = req.headers[headerName]?.toString();
-  if (!id) {
+  if (!(headerName in req.headers)) {
     return;
   }
+  const id = req.headers[headerName]?.toString();
   const obj = await table.get(id);
   if (!obj || obj.deleted) {
     throw new NotFoundError(`${table.name} not found`);
