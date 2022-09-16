@@ -1561,6 +1561,12 @@ components:
           description:
             Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
+        lastUsedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the signing-key was last used
+          example: 1587667174725
         userId:
           type: string
           readOnly: true
