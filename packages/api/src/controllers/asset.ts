@@ -101,9 +101,9 @@ async function validateAssetPayload(
       );
     }
     const os = await db.objectStore.get(payload.objectStoreId);
-    if (os.userId !== userId) {
+    if (!os || os.deleted || os.userId !== userId || os.disabled) {
       throw new ForbiddenError(
-        `the provided objectStoreId is not owned by the user`
+        `object store ${payload.objectStoreId} not found or disabled`
       );
     }
   }
@@ -536,8 +536,10 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
   }
 
   const os = await db.objectStore.get(inputAsset.objectStoreId);
-  if (!os) {
-    throw new UnprocessableEntityError("Asset has invalid objectStoreId");
+  if (!os || os.deleted || os.disabled) {
+    throw new UnprocessableEntityError(
+      "Asset object store not found or disabled"
+    );
   }
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);

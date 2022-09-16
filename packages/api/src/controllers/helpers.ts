@@ -124,8 +124,11 @@ export type OSS3Config = S3ClientConfig &
 export async function getObjectStoreS3Config(
   osId: string
 ): Promise<OSS3Config> {
-  const store = await db.objectStore.get(osId);
-  const url = new URL(store.url);
+  const os = await db.objectStore.get(osId);
+  if (!os || os.deleted || os.disabled) {
+    throw new Error("Object store not found or disabled");
+  }
+  const url = new URL(os.url);
   let protocol = url.protocol;
   if (protocol !== "s3+http:" && protocol !== "s3+https:") {
     throw new Error(`Unsupported OS URL protocol: ${protocol}`);

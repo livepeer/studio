@@ -1,13 +1,21 @@
 import { authorizer } from "../middleware";
 import { validatePost } from "../middleware";
-import Router from "express/lib/router";
-import { makeNextHREF, parseFilters, parseOrder } from "./helpers";
-import uuid from "uuid/v4";
+import { Router } from "express";
+import {
+  FieldsMap,
+  makeNextHREF,
+  parseFilters,
+  parseOrder,
+  toStringValues,
+} from "./helpers";
+import { v4 as uuid } from "uuid";
+import sql from "sql-template-strings";
 import { db } from "../store";
+import { ObjectStorePatchPayload } from "../schema/types";
 
 const app = Router();
 
-const fieldsMap = {
+const fieldsMap: FieldsMap = {
   id: `object_store.ID`,
   name: { val: `object_store.data->>'name'`, type: "full-text" },
   url: `object_store.data->>'url'`,
@@ -19,13 +27,18 @@ const fieldsMap = {
 };
 
 app.get("/", authorizer({}), async (req, res) => {
-  let { limit, cursor, userId, order, filters } = req.query;
+  let { limit, all, cursor, userId, order, filters } = toStringValues(
+    req.query
+  );
   if (isNaN(parseInt(limit))) {
     limit = undefined;
   }
 
   if (req.user.admin && !userId) {
     const query = parseFilters(fieldsMap, filters);
+    if (!all || all === "false") {
+      query.push(sql`object_store.data->>'deleted' IS NULL`);
+    }
 
     const fields =
       " object_store.id as id, object_store.data as data, users.id as usersId, users.data as usersdata";
@@ -48,51 +61,40 @@ app.get("/", authorizer({}), async (req, res) => {
     }
     return res.json(output);
   }
-
-  if (!userId) {
-    res.status(400);
-    return res.json({
-      errors: [`required query parameter: userId`],
-    });
+  if (!req.user.admin) {
+    userId = req.user.id;
   }
 
-  if (req.user.admin !== true && req.user.id !== userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own object stores"],
-    });
-  }
+  const query = parseFilters(fieldsMap, filters);
+  query.push(sql`object_store.data->>'userId' = ${userId}`);
+  query.push(sql`object_store.data->>'deleted' IS NULL`);
 
-  const { data, cursor: newCursor } = await req.store.queryObjects({
-    kind: "object-store",
-    query: { userId: userId },
-    limit,
+  let [data, newCursor] = await db.objectStore.find(query, {
     cursor,
+    limit,
   });
+  if (!req.user.admin) {
+    data = db.objectStore.cleanWriteOnlyResponses(data);
+  }
 
-  res.status(200);
   if (data.length > 0 && newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(data);
+  res.status(200).json(data);
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const os = await req.store.get(
-    `object-store/${req.params.id}`,
-    !req.user.admin
-  );
-  if (!os) {
-    res.status(404);
-    return res.json({
-      errors: ["not found"],
-    });
+  let os = await db.objectStore.get(req.params.id);
+  if (!req.user.admin) {
+    os = db.objectStore.cleanWriteOnlyResponse(os);
+  }
+  if (!os || os.deleted) {
+    return res.status(404).json({ errors: ["not found"] });
   }
 
   if (req.user.admin !== true && req.user.id !== os.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own object stores"],
+    return res.status(403).json({
+      errors: ["user can only request information on their own user object"],
     });
   }
 
@@ -130,46 +132,42 @@ app.post(
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+  if (!objectStore || objectStore.deleted) {
+    return res.status(404).json({ errors: ["not found"] });
   }
   if (!req.user.admin && req.user.id !== objectStore.userId) {
-    res.status(403);
-    return res.json({
+    return res.status(403).json({
       errors: ["users may only delete their own object stores"],
     });
   }
-  await db.objectStore.delete(id);
-  res.status(204);
-  res.end();
+  await db.objectStore.markDeleted(id);
+  res.status(204).end();
 });
 
-app.patch("/:id", authorizer({}), async (req, res) => {
-  const { id } = req.params;
-  const objectStore = await db.objectStore.get(id);
-  if (!objectStore) {
-    res.status(404);
-    return res.json({ errors: ["not found"] });
+app.patch(
+  "/:id",
+  validatePost("object-store-patch-payload"),
+  authorizer({}),
+  async (req, res) => {
+    const { id } = req.params;
+    const objectStore = await db.objectStore.get(id);
+    if (!objectStore || objectStore.deleted) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+    if (!req.user.admin && req.user.id !== objectStore.userId) {
+      return res.status(403).json({
+        errors: ["users may change only their own object stores"],
+      });
+    }
+    const payload = req.body as ObjectStorePatchPayload;
+    console.log(
+      `patch object store id=${id} payload=${JSON.stringify(
+        JSON.stringify(payload)
+      )}`
+    );
+    await db.objectStore.update(id, payload);
+    res.status(204).end();
   }
-  if (!req.user.admin && req.user.id !== objectStore.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["users may change only their own object stores"],
-    });
-  }
-  const { disabled, url } = req.body;
-  if (
-    (disabled === undefined && url === undefined) ||
-    typeof url !== "string"
-  ) {
-    res.status(400);
-    return res.json({ errors: ["disabled or url fields required"] });
-  }
-  console.log(`set object store ${id} disabled=${disabled} url=${url}`);
-  await db.objectStore.update(id, { disabled: !!disabled, url });
-  res.status(204);
-  res.end();
-});
+);
 
 export default app;

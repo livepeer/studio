@@ -17,12 +17,14 @@ beforeAll(async () => {
   server = await serverPromise;
   postMockStore = {
     url: "s3://abc123:abc123@us-west-2/my-bucket",
+    publicUrl: "https://my-bucket.s3.amazonaws.com",
   };
 
   store = {
     id: "mock-store",
     kind: "object-store",
     url: "s3://abc123:abc123@us-west-1/my-bucket",
+    publicUrl: "https://my-bucket.s3.amazonaws.com",
   };
 
   mockUser = {
@@ -163,7 +165,8 @@ describe("controllers/object-stores", () => {
       const resp = await client.get(`/object-store/${objStore.id}`);
       expect(resp.status).toBe(200);
       const objStoreGet = await resp.json();
-      expect(objStoreGet.url).toEqual(null);
+      expect(objStoreGet.url).toEqual(undefined);
+      expect(objStoreGet.publicUrl).toEqual(mockStore.publicUrl);
       expect(objStoreGet.userId).toBe(objStore.userId);
 
       // if same request is made, should return a 201
@@ -226,7 +229,9 @@ describe("controllers/object-stores", () => {
       expect(res.status).toBe(403);
 
       res = await client.get(`/object-store?userId=${adminUser.id}`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(200);
+      const objStore = await res.json();
+      expect(objStore.length).toEqual(0);
     });
   });
 
@@ -273,17 +278,29 @@ describe("controllers/object-stores", () => {
     });
 
     it("should not get all object stores with nonadmin token", async () => {
+      await server.store.create({
+        ...store,
+        id: uuid(),
+        userId: adminUser.id,
+      });
       client.apiKey = nonAdminApiKey;
-      let res = await client.get(`/object-store?userId=${adminUser.id}`);
+      let res = await client.get(`/object-store`);
+      expect(res.status).toBe(200);
       const objStore = await res.json();
-      expect(res.status).toBe(403);
+      expect(objStore.length).toEqual(0);
     });
 
     it("should get all object stores for another user with admin token and apiKey", async () => {
+      await server.store.create({
+        ...store,
+        id: uuid(),
+        userId: nonAdminUser.id,
+      });
       client.apiKey = adminApiKey;
-      const res = await client.get(`/object-store?userId=${nonAdminUser.id}`);
-      const objStore = await res.json();
+      const res = await client.get(`/object-store`);
       expect(res.status).toBe(200);
+      const objStore = await res.json();
+      expect(objStore.length).toEqual(1);
     });
 
     it("should throw forbidden error when using random api Key", async () => {
