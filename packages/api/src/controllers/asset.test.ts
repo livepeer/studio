@@ -233,6 +233,7 @@ describe("controllers/asset", () => {
             spec: {},
             ...withIpfsUrls({ cid: "QmX" }),
             nftMetadata: withIpfsUrls({ cid: "QmY" }),
+            updatedAt: expect.any(Number),
           },
           status: {
             phase: "ready",
