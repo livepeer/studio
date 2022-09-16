@@ -648,6 +648,8 @@ components:
           $ref: "#/components/schemas/asset/properties/name"
         meta:
           $ref: "#/components/schemas/asset/properties/meta"
+        playbackPolicy:
+          $ref: "#/components/schemas/asset/properties/playbackPolicy"
         storage:
           additionalProperties: false
           properties:
@@ -964,6 +966,17 @@ components:
           readOnly: true
           example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
+        playbackPolicy:
+          type: object
+          additionalProperties: false
+          description: Access Control policy for playback
+          properties:
+            enabled:
+              type: boolean
+              description: Enable playback policy
+            signingKeyId:
+              type: string
+              description: Id of signing key used to sign playback URLs
         downloadUrl:
           type: string
           readOnly: true
@@ -1251,6 +1264,19 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
+        playbackPolicy:
+          type: object
+          additionalProperties: false
+          description: Access control Playback policy for the asset
+          properties:
+            enabled:
+              type: boolean
+              description:
+                Whether the access control policy is enabled for the asset
+            signingKeyId:
+              type: string
+              description:
+                ID of the signing key to use for signing the playback policy
         meta:
           type: object
           description: User input metadata associated with the asset

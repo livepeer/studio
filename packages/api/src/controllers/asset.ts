@@ -108,6 +108,8 @@ async function validateAssetPayload(
     }
   }
 
+  // TODO: Validate playbackPolicy when signing-key pr is merged
+
   return {
     id,
     playbackId,
@@ -118,6 +120,7 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
+    playbackPolicy: payload.playbackPolicy,
     meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
@@ -803,7 +806,12 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
+    let {
+      name,
+      meta,
+      playbackPolicy,
+      storage: storageInput,
+    } = req.body as AssetPatchPayload;
 
     let storage: Asset["storage"];
     if (storageInput?.ipfs !== undefined) {
@@ -831,7 +839,13 @@ app.patch(
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
-    await req.taskScheduler.updateAsset(asset, { name, meta, storage });
+    // TODO: Validate playbackPolicy when signing-key pr is merged
+    await req.taskScheduler.updateAsset(asset, {
+      name,
+      meta,
+      storage,
+      playbackPolicy,
+    });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }
