@@ -298,13 +298,12 @@ function authorizer(params: AuthzParams): RequestHandler {
     }
     const accessRules = tokenAccessRules(token);
     if (accessRules) {
+      const { httpPrefix } = req.config;
       let fullPath = pathJoin2(req.baseUrl, req.path);
-      let { httpPrefix } = req.config;
       if (params.originalUriHeader) {
         const header = req.headers[params.originalUriHeader];
         const originalUri = new URL(header?.toString() ?? "");
         fullPath = originalUri.pathname;
-        httpPrefix = null;
       }
       if (!isAuthorized(req.method, fullPath, accessRules, httpPrefix)) {
         throw new ForbiddenError(
