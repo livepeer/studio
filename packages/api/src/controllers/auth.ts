@@ -2,9 +2,35 @@
  * Special controller for forwarding all incoming requests to a geolocated API region
  */
 
-import { Router } from "express";
+import { Request, Router } from "express";
 import { authorizer } from "../middleware";
 import { db } from "../store";
+import { ForbiddenError, NotFoundError } from "../store/errors";
+import Table from "../store/table";
+
+type UserOwnedObj = { id: string; deleted?: boolean; userId?: string };
+
+// Grabs the ID from the provided request header, fetches the corresponding
+// object in the database table and checks that it is owned by the user making
+// the request. Throws a status code error if not.
+async function checkUserOwned(
+  req: Request,
+  headerName: string,
+  table: Table<UserOwnedObj>
+) {
+  if (!(headerName in req.headers)) {
+    return;
+  }
+  const id = req.headers[headerName]?.toString();
+  const obj = await table.get(id);
+  if (!obj || obj.deleted) {
+    throw new NotFoundError(`${table.name} not found`);
+  }
+  const hasAccess = obj.userId === req.user.id || req.user.admin;
+  if (!hasAccess) {
+    throw new ForbiddenError(`access forbidden`);
+  }
+}
 
 const app = Router();
 
@@ -12,15 +38,8 @@ app.all(
   "/",
   authorizer({ originalUriHeader: "x-original-uri" }),
   async (req, res) => {
-    const streamId = req.headers["x-livepeer-stream-id"];
-    const stream = await db.stream.get(streamId?.toString() ?? "");
-    if (!stream) {
-      return res.status(404).json({ errors: ["stream not found"] });
-    }
-    const hasAccess = stream.userId === req.user.id || req.user.admin;
-    if (!hasAccess) {
-      return res.status(403).json({ errors: ["access forbidden"] });
-    }
+    await checkUserOwned(req, "x-livepeer-stream-id", db.stream);
+    await checkUserOwned(req, "x-livepeer-asset-id", db.asset);
     res.status(204).end();
   }
 );

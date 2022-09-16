@@ -1,27 +1,22 @@
-import { Router } from "express";
 import { Response } from "node-fetch";
-import { authorizer } from ".";
 
-import { ApiToken, User } from "../schema/types";
+import { ApiToken, Asset, Stream, User } from "../schema/types";
 import { db } from "../store";
 import {
   AuxTestServer,
   clearDatabase,
   setupUsers,
-  startAuxTestServer,
   TestClient,
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
-import { authenticator, corsApiKeyAccessRules } from "./auth";
-import { AuthPolicy } from "./authPolicy";
-import errorHandler from "./errorHandler";
+import { pathJoin2 } from "./helpers";
+import { v4 as uuid } from "uuid";
 
 let server: TestServer;
 let mockAdminUserInput: User;
 let mockNonAdminUserInput: User;
 
 let testServer: AuxTestServer;
-let httpPrefix: string;
 
 beforeAll(async () => {
   server = await serverPromise;
@@ -35,100 +30,13 @@ beforeAll(async () => {
     email: "user_non_admin@gmail.com",
     password: "y".repeat(64),
   };
-
-  const { app } = (testServer = await startAuxTestServer());
-  app.use((req, res, next) => {
-    req.config = {
-      httpPrefix,
-      jwtAudience: "livepeer",
-      jwtSecret: "secret",
-    } as any;
-    next();
-  });
-  app.use(authenticator());
-
-  app.all("/admin/*", authorizer({ anyAdmin: true }), (_req, res) =>
-    res.status(202).end()
-  );
-
-  const router = Router();
-  router.use(
-    "/nested",
-    Router().all("/*", authorizer({}), (_req, res) => res.status(203).end())
-  );
-  router.all("/*", authorizer({}), (_req, res) => res.status(203).end());
-  app.use("/router", router);
-
-  app.all("/*", authorizer({}), (_req, res) => res.status(204).end());
-  app.use(errorHandler());
 });
 
-afterAll(() => testServer.close());
-
 afterEach(async () => {
-  httpPrefix = "";
   await clearDatabase(server);
 });
 
-describe("auth middleware", () => {
-  describe("api header parsing", () => {
-    let nonAdminUser: User;
-    let nonAdminApiKey: string;
-    let nonAdminToken: string;
-    let basicAuth: string;
-    let basicAuth64: string;
-    let client: TestClient;
-
-    const fetchWithHeader = async (header?: string) => {
-      const res = await client.fetch("/foo", {
-        headers: header ? { authorization: header } : {},
-      });
-      return res.status;
-    };
-
-    const expectStatus = (header?: string) =>
-      expect(fetchWithHeader(header)).resolves;
-
-    beforeEach(async () => {
-      ({ nonAdminUser, nonAdminApiKey, nonAdminToken } = await setupUsers(
-        server,
-        mockAdminUserInput,
-        mockNonAdminUserInput
-      ));
-      basicAuth = `${nonAdminUser.id}:${nonAdminApiKey}`;
-      basicAuth64 = Buffer.from(basicAuth).toString("base64");
-
-      client = new TestClient({ server: testServer });
-    });
-
-    it("should 401 without auth", async () => {
-      await expectStatus().toBe(401);
-    });
-
-    it("should auth by bearer api key", async () => {
-      client.apiKey = nonAdminApiKey;
-      await expectStatus().toBe(204);
-    });
-
-    it("should auth by basic auth (api key password)", async () => {
-      client.basicAuth = basicAuth;
-      await expectStatus().toBe(204);
-    });
-
-    it("should auth by jwt", async () => {
-      client.jwtAuth = nonAdminToken;
-      await expectStatus().toBe(204);
-    });
-
-    it("should be case and whitespace insensitive", async () => {
-      await expectStatus(`   beAReR\t ${nonAdminApiKey}`).toBe(204);
-      await expectStatus(`  BEARER ${nonAdminApiKey}`).toBe(204);
-      await expectStatus(` baSIc  ${basicAuth64}`).toBe(204);
-      await expectStatus(`\tJwt    ${nonAdminToken}`).toBe(204);
-      await expectStatus(`JWT \t${nonAdminToken}   `).toBe(204);
-    });
-  });
-
+describe("controller/auth", () => {
   describe("api token access rules", () => {
     let adminUser: User;
     let adminApiKey: string;
@@ -139,19 +47,22 @@ describe("auth middleware", () => {
     const setAccess = (token: string, rules?: ApiToken["access"]["rules"]) =>
       db.apiToken.update(token, { access: { rules } });
 
-    const fetchStatus = async (method: string, path: string) => {
-      const res = await client.fetch(path, { method });
+    const fetchAuth = async (method: string, path: string) => {
+      const res = await client.fetch("/auth", {
+        method,
+        headers: {
+          "x-original-uri": pathJoin2("https://livepeer.studio/", path),
+        },
+      });
       return res.status;
     };
 
     const expectStatus = (method: string, path: string) =>
-      expect(fetchStatus(method, path)).resolves;
+      expect(fetchAuth(method, path)).resolves;
 
     beforeEach(async () => {
-      ({ adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
+      ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminApiKey } =
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
-
-      client = new TestClient({ server: testServer });
       client.apiKey = nonAdminApiKey;
     });
 
@@ -197,11 +108,11 @@ describe("auth middleware", () => {
         await expectStatus("post", "/foo").toBe(403);
         await expectStatus("get", "/foo").toBe(403);
 
-        await expectStatus("options", "/foo/bar").toBe(403);
+        await expectStatus("delete", "/foo/bar").toBe(403);
         await expectStatus("post", "/foo/bar").toBe(403);
         await expectStatus("head", "/foo/bar").toBe(403);
 
-        await expectStatus("options", "/foo/bar/zaz").toBe(403);
+        await expectStatus("put", "/foo/bar/zaz").toBe(403);
         await expectStatus("patch", "/foo/bar/zaz").toBe(403);
         await expectStatus("get", "/foo/bar/zaz").toBe(403);
       });
@@ -259,46 +170,6 @@ describe("auth middleware", () => {
       });
     });
 
-    describe("http prefix", () => {
-      it("should trim http prefix when authorizing", async () => {
-        httpPrefix = "/livepeer/api";
-        await setAccess(nonAdminApiKey, [{ resources: ["goo", "router/baz"] }]);
-
-        await expectStatus("head", "/zoo").toBe(403);
-        await expectStatus("put", "/api/goo").toBe(403);
-        await expectStatus("post", "/livepeer/api/goo/blah").toBe(403);
-        await expectStatus("post", "/livepeer/api/baz").toBe(403);
-
-        await expectStatus("get", "/goo").toBe(204);
-        await expectStatus("post", "/router/baz").toBe(203);
-        await expectStatus("post", "/livepeer/api/goo").toBe(204);
-        await expectStatus("post", "/livepeer/api/router/baz").toBe(204);
-      });
-
-      it("should handle leading and trailing slashes gracefully", async () => {
-        await setAccess(nonAdminApiKey, [{ resources: ["far"] }]);
-
-        for (const prefix of ["api", "/api", "/api/", "api/"]) {
-          httpPrefix = prefix;
-          await expectStatus("post", "/api/far").toBe(204);
-          await expectStatus("post", "/far").toBe(204);
-          await expectStatus("post", "/far/api").toBe(403);
-        }
-      });
-
-      it("should handle corner cases", async () => {
-        await setAccess(nonAdminApiKey, [{ resources: ["/"] }]);
-        httpPrefix = "/api";
-        await expectStatus("head", "/api").toBe(204);
-        await expectStatus("head", "/api/").toBe(204);
-        await expectStatus("head", "/api-not").toBe(403);
-        await expectStatus("head", "//api").toBe(403);
-
-        await setAccess(nonAdminApiKey, [{ resources: ["/api-key"] }]);
-        await expectStatus("head", "/api-key").toBe(204);
-      });
-    });
-
     it("should block access on bad rules", async () => {
       await setAccess(nonAdminApiKey, [{ resources: ["far", "far"] }]);
       await expectStatus("post", "/far").toBe(403);
@@ -329,28 +200,14 @@ describe("auth middleware", () => {
       await expectStatus("get", "/router/router/foo").toBe(403);
       await expectStatus("post", "/foo").toBe(403);
 
-      await expectStatus("post", "/router/nested/zaz").toBe(203);
-      await expectStatus("post", "/router/foo").toBe(203);
+      await expectStatus("post", "/router/nested/zaz").toBe(204);
+      await expectStatus("post", "/router/foo").toBe(204);
       await expectStatus("post", "/bar").toBe(204);
     });
 
     it("should handle query strings fine", async () => {
       await setAccess(nonAdminApiKey, [{ resources: ["foo"] }]);
       await expectStatus("post", "/foo?hello=query").toBe(204);
-    });
-
-    it("should authorize admin independently", async () => {
-      await setAccess(nonAdminApiKey, [{ resources: ["admin/bra"] }]);
-      await expectStatus("post", "/admin/bra").toBe(403);
-
-      client.apiKey = adminApiKey;
-      await setAccess(adminApiKey, [{ resources: ["gus", "admin/foo"] }]);
-
-      await expectStatus("post", "/fra").toBe(403);
-      await expectStatus("put", "/admin/bar").toBe(403);
-
-      await expectStatus("get", "/gus").toBe(204);
-      await expectStatus("head", "/admin/foo").toBe(202);
     });
   });
 
@@ -375,50 +232,6 @@ describe("auth middleware", () => {
       } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
     });
 
-    const setAccess = (token: string, access?: ApiToken["access"]) =>
-      db.apiToken.update(token, { access });
-
-    const expectResponse = (res: Response) =>
-      expect(res.json().then((body) => ({ status: res.status, body })))
-        .resolves;
-
-    it("shoul have valid CORS API key access rules", async () => {
-      expect(() => new AuthPolicy(corsApiKeyAccessRules)).not.toThrow();
-    });
-
-    it("should disallow admins from creating CORS API keys", async () => {
-      client.jwtAuth = adminToken;
-      let res = await client.post("/api-token", {
-        name: "test",
-        access: { cors: {} },
-      });
-      expectResponse(res).toEqual({
-        status: 403,
-        body: {
-          errors: ["cors api keys are not available to admins"],
-        },
-      });
-    });
-
-    it("should disallow CORS access on existing admin API keys", async () => {
-      client.apiKey = adminApiKey;
-      let res = await client.get("/stream");
-      expectResponse(res).toEqual({ status: 200, body: [] });
-
-      await setAccess(adminApiKey, {
-        cors: { allowedOrigins: ["http://localhost:3000"] },
-      });
-      res = await client.get("/stream");
-      expectResponse(res).toEqual({
-        status: 403,
-        body: {
-          errors: [
-            expect.stringMatching("cors access is not available to admins"),
-          ],
-        },
-      });
-    });
-
     const testMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
     const testOrigins = [
@@ -439,7 +252,13 @@ describe("auth middleware", () => {
     ];
 
     const fetchCors = async (method: string, path: string, origin: string) => {
-      const res = await client.fetch(path, { method, headers: { origin } });
+      const res = await client.fetch("/auth", {
+        method,
+        headers: {
+          "x-original-uri": pathJoin2("https://livepeer.studio/", path),
+          origin,
+        },
+      });
       if (method === "OPTIONS") {
         expect(res.status).toEqual(204);
         expect(res.headers.get("access-control-allow-methods")).toEqual(
@@ -459,38 +278,12 @@ describe("auth middleware", () => {
     };
 
     const isAllowed = async (method: string, path: string, origin: string) => {
-      const { corsAllowed } = await fetchCors(method, path, origin);
+      const { corsAllowed, body } = await fetchCors(method, path, origin);
       return corsAllowed;
     };
 
     const expectAllowed = (method: string, path: string, origin: string) =>
       expect(isAllowed(method, path, origin)).resolves;
-
-    it("should allow any origin on pre-flight requests", async () => {
-      for (const origin of testOrigins) {
-        await expectAllowed("OPTIONS", "/stream", origin).toBe(true);
-        await expectAllowed(
-          "OPTIONS",
-          "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
-          origin
-        ).toBe(true);
-        await expectAllowed("OPTIONS", "/playback/1234", origin).toBe(true);
-        await expectAllowed("OPTIONS", "/user", origin).toBe(true);
-      }
-    });
-
-    it("should allow requests from any origin on always-allowed paths", async () => {
-      for (const method of testMethods) {
-        for (const origin of testOrigins) {
-          await expectAllowed(
-            method,
-            "/asset/upload/direct?token=eyJhbG.eyJzdWI.SflKx",
-            origin
-          ).toBe(true);
-          await expectAllowed(method, "/playback/1234", origin).toBe(true);
-        }
-      }
-    });
 
     it("should NOT allow requests from custom origins on regular paths", async () => {
       for (const method of testMethods) {
@@ -574,13 +367,13 @@ describe("auth middleware", () => {
         fetchCors("GET", "/stream/1234", allowedOrigins[0])
       ).resolves.toMatchObject({
         corsAllowed: true,
-        status: 404,
+        status: 204,
       });
       await expect(
         fetchCors("GET", "/data/views/1234/total", allowedOrigins[0])
       ).resolves.toMatchObject({
         corsAllowed: true,
-        status: 404,
+        status: 204,
       });
 
       for (const [method, path] of forbiddenApis) {
@@ -610,7 +403,7 @@ describe("auth middleware", () => {
           allowedOrigins[0]
         );
         expect(corsAllowed).toBe(true);
-        expect([200, 403, 404, 422]).toContain(status);
+        expect(status).toBe(204);
         if (status === 403) {
           expect(body).toMatchObject({
             errors: [
@@ -643,6 +436,95 @@ describe("auth middleware", () => {
           },
         });
       }
+    });
+  });
+
+  describe("user resources access", () => {
+    let adminUser: User;
+    let adminApiKey: string;
+    let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let nonAdminToken: string;
+    let client: TestClient;
+
+    let adminStream: Stream, adminAsset: Asset;
+    let nonAdminStream: Stream, nonAdminAsset: Asset;
+
+    beforeEach(async () => {
+      ({
+        client,
+        adminUser,
+        adminApiKey,
+        adminToken,
+        nonAdminUser,
+        nonAdminApiKey,
+        nonAdminToken,
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      client.apiKey = nonAdminApiKey;
+
+      nonAdminStream = await db.stream.create({
+        id: uuid(),
+        userId: nonAdminUser.id,
+      } as any);
+      nonAdminAsset = await db.asset.create({
+        id: uuid(),
+        userId: nonAdminUser.id,
+      } as any);
+      adminStream = await db.stream.create({
+        id: uuid(),
+        userId: adminUser.id,
+      } as any);
+      adminAsset = await db.asset.create({
+        id: uuid(),
+        userId: adminUser.id,
+      } as any);
+    });
+
+    const fetchAuth = async (ids: { streamId?: string; assetId?: string }) => {
+      const res = await client.fetch("/auth", {
+        method: "GET",
+        headers: {
+          "x-original-uri": "https://livepeer.studio/api/data/views/1234/total",
+          ...(ids.streamId ? { "x-livepeer-stream-id": ids.streamId } : null),
+          ...(ids.assetId ? { "x-livepeer-asset-id": ids.assetId } : null),
+        },
+      });
+      return res.status;
+    };
+
+    it("should disallow access to non-existent resources", async () => {
+      await expect(fetchAuth({ streamId: "1234" })).resolves.toBe(404);
+      await expect(fetchAuth({ assetId: "1234" })).resolves.toBe(404);
+    });
+
+    it("should disallow access to deleted resources", async () => {
+      await db.stream.markDeleted(nonAdminStream.id);
+      await db.asset.markDeleted(nonAdminAsset.id);
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        404
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(404);
+    });
+
+    it("should disallow access to other users resources", async () => {
+      await expect(fetchAuth({ streamId: adminStream.id })).resolves.toBe(403);
+      await expect(fetchAuth({ assetId: adminAsset.id })).resolves.toBe(403);
+    });
+
+    it("should allow access to own resources", async () => {
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        204
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
+    });
+
+    it("should allow admins to access to other users resources", async () => {
+      client.apiKey = adminApiKey;
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        204
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
     });
   });
 });
