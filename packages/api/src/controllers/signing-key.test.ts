@@ -99,6 +99,27 @@ describe("controllers/signing-key", () => {
       expect(res.status).toBe(204);
     });
 
+    it("should allow disable and enable the signing key & change the name", async () => {
+      let res = await client.patch(`/signing-key/${signingKey.id}`, {
+        disabled: true,
+        name: "My test signing key 1",
+      });
+      expect(res.status).toBe(204);
+      res = await client.get(`/signing-key/${signingKey.id}`);
+      let updated = await res.json();
+      expect(updated.disabled).toBe(true);
+      expect(updated.name).toBe("My test signing key 1");
+      res = await client.patch(`/signing-key/${signingKey.id}`, {
+        disabled: false,
+        name: "My test signing key 2",
+      });
+      expect(res.status).toBe(204);
+      res = await client.get(`/signing-key/${signingKey.id}`);
+      updated = await res.json();
+      expect(updated.disabled).toBe(false);
+      expect(updated.name).toBe("My test signing key 2");
+    });
+
     it("shoud delete the signing key", async () => {
       let res = await client.delete(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(204);

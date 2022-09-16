@@ -1,4 +1,4 @@
-import { authorizer } from "../middleware";
+import { authorizer, validatePost } from "../middleware";
 import { Router } from "express";
 import {
   FieldsMap,
@@ -12,7 +12,11 @@ import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
 import { generateKeyPairSync } from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
-import { SigningKey, SigningKeyResponsePayload } from "../schema/types";
+import {
+  SigningKey,
+  SigningKeyPatchPayload,
+  SigningKeyResponsePayload,
+} from "../schema/types";
 import { WithID } from "../store/types";
 
 const fieldsMap: FieldsMap = {
@@ -139,47 +143,57 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(signingKey);
 });
 
-app.post("/", authorizer({}), async (req, res) => {
-  const query = parseFilters(fieldsMap, "");
-  query.push(sql`signing_key.data->>'userId' = ${req.user.id}`);
-  query.push(sql`signing_key.data->>'deleted' IS NULL`);
-  const [output] = await db.signingKey.find(query, {
-    limit: 100,
-    fields: " signing_key.id as id, signing_key.data as data",
-    from: `signing_key`,
-    order: parseOrder(fieldsMap, "createdAt-true"),
-    process: ({ data }) => {
-      return data;
-    },
-  });
-
-  if (output.length > 10) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only have up to 10 signing keys, delete some first"],
+app.post(
+  "/",
+  validatePost("new-signing-key-payload"),
+  authorizer({}),
+  async (req, res) => {
+    const query = parseFilters(fieldsMap, "");
+    query.push(sql`signing_key.data->>'userId' = ${req.user.id}`);
+    query.push(sql`signing_key.data->>'deleted' IS NULL`);
+    const [output] = await db.signingKey.find(query, {
+      limit: 100,
+      fields: " signing_key.id as id, signing_key.data as data",
+      from: `signing_key`,
+      order: parseOrder(fieldsMap, "createdAt-true"),
+      process: ({ data }) => {
+        return data;
+      },
     });
+
+    if (output.length > 10) {
+      res.status(403);
+      return res.json({
+        errors: ["user can only have up to 10 signing keys, delete some first"],
+      });
+    }
+
+    const id = uuid();
+    const keypair = generateSigningKeys();
+
+    if (!req.body.name || req.body.name === "") {
+      req.body.name = "Signing Key " + (output.length + 1);
+    }
+
+    var doc: WithID<SigningKey> = {
+      id,
+      name: req.body.name,
+      userId: req.user.id,
+      createdAt: Date.now(),
+      publicKey: keypair.publicKey,
+    };
+
+    await db.signingKey.create(doc);
+
+    var createdSigningKey: SigningKeyResponsePayload = {
+      ...doc,
+      privateKey: keypair.privateKey,
+    };
+
+    res.status(201);
+    res.json(createdSigningKey);
   }
-
-  const id = uuid();
-  const keypair = generateSigningKeys();
-
-  var doc: WithID<SigningKey> = {
-    id,
-    userId: req.user.id,
-    createdAt: Date.now(),
-    publicKey: keypair.publicKey,
-  };
-
-  await db.signingKey.create(doc);
-
-  var createdSigningKey: SigningKeyResponsePayload = {
-    ...doc,
-    privateKey: keypair.privateKey,
-  };
-
-  res.status(201);
-  res.json(createdSigningKey);
-});
+);
 
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
@@ -194,5 +208,31 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.status(204);
   res.end();
 });
+
+app.patch(
+  "/:id",
+  validatePost("signing-key-patch-payload"),
+  authorizer({}),
+  async (req, res) => {
+    const { id } = req.params;
+    const signingKey = await db.signingKey.get(id);
+    if (!signingKey || signingKey.deleted) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+    if (!req.user.admin && req.user.id !== signingKey.userId) {
+      return res.status(403).json({
+        errors: ["users may change only their own signing key"],
+      });
+    }
+    const payload = req.body as SigningKeyPatchPayload;
+    console.log(
+      `patch signing key id=${id} payload=${JSON.stringify(
+        JSON.stringify(payload)
+      )}`
+    );
+    await db.signingKey.update(id, payload);
+    res.status(204).end();
+  }
+);
 
 export default app;
