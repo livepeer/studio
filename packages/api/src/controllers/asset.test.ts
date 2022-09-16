@@ -131,6 +131,23 @@ describe("controllers/asset", () => {
       });
     });
 
+    it("should allow editing asset playback policy", async () => {
+      let playbackPolicy = {
+        enabled: true,
+        signingKeyId: "00000000-0000-0000-0000-000000000000", // TODO: this should be a valid key id
+      };
+      const res = await client.patch(`/asset/${asset.id}`, {
+        playbackPolicy: playbackPolicy,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toMatchObject({
+        ...asset,
+        playbackPolicy,
+        status: { ...asset.status, updatedAt: expect.any(Number) },
+      });
+    });
+
     it("should start export task when adding IPFS storage", async () => {
       let res = await client.patch(`/asset/${asset.id}`, {
         storage: { ipfs: { spec: { nftMetadata: { a: "b" } } } },
