@@ -1,6 +1,6 @@
 import { Response } from "node-fetch";
 
-import { ApiToken, User } from "../schema/types";
+import { ApiToken, Asset, Stream, User } from "../schema/types";
 import { db } from "../store";
 import {
   AuxTestServer,
@@ -10,6 +10,7 @@ import {
 } from "../test-helpers";
 import serverPromise, { TestServer } from "../test-server";
 import { pathJoin2 } from "./helpers";
+import { v4 as uuid } from "uuid";
 
 let server: TestServer;
 let mockAdminUserInput: User;
@@ -435,6 +436,95 @@ describe("controller/auth", () => {
           },
         });
       }
+    });
+  });
+
+  describe("user resources access", () => {
+    let adminUser: User;
+    let adminApiKey: string;
+    let adminToken: string;
+    let nonAdminUser: User;
+    let nonAdminApiKey: string;
+    let nonAdminToken: string;
+    let client: TestClient;
+
+    let adminStream: Stream, adminAsset: Asset;
+    let nonAdminStream: Stream, nonAdminAsset: Asset;
+
+    beforeEach(async () => {
+      ({
+        client,
+        adminUser,
+        adminApiKey,
+        adminToken,
+        nonAdminUser,
+        nonAdminApiKey,
+        nonAdminToken,
+      } = await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
+      client.apiKey = nonAdminApiKey;
+
+      nonAdminStream = await db.stream.create({
+        id: uuid(),
+        userId: nonAdminUser.id,
+      } as any);
+      nonAdminAsset = await db.asset.create({
+        id: uuid(),
+        userId: nonAdminUser.id,
+      } as any);
+      adminStream = await db.stream.create({
+        id: uuid(),
+        userId: adminUser.id,
+      } as any);
+      adminAsset = await db.asset.create({
+        id: uuid(),
+        userId: adminUser.id,
+      } as any);
+    });
+
+    const fetchAuth = async (ids: { streamId?: string; assetId?: string }) => {
+      const res = await client.fetch("/auth", {
+        method: "GET",
+        headers: {
+          "x-original-uri": "https://livepeer.studio/api/data/views/1234/total",
+          ...(ids.streamId ? { "x-livepeer-stream-id": ids.streamId } : null),
+          ...(ids.assetId ? { "x-livepeer-asset-id": ids.assetId } : null),
+        },
+      });
+      return res.status;
+    };
+
+    it("should disallow access to non-existent resources", async () => {
+      await expect(fetchAuth({ streamId: "1234" })).resolves.toBe(404);
+      await expect(fetchAuth({ assetId: "1234" })).resolves.toBe(404);
+    });
+
+    it("should disallow access to deleted resources", async () => {
+      await db.stream.markDeleted(nonAdminStream.id);
+      await db.asset.markDeleted(nonAdminAsset.id);
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        404
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(404);
+    });
+
+    it("should disallow access to other users resources", async () => {
+      await expect(fetchAuth({ streamId: adminStream.id })).resolves.toBe(403);
+      await expect(fetchAuth({ assetId: adminAsset.id })).resolves.toBe(403);
+    });
+
+    it("should allow access to own resources", async () => {
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        204
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
+    });
+
+    it("should allow admins to access to other users resources", async () => {
+      client.apiKey = adminApiKey;
+      await expect(fetchAuth({ streamId: nonAdminStream.id })).resolves.toBe(
+        204
+      );
+      await expect(fetchAuth({ assetId: nonAdminAsset.id })).resolves.toBe(204);
     });
   });
 });
