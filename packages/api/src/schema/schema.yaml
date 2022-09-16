@@ -996,6 +996,13 @@ components:
                 $ref: "#/components/schemas/ipfs-file-info/properties"
                 nftMetadata:
                   $ref: "#/components/schemas/ipfs-file-info"
+                updatedAt:
+                  type: number
+                  readOnly: true
+                  description:
+                    Timestamp (in milliseconds) at which IPFS export task was
+                    updated
+                  example: 1587667174725
             status:
               readOnly: true
               additionalProperties: false

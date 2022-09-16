@@ -20,6 +20,7 @@ import CurlyBracesIcon from "../../../public/img/icons/curly-braces.svg";
 import DatabaseIcon from "../../../public/img/icons/database.svg";
 import { useApi } from "hooks";
 import Spinner from "../Spinner";
+import moment from "moment";
 
 const StyledIpfsIcon = styled(IpfsIcon, {
   color: "$gray",
@@ -144,6 +145,15 @@ const AssetOverviewTab = ({
               <StyledIpfsIcon />
               <Text size="3">IPFS</Text>
             </Flex>
+
+            {asset?.storage?.ipfs?.updatedAt && (
+              <Text size="3" variant="gray">
+                Uploaded on{" "}
+                {moment
+                  .unix(asset?.storage?.ipfs?.updatedAt / 1000)
+                  .format("LLL")}
+              </Text>
+            )}
 
             {!asset?.storage?.ipfs?.cid && (
               <>
