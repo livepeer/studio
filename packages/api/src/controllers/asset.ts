@@ -108,8 +108,6 @@ async function validateAssetPayload(
     }
   }
 
-  // TODO: Validate playbackPolicy when signing-key pr is merged
-
   return {
     id,
     playbackId,
@@ -839,7 +837,6 @@ app.patch(
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
-    // TODO: Validate playbackPolicy when signing-key pr is merged
     await req.taskScheduler.updateAsset(asset, {
       name,
       meta,

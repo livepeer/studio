@@ -451,6 +451,8 @@ components:
           example: eaw4nk06ts2d0mzb
           description: Used to form playback URL
           unique: true
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
           default:
@@ -677,6 +679,8 @@ components:
           $ref: "#/components/schemas/stream/properties/suspended"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
 
     object-store-patch-payload:
       type: object
@@ -735,15 +739,13 @@ components:
           $ref: "#/components/schemas/webhook-response"
 
     playback-policy:
-      type: object
-      additionalProperties: false
-      properties:
-        enabled:
-          type: boolean
-          description: If the policy is enabled for this asset / stream
-        signingKeyId:
-          type: string
-          description: ID of the key to use for signing the playback token
+      type: string
+      description:
+        Whether the playback policy for a asset or stream is public or signed
+      enum:
+        - public
+        - signed
+        - private
 
     session:
       type: object
@@ -978,7 +980,7 @@ components:
           example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
         playbackPolicy:
-          ref: "#/components/schemas/playback-policy"
+          $ref: "#/components/schemas/playback-policy"
         downloadUrl:
           type: string
           readOnly: true
@@ -1267,7 +1269,7 @@ components:
             custom name or title
           example: filename.mp4
         playbackPolicy:
-          ref: "#/components/schemas/playback-policy"
+          $ref: "#/components/schemas/playback-policy"
         meta:
           type: object
           description: User input metadata associated with the asset

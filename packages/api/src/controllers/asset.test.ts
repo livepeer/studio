@@ -132,12 +132,9 @@ describe("controllers/asset", () => {
     });
 
     it("should allow editing asset playback policy", async () => {
-      let playbackPolicy = {
-        enabled: true,
-        signingKeyId: "00000000-0000-0000-0000-000000000000", // TODO: this should be a valid key id
-      };
+      let playbackPolicy = "public";
       const res = await client.patch(`/asset/${asset.id}`, {
-        playbackPolicy: playbackPolicy,
+        playbackPolicy,
       });
       expect(res.status).toBe(200);
       const body = await res.json();
