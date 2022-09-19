@@ -184,7 +184,7 @@ const AssetDetail = ({
       />
       <Layout id="assets" breadcrumbs={breadcrumbs}>
         <Box css={{ px: "$6", py: "$7" }}>
-          {asset != undefined && totalViews != undefined ? (
+          {asset != undefined ? (
             <>
               <Flex>
                 <Box
@@ -212,19 +212,23 @@ const AssetDetail = ({
                       </Flex>
                     </Heading>
                     <Flex align="center">
-                      <Tooltip
-                        css={{ bc: "$neutral3", color: "$neutral3" }}
-                        content={
-                          <Box css={{ color: "$hiContrast" }}>
-                            Views are defined as at least 1 second of watch
-                            time.
-                          </Box>
-                        }>
-                        <Flex align="center" css={{ mr: "$3", fontSize: "$2" }}>
-                          <Box as={PlayIcon} css={{ mr: "$1" }} /> {totalViews}{" "}
-                          views
-                        </Flex>
-                      </Tooltip>
+                      {totalViews != undefined ? (
+                        <Tooltip
+                          css={{ bc: "$neutral3", color: "$neutral3" }}
+                          content={
+                            <Box css={{ color: "$hiContrast" }}>
+                              Views are defined as at least 1 second of watch
+                              time.
+                            </Box>
+                          }>
+                          <Flex
+                            align="center"
+                            css={{ mr: "$3", fontSize: "$2" }}>
+                            <Box as={PlayIcon} css={{ mr: "$1" }} />{" "}
+                            {totalViews} views
+                          </Flex>
+                        </Tooltip>
+                      ) : null}
                       <Flex align="center" css={{ fontSize: "$2" }}>
                         <Box as={CalendarIcon} css={{ mr: "$1" }} />
                         <RelativeTime
