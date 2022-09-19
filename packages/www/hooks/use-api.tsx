@@ -169,15 +169,7 @@ const makeContext = (
       if (state.token && !headers.has("authorization")) {
         headers.set("authorization", `JWT ${state.token}`);
       }
-
-      // TODO: remove conditional once we add a route for /api/data
-      if (url.includes("/data")) {
-        url = `${endpoint}${url}`;
-      } else {
-        url = `${endpoint}/api${url}`;
-      }
-
-      const res = await fetch(url, {
+      const res = await fetch(`${endpoint}/api${url}`, {
         ...opts,
         headers,
       });
@@ -1241,9 +1233,9 @@ const makeContext = (
       return { tag: "unknown", commit: "unknowm" };
     },
 
-    async getTotalViews(playbackId): Promise<number> {
+    async getTotalViews(assetId: string): Promise<number> {
       const [res, totalViews] = await context.fetch(
-        `/data/views/${playbackId}/total`
+        `/data/views/${assetId}/total`
       );
       if (res.status !== 200) {
         throw totalViews && typeof totalViews === "object"
