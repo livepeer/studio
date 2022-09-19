@@ -20,7 +20,7 @@ const AssetDetails = () => {
   const id = query.id as string;
 
   const { data: asset, refetch: refetchAsset } = useQuery(
-    [id],
+    ["asset", id],
     () => getAsset(id),
     {
       refetchInterval,
@@ -28,10 +28,14 @@ const AssetDetails = () => {
     }
   );
 
-  const { data: totalViews } = useQuery([id], () => getTotalViews(id), {
-    refetchInterval,
-    enabled: Boolean(id),
-  });
+  const { data: totalViews } = useQuery(
+    ["totalViews", id],
+    () => getTotalViews(id),
+    {
+      refetchInterval,
+      enabled: Boolean(id),
+    }
+  );
 
   return (
     <AssetDetail
