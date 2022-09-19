@@ -28,14 +28,10 @@ const AssetDetails = () => {
     }
   );
 
-  const { data: totalViews } = useQuery(
-    [asset?.playbackId],
-    () => getTotalViews(asset?.playbackId),
-    {
-      refetchInterval,
-      enabled: Boolean(asset?.playbackId),
-    }
-  );
+  const { data: totalViews } = useQuery([id], () => getTotalViews(id), {
+    refetchInterval,
+    enabled: Boolean(id),
+  });
 
   return (
     <AssetDetail

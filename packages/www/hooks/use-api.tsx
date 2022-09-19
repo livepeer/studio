@@ -1241,9 +1241,9 @@ const makeContext = (
       return { tag: "unknown", commit: "unknowm" };
     },
 
-    async getTotalViews(playbackId): Promise<number> {
+    async getTotalViews(assetId: string): Promise<number> {
       const [res, totalViews] = await context.fetch(
-        `/data/views/${playbackId}/total`
+        `/data/views/${assetId}/total`
       );
       if (res.status !== 200) {
         throw totalViews && typeof totalViews === "object"
