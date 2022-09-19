@@ -507,6 +507,13 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(204);
       });
 
+      it("should allow patch of playbackPolicy", async () => {
+        const res = await client.patch(patchPath, {
+          playbackPolicy: "public",
+        });
+        expect(res.status).toBe(204);
+      });
+
       it("should disallow additional fields", async () => {
         const res = await client.patch(patchPath, {
           name: "the stream name is immutable",
