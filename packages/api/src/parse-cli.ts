@@ -115,6 +115,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://{{ip}}:8935",
       },
+      "ipfs-gateway-url": {
+        describe:
+          "base URL to use for the IPFS content gateway returned on assets.",
+        type: "string",
+        default: "https://cloudflare-ipfs.com/ipfs/",
+      },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
         type: "boolean",
