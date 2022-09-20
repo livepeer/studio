@@ -82,6 +82,7 @@ const AssetDetail = ({
         onEdit={onEditAsset}
         asset={asset}
       />
+
       <Layout id="assets" breadcrumbs={breadcrumbs}>
         <Box css={{ px: "$6", py: "$7" }}>
           {asset != undefined ? (
