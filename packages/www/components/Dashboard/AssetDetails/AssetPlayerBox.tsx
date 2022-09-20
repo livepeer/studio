@@ -2,6 +2,7 @@ import { Badge, Box, Button, Flex, Link, Status } from "@livepeer/design-system"
 import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons"
 import { Asset } from "livepeer"
 import Player from "../Player"
+import AssetSharePopup from "./AssetSharePopup"
 
 export type AssetPlayerBoxProps = {
   asset?: Asset;
@@ -104,18 +105,21 @@ const AssetPlayerBox = ({ asset }: AssetPlayerBoxProps) => {
               </Button>
             </Link>
           )}
-          <Button
-            size="2"
-            onClick={() => {}}
-            ghost={true}>
-            <Box
-              as={Share2Icon}
-              css={{
-                mr: "$1",
-              }}
-            />
-            Share
-          </Button>
+
+          <AssetSharePopup triggerNode={(
+            <Button
+              size="2"
+              onClick={() => {}}
+              ghost={true}>
+              <Box
+                as={Share2Icon}
+                css={{
+                  mr: "$1",
+                }}
+              />
+              Share
+            </Button>
+          )} />
         </Flex>
       </Box>
     </Box>
