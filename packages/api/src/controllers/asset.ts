@@ -150,7 +150,7 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   };
 }
 
-const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
+const ipfsGateway = "https://cloudflare-ipfs.com/ipfs/";
 
 export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(ipfs: T): T {
   if (!ipfs?.cid) {
