@@ -18701,10 +18701,10 @@ live-server@^1.2.1:
     send latest
     serve-index "^1.9.1"
 
-livepeer@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-0.3.0.tgz#445d37a40330d93cea861fae78f8be2c2dbfa056"
-  integrity sha512-gP1jmVYZAcd3Kj0feJTWv2fhJrWnWsFOnITYX+5My8dzbEXL5Z0Bs5frn/GeVPBgUpcMty+iLCp1AsN/e5x8rg==
+livepeer@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-0.5.0.tgz#514d9569ab032a609f4fe51f360e6262a76da1f1"
+  integrity sha512-vJsIv17ITYjDt/9fp+4IGGr/xWU+AvjiFD/541h0j48Ui2Cc7ny4jWWn9sa6C4dj2ImmKT1G80xyETfn63xxmQ==
   dependencies:
     cross-fetch "^3.1.5"
     hls.js "^1.2.1"
