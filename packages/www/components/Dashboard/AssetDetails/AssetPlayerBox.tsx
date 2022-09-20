@@ -1,4 +1,5 @@
-import { Badge, Box, Status } from "@livepeer/design-system"
+import { Badge, Box, Button, Flex, Link, Status } from "@livepeer/design-system"
+import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons"
 import { Asset } from "livepeer"
 import Player from "../Player"
 
@@ -19,7 +20,7 @@ const AssetPlayerBox = ({ asset }: AssetPlayerBoxProps) => {
           borderRadius: "$3",
           overflow: "hidden",
           position: "relative",
-          mb: "$5",
+          mb: "$2",
         }}>
         {asset?.status?.phase === "ready" &&
         asset.playbackUrl ? (
@@ -80,6 +81,42 @@ const AssetPlayerBox = ({ asset }: AssetPlayerBoxProps) => {
             </Badge>
           </Box>
         )}
+      </Box>
+      <Box css={{
+        mb: "$5",
+      }}>
+        <Flex align="center">
+          {asset?.downloadUrl && (
+            <Link target="_blank" href={asset?.downloadUrl}>
+              <Button
+                size="2"
+                css={{
+                  mr: "$1",
+                }}
+                ghost={true}>
+                <Box
+                  as={DownloadIcon}
+                  css={{
+                    mr: "$1",
+                  }}
+                />
+                Download
+              </Button>
+            </Link>
+          )}
+          <Button
+            size="2"
+            onClick={() => {}}
+            ghost={true}>
+            <Box
+              as={Share2Icon}
+              css={{
+                mr: "$1",
+              }}
+            />
+            Share
+          </Button>
+        </Flex>
       </Box>
     </Box>
   )
