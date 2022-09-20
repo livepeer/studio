@@ -10,9 +10,13 @@ const buttonLinkCss = {
 
 export type AssetSharePopupProps = {
   triggerNode: ReactNode;
+  onEmbedVideoClick: () => void;
 }
 
-const AssetSharePopup = ({ triggerNode }: AssetSharePopupProps) => {
+const AssetSharePopup = ({
+  triggerNode,
+  onEmbedVideoClick,
+}: AssetSharePopupProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -29,7 +33,6 @@ const AssetSharePopup = ({ triggerNode }: AssetSharePopupProps) => {
         }}>
           <Button
             size="2"
-            onClick={() => {}}
             ghost={true}
             css={buttonLinkCss}>
             <Box
@@ -40,7 +43,7 @@ const AssetSharePopup = ({ triggerNode }: AssetSharePopupProps) => {
           </Button>
           <Button
             size="2"
-            onClick={() => {}}
+            onClick={() => onEmbedVideoClick()}
             ghost={true}
             css={buttonLinkCss}>
             <Box

@@ -6,9 +6,13 @@ import AssetSharePopup from "./AssetSharePopup"
 
 export type AssetPlayerBoxProps = {
   asset?: Asset;
+  onEmbedVideoClick: () => void;
 }
 
-const AssetPlayerBox = ({ asset }: AssetPlayerBoxProps) => {
+const AssetPlayerBox = ({
+  asset,
+  onEmbedVideoClick,
+}: AssetPlayerBoxProps) => {
   return (
     <Box
       css={{
@@ -106,20 +110,23 @@ const AssetPlayerBox = ({ asset }: AssetPlayerBoxProps) => {
             </Link>
           )}
 
-          <AssetSharePopup triggerNode={(
-            <Button
-              size="2"
-              onClick={() => {}}
-              ghost={true}>
-              <Box
-                as={Share2Icon}
-                css={{
-                  mr: "$1",
-                }}
-              />
-              Share
-            </Button>
-          )} />
+          <AssetSharePopup
+            triggerNode={(
+              <Button
+                size="2"
+                onClick={() => {}}
+                ghost={true}>
+                <Box
+                  as={Share2Icon}
+                  css={{
+                    mr: "$1",
+                  }}
+                />
+                Share
+              </Button>
+            )}
+            onEmbedVideoClick={onEmbedVideoClick}
+          />
         </Flex>
       </Box>
     </Box>

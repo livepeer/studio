@@ -5,6 +5,7 @@ import AssetPlayerBox from "@components/Dashboard/AssetDetails/AssetPlayerBox";
 import EditAssetDialog, {
   EditAssetReturnValue,
 } from "@components/Dashboard/AssetDetails/EditAssetDialog";
+import EmbedVideoDialog from "@components/Dashboard/AssetDetails/EmbedVideoDialog";
 import { Box, Flex } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { useApi, useLoggedIn } from "hooks";
@@ -28,6 +29,8 @@ export type AssetDetailProps = {
   refetchAsset: () => void;
   editAssetDialogOpen: boolean;
   setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
+  embedVideoDialogOpen: boolean;
+  setEmbedVideoDialogOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 const AssetDetail = ({
@@ -37,9 +40,11 @@ const AssetDetail = ({
   totalViews,
   setSwitchTab,
   activeTab = "Overview",
+  refetchAsset,
   editAssetDialogOpen,
   setEditAssetDialogOpen,
-  refetchAsset,
+  embedVideoDialogOpen,
+  setEmbedVideoDialogOpen,
 }: AssetDetailProps) => {
 
   useLoggedIn();
@@ -83,6 +88,12 @@ const AssetDetail = ({
         asset={asset}
       />
 
+      <EmbedVideoDialog
+        isOpen={embedVideoDialogOpen}
+        onOpenChange={setEmbedVideoDialogOpen}
+        asset={asset}
+      />
+
       <Layout id="assets" breadcrumbs={breadcrumbs}>
         <Box css={{ px: "$6", py: "$7" }}>
           {asset != undefined ? (
@@ -94,7 +105,10 @@ const AssetDetail = ({
                 }}>
                 <AssetHeadingBox asset={asset} totalViews={totalViews} />
                 <Box>
-                  <AssetPlayerBox asset={asset} />
+                  <AssetPlayerBox
+                    asset={asset}
+                    onEmbedVideoClick={() => setEmbedVideoDialogOpen(true)}
+                  />
                   <AssetDetailsBox asset={asset} />
                 </Box>
               </Box>

@@ -15,6 +15,7 @@ const AssetDetails = () => {
     "Overview"
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
+  const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
 
   const { query } = router;
   const id = query.id as string;
@@ -45,6 +46,8 @@ const AssetDetails = () => {
       setSwitchTab={setCurrentTab}
       editAssetDialogOpen={editAssetDialogOpen}
       setEditAssetDialogOpen={setEditAssetDialogOpen}
+      embedVideoDialogOpen={embedVideoDialogOpen}
+      setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}
       refetchAsset={() => refetchAsset()}
       breadcrumbs={[
         { title: "Assets", href: "/dashboard/assets" },
