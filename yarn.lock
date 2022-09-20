@@ -4530,10 +4530,10 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-0.3.0.tgz#ae96aec79309c7778c464ad27ff3ce0280bd4f2c"
-  integrity sha512-F6VXXyYdLPnqY3qS+m6yDVwj98qB+Cnr/YRAX48CQ8zhySDhFsNm5+s/RaWK638wv2gJmMYTVKpuLPldo35Fnw==
+"@livepeer/react@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-0.5.0.tgz#b3011d36f1061340d58aee99a1289c9a7e3e81cc"
+  integrity sha512-sMr4CHOdef1YJUHqdtXvu8bXXguJGn88YUlpZ7Opydeelgg0asvh/Lr4xM3FoM+3ePNJ2SJ55bFy49IUrlewIA==
   dependencies:
     "@tanstack/query-sync-storage-persister" "4.2.3"
     "@tanstack/react-query" "4.2.3"
@@ -18701,10 +18701,10 @@ live-server@^1.2.1:
     send latest
     serve-index "^1.9.1"
 
-livepeer@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-0.3.0.tgz#445d37a40330d93cea861fae78f8be2c2dbfa056"
-  integrity sha512-gP1jmVYZAcd3Kj0feJTWv2fhJrWnWsFOnITYX+5My8dzbEXL5Z0Bs5frn/GeVPBgUpcMty+iLCp1AsN/e5x8rg==
+livepeer@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-0.5.0.tgz#514d9569ab032a609f4fe51f360e6262a76da1f1"
+  integrity sha512-vJsIv17ITYjDt/9fp+4IGGr/xWU+AvjiFD/541h0j48Ui2Cc7ny4jWWn9sa6C4dj2ImmKT1G80xyETfn63xxmQ==
   dependencies:
     cross-fetch "^3.1.5"
     hls.js "^1.2.1"
