@@ -1,0 +1,112 @@
+import { Box, Flex, Button, Link } from "@livepeer/design-system";
+import { DownloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { Asset } from "livepeer";
+import { Dispatch, SetStateAction } from "react";
+
+
+export type AssetChildrenHeadingBoxProps = {
+  asset?: Asset;
+  children: React.ReactNode;
+  activeTab: "Overview" | "Event Logs";
+  setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
+  setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const AssetChildrenHeadingBox = ({ 
+  asset,
+  children,
+  activeTab,
+  setSwitchTab,
+  setEditAssetDialogOpen,
+}: AssetChildrenHeadingBoxProps) => {
+  return (
+    <Box css={{ flexGrow: 1, ml: "$8" }}>
+      <Flex
+        justify="between"
+        css={{
+          borderBottom: "1px solid",
+          borderColor: "$neutral6",
+          mb: "$4",
+          width: "100%",
+        }}>
+        <Box css={{ display: "flex" }}>
+          <Box
+            as="div"
+            onClick={() => setSwitchTab("Overview")}
+            css={{
+              pb: "$2",
+              width: "100%",
+              cursor: "pointer",
+              textDecoration: "none",
+              borderBottom: "2px solid",
+              borderColor:
+                activeTab === "Overview" ? "$blue9" : "transparent",
+              mr: "$5",
+              "&:hover": {
+                textDecoration: "none",
+              },
+            }}>
+            Overview
+          </Box>
+
+          <Box
+            as="div"
+            onClick={() => setSwitchTab("Event Logs")}
+            css={{
+              textDecoration: "none",
+              pb: "$2",
+              width: "100%",
+              cursor: "pointer",
+              borderBottom: "2px solid",
+              borderColor:
+                activeTab === "Event Logs"
+                  ? "$blue9"
+                  : "transparent",
+              whiteSpace: "nowrap",
+              "&:hover": {
+                textDecoration: "none",
+              },
+            }}>
+            Event Logs
+          </Box>
+        </Box>
+        <Box css={{ position: "relative", top: "-8px" }}>
+          <Flex align="center">
+            {asset?.downloadUrl && (
+              <Link target="_blank" href={asset?.downloadUrl}>
+                <Button
+                  size="2"
+                  css={{
+                    mr: "$1",
+                  }}>
+                  <Box
+                    as={DownloadIcon}
+                    css={{
+                      mr: "$1",
+                    }}
+                  />
+                  Download
+                </Button>
+              </Link>
+            )}
+            <Button
+              size="2"
+              onClick={() => setEditAssetDialogOpen(true)}
+              variant="primary">
+              <Box
+                as={Pencil1Icon}
+                css={{
+                  mr: "$1",
+                }}
+              />
+              Edit Asset
+            </Button>
+          </Flex>
+        </Box>
+      </Flex>
+      <Box css={{ py: "$2" }}>{children}</Box>
+    </Box>
+  )
+}
+
+export default AssetChildrenHeadingBox;
