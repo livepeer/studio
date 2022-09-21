@@ -1,5 +1,6 @@
-import { Dialog, DialogContent, DialogTitle, Heading, Box, Flex, Button, Text, TextField } from "@livepeer/design-system";
+import { Dialog, DialogContent, DialogTitle, Heading, Flex, Button, Text, TextField, useSnackbar } from "@livepeer/design-system";
 import { Asset } from "livepeer";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const embedStringForAsset = (asset?: Asset) => `
 <iframe
@@ -22,6 +23,13 @@ const EmbedVideoDialog = ({
   onOpenChange,
   asset,
 }: EmbedVideoDialog) => {
+  const embedString = embedStringForAsset(asset)
+  const [openSnackbar] = useSnackbar();
+
+  const onCopy = () => {
+    onOpenChange(false);
+    openSnackbar("Copied to clipboard");
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -45,22 +53,29 @@ const EmbedVideoDialog = ({
           </Text>
 
           <TextField
-            css={{ mt: "$1" }}
-            size="2"
+            css={{
+              mt: "$2",
+              color: "$hiContrast !important",
+              backgroundColor: "$neutral5 !important",
+              boxShadow: "none",
+            }}
+            size="3"
             id="name"
             type="text"
-            // autoFocus={true}
-            value={embedStringForAsset(asset)}
-            // contentEditable={false}
+            value={embedString}
             disabled={true}
           />
 
-          <Button
-            css={{ mt: "$3", alignSelf: "flex-end" }}
-            size="2"
-            variant="primary">
-            Copy Code
-          </Button>
+          <CopyToClipboard
+            text={embedString}
+            onCopy={onCopy}>
+            <Button
+              css={{ mt: "$4", alignSelf: "flex-end" }}
+              size="2"
+              variant="primary">
+              Copy Code
+            </Button>
+          </CopyToClipboard>
         </Flex>
 
       </DialogContent>

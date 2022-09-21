@@ -60,8 +60,6 @@ const AssetOverviewTab = ({
     }
   }, [asset, patchAsset]);
 
-  const [openSnackbar] = useSnackbar();
-
   const metadataStringified = useMemo(
     () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
     [asset?.meta]
