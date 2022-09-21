@@ -1,18 +1,22 @@
-import { Badge, Box, Button, Flex, Link, Status } from "@livepeer/design-system"
-import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons"
-import { Asset } from "livepeer"
-import Player from "../Player"
-import AssetSharePopup from "./AssetSharePopup"
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Link,
+  Status,
+} from "@livepeer/design-system";
+import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons";
+import { Asset } from "livepeer";
+import Player from "../Player";
+import AssetSharePopup from "./AssetSharePopup";
 
 export type AssetPlayerBoxProps = {
   asset?: Asset;
   onEmbedVideoClick: () => void;
-}
+};
 
-const AssetPlayerBox = ({
-  asset,
-  onEmbedVideoClick,
-}: AssetPlayerBoxProps) => {
+const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
   return (
     <Box
       css={{
@@ -27,8 +31,7 @@ const AssetPlayerBox = ({
           position: "relative",
           mb: "$2",
         }}>
-        {asset?.status?.phase === "ready" &&
-        asset.playbackUrl ? (
+        {asset?.status?.phase === "ready" && asset.playbackUrl ? (
           <Player src={asset.playbackUrl} autoPlay={false} />
         ) : asset?.status?.phase === "failed" ? (
           <Box
@@ -77,19 +80,17 @@ const AssetPlayerBox = ({
                 letterSpacing: 0,
               }}>
               <Box css={{ mr: 5 }}>
-                <Status
-                  css={{ backgroundColor: "$primary9" }}
-                  size="1"
-                />
+                <Status css={{ backgroundColor: "$primary9" }} size="1" />
               </Box>
               Processing
             </Badge>
           </Box>
         )}
       </Box>
-      <Box css={{
-        mb: "$5",
-      }}>
+      <Box
+        css={{
+          mb: "$5",
+        }}>
         <Flex align="center">
           {asset?.downloadUrl && (
             <Link target="_blank" href={asset?.downloadUrl}>
@@ -112,11 +113,8 @@ const AssetPlayerBox = ({
 
           <AssetSharePopup
             asset={asset}
-            triggerNode={(
-              <Button
-                size="2"
-                onClick={() => {}}
-                ghost={true}>
+            triggerNode={
+              <Button size="2" onClick={() => {}} ghost={true}>
                 <Box
                   as={Share2Icon}
                   css={{
@@ -125,13 +123,13 @@ const AssetPlayerBox = ({
                 />
                 Share
               </Button>
-            )}
+            }
             onEmbedVideoClick={onEmbedVideoClick}
           />
         </Flex>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
 export default AssetPlayerBox;

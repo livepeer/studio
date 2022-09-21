@@ -3,11 +3,10 @@ import { PlayIcon, CalendarIcon } from "@radix-ui/react-icons";
 import { Asset } from "livepeer";
 import RelativeTime from "../RelativeTime";
 
-
 export type AssetHeadingBoxProps = {
   asset?: Asset;
   totalViews: number;
-}
+};
 
 const AssetHeadingBox = ({ asset, totalViews }: AssetHeadingBoxProps) => {
   return (
@@ -36,15 +35,11 @@ const AssetHeadingBox = ({ asset, totalViews }: AssetHeadingBoxProps) => {
             css={{ bc: "$neutral3", color: "$neutral3" }}
             content={
               <Box css={{ color: "$hiContrast" }}>
-                Views are defined as at least 1 second of watch
-                time.
+                Views are defined as at least 1 second of watch time.
               </Box>
             }>
-            <Flex
-              align="center"
-              css={{ mr: "$3", fontSize: "$2" }}>
-              <Box as={PlayIcon} css={{ mr: "$1" }} />{" "}
-              {totalViews} views
+            <Flex align="center" css={{ mr: "$3", fontSize: "$2" }}>
+              <Box as={PlayIcon} css={{ mr: "$1" }} /> {totalViews} views
             </Flex>
           </Tooltip>
         ) : null}
@@ -59,7 +54,7 @@ const AssetHeadingBox = ({ asset, totalViews }: AssetHeadingBoxProps) => {
         </Flex>
       </Flex>
     </Box>
-  )
-}
+  );
+};
 
 export default AssetHeadingBox;

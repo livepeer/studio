@@ -101,7 +101,10 @@ const AssetOverviewTab = ({
               </Text>
 
               <Box>
-                <ClipButton value={metadataStringified} successMessage="Copied metadata to clipboard" />
+                <ClipButton
+                  value={metadataStringified}
+                  successMessage="Copied metadata to clipboard"
+                />
               </Box>
             </Flex>
           ) : (
@@ -190,7 +193,10 @@ const AssetOverviewTab = ({
                       }}>
                       Content Hash
                     </Text>
-                    <ClipButton value={`ipfs://${asset.storage.ipfs.cid}`} successMessage="Copied IPFS CID to clipboard" />
+                    <ClipButton
+                      value={`ipfs://${asset.storage.ipfs.cid}`}
+                      successMessage="Copied IPFS CID to clipboard"
+                    />
                   </Flex>
                   <Text
                     variant="gray"

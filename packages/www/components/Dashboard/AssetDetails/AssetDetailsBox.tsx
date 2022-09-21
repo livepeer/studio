@@ -1,10 +1,10 @@
-import { Box, Flex, Heading, HoverCardContent, HoverCardRoot, HoverCardTrigger, Text, useSnackbar } from "@livepeer/design-system"
-import { Asset } from "livepeer"
-import numeral from "numeral"
-import RelativeTime from "../RelativeTime"
-import ShowURL from "../ShowURL"
-import { useMemo } from "react"
-import ClipButton from "../ClipButton"
+import { Box, Flex, Heading } from "@livepeer/design-system";
+import { Asset } from "livepeer";
+import numeral from "numeral";
+import RelativeTime from "../RelativeTime";
+import ShowURL from "../ShowURL";
+import { useMemo } from "react";
+import ClipButton from "../ClipButton";
 
 const Cell = ({ children, css = {} }) => {
   return (
@@ -16,7 +16,7 @@ const Cell = ({ children, css = {} }) => {
 
 export type AssetDetailsBoxProps = {
   asset?: Asset;
-}
+};
 
 const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
   const videoTrack = useMemo(
@@ -57,15 +57,11 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
           <Cell>{asset.name}</Cell>
           {asset?.playbackUrl && (
             <>
-              <Cell css={{ color: "$hiContrast" }}>
-                Playback ID
-              </Cell>
+              <Cell css={{ color: "$hiContrast" }}>Playback ID</Cell>
               <Cell>
                 <ClipButton value={asset.playbackId} text={asset.playbackId} />
               </Cell>
-              <Cell css={{ color: "$hiContrast" }}>
-                Playback URL
-              </Cell>
+              <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
               <Cell css={{ cursor: "pointer" }}>
                 <ShowURL
                   url={asset.playbackUrl}
@@ -99,21 +95,15 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
           )}
           {asset?.videoSpec?.format && (
             <>
-              <Cell css={{ color: "$hiContrast" }}>
-                Container
-              </Cell>
+              <Cell css={{ color: "$hiContrast" }}>Container</Cell>
               <Cell>{asset.videoSpec.format}</Cell>
             </>
           )}
           {asset.size && (
             <>
-              <Cell css={{ color: "$hiContrast" }}>
-                File size
-              </Cell>
+              <Cell css={{ color: "$hiContrast" }}>File size</Cell>
               <Cell>
-                {numeral(asset.size)
-                  .format("0,0.00 b")
-                  .toLowerCase()}
+                {numeral(asset.size).format("0,0.00 b").toLowerCase()}
               </Cell>
             </>
           )}
@@ -122,9 +112,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
             <>
               <Cell css={{ color: "$hiContrast" }}>Bitrate</Cell>
               <Cell>
-                {numeral(
-                  asset?.videoSpec?.bitrate ?? videoTrack?.bitrate
-                )
+                {numeral(asset?.videoSpec?.bitrate ?? videoTrack?.bitrate)
                   .format("0,0.00 b")
                   .toLowerCase()}
                 {"ps"}
@@ -133,9 +121,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
           )}
           {videoTrack?.width && videoTrack?.height && (
             <>
-              <Cell css={{ color: "$hiContrast" }}>
-                Resolution
-              </Cell>
+              <Cell css={{ color: "$hiContrast" }}>Resolution</Cell>
               <Cell>
                 {videoTrack.width}
                 {"x"}
@@ -146,7 +132,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
         </Box>
       </Flex>
     </>
-  )
-}
+  );
+};
 
 export default AssetDetailsBox;

@@ -46,7 +46,6 @@ const AssetDetail = ({
   embedVideoDialogOpen,
   setEmbedVideoDialogOpen,
 }: AssetDetailProps) => {
-
   useLoggedIn();
   const { user, patchAsset } = useApi();
   const [isCopied, setCopied] = useState(0);

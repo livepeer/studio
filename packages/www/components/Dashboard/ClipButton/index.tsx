@@ -1,4 +1,12 @@
-import { useSnackbar, HoverCardRoot, HoverCardTrigger, Flex, Box, HoverCardContent, Text } from "@livepeer/design-system";
+import {
+  useSnackbar,
+  HoverCardRoot,
+  HoverCardTrigger,
+  Flex,
+  Box,
+  HoverCardContent,
+  Text,
+} from "@livepeer/design-system";
 import { CopyIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -7,16 +15,13 @@ export type ClipButtonProps = {
   value: string;
   text?: string;
   successMessage?: string;
-}
+};
 
-const ClipButton = ({
-  value,
-  text,
-  successMessage,
-}: ClipButtonProps) => {
+const ClipButton = ({ value, text, successMessage }: ClipButtonProps) => {
   const [isCopied, setCopied] = useState(0);
   const [openSnackbar] = useSnackbar();
-  const snackbarMessage = successMessage !== undefined ? successMessage : "Copied to clipboard";
+  const snackbarMessage =
+    successMessage !== undefined ? successMessage : "Copied to clipboard";
 
   useEffect(() => {
     if (isCopied) {
@@ -44,7 +49,7 @@ const ClipButton = ({
                 ml: 0,
                 mr: 0,
               }}>
-              {text !== undefined && (<Box css={{ mr: "$1" }}>{text}</Box>)}
+              {text !== undefined && <Box css={{ mr: "$1" }}>{text}</Box>}
               <CopyIcon
                 css={{
                   mr: "$2",

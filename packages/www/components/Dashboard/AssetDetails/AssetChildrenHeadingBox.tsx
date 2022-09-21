@@ -3,16 +3,15 @@ import { DownloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { Asset } from "livepeer";
 import { Dispatch, SetStateAction } from "react";
 
-
 export type AssetChildrenHeadingBoxProps = {
   asset?: Asset;
   children: React.ReactNode;
   activeTab: "Overview" | "Event Logs";
   setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
   setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
-}
+};
 
-const AssetChildrenHeadingBox = ({ 
+const AssetChildrenHeadingBox = ({
   asset,
   children,
   activeTab,
@@ -39,8 +38,7 @@ const AssetChildrenHeadingBox = ({
               cursor: "pointer",
               textDecoration: "none",
               borderBottom: "2px solid",
-              borderColor:
-                activeTab === "Overview" ? "$blue9" : "transparent",
+              borderColor: activeTab === "Overview" ? "$blue9" : "transparent",
               mr: "$5",
               "&:hover": {
                 textDecoration: "none",
@@ -59,9 +57,7 @@ const AssetChildrenHeadingBox = ({
               cursor: "pointer",
               borderBottom: "2px solid",
               borderColor:
-                activeTab === "Event Logs"
-                  ? "$blue9"
-                  : "transparent",
+                activeTab === "Event Logs" ? "$blue9" : "transparent",
               whiteSpace: "nowrap",
               "&:hover": {
                 textDecoration: "none",
@@ -106,7 +102,7 @@ const AssetChildrenHeadingBox = ({
       </Flex>
       <Box css={{ py: "$2" }}>{children}</Box>
     </Box>
-  )
-}
+  );
+};
 
 export default AssetChildrenHeadingBox;

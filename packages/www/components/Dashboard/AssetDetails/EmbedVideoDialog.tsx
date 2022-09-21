@@ -1,4 +1,14 @@
-import { Dialog, DialogContent, DialogTitle, Heading, Flex, Button, Text, TextField, useSnackbar } from "@livepeer/design-system";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Heading,
+  Flex,
+  Button,
+  Text,
+  TextField,
+  useSnackbar,
+} from "@livepeer/design-system";
 import { Asset } from "livepeer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
@@ -16,20 +26,20 @@ export type EmbedVideoDialog = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   asset?: Asset;
-}
+};
 
 const EmbedVideoDialog = ({
   isOpen,
   onOpenChange,
   asset,
 }: EmbedVideoDialog) => {
-  const embedString = embedStringForAsset(asset)
+  const embedString = embedStringForAsset(asset);
   const [openSnackbar] = useSnackbar();
 
   const onCopy = () => {
     onOpenChange(false);
     openSnackbar("Copied to clipboard");
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -42,7 +52,6 @@ const EmbedVideoDialog = ({
           pb: "$4",
           zIndex: 5,
         }}>
-
         <DialogTitle asChild>
           <Heading size="1">Embed Video</Heading>
         </DialogTitle>
@@ -66,9 +75,7 @@ const EmbedVideoDialog = ({
             disabled={true}
           />
 
-          <CopyToClipboard
-            text={embedString}
-            onCopy={onCopy}>
+          <CopyToClipboard text={embedString} onCopy={onCopy}>
             <Button
               css={{ mt: "$4", alignSelf: "flex-end" }}
               size="2"
@@ -77,7 +84,6 @@ const EmbedVideoDialog = ({
             </Button>
           </CopyToClipboard>
         </Flex>
-
       </DialogContent>
     </Dialog>
   );
