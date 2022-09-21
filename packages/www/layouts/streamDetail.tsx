@@ -1,117 +1,15 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Link as A,
-  Status,
-  Badge,
-  Tooltip,
-  Text,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  HoverCardRoot,
-  HoverCardContent,
-  HoverCardTrigger,
-  useSnackbar,
-} from "@livepeer/design-system";
+import { Box, Flex } from "@livepeer/design-system";
 import Layout from "layouts/dashboard";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useRouter } from "next/router";
 import { useApi, useLoggedIn } from "hooks";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { isStaging } from "lib/utils";
-import RelativeTime from "components/Dashboard/RelativeTime";
-import {
-  CopyIcon as Copy,
-  QuestionMarkCircledIcon as Help,
-  PauseIcon,
-  ChevronDownIcon,
-} from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
-import Player from "components/Dashboard/Player";
-import Record from "components/Dashboard/StreamDetails/Record";
-import Terminate from "components/Dashboard/StreamDetails/Terminate";
-import Suspend from "components/Dashboard/StreamDetails/Suspend";
-import Delete from "components/Dashboard/StreamDetails/Delete";
-import StatusBadge, {
-  Variant as StatusVariant,
-} from "@components/Dashboard/StatusBadge";
-import ShowURL from "@components/Dashboard/ShowURL";
-
-const Cell = ({ children, css = {} }) => {
-  return (
-    <Flex align="center" css={{ height: 22, mb: "$3", ...css }}>
-      {children}
-    </Flex>
-  );
-};
-
-const ClipBut = ({ text }) => {
-  const [isCopied, setCopied] = useState(0);
-  const [openSnackbar] = useSnackbar();
-
-  useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => {
-        setCopied(0);
-      }, isCopied);
-      return () => clearTimeout(timeout);
-    }
-  }, [isCopied]);
-
-  return (
-    <HoverCardRoot openDelay={200}>
-      <HoverCardTrigger>
-        <Flex css={{ ai: "center" }}>
-          <CopyToClipboard
-            text={text}
-            onCopy={() => {
-              openSnackbar("Copied to clipboard");
-              setCopied(2000);
-            }}>
-            <Flex
-              css={{
-                alignItems: "center",
-                cursor: "pointer",
-                ml: 0,
-                mr: 0,
-              }}>
-              <Box css={{ mr: "$1" }}>{text}</Box>
-              <Copy
-                css={{
-                  mr: "$2",
-                  width: 14,
-                  height: 14,
-                  color: "$hiContrast",
-                }}
-              />
-            </Flex>
-          </CopyToClipboard>
-        </Flex>
-      </HoverCardTrigger>
-      <HoverCardContent>
-        <Text
-          variant="gray"
-          css={{
-            backgroundColor: "$panel",
-            borderRadius: 6,
-            px: "$3",
-            py: "$1",
-            fontSize: "$1",
-            display: "flex",
-            ai: "center",
-          }}>
-          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
-        </Text>
-      </HoverCardContent>
-    </HoverCardRoot>
-  );
-};
+import { Variant as StatusVariant } from "@components/Dashboard/StatusBadge";
+import StreamPlayerBox from "@components/Dashboard/StreamDetails/StreamPlayerBox";
+import StreamDetailsBox from "@components/Dashboard/StreamDetails/StreamDetailsBox";
+import StreamHeadingBox from "@components/Dashboard/StreamDetails/StreamHeadingBox";
+import StreamChildrenHeadingBox from "@components/Dashboard/StreamDetails/StreamChildrenHeadingBox";
 
 const StreamDetail = ({
   breadcrumbs,
@@ -124,14 +22,12 @@ const StreamDetail = ({
 }) => {
   useLoggedIn();
   const { user, getIngest, getAdminStreams } = useApi();
-  const userIsAdmin = user && user.admin;
   const router = useRouter();
   const { query } = router;
   const id = query.id;
   const [_, setIngest] = useState([]);
   const [notFound, setNotFound] = useState(false);
   const [isCopied, setCopied] = useState(0);
-  const [keyRevealed, setKeyRevealed] = useState(false);
   const [lastSession, setLastSession] = useState(null);
   const [lastSessionLoading, setLastSessionLoading] = useState(false);
 
@@ -225,335 +121,34 @@ const StreamDetail = ({
                   minWidth: 424,
                   flex: "0 0 33%",
                 }}>
-                <Flex
-                  justify="between"
-                  align="end"
-                  css={{
-                    pb: "$3",
-                    mb: "$5",
-                    width: "100%",
-                  }}>
-                  <Heading size="2">
-                    <Flex css={{ ai: "center" }}>
-                      <Box
-                        css={{
-                          fontWeight: 600,
-                          letterSpacing: "0",
-                          mr: "$2",
-                        }}>
-                        {stream.name}
-                      </Box>
-                      {!healthState ? null : (
-                        <StatusBadge
-                          variant={healthState}
-                          timestamp={streamHealth?.healthy?.lastProbeTime}
-                          css={{ mt: "$1", letterSpacing: 0 }}
-                        />
-                      )}
-                      {stream.suspended && (
-                        <Badge
-                          size="2"
-                          variant="red"
-                          css={{
-                            ml: "$1",
-                            mt: "$1",
-                            letterSpacing: 0,
-                          }}>
-                          <Box css={{ mr: 5 }}>
-                            <PauseIcon />
-                          </Box>
-                          Suspended
-                        </Badge>
-                      )}
-                    </Flex>
-                  </Heading>
-                </Flex>
+                <StreamHeadingBox
+                  stream={stream}
+                  healthState={healthState}
+                  streamHealth={streamHealth}
+                />
 
                 <Box>
-                  <Box
-                    css={{
-                      maxWidth: "470px",
-                      justifySelf: "flex-end",
-                      width: "100%",
-                    }}>
-                    <Box
-                      css={{
-                        borderRadius: "$3",
-                        overflow: "hidden",
-                        position: "relative",
-                        mb: "$7",
-                      }}>
-                      {stream.isActive ? (
-                        <>
-                          <Badge
-                            size="2"
-                            variant="green"
-                            css={{
-                              position: "absolute",
-                              zIndex: 1,
-                              left: 10,
-                              top: 10,
-                              letterSpacing: 0,
-                            }}>
-                            <Box css={{ mr: 5 }}>
-                              <Status size="1" variant="green" />
-                            </Box>
-                            Active
-                          </Badge>
-                          <Player src={globalPlaybackUrl} />
-                        </>
-                      ) : (
-                        <Box
-                          css={{
-                            width: "100%",
-                            height: 265,
-                            borderRadius: "$2",
-                            overflow: "hidden",
-                            position: "relative",
-                            bc: "#28282c",
-                          }}>
-                          <Badge
-                            size="2"
-                            css={{
-                              backgroundColor: "$primary7",
-                              position: "absolute",
-                              zIndex: 1,
-                              left: 10,
-                              top: 10,
-                              letterSpacing: 0,
-                            }}>
-                            <Box css={{ mr: 5 }}>
-                              <Status
-                                css={{ backgroundColor: "$primary9" }}
-                                size="1"
-                              />
-                            </Box>
-                            Idle
-                          </Badge>
-                        </Box>
-                      )}
-                    </Box>
-                  </Box>
-                  <Box
-                    css={{
-                      borderBottom: "1px solid",
-                      borderColor: "$neutral6",
-                      pb: "$2",
-                      mb: "$4",
-                      width: "100%",
-                    }}>
-                    <Heading size="1" css={{ fontWeight: 600 }}>
-                      Details
-                    </Heading>
-                  </Box>
-                  <Flex
-                    css={{
-                      justifyContent: "flex-start",
-                      alignItems: "baseline",
-                      flexDirection: "column",
-                    }}>
-                    <Box
-                      css={{
-                        display: "grid",
-                        alignItems: "center",
-                        gridTemplateColumns: "10em auto",
-                        width: "100%",
-                        fontSize: "$2",
-                        position: "relative",
-                      }}>
-                      <Cell css={{ color: "$hiContrast" }}>Stream name</Cell>
-                      <Cell>{stream.name}</Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Stream ID</Cell>
-                      <Cell>
-                        <ClipBut text={stream.id} />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Stream key</Cell>
-                      <Cell>
-                        {keyRevealed ? (
-                          <Flex>
-                            <ClipBut text={stream.streamKey} />
-                          </Flex>
-                        ) : (
-                          <Button
-                            type="button"
-                            variant="primary"
-                            onClick={() => setKeyRevealed(true)}>
-                            Reveal stream key
-                          </Button>
-                        )}
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>
-                        RTMP ingest URL
-                      </Cell>
-                      <Cell css={{ cursor: "pointer" }}>
-                        <ShowURL url={globalIngestUrl} anchor={false} />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>SRT ingest URL</Cell>
-                      <Cell css={{ cursor: "pointer" }}>
-                        <ShowURL
-                          url={globalSrtIngestUrl}
-                          shortendUrl={globalSrtIngestUrl.replace(
-                            globalSrtIngestUrl.slice(38),
-                            "…"
-                          )}
-                          anchor={false}
-                        />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Playback ID</Cell>
-                      <Cell>
-                        <ClipBut text={stream.playbackId} />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Playback URL</Cell>
-                      <Cell css={{ cursor: "pointer" }}>
-                        <ShowURL
-                          url={globalPlaybackUrl}
-                          shortendUrl={globalPlaybackUrl.replace(
-                            globalPlaybackUrl.slice(29, 45),
-                            "…"
-                          )}
-                          anchor={false}
-                        />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>
-                        Record sessions
-                      </Cell>
-                      <Cell>
-                        <Flex css={{ position: "relative", top: "2px" }}>
-                          <Box css={{ mr: "$2" }}>
-                            <Record
-                              stream={stream}
-                              invalidate={invalidateStream}
-                            />
-                          </Box>
-                          <Tooltip
-                            multiline
-                            content={
-                              <Box>
-                                When enabled, transcoded streaming sessions will
-                                be recorded and stored by Livepeer Studio. Each
-                                recorded session will have a recording .m3u8 URL
-                                for playback and an MP4 download link. This
-                                feature is currently free.
-                              </Box>
-                            }>
-                            <Help />
-                          </Tooltip>
-                        </Flex>
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
-                      <Cell>
-                        <RelativeTime
-                          id="cat"
-                          prefix="createdat"
-                          tm={stream.createdAt}
-                          swap={true}
-                        />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Last seen</Cell>
-                      <Cell>
-                        <RelativeTime
-                          id="last"
-                          prefix="lastSeen"
-                          tm={stream.lastSeen}
-                          swap={true}
-                        />
-                      </Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Status</Cell>
-                      <Cell>{stream.isActive ? "Active" : "Idle"}</Cell>
-                      <Cell css={{ color: "$hiContrast" }}>Suspended</Cell>
-                      <Cell>{stream.suspended ? "Suspended" : "Normal"}</Cell>
-                    </Box>
-                  </Flex>
+                  <StreamPlayerBox
+                    stream={stream}
+                    globalPlaybackUrl={globalPlaybackUrl}
+                  />
+                  <StreamDetailsBox
+                    stream={stream}
+                    globalIngestUrl={globalIngestUrl}
+                    globalSrtIngestUrl={globalSrtIngestUrl}
+                    globalPlaybackUrl={globalPlaybackUrl}
+                    invalidateStream={invalidateStream}
+                  />
                 </Box>
               </Box>
               <Box css={{ flexGrow: 1, ml: "$8" }}>
-                <Flex
-                  justify="between"
-                  css={{
-                    borderBottom: "1px solid",
-                    borderColor: "$neutral6",
-                    mb: "$4",
-                    width: "100%",
-                  }}>
-                  <Box css={{ display: "flex" }}>
-                    <Box
-                      as="div"
-                      onClick={() => setSwitchTab("Overview")}
-                      css={{
-                        pb: "$2",
-                        width: "100%",
-                        cursor: "pointer",
-                        textDecoration: "none",
-                        borderBottom: "2px solid",
-                        borderColor:
-                          activeTab === "Overview" ? "$blue9" : "transparent",
-                        mr: "$5",
-                        "&:hover": {
-                          textDecoration: "none",
-                        },
-                      }}>
-                      Overview
-                    </Box>
-
-                    <Box
-                      as="div"
-                      onClick={() => setSwitchTab("Health")}
-                      css={{
-                        textDecoration: "none",
-                        pb: "$2",
-                        width: "100%",
-                        cursor: "pointer",
-                        borderBottom: "2px solid",
-                        borderColor:
-                          activeTab === "Health" ? "$blue9" : "transparent",
-                        "&:hover": {
-                          textDecoration: "none",
-                        },
-                      }}>
-                      Health
-                    </Box>
-                  </Box>
-                  <Box css={{ position: "relative", top: "-8px" }}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="primary"
-                          size="2"
-                          css={{ display: "flex", ai: "center", mr: "$1" }}>
-                          Actions
-                          <Box as={ChevronDownIcon} css={{ ml: "$1" }} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuGroup>
-                          <Record
-                            stream={stream}
-                            invalidate={invalidateStream}
-                            isSwitch={false}
-                          />
-                          <Suspend
-                            stream={stream}
-                            invalidate={invalidateStream}
-                          />
-                          <Delete
-                            stream={stream}
-                            invalidate={invalidateStream}
-                          />
-                          {userIsAdmin && stream.isActive && (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuLabel>Admin only</DropdownMenuLabel>
-                              <Terminate
-                                stream={stream}
-                                invalidate={invalidateStream}
-                              />
-                            </>
-                          )}
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </Box>
-                </Flex>
+                <StreamChildrenHeadingBox
+                  stream={stream}
+                  user={user}
+                  activeTab={activeTab}
+                  setSwitchTab={setSwitchTab}
+                  invalidateStream={invalidateStream}
+                />
                 <Box css={{ py: "$4" }}>{children}</Box>
               </Box>
             </Flex>
