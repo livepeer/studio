@@ -4,11 +4,16 @@ import { useState, useEffect } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export type ClipButtonProps = {
-  text: string;
+  value: string;
+  text?: string;
   successMessage?: string;
 }
 
-const ClipButton = ({ text, successMessage }: ClipButtonProps) => {
+const ClipButton = ({
+  value,
+  text,
+  successMessage,
+}: ClipButtonProps) => {
   const [isCopied, setCopied] = useState(0);
   const [openSnackbar] = useSnackbar();
   const snackbarMessage = successMessage !== undefined ? successMessage : "Copied to clipboard";
@@ -27,7 +32,7 @@ const ClipButton = ({ text, successMessage }: ClipButtonProps) => {
       <HoverCardTrigger>
         <Flex css={{ ai: "center" }}>
           <CopyToClipboard
-            text={text}
+            text={value}
             onCopy={() => {
               openSnackbar(snackbarMessage);
               setCopied(2000);
@@ -39,7 +44,7 @@ const ClipButton = ({ text, successMessage }: ClipButtonProps) => {
                 ml: 0,
                 mr: 0,
               }}>
-              <Box css={{ mr: "$1" }}>{text}</Box>
+              {text !== undefined && (<Box css={{ mr: "$1" }}>{text}</Box>)}
               <CopyIcon
                 css={{
                   mr: "$2",

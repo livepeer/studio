@@ -61,7 +61,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
                 Playback ID
               </Cell>
               <Cell>
-                <ClipButton text={asset.playbackId} />
+                <ClipButton value={asset.playbackId} text={asset.playbackId} />
               </Cell>
               <Cell css={{ color: "$hiContrast" }}>
                 Playback URL
@@ -80,7 +80,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
           )}
           <Cell css={{ color: "$hiContrast" }}>Asset ID</Cell>
           <Cell>
-            <ClipButton text={asset.id} />
+            <ClipButton value={asset.id} text={asset.id} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
           <Cell>
