@@ -3,77 +3,14 @@ import { Asset } from "livepeer"
 import numeral from "numeral"
 import RelativeTime from "../RelativeTime"
 import ShowURL from "../ShowURL"
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { useEffect, useMemo, useState } from "react"
-import { CopyIcon } from "@radix-ui/react-icons"
+import { useMemo } from "react"
+import ClipButton from "../ClipButton"
 
 const Cell = ({ children, css = {} }) => {
   return (
     <Flex align="center" css={{ height: 22, mb: "$3", ...css }}>
       {children}
     </Flex>
-  );
-};
-
-const ClipBut = ({ text }) => {
-  const [isCopied, setCopied] = useState(0);
-  const [openSnackbar] = useSnackbar();
-
-  useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => {
-        setCopied(0);
-      }, isCopied);
-      return () => clearTimeout(timeout);
-    }
-  }, [isCopied]);
-
-  return (
-    <HoverCardRoot openDelay={200}>
-      <HoverCardTrigger>
-        <Flex css={{ ai: "center" }}>
-          <CopyToClipboard
-            text={text}
-            onCopy={() => {
-              openSnackbar("Copied to clipboard");
-              setCopied(2000);
-            }}>
-            <Flex
-              css={{
-                alignItems: "center",
-                cursor: "pointer",
-                ml: 0,
-                mr: 0,
-              }}>
-              <Box css={{ mr: "$1" }}>{text}</Box>
-              <CopyIcon
-                css={{
-                  mr: "$2",
-                  width: 14,
-                  height: 14,
-                  color: "$hiContrast",
-                }}
-              />
-            </Flex>
-          </CopyToClipboard>
-        </Flex>
-      </HoverCardTrigger>
-      <HoverCardContent>
-        <Text
-          variant="gray"
-          css={{
-            backgroundColor: "$panel",
-            borderRadius: 6,
-            px: "$3",
-            py: "$1",
-            fontSize: "$1",
-            display: "flex",
-            ai: "center",
-          }}>
-          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
-        </Text>
-      </HoverCardContent>
-    </HoverCardRoot>
   );
 };
 
@@ -124,7 +61,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
                 Playback ID
               </Cell>
               <Cell>
-                <ClipBut text={asset.playbackId} />
+                <ClipButton text={asset.playbackId} />
               </Cell>
               <Cell css={{ color: "$hiContrast" }}>
                 Playback URL
@@ -143,7 +80,7 @@ const AssetDetailsBox = ({ asset }: AssetDetailsBoxProps) => {
           )}
           <Cell css={{ color: "$hiContrast" }}>Asset ID</Cell>
           <Cell>
-            <ClipBut text={asset.id} />
+            <ClipButton text={asset.id} />
           </Cell>
           <Cell css={{ color: "$hiContrast" }}>Created at</Cell>
           <Cell>

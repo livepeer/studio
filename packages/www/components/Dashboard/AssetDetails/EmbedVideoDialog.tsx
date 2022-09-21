@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogTitle, Heading, Box, Flex, Button, Text, TextField } from "@livepeer/design-system";
 import { Asset } from "livepeer";
 
-const embedStringForAsset = (asset: Asset) => `
+const embedStringForAsset = (asset?: Asset) => `
 <iframe
-src="https://lvpr.tv?v=${asset.playbackId}"
+src="https://lvpr.tv?v=${asset?.playbackId}"
 frameborder="0"
 allowfullscreen
 allow="autoplay; encrypted-media; picture-in-picture"
@@ -14,7 +14,7 @@ sandbox="allow-scripts">
 export type EmbedVideoDialog = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  asset: Asset;
+  asset?: Asset;
 }
 
 const EmbedVideoDialog = ({
@@ -49,9 +49,10 @@ const EmbedVideoDialog = ({
             size="2"
             id="name"
             type="text"
-            autoFocus={true}
+            // autoFocus={true}
             value={embedStringForAsset(asset)}
-            contentEditable={false}
+            // contentEditable={false}
+            disabled={true}
           />
 
           <Button
