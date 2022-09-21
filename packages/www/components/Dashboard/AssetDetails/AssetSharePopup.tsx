@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
-import { Popover, PopoverTrigger, PopoverContent, Box, Button, Flex } from "@livepeer/design-system";
+import { Popover, PopoverTrigger, PopoverContent, Box, Button, Flex, useSnackbar } from "@livepeer/design-system";
 import { CodeIcon, Link1Icon } from "@radix-ui/react-icons";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Asset } from "livepeer";
 
 const buttonLinkCss = {
   display: "flex",
@@ -9,14 +11,19 @@ const buttonLinkCss = {
 }
 
 export type AssetSharePopupProps = {
+  asset: Asset;
   triggerNode: ReactNode;
   onEmbedVideoClick: () => void;
 }
 
 const AssetSharePopup = ({
+  asset,
   triggerNode,
   onEmbedVideoClick,
 }: AssetSharePopupProps) => {
+  const [openSnackbar] = useSnackbar();
+  const copyString = `https://lvpr.tv?v=${asset.playbackId}`
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -31,16 +38,20 @@ const AssetSharePopup = ({
           gap: "$1",
           flexDirection: "column",
         }}>
-          <Button
-            size="2"
-            ghost={true}
-            css={buttonLinkCss}>
-            <Box
-              as={Link1Icon}
-              css={{ mr: "$1" }}
-            />
-            Copy link
-          </Button>
+          <CopyToClipboard
+            text={copyString}
+            onCopy={() => openSnackbar("Copied to clipboard")}>
+            <Button
+              size="2"
+              ghost={true}
+              css={buttonLinkCss}>
+              <Box
+                as={Link1Icon}
+                css={{ mr: "$1" }}
+              />
+              Copy link
+            </Button>
+          </CopyToClipboard>
           <Button
             size="2"
             onClick={() => onEmbedVideoClick()}

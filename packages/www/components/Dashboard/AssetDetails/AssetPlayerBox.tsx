@@ -111,6 +111,7 @@ const AssetPlayerBox = ({
           )}
 
           <AssetSharePopup
+            asset={asset}
             triggerNode={(
               <Button
                 size="2"
