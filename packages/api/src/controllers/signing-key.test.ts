@@ -8,6 +8,7 @@ import {
 import { SigningKey, SigningKeyResponsePayload, User } from "../schema/types";
 import { WithID } from "../store/types";
 import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
+import { db } from "../store";
 
 // includes auth file tests
 
@@ -81,7 +82,7 @@ describe("controllers/signing-key", () => {
       expect(getResponse).toEqual(withoutPvtk);
     });
 
-    it("should list all signing keys", async () => {
+    it("should list all user signing keys", async () => {
       const res = await client.get(`/signing-key`);
       expect(res.status).toBe(200);
     });
@@ -104,8 +105,6 @@ describe("controllers/signing-key", () => {
       expect(() => jwt.verify(token, otherSigningKey.publicKey)).toThrow(
         JsonWebTokenError
       );
-      let res = await client.delete(`/signing-key/${signingKey.id}`);
-      expect(res.status).toBe(204);
     });
 
     it("should allow disable and enable the signing key & change the name", async () => {
@@ -134,6 +133,8 @@ describe("controllers/signing-key", () => {
       expect(res.status).toBe(204);
       res = await client.get(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(404);
+      let deletedSigningKey = await db.signingKey.get(signingKey.id);
+      expect(deletedSigningKey.deleted).toBe(true);
     });
   });
 });
