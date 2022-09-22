@@ -141,7 +141,7 @@ const StreamDetail = ({
                     <StreamPlayerBox
                       stream={stream}
                       globalPlaybackUrl={globalPlaybackUrl}
-                      onEmbedVideoClick={setEmbedVideoDialogOpen}
+                      onEmbedVideoClick={() => setEmbedVideoDialogOpen(true)}
                     />
                     <StreamDetailsBox
                       stream={stream}
