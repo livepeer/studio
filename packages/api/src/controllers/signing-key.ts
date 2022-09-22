@@ -126,17 +126,15 @@ app.get("/", authorizer({}), async (req, res) => {
 
 app.get("/:id", authorizer({}), async (req, res) => {
   const signingKey = await db.signingKey.get(req.params.id);
-  if (!signingKey || signingKey.deleted) {
+
+  if (
+    !signingKey ||
+    signingKey.deleted ||
+    (req.user.admin !== true && req.user.id !== signingKey.userId)
+  ) {
     res.status(404);
     return res.json({
       errors: ["not found"],
-    });
-  }
-
-  if (req.user.admin !== true && req.user.id !== signingKey.userId) {
-    res.status(403);
-    return res.json({
-      errors: ["user can only request information on their own signingKeys"],
     });
   }
 
@@ -171,17 +169,13 @@ app.post(
     const id = uuid();
     const keypair = generateSigningKeys();
 
-    if (!req.body.name || req.body.name === "") {
-      req.body.name = "Signing Key " + (output.length + 1);
-    }
-
     let b64PublicKey = Buffer.from(JSON.stringify(keypair.publicKey)).toString(
       "base64"
     );
 
     var doc: WithID<SigningKey> = {
       id,
-      name: req.body.name,
+      name: req.body.name || "Signing Key " + (output.length + 1),
       userId: req.user.id,
       createdAt: Date.now(),
       publicKey: b64PublicKey,
