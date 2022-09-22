@@ -42,6 +42,7 @@ describe("controllers/signing-key", () => {
     let adminToken: string;
     let nonAdminUser: User;
     let nonAdminToken: string;
+    let otherUserToken: string;
     let signingKey: WithID<SigningKey>;
     let samplePrivateKey: string;
     let otherSigningKey: WithID<SigningKey>;
@@ -50,9 +51,9 @@ describe("controllers/signing-key", () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       client.jwtAuth = nonAdminToken;
-      let created: SigningKeyResponsePayload = await (
-        await client.post("/signing-key")
-      ).json();
+      let created: SigningKeyResponsePayload = await client
+        .post("/signing-key")
+        .then((res) => res.json());
       samplePrivateKey = created.privateKey;
       let res = await client.get(`/signing-key/${created.id}`);
       signingKey = await res.json();
@@ -66,17 +67,23 @@ describe("controllers/signing-key", () => {
       let res = await client.post("/signing-key");
       expect(res.status).toBe(201);
       const created = (await res.json()) as SigningKeyResponsePayload;
-      expect(created.privateKey).toBeDefined();
-      expect(created.publicKey).toBeDefined();
-      expect(created.id).toBeDefined();
+      expect(created).toMatchObject({
+        id: expect.any(String),
+        privateKey: expect.any(String),
+        publicKey: expect.any(String),
+        createdAt: expect.any(Number),
+      });
       expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
       res = await client.get(`/signing-key/${created.id}`);
       expect(res.status).toBe(200);
       const getResponse = await res.json();
-      expect(getResponse.privateKey).toBeUndefined();
-      expect(getResponse.publicKey).toEqual(created.publicKey);
-      res = await client.delete(`/signing-key/${created.id}`);
-      expect(res.status).toBe(204);
+      const { privateKey, ...withoutPvtk } = created;
+      expect(getResponse).toEqual(withoutPvtk);
+    });
+
+    it("should list all signing keys", async () => {
+      const res = await client.get(`/signing-key`);
+      expect(res.status).toBe(200);
     });
 
     it("should create a JWT using the private key and verify it with the public key", async () => {
@@ -86,6 +93,7 @@ describe("controllers/signing-key", () => {
         name: "Satoshi Nakamoto",
         admin: false,
         signature: "0x4815162342",
+        pub: signingKey.publicKey,
         exp: expiration,
       };
       const token = jwt.sign(payload, samplePrivateKey, { algorithm: "RS256" });
@@ -93,8 +101,9 @@ describe("controllers/signing-key", () => {
         complete: true,
       });
       expect(decoded.payload["exp"]).toEqual(expiration);
-      const failDecoded = verifyJwt(token, otherSigningKey.publicKey);
-      expect(failDecoded).toBeInstanceOf(JsonWebTokenError);
+      expect(() => jwt.verify(token, otherSigningKey.publicKey)).toThrow(
+        JsonWebTokenError
+      );
       let res = await client.delete(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(204);
     });
@@ -120,7 +129,7 @@ describe("controllers/signing-key", () => {
       expect(updated.name).toBe("My test signing key 2");
     });
 
-    it("shoud delete the signing key", async () => {
+    it("should delete the signing key", async () => {
       let res = await client.delete(`/signing-key/${signingKey.id}`);
       expect(res.status).toBe(204);
       res = await client.get(`/signing-key/${signingKey.id}`);

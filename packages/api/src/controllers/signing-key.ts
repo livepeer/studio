@@ -28,11 +28,11 @@ const fieldsMap: FieldsMap = {
 };
 
 function generateSigningKeys() {
-  const keypair = generateKeyPairSync("rsa", {
-    modulusLength: 4096,
+  const keypair = generateKeyPairSync("ec", {
+    namedCurve: "P-521",
     publicKeyEncoding: {
       type: "spki",
-      format: "pem",
+      format: "jwk",
     },
     privateKeyEncoding: {
       type: "pkcs8",
@@ -175,19 +175,23 @@ app.post(
       req.body.name = "Signing Key " + (output.length + 1);
     }
 
+    let b64PublicKey = Buffer.from(JSON.stringify(keypair.publicKey)).toString(
+      "base64"
+    );
+
     var doc: WithID<SigningKey> = {
       id,
       name: req.body.name,
       userId: req.user.id,
       createdAt: Date.now(),
-      publicKey: keypair.publicKey,
+      publicKey: b64PublicKey,
     };
 
     await db.signingKey.create(doc);
 
     var createdSigningKey: SigningKeyResponsePayload = {
       ...doc,
-      privateKey: keypair.privateKey,
+      privateKey: keypair.privateKey.toString(),
     };
 
     res.status(201);
@@ -198,7 +202,7 @@ app.post(
 app.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const signingKey = await db.signingKey.get(id);
-  if (!signingKey) {
+  if (!signingKey || signingKey.deleted) {
     throw new NotFoundError(`signing key not found`);
   }
   if (!req.user.admin && req.user.id !== signingKey.userId) {
