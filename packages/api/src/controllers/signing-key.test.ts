@@ -46,7 +46,8 @@ describe("controllers/signing-key", () => {
     let otherUserToken: string;
     let signingKey: WithID<SigningKey>;
     let samplePrivateKey: string;
-    let otherSigningKey: WithID<SigningKey>;
+    let decodedPublicKey: string;
+    let otherPublicKey: string;
 
     beforeEach(async () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
@@ -58,9 +59,15 @@ describe("controllers/signing-key", () => {
       samplePrivateKey = created.privateKey;
       let res = await client.get(`/signing-key/${created.id}`);
       signingKey = await res.json();
+      // decoded public key is decoded b64 of signingKey.publicKey parsed as json
+      decodedPublicKey = Buffer.from(signingKey.publicKey, "base64").toString();
       created = await (await client.post("/signing-key")).json();
       res = await client.get(`/signing-key/${created.id}`);
-      otherSigningKey = await res.json();
+      let otherSigningKey = await res.json();
+      otherPublicKey = Buffer.from(
+        otherSigningKey.publicKey,
+        "base64"
+      ).toString();
     });
 
     it("should create a signing key and display the private key only on creation", async () => {
@@ -90,19 +97,17 @@ describe("controllers/signing-key", () => {
     it("should create a JWT using the private key and verify it with the public key", async () => {
       const expiration = Math.floor(Date.now() / 1000) + 1000;
       const payload: JwtPayload = {
-        sub: "4815162342",
+        sub: "b0dcxvwml48mxt2s",
+        action: "pull",
         name: "Satoshi Nakamoto",
-        admin: false,
-        signature: "0x4815162342",
         pub: signingKey.publicKey,
         exp: expiration,
+        video: "none",
       };
-      const token = jwt.sign(payload, samplePrivateKey, { algorithm: "RS256" });
-      const decoded = verifyJwt(token, signingKey.publicKey, {
-        complete: true,
-      });
-      expect(decoded.payload["exp"]).toEqual(expiration);
-      expect(() => jwt.verify(token, otherSigningKey.publicKey)).toThrow(
+      const token = jwt.sign(payload, samplePrivateKey, { algorithm: "ES256" });
+
+      expect(() => jwt.verify(token, decodedPublicKey)).not.toThrow();
+      expect(() => jwt.verify(token, otherPublicKey)).toThrow(
         JsonWebTokenError
       );
     });

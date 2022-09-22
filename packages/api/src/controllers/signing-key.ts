@@ -10,7 +10,7 @@ import {
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
-import { generateKeyPairSync } from "crypto";
+import { generateKeyPairSync, generateKeyPair } from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import {
   SigningKey,
@@ -29,10 +29,10 @@ const fieldsMap: FieldsMap = {
 
 function generateSigningKeys() {
   const keypair = generateKeyPairSync("ec", {
-    namedCurve: "P-521",
+    namedCurve: "P-256",
     publicKeyEncoding: {
       type: "spki",
-      format: "jwk",
+      format: "pem",
     },
     privateKeyEncoding: {
       type: "pkcs8",
@@ -169,9 +169,7 @@ app.post(
     const id = uuid();
     const keypair = generateSigningKeys();
 
-    let b64PublicKey = Buffer.from(JSON.stringify(keypair.publicKey)).toString(
-      "base64"
-    );
+    let b64PublicKey = Buffer.from(keypair.publicKey).toString("base64");
 
     var doc: WithID<SigningKey> = {
       id,
