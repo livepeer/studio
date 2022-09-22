@@ -10,7 +10,11 @@ import {
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
-import { generateKeyPairSync, generateKeyPair } from "crypto";
+import {
+  generateKeyPairSync,
+  generateKeyPair,
+  KeyPairSyncResult,
+} from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import {
   SigningKey,
@@ -27,18 +31,27 @@ const fieldsMap: FieldsMap = {
   userId: `signing_key.data->>'userId'`,
 };
 
-function generateSigningKeys() {
-  const keypair = generateKeyPairSync("ec", {
-    namedCurve: "P-256",
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem",
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem",
-    },
-  });
+async function generateSigningKeys() {
+  let keypair: Promise<KeyPairSyncResult<string, string>> = new Promise(
+    (resolve, reject) => {
+      generateKeyPair(
+        "ec",
+        {
+          namedCurve: "P-256",
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem",
+          },
+        },
+        (err, publicKey, privateKey) =>
+          err ? reject(err) : resolve({ publicKey, privateKey })
+      );
+    }
+  );
   return keypair;
 }
 
@@ -167,7 +180,7 @@ signingKeyApp.post(
     }
 
     const id = uuid();
-    const keypair = generateSigningKeys();
+    const keypair = await generateSigningKeys();
 
     let b64PublicKey = Buffer.from(keypair.publicKey).toString("base64");
 
