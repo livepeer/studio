@@ -1,15 +1,19 @@
-import { Box, Badge, Status } from "@livepeer/design-system";
+import { Box, Badge, Status, Flex, Button } from "@livepeer/design-system";
+import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "livepeer";
+import AssetSharePopup from "../AssetDetails/AssetSharePopup";
 import Player from "../Player";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
   globalPlaybackUrl: string;
+  onEmbedVideoClick: () => void;
 };
 
 const StreamPlayerBox = ({
   stream,
   globalPlaybackUrl,
+  onEmbedVideoClick,
 }: StreamPlayerBoxProps) => {
   return (
     <Box
@@ -23,7 +27,7 @@ const StreamPlayerBox = ({
           borderRadius: "$3",
           overflow: "hidden",
           position: "relative",
-          mb: "$7",
+          mb: "$2",
         }}>
         {stream.isActive ? (
           <>
@@ -71,6 +75,28 @@ const StreamPlayerBox = ({
             </Badge>
           </Box>
         )}
+      </Box>
+      <Box
+        css={{
+          mb: "$5",
+        }}>
+        <Flex align="center">
+          <AssetSharePopup
+            playbackId={stream.playbackId}
+            triggerNode={
+              <Button size="2" onClick={() => {}} ghost={true}>
+                <Box
+                  as={Share2Icon}
+                  css={{
+                    mr: "$1",
+                  }}
+                />
+                Share
+              </Button>
+            }
+            onEmbedVideoClick={onEmbedVideoClick}
+          />
+        </Flex>
       </Box>
     </Box>
   );

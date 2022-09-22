@@ -112,7 +112,7 @@ const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
           )}
 
           <AssetSharePopup
-            asset={asset}
+            playbackId={asset.playbackId}
             triggerNode={
               <Button size="2" onClick={() => {}} ghost={true}>
                 <Box

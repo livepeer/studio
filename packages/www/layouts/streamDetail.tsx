@@ -10,6 +10,7 @@ import StreamPlayerBox from "@components/Dashboard/StreamDetails/StreamPlayerBox
 import StreamDetailsBox from "@components/Dashboard/StreamDetails/StreamDetailsBox";
 import StreamHeadingBox from "@components/Dashboard/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "@components/Dashboard/StreamDetails/StreamChildrenHeadingBox";
+import EmbedVideoDialog from "@components/Dashboard/AssetDetails/EmbedVideoDialog";
 
 const StreamDetail = ({
   breadcrumbs,
@@ -19,6 +20,8 @@ const StreamDetail = ({
   invalidateStream,
   setSwitchTab,
   activeTab = "Overview",
+  embedVideoDialogOpen,
+  setEmbedVideoDialogOpen,
 }) => {
   useLoggedIn();
   const { user, getIngest, getAdminStreams } = useApi();
@@ -111,62 +114,71 @@ const StreamDetail = ({
   }`;
 
   return (
-    <Layout id="streams" breadcrumbs={breadcrumbs}>
-      <Box css={{ px: "$6", py: "$7" }}>
-        {stream ? (
-          <>
-            <Flex>
-              <Box
-                css={{
-                  minWidth: 424,
-                  flex: "0 0 33%",
-                }}>
-                <StreamHeadingBox
-                  stream={stream}
-                  healthState={healthState}
-                  streamHealth={streamHealth}
-                />
+    <>
+      <EmbedVideoDialog
+        isOpen={embedVideoDialogOpen}
+        onOpenChange={setEmbedVideoDialogOpen}
+        playbackId={stream?.playbackId}
+      />
 
-                <Box>
-                  <StreamPlayerBox
+      <Layout id="streams" breadcrumbs={breadcrumbs}>
+        <Box css={{ px: "$6", py: "$7" }}>
+          {stream ? (
+            <>
+              <Flex>
+                <Box
+                  css={{
+                    minWidth: 424,
+                    flex: "0 0 33%",
+                  }}>
+                  <StreamHeadingBox
                     stream={stream}
-                    globalPlaybackUrl={globalPlaybackUrl}
+                    healthState={healthState}
+                    streamHealth={streamHealth}
                   />
-                  <StreamDetailsBox
+
+                  <Box>
+                    <StreamPlayerBox
+                      stream={stream}
+                      globalPlaybackUrl={globalPlaybackUrl}
+                      onEmbedVideoClick={setEmbedVideoDialogOpen}
+                    />
+                    <StreamDetailsBox
+                      stream={stream}
+                      globalIngestUrl={globalIngestUrl}
+                      globalSrtIngestUrl={globalSrtIngestUrl}
+                      globalPlaybackUrl={globalPlaybackUrl}
+                      invalidateStream={invalidateStream}
+                    />
+                  </Box>
+                </Box>
+                <Box css={{ flexGrow: 1, ml: "$8" }}>
+                  <StreamChildrenHeadingBox
                     stream={stream}
-                    globalIngestUrl={globalIngestUrl}
-                    globalSrtIngestUrl={globalSrtIngestUrl}
-                    globalPlaybackUrl={globalPlaybackUrl}
+                    user={user}
+                    activeTab={activeTab}
+                    setSwitchTab={setSwitchTab}
                     invalidateStream={invalidateStream}
                   />
+                  <Box css={{ py: "$4" }}>{children}</Box>
                 </Box>
-              </Box>
-              <Box css={{ flexGrow: 1, ml: "$8" }}>
-                <StreamChildrenHeadingBox
-                  stream={stream}
-                  user={user}
-                  activeTab={activeTab}
-                  setSwitchTab={setSwitchTab}
-                  invalidateStream={invalidateStream}
-                />
-                <Box css={{ py: "$4" }}>{children}</Box>
-              </Box>
+              </Flex>
+            </>
+          ) : notFound ? (
+            <Box>Not found</Box>
+          ) : (
+            <Flex
+              css={{
+                height: "calc(100vh - 300px)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+              <Spinner />
             </Flex>
-          </>
-        ) : notFound ? (
-          <Box>Not found</Box>
-        ) : (
-          <Flex
-            css={{
-              height: "calc(100vh - 300px)",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-            <Spinner />
-          </Flex>
-        )}
-      </Box>
-    </Layout>
+          )}
+        </Box>
+      </Layout>
+    </>
   );
 };
 

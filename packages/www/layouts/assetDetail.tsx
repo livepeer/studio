@@ -20,7 +20,7 @@ import {
 } from "react";
 
 export type AssetDetailProps = {
-  asset: Asset;
+  asset?: Asset;
   children: React.ReactNode;
   totalViews: number;
   breadcrumbs: Breadcrumb[];
@@ -90,7 +90,7 @@ const AssetDetail = ({
       <EmbedVideoDialog
         isOpen={embedVideoDialogOpen}
         onOpenChange={setEmbedVideoDialogOpen}
-        asset={asset}
+        playbackId={asset?.playbackId}
       />
 
       <Layout id="assets" breadcrumbs={breadcrumbs}>

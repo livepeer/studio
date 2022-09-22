@@ -12,9 +12,9 @@ import {
 import { Asset } from "livepeer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const embedStringForAsset = (asset?: Asset) => `
+const embedStringForAsset = (playbackId: string) => `
 <iframe
-src="https://lvpr.tv?v=${asset?.playbackId}"
+src="https://lvpr.tv?v=${playbackId}"
 frameborder="0"
 allowfullscreen
 allow="autoplay; encrypted-media; picture-in-picture"
@@ -25,15 +25,15 @@ sandbox="allow-scripts">
 export type EmbedVideoDialog = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  asset?: Asset;
+  playbackId: string;
 };
 
 const EmbedVideoDialog = ({
   isOpen,
   onOpenChange,
-  asset,
+  playbackId,
 }: EmbedVideoDialog) => {
-  const embedString = embedStringForAsset(asset);
+  const embedString = embedStringForAsset(playbackId);
   const [openSnackbar] = useSnackbar();
 
   const onCopy = () => {

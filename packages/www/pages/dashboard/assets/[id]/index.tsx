@@ -5,6 +5,7 @@ import { useApi } from "hooks";
 import AssetDetail from "layouts/assetDetail";
 import AssetOverviewTab from "@components/Dashboard/AssetDetails/AssetOverviewTab";
 import AssetEventLogTab from "@components/Dashboard/AssetDetails/AssetEventLogTab";
+import { Asset } from "livepeer";
 
 const refetchInterval = 5 * 1000;
 
@@ -41,7 +42,7 @@ const AssetDetails = () => {
   return (
     <AssetDetail
       activeTab={currentTab}
-      asset={asset}
+      asset={asset as Asset}
       totalViews={totalViews}
       setSwitchTab={setCurrentTab}
       editAssetDialogOpen={editAssetDialogOpen}

@@ -10,7 +10,6 @@ import {
 } from "@livepeer/design-system";
 import { CodeIcon, Link1Icon } from "@radix-ui/react-icons";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Asset } from "livepeer";
 
 const buttonLinkCss = {
   display: "flex",
@@ -19,18 +18,18 @@ const buttonLinkCss = {
 };
 
 export type AssetSharePopupProps = {
-  asset: Asset;
+  playbackId: string;
   triggerNode: ReactNode;
   onEmbedVideoClick: () => void;
 };
 
 const AssetSharePopup = ({
-  asset,
+  playbackId,
   triggerNode,
   onEmbedVideoClick,
 }: AssetSharePopupProps) => {
   const [openSnackbar] = useSnackbar();
-  const copyString = `https://lvpr.tv?v=${asset.playbackId}`;
+  const copyString = `https://lvpr.tv?v=${playbackId}`;
 
   return (
     <Popover>
