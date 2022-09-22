@@ -54,15 +54,15 @@ describe("controllers/signing-key", () => {
         await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
       client.jwtAuth = nonAdminToken;
       let created: SigningKeyResponsePayload = await client
-        .post("/signing-key")
+        .post("/access-control/signing-key")
         .then((res) => res.json());
       samplePrivateKey = created.privateKey;
-      let res = await client.get(`/signing-key/${created.id}`);
+      let res = await client.get(`/access-control/signing-key/${created.id}`);
       signingKey = await res.json();
       // decoded public key is decoded b64 of signingKey.publicKey parsed as json
       decodedPublicKey = Buffer.from(signingKey.publicKey, "base64").toString();
-      created = await (await client.post("/signing-key")).json();
-      res = await client.get(`/signing-key/${created.id}`);
+      created = await (await client.post("/access-control/signing-key")).json();
+      res = await client.get(`/access-control/signing-key/${created.id}`);
       let otherSigningKey = await res.json();
       otherPublicKey = Buffer.from(
         otherSigningKey.publicKey,
@@ -72,7 +72,7 @@ describe("controllers/signing-key", () => {
 
     it("should create a signing key and display the private key only on creation", async () => {
       const preCreationTime = Date.now();
-      let res = await client.post("/signing-key");
+      let res = await client.post("/access-control/signing-key");
       expect(res.status).toBe(201);
       const created = (await res.json()) as SigningKeyResponsePayload;
       expect(created).toMatchObject({
@@ -82,7 +82,7 @@ describe("controllers/signing-key", () => {
         createdAt: expect.any(Number),
       });
       expect(created.createdAt).toBeGreaterThanOrEqual(preCreationTime);
-      res = await client.get(`/signing-key/${created.id}`);
+      res = await client.get(`/access-control/signing-key/${created.id}`);
       expect(res.status).toBe(200);
       const getResponse = await res.json();
       const { privateKey, ...withoutPvtk } = created;
@@ -90,7 +90,7 @@ describe("controllers/signing-key", () => {
     });
 
     it("should list all user signing keys", async () => {
-      const res = await client.get(`/signing-key`);
+      const res = await client.get(`/access-control/signing-key`);
       expect(res.status).toBe(200);
     });
 
@@ -119,30 +119,35 @@ describe("controllers/signing-key", () => {
     });
 
     it("should allow disable and enable the signing key & change the name", async () => {
-      let res = await client.patch(`/signing-key/${signingKey.id}`, {
-        disabled: true,
-        name: "My test signing key 1",
-      });
+      let res = await client.patch(
+        `/access-control/signing-key/${signingKey.id}`,
+        {
+          disabled: true,
+          name: "My test signing key 1",
+        }
+      );
       expect(res.status).toBe(204);
-      res = await client.get(`/signing-key/${signingKey.id}`);
+      res = await client.get(`/access-control/signing-key/${signingKey.id}`);
       let updated = await res.json();
       expect(updated.disabled).toBe(true);
       expect(updated.name).toBe("My test signing key 1");
-      res = await client.patch(`/signing-key/${signingKey.id}`, {
+      res = await client.patch(`/access-control/signing-key/${signingKey.id}`, {
         disabled: false,
         name: "My test signing key 2",
       });
       expect(res.status).toBe(204);
-      res = await client.get(`/signing-key/${signingKey.id}`);
+      res = await client.get(`/access-control/signing-key/${signingKey.id}`);
       updated = await res.json();
       expect(updated.disabled).toBe(false);
       expect(updated.name).toBe("My test signing key 2");
     });
 
     it("should delete the signing key", async () => {
-      let res = await client.delete(`/signing-key/${signingKey.id}`);
+      let res = await client.delete(
+        `/access-control/signing-key/${signingKey.id}`
+      );
       expect(res.status).toBe(204);
-      res = await client.get(`/signing-key/${signingKey.id}`);
+      res = await client.get(`/access-control/signing-key/${signingKey.id}`);
       expect(res.status).toBe(404);
       let deletedSigningKey = await db.signingKey.get(signingKey.id);
       expect(deletedSigningKey.deleted).toBe(true);

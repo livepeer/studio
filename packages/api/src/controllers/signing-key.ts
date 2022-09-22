@@ -42,9 +42,9 @@ function generateSigningKeys() {
   return keypair;
 }
 
-const app = Router();
+const signingKeyApp = Router();
 
-app.get("/", authorizer({}), async (req, res) => {
+signingKeyApp.get("/", authorizer({}), async (req, res) => {
   let { limit, cursor, all, allUsers, order, filters, count } = toStringValues(
     req.query
   );
@@ -124,7 +124,7 @@ app.get("/", authorizer({}), async (req, res) => {
   return res.json(output);
 });
 
-app.get("/:id", authorizer({}), async (req, res) => {
+signingKeyApp.get("/:id", authorizer({}), async (req, res) => {
   const signingKey = await db.signingKey.get(req.params.id);
 
   if (
@@ -141,7 +141,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.json(signingKey);
 });
 
-app.post(
+signingKeyApp.post(
   "/",
   validatePost("new-signing-key-payload"),
   authorizer({}),
@@ -191,7 +191,7 @@ app.post(
   }
 );
 
-app.delete("/:id", authorizer({}), async (req, res) => {
+signingKeyApp.delete("/:id", authorizer({}), async (req, res) => {
   const { id } = req.params;
   const signingKey = await db.signingKey.get(id);
   if (!signingKey || signingKey.deleted) {
@@ -205,7 +205,7 @@ app.delete("/:id", authorizer({}), async (req, res) => {
   res.end();
 });
 
-app.patch(
+signingKeyApp.patch(
   "/:id",
   validatePost("signing-key-patch-payload"),
   authorizer({}),
@@ -231,4 +231,4 @@ app.patch(
   }
 );
 
-export default app;
+export default signingKeyApp;
