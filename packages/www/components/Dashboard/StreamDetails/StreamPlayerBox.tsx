@@ -84,7 +84,7 @@ const StreamPlayerBox = ({
           <AssetSharePopup
             playbackId={stream.playbackId}
             triggerNode={
-              <Button size="2" onClick={() => {}} ghost={true}>
+              <Button size="2" ghost={true}>
                 <Box
                   as={Share2Icon}
                   css={{
