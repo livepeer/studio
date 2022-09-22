@@ -509,7 +509,9 @@ describe("controllers/stream", () => {
 
       it("should allow patch of playbackPolicy", async () => {
         const res = await client.patch(patchPath, {
-          playbackPolicy: "public",
+          playbackPolicy: {
+            kind: "public",
+          },
         });
         expect(res.status).toBe(204);
       });

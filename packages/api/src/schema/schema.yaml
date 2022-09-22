@@ -739,13 +739,15 @@ components:
           $ref: "#/components/schemas/webhook-response"
 
     playback-policy:
-      type: string
+      type: object
       description:
         Whether the playback policy for a asset or stream is public or signed
-      enum:
-        - public
-        - signed
-        - private
+      additionalProperties: false
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [public, signed, private]
 
     session:
       type: object
