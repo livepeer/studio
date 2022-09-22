@@ -106,6 +106,12 @@ describe("controllers/signing-key", () => {
       };
       const token = jwt.sign(payload, samplePrivateKey, { algorithm: "ES256" });
 
+      const decoded = verifyJwt(token, decodedPublicKey, {
+        complete: true,
+      });
+
+      expect(decoded.payload["exp"]).toEqual(expiration);
+
       expect(() => jwt.verify(token, decodedPublicKey)).not.toThrow();
       expect(() => jwt.verify(token, otherPublicKey)).toThrow(
         JsonWebTokenError
