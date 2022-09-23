@@ -11,6 +11,7 @@ import { validatePost } from "../middleware";
 import { geolocateMiddleware } from "../middleware";
 import {
   DetectionWebhookPayload,
+  StreamCatalystHookStarted,
   StreamPatchPayload,
   StreamSetActivePayload,
   User,
@@ -783,6 +784,66 @@ app.post(
       }' playbackid=${stream.playbackId} session_id=${id} elapsed=${
         Date.now() - start
       }ms`
+    );
+  }
+);
+
+app.post(
+  "/hook/catalyst/stream-started",
+  authorizer({ anyAdmin: true }),
+  validatePost("stream-catalyst-hook-started"),
+  async (req, res) => {
+    const start = Date.now();
+    const { streamId, sessionId, startedAt } =
+      req.body as StreamCatalystHookStarted;
+    let stream: DBStream;
+    if (streamId.indexOf("+") > -1) {
+      const playbackId = streamId.split("+")[1];
+      stream = await db.stream.getByPlaybackId(playbackId, {
+        useReplica: false,
+      });
+    } else {
+      stream =
+        (await db.stream.get(streamId)) ??
+        (await db.stream.getByStreamKey(streamId));
+    }
+    if (!stream || stream.deleted) {
+      return res.status(404).json({ errors: ["not found"] });
+    }
+
+    const createdAt = Date.now();
+    const session: DBSession = {
+      id: sessionId,
+      parentId: stream.id,
+      playbackId: stream.playbackId,
+      userId: stream.userId,
+      name: stream.name,
+      createdAt,
+      lastSeen: startedAt,
+      sourceSegments: 0,
+      transcodedSegments: 0,
+      sourceSegmentsDuration: 0,
+      transcodedSegmentsDuration: 0,
+      sourceBytes: 0,
+      transcodedBytes: 0,
+      ingestRate: 0,
+      outgoingRate: 0,
+      deleted: false,
+      region: req.config.ownRegion,
+      recordObjectStoreId: stream.recordObjectStoreId,
+      record: stream.record,
+      profiles: stream.profiles,
+    };
+    await db.session.create(session);
+
+    res.status(201);
+    res.json(db.session.cleanWriteOnlyResponse(session));
+    logger.info(
+      `catalyst start hook: stream user session created for stream_id=${
+        stream.id
+      } stream_name="${stream.name}" playbackId=${
+        stream.playbackId
+      } session_id=${sessionId} elapsed=${Date.now() - start}ms`
     );
   }
 );

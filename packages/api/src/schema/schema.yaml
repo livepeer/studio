@@ -644,6 +644,27 @@ components:
           description: Timestamp (in milliseconds) at which the stream started.
           example: 1587667174725
 
+    stream-catalyst-hook-started:
+      type: object
+      required: [name, sessionId, startedAt]
+      properties:
+        streamId:
+          type: string
+          description: Stream identifier inside Catalyst
+          pattern: ^.+\+.+$
+        sessionId:
+          type: string
+          description: Randomly generated UUID of the session on Catalyst side.
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89AB][0-9a-f]{3}-[0-9a-f]{12}$
+        startedAt:
+          type: number
+          description: Timestamp (in milliseconds) at which the stream started.
+          example: 1587667174725
+        region:
+          $ref: "#/components/schemas/session/properties/region"
+        hostname:
+          $ref: "#/components/schemas/session/properties/catalystIngestHost"
+
     asset-patch-payload:
       type: object
       additionalProperties: false
@@ -879,6 +900,14 @@ components:
             $ref: "#/components/schemas/ffmpeg-profile"
         lastSessionId:
           type: string
+        region:
+          type: string
+          example: fra
+          description: Region in which this session object was created
+        catalystIngestHost:
+          type: string
+          description:
+            Hostname of the Catalyst node where this session was ingested
 
     error:
       required:
