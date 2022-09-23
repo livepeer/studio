@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { get } from "lodash";
-import Link from "next/link";
-import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
 import {
@@ -12,21 +11,10 @@ import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
-import {
-  CellComponentProps,
-  TableData,
-} from "components/Dashboard/Table/types";
-import {
-  Flex,
-  Heading,
-  Link as A,
-  Button,
-  Text,
-  Box,
-  useSnackbar,
-} from "@livepeer/design-system";
+import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
+import EmptyState from "./EmptyState";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -161,65 +149,6 @@ const AssetsTable = ({
     [userId]
   );
 
-  const emptyState = (
-    <Flex
-      direction="column"
-      justify="center"
-      css={{
-        margin: "0 auto",
-        height: "calc(100vh - 400px)",
-        maxWidth: 450,
-      }}>
-      <Flex
-        direction="column"
-        justify="center"
-        css={{
-          margin: "0 auto",
-          height: "calc(100vh - 400px)",
-          maxWidth: 450,
-        }}>
-        <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Upload your first On Demand asset
-        </Heading>
-        <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Studio supports video on demand which allows you to import
-          video assets, store them on decentralized storage, and easily mint a
-          video NFT.
-        </Text>
-
-        <Box
-          css={{
-            display: "block",
-            "@bp1": {
-              display: "flex",
-            },
-          }}>
-          <Link
-            href="https://docs.livepeer.studio/category/on-demand "
-            passHref>
-            <A
-              target="_blank"
-              variant="primary"
-              css={{ display: "flex", ai: "center", mb: "$5" }}>
-              <Box>Learn more</Box>
-              <ArrowRightIcon />
-            </A>
-          </Link>
-        </Box>
-        <Button
-          onClick={() => createDialogState.onOn()}
-          css={{ alignSelf: "flex-start" }}
-          size="2"
-          variant="primary">
-          <PlusIcon />{" "}
-          <Box as="span" css={{ ml: "$2" }}>
-            Upload asset
-          </Box>
-        </Button>
-      </Flex>
-    </Flex>
-  );
-
   return (
     <>
       <Table
@@ -229,7 +158,7 @@ const AssetsTable = ({
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
-        emptyState={emptyState}
+        emptyState={<EmptyState createDialogState={createDialogState} />}
         viewAll={viewAll}
         header={
           <Heading size="2">

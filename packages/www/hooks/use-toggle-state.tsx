@@ -1,7 +1,14 @@
 import { useCallback } from "react";
 import { useState } from "react";
 
-export const useToggleState = (initialState = false) => {
+export type ToggleState = {
+  on: boolean;
+  onOn(): void;
+  onOff(): void;
+  onToggle(): void;
+};
+
+export const useToggleState = (initialState = false): ToggleState => {
   const [on, setOn] = useState(initialState);
 
   const onOn = useCallback(() => {
