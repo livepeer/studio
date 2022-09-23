@@ -747,7 +747,7 @@ components:
       properties:
         kind:
           type: string
-          enum: [public, signed, private]
+          enum: [public, signed]
 
     session:
       type: object
