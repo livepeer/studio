@@ -16,6 +16,7 @@ import {
   WebhookResponse,
   Session,
   CdnUsageLast,
+  SigningKey,
 } from "../schema/types";
 import BaseTable, { TableOptions } from "./table";
 import StreamTable, { DBStreamFields } from "./stream-table";
@@ -64,6 +65,7 @@ export class DB {
   multistreamTarget: MultistreamTargetTable;
   asset: AssetTable;
   task: Table<Task>;
+  signingKey: Table<SigningKey>;
   apiToken: Table<ApiToken>;
   user: Table<User>;
   usage: Table<Usage>;
@@ -152,6 +154,10 @@ export class DB {
     this.task = makeTable<Task>({
       db: this,
       schema: schemas["task"],
+    });
+    this.signingKey = makeTable<SigningKey>({
+      db: this,
+      schema: schemas["signing-key"],
     });
     this.user = makeTable<User>({ db: this, schema: schemas["user"] });
     this.usage = makeTable<Usage>({ db: this, schema: schemas["usage"] });
