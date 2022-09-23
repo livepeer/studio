@@ -1354,7 +1354,8 @@ components:
           type: string
           description: Type of the task
           enum:
-            - import
+            - upload
+            - import # Import is the deprecated pipeline, upload is on Catalyst
             - export
             - transcode
         createdAt:
@@ -1380,14 +1381,14 @@ components:
           additionalProperties: false
           description: Parameters of the task
           properties:
-            import:
+            upload:
               type: object
               additionalProperties: false
-              description: Parameters for the import task
+              description: Parameters for the upload task
               properties:
                 url:
                   type: string
-                  description: URL of the asset to import
+                  description: URL of the asset to "upload"
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
                 recordedSessionId:
                   type: string
@@ -1399,6 +1400,8 @@ components:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+            import:
+              $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
               $ref: "#/components/schemas/export-task-params"
             transcode:
@@ -1446,10 +1449,10 @@ components:
           additionalProperties: false
           description: Output of the task
           properties:
-            import:
+            upload:
               type: object
               additionalProperties: true
-              description: Output of the import task
+              description: Output of the upload task
               properties:
                 videoFilePath:
                   type: string
@@ -1459,6 +1462,8 @@ components:
                   writeOnly: true
                 assetSpec:
                   $ref: "#/components/schemas/asset"
+            import:
+              $ref: "#/components/schemas/task/properties/output/properties/upload"
             export:
               type: object
               additionalProperties: false
