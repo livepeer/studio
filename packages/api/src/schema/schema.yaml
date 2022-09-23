@@ -453,6 +453,8 @@ components:
           example: eaw4nk06ts2d0mzb
           description: Used to form playback URL
           unique: true
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
           default:
@@ -650,6 +652,8 @@ components:
           $ref: "#/components/schemas/asset/properties/name"
         meta:
           $ref: "#/components/schemas/asset/properties/meta"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         storage:
           additionalProperties: false
           properties:
@@ -677,6 +681,8 @@ components:
           $ref: "#/components/schemas/stream/properties/suspended"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
 
     object-store-patch-payload:
       type: object
@@ -742,6 +748,17 @@ components:
           description: Error message if the webhook failed to process the event
         response:
           $ref: "#/components/schemas/webhook-response"
+
+    playback-policy:
+      type: object
+      description:
+        Whether the playback policy for a asset or stream is public or signed
+      additionalProperties: false
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [public, signed]
 
     session:
       type: object
@@ -975,6 +992,8 @@ components:
           readOnly: true
           example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         downloadUrl:
           type: string
           readOnly: true
@@ -1269,6 +1288,8 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         meta:
           type: object
           description: User input metadata associated with the asset
