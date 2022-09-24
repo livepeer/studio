@@ -119,7 +119,7 @@ export default function parseCli(argv?: string | readonly string[]) {
         describe:
           "base URL to use for the IPFS content gateway returned on assets.",
         type: "string",
-        default: "https://cloudflare-ipfs.com/ipfs/",
+        default: "https://ipfs.livepeer.studio/ipfs/",
       },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
