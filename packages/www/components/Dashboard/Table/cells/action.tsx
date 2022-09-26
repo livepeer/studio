@@ -20,18 +20,14 @@ const DeleteActionCell = ({ onDelete }: { onDelete(): void }) => {
 };
 
 export type ActionCellProps = {
-  id: string;
-  status: {
-    phase: string;
-    errorMessage?: string;
-  };
+  isStatusFailed: boolean;
   onDelete(): void;
 };
 
 const ActionCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, ActionCellProps>) => {
-  if (cell.value.status.phase === "failed") {
+  if (cell.value.isStatusFailed) {
     return <DeleteActionCell onDelete={cell.value.onDelete} />;
   }
   return <></>;

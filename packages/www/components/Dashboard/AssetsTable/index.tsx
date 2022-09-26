@@ -16,6 +16,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
 import EmptyState from "./EmptyState";
 import ActionCell, { ActionCellProps } from "../Table/cells/action";
+import { displayReadyAssetName, makeNameSectionChildren } from "./helpers";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -112,19 +113,19 @@ const AssetsTable = ({
         const source =
           tasks && tasks.find((task) => task.outputAssetId === asset.id);
         const sourceUrl = get(source, "params.import.url");
+        const isStatusFailed = asset.status.phase === "failed";
+        const displayName = displayReadyAssetName(asset.name);
+        const nameSectionChildren = makeNameSectionChildren(
+          isStatusFailed,
+          displayName
+        );
 
         return {
           id: asset.id,
           name: {
             id: asset.id,
             value: asset.name,
-            children:
-              asset.name.length > 24
-                ? asset.name.replace(
-                    asset.name.slice(18, asset.name.length - 6),
-                    "..."
-                  )
-                : asset.name,
+            children: nameSectionChildren,
             href: `/dashboard/assets/${asset.id}`,
           },
           source: {
@@ -155,8 +156,7 @@ const AssetsTable = ({
             href: `/dashboard/assets/${asset.id}`,
           },
           action: {
-            id: asset.id,
-            status: asset.status,
+            isStatusFailed,
             onDelete: () => onDeleteAsset(asset.id),
           },
         };
