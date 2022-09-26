@@ -743,9 +743,9 @@ components:
       description:
         Whether the playback policy for a asset or stream is public or signed
       additionalProperties: false
-      required: [kind]
+      required: [type]
       properties:
-        kind:
+        type:
           type: string
           enum: [public, signed]
 

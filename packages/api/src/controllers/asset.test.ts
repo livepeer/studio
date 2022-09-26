@@ -133,7 +133,7 @@ describe("controllers/asset", () => {
 
     it("should allow editing asset playback policy", async () => {
       let playbackPolicy = {
-        kind: "public",
+        type: "public",
       };
       const res = await client.patch(`/asset/${asset.id}`, {
         playbackPolicy,
