@@ -15,6 +15,7 @@ import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
 import EmptyState from "./EmptyState";
+import ActionCell, { ActionCellProps } from "../Table/cells/action";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -28,6 +29,7 @@ type AssetsTableData = {
   source: TextCellProps;
   createdAt: DateCellProps;
   updatedAt: DateCellProps;
+  action: ActionCellProps;
 };
 
 const AssetsTable = ({
@@ -80,9 +82,19 @@ const AssetsTable = ({
         Cell: TextCell,
         disableSortBy: true,
       },
+      {
+        Header: "",
+        accessor: "action",
+        Cell: ActionCell,
+        disableSortBy: true,
+      },
     ],
     []
   );
+
+  const onDeleteAsset = (id: string) => {
+    console.log("Delete assed id: ", id);
+  };
 
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) => {
@@ -141,6 +153,11 @@ const AssetsTable = ({
                 : null,
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             href: `/dashboard/assets/${asset.id}`,
+          },
+          action: {
+            id: asset.id,
+            status: asset.status,
+            onDelete: () => onDeleteAsset(asset.id),
           },
         };
       });

@@ -1,7 +1,6 @@
-import Link from "next/link";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
-import { Box, Link as A } from "@livepeer/design-system";
+import { Box } from "@livepeer/design-system";
 
 export type TextCellProps = {
   children?: React.ReactNode;
