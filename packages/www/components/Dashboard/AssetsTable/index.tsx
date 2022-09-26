@@ -88,6 +88,7 @@ const AssetsTable = ({
         accessor: "action",
         Cell: ActionCell,
         disableSortBy: true,
+        width: "$7", // TODO: maybe $7
       },
     ],
     []

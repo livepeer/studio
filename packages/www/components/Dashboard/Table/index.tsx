@@ -1,10 +1,5 @@
-import { Column, Row, useRowSelect, useSortBy, useTable } from "react-table";
-import {
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-  UseQueryResult,
-} from "react-query";
+import { Row, useRowSelect, useSortBy, useTable } from "react-table";
+import { useQuery, useQueryClient, UseQueryOptions } from "react-query";
 import {
   useEffect,
   useMemo,
