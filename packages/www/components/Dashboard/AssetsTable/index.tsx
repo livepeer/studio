@@ -143,9 +143,12 @@ const AssetsTable = ({
             href: `/dashboard/assets/${asset.id}`,
           },
           createdAt: {
+            id: asset.id,
             date: new Date(asset.createdAt),
             fallback: <Box css={{ color: "$primary8" }}>—</Box>,
             href: `/dashboard/assets/${asset.id}`,
+            isStatusFailed,
+            errorMessage: asset.status.errorMessage,
           },
           updatedAt: {
             date:
@@ -157,6 +160,7 @@ const AssetsTable = ({
             href: `/dashboard/assets/${asset.id}`,
           },
           action: {
+            id: asset.id,
             isStatusFailed,
             onDelete: () => onDeleteAsset(asset.id),
           },
