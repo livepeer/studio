@@ -17,6 +17,7 @@ import CreateAssetDialog from "./CreateAssetDialog";
 import EmptyState from "./EmptyState";
 import ActionCell, { ActionCellProps } from "../Table/cells/action";
 import { displayReadyAssetName, makeNameSectionChildren } from "./helpers";
+import CreatedAtCell from "../Table/cells/createdAt";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -66,7 +67,7 @@ const AssetsTable = ({
       {
         Header: "Created",
         accessor: "createdAt",
-        Cell: DateCell,
+        Cell: CreatedAtCell,
         sortType: (...params: SortTypeArgs) =>
           dateSort("original.createdAt.date", ...params),
       },
@@ -116,17 +117,14 @@ const AssetsTable = ({
         const sourceUrl = get(source, "params.import.url");
         const isStatusFailed = asset.status.phase === "failed";
         const displayName = displayReadyAssetName(asset.name);
-        const nameSectionChildren = makeNameSectionChildren(
-          isStatusFailed,
-          displayName
-        );
 
         return {
           id: asset.id,
           name: {
             id: asset.id,
             value: asset.name,
-            children: nameSectionChildren,
+            children: makeNameSectionChildren(isStatusFailed, displayName),
+            tooltipChildren: asset.status.errorMessage,
             href: `/dashboard/assets/${asset.id}`,
           },
           source: {
