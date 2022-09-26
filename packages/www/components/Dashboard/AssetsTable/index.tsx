@@ -9,15 +9,15 @@ import {
 } from "components/Dashboard/Table/filters";
 import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
+import ActionCell, { ActionCellProps } from "../Table/cells/action";
+import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";
+import NameCell, { NameCellProps } from "../Table/cells/name";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
 import EmptyState from "./EmptyState";
-import ActionCell, { ActionCellProps } from "../Table/cells/action";
-import { displayReadyAssetName, makeNameSectionChildren } from "./helpers";
-import CreatedAtCell from "../Table/cells/createdAt";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -27,9 +27,9 @@ const filterItems: FilterItem[] = [
 
 type AssetsTableData = {
   id: string;
-  name: TextCellProps;
+  name: NameCellProps;
   source: TextCellProps;
-  createdAt: DateCellProps;
+  createdAt: CreatedAtCellProps;
   updatedAt: DateCellProps;
   action: ActionCellProps;
 };
@@ -60,7 +60,7 @@ const AssetsTable = ({
       {
         Header: "Name",
         accessor: "name",
-        Cell: TextCell,
+        Cell: NameCell,
         sortType: (...params: SortTypeArgs) =>
           stringSort("original.name.value", ...params),
       },
@@ -116,16 +116,15 @@ const AssetsTable = ({
           tasks && tasks.find((task) => task.outputAssetId === asset.id);
         const sourceUrl = get(source, "params.import.url");
         const isStatusFailed = asset.status.phase === "failed";
-        const displayName = displayReadyAssetName(asset.name);
 
         return {
           id: asset.id,
           name: {
             id: asset.id,
-            value: asset.name,
-            children: makeNameSectionChildren(isStatusFailed, displayName),
-            tooltipChildren: asset.status.errorMessage,
             href: `/dashboard/assets/${asset.id}`,
+            assetName: asset.name,
+            isStatusFailed,
+            errorMessage: asset.status.errorMessage,
           },
           source: {
             children: (
