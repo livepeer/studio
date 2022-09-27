@@ -32,13 +32,15 @@ declare global {
   }
 }
 
-export type Files = {
-  [key: string]: {
-    file: File;
-    progress?: number;
-    error?: Error;
-    completed: boolean;
-  };
+export type FileUpload = {
+  file: File;
+  progress?: number;
+  error?: Error;
+  completed: boolean;
+};
+
+export type FileUploadsDictionary = {
+  [key: string]: FileUpload;
 };
 
 type ApiState = {
@@ -46,7 +48,7 @@ type ApiState = {
   token?: string;
   userRefresh?: number;
   noStripe?: boolean;
-  currentFileUploads?: Files;
+  currentFileUploads?: FileUploadsDictionary;
 };
 
 export interface UsageData {
