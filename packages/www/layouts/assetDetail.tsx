@@ -112,7 +112,6 @@ const AssetDetail = ({
                 </Box>
               </Box>
               <AssetChildrenHeadingBox
-                asset={asset}
                 children={children}
                 activeTab={activeTab}
                 setSwitchTab={setSwitchTab}

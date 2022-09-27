@@ -1,10 +1,8 @@
-import { Box, Flex, Button, Link } from "@livepeer/design-system";
-import { DownloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
-import { Asset } from "livepeer";
+import { Box, Flex, Button } from "@livepeer/design-system";
+import { Pencil1Icon } from "@radix-ui/react-icons";
 import { Dispatch, SetStateAction } from "react";
 
 export type AssetChildrenHeadingBoxProps = {
-  asset?: Asset;
   children: React.ReactNode;
   activeTab: "Overview" | "Event Logs";
   setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
@@ -12,7 +10,6 @@ export type AssetChildrenHeadingBoxProps = {
 };
 
 const AssetChildrenHeadingBox = ({
-  asset,
   children,
   activeTab,
   setSwitchTab,
@@ -67,37 +64,18 @@ const AssetChildrenHeadingBox = ({
           </Box>
         </Box>
         <Box css={{ position: "relative", top: "-8px" }}>
-          <Flex align="center">
-            {asset?.downloadUrl && (
-              <Link target="_blank" href={asset?.downloadUrl}>
-                <Button
-                  size="2"
-                  css={{
-                    mr: "$1",
-                  }}>
-                  <Box
-                    as={DownloadIcon}
-                    css={{
-                      mr: "$1",
-                    }}
-                  />
-                  Download
-                </Button>
-              </Link>
-            )}
-            <Button
-              size="2"
-              onClick={() => setEditAssetDialogOpen(true)}
-              variant="primary">
-              <Box
-                as={Pencil1Icon}
-                css={{
-                  mr: "$1",
-                }}
-              />
-              Edit Asset
-            </Button>
-          </Flex>
+          <Button
+            size="2"
+            onClick={() => setEditAssetDialogOpen(true)}
+            variant="primary">
+            <Box
+              as={Pencil1Icon}
+              css={{
+                mr: "$1",
+              }}
+            />
+            Edit Asset
+          </Button>
         </Box>
       </Flex>
       <Box css={{ py: "$2" }}>{children}</Box>
