@@ -93,13 +93,21 @@ const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
         }}>
         <Flex align="center">
           {asset?.downloadUrl && (
-            <Link target="_blank" href={asset?.downloadUrl}>
+            <Link
+              css={{
+                textDecorationColor: "transparent",
+                "&:hover": {
+                  textDecorationColor: "transparent",
+                },
+              }}
+              target="_blank"
+              href={asset?.downloadUrl}>
               <Button
                 size="2"
+                ghost
                 css={{
                   mr: "$1",
-                }}
-                ghost={true}>
+                }}>
                 <Box
                   as={DownloadIcon}
                   css={{
@@ -114,7 +122,7 @@ const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
           <AssetSharePopup
             playbackId={asset.playbackId}
             triggerNode={
-              <Button size="2" ghost={true}>
+              <Button size="2" ghost>
                 <Box
                   as={Share2Icon}
                   css={{
