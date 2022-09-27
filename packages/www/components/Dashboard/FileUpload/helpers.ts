@@ -1,5 +1,5 @@
 import { FileUpload } from "hooks/use-api";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 
 export type FileUploadFilteredItem = {
   type: "file" | "asset";

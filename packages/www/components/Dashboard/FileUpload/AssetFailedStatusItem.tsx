@@ -1,6 +1,6 @@
 import { Box, Text } from "@livepeer/design-system";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import { Asset } from "livepeer";
+import { Asset } from "@livepeer.studio/api";
 import Item from "./Item";
 
 const MAX_FILENAME_LENGTH = 20;
