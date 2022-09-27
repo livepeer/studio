@@ -12,15 +12,8 @@ import {
 import { Asset } from "livepeer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-const embedStringForAsset = (playbackId: string) => `
-<iframe
-src="https://lvpr.tv?v=${playbackId}"
-frameborder="0"
-allowfullscreen
-allow="autoplay; encrypted-media; picture-in-picture"
-sandbox="allow-scripts">
-</iframe>
-`;
+const embedStringForAsset = (playbackId: string) =>
+  `<iframe src="https://lvpr.tv?v=${playbackId}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" sandbox="allow-scripts"></iframe>`;
 
 export type EmbedVideoDialog = {
   isOpen: boolean;
