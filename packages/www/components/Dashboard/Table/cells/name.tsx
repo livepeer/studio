@@ -50,7 +50,7 @@ const NameCell = <D extends TableData>({
     );
   }
 
-  return <Box css={{ lineHeight: 1.5 }}>displayAssetName</Box>;
+  return <Box css={{ lineHeight: 1.5 }}>{displayAssetName}</Box>;
 };
 
 export default NameCell;
