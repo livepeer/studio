@@ -50,6 +50,7 @@ type ApiState = {
   userRefresh?: number;
   noStripe?: boolean;
   currentFileUploads?: FileUploadsDictionary;
+  latestGetAssetsResult?: Asset[];
 };
 
 export interface UsageData {
@@ -928,13 +929,10 @@ const makeContext = (
           const previousUploads = await uploadWithoutUrl.findPreviousUploads();
           if (previousUploads.length > 0) {
             uploadWithoutUrl.resumeFromPreviousUpload(previousUploads[0]);
-
             uploadWithoutUrl.start();
           } else {
             const assetUpload = await requestAssetUpload({ name: file.name });
-
             const upload = getTusUpload(file, assetUpload.tusEndpoint);
-
             upload.start();
           }
         } catch (e) {
@@ -974,6 +972,7 @@ const makeContext = (
       if (res.status !== 200) {
         throw new Error(assets);
       }
+      setState((state) => ({ ...state, latestGetAssetsResult: assets }));
       const nextCursor = getCursor(res.headers.get("link"));
       const count = res.headers.get("X-Total-Count");
       return [assets, nextCursor, count];

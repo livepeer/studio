@@ -4,11 +4,11 @@ import { useApi } from "hooks";
 import { useEffect, useMemo, useState } from "react";
 import AssetFailedStatusItem from "./AssetFailedStatusItem";
 import FileItem from "./FileItem";
-import { FileUploadFilteredItem, filteredItemsToShow } from "./helpers";
+import { filteredItemsToShow } from "./helpers";
 
 const FileUpload = () => {
-  const { currentFileUploads, clearFileUploads, getAssets, user } = useApi();
-  const [items, setItems] = useState<FileUploadFilteredItem[]>([]);
+  const { currentFileUploads, clearFileUploads, latestGetAssetsResult } =
+    useApi();
 
   const fileUploadsFiltered = useMemo(
     () =>
@@ -21,6 +21,11 @@ const FileUpload = () => {
   const hasPendingFileUploads = useMemo(
     () => fileUploadsFiltered.some((file) => !file.completed),
     [fileUploadsFiltered]
+  );
+
+  const items = useMemo(
+    () => filteredItemsToShow(fileUploadsFiltered, latestGetAssetsResult ?? []),
+    [fileUploadsFiltered, latestGetAssetsResult]
   );
 
   useEffect(() => {
@@ -37,15 +42,6 @@ const FileUpload = () => {
       };
     }
   }, [typeof window, hasPendingFileUploads]);
-
-  useEffect(() => {
-    (async () => {
-      if (!user) return;
-      const [assets] = await getAssets(user.id, { limit: 20 });
-      const filteredItems = filteredItemsToShow(fileUploadsFiltered, assets);
-      setItems(filteredItems);
-    })();
-  }, [user, fileUploadsFiltered]);
 
   if (!items.length) {
     return <></>;
