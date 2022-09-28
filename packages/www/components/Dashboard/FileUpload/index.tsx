@@ -94,14 +94,15 @@ const FileUpload = () => {
         )}
 
         {items.map((item) => {
-          switch (item.type) {
-            case "file":
-              return <FileItem fileUpload={item.file} />;
-            case "asset":
-              return <AssetFailedStatusItem asset={item.asset} />;
-            default:
-              return <></>;
+          if (item.type === "file") {
+            const key = `file-item-${item.file.file.name}`;
+            return <FileItem key={key} fileUpload={item.file} />;
           }
+          if (item.type === "asset") {
+            const key = `asset-failed-status-item-${item.asset.name}`;
+            return <AssetFailedStatusItem key={key} asset={item.asset} />;
+          }
+          return <></>;
         })}
       </Flex>
     </Box>

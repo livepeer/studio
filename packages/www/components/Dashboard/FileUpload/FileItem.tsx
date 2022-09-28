@@ -36,7 +36,6 @@ const FileItem = ({ fileUpload }: { fileUpload: FileUpload }) => {
 
   return (
     <Item
-      itemKey={`file-item-${name}`}
       mainChildren={mainChildren}
       secondaryChildren={secondaryChildren}
       accessoryChildren={accessoryChildren}

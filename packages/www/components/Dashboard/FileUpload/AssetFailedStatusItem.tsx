@@ -6,7 +6,7 @@ import Item from "./Item";
 const MAX_FILENAME_LENGTH = 20;
 
 const AssetFailedStatusItem = ({ asset }: { asset: Asset }) => {
-  const { id, name } = asset;
+  const { name } = asset;
 
   const mainChildren = (
     <Text variant="red">
@@ -31,7 +31,6 @@ const AssetFailedStatusItem = ({ asset }: { asset: Asset }) => {
 
   return (
     <Item
-      itemKey={`asset-failed-status-item-${id}`}
       mainChildren={mainChildren}
       secondaryChildren={secondaryChildren}
       accessoryChildren={accessoryChildren}
