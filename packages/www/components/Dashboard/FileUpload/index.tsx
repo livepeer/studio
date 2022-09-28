@@ -42,7 +42,7 @@ const FileUpload = () => {
     (async () => {
       if (!user) return;
       const [assets] = await getAssets(user.id, { limit: 20 });
-      const filteredItems = filteredItemsToShow(fileUploadsFiltered, assets); // TODO: deal with id?
+      const filteredItems = filteredItemsToShow(fileUploadsFiltered, assets);
       setItems(filteredItems);
     })();
   }, [user, fileUploadsFiltered]);

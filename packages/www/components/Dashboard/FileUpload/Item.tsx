@@ -1,21 +1,21 @@
 import { Flex, Box } from "@livepeer/design-system";
 
 export type ItemProps = {
-  key: string;
+  itemKey: string;
   mainChildren: React.ReactNode;
   secondaryChildren: React.ReactNode;
   accessoryChildren: React.ReactNode;
 };
 
 const Item = ({
-  key,
+  itemKey,
   mainChildren,
   secondaryChildren,
   accessoryChildren,
 }: ItemProps) => {
   return (
     <Flex
-      key={key}
+      key={itemKey}
       align="center"
       css={{
         my: "$2",

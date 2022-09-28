@@ -36,6 +36,7 @@ export type FileUpload = {
   file: File;
   progress?: number;
   error?: Error;
+  updatedAt: number;
   completed: boolean;
 };
 
@@ -880,6 +881,7 @@ const makeContext = (
         file: File,
         progress: number,
         completed: boolean,
+        updatedAt: number,
         error?: Error
       ) => {
         setState((state) => ({
@@ -890,6 +892,7 @@ const makeContext = (
               file,
               progress,
               error,
+              updatedAt,
               completed:
                 state?.currentFileUploads?.[file.name]?.completed ||
                 Boolean(completed),
@@ -906,20 +909,20 @@ const makeContext = (
           },
           uploadSize: file.size,
           onError(err) {
-            updateStateWithProgressOrError(file, 0, false, err);
+            updateStateWithProgressOrError(file, 0, false, Date.now(), err);
           },
           onProgress(bytesUploaded, bytesTotal) {
             const percentage = bytesUploaded / bytesTotal;
-            updateStateWithProgressOrError(file, percentage, false);
+            updateStateWithProgressOrError(file, percentage, false, Date.now());
           },
           onSuccess() {
-            updateStateWithProgressOrError(file, 1, true);
+            updateStateWithProgressOrError(file, 1, true, Date.now());
           },
         });
 
       for (const file of files) {
         try {
-          updateStateWithProgressOrError(file, 0, false);
+          updateStateWithProgressOrError(file, 0, false, Date.now());
 
           const uploadWithoutUrl = getTusUpload(file);
           const previousUploads = await uploadWithoutUrl.findPreviousUploads();
