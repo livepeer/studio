@@ -4530,10 +4530,10 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-0.5.0.tgz#b3011d36f1061340d58aee99a1289c9a7e3e81cc"
-  integrity sha512-sMr4CHOdef1YJUHqdtXvu8bXXguJGn88YUlpZ7Opydeelgg0asvh/Lr4xM3FoM+3ePNJ2SJ55bFy49IUrlewIA==
+"@livepeer/react@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-0.6.1.tgz#b763ab875ca6c998dfafa33fc71695dcf05b4ae2"
+  integrity sha512-WSFaDnT28Ymq7AsQj6CpPuXUlU6Yvz59cjCpwhUOiCBb2olf02ukVHQe6Tu9KU+MnA/2fTbquez0jgZ5dQjkyw==
   dependencies:
     "@tanstack/query-sync-storage-persister" "4.2.3"
     "@tanstack/react-query" "4.2.3"
