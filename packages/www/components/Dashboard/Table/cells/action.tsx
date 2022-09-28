@@ -1,7 +1,9 @@
 import { CellComponentProps, TableData } from "../types";
 import { Box, Button } from "@livepeer/design-system";
+import Spinner from "components/Dashboard/Spinner";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import ReactTooltip from "react-tooltip";
+import { useState } from "react";
 
 const DeleteActionCell = ({
   id,
@@ -10,7 +12,9 @@ const DeleteActionCell = ({
   id: string;
   onDelete(): void;
 }) => {
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const tooltipId = `delete-button-${id}`;
+
   return (
     <>
       <ReactTooltip
@@ -26,14 +30,22 @@ const DeleteActionCell = ({
         <Button
           data-tip
           data-for={tooltipId}
-          onClick={onDelete}
+          onClick={() => {
+            setIsDeleteLoading(true);
+            onDelete();
+          }}
+          disabled={isDeleteLoading}
           css={{
             borderRadius: "50%",
             width: "$6",
             height: "$6",
             margin: "-$1 0",
           }}>
-          <CrossCircledIcon />
+          {isDeleteLoading ? (
+            <Spinner css={{ width: "$3", height: "$3" }} />
+          ) : (
+            <CrossCircledIcon />
+          )}
         </Button>
       </Box>
     </>

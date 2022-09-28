@@ -1003,6 +1003,15 @@ const makeContext = (
       return res;
     },
 
+    async deleteAsset(assetId): Promise<void> {
+      const [res] = await context.fetch(`/asset/${assetId}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new Error(`Failed to delete asset with id: ${assetId}`);
+      }
+    },
+
     async getTasks(
       userId,
       opts?: {

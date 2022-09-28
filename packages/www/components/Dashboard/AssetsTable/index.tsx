@@ -47,7 +47,7 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, uploadAssets, getTasks } = useApi();
+  const { getAssets, uploadAssets, deleteAsset, getTasks } = useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -89,14 +89,17 @@ const AssetsTable = ({
         accessor: "action",
         Cell: ActionCell,
         disableSortBy: true,
-        width: "$7", // TODO: maybe $7
+        width: "$7",
       },
     ],
     []
   );
 
-  const onDeleteAsset = (id: string) => {
-    console.log("Delete assed id: ", id);
+  const onDeleteAsset = (assetId: string) => {
+    (async () => {
+      await deleteAsset(assetId);
+      await state.invalidate();
+    })();
   };
 
   const fetcher: Fetcher<AssetsTableData> = useCallback(
@@ -202,6 +205,7 @@ const AssetsTable = ({
           ),
         }}
       />
+
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
