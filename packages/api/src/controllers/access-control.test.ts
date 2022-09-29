@@ -1,14 +1,7 @@
 import serverPromise, { TestServer } from "../test-server";
-import {
-  TestClient,
-  clearDatabase,
-  setupUsers,
-  verifyJwt,
-} from "../test-helpers";
+import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { SigningKey, SigningKeyResponsePayload, User } from "../schema/types";
 import { WithID } from "../store/types";
-import jwt, { JsonWebTokenError, JwtPayload } from "jsonwebtoken";
-import { db } from "../store";
 
 // includes auth file tests
 
@@ -122,6 +115,14 @@ describe("controllers/signing-key", () => {
         type: "jwt",
       });
       expect(res.status).toBe(403);
+    });
+
+    it("should allow playback on public playbackId", async () => {
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${publicPlaybackId}`,
+        type: "jwt",
+      });
+      expect(res.status).toBe(200);
     });
   });
 });
