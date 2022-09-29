@@ -749,6 +749,21 @@ components:
         response:
           $ref: "#/components/schemas/webhook-response"
 
+    access-control-gate-payload:
+      type: object
+      additionalProperties: false
+      required: [type, stream]
+      properties:
+        type:
+          type: string
+          enum: [jwt]
+        stream:
+          type: string
+          description: Stream ID to which this gate applies
+        pub:
+          type: string
+          description: Base64 of Public key used for JWT verification
+
     playback-policy:
       type: object
       description:
