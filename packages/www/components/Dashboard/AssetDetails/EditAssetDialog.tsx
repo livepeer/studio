@@ -1,5 +1,5 @@
 import { HttpError } from "@lib/utils";
-import { Asset } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -8,7 +8,6 @@ import {
   AlertDialogTitle,
   Box,
   Button,
-  Checkbox,
   Flex,
   Heading,
   Label,

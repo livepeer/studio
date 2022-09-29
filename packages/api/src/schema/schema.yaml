@@ -28,6 +28,8 @@ tags:
     description: Asset Endpoints
   - name: task
     description: Task Endpoints
+  - name: signing-key
+    description: Signing Key Endpoints
   - name: webhook-response
     description: webhook client responses
   - name: verify-email
@@ -451,6 +453,8 @@ components:
           example: eaw4nk06ts2d0mzb
           description: Used to form playback URL
           unique: true
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         profiles:
           type: array
           default:
@@ -648,6 +652,8 @@ components:
           $ref: "#/components/schemas/asset/properties/name"
         meta:
           $ref: "#/components/schemas/asset/properties/meta"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         storage:
           additionalProperties: false
           properties:
@@ -675,6 +681,8 @@ components:
           $ref: "#/components/schemas/stream/properties/suspended"
         multistream:
           $ref: "#/components/schemas/stream/properties/multistream"
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
 
     object-store-patch-payload:
       type: object
@@ -707,6 +715,15 @@ components:
       required: []
       table: null
 
+    signing-key-patch-payload:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/signing-key/properties/name"
+        disabled:
+          $ref: "#/components/schemas/signing-key/properties/disabled"
+
     webhook-patch-payload:
       type: object
       additionalProperties: false
@@ -731,6 +748,17 @@ components:
           description: Error message if the webhook failed to process the event
         response:
           $ref: "#/components/schemas/webhook-response"
+
+    playback-policy:
+      type: object
+      description:
+        Whether the playback policy for a asset or stream is public or signed
+      additionalProperties: false
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [public, signed]
 
     session:
       type: object
@@ -964,6 +992,8 @@ components:
           readOnly: true
           example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         downloadUrl:
           type: string
           readOnly: true
@@ -1235,6 +1265,13 @@ components:
           readOnly: true
           description: URL to access file via HTTP through an IPFS gateway
 
+    new-signing-key-payload:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Name of the signing key
+
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1251,6 +1288,8 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         meta:
           type: object
           description: User input metadata associated with the asset
@@ -1315,7 +1354,8 @@ components:
           type: string
           description: Type of the task
           enum:
-            - import
+            - upload
+            - import # Import is the deprecated pipeline, upload is on Catalyst
             - export
             - transcode
         createdAt:
@@ -1341,14 +1381,14 @@ components:
           additionalProperties: false
           description: Parameters of the task
           properties:
-            import:
+            upload:
               type: object
               additionalProperties: false
-              description: Parameters for the import task
+              description: Parameters for the upload task
               properties:
                 url:
                   type: string
-                  description: URL of the asset to import
+                  description: URL of the asset to "upload"
                   example: https://cdn.livepeer.com/ABC123/filename.mp4
                 recordedSessionId:
                   type: string
@@ -1360,6 +1400,8 @@ components:
                   type: string
                   description: S3 object key of the uploaded asset
                   example: ABC123/filename.mp4
+            import:
+              $ref: "#/components/schemas/task/properties/params/properties/upload"
             export:
               $ref: "#/components/schemas/export-task-params"
             transcode:
@@ -1407,10 +1449,10 @@ components:
           additionalProperties: false
           description: Output of the task
           properties:
-            import:
+            upload:
               type: object
               additionalProperties: true
-              description: Output of the import task
+              description: Output of the upload task
               properties:
                 videoFilePath:
                   type: string
@@ -1420,6 +1462,8 @@ components:
                   writeOnly: true
                 assetSpec:
                   $ref: "#/components/schemas/asset"
+            import:
+              $ref: "#/components/schemas/task/properties/output/properties/upload"
             export:
               type: object
               additionalProperties: false
@@ -1545,6 +1589,54 @@ components:
                           writeOnly: true
                           description:
                             Will be added to the pinata_secret_api_key header.
+
+    signing-key:
+      type: object
+      additionalProperties: false
+      required: [publicKey]
+      table: signing_key
+      properties:
+        id:
+          type: string
+          readOnly: true
+          index: true
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+        name:
+          type: string
+          description: Name of the signing key
+        createdAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the signing-key was created
+          example: 1587667174725
+        lastUsedAt:
+          type: number
+          readOnly: true
+          description:
+            Timestamp (in milliseconds) at which the signing-key was last used
+          example: 1587667174725
+        userId:
+          type: string
+          readOnly: true
+          index: true
+          example: 78df0075-b5f3-4683-a618-1086faca35dc
+        publicKey:
+          type: string
+        deleted:
+          type: boolean
+          default: false
+        disabled:
+          type: boolean
+          description: Disable the signing key to allow rotation safely
+
+    signing-key-response-payload:
+      type: object
+      required: [publicKey, privateKey]
+      properties:
+        $ref: "#/components/schemas/signing-key/properties"
+        privateKey:
+          type: string
 
     api-token:
       type: object

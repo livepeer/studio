@@ -6,6 +6,7 @@ import schema from "./schema/schema.json";
 import { User } from "./schema/types";
 import { TestServer } from "./test-server";
 import fs from "fs";
+import jwt, { VerifyOptions } from "jsonwebtoken";
 
 const vhostUrl = (vhost: string) =>
   `http://guest:guest@localhost:15672/api/vhosts/${vhost}`;
@@ -23,6 +24,18 @@ export async function clearDatabase(server: TestServer) {
     .map((s) => ("table" in s ? s.table : null))
     .filter((t) => !!t);
   await Promise.all(tables.map((t) => server.db.query(`TRUNCATE TABLE ${t}`)));
+}
+
+export function verifyJwt(
+  token: string,
+  publicKey: string,
+  verifyOptions?: VerifyOptions
+) {
+  try {
+    return jwt.verify(token, publicKey, verifyOptions);
+  } catch (e) {
+    return e;
+  }
 }
 
 export interface AuxTestServer {

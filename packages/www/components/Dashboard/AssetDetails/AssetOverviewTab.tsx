@@ -11,9 +11,7 @@ import {
 } from "@livepeer/design-system";
 
 import { Asset } from "@livepeer.studio/api";
-import { CopyIcon } from "@radix-ui/react-icons";
 import { useCallback, useMemo, useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import IpfsIcon from "../../../public/img/icons/ipfs-logo.svg";
 import CurlyBracesIcon from "../../../public/img/icons/curly-braces.svg";
@@ -21,6 +19,7 @@ import DatabaseIcon from "../../../public/img/icons/database.svg";
 import { useApi } from "hooks";
 import Spinner from "../Spinner";
 import moment from "moment";
+import ClipButton from "../ClipButton";
 
 const StyledIpfsIcon = styled(IpfsIcon, {
   color: "$gray",
@@ -61,8 +60,6 @@ const AssetOverviewTab = ({
     }
   }, [asset, patchAsset]);
 
-  const [openSnackbar] = useSnackbar();
-
   const metadataStringified = useMemo(
     () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
     [asset?.meta]
@@ -93,24 +90,23 @@ const AssetOverviewTab = ({
         </Box>
         <Promo size="2" css={{ mb: "$5" }}>
           {metadataStringified ? (
-            <CopyToClipboard
-              text={metadataStringified}
-              onCopy={() => openSnackbar("Copied metadata to clipboard")}>
-              <Flex
-                align="center"
-                css={{
-                  cursor: "pointer",
-                  justifyContent: "space-between",
-                }}>
-                <Text variant="gray" size="2">
-                  {metadataStringified}
-                </Text>
+            <Flex
+              align="center"
+              css={{
+                cursor: "pointer",
+                justifyContent: "space-between",
+              }}>
+              <Text variant="gray" size="2">
+                {metadataStringified}
+              </Text>
 
-                <Box>
-                  <CopyIcon />
-                </Box>
-              </Flex>
-            </CopyToClipboard>
+              <Box>
+                <ClipButton
+                  value={metadataStringified}
+                  successMessage="Copied metadata to clipboard"
+                />
+              </Box>
+            </Flex>
           ) : (
             <Text
               size="3"
@@ -185,32 +181,31 @@ const AssetOverviewTab = ({
           </Flex>
           {asset?.storage?.ipfs?.cid && (
             <Box css={{ mt: "$3" }}>
-              <CopyToClipboard
-                text={`ipfs://${asset.storage.ipfs.cid}`}
-                onCopy={() => openSnackbar("Copied IPFS CID to clipboard")}>
-                <Flex css={{ cursor: "pointer" }}>
-                  <Box>
-                    <Flex align="center">
-                      <Text
-                        size="2"
-                        css={{
-                          fontSize: "14px",
-                          mr: "$1",
-                          fontWeight: 500,
-                        }}>
-                        Content Hash
-                      </Text>
-                      <CopyIcon />
-                    </Flex>
+              <Flex css={{ cursor: "pointer" }}>
+                <Box>
+                  <Flex align="center">
                     <Text
-                      variant="gray"
                       size="2"
-                      css={{ mt: "$1", lineHeight: 1.4 }}>
-                      ipfs://{asset?.storage?.ipfs?.cid}
+                      css={{
+                        fontSize: "14px",
+                        mr: "$1",
+                        fontWeight: 500,
+                      }}>
+                      Content Hash
                     </Text>
-                  </Box>
-                </Flex>
-              </CopyToClipboard>
+                    <ClipButton
+                      value={`ipfs://${asset.storage.ipfs.cid}`}
+                      successMessage="Copied IPFS CID to clipboard"
+                    />
+                  </Flex>
+                  <Text
+                    variant="gray"
+                    size="2"
+                    css={{ mt: "$1", lineHeight: 1.4 }}>
+                    ipfs://{asset?.storage?.ipfs?.cid}
+                  </Text>
+                </Box>
+              </Flex>
             </Box>
           )}
         </Promo>

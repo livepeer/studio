@@ -47,6 +47,14 @@ const app = Router();
 
 const META_MAX_SIZE = 1024;
 
+function shouldUseCatalyst({ query, user, config }: Request) {
+  const { upload } = toStringValues(query);
+  if (user.admin && upload === "1") {
+    return true;
+  }
+  return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
+}
+
 function validateAssetMeta(
   meta: Record<string, string>,
   asset?: WithID<Asset>
@@ -118,6 +126,7 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
+    playbackPolicy: payload.playbackPolicy,
     meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
@@ -479,12 +488,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   }
 
   asset = await createAsset(asset, req.queue);
-
-  let taskType: Task["type"] = "import";
-  const { upload } = toStringValues(req.query);
-  if (req.user.admin && upload === "1") {
-    taskType = "upload" as any;
-  }
+  const taskType = shouldUseCatalyst(req) ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
@@ -617,11 +621,7 @@ app.post(
     const tusEndpoint = `${baseUrl}/api/asset/upload/tus?token=${uploadToken}`;
 
     asset = await createAsset(asset, req.queue);
-    let taskType: Task["type"] = "import";
-    const { upload } = toStringValues(req.query);
-    if (req.user.admin && upload === "1") {
-      taskType = "upload" as any;
-    }
+    const taskType = shouldUseCatalyst(req) ? "upload" : "import";
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
@@ -803,7 +803,12 @@ app.patch(
   validatePost("asset-patch-payload"),
   async (req, res) => {
     // these are the only updateable fields
-    let { name, meta, storage: storageInput } = req.body as AssetPatchPayload;
+    let {
+      name,
+      meta,
+      playbackPolicy,
+      storage: storageInput,
+    } = req.body as AssetPatchPayload;
 
     let storage: Asset["storage"];
     if (storageInput?.ipfs !== undefined) {
@@ -831,7 +836,12 @@ app.patch(
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
-    await req.taskScheduler.updateAsset(asset, { name, meta, storage });
+    await req.taskScheduler.updateAsset(asset, {
+      name,
+      meta,
+      storage,
+      playbackPolicy,
+    });
     const updated = await db.asset.get(id, { useReplica: false });
     res.status(200).json(updated);
   }

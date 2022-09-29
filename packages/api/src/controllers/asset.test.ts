@@ -131,6 +131,22 @@ describe("controllers/asset", () => {
       });
     });
 
+    it("should allow editing asset playback policy", async () => {
+      let playbackPolicy = {
+        type: "public",
+      };
+      const res = await client.patch(`/asset/${asset.id}`, {
+        playbackPolicy,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toMatchObject({
+        ...asset,
+        playbackPolicy,
+        status: { ...asset.status, updatedAt: expect.any(Number) },
+      });
+    });
+
     it("should start export task when adding IPFS storage", async () => {
       let res = await client.patch(`/asset/${asset.id}`, {
         storage: { ipfs: { spec: { nftMetadata: { a: "b" } } } },

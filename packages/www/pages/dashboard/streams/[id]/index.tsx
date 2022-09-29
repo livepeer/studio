@@ -17,6 +17,7 @@ const StreamDetails = () => {
   const [currentTab, setCurrentTab] = useState<"Overview" | "Health">(
     "Overview"
   );
+  const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
 
   const { query } = router;
   const id = query.id as string;
@@ -52,7 +53,9 @@ const StreamDetails = () => {
       breadcrumbs={[
         { title: "Streams", href: "/dashboard/streams" },
         { title: stream?.name },
-      ]}>
+      ]}
+      embedVideoDialogOpen={embedVideoDialogOpen}
+      setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}>
       {currentTab === "Overview" ? (
         <StreamOverviewTab
           id={id}

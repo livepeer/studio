@@ -3,6 +3,7 @@ import auth from "./auth";
 import broadcaster from "./broadcaster";
 import ingest from "./ingest";
 import objectStore from "./object-store";
+import accessControl from "./access-control";
 import multistream from "./multistream";
 import orchestrator from "./orchestrator";
 import stream from "./stream";
@@ -35,6 +36,7 @@ export default {
   webhook,
   asset,
   task,
+  "access-control": accessControl,
   region,
   stripe,
   version,
