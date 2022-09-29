@@ -124,5 +124,18 @@ describe("controllers/signing-key", () => {
       });
       expect(res.status).toBe(200);
     });
+
+    it("should allow playback if playbackPolicy is not specified", async () => {
+      const stream = await client.post("/stream", {
+        name: "test",
+      });
+      const streamPlaybackId = (await stream.json()).playbackId;
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${streamPlaybackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res.status).toBe(200);
+    });
   });
 });
