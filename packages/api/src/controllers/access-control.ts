@@ -41,8 +41,9 @@ accessControl.post(
 
     if (playbackPolicy) {
       if (playbackPolicy.type === "public") {
+        res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
         res.status(200);
-        return res.json(playbackPolicy);
+        return res.json();
       }
 
       if (playbackPolicy.type === "signed") {
@@ -74,10 +75,9 @@ accessControl.post(
         }
       }
     }
-
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
     res.status(200);
-    return res.json(playbackPolicy);
+    return res.json();
   }
 );
 
