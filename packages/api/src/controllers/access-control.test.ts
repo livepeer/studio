@@ -75,7 +75,7 @@ describe("controllers/signing-key", () => {
         pub: signingKey.publicKey,
         type: "jwt",
       });
-      expect(res2.status).toBe(200);
+      expect(res2.status).toBe(204);
     });
 
     it("should not allow playback on not existing streams or public keys", async () => {
@@ -122,7 +122,7 @@ describe("controllers/signing-key", () => {
         stream: `video+${publicPlaybackId}`,
         type: "jwt",
       });
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(204);
     });
 
     it("should allow playback if playbackPolicy is not specified", async () => {
@@ -135,7 +135,7 @@ describe("controllers/signing-key", () => {
         type: "jwt",
         pub: signingKey.publicKey,
       });
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(204);
     });
   });
 });
