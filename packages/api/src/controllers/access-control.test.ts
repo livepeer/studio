@@ -2,6 +2,10 @@ import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
 import { SigningKey, SigningKeyResponsePayload, User } from "../schema/types";
 import { WithID } from "../store/types";
+import { Asset } from "../schema/types";
+import { v4 as uuid } from "uuid";
+import { db } from "../store";
+import { generateUniquePlaybackId } from "./generate-keys";
 
 // includes auth file tests
 
@@ -40,6 +44,7 @@ describe("controllers/signing-key", () => {
     let signingKey: WithID<SigningKey>;
     let gatedPlaybackId: string;
     let publicPlaybackId: string;
+    let gatedAsset: WithID<Asset>;
 
     beforeEach(async () => {
       ({ client, adminUser, adminToken, nonAdminUser, nonAdminToken } =
@@ -66,6 +71,21 @@ describe("controllers/signing-key", () => {
       });
       const publicStream = await res3.json();
       publicPlaybackId = publicStream.playbackId;
+      let id = uuid();
+      gatedAsset = await db.asset.create({
+        id,
+        name: "test-storage",
+        createdAt: Date.now(),
+        playbackId: await generateUniquePlaybackId(id),
+        playbackPolicy: {
+          type: "signed",
+        },
+        status: {
+          phase: "ready",
+          updatedAt: Date.now(),
+        },
+        userId: nonAdminUser.id,
+      });
     });
 
     it("should create a gate stream and allow playback with given public key", async () => {
@@ -75,6 +95,7 @@ describe("controllers/signing-key", () => {
         pub: signingKey.publicKey,
         type: "jwt",
       });
+
       expect(res2.status).toBe(204);
     });
 
@@ -118,6 +139,7 @@ describe("controllers/signing-key", () => {
     });
 
     it("should allow playback on public playbackId", async () => {
+      client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {
         stream: `video+${publicPlaybackId}`,
         type: "jwt",
@@ -126,12 +148,24 @@ describe("controllers/signing-key", () => {
     });
 
     it("should allow playback if playbackPolicy is not specified", async () => {
+      client.jwtAuth = nonAdminToken;
       const stream = await client.post("/stream", {
         name: "test",
       });
+      client.jwtAuth = adminToken;
       const streamPlaybackId = (await stream.json()).playbackId;
       const res = await client.post("/access-control/gate", {
         stream: `video+${streamPlaybackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res.status).toBe(204);
+    });
+
+    it("should allow playback on gated asset", async () => {
+      client.jwtAuth = adminToken;
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
         type: "jwt",
         pub: signingKey.publicKey,
       });

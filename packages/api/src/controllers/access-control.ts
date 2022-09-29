@@ -20,30 +20,25 @@ accessControl.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace("video+", "");
+    const content =
+      (await db.stream.getByPlaybackId(playbackId)) ||
+      (await db.asset.getByPlaybackId(playbackId));
 
-    var query = [];
-    query.push(sql`stream.data->>'playbackId' = ${playbackId}`);
-    var [output] = await db.stream.find(query, {
-      limit: 1,
-    });
-
-    if (output.length === 0) {
-      // TODO: VOD Assets
-      throw new ForbiddenError("Stream not found");
+    if (!content) {
+      throw new ForbiddenError("Content not found");
     }
-    const stream = output[0];
 
-    if (stream.deleted) {
+    if (content.deleted) {
       throw new ForbiddenError("Stream is deleted");
     }
 
-    const playbackPolicy = stream.playbackPolicy;
+    const playbackPolicy = content.playbackPolicy;
 
     if (playbackPolicy) {
       if (playbackPolicy.type === "public") {
         res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
         res.status(204);
-        return res.json();
+        return res.end();
       }
 
       if (playbackPolicy.type === "signed") {
@@ -51,9 +46,9 @@ accessControl.post(
           throw new ForbiddenError("Stream is gated and requires a public key");
         }
 
-        var query = [];
+        const query = [];
         query.push(sql`signing_key.data->>'publicKey' = ${req.body.pub}`);
-        var [signingKeyOutput] = await db.signingKey.find(query, {
+        const [signingKeyOutput] = await db.signingKey.find(query, {
           limit: 1,
         });
 
@@ -64,7 +59,7 @@ accessControl.post(
         }
 
         const signingKey = signingKeyOutput[0];
-        if (signingKey.userId !== stream.userId) {
+        if (signingKey.userId !== content.userId) {
           throw new ForbiddenError(
             "The stream and the public key do not share the same owner"
           );
@@ -77,7 +72,7 @@ accessControl.post(
     }
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
     res.status(204);
-    return res.json();
+    return res.end();
   }
 );
 
