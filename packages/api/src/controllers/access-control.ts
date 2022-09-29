@@ -42,7 +42,7 @@ accessControl.post(
     if (playbackPolicy) {
       if (playbackPolicy.type === "public") {
         res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
-        res.status(200);
+        res.status(204);
         return res.json();
       }
 
@@ -76,7 +76,7 @@ accessControl.post(
       }
     }
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
-    res.status(200);
+    res.status(204);
     return res.json();
   }
 );
