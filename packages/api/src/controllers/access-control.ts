@@ -23,14 +23,20 @@ accessControl.post(
 
     var query = [];
     query.push(sql`stream.data->>'playbackId' = ${playbackId}`);
-    var [output] = await db.stream.find(query);
+    var [output] = await db.stream.find(query, {
+      limit: 1,
+    });
 
     if (output.length === 0) {
       // TODO: VOD Assets
       throw new ForbiddenError("Stream not found");
     }
-
     const stream = output[0];
+
+    if (stream.deleted) {
+      throw new ForbiddenError("Stream is deleted");
+    }
+
     const playbackPolicy = stream.playbackPolicy;
 
     if (playbackPolicy) {
@@ -46,7 +52,9 @@ accessControl.post(
 
         var query = [];
         query.push(sql`signing_key.data->>'publicKey' = ${req.body.pub}`);
-        var [signingKeyOutput] = await db.signingKey.find(query);
+        var [signingKeyOutput] = await db.signingKey.find(query, {
+          limit: 1,
+        });
 
         if (signingKeyOutput.length == 0) {
           throw new ForbiddenError(
@@ -59,6 +67,10 @@ accessControl.post(
           throw new ForbiddenError(
             "The stream and the public key do not share the same owner"
           );
+        }
+
+        if (signingKey.disabled || signingKey.deleted) {
+          throw new ForbiddenError("The public key is disabled or deleted");
         }
       }
     }
