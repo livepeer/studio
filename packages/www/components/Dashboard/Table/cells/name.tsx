@@ -30,7 +30,8 @@ const NameCell = <D extends TableData>({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid">
+          effect="solid"
+          delayShow={500}>
           {errorMessage}
         </ReactTooltip>
         <Box

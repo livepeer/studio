@@ -21,7 +21,8 @@ const TextCell = <D extends TableData>({
           className="tooltip"
           place="top"
           type="dark"
-          effect="solid">
+          effect="solid"
+          delayShow={500}>
           {cell.value.tooltipChildren}
         </ReactTooltip>
       ) : null}
