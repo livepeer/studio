@@ -257,6 +257,13 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
     stateSetter.setFilters(e);
   };
 
+  const headerCssWidth = (column, index, rowSelection): string => {
+    if (column.width) {
+      return column.width;
+    }
+    return index === 0 && rowSelection === "all" ? "$6" : "auto";
+  };
+
   return (
     <Box>
       <Flex
@@ -366,10 +373,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           scope="col"
                           css={{
                             pl: i === 0 ? "$1" : 0,
-                            width:
-                              i === 0 && rowSelection === "all"
-                                ? "30px"
-                                : "auto",
+                            width: headerCssWidth(column, i, rowSelection),
                           }}
                           {...column.getHeaderProps(
                             // @ts-ignore

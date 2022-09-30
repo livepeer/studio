@@ -42,7 +42,7 @@ export const makeColumns = () => [
     accessor: "action",
     Cell: ActionCell,
     disableSortBy: true,
-    width: "$7",
+    width: "$5",
   },
 ];
 

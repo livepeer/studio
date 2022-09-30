@@ -41,7 +41,7 @@ const DeleteActionCell = ({
             borderRadius: "50%",
             width: "$6",
             height: "$6",
-            margin: "-$1 $2",
+            margin: "-$1 $2 -$1 0",
             transition: "0.2s",
             "&:hover": {
               backgroundColor: "$neutral4",
