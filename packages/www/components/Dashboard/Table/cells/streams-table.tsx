@@ -98,7 +98,8 @@ const RenditionsDetailsCell = <D extends TableData>({
               className="tooltip"
               place="top"
               type="dark"
-              effect="solid">
+              effect="solid"
+              delayShow={500}>
               {detailsTooltip}
             </ReactTooltip>
             <StyledQuestionMarkIcon

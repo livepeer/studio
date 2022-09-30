@@ -28,18 +28,13 @@ import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
 import { RenditionDetailsCellProps } from "components/Dashboard/Table/cells/streams-table";
 import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import {
-  QuestionMarkIcon,
-  Cross1Icon,
-  PlusIcon,
-  ArrowRightIcon,
-} from "@radix-ui/react-icons";
+import { QuestionMarkIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import ActiveStreamsBadge from "components/Dashboard/ActiveStreamsBadge";
+import EmptyState from "./EmptyState";
 
 type ProfileProps = {
   id: string;
@@ -302,44 +297,6 @@ const StreamsTable = ({
     state.invalidate,
   ]);
 
-  const emptyState = (
-    <Flex
-      direction="column"
-      justify="center"
-      css={{
-        margin: "0 auto",
-        height: "calc(100vh - 400px)",
-        maxWidth: 450,
-      }}>
-      <Heading css={{ fontWeight: 500, mb: "$3" }}>
-        Create your first stream
-      </Heading>
-      <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-        Create a unique stream object, broadcast live video content and playback
-        your live stream with Livepeer Studio.
-      </Text>
-      <Link href="https://docs.livepeer.studio/category/live" passHref>
-        <A
-          target="_blank"
-          variant="primary"
-          css={{ display: "flex", ai: "center", mb: "$5" }}>
-          <Box>Learn more</Box>
-          <ArrowRightIcon />
-        </A>
-      </Link>
-      <Button
-        onClick={() => createDialogState.onOn()}
-        css={{ alignSelf: "flex-start" }}
-        size="2"
-        variant="primary">
-        <PlusIcon />{" "}
-        <Box as="span" css={{ ml: "$2" }}>
-          Create stream
-        </Box>
-      </Button>
-    </Flex>
-  );
-
   return (
     <>
       <Table
@@ -349,7 +306,7 @@ const StreamsTable = ({
         stateSetter={stateSetter}
         rowSelection="all"
         filterItems={!viewAll && filterItems}
-        emptyState={emptyState}
+        emptyState={<EmptyState createDialogState={createDialogState} />}
         viewAll={viewAll}
         header={
           <Heading size="2">

@@ -1,15 +1,19 @@
 import { format } from "date-fns";
 import { CellComponentProps, TableData } from "../types";
 
-export type DateCellProps = { date: Date; fallback: React.ReactNode };
+export type DateCellProps = {
+  date: Date;
+  fallback: React.ReactNode;
+};
 
 const DateCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, DateCellProps>) => {
+  const { date, fallback } = cell.value;
   try {
-    return format(cell.value.date, "MMMM dd, yyyy h:mm a");
+    return format(date, "MMMM dd, yyyy h:mm a");
   } catch (error) {
-    return cell.value.fallback;
+    return fallback;
   }
 };
 

@@ -1,23 +1,14 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  ProgressBar,
-  Text,
-} from "@livepeer/design-system";
-import {
-  CheckIcon,
-  Cross2Icon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import { Box, Flex, Heading, IconButton, Text } from "@livepeer/design-system";
+import { Cross2Icon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import { useEffect, useMemo } from "react";
-
-const MAX_FILENAME_LENGTH = 20;
+import { useEffect, useMemo, useState } from "react";
+import AssetFailedStatusItem from "./AssetFailedStatusItem";
+import FileItem from "./FileItem";
+import { filteredItemsToShow } from "./helpers";
 
 const FileUpload = () => {
-  const { currentFileUploads, clearFileUploads } = useApi();
+  const { currentFileUploads, clearFileUploads, latestGetAssetsResult } =
+    useApi();
 
   const fileUploadsFiltered = useMemo(
     () =>
@@ -30,6 +21,11 @@ const FileUpload = () => {
   const hasPendingFileUploads = useMemo(
     () => fileUploadsFiltered.some((file) => !file.completed),
     [fileUploadsFiltered]
+  );
+
+  const items = useMemo(
+    () => filteredItemsToShow(fileUploadsFiltered, latestGetAssetsResult ?? []),
+    [fileUploadsFiltered, latestGetAssetsResult]
   );
 
   useEffect(() => {
@@ -47,9 +43,11 @@ const FileUpload = () => {
     }
   }, [typeof window, hasPendingFileUploads]);
 
-  return fileUploadsFiltered.length === 0 ? (
-    <></>
-  ) : (
+  if (!items.length) {
+    return <></>;
+  }
+
+  return (
     <Box
       css={{
         position: "fixed",
@@ -73,9 +71,11 @@ const FileUpload = () => {
             </IconButton>
           </Box>
         )}
+
         <Heading css={{ fontWeight: 500, mb: "$3" }}>
           {hasPendingFileUploads ? "Upload in progress" : "Upload complete"}
         </Heading>
+
         {hasPendingFileUploads && (
           <Box
             css={{
@@ -92,47 +92,18 @@ const FileUpload = () => {
             </Flex>
           </Box>
         )}
-        {fileUploadsFiltered.map((file) => (
-          <Flex
-            key={file?.file?.name ?? ""}
-            align="center"
-            css={{
-              my: "$1",
-              width: "100%",
-              justifyContent: "space-between",
-            }}>
-            <Text>
-              {file?.file?.name?.length > MAX_FILENAME_LENGTH
-                ? `${file.file.name.slice(0, MAX_FILENAME_LENGTH)}...`
-                : file?.file?.name ?? ""}
-            </Text>
-            <Flex align="center" css={{ ml: "$3" }}>
-              <Box css={{ mr: "$2", width: 120 }}>
-                {file?.completed ? (
-                  <Text size="2" css={{}} variant="gray">
-                    {"100% uploaded"}
-                  </Text>
-                ) : (
-                  <ProgressBar
-                    variant="blue"
-                    value={(file?.progress ?? 0) * 100}
-                  />
-                )}
-              </Box>
-              {file?.completed ? (
-                <Box
-                  as={CheckIcon}
-                  css={{ align: "right", color: "$green9" }}
-                />
-              ) : (
-                <Text size="2" css={{ mr: "$2", width: 25 }} variant="gray">
-                  {(Number(file?.progress ?? 0) * 100).toFixed(0)}
-                  {"%"}
-                </Text>
-              )}
-            </Flex>
-          </Flex>
-        ))}
+
+        {items.map((item) => {
+          if (item.type === "file") {
+            const key = `file-item-${item.file.file.name}`;
+            return <FileItem key={key} fileUpload={item.file} />;
+          }
+          if (item.type === "asset") {
+            const key = `asset-failed-status-item-${item.asset.name}`;
+            return <AssetFailedStatusItem key={key} asset={item.asset} />;
+          }
+          return <></>;
+        })}
       </Flex>
     </Box>
   );

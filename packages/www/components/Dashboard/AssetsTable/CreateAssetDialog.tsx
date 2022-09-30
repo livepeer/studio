@@ -8,10 +8,8 @@ import {
   AlertDialogContent,
   AlertDialogCancel,
   AlertDialogDescription,
-  TextField,
   Heading,
   Text,
-  Label,
 } from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import Spinner from "components/Dashboard/Spinner";
@@ -68,7 +66,7 @@ const CreateAssetDialog = ({
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: "video/*",
+    accept: ["video/mp4"],
     maxFiles: 20,
     onDrop,
   });

@@ -1,32 +1,18 @@
 import { useCallback, useMemo } from "react";
-import { get } from "lodash";
-import Link from "next/link";
-import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
-import {
-  FilterItem,
-  formatFiltersForApiRequest,
-} from "components/Dashboard/Table/filters";
-import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
-import DateCell, { DateCellProps } from "components/Dashboard/Table/cells/date";
-import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { dateSort, stringSort } from "components/Dashboard/Table/sorts";
-import {
-  CellComponentProps,
-  TableData,
-} from "components/Dashboard/Table/types";
-import {
-  Flex,
-  Heading,
-  Link as A,
-  Button,
-  Text,
-  Box,
-  useSnackbar,
-} from "@livepeer/design-system";
+import { FilterItem } from "components/Dashboard/Table/filters";
+import { TextCellProps } from "components/Dashboard/Table/cells/text";
+import { DateCellProps } from "components/Dashboard/Table/cells/date";
+import { ActionCellProps } from "../Table/cells/action";
+import { CreatedAtCellProps } from "../Table/cells/createdAt";
+import { NameCellProps } from "../Table/cells/name";
+import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
+import EmptyState from "./EmptyState";
+import { makeColumns, rowsPageFromState } from "./helpers";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
@@ -36,10 +22,11 @@ const filterItems: FilterItem[] = [
 
 type AssetsTableData = {
   id: string;
-  name: TextCellProps;
+  name: NameCellProps;
   source: TextCellProps;
-  createdAt: DateCellProps;
+  createdAt: CreatedAtCellProps;
   updatedAt: DateCellProps;
+  action: ActionCellProps;
 };
 
 const AssetsTable = ({
@@ -55,7 +42,7 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const { getAssets, uploadAssets, getTasks } = useApi();
+  const { getAssets, uploadAssets, deleteAsset, getTasks } = useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -63,161 +50,19 @@ const AssetsTable = ({
     tableId,
   });
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: "Name",
-        accessor: "name",
-        Cell: TextCell,
-        sortType: (...params: SortTypeArgs) =>
-          stringSort("original.name.value", ...params),
-      },
-      {
-        Header: "Created",
-        accessor: "createdAt",
-        Cell: DateCell,
-        sortType: (...params: SortTypeArgs) =>
-          dateSort("original.createdAt.date", ...params),
-      },
-      {
-        Header: "Updated",
-        accessor: "updatedAt",
-        Cell: DateCell,
-        sortType: (...params: SortTypeArgs) =>
-          dateSort("original.updatedAt.date", ...params),
-      },
-      {
-        Header: "Source",
-        accessor: "source",
-        Cell: TextCell,
-        disableSortBy: true,
-      },
-    ],
-    []
-  );
+  const columns = useMemo(makeColumns, []);
+
+  const onDeleteAsset = (assetId: string) => {
+    (async () => {
+      await deleteAsset(assetId);
+      await state.invalidate();
+    })();
+  };
 
   const fetcher: Fetcher<AssetsTableData> = useCallback(
-    async (state) => {
-      const [assets, nextCursor, count] = await getAssets(userId, {
-        filters: formatFiltersForApiRequest(state.filters),
-        limit: state.pageSize.toString(),
-        cursor: state.cursor,
-        order: state.order,
-        count: true,
-      });
-
-      const [tasks] = await getTasks(userId);
-
-      const rows = assets.map((asset) => {
-        const source =
-          tasks && tasks.find((task) => task.outputAssetId === asset.id);
-        const sourceUrl = get(source, "params.import.url");
-
-        return {
-          id: asset.id,
-          name: {
-            id: asset.id,
-            value: asset.name,
-            children:
-              asset.name.length > 24
-                ? asset.name.replace(
-                    asset.name.slice(18, asset.name.length - 6),
-                    "..."
-                  )
-                : asset.name,
-            href: `/dashboard/assets/${asset.id}`,
-          },
-          source: {
-            children: (
-              <Box>
-                {sourceUrl &&
-                (sourceUrl.indexOf("https://livepeercdn.com") === 0 ||
-                  sourceUrl.indexOf("https://cdn.livepeer.com") === 0)
-                  ? "Live Stream"
-                  : "Upload"}
-              </Box>
-            ),
-            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-            href: `/dashboard/assets/${asset.id}`,
-          },
-          createdAt: {
-            date: new Date(asset.createdAt),
-            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-            href: `/dashboard/assets/${asset.id}`,
-          },
-          updatedAt: {
-            date:
-              asset.status.updatedAt &&
-              asset.status.updatedAt !== asset.createdAt
-                ? new Date(asset.status.updatedAt)
-                : null,
-            fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-            href: `/dashboard/assets/${asset.id}`,
-          },
-        };
-      });
-      return { rows, nextCursor, count };
-    },
+    async (state) =>
+      rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
     [userId]
-  );
-
-  const emptyState = (
-    <Flex
-      direction="column"
-      justify="center"
-      css={{
-        margin: "0 auto",
-        height: "calc(100vh - 400px)",
-        maxWidth: 450,
-      }}>
-      <Flex
-        direction="column"
-        justify="center"
-        css={{
-          margin: "0 auto",
-          height: "calc(100vh - 400px)",
-          maxWidth: 450,
-        }}>
-        <Heading css={{ fontWeight: 500, mb: "$3" }}>
-          Upload your first On Demand asset
-        </Heading>
-        <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-          Livepeer Studio supports video on demand which allows you to import
-          video assets, store them on decentralized storage, and easily mint a
-          video NFT.
-        </Text>
-
-        <Box
-          css={{
-            display: "block",
-            "@bp1": {
-              display: "flex",
-            },
-          }}>
-          <Link
-            href="https://docs.livepeer.studio/category/on-demand "
-            passHref>
-            <A
-              target="_blank"
-              variant="primary"
-              css={{ display: "flex", ai: "center", mb: "$5" }}>
-              <Box>Learn more</Box>
-              <ArrowRightIcon />
-            </A>
-          </Link>
-        </Box>
-        <Button
-          onClick={() => createDialogState.onOn()}
-          css={{ alignSelf: "flex-start" }}
-          size="2"
-          variant="primary">
-          <PlusIcon />{" "}
-          <Box as="span" css={{ ml: "$2" }}>
-            Upload asset
-          </Box>
-        </Button>
-      </Flex>
-    </Flex>
   );
 
   return (
@@ -229,7 +74,7 @@ const AssetsTable = ({
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
-        emptyState={emptyState}
+        emptyState={<EmptyState createDialogState={createDialogState} />}
         viewAll={viewAll}
         header={
           <Heading size="2">
@@ -254,6 +99,7 @@ const AssetsTable = ({
           ),
         }}
       />
+
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}

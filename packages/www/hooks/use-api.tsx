@@ -32,13 +32,16 @@ declare global {
   }
 }
 
-export type Files = {
-  [key: string]: {
-    file: File;
-    progress?: number;
-    error?: Error;
-    completed: boolean;
-  };
+export type FileUpload = {
+  file: File;
+  progress?: number;
+  error?: Error;
+  updatedAt: number;
+  completed: boolean;
+};
+
+export type FileUploadsDictionary = {
+  [key: string]: FileUpload;
 };
 
 type ApiState = {
@@ -46,7 +49,8 @@ type ApiState = {
   token?: string;
   userRefresh?: number;
   noStripe?: boolean;
-  currentFileUploads?: Files;
+  currentFileUploads?: FileUploadsDictionary;
+  latestGetAssetsResult?: Asset[];
 };
 
 export interface UsageData {
@@ -878,6 +882,7 @@ const makeContext = (
         file: File,
         progress: number,
         completed: boolean,
+        updatedAt: number,
         error?: Error
       ) => {
         setState((state) => ({
@@ -888,6 +893,7 @@ const makeContext = (
               file,
               progress,
               error,
+              updatedAt,
               completed:
                 state?.currentFileUploads?.[file.name]?.completed ||
                 Boolean(completed),
@@ -904,32 +910,29 @@ const makeContext = (
           },
           uploadSize: file.size,
           onError(err) {
-            updateStateWithProgressOrError(file, 0, false, err);
+            updateStateWithProgressOrError(file, 0, false, Date.now(), err);
           },
           onProgress(bytesUploaded, bytesTotal) {
             const percentage = bytesUploaded / bytesTotal;
-            updateStateWithProgressOrError(file, percentage, false);
+            updateStateWithProgressOrError(file, percentage, false, Date.now());
           },
           onSuccess() {
-            updateStateWithProgressOrError(file, 1, true);
+            updateStateWithProgressOrError(file, 1, true, Date.now());
           },
         });
 
       for (const file of files) {
         try {
-          updateStateWithProgressOrError(file, 0, false);
+          updateStateWithProgressOrError(file, 0, false, Date.now());
 
           const uploadWithoutUrl = getTusUpload(file);
           const previousUploads = await uploadWithoutUrl.findPreviousUploads();
           if (previousUploads.length > 0) {
             uploadWithoutUrl.resumeFromPreviousUpload(previousUploads[0]);
-
             uploadWithoutUrl.start();
           } else {
             const assetUpload = await requestAssetUpload({ name: file.name });
-
             const upload = getTusUpload(file, assetUpload.tusEndpoint);
-
             upload.start();
           }
         } catch (e) {
@@ -969,6 +972,7 @@ const makeContext = (
       if (res.status !== 200) {
         throw new Error(assets);
       }
+      setState((state) => ({ ...state, latestGetAssetsResult: assets }));
       const nextCursor = getCursor(res.headers.get("link"));
       const count = res.headers.get("X-Total-Count");
       return [assets, nextCursor, count];
@@ -996,6 +1000,15 @@ const makeContext = (
         throw new HttpError(res.status, body);
       }
       return res;
+    },
+
+    async deleteAsset(assetId): Promise<void> {
+      const [res] = await context.fetch(`/asset/${assetId}`, {
+        method: "DELETE",
+      });
+      if (res.status !== 204) {
+        throw new Error(`Failed to delete asset with id: ${assetId}`);
+      }
     },
 
     async getTasks(
