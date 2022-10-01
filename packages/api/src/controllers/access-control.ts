@@ -5,7 +5,7 @@ import { Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { ForbiddenError, NotFoundError } from "../store/errors";
+import { NotFoundError, ForbiddenError } from "../store/errors";
 
 const accessControl = Router();
 

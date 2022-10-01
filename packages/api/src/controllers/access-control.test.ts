@@ -100,12 +100,13 @@ describe("controllers/signing-key", () => {
     });
 
     it("should not allow playback on not existing streams or public keys", async () => {
+      client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {
-        stream: `video+0000000000`,
+        stream: `video+0000000000123`,
         pub: signingKey.publicKey,
         type: "jwt",
       });
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(404);
       const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedPlaybackId}`,
         pub: "00000000000000",
@@ -115,6 +116,7 @@ describe("controllers/signing-key", () => {
     });
 
     it("should not allow playback if stream is gated an pub is missing", async () => {
+      client.jwtAuth = adminToken;
       const res2 = await client.post("/access-control/gate", {
         stream: `video+${gatedPlaybackId}`,
         type: "jwt",
@@ -123,6 +125,7 @@ describe("controllers/signing-key", () => {
     });
 
     it("should not allow playback if stream and public key does not share the same owner", async () => {
+      client.jwtAuth = adminToken;
       const otherStream = await client.post("/stream", {
         name: "test",
         playbackPolicy: {
@@ -170,6 +173,32 @@ describe("controllers/signing-key", () => {
         pub: signingKey.publicKey,
       });
       expect(res.status).toBe(204);
+    });
+
+    it("should not allow playback if signing key is deleted or disabled", async () => {
+      client.jwtAuth = nonAdminToken;
+      await client.patch(`/access-control/signing-key/${signingKey.id}`, {
+        disabled: true,
+      });
+      client.jwtAuth = adminToken;
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedPlaybackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res.status).toBe(403);
+      client.jwtAuth = nonAdminToken;
+      await client.patch(`/access-control/signing-key/${signingKey.id}`, {
+        disabled: false,
+      });
+      await client.delete(`/access-control/signing-key/${signingKey.id}`);
+      client.jwtAuth = adminToken;
+      const res2 = await client.post("/access-control/gate", {
+        stream: `video+${gatedPlaybackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res2.status).toBe(403);
     });
   });
 });
