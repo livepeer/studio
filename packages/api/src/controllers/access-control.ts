@@ -33,9 +33,9 @@ accessControl.post(
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
-    res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
     if (playbackPolicyType === "public") {
+      res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
       res.status(204);
       return res.end();
     } else if (playbackPolicyType === "jwt") {
@@ -66,6 +66,7 @@ accessControl.post(
         throw new ForbiddenError("The public key is disabled or deleted");
       }
 
+      res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
       res.status(204);
       return res.end();
     } else {
