@@ -278,7 +278,7 @@ const ID = () => {
       return "https://lvpr.tv/";
     }
     const autoplay = query.autoplay?.toString() ?? "0";
-    let url = `https://lvpr.tv/?theme=fantasy&live=${stream?.playbackId}&autoplay=${autoplay}`;
+    let url = `https://lvpr.tv/?v=${stream?.playbackId}&autoplay=${autoplay}`;
     if (isStaging() || isDevelopment()) {
       url += "&monster";
     }
