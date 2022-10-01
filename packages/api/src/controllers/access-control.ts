@@ -5,7 +5,7 @@ import { Router } from "express";
 import _ from "lodash";
 import { db } from "../store";
 import sql from "sql-template-strings";
-import { ForbiddenError } from "../store/errors";
+import { ForbiddenError, NotFoundError } from "../store/errors";
 
 const accessControl = Router();
 
@@ -24,12 +24,8 @@ accessControl.post(
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
 
-    if (!content) {
-      throw new ForbiddenError("Content not found");
-    }
-
-    if (content.deleted) {
-      throw new ForbiddenError("Stream is deleted");
+    if (!content || content.deleted) {
+      throw new NotFoundError("Content not found");
     }
 
     const playbackPolicy = content.playbackPolicy;
