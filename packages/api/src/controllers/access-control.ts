@@ -55,6 +55,12 @@ accessControl.post(
         );
       }
 
+      if (signingKeyOutput.length > 1) {
+        throw new BadRequestError(
+          "Multiple signing keys found for the same public key. This shouldn't happen."
+        );
+      }
+
       const signingKey = signingKeyOutput[0];
       if (signingKey.userId !== content.userId) {
         throw new ForbiddenError(
@@ -70,7 +76,9 @@ accessControl.post(
       res.status(204);
       return res.end();
     } else {
-      throw new BadRequestError(`unknown policy type: ${playbackPolicyType}`);
+      throw new BadRequestError(
+        `unknown playbackPolicy type: ${playbackPolicyType}`
+      );
     }
   }
 );
