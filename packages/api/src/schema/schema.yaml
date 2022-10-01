@@ -773,7 +773,7 @@ components:
       properties:
         type:
           type: string
-          enum: [public, signed]
+          enum: [public, jwt]
 
     session:
       type: object

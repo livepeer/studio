@@ -58,7 +58,7 @@ describe("controllers/signing-key", () => {
       const res2 = await client.post("/stream", {
         name: "test",
         playbackPolicy: {
-          type: "signed",
+          type: "jwt",
         },
       });
       const stream = await res2.json();
@@ -78,7 +78,7 @@ describe("controllers/signing-key", () => {
         createdAt: Date.now(),
         playbackId: await generateUniquePlaybackId(id),
         playbackPolicy: {
-          type: "signed",
+          type: "jwt",
         },
         status: {
           phase: "ready",
@@ -129,7 +129,7 @@ describe("controllers/signing-key", () => {
       const otherStream = await client.post("/stream", {
         name: "test",
         playbackPolicy: {
-          type: "signed",
+          type: "jwt",
         },
       });
       const otherStreamPlaybackId = (await otherStream.json()).playbackId;

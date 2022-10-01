@@ -32,13 +32,13 @@ accessControl.post(
       throw new NotFoundError("Content not found");
     }
 
-    const playbackPolicyType: string = content.playbackPolicy?.type ?? "public";
+    const playbackPolicyType = content.playbackPolicy?.type ?? "public";
     res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
 
     if (playbackPolicyType === "public") {
       res.status(204);
       return res.end();
-    } else if (playbackPolicyType === "signed") {
+    } else if (playbackPolicyType === "jwt") {
       if (!req.body.pub) {
         throw new ForbiddenError("Stream is gated and requires a public key");
       }
