@@ -3,31 +3,17 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
 import { FilterItem } from "components/Dashboard/Table/filters";
-import { TextCellProps } from "components/Dashboard/Table/cells/text";
-import { DateCellProps } from "components/Dashboard/Table/cells/date";
-import { ActionCellProps } from "../Table/cells/action";
-import { CreatedAtCellProps } from "../Table/cells/createdAt";
-import { NameCellProps } from "../Table/cells/name";
 import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
 import EmptyState from "./EmptyState";
-import { makeColumns, rowsPageFromState } from "./helpers";
+import { AssetsTableData, makeColumns, rowsPageFromState } from "./helpers";
 
 const filterItems: FilterItem[] = [
   { label: "Name", id: "name", type: "text" },
   { label: "Created", id: "createdAt", type: "date" },
   { label: "Updated", id: "updatedAt", type: "date" },
 ];
-
-type AssetsTableData = {
-  id: string;
-  name: NameCellProps;
-  source: TextCellProps;
-  createdAt: CreatedAtCellProps;
-  updatedAt: DateCellProps;
-  action: ActionCellProps;
-};
 
 const AssetsTable = ({
   userId,

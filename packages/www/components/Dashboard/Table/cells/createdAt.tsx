@@ -9,6 +9,7 @@ export type CreatedAtCellProps = {
   fallback: React.ReactNode;
   isStatusFailed: boolean;
   errorMessage?: string;
+  href?: string;
 };
 
 const CreatedAtCell = <D extends TableData>({

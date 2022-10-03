@@ -4,6 +4,7 @@ import { Box } from "@livepeer/design-system";
 
 export type TextCellProps = {
   children?: React.ReactNode;
+  fallback?: React.ReactNode;
   tooltipChildren?: React.ReactNode;
   href?: string;
   id?: string;
