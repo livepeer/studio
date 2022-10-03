@@ -22,6 +22,10 @@ class Tracker {
     this.recordLastSeen(db.apiToken, id);
   }
 
+  recordSigningKeyValidation(signingKeyId: string) {
+    this.recordLastSeen(db.signingKey, signingKeyId);
+  }
+
   private recordLastSeen(
     table: Table<{ id: string; lastSeen?: number }>,
     id: string

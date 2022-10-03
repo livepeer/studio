@@ -10,6 +10,7 @@ import {
   ForbiddenError,
   BadRequestError,
 } from "../store/errors";
+import tracking from "../middleware/tracking";
 
 const accessControl = Router();
 
@@ -62,6 +63,7 @@ accessControl.post(
       }
 
       const signingKey = signingKeyOutput[0];
+
       if (signingKey.userId !== content.userId) {
         throw new ForbiddenError(
           "The stream and the public key do not share the same owner"
@@ -78,6 +80,7 @@ accessControl.post(
         throw new ForbiddenError("The owner of the content is suspended");
       }
 
+      tracking.recordSigningKeyValidation(signingKey.id);
       res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
       res.status(204);
       return res.end();

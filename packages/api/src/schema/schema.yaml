@@ -1625,7 +1625,7 @@ components:
           description:
             Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
-        lastUsedAt:
+        lastSeen:
           type: number
           readOnly: true
           description:
