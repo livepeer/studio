@@ -28,13 +28,7 @@ const AssetsTable = ({
   tableId: string;
   viewAll?: string;
 }) => {
-  const {
-    getAssets,
-    uploadAssets,
-    deleteAsset,
-    getTasks,
-    getCurrentFileUploads,
-  } = useApi();
+  const { getAssets, uploadAssets, deleteAsset, getTasks } = useApi();
   const [openSnackbar] = useSnackbar();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<AssetsTableData>({
@@ -51,18 +45,10 @@ const AssetsTable = ({
     })();
   };
 
-  const currentFileUploads = getCurrentFileUploads();
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
-      rowsPageFromState(
-        state,
-        userId,
-        getAssets,
-        getTasks,
-        currentFileUploads,
-        onDeleteAsset
-      ),
-    [userId, currentFileUploads]
+      rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
+    [userId]
   );
 
   return (
