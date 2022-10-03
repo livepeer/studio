@@ -141,13 +141,24 @@ describe("controllers/signing-key", () => {
       expect(res.status).toBe(403);
     });
 
-    it("should allow playback on public playbackId", async () => {
+    it("should allow playback on public playbackId with and without a public key provided", async () => {
       client.jwtAuth = adminToken;
       const res = await client.post("/access-control/gate", {
         stream: `video+${publicPlaybackId}`,
         type: "jwt",
       });
       expect(res.status).toBe(204);
+      client.jwtAuth = nonAdminToken;
+      const stream = await client.post("/stream", {
+        name: "test",
+      });
+      client.jwtAuth = adminToken;
+      const streamPlaybackId = (await stream.json()).playbackId;
+      const res2 = await client.post("/access-control/gate", {
+        stream: `video+${streamPlaybackId}`,
+        type: "jwt",
+      });
+      expect(res2.status).toBe(204);
     });
 
     it("should allow playback if playbackPolicy is not specified", async () => {
@@ -173,6 +184,24 @@ describe("controllers/signing-key", () => {
         pub: signingKey.publicKey,
       });
       expect(res.status).toBe(204);
+    });
+
+    it("should not allow playback if user is suspended", async () => {
+      client.jwtAuth = adminToken;
+      const res = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res.status).toBe(204);
+      await db.user.update(gatedAsset.userId, { suspended: true });
+      const res2 = await client.post("/access-control/gate", {
+        stream: `video+${gatedAsset.playbackId}`,
+        type: "jwt",
+        pub: signingKey.publicKey,
+      });
+      expect(res2.status).toBe(403);
+      await db.user.update(gatedAsset.userId, { suspended: false });
     });
 
     it("should not allow playback if signing key is deleted or disabled", async () => {

@@ -72,6 +72,12 @@ accessControl.post(
         throw new ForbiddenError("The public key is disabled or deleted");
       }
 
+      const user = await db.user.get(content.userId);
+
+      if (user.suspended) {
+        throw new ForbiddenError("The owner of the content is suspended");
+      }
+
       res.set("Cache-Control", "max-age=120,stale-while-revalidate=600");
       res.status(204);
       return res.end();
