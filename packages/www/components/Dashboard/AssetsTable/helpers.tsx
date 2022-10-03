@@ -1,5 +1,6 @@
 import { Asset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
+import { FileUpload, FileUploadsDictionary } from "hooks/use-api";
 import { get } from "lodash";
 import ActionCell, { ActionCellProps } from "../Table/cells/action";
 import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";
@@ -62,12 +63,24 @@ export type RowsPageFromStateResult = {
   count: any;
 };
 
+const fileUploadProgressForAsset = (
+  asset: Asset,
+  fileUploads: FileUpload[]
+): number | undefined => {
+  const fileUpload = fileUploads.find(
+    (upload) =>
+      asset.name === upload.file.name && asset.status?.phase === "waiting"
+  );
+  return fileUpload ? fileUpload.progress : undefined;
+};
+
 export const rowsPageFromState = async (
   state,
-  userId,
-  getAssets,
-  getTasks,
-  onDeleteAsset
+  userId: string,
+  getAssets: Function,
+  getTasks: Function,
+  currentFileUploads: FileUploadsDictionary,
+  onDeleteAsset: Function
 ): Promise<RowsPageFromStateResult> => {
   const [assets, nextCursor, count] = await getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
@@ -79,12 +92,24 @@ export const rowsPageFromState = async (
 
   const [tasks] = await getTasks(userId);
 
+  const fileUploadsFiltered = Object.keys(currentFileUploads ?? {})
+    .map((key) => currentFileUploads?.[key])
+    .filter((file) => file && !file.error && file.file.name && !file.completed);
+
   const rows: AssetsTableData[] = assets.map(
     (asset: Asset): AssetsTableData => {
       const source: Task =
         tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
       const sourceUrl = get(source, "params.import.url");
+
       const isStatusFailed = asset.status.phase === "failed";
+      const { errorMessage } = asset.status;
+
+      const fileUploadProgress = fileUploadProgressForAsset(
+        asset,
+        fileUploadsFiltered
+      );
+      const isFileUploading = fileUploadProgress !== undefined;
 
       return {
         id: asset.id,
@@ -93,7 +118,7 @@ export const rowsPageFromState = async (
           href: `/dashboard/assets/${asset.id}`,
           assetName: asset.name,
           isStatusFailed,
-          errorMessage: asset.status.errorMessage,
+          errorMessage,
         },
         source: {
           children: (
@@ -114,7 +139,9 @@ export const rowsPageFromState = async (
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
           isStatusFailed,
-          errorMessage: asset.status.errorMessage,
+          errorMessage,
+          isFileUploading,
+          fileUploadProgress,
         },
         updatedAt: {
           date:

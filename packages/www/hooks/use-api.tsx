@@ -936,9 +936,13 @@ const makeContext = (
             upload.start();
           }
         } catch (e) {
-          updateStateWithProgressOrError(file, 0, false, e);
+          updateStateWithProgressOrError(file, 0, false, Date.now(), e);
         }
       }
+    },
+
+    getCurrentFileUploads(): FileUploadsDictionary {
+      return state.currentFileUploads ?? {};
     },
 
     async clearFileUploads() {

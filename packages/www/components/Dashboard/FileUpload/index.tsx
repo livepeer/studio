@@ -1,7 +1,7 @@
 import { Box, Flex, Heading, IconButton, Text } from "@livepeer/design-system";
 import { Cross2Icon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import AssetFailedStatusItem from "./AssetFailedStatusItem";
 import FileItem from "./FileItem";
 import { filteredItemsToShow } from "./helpers";
