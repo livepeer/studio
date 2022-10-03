@@ -40,7 +40,6 @@ describe("controllers/signing-key", () => {
     let adminToken: string;
     let nonAdminUser: User;
     let nonAdminToken: string;
-    let otherUserToken: string;
     let signingKey: WithID<SigningKey>;
     let gatedPlaybackId: string;
     let publicPlaybackId: string;

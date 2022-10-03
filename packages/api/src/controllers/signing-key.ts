@@ -10,11 +10,7 @@ import {
 import { db } from "../store";
 import sql from "sql-template-strings";
 import { v4 as uuid } from "uuid";
-import {
-  generateKeyPairSync,
-  generateKeyPair,
-  KeyPairSyncResult,
-} from "crypto";
+import { generateKeyPair, KeyPairSyncResult } from "crypto";
 import { ForbiddenError, NotFoundError } from "../store/errors";
 import {
   SigningKey,
