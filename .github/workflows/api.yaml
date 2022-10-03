@@ -1,7 +1,6 @@
 name: Build API service docker image
 
 on:
-  pull_request_target:
   pull_request:
   push:
     paths:
