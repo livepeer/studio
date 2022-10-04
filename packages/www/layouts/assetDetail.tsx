@@ -1,7 +1,7 @@
 import AssetChildrenHeadingBox from "@components/Dashboard/AssetDetails/AssetChildrenHeadingBox";
 import AssetDetailsBox from "@components/Dashboard/AssetDetails/AssetDetailsBox";
 import AssetHeadingBox from "@components/Dashboard/AssetDetails/AssetHeadingBox";
-import AssetPlayerBox from "@components/Dashboard/AssetDetails/AssetPlayerBox";
+import AssetPlayerBox from "@components/Dashboard/AssetDetails/AssetPlayerBox/";
 import EditAssetDialog, {
   EditAssetReturnValue,
 } from "@components/Dashboard/AssetDetails/EditAssetDialog";
