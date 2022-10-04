@@ -80,17 +80,15 @@ const CreatedAtCell = <D extends TableData>({
 }: CellComponentProps<D, CreatedAtCellProps>) => {
   const { id, date, fallback, asset } = cell.value;
 
-  const { getCurrentFileUploads } = useApi();
-  const [currentFileUploads, setCurrentFileUploads] = useState<
-    FileUploadsDictionary | undefined
-  >();
+  const { getCurrentFileUploadsArray } = useApi();
+  const [currentFileUploads, setCurrentFileUploads] = useState<FileUpload[]>(
+    []
+  );
 
   const fileUploadProgress = useMemo(() => {
-    const fileUploadsFiltered = Object.keys(currentFileUploads ?? {})
-      .map((key) => currentFileUploads?.[key])
-      .filter(
-        (file) => file && !file.error && file.file.name //&& !file.completed
-      );
+    const fileUploadsFiltered = currentFileUploads.filter(
+      (file) => file && !file.error && file.file.name
+    );
     return fileUploadProgressForAsset(asset, fileUploadsFiltered);
   }, [currentFileUploads]);
 
@@ -99,10 +97,10 @@ const CreatedAtCell = <D extends TableData>({
 
   useEffect(() => {
     // Has to fetch the file uploads from this cell, instead of from the table fetcher, to avoid fetching again assets too
-    const fileUploads = getCurrentFileUploads();
-    if (JSON.stringify(fileUploads) === JSON.stringify(currentFileUploads))
-      return;
-    setCurrentFileUploads(fileUploads);
+    const fileUploads = getCurrentFileUploadsArray();
+    if (JSON.stringify(fileUploads) !== JSON.stringify(currentFileUploads)) {
+      setCurrentFileUploads(fileUploads);
+    }
   });
 
   const { phase, errorMessage, progress } = asset.status;

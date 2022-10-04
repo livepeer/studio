@@ -7,14 +7,18 @@ import FileItem from "./FileItem";
 import { filteredItemsToShow } from "./helpers";
 
 const FileUpload = () => {
-  const { currentFileUploads, clearFileUploads, latestGetAssetsResult } =
-    useApi();
+  const {
+    getCurrentFileUploadsArray,
+    clearFileUploads,
+    latestGetAssetsResult,
+  } = useApi();
 
+  const currentFileUploads = getCurrentFileUploadsArray();
   const fileUploadsFiltered = useMemo(
     () =>
-      Object.keys(currentFileUploads ?? {})
-        .map((key) => currentFileUploads?.[key])
-        .filter((file) => file && !file.error && file.file.name),
+      currentFileUploads.filter(
+        (file) => file && !file.error && file.file.name
+      ),
     [currentFileUploads]
   );
 

@@ -168,6 +168,7 @@ const makeContext = (
   const context = {
     ...state,
     endpoint,
+
     async fetch(url: string, opts: RequestInit = {}) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
@@ -951,6 +952,12 @@ const makeContext = (
 
     getCurrentFileUploads(): FileUploadsDictionary {
       return state.currentFileUploads ?? {};
+    },
+
+    getCurrentFileUploadsArray(): FileUpload[] {
+      return Object.keys(state.currentFileUploads ?? {}).map(
+        (key) => state.currentFileUploads?.[key]
+      );
     },
 
     async clearFileUploads() {
