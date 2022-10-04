@@ -10,6 +10,8 @@ import { formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
 
+const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
+
 export const makeColumns = () => [
   {
     Header: "Name",
@@ -84,6 +86,9 @@ export const rowsPageFromState = async (
       const source: Task =
         tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
       const sourceUrl = get(source, "params.import.url");
+      const sourceHost = sourceUrl && new URL(sourceUrl).host;
+      const isLiveStream = !!sourceUrl && liveStreamHosts.includes(sourceHost);
+
       const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
@@ -97,15 +102,7 @@ export const rowsPageFromState = async (
           errorMessage,
         },
         source: {
-          children: (
-            <Box>
-              {sourceUrl &&
-              (sourceUrl.indexOf("https://livepeercdn.com") === 0 ||
-                sourceUrl.indexOf("https://cdn.livepeer.com") === 0)
-                ? "Live Stream"
-                : "Upload"}
-            </Box>
-          ),
+          children: <Box>{isLiveStream ? "Live Stream" : "Upload"}</Box>,
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
         },
