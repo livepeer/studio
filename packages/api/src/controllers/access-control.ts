@@ -33,6 +33,12 @@ accessControl.post(
       throw new NotFoundError("Content not found");
     }
 
+    const user = await db.user.get(content.userId);
+
+    if (user.suspended || ("suspended" in content && content.suspended)) {
+      throw new ForbiddenError("The owner of the content is suspended");
+    }
+
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
 
     if (playbackPolicyType === "public") {
@@ -72,12 +78,6 @@ accessControl.post(
 
       if (signingKey.disabled || signingKey.deleted) {
         throw new ForbiddenError("The public key is disabled or deleted");
-      }
-
-      const user = await db.user.get(content.userId);
-
-      if (user.suspended) {
-        throw new ForbiddenError("The owner of the content is suspended");
       }
 
       tracking.recordSigningKeyValidation(signingKey.id);
