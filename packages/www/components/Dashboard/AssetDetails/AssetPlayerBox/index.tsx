@@ -13,7 +13,7 @@ const AssetStatusBox = ({ asset }) => {
   if (asset?.status?.phase === "failed") {
     return <FailedProcessing />;
   }
-  return <ProcessingProgress />;
+  return <ProcessingProgress asset={asset} />;
 };
 
 const DownloadLink = ({ downloadUrl }: { downloadUrl?: string }) => {
