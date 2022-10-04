@@ -857,7 +857,12 @@ const makeContext = (
       return asset;
     },
 
-    async uploadAssets(files: File[]): Promise<void> {
+    async uploadAssets(
+      files: File[],
+      onSuccess?: (file: File) => void,
+      onError?: (file: File, error: Error) => void,
+      onProgress?: (file: File, progress: number) => void
+    ): Promise<void> {
       const requestAssetUpload = async (
         params
       ): Promise<{ tusEndpoint: string }> => {
@@ -911,13 +916,16 @@ const makeContext = (
           uploadSize: file.size,
           onError(err) {
             updateStateWithProgressOrError(file, 0, false, Date.now(), err);
+            if (onError) onError(file, err);
           },
           onProgress(bytesUploaded, bytesTotal) {
             const percentage = bytesUploaded / bytesTotal;
             updateStateWithProgressOrError(file, percentage, false, Date.now());
+            if (onProgress) onProgress(file, percentage);
           },
           onSuccess() {
             updateStateWithProgressOrError(file, 1, true, Date.now());
+            if (onSuccess) onSuccess(file);
           },
         });
 

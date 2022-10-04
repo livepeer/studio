@@ -45,6 +45,8 @@ const AssetsTable = ({
     })();
   };
 
+  const onUploadAssetSuccess = () => state.invalidate();
+
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
@@ -91,7 +93,7 @@ const AssetsTable = ({
         onOpenChange={createDialogState.onToggle}
         onCreate={async ({ videoFiles }: { videoFiles: File[] }) => {
           try {
-            await uploadAssets(videoFiles);
+            await uploadAssets(videoFiles, onUploadAssetSuccess);
             await state.invalidate();
             createDialogState.onOff();
           } catch (e) {
