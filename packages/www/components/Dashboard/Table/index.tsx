@@ -566,7 +566,7 @@ const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
     state.order,
     state.stringifiedFilters,
   ];
-  const tableData = useQuery(queryKey, () => fetcher(state));
+  const tableData = useQuery(queryKey, () => fetcher(state), fetcherOptions);
   return DataTableComponent({ ...props, tableData });
 };
 
