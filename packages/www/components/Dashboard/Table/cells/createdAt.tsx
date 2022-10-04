@@ -49,15 +49,22 @@ const FileUploading = ({ progress }) => (
   </Flex>
 );
 
+const ProcessingProgress = ({ progress }) => (
+  <Flex gap={1}>
+    <UploadIcon /> Processing {Math.floor(progress * 100)}%
+  </Flex>
+);
+
 const fileUploadProgressForAsset = (
   asset: Asset,
   fileUploads: FileUpload[]
 ): number | undefined => {
   const fileUpload = fileUploads.find(
-    (upload) =>
-      asset.name === upload.file.name && asset.status?.phase === "waiting"
+    (upload) => upload.file.name === asset.name
   );
-  return fileUpload ? fileUpload.progress : undefined;
+  return fileUpload && asset.status?.phase === "waiting"
+    ? fileUpload.progress
+    : undefined;
 };
 
 export type CreatedAtCellProps = {
@@ -65,39 +72,46 @@ export type CreatedAtCellProps = {
   date: Date;
   fallback: React.ReactNode;
   href?: string;
-  isStatusFailed: boolean;
-  errorMessage?: string;
   asset: Asset;
 };
 
 const CreatedAtCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, CreatedAtCellProps>) => {
-  const { id, date, fallback, asset, isStatusFailed, errorMessage } =
-    cell.value;
+  const { id, date, fallback, asset } = cell.value;
 
   const { getCurrentFileUploads } = useApi();
   const [currentFileUploads, setCurrentFileUploads] = useState<
     FileUploadsDictionary | undefined
   >();
+
   const fileUploadProgress = useMemo(() => {
     const fileUploadsFiltered = Object.keys(currentFileUploads ?? {})
       .map((key) => currentFileUploads?.[key])
       .filter(
-        (file) => file && !file.error && file.file.name && !file.completed
+        (file) => file && !file.error && file.file.name //&& !file.completed
       );
     return fileUploadProgressForAsset(asset, fileUploadsFiltered);
   }, [currentFileUploads]);
-  const isFileUploading = fileUploadProgress !== undefined;
+
+  const isFileUploading =
+    fileUploadProgress !== undefined && fileUploadProgress !== 1;
 
   useEffect(() => {
     // Has to fetch the file uploads from this cell, instead of from the table fetcher, to avoid fetching again assets too
     const fileUploads = getCurrentFileUploads();
+    if (JSON.stringify(fileUploads) === JSON.stringify(currentFileUploads))
+      return;
     setCurrentFileUploads(fileUploads);
   });
 
-  if (isStatusFailed) {
+  const { phase, errorMessage, progress } = asset.status;
+
+  if (phase === "failed") {
     return <FailedProcessing id={id} errorMessage={errorMessage} />;
+  }
+  if (phase === "processing") {
+    return <ProcessingProgress progress={progress} />;
   }
   if (isFileUploading) {
     return <FileUploading progress={fileUploadProgress} />;

@@ -84,8 +84,7 @@ export const rowsPageFromState = async (
       const source: Task =
         tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
       const sourceUrl = get(source, "params.import.url");
-
-      const isStatusFailed = asset.status.phase === "failed";
+      const isStatusFailed = asset.status?.phase === "failed";
       const { errorMessage } = asset.status;
 
       return {
@@ -116,8 +115,6 @@ export const rowsPageFromState = async (
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
           asset,
-          isStatusFailed,
-          errorMessage,
         },
         updatedAt: {
           date:
