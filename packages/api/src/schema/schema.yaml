@@ -749,6 +749,21 @@ components:
         response:
           $ref: "#/components/schemas/webhook-response"
 
+    access-control-gate-payload:
+      type: object
+      additionalProperties: false
+      required: [type, stream]
+      properties:
+        type:
+          type: string
+          enum: [jwt]
+        stream:
+          type: string
+          description: Stream ID to which this gate applies
+        pub:
+          type: string
+          description: Base64 of Public key used for JWT verification
+
     playback-policy:
       type: object
       description:
@@ -758,7 +773,7 @@ components:
       properties:
         type:
           type: string
-          enum: [public, signed]
+          enum: [public, jwt]
 
     session:
       type: object
@@ -1610,7 +1625,7 @@ components:
           description:
             Timestamp (in milliseconds) at which the signing-key was created
           example: 1587667174725
-        lastUsedAt:
+        lastSeen:
           type: number
           readOnly: true
           description:
