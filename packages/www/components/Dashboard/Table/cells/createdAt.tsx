@@ -73,8 +73,7 @@ const CreatedAtCell = <D extends TableData>({
   >();
   const { id, date, fallback, asset } = cell.value;
   const { phase, errorMessage, progress } = asset.status;
-  const isFileUploading =
-    fileUploadProgress !== undefined && fileUploadProgress !== 1;
+  const isFileUploading = fileUploadProgress !== undefined;
 
   useEffect(() => {
     // Has to fetch the file uploads from this cell, instead of from the table fetcher, to avoid fetching again assets too
