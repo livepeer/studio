@@ -950,14 +950,10 @@ const makeContext = (
       }
     },
 
-    getCurrentFileUploads(): FileUploadsDictionary {
-      return state.currentFileUploads ?? {};
-    },
-
-    getCurrentFileUploadsArray(): FileUpload[] {
-      return Object.keys(state.currentFileUploads ?? {}).map(
-        (key) => state.currentFileUploads?.[key]
-      );
+    getFilteredFileUploads(): FileUpload[] {
+      return Object.keys(state.currentFileUploads ?? {})
+        .map((key) => state.currentFileUploads?.[key])
+        .filter((file) => file && !file.error && file.file.name);
     },
 
     async clearFileUploads() {

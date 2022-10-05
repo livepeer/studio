@@ -35,7 +35,6 @@ const AssetsTable = ({
     pageSize,
     tableId,
   });
-
   const columns = useMemo(makeColumns, []);
 
   const onDeleteAsset = (assetId: string) => {

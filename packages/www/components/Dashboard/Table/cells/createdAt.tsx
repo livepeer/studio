@@ -78,7 +78,7 @@ export type CreatedAtCellProps = {
 const CreatedAtCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, CreatedAtCellProps>) => {
-  const { getCurrentFileUploadsArray } = useApi();
+  const { getFilteredFileUploads } = useApi();
   const [fileUploadProgress, setFileUploadProgress] = useState<
     number | undefined
   >();
@@ -89,10 +89,8 @@ const CreatedAtCell = <D extends TableData>({
 
   useEffect(() => {
     // Has to fetch the file uploads from this cell, instead of from the table fetcher, to avoid fetching again assets too
-    const fileUploadsFiltered = getCurrentFileUploadsArray().filter(
-      (file) => file && !file.error && file.file.name
-    );
-    const newProgress = fileUploadProgressForAsset(asset, fileUploadsFiltered);
+    const fileUploads = getFilteredFileUploads();
+    const newProgress = fileUploadProgressForAsset(asset, fileUploads);
     if (JSON.stringify(newProgress) !== JSON.stringify(fileUploadProgress)) {
       setFileUploadProgress(newProgress);
     }

@@ -7,29 +7,19 @@ import FileItem from "./FileItem";
 import { filteredItemsToShow } from "./helpers";
 
 const FileUpload = () => {
-  const {
-    getCurrentFileUploadsArray,
-    clearFileUploads,
-    latestGetAssetsResult,
-  } = useApi();
+  const { getFilteredFileUploads, clearFileUploads, latestGetAssetsResult } =
+    useApi();
 
-  const currentFileUploads = getCurrentFileUploadsArray();
-  const fileUploadsFiltered = useMemo(
-    () =>
-      currentFileUploads.filter(
-        (file) => file && !file.error && file.file.name
-      ),
-    [currentFileUploads]
-  );
+  const fileUploads = getFilteredFileUploads();
 
   const hasPendingFileUploads = useMemo(
-    () => fileUploadsFiltered.some((file) => !file.completed),
-    [fileUploadsFiltered]
+    () => fileUploads.some((file) => !file.completed),
+    [fileUploads]
   );
 
   const items = useMemo(
-    () => filteredItemsToShow(fileUploadsFiltered, latestGetAssetsResult ?? []),
-    [fileUploadsFiltered, latestGetAssetsResult]
+    () => filteredItemsToShow(fileUploads, latestGetAssetsResult ?? []),
+    [fileUploads, latestGetAssetsResult]
   );
 
   useEffect(() => {
