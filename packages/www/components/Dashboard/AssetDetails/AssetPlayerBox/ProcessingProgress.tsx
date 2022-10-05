@@ -1,6 +1,7 @@
-import { Box, Badge, Status } from "@livepeer/design-system";
+import { Flex, Text } from "@livepeer/design-system";
 import { Asset } from "livepeer";
 import { useMemo } from "react";
+import Spinner from "components/Dashboard/Spinner";
 
 const ProcessingProgress = ({ asset }: { asset?: Asset }) => {
   const percentage = useMemo(() => {
@@ -9,31 +10,29 @@ const ProcessingProgress = ({ asset }: { asset?: Asset }) => {
   }, [asset]);
 
   return (
-    <Box
+    <Flex
+      direction="column"
+      gap={1}
+      align="center"
+      justify="center"
       css={{
         width: "100%",
         height: 265,
         borderRadius: "$2",
         overflow: "hidden",
-        position: "relative",
         bc: "#28282c",
       }}>
-      <Badge
-        size="2"
+      <Spinner
         css={{
-          backgroundColor: "$primary7",
-          position: "absolute",
-          zIndex: 1,
-          left: 10,
-          top: 10,
-          letterSpacing: 0,
-        }}>
-        <Box css={{ mr: 5 }}>
-          <Status css={{ backgroundColor: "$primary9" }} size="1" />
-        </Box>
+          color: "$loContrast",
+          width: "$9",
+          height: "$9",
+        }}
+      />
+      <Text size="2" css={{ color: "$loContrast" }}>
         Processing {percentage}%
-      </Badge>
-    </Box>
+      </Text>
+    </Flex>
   );
 };
 
