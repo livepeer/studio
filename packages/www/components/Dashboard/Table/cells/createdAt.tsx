@@ -1,11 +1,10 @@
 import { fileUploadProgressForAsset } from "@components/Dashboard/AssetsTable/helpers";
-import { Asset } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
 import { Badge, Flex } from "@livepeer/design-system";
 import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useApi } from "hooks";
-import { FileUpload, FileUploadsDictionary } from "hooks/use-api";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { CellComponentProps, TableData } from "../types";
 

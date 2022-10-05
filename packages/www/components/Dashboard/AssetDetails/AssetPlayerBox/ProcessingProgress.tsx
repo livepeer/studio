@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Asset } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
 import Progress from "./Progress";
 
 const ProcessingProgress = ({ asset }: { asset?: Asset }) => {

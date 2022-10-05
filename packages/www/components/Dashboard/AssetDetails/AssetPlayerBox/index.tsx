@@ -1,4 +1,4 @@
-import { Asset } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
 import { Box, Button, Flex, Link } from "@livepeer/design-system";
 import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons";
 import Player from "../../Player";

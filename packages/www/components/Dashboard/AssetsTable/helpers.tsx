@@ -1,4 +1,5 @@
-import { Asset, Task } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
+import { Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import { FileUpload } from "hooks/use-api";
 import { get } from "lodash";
