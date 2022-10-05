@@ -1,7 +1,7 @@
 import { Flex, Text } from "@livepeer/design-system";
-import { Asset } from "livepeer";
 import { useMemo } from "react";
 import Spinner from "components/Dashboard/Spinner";
+import { Asset } from "@livepeer.studio/api";
 
 const ProcessingProgress = ({ asset }: { asset?: Asset }) => {
   const percentage = useMemo(() => {

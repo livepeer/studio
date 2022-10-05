@@ -1,5 +1,6 @@
 import { Asset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
+import { FileUpload } from "hooks/use-api";
 import { get } from "lodash";
 import ActionCell, { ActionCellProps } from "../Table/cells/action";
 import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";
@@ -130,4 +131,16 @@ export const rowsPageFromState = async (
     }
   );
   return { rows, nextCursor, count };
+};
+
+export const fileUploadProgressForAsset = (
+  asset: Asset,
+  fileUploads: FileUpload[]
+): number | undefined => {
+  const fileUpload = fileUploads.find(
+    (upload) => upload.file.name === asset.name
+  );
+  return fileUpload && asset.status?.phase === "waiting"
+    ? fileUpload.progress
+    : undefined;
 };

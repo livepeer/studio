@@ -1,3 +1,4 @@
+import { fileUploadProgressForAsset } from "@components/Dashboard/AssetsTable/helpers";
 import { Asset } from "@livepeer.studio/api";
 import { Badge, Flex } from "@livepeer/design-system";
 import { UploadIcon } from "@radix-ui/react-icons";
@@ -54,18 +55,6 @@ const ProcessingProgress = ({ progress }) => (
     <UploadIcon /> Processing {Math.floor(progress * 100)}%
   </Flex>
 );
-
-const fileUploadProgressForAsset = (
-  asset: Asset,
-  fileUploads: FileUpload[]
-): number | undefined => {
-  const fileUpload = fileUploads.find(
-    (upload) => upload.file.name === asset.name
-  );
-  return fileUpload && asset.status?.phase === "waiting"
-    ? fileUpload.progress
-    : undefined;
-};
 
 export type CreatedAtCellProps = {
   id: string;
