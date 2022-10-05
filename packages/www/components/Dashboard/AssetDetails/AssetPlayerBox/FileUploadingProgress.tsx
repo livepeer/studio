@@ -9,7 +9,10 @@ const FileUploadingProgress = ({ asset }: { asset?: Asset }) => {
   const [fileUploadProgress, setFileUploadProgress] = useState<
     number | undefined
   >();
-  const percentage = Math.floor(fileUploadProgress * 100);
+  const percentage =
+    fileUploadProgress !== undefined
+      ? Math.floor(fileUploadProgress * 100)
+      : undefined;
 
   useEffect(() => {
     const fileUploads = getFilteredFileUploads();

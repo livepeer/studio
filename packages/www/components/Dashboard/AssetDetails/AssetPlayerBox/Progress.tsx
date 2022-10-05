@@ -6,7 +6,7 @@ const Progress = ({
   percentage,
 }: {
   text: string;
-  percentage: number;
+  percentage?: number;
 }) => (
   <Flex
     direction="column"
@@ -22,14 +22,16 @@ const Progress = ({
     }}>
     <Spinner
       css={{
-        color: "$loContrast",
+        color: "$whiteA10",
         width: "$9",
         height: "$9",
       }}
     />
-    <Text size="2" css={{ color: "$loContrast" }}>
-      {text} {percentage}%
-    </Text>
+    {percentage !== undefined && (
+      <Text size="2" css={{ color: "$whiteA12" }}>
+        {text} {percentage}%
+      </Text>
+    )}
   </Flex>
 );
 
