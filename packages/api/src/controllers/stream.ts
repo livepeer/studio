@@ -202,25 +202,24 @@ function activeCleanup(streams: DBStream[], activeOnly = false) {
   return streams;
 }
 
+function isTrue(value: string) {
+  return ["1", "true"].includes(value?.toLowerCase());
+}
+
 app.use(
   mung.jsonAsync(async function mapToExternalStreams(
     data: DBStream[] | DBStream | { stream: DBStream },
     req
   ) {
-    const forceUrl = ["1", "true"].includes(
-      req.query.forceUrl?.toString().toLowerCase()
-    );
-    const raw = req.query.raw && req.user.admin;
-
     const ingests = await req.getIngest();
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
-    const { details } = toStringValues(req.query);
+    const { forceUrl, raw } = toStringValues(req.query);
     const ingest = ingests[0].base;
     let toExternalStream = (s: DBStream) => {
-      s = withRecordingFields(ingest, s, forceUrl);
-      if (!raw) {
+      s = withRecordingFields(ingest, s, isTrue(forceUrl));
+      if (!(req.user.admin && isTrue(raw))) {
         s = db.stream.removePrivateFields(s, req.user.admin);
       }
       if (!req.user.admin) {
