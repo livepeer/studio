@@ -412,6 +412,17 @@ describe("controllers/stream", () => {
         expect(res.status).toBe(201);
       });
 
+      it("should create a test user stream", async () => {
+        await server.db.user.update(adminUser.id, {
+          isTestUser: true,
+        });
+        const res = await client.post("/stream", {
+          ...postMockStream,
+        });
+        const data = await res.json();
+        expect(data.playbackId).toMatch(/.+-test$/);
+      });
+
       it("should create stream with valid detection config", async () => {
         const res = await client.post("/stream", {
           ...postMockStream,
