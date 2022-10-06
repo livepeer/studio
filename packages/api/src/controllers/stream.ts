@@ -798,7 +798,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
   const createdAt = Date.now();
   const streamKey = await generateUniqueStreamKey(id);
   let playbackId = await generateUniquePlaybackId(id, [streamKey]);
-  if (req.user.isTestUser === true) {
+  if (req.user.isTestUser) {
     playbackId += "-test";
   }
 
