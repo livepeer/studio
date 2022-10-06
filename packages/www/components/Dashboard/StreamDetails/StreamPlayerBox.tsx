@@ -2,7 +2,7 @@ import { Box, Badge, Status, Flex, Button } from "@livepeer/design-system";
 import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "livepeer";
 import AssetSharePopup from "../AssetDetails/AssetSharePopup";
-import Player from "../Player";
+import AppPlayer from "../../Site/AppPlayer";
 
 export type StreamPlayerBoxProps = {
   stream: Stream;
@@ -46,7 +46,7 @@ const StreamPlayerBox = ({
               </Box>
               Active
             </Badge>
-            <Player src={globalPlaybackUrl} />
+            <AppPlayer playbackUrl={globalPlaybackUrl} />
           </>
         ) : (
           <Box
