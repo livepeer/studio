@@ -364,6 +364,9 @@ export function getRecordingFields(
   session: DBSession,
   forceUrl: boolean
 ): Pick<DBSession, "recordingStatus" | "recordingUrl" | "mp4Url"> {
+  // TODO: Make sure we only add recording URL to streams that really have a
+  // recording. The closest to that is recordObjectStoreId, which can have been
+  // set by the user on a parent stream, which should not have a recording.
   if (!session.record || !session.recordObjectStoreId || !session.lastSeen) {
     return {};
   }
