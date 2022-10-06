@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import { isStaging } from "lib/utils";
 import Spinner from "components/Dashboard/Spinner";
 import { Variant as StatusVariant } from "@components/Dashboard/StatusBadge";
-import StreamPlayerBox from "@components/Dashboard/StreamDetails/StreamPlayerBox";
+import StreamPlayerBox from "@components/Dashboard/StreamDetails/StreamPlayerBox/";
 import StreamDetailsBox from "@components/Dashboard/StreamDetails/StreamDetailsBox";
 import StreamHeadingBox from "@components/Dashboard/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "@components/Dashboard/StreamDetails/StreamChildrenHeadingBox";
