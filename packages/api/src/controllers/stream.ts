@@ -215,11 +215,13 @@ app.use(
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
-    const { forceUrl, raw } = toStringValues(req.query);
     const ingest = ingests[0].base;
+    const { forceUrl, raw: rawStr } = toStringValues(req.query);
+    const raw = req.user.admin && isTrue(rawStr);
+
     let toExternalStream = (s: DBStream) => {
       s = withRecordingFields(ingest, s, isTrue(forceUrl));
-      if (!(req.user.admin && isTrue(raw))) {
+      if (!raw) {
         s = db.stream.removePrivateFields(s, req.user.admin);
       }
       if (!req.user.admin) {
@@ -349,14 +351,7 @@ app.get("/", authorizer({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(
-    activeCleanup(
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(output, req.user.admin)
-      ),
-      !!active
-    )
-  );
+  res.json(activeCleanup(output, !!active));
 });
 
 export function getRecordingFields(
@@ -395,16 +390,9 @@ export function withRecordingFields(
 // returns only 'user' sessions and adds
 app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   const { parentId } = req.params;
-  const { record, forceUrl } = req.query;
+  const { record } = req.query;
   let { limit, cursor } = toStringValues(req.query);
-  const raw = req.query.raw && req.user.admin;
-
-  const ingests = await req.getIngest();
-  if (!ingests.length) {
-    res.status(501);
-    return res.json({ errors: ["Ingest not configured"] });
-  }
-  const ingest = ingests[0].base;
+  const raw = isTrue(req.query.raw?.toString()) && req.user.admin;
 
   const stream = await db.stream.get(parentId);
   if (
@@ -439,7 +427,6 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   });
 
   sessions = sessions.map((session) => {
-    session = withRecordingFields(ingest, session, !!forceUrl);
     if (!raw) {
       if (session.previousSessions && session.previousSessions.length) {
         session.id = session.previousSessions[0]; // return id of the first session object so
@@ -466,7 +453,7 @@ app.get("/:parentId/sessions", authorizer({}), async (req, res) => {
   if (!raw) {
     db.stream.removePrivateFieldsMany(sessions, req.user.admin);
   }
-  res.json(db.stream.addDefaultFieldsMany(sessions));
+  res.json(sessions);
 });
 
 app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
@@ -494,11 +481,7 @@ app.get("/sessions/:parentId", authorizer({}), async (req, res) => {
   if (data.length > 0 && nextCursor) {
     res.links({ next: makeNextHREF(req, nextCursor) });
   }
-  res.json(
-    db.stream.addDefaultFieldsMany(
-      db.stream.removePrivateFieldsMany(data, req.user.admin)
-    )
-  );
+  res.json(data);
 });
 
 app.get("/user/:userId", authorizer({}), async (req, res) => {
@@ -533,18 +516,11 @@ app.get("/user/:userId", authorizer({}), async (req, res) => {
   if (newCursor) {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
-  res.json(
-    activeCleanup(
-      db.stream.addDefaultFieldsMany(
-        db.stream.removePrivateFieldsMany(streams, req.user.admin)
-      )
-    )
-  );
+  res.json(activeCleanup(streams));
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
   const raw = req.query.raw && req.user.admin;
-  const { forceUrl } = req.query;
   let stream = await db.stream.get(req.params.id);
   if (
     !stream ||
@@ -574,18 +550,8 @@ app.get("/:id", authorizer({}), async (req, res) => {
       ...combinedStats,
     };
   }
-  if (stream.record) {
-    const ingests = await req.getIngest();
-    if (ingests.length) {
-      const ingest = ingests[0].base;
-      stream = withRecordingFields(ingest, stream, !!forceUrl);
-    }
-  }
   res.status(200);
-  if (!raw) {
-    db.stream.removePrivateFields(stream, req.user.admin);
-  }
-  res.json(db.stream.addDefaultFields(stream));
+  res.json(stream);
 });
 
 // returns stream by steamKey
@@ -605,11 +571,7 @@ app.get("/playback/:playbackId", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(
-    db.stream.addDefaultFields(
-      db.stream.removePrivateFields(stream, req.user.admin)
-    )
-  );
+  res.json(stream);
 });
 
 // returns stream by steamKey
@@ -627,11 +589,7 @@ app.get("/key/:streamKey", authorizer({}), async (req, res) => {
     return res.json({ errors: ["not found"] });
   }
   res.status(200);
-  res.json(
-    db.stream.addDefaultFields(
-      db.stream.removePrivateFields(docs[0], req.user.admin)
-    )
-  );
+  res.json(docs[0]);
 });
 
 // Needed for Mist server
@@ -822,7 +780,7 @@ app.post(
     }
 
     res.status(201);
-    res.json(db.stream.removePrivateFields(doc, req.user.admin));
+    res.json(doc);
     logger.info(
       `stream session created for stream_id=${stream.id} stream_name='${
         stream.name
@@ -887,11 +845,7 @@ app.post("/", authorizer({}), validatePost("stream"), async (req, res) => {
   await req.store.create(doc);
 
   res.status(201);
-  res.json(
-    db.stream.addDefaultFields(
-      db.stream.removePrivateFields(doc, req.user.admin)
-    )
-  );
+  res.json(doc);
 });
 
 app.put(
@@ -1247,9 +1201,7 @@ app.get("/:id/info", authorizer({}), async (req, res) => {
   }
   const user = await db.user.get(stream.userId);
   const resp = {
-    stream: db.stream.addDefaultFields(
-      db.stream.removePrivateFields(stream, req.user.admin)
-    ),
+    stream,
     session,
     isPlaybackid,
     isSession,
