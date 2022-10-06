@@ -28,7 +28,7 @@ const StreamDetail = ({
   const router = useRouter();
   const { query } = router;
   const id = query.id;
-  const [_, setIngest] = useState([]);
+  const [ingest, setIngest] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [isCopied, setCopied] = useState(0);
   const [lastSession, setLastSession] = useState(null);
@@ -70,7 +70,9 @@ const StreamDetail = ({
         if (Array.isArray(ingest)) {
           ingest.sort((a, b) => a.base.localeCompare(b.base));
         }
-        setIngest(ingest);
+        if (ingest.length > 0) {
+          setIngest(ingest[0]);
+        }
       })
       .catch((err) => console.error(err)); // todo: surface this
   }, [id]);
@@ -106,12 +108,17 @@ const StreamDetail = ({
   }
 
   const playbackId = (stream || {}).playbackId || "";
-  const domain = isStaging() ? "monster" : "com";
-  const globalIngestUrl = `rtmp://rtmp.livepeer.${domain}/live`;
-  const globalPlaybackUrl = `https://livepeercdn.${domain}/hls/${playbackId}/index.m3u8`;
-  const globalSrtIngestUrl = `srt://rtmp.livepeer.${domain}:2935?streamid=${
-    stream?.streamKey || ""
-  }`;
+
+  let globalIngestUrl = "";
+  let globalPlaybackUrl = "";
+  let globalSrtIngestUrl = "";
+  if (ingest) {
+    globalIngestUrl = ingest.ingests.rtmp;
+    globalPlaybackUrl = `${ingest.playback}/${playbackId}/index.m3u8`;
+    globalSrtIngestUrl = `${ingest.ingests.srt}?streamid=${
+      stream?.streamKey || ""
+    }`;
+  }
 
   return (
     <>
