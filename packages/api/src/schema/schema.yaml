@@ -2066,11 +2066,13 @@ components:
         internal:
           type: boolean
           example: false
-          description: Internal user that should be disregarded from usage information
+          description:
+            Internal user that should be disregarded from usage information
         isTestUser:
           type: boolean
           example: false
-          description: User creates test streams and playbackIds should be flagged as such
+          description:
+            User creates test streams and playbackIds should be flagged as such
     usage:
       type: object
       table: usage
