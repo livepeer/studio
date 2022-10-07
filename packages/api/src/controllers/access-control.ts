@@ -21,7 +21,6 @@ app.use("/access-control", accessControl);
 
 accessControl.post(
   "/gate",
-  authorizer({ anyAdmin: true }),
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace("video+", "");
@@ -36,7 +35,10 @@ accessControl.post(
     const user = await db.user.get(content.userId);
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
-      throw new ForbiddenError("The owner of the content is suspended");
+      console.log(`
+        access-control: disallowing access for contentId=${content.id}, user ${user.id} is suspended
+      `);
+      throw new NotFoundError("Content not found");
     }
 
     const playbackPolicyType = content.playbackPolicy?.type ?? "public";
@@ -47,7 +49,7 @@ accessControl.post(
       return res.end();
     } else if (playbackPolicyType === "jwt") {
       if (!req.body.pub) {
-        throw new ForbiddenError("Stream is gated and requires a public key");
+        throw new ForbiddenError("Content is gated and requires a public key");
       }
 
       const query = [];
@@ -58,22 +60,23 @@ accessControl.post(
 
       if (signingKeyOutput.length == 0) {
         throw new ForbiddenError(
-          "Stream is gated and corresponding public key not found"
+          "Content is gated and corresponding public key not found"
         );
       }
 
       if (signingKeyOutput.length > 1) {
         throw new BadRequestError(
-          "Multiple signing keys found for the same public key. This shouldn't happen."
+          "Multiple signing keys found for the same public key."
         );
       }
 
       const signingKey = signingKeyOutput[0];
 
       if (signingKey.userId !== content.userId) {
-        throw new ForbiddenError(
-          "The stream and the public key do not share the same owner"
-        );
+        console.log(`
+          access-control: disallowing playback for contentId=${content.id} the content and the public key pub=${signingKey.id} do not share the same owner
+        `);
+        throw new NotFoundError("Content not found");
       }
 
       if (signingKey.disabled || signingKey.deleted) {
