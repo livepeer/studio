@@ -29,7 +29,7 @@ const Progress = ({
     />
     {percentage !== undefined && (
       <Text size="2" css={{ color: "$whiteA12" }}>
-        {text} {percentage}%
+        {text}{percentage ? ` ${percentage}%` : '...'}
       </Text>
     )}
   </Flex>
