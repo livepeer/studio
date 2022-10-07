@@ -70,8 +70,8 @@ const StreamDetail = ({
         if (Array.isArray(ingest)) {
           ingest.sort((a, b) => a.base.localeCompare(b.base));
         }
-        if (ingest.length > 0) {
-          setIngest(ingest[0]);
+        if ((ingest?.length ?? 0) > 0) {
+          setIngest(ingest?.[0]);
         }
       })
       .catch((err) => console.error(err)); // todo: surface this
@@ -113,9 +113,9 @@ const StreamDetail = ({
   let globalPlaybackUrl = "";
   let globalSrtIngestUrl = "";
   if (ingest) {
-    globalIngestUrl = ingest.ingests.rtmp;
-    globalPlaybackUrl = `${ingest.playback}/${playbackId}/index.m3u8`;
-    globalSrtIngestUrl = `${ingest.ingests.srt}?streamid=${
+    globalIngestUrl = ingest?.ingests?.rtmp;
+    globalPlaybackUrl = `${ingest?.playback ?? ""}/${playbackId}/index.m3u8`;
+    globalSrtIngestUrl = `${ingest?.ingests?.srt ?? ""}?streamid=${
       stream?.streamKey || ""
     }`;
   }
