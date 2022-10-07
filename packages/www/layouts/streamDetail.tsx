@@ -70,7 +70,7 @@ const StreamDetail = ({
         if (Array.isArray(ingest)) {
           ingest.sort((a, b) => a.base.localeCompare(b.base));
         }
-        if (ingest.length > 0) {
+        if ((ingest?.length ?? 0) > 0) {
           setIngest(ingest?.[0]);
         }
       })
