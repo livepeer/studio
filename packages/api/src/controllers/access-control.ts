@@ -21,7 +21,6 @@ app.use("/access-control", accessControl);
 
 accessControl.post(
   "/gate",
-  authorizer({}),
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace("video+", "");
