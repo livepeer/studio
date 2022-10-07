@@ -4530,17 +4530,17 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-1.0.5.tgz#7af5567113fe5bb37aff33dc7e7d49b40d51797d"
-  integrity sha512-f5WmlEni9Cy68Gdab+kIa8baJTxbgZq+6wbhgy+zeC7dTVqHJkI0TCWh2v8cIZJ6RZoAxLsPdPEX8ETBSmNwjg==
+"@livepeer/react@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-1.0.6.tgz#d537f738900c00f6716e7f9cea7d5376dbacee4d"
+  integrity sha512-BKmvn++YcOSnKCOaZqRQdwaQVe5mepSJdiCNazRqa9euZBBJHsZbm7hx5jNLTtBPa+h8dQbKk3uy3cKgExGoVg==
   dependencies:
     "@stitches/react" "^1.2.8"
     "@tanstack/query-sync-storage-persister" "4.2.3"
     "@tanstack/react-query" "4.2.3"
     "@tanstack/react-query-persist-client" "4.2.1"
     core-js "^3.25.2"
-    livepeer "^1.0.3"
+    livepeer "^1.0.4"
     use-sync-external-store "^1.2.0"
     zustand "^4.1.1"
 
@@ -18725,10 +18725,10 @@ livepeer@^0.5.0:
     tus-js-client "^3.0.0"
     zustand "^4.1.1"
 
-livepeer@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-1.0.3.tgz#f61219bf0f0ccf7aa6dd15b6cabc9fa615cf42ad"
-  integrity sha512-53qXL3TcrLJ1w0E44sEnB2B/Wj3PW0aOlpvQpO4UY1hc6OjSSCZk2nhE87JN2SoHdUPufdH+Nu9jx7w/ryu2QQ==
+livepeer@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-1.0.4.tgz#8df78579d3bfd49dd926c26339ee608fd114d1ad"
+  integrity sha512-7MkA4W+Z3JQryK1QqHc4tFfPwvz2YvbokgitQB7x/SwsNmANKE4HiX5BZKz5I112MHvxP2rBi+X8LXXyd1KGcw==
   dependencies:
     "@stitches/core" "^1.2.8"
     core-js "^3.25.2"
