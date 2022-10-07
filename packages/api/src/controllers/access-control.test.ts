@@ -137,7 +137,7 @@ describe("controllers/signing-key", () => {
         pub: signingKey.publicKey,
         type: "jwt",
       });
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(404);
     });
 
     it("should allow playback on public playbackId with and without a public key provided", async () => {
@@ -199,7 +199,7 @@ describe("controllers/signing-key", () => {
         type: "jwt",
         pub: signingKey.publicKey,
       });
-      expect(res2.status).toBe(403);
+      expect(res2.status).toBe(404);
       await db.user.update(gatedAsset.userId, { suspended: false });
     });
 
