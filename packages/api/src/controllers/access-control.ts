@@ -23,7 +23,7 @@ accessControl.post(
   "/gate",
   validatePost("access-control-gate-payload"),
   async (req, res) => {
-    const playbackId = req.body.stream.replace("video+", "");
+    const playbackId = req.body.stream.replace(/^\w+\+/, "");
     const content =
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
