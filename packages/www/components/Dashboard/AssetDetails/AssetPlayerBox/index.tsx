@@ -1,7 +1,7 @@
 import { Asset } from "livepeer";
 import { Box, Button, Flex, Link } from "@livepeer/design-system";
 import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons";
-import Player from "../../Player";
+import AppPlayer from "components/Site/AppPlayer";
 import AssetSharePopup from "../AssetSharePopup";
 import FailedProcessing from "./FailedProcessing";
 import FileUploadingProgress from "./FileUploadingProgress";
@@ -9,7 +9,7 @@ import ProcessingProgress from "./ProcessingProgress";
 
 const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
   if (asset?.status?.phase === "ready" && asset.playbackUrl) {
-    return <Player src={asset.playbackUrl} autoPlay={false} />;
+    return <AppPlayer playbackUrl={asset.playbackUrl} autoPlay={false} />;
   }
   if (asset?.status?.phase === "failed") {
     return <FailedProcessing />;
