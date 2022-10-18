@@ -283,7 +283,7 @@ const SaveTargetDialog = ({
               }
             />
             <Text size="1" css={{ fontWeight: 500, color: "$gray9" }}>
-              Supported protocols: RTMP(S) and SRT
+              Supported protocols: RTMP(S)
             </Text>
 
             <Label htmlFor="streamKey">Stream key (optional)</Label>
