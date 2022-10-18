@@ -1,5 +1,10 @@
 import { Row, useRowSelect, useSortBy, useTable } from "react-table";
-import { useQuery, useQueryClient, UseQueryOptions } from "react-query";
+import {
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+  UseQueryResult,
+} from "react-query";
 import {
   useEffect,
   useMemo,
@@ -84,7 +89,7 @@ type Props<T extends Record<string, unknown>> = {
   stateSetter: StateSetter<T>;
   state: State<T>;
   fetcher: Fetcher<T>;
-  fetcherOptions?: UseQueryOptions;
+  fetcherOptions?: UseQueryOptions<FetchResult<T>>;
   noPagination?: boolean;
   emptyState?: React.ReactNode;
   viewAll?: string;
@@ -566,7 +571,11 @@ const TableComponent = <T extends Record<string, unknown>>(props: Props<T>) => {
     state.order,
     state.stringifiedFilters,
   ];
-  const tableData = useQuery(queryKey, () => fetcher(state));
+  const tableData: UseQueryResult<FetchResult<T>> = useQuery(
+    queryKey,
+    () => fetcher(state),
+    fetcherOptions
+  );
   return DataTableComponent({ ...props, tableData });
 };
 

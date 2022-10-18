@@ -4,6 +4,7 @@ import { CellComponentProps, TableData } from "../types";
 export type DateCellProps = {
   date: Date;
   fallback: React.ReactNode;
+  href?: string;
 };
 
 const DateCell = <D extends TableData>({

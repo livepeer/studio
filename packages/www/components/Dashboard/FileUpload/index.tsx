@@ -1,31 +1,25 @@
 import { Box, Flex, Heading, IconButton, Text } from "@livepeer/design-system";
 import { Cross2Icon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import AssetFailedStatusItem from "./AssetFailedStatusItem";
 import FileItem from "./FileItem";
 import { filteredItemsToShow } from "./helpers";
 
 const FileUpload = () => {
-  const { currentFileUploads, clearFileUploads, latestGetAssetsResult } =
+  const { getFilteredFileUploads, clearFileUploads, latestGetAssetsResult } =
     useApi();
 
-  const fileUploadsFiltered = useMemo(
-    () =>
-      Object.keys(currentFileUploads ?? {})
-        .map((key) => currentFileUploads?.[key])
-        .filter((file) => file && !file.error && file.file.name),
-    [currentFileUploads]
-  );
+  const fileUploads = getFilteredFileUploads();
 
   const hasPendingFileUploads = useMemo(
-    () => fileUploadsFiltered.some((file) => !file.completed),
-    [fileUploadsFiltered]
+    () => fileUploads.some((file) => !file.completed),
+    [fileUploads]
   );
 
   const items = useMemo(
-    () => filteredItemsToShow(fileUploadsFiltered, latestGetAssetsResult ?? []),
-    [fileUploadsFiltered, latestGetAssetsResult]
+    () => filteredItemsToShow(fileUploads, latestGetAssetsResult ?? []),
+    [fileUploads, latestGetAssetsResult]
   );
 
   useEffect(() => {

@@ -168,6 +168,7 @@ const makeContext = (
   const context = {
     ...state,
     endpoint,
+
     async fetch(url: string, opts: RequestInit = {}) {
       let headers = new Headers(opts.headers || {});
       if (state.token && !headers.has("authorization")) {
@@ -857,7 +858,12 @@ const makeContext = (
       return asset;
     },
 
-    async uploadAssets(files: File[]): Promise<void> {
+    async uploadAssets(
+      files: File[],
+      onSuccess?: (file: File) => void,
+      onError?: (file: File, error: Error) => void,
+      onProgress?: (file: File, progress: number) => void
+    ): Promise<void> {
       const requestAssetUpload = async (
         params
       ): Promise<{ tusEndpoint: string }> => {
@@ -911,13 +917,16 @@ const makeContext = (
           uploadSize: file.size,
           onError(err) {
             updateStateWithProgressOrError(file, 0, false, Date.now(), err);
+            if (onError) onError(file, err);
           },
           onProgress(bytesUploaded, bytesTotal) {
             const percentage = bytesUploaded / bytesTotal;
             updateStateWithProgressOrError(file, percentage, false, Date.now());
+            if (onProgress) onProgress(file, percentage);
           },
           onSuccess() {
             updateStateWithProgressOrError(file, 1, true, Date.now());
+            if (onSuccess) onSuccess(file);
           },
         });
 
@@ -936,9 +945,15 @@ const makeContext = (
             upload.start();
           }
         } catch (e) {
-          updateStateWithProgressOrError(file, 0, false, e);
+          updateStateWithProgressOrError(file, 0, false, Date.now(), e);
         }
       }
+    },
+
+    getFilteredFileUploads(): FileUpload[] {
+      return Object.keys(state.currentFileUploads ?? {})
+        .map((key) => state.currentFileUploads?.[key])
+        .filter((file) => file && !file.error && file.file.name);
     },
 
     async clearFileUploads() {
