@@ -16,7 +16,9 @@ import {
 import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
-import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
+import CreateDialog, {
+  Action,
+} from "@components/Dashboard/WebhookDialogs/CreateDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Pencil1Icon, Cross1Icon } from "@radix-ui/react-icons";
 import Spinner from "components/Dashboard/Spinner";
@@ -63,7 +65,9 @@ const WebhookDetail = () => {
     return queryClient.invalidateQueries(id);
   }, [queryClient, id]);
 
-  return !user ? null : (
+  if (!user) return null;
+
+  return (
     <Layout
       id="developers/webhooks"
       breadcrumbs={[
@@ -100,6 +104,7 @@ const WebhookDetail = () => {
                   }}>
                   {data.url}
                 </Heading>
+
                 <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
                   <AlertDialog open={deleteDialogOpen}>
                     <Button
@@ -112,6 +117,7 @@ const WebhookDetail = () => {
                       <StyledCross />
                       Delete
                     </Button>
+
                     <AlertDialogContent
                       css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
                       <AlertDialogTitle asChild>
@@ -160,7 +166,8 @@ const WebhookDetail = () => {
                       </Flex>
                     </AlertDialogContent>
                   </AlertDialog>
-                  <WebhookDialog
+
+                  <CreateDialog
                     button={
                       <Button
                         size="2"

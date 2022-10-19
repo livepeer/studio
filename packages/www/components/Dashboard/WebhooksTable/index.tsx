@@ -4,11 +4,13 @@ import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import { Box, Heading } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-import WebhookDialog, { Action } from "components/Dashboard/WebhookDialog";
+import CreateDialog, {
+  Action,
+} from "@components/Dashboard/WebhookDialogs/CreateDialog";
 import { useRouter } from "next/router";
 import { makeColumns, rowsPageFromState, WebhooksTableData } from "./helpers";
 import EmptyState from "./EmptyState";
-import DeleteAlertDialog from "./DeleteAlertDialog";
+import DeleteAlertDialog from "../WebhookDialogs/DeleteAlertDialog";
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
@@ -95,8 +97,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         onDeleteWebhooks={onDeleteWebhooks}
       />
 
-      {/* Create webhook dialog */}
-      <WebhookDialog
+      <CreateDialog
         action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}

@@ -71,7 +71,7 @@ export enum Action {
   Update = "Update",
 }
 
-const WebhookDialog = ({
+const CreateDialog = ({
   isOpen,
   onOpenChange,
   onSubmit,
@@ -316,4 +316,4 @@ const WebhookDialog = ({
   );
 };
 
-export default WebhookDialog;
+export default CreateDialog;
