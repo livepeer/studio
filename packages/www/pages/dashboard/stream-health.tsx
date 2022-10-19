@@ -12,7 +12,7 @@ import { useApi } from "hooks";
 import { useEffect, useState } from "react";
 import { StreamInfo } from "hooks/use-api";
 import Chart from "components/Dashboard/Chart";
-import Player from "components/Dashboard/Player";
+import AppPlayer from "@components/Site/AppPlayer";
 import { DashboardStreamHealth as Content } from "content";
 
 const Arrow = ({ active }: Props) => {
@@ -175,7 +175,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <Player src={playbackUrl} />
+              <AppPlayer playbackUrl={playbackUrl} />
             </Box>
           </Box>
           <Arrow active />
@@ -196,7 +196,7 @@ const Health = () => {
                 borderRadius: "$3",
                 overflow: "hidden",
               }}>
-              <Player src={playbackUrl} />
+              <AppPlayer playbackUrl={playbackUrl} />
             </Box>
           </Box>
         </Box>
