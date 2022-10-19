@@ -30,12 +30,13 @@ const DetailsBox = ({ data }) => (
     <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
     <Cell variant="gray">Event types</Cell>
     <Cell css={{ display: "flex", fw: "wrap" }}>
-      {data.events.map((e) => (
+      {data.events.map((event, index) => (
         <Badge
+          key={`badge-event${index}`}
           variant="primary"
           size="2"
           css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
-          {e}
+          {event}
         </Badge>
       ))}
     </Cell>
