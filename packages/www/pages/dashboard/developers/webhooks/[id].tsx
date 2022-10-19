@@ -9,7 +9,7 @@ const WebhookDetail = () => {
   useLoggedIn();
   const { user } = useApi();
 
-  const { getWebhook, deleteWebhook, updateWebhook } = useApi();
+  const { getWebhook } = useApi();
   const router = useRouter();
   const { id } = router.query;
 
@@ -32,12 +32,7 @@ const WebhookDetail = () => {
         { title: "Webhooks", href: "/dashboard/developers/webhooks" },
         { title: data?.name },
       ]}>
-      <Webhook
-        id={id}
-        data={data}
-        deleteWebhook={deleteWebhook}
-        updateWebhook={updateWebhook}
-      />
+      <Webhook id={id} data={data} />
     </Layout>
   );
 };

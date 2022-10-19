@@ -3,30 +3,18 @@ import {
   Box,
   Flex,
   Heading,
-  AlertDialog,
   Button,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  Badge,
   styled,
 } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { useRouter } from "next/router";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
-import { format } from "date-fns";
 import { Action } from "../MultistreamTargetsTable/SaveTargetDialog";
-import Spinner from "../Spinner";
 import CreateDialog from "../WebhookDialogs/CreateDialog";
-import { STATUS_CODES } from "http";
 import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
-
-const Cell = styled(Text, {
-  py: "$2",
-  fontSize: "$3",
-});
+import { useApi } from "hooks";
+import DeleteAlertDialog from "./DeleteAlertDialog";
+import DetailsBox from "./DetailsBox";
 
 const StyledPencil = styled(Pencil1Icon, {
   mr: "$1",
@@ -40,10 +28,10 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const Webhook = ({ id, data, deleteWebhook, updateWebhook }) => {
+const Webhook = ({ id, data }) => {
+  const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const router = useRouter();
   const dialogState = useToggleState();
   const queryClient = useQueryClient();
 
@@ -83,184 +71,56 @@ const Webhook = ({ id, data, deleteWebhook, updateWebhook }) => {
           </Heading>
 
           <Flex css={{ ai: "flex-end", fg: "0", fs: "0", pl: "$3" }}>
-            <AlertDialog open={deleteDialogOpen}>
-              <Button
-                onClick={() => {
-                  setDeleteDialogOpen(true);
-                }}
-                size="2"
-                css={{ mr: "$2", display: "flex", ai: "center" }}
-                variant="red">
-                <StyledCross />
-                Delete
-              </Button>
-
-              <AlertDialogContent
-                css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
-                <AlertDialogTitle asChild>
-                  <Heading size="1">Delete Webhook</Heading>
-                </AlertDialogTitle>
-                <AlertDialogDescription asChild>
-                  <Text
-                    size="3"
-                    variant="gray"
-                    css={{ mt: "$2", lineHeight: "22px" }}>
-                    Are you sure you want to delete this webhook?
-                  </Text>
-                </AlertDialogDescription>
-                <Flex css={{ jc: "flex-end", gap: "$2", mt: "$5" }}>
-                  <Button
-                    onClick={() => setDeleteDialogOpen(false)}
-                    size="2"
-                    ghost>
-                    Cancel
-                  </Button>
-                  <AlertDialogAction asChild>
-                    <Button
-                      size="2"
-                      disabled={deleting}
-                      onClick={async () => {
-                        setDeleting(true);
-                        await deleteWebhook(data.id);
-                        await invalidateQuery();
-                        setDeleting(false);
-                        setDeleteDialogOpen(false);
-                        router.push("/dashboard/developers/webhooks");
-                      }}
-                      variant="red">
-                      {deleting && (
-                        <Spinner
-                          css={{
-                            width: 16,
-                            height: 16,
-                            mr: "$2",
-                          }}
-                        />
-                      )}
-                      Delete
-                    </Button>
-                  </AlertDialogAction>
-                </Flex>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <CreateDialog
-              button={
-                <Button
-                  size="2"
-                  css={{ display: "flex", ai: "center" }}
-                  onClick={() => dialogState.onToggle()}>
-                  <StyledPencil />
-                  Update details
-                </Button>
-              }
-              webhook={data}
-              action={Action.Update}
-              isOpen={dialogState.on}
-              onOpenChange={dialogState.onToggle}
-              onSubmit={async ({ events, name, url, sharedSecret }) => {
-                delete data.event; // remove deprecated field before updating
-                await updateWebhook(data.id, {
-                  ...data,
-                  events: events ? events : data.events,
-                  name: name ? name : data.name,
-                  url: url ? url : data.url,
-                  sharedSecret: sharedSecret ?? data.sharedSecret,
-                });
-                await invalidateQuery();
+            <Button
+              onClick={() => {
+                setDeleteDialogOpen(true);
               }}
-            />
+              size="2"
+              css={{ mr: "$2", display: "flex", ai: "center" }}
+              variant="red">
+              <StyledCross />
+              Delete
+            </Button>
+
+            <Button
+              size="2"
+              css={{ display: "flex", ai: "center" }}
+              onClick={() => dialogState.onToggle()}>
+              <StyledPencil />
+              Update details
+            </Button>
           </Flex>
         </Flex>
 
-        <Box
-          css={{
-            display: "grid",
-            gridTemplateColumns: "12em auto",
-            width: "100%",
-            fontSize: "$2",
-            position: "relative",
-            p: "$3",
-            borderBottomLeftRadius: 6,
-            borderBottomRightRadius: 6,
-            backgroundColor: "$panel",
-          }}>
-          <Cell variant="gray">URL</Cell>
-          <Cell>{data.url}</Cell>
-          <Cell variant="gray">Name</Cell>
-          <Cell>{data.name}</Cell>
-          <Cell variant="gray">Secret</Cell>
-          <Cell>{data.sharedSecret}</Cell>
-          <Cell variant="gray">Created</Cell>
-          <Cell>{format(data.createdAt, "MMMM dd, yyyy h:mm a")}</Cell>
-          <Cell variant="gray">Event types</Cell>
-          <Cell css={{ display: "flex", fw: "wrap" }}>
-            {data.events.map((e) => (
-              <Badge
-                variant="primary"
-                size="2"
-                css={{ fontWeight: 600, mr: "$1", mb: "$1" }}>
-                {e}
-              </Badge>
-            ))}
-          </Cell>
-          <Cell variant="gray">Last trigger</Cell>
-          <Cell>
-            {data.status
-              ? format(data.status?.lastTriggeredAt, "MMMM dd, yyyy h:mm:ss a")
-              : "Never"}
-          </Cell>
-          <Cell variant="gray">Last failure</Cell>
-          <Cell>
-            {!data.status
-              ? "Never"
-              : data.status.lastFailure
-              ? format(
-                  data.status.lastFailure.timestamp,
-                  "MMMM dd, yyyy h:mm:ss a"
-                )
-              : "Never"}
-          </Cell>
-          {data.status ? (
-            data.status.lastFailure?.statusCode ? (
-              <>
-                <Cell variant="gray">Error Status Code</Cell>
-                <Cell>{`${data.status.lastFailure.statusCode} 
-                        ${
-                          STATUS_CODES[data.status.lastFailure.statusCode]
-                        }`}</Cell>
-              </>
-            ) : data.status.lastFailure ? (
-              <>
-                <Cell variant="gray">Error message</Cell>
-                <Cell
-                  css={{
-                    fontFamily: "monospace",
-                  }}>
-                  {data.status.lastFailure.error ?? "unknown"}
-                </Cell>
-              </>
-            ) : (
-              ""
-            )
-          ) : (
-            ""
-          )}
-          {data.status?.lastFailure?.response ? (
-            <>
-              <Cell variant="gray">Error response</Cell>
-              <Cell
-                css={{
-                  fontFamily: "monospace",
-                }}>
-                {data.status.lastFailure.response}
-              </Cell>
-            </>
-          ) : (
-            ""
-          )}
-        </Box>
+        <DetailsBox data={data} />
       </Box>
+
+      <DeleteAlertDialog
+        deleteDialogOpen={deleteDialogOpen}
+        setDeleteDialogOpen={setDeleteDialogOpen}
+        deleting={deleting}
+        setDeleting={setDeleting}
+        deleteWebhook={async () => deleteWebhook(data.id)}
+        invalidateQuery={invalidateQuery}
+      />
+
+      <CreateDialog
+        webhook={data}
+        action={Action.Update}
+        isOpen={dialogState.on}
+        onOpenChange={dialogState.onToggle}
+        onSubmit={async ({ events, name, url, sharedSecret }) => {
+          delete data.event; // remove deprecated field before updating
+          await updateWebhook(data.id, {
+            ...data,
+            events: events ? events : data.events,
+            name: name ? name : data.name,
+            url: url ? url : data.url,
+            sharedSecret: sharedSecret ?? data.sharedSecret,
+          });
+          await invalidateQuery();
+        }}
+      />
     </Box>
   );
 };
