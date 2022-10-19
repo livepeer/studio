@@ -49,7 +49,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   ]);
 
   return (
-    <>
+    <Box css={{ p: "$6", mb: "$8" }}>
       <Table
         columns={columns}
         fetcher={fetcher}
@@ -115,7 +115,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
           });
         }}
       />
-    </>
+    </Box>
   );
 };
 
