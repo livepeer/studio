@@ -46,13 +46,13 @@ const Webhook = ({ id, data }) => {
       <Box
         css={{
           borderRadius: 6,
-          border: "1px solid $colors$primary7",
+          border: "1px solid $colors$neutral6",
         }}>
         <Flex
           css={{
             p: "$3",
             width: "100%",
-            borderBottom: "1px solid $colors$primary7",
+            borderBottom: "1px solid $colors$neutral6",
             gap: "$3",
             fd: "row",
             ai: "center",
