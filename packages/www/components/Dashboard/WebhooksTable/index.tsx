@@ -99,11 +99,12 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onSubmit={async ({ events, name, url }) => {
+        onSubmit={async ({ events, name, url, sharedSecret }) => {
           const newWebhook = await createWebhook({
             events,
             name,
             url,
+            sharedSecret,
           });
           await state.invalidate();
           const query = router.query.admin === "true" ? { admin: true } : {};
