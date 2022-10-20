@@ -649,8 +649,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
-        meta:
-          $ref: "#/components/schemas/asset/properties/meta"
+        tags:
+          $ref: "#/components/schemas/asset/properties/tags"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
@@ -1133,7 +1133,7 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
-        meta:
+        tags:
           type: object
           description: User input metadata associated with the asset
           additionalProperties:
@@ -1304,7 +1304,7 @@ components:
           example: filename.mp4
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
-        meta:
+        tags:
           type: object
           description: User input metadata associated with the asset
           additionalProperties:
