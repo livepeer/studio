@@ -45,7 +45,7 @@ import os from "os";
 
 const app = Router();
 
-const META_MAX_SIZE = 1024;
+const TAGS_MAX_SIZE = 1024;
 
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
@@ -55,30 +55,30 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
 }
 
-function validateAssetMeta(
-  meta: Record<string, string>,
+function validateAssetTags(
+  tags: Record<string, string>,
   asset?: WithID<Asset>
 ) {
-  if (!meta) {
-    return meta;
+  if (!tags) {
+    return tags;
   }
-  meta = _({ ...asset?.meta, ...meta })
+  tags = _({ ...asset?.tags, ...tags })
     .omitBy(_.isNull)
     .value();
   try {
-    if (meta && JSON.stringify(meta).length > META_MAX_SIZE) {
-      console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
+    if (tags && JSON.stringify(tags).length > TAGS_MAX_SIZE) {
+      console.error(`provided tags exceeds max size of ${TAGS_MAX_SIZE}`);
       throw new UnprocessableEntityError(
-        `the provided meta exceeds max size of ${META_MAX_SIZE} characters`
+        `the provided tags exceeds max size of ${TAGS_MAX_SIZE} characters`
       );
     }
   } catch (e) {
-    console.error(`couldn't parse the provided meta ${meta}`);
+    console.error(`couldn't parse the provided tags=${tags}`);
     throw new UnprocessableEntityError(
-      `the provided meta is not in a valid json format`
+      `the provided tags are not in a valid json format`
     );
   }
-  return meta;
+  return tags;
 }
 
 function cleanAssetTracks(asset: WithID<Asset>) {
@@ -127,7 +127,7 @@ async function validateAssetPayload(
     },
     name: payload.name,
     playbackPolicy: payload.playbackPolicy,
-    meta: validateAssetMeta(payload.meta),
+    tags: validateAssetTags(payload.tags),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
@@ -332,7 +332,7 @@ const fieldsMap: FieldsMap = {
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
-  meta: `asset.data->>'meta'`,
+  tags: `asset.data->>'tags'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
 };
@@ -743,7 +743,7 @@ app.post("/upload/tus", async (req, res) => {
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
   await getPendingAssetAndTask(playbackId);
-  // TODO: Consider updating asset name and meta from metadata?
+  // TODO: Consider updating asset name and tags from metadata?
   res.setHeader("livepeer-playback-id", playbackId);
   return tusServer.handle(req, res);
 });
@@ -805,7 +805,7 @@ app.patch(
     // these are the only updateable fields
     let {
       name,
-      meta,
+      tags,
       playbackPolicy,
       storage: storageInput,
     } = req.body as AssetPatchPayload;
@@ -830,7 +830,7 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
-    meta = validateAssetMeta(meta, asset);
+    tags = validateAssetTags(tags, asset);
 
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
@@ -838,7 +838,7 @@ app.patch(
 
     await req.taskScheduler.updateAsset(asset, {
       name,
-      meta,
+      tags,
       storage,
       playbackPolicy,
     });
