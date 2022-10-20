@@ -173,14 +173,14 @@ const CreateDialog = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Box>
-                  <Select disabled css={{ fontSize: "$3", p: "$2" }}>
+                  <Select css={{ fontSize: "$3", px: "$2", mb: "$4" }}>
                     <Box as="option" value="" disabled selected>
                       Select events...
                     </Box>
                   </Select>
                 </Box>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent css={{ mt: "$1" }}>
                 <Box
                   css={{
                     position: "relative",
