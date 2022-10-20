@@ -68,12 +68,20 @@ export const rowsPageFromState = async (state, getWebhooks) => {
           href: `/dashboard/developers/webhooks/${webhook.id}`,
           css: {
             cursor: "pointer",
+            overflow: "hidden",
+            "text-overflow": "ellipsis",
           },
         },
         url: {
           value: webhook.url,
           children: (
-            <Link as="div" variant="primary">
+            <Link
+              as="div"
+              variant="primary"
+              css={{
+                overflow: "hidden",
+                "text-overflow": "ellipsis",
+              }}>
               {webhook.url}
             </Link>
           ),

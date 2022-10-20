@@ -58,11 +58,9 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         rowSelection="all"
         emptyState={<EmptyState createDialogState={createDialogState} />}
         header={
-          <>
-            <Heading size="2" css={{ fontWeight: 600 }}>
-              {title}
-            </Heading>
-          </>
+          <Heading size="2" css={{ fontWeight: 600 }}>
+            {title}
+          </Heading>
         }
         selectAction={{
           onClick: deleteDialogState.onOn,
