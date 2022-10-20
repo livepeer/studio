@@ -6,11 +6,11 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import CreateDialog, {
   Action,
-} from "@components/Dashboard/WebhookDialogs/CreateDialog";
+} from "@components/Dashboard/WebhookDialogs/CreateEditDialog";
 import { useRouter } from "next/router";
 import { makeColumns, rowsPageFromState, WebhooksTableData } from "./helpers";
 import EmptyState from "./EmptyState";
-import DeleteAlertDialog from "../WebhookDialogs/DeleteAlertDialog";
+import DeleteDialog from "./DeleteDialog";
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
@@ -87,7 +87,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         }}
       />
 
-      <DeleteAlertDialog
+      <DeleteDialog
         deleteDialogState={deleteDialogState}
         state={state}
         savingDeleteDialog={savingDeleteDialog}

@@ -56,7 +56,7 @@ export enum Action {
   Update = "Update",
 }
 
-const CreateDialog = ({
+const CreateEditDialog = ({
   isOpen,
   onOpenChange,
   onSubmit,
@@ -301,4 +301,4 @@ const CreateDialog = ({
   );
 };
 
-export default CreateDialog;
+export default CreateEditDialog;

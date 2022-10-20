@@ -14,7 +14,7 @@ import {
 import { ToggleState } from "hooks/use-toggle-state";
 import Spinner from "../Spinner";
 
-const DeleteAlertDialog = ({
+const DeleteDialog = ({
   deleteDialogState,
   state,
   savingDeleteDialog,
@@ -98,4 +98,4 @@ const DeleteAlertDialog = ({
   );
 };
 
-export default DeleteAlertDialog;
+export default DeleteDialog;

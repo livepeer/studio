@@ -12,7 +12,7 @@ import {
 import router from "next/router";
 import Spinner from "../Spinner";
 
-const DeleteAlertDialog = ({
+const DeleteDialog = ({
   deleteDialogOpen,
   setDeleteDialogOpen,
   deleting,
@@ -71,4 +71,4 @@ const DeleteAlertDialog = ({
   </AlertDialog>
 );
 
-export default DeleteAlertDialog;
+export default DeleteDialog;

@@ -10,10 +10,10 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
 import { Action } from "../MultistreamTargetsTable/SaveTargetDialog";
-import CreateDialog from "../WebhookDialogs/CreateDialog";
+import CreateEditDialog from "../WebhookDialogs/CreateEditDialog";
 import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
-import DeleteAlertDialog from "./DeleteAlertDialog";
+import DeleteDialog from "../WebhookDialogs/DeleteDialog";
 import DetailsBox from "./DetailsBox";
 
 const StyledPencil = styled(Pencil1Icon, {
@@ -95,7 +95,7 @@ const Webhook = ({ id, data }) => {
         <DetailsBox data={data} />
       </Box>
 
-      <DeleteAlertDialog
+      <DeleteDialog
         deleteDialogOpen={deleteDialogOpen}
         setDeleteDialogOpen={setDeleteDialogOpen}
         deleting={deleting}
@@ -104,7 +104,7 @@ const Webhook = ({ id, data }) => {
         invalidateQuery={invalidateQuery}
       />
 
-      <CreateDialog
+      <CreateEditDialog
         webhook={data}
         action={Action.Update}
         isOpen={dialogState.on}
