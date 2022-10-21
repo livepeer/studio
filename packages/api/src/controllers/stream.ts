@@ -37,6 +37,7 @@ import {
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
+import { toExternalSession } from "./session";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -932,12 +933,12 @@ app.put(
   }
 );
 
-const sendSetActiveHooks = async (
+async function sendSetActiveHooks(
   stream: DBStream,
   { active, startedAt }: StreamSetActivePayload,
   queue: Queue,
   ingest: string
-) => {
+) {
   // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
   // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
   const event = active ? "stream.started" : "stream.idle";
@@ -962,8 +963,10 @@ const sendSetActiveHooks = async (
         // last session is too old, probably transcoding wasn't happening, and so there
         // will be no recording
       } else {
-        const recordingUrl = getRecordingUrl(ingest, session);
-        const mp4Url = getRecordingUrl(ingest, session, true);
+        let userSession = session;
+        if (session.previousSessions?.length) {
+          userSession = await db.stream.get(session.previousSessions[0]);
+        }
         await queue.delayedPublishWebhook(
           "events.recording.ready",
           {
@@ -973,10 +976,11 @@ const sendSetActiveHooks = async (
             streamId: stream.id,
             event: "recording.ready",
             userId: stream.userId,
-            sessionId: session.lastSessionId ?? session.id,
+            sessionId: session.id,
             payload: {
-              recordingUrl,
-              mp4Url,
+              recordingUrl: getRecordingUrl(ingest, userSession),
+              mp4Url: getRecordingUrl(ingest, userSession, true),
+              session: toExternalSession(userSession, ingest),
             },
           },
           USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
@@ -1006,7 +1010,7 @@ const sendSetActiveHooks = async (
       });
     }
   }
-};
+}
 
 // sets 'isActive' field to false for many objects at once
 app.patch(
