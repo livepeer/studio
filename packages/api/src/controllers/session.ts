@@ -129,11 +129,8 @@ app.get("/", authorizer({}), async (req, res, next) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   let sessions = output.map((session) =>
-    withRecordingFields(ingest, session, !!forceUrl)
+    toExternalSession(session, ingest, req.user.admin)
   );
-  if (!req.user.admin) {
-    sessions = removePrivateFieldsMany(sessions, false);
-  }
   res.json(sessions);
 });
 
@@ -241,27 +238,29 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  session = withRecordingFields(ingest, session, false);
-  if (!req.user.admin) {
-    removePrivateFields(session, req.user.admin);
-  }
+  session = toExternalSession(session, ingest, req.user.admin);
   res.json(session);
 });
 
-function removePrivateFields(obj: DBSession, isAdmin = false) {
-  for (const fn of privateFields) {
-    delete obj[fn];
-  }
+export function toExternalSession(
+  obj: DBSession,
+  ingest: string,
+  isAdmin = false
+) {
+  obj = withRecordingFields(ingest, obj, isAdmin);
   if (!isAdmin) {
-    for (const fn of adminOnlyFields) {
-      delete obj[fn];
-    }
+    removePrivateFields(obj);
   }
   return obj;
 }
 
-function removePrivateFieldsMany(objs: DBSession[], isAdmin = false) {
-  return objs.map((o) => removePrivateFields(o, isAdmin));
+function removePrivateFields(obj: DBSession) {
+  for (const fn of privateFields) {
+    delete obj[fn];
+  }
+  for (const fn of adminOnlyFields) {
+    delete obj[fn];
+  }
 }
 
 const adminOnlyFields: (keyof DBSession)[] = ["deleted", "broadcasterHost"];
