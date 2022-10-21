@@ -103,6 +103,8 @@ const EditAssetDialog = ({
                 (error as HttpError)?.message?.includes("should be string")
               ) {
                 setTagsError("Tags must only contain string key value pairs.");
+              } else {
+                setTagsError("Error updating asset.");
               }
             } finally {
               setEditing(false);
