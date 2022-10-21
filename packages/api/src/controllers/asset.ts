@@ -295,6 +295,8 @@ app.use(
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
       a = assetWithIpfsUrls(a);
+      // TODO: Remove compatibiltiy logic (tags used to be called meta)
+      a = { ...a, tags: a.tags || (a as any).meta };
       if (req.user.admin) {
         return a;
       }
