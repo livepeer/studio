@@ -111,13 +111,9 @@ const StreamDetail = ({
 
   let globalIngestUrl = "";
   let globalPlaybackUrl = "";
-  let globalSrtIngestUrl = "";
   if (ingest) {
     globalIngestUrl = ingest?.ingests?.rtmp;
     globalPlaybackUrl = `${ingest?.playback ?? ""}/${playbackId}/index.m3u8`;
-    globalSrtIngestUrl = `${ingest?.ingests?.srt ?? ""}?streamid=${
-      stream?.streamKey || ""
-    }`;
   }
 
   return (
@@ -153,7 +149,6 @@ const StreamDetail = ({
                     <StreamDetailsBox
                       stream={stream}
                       globalIngestUrl={globalIngestUrl}
-                      globalSrtIngestUrl={globalSrtIngestUrl}
                       globalPlaybackUrl={globalPlaybackUrl}
                       invalidateStream={invalidateStream}
                     />
