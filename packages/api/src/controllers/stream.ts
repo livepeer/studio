@@ -767,6 +767,10 @@ app.post(
         session.mp4Url = "";
       }
       await db.session.create(session);
+      if (session.record) {
+        const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+        publishRecordingStartedHook(session, req.queue, ingest);
+      }
     }
 
     try {
@@ -988,28 +992,26 @@ async function sendSetActiveHooks(
       }
     }
   }
-  if (active && stream.record === true) {
-    let shouldEmit = true;
-    const session = await db.stream.getLastSession(stream.id);
-    if (session) {
-      const timeSinceSeen = Date.now() - (session.lastSeen ?? 0);
-      if (timeSinceSeen < USER_SESSION_TIMEOUT) {
-        // there is recent session exits, so new one will be joined with last one
-        // not emitting "recording.started" because it will be same recorded session
-        shouldEmit = false;
-      }
-    }
-    if (shouldEmit) {
-      await queue.publishWebhook("events.recording.started", {
-        type: "webhook_event",
-        id: uuid(),
-        timestamp: Date.now(),
-        streamId: stream.id,
-        event: "recording.started",
-        userId: stream.userId,
-      });
-    }
-  }
+}
+
+function publishRecordingStartedHook(
+  session: DBSession,
+  queue: Queue,
+  ingest: string
+) {
+  queue
+    .publishWebhook("events.recording.started", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp: Date.now(),
+      streamId: session.parentId,
+      userId: session.userId,
+      event: "recording.started",
+      payload: { session: toExternalSession(session, ingest) },
+    })
+    .catch((err) => {
+      logger.error("Error sending recording.started hook err=", err);
+    });
 }
 
 // sets 'isActive' field to false for many objects at once
