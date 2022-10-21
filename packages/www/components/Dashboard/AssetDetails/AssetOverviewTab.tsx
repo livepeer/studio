@@ -79,8 +79,8 @@ const AssetOverviewTab = ({
             </Heading>
           </Flex>
           <Text variant="gray" size="2">
-            A list of key value pairs that you use to add information to your
-            video.{" "}
+            A list of key value pairs that you use to add app-specific
+            annotations about your video.{" "}
             <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
               Edit asset
             </A>{" "}
@@ -112,7 +112,7 @@ const AssetOverviewTab = ({
               css={{
                 mr: "$1",
               }}>
-              No tags set yet
+              No tags set
             </Text>
           )}
         </Promo>
