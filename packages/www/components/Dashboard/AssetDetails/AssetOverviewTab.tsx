@@ -7,7 +7,6 @@ import {
   Heading,
   Promo,
   Text,
-  useSnackbar,
 } from "@livepeer/design-system";
 
 import { Asset } from "@livepeer.studio/api";
@@ -60,9 +59,9 @@ const AssetOverviewTab = ({
     }
   }, [asset, patchAsset]);
 
-  const metadataStringified = useMemo(
-    () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
-    [asset?.meta]
+  const tagsStringified = useMemo(
+    () => (asset?.tags ? JSON.stringify(asset.tags, null, 4) : ""),
+    [asset?.tags]
   );
 
   return (
@@ -76,20 +75,20 @@ const AssetOverviewTab = ({
           <Flex css={{ mb: "$2" }} align="center">
             <StyledCurlyBracesIcon />
             <Heading size="1" css={{ fontWeight: 500 }}>
-              Metadata
+              Tags
             </Heading>
           </Flex>
           <Text variant="gray" size="2">
-            A list of key value pairs that you use to provide metadata for your
+            A list of key value pairs that you use to add information to your
             video.{" "}
             <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
               Edit asset
             </A>{" "}
-            to add metadata.
+            to add tags.
           </Text>
         </Box>
         <Promo size="2" css={{ mb: "$5" }}>
-          {metadataStringified ? (
+          {tagsStringified ? (
             <Flex
               align="center"
               css={{
@@ -97,13 +96,13 @@ const AssetOverviewTab = ({
                 justifyContent: "space-between",
               }}>
               <Text variant="gray" size="2">
-                {metadataStringified}
+                {tagsStringified}
               </Text>
 
               <Box>
                 <ClipButton
-                  value={metadataStringified}
-                  successMessage="Copied metadata to clipboard"
+                  value={tagsStringified}
+                  successMessage="Copied tags to clipboard"
                 />
               </Box>
             </Flex>
@@ -113,7 +112,7 @@ const AssetOverviewTab = ({
               css={{
                 mr: "$1",
               }}>
-              No metadata yet
+              No tags set yet
             </Text>
           )}
         </Promo>
