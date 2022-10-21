@@ -23952,10 +23952,10 @@ react-hook-form@^6.9.0:
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-6.15.8.tgz#725c139d308c431c4611e4b9d85a49f01cfc0e7a"
   integrity sha512-prq82ofMbnRyj5wqDe8hsTRcdR25jQ+B8KtCS7BLCzjFHAwNuCjRwzPuP4eYLsEBjEIeYd6try+pdLdw0kPkpg==
 
-react-horizontal-scrolling-menu@^2.8.2:
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/react-horizontal-scrolling-menu/-/react-horizontal-scrolling-menu-2.8.2.tgz#cb7bc7c6798e0cd9203555cf4e6fcffb5f0ba0f2"
-  integrity sha512-OmCQDONx/4TnyxQr+RoxP7AwSPQxdQGkFnWuCknF3s2pySNAogL4AB1LQv6bUrXIwFMXdrJBqxFeq3tZ24J7/w==
+react-horizontal-scrolling-menu@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-horizontal-scrolling-menu/-/react-horizontal-scrolling-menu-3.2.0.tgz#f871b46125225fae4cf311b00720579066b35ace"
+  integrity sha512-6kmUPdTDXJKYlhfS5K1tAop6P1LJTSL493cUZBKHjOWsnmg3/KLPI/7Pr3b/LpiNFCUjTAPRl2JOunagGzwOjQ==
   dependencies:
     smooth-scroll-into-view-if-needed "^1.1.32"
 
