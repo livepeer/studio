@@ -11,6 +11,7 @@ import Spinner from "components/Dashboard/Spinner";
 import { useApi, useLoggedIn } from "hooks";
 import Layout, { Breadcrumb } from "layouts/dashboard";
 import { Asset } from "livepeer";
+import { Asset as ApiAsset } from "@livepeer.studio/api";
 import {
   Dispatch,
   SetStateAction,
@@ -52,12 +53,10 @@ const AssetDetail = ({
 
   const onEditAsset = useCallback(
     async (v: EditAssetReturnValue) => {
-      if (asset?.id && (v?.name || v?.metadata)) {
+      if (asset?.id && (v?.name || v?.tags)) {
         await patchAsset(asset.id, {
           ...(v?.name ? { name: v.name } : {}),
-          ...(v?.metadata
-            ? { meta: v.metadata as Record<string, string> }
-            : {}),
+          ...(v?.tags ? { tags: v.tags } : {}),
         });
         await refetchAsset();
       }
@@ -84,7 +83,7 @@ const AssetDetail = ({
         isOpen={editAssetDialogOpen}
         onOpenChange={setEditAssetDialogOpen}
         onEdit={onEditAsset}
-        asset={asset}
+        asset={asset as ApiAsset}
       />
 
       <EmbedVideoDialog
