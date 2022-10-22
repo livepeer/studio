@@ -984,7 +984,10 @@ async function sendSetActiveHooks(
             payload: {
               recordingUrl: getRecordingUrl(ingest, userSession),
               mp4Url: getRecordingUrl(ingest, userSession, true),
-              session: toExternalSession(userSession, ingest),
+              session: {
+                ...toExternalSession(userSession, ingest, true),
+                recordingStatus: "ready", // recording will be ready if this webhook is actually sent
+              },
             },
           },
           USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT

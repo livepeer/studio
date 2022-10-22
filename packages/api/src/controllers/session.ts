@@ -129,7 +129,7 @@ app.get("/", authorizer({}), async (req, res, next) => {
     res.links({ next: makeNextHREF(req, newCursor) });
   }
   let sessions = output.map((session) =>
-    toExternalSession(session, ingest, req.user.admin)
+    toExternalSession(session, ingest, !!forceUrl, req.user.admin)
   );
   res.json(sessions);
 });
@@ -238,16 +238,17 @@ app.get("/:id", authorizer({}), async (req, res) => {
   res.status(200);
   const ingests = await req.getIngest();
   const ingest = ingests && ingests.length ? ingests[0].base : "";
-  session = toExternalSession(session, ingest, req.user.admin);
+  session = toExternalSession(session, ingest, false, req.user.admin);
   res.json(session);
 });
 
 export function toExternalSession(
   obj: DBSession,
   ingest: string,
+  forceUrl = false,
   isAdmin = false
 ) {
-  obj = withRecordingFields(ingest, obj, isAdmin);
+  obj = withRecordingFields(ingest, obj, forceUrl);
   if (!isAdmin) {
     removePrivateFields(obj);
   }
