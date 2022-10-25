@@ -14,6 +14,7 @@ import {
   Asset,
   Task,
   SuspendUserPayload,
+  SigningKey,
 } from "@livepeer.studio/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -1251,6 +1252,17 @@ const makeContext = (
       if (res.status !== 204) {
         throw new Error(body);
       }
+    },
+
+    async getSigningKeys(): Promise<
+      [Array<SigningKey> | ApiError, string, number]
+    > {
+      const [res, signingKeys] = await context.fetch(
+        `/access-control/signing-key?`
+      );
+      const nextCursor = getCursor(res.headers.get("link"));
+      const count = res.headers.get("X-Total-Count");
+      return [signingKeys, nextCursor, count];
     },
 
     async getVersion(): Promise<Version> {
