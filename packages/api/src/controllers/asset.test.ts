@@ -406,6 +406,50 @@ describe("controllers/asset", () => {
         expect.not.stringMatching(firstTaskId);
       await testStoragePatch(patch, expectedStorage);
     });
+
+    it("should update import object if asset is imported from an IPFS gateway URL", async () => {
+      const url =
+        "https://zora-dev.mypinata.cloud/ipfs/bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm";
+      let res = await client.post("/asset/import", {
+        name: "import-test",
+        url,
+      });
+      expect(res.status).toBe(201);
+
+      const { asset } = await res.json();
+
+      res = await client.get(`/asset/${asset.id}`);
+      expect(res.status).toBe(200);
+
+      const { import: importObj } = await res.json();
+      expect(importObj).toMatchObject({
+        url,
+        type: "ipfs",
+        id: "bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm",
+      });
+    });
+
+    it("should update import object if asset is imported from an Arweave gateway URL", async () => {
+      const url =
+        "https://l34wjojevqdgngyhzs7hje7bth37wawkgdqwgt3ihi3qzsy64gta.arweave.net/UyvmvEslVytmcH1-NH8rPm2FRBss5U3esVolWMVD72I";
+      let res = await client.post("/asset/import", {
+        name: "import-test",
+        url,
+      });
+      expect(res.status).toBe(201);
+
+      const { asset } = await res.json();
+
+      res = await client.get(`/asset/${asset.id}`);
+      expect(res.status).toBe(200);
+
+      const { import: importObj } = await res.json();
+      expect(importObj).toMatchObject({
+        url,
+        type: "arweave",
+        id: "UyvmvEslVytmcH1-NH8rPm2FRBss5U3esVolWMVD72I",
+      });
+    });
   });
 
   describe("asset list", () => {

@@ -36,6 +36,7 @@ import {
   IpfsFileInfo,
   NewAssetPayload,
   Task,
+  Import,
 } from "../schema/types";
 import { WithID } from "../store/types";
 import Queue from "../store/queue";
@@ -129,6 +130,46 @@ async function validateAssetPayload(
     playbackPolicy: payload.playbackPolicy,
     meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
+    import: validateAssetImport(payload.url),
+  };
+}
+
+function validateAssetImport(url: string): Import {
+  if (!url) {
+    return undefined;
+  }
+
+  const u = new URL(url);
+
+  // Only parse ID if there is a single path segment which is assumed to be a tx ID
+  // This means we cannot handle directories right now
+  const pathSegs = u.pathname.split("/").filter((e) => e);
+
+  // Example
+  // https://zora-dev.mypinata.cloud/ipfs/bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm
+  const ipfsPathPrefix = "/ipfs/";
+  if (u.pathname.includes(ipfsPathPrefix) && pathSegs.length == 2) {
+    return {
+      url,
+      type: "ipfs",
+      // ipfs is the first segment, CID is the second segment
+      id: pathSegs[1],
+    };
+  }
+
+  // Example
+  // https://l34wjojevqdgngyhzs7hje7bth37wawkgdqwgt3ihi3qzsy64gta.arweave.net/UyvmvEslVytmcH1-NH8rPm2FRBss5U3esVolWMVD72I
+  const arweaveHostname = "arweave.net";
+  if (u.hostname.includes(arweaveHostname) && pathSegs.length == 1) {
+    return {
+      url,
+      type: "arweave",
+      id: pathSegs[0],
+    };
+  }
+
+  return {
+    url,
   };
 }
 
