@@ -174,6 +174,35 @@ describe("controllers/playback", () => {
           },
         });
       });
+
+      it("should return playback URL assets from import ID", async () => {
+        const url =
+          "https://zora-dev.mypinata.cloud/ipfs/bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm";
+        const id =
+          "bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm";
+        await db.asset.update(asset.id, {
+          playbackRecordingId: "mock_recording_id_2",
+          import: {
+            url,
+            type: "ipfs",
+            id,
+          },
+        });
+        const res = await client.get(`/playback/${id}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
     });
 
     describe("for recordings", () => {
