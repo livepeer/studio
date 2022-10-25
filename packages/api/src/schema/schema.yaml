@@ -775,6 +775,28 @@ components:
           type: string
           enum: [public, jwt]
 
+    import:
+      type: object
+      description: Information about an imported asset
+      additionalProperties: false
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: External URL that asset is imported from.
+          example: https://zora-dev.mypinata.cloud/ipfs/bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm
+        type:
+          type: string
+          enum:
+            - ipfs
+            - arweave
+          description: Type of import.
+          example: ipfs
+        id:
+          type: string
+          description: ID of asset from external URL.
+          example: bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm
+
     session:
       type: object
       table: session
@@ -991,6 +1013,8 @@ components:
             - audio
           description: Type of the asset.
           example: video
+        import:
+          $ref: "#/components/schemas/import"
         playbackId:
           type: string
           example: eaw4nk06ts2d0mzb
