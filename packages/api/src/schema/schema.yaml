@@ -1036,7 +1036,7 @@ components:
               properties:
                 type:
                   type: string
-                  const: url
+                  enum: [url]
                 url:
                   type: string
                   description: URL from which the asset was uploaded
@@ -1045,13 +1045,13 @@ components:
               properties:
                 type:
                   type: string
-                  const: directUpload
+                  enum: [directUpload]
             - additionalProperties: false
               required: [type, sessionId]
               properties:
                 type:
                   type: string
-                  const: recording
+                  enum: [recording]
                 sessionId:
                   type: string
                   description:
@@ -1061,7 +1061,7 @@ components:
               properties:
                 type:
                   type: string
-                  const: transcode
+                  enum: [transcode]
                 inputAssetId:
                   type: string
                   description:
