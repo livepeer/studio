@@ -99,7 +99,8 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  payload: NewAssetPayload
+  payload: NewAssetPayload,
+  source?: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
     if (payload.objectStoreId !== defaultObjectStoreId) {
@@ -126,6 +127,11 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
+    source:
+      source ??
+      (payload.url
+        ? { type: "url", url: payload.url }
+        : { type: "directUpload" }),
     playbackPolicy: payload.playbackPolicy,
     meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
@@ -555,7 +561,8 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.config.vodObjectStoreId,
     {
       name: req.body.name ?? inputAsset.name,
-    }
+    },
+    { type: "transcode", inputAssetId: inputAsset.id }
   );
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
   outputAsset = await createAsset(outputAsset, req.queue);
