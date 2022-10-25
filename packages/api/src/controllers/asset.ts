@@ -485,11 +485,17 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     req.user.id,
     Date.now(),
     req.config.vodObjectStoreId,
-    req.body
+    req.body,
+    req.body.source
   );
-  if (!req.body.url) {
+
+  const url =
+    req.body.url ?? (req.body.source ? req.body.source.url : undefined);
+  if (!url) {
     return res.status(422).json({
-      errors: [`Must provide a "url" field for the asset contents`],
+      errors: [
+        `Must provide a "url" or "source.url" field for the asset contents`,
+      ],
     });
   }
 
@@ -499,7 +505,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     taskType,
     {
       [taskType]: {
-        url: req.body.url,
+        url,
       },
     },
     undefined,
