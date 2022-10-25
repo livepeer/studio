@@ -1,6 +1,6 @@
 import serverPromise, { TestServer } from "../test-server";
 import { TestClient, clearDatabase, setupUsers } from "../test-helpers";
-import { Asset, User } from "../schema/types";
+import { Asset, RemoteSourcePayload, User } from "../schema/types";
 import { db } from "../store";
 import { DBStream } from "../store/stream-table";
 import { WithID } from "../store/types";
@@ -160,6 +160,32 @@ describe("controllers/playback", () => {
           },
         });
         const res = await client.get(`/playback/${cid}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      it("should return playback URL assets from source ID", async () => {
+        const source: RemoteSourcePayload = {
+          url: "https://zora-dev.mypinata.cloud/ipfs/bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm",
+          type: "url",
+          id: "bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm",
+        };
+        await db.asset.update(asset.id, {
+          playbackRecordingId: "mock_recording_id_2",
+          source,
+        });
+        const res = await client.get(`/playback/${source.id}`);
         expect(res.status).toBe(200);
         await expect(res.json()).resolves.toMatchObject({
           type: "vod",

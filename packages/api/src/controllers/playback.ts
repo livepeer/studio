@@ -48,7 +48,8 @@ const getAssetPlaybackUrl = async (
 ) => {
   const asset = cid
     ? await db.asset.getByIpfsCid(id)
-    : await db.asset.getByPlaybackId(id);
+    : (await db.asset.getByPlaybackId(id)) ??
+      (await db.asset.getBySourceId(id));
   if (!asset || asset.deleted) {
     return null;
   }

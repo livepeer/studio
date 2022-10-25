@@ -53,4 +53,19 @@ export default class AssetTable extends Table<WithID<Asset>> {
     }
     return assets[0];
   }
+
+  async getBySourceId(id: string): Promise<WithID<Asset>> {
+    const query = [
+      sql`asset.data->'source'->>'id' = ${id}`,
+      sql`asset.data->>'deleted' IS NULL`,
+    ];
+    const [assets] = await this.find(query, {
+      limit: 2,
+      order: "coalesce((asset.data->'createdAt')::bigint, 0) ASC",
+    });
+    if (!assets || assets.length < 1) {
+      return null;
+    }
+    return assets[0];
+  }
 }
