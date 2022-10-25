@@ -1031,15 +1031,7 @@ components:
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
         source:
           oneOf:
-            - additionalProperties: false
-              required: [type, url]
-              properties:
-                type:
-                  type: string
-                  enum: [url]
-                url:
-                  type: string
-                  description: URL from which the asset was uploaded
+            - $ref: "#/components/schemas/remote-source-payload"
             - additionalProperties: false
               required: [type]
               properties:
@@ -1326,6 +1318,21 @@ components:
           type: string
           description: Name of the signing key
 
+    remote-source-payload:
+      required: [type, url]
+      properties:
+        type:
+          type: string
+          enum: [url]
+        url:
+          type: string
+          description: URL from which the asset was uploaded
+        id:
+          type: string
+          description:
+            ID for the asset in the context of where it was uploaded from
+          example: bafybeic7eaf4k34jp7onsrumd2y7z5qjxisu6ya3eziyvcgbspnp4esimm
+
     new-asset-payload:
       additionalProperties: false
       required:
@@ -1363,6 +1370,8 @@ components:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
           example: https://s3.amazonaws.com/my-bucket/path/filename.mp4
+        source:
+          $ref: "#/components/schemas/remote-source-payload"
 
     transcode-asset-payload:
       additionalProperties: false
