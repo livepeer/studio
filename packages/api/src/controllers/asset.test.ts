@@ -110,6 +110,9 @@ describe("controllers/asset", () => {
     beforeEach(async () => {
       asset = await db.asset.create({
         id: uuid(),
+        source: {
+          type: "directUpload",
+        },
         name: "test-storage",
         createdAt: Date.now(),
         status: {
@@ -414,6 +417,9 @@ describe("controllers/asset", () => {
     beforeEach(async () => {
       await db.asset.create({
         id: uuid(),
+        source: {
+          type: "directUpload",
+        },
         name: "dummy",
         createdAt: Date.now(),
         status: {
@@ -425,6 +431,9 @@ describe("controllers/asset", () => {
       const id = uuid();
       asset = await db.asset.create({
         id,
+        source: {
+          type: "directUpload",
+        },
         name: "test-storage",
         createdAt: Date.now(),
         playbackId: await generateUniquePlaybackId(id),
