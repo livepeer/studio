@@ -29,21 +29,6 @@ const StyledCrossIcon = styled(Cross1Icon, {
   cursor: "pointer",
 });
 
-const StyledContent = styled(DropdownMenuContent, {
-  minWidth: 400,
-  top: -15,
-  position: "relative",
-  borderLeft: "1px solid $colors$slate7",
-  borderRight: "1px solid $colors$slate7",
-  borderBottom: "1px solid $colors$slate7",
-  backgroundColor: "$loContrast",
-  borderBottomLeftRadius: 6,
-  borderBottomRightRadius: 6,
-  borderTopRightRadius: 0,
-  borderTopLeftRadius: 0,
-  boxShadow: "0 7px 14px 0 rgb(60 66 87 / 8%), 0 0 0 0 rgb(0 0 0 / 12%)",
-});
-
 const eventOptions: Webhook["events"] = [
   "stream.started",
   // "stream.detection", // not yet...
@@ -70,7 +55,7 @@ export enum Action {
   Update = "Update",
 }
 
-const WebhookDialog = ({
+const CreateEditDialog = ({
   isOpen,
   onOpenChange,
   onSubmit,
@@ -187,14 +172,14 @@ const WebhookDialog = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Box>
-                  <Select disabled css={{ fontSize: "$3", p: "$2" }}>
+                  <Select css={{ fontSize: "$3", px: "$2", mb: "$4" }}>
                     <Box as="option" value="" disabled selected>
                       Select events...
                     </Box>
                   </Select>
                 </Box>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent css={{ mt: "$1" }}>
                 <Box
                   css={{
                     position: "relative",
@@ -315,4 +300,4 @@ const WebhookDialog = ({
   );
 };
 
-export default WebhookDialog;
+export default CreateEditDialog;
