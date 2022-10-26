@@ -649,8 +649,6 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/asset/properties/name"
-        tags:
-          $ref: "#/components/schemas/asset/properties/tags"
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
         storage:
@@ -1133,17 +1131,6 @@ components:
             Name of the asset. This is not necessarily the filename, can be a
             custom name or title
           example: filename.mp4
-        tags:
-          type: object
-          description: User input metadata associated with the asset
-          additionalProperties:
-            type: string
-          example:
-            {
-              "title": "My awesome video",
-              "description": "This is a video of my awesome life",
-              "tags": "awesome,life,video",
-            }
         createdAt:
           type: number
           readOnly: true
@@ -1304,17 +1291,6 @@ components:
           example: filename.mp4
         playbackPolicy:
           $ref: "#/components/schemas/playback-policy"
-        tags:
-          type: object
-          description: User input metadata associated with the asset
-          additionalProperties:
-            type: string
-          example:
-            {
-              "title": "My awesome video",
-              "description": "This is a video of my awesome life",
-              "tags": ["awesome", "life", "video"],
-            }
         url:
           type: string
           format: uri
