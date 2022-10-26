@@ -48,7 +48,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
 };
 
-type State<T extends Record<string, unknown>> = {
+export type State<T extends Record<string, unknown>> = {
   tableId: string;
   order: string;
   cursor: string;
