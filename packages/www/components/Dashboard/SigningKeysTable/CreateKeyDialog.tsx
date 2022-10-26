@@ -14,13 +14,13 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   useSnackbar,
+  Alert,
 } from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { SigningKey } from "@livepeer.studio/api";
-import { CopyIcon as Copy } from "@radix-ui/react-icons";
+import { SigningKeyResponsePayload } from "@livepeer.studio/api";
 
 type Props = {
   isOpen: boolean;
@@ -43,29 +43,23 @@ const ClipBut = ({ text }) => {
   return (
     <HoverCardRoot openDelay={200}>
       <HoverCardTrigger>
-        <Flex css={{ height: 25, ai: "center" }}>
+        <Flex direction="column">
           <CopyToClipboard
             text={text}
             onCopy={() => {
               openSnackbar("Copied to clipboard");
               setCopied(2000);
             }}>
-            <Flex
-              css={{
-                alignItems: "center",
-                cursor: "pointer",
-                ml: 0,
-                mr: 0,
-              }}>
-              <Box css={{ mr: "$1" }}>{text}</Box>
-              <Copy
+            <Flex direction="column">
+              <Alert
                 css={{
-                  mr: "$2",
-                  width: 14,
-                  height: 14,
-                  color: "$hiContrast",
-                }}
-              />
+                  cursor: "pointer",
+                  overflow: "clip",
+                  overflowWrap: "anywhere",
+                  backgroundColor: "$gray4",
+                }}>
+                <Text size="2">{text}</Text>
+              </Alert>
             </Flex>
           </CopyToClipboard>
         </Flex>
@@ -97,9 +91,9 @@ const CreateKeyDialog = ({
 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [keyName, setKeyName] = useState("");
-  const { createSigningKeys } = useApi();
+  const { createSigningKey } = useApi();
   const [isCopied, setCopied] = useState(0);
-  const [newKey, setNewKey] = useState<SigningKey | null>(null);
+  const [newKey, setNewKey] = useState<SigningKeyResponsePayload | null>(null);
 
   useEffect(() => {
     setNewKey(null);
@@ -117,7 +111,7 @@ const CreateKeyDialog = ({
     if (isLoading) return;
     setIsLoading(true);
     try {
-      const newKey = await createSigningKeys({ name: keyName });
+      const newKey = await createSigningKey({ name: keyName });
       setNewKey(newKey);
       onCreateSuccess?.();
     } finally {
@@ -186,24 +180,33 @@ const CreateKeyDialog = ({
         {newKey && (
           <Box>
             <AlertDialogTitle asChild>
-              <Heading size="1">Token Created</Heading>
+              <Heading size="2" css={{ mb: "$4" }}>
+                Here's your new signing key pair
+              </Heading>
             </AlertDialogTitle>
+
             <AlertDialogDescription asChild>
-              <Text
-                size="3"
-                variant="gray"
+              <Flex
+                direction="column"
                 css={{ mt: "$2", lineHeight: "22px", mb: "$2" }}>
-                <Box>
-                  <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
-                  <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
-                    <ClipBut text={newKey.id} />
-                  </Button>
-                </Box>
-              </Text>
+                <Text size="3" css={{ mb: "$2", fontWeight: 500 }}>
+                  Public key
+                </Text>
+                <ClipBut text={newKey.publicKey} />
+
+                <Text size="3" css={{ mt: "$5", fontWeight: 500 }}>
+                  Private key
+                </Text>
+                <Text size="3" variant="gray" css={{ mb: "$2" }}>
+                  Make sure you save it - you won't be able to access it again.
+                </Text>
+                <ClipBut text={newKey.privateKey} />
+              </Flex>
             </AlertDialogDescription>
+
             <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
-              <Button onClick={() => onClose()} size="2">
-                Close
+              <Button variant="blue" onClick={() => onClose()} size="2">
+                Continue
               </Button>
             </Flex>
           </Box>

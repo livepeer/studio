@@ -18,7 +18,6 @@ export const makeColumns = () => [
   {
     Header: "Public Key",
     accessor: "publicKey",
-    width: 400,
     disableSortBy: true,
     Cell: TextCell,
   },
@@ -63,7 +62,11 @@ export const rowsPageFromState = async (
         isStatusFailed: false,
       },
       publicKey: {
-        children: <Box>{signingKey.publicKey}</Box>,
+        children: (
+          <Box css={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            {signingKey.publicKey}
+          </Box>
+        ),
       },
       createdAt: {
         date: new Date(signingKey.createdAt),

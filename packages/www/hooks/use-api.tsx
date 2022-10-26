@@ -15,6 +15,7 @@ import {
   Task,
   SuspendUserPayload,
   SigningKey,
+  SigningKeyResponsePayload,
 } from "@livepeer.studio/api";
 import qs from "qs";
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
@@ -1276,7 +1277,7 @@ const makeContext = (
       return [signingKeys, nextCursor, res, count];
     },
 
-    async createSigningKeys(params): Promise<SigningKey> {
+    async createSigningKey(params): Promise<SigningKeyResponsePayload> {
       trackPageView(params.email, "/create-signing-key");
       const [res, token] = await context.fetch(`/access-control/signing-key`, {
         method: "POST",
