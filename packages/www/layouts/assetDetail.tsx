@@ -52,12 +52,12 @@ const AssetDetail = ({
 
   const onEditAsset = useCallback(
     async (v: EditAssetReturnValue) => {
-      if (asset?.id && (v?.name || v?.metadata)) {
+      if (asset?.id && v?.name) {
         await patchAsset(asset.id, {
           ...(v?.name ? { name: v.name } : {}),
-          ...(v?.metadata
-            ? { meta: v.metadata as Record<string, string> }
-            : {}),
+          // ...(v?.metadata
+          //   ? { meta: v.metadata as Record<string, string> }
+          //   : {}),
         });
         await refetchAsset();
       }
