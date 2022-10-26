@@ -10,77 +10,18 @@ import {
   TextField,
   Text,
   Heading,
-  HoverCardRoot,
-  HoverCardContent,
-  HoverCardTrigger,
-  useSnackbar,
-  Alert,
 } from "@livepeer/design-system";
 import { useState, useEffect } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { SigningKeyResponsePayload } from "@livepeer.studio/api";
+import ClipTextArea from "../Clipping/ClipTextArea";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onCreateSuccess: undefined | (() => void);
   onClose: () => void;
-};
-
-const ClipBut = ({ text }) => {
-  const [isCopied, setCopied] = useState(0);
-  const [openSnackbar] = useSnackbar();
-
-  useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => setCopied(0), isCopied);
-      return () => clearTimeout(timeout);
-    }
-  }, [isCopied]);
-
-  return (
-    <HoverCardRoot openDelay={200}>
-      <HoverCardTrigger>
-        <Flex direction="column">
-          <CopyToClipboard
-            text={text}
-            onCopy={() => {
-              openSnackbar("Copied to clipboard");
-              setCopied(2000);
-            }}>
-            <Flex direction="column">
-              <Alert
-                css={{
-                  cursor: "pointer",
-                  overflow: "clip",
-                  overflowWrap: "anywhere",
-                  backgroundColor: "$gray4",
-                }}>
-                <Text size="2">{text}</Text>
-              </Alert>
-            </Flex>
-          </CopyToClipboard>
-        </Flex>
-      </HoverCardTrigger>
-      <HoverCardContent>
-        <Text
-          variant="gray"
-          css={{
-            backgroundColor: "$panel",
-            borderRadius: 6,
-            px: "$3",
-            py: "$1",
-            fontSize: "$1",
-            display: "flex",
-            ai: "center",
-          }}>
-          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
-        </Text>
-      </HoverCardContent>
-    </HoverCardRoot>
-  );
 };
 
 const CreateKeyDialog = ({
@@ -192,7 +133,10 @@ const CreateKeyDialog = ({
                 <Text size="3" css={{ mb: "$2", fontWeight: 500 }}>
                   Public key
                 </Text>
-                <ClipBut text={newKey.publicKey} />
+                <ClipTextArea
+                  value={newKey.publicKey}
+                  text={newKey.publicKey}
+                />
 
                 <Text size="3" css={{ mt: "$5", fontWeight: 500 }}>
                   Private key
@@ -200,7 +144,10 @@ const CreateKeyDialog = ({
                 <Text size="3" variant="gray" css={{ mb: "$2" }}>
                   Make sure you save it - you won't be able to access it again.
                 </Text>
-                <ClipBut text={newKey.privateKey} />
+                <ClipTextArea
+                  value={newKey.privateKey}
+                  text={newKey.privateKey}
+                />
               </Flex>
             </AlertDialogDescription>
 

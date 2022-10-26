@@ -10,10 +10,6 @@ import {
   TextField,
   Text,
   Heading,
-  HoverCardRoot,
-  HoverCardContent,
-  HoverCardTrigger,
-  useSnackbar,
   Label,
   Link,
   Tooltip,
@@ -23,83 +19,20 @@ import {
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ApiToken } from "../../../../api/src/schema/types";
 import {
-  CopyIcon as Copy,
   ExclamationTriangleIcon as Warning,
   QuestionMarkCircledIcon as Help,
   Cross1Icon as Cross,
   PlusIcon as Plus,
 } from "@radix-ui/react-icons";
+import ClipButton from "../Clipping/ClipButton";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onCreateSuccess: undefined | (() => void);
   onClose: () => void;
-};
-
-const ClipBut = ({ text }) => {
-  const [isCopied, setCopied] = useState(0);
-  const [openSnackbar] = useSnackbar();
-
-  useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => {
-        setCopied(0);
-      }, isCopied);
-      return () => clearTimeout(timeout);
-    }
-  }, [isCopied]);
-
-  return (
-    <HoverCardRoot openDelay={200}>
-      <HoverCardTrigger>
-        <Flex css={{ height: 25, ai: "center" }}>
-          <CopyToClipboard
-            text={text}
-            onCopy={() => {
-              openSnackbar("Copied to clipboard");
-              setCopied(2000);
-            }}>
-            <Flex
-              css={{
-                alignItems: "center",
-                cursor: "pointer",
-                ml: 0,
-                mr: 0,
-              }}>
-              <Box css={{ mr: "$1" }}>{text}</Box>
-              <Copy
-                css={{
-                  mr: "$2",
-                  width: 14,
-                  height: 14,
-                  color: "$hiContrast",
-                }}
-              />
-            </Flex>
-          </CopyToClipboard>
-        </Flex>
-      </HoverCardTrigger>
-      <HoverCardContent>
-        <Text
-          variant="gray"
-          css={{
-            backgroundColor: "$panel",
-            borderRadius: 6,
-            px: "$3",
-            py: "$1",
-            fontSize: "$1",
-            display: "flex",
-            ai: "center",
-          }}>
-          <Box>{isCopied ? "Copied" : "Copy to Clipboard"}</Box>
-        </Text>
-      </HoverCardContent>
-    </HoverCardRoot>
-  );
 };
 
 const initialCorsOpts: ApiToken["access"]["cors"] = {
@@ -431,7 +364,7 @@ const CreateTokenDialog = ({
                 <Box>
                   <Box css={{ mb: "$2" }}>Here's your new API key:</Box>
                   <Button variant="gray" size="2" css={{ cursor: "pointer" }}>
-                    <ClipBut text={newToken.id} />
+                    <ClipButton value={newToken.id} text={newToken.id} />
                   </Button>
                 </Box>
               </Text>

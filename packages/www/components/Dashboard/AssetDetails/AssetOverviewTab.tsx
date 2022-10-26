@@ -19,7 +19,7 @@ import DatabaseIcon from "../../../public/img/icons/database.svg";
 import { useApi } from "hooks";
 import Spinner from "../Spinner";
 import moment from "moment";
-import ClipButton from "../ClipButton";
+import ClipButton from "../Clipping/ClipButton";
 
 const StyledIpfsIcon = styled(IpfsIcon, {
   color: "$gray",

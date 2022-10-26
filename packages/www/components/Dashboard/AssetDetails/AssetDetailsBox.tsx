@@ -4,7 +4,7 @@ import numeral from "numeral";
 import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
 import { useMemo } from "react";
-import ClipButton from "../ClipButton";
+import ClipButton from "../Clipping/ClipButton";
 
 const Cell = ({ children, css = {} }) => {
   return (
