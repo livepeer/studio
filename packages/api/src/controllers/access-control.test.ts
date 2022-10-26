@@ -74,6 +74,7 @@ describe("controllers/signing-key", () => {
       gatedAsset = await db.asset.create({
         id,
         name: "test-storage",
+        source: { type: "directUpload" },
         createdAt: Date.now(),
         playbackId: await generateUniquePlaybackId(id),
         playbackPolicy: {
