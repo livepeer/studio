@@ -23,20 +23,18 @@ export const taskOutputToIpfsStorage = (
       };
 
 export default class AssetTable extends Table<WithID<Asset>> {
-  async getByPlaybackId(
-    playbackId: string,
-    opts?: QueryOptions
-  ): Promise<WithID<Asset>> {
-    const res: QueryResult<DBLegacyObject> = await this.db.queryWithOpts(
-      sql`SELECT id, data FROM asset WHERE data->>'playbackId' = ${playbackId}`.setName(
-        `${this.name}_by_playbackid`
-      ),
-      opts
-    );
-    if (res.rowCount < 1) {
+  async getByPlaybackId(playbackId: string): Promise<WithID<Asset>> {
+    const query = [
+      sql`asset.data->'playbackId' = ${playbackId}`,
+      sql`asset.data->>'deleted' IS NULL`,
+    ];
+    const [assets] = await this.find(query, {
+      limit: 2,
+    });
+    if (assets.length < 1) {
       return null;
     }
-    return res.rows[0].data as WithID<Asset>;
+    return assets[0];
   }
 
   async getByIpfsCid(cid: string): Promise<WithID<Asset>> {
