@@ -1039,6 +1039,7 @@ components:
                   enum: [url]
                 url:
                   type: string
+                  index: true
                   description: URL from which the asset was uploaded
             - additionalProperties: false
               required: [type]

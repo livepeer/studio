@@ -342,6 +342,13 @@ export default class Table<T extends DBObject> {
       // avoid creating indexes in production right now...
       return;
     }
+    if (prop.oneOf?.length) {
+      return Promise.all(
+        prop.oneOf.map((oneSchema) =>
+          this.ensureIndex(propName, oneSchema, parents)
+        )
+      );
+    }
 
     if (!prop.index && !prop.unique) {
       if (prop.properties && this.name === "asset") {
