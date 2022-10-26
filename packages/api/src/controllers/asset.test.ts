@@ -97,6 +97,7 @@ describe("controllers/asset", () => {
         "asset_playbackId",
         "asset_playbackRecordingId",
         "asset_sourceAssetId",
+        "asset_source_url",
         "asset_storage_ipfs_cid",
         "asset_storage_ipfs_nftMetadata_cid",
         "asset_userId",
