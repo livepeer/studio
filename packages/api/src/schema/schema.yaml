@@ -976,7 +976,9 @@ components:
       table: asset
       additionalProperties: false
       required:
+        - id
         - name
+        - source
       properties:
         id:
           type: string
@@ -1027,6 +1029,44 @@ components:
           description: Object store ID where the asset is stored
           writeOnly: true
           example: 09F8B46C-61A0-4254-9875-F71F4C605BC7
+        source:
+          oneOf:
+            - additionalProperties: false
+              required: [type, url]
+              properties:
+                type:
+                  type: string
+                  enum: [url]
+                url:
+                  type: string
+                  description: URL from which the asset was uploaded
+            - additionalProperties: false
+              required: [type]
+              properties:
+                type:
+                  type: string
+                  enum: [directUpload]
+            - additionalProperties: false
+              required: [type, sessionId]
+              properties:
+                type:
+                  type: string
+                  enum: [recording]
+                sessionId:
+                  type: string
+                  description:
+                    ID of the session from which this asset was created
+            - additionalProperties: false
+              required: [type, inputAssetId]
+              properties:
+                type:
+                  type: string
+                  enum: [transcode]
+                inputAssetId:
+                  type: string
+                  description:
+                    ID of the source asset that was processed by a transcode
+                    task to create this asset
         storage:
           additionalProperties: false
           properties:

@@ -111,6 +111,7 @@ describe("controllers/asset", () => {
       asset = await db.asset.create({
         id: uuid(),
         name: "test-storage",
+        source: { type: "directUpload" },
         createdAt: Date.now(),
         status: {
           phase: "ready",
@@ -415,6 +416,7 @@ describe("controllers/asset", () => {
       await db.asset.create({
         id: uuid(),
         name: "dummy",
+        source: { type: "directUpload" },
         createdAt: Date.now(),
         status: {
           phase: "ready",
@@ -428,6 +430,7 @@ describe("controllers/asset", () => {
         name: "test-storage",
         createdAt: Date.now(),
         playbackId: await generateUniquePlaybackId(id),
+        source: { type: "directUpload" },
         storage: {
           ipfs: {
             spec: {},
