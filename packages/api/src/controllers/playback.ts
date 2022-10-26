@@ -44,11 +44,12 @@ const newPlaybackInfo = (
 const getAssetPlaybackUrl = async (
   ingest: string,
   id: string,
-  cid: boolean
+  isPlaybackAlias: boolean
 ) => {
-  const asset = cid
+  const asset = isPlaybackAlias
     ? (await db.asset.getByIpfsCid(id)) ??
-      (await db.asset.getBySourceURL("ipfs://" + id))
+      (await db.asset.getBySourceURL("ipfs://" + id)) ??
+      (await db.asset.getBySourceURL("ar://" + id))
     : await db.asset.getByPlaybackId(id);
   if (!asset || asset.deleted) {
     return null;

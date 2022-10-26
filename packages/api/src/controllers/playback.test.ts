@@ -216,6 +216,48 @@ describe("controllers/playback", () => {
         const res = await client.get(`/playback/${cid}`);
         expect(res.status).toBe(404);
       });
+
+      it("should return playback URL assets from Arweave tx ID based on source URL lookup", async () => {
+        const txID = "bafyfoobar";
+        await db.asset.update(asset.id, {
+          playbackRecordingId: "mock_recording_id_2",
+          source: {
+            type: "url",
+            url: "ar://" + txID,
+          },
+          status: {
+            phase: "ready",
+            updatedAt: 1234,
+          },
+        });
+        const res = await client.get(`/playback/${txID}`);
+        expect(res.status).toBe(200);
+        await expect(res.json()).resolves.toMatchObject({
+          type: "vod",
+          meta: {
+            source: [
+              {
+                hrn: "HLS (TS)",
+                type: "html5/application/vnd.apple.mpegurl",
+                url: `${ingest}/recordings/mock_recording_id_2/index.m3u8`,
+              },
+            ],
+          },
+        });
+      });
+
+      it("should return 404 for Arweave tx ID based on source URL lookup if asset is not ready", async () => {
+        const txID = "bafyfoobar";
+        await db.asset.update(asset.id, {
+          playbackRecordingId: "mock_recording_id_2",
+          source: {
+            type: "url",
+            url: "ar://" + txID,
+          },
+        });
+        const res = await client.get(`/playback/${txID}`);
+        expect(res.status).toBe(404);
+      });
     });
 
     describe("for recordings", () => {
