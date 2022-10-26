@@ -55,32 +55,6 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
 }
 
-function validateAssetTags(
-  tags: Record<string, string>,
-  asset?: WithID<Asset>
-) {
-  if (!tags) {
-    return tags;
-  }
-  tags = _({ ...asset?.tags, ...tags })
-    .omitBy(_.isNull)
-    .value();
-  try {
-    if (tags && JSON.stringify(tags).length > TAGS_MAX_SIZE) {
-      console.error(`provided tags exceeds max size of ${TAGS_MAX_SIZE}`);
-      throw new UnprocessableEntityError(
-        `the provided tags exceeds max size of ${TAGS_MAX_SIZE} characters`
-      );
-    }
-  } catch (e) {
-    console.error(`couldn't parse the provided tags=${tags}`);
-    throw new UnprocessableEntityError(
-      `the provided tags are not in a valid json format`
-    );
-  }
-  return tags;
-}
-
 function cleanAssetTracks(asset: WithID<Asset>) {
   return !asset.videoSpec
     ? asset
@@ -127,7 +101,6 @@ async function validateAssetPayload(
     },
     name: payload.name,
     playbackPolicy: payload.playbackPolicy,
-    tags: validateAssetTags(payload.tags),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
@@ -295,8 +268,6 @@ app.use(
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
       a = assetWithIpfsUrls(a);
-      // TODO: Remove compatibiltiy logic (tags used to be called meta)
-      a = { ...a, tags: a.tags || (a as any).meta };
       if (req.user.admin) {
         return a;
       }
@@ -807,7 +778,6 @@ app.patch(
     // these are the only updateable fields
     let {
       name,
-      tags,
       playbackPolicy,
       storage: storageInput,
     } = req.body as AssetPatchPayload;
@@ -832,15 +802,12 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
-    tags = validateAssetTags(tags, asset);
-
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
     await req.taskScheduler.updateAsset(asset, {
       name,
-      tags,
       storage,
       playbackPolicy,
     });
