@@ -1,5 +1,5 @@
 import { HttpError } from "@lib/utils";
-import { Asset } from "@livepeer.studio/api";
+import { Asset } from "livepeer";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,15 +18,15 @@ import {
 import Spinner from "components/Dashboard/Spinner";
 import { useEffect, useMemo, useState } from "react";
 
-const demoTags = {
-  rating: "E",
-  category: "abstract",
-  languages: "english",
+const demoIpfsContent = {
+  name: "Singularity in Heritage - Chapter III #095",
+  tokenID: "316",
+  image: "ipfs://QmUrkCHzXHFE2DVucEcarXSe7po39mcKereN1wd9k6gQfw/316.jpg",
 } as const;
 
 export type EditAssetReturnValue = {
   name: string;
-  tags?: Record<string, string>;
+  metadata: Record<string, unknown> | null;
 };
 
 const EditAssetDialog = ({
@@ -42,28 +42,28 @@ const EditAssetDialog = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
-  const [tags, setTags] = useState("");
-  const [tagsError, setTagsError] = useState("");
+  const [metadata, setMetadata] = useState("");
+  const [metadataError, setMetadataError] = useState("");
 
   useEffect(() => {
     setName(asset?.name);
-    if (asset?.tags) {
-      setTags(JSON.stringify(asset?.tags ?? {}, null, 4));
+    if (asset?.meta) {
+      setMetadata(JSON.stringify(asset?.meta ?? {}, null, 4));
     }
   }, [asset]);
 
-  const areTagsValid = useMemo(() => {
-    if (!tags) {
+  const isMetadataValid = useMemo(() => {
+    if (!metadata) {
       return true;
     }
 
     try {
-      const value = JSON.parse(tags);
+      const value = JSON.parse(metadata);
       return Boolean(value);
     } catch (e) {}
 
     return false;
-  }, [tags]);
+  }, [metadata]);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -88,12 +88,12 @@ const EditAssetDialog = ({
             if (editing || !name) {
               return;
             }
-            setTagsError("");
+            setMetadataError("");
             setEditing(true);
             try {
               await onEdit({
                 name,
-                tags: tags ? JSON.parse(tags) : null,
+                metadata: metadata ? JSON.parse(metadata) : null,
               });
               onOpenChange(false);
             } catch (error) {
@@ -102,9 +102,9 @@ const EditAssetDialog = ({
                 (error as HttpError)?.status === 422 &&
                 (error as HttpError)?.message?.includes("should be string")
               ) {
-                setTagsError("Tags must only contain string key value pairs.");
-              } else {
-                setTagsError("Error updating asset.");
+                setMetadataError(
+                  "Metadata must only contain string key value pairs."
+                );
               }
             } finally {
               setEditing(false);
@@ -124,22 +124,22 @@ const EditAssetDialog = ({
           </Flex>
 
           <Flex css={{ mt: "$2" }} direction="column" gap="1">
-            <Label htmlFor="tags">Tags</Label>
+            <Label htmlFor="metadata">Metadata</Label>
             <TextArea
               size="2"
-              id="tags"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder={JSON.stringify(demoTags, null, 4)}
+              id="metadata"
+              value={metadata}
+              onChange={(e) => setMetadata(e.target.value)}
+              placeholder={JSON.stringify(demoIpfsContent, null, 4)}
             />
           </Flex>
-          {(tagsError || !areTagsValid) && (
+          {(metadataError || !isMetadataValid) && (
             <AlertDialogDescription asChild>
               <Text
                 size="3"
                 variant="red"
                 css={{ mt: "$2", fontSize: "$2", mb: "$4" }}>
-                {tagsError || "Tags must be valid JSON."}
+                {metadataError || "Metadata must be valid JSON."}
               </Text>
             </AlertDialogDescription>
           )}
@@ -154,7 +154,7 @@ const EditAssetDialog = ({
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
-              disabled={editing || !areTagsValid || !name}
+              disabled={editing || !isMetadataValid || !name}
               variant="primary">
               {editing && (
                 <Spinner

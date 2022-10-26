@@ -7,6 +7,7 @@ import {
   Heading,
   Promo,
   Text,
+  useSnackbar,
 } from "@livepeer/design-system";
 
 import { Asset } from "@livepeer.studio/api";
@@ -59,9 +60,9 @@ const AssetOverviewTab = ({
     }
   }, [asset, patchAsset]);
 
-  const tagsStringified = useMemo(
-    () => (asset?.tags ? JSON.stringify(asset.tags, null, 4) : ""),
-    [asset?.tags]
+  const metadataStringified = useMemo(
+    () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
+    [asset?.meta]
   );
 
   return (
@@ -75,20 +76,20 @@ const AssetOverviewTab = ({
           <Flex css={{ mb: "$2" }} align="center">
             <StyledCurlyBracesIcon />
             <Heading size="1" css={{ fontWeight: 500 }}>
-              Tags
+              Metadata
             </Heading>
           </Flex>
           <Text variant="gray" size="2">
-            A list of key value pairs that you use to add app-specific
-            annotations about your video.{" "}
+            A list of key value pairs that you use to provide metadata for your
+            video.{" "}
             <A css={{ cursor: "pointer" }} onClick={onEditAsset}>
               Edit asset
             </A>{" "}
-            to add tags.
+            to add metadata.
           </Text>
         </Box>
         <Promo size="2" css={{ mb: "$5" }}>
-          {tagsStringified ? (
+          {metadataStringified ? (
             <Flex
               align="center"
               css={{
@@ -96,13 +97,13 @@ const AssetOverviewTab = ({
                 justifyContent: "space-between",
               }}>
               <Text variant="gray" size="2">
-                {tagsStringified}
+                {metadataStringified}
               </Text>
 
               <Box>
                 <ClipButton
-                  value={tagsStringified}
-                  successMessage="Copied tags to clipboard"
+                  value={metadataStringified}
+                  successMessage="Copied metadata to clipboard"
                 />
               </Box>
             </Flex>
@@ -112,7 +113,7 @@ const AssetOverviewTab = ({
               css={{
                 mr: "$1",
               }}>
-              No tags set
+              No metadata yet
             </Text>
           )}
         </Promo>
