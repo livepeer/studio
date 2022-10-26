@@ -99,7 +99,7 @@ export const rowsPageFromState = async (
         name: {
           id: asset.id,
           href: `/dashboard/assets/${asset.id}`,
-          assetName: asset.name,
+          name: asset.name,
           isStatusFailed,
           errorMessage,
         },

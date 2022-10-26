@@ -21,7 +21,7 @@ const SigningKeys = () => {
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
-          <SigningKeysTable />
+          <SigningKeysTable tableId="dashboardSigningKeysTable" />
         </Box>
       </Box>
     </Layout>

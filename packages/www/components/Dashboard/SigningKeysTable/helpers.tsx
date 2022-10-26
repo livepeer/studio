@@ -1,7 +1,9 @@
 import { SigningKey } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import DateCell, { DateCellProps } from "../Table/cells/date";
+import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import { formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
 
@@ -9,13 +11,13 @@ export const makeColumns = () => [
   {
     Header: "Name",
     accessor: "name",
-    Cell: TextCell,
+    Cell: NameCell,
     sortType: (...params: SortTypeArgs) =>
-      stringSort("original.name.children", ...params),
+      stringSort("original.name.value", ...params),
   },
   {
     Header: "Public Key",
-    accessor: "token",
+    accessor: "publicKey",
     width: 400,
     disableSortBy: true,
     Cell: TextCell,
@@ -31,7 +33,7 @@ export const makeColumns = () => [
 
 export type SigningKeysTableData = {
   id: string;
-  name: TextCellProps;
+  name: NameCellProps;
   publicKey: TextCellProps;
   createdAt: DateCellProps;
 };
@@ -46,24 +48,28 @@ export const rowsPageFromState = async (
   state,
   getSigningKeys: Function
 ): Promise<RowsPageFromStateResult> => {
-  const [signingKeys, nextCursor, count] = await getSigningKeys();
-  const rows: SigningKeysTableData[] = signingKeys.map(
-    (signingKey: SigningKey): SigningKeysTableData => {
-      return {
-        id: signingKey.id,
-        name: {
-          children: <Box>{signingKey.name}</Box>,
-        },
-        publicKey: {
-          children: <Box>{signingKey.publicKey}</Box>,
-        },
-        createdAt: {
-          date: new Date(signingKey.createdAt),
-          fallback: <Box css={{ color: "$primary8" }}>—</Box>,
-        },
-      };
-    }
+  const [signingKeys, nextCursor, _, count] = await getSigningKeys({
+    filters: formatFiltersForApiRequest(state.filters),
+    limit: state.pageSize.toString(),
+    cursor: state.cursor,
+    order: state.order,
+    count: true,
+  });
+  const rows = signingKeys.map(
+    (signingKey: SigningKey): SigningKeysTableData => ({
+      id: signingKey.id,
+      name: {
+        name: signingKey.name,
+        isStatusFailed: false,
+      },
+      publicKey: {
+        children: <Box>{signingKey.publicKey}</Box>,
+      },
+      createdAt: {
+        date: new Date(signingKey.createdAt),
+        fallback: <Box css={{ color: "$primary8" }}>—</Box>,
+      },
+    })
   );
-  console.log("rows", rows, nextCursor, count);
   return { rows, nextCursor, count };
 };
