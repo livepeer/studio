@@ -60,15 +60,15 @@ const AssetOverviewTab = ({
     }
   }, [asset, patchAsset]);
 
-  const metadataStringified = useMemo(
-    () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
-    [asset?.meta]
-  );
+  // const metadataStringified = useMemo(
+  //   () => (asset?.meta ? JSON.stringify(asset.meta, null, 4) : ""),
+  //   [asset?.meta]
+  // );
 
   return (
     <>
       <Box>
-        <Box
+        {/* <Box
           css={{
             mb: "$3",
             width: "100%",
@@ -116,7 +116,7 @@ const AssetOverviewTab = ({
               No metadata yet
             </Text>
           )}
-        </Promo>
+        </Promo> */}
 
         <Box
           css={{
