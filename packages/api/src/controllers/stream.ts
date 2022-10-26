@@ -37,6 +37,7 @@ import {
 import { terminateStream, listActiveStreams } from "./mist-api";
 import wowzaHydrate from "./wowza-hydrate";
 import Queue from "../store/queue";
+import { toExternalSession } from "./session";
 
 type Profile = DBStream["profiles"][number];
 type MultistreamOptions = DBStream["multistream"];
@@ -766,6 +767,10 @@ app.post(
         session.mp4Url = "";
       }
       await db.session.create(session);
+      if (session.record) {
+        const ingest = ((await req.getIngest()) ?? [])[0]?.base;
+        publishRecordingStartedHook(session, req.queue, ingest);
+      }
     }
 
     try {
@@ -932,12 +937,12 @@ app.put(
   }
 );
 
-const sendSetActiveHooks = async (
+async function sendSetActiveHooks(
   stream: DBStream,
   { active, startedAt }: StreamSetActivePayload,
   queue: Queue,
   ingest: string
-) => {
+) {
   // trigger the webhooks, reference https://github.com/livepeer/livepeerjs/issues/791#issuecomment-658424388
   // this could be used instead of /webhook/:id/trigger (althoughs /trigger requires admin access )
   const event = active ? "stream.started" : "stream.idle";
@@ -962,8 +967,8 @@ const sendSetActiveHooks = async (
         // last session is too old, probably transcoding wasn't happening, and so there
         // will be no recording
       } else {
-        const recordingUrl = getRecordingUrl(ingest, session);
-        const mp4Url = getRecordingUrl(ingest, session, true);
+        const userSessionId = session.previousSessions?.[0] ?? session.id;
+        const userSession = await db.session.get(userSessionId);
         await queue.delayedPublishWebhook(
           "events.recording.ready",
           {
@@ -973,10 +978,14 @@ const sendSetActiveHooks = async (
             streamId: stream.id,
             event: "recording.ready",
             userId: stream.userId,
-            sessionId: session.lastSessionId ?? session.id,
+            sessionId: session.id,
             payload: {
-              recordingUrl,
-              mp4Url,
+              recordingUrl: getRecordingUrl(ingest, userSession),
+              mp4Url: getRecordingUrl(ingest, userSession, true),
+              session: {
+                ...toExternalSession(userSession, ingest, true),
+                recordingStatus: "ready", // recording will be ready if this webhook is actually sent
+              },
             },
           },
           USER_SESSION_TIMEOUT + HTTP_PUSH_TIMEOUT
@@ -984,29 +993,27 @@ const sendSetActiveHooks = async (
       }
     }
   }
-  if (active && stream.record === true) {
-    let shouldEmit = true;
-    const session = await db.stream.getLastSession(stream.id);
-    if (session) {
-      const timeSinceSeen = Date.now() - (session.lastSeen ?? 0);
-      if (timeSinceSeen < USER_SESSION_TIMEOUT) {
-        // there is recent session exits, so new one will be joined with last one
-        // not emitting "recording.started" because it will be same recorded session
-        shouldEmit = false;
-      }
-    }
-    if (shouldEmit) {
-      await queue.publishWebhook("events.recording.started", {
-        type: "webhook_event",
-        id: uuid(),
-        timestamp: Date.now(),
-        streamId: stream.id,
-        event: "recording.started",
-        userId: stream.userId,
-      });
-    }
-  }
-};
+}
+
+function publishRecordingStartedHook(
+  session: DBSession,
+  queue: Queue,
+  ingest: string
+) {
+  queue
+    .publishWebhook("events.recording.started", {
+      type: "webhook_event",
+      id: uuid(),
+      timestamp: Date.now(),
+      streamId: session.parentId,
+      userId: session.userId,
+      event: "recording.started",
+      payload: { session: toExternalSession(session, ingest) },
+    })
+    .catch((err) => {
+      logger.error("Error sending recording.started hook err=", err);
+    });
+}
 
 // sets 'isActive' field to false for many objects at once
 app.patch(
