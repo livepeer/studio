@@ -28,7 +28,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
     opts?: QueryOptions
   ): Promise<WithID<Asset>> {
     const query = [
-      sql`asset.data->'playbackId' = ${playbackId}`,
+      sql`asset.data->>'playbackId' = ${playbackId}`,
       sql`asset.data->>'deleted' IS NULL`,
     ];
     const [assets] = await this.find(query, {
