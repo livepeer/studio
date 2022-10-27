@@ -2,7 +2,7 @@ import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import TokenTable from "components/Dashboard/TokenTable";
-import { DashboardAPIkeys as Content } from "content";
+import { DashboardAPIKeys as Content } from "content";
 
 const ApiKeys = () => {
   useLoggedIn();
