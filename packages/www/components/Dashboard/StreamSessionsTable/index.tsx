@@ -14,7 +14,6 @@ import {
 } from "components/Dashboard/Table/sorts";
 import Link from "next/link";
 import { SortTypeArgs } from "components/Dashboard/Table/types";
-import { Column } from "react-table";
 import {
   CellComponentProps,
   TableData,
@@ -89,7 +88,7 @@ type SessionsTableData = {
   sourceSegmentsDuration: DurationCellProps;
 };
 
-const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
+const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
   const tableProps = useTableState({
     tableId: "allSessionsTable",
@@ -282,4 +281,4 @@ const AllSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   );
 };
 
-export default AllSessionsTable;
+export default StreamSessionsTable;
