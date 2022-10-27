@@ -25,7 +25,8 @@ const EmptyState = ({
     }}>
     <Heading css={{ fontWeight: 500, mb: "$3" }}>Create a Signing key</Heading>
     <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-      Signing keys allow you to add access control to streams and assets
+      Signing keys allow you to use playback policies with your streams to
+      restrict access to them
     </Text>
     <Link href="https://docs.livepeer.studio/category/api" passHref>
       <A
