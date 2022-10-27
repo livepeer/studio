@@ -1359,7 +1359,7 @@ components:
         url:
           type: string
           format: uri
-          pattern: ^http(s)?://
+          pattern: ^(https?|ipfs|ar)://
           description:
             URL where the asset contents can be retrieved. Only valid for the
             import task endpoint.
