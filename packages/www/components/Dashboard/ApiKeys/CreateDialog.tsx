@@ -19,7 +19,7 @@ import {
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Spinner from "components/Dashboard/Spinner";
-import { ApiToken } from "../../../../api/src/schema/types";
+import { ApiToken } from "@livepeer.studio/api";
 import {
   ExclamationTriangleIcon as Warning,
   QuestionMarkCircledIcon as Help,
@@ -27,13 +27,6 @@ import {
   PlusIcon as Plus,
 } from "@radix-ui/react-icons";
 import ClipButton from "../Clipping/ClipButton";
-
-type Props = {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  onCreateSuccess: undefined | (() => void);
-  onClose: () => void;
-};
 
 const initialCorsOpts: ApiToken["access"]["cors"] = {
   allowedOrigins: ["http://localhost:3000"],
@@ -43,12 +36,17 @@ const StyledCross = styled(Cross, {
   cursor: "pointer",
 });
 
-const CreateTokenDialog = ({
+const CreateDialog = ({
   isOpen,
   onOpenChange,
   onCreateSuccess,
   onClose,
-}: Props) => {
+}: {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  onCreateSuccess: undefined | (() => void);
+  onClose: () => void;
+}) => {
   const [creating, setCreating] = useState(false);
   const [tokenName, setTokenName] = useState("");
   const [allowCors, setAllowCors] = useState(false);
@@ -381,4 +379,4 @@ const CreateTokenDialog = ({
   );
 };
 
-export default CreateTokenDialog;
+export default CreateDialog;

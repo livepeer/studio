@@ -20,6 +20,21 @@ export const filterItems: FilterItem[] = [
   { label: "Updated", id: "updatedAt", type: "date" },
 ];
 
+export type AssetsTableData = {
+  id: string;
+  name: NameCellProps;
+  source: TextCellProps;
+  createdAt: CreatedAtCellProps;
+  updatedAt: DateCellProps;
+  action: ActionCellProps;
+};
+
+export type RowsPageFromStateResult = {
+  rows: AssetsTableData[];
+  nextCursor: any;
+  count: any;
+};
+
 export const makeColumns = () => [
   {
     Header: "Name",
@@ -56,21 +71,6 @@ export const makeColumns = () => [
     width: "$5",
   },
 ];
-
-export type AssetsTableData = {
-  id: string;
-  name: NameCellProps;
-  source: TextCellProps;
-  createdAt: CreatedAtCellProps;
-  updatedAt: DateCellProps;
-  action: ActionCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: AssetsTableData[];
-  nextCursor: any;
-  count: any;
-};
 
 export const rowsPageFromState = async (
   state,
