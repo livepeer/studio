@@ -17,19 +17,17 @@ import Spinner from "components/Dashboard/Spinner";
 import { SigningKeyResponsePayload } from "@livepeer.studio/api";
 import ClipTextArea from "../Clipping/ClipTextArea";
 
-type Props = {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  onCreateSuccess: undefined | (() => void);
-  onClose: () => void;
-};
-
-const CreateKeyDialog = ({
+const CreateDialog = ({
   isOpen,
   onOpenChange,
   onCreateSuccess,
   onClose,
-}: Props) => {
+}: {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  onCreateSuccess: undefined | (() => void);
+  onClose: () => void;
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [keyName, setKeyName] = useState("");
   const { createSigningKey } = useApi();
@@ -163,4 +161,4 @@ const CreateKeyDialog = ({
   );
 };
 
-export default CreateKeyDialog;
+export default CreateDialog;

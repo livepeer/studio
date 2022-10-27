@@ -16,6 +16,12 @@ export type WebhooksTableData = {
   status: TextCellProps;
 };
 
+export type RowsPageFromStateResult = {
+  rows: WebhooksTableData[];
+  nextCursor: any;
+  count: any;
+};
+
 export const makeColumns = () => [
   {
     Header: "URL",
@@ -46,7 +52,10 @@ export const makeColumns = () => [
   },
 ];
 
-export const rowsPageFromState = async (state, getWebhooks) => {
+export const rowsPageFromState = async (
+  state,
+  getWebhooks: Function
+): Promise<RowsPageFromStateResult> => {
   const [webhooks, nextCursor, _res, count] = await getWebhooks(
     false,
     false,

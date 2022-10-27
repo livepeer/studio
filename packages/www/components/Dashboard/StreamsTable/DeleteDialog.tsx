@@ -11,43 +11,33 @@ import {
   Text,
   useSnackbar,
 } from "@livepeer/design-system";
-import { useApi } from "hooks";
-import { ToggleState } from "hooks/use-toggle-state";
-import { useCallback, useState } from "react";
 import Spinner from "../Spinner";
-import { State } from "../Table";
-import { SigningKeysTableData } from "./helpers";
 
-const DeleteKeysDialog = ({
+const DeleteDialog = ({
   state,
   deleteDialogState,
-}: {
-  state: State<SigningKeysTableData>;
-  deleteDialogState: ToggleState;
+  savingDeleteDialog,
+  setSavingDeleteDialog,
+  onDeleteStreams,
 }) => {
-  const { deleteSigningKey } = useApi();
   const [openSnackbar] = useSnackbar();
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const onDeleteSigningKeys = useCallback(async () => {
-    setIsDeleting(true);
-    await Promise.all(
-      state.selectedRows.map((row) => deleteSigningKey(row.id))
-    );
-    openSnackbar(
-      `${state.selectedRows.length} signing key${
-        state.selectedRows.length > 1 ? "s" : ""
-      } deleted.`
-    );
-    setIsDeleting(false);
-    await state.invalidate();
-    deleteDialogState.onOff();
-  }, [
-    deleteSigningKey,
-    deleteDialogState.onOff,
-    state.selectedRows.length,
-    state.invalidate,
-  ]);
+  const onDeleteClick = async (e) => {
+    try {
+      e.preventDefault();
+      setSavingDeleteDialog(true);
+      await onDeleteStreams();
+      openSnackbar(
+        `${state.selectedRows.length} stream${
+          state.selectedRows.length > 1 ? "s" : ""
+        } deleted.`
+      );
+      setSavingDeleteDialog(false);
+      deleteDialogState.onOff();
+    } catch (e) {
+      setSavingDeleteDialog(false);
+    }
+  };
 
   return (
     <AlertDialog
@@ -56,13 +46,13 @@ const DeleteKeysDialog = ({
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">
-            Delete {state.selectedRows.length} signing key
+            Delete {state.selectedRows.length} stream
             {state.selectedRows.length > 1 && "s"}?
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
           <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the signing key
+            This will permanently remove the stream
             {state.selectedRows.length > 1 && "s"}. This action cannot be
             undone.
           </Text>
@@ -77,10 +67,10 @@ const DeleteKeysDialog = ({
           <AlertDialogAction asChild>
             <Button
               size="2"
-              disabled={isDeleting}
-              onClick={onDeleteSigningKeys}
+              disabled={savingDeleteDialog}
+              onClick={onDeleteClick}
               variant="red">
-              {isDeleting && (
+              {savingDeleteDialog && (
                 <Spinner
                   css={{
                     color: "$hiContrast",
@@ -99,4 +89,4 @@ const DeleteKeysDialog = ({
   );
 };
 
-export default DeleteKeysDialog;
+export default DeleteDialog;

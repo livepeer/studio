@@ -1,5 +1,4 @@
 import {
-  Text,
   AlertDialog,
   AlertDialogContent,
   AlertDialogTitle,
@@ -9,43 +8,41 @@ import {
   AlertDialogCancel,
   Button,
   AlertDialogAction,
+  Text,
   useSnackbar,
 } from "@livepeer/design-system";
+import { useApi } from "hooks";
 import { ToggleState } from "hooks/use-toggle-state";
+import { useState } from "react";
 import Spinner from "../Spinner";
+import { State } from "../Table";
+import { SigningKeysTableData } from "./helpers";
 
 const DeleteDialog = ({
-  deleteDialogState,
   state,
-  savingDeleteDialog,
-  setSavingDeleteDialog,
-  onDeleteWebhooks,
+  deleteDialogState,
 }: {
+  state: State<SigningKeysTableData>;
   deleteDialogState: ToggleState;
-  state: {
-    selectedRows: any[];
-  };
-  savingDeleteDialog: boolean;
-  setSavingDeleteDialog(boolean): void;
-  onDeleteWebhooks(): void;
 }) => {
+  const { deleteSigningKey } = useApi();
   const [openSnackbar] = useSnackbar();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const onDeleteClick = async (e) => {
-    try {
-      e.preventDefault();
-      setSavingDeleteDialog(true);
-      await onDeleteWebhooks();
-      openSnackbar(
-        `${state.selectedRows.length} webhook${
-          state.selectedRows.length > 1 ? "s" : ""
-        } deleted.`
-      );
-      setSavingDeleteDialog(false);
-      deleteDialogState.onOff();
-    } catch (e) {
-      setSavingDeleteDialog(false);
-    }
+    e.preventDefault();
+    setIsDeleting(true);
+    await Promise.all(
+      state.selectedRows.map((row) => deleteSigningKey(row.id))
+    );
+    openSnackbar(
+      `${state.selectedRows.length} signing key${
+        state.selectedRows.length > 1 ? "s" : ""
+      } deleted.`
+    );
+    setIsDeleting(false);
+    await state.invalidate();
+    deleteDialogState.onOff();
   };
 
   return (
@@ -55,15 +52,13 @@ const DeleteDialog = ({
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">
-            Delete{" "}
-            {state.selectedRows.length > 1 ? state.selectedRows.length : ""}{" "}
-            webhook
+            Delete {state.selectedRows.length} signing key
             {state.selectedRows.length > 1 && "s"}?
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
           <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the webhook
+            This will permanently remove the signing key
             {state.selectedRows.length > 1 && "s"}. This action cannot be
             undone.
           </Text>
@@ -78,10 +73,10 @@ const DeleteDialog = ({
           <AlertDialogAction asChild>
             <Button
               size="2"
-              disabled={savingDeleteDialog}
+              disabled={isDeleting}
               onClick={onDeleteClick}
               variant="red">
-              {savingDeleteDialog && (
+              {isDeleting && (
                 <Spinner
                   css={{
                     color: "$hiContrast",

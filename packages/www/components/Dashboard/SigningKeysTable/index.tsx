@@ -10,8 +10,8 @@ import {
   rowsPageFromState,
   SigningKeysTableData,
 } from "./helpers";
-import CreateKeyDialog from "./CreateKeyDialog";
-import DeleteKeysDialog from "./DeleteKeysDialog";
+import CreateDialog from "./CreateDialog";
+import DeleteDialog from "./DeleteDialog";
 
 const SigningKeysTable = ({
   title = "Signing Keys",
@@ -77,11 +77,9 @@ const SigningKeysTable = ({
         }}
       />
 
-      {/* Delete dialog */}
-      <DeleteKeysDialog state={state} deleteDialogState={deleteDialogState} />
+      <DeleteDialog state={state} deleteDialogState={deleteDialogState} />
 
-      {/* Create dialog */}
-      <CreateKeyDialog
+      <CreateDialog
         isOpen={createDialogState.on}
         onClose={createDialogState.onOff}
         onOpenChange={createDialogState.onToggle}
