@@ -1,4 +1,4 @@
-import StreamSessionsTable from "@components/Dashboard/SessionsTable";
+import SessionsTable from "./SessionsTable";
 import MultistreamTargetsTable from "@components/Dashboard/MultistreamTargetsTable";
 import { Text } from "@livepeer/design-system";
 
@@ -18,7 +18,7 @@ const StreamOverviewTab = ({ id, stream, streamHealth, invalidateStream }) => {
         tableLayout="auto"
         border
       />
-      <StreamSessionsTable
+      <SessionsTable
         streamId={id}
         emptyState={
           <Text variant="gray" size="2">
