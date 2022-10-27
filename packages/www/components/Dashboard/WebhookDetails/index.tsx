@@ -9,7 +9,7 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
-import { Action } from "../MultistreamTargetsTable/SaveTargetDialog";
+import { Action } from "../StreamDetails/MultistreamTargetsTable/SaveTargetDialog";
 import CreateEditDialog from "../WebhookDialogs/CreateEditDialog";
 import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";

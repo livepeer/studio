@@ -12,7 +12,7 @@ import { useToggleState } from "hooks/use-toggle-state";
 import { useApi } from "hooks";
 import { HealthStatus } from "hooks/use-analyzer";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
-import ErrorDialog from "../ErrorDialog";
+import ErrorDialog from "../../ErrorDialog";
 import { makeColumns, makeTableData, TargetsTableData } from "./helpers";
 
 const MultistreamTargetsTable = ({

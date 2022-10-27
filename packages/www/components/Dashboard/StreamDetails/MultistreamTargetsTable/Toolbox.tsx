@@ -23,11 +23,11 @@ import {
 
 import Spinner from "components/Dashboard/Spinner";
 
-import { useApi } from "../../../hooks";
+import { useApi } from "../../../../hooks";
 import { useToggleState } from "hooks/use-toggle-state";
-import { MultistreamTarget, Stream } from "../../../../api/src/schema/types";
+import { MultistreamTarget, Stream } from "@livepeer.studio/api";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
-import ErrorDialog from "../ErrorDialog";
+import ErrorDialog from "../../ErrorDialog";
 
 const DisableDialog = ({
   onDialogAction,

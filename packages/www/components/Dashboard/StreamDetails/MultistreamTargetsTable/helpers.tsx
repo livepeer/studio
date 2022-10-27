@@ -1,6 +1,6 @@
-import TextCell, { TextCellProps } from "../Table/cells/text";
-import { stringSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import TextCell, { TextCellProps } from "../../Table/cells/text";
+import { stringSort } from "../../Table/sorts";
+import { SortTypeArgs } from "../../Table/types";
 import { TableData } from "components/Dashboard/Table";
 import TargetStatusBadge from "./TargetStatusBadge";
 import Toolbox from "./Toolbox";
