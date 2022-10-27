@@ -495,6 +495,7 @@ describe("auth middleware", () => {
     it("should NOT allow requests from custom origins on regular paths", async () => {
       for (const method of testMethods) {
         for (const origin of testOrigins) {
+          await expectAllowed(method, "/asset/import", origin).toBe(false);
           await expectAllowed(method, "/asset/upload", origin).toBe(false);
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
             false
@@ -546,6 +547,7 @@ describe("auth middleware", () => {
         for (const origin of testOrigins) {
           const expected = allowedOrigins.includes(origin);
 
+          await expectAllowed(method, "/asset/import", origin).toBe(expected);
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
             expected
           );
