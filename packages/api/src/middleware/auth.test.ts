@@ -547,9 +547,7 @@ describe("auth middleware", () => {
         for (const origin of testOrigins) {
           const expected = allowedOrigins.includes(origin);
 
-          await expectAllowed(method, "/asset/import", origin).toBe(
-            expected
-          );
+          await expectAllowed(method, "/asset/import", origin).toBe(expected);
           await expectAllowed(method, "/asset/request-upload", origin).toBe(
             expected
           );
