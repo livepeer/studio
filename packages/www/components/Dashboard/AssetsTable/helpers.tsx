@@ -8,11 +8,17 @@ import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
-import { formatFiltersForApiRequest } from "../Table/filters";
+import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
+
+export const filterItems: FilterItem[] = [
+  { label: "Name", id: "name", type: "text" },
+  { label: "Created", id: "createdAt", type: "date" },
+  { label: "Updated", id: "updatedAt", type: "date" },
+];
 
 export const makeColumns = () => [
   {
