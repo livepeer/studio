@@ -28,7 +28,7 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const Webhook = ({ id, data }) => {
+const WebhookDetails = ({ id, data }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -125,4 +125,4 @@ const Webhook = ({ id, data }) => {
   );
 };
 
-export default Webhook;
+export default WebhookDetails;
