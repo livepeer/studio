@@ -51,6 +51,11 @@ export default {
       title: "Page sections",
       of: [
         { type: "hero" },
+        { type: "heroImage" },
+        { type: "offSetPortableText" },
+        { type: "centerTitle" },
+        { type: "splitImage" },
+        { type: "iconGrid" },
         { type: "valuesSection" },
         { type: "investorsSection" },
         { type: "testimonialsSection" },
