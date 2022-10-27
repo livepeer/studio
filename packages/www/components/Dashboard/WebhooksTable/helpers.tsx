@@ -4,7 +4,7 @@ import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 
 // 1 hour
 const WARNING_TIMEFRAME = 1000 * 60 * 60;
@@ -14,12 +14,6 @@ export type WebhooksTableData = {
   url: TextCellProps;
   created: DateCellProps;
   status: TextCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: WebhooksTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const makeColumns = () => [
@@ -55,7 +49,7 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   state,
   getWebhooks: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<WebhooksTableData>> => {
   const [webhooks, nextCursor, _res, count] = await getWebhooks(
     false,
     false,

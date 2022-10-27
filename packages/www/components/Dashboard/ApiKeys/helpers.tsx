@@ -3,7 +3,7 @@ import { Box } from "@livepeer/design-system";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import CorsCell from "./CorsCell";
 import KeyCell from "./KeyCell";
 
@@ -14,12 +14,6 @@ export type ApiKeysTableData = {
   lastUsed: DateCellProps;
   createdAt: DateCellProps;
   cors: TextCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: ApiKeysTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const makeColumns = () => [
@@ -62,7 +56,7 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   userId: string,
   getApiTokens: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<ApiKeysTableData>> => {
   const [tokens, nextCursor, resp, count] = await getApiTokens(userId, {
     count: true,
   });

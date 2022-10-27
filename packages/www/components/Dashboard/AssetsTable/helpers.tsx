@@ -10,7 +10,7 @@ import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
@@ -28,12 +28,6 @@ export type AssetsTableData = {
   createdAt: CreatedAtCellProps;
   updatedAt: DateCellProps;
   action: ActionCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: AssetsTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const makeColumns = () => [
@@ -79,7 +73,7 @@ export const rowsPageFromState = async (
   getAssets: Function,
   getTasks: Function,
   onDeleteAsset: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const [assets, nextCursor, count] = await getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
     limit: state.pageSize.toString(),

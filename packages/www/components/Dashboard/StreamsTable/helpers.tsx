@@ -5,7 +5,7 @@ import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 
 export type StreamsTableData = {
   id: string;
@@ -14,12 +14,6 @@ export type StreamsTableData = {
   createdAt: DateCellProps;
   lastSeen: DateCellProps;
   status: TextCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: StreamsTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const filterItems: FilterItem[] = [
@@ -69,7 +63,7 @@ export const rowsPageFromState = async (
   state: State<StreamsTableData>,
   userId: string,
   getStreams: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<StreamsTableData>> => {
   let active: boolean;
   const filteredFilters = state.filters.filter((f) => {
     if (f.id === "isActive" && f.isOpen) {

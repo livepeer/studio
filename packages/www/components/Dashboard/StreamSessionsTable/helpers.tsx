@@ -14,7 +14,7 @@ import DurationCell, { DurationCellProps } from "../Table/cells/duration";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort, numberSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { truncate } from "../../../lib/utils";
 import { State } from "../Table";
@@ -34,12 +34,6 @@ export type StreamSessionsTableData = {
   recordingUrl: TextCellProps;
   createdAt: DateCellProps;
   sourceSegmentsDuration: DurationCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: StreamSessionsTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const makeColumns = () => [
@@ -80,7 +74,7 @@ export const rowsPageFromState = async (
   userId: string,
   getStreamSessionsByUserId: Function,
   openSnackbar: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<StreamSessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessionsByUserId(
     userId,
     state.cursor,

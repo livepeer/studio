@@ -19,7 +19,10 @@ import {
 import { CopyIcon } from "@radix-ui/react-icons";
 import { truncate } from "../../../../lib/utils";
 import RecordingUrlCell from "./RecordingUrlCell";
-import { SortTypeArgs } from "@components/Dashboard/Table/types";
+import {
+  RowsPageFromStateResult,
+  SortTypeArgs,
+} from "@components/Dashboard/Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { State } from "../../Table";
 
@@ -37,12 +40,6 @@ export type SessionsTableData = {
   recordingUrl: TextCellProps;
   createdAt: DateCellProps;
   sourceSegmentsDuration: DurationCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: SessionsTableData[];
-  nextCursor: any;
-  count: any;
 };
 
 export const makeColumns = () => [
@@ -76,7 +73,7 @@ export const rowsPageFromState = async (
   streamId: string,
   getStreamSessions: Function,
   openSnackbar: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<SessionsTableData>> => {
   const [streams, nextCursor, count] = await getStreamSessions(
     streamId,
     state.cursor,
