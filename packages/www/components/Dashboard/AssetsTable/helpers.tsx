@@ -11,6 +11,7 @@ import TextCell, { TextCellProps } from "../Table/cells/text";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
+import { State } from "../Table";
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
 
@@ -73,7 +74,7 @@ export const makeColumns = () => [
 ];
 
 export const rowsPageFromState = async (
-  state,
+  state: State<AssetsTableData>,
   userId: string,
   getAssets: Function,
   getTasks: Function,

@@ -1,11 +1,25 @@
 import { SigningKey } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
+import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
 import { formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
+
+export type SigningKeysTableData = {
+  id: string;
+  name: NameCellProps;
+  publicKey: TextCellProps;
+  createdAt: DateCellProps;
+};
+
+export type RowsPageFromStateResult = {
+  rows: SigningKeysTableData[];
+  nextCursor: any;
+  count: any;
+};
 
 export const makeColumns = () => [
   {
@@ -30,21 +44,8 @@ export const makeColumns = () => [
   },
 ];
 
-export type SigningKeysTableData = {
-  id: string;
-  name: NameCellProps;
-  publicKey: TextCellProps;
-  createdAt: DateCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: SigningKeysTableData[];
-  nextCursor: any;
-  count: any;
-};
-
 export const rowsPageFromState = async (
-  state,
+  state: State<SigningKeysTableData>,
   getSigningKeys: Function
 ): Promise<RowsPageFromStateResult> => {
   const [signingKeys, nextCursor, _, count] = await getSigningKeys({

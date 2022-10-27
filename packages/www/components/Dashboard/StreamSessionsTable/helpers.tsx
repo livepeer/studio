@@ -17,6 +17,7 @@ import { stringSort, dateSort, numberSort } from "../Table/sorts";
 import { SortTypeArgs } from "../Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { truncate } from "../../../lib/utils";
+import { State } from "../Table";
 
 export const filterItems: FilterItem[] = [
   { label: "Created Date", id: "createdAt", type: "date" },
@@ -27,7 +28,7 @@ export const filterItems: FilterItem[] = [
   },
 ];
 
-export type SessionsTableData = {
+export type StreamSessionsTableData = {
   id: string;
   parentStream: TextCellProps;
   recordingUrl: TextCellProps;
@@ -36,7 +37,7 @@ export type SessionsTableData = {
 };
 
 export type RowsPageFromStateResult = {
-  rows: SessionsTableData[];
+  rows: StreamSessionsTableData[];
   nextCursor: any;
   count: any;
 };
@@ -75,7 +76,7 @@ export const makeColumns = () => [
 ];
 
 export const rowsPageFromState = async (
-  state,
+  state: State<StreamSessionsTableData>,
   userId: string,
   getStreamSessionsByUserId: Function,
   openSnackbar: Function

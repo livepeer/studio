@@ -6,19 +6,19 @@ import {
   filterItems,
   makeColumns,
   rowsPageFromState,
-  SessionsTableData,
+  StreamSessionsTableData,
 } from "./helpers";
 import EmptyState from "./EmptyState";
 
 const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
-  const tableProps = useTableState({
+  const { state, stateSetter } = useTableState<StreamSessionsTableData>({
     tableId: "allSessionsTable",
   });
   const [openSnackbar] = useSnackbar();
   const columns = useMemo(makeColumns, []);
 
-  const fetcher: Fetcher<SessionsTableData> = useCallback(
+  const fetcher: Fetcher<StreamSessionsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(
         state,
@@ -31,7 +31,8 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
 
   return (
     <Table
-      {...tableProps}
+      state={state}
+      stateSetter={stateSetter}
       columns={columns}
       fetcher={fetcher}
       initialSortBy={[{ id: "createdAt", desc: true }]}

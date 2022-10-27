@@ -13,18 +13,18 @@ import {
 } from "@livepeer/design-system";
 import { ToggleState } from "hooks/use-toggle-state";
 import Spinner from "../Spinner";
+import { State } from "../Table";
+import { WebhooksTableData } from "./helpers";
 
 const DeleteDialog = ({
-  deleteDialogState,
   state,
+  deleteDialogState,
   savingDeleteDialog,
   setSavingDeleteDialog,
   onDeleteWebhooks,
 }: {
+  state: State<WebhooksTableData>;
   deleteDialogState: ToggleState;
-  state: {
-    selectedRows: any[];
-  };
   savingDeleteDialog: boolean;
   setSavingDeleteDialog(boolean): void;
   onDeleteWebhooks(): void;

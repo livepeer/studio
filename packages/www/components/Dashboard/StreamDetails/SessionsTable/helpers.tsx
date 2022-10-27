@@ -21,6 +21,7 @@ import { truncate } from "../../../../lib/utils";
 import RecordingUrlCell from "./RecordingUrlCell";
 import { SortTypeArgs } from "@components/Dashboard/Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { State } from "../../Table";
 
 export const filterItems: FilterItem[] = [
   { label: "Created Date", id: "createdAt", type: "date" },
@@ -71,7 +72,7 @@ export const makeColumns = () => [
 ];
 
 export const rowsPageFromState = async (
-  state,
+  state: State<SessionsTableData>,
   streamId: string,
   getStreamSessions: Function,
   openSnackbar: Function

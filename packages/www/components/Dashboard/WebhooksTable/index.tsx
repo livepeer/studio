@@ -48,6 +48,21 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     state.invalidate,
   ]);
 
+  const onCreateSubmit = async ({ events, name, url, sharedSecret }) => {
+    const newWebhook = await createWebhook({
+      events,
+      name,
+      url,
+      sharedSecret,
+    });
+    await state.invalidate();
+    const query = router.query.admin === "true" ? { admin: true } : {};
+    await router.push({
+      pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
+      query,
+    });
+  };
+
   return (
     <Box css={{ p: "$6", mb: "$8" }}>
       <Table
@@ -99,20 +114,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onSubmit={async ({ events, name, url, sharedSecret }) => {
-          const newWebhook = await createWebhook({
-            events,
-            name,
-            url,
-            sharedSecret,
-          });
-          await state.invalidate();
-          const query = router.query.admin === "true" ? { admin: true } : {};
-          await router.push({
-            pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
-            query,
-          });
-        }}
+        onSubmit={onCreateSubmit}
       />
     </Box>
   );

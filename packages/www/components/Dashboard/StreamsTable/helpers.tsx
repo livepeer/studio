@@ -1,4 +1,5 @@
 import { Box, Link } from "@livepeer/design-system";
+import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
 import TextCell, { TextCellProps } from "../Table/cells/text";
@@ -65,7 +66,7 @@ export const makeColumns = () => [
 ];
 
 export const rowsPageFromState = async (
-  state,
+  state: State<StreamsTableData>,
   userId: string,
   getStreams: Function
 ): Promise<RowsPageFromStateResult> => {

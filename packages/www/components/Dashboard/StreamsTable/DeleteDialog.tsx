@@ -11,7 +11,10 @@ import {
   Text,
   useSnackbar,
 } from "@livepeer/design-system";
+import { ToggleState } from "hooks/use-toggle-state";
 import Spinner from "../Spinner";
+import { State } from "../Table";
+import { StreamsTableData } from "./helpers";
 
 const DeleteDialog = ({
   state,
@@ -19,6 +22,12 @@ const DeleteDialog = ({
   savingDeleteDialog,
   setSavingDeleteDialog,
   onDeleteStreams,
+}: {
+  state: State<StreamsTableData>;
+  deleteDialogState: ToggleState;
+  savingDeleteDialog: boolean;
+  setSavingDeleteDialog(boolean): void;
+  onDeleteStreams: Function;
 }) => {
   const [openSnackbar] = useSnackbar();
 

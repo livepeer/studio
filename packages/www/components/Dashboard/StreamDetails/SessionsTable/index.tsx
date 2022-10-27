@@ -23,11 +23,12 @@ const SessionsTable = ({
   tableLayout?: string;
 }) => {
   const { user, getStreamSessions } = useApi();
-  const tableProps = useTableState({
+  const { state, stateSetter } = useTableState<SessionsTableData>({
     tableId: "streamSessionsTable",
   });
   const [openSnackbar] = useSnackbar();
   const columns = useMemo(makeColumns, []);
+
   const fetcher: Fetcher<SessionsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, streamId, getStreamSessions, openSnackbar),
@@ -37,7 +38,8 @@ const SessionsTable = ({
   return (
     <Box>
       <Table
-        {...tableProps}
+        state={state}
+        stateSetter={stateSetter}
         header={<Heading>{title}</Heading>}
         border={border}
         filterItems={filterItems}
