@@ -1,11 +1,5 @@
-import { Box, Heading } from "@livepeer/design-system";
+import { Box } from "@livepeer/design-system";
 import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-
-export const DefaultTableHeader = ({ title }: { title: string }) => (
-  <Heading size="2" css={{ fontWeight: 600 }}>
-    {title}
-  </Heading>
-);
 
 export const makeSelectAction = (title: string, onClick: () => void) => ({
   onClick,

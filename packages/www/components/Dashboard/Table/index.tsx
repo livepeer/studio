@@ -36,7 +36,7 @@ import TableFilter, {
 import Link from "next/link";
 import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import { DefaultTableHeader } from "./helpers";
+import TableHeader from "./components/TableHeader";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -273,7 +273,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   const headerComponent = header ? (
     header
   ) : title ? (
-    <DefaultTableHeader title={title} />
+    <TableHeader title={title} />
   ) : null;
 
   return (
