@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import { Heading, useSnackbar } from "@livepeer/design-system";
+import { useSnackbar } from "@livepeer/design-system";
 import {
   filterItems,
   makeColumns,
@@ -31,6 +31,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
 
   return (
     <Table
+      title={title}
       state={state}
       stateSetter={stateSetter}
       columns={columns}
@@ -39,11 +40,6 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       showOverflow={true}
       filterItems={filterItems}
       emptyState={<EmptyState />}
-      header={
-        <Heading size="2" css={{ fontWeight: 600 }}>
-          {title}
-        </Heading>
-      }
     />
   );
 };

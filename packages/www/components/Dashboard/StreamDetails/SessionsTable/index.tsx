@@ -38,9 +38,9 @@ const SessionsTable = ({
   return (
     <Box>
       <Table
+        header={<Heading>{title}</Heading>}
         state={state}
         stateSetter={stateSetter}
-        header={<Heading>{title}</Heading>}
         border={border}
         filterItems={filterItems}
         columns={columns}

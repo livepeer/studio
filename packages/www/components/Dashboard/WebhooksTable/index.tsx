@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import { Box, Heading } from "@livepeer/design-system";
+import { Box } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import CreateDialog, {
   Action,
 } from "@components/Dashboard/WebhookDialogs/CreateEditDialog";
@@ -11,6 +10,7 @@ import { useRouter } from "next/router";
 import { makeColumns, rowsPageFromState, WebhooksTableData } from "./helpers";
 import EmptyState from "./EmptyState";
 import DeleteDialog from "./DeleteDialog";
+import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
@@ -66,40 +66,18 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   return (
     <Box css={{ p: "$6", mb: "$8" }}>
       <Table
+        title={title}
         columns={columns}
         fetcher={fetcher}
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
         emptyState={<EmptyState createDialogState={createDialogState} />}
-        header={
-          <Heading size="2" css={{ fontWeight: 600 }}>
-            {title}
-          </Heading>
-        }
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon />{" "}
-              <Box css={{ ml: "$2" }} as="span">
-                Delete
-              </Box>
-            </>
-          ),
-        }}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create webhook
-              </Box>
-            </>
-          ),
-        }}
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
+        createAction={makeCreateAction(
+          "Create webhook",
+          createDialogState.onOn
+        )}
       />
 
       <DeleteDialog

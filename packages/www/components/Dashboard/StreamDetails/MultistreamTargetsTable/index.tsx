@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from "react";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { useQueries, useQueryClient } from "react-query";
 import { Box, Heading } from "@livepeer/design-system";
 import { MultistreamTarget, Stream } from "@livepeer.studio/api";
@@ -14,6 +13,7 @@ import { HealthStatus } from "hooks/use-analyzer";
 import SaveTargetDialog, { Action } from "./SaveTargetDialog";
 import ErrorDialog from "../../ErrorDialog";
 import { makeColumns, makeTableData, TargetsTableData } from "./helpers";
+import { makeCreateAction } from "@components/Dashboard/Table/helpers";
 
 const MultistreamTargetsTable = ({
   title = "Multistream Targets",
@@ -76,13 +76,17 @@ const MultistreamTargetsTable = ({
     [state.tableId, stream, streamHealth, ...targets]
   );
 
+  const onCreateClick = stream.isActive
+    ? errorRecordDialogState.onOn
+    : saveDialogState.onOn;
+
   return (
     <Box {...props}>
       <Table
+        header={<Heading>{title}</Heading>}
         tableData={tableData}
         state={state}
         stateSetter={stateSetter}
-        header={<Heading>{title}</Heading>}
         border={border}
         columns={columns}
         rowSelection={null}
@@ -90,21 +94,7 @@ const MultistreamTargetsTable = ({
         noPagination={true}
         emptyState={emptyState}
         tableLayout={tableLayout}
-        createAction={{
-          onClick: () =>
-            stream.isActive
-              ? errorRecordDialogState.onOn()
-              : saveDialogState.onOn(),
-          css: { display: "flex", alignItems: "center", ml: "$1" },
-          children: (
-            <>
-              <PlusIcon />
-              <Box as="span" css={{ ml: "$2" }}>
-                Create
-              </Box>
-            </>
-          ),
-        }}
+        createAction={makeCreateAction("Create", onCreateClick)}
       />
 
       <ErrorDialog
