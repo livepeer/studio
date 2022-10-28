@@ -1,15 +1,14 @@
 import { useCallback, useMemo } from "react";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
-import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
+import { useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
-import EmptyState from "./EmptyState";
 import {
   AssetsTableData,
   filterItems,
   makeColumns,
+  makeEmptyState,
   rowsPageFromState,
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
@@ -73,7 +72,7 @@ const AssetsTable = ({
         filterItems={!viewAll && filterItems}
         viewAll={viewAll}
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
+        emptyState={makeEmptyState(createDialogState)}
         createAction={makeCreateAction("Upload asset", createDialogState.onOn)}
       />
 

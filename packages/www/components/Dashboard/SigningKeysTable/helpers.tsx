@@ -4,6 +4,7 @@ import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import TableEmptyState from "../Table/components/TableEmptyState";
 import { formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
@@ -73,3 +74,13 @@ export const rowsPageFromState = async (
   );
   return { rows, nextCursor, count };
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Create a Signing key"
+    description="Signing keys allow you to use playback policies with your streams to restrict access to them"
+    learnMoreUrl="https://docs.livepeer.studio/category/api/create-signing-keys"
+    actionTitle="Create signing key"
+    actionToggleState={actionToggleState}
+  />
+);

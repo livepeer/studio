@@ -1,12 +1,10 @@
-import { Heading, Box } from "@livepeer/design-system";
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useToggleState } from "hooks/use-toggle-state";
-import EmptyState from "./EmptyState";
 import {
   makeColumns,
+  makeEmptyState,
   rowsPageFromState,
   SigningKeysTableData,
 } from "./helpers";
@@ -48,7 +46,7 @@ const SigningKeysTable = ({
         state={state}
         stateSetter={stateSetter}
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
+        emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />

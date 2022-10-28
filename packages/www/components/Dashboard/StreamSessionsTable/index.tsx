@@ -5,10 +5,10 @@ import { useSnackbar } from "@livepeer/design-system";
 import {
   filterItems,
   makeColumns,
+  makeEmptyState,
   rowsPageFromState,
   StreamSessionsTableData,
 } from "./helpers";
-import EmptyState from "./EmptyState";
 
 const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
   const { user, getStreamSessionsByUserId } = useApi();
@@ -39,7 +39,7 @@ const StreamSessionsTable = ({ title = "Sessions" }: { title?: string }) => {
       initialSortBy={[{ id: "createdAt", desc: true }]}
       showOverflow={true}
       filterItems={filterItems}
-      emptyState={<EmptyState />}
+      emptyState={makeEmptyState()}
     />
   );
 };

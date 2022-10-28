@@ -3,6 +3,7 @@ import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import { RenditionDetailsCellProps } from "../Table/cells/streams-table";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import TableEmptyState from "../Table/components/TableEmptyState";
 import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
@@ -147,3 +148,13 @@ export const defaultCreateProfiles = [
     height: 720,
   },
 ];
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Create your first stream"
+    description="Create a unique stream object, broadcast live video content and playback your live stream with Livepeer Studio."
+    learnMoreUrl="https://docs.livepeer.studio/category/live"
+    actionTitle="Create stream"
+    actionToggleState={actionToggleState}
+  />
+);

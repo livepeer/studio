@@ -3,8 +3,12 @@ import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import CreateDialog from "./CreateDialog";
 import { useToggleState } from "hooks/use-toggle-state";
-import { ApiKeysTableData, makeColumns, rowsPageFromState } from "./helpers";
-import EmptyState from "./EmptyState";
+import {
+  ApiKeysTableData,
+  makeColumns,
+  makeEmptyState,
+  rowsPageFromState,
+} from "./helpers";
 import DeleteDialog from "./DeleteDialog";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 
@@ -38,7 +42,7 @@ const ApiKeysTable = ({
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
-        emptyState={<EmptyState createDialogState={createDialogState} />}
+        emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />

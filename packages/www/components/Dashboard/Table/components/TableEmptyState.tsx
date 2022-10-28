@@ -10,10 +10,18 @@ import { ArrowRightIcon, PlusIcon } from "@radix-ui/react-icons";
 import { ToggleState } from "hooks/use-toggle-state";
 import Link from "next/link";
 
-const EmptyState = ({
-  createDialogState,
+const TableEmptyState = ({
+  title,
+  description,
+  learnMoreUrl,
+  actionTitle,
+  actionToggleState,
 }: {
-  createDialogState: ToggleState;
+  title: string;
+  description: string;
+  learnMoreUrl: string;
+  actionTitle?: string;
+  actionToggleState?: ToggleState;
 }) => (
   <Flex
     direction="column"
@@ -23,11 +31,13 @@ const EmptyState = ({
       height: "calc(100vh - 400px)",
       maxWidth: 450,
     }}>
-    <Heading css={{ fontWeight: 500, mb: "$3" }}>Create an API key</Heading>
+    <Heading css={{ fontWeight: 500, mb: "$3" }}>{title}</Heading>
+
     <Text variant="gray" css={{ lineHeight: 1.5, mb: "$3" }}>
-      API keys allow you to authenticate API requests in your app
+      {description}
     </Text>
-    <Link href="https://docs.livepeer.studio/category/api" passHref>
+
+    <Link href={learnMoreUrl} passHref>
       <A
         target="_blank"
         variant="primary"
@@ -36,17 +46,20 @@ const EmptyState = ({
         <ArrowRightIcon />
       </A>
     </Link>
-    <Button
-      onClick={() => createDialogState.onOn()}
-      css={{ alignSelf: "flex-start" }}
-      size="2"
-      variant="primary">
-      <PlusIcon />{" "}
-      <Box as="span" css={{ ml: "$2" }}>
-        Create API key
-      </Box>
-    </Button>
+
+    {actionTitle !== undefined && (
+      <Button
+        onClick={actionToggleState.onOn}
+        css={{ alignSelf: "flex-start" }}
+        size="2"
+        variant="primary">
+        <PlusIcon />{" "}
+        <Box as="span" css={{ ml: "$2" }}>
+          {actionTitle}
+        </Box>
+      </Button>
+    )}
   </Flex>
 );
 
-export default EmptyState;
+export default TableEmptyState;

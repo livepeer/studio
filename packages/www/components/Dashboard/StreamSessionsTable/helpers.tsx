@@ -18,6 +18,7 @@ import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { truncate } from "../../../lib/utils";
 import { State } from "../Table";
+import TableEmptyState from "../Table/components/TableEmptyState";
 
 export const filterItems: FilterItem[] = [
   { label: "Created Date", id: "createdAt", type: "date" },
@@ -171,3 +172,11 @@ export const rowsPageFromState = async (
     }),
   };
 };
+
+export const makeEmptyState = () => (
+  <TableEmptyState
+    title="No sessions"
+    description="Stream sessions belong to parent streams."
+    learnMoreUrl="https://docs.livepeer.studio/reference/api/get-session"
+  />
+);

@@ -7,11 +7,11 @@ import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
 import ActiveStreamsBadge from "components/Dashboard/ActiveStreamsBadge";
-import EmptyState from "./EmptyState";
 import {
   defaultCreateProfiles,
   filterItems,
   makeColumns,
+  makeEmptyState,
   rowsPageFromState,
   StreamsTableData,
 } from "./helpers";
@@ -88,7 +88,7 @@ const StreamsTable = ({
         stateSetter={stateSetter}
         rowSelection="all"
         filterItems={!viewAll && filterItems}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
+        emptyState={makeEmptyState(createDialogState)}
         viewAll={viewAll}
         header={
           <Heading size="2">

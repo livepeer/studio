@@ -12,6 +12,7 @@ import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
+import TableEmptyState from "../Table/components/TableEmptyState";
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
 
@@ -146,3 +147,13 @@ export const fileUploadProgressForAsset = (
     ? fileUpload.progress
     : undefined;
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Upload your first On Demand asset"
+    description="Livepeer Studio supports video on demand which allows you to import video assets, store them on decentralized storage, and easily mint a video NFT."
+    learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
+    actionTitle="Upload asset"
+    actionToggleState={actionToggleState}
+  />
+);

@@ -7,8 +7,12 @@ import CreateDialog, {
   Action,
 } from "@components/Dashboard/WebhookDialogs/CreateEditDialog";
 import { useRouter } from "next/router";
-import { makeColumns, rowsPageFromState, WebhooksTableData } from "./helpers";
-import EmptyState from "./EmptyState";
+import {
+  makeColumns,
+  makeEmptyState,
+  rowsPageFromState,
+  WebhooksTableData,
+} from "./helpers";
 import DeleteDialog from "./DeleteDialog";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 
@@ -72,7 +76,7 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
-        emptyState={<EmptyState createDialogState={createDialogState} />}
+        emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction(
           "Create webhook",

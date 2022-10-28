@@ -2,6 +2,7 @@ import { ApiToken } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import TableEmptyState from "../Table/components/TableEmptyState";
 import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import CorsCell from "./CorsCell";
@@ -94,3 +95,13 @@ export const rowsPageFromState = async (
     count,
   };
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Create an API key"
+    description="API keys allow you to authenticate API requests in your app"
+    learnMoreUrl="https://docs.livepeer.studio/category/api"
+    actionTitle="Create API key"
+    actionToggleState={actionToggleState}
+  />
+);
