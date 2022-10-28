@@ -28,7 +28,9 @@ const EmptyState = ({
       Signing keys allow you to use playback policies with your streams to
       restrict access to them
     </Text>
-    <Link href="https://docs.livepeer.studio/category/api" passHref>
+    <Link
+      href="https://docs.livepeer.studio/category/api/create-signing-keys"
+      passHref>
       <A
         target="_blank"
         variant="primary"
