@@ -20,7 +20,7 @@ export const makeSelectAction = (title: string, onClick: () => void) => ({
 
 export const makeCreateAction = (title: string, onClick: () => void) => ({
   onClick,
-  css: { display: "flex", alignItems: "center" },
+  css: { display: "flex", alignItems: "center", ml: "$1" },
   children: (
     <>
       <PlusIcon />{" "}

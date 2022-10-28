@@ -14,6 +14,7 @@ const HealthChecksTable = ({
   stream,
   streamHealth,
   invalidateStream,
+  emptyState,
   border = false,
   tableLayout = "fixed",
   ...props
@@ -56,16 +57,17 @@ const HealthChecksTable = ({
   return (
     <Box {...props}>
       <Table
-        tableData={tableData}
+        header={<Heading>{title}</Heading>}
         state={state}
         stateSetter={stateSetter}
-        header={<Heading>{title}</Heading>}
+        tableData={tableData}
         border={border}
         columns={columns}
         rowSelection={null}
         showOverflow={true}
         noPagination={true}
         tableLayout={tableLayout}
+        emptyState={emptyState}
       />
     </Box>
   );

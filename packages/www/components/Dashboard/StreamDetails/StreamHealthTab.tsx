@@ -126,7 +126,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         css={{ mb: "$7" }}
         emptyState={
           <Text variant="gray" size="2">
-            No targets
+            No data
           </Text>
         }
         tableLayout="auto"

@@ -12,6 +12,7 @@ import {
   makeColumns,
   rowsPageFromState,
 } from "./helpers";
+import { makeCreateAction } from "../Table/helpers";
 
 const AssetsTable = ({
   userId,
@@ -44,6 +45,16 @@ const AssetsTable = ({
 
   const onUploadAssetSuccess = () => state.invalidate();
 
+  const onCreate = async ({ videoFiles }: { videoFiles: File[] }) => {
+    try {
+      await uploadAssets(videoFiles, onUploadAssetSuccess);
+      await state.invalidate();
+      createDialogState.onOff();
+    } catch (e) {
+      openSnackbar(`Error with uploading videos, please try again.`);
+    }
+  };
+
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
@@ -53,50 +64,23 @@ const AssetsTable = ({
   return (
     <>
       <Table
+        title={title}
         columns={columns}
         fetcher={fetcher}
         fetcherOptions={{ refetchInterval: 15000 }}
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
         viewAll={viewAll}
-        header={
-          <Heading size="2">
-            <Flex>
-              <Box css={{ mr: "$3", fontWeight: 600, letterSpacing: 0 }}>
-                {title}
-              </Box>
-            </Flex>
-          </Heading>
-        }
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center", ml: "$1" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Upload asset
-              </Box>
-            </>
-          ),
-        }}
+        emptyState={<EmptyState createDialogState={createDialogState} />}
+        createAction={makeCreateAction("Upload asset", createDialogState.onOn)}
       />
 
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onCreate={async ({ videoFiles }: { videoFiles: File[] }) => {
-          try {
-            await uploadAssets(videoFiles, onUploadAssetSuccess);
-            await state.invalidate();
-            createDialogState.onOff();
-          } catch (e) {
-            openSnackbar(`Error with uploading videos, please try again.`);
-          }
-        }}
+        onCreate={onCreate}
       />
     </>
   );

@@ -12,6 +12,7 @@ import {
 } from "./helpers";
 import CreateDialog from "./CreateDialog";
 import DeleteDialog from "./DeleteDialog";
+import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 
 const SigningKeysTable = ({
   title = "Signing Keys",
@@ -40,41 +41,16 @@ const SigningKeysTable = ({
   return (
     <>
       <Table
+        title={title}
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
         state={state}
         stateSetter={stateSetter}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
-        header={
-          <Heading size="2" css={{ fontWeight: 600 }}>
-            {title}
-          </Heading>
-        }
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create key
-              </Box>
-            </>
-          ),
-        }}
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon /> <Box css={{ ml: "$2" }}>Delete</Box>
-            </>
-          ),
-          css: { display: "flex", alignItems: "center" },
-          // @ts-ignore
-          size: "2",
-        }}
+        emptyState={<EmptyState createDialogState={createDialogState} />}
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
+        createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />
 
       <DeleteDialog state={state} deleteDialogState={deleteDialogState} />

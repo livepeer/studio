@@ -4,6 +4,8 @@ import TextCell, {
   TextCellProps,
 } from "@components/Dashboard/Table/cells/text";
 import { Box } from "@livepeer/design-system";
+import { Condition } from "hooks/use-analyzer";
+import { Stream } from "@livepeer.studio/api";
 
 export type HealthChecksTableData = {
   id: string;
@@ -33,9 +35,9 @@ export const makeColumns = () => [
 ];
 
 export const makeTableData = (
-  conditionsMap,
-  stream,
-  streamActiveSince
+  conditionsMap: Record<string, Condition>,
+  stream: Stream,
+  streamActiveSince: number
 ): TableData<HealthChecksTableData> => ({
   isLoading: false,
   data: {
