@@ -263,10 +263,8 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   };
 
   const headerCssWidth = (column, index, rowSelection): string => {
-    if (column.width) {
-      return column.width;
-    }
-    return index === 0 && rowSelection === "all" ? "$6" : "auto";
+    const isSelectColumn = index === 0 && rowSelection === "all";
+    return isSelectColumn ? "$4" : column.width || "auto";
   };
 
   return (
