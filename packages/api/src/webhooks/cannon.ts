@@ -517,6 +517,7 @@ export default class WebhookCannon {
         playbackId,
         userId,
         createdAt,
+        source: { type: "recording", sessionId },
         status: { phase: "waiting", updatedAt: createdAt },
         name: `live-to-vod-${sessionId}`,
         objectStoreId: this.vodObjectStoreId,

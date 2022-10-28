@@ -41,14 +41,12 @@ const newPlaybackInfo = (
   },
 });
 
-const getAssetPlaybackUrl = async (
-  ingest: string,
-  id: string,
-  cid: boolean
-) => {
-  const asset = cid
-    ? await db.asset.getByIpfsCid(id)
-    : await db.asset.getByPlaybackId(id);
+const getAssetPlaybackUrl = async (ingest: string, id: string) => {
+  const asset =
+    (await db.asset.getByPlaybackId(id)) ??
+    (await db.asset.getByIpfsCid(id)) ??
+    (await db.asset.getBySourceURL("ipfs://" + id)) ??
+    (await db.asset.getBySourceURL("ar://" + id));
   if (!asset || asset.deleted) {
     return null;
   }
@@ -80,9 +78,7 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
-  const assetUrl =
-    (await getAssetPlaybackUrl(ingest, id, false)) ??
-    (await getAssetPlaybackUrl(ingest, id, true));
+  const assetUrl = await getAssetPlaybackUrl(ingest, id);
   if (assetUrl) {
     return newPlaybackInfo("vod", assetUrl);
   }

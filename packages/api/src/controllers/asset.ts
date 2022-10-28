@@ -45,40 +45,12 @@ import os from "os";
 
 const app = Router();
 
-const META_MAX_SIZE = 1024;
-
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
   if (user.admin && upload === "1") {
     return true;
   }
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
-}
-
-function validateAssetMeta(
-  meta: Record<string, string>,
-  asset?: WithID<Asset>
-) {
-  if (!meta) {
-    return meta;
-  }
-  meta = _({ ...asset?.meta, ...meta })
-    .omitBy(_.isNull)
-    .value();
-  try {
-    if (meta && JSON.stringify(meta).length > META_MAX_SIZE) {
-      console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
-      throw new UnprocessableEntityError(
-        `the provided meta exceeds max size of ${META_MAX_SIZE} characters`
-      );
-    }
-  } catch (e) {
-    console.error(`couldn't parse the provided meta ${meta}`);
-    throw new UnprocessableEntityError(
-      `the provided meta is not in a valid json format`
-    );
-  }
-  return meta;
 }
 
 function cleanAssetTracks(asset: WithID<Asset>) {
@@ -99,7 +71,8 @@ async function validateAssetPayload(
   userId: string,
   createdAt: number,
   defaultObjectStoreId: string,
-  payload: NewAssetPayload
+  payload: NewAssetPayload,
+  source?: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
     if (payload.objectStoreId !== defaultObjectStoreId) {
@@ -126,8 +99,12 @@ async function validateAssetPayload(
       updatedAt: createdAt,
     },
     name: payload.name,
+    source:
+      source ??
+      (payload.url
+        ? { type: "url", url: payload.url }
+        : { type: "directUpload" }),
     playbackPolicy: payload.playbackPolicy,
-    meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
@@ -332,7 +309,6 @@ const fieldsMap: FieldsMap = {
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
-  meta: `asset.data->>'meta'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
 };
@@ -555,7 +531,8 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     req.config.vodObjectStoreId,
     {
       name: req.body.name ?? inputAsset.name,
-    }
+    },
+    { type: "transcode", inputAssetId: inputAsset.id }
   );
   outputAsset.sourceAssetId = inputAsset.sourceAssetId ?? inputAsset.id;
   outputAsset = await createAsset(outputAsset, req.queue);
@@ -743,7 +720,7 @@ app.post("/upload/tus", async (req, res) => {
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
   await getPendingAssetAndTask(playbackId);
-  // TODO: Consider updating asset name and meta from metadata?
+  // TODO: Consider updating asset name from metadata?
   res.setHeader("livepeer-playback-id", playbackId);
   return tusServer.handle(req, res);
 });
@@ -805,7 +782,6 @@ app.patch(
     // these are the only updateable fields
     let {
       name,
-      meta,
       playbackPolicy,
       storage: storageInput,
     } = req.body as AssetPatchPayload;
@@ -830,15 +806,12 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
-    meta = validateAssetMeta(meta, asset);
-
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
     await req.taskScheduler.updateAsset(asset, {
       name,
-      meta,
       storage,
       playbackPolicy,
     });
