@@ -1,8 +1,6 @@
-import { Heading, Box, Flex } from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateStreamDialog from "./CreateStreamDialog";
 import { useRouter } from "next/router";
@@ -16,6 +14,8 @@ import {
   StreamsTableData,
 } from "./helpers";
 import DeleteDialog from "./DeleteDialog";
+import { makeSelectAction, makeCreateAction } from "../Table/helpers";
+import TableHeader from "../Table/components/TableHeader";
 
 const StreamsTable = ({
   title = "Streams",
@@ -88,42 +88,16 @@ const StreamsTable = ({
         stateSetter={stateSetter}
         rowSelection="all"
         filterItems={!viewAll && filterItems}
-        emptyState={makeEmptyState(createDialogState)}
         viewAll={viewAll}
-        header={
-          <Heading size="2">
-            <Flex>
-              <Box css={{ mr: "$3", fontWeight: 600, letterSpacing: 0 }}>
-                {title}
-              </Box>
-              <ActiveStreamsBadge />
-            </Flex>
-          </Heading>
-        }
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon />{" "}
-              <Box css={{ ml: "$2" }} as="span">
-                Delete
-              </Box>
-            </>
-          ),
-        }}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center", ml: "$1" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create stream
-              </Box>
-            </>
-          ),
-        }}
+        emptyState={makeEmptyState(createDialogState)}
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
+        createAction={makeCreateAction("Create stream", createDialogState.onOn)}
+        header={
+          <TableHeader title={title}>
+            <ActiveStreamsBadge />
+          </TableHeader>
+        }
       />
 
       <DeleteDialog
