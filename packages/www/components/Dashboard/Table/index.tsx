@@ -36,6 +36,7 @@ import TableFilter, {
 import Link from "next/link";
 import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { DefaultTableHeader } from "./helpers";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -78,7 +79,8 @@ export type TableData<T extends Record<string, unknown>> = {
 
 type Props<T extends Record<string, unknown>> = {
   columns: any;
-  header: React.ReactNode;
+  header?: React.ReactNode;
+  title?: string;
   rowSelection?: "individual" | "all" | null;
   initialSortBy?: Sort<T>[];
   filterItems?: FilterItem[];
@@ -105,6 +107,7 @@ type DataTableProps<T extends Record<string, unknown>> = Omit<
 export const DataTableComponent = <T extends Record<string, unknown>>({
   columns,
   header,
+  title,
   rowSelection,
   initialSortBy,
   filterItems,
@@ -267,6 +270,12 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
     return isSelectColumn ? "$4" : column.width || "auto";
   };
 
+  const headerComponent = header ? (
+    header
+  ) : title ? (
+    <DefaultTableHeader title={title} />
+  ) : null;
+
   return (
     <Box>
       <Flex
@@ -278,7 +287,10 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           borderColor: border ? "$neutral5" : "transparent",
           pb: border ? "$2" : 0,
         }}>
-        <Box>{header}</Box>
+        {/* Header title */}
+        <Box>{headerComponent}</Box>
+
+        {/* Header actions */}
         <Flex css={{ alignItems: "center" }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>

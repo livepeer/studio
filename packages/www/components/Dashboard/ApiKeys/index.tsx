@@ -1,13 +1,12 @@
-import { Heading, Box } from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import CreateDialog from "./CreateDialog";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { useToggleState } from "hooks/use-toggle-state";
 import { ApiKeysTableData, makeColumns, rowsPageFromState } from "./helpers";
 import EmptyState from "./EmptyState";
 import DeleteDialog from "./DeleteDialog";
+import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -33,40 +32,15 @@ const ApiKeysTable = ({
   return (
     <>
       <Table
+        title={title}
         state={state}
         stateSetter={stateSetter}
-        header={
-          <Heading size="2" css={{ fontWeight: 600 }}>
-            {title}
-          </Heading>
-        }
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
         emptyState={<EmptyState createDialogState={createDialogState} />}
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon /> <Box css={{ ml: "$2" }}>Delete</Box>
-            </>
-          ),
-          css: { display: "flex", alignItems: "center" },
-          // @ts-ignore
-          size: "2",
-        }}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create key
-              </Box>
-            </>
-          ),
-        }}
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
+        createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />
 
       <DeleteDialog
