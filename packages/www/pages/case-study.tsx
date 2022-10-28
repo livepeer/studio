@@ -4,14 +4,20 @@ import { HeroImage } from "@components/Site/HeroImage";
 import { OffsetPortableText } from "@components/Site/OffsetPortableText";
 import { IconGrid } from "@components/Site/IconGrid";
 import Layout from "layouts/main";
+import { SplitImage } from "@components/Site/SplitImage";
 
 const CaseSudy = () => {
   return (
     <Layout navBackgroundColor="$hiContrast" {...Content.metaData}>
       <HeroImage />
       <OffsetPortableText />
+      <IconGrid noTitle={true} />
       <CenterTitle />
-      <IconGrid />
+      <SplitImage direction={true} />
+      <SplitImage direction={false} />
+      <SplitImage direction={true} />
+      <SplitImage direction={false} />
+      <IconGrid noTitle={false} />
     </Layout>
   );
 };
