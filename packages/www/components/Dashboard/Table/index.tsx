@@ -263,10 +263,8 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   };
 
   const headerCssWidth = (column, index, rowSelection): string => {
-    if (column.width) {
-      return column.width;
-    }
-    return index === 0 && rowSelection === "all" ? "$6" : "auto";
+    const isSelectColumn = index === 0 && rowSelection === "all";
+    return isSelectColumn ? "$4" : column.width || "auto";
   };
 
   return (
@@ -378,6 +376,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           scope="col"
                           css={{
                             pl: i === 0 ? "$1" : 0,
+                            pr: "$2",
                             width: headerCssWidth(column, i, rowSelection),
                           }}
                           {...column.getHeaderProps(
@@ -427,11 +426,8 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                         <Td
                           as={i === 0 ? Th : Td}
                           css={{
-                            py: 0,
-                            width:
-                              i === 0 && rowSelection === "all"
-                                ? "30px"
-                                : "auto",
+                            pl: 0,
+                            pr: "$2",
                             ...cell.value?.css,
                           }}
                           {...cell.getCellProps()}>

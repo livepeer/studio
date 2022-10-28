@@ -26,7 +26,6 @@ const demoIpfsContent = {
 
 export type EditAssetReturnValue = {
   name: string;
-  metadata: Record<string, unknown> | null;
 };
 
 const EditAssetDialog = ({
@@ -93,7 +92,6 @@ const EditAssetDialog = ({
             try {
               await onEdit({
                 name,
-                metadata: metadata ? JSON.parse(metadata) : null,
               });
               onOpenChange(false);
             } catch (error) {
@@ -123,7 +121,7 @@ const EditAssetDialog = ({
             />
           </Flex>
 
-          <Flex css={{ mt: "$2" }} direction="column" gap="1">
+          {/* <Flex css={{ mt: "$2" }} direction="column" gap="1">
             <Label htmlFor="metadata">Metadata</Label>
             <TextArea
               size="2"
@@ -142,7 +140,7 @@ const EditAssetDialog = ({
                 {metadataError || "Metadata must be valid JSON."}
               </Text>
             </AlertDialogDescription>
-          )}
+          )} */}
 
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
             <AlertDialogCancel asChild>
@@ -154,7 +152,7 @@ const EditAssetDialog = ({
               css={{ display: "flex", ai: "center" }}
               type="submit"
               size="2"
-              disabled={editing || !isMetadataValid || !name}
+              disabled={editing || !name} // || !isMetadataValid
               variant="primary">
               {editing && (
                 <Spinner

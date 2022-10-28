@@ -51,6 +51,9 @@ jobs:
       - name: yarn install
         run: yarn install --frozen-lockfile
 
+      - name: yarn tests without coverage
+        run: yarn run test
+
       - name: yarn tests with coverage
         run: yarn run coverage
 

@@ -22,6 +22,7 @@ export const makeColumns = () => [
     Cell: NameCell,
     sortType: (...params: SortTypeArgs) =>
       stringSort("original.name.value", ...params),
+    width: "$9",
   },
   {
     Header: "Public Key",
@@ -35,6 +36,7 @@ export const makeColumns = () => [
     Cell: DateCell,
     sortType: (...params: SortTypeArgs) =>
       dateSort("original.createdAt.date", ...params),
+    width: "$9",
   },
 ];
 
