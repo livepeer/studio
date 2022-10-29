@@ -1070,7 +1070,7 @@ app.patch(
       return res.json({ errors: ["can't patch stream session"] });
     }
 
-    let { record, suspended, multistream } = payload;
+    let { record, suspended, multistream, playbackPolicy } = payload;
     let patch: StreamPatchPayload = {};
     if (typeof record === "boolean") {
       patch = { ...patch, record };
@@ -1085,6 +1085,9 @@ app.patch(
         multistream
       );
       patch = { ...patch, multistream };
+    }
+    if (playbackPolicy) {
+      patch = { ...patch, playbackPolicy };
     }
     if (Object.keys(patch).length === 0) {
       return res.status(204).end();
