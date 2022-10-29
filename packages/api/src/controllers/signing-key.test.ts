@@ -56,7 +56,8 @@ describe("controllers/signing-key", () => {
       let created: SigningKeyResponsePayload = await client
         .post("/access-control/signing-key")
         .then((res) => res.json());
-      samplePrivateKey = created.privateKey;
+      let encodedPrivateKey = created.privateKey;
+      samplePrivateKey = Buffer.from(encodedPrivateKey, "base64").toString();
       let res = await client.get(`/access-control/signing-key/${created.id}`);
       signingKey = await res.json();
       // decoded public key is decoded b64 of signingKey.publicKey parsed as json
