@@ -42,7 +42,7 @@ const EmbedVideoDialog = ({
           px: "$5",
           pt: "$4",
           pb: "$4",
-          zIndex: 5,
+          zIndex: 1001,
         }}>
         <DialogTitle asChild>
           <Heading size="1">Embed Video</Heading>
