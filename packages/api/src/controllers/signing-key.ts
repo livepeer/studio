@@ -179,6 +179,7 @@ signingKeyApp.post(
     const keypair = await generateSigningKeys();
 
     let b64PublicKey = Buffer.from(keypair.publicKey).toString("base64");
+    let b64PrivateKey = Buffer.from(keypair.privateKey).toString("base64");
 
     var doc: WithID<SigningKey> = {
       id,
@@ -192,7 +193,7 @@ signingKeyApp.post(
 
     var createdSigningKey: SigningKeyResponsePayload = {
       ...doc,
-      privateKey: keypair.privateKey.toString(),
+      privateKey: b64PrivateKey,
     };
 
     res.status(201);
