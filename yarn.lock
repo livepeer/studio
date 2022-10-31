@@ -4483,10 +4483,10 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
-"@livepeer/design-system@^1.0.4-0":
-  version "1.0.4-0"
-  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-1.0.4-0.tgz#d1907f0be517ea3e74e3a726e72d36517d4fce87"
-  integrity sha512-TFqOh8KA4433ZDoB4KFJJIlysRFeVKf1Q/lhPIR8Us/O38Sz977Lo5xONkYiXCGM32Fk2PJNhGw6WNMvz9wwyg==
+"@livepeer/design-system@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@livepeer/design-system/-/design-system-1.0.4.tgz#2104a25be395101f9683ef79ded4047a7177ff87"
+  integrity sha512-em1JHADADMrgEiehQpemCj052XyyFyIP5kFicwPZkRnmunVrX1/6HskJMNonDWGl4V7pfvaWVVJMljONWQGx/Q==
   dependencies:
     "@radix-ui/colors" "0.1.8"
     "@radix-ui/react-accessible-icon" "^1.0.0"
