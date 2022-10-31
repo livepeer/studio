@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
 import { Box } from "@livepeer/design-system";
@@ -13,15 +13,14 @@ import {
   rowsPageFromState,
   WebhooksTableData,
 } from "./helpers";
-import DeleteDialog from "./DeleteDialog";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
-  const { user, getWebhooks, deleteWebhook, deleteWebhooks, createWebhook } =
+  const { user, getWebhooks, createWebhook, deleteWebhook, deleteWebhooks } =
     useApi();
   const deleteDialogState = useToggleState();
-  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
     tableId: "webhooksTable",
@@ -33,24 +32,6 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     async (state) => rowsPageFromState(state, getWebhooks),
     [getWebhooks, user.id]
   );
-
-  const onDeleteWebhooks = useCallback(async () => {
-    if (state.selectedRows.length === 1) {
-      await deleteWebhook(state.selectedRows[0].id);
-      await state.invalidate();
-      deleteDialogState.onOff();
-    } else if (state.selectedRows.length > 1) {
-      await deleteWebhooks(state.selectedRows.map((s) => s.id));
-      await state.invalidate();
-      deleteDialogState.onOff();
-    }
-  }, [
-    deleteWebhook,
-    deleteWebhooks,
-    deleteDialogState.onOff,
-    state.selectedRows.length,
-    state.invalidate,
-  ]);
 
   const onCreateSubmit = async ({ events, name, url, sharedSecret }) => {
     const newWebhook = await createWebhook({
@@ -84,12 +65,12 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
         )}
       />
 
-      <DeleteDialog
-        deleteDialogState={deleteDialogState}
+      <TableStateDeleteDialog
+        entityName={{ singular: "webhook", plural: "webhooks" }}
         state={state}
-        savingDeleteDialog={savingDeleteDialog}
-        setSavingDeleteDialog={setSavingDeleteDialog}
-        onDeleteWebhooks={onDeleteWebhooks}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteWebhook}
+        deleteMultipleFunction={deleteWebhooks}
       />
 
       <CreateDialog

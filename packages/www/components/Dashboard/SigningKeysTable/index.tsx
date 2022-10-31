@@ -9,8 +9,8 @@ import {
   SigningKeysTableData,
 } from "./helpers";
 import CreateDialog from "./CreateDialog";
-import DeleteDialog from "./DeleteDialog";
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
 const SigningKeysTable = ({
   title = "Signing Keys",
@@ -21,7 +21,7 @@ const SigningKeysTable = ({
   pageSize?: number;
   tableId: string;
 }) => {
-  const { getSigningKeys } = useApi();
+  const { getSigningKeys, deleteSigningKey } = useApi();
   const { state, stateSetter } = useTableState<SigningKeysTableData>({
     pageSize,
     tableId,
@@ -51,7 +51,12 @@ const SigningKeysTable = ({
         createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />
 
-      <DeleteDialog state={state} deleteDialogState={deleteDialogState} />
+      <TableStateDeleteDialog
+        entityName={{ singular: "signing key", plural: "signing keys" }}
+        state={state}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteSigningKey}
+      />
 
       <CreateDialog
         isOpen={createDialogState.on}

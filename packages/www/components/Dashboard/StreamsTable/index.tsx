@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
 import { useToggleState } from "hooks/use-toggle-state";
@@ -13,9 +13,9 @@ import {
   rowsPageFromState,
   StreamsTableData,
 } from "./helpers";
-import DeleteDialog from "./DeleteDialog";
 import { makeSelectAction, makeCreateAction } from "../Table/helpers";
 import TableHeader from "../Table/components/TableHeader";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
 const StreamsTable = ({
   title = "Streams",
@@ -31,8 +31,7 @@ const StreamsTable = ({
   viewAll?: string;
 }) => {
   const router = useRouter();
-  const { getStreams, deleteStream, deleteStreams, createStream } = useApi();
-  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
+  const { getStreams, createStream, deleteStream, deleteStreams } = useApi();
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<StreamsTableData>({
@@ -44,24 +43,6 @@ const StreamsTable = ({
     async (state) => rowsPageFromState(state, userId, getStreams),
     [userId]
   );
-
-  const onDeleteStreams = useCallback(async () => {
-    if (state.selectedRows.length === 1) {
-      await deleteStream(state.selectedRows[0].id);
-      await state.invalidate();
-      deleteDialogState.onOff();
-    } else if (state.selectedRows.length > 1) {
-      await deleteStreams(state.selectedRows.map((s) => s.id));
-      await state.invalidate();
-      deleteDialogState.onOff();
-    }
-  }, [
-    deleteStream,
-    deleteStreams,
-    deleteDialogState.onOff,
-    state.selectedRows.length,
-    state.invalidate,
-  ]);
 
   const onCreateClick = useCallback(
     async (streamName: string) => {
@@ -100,12 +81,12 @@ const StreamsTable = ({
         }
       />
 
-      <DeleteDialog
+      <TableStateDeleteDialog
+        entityName={{ singular: "stream", plural: "streams" }}
         state={state}
-        deleteDialogState={deleteDialogState}
-        savingDeleteDialog={savingDeleteDialog}
-        setSavingDeleteDialog={setSavingDeleteDialog}
-        onDeleteStreams={onDeleteStreams}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteStream}
+        deleteMultipleFunction={deleteStreams}
       />
 
       <CreateStreamDialog

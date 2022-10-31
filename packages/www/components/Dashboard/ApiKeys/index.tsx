@@ -9,8 +9,8 @@ import {
   makeEmptyState,
   rowsPageFromState,
 } from "./helpers";
-import DeleteDialog from "./DeleteDialog";
 import { makeCreateAction, makeSelectAction } from "../Table/helpers";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
 const ApiKeysTable = ({
   title = "API Keys",
@@ -25,7 +25,6 @@ const ApiKeysTable = ({
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
-  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const columns = useMemo(makeColumns, []);
 
   const fetcher: Fetcher<ApiKeysTableData> = useCallback(
@@ -47,12 +46,11 @@ const ApiKeysTable = ({
         createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />
 
-      <DeleteDialog
+      <TableStateDeleteDialog
+        entityName={{ singular: "API key", plural: "API keys" }}
         state={state}
-        deleteDialogState={deleteDialogState}
-        savingDeleteDialog={savingDeleteDialog}
-        setSavingDeleteDialog={setSavingDeleteDialog}
-        deleteApiToken={deleteApiToken}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteApiToken}
       />
 
       <CreateDialog

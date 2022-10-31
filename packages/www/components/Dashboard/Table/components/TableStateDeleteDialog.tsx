@@ -12,77 +12,85 @@ import {
   useSnackbar,
 } from "@livepeer/design-system";
 import { ToggleState } from "hooks/use-toggle-state";
-import Spinner from "../Spinner";
-import { State } from "../Table";
-import { ApiKeysTableData } from "./helpers";
+import { useState } from "react";
+import Spinner from "../../Spinner";
+import { State } from "..";
 
-const DeleteDialog = ({
+const TableStateDeleteDialog = ({
+  entityName,
   state,
-  deleteDialogState,
-  savingDeleteDialog,
-  setSavingDeleteDialog,
-  deleteApiToken,
+  dialogToggleState,
+  deleteFunction,
+  deleteMultipleFunction,
 }: {
-  state: State<ApiKeysTableData>;
-  deleteDialogState: ToggleState;
-  savingDeleteDialog: boolean;
-  setSavingDeleteDialog(boolean): void;
-  deleteApiToken: Function;
+  entityName: { singular: string; plural: string };
+  state: State<any>;
+  dialogToggleState: ToggleState;
+  deleteFunction(string): void;
+  deleteMultipleFunction?(ids: string[]): void;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [openSnackbar] = useSnackbar();
+
+  const { singular, plural } = entityName;
+  const name = state.selectedRows.length > 1 ? plural : singular;
 
   const onDeleteClick = async (e) => {
     try {
       e.preventDefault();
-      setSavingDeleteDialog(true);
-      const promises = state.selectedRows.map(async (row) => {
-        return deleteApiToken(row.original.id as string);
-      });
-      await Promise.all(promises);
+      setIsLoading(true);
+
+      const ids = state.selectedRows.map((row) => row.original.id);
+
+      if (ids.length > 1 && deleteMultipleFunction) {
+        await deleteMultipleFunction(ids);
+      } else if (ids.length > 1) {
+        const promises = state.selectedRows.map(async (row) =>
+          deleteFunction(row.original.id)
+        );
+        await Promise.all(promises);
+      } else if (ids.length === 1) {
+        await deleteFunction(ids[0]);
+      }
+
       await state.invalidate();
-      openSnackbar(
-        `${state.selectedRows.length} stream${
-          state.selectedRows.length > 1 ? "s" : ""
-        } deleted.`
-      );
-      deleteDialogState.onOff();
+      openSnackbar(`${state.selectedRows.length} ${name} deleted.`);
+      dialogToggleState.onOff();
     } finally {
-      setSavingDeleteDialog(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <AlertDialog
-      open={deleteDialogState.on}
-      onOpenChange={deleteDialogState.onOff}>
+      open={dialogToggleState.on}
+      onOpenChange={dialogToggleState.onOff}>
       <AlertDialogContent css={{ maxWidth: 450, px: "$5", pt: "$4", pb: "$4" }}>
         <AlertDialogTitle asChild>
           <Heading size="1">
-            Delete {state.selectedRows.length} API token
-            {state.selectedRows.length > 1 && "s"}?
+            Delete {state.selectedRows.length} {name}?
           </Heading>
         </AlertDialogTitle>
         <AlertDialogDescription asChild>
           <Text size="3" variant="gray" css={{ mt: "$2", lineHeight: "22px" }}>
-            This will permanently remove the API token
-            {state.selectedRows.length > 1 && "s"}. This action cannot be
+            This will permanently remove the {name}. This action cannot be
             undone.
           </Text>
         </AlertDialogDescription>
 
         <Flex css={{ jc: "flex-end", gap: "$3", mt: "$5" }}>
           <AlertDialogCancel asChild>
-            <Button size="2" onClick={deleteDialogState.onOff} ghost>
+            <Button size="2" onClick={dialogToggleState.onOff} ghost>
               Cancel
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button
               size="2"
-              disabled={savingDeleteDialog}
+              disabled={isLoading}
               onClick={onDeleteClick}
               variant="red">
-              {savingDeleteDialog && (
+              {isLoading && (
                 <Spinner
                   css={{
                     color: "$hiContrast",
@@ -101,4 +109,4 @@ const DeleteDialog = ({
   );
 };
 
-export default DeleteDialog;
+export default TableStateDeleteDialog;
