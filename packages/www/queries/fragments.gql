@@ -42,17 +42,48 @@ fragment hero on Hero {
   }
 }
 
-# fragment heroImage on HeroImage {
-#   _type
-#   title
-#   richText
-#   image {
-#     ...imageInfo
-#   }
-# }
-
-fragment offSetPortableText on OffSetPortableText {
+fragment heroImage on HeroImage {
   _type
+  title
+  richText
+  defaultImage {
+    asset {
+      url
+    }
+  }
+}
+fragment centerTitle on CenterTitle {
+  _type
+  title
+  richText
+}
+
+fragment offsetPortableText on OffsetPortableText {
+  _type
+  title
+  richText
+}
+fragment splitImage on SplitImage {
+  _type
+  inverted
+  title
+  richText
+  defaultImage {
+    asset {
+      url
+    }
+  }
+}
+fragment iconGrid on IconGrid {
+  _type
+  title
+  richText
+}
+fragment form on Form {
+  _type
+  region
+  portalId
+  formId
 }
 
 fragment valuesSection on ValuesSection {

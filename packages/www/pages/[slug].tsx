@@ -63,6 +63,7 @@ const Page = ({
 };
 
 export async function getStaticPaths() {
+  // @ts-ignore
   const { allPage } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPages),

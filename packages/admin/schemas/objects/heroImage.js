@@ -13,23 +13,12 @@ export default {
     {
       name: "richText",
       title: "Rich Text",
-      type: "portableText",
+      type: "text",
     },
     {
-      name: "image",
+      name: "defaultImage",
       title: "Image",
-      type: "image",
-      validation: (Rule) => Rule.required(),
-      fields: [
-        {
-          name: "alt",
-          type: "string",
-          title: "Alt Text",
-          options: {
-            isHighlighted: true,
-          },
-        },
-      ],
+      type: "defaultImage",
     },
   ],
 };

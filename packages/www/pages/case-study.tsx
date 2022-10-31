@@ -1,10 +1,11 @@
 import { Home as Content } from "content";
-import { CenterTitle } from "@components/Site/CenterTitle";
-import { HeroImage } from "@components/Site/HeroImage";
-import { OffsetPortableText } from "@components/Site/OffsetPortableText";
-import { IconGrid } from "@components/Site/IconGrid";
+import CenterTitle from "@components/Site/CenterTitle";
+import HeroImage from "@components/Site/HeroImage";
+import OffsetPortableText from "@components/Site/OffsetPortableText";
+import IconGrid from "@components/Site/IconGrid";
 import Layout from "layouts/main";
-import { SplitImage } from "@components/Site/SplitImage";
+import SplitImage from "@components/Site/SplitImage";
+import Form from "@components/Site/Form";
 
 const CaseSudy = () => {
   return (
@@ -18,6 +19,7 @@ const CaseSudy = () => {
       <SplitImage direction={true} />
       <SplitImage direction={false} />
       <IconGrid noTitle={false} />
+      <Form />
     </Layout>
   );
 };

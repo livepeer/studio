@@ -1,7 +1,8 @@
 import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
-export const HeroImage = () => {
+
+export default function HeroImage({ title, richText }) {
   return (
     <Container sx={{ paddingX: "15px" }}>
       <Box
@@ -42,12 +43,9 @@ export const HeroImage = () => {
                   fontSize: 100,
                 },
               }}>
-              BUILDING WEB3 VIDEO
+              {title}
             </LiveBox>
-            <Text>
-              The formula for video in web3 is decentralized storage plus
-              Livepeer Studio.
-            </Text>
+            <Text>{richText}</Text>
           </Box>
           <Image
             src="/img/temp/example-cloud.png"
@@ -61,4 +59,4 @@ export const HeroImage = () => {
       </Box>
     </Container>
   );
-};
+}

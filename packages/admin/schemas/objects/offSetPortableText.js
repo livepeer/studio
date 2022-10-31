@@ -1,6 +1,6 @@
 import { BsTextareaT } from "react-icons/bs";
 export default {
-  name: "offSetPortableText",
+  name: "offsetPortableText",
   title: "OffSet PortableText",
   type: "object",
   icon: BsTextareaT,
@@ -11,27 +11,9 @@ export default {
       type: "string",
     },
     {
-      name: "description",
+      name: "richText",
       title: "Description",
-      type: "portableText",
-    },
-    // {
-    //   name: "buttons",
-    //   title: "Buttons",
-    //   type: "array",
-    //   of: [{ type: "button" }],
-    // },
-    {
-      name: "socials",
-      title: "Socials",
-      type: "array",
-      of: [
-        {
-          name: "icon",
-          title: "Icon",
-          type: "string",
-        },
-      ],
+      type: "text",
     },
   ],
 };

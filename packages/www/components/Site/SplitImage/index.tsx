@@ -1,7 +1,7 @@
-import { Text, Link as A, Box as LiveBox } from "@livepeer/design-system";
+import { Box as LiveBox } from "@livepeer/design-system";
 import { Container, Box } from "@theme-ui/components";
 
-export const SplitImage = ({ direction }) => {
+export default function SplitImage({ direction }) {
   return (
     <Container>
       <Box
@@ -58,6 +58,4 @@ export const SplitImage = ({ direction }) => {
       </Box>
     </Container>
   );
-};
-
-export default SplitImage;
+}

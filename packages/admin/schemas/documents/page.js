@@ -52,7 +52,7 @@ export default {
       of: [
         { type: "hero" },
         { type: "heroImage" },
-        { type: "offSetPortableText" },
+        { type: "offsetPortableText" },
         { type: "centerTitle" },
         { type: "splitImage" },
         { type: "iconGrid" },

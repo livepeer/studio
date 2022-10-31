@@ -7,22 +7,6 @@ export default {
   type: "object",
   fields: [
     {
-      name: "image",
-      title: "Image",
-      type: "image",
-      validation: (Rule) => Rule.required(),
-      fields: [
-        {
-          name: "alt",
-          type: "string",
-          title: "Alt Text",
-          options: {
-            isHighlighted: true,
-          },
-        },
-      ],
-    },
-    {
       name: "inverted",
       title: "Image orientation",
       description:
@@ -38,13 +22,12 @@ export default {
     {
       name: "richText",
       title: "Rich Text",
-      type: "portableText",
+      type: "text",
     },
-    // {
-    //   name: "buttons",
-    //   title: "Buttons",
-    //   type: "array",
-    //   of: [{ type: "buttons" }],
-    // },
+    {
+      name: "defaultImage",
+      title: "Image",
+      type: "defaultImage",
+    },
   ],
 };

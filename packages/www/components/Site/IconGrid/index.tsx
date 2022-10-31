@@ -2,11 +2,11 @@ import { Link as A, Box as LiveBox } from "@livepeer/design-system";
 import { Text, Container, Box } from "@theme-ui/components";
 import Image from "next/image";
 
-export const IconGrid = ({ noTitle }) => {
+export default function IconGrid({ title, richText }) {
   return (
     <Box sx={{ paddingY: "64px" }}>
       <Container css={{ maxWidth: "1200px", textAlign: "center" }}>
-        {!noTitle && (
+        {title && (
           <Box sx={{ marginBottom: "32px" }}>
             <LiveBox
               css={{
@@ -25,12 +25,9 @@ export const IconGrid = ({ noTitle }) => {
                   fontSize: 58,
                 },
               }}>
-              Build Anywhere
+              {title}
             </LiveBox>
-            <Text sx={{ maxWidth: "640px", marginX: "auto" }}>
-              Livepeer Studio is compatible with all L1 blockchains. Create the
-              best video experiences wherever you prefer to build.
-            </Text>
+            <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
           </Box>
         )}
         <Box
@@ -69,4 +66,4 @@ export const IconGrid = ({ noTitle }) => {
       </Container>
     </Box>
   );
-};
+}

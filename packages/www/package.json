@@ -29,6 +29,7 @@
     "@mdx-js/react": "^1.6.16",
     "@mdx-js/tag": "^0.20.3",
     "@next/mdx": "^9.5.2",
+    "@portabletext/react": "^1.0.6",
     "@radix-ui/react-accordion": "^0.1.7-rc.7",
     "@radix-ui/react-collapsible": "^0.1.6",
     "@radix-ui/react-icons": "^1.0.3",

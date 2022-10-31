@@ -17,8 +17,6 @@ query allPage($where: PageFilter) {
     }
     content {
       ...hero
-      # ...heroImage
-      ...offSetPortableText
       ...valuesSection
       ...investorsSection
       ...testimonialsSection
@@ -28,6 +26,13 @@ query allPage($where: PageFilter) {
       ...markdownSection
       ...teamSection
       ...jobsSection
+      # New components
+      ...heroImage
+      ...offsetPortableText
+      ...splitImage
+      ...centerTitle
+      ...iconGrid
+      ...form
     }
   }
 }

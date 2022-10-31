@@ -2,7 +2,7 @@ import { Text, Link as A, Box as LiveBox } from "@livepeer/design-system";
 import { Container, Box } from "@theme-ui/components";
 import Button from "@components/Site/Button";
 
-export const OffsetPortableText = () => {
+export default function OffsetPortableText() {
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -96,4 +96,4 @@ export const OffsetPortableText = () => {
       </Box>
     </>
   );
-};
+}

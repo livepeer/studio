@@ -38,10 +38,11 @@ import homePrinciplesSection from "./objects/home/principlesSection";
 import card from "./objects/card";
 import localeString from "./objects/localeString";
 import heroImage from "./objects/heroImage";
-import offSetPortableText from "./objects/offSetPortableText";
+import offsetPortableText from "./objects/offsetPortableText";
 import centerTitle from "./objects/centerTitle";
 import splitImage from "./objects/splitImage";
 import iconGrid from "./objects/iconGrid";
+import defaultImage from "./objects/defaultImage";
 
 // Landing page sections
 import hero from "./objects/hero";
@@ -109,10 +110,11 @@ export default createSchema({
     card,
     footer,
     localeString,
-    offSetPortableText,
+    offsetPortableText,
     heroImage,
     centerTitle,
     splitImage,
     iconGrid,
+    defaultImage,
   ]),
 });

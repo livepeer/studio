@@ -1,7 +1,9 @@
-import { Link as A, Box as LiveBox } from "@livepeer/design-system";
+import { Box as LiveBox } from "@livepeer/design-system";
 import { Text, Container, Box } from "@theme-ui/components";
 
-export const CenterTitle = () => {
+import React from "react";
+
+export default function CenterTitle({ title, richText }) {
   return (
     <Box sx={{ paddingY: "64px" }}>
       <Container css={{ maxWidth: "800px", textAlign: "center" }}>
@@ -22,14 +24,10 @@ export const CenterTitle = () => {
               fontSize: 58,
             },
           }}>
-          Web3 Video. Fast.
+          {title}
         </LiveBox>
-        <Text sx={{ maxWidth: "640px", marginX: "auto" }}>
-          Livepeer Studio is the complete video solution that provides
-          developers with all the tooling needed to add web3 video to their
-          apps.
-        </Text>
+        <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
       </Container>
     </Box>
   );
-};
+}
