@@ -47,7 +47,7 @@ const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
-  if (user.admin && upload === "1") {
+  if (user.admin || upload === "1") {
     return true;
   }
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
