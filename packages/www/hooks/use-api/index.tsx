@@ -18,129 +18,25 @@ import {
   SigningKeyResponsePayload,
 } from "@livepeer.studio/api";
 import qs from "qs";
-import { isStaging, isDevelopment, HttpError } from "../lib/utils";
-import Head from "next/head";
+import { isStaging, isDevelopment, HttpError } from "../../lib/utils";
 import { products } from "@livepeer.studio/api/src/config";
 import * as tus from "tus-js-client";
+import {
+  ApiState,
+  UsageData,
+  Ingest,
+  StreamInfo,
+  FileUpload,
+  Version,
+} from "./types";
+import { storeToken, clearToken, getStoredToken } from "./tokenStorage";
+import { trackPageView } from "./tracking";
+import makeStreamApiFunctions from "./streams";
 
 /**
  * Primary React API client. Definitely a "first pass". Should be replaced with some
  * helpers around a nice auto-generated TypeScript client from our Swagger schema.
  */
-
-declare global {
-  interface Window {
-    _hsq: any;
-  }
-}
-
-export type FileUpload = {
-  file: File;
-  progress?: number;
-  error?: Error;
-  updatedAt: number;
-  completed: boolean;
-};
-
-export type FileUploadsDictionary = {
-  [key: string]: FileUpload;
-};
-
-type ApiState = {
-  user?: User;
-  token?: string;
-  userRefresh?: number;
-  noStripe?: boolean;
-  currentFileUploads?: FileUploadsDictionary;
-  latestGetAssetsResult?: Asset[];
-};
-
-export interface UsageData {
-  sourceSegments: number;
-  transcodedSegments: number;
-  sourceSegmentsDuration: number;
-  transcodedSegmentsDuration: number;
-}
-
-export interface StreamInfo {
-  stream: Stream;
-  session?: Stream;
-  isPlaybackid: boolean;
-  isSession: boolean;
-  isStreamKey: boolean;
-  user: User;
-}
-
-export interface Version {
-  tag: string;
-  commit: string;
-}
-
-export interface Ingest {
-  ingest: string;
-  playback: string;
-  base: string;
-}
-
-const PERSISTENT_TOKEN = "PERSISTENT_TOKEN";
-
-const storeToken = (token) => {
-  try {
-    localStorage.setItem(PERSISTENT_TOKEN, token);
-  } catch (err) {
-    console.error(`
-      Error storing persistent token: ${err.message}. Usually this means that you're in a
-      Safari private window and you don't want the token to persist anyway.
-    `);
-  }
-};
-
-const trackPageView = (email, path = null) => {
-  var _hsq = (window._hsq = window._hsq || []);
-  _hsq.push(["identify", { email: email }]);
-  if (path) {
-    _hsq.push(["setPath", path]);
-  }
-  _hsq.push(["trackPageView"]);
-};
-
-const getStoredToken = () => {
-  if (!("browser" in process)) {
-    return null;
-  }
-  try {
-    return localStorage.getItem(PERSISTENT_TOKEN);
-  } catch (err) {
-    console.error(`Error retrieving persistent token: ${err.message}.`);
-    return null;
-  }
-};
-
-export const DashboardRedirect = () => {
-  return (
-    <Head>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-  if (!window.localStorage || !window.localStorage.getItem('${PERSISTENT_TOKEN}')) {
-      location.replace('/login?next=' + encodeURIComponent(
-        location.pathname + location.search
-      ))
-  }
-  `,
-        }}
-      />
-    </Head>
-  );
-};
-
-const clearToken = () => {
-  try {
-    localStorage.removeItem(PERSISTENT_TOKEN);
-  } catch (err) {
-    console.error(`Error clearing persistent token: ${err.message}.`);
-  }
-};
 
 const linkRE = new RegExp("<.[^?]?([^>]*)>");
 
@@ -167,6 +63,7 @@ const makeContext = (
     : isStaging()
     ? `https://livepeer.monster`
     : ``;
+
   const context = {
     ...state,
     endpoint,
@@ -584,14 +481,6 @@ const makeContext = (
         throw new Error(ingest);
       }
       return ingest;
-    },
-
-    async getStreamInfo(
-      id: string
-    ): Promise<[Response, StreamInfo | ApiError]> {
-      let [res, info] = await context.fetch(`/stream/${id}/info`);
-
-      return [res, info as StreamInfo | ApiError];
     },
 
     async getStream(streamId): Promise<Stream> {
@@ -1324,8 +1213,19 @@ const makeContext = (
       return totalViews[0].startViews;
     },
   };
-  return context;
+
+  return {
+    ...context,
+    ...makeStreamApiFunctions(context),
+  };
 };
+
+export interface ApiContextInterface {
+  fetch(
+    url: string,
+    opts?: RequestInit
+  ): Promise<[Response, any] | [Response] | any[]>;
+}
 
 export const ApiContext = createContext(makeContext({} as ApiState, () => {}));
 

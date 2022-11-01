@@ -8,10 +8,10 @@ import { getStripe } from "../lib/utils";
 import ReactGA from "react-ga";
 import Router from "next/router";
 import { useEffect } from "react";
-import { DashboardRedirect } from "hooks/use-api";
 import { hotjar } from "react-hotjar";
 import Head from "next/head";
 import { NextSeo } from "next-seo";
+import { DashboardRedirect } from "@components/Dashboard/Redirect";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
