@@ -8,10 +8,9 @@ import {
 } from "@livepeer.studio/api";
 import { HttpError } from "../../../lib/utils";
 import { StreamInfo } from "../types";
-import { ApiContextInterface } from "..";
 import { getCursor } from "../helpers";
 
-const makeStreamEndpointFunctions = (context: ApiContextInterface) => ({
+const makeStreamEndpointsFunctions = (context: any) => ({
   async getStreamInfo(id: string): Promise<[Response, StreamInfo | ApiError]> {
     let [res, info] = await context.fetch(`/stream/${id}/info`);
     return [res, info as StreamInfo | ApiError];
@@ -269,4 +268,4 @@ const makeStreamEndpointFunctions = (context: ApiContextInterface) => ({
   },
 });
 
-export default makeStreamEndpointFunctions;
+export default makeStreamEndpointsFunctions;
