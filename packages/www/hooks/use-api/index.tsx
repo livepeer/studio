@@ -19,7 +19,7 @@ import { ApiState, Ingest, FileUpload, Version } from "./types";
 import { clearToken, getStoredToken } from "./tokenStorage";
 import { trackPageView } from "./tracking";
 import makeStreamEndpointsFunctions from "./endpoints/stream";
-import makeUserEndpointsFunctions from "./endpoints/user";
+import * as userEndpointsFunctions from "./endpoints/user";
 import { getCursor } from "./helpers";
 
 /**
@@ -559,9 +559,11 @@ const makeContext = (
     },
   };
 
+  userEndpointsFunctions.setSharedScope(context, setState);
+
   return {
     ...context,
-    ...makeUserEndpointsFunctions(context, state, setState),
+    ...userEndpointsFunctions,
     ...makeStreamEndpointsFunctions(context),
   };
 };
