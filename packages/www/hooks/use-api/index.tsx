@@ -557,15 +557,13 @@ const makeContext = (
       }
       return totalViews[0].startViews;
     },
+
+    ...userEndpointsFunctions,
   };
 
   userEndpointsFunctions.setSharedScope(context, setState);
 
-  return {
-    ...context,
-    ...userEndpointsFunctions,
-    ...makeStreamEndpointsFunctions(context),
-  };
+  return context;
 };
 
 export const ApiContext = createContext(makeContext({} as ApiState, () => {}));
