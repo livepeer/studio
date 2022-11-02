@@ -73,7 +73,6 @@ const EditAssetDialog = ({
           px: "$5",
           pt: "$4",
           pb: "$4",
-          zIndex: 5,
         }}>
         <AlertDialogTitle asChild>
           <Heading size="1">Edit Asset</Heading>
