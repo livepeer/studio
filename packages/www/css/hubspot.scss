@@ -21,21 +21,29 @@
       border-bottom: 1px solid #666773;
       font-size: 18px;
       border-radius: none;
-      padding-left: 32px;
-      padding-right: 32px;
-      padding-top: 8px;
-      padding-bottom: 16px;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
+      padding-top: 8px;
+      padding-bottom: 16px;
+      padding-left: 32px;
+      padding-right: 32px;
+      @media (max-width: 640px) {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
     }
     label {
       color: #666773;
       width: 100%;
       display: block;
+      text-transform: uppercase;
       padding-left: 32px;
       padding-right: 32px;
-      text-transform: uppercase;
+      @media (max-width: 640px) {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
     }
     .hs-error-msgs {
       list-style: none;
@@ -63,6 +71,10 @@
     transition: 0.2s;
     &:hover {
       background: rgb(15, 48, 88);
+    }
+    @media (max-width: 640px) {
+      margin-left: 16px;
+      margin-right: 16px;
     }
   }
 }

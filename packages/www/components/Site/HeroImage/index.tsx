@@ -19,7 +19,7 @@ export default function HeroImage({ title, richText }) {
         }}>
         <Box
           sx={{
-            height: "800px",
+            height: ["400px", "400px", "600px", "600px", "800px"],
             borderRadius: "12px",
             overflow: "hidden",
             position: "relative",
@@ -28,22 +28,23 @@ export default function HeroImage({ title, richText }) {
             sx={{
               position: "absolute",
               maxWidth: "800px",
-              left: "32px",
-              bottom: "32px",
+              left: ["16px", "32px"],
+              bottom: ["32px"],
               color: "#ECEDEE",
               zIndex: 1,
             }}>
             <LiveBox
               css={{
-                fontSize: 100,
+                fontSize: 40,
                 fontWeight: 600,
                 lineHeight: 0.8,
-                letterSpacing: "-4px",
+                letterSpacing: "-2px",
+                mb: "8px",
                 "@bp1": {
-                  fontSize: 100,
+                  fontSize: 60,
                 },
                 "@bp2": {
-                  fontSize: 100,
+                  fontSize: 80,
                 },
                 "@bp3": {
                   fontSize: 100,

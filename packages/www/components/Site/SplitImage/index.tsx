@@ -15,7 +15,7 @@ export default function SplitImage({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: ["1fr", "1fr 1fr"],
           gridAutoFlow: "dense",
           padding: "15px",
           gap: "20px",
@@ -28,6 +28,7 @@ export default function SplitImage({
             background: "#D4D4D4",
             color: "#000116",
             borderRadius: "12px",
+            overflow: "hidden",
           }}>
           <img
             src={defaultImage.asset.url}
@@ -42,24 +43,27 @@ export default function SplitImage({
             borderRadius: "12px",
             paddingX: "32px",
             paddingY: "32px",
-            gridColumn: inverted ? 1 : 2,
+            gridColumn: inverted ? ["unset", 1] : ["unset", 2],
             gridRow: 1,
           }}>
           <LiveBox
             css={{
-              fontSize: 58,
+              fontSize: 32,
               fontWeight: 600,
               lineHeight: 1,
-              letterSpacing: "-4px",
               mb: 32,
+              letterSpacing: "0px",
               "@bp1": {
-                fontSize: 58,
+                fontSize: 40,
+                letterSpacing: "-1px",
               },
               "@bp2": {
-                fontSize: 58,
+                fontSize: 50,
+                letterSpacing: "-2px",
               },
               "@bp3": {
                 fontSize: 58,
+                letterSpacing: "-4px",
               },
             }}>
             {title}

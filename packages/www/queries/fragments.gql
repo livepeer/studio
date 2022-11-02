@@ -78,6 +78,11 @@ fragment iconGrid on IconGrid {
   _type
   title
   richText
+  icons {
+    asset {
+      url
+    }
+  }
 }
 
 fragment form on Form {

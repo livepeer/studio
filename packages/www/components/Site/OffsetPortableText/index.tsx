@@ -10,29 +10,32 @@ export default function OffsetPortableText() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: ["1fr", "1fr 1fr"],
               paddingY: "96px",
               maxWidth: "1600px",
               marginLeft: "auto",
               marginRight: "auto",
             }}>
             <Box></Box>
-            <Box sx={{ paddingX: "50px" }}>
+            <Box sx={{ paddingX: ["16px", "50px"], zIndex: 1 }}>
               <LiveBox
                 css={{
-                  fontSize: 58,
+                  fontSize: 32,
                   fontWeight: 600,
                   lineHeight: 1,
-                  letterSpacing: "-4px",
                   mb: 32,
+                  letterSpacing: "0px",
                   "@bp1": {
-                    fontSize: 58,
+                    fontSize: 40,
+                    letterSpacing: "-1px",
                   },
                   "@bp2": {
-                    fontSize: 58,
+                    fontSize: 50,
+                    letterSpacing: "-2px",
                   },
                   "@bp3": {
                     fontSize: 58,
+                    letterSpacing: "-4px",
                   },
                 }}>
                 Exponential growth with Livepeer Studio
@@ -87,13 +90,22 @@ export default function OffsetPortableText() {
           }}>
           <Box
             sx={{
-              background: `repeating-linear-gradient(
+              background: [
+                `repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 20px,
+            #66677450 20px,
+            #66677450 21px
+          );`,
+                `repeating-linear-gradient(
             90deg,
             transparent,
             transparent 20px,
             #666774 20px,
             #666774 21px
           );`,
+              ],
             }}></Box>
         </Box>
       </Box>

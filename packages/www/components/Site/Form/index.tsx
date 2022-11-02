@@ -72,13 +72,13 @@ export default function HubSpot({ title, subtitle, region, portalId, formId }) {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: ["1fr", "1fr 1fr"],
             gap: "32px",
             maxWidth: "1600px",
             marginLeft: "auto",
             marginRight: "auto",
           }}>
-          <Box sx={{ px: "32px", py: "48px" }}>
+          <Box sx={{ px: ["16px", "32px"], py: "48px" }}>
             <Box
               sx={{
                 display: "flex",
@@ -118,7 +118,8 @@ export default function HubSpot({ title, subtitle, region, portalId, formId }) {
           </Box>
           <Box
             sx={{
-              borderLeft: "1px solid #666774",
+              borderLeft: ["unset", "1px solid #666774"],
+              borderTop: ["1px solid #666774", "unset"],
               py: "48px",
             }}>
             {errors.map((error) => {
