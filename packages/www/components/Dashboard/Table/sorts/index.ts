@@ -5,6 +5,9 @@ const stringSort: SortFn = (path, a, b, _columnId, desc) => {
   const aItem = get(a, path);
   const bItem = get(b, path);
   let ret = 0;
+  if (aItem === undefined || bItem === undefined) {
+    return ret;
+  }
   if (desc) {
     ret = aItem.localeCompare(bItem);
   }
