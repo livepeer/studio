@@ -18,8 +18,8 @@ import * as tus from "tus-js-client";
 import { ApiState, Ingest, FileUpload, Version } from "./types";
 import { clearToken, getStoredToken } from "./tokenStorage";
 import { trackPageView } from "./tracking";
-import makeStreamEndpointsFunctions from "./endpoints/stream";
 import * as userEndpointsFunctions from "./endpoints/user";
+import * as streamEndpointsFunctions from "./endpoints/stream";
 import { getCursor } from "./helpers";
 
 /**
@@ -559,9 +559,12 @@ const makeContext = (
     },
 
     ...userEndpointsFunctions,
+    ...streamEndpointsFunctions,
   };
 
   userEndpointsFunctions.setSharedScope(context, setState);
+  streamEndpointsFunctions.setSharedScope(context, setState);
+  delete context.setSharedScope;
 
   return context;
 };
