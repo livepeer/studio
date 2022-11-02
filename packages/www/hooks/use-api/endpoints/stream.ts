@@ -1,8 +1,6 @@
 import qs from "qs";
 import {
   Error as ApiError,
-  MultistreamTarget,
-  MultistreamTargetPatchPayload,
   Stream,
   StreamPatchPayload,
 } from "@livepeer.studio/api";
@@ -122,109 +120,6 @@ export const createStream = async (params): Promise<Stream> => {
     throw new Error(stream.errors.join(", "));
   }
   return stream;
-};
-
-export const getStreamSessions = async (
-  id,
-  cursor?: string,
-  limit: number = 20,
-  filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
-): Promise<[Array<Stream>, string, number]> => {
-  const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
-  const uri = `/session?${qs.stringify({
-    limit,
-    cursor,
-    parentId: id,
-    filters: stringifiedFilters,
-    count,
-  })}`;
-  const [res, streams] = await context.fetch(uri);
-  if (res.status !== 200) {
-    throw new Error(streams);
-  }
-  const nextCursor = getCursor(res.headers.get("link"));
-  const c = res.headers.get("X-Total-Count");
-  return [streams, nextCursor, c];
-};
-
-export const createMultistreamTarget = async (
-  id: string,
-  input: Omit<MultistreamTarget, "id">
-): Promise<MultistreamTarget> => {
-  const [res, target] = await context.fetch("/multistream/target", {
-    method: "POST",
-    body: JSON.stringify(input),
-    headers: {
-      "content-type": "application/json",
-    },
-  });
-  if (res.status !== 201) {
-    throw new HttpError(res.status, target);
-  }
-  return target;
-};
-
-export const getMultistreamTarget = async (
-  id: string
-): Promise<MultistreamTarget> => {
-  const uri = `/multistream/target/${id}`;
-  const [res, target] = await context.fetch(uri);
-  if (res.status !== 200) {
-    throw new HttpError(res.status, target);
-  }
-  return target;
-};
-
-export const patchMultistreamTarget = async (
-  id: string,
-  patch: MultistreamTargetPatchPayload
-): Promise<void> => {
-  const [res, body] = await context.fetch(`/multistream/target/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(patch),
-    headers: {
-      "content-type": "application/json",
-    },
-  });
-  if (res.status !== 204) {
-    throw new HttpError(res.status, body);
-  }
-};
-
-export const deleteMultistreamTarget = async (id: string): Promise<void> => {
-  const [res, body] = await context.fetch(`/multistream/target/${id}`, {
-    method: "DELETE",
-  });
-  if (res.status !== 204) {
-    throw new HttpError(res.status, body);
-  }
-};
-
-export const getStreamSessionsByUserId = async (
-  userId,
-  cursor?: string,
-  limit: number = 20,
-  order?: string,
-  filters?: Array<{ id: string; value: string | object }>,
-  count?: boolean
-): Promise<[Array<Stream>, string, number]> => {
-  const stringifiedFilters = filters ? JSON.stringify(filters) : undefined;
-  const uri = `/session?${qs.stringify({
-    limit,
-    cursor,
-    order,
-    userId,
-    filters: stringifiedFilters,
-    count,
-  })}`;
-  const [res, streams] = await context.fetch(uri);
-  if (res.status !== 200) {
-    throw new Error(streams);
-  }
-  const nextCursor = getCursor(res.headers.get("link"));
-  const c = res.headers.get("X-Total-Count");
-  return [streams, nextCursor, c];
 };
 
 export const terminateStream = async (id: string): Promise<boolean> => {

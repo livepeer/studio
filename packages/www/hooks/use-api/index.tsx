@@ -20,6 +20,10 @@ import { clearToken, getStoredToken } from "./tokenStorage";
 import { trackPageView } from "./tracking";
 import * as userEndpointsFunctions from "./endpoints/user";
 import * as streamEndpointsFunctions from "./endpoints/stream";
+import * as multistreamEndpointsFunctions from "./endpoints/multistream";
+import * as sessionEndpointsFunctions from "./endpoints/session";
+import * as broadcasterEndpointsFunctions from "./endpoints/broadcaster";
+import * as ingestEndpointsFunctions from "./endpoints/ingest";
 import { getCursor } from "./helpers";
 
 /**
@@ -60,23 +64,6 @@ const makeContext = (
         body.errors = [body.error];
       }
       return [res, body];
-    },
-
-    async getBroadcasters(): Promise<Array<{ address: string }>> {
-      const [res, broadcasters] = await context.fetch(`/broadcaster`);
-      if (res.status !== 200) {
-        throw new Error(broadcasters);
-      }
-      return broadcasters;
-    },
-
-    async getIngest(all = false): Promise<Array<Ingest>> {
-      const q = all ? "?first=false" : "";
-      const [res, ingest] = await context.fetch(`/ingest${q}`);
-      if (res.status !== 200) {
-        throw new Error(ingest);
-      }
-      return ingest;
     },
 
     async createAsset(params): Promise<Asset> {
@@ -560,10 +547,18 @@ const makeContext = (
 
     ...userEndpointsFunctions,
     ...streamEndpointsFunctions,
+    ...multistreamEndpointsFunctions,
+    ...sessionEndpointsFunctions,
+    ...broadcasterEndpointsFunctions,
+    ...ingestEndpointsFunctions,
   };
 
   userEndpointsFunctions.setSharedScope(context, setState);
   streamEndpointsFunctions.setSharedScope(context, setState);
+  multistreamEndpointsFunctions.setSharedScope(context, setState);
+  sessionEndpointsFunctions.setSharedScope(context, setState);
+  broadcasterEndpointsFunctions.setSharedScope(context, setState);
+  ingestEndpointsFunctions.setSharedScope(context, setState);
   delete context.setSharedScope;
 
   return context;
