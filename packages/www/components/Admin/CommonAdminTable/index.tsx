@@ -13,7 +13,7 @@ import {
   useRowSelect,
 } from "react-table";
 import Help from "../../../public/img/help.svg";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import { User, Stream } from "@livepeer.studio/api";
 
 const loadingAnim = keyframes`
@@ -47,14 +47,14 @@ export const StreamName = ({
   return (
     <Box>
       {stream.createdByTokenName ? (
-        <ReactTooltip
+        <Tooltip
           id={pid}
           className="tooltip"
           place="top"
           type="dark"
           effect="solid">
           Created by token <b>{stream.createdByTokenName}</b>
-        </ReactTooltip>
+        </Tooltip>
       ) : null}
       <Box data-tip data-for={pid}>
         <Link
@@ -92,14 +92,14 @@ export const RelativeTime = ({
     <Box id={idpref} key={idpref}>
       {tm ? (
         <>
-          <ReactTooltip
+          <Tooltip
             id={`tooltip-${idpref}`}
             className="tooltip"
             place="top"
             type="dark"
             effect="solid">
             {toolTip}
-          </ReactTooltip>
+          </Tooltip>
           <span data-tip data-for={`tooltip-${idpref}`}>
             {main}
           </span>
@@ -119,7 +119,7 @@ export const UserName = ({ user }: { user: User }) => {
         overflow: "hidden",
         textOverflow: "ellipsis",
       }}>
-      <ReactTooltip
+      <Tooltip
         id={tid}
         className="tooltip"
         place="top"
@@ -128,7 +128,7 @@ export const UserName = ({ user }: { user: User }) => {
         <span>{user.id}</span>
         <span>{user.firstName}</span>
         <span>{user.lastName}</span>
-      </ReactTooltip>
+      </Tooltip>
       <span data-tip data-for={tid}>
         {user.email.includes("@")
           ? user.email.split("@").join("@\u{200B}")
@@ -453,7 +453,7 @@ const CommonAdminTable = ({
                         <Flex
                           sx={{ alignItems: "center", ml: "auto", mr: "1em" }}>
                           <Flex>
-                            <ReactTooltip
+                            <Tooltip
                               id={`tooltip-multiorder`}
                               className="tooltip"
                               place="top"
@@ -461,7 +461,7 @@ const CommonAdminTable = ({
                               effect="solid">
                               To multi-sort (sort by two column simultaneously)
                               hold shift while clicking on second column name.
-                            </ReactTooltip>
+                            </Tooltip>
                             <Help
                               data-tip
                               data-for={`tooltip-multiorder`}

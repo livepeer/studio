@@ -2,7 +2,7 @@ import { CellComponentProps, TableData } from "../types";
 import { Box, Button } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { TrashIcon } from "@radix-ui/react-icons";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import { useState } from "react";
 
 const DeleteActionCell = ({
@@ -17,7 +17,7 @@ const DeleteActionCell = ({
 
   return (
     <>
-      <ReactTooltip
+      <Tooltip
         id={tooltipId}
         className="tooltip"
         place="top"
@@ -25,7 +25,7 @@ const DeleteActionCell = ({
         effect="solid"
         delayShow={500}>
         Delete
-      </ReactTooltip>
+      </Tooltip>
 
       <Box css={{ textAlign: "right" }}>
         <Button

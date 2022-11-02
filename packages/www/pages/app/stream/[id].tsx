@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import {
   Spinner,
   Box,
@@ -690,7 +690,7 @@ const ID = () => {
                         />
                       </Flex>
                     </Flex>
-                    <ReactTooltip
+                    <Tooltip
                       id={`tooltip-record-${stream.id}`}
                       className="tooltip"
                       place="top"
@@ -704,7 +704,7 @@ const ID = () => {
                         <br />
                         This feature is currently free.
                       </p>
-                    </ReactTooltip>
+                    </Tooltip>
                   </Box>
                   <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                     <hr />
@@ -769,7 +769,7 @@ const ID = () => {
                         />
                       </Flex>
                     </Flex>
-                    <ReactTooltip
+                    <Tooltip
                       id={`tooltip-suspend-${stream.id}`}
                       className="tooltip"
                       place="top"
@@ -782,7 +782,7 @@ const ID = () => {
                         New sessions will be prevented from starting until
                         turned off.
                       </p>
-                    </ReactTooltip>
+                    </Tooltip>
                   </Box>
                   <Box sx={{ m: "0.4em", gridColumn: "1/-1" }}>
                     <hr />

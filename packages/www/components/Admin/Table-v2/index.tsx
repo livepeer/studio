@@ -11,7 +11,7 @@ import {
 } from "react-table";
 import { useEffect, useMemo, useCallback } from "react";
 import Paginator from "./paginator";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import Help from "../../../public/img/help.svg";
 import Checkbox from "@components/Admin/Checkbox";
 import {
@@ -294,7 +294,7 @@ const Table = <T extends Record<string, unknown>>({
                               top: "50%",
                               transform: "translateY(-50%)",
                             }}>
-                            <ReactTooltip
+                            <Tooltip
                               id={`tooltip-multiorder`}
                               className="tooltip"
                               place="top"
@@ -302,7 +302,7 @@ const Table = <T extends Record<string, unknown>>({
                               effect="solid">
                               To multi-sort (sort by two column simultaneously)
                               hold shift while clicking on second column name.
-                            </ReactTooltip>
+                            </Tooltip>
                             <Help
                               data-tip
                               data-for={`tooltip-multiorder`}

@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Box } from "@theme-ui/components";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 
 type RelativeTimeProps = {
   id: string;
@@ -22,14 +22,14 @@ const RelativeTime = ({ id, prefix, tm, swap = false }: RelativeTimeProps) => {
     <Box id={idpref} key={idpref}>
       {tm ? (
         <>
-          <ReactTooltip
+          <Tooltip
             id={`tooltip-${idpref}`}
             className="tooltip"
             place="top"
             type="dark"
             effect="solid">
             {toolTip}
-          </ReactTooltip>
+          </Tooltip>
           <Box as="span" data-tip data-for={`tooltip-${idpref}`}>
             {main}
           </Box>
