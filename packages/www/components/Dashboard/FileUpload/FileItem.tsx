@@ -1,6 +1,6 @@
 import { Box, ProgressBar, Text } from "@livepeer/design-system";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { FileUpload } from "hooks/use-api";
+import { FileUpload } from "hooks/use-api/types";
 import Item from "./Item";
 
 const MAX_FILENAME_LENGTH = 20;
