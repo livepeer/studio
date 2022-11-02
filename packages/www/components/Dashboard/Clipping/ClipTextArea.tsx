@@ -6,58 +6,51 @@ import {
   Box,
   HoverCardContent,
   Text,
+  Alert,
 } from "@livepeer/design-system";
-import { CopyIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-export type ClipButtonProps = {
+const ClipTextArea = ({
+  value,
+  text,
+  successMessage,
+}: {
   value: string;
   text?: string;
   successMessage?: string;
-};
-
-const ClipButton = ({ value, text, successMessage }: ClipButtonProps) => {
-  const [isCopied, setCopied] = useState(0);
+}) => {
+  const [isCopied, setIsCopied] = useState(0);
   const [openSnackbar] = useSnackbar();
   const snackbarMessage =
     successMessage !== undefined ? successMessage : "Copied to clipboard";
 
   useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => {
-        setCopied(0);
-      }, isCopied);
-      return () => clearTimeout(timeout);
-    }
+    if (!isCopied) return;
+    const timeout = setTimeout(() => setIsCopied(0), isCopied);
+    return () => clearTimeout(timeout);
   }, [isCopied]);
 
   return (
     <HoverCardRoot openDelay={200}>
       <HoverCardTrigger>
-        <Flex css={{ ai: "center" }}>
+        <Flex direction="column">
           <CopyToClipboard
             text={value}
             onCopy={() => {
               openSnackbar(snackbarMessage);
-              setCopied(2000);
+              setIsCopied(2000);
             }}>
-            <Flex
-              css={{
-                alignItems: "center",
-                cursor: "pointer",
-                ml: 0,
-                mr: 0,
-              }}>
-              {text !== undefined && <Box css={{ mr: "$1" }}>{text}</Box>}
-              <CopyIcon
+            <Flex direction="column">
+              <Alert
                 css={{
-                  mr: "$2",
-                  width: 14,
-                  height: 14,
-                  color: "$hiContrast",
-                }}
-              />
+                  cursor: "pointer",
+                  overflow: "clip",
+                  overflowWrap: "anywhere",
+                  backgroundColor: "$gray4",
+                }}>
+                <Text size="2">{text}</Text>
+              </Alert>
             </Flex>
           </CopyToClipboard>
         </Flex>
@@ -81,4 +74,4 @@ const ClipButton = ({ value, text, successMessage }: ClipButtonProps) => {
   );
 };
 
-export default ClipButton;
+export default ClipTextArea;

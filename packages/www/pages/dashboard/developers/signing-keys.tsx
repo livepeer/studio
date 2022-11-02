@@ -1,10 +1,10 @@
 import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import TokenTable from "components/Dashboard/TokenTable";
-import { DashboardAPIKeys as Content } from "content";
+import { DashboardSigningKeys as Content } from "content";
+import SigningKeysTable from "@components/Dashboard/SigningKeysTable";
 
-const ApiKeys = () => {
+const SigningKeys = () => {
   useLoggedIn();
   const { user } = useApi();
 
@@ -13,19 +13,19 @@ const ApiKeys = () => {
   }
   return (
     <Layout
-      id="developers"
+      id="developers/signing-keys"
       breadcrumbs={[
-        { title: "Developers", href: "/dashboard/developers/api-keys" },
-        { title: "API Keys" },
+        { title: "Developers", href: "/dashboard/developers/signing-keys" },
+        { title: "Signing Keys" },
       ]}
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
-          <TokenTable userId={user.id} />
+          <SigningKeysTable tableId="dashboardSigningKeysTable" />
         </Box>
       </Box>
     </Layout>
   );
 };
 
-export default ApiKeys;
+export default SigningKeys;

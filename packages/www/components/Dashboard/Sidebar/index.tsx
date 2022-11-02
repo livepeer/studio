@@ -46,6 +46,7 @@ export type SidebarId =
   | "streams/health"
   | "assets"
   | "developers"
+  | "developers/signing-keys"
   | "developers/webhooks"
   | "billing"
   | "billing/plans";
@@ -232,6 +233,22 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                       lineHeight: 1.2,
                     }}>
                     API Keys
+                  </Text>
+                </NavLink>
+              </Link>
+              <Link href="/dashboard/developers/signing-keys" passHref>
+                <NavLink>
+                  <Text
+                    variant={id === "developers/signing-keys" ? "blue" : null}
+                    css={{
+                      fontWeight: id === "developers/signing-keys" ? 700 : 400,
+                      backgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      mb: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Signing Keys
                   </Text>
                 </NavLink>
               </Link>

@@ -9,7 +9,6 @@ import {
   TextField,
   useSnackbar,
 } from "@livepeer/design-system";
-import { Asset } from "livepeer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const embedStringForAsset = (playbackId: string) =>
