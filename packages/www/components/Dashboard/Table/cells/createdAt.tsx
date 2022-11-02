@@ -5,7 +5,7 @@ import { UploadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { useApi } from "hooks";
 import { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import { CellComponentProps, TableData } from "../types";
 
 const CreatedAt = ({ date, fallback }) => {
@@ -21,7 +21,7 @@ const FailedProcessing = ({ id, errorMessage }) => {
   return (
     <>
       {errorMessage !== undefined && (
-        <ReactTooltip
+        <Tooltip
           id={tooltipId}
           className="tooltip"
           place="top"
@@ -29,7 +29,7 @@ const FailedProcessing = ({ id, errorMessage }) => {
           effect="solid"
           delayShow={500}>
           {errorMessage}
-        </ReactTooltip>
+        </Tooltip>
       )}
       <Badge
         data-tip

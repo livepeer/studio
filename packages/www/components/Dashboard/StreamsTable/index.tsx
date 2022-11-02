@@ -14,7 +14,7 @@ import {
   Link as A,
   useSnackbar,
 } from "@livepeer/design-system";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import { useCallback, useMemo, useState } from "react";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
@@ -131,14 +131,14 @@ export const RenditionsDetails = ({ stream }: { stream: Stream }) => {
       {detailsTooltip ? (
         <Flex css={{ alignItems: "center" }}>
           <Flex>
-            <ReactTooltip
+            <Tooltip
               id={`tooltip-details-${stream.id}`}
               className="tooltip"
               place="top"
               type="dark"
               effect="solid">
               {detailsTooltip}
-            </ReactTooltip>
+            </Tooltip>
             <StyledQuestionMarkIcon
               data-tip
               data-for={`tooltip-details-${stream.id}`}

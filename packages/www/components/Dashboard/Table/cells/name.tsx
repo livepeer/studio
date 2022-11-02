@@ -1,7 +1,7 @@
 import { CellComponentProps, TableData } from "../types";
 import { Box } from "@livepeer/design-system";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 
 export type NameCellProps = {
   id?: string;
@@ -25,7 +25,7 @@ const NameCell = <D extends TableData>({
     const tooltipId = "tooltip-error-" + id;
     return (
       <>
-        <ReactTooltip
+        <Tooltip
           id={tooltipId}
           className="tooltip"
           place="top"
@@ -33,7 +33,7 @@ const NameCell = <D extends TableData>({
           effect="solid"
           delayShow={500}>
           {errorMessage}
-        </ReactTooltip>
+        </Tooltip>
         <Box
           data-tip
           data-for={tooltipId}

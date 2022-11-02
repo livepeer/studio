@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { jsx } from "theme-ui";
 import Link from "next/link";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "@livepeer/design-system";
 import { CellComponentProps, TableData } from "../types";
 
 export type TextCellProps = {
@@ -18,14 +18,14 @@ const TextCell = <D extends TableData>({
   return (
     <div>
       {cell.value.tooltipChildren ? (
-        <ReactTooltip
+        <Tooltip
           id={pid}
           className="tooltip"
           place="top"
           type="dark"
           effect="solid">
           {cell.value.tooltipChildren}
-        </ReactTooltip>
+        </Tooltip>
       ) : null}
       <div data-tip data-for={pid}>
         {cell.value.href ? (
