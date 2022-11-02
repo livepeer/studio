@@ -12,6 +12,9 @@ export default function OffsetPortableText() {
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               paddingY: "96px",
+              maxWidth: "1600px",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}>
             <Box></Box>
             <Box sx={{ paddingX: "50px" }}>

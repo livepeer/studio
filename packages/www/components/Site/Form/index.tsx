@@ -74,6 +74,9 @@ export default function HubSpot({ title, subtitle, region, portalId, formId }) {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "32px",
+            maxWidth: "1600px",
+            marginLeft: "auto",
+            marginRight: "auto",
           }}>
           <Box sx={{ px: "32px", py: "48px" }}>
             <Box

@@ -4,12 +4,18 @@ import Image from "next/image";
 
 export default function HeroImage({ title, richText }) {
   return (
-    <Container sx={{ paddingX: "15px" }}>
+    <Container
+      sx={{
+        paddingX: "15px",
+      }}>
       <Box
         sx={{
           padding: "15px",
           background: "#ECEDEE",
           borderTopRightRadius: "12px",
+          maxWidth: "1600px",
+          marginLeft: "auto",
+          marginRight: "auto",
         }}>
         <Box
           sx={{
