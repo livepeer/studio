@@ -48,7 +48,10 @@ const SigningKeysTable = ({
         initialSortBy={[{ id: "createdAt", desc: true }]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction("Create key", createDialogState.onOn)}
+        createAction={makeCreateAction(
+          "Create a Signing Key",
+          createDialogState.onOn
+        )}
       />
 
       <TableStateDeleteDialog

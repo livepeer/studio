@@ -122,7 +122,7 @@ const CreateDialog = ({
         {!newToken && (
           <>
             <AlertDialogTitle asChild>
-              <Heading size="1">Create key</Heading>
+              <Heading size="1">Create an API Key</Heading>
             </AlertDialogTitle>
             <Box
               as="form"

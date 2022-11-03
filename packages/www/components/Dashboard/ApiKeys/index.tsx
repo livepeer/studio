@@ -43,7 +43,10 @@ const ApiKeysTable = ({
         rowSelection="all"
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
-        createAction={makeCreateAction("Create key", createDialogState.onOn)}
+        createAction={makeCreateAction(
+          "Create an API Key",
+          createDialogState.onOn
+        )}
       />
 
       <TableStateDeleteDialog
