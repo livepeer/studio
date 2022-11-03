@@ -1,7 +1,7 @@
 import { Asset } from "livepeer";
 import { Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
-import { FileUpload } from "hooks/use-api";
+import { FileUpload } from "hooks/use-api/types";
 import { get } from "lodash";
 import ActionCell, { ActionCellProps } from "../Table/cells/action";
 import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";

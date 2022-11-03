@@ -3,9 +3,9 @@ import { jsx } from "theme-ui";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApi } from "hooks";
-import { StreamInfo, Ingest } from "hooks/use-api";
 import { Container, Box, Button, Input } from "@theme-ui/components";
 import moment from "moment";
+import { Ingest, StreamInfo } from "hooks/use-api/types";
 
 const AdminTools = ({ id }: { id: string }) => {
   const [message, setMessage] = useState("");
