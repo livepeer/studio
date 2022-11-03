@@ -3,6 +3,7 @@ import { jsx } from "theme-ui";
 import { NextSeo } from "next-seo";
 import { withEmailVerifyMode } from "./withEmailVerifyMode";
 import { DefaultNav } from "@components/Site/Navigation";
+import Footer from "@components/Site/Footer";
 import { Flex, Box } from "@theme-ui/components";
 import { useEffect } from "react";
 import ReactGA from "react-ga";
@@ -127,6 +128,7 @@ const Layout = ({
               )}
               <Box css={{ position: "relative" }}>{children}</Box>
             </Flex>
+            <Footer />
           </Flex>
         </Box>
       </ThemeProvider>
