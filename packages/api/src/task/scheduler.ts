@@ -102,6 +102,7 @@ export class TaskScheduler {
     let assetSpec: Asset;
     switch (event.task.type) {
       case "import":
+      case "upload":
         assetSpec = event.output?.import?.assetSpec;
         if (!assetSpec) {
           const error = "bad task output: missing assetSpec";
