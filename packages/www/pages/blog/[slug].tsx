@@ -169,11 +169,9 @@ const Post = ({
                   }}>
                   <Image
                     alt={author.image?.alt}
-                    layout="fill"
-                    objectFit="cover"
-                    width={mainImage.asset.metadata.dimensions.width}
-                    height={mainImage.asset.metadata.dimensions.width}
                     src={builder.image(author.image).url()}
+                    fill
+                    style={{ objectFit: "cover" }}
                   />
                 </Box>
                 <Box
@@ -292,7 +290,7 @@ export async function getStaticPaths() {
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
-  const { allPost } = await graphQLClient.request(print(allPosts), {
+  const { allPost }: any = await graphQLClient.request(print(allPosts), {
     where: {},
   });
 

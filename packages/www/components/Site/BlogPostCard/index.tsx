@@ -50,12 +50,10 @@ const BlogPostCard = ({ post, css = {} }) => {
               },
             }}>
             <Image
-              alt={post.mainImage?.alt}
-              layout="fill"
-              objectFit="cover"
-              width={post.mainImage.asset.metadata.dimensions.width}
-              height={post.mainImage.asset.metadata.dimensions.height}
               src={builder.image(post.mainImage).url()}
+              alt={post.mainImage?.alt}
+              fill
+              style={{ objectFit: "cover" }}
             />
           </Box>
         )}
@@ -96,9 +94,9 @@ const BlogPostCard = ({ post, css = {} }) => {
                 }}>
                 <Image
                   alt={post.author.image?.alt}
-                  layout="fill"
-                  objectFit="cover"
                   src={builder.image(post.author.image).url()}
+                  fill
+                  style={{ objectFit: "cover" }}
                 />
               </Box>
               <Box
