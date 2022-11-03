@@ -17,8 +17,8 @@ const DefaultError = () => {
         <Image
           src="/img/404.png"
           alt="404"
-          fill
-          style={{ objectFit: "contain" }}
+          layout="fill"
+          objectFit="contain"
           css={{
             position: "absolute",
             top: "50%",

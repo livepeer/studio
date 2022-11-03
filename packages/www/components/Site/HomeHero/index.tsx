@@ -128,10 +128,7 @@ const HomeHero = ({ content }) => {
                 }}>
                 {content.secondaryCallToAction.title}
               </Button>
-              <Link
-                href={content.primaryCallToAction.href}
-                passHref
-                legacyBehavior>
+              <Link href={content.primaryCallToAction.href} passHref legacyBehavior>
                 <Button
                   as={A}
                   target={

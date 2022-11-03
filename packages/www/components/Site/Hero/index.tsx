@@ -95,12 +95,7 @@ const Hero = ({
                       transform: "translate(-50%)",
                       left: "50%",
                     }}>
-                    <Image
-                      src={image}
-                      width={542 / 2}
-                      height={1096 / 2}
-                      alt="hero image"
-                    />
+                    <Image src={image} width={542 / 2} height={1096 / 2} />
                   </Box>
                 ) : (
                   <Box
@@ -112,12 +107,7 @@ const Hero = ({
                       width: "110%",
                       height: "110%",
                     }}>
-                    <Image
-                      src={image}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      alt="hero image"
-                    />
+                    <Image src={image} objectFit="cover" layout="fill" />
                   </Box>
                 )}
                 <Box

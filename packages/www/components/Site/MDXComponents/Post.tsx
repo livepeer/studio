@@ -32,7 +32,6 @@ const Card = ({ description, title, image, href }) => {
               objectFit="cover"
               width={372}
               height={272}
-              alt={""}
             />
           )}
         </Box>
