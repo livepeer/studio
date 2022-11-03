@@ -248,14 +248,21 @@ async function genUploadUrl(
   aud: string
 ) {
   const uploadedObjectKey = `directUpload/${playbackId}`;
-  const presignedUrl = await getS3PresignedUrl(
-    objectStoreId,
-    uploadedObjectKey
-  );
+  const os = await db.objectStore.get(objectStoreId);
+  if (!os || os.deleted || os.disabled) {
+    throw new Error("Object store not found or disabled");
+  }
+
+  const presignedUrl = await getS3PresignedUrl(os, uploadedObjectKey);
   const uploadToken = jwt.sign({ playbackId, presignedUrl, aud }, jwtSecret, {
     algorithm: "HS256",
   });
-  return { uploadedObjectKey, uploadToken };
+
+  const osPublicUrl = new URL(os.publicUrl);
+  osPublicUrl.pathname = pathJoin(osPublicUrl.pathname, uploadedObjectKey);
+  const downloadUrl = osPublicUrl.toString();
+
+  return { uploadedObjectKey, uploadToken, downloadUrl };
 }
 
 function parseUploadUrl(
@@ -603,7 +610,7 @@ app.post(
       defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { uploadedObjectKey, uploadToken } = await genUploadUrl(
+    const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
       asset.objectStoreId,
       jwtSecret,
@@ -624,7 +631,7 @@ app.post(
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
-        [taskType]: { uploadedObjectKey },
+        [taskType]: { url: downloadUrl },
       },
       null,
       asset
@@ -641,7 +648,11 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 };
 
 async function createTusServer(objectStoreId: string) {
-  const s3config = await getObjectStoreS3Config(objectStoreId);
+  const os = await db.objectStore.get(objectStoreId);
+  if (!os || os.deleted || os.disabled) {
+    throw new Error("Object store not found or disabled");
+  }
+  const s3config = await getObjectStoreS3Config(os);
   const opts: tus.S3StoreOptions & S3ClientConfig = {
     ...s3config,
     path: "/upload/tus",
