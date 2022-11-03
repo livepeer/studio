@@ -125,15 +125,22 @@ async function validateAssetPayload(
 }
 
 export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
-  if (!asset.playbackRecordingId) {
-    return undefined;
+  if (asset.playbackRecordingId) {
+    return pathJoin(
+      ingest,
+      "recordings",
+      asset.playbackRecordingId,
+      "index.m3u8"
+    );
+  } else if (asset.files?.some((f) => f.type === "catalyst_hls_manifest")) {
+    return pathJoin(
+      "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
+      "hls",
+      `asset+${asset.playbackId}`,
+      "index.m3u8"
+    );
   }
-  return pathJoin(
-    ingest,
-    "recordings",
-    asset.playbackRecordingId,
-    "index.m3u8"
-  );
+  return undefined;
 }
 
 function getDownloadUrl(ingest: string, asset: WithID<Asset>): string {

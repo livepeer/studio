@@ -1001,18 +1001,39 @@ components:
           example: ea03f37e-f861-4cdd-b495-0e60b6d753ad
           index: true
           description: Used to form recording URL for HLS playback
+        files:
+          type: array
+          writeOnly: true
+          description:
+            Internal field with the list of files stored in the object store
+          items:
+            type: object
+            additionalProperties: false
+            required: [type, path]
+            properties:
+              type:
+                type: string
+                example: catalyst_hls_manifest
+                description: Type of the file in the VOD system.
+              path:
+                type: string
+                example: /path/to/file
+                description:
+                  Path to the file in the asset subfolder in the object store.
+                  This means that all these paths are relative to a folder in
+                  the OS the asset playback ID as the name.
         playbackUrl:
           type: string
           readOnly: true
           example: https://livepeercdn.com/asset/ea03f37e-f861-4cdd-b495-0e60b6d753ad/index.m3u8
           description: URL for HLS playback
-        playbackPolicy:
-          $ref: "#/components/schemas/playback-policy"
         downloadUrl:
           type: string
           readOnly: true
           example: https://livepeercdn.com/asset/eaw4nk06ts2d0mzb/video
           description: URL to manually download the asset if desired
+        playbackPolicy:
+          $ref: "#/components/schemas/playback-policy"
         userId:
           type: string
           readOnly: true

@@ -116,6 +116,7 @@ export class TaskScheduler {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
+          files: assetSpec.files,
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
