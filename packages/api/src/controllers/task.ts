@@ -211,9 +211,14 @@ app.post(
 app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   // update status of a specific task
   const { id } = req.params;
-  const task = await db.task.get(id);
+  const task = await db.task.get(id, { useReplica: false });
   if (!task) {
     return res.status(404).json({ errors: ["not found"] });
+  } else if (
+    task.status?.phase !== "waiting" &&
+    task.status?.phase !== "running"
+  ) {
+    return res.status(400).json({ errors: ["task is not running"] });
   }
 
   const doc = req.body.status;
