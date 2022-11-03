@@ -9,7 +9,7 @@ import {
 import { useToggleState } from "hooks/use-toggle-state";
 import { useState, useCallback } from "react";
 import { useQueryClient } from "react-query";
-import { Action } from "../MultistreamTargetsTable/SaveTargetDialog";
+import { Action } from "../StreamDetails/MultistreamTargetsTable/SaveTargetDialog";
 import CreateEditDialog from "../WebhookDialogs/CreateEditDialog";
 import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
@@ -28,7 +28,7 @@ const StyledCross = styled(Cross1Icon, {
   height: 12,
 });
 
-const Webhook = ({ id, data }) => {
+const WebhookDetails = ({ id, data }) => {
   const { deleteWebhook, updateWebhook } = useApi();
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -125,4 +125,4 @@ const Webhook = ({ id, data }) => {
   );
 };
 
-export default Webhook;
+export default WebhookDetails;

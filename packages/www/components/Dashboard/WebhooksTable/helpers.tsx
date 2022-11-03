@@ -3,8 +3,9 @@ import { Box, Link } from "@livepeer/design-system";
 import StatusBadge, { Variant as StatusVariant } from "../StatusBadge";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import TableEmptyState from "../Table/components/TableEmptyState";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 
 // 1 hour
 const WARNING_TIMEFRAME = 1000 * 60 * 60;
@@ -46,7 +47,10 @@ export const makeColumns = () => [
   },
 ];
 
-export const rowsPageFromState = async (state, getWebhooks) => {
+export const rowsPageFromState = async (
+  state,
+  getWebhooks: Function
+): Promise<RowsPageFromStateResult<WebhooksTableData>> => {
   const [webhooks, nextCursor, _res, count] = await getWebhooks(
     false,
     false,
@@ -134,3 +138,13 @@ export const rowsPageFromState = async (state, getWebhooks) => {
     }),
   };
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Create your first webhook"
+    description="Listen for events on your Livepeer Studio account so your integration can automatically trigger reactions."
+    learnMoreUrl="https://docs.livepeer.studio/guides/listen-for-webhooks"
+    actionTitle="Create webhook"
+    actionToggleState={actionToggleState}
+  />
+);

@@ -8,11 +8,28 @@ import CreatedAtCell, { CreatedAtCellProps } from "../Table/cells/createdAt";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
-import { formatFiltersForApiRequest } from "../Table/filters";
+import { FilterItem, formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+import { State } from "../Table";
+import TableEmptyState from "../Table/components/TableEmptyState";
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
+
+export const filterItems: FilterItem[] = [
+  { label: "Name", id: "name", type: "text" },
+  { label: "Created", id: "createdAt", type: "date" },
+  { label: "Updated", id: "updatedAt", type: "date" },
+];
+
+export type AssetsTableData = {
+  id: string;
+  name: NameCellProps;
+  source: TextCellProps;
+  createdAt: CreatedAtCellProps;
+  updatedAt: DateCellProps;
+  action: ActionCellProps;
+};
 
 export const makeColumns = () => [
   {
@@ -51,28 +68,13 @@ export const makeColumns = () => [
   },
 ];
 
-export type AssetsTableData = {
-  id: string;
-  name: NameCellProps;
-  source: TextCellProps;
-  createdAt: CreatedAtCellProps;
-  updatedAt: DateCellProps;
-  action: ActionCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: AssetsTableData[];
-  nextCursor: any;
-  count: any;
-};
-
 export const rowsPageFromState = async (
-  state,
+  state: State<AssetsTableData>,
   userId: string,
   getAssets: Function,
   getTasks: Function,
   onDeleteAsset: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const [assets, nextCursor, count] = await getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
     limit: state.pageSize.toString(),
@@ -145,3 +147,13 @@ export const fileUploadProgressForAsset = (
     ? fileUpload.progress
     : undefined;
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Upload your first On Demand asset"
+    description="Livepeer Studio supports video on demand which allows you to import video assets, store them on decentralized storage, and easily mint a video NFT."
+    learnMoreUrl="https://docs.livepeer.studio/category/on-demand"
+    actionTitle="Upload asset"
+    actionToggleState={actionToggleState}
+  />
+);

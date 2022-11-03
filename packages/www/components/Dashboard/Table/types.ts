@@ -20,3 +20,9 @@ export type SortFn = (
   columnId: string,
   desc: boolean
 ) => number;
+
+export type RowsPageFromStateResult<RowType> = {
+  rows: RowType[];
+  nextCursor: any;
+  count: any;
+};

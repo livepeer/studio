@@ -29,7 +29,7 @@ import {
   MultistreamTarget,
   Stream,
   StreamPatchPayload,
-} from "../../../../api/src/schema/types";
+} from "@livepeer.studio/api";
 import { pathJoin2 } from "@lib/utils";
 
 type MultistreamTargetRef =

@@ -4,7 +4,7 @@ import { useApi } from "hooks";
 import { StreamInfo } from "hooks/use-api";
 import Logger from "@components/Dashboard/Logger";
 import Chart from "@components/Dashboard/Chart";
-import HealthChecksTable from "@components/Dashboard/HealthChecksTable";
+import HealthChecksTable from "@components/Dashboard/StreamDetails/HealthChecksTable";
 import { Text, Box, Heading } from "@livepeer/design-system";
 
 const ingestInterval = 10 * 1000;
@@ -126,7 +126,7 @@ const StreamHealthTab = ({ stream, streamHealth, invalidateStream }) => {
         css={{ mb: "$7" }}
         emptyState={
           <Text variant="gray" size="2">
-            No targets
+            No data
           </Text>
         }
         tableLayout="auto"

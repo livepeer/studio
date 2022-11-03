@@ -2,7 +2,7 @@ import { MultistreamTarget, Stream } from "@livepeer.studio/api";
 
 import { MultistreamStatus } from "hooks/use-analyzer";
 import { useMemo } from "react";
-import StatusBadge, { Variant as Status } from "../StatusBadge";
+import StatusBadge, { Variant as Status } from "../../StatusBadge";
 
 const computeStatus = (
   stream: Stream,

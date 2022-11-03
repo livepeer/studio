@@ -16,7 +16,7 @@ import { useState } from "react";
 import Spinner from "components/Dashboard/Spinner";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
-const Delete = ({ total, onUnselect, onDelete }) => {
+const DeleteDialog = ({ total, onUnselect, onDelete }) => {
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [openSnackbar] = useSnackbar();
@@ -102,4 +102,4 @@ const Delete = ({ total, onUnselect, onDelete }) => {
   );
 };
 
-export default Delete;
+export default DeleteDialog;

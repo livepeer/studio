@@ -1,5 +1,4 @@
 import {
-  Box,
   Link as A,
   Table,
   Thead,

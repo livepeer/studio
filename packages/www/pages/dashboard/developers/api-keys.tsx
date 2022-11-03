@@ -1,7 +1,7 @@
 import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import TokenTable from "components/Dashboard/TokenTable";
+import ApiKeysTable from "@components/Dashboard/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
 
 const ApiKeys = () => {
@@ -21,7 +21,7 @@ const ApiKeys = () => {
       {...Content.metaData}>
       <Box css={{ p: "$6" }}>
         <Box css={{ mb: "$8" }}>
-          <TokenTable userId={user.id} />
+          <ApiKeysTable userId={user.id} />
         </Box>
       </Box>
     </Layout>

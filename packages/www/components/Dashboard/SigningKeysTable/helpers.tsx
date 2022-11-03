@@ -1,11 +1,20 @@
 import { SigningKey } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
+import { State } from "../Table";
 import DateCell, { DateCellProps } from "../Table/cells/date";
 import NameCell, { NameCellProps } from "../Table/cells/name";
 import TextCell, { TextCellProps } from "../Table/cells/text";
+import TableEmptyState from "../Table/components/TableEmptyState";
 import { formatFiltersForApiRequest } from "../Table/filters";
 import { stringSort, dateSort } from "../Table/sorts";
-import { SortTypeArgs } from "../Table/types";
+import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
+
+export type SigningKeysTableData = {
+  id: string;
+  name: NameCellProps;
+  publicKey: TextCellProps;
+  createdAt: DateCellProps;
+};
 
 export const makeColumns = () => [
   {
@@ -32,23 +41,10 @@ export const makeColumns = () => [
   },
 ];
 
-export type SigningKeysTableData = {
-  id: string;
-  name: NameCellProps;
-  publicKey: TextCellProps;
-  createdAt: DateCellProps;
-};
-
-export type RowsPageFromStateResult = {
-  rows: SigningKeysTableData[];
-  nextCursor: any;
-  count: any;
-};
-
 export const rowsPageFromState = async (
-  state,
+  state: State<SigningKeysTableData>,
   getSigningKeys: Function
-): Promise<RowsPageFromStateResult> => {
+): Promise<RowsPageFromStateResult<SigningKeysTableData>> => {
   const [signingKeys, nextCursor, _, count] = await getSigningKeys({
     filters: formatFiltersForApiRequest(state.filters),
     limit: state.pageSize.toString(),
@@ -78,3 +74,13 @@ export const rowsPageFromState = async (
   );
   return { rows, nextCursor, count };
 };
+
+export const makeEmptyState = (actionToggleState) => (
+  <TableEmptyState
+    title="Create a Signing key"
+    description="Signing keys allow you to use playback policies with your streams to restrict access to them"
+    learnMoreUrl="https://docs.livepeer.studio/category/api/create-signing-keys"
+    actionTitle="Create signing key"
+    actionToggleState={actionToggleState}
+  />
+);

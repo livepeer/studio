@@ -1,61 +1,56 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
+import CreateDialog from "./CreateDialog";
 import { useToggleState } from "hooks/use-toggle-state";
 import {
+  ApiKeysTableData,
   makeColumns,
   makeEmptyState,
   rowsPageFromState,
-  SigningKeysTableData,
 } from "./helpers";
-import CreateDialog from "./CreateDialog";
-import { makeSelectAction, makeCreateAction } from "../Table/helpers";
+import { makeCreateAction, makeSelectAction } from "../Table/helpers";
 import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
-const SigningKeysTable = ({
-  title = "Signing Keys",
-  pageSize = 20,
-  tableId,
+const ApiKeysTable = ({
+  title = "API Keys",
+  userId,
 }: {
   title?: string;
-  pageSize?: number;
-  tableId: string;
+  userId: string;
 }) => {
-  const { getSigningKeys, deleteSigningKey } = useApi();
-  const { state, stateSetter } = useTableState<SigningKeysTableData>({
-    pageSize,
-    tableId,
+  const { getApiTokens, deleteApiToken } = useApi();
+  const { state, stateSetter } = useTableState<ApiKeysTableData>({
+    tableId: "tokenTable",
   });
   const deleteDialogState = useToggleState();
   const createDialogState = useToggleState();
-
   const columns = useMemo(makeColumns, []);
 
-  const fetcher: Fetcher<SigningKeysTableData> = useCallback(
-    async (state) => rowsPageFromState(state, getSigningKeys),
-    []
+  const fetcher: Fetcher<ApiKeysTableData> = useCallback(
+    async () => rowsPageFromState(userId, getApiTokens),
+    [userId]
   );
 
   return (
     <>
       <Table
         title={title}
+        state={state}
+        stateSetter={stateSetter}
         columns={columns}
         fetcher={fetcher}
         rowSelection="all"
-        state={state}
-        stateSetter={stateSetter}
-        initialSortBy={[{ id: "createdAt", desc: true }]}
         emptyState={makeEmptyState(createDialogState)}
         selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
         createAction={makeCreateAction("Create key", createDialogState.onOn)}
       />
 
       <TableStateDeleteDialog
-        entityName={{ singular: "signing key", plural: "signing keys" }}
+        entityName={{ singular: "API key", plural: "API keys" }}
         state={state}
         dialogToggleState={deleteDialogState}
-        deleteFunction={deleteSigningKey}
+        deleteFunction={deleteApiToken}
       />
 
       <CreateDialog
@@ -68,4 +63,4 @@ const SigningKeysTable = ({
   );
 };
 
-export default SigningKeysTable;
+export default ApiKeysTable;

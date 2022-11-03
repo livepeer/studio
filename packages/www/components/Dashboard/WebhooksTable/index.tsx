@@ -1,23 +1,26 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useApi } from "../../../hooks";
 import Table, { Fetcher, useTableState } from "components/Dashboard/Table";
-import { Box, Heading } from "@livepeer/design-system";
+import { Box } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
-import { Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
 import CreateDialog, {
   Action,
 } from "@components/Dashboard/WebhookDialogs/CreateEditDialog";
 import { useRouter } from "next/router";
-import { makeColumns, rowsPageFromState, WebhooksTableData } from "./helpers";
-import EmptyState from "./EmptyState";
-import DeleteDialog from "./DeleteDialog";
+import {
+  makeColumns,
+  makeEmptyState,
+  rowsPageFromState,
+  WebhooksTableData,
+} from "./helpers";
+import { makeCreateAction, makeSelectAction } from "../Table/helpers";
+import TableStateDeleteDialog from "../Table/components/TableStateDeleteDialog";
 
 const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
   const router = useRouter();
-  const { user, getWebhooks, deleteWebhook, deleteWebhooks, createWebhook } =
+  const { user, getWebhooks, createWebhook, deleteWebhook, deleteWebhooks } =
     useApi();
   const deleteDialogState = useToggleState();
-  const [savingDeleteDialog, setSavingDeleteDialog] = useState(false);
   const createDialogState = useToggleState();
   const { state, stateSetter } = useTableState<WebhooksTableData>({
     tableId: "webhooksTable",
@@ -30,89 +33,51 @@ const WebhooksTable = ({ title = "Webhooks" }: { title?: string }) => {
     [getWebhooks, user.id]
   );
 
-  const onDeleteWebhooks = useCallback(async () => {
-    if (state.selectedRows.length === 1) {
-      await deleteWebhook(state.selectedRows[0].id);
-      await state.invalidate();
-      deleteDialogState.onOff();
-    } else if (state.selectedRows.length > 1) {
-      await deleteWebhooks(state.selectedRows.map((s) => s.id));
-      await state.invalidate();
-      deleteDialogState.onOff();
-    }
-  }, [
-    deleteWebhook,
-    deleteWebhooks,
-    deleteDialogState.onOff,
-    state.selectedRows.length,
-    state.invalidate,
-  ]);
+  const onCreateSubmit = async ({ events, name, url, sharedSecret }) => {
+    const newWebhook = await createWebhook({
+      events,
+      name,
+      url,
+      sharedSecret,
+    });
+    await state.invalidate();
+    const query = router.query.admin === "true" ? { admin: true } : {};
+    await router.push({
+      pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
+      query,
+    });
+  };
 
   return (
     <Box css={{ p: "$6", mb: "$8" }}>
       <Table
+        title={title}
         columns={columns}
         fetcher={fetcher}
         state={state}
         stateSetter={stateSetter}
         rowSelection="all"
-        emptyState={<EmptyState createDialogState={createDialogState} />}
-        header={
-          <Heading size="2" css={{ fontWeight: 600 }}>
-            {title}
-          </Heading>
-        }
-        selectAction={{
-          onClick: deleteDialogState.onOn,
-          children: (
-            <>
-              <Cross1Icon />{" "}
-              <Box css={{ ml: "$2" }} as="span">
-                Delete
-              </Box>
-            </>
-          ),
-        }}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Create webhook
-              </Box>
-            </>
-          ),
-        }}
+        emptyState={makeEmptyState(createDialogState)}
+        selectAction={makeSelectAction("Delete", deleteDialogState.onOn)}
+        createAction={makeCreateAction(
+          "Create webhook",
+          createDialogState.onOn
+        )}
       />
 
-      <DeleteDialog
-        deleteDialogState={deleteDialogState}
+      <TableStateDeleteDialog
+        entityName={{ singular: "webhook", plural: "webhooks" }}
         state={state}
-        savingDeleteDialog={savingDeleteDialog}
-        setSavingDeleteDialog={setSavingDeleteDialog}
-        onDeleteWebhooks={onDeleteWebhooks}
+        dialogToggleState={deleteDialogState}
+        deleteFunction={deleteWebhook}
+        deleteMultipleFunction={deleteWebhooks}
       />
 
       <CreateDialog
         action={Action.Create}
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onSubmit={async ({ events, name, url, sharedSecret }) => {
-          const newWebhook = await createWebhook({
-            events,
-            name,
-            url,
-            sharedSecret,
-          });
-          await state.invalidate();
-          const query = router.query.admin === "true" ? { admin: true } : {};
-          await router.push({
-            pathname: `/dashboard/developers/webhooks/${newWebhook.id}`,
-            query,
-          });
-        }}
+        onSubmit={onCreateSubmit}
       />
     </Box>
   );
