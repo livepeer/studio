@@ -249,7 +249,7 @@ const StreamsTable = ({ userId, id }: { userId: string; id: string }) => {
       )}
       <Flex sx={{ alignItems: "center", mb: 3 }}>
         <Box>
-          <Link href="/app/stream/new-stream" passHref>
+          <Link href="/app/stream/new-stream" passHref legacyBehavior>
             <A variant="buttons.outlineSmall" sx={{ mr: 2 }}>
               Create
             </A>

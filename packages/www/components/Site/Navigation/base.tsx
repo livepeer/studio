@@ -107,7 +107,7 @@ const NavigationBase = ({
                   }}>
                   {links.map((link, i) => {
                     return (
-                      <Link href={link.href} key={`nav-link-${i}`} passHref>
+                      <Link href={link.href} key={`nav-link-${i}`} passHref legacyBehavior>
                         <A
                           target={link.isExternal ? "_blank" : null}
                           css={{
@@ -136,7 +136,7 @@ const NavigationBase = ({
                 <Flex>
                   {!loggedIn && (
                     <>
-                      <Link href="/login" passHref>
+                      <Link href="/login" passHref legacyBehavior>
                         <A
                           css={{
                             fontSize: "$4",
@@ -215,18 +215,18 @@ const NavigationBase = ({
                         },
                       }}>
                       {isDashboard && (
-                        <Link href="https://docs.livepeer.studio" passHref>
+                        <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
                           <A target="_blank">Docs</A>
                         </Link>
                       )}
                       {isDashboard && (
-                        <Link href="/contact" passHref>
+                        <Link href="/contact" passHref legacyBehavior>
                           <A>Contact</A>
                         </Link>
                       )}
 
                       {!isDashboard && (
-                        <Link href="/dashboard" passHref>
+                        <Link href="/dashboard" passHref legacyBehavior>
                           <A
                             css={{
                               fontSize: "$4",

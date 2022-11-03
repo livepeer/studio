@@ -97,258 +97,257 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
     }
   }, [promptUpgrade]);
 
-  return (
-    <>
-      <Tour
-        steps={steps}
-        disableDotsNavigation={false}
-        showButtons={false}
-        rounded={16}
-        showNumber={false}
-        showNavigation={false}
-        isOpen={isTourOpen}
-        onAfterOpen={() => (document.body.style.overflowY = "hidden")}
-        onBeforeClose={() => {
-          document.body.style.overflowY = "auto";
-          if (location.href.includes("?")) {
-            history.pushState({}, null, location.href.split("?")[0]);
-          }
-        }}
-        onRequestClose={() => setIsTourOpen(false)}
-      />
+  return <>
+    <Tour
+      steps={steps}
+      disableDotsNavigation={false}
+      showButtons={false}
+      rounded={16}
+      showNumber={false}
+      showNavigation={false}
+      isOpen={isTourOpen}
+      onAfterOpen={() => (document.body.style.overflowY = "hidden")}
+      onBeforeClose={() => {
+        document.body.style.overflowY = "auto";
+        if (location.href.includes("?")) {
+          history.pushState({}, null, location.href.split("?")[0]);
+        }
+      }}
+      onRequestClose={() => setIsTourOpen(false)}
+    />
 
-      <Box
+    <Box
+      css={{
+        borderRadius: 16,
+        position: "relative",
+        py: 5,
+        mb: 100,
+      }}>
+      <Flex
         css={{
-          borderRadius: 16,
-          position: "relative",
-          py: 5,
-          mb: 100,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}>
-        <Flex
+        <Box
           css={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            pl: 4,
+            width: "25%",
+            maxWidth: 174,
           }}>
-          <Box
+          <Flex
             css={{
-              pl: 4,
-              width: "25%",
-              maxWidth: 174,
+              mb: "$4",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              height: 116,
+              fontWeight: 500,
             }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "flex-end",
-                height: 116,
-                fontWeight: 500,
-              }}>
-              Usage
-            </Flex>
-            <List>
-              <Item displayCheck={false} title="Transcoding" />
-              <Item displayCheck={false} title="Recording storage" />
-              <Item
-                displayCheck={false}
-                title="Stream Delivery via CDN"
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                displayCheck={false}
-                title="Multistreaming*"
-                css={{ borderBottom: 0 }}
-              />
-            </List>
-          </Box>
-          <Box
-            css={{
-              p: "$4",
-              borderRadius: 16,
-              width: "25%",
-              minWidth: 300,
-            }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: 116,
-              }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_0"].name}
-              </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
-              <PlanForm
-                text={
-                  dashboard
-                    ? stripeProductId === "prod_0"
-                      ? "Current plan"
-                      : "Downgrade"
-                    : "Sign up"
-                }
-                disabled={
-                  dashboard && stripeProductId === "prod_0" ? true : false
-                }
-                variant="primary"
-                stripeProductId="prod_0"
-                onClick={() => {
-                  if (!dashboard) {
-                    router.push("/register");
-                  }
-                }}
-              />
-            </Flex>
-            <List>
-              <Item title={<span>1000 minutes / month</span>} />
-              <Item
-                title={<span>None</span>}
-                displayX={true}
-                displayCheck={false}
-              />
-              <Item
-                title={<span>10 concurrent viewers / account</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>3 stream destinations</span>}
-                displayCheck={true}
-                css={{ borderBottom: 0 }}
-              />
-            </List>
-          </Box>
-          <Box
-            className="upgrade-card"
-            css={{
-              width: "25%",
-              color: "$hiContrast",
-              boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
-              borderRadius: "16px",
-              background: "$panel",
-              p: "$4",
-              minWidth: 300,
-            }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: 116,
-              }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_1"].name}
-              </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
-              <PlanForm
-                text={
-                  dashboard
-                    ? stripeProductId === "prod_1"
-                      ? "Current plan"
-                      : stripeProductId === "prod_2"
-                      ? "Downgrade"
-                      : "Upgrade"
-                    : "Sign up"
-                }
-                disabled={
-                  dashboard && stripeProductId === "prod_1" ? true : false
-                }
-                variant="primary"
-                stripeProductId="prod_1"
-                onClick={() => {
-                  if (dashboard) {
-                    setIsTourOpen(false);
-                  } else {
-                    router.push("/register?selectedPlan=1");
-                  }
-                }}
-              />
-            </Flex>
-
-            <List>
-              <Item
-                css={{ borderColor: "$neutral5" }}
-                title={<span>$0.005 USD / min video ingested</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5" }}
-                title={<span>Coming soon</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.015 USD / gb video streamed</span>}
-              />
-              <Item
-                css={{ borderColor: "$neutral5", borderBottom: 0 }}
-                title={<span>$0.002 USD / min per destination</span>}
-              />
-            </List>
-          </Box>
-          <Box
-            css={{
-              borderRadius: 16,
-              p: "$4",
-              width: "25%",
-              minWidth: 300,
-            }}>
-            <Flex
-              css={{
-                mb: "$4",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: 116,
-              }}>
-              <Heading as="h3" size="2" css={{ mb: "$3" }}>
-                {products["prod_2"].name}
-              </Heading>
-              <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
-              <Link
-                href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                passHref>
-                <Button
-                  as="a"
-                  size="3"
-                  onClick={() => {
-                    router.push(
-                      "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                    );
-                  }}
-                  variant="blue">
-                  Contact Us
-                </Button>
-              </Link>
-            </Flex>
-
-            <List>
-              <Item title={<span>Custom pricing available</span>} />
-              <Item title={<span>Coming soon</span>} />
-              <Item
-                title={<span>Custom pricing available</span>}
-                css={{ borderBottom: 0 }}
-              />
-              <Item
-                title={<span>Custom pricing available</span>}
-                css={{ borderBottom: 0 }}
-              />
-            </List>
-          </Box>
-        </Flex>
-        <Container
+            Usage
+          </Flex>
+          <List>
+            <Item displayCheck={false} title="Transcoding" />
+            <Item displayCheck={false} title="Recording storage" />
+            <Item
+              displayCheck={false}
+              title="Stream Delivery via CDN"
+              css={{ borderBottom: 0 }}
+            />
+            <Item
+              displayCheck={false}
+              title="Multistreaming*"
+              css={{ borderBottom: 0 }}
+            />
+          </List>
+        </Box>
+        <Box
           css={{
-            fontSize: "$1",
-            textAlign: "center",
-            maxWidth: 800,
-            mt: "$8",
-            mx: "auto",
-            fontStyle: "italic",
+            p: "$4",
+            borderRadius: 16,
+            width: "25%",
+            minWidth: 300,
+          }}>
+          <Flex
+            css={{
+              mb: "$4",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: 116,
+            }}>
+            <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              {products["prod_0"].name}
+            </Heading>
+            <Box css={{ mb: "$4", fontSize: "$2" }}>Free</Box>
+            <PlanForm
+              text={
+                dashboard
+                  ? stripeProductId === "prod_0"
+                    ? "Current plan"
+                    : "Downgrade"
+                  : "Sign up"
+              }
+              disabled={
+                dashboard && stripeProductId === "prod_0" ? true : false
+              }
+              variant="primary"
+              stripeProductId="prod_0"
+              onClick={() => {
+                if (!dashboard) {
+                  router.push("/register");
+                }
+              }}
+            />
+          </Flex>
+          <List>
+            <Item title={<span>1000 minutes / month</span>} />
+            <Item
+              title={<span>None</span>}
+              displayX={true}
+              displayCheck={false}
+            />
+            <Item
+              title={<span>10 concurrent viewers / account</span>}
+              displayCheck={true}
+              css={{ borderBottom: 0 }}
+            />
+            <Item
+              title={<span>3 stream destinations</span>}
+              displayCheck={true}
+              css={{ borderBottom: 0 }}
+            />
+          </List>
+        </Box>
+        <Box
+          className="upgrade-card"
+          css={{
+            width: "25%",
             color: "$hiContrast",
+            boxShadow: "0px 4px 34px rgba(0, 0, 0, 0.1)",
+            borderRadius: "16px",
+            background: "$panel",
+            p: "$4",
+            minWidth: 300,
           }}>
-          *Currently, we are not charging for this feature. We'll be sure to
-          reach out before we do.
-        </Container>
-      </Box>
-    </>
-  );
+          <Flex
+            css={{
+              mb: "$4",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: 116,
+            }}>
+            <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              {products["prod_1"].name}
+            </Heading>
+            <Box css={{ mb: "$4", fontSize: "$2" }}>Pay as you go</Box>
+            <PlanForm
+              text={
+                dashboard
+                  ? stripeProductId === "prod_1"
+                    ? "Current plan"
+                    : stripeProductId === "prod_2"
+                    ? "Downgrade"
+                    : "Upgrade"
+                  : "Sign up"
+              }
+              disabled={
+                dashboard && stripeProductId === "prod_1" ? true : false
+              }
+              variant="primary"
+              stripeProductId="prod_1"
+              onClick={() => {
+                if (dashboard) {
+                  setIsTourOpen(false);
+                } else {
+                  router.push("/register?selectedPlan=1");
+                }
+              }}
+            />
+          </Flex>
+
+          <List>
+            <Item
+              css={{ borderColor: "$neutral5" }}
+              title={<span>$0.005 USD / min video ingested</span>}
+            />
+            <Item
+              css={{ borderColor: "$neutral5" }}
+              title={<span>Coming soon</span>}
+            />
+            <Item
+              css={{ borderColor: "$neutral5", borderBottom: 0 }}
+              title={<span>$0.015 USD / gb video streamed</span>}
+            />
+            <Item
+              css={{ borderColor: "$neutral5", borderBottom: 0 }}
+              title={<span>$0.002 USD / min per destination</span>}
+            />
+          </List>
+        </Box>
+        <Box
+          css={{
+            borderRadius: 16,
+            p: "$4",
+            width: "25%",
+            minWidth: 300,
+          }}>
+          <Flex
+            css={{
+              mb: "$4",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: 116,
+            }}>
+            <Heading as="h3" size="2" css={{ mb: "$3" }}>
+              {products["prod_2"].name}
+            </Heading>
+            <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
+            <Link
+              href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
+              passHref
+              legacyBehavior>
+              <Button
+                as="a"
+                size="3"
+                onClick={() => {
+                  router.push(
+                    "/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
+                  );
+                }}
+                variant="blue">
+                Contact Us
+              </Button>
+            </Link>
+          </Flex>
+
+          <List>
+            <Item title={<span>Custom pricing available</span>} />
+            <Item title={<span>Coming soon</span>} />
+            <Item
+              title={<span>Custom pricing available</span>}
+              css={{ borderBottom: 0 }}
+            />
+            <Item
+              title={<span>Custom pricing available</span>}
+              css={{ borderBottom: 0 }}
+            />
+          </List>
+        </Box>
+      </Flex>
+      <Container
+        css={{
+          fontSize: "$1",
+          textAlign: "center",
+          maxWidth: 800,
+          mt: "$8",
+          mx: "auto",
+          fontStyle: "italic",
+          color: "$hiContrast",
+        }}>
+        *Currently, we are not charging for this feature. We'll be sure to
+        reach out before we do.
+      </Container>
+    </Box>
+  </>;
 };
 
 export default Plans;

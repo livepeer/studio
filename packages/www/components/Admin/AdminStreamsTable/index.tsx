@@ -161,11 +161,11 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         <Link
           href={{ pathname: "/app/stream/new-stream", query: { admin: true } }}
           as="/app/stream/new-stream">
-          <a>
-            <Button variant="outlineSmall" sx={{ margin: 2 }}>
-              Create
-            </Button>
-          </a>
+
+          <Button variant="outlineSmall" sx={{ margin: 2 }}>
+            Create
+          </Button>
+
         </Link>
         <Button
           variant="primarySmall"

@@ -65,7 +65,7 @@ const LoginPage = () => {
             />
             <Box css={{ maxWidth: 500, width: "100%" }}>
               <Box css={{ textAlign: "center" }}>
-                <Link href="/forgot-password" passHref>
+                <Link href="/forgot-password" passHref legacyBehavior>
                   <A css={{ textDecoration: "none" }}>Forgot your password?</A>
                 </Link>
               </Box>
@@ -78,7 +78,7 @@ const LoginPage = () => {
                   bc: "$neutral6",
                 }}
               />
-              <Link href="/register" passHref>
+              <Link href="/register" passHref legacyBehavior>
                 <Button
                   href="/register"
                   as={A}

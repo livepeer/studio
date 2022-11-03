@@ -101,7 +101,7 @@ const Header = ({ breadcrumbs = [] }) => {
           {breadcrumbs.map((breadcrumb, i) => {
             if (breadcrumb?.href) {
               return (
-                <Link key={i} href={breadcrumb.href} passHref>
+                <Link key={i} href={breadcrumb.href} passHref legacyBehavior>
                   <A variant="primary">{breadcrumb.title}</A>
                 </Link>
               );
@@ -120,7 +120,7 @@ const Header = ({ breadcrumbs = [] }) => {
               border: "none",
             }}>
             <StyledDocumentationIcon />
-            <Link href="https://docs.livepeer.studio" passHref>
+            <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
               <A
                 target="_blank"
                 css={{
@@ -293,7 +293,7 @@ const Header = ({ breadcrumbs = [] }) => {
               <Text size="2" css={{ mb: "$3", color: "$hiContrast" }}>
                 HELP
               </Text>
-              <Link href="https://docs.livepeer.studio" passHref>
+              <Link href="https://docs.livepeer.studio" passHref legacyBehavior>
                 <A
                   target="_blank"
                   css={{
@@ -308,7 +308,7 @@ const Header = ({ breadcrumbs = [] }) => {
                   <StyledHyperlinkIcon />
                 </A>
               </Link>
-              <Link href="/contact" passHref>
+              <Link href="/contact" passHref legacyBehavior>
                 <A>
                   <Flex align="center" css={{ cursor: "pointer" }}>
                     <StyledSupportIcon />

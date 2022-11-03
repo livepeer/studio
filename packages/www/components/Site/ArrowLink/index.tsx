@@ -10,7 +10,7 @@ const ArrowLink = ({
   target = "_self",
 }) => {
   return (
-    <Link href={href} passHref>
+    <Link href={href} passHref legacyBehavior>
       <A
         css={{
           color,

@@ -4,7 +4,7 @@ import { Box, Flex, Link as A } from "@livepeer/design-system";
 const Logo = ({ navBackgroundColor = "$hiContrast", badge = "" }) => {
   return (
     <Flex align="center">
-      <Link href="/" passHref>
+      <Link href="/" passHref legacyBehavior>
         <A
           css={{
             textDecoration: "none",

@@ -37,7 +37,7 @@ const TableEmptyState = ({
       {description}
     </Text>
 
-    <Link href={learnMoreUrl} passHref>
+    <Link href={learnMoreUrl} passHref legacyBehavior>
       <A
         target="_blank"
         variant="primary"

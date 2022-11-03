@@ -51,7 +51,7 @@ const Button = ({ children, sx, ink = false, ...props }: ButtonProps) => {
       );
     }
     return (
-      <Link href={props.href} as={props.asPath} passHref>
+      <Link href={props.href} as={props.asPath} passHref legacyBehavior>
         <ThemeUIButton
           {...props}
           isLink={undefined}
