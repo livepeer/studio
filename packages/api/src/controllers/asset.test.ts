@@ -242,6 +242,7 @@ describe("controllers/asset", () => {
         },
       });
 
+      const { ipfsGatewayUrl } = server;
       res = await client.get(`/asset/${asset.id}`);
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toEqual({
@@ -249,8 +250,8 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: {},
-            ...withIpfsUrls({ cid: "QmX" }),
-            nftMetadata: withIpfsUrls({ cid: "QmY" }),
+            ...withIpfsUrls(ipfsGatewayUrl, { cid: "QmX" }),
+            nftMetadata: withIpfsUrls(ipfsGatewayUrl, { cid: "QmY" }),
             updatedAt: expect.any(Number),
           },
           status: {
