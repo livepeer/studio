@@ -55,7 +55,7 @@ const DefaultError = () => {
               Something went wrong.
             </Heading>
             <Text size="5">The page you requested could not be found.</Text>
-            <Link href="/" passHref legacyBehavior>
+            <Link href="/" passHref>
               <A css={{ mt: "$4" }}>Go to the homepage</A>
             </Link>
           </Box>

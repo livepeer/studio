@@ -129,7 +129,7 @@ const RegisterPage = () => {
             />
             <Flex align="center" css={{ color: "$hiContrast" }}>
               Already have an account?&nbsp;
-              <Link href="/login" passHref legacyBehavior>
+              <Link href="/login" passHref>
                 <A>Log in</A>
               </Link>
             </Flex>

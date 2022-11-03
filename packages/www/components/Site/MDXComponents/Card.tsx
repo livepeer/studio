@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
 
 const Post = ({ href, title, label }) => (
-  <Link href={href} passHref legacyBehavior>
+  <Link href={href} passHref>
     <A
       css={{
         textDecoration: "none",

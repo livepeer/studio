@@ -68,7 +68,7 @@ const Hero = ({
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center" justify={centered ? "center" : "start"}>
-                  <Link href={ctas[0].href} passHref legacyBehavior>
+                  <Link href={ctas[0].href} passHref>
                     <Button as="a" arrow css={{ mr: "$4" }}>
                       {ctas[0].children}
                     </Button>

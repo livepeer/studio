@@ -77,7 +77,7 @@ const Menu = ({
         <Flex css={{ flexDirection: "column" }}>
           {links.map((link) => {
             return (
-              <Link href={link.href} key={`menu-link-${link.href}`} passHref legacyBehavior>
+              <Link href={link.href} key={`menu-link-${link.href}`} passHref>
                 <A
                   onClick={() => setMobileMenuIsOpen(false)}
                   css={{
@@ -100,18 +100,18 @@ const Menu = ({
           }}>
           {!!token ? (
             <>
-              <Link href="dashboard" passHref legacyBehavior>
+              <Link href="dashboard" passHref>
                 <Button arrow>Dashboard</Button>
               </Link>
               {user && user.admin && (
-                <Link href="/app/admin" passHref legacyBehavior>
+                <Link href="/app/admin" passHref>
                   <A css={{ ml: "$3" }}>Admin</A>
                 </Link>
               )}
             </>
           ) : (
             <>
-              <Link href="/login" passHref legacyBehavior>
+              <Link href="/login" passHref>
                 <Button
                   onClick={() => setMobileMenuIsOpen(false)}
                   arrow

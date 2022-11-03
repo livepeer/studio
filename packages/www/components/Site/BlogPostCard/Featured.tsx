@@ -13,11 +13,7 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
   const builder = imageUrlBuilder(client as any);
 
   return (
-    <Link
-      href="/blog/[slug]"
-      as={`/blog/${post.slug.current}`}
-      passHref
-      legacyBehavior>
+    <Link href="/blog/[slug]" as={`/blog/${post.slug.current}`} passHref>
       <A
         css={{
           width: "100%",

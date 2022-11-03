@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Card = ({ description, title, image, href }) => {
   return (
-    <Link href={href} passHref legacyBehavior>
+    <Link href={href} passHref>
       <A
         css={{
           borderRadius: 16,

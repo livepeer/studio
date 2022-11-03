@@ -85,7 +85,7 @@ const TableOfContents = ({ onClose = null, tree, ignoreList = [] }: Props) => {
       borderRadius: 4,
     };
     return (
-      <Link href={heading.slug} passHref legacyBehavior>
+      <Link href={heading.slug} passHref>
         <Box
           as="a"
           onClick={onClose}

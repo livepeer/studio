@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 function Hit({ hit, children }) {
   return (
     <Link href={hit.url}>
-      {children}
+      <a>{children}</a>
     </Link>
   );
 }

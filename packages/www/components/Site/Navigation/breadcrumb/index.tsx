@@ -43,122 +43,123 @@ const NavigationBreadcrumb = ({
   const [openDropdown, setOpenDropdown] = useState(false);
 
   if (breadcrumb) {
-    return <>
-      <Logo navBackgroundColor={navBackgroundColor} />
-      {breadcrumb.map((item) => (
-        <Box as="span" key={`breadcrumb-${item.href}`}>
-          <Box
-            as="span"
-            css={{
-              position: "relative",
-              display: "inline-flex",
-              alignItems: "center",
-              height: "33px",
-            }}>
-            <Divider />
-            <Box
-              css={{
-                fontWeight: 800,
-                color: "text",
-                display: "flex",
-                alignItems: "center",
-                "@bp1": {
-                  fontSize: "$2",
-                },
-                "@bp3": {
-                  fontSize: "$3",
-                },
-              }}>
-              {slugify(item.children.toString())}
-            </Box>
-          </Box>
-          {item.mobileDropdownLinks && (
+    return (
+      <>
+        <Logo navBackgroundColor={navBackgroundColor} />
+        {breadcrumb.map((item) => (
+          <Box as="span" key={`breadcrumb-${item.href}`}>
             <Box
               as="span"
               css={{
                 position: "relative",
+                display: "inline-flex",
                 alignItems: "center",
                 height: "33px",
-                ml: "-6px",
-                "@bp1": {
-                  display: "inline-flex",
-                },
-                "@bp3": {
-                  fontSize: "none",
-                },
               }}>
               <Divider />
-              {(() => {
-                const { children, ...selectedProps } =
-                  item.mobileDropdownLinks.find((l) => l.isSelected) ??
-                  item.mobileDropdownLinks.find(
-                    (l) => l.href === "/docs/guides"
-                  );
-                return (
-                  <>
-                    <Box
-                      css={{
-                        fontWeight: 800,
-                        color: "text",
-                        display: "flex",
-                        alignItems: "center",
-                        "@bp1": {
-                          fontSize: "$2",
-                        },
-                        "@bp3": {
-                          fontSize: "$3",
-                        },
-                      }}>
-                      {slugify(
-                        children.toString() === "API Reference"
-                          ? "API"
-                          : children.toString()
-                      )}
-                    </Box>
-                  </>
-                );
-              })()}
-              <BreadcrumbDropdown
-                isOpen={openDropdown}
-                close={() => setOpenDropdown(false)}
+              <Box
                 css={{
+                  fontWeight: 800,
+                  color: "text",
+                  display: "flex",
+                  alignItems: "center",
                   "@bp1": {
-                    right: "12px",
+                    fontSize: "$2",
                   },
-                  "@bp2": {
-                    right: "15px",
+                  "@bp3": {
+                    fontSize: "$3",
                   },
                 }}>
-                {item.mobileDropdownLinks
-                  .filter((l) => !l.isSelected)
-                  .map((link) => (
-                    <Link
-                      href={link.href}
-                      passHref
-                      key={`dropdown-link-${link.href}`}
-                      legacyBehavior>
-                      <A
+                {slugify(item.children.toString())}
+              </Box>
+            </Box>
+            {item.mobileDropdownLinks && (
+              <Box
+                as="span"
+                css={{
+                  position: "relative",
+                  alignItems: "center",
+                  height: "33px",
+                  ml: "-6px",
+                  "@bp1": {
+                    display: "inline-flex",
+                  },
+                  "@bp3": {
+                    fontSize: "none",
+                  },
+                }}>
+                <Divider />
+                {(() => {
+                  const { children, ...selectedProps } =
+                    item.mobileDropdownLinks.find((l) => l.isSelected) ??
+                    item.mobileDropdownLinks.find(
+                      (l) => l.href === "/docs/guides"
+                    );
+                  return (
+                    <>
+                      <Box
                         css={{
-                          display: "block",
-                          fontWeight: 500,
-                          fontSize: "$2",
-                          color: "$hiContrast",
-                          ":not(:last-of-type)": {
-                            mb: "$3",
+                          fontWeight: 800,
+                          color: "text",
+                          display: "flex",
+                          alignItems: "center",
+                          "@bp1": {
+                            fontSize: "$2",
+                          },
+                          "@bp3": {
+                            fontSize: "$3",
                           },
                         }}>
-                        {link.children === "API Reference"
-                          ? "API"
-                          : link.children}
-                      </A>
-                    </Link>
-                  ))}
-              </BreadcrumbDropdown>
-            </Box>
-          )}
-        </Box>
-      ))}
-    </>;
+                        {slugify(
+                          children.toString() === "API Reference"
+                            ? "API"
+                            : children.toString()
+                        )}
+                      </Box>
+                    </>
+                  );
+                })()}
+                <BreadcrumbDropdown
+                  isOpen={openDropdown}
+                  close={() => setOpenDropdown(false)}
+                  css={{
+                    "@bp1": {
+                      right: "12px",
+                    },
+                    "@bp2": {
+                      right: "15px",
+                    },
+                  }}>
+                  {item.mobileDropdownLinks
+                    .filter((l) => !l.isSelected)
+                    .map((link) => (
+                      <Link
+                        href={link.href}
+                        passHref
+                        key={`dropdown-link-${link.href}`}>
+                        <A
+                          css={{
+                            display: "block",
+                            fontWeight: 500,
+                            fontSize: "$2",
+                            color: "$hiContrast",
+                            ":not(:last-of-type)": {
+                              mb: "$3",
+                            },
+                          }}>
+                          {link.children === "API Reference"
+                            ? "API"
+                            : link.children}
+                        </A>
+                      </Link>
+                    ))}
+                </BreadcrumbDropdown>
+              </Box>
+            )}
+          </Box>
+        ))}
+      </>
+    );
   }
   return <Logo navBackgroundColor={navBackgroundColor} />;
 };

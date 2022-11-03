@@ -76,7 +76,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                 {heading}
               </Heading>
             </Flex>
-            <Link href="/register" passHref legacyBehavior>
+            <Link href="/register" passHref>
               <Button arrow as="a" size="4">
                 Sign up for free
               </Button>

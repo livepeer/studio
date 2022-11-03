@@ -62,7 +62,7 @@ const Table = ({
                   pr: "$4",
                 }}>
                 {key === "link" ? (
-                  <Link href={value as string} passHref legacyBehavior>
+                  <Link href={value as string} passHref>
                     <A variant="primary">{value}</A>
                   </Link>
                 ) : (

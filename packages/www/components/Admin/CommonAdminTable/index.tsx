@@ -60,7 +60,7 @@ export const StreamName = ({
         <Link
           href={{ pathname: "/app/stream/[id]", query }}
           as={`/app/stream/${stream.id}`}>
-          {stream.name}
+          <a>{stream.name}</a>
         </Link>
       </Box>
     </Box>

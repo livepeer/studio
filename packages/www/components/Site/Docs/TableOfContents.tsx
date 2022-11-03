@@ -118,7 +118,7 @@ const CollapsibleMenuItem = ({ route }: { route: Child }) => {
       }>
       <Box css={{ pt: 0, pb: "$4", background: "none" }}>
         {route.children.map((child, idx2) => (
-          <Link href={`/${child.slug}`} key={idx2} passHref legacyBehavior>
+          <Link href={`/${child.slug}`} key={idx2} passHref>
             <A
               variant="subtle"
               css={{
@@ -161,7 +161,7 @@ const Menu = ({ menu }: MenuProps) => {
           <CollapsibleMenuItem route={route} key={idx} />
         ) : (
           !route.hide && (
-            <Link href={`/${route.slug}`} key={idx} passHref legacyBehavior>
+            <Link href={`/${route.slug}`} key={idx} passHref>
               <Box
                 as="a"
                 css={{

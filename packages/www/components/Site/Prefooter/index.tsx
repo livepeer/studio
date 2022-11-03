@@ -71,7 +71,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
               flexDirection: "row",
             },
           }}>
-          <Link href="/register" passHref legacyBehavior>
+          <Link href="/register" passHref>
             <Button
               size="4"
               as="a"
@@ -86,7 +86,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
               Sign up for free
             </Button>
           </Link>
-          <Link href="/contact" passHref legacyBehavior>
+          <Link href="/contact" passHref>
             <A
               css={{
                 textDecoration: "none",

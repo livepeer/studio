@@ -33,7 +33,7 @@ const BlogCTA = ({
         },
       }}>
       {document && (
-        <Link href={`/${document?.slug?.current}`} passHref legacyBehavior>
+        <Link href={`/${document?.slug?.current}`} passHref>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
             {title}
           </Button>
@@ -53,7 +53,7 @@ const BlogCTA = ({
       )}
 
       {anchorLink && (
-        <Link href={anchorLink} passHref legacyBehavior>
+        <Link href={anchorLink} passHref>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
             {title}
           </Button>

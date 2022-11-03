@@ -30,8 +30,7 @@ const EmptyState = ({
     </Text>
     <Link
       href="https://docs.livepeer.studio/reference/api/create-signing-keys"
-      passHref
-      legacyBehavior>
+      passHref>
       <A
         target="_blank"
         variant="primary"

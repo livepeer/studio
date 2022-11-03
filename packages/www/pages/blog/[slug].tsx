@@ -128,8 +128,7 @@ const Post = ({
                       ? "/blog"
                       : `/blog/category/${category.slug.current}`
                   }
-                  passHref
-                  legacyBehavior>
+                  passHref>
                   <A
                     css={{
                       color: "$hiContrast",

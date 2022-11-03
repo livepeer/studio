@@ -118,7 +118,7 @@ const AdminTools = ({ id }: { id: string }) => {
             <Link
               href={{ pathname: "/app/stream/[id]", query }}
               as={`/app/stream/${ginfo.stream.id}`}>
-              {ginfo.stream.name}
+              <a>{ginfo.stream.name}</a>
             </Link>
           </Box>
           <Box>

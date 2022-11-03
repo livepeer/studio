@@ -175,7 +175,7 @@ const Billing = () => {
               </Badge>
               plan.
             </Text>
-            <Link href="/dashboard/billing/plans" passHref legacyBehavior>
+            <Link href="/dashboard/billing/plans" passHref>
               <A
                 variant="primary"
                 css={{ display: "flex", alignItems: "center" }}>

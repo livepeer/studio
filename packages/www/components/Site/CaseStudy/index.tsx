@@ -146,7 +146,7 @@ const CaseStudy = ({
                     {solution}
                   </Text>
                   {internalLink && (
-                    <Link href={`/blog/${internalLink.slug.current}`} passHref legacyBehavior>
+                    <Link href={`/blog/${internalLink.slug.current}`} passHref>
                       <A css={{ fontSize: "$3" }} variant="primary">
                         Read the full story
                       </A>

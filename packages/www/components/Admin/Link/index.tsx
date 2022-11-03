@@ -24,7 +24,7 @@ const Link = ({ isExternal, children, ...moreProps }: LinkProps) => {
   }
   const { asPath, href, ...anchorProps } = moreProps;
   return (
-    <NextLink as={asPath} href={href} passHref legacyBehavior>
+    <NextLink as={asPath} href={href} passHref>
       <A {...anchorProps}>{children}</A>
     </NextLink>
   );

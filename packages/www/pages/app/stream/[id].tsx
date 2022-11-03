@@ -436,7 +436,7 @@ const ID = () => {
             </Flex>
           </Modal>
         )}
-        <Link href={backLink} passHref legacyBehavior>
+        <Link href={backLink} passHref>
           <A
             sx={{
               mt: 4,
@@ -579,8 +579,7 @@ const ID = () => {
                         optimal Livepeer Studio experience.
                         <Link
                           href="/docs/guides/dashboard/ingest-playback-url-pair"
-                          passHref
-                          legacyBehavior>
+                          passHref>
                           <A target="_blank">
                             <i>
                               Learn more about forgoing the global ingest and
