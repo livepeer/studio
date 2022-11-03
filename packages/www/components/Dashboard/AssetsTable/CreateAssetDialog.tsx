@@ -152,25 +152,27 @@ const CreateAssetDialog = ({
                 </Text>
               </Box>
             </Box>
-            {videoFiles &&
-              Object.keys(videoFiles).map((key) => (
-                <Flex key={key} align="center">
-                  <IconButton
-                    onClick={() => setVideoFiles((prev) => omit(prev, key))}
-                    css={{ color: "$whiteA12", mr: "$1", cursor: "pointer" }}>
-                    <Cross2Icon />
-                  </IconButton>
 
-                  <Text
-                    as="p"
-                    css={{
-                      my: "$1",
-                      fontSize: "$1",
-                    }}>
-                    {key}
-                  </Text>
-                </Flex>
-              ))}
+            <Box css={{ mt: "$1" }}>
+              {videoFiles &&
+                Object.keys(videoFiles).map((key) => (
+                  <Flex key={key} align="center">
+                    <IconButton
+                      onClick={() => setVideoFiles((prev) => omit(prev, key))}
+                      css={{ mr: "$1", cursor: "pointer" }}>
+                      <Cross2Icon />
+                    </IconButton>
+                    <Text
+                      as="p"
+                      css={{
+                        my: "$1",
+                        fontSize: "$1",
+                      }}>
+                      {key}
+                    </Text>
+                  </Flex>
+                ))}
+            </Box>
 
             {error && (
               <Box>
@@ -184,6 +186,8 @@ const CreateAssetDialog = ({
               variant="gray"
               css={{ mt: "$1", fontSize: "$2", mb: "$4" }}>
               Select up to 20 files at a time
+              <br />
+              .mp4 files supported
             </Text>
           </AlertDialogDescription>
           <Flex css={{ jc: "flex-end", gap: "$3", mt: "$4" }}>
