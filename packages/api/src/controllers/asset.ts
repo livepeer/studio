@@ -58,6 +58,16 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
 }
 
+function defaultObjectStoreId(
+  { config }: Request,
+  useCatalyst: boolean
+): string {
+  if (!useCatalyst) {
+    return config.vodObjectStoreId;
+  }
+  return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
+}
+
 function cleanAssetTracks(asset: WithID<Asset>) {
   return !asset.videoSpec
     ? asset
@@ -459,12 +469,13 @@ app.post(
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
+  const useCatalyst = shouldUseCatalyst(req);
   let asset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
     Date.now(),
-    req.config.vodObjectStoreId,
+    defaultObjectStoreId(req, useCatalyst),
     req.body
   );
   if (!req.body.url) {
@@ -474,7 +485,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   }
 
   asset = await createAsset(asset, req.queue);
-  const taskType = shouldUseCatalyst(req) ? "upload" : "import";
+  const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
@@ -538,7 +549,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    req.config.vodObjectStoreId,
+    defaultObjectStoreId(req, false), // transcode only in old pipeline for now
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -582,13 +593,14 @@ app.post(
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
 
-    const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
+    const useCatalyst = shouldUseCatalyst(req);
+    const { jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
-      vodObjectStoreId,
+      defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
     const { uploadedObjectKey, uploadToken } = await genUploadUrl(

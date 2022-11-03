@@ -223,7 +223,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         coerce: coerceArr,
       },
       vodObjectStoreId: {
-        describe: "s3 object store id for vod",
+        describe: "object store ID to use for VOD",
+        type: "string",
+      },
+      vodCatalystObjectStoreId: {
+        describe: "object store ID to use for Catalyst VOD",
         type: "string",
       },
       vodCatalystPipelineRolloutPercent: {
