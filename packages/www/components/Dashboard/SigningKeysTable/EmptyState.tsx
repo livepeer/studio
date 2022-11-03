@@ -29,7 +29,7 @@ const EmptyState = ({
       restrict access to them
     </Text>
     <Link
-      href="https://docs.livepeer.studio/category/api/create-signing-keys"
+      href="https://docs.livepeer.studio/reference/api/create-signing-keys"
       passHref>
       <A
         target="_blank"
