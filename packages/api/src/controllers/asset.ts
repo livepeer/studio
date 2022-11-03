@@ -47,7 +47,7 @@ const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
-  if (user.admin && upload === "1") {
+  if (user.admin || upload === "1") {
     return true;
   }
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
@@ -136,28 +136,32 @@ function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
   };
 }
 
-const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
-
-export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(ipfs: T): T {
+export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(
+  gatewayUrl: string,
+  ipfs: T
+): T {
   if (!ipfs?.cid) {
     return ipfs;
   }
   return {
     ...ipfs,
     url: `ipfs://${ipfs.cid}`,
-    gatewayUrl: pathJoin(ipfsGateway, ipfs.cid),
+    gatewayUrl: pathJoin(gatewayUrl, ipfs.cid),
   };
 }
 
-function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
+function assetWithIpfsUrls(
+  gatewayUrl: string,
+  asset: WithID<Asset>
+): WithID<Asset> {
   if (!asset?.storage?.ipfs?.cid) {
     return asset;
   }
   return _.merge({}, asset, {
     storage: {
       ipfs: {
-        ...withIpfsUrls(asset.storage.ipfs),
-        nftMetadata: withIpfsUrls(asset.storage.ipfs.nftMetadata),
+        ...withIpfsUrls(gatewayUrl, asset.storage.ipfs),
+        nftMetadata: withIpfsUrls(gatewayUrl, asset.storage.ipfs.nftMetadata),
       },
     },
   });
@@ -263,6 +267,7 @@ app.use(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
+    const { ipfsGatewayUrl } = req.config;
     const ingests = await req.getIngest();
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
@@ -271,7 +276,7 @@ app.use(
     const ingest = ingests[0].base;
     let toExternalAsset = (a: WithID<Asset>) => {
       a = withPlaybackUrls(ingest, a);
-      a = assetWithIpfsUrls(a);
+      a = assetWithIpfsUrls(ipfsGatewayUrl, a);
       if (req.user.admin) {
         return a;
       }
