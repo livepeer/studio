@@ -1080,8 +1080,8 @@ components:
                   properties:
                     nftMetadataTemplate:
                       type: string
-                      enum: [player, file]
-                      default: player
+                      enum: [file, player]
+                      default: file
                       description:
                         Name of the NFT metadata template to export. 'player'
                         will embed the Livepeer Player on the NFT while 'file'
