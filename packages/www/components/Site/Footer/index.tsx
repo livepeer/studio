@@ -126,7 +126,7 @@ const Footer = () => {
                         {data.description[locale]}
                       </Box>
                       <Flex align="center">
-                        <Link href="/contact" passHref>
+                        <Link href="/contact" passHref legacyBehavior>
                           <Button
                             as={A}
                             css={{
@@ -155,7 +155,7 @@ const Footer = () => {
                             Contact
                           </Button>
                         </Link>
-                        <Link href="/login" passHref>
+                        <Link href="/login" passHref legacyBehavior>
                           <Button
                             as={A}
                             small
@@ -469,7 +469,7 @@ const Footer = () => {
                       },
                     },
                   }}>
-                  <Link href="/pricing-faq" passHref>
+                  <Link href="/pricing-faq" passHref legacyBehavior>
                     <A>Pricing</A>
                   </Link>
                   <A href="https://livepeer.org/jobs" target="_blank">
@@ -478,10 +478,10 @@ const Footer = () => {
                   <A href="https://status.livepeer.studio/" target="_blank">
                     Status Page
                   </A>
-                  <Link href="/privacy-policy" passHref>
+                  <Link href="/privacy-policy" passHref legacyBehavior>
                     <A>Privacy Policy</A>
                   </Link>
-                  <Link href="/terms-of-service" passHref>
+                  <Link href="/terms-of-service" passHref legacyBehavior>
                     <A>Terms of Service</A>
                   </Link>
                 </Box>

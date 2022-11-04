@@ -30,7 +30,7 @@ const TextCell = <D extends TableData>({
       <div data-tip data-for={pid}>
         {cell.value.href ? (
           <Link href={cell.value.href}>
-            <a>{cell.value.children}</a>
+            {cell.value.children}
           </Link>
         ) : (
           cell.value.children

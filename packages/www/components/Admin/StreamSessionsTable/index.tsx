@@ -74,7 +74,7 @@ const RecordingUrlCell = <D extends TableData>({
       {cell.value.href ? (
         <Flex sx={{ justifyContent: "space-between" }}>
           <Link href={cell.value.href}>
-            <a>{cell.value.children}</a>
+            {cell.value.children}
           </Link>
           {cell.value.showMP4 && cell.value.profiles?.length ? (
             <Box>

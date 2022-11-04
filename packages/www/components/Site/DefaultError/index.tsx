@@ -17,8 +17,8 @@ const DefaultError = () => {
         <Image
           src="/img/404.png"
           alt="404"
-          layout="fill"
-          objectFit="contain"
+          fill
+          style={{ objectFit: "contain" }}
           css={{
             position: "absolute",
             top: "50%",
@@ -55,7 +55,7 @@ const DefaultError = () => {
               Something went wrong.
             </Heading>
             <Text size="5">The page you requested could not be found.</Text>
-            <Link href="/" passHref>
+            <Link href="/" passHref legacyBehavior>
               <A css={{ mt: "$4" }}>Go to the homepage</A>
             </Link>
           </Box>

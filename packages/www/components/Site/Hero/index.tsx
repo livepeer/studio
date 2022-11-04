@@ -68,7 +68,7 @@ const Hero = ({
               </Text>
               {ctas?.length > 0 && (
                 <Flex align="center" justify={centered ? "center" : "start"}>
-                  <Link href={ctas[0].href} passHref>
+                  <Link href={ctas[0].href} passHref legacyBehavior>
                     <Button as="a" arrow css={{ mr: "$4" }}>
                       {ctas[0].children}
                     </Button>
@@ -95,7 +95,12 @@ const Hero = ({
                       transform: "translate(-50%)",
                       left: "50%",
                     }}>
-                    <Image src={image} width={542 / 2} height={1096 / 2} />
+                    <Image
+                      src={image}
+                      width={542 / 2}
+                      height={1096 / 2}
+                      alt="hero image"
+                    />
                   </Box>
                 ) : (
                   <Box
@@ -107,7 +112,12 @@ const Hero = ({
                       width: "110%",
                       height: "110%",
                     }}>
-                    <Image src={image} objectFit="cover" layout="fill" />
+                    <Image
+                      src={image}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      alt="hero image"
+                    />
                   </Box>
                 )}
                 <Box
