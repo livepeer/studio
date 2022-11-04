@@ -99,93 +99,95 @@ const UsageSummary = () => {
     }
   }, [user]);
 
-  return <>
-    <Flex
-      justify="between"
-      align="end"
-      css={{
-        borderBottom: "1px solid",
-        borderColor: "$neutral6",
-        pb: "$4",
-        mb: "$5",
-        width: "100%",
-      }}>
-      <Heading size="2">
-        <Flex>
-          <Box
-            css={{
-              mr: "$3",
-              fontWeight: 600,
-              letterSpacing: "0",
-            }}>
-            Usage
-          </Box>
-          <Badge
-            size="1"
-            variant="neutral"
-            css={{ letterSpacing: 0, mt: "7px" }}>
-            {user?.stripeProductId
-              ? products[user.stripeProductId].name
-              : products["prod_0"].name}{" "}
-            Plan
-          </Badge>
-        </Flex>
-      </Heading>
-      <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
-        Current billing period (
-        {subscription && (
+  return (
+    <>
+      <Flex
+        justify="between"
+        align="end"
+        css={{
+          borderBottom: "1px solid",
+          borderColor: "$neutral6",
+          pb: "$4",
+          mb: "$5",
+          width: "100%",
+        }}>
+        <Heading size="2">
           <Flex>
-            {new Date(
-              subscription.current_period_start * 1000
-            ).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}{" "}
-            to{" "}
-            {new Date(
-              subscription.current_period_end * 1000
-            ).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}{" "}
+            <Box
+              css={{
+                mr: "$3",
+                fontWeight: 600,
+                letterSpacing: "0",
+              }}>
+              Usage
+            </Box>
+            <Badge
+              size="1"
+              variant="neutral"
+              css={{ letterSpacing: 0, mt: "7px" }}>
+              {user?.stripeProductId
+                ? products[user.stripeProductId].name
+                : products["prod_0"].name}{" "}
+              Plan
+            </Badge>
           </Flex>
-        )}
-        )
+        </Heading>
+        <Flex css={{ fontSize: "$3", color: "$hiContrast" }}>
+          Current billing period (
+          {subscription && (
+            <Flex>
+              {new Date(
+                subscription.current_period_start * 1000
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}{" "}
+              to{" "}
+              {new Date(
+                subscription.current_period_end * 1000
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}{" "}
+            </Flex>
+          )}
+          )
+        </Flex>
       </Flex>
-    </Flex>
-    <Grid gap="4" columns="3">
-      <UsageCard
-        title="Transcoding minutes"
-        loading={!usage}
-        usage={
-          usage &&
-          (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
-        }
-        limit={!products[user.stripeProductId]?.order ? 1000 : false}
-      />
-    </Grid>
-    <Flex
-      justify="between"
-      align="center"
-      css={{ fontSize: "$3", color: "$hiContrast" }}>
-      <Text variant="gray" css={{ display: "flex", ai: "center" }}>
-        <StyledUpcomingIcon />
-        Upcoming invoice:{" "}
-        <Box css={{ ml: "$1", fontWeight: 600 }}>
-          {usage &&
-            `$${(
-              (usage.sourceSegmentsDuration / 60) *
-              transcodingPrice
-            ).toFixed(2)}`}
-        </Box>
-      </Text>
-      <Link href="/dashboard/billing" passHref legacyBehavior>
-        <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
-          View billing <ArrowRightIcon />
-        </A>
-      </Link>
-    </Flex>
-  </>;
+      <Grid gap="4" columns="3">
+        <UsageCard
+          title="Transcoding minutes"
+          loading={!usage}
+          usage={
+            usage &&
+            (usage.sourceSegmentsDuration / 60).toFixed(2).toLocaleString()
+          }
+          limit={!products[user.stripeProductId]?.order ? 1000 : false}
+        />
+      </Grid>
+      <Flex
+        justify="between"
+        align="center"
+        css={{ fontSize: "$3", color: "$hiContrast" }}>
+        <Text variant="gray" css={{ display: "flex", ai: "center" }}>
+          <StyledUpcomingIcon />
+          Upcoming invoice:{" "}
+          <Box css={{ ml: "$1", fontWeight: 600 }}>
+            {usage &&
+              `$${(
+                (usage.sourceSegmentsDuration / 60) *
+                transcodingPrice
+              ).toFixed(2)}`}
+          </Box>
+        </Text>
+        <Link href="/dashboard/billing" passHref legacyBehavior>
+          <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
+            View billing <ArrowRightIcon />
+          </A>
+        </Link>
+      </Flex>
+    </>
+  );
 };
 
 export default UsageSummary;

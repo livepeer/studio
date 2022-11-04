@@ -220,7 +220,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   mt: "$1",
                 },
               }}>
-              <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
+              <Link
+                href="/dashboard/developers/api-keys"
+                passHref
+                legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "developers" ? "blue" : null}
@@ -236,7 +239,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   </Text>
                 </NavLink>
               </Link>
-              <Link href="/dashboard/developers/signing-keys" passHref legacyBehavior>
+              <Link
+                href="/dashboard/developers/signing-keys"
+                passHref
+                legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "developers/signing-keys" ? "blue" : null}
@@ -252,7 +258,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   </Text>
                 </NavLink>
               </Link>
-              <Link href="/dashboard/developers/webhooks" passHref legacyBehavior>
+              <Link
+                href="/dashboard/developers/webhooks"
+                passHref
+                legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "developers/webhooks" ? "blue" : null}

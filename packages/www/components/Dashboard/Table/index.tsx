@@ -444,7 +444,10 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           }}
                           {...cell.getCellProps()}>
                           {cell.value?.href ? (
-                            <Link href={cell.value.href} passHref legacyBehavior>
+                            <Link
+                              href={cell.value.href}
+                              passHref
+                              legacyBehavior>
                               <A
                                 css={{
                                   textDecoration: "none",

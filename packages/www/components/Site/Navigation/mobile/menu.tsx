@@ -77,7 +77,11 @@ const Menu = ({
         <Flex css={{ flexDirection: "column" }}>
           {links.map((link) => {
             return (
-              <Link href={link.href} key={`menu-link-${link.href}`} passHref legacyBehavior>
+              <Link
+                href={link.href}
+                key={`menu-link-${link.href}`}
+                passHref
+                legacyBehavior>
                 <A
                   onClick={() => setMobileMenuIsOpen(false)}
                   css={{
