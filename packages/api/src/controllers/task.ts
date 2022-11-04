@@ -211,9 +211,14 @@ app.post(
 app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   // update status of a specific task
   const { id } = req.params;
-  const task = await db.task.get(id);
+  const task = await db.task.get(id, { useReplica: false });
   if (!task) {
     return res.status(404).json({ errors: ["not found"] });
+  } else if (
+    task.status?.phase !== "waiting" &&
+    task.status?.phase !== "running"
+  ) {
+    return res.status(400).json({ errors: ["task is not running"] });
   }
 
   const doc = req.body.status;
@@ -231,15 +236,23 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     progress: doc.progress,
     step: doc.step,
   };
-  await req.taskScheduler.updateTask(task, { status });
+  await req.taskScheduler.updateTask(
+    task,
+    { status },
+    { allowedPhases: ["waiting", "running"] }
+  );
   if (task.outputAssetId) {
-    await req.taskScheduler.updateAsset(task.outputAssetId, {
-      status: {
-        phase: "processing",
-        updatedAt: Date.now(),
-        progress: doc.progress,
+    await req.taskScheduler.updateAsset(
+      task.outputAssetId,
+      {
+        status: {
+          phase: "processing",
+          updatedAt: Date.now(),
+          progress: doc.progress,
+        },
       },
-    });
+      { allowedPhases: ["waiting", "processing"] }
+    );
   }
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);

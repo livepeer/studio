@@ -24,7 +24,7 @@ describe("helpers/osS3Urls", () => {
       name: "test",
       url,
     });
-    return getS3PresignedUrl(os.id, file);
+    return getS3PresignedUrl(os, file);
   };
 
   it("should support old object store URLs with region", async () => {

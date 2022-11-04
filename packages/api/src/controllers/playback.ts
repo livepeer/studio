@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import { db } from "../store";
 import {
   getPlaybackUrl as streamPlaybackUrl,
@@ -41,7 +41,11 @@ const newPlaybackInfo = (
   },
 });
 
-const getAssetPlaybackUrl = async (ingest: string, id: string) => {
+const getAssetPlaybackUrl = async (
+  config: Request["config"],
+  ingest: string,
+  id: string
+) => {
   const asset =
     (await db.asset.getByPlaybackId(id)) ??
     (await db.asset.getByIpfsCid(id)) ??
@@ -50,7 +54,11 @@ const getAssetPlaybackUrl = async (ingest: string, id: string) => {
   if (!asset || asset.deleted) {
     return null;
   }
-  return assetPlaybackUrl(ingest, asset);
+  const os = await db.objectStore.get(asset.objectStoreId);
+  if (!os || os.deleted || os.disabled) {
+    return null;
+  }
+  return assetPlaybackUrl(config, ingest, asset, os);
 };
 
 const getRecordingPlaybackUrl = async (
@@ -67,6 +75,7 @@ const getRecordingPlaybackUrl = async (
 };
 
 async function getPlaybackInfo(
+  { config }: Request,
   ingest: string,
   id: string
 ): Promise<PlaybackInfo> {
@@ -78,7 +87,7 @@ async function getPlaybackInfo(
       stream.isActive ? 1 : 0
     );
   }
-  const assetUrl = await getAssetPlaybackUrl(ingest, id);
+  const assetUrl = await getAssetPlaybackUrl(config, ingest, id);
   if (assetUrl) {
     return newPlaybackInfo("vod", assetUrl);
   }
@@ -103,7 +112,7 @@ app.get("/:id", async (req, res) => {
   const ingest = ingests[0].base;
 
   let { id } = req.params;
-  const info = await getPlaybackInfo(ingest, id);
+  const info = await getPlaybackInfo(req, ingest, id);
   res.status(200).json(info);
 });
 
