@@ -18,7 +18,7 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 import { isStaging } from "lib/utils";
 
-const acceptedMimeTypes = isStaging() ? [] : ["video/mp4"];
+const acceptedMimeTypes = ["video/*"];
 
 const activeStyle = {
   borderColor: "white",
