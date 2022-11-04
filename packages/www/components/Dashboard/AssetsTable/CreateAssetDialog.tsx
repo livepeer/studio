@@ -17,7 +17,7 @@ import { useDropzone } from "react-dropzone";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 
-const acceptedMimeTypes = [];
+const acceptedMimeTypes = isStaging() ? [] : ["video/mp4"];
 
 const activeStyle = {
   borderColor: "white",
