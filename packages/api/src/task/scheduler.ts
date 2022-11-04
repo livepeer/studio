@@ -9,6 +9,7 @@ import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
+import sql, { SQLStatement } from "sql-template-strings";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
@@ -301,9 +302,17 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">
+    updates: Pick<Task, "status" | "output">,
+    filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
-    await db.task.update(task.id, updates);
+    let query = [sql`id = ${task.id}`];
+    if (filters?.allowedPhases) {
+      query.push(sql`data->'status'->>'phase' = ANY ${filters.allowedPhases}`);
+    }
+    const res = await db.task.update(query, updates);
+    if (!res?.rowCount) {
+      return;
+    }
     task = {
       ...task,
       ...updates,
@@ -357,7 +366,11 @@ export class TaskScheduler {
     });
   }
 
-  async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
+  async updateAsset(
+    asset: string | Asset,
+    updates: Partial<Asset>,
+    filters?: { allowedPhases: Array<Asset["status"]["phase"]> }
+  ) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
@@ -369,7 +382,14 @@ export class TaskScheduler {
         status: { ...asset.status, updatedAt: Date.now() },
       };
     }
-    await db.asset.update(asset.id, updates);
+    let query = [sql`id = ${asset.id}`];
+    if (filters?.allowedPhases) {
+      query.push(sql`data->'status'->>'phase' = ANY ${filters.allowedPhases}`);
+    }
+    const res = await db.asset.update(query, updates);
+    if (!res?.rowCount) {
+      return;
+    }
     asset = {
       ...asset,
       ...updates,

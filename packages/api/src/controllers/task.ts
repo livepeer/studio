@@ -236,15 +236,23 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     progress: doc.progress,
     step: doc.step,
   };
-  await req.taskScheduler.updateTask(task, { status });
+  await req.taskScheduler.updateTask(
+    task,
+    { status },
+    { allowedPhases: ["waiting", "running"] }
+  );
   if (task.outputAssetId) {
-    await req.taskScheduler.updateAsset(task.outputAssetId, {
-      status: {
-        phase: "processing",
-        updatedAt: Date.now(),
-        progress: doc.progress,
+    await req.taskScheduler.updateAsset(
+      task.outputAssetId,
+      {
+        status: {
+          phase: "processing",
+          updatedAt: Date.now(),
+          progress: doc.progress,
+        },
       },
-    });
+      { allowedPhases: ["waiting", "processing"] }
+    );
   }
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);
