@@ -17,6 +17,8 @@ import { useDropzone } from "react-dropzone";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
 
+const acceptedMimeTypes = ["video/mp4", "video/quicktime"];
+
 const activeStyle = {
   borderColor: "white",
 };
@@ -66,7 +68,7 @@ const CreateAssetDialog = ({
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: ["video/mp4"],
+    accept: acceptedMimeTypes,
     maxFiles: 20,
     onDrop,
   });
