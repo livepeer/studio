@@ -49,7 +49,7 @@ const app = Router();
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
   if (
-    config.frontendDomain.endsWith(".monster") &&
+    config.frontendDomain?.endsWith(".monster") &&
     user.email?.endsWith("@livepeer.org")
   ) {
     return true;
