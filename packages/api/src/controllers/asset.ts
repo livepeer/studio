@@ -632,7 +632,7 @@ app.post(
     let playbackId = await generateUniquePlaybackId(id);
 
     const useCatalyst = shouldUseCatalyst(req);
-    const { jwtSecret, jwtAudience } = req.config;
+    const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
@@ -643,7 +643,7 @@ app.post(
     );
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
-      asset.objectStoreId,
+      vodObjectStoreId,
       jwtSecret,
       jwtAudience
     );
