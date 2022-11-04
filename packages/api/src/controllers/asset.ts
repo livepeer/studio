@@ -579,7 +579,6 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     throw new NotFoundError(`asset not found`);
   }
 
-  const os = await getActiveObjectStore(inputAsset.objectStoreId);
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   let outputAsset = await validateAssetPayload(

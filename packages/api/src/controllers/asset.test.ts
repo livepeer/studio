@@ -80,6 +80,7 @@ describe("controllers/asset", () => {
     await db.objectStore.create({
       id: "mock_vod_store",
       url: "s3+http://user:password@localhost:8080/us-east-1/vod",
+      publicUrl: "http://localhost/bucket/vod",
     });
     ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
@@ -173,12 +174,14 @@ describe("controllers/asset", () => {
         name: "test-storage",
         source: { type: "directUpload" },
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         status: {
           phase: "ready",
           updatedAt: Date.now(),
         },
         userId: nonAdminUser.id,
       });
+      asset = db.asset.cleanWriteOnlyResponse(asset);
     });
 
     it("should allow editing asset name", async () => {
@@ -479,6 +482,7 @@ describe("controllers/asset", () => {
         name: "dummy",
         source: { type: "directUpload" },
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         status: {
           phase: "ready",
           updatedAt: Date.now(),
@@ -490,6 +494,7 @@ describe("controllers/asset", () => {
         id,
         name: "test-storage",
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         playbackId: await generateUniquePlaybackId(id),
         source: { type: "directUpload" },
         storage: {
@@ -505,6 +510,7 @@ describe("controllers/asset", () => {
         },
         userId: nonAdminUser.id,
       });
+      asset = db.asset.cleanWriteOnlyResponse(asset);
     });
 
     const expectFindAsset = async (qs: string, shouldFind: boolean) => {
