@@ -35,6 +35,7 @@ import {
   ExportTaskParams,
   IpfsFileInfo,
   NewAssetPayload,
+  ObjectStore,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -90,16 +91,10 @@ async function validateAssetPayload(
   source?: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
-    if (payload.objectStoreId !== defaultObjectStoreId) {
-      // TODO: Allow assets Object Store to be changed at some point.
-      throw new UnprocessableEntityError(
-        `Object store is not customizable right now`
-      );
-    }
-    const os = await db.objectStore.get(payload.objectStoreId);
-    if (!os || os.deleted || os.userId !== userId || os.disabled) {
+    const os = await getActiveObjectStore(payload.objectStoreId);
+    if (os.userId !== userId) {
       throw new ForbiddenError(
-        `object store ${payload.objectStoreId} not found or disabled`
+        `the provided object store is not owned by user`
       );
     }
   }
@@ -124,7 +119,20 @@ async function validateAssetPayload(
   };
 }
 
-export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
+async function getActiveObjectStore(id: string) {
+  const os = await db.objectStore.get(id);
+  if (!os || os.deleted || os.disabled) {
+    throw new Error("Object store not found or disabled");
+  }
+  return os;
+}
+
+export function getPlaybackUrl(
+  { vodCatalystObjectStoreId }: Request["config"],
+  ingest: string,
+  asset: WithID<Asset>,
+  os: ObjectStore
+): string {
   if (asset.playbackRecordingId) {
     return pathJoin(
       ingest,
@@ -132,7 +140,14 @@ export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
       asset.playbackRecordingId,
       "index.m3u8"
     );
-  } else if (asset.files?.some((f) => f.type === "catalyst_hls_manifest")) {
+  }
+  const catalystManifest = asset.files?.find(
+    (f) => f.type === "catalyst_hls_manifest"
+  );
+  if (catalystManifest) {
+    if (os.id !== vodCatalystObjectStoreId) {
+      return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
+    }
     return pathJoin(
       "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
       "hls",
@@ -143,18 +158,35 @@ export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
   return undefined;
 }
 
-function getDownloadUrl(ingest: string, asset: WithID<Asset>): string {
-  return pathJoin(ingest, "asset", asset.playbackId, "video");
+function getDownloadUrl(
+  { vodObjectStoreId }: Request["config"],
+  ingest: string,
+  asset: WithID<Asset>,
+  os: ObjectStore
+): string {
+  const base =
+    os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
+  const source = asset.files?.find((f) => f.type === "source_file");
+  if (source) {
+    return pathJoin(base, asset.playbackId, source.path);
+  }
+  return pathJoin(base, asset.playbackId, "video");
 }
 
-function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
+async function withPlaybackUrls(
+  { config }: Request,
+  ingest: string,
+  asset: WithID<Asset>,
+  os?: ObjectStore
+): Promise<WithID<Asset>> {
   if (asset.status.phase !== "ready") {
     return asset;
   }
+  os = os || (await getActiveObjectStore(asset.objectStoreId));
   return {
     ...asset,
-    playbackUrl: getPlaybackUrl(ingest, asset),
-    downloadUrl: getDownloadUrl(ingest, asset),
+    playbackUrl: getPlaybackUrl(config, ingest, asset, os),
+    downloadUrl: getDownloadUrl(config, ingest, asset, os),
   };
 }
 
@@ -255,10 +287,7 @@ async function genUploadUrl(
   aud: string
 ) {
   const uploadedObjectKey = `directUpload/${playbackId}`;
-  const os = await db.objectStore.get(objectStoreId);
-  if (!os || os.deleted || os.disabled) {
-    throw new Error("Object store not found or disabled");
-  }
+  const os = await getActiveObjectStore(objectStoreId);
 
   const presignedUrl = await getS3PresignedUrl(os, uploadedObjectKey);
   const uploadToken = jwt.sign({ playbackId, presignedUrl, aud }, jwtSecret, {
@@ -303,8 +332,8 @@ app.use(
     }
     const { details } = toStringValues(req.query);
     const ingest = ingests[0].base;
-    let toExternalAsset = (a: WithID<Asset>) => {
-      a = withPlaybackUrls(ingest, a);
+    let toExternalAsset = async (a: WithID<Asset>) => {
+      a = await withPlaybackUrls(req, ingest, a);
       a = assetWithIpfsUrls(ipfsGatewayUrl, a);
       if (req.user.admin) {
         return a;
@@ -317,7 +346,7 @@ app.use(
     };
 
     if (Array.isArray(data)) {
-      return data.map(toExternalAsset);
+      return Promise.all(data.map(toExternalAsset));
     }
     if ("id" in data) {
       return toExternalAsset(data);
@@ -325,7 +354,7 @@ app.use(
     if ("asset" in data) {
       return {
         ...data,
-        asset: toExternalAsset(data.asset),
+        asset: await toExternalAsset(data.asset),
       };
     }
     return data;
@@ -550,12 +579,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     throw new NotFoundError(`asset not found`);
   }
 
-  const os = await db.objectStore.get(inputAsset.objectStoreId);
-  if (!os || os.deleted || os.disabled) {
-    throw new UnprocessableEntityError(
-      "Asset object store not found or disabled"
-    );
-  }
+  const os = await getActiveObjectStore(inputAsset.objectStoreId);
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   let outputAsset = await validateAssetPayload(
@@ -655,10 +679,7 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 };
 
 async function createTusServer(objectStoreId: string) {
-  const os = await db.objectStore.get(objectStoreId);
-  if (!os || os.deleted || os.disabled) {
-    throw new Error("Object store not found or disabled");
-  }
+  const os = await getActiveObjectStore(objectStoreId);
   const s3config = await getObjectStoreS3Config(os);
   const opts: tus.S3StoreOptions & S3ClientConfig = {
     ...s3config,
