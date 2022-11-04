@@ -17,6 +17,13 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
   snapshot: task,
 });
 
+function sqlQueryGroup(values: string[]) {
+  const query = sql`(`;
+  values.forEach((value) => query.append(sql`${value}, `));
+  query.append(sql`)`);
+  return query;
+}
+
 const MAX_RETRIES = 2;
 const TASK_RETRY_BASE_DELAY = 30 * 1000;
 
@@ -307,7 +314,11 @@ export class TaskScheduler {
   ) {
     let query = [sql`id = ${task.id}`];
     if (filters?.allowedPhases) {
-      query.push(sql`data->'status'->>'phase' = ANY ${filters.allowedPhases}`);
+      query.push(
+        sql`data->'status'->>'phase' IN `.append(
+          sqlQueryGroup(filters.allowedPhases)
+        )
+      );
     }
     const res = await db.task.update(query, updates);
     if (!res?.rowCount) {
@@ -384,7 +395,11 @@ export class TaskScheduler {
     }
     let query = [sql`id = ${asset.id}`];
     if (filters?.allowedPhases) {
-      query.push(sql`data->'status'->>'phase' = ANY ${filters.allowedPhases}`);
+      query.push(
+        sql`data->'status'->>'phase' IN `.append(
+          sqlQueryGroup(filters.allowedPhases)
+        )
+      );
     }
     const res = await db.asset.update(query, updates);
     if (!res?.rowCount) {
