@@ -16,6 +16,7 @@ import Spinner from "components/Dashboard/Spinner";
 import { useDropzone } from "react-dropzone";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import omit from "lodash.omit";
+import { isStaging } from "lib/utils";
 
 const acceptedMimeTypes = isStaging() ? [] : ["video/mp4"];
 
