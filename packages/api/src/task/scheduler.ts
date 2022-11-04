@@ -19,8 +19,11 @@ const taskInfo = (task: Task): messages.TaskInfo => ({
 
 function sqlQueryGroup(values: string[]) {
   const query = sql`(`;
-  values.forEach((value) => query.append(sql`${value}, `));
-  query.append(sql`)`);
+  values.forEach((value, i) => {
+    if (i) query.append(`, `);
+    query.append(sql`${value}`);
+  });
+  query.append(`)`);
   return query;
 }
 

@@ -113,7 +113,7 @@ describe("controllers/asset", () => {
         url: "https://example.com/test.mp4",
       };
       let res = await client.post(`/asset/upload/url`, spec);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(201);
       const { asset, task } = await res.json();
       expect(asset).toMatchObject({
         id: expect.any(String),
@@ -143,9 +143,11 @@ describe("controllers/asset", () => {
       client.jwtAuth = null;
       client.apiKey = adminApiKey;
       res = await client.post(`/task/${taskId}/status`, {
-        phase: "running",
-        progress: 0.5,
-        step: "downloading",
+        status: {
+          phase: "running",
+          progress: 0.5,
+          step: "downloading",
+        },
       });
       expect(res.status).toBe(200);
 
