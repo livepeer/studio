@@ -1,4 +1,5 @@
 import { Box as LiveBox } from "@livepeer/design-system";
+import { PortableText } from "@portabletext/react";
 import { Container, Box } from "@theme-ui/components";
 import Image from "next/image";
 
@@ -7,9 +8,10 @@ export default function SplitImage({
   title,
   richText,
   defaultImage,
+  portableTextRaw,
 }) {
   const { image } = defaultImage;
-  console.log(defaultImage.asset.url);
+  console.log("split image", defaultImage.asset.url, portableTextRaw);
   return (
     <Container>
       <Box
@@ -69,6 +71,7 @@ export default function SplitImage({
             {title}
           </LiveBox>
           <Box sx={{ color: "#000116" }}>{richText}</Box>
+          <PortableText value={portableTextRaw} />
         </Box>
       </Box>
     </Container>

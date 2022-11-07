@@ -1,9 +1,10 @@
 import { Link as A, Box as LiveBox } from "@livepeer/design-system";
+import { PortableText } from "@portabletext/react";
 import { Text, Container, Box } from "@theme-ui/components";
 import Image from "next/image";
 
-export default function IconGrid({ title, richText, icons }) {
-  console.log(icons);
+export default function IconGrid({ title, richText, icons, portableTextRaw }) {
+  console.log("portable Text on icon grid: ", portableTextRaw);
   return (
     <Box sx={{ paddingY: "64px" }}>
       <Container css={{ maxWidth: "1200px", textAlign: "center" }}>
@@ -32,6 +33,7 @@ export default function IconGrid({ title, richText, icons }) {
               {title}
             </LiveBox>
             <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
+            <PortableText value={portableTextRaw} />
           </Box>
         )}
         <Box

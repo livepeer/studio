@@ -1,8 +1,9 @@
+import { PortableText } from "@portabletext/react";
 import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
 
-export default function HeroImage({ title, richText }) {
+export default function HeroImage({ title, richText, portableTextRaw }) {
   return (
     <Container
       sx={{
@@ -52,7 +53,9 @@ export default function HeroImage({ title, richText }) {
               }}>
               {title}
             </LiveBox>
+            bhasda
             <Text>{richText}</Text>
+            <PortableText value={portableTextRaw} />
           </Box>
           <Image
             src="/img/temp/example-cloud.png"

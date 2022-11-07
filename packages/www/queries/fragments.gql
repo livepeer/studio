@@ -46,6 +46,7 @@ fragment heroImage on HeroImage {
   _type
   title
   richText
+  portableTextRaw
   defaultImage {
     asset {
       url
@@ -56,18 +57,21 @@ fragment centerTitle on CenterTitle {
   _type
   title
   richText
+  portableTextRaw
 }
 
 fragment offsetPortableText on OffsetPortableText {
   _type
   title
   richText
+  portableTextRaw
 }
 fragment splitImage on SplitImage {
   _type
   inverted
   title
   richText
+  portableTextRaw
   defaultImage {
     asset {
       url
@@ -78,6 +82,7 @@ fragment iconGrid on IconGrid {
   _type
   title
   richText
+  portableTextRaw
   icons {
     asset {
       url

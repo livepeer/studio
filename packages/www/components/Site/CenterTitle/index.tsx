@@ -1,9 +1,10 @@
 import { Box as LiveBox } from "@livepeer/design-system";
+import { PortableText } from "@portabletext/react";
 import { Text, Container, Box } from "@theme-ui/components";
 
 import React from "react";
 
-export default function CenterTitle({ title, richText }) {
+export default function CenterTitle({ title, richText, portableTextRaw }) {
   return (
     <Box sx={{ paddingY: "64px", px: "16px" }}>
       <Container css={{ maxWidth: "800px", textAlign: "center" }}>
@@ -30,6 +31,7 @@ export default function CenterTitle({ title, richText }) {
           {title}
         </LiveBox>
         <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
+        <PortableText value={portableTextRaw} />
       </Container>
     </Box>
   );

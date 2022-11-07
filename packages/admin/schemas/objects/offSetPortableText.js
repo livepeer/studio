@@ -15,5 +15,10 @@ export default {
       title: "Description",
       type: "text",
     },
+    {
+      name: "portableText",
+      title: "Portable Text",
+      type: "portableText",
+    },
   ],
 };

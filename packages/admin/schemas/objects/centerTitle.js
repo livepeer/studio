@@ -12,8 +12,13 @@ export default {
     },
     {
       name: "richText",
-      title: "Portable Text",
+      title: "Rich Text",
       type: "text",
+    },
+    {
+      name: "portableText",
+      title: "Portable Text",
+      type: "portableText",
     },
   ],
 };

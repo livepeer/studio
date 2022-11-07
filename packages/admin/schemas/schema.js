@@ -38,7 +38,7 @@ import homePrinciplesSection from "./objects/home/principlesSection";
 import card from "./objects/card";
 import localeString from "./objects/localeString";
 import heroImage from "./objects/heroImage";
-import offsetPortableText from "./objects/offsetPortableText";
+import offsetPortableText from "./objects/offSetPortableText";
 import centerTitle from "./objects/centerTitle";
 import splitImage from "./objects/splitImage";
 import iconGrid from "./objects/iconGrid";

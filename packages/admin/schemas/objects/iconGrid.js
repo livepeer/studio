@@ -17,6 +17,11 @@ export default {
       type: "text",
     },
     {
+      name: "portableText",
+      title: "Portable Text",
+      type: "portableText",
+    },
+    {
       name: "icons",
       title: "Icons",
       type: "array",

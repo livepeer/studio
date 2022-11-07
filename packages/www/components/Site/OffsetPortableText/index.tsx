@@ -1,8 +1,10 @@
 import { Text, Link as A, Box as LiveBox } from "@livepeer/design-system";
 import { Container, Box } from "@theme-ui/components";
 import Button from "@components/Site/Button";
+import { PortableText } from "@portabletext/react";
 
-export default function OffsetPortableText() {
+export default function OffsetPortableText({ title, portableTextRaw }) {
+  console.log("args: ", title, portableTextRaw);
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -38,19 +40,21 @@ export default function OffsetPortableText() {
                     letterSpacing: "-4px",
                   },
                 }}>
-                Exponential growth with Livepeer Studio
+                {title}
               </LiveBox>
-              <Text>
+              {/* <Text>
                 Why do video apps using decentralized storage have super high
                 churn rates? It’s because most of them do not use a service to
                 process video. This means that the end user experience is
                 generally a video buffering.
               </Text>
+
               <Text>
                 Decentralized storage is not optimized for video streaming.
                 Building with decentralized storage and Livepeer Studio creates
                 the optimal video viewing experience.
-              </Text>
+              </Text> */}
+              <PortableText value={portableTextRaw} />
               <Button
                 as={A}
                 small

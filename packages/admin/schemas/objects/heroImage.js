@@ -16,6 +16,11 @@ export default {
       type: "text",
     },
     {
+      name: "portableText",
+      title: "Portable Text",
+      type: "portableText",
+    },
+    {
       name: "defaultImage",
       title: "Image",
       type: "defaultImage",
