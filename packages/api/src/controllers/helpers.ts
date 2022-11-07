@@ -12,6 +12,7 @@ import { S3StoreOptions as TusS3Opts } from "tus-node-server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { db } from "../store";
+import { ObjectStore } from "../schema/types";
 
 const ITERATIONS = 10000;
 
@@ -122,12 +123,8 @@ export type OSS3Config = S3ClientConfig &
   Pick<TusS3Opts, "accessKeyId" | "secretAccessKey" | "region" | "bucket">;
 
 export async function getObjectStoreS3Config(
-  osId: string
+  os: ObjectStore
 ): Promise<OSS3Config> {
-  const os = await db.objectStore.get(osId);
-  if (!os || os.deleted || os.disabled) {
-    throw new Error("Object store not found or disabled");
-  }
   const url = new URL(os.url);
   let protocol = url.protocol;
   if (protocol !== "s3+http:" && protocol !== "s3+https:") {
@@ -157,11 +154,8 @@ export async function getObjectStoreS3Config(
   };
 }
 
-export async function getS3PresignedUrl(
-  vodObjectStoreId: string,
-  objectKey: string
-) {
-  const config = await getObjectStoreS3Config(vodObjectStoreId);
+export async function getS3PresignedUrl(os: ObjectStore, objectKey: string) {
+  const config = await getObjectStoreS3Config(os);
   const s3 = new S3Client(config);
   const putCommand = new PutObjectCommand({
     Bucket: config.bucket,
