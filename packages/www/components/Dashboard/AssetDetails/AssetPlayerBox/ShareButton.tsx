@@ -16,7 +16,7 @@ const ShareButton = ({
     <AssetSharePopup
       playbackId={playbackId}
       triggerNode={
-        <Button size="2" ghost>
+        <Button size="2" ghost css={{ mr: "$1" }}>
           <Box
             as={Share2Icon}
             css={{
