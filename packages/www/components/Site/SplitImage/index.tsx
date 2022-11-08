@@ -1,3 +1,4 @@
+import { urlFor } from "@lib/client";
 import { Box as LiveBox } from "@livepeer/design-system";
 import { PortableText } from "@portabletext/react";
 import { Container, Box } from "@theme-ui/components";
@@ -12,6 +13,7 @@ export default function SplitImage({
 }) {
   const { image } = defaultImage;
   console.log("split image", defaultImage.asset.url, portableTextRaw);
+  console.log("arg:s", defaultImage);
   return (
     <Container>
       <Box
@@ -32,11 +34,29 @@ export default function SplitImage({
             borderRadius: "12px",
             overflow: "hidden",
           }}>
-          <img
+          <Image
+            src={urlFor(defaultImage).url()}
+            alt={title ?? "asdad"}
+            placeholder="blur"
+            blurDataURL={urlFor(defaultImage)
+              .width(24)
+              .height(24)
+              .blur(10)
+              .url()}
+            // sizes="100vw"
+            width={1080}
+            height={1080}
+            // style={{
+            //   width: "100%",
+            //   height: "100%",
+            //   objectFit: "cover",
+            // }}
+          />
+          {/* <img
             src={defaultImage.asset.url}
             alt={title}
             style={{ objectFit: "cover", width: "100%", height: "100%" }}
-          />
+          /> */}
         </Box>
         <Box
           sx={{
