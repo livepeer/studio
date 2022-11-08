@@ -4,8 +4,8 @@ import AssetHeadingBox from "@components/Dashboard/AssetDetails/AssetHeadingBox"
 import AssetPlayerBox from "@components/Dashboard/AssetDetails/AssetPlayerBox/";
 import EditAssetDialog, {
   EditAssetReturnValue,
-} from "@components/Dashboard/AssetDetails/EditAssetDialog";
-import EmbedVideoDialog from "@components/Dashboard/AssetDetails/EmbedVideoDialog";
+} from "@components/Dashboard/AssetDetails/Dialogs/EditAssetDialog";
+import EmbedVideoDialog from "@components/Dashboard/AssetDetails/Dialogs/EmbedVideoDialog";
 import { Box, Flex } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { useApi, useLoggedIn } from "hooks";

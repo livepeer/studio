@@ -2,7 +2,7 @@ import { Asset } from "livepeer";
 import { Box, Button, Flex, Link } from "@livepeer/design-system";
 import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons";
 import AppPlayer from "components/Site/AppPlayer";
-import AssetSharePopup from "../AssetSharePopup";
+import AssetSharePopup from "../Dialogs/AssetSharePopup";
 import FailedProcessing from "./FailedProcessing";
 import FileUploadingProgress from "./FileUploadingProgress";
 import ProcessingProgress from "./ProcessingProgress";
