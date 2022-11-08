@@ -1,92 +1,19 @@
 import { Asset } from "livepeer";
-import { Box, Button, Flex, Link } from "@livepeer/design-system";
-import { DownloadIcon, Share2Icon } from "@radix-ui/react-icons";
-import AppPlayer from "components/Site/AppPlayer";
-import AssetSharePopup from "../Dialogs/AssetSharePopup";
-import FailedProcessing from "./FailedProcessing";
-import FileUploadingProgress from "./FileUploadingProgress";
-import ProcessingProgress from "./ProcessingProgress";
+import { Box, Flex } from "@livepeer/design-system";
+import AssetStatusBox from "./AssetStatusBox";
+import DownloadButton from "./DownloadButton";
+import MintNftButton from "./MintNftButton";
+import ShareButton from "./ShareButton";
 
-const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
-  if (asset?.status?.phase === "ready" && asset.playbackUrl) {
-    return <AppPlayer playbackUrl={asset.playbackUrl} autoPlay={false} />;
-  }
-  if (asset?.status?.phase === "failed") {
-    return <FailedProcessing />;
-  }
-  if (asset?.status?.phase === "waiting") {
-    return <FileUploadingProgress asset={asset} />;
-  }
-  return <ProcessingProgress asset={asset} />;
-};
-
-const DownloadLink = ({ downloadUrl }: { downloadUrl?: string }) => {
-  if (!downloadUrl) {
-    return null;
-  }
-  return (
-    <Link
-      css={{
-        textDecorationColor: "transparent",
-        "&:hover": {
-          textDecorationColor: "transparent",
-        },
-      }}
-      target="_blank"
-      href={downloadUrl}>
-      <Button
-        size="2"
-        ghost
-        css={{
-          mr: "$1",
-        }}>
-        <Box
-          as={DownloadIcon}
-          css={{
-            mr: "$1",
-          }}
-        />
-        Download
-      </Button>
-    </Link>
-  );
-};
-
-const ShareComponent = ({
-  playbackId,
+const AssetPlayerBox = ({
+  asset,
   onEmbedVideoClick,
+  onMintNftClick,
 }: {
-  playbackId?: string;
-  onEmbedVideoClick(): void;
-}) => {
-  if (!playbackId) {
-    return null;
-  }
-  return (
-    <AssetSharePopup
-      playbackId={playbackId}
-      triggerNode={
-        <Button size="2" ghost>
-          <Box
-            as={Share2Icon}
-            css={{
-              mr: "$1",
-            }}
-          />
-          Share
-        </Button>
-      }
-      onEmbedVideoClick={onEmbedVideoClick}
-    />
-  );
-};
-
-export type AssetPlayerBoxProps = {
   asset?: Asset;
   onEmbedVideoClick: () => void;
-};
-
-const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
+  onMintNftClick: () => void;
+}) => {
   if (!asset) {
     return null;
   }
@@ -111,11 +38,12 @@ const AssetPlayerBox = ({ asset, onEmbedVideoClick }: AssetPlayerBoxProps) => {
           mb: "$5",
         }}>
         <Flex align="center">
-          <DownloadLink downloadUrl={asset.downloadUrl} />
-          <ShareComponent
+          <DownloadButton downloadUrl={asset.downloadUrl} />
+          <ShareButton
             playbackId={asset.playbackId}
             onEmbedVideoClick={onEmbedVideoClick}
           />
+          <MintNftButton onClick={onMintNftClick} />
         </Flex>
       </Box>
     </Box>

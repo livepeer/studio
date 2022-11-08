@@ -6,6 +6,7 @@ import EditAssetDialog, {
   EditAssetReturnValue,
 } from "@components/Dashboard/AssetDetails/Dialogs/EditAssetDialog";
 import EmbedVideoDialog from "@components/Dashboard/AssetDetails/Dialogs/EmbedVideoDialog";
+import MintNftDialog from "@components/Dashboard/AssetDetails/Dialogs/MintNftDialog";
 import { Box, Flex } from "@livepeer/design-system";
 import Spinner from "components/Dashboard/Spinner";
 import { useApi, useLoggedIn } from "hooks";
@@ -19,20 +20,6 @@ import {
   useState,
 } from "react";
 
-export type AssetDetailProps = {
-  asset?: Asset;
-  children: React.ReactNode;
-  totalViews: number;
-  breadcrumbs: Breadcrumb[];
-  activeTab: "Overview" | "Event Logs";
-  setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
-  refetchAsset: () => void;
-  editAssetDialogOpen: boolean;
-  setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
-  embedVideoDialogOpen: boolean;
-  setEmbedVideoDialogOpen: Dispatch<SetStateAction<boolean>>;
-};
-
 const AssetDetail = ({
   breadcrumbs,
   children,
@@ -45,7 +32,23 @@ const AssetDetail = ({
   setEditAssetDialogOpen,
   embedVideoDialogOpen,
   setEmbedVideoDialogOpen,
-}: AssetDetailProps) => {
+  mintNftDialogOpen,
+  setMintNftDialogOpen,
+}: {
+  asset?: Asset;
+  children: React.ReactNode;
+  totalViews: number;
+  breadcrumbs: Breadcrumb[];
+  activeTab: "Overview" | "Event Logs";
+  setSwitchTab: Dispatch<SetStateAction<"Overview" | "Event Logs">>;
+  refetchAsset: () => void;
+  editAssetDialogOpen: boolean;
+  setEditAssetDialogOpen: Dispatch<SetStateAction<boolean>>;
+  embedVideoDialogOpen: boolean;
+  setEmbedVideoDialogOpen: Dispatch<SetStateAction<boolean>>;
+  mintNftDialogOpen: boolean;
+  setMintNftDialogOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
   useLoggedIn();
   const { user, patchAsset } = useApi();
   const [isCopied, setCopied] = useState(0);
@@ -55,9 +58,6 @@ const AssetDetail = ({
       if (asset?.id && v?.name) {
         await patchAsset(asset.id, {
           ...(v?.name ? { name: v.name } : {}),
-          // ...(v?.metadata
-          //   ? { meta: v.metadata as Record<string, string> }
-          //   : {}),
         });
         await refetchAsset();
       }
@@ -93,6 +93,12 @@ const AssetDetail = ({
         playbackId={asset?.playbackId}
       />
 
+      <MintNftDialog
+        isOpen={mintNftDialogOpen}
+        onOpenChange={setMintNftDialogOpen}
+        asset={asset}
+      />
+
       <Layout id="assets" breadcrumbs={breadcrumbs}>
         <Box css={{ px: "$6", py: "$7" }}>
           {asset != undefined ? (
@@ -107,6 +113,7 @@ const AssetDetail = ({
                   <AssetPlayerBox
                     asset={asset}
                     onEmbedVideoClick={() => setEmbedVideoDialogOpen(true)}
+                    onMintNftClick={() => setMintNftDialogOpen(true)}
                   />
                   <AssetDetailsBox asset={asset} />
                 </Box>

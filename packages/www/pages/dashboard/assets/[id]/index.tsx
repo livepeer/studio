@@ -17,6 +17,7 @@ const AssetDetails = () => {
   );
   const [editAssetDialogOpen, setEditAssetDialogOpen] = useState(false);
   const [embedVideoDialogOpen, setEmbedVideoDialogOpen] = useState(false);
+  const [mintNftDialogOpen, setMintNftDialogOpen] = useState(false);
 
   const { query } = router;
   const id = query.id as string;
@@ -41,19 +42,21 @@ const AssetDetails = () => {
 
   return (
     <AssetDetail
-      activeTab={currentTab}
+      breadcrumbs={[
+        { title: "Assets", href: "/dashboard/assets" },
+        { title: asset?.name },
+      ]}
       asset={asset as Asset}
       totalViews={totalViews}
       setSwitchTab={setCurrentTab}
+      activeTab={currentTab}
+      refetchAsset={refetchAsset}
       editAssetDialogOpen={editAssetDialogOpen}
       setEditAssetDialogOpen={setEditAssetDialogOpen}
       embedVideoDialogOpen={embedVideoDialogOpen}
       setEmbedVideoDialogOpen={setEmbedVideoDialogOpen}
-      refetchAsset={() => refetchAsset()}
-      breadcrumbs={[
-        { title: "Assets", href: "/dashboard/assets" },
-        { title: asset?.name },
-      ]}>
+      mintNftDialogOpen={mintNftDialogOpen}
+      setMintNftDialogOpen={setMintNftDialogOpen}>
       {currentTab === "Overview" ? (
         <AssetOverviewTab
           asset={asset}
