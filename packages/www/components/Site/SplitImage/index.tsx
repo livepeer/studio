@@ -43,14 +43,8 @@ export default function SplitImage({
               .height(24)
               .blur(10)
               .url()}
-            // sizes="100vw"
             width={1080}
             height={1080}
-            // style={{
-            //   width: "100%",
-            //   height: "100%",
-            //   objectFit: "cover",
-            // }}
           />
           {/* <img
             src={defaultImage.asset.url}

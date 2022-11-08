@@ -2,8 +2,14 @@ import { PortableText } from "@portabletext/react";
 import { Container, Box } from "@theme-ui/components";
 import { Text, Box as LiveBox } from "@livepeer/design-system";
 import Image from "next/image";
+import { urlFor } from "@lib/client";
 
-export default function HeroImage({ title, richText, portableTextRaw }) {
+export default function HeroImage({
+  title,
+  richText,
+  portableTextRaw,
+  defaultImage,
+}) {
   return (
     <Container
       sx={{
@@ -57,6 +63,17 @@ export default function HeroImage({ title, richText, portableTextRaw }) {
             <Text>{richText}</Text>
             {portableTextRaw && <PortableText value={portableTextRaw} />}
           </Box>
+          <Image
+            src={urlFor(defaultImage).url()}
+            width={100}
+            height={100}
+            placeholder="blur"
+            blurDataURL={urlFor(defaultImage)
+              .width(24)
+              .height(24)
+              .blur(10)
+              .url()}
+          />
           <Image
             src="/img/temp/example-cloud.png"
             alt="REPLACE ME"
