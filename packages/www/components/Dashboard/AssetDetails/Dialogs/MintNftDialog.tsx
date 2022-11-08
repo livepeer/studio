@@ -1,10 +1,10 @@
 import { Asset } from "livepeer";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTitle,
   Box,
   Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Heading,
 } from "@livepeer/design-system";
 
@@ -18,17 +18,11 @@ const MintNftDialog = ({
   asset: Asset;
 }) => {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        css={{
-          width: 550,
-          px: "$5",
-          pt: "$4",
-          pb: "$4",
-        }}>
-        <AlertDialogTitle asChild>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent css={{ width: 550, px: "$5", py: "$4" }}>
+        <DialogTitle asChild>
           <Heading size="1">Mint a Video NFT</Heading>
-        </AlertDialogTitle>
+        </DialogTitle>
 
         <Box css={{ my: "$5" }}>
           Sed ut perspiciatis unde omnis iste natus error sit voluptatem
@@ -38,8 +32,8 @@ const MintNftDialog = ({
         <Button css={{ width: "100%" }} size="4" variant="primary">
           Connect my wallet
         </Button>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 
