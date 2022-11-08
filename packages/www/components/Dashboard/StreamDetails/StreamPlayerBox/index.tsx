@@ -1,7 +1,7 @@
 import { Box, Flex, Button } from "@livepeer/design-system";
 import { Share2Icon } from "@radix-ui/react-icons";
 import { Stream } from "livepeer";
-import AssetSharePopup from "../../AssetDetails/AssetSharePopup";
+import AssetSharePopup from "../../AssetDetails/Dialogs/AssetSharePopup";
 import ActiveStream from "./ActiveStream";
 import IdleStream from "./IdleStream";
 

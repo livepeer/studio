@@ -10,7 +10,7 @@ import StreamPlayerBox from "@components/Dashboard/StreamDetails/StreamPlayerBox
 import StreamDetailsBox from "@components/Dashboard/StreamDetails/StreamDetailsBox";
 import StreamHeadingBox from "@components/Dashboard/StreamDetails/StreamHeadingBox";
 import StreamChildrenHeadingBox from "@components/Dashboard/StreamDetails/StreamChildrenHeadingBox";
-import EmbedVideoDialog from "@components/Dashboard/AssetDetails/EmbedVideoDialog";
+import EmbedVideoDialog from "@components/Dashboard/AssetDetails/Dialogs/EmbedVideoDialog";
 
 const StreamDetail = ({
   breadcrumbs,
