@@ -33,7 +33,7 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
               {title}
             </LiveBox>
             <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
-            <PortableText value={portableTextRaw} />
+            {portableTextRaw && <PortableText value={portableTextRaw} />}
           </Box>
         )}
         <Box

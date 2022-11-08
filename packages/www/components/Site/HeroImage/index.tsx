@@ -55,7 +55,7 @@ export default function HeroImage({ title, richText, portableTextRaw }) {
             </LiveBox>
             bhasda
             <Text>{richText}</Text>
-            <PortableText value={portableTextRaw} />
+            {portableTextRaw && <PortableText value={portableTextRaw} />}
           </Box>
           <Image
             src="/img/temp/example-cloud.png"

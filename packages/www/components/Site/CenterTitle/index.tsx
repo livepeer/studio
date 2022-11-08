@@ -31,7 +31,7 @@ export default function CenterTitle({ title, richText, portableTextRaw }) {
           {title}
         </LiveBox>
         <Text sx={{ maxWidth: "640px", marginX: "auto" }}>{richText}</Text>
-        <PortableText value={portableTextRaw} />
+        {portableTextRaw && <PortableText value={portableTextRaw} />}
       </Container>
     </Box>
   );

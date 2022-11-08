@@ -54,7 +54,7 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                 Building with decentralized storage and Livepeer Studio creates
                 the optimal video viewing experience.
               </Text> */}
-              <PortableText value={portableTextRaw} />
+              {portableTextRaw && <PortableText value={portableTextRaw} />}
               <Button
                 as={A}
                 small

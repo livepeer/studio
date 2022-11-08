@@ -71,7 +71,7 @@ export default function SplitImage({
             {title}
           </LiveBox>
           <Box sx={{ color: "#000116" }}>{richText}</Box>
-          <PortableText value={portableTextRaw} />
+          {portableTextRaw && <PortableText value={portableTextRaw} />}
         </Box>
       </Box>
     </Container>
