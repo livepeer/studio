@@ -1,17 +1,7 @@
-// jest.config.js
+console.log("#### CONFIG ####");
+
 module.exports = {
-  collectCoverage: true,
-  // on node 14.x coverage provider v8 offers good speed and more or less good report
-  coverageProvider: "v8",
-  collectCoverageFrom: [
-    "**/*.{js,jsx,ts,tsx}",
-    "!**/*.d.ts",
-    "!**/node_modules/**",
-    "!<rootDir>/out/**",
-    "!<rootDir>/.next/**",
-    "!<rootDir>/*.config.js",
-    "!<rootDir>/coverage/**",
-  ],
+  collectCoverage: false,
   moduleNameMapper: {
     // Handle CSS imports (with CSS modules)
     // https://jestjs.io/docs/webpack#mocking-css-modules
@@ -25,11 +15,11 @@ module.exports = {
     "^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$/i": `<rootDir>/__mocks__/fileMock.js`,
 
     // Handle module aliases
-    "^@/components/(.*)$": "<rootDir>/components/$1",
-    "^@/lib/(.*)$": "<rootDir>/lib/$1",
+    "^@components/(.*)$": "<rootDir>/components/$1",
+    "^@lib/(.*)$": "<rootDir>/lib/$1",
   },
   // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],
   testEnvironment: "jsdom",
   transform: {

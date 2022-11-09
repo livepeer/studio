@@ -22,5 +22,5 @@
     "incremental": true
   },
   "exclude": ["node_modules", ".next"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "jest.config.js"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
