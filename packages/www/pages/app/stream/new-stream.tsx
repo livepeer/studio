@@ -35,9 +35,7 @@ const NewStream = () => {
           mt: 3,
         }}>
         <Box sx={{ mb: 3 }}>
-          <Link href={backLink}>
-            <a>{"← stream list"}</a>
-          </Link>
+          <Link href={backLink}>{"← stream list"}</Link>
         </Box>
 
         <Heading as="h3" sx={{ mb: 4 }}>

@@ -102,7 +102,7 @@ const PricingCard = ({
           }}>
           {pricingDescription}
         </Text>
-        <Link href={btn.href} passHref>
+        <Link href={btn.href} passHref legacyBehavior>
           <Button
             as="a"
             arrow

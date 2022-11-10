@@ -41,7 +41,8 @@ async function richMintNft(
         Mint transaction sent:{" "}
         <Link
           href={`${chain.spec.blockExplorerUrls[0]}/tx/${tx.hash}`}
-          passHref>
+          passHref
+          legacyBehavior>
           <A target="_blank">{displayAddr(tx.hash)}</A>
         </Link>
       </>
@@ -60,7 +61,8 @@ async function richMintNft(
         )}
         <Link
           href={info?.opensea?.tokenUrl ?? info?.opensea?.contractUrl}
-          passHref>
+          passHref
+          legacyBehavior>
           <A target="_blank">OpenSea</A>
         </Link>
       </>

@@ -156,7 +156,7 @@ const DocsNav = ({
               <Flex align="center" justify="center">
                 {categories.map((each, idx) => {
                   return (
-                    <Link href={each?.slug} key={idx} passHref>
+                    <Link href={each?.slug} key={idx} passHref legacyBehavior>
                       {each?.type === "button" ? (
                         <Button as="a" arrow css={{ ml: "$5" }}>
                           {each.name}
@@ -204,7 +204,7 @@ const DocsNav = ({
           <Flex align="center" justify="center">
             {categories.map((each, idx) => {
               return (
-                <Link href={each?.slug} key={idx} passHref>
+                <Link href={each?.slug} key={idx} passHref legacyBehavior>
                   <A
                     css={{
                       fontSize: "$1",

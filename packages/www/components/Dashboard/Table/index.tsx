@@ -444,7 +444,10 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           }}
                           {...cell.getCellProps()}>
                           {cell.value?.href ? (
-                            <Link href={cell.value.href} passHref>
+                            <Link
+                              href={cell.value.href}
+                              passHref
+                              legacyBehavior>
                               <A
                                 css={{
                                   textDecoration: "none",
@@ -477,7 +480,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                 <b>{data?.count}</b> results
               </Text>
               {viewAll ? (
-                <Link href={viewAll} passHref>
+                <Link href={viewAll} passHref legacyBehavior>
                   <A variant="primary" css={{ display: "flex", ai: "center" }}>
                     <Box>View all</Box> <ArrowRightIcon />
                   </A>

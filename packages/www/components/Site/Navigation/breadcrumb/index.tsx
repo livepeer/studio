@@ -136,7 +136,8 @@ const NavigationBreadcrumb = ({
                       <Link
                         href={link.href}
                         passHref
-                        key={`dropdown-link-${link.href}`}>
+                        key={`dropdown-link-${link.href}`}
+                        legacyBehavior>
                         <A
                           css={{
                             display: "block",

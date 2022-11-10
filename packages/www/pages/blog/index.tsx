@@ -121,7 +121,8 @@ const BlogIndex = ({ categories, posts }) => {
                       ? "/blog"
                       : `/blog/category/${c.slug.current}`
                   }
-                  passHref>
+                  passHref
+                  legacyBehavior>
                   <A
                     css={{
                       display: "block",

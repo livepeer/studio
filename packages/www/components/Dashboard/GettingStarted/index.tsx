@@ -33,11 +33,11 @@ const GettingStarted = ({ firstName = "" }) => {
                 css={{ mb: "$3", lineHeight: "23px" }}>
                 No code required! All you need to do is create a RTMP stream
                 with broadcasting software like{" "}
-                <Link passHref href="https://obsproject.com/">
+                <Link passHref href="https://obsproject.com/" legacyBehavior>
                   <A target="_blank">OBS Studio</A>
                 </Link>{" "}
                 or{" "}
-                <Link passHref href="https://streamlabs.com/">
+                <Link passHref href="https://streamlabs.com/" legacyBehavior>
                   <A target="_blank">streamlabs</A>
                 </Link>
                 . Here’s how:
@@ -64,7 +64,8 @@ const GettingStarted = ({ firstName = "" }) => {
             </Box>
             <Link
               href="https://docs.livepeer.studio/guides/live/create-a-livestream"
-              passHref>
+              passHref
+              legacyBehavior>
               <Button
                 as="a"
                 target="_blank"
@@ -106,7 +107,8 @@ const GettingStarted = ({ firstName = "" }) => {
             </Box>
             <Link
               href="https://docs.livepeer.studio/guides/on-demand/upload-video-asset/dashboard"
-              passHref>
+              passHref
+              legacyBehavior>
               <Button
                 as="a"
                 target="_blank"
@@ -138,20 +140,23 @@ const GettingStarted = ({ firstName = "" }) => {
               Ready to code? The API is nimble and designed for customization.
               All you need to do is create an RTMP stream with broadcasting
               software like{" "}
-              <Link passHref href="https://obsproject.com/">
+              <Link passHref href="https://obsproject.com/" legacyBehavior>
                 <A target="_blank">OBS Studio</A>
               </Link>
               ,{" "}
-              <Link passHref href="https://streamlabs.com/">
+              <Link passHref href="https://streamlabs.com/" legacyBehavior>
                 <A target="_blank">streamlabs</A>
               </Link>
               , or{" "}
-              <Link passHref href="https://ffmpeg.org/">
+              <Link passHref href="https://ffmpeg.org/" legacyBehavior>
                 <A target="_blank">ffmpeg</A>
               </Link>
               .
             </Text>
-            <Link href="https://docs.livepeer.studio/category/api" passHref>
+            <Link
+              href="https://docs.livepeer.studio/category/api"
+              passHref
+              legacyBehavior>
               <Button
                 as="a"
                 target="_blank"
@@ -186,7 +191,8 @@ const GettingStarted = ({ firstName = "" }) => {
             </Text>
             <Link
               href="https://docs.livepeer.studio/reference/examples"
-              passHref>
+              passHref
+              legacyBehavior>
               <Button
                 as="a"
                 target="_blank"

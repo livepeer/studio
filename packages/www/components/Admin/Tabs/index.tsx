@@ -30,7 +30,7 @@ const Tabs = ({ tabs }: TabsProps) => {
       }}>
       <Container>
         {tabs.map((tab: TabType, i: number) => (
-          <Link key={i} href={tab.href} as={tab.as} passHref>
+          <Link key={i} href={tab.href} as={tab.as} passHref legacyBehavior>
             <Box
               as="a"
               sx={{

@@ -115,7 +115,7 @@ export const components = {
       );
     }
     return (
-      <NextLink href={href} passHref>
+      <NextLink href={href} passHref legacyBehavior>
         <DS.Link {...props} css={{ color: "inherit", fontSize: "inherit" }} />
       </NextLink>
     );

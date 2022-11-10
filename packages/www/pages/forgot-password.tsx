@@ -77,7 +77,7 @@ const ForgotPasswordPage = () => {
               />
               <Box>
                 Nevermind!&nbsp;
-                <Link href="/login" passHref>
+                <Link href="/login" passHref legacyBehavior>
                   <A>Take me back to log in</A>
                 </Link>
               </Box>
