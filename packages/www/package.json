@@ -13,7 +13,8 @@
     "docker:build": "docker build $(printf ' -t livepeerci/www:%s' ${DOCKER_TAGS:-master}) -f Dockerfile ../..",
     "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
-    "pkg:local": "yarn run build && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')"
+    "pkg:local": "yarn run build && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')",
+    "analyze": "ANALYZE=true yarn build"
   },
   "license": "MIT",
   "dependencies": {
@@ -129,6 +130,7 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-transform-react-jsx": "7.8.3",
     "@emotion/babel-plugin-jsx-pragmatic": "0.1.5",
+    "@next/bundle-analyzer": "^13.0.2",
     "@svgr/webpack": "^6.5.1",
     "@types/eventsource": "^1.1.7",
     "@types/isomorphic-fetch": "^0.0.35",

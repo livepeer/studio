@@ -6,6 +6,11 @@ const withMDX = require("@next/mdx")({
   },
 });
 
+// TODO: ⚠️ DO NOT MERGE IN PRODUCTION ⚠️
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
 const config = {
   images: {
     domains: ["cdn.sanity.io"],
@@ -242,6 +247,7 @@ module.exports = withPlugins(
         },
       },
     ],
+    withBundleAnalyzer,
   ],
   config
 );
