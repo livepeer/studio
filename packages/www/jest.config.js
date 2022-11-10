@@ -1,5 +1,3 @@
-console.log("#### CONFIG ####");
-
 module.exports = {
   collectCoverage: false,
   moduleNameMapper: {
@@ -13,10 +11,6 @@ module.exports = {
     // Handle image imports
     // https://jestjs.io/docs/webpack#handling-static-assets
     "^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$/i": `<rootDir>/__mocks__/fileMock.js`,
-
-    // Handle module aliases
-    "^@components/(.*)$": "<rootDir>/components/$1",
-    "^@lib/(.*)$": "<rootDir>/lib/$1",
   },
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

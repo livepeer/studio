@@ -2,7 +2,7 @@ import { TextField, Grid, Box, Link as A } from "@livepeer/design-system";
 import { useEffect, useState } from "react";
 import hash from "@livepeer.studio/api/dist/hash";
 import { useRouter } from "next/router";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import { useHubspotForm } from "hooks";
 
 // The frontend salts are all the same. This could be configurable someday.

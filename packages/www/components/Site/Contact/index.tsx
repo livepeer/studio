@@ -10,7 +10,7 @@ import {
   Link as A,
 } from "@livepeer/design-system";
 import { useHubspotForm } from "hooks";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import Fade from "react-reveal/Fade";
 
 const Contact = () => {

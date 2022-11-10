@@ -13,17 +13,17 @@ import { print } from "graphql/language/printer";
 import { useRouter } from "next/router";
 import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
-import BlogPostCard from "@components/Site/BlogPostCard";
+import BlogPostCard from "components/Site/BlogPostCard";
 import client from "lib/client";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "@components/Site/BlogVideoPlayer";
+import Player from "components/Site/BlogVideoPlayer";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import BlogCTA from "@components/Site/BlogCTA";
+import BlogCTA from "components/Site/BlogCTA";
 
 const serializers = {
   types: {

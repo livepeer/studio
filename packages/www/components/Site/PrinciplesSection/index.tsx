@@ -1,5 +1,5 @@
 import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
-import BulletedTitle from "@components/Site/BulletedTitle";
+import BulletedTitle from "components/Site/BulletedTitle";
 
 const PrinciplesSection = ({ content }) => {
   return (

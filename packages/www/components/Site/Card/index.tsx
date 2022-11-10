@@ -1,6 +1,6 @@
 import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
-import CutOut from "@components/Site/CutOut";
-import Badge from "@components/Site/Badge";
+import CutOut from "components/Site/CutOut";
+import Badge from "components/Site/Badge";
 import { MdCheckBoxOutlineBlank } from "react-icons/md";
 
 type Cta = {

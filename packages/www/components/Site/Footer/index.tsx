@@ -6,9 +6,9 @@ import {
   Link as A,
   Container,
 } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import Link from "next/link";
-import CutOut from "@components/Site/CutOut";
+import CutOut from "components/Site/CutOut";
 import { useRouter } from "next/router";
 import {
   useQuery,

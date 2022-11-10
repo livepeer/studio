@@ -4,8 +4,8 @@ import { useQuery, useQueryClient } from "react-query";
 import { Stream } from "@livepeer.studio/api";
 import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
-import StreamHealthTab from "@components/Dashboard/StreamDetails/StreamHealthTab";
-import StreamOverviewTab from "@components/Dashboard/StreamDetails/StreamOverviewTab";
+import StreamHealthTab from "components/Dashboard/StreamDetails/StreamHealthTab";
+import StreamOverviewTab from "components/Dashboard/StreamDetails/StreamOverviewTab";
 
 const refetchInterval = 5 * 1000;
 
