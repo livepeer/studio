@@ -6,12 +6,7 @@ interface AppPlayerProps {
 }
 
 const AppPlayer = ({ playbackUrl, autoPlay = true }: AppPlayerProps) => (
-  <Player
-    src={playbackUrl}
-    autoPlay={autoPlay}
-    objectFit="contain"
-    
-  />
+  <Player src={playbackUrl} autoPlay={autoPlay} objectFit="contain" />
 );
 
 export default AppPlayer;
