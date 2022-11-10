@@ -6260,15 +6260,10 @@
     "@radix-ui/react-primitive" "1.0.0"
     "@radix-ui/react-use-controllable-state" "1.0.0"
 
-"@radix-ui/react-icons@1.1.1":
+"@radix-ui/react-icons@1.1.1", "@radix-ui/react-icons@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-icons/-/react-icons-1.1.1.tgz#38d2aa548035dd3b799c169bd17177b1cec3152b"
   integrity sha512-xc3wQC59rsFylVbSusQCrrM+6695ppF730Q6yqzhRdqDcRNWIm2R6ngpzBoSOQMcwnq4p805F+Gr7xo4fmtN1A==
-
-"@radix-ui/react-icons@^1.0.3":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@radix-ui/react-icons/-/react-icons-1.1.0.tgz#c060c48ea04ea9df15cfc2be801f84eea3015855"
-  integrity sha512-nhctV9YKN8G4HfkS3p03ml+osTBDMGKImaAJTm666hymtaWEgIPiqL7F53ivDqIO4A+20ERwUiiKJ8h3XK7uAg==
 
 "@radix-ui/react-id@0.0.6":
   version "0.0.6"
@@ -8882,13 +8877,6 @@
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
-
-"@types/react-icons@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/react-icons/-/react-icons-3.0.0.tgz#27ca2823a6add881d06a371bfff093afc1b9c829"
-  integrity sha512-Vefs6LkLqF61vfV7AiAqls+vpR94q67gunhMueDznG+msAkrYgRxl7gYjNem/kZ+as2l2mNChmF1jRZzzQQtMg==
-  dependencies:
-    react-icons "*"
 
 "@types/react-redux@^7.1.20":
   version "7.1.24"
@@ -25602,17 +25590,22 @@ react-icon-base@^2.1.2:
   resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.1.2.tgz#a17101dad9c1192652356096860a9ab43a0766c7"
   integrity sha512-NRlRo0RPxWRMQT7osj8UCBSSXsGOxhF1pre84ildhuft5S2U382NOs7tg29osWSjbO90L2a3VTCqadA/LnAzHQ==
 
-react-icons@*, react-icons@^4.2.0, react-icons@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.3.1.tgz#2fa92aebbbc71f43d2db2ed1aed07361124e91ca"
-  integrity sha512-cB10MXLTs3gVuXimblAdI71jrJx8njrJZmNMEMC+sQu5B/BIOmlsAjskdqpn81y8UBVEGuHODd7/ci5DvoSzTQ==
-
 react-icons@^3.11.0:
   version "3.11.0"
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-3.11.0.tgz#2ca2903dfab8268ca18ebd8cc2e879921ec3b254"
   integrity sha512-JRgiI/vdF6uyBgyZhVyYJUZAop95Sy4XDe/jmT3R/bKliFWpO/uZBwvSjWEdxwzec7SYbEPNPck0Kff2tUGM2Q==
   dependencies:
     camelcase "^5.0.0"
+
+react-icons@^4.2.0, react-icons@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.3.1.tgz#2fa92aebbbc71f43d2db2ed1aed07361124e91ca"
+  integrity sha512-cB10MXLTs3gVuXimblAdI71jrJx8njrJZmNMEMC+sQu5B/BIOmlsAjskdqpn81y8UBVEGuHODd7/ci5DvoSzTQ==
+
+react-icons@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.6.0.tgz#f83eda179af5d02c047449a20b702c858653d397"
+  integrity sha512-rR/L9m9340yO8yv1QT1QurxWQvWpbNHqVX0fzMln2HEb9TEIrQRGsqiNFQfiv9/JEUbyHmHPlNTB2LWm2Ttz0g==
 
 react-ink@^6.4.0:
   version "6.5.1"
