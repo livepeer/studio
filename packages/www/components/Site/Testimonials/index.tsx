@@ -1,6 +1,6 @@
 import { Box, Grid, Container } from "@livepeer/design-system";
 import Card, { CardProps } from "./Card";
-import Guides from "@components/Site/Guides";
+import Guides from "components/Site/Guides";
 import CBSIcon from "../../../public/img/testimonials/cbs-interactive/logo.svg";
 import HousePartyIcon from "../../../public/img/testimonials/houseparty/logo.svg";
 import PlayDJIcon from "../../../public/img/testimonials/playdj-tv/logo.svg";

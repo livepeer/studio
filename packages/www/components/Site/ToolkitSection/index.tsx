@@ -1,6 +1,6 @@
 import { Container, Box, Flex, Heading, Text } from "@livepeer/design-system";
-import Card from "@components/Site/Card";
-import BulletedTitle from "@components/Site/BulletedTitle";
+import Card from "components/Site/Card";
+import BulletedTitle from "components/Site/BulletedTitle";
 
 const ToolkitSection = ({ content }) => {
   return (

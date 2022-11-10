@@ -7,7 +7,7 @@ import { dateSort, numberSort } from "components/Dashboard/Table/sorts";
 import {
   FilterItem,
   formatFiltersForApiRequest,
-} from "@components/Dashboard/Table/filters";
+} from "components/Dashboard/Table/filters";
 import {
   HoverCardRoot,
   HoverCardTrigger,
@@ -22,7 +22,7 @@ import RecordingUrlCell from "./RecordingUrlCell";
 import {
   RowsPageFromStateResult,
   SortTypeArgs,
-} from "@components/Dashboard/Table/types";
+} from "components/Dashboard/Table/types";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { State } from "../../Table";
 

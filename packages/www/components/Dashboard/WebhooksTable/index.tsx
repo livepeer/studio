@@ -5,7 +5,7 @@ import { Box } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateDialog, {
   Action,
-} from "@components/Dashboard/WebhookDialogs/CreateEditDialog";
+} from "components/Dashboard/WebhookDialogs/CreateEditDialog";
 import { useRouter } from "next/router";
 import {
   makeColumns,

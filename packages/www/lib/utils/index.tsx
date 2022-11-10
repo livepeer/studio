@@ -1,6 +1,6 @@
 import { pascalCase } from "pascal-case";
 import { Element } from "react-scroll";
-import { Tree } from "@components/Site/TableOfContents";
+import { Tree } from "components/Site/TableOfContents";
 import { Stripe, loadStripe } from "@stripe/stripe-js";
 import { theme } from "../theme";
 

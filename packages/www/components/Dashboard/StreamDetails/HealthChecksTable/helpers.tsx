@@ -1,8 +1,6 @@
 import StatusBadge, { Variant as StatusVariant } from "../../StatusBadge";
-import { TableData } from "@components/Dashboard/Table";
-import TextCell, {
-  TextCellProps,
-} from "@components/Dashboard/Table/cells/text";
+import { TableData } from "components/Dashboard/Table";
+import TextCell, { TextCellProps } from "components/Dashboard/Table/cells/text";
 import { Box } from "@livepeer/design-system";
 import { Condition } from "hooks/use-analyzer";
 import { Stream } from "@livepeer.studio/api";

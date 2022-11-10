@@ -1,7 +1,7 @@
 import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import ApiKeysTable from "@components/Dashboard/ApiKeys";
+import ApiKeysTable from "components/Dashboard/ApiKeys";
 import { DashboardAPIKeys as Content } from "content";
 
 const ApiKeys = () => {

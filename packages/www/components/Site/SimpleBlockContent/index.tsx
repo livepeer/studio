@@ -1,5 +1,5 @@
 import BlockContent from "@sanity/block-content-to-react";
-import Serializers from "@components/Site/Serializers";
+import Serializers from "components/Site/Serializers";
 import { Box } from "@livepeer/design-system";
 
 const SimpleBlockContent = (props) => {

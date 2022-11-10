@@ -30,7 +30,7 @@ import {
   Stream,
   StreamPatchPayload,
 } from "@livepeer.studio/api";
-import { pathJoin2 } from "@lib/utils";
+import { pathJoin2 } from "lib/utils";
 
 type MultistreamTargetRef =
   StreamPatchPayload["multistream"]["targets"][number];
