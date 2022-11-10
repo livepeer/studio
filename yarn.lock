@@ -5058,7 +5058,7 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^1.5.0":
+"@livepeer/react@^1.2.1":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-1.5.0.tgz#4fbf3e13bf88e44d7676cc9c16b711760643e81b"
   integrity sha512-vBUISCmUVF1rcExz91htg6jEOLFyEcD6iAtVCut+GWB1rFazn6sw+hwXmhG08iy9bXkGfnIu9aqSb6n7IMUwFg==
