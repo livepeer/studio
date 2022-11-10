@@ -10,11 +10,7 @@ const AppPlayer = ({ playbackUrl, autoPlay = true }: AppPlayerProps) => (
     src={playbackUrl}
     autoPlay={autoPlay}
     objectFit="contain"
-    theme={{
-      colors: {
-        accent: "$colors$blue10",
-      },
-    }}
+    
   />
 );
 
