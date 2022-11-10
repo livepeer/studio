@@ -24,7 +24,7 @@
     "@sanity/default-layout": "^2.13.1",
     "@sanity/default-login": "^2.13.1",
     "@sanity/desk-tool": "^2.13.1",
-    "@sanity/document-internationalization": "^0.3.5",
+    "@sanity/document-internationalization": "^0.3.7",
     "@sanity/language-filter": "^2.30.3",
     "@sanity/orderable-document-list": "^0.0.10",
     "@sanity/production-preview": "^2.13.0",
