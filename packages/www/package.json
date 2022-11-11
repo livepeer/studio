@@ -118,7 +118,7 @@
     "theme-ui": "0.3.1",
     "title": "^3.4.3",
     "toc": "^0.4.0",
-    "tus-js-client": "^3.0.0",
+    "tus-js-client": "^3.0.1",
     "unified": "^10.0.1",
     "unist-util-visit": "^3.1.0",
     "url": "^0.11.0",
