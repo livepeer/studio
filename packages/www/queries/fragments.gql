@@ -79,8 +79,11 @@ fragment iconGrid on IconGrid {
   title
   richText
 }
+
 fragment form on Form {
   _type
+  title
+  subtitle
   region
   portalId
   formId

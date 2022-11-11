@@ -20,6 +20,7 @@ const Page = ({
   content,
   noindex = false,
   preview,
+  alternateNavigation,
 }) => {
   const router = useRouter();
   const builder = imageUrlBuilder(client as any);
@@ -54,7 +55,8 @@ const Page = ({
         alt: openGraphImage?.asset?.altText,
       }}
       url={metaUrl}
-      preview={preview}>
+      preview={preview}
+      navBackgroundColor={alternateNavigation ? "$hiContrast" : ""}>
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}

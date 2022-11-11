@@ -1,8 +1,21 @@
+import FaFileText from "react-icons/fa";
+
 export default {
   name: "form",
   title: "Form",
+  icon: FaFileText,
   type: "object",
   fields: [
+    {
+      name: "title",
+      title: "Title",
+      type: "string",
+    },
+    {
+      name: "subtitle",
+      title: "Subtitle",
+      type: "string",
+    },
     {
       name: "region",
       description: "Take 'region' from the hubspot embed form e.g 'na1'",

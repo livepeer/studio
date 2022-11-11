@@ -6,6 +6,7 @@ query allPage($where: PageFilter) {
     metaTitle
     metaDescription
     metaUrl
+    alternateNavigation
     openGraphImage {
       asset {
         altText

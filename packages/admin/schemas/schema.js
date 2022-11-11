@@ -59,6 +59,7 @@ import caseStudy from "./objects/caseStudy";
 import reason from "./objects/reason";
 import footer from "./objects/footer";
 import application from "./objects/application";
+import form from "./objects/form";
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -116,5 +117,6 @@ export default createSchema({
     splitImage,
     iconGrid,
     defaultImage,
+    form,
   ]),
 });

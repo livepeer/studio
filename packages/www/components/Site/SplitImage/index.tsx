@@ -1,7 +1,7 @@
 import { Box as LiveBox } from "@livepeer/design-system";
 import { Container, Box } from "@theme-ui/components";
 
-export default function SplitImage({ direction }) {
+export default function SplitImage({ inverted, title, richText }) {
   return (
     <Container>
       <Box
@@ -25,7 +25,7 @@ export default function SplitImage({ direction }) {
             borderRadius: "12px",
             paddingX: "32px",
             paddingY: "120px",
-            gridColumn: direction ? 1 : 2,
+            gridColumn: inverted ? 1 : 2,
             gridRow: 1,
           }}>
           <LiveBox
@@ -45,15 +45,9 @@ export default function SplitImage({ direction }) {
                 fontSize: 58,
               },
             }}>
-            Video Simplified for Web3 Apps
+            {title}
           </LiveBox>
-          <Box sx={{ color: "#000116" }}>
-            New to building apps with video? Livepeer Studio makes it easy.
-            Access the decentralized infrastructure of the Livepeer network, all
-            the features you need for tooling, and pricing at a fraction of the
-            prices of web2 solutions to accelerate app development and minimize
-            maintenance.
-          </Box>
+          <Box sx={{ color: "#000116" }}>{richText}</Box>
         </Box>
       </Box>
     </Container>

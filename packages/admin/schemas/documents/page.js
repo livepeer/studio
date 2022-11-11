@@ -51,11 +51,6 @@ export default {
       title: "Page sections",
       of: [
         { type: "hero" },
-        { type: "heroImage" },
-        { type: "offsetPortableText" },
-        { type: "centerTitle" },
-        { type: "splitImage" },
-        { type: "iconGrid" },
         { type: "valuesSection" },
         { type: "investorsSection" },
         { type: "testimonialsSection" },
@@ -65,6 +60,13 @@ export default {
         { type: "markdownSection" },
         { type: "teamSection" },
         { type: "jobsSection" },
+        // New components
+        { type: "heroImage" },
+        { type: "offsetPortableText" },
+        { type: "centerTitle" },
+        { type: "splitImage" },
+        { type: "iconGrid" },
+        { type: "form" },
       ],
     },
     {
@@ -106,6 +108,13 @@ export default {
       type: "boolean",
       title: "Disallow in robots.txt",
       description: "Hide this route for search engines",
+    },
+    {
+      name: "alternateNavigation",
+      title: "Alternate navigation",
+      description: "Use the navigation style from the homepage, or the default",
+      type: "boolean",
+      initialValue: false,
     },
   ],
 
