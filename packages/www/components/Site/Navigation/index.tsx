@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback, useEffect } from "react";
 import NavigationBase from "./base";
 import { useRouter } from "next/router";
 import DocsMobileSubMenu from "./mobile/docs-submenu";
-import { Tree } from "@components/Site/TableOfContents";
+import { Tree } from "components/Site/TableOfContents";
 import { isMobile } from "react-device-detect";
 
 const defaultNavProps = {

@@ -1,5 +1,5 @@
 import { Box, Grid, Text, Container } from "@livepeer/design-system";
-import Guides from "@components/Site/Guides";
+import Guides from "components/Site/Guides";
 
 const investorIds = [
   "northzone",

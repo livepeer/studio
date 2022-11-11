@@ -8,7 +8,7 @@ import {
 import { User } from "@livepeer.studio/api";
 import Link from "next/link";
 import { BreadcrumbItem } from "../breadcrumb";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 
 type Props = {
   links: any;

@@ -6,7 +6,7 @@ import GettingStarted from "components/Dashboard/GettingStarted";
 import UsageSummary from "components/Dashboard/UsageSummary";
 import StreamsTable from "components/Dashboard/StreamsTable";
 import Spinner from "components/Dashboard/Spinner";
-import Banner from "@components/Dashboard/Banner";
+import Banner from "components/Dashboard/Banner";
 
 import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";

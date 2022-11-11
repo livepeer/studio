@@ -4,7 +4,7 @@ import { useApi } from "hooks";
 import { Button, Flex, Container, Select } from "@theme-ui/components";
 import Modal from "../Modal";
 import { products } from "@livepeer.studio/api/src/config";
-import CommonAdminTable from "@components/Admin/CommonAdminTable";
+import CommonAdminTable from "components/Admin/CommonAdminTable";
 import SuspendUserModal from "../SuspendUserModal";
 
 type UserTableProps = {

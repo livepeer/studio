@@ -6,8 +6,8 @@ import {
   Box,
   Link as A,
 } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
-import Guides from "@components/Site/Guides";
+import Button from "components/Site/Button";
+import Guides from "components/Site/Guides";
 import Link from "next/link";
 
 const Prefooter = ({ backgroundColor = "$loContrast" }) => (

@@ -1,10 +1,10 @@
 import Layout from "layouts/main";
 import { Home as Content } from "content";
-import HomeHero from "@components/Site/HomeHero";
-import ToolkitSection from "@components/Site/ToolkitSection";
-import GuideSection from "@components/Site/GuideSection";
-import FeaturedAppsSection from "@components/Site/FeaturedAppsSection";
-import PrinciplesSection from "@components/Site/PrinciplesSection";
+import HomeHero from "components/Site/HomeHero";
+import ToolkitSection from "components/Site/ToolkitSection";
+import GuideSection from "components/Site/GuideSection";
+import FeaturedAppsSection from "components/Site/FeaturedAppsSection";
+import PrinciplesSection from "components/Site/PrinciplesSection";
 import { GraphQLClient } from "graphql-request";
 import allHome from "../queries/allHome.gql";
 import { print } from "graphql/language/printer";

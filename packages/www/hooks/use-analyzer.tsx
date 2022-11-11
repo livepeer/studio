@@ -1,7 +1,6 @@
 import EventSource from "eventsource";
 import { useApi } from "hooks";
 import { useContext, useMemo, createContext, ReactNode } from "react";
-
 import { isStaging, isDevelopment, HttpError } from "../lib/utils";
 
 const useLocalAnalyzer = false;

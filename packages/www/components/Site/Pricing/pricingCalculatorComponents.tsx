@@ -1,7 +1,7 @@
 import { ReactNode, useCallback } from "react";
 import { useApi } from "hooks";
 import { Box, Grid, Flex, Text, TextField } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import { useRouter } from "next/router";
 
 type PreviewItemProps = {

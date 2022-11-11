@@ -1,4 +1,4 @@
-import { fileUploadProgressForAsset } from "@components/Dashboard/AssetsTable/helpers";
+import { fileUploadProgressForAsset } from "components/Dashboard/AssetsTable/helpers";
 import { Asset } from "livepeer";
 import { Badge, Flex } from "@livepeer/design-system";
 import { UploadIcon } from "@radix-ui/react-icons";
