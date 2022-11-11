@@ -37,6 +37,12 @@ import homeFeaturedAppSection from "./objects/home/featuredAppSection";
 import homePrinciplesSection from "./objects/home/principlesSection";
 import card from "./objects/card";
 import localeString from "./objects/localeString";
+import heroImage from "./objects/heroImage";
+import offsetPortableText from "./objects/offSetPortableText";
+import centerTitle from "./objects/centerTitle";
+import splitImage from "./objects/splitImage";
+import iconGrid from "./objects/iconGrid";
+import defaultImage from "./objects/defaultImage";
 
 // Landing page sections
 import hero from "./objects/hero";
@@ -53,6 +59,7 @@ import caseStudy from "./objects/caseStudy";
 import reason from "./objects/reason";
 import footer from "./objects/footer";
 import application from "./objects/application";
+import form from "./objects/form";
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -104,5 +111,12 @@ export default createSchema({
     card,
     footer,
     localeString,
+    offsetPortableText,
+    heroImage,
+    centerTitle,
+    splitImage,
+    iconGrid,
+    defaultImage,
+    form,
   ]),
 });

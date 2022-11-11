@@ -95,12 +95,7 @@ const Hero = ({
                       transform: "translate(-50%)",
                       left: "50%",
                     }}>
-                    <Image
-                      src={image}
-                      width={542 / 2}
-                      height={1096 / 2}
-                      alt="hero image"
-                    />
+                    {/* <Image src={image} width={542 / 2} height={1096 / 2} /> */}
                   </Box>
                 ) : (
                   <Box

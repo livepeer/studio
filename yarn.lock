@@ -5488,6 +5488,14 @@
     "@portabletext/toolkit" "^1.0.5"
     "@portabletext/types" "^1.0.3"
 
+"@portabletext/react@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@portabletext/react/-/react-2.0.0.tgz#188dc7bbd3d02693ceefbeb9115e44ccdf4c3554"
+  integrity sha512-8AaTfRdRAzWxs2ADbMXV32/LTOJaRDp/m89hax/NTbC8F+OBOgHLBl+M7zSJDVIS1k+fuorFCLcOoq+PuAGJvQ==
+  dependencies:
+    "@portabletext/toolkit" "^2.0.0"
+    "@portabletext/types" "^2.0.0"
+
 "@portabletext/toolkit@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@portabletext/toolkit/-/toolkit-1.0.5.tgz#2bbcc527a6dd1f6594fb538ff9670a9958147197"
@@ -5495,10 +5503,22 @@
   dependencies:
     "@portabletext/types" "^1.0.3"
 
+"@portabletext/toolkit@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@portabletext/toolkit/-/toolkit-2.0.0.tgz#b6675bc4a90c4b0ec92cb66687d149034b38e4b6"
+  integrity sha512-2Ljk7dnofxqam9u4B0h1UmpU18h+6SerSU/UanEHQW/IfjmOi48qZDre6MsOrQJ9/LsmlA8MDrmlCND5r/tg3A==
+  dependencies:
+    "@portabletext/types" "^2.0.0"
+
 "@portabletext/types@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@portabletext/types/-/types-1.0.3.tgz#b23f832ae5331c1d864195a95eba34abf340597e"
   integrity sha512-SDDsdury2SaTI2D5Ea6o+Y39SSZMYHRMWJHxkxYl3yzFP0n/0EknOhoXcoaV+bxGr2dTTqZi2TOEj+uWYuavSw==
+
+"@portabletext/types@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@portabletext/types/-/types-2.0.0.tgz#920d9ffb19ea68c6b0857fe1e97e27c7464d5055"
+  integrity sha512-AjbCPt9x9U0XFwLuVnIxweBrDAlKKcPJRVkpckjMk77VKEQoYvX2dITf5QtQf1TlLIx8zHJFtMcLmiqDJiGuLg==
 
 "@radix-ui/colors@0.1.8":
   version "0.1.8"
