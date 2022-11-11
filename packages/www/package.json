@@ -14,7 +14,7 @@
     "docker:push": "for TAG in ${DOCKER_TAGS:-dev}; do docker push livepeerci/www:${TAG}; done",
     "pkg": "pkg --out-path=bin --no-bytecode --public-packages \"*\" --public . --compress GZip ",
     "pkg:local": "yarn run build && yarn run pkg --targets=$(node -p '`node16-${os.platform()}-${os.arch()}`')",
-    "analyze": "ANALYZE=true yarn build"
+    "analyze-bundle": "ANALYZE=true yarn build"
   },
   "license": "MIT",
   "dependencies": {

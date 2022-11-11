@@ -6,12 +6,7 @@ const withMDX = require("@next/mdx")({
   },
 });
 
-// TODO: ⚠️ DO NOT MERGE IN PRODUCTION ⚠️
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-});
-const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
-// ⚠️ --- ⚠️
+const isAnalyzeEnabled = process.env.ANALYZE === "true";
 
 const config = {
   images: {
@@ -245,12 +240,17 @@ module.exports = withPlugins(
             test: /\.svg$/,
             use: ["@svgr/webpack"],
           });
-          config.plugins.push(new DuplicatePackageCheckerPlugin());
+          if (isAnalyzeEnabled) {
+            const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+            config.plugins.push(new DuplicatePackageCheckerPlugin());
+          }
           return config;
         },
       },
     ],
-    withBundleAnalyzer,
+    ...(isAnalyzeEnabled
+      ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
+      : []),
   ],
   config
 );
