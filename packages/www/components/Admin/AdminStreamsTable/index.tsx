@@ -4,10 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useApi } from "hooks";
 import { Box, Button, Container, Flex } from "@theme-ui/components";
-import DeleteStreamModal from "@components/Admin/DeleteStreamModal";
-import { Checkbox } from "@components/Admin/Table";
-import CommonAdminTable from "@components/Admin/CommonAdminTable";
-import { StreamName } from "@components/Admin/CommonAdminTable";
+import DeleteStreamModal from "components/Admin/DeleteStreamModal";
+import { Checkbox } from "components/Admin/Table";
+import CommonAdminTable from "components/Admin/CommonAdminTable";
+import { StreamName } from "components/Admin/CommonAdminTable";
 
 const ROWS_PER_PAGE = 20;
 
@@ -161,11 +161,9 @@ const AdminStreamsTable = ({ id }: { id: string }) => {
         <Link
           href={{ pathname: "/app/stream/new-stream", query: { admin: true } }}
           as="/app/stream/new-stream">
-          <a>
-            <Button variant="outlineSmall" sx={{ margin: 2 }}>
-              Create
-            </Button>
-          </a>
+          <Button variant="outlineSmall" sx={{ margin: 2 }}>
+            Create
+          </Button>
         </Link>
         <Button
           variant="primarySmall"

@@ -6,6 +6,7 @@ query allPage($where: PageFilter) {
     metaTitle
     metaDescription
     metaUrl
+    alternateNavigation
     openGraphImage {
       asset {
         altText
@@ -26,6 +27,13 @@ query allPage($where: PageFilter) {
       ...markdownSection
       ...teamSection
       ...jobsSection
+      # New components
+      ...heroImage
+      ...offsetPortableText
+      ...splitImage
+      ...centerTitle
+      ...iconGrid
+      ...form
     }
   }
 }

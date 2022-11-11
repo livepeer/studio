@@ -1,4 +1,4 @@
-import Logo from "@components/Site/Logo";
+import Logo from "components/Site/Logo";
 import { useState } from "react";
 import { Box, Link as A } from "@livepeer/design-system";
 import BreadcrumbDropdown from "./dropdown";
@@ -136,7 +136,8 @@ const NavigationBreadcrumb = ({
                       <Link
                         href={link.href}
                         passHref
-                        key={`dropdown-link-${link.href}`}>
+                        key={`dropdown-link-${link.href}`}
+                        legacyBehavior>
                         <A
                           css={{
                             display: "block",

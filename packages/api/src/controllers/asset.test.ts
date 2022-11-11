@@ -80,6 +80,7 @@ describe("controllers/asset", () => {
     await db.objectStore.create({
       id: "mock_vod_store",
       url: "s3+http://user:password@localhost:8080/us-east-1/vod",
+      publicUrl: "http://localhost/bucket/vod",
     });
     ({ client, adminUser, adminApiKey, nonAdminUser, nonAdminToken } =
       await setupUsers(server, mockAdminUserInput, mockNonAdminUserInput));
@@ -105,6 +106,67 @@ describe("controllers/asset", () => {
     });
   });
 
+  describe("asset creation", () => {
+    it("should import asset and allow updating task progress", async () => {
+      const spec = {
+        name: "test",
+        url: "https://example.com/test.mp4",
+      };
+      let res = await client.post(`/asset/upload/url`, spec);
+      expect(res.status).toBe(201);
+      const { asset, task } = await res.json();
+      expect(asset).toMatchObject({
+        id: expect.any(String),
+        name: "test",
+        source: {
+          type: "url",
+          url: spec.url,
+        },
+        status: { phase: "waiting" },
+      });
+
+      const taskId = task.id;
+      res = await client.get(`/task/${task.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: taskId,
+        type: "import",
+        outputAssetId: asset.id,
+        params: {
+          import: {
+            url: spec.url,
+          },
+        },
+        status: { phase: "waiting" },
+      });
+
+      client.jwtAuth = null;
+      client.apiKey = adminApiKey;
+      res = await client.post(`/task/${taskId}/status`, {
+        status: {
+          phase: "running",
+          progress: 0.5,
+          step: "downloading",
+        },
+      });
+      expect(res.status).toBe(200);
+
+      res = await client.get(`/task/${task.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: taskId,
+        status: { phase: "running", progress: 0.5 },
+      });
+
+      res = await client.get(`/asset/${asset.id}`);
+      expect(res.status).toBe(200);
+      expect(res.json()).resolves.toMatchObject({
+        id: asset.id,
+        status: { phase: "processing", progress: 0.5 },
+      });
+    });
+  });
+
   describe("asset inline storage", () => {
     let asset: WithID<Asset>;
 
@@ -114,12 +176,14 @@ describe("controllers/asset", () => {
         name: "test-storage",
         source: { type: "directUpload" },
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         status: {
           phase: "ready",
           updatedAt: Date.now(),
         },
         userId: nonAdminUser.id,
       });
+      asset = db.asset.cleanWriteOnlyResponse(asset);
     });
 
     it("should allow editing asset name", async () => {
@@ -242,6 +306,7 @@ describe("controllers/asset", () => {
         },
       });
 
+      const { ipfsGatewayUrl } = server;
       res = await client.get(`/asset/${asset.id}`);
       expect(res.status).toBe(200);
       expect(res.json()).resolves.toEqual({
@@ -249,8 +314,8 @@ describe("controllers/asset", () => {
         storage: {
           ipfs: {
             spec: {},
-            ...withIpfsUrls({ cid: "QmX" }),
-            nftMetadata: withIpfsUrls({ cid: "QmY" }),
+            ...withIpfsUrls(ipfsGatewayUrl, { cid: "QmX" }),
+            nftMetadata: withIpfsUrls(ipfsGatewayUrl, { cid: "QmY" }),
             updatedAt: expect.any(Number),
           },
           status: {
@@ -419,6 +484,7 @@ describe("controllers/asset", () => {
         name: "dummy",
         source: { type: "directUpload" },
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         status: {
           phase: "ready",
           updatedAt: Date.now(),
@@ -430,6 +496,7 @@ describe("controllers/asset", () => {
         id,
         name: "test-storage",
         createdAt: Date.now(),
+        objectStoreId: "mock_vod_store",
         playbackId: await generateUniquePlaybackId(id),
         source: { type: "directUpload" },
         storage: {
@@ -445,6 +512,7 @@ describe("controllers/asset", () => {
         },
         userId: nonAdminUser.id,
       });
+      asset = db.asset.cleanWriteOnlyResponse(asset);
     });
 
     const expectFindAsset = async (qs: string, shouldFind: boolean) => {

@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import { useApi } from "hooks";
 import AssetDetail from "layouts/assetDetail";
-import AssetOverviewTab from "@components/Dashboard/AssetDetails/AssetOverviewTab";
-import AssetEventLogTab from "@components/Dashboard/AssetDetails/AssetEventLogTab";
+import AssetOverviewTab from "components/Dashboard/AssetDetails/AssetOverviewTab";
+import AssetEventLogTab from "components/Dashboard/AssetDetails/AssetEventLogTab";
 import { Asset } from "livepeer";
 
 const refetchInterval = 5 * 1000;

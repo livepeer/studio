@@ -5,8 +5,8 @@ import Menu from "./mobile/menu";
 import { useRouter } from "next/router";
 import NavigationBreadcrumb, { BreadcrumbItem } from "./breadcrumb";
 import Link from "next/link";
-import CutOut from "@components/Site/CutOut";
-import RegionSelector from "@components/Site/RegionSelector";
+import CutOut from "components/Site/CutOut";
+import RegionSelector from "components/Site/RegionSelector";
 
 const sidesWidth = "250px"; // We provide the same value for the logo and the CTAs so the center links are really centered.
 
@@ -107,7 +107,11 @@ const NavigationBase = ({
                   }}>
                   {links.map((link, i) => {
                     return (
-                      <Link href={link.href} key={`nav-link-${i}`} passHref>
+                      <Link
+                        href={link.href}
+                        key={`nav-link-${i}`}
+                        passHref
+                        legacyBehavior>
                         <A
                           target={link.isExternal ? "_blank" : null}
                           css={{
@@ -136,7 +140,7 @@ const NavigationBase = ({
                 <Flex>
                   {!loggedIn && (
                     <>
-                      <Link href="/login" passHref>
+                      <Link href="/login" passHref legacyBehavior>
                         <A
                           css={{
                             fontSize: "$4",
@@ -215,18 +219,21 @@ const NavigationBase = ({
                         },
                       }}>
                       {isDashboard && (
-                        <Link href="https://docs.livepeer.studio" passHref>
+                        <Link
+                          href="https://docs.livepeer.studio"
+                          passHref
+                          legacyBehavior>
                           <A target="_blank">Docs</A>
                         </Link>
                       )}
                       {isDashboard && (
-                        <Link href="/contact" passHref>
+                        <Link href="/contact" passHref legacyBehavior>
                           <A>Contact</A>
                         </Link>
                       )}
 
                       {!isDashboard && (
-                        <Link href="/dashboard" passHref>
+                        <Link href="/dashboard" passHref legacyBehavior>
                           <A
                             css={{
                               fontSize: "$4",

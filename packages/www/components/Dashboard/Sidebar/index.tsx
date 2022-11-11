@@ -46,6 +46,7 @@ export type SidebarId =
   | "streams/health"
   | "assets"
   | "developers"
+  | "developers/signing-keys"
   | "developers/webhooks"
   | "billing"
   | "billing/plans";
@@ -122,7 +123,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         <ThemeSwitch />
       </Flex>
       <Grid css={{ px: "$4", a: { textDecoration: "none" } }} gap="3">
-        <Link href="/dashboard" passHref>
+        <Link href="/dashboard" passHref legacyBehavior>
           <NavLink>
             <HomeIcon active={id === "home"} />
             <Text
@@ -138,7 +139,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           </NavLink>
         </Link>
         <Box>
-          <Link href="/dashboard/streams" passHref>
+          <Link href="/dashboard/streams" passHref legacyBehavior>
             <NavLink>
               <StreamIcon active={id === "streams"} />
               <Text
@@ -161,7 +162,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   mt: "$1",
                 },
               }}>
-              <Link href="/dashboard/sessions" passHref>
+              <Link href="/dashboard/sessions" passHref legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "streams/sessions" ? "blue" : null}
@@ -180,7 +181,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
           )}
         </Box>
 
-        <Link href="/dashboard/assets" passHref>
+        <Link href="/dashboard/assets" passHref legacyBehavior>
           <NavLink>
             <AssetsIcon active={id === "assets"} />
             <Text
@@ -197,7 +198,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         </Link>
 
         <Box>
-          <Link href="/dashboard/developers/api-keys" passHref>
+          <Link href="/dashboard/developers/api-keys" passHref legacyBehavior>
             <NavLink>
               <TerminalIcon active={id?.split("/")[0] === "developers"} />
               <Text
@@ -219,7 +220,10 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   mt: "$1",
                 },
               }}>
-              <Link href="/dashboard/developers/api-keys" passHref>
+              <Link
+                href="/dashboard/developers/api-keys"
+                passHref
+                legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "developers" ? "blue" : null}
@@ -235,7 +239,29 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   </Text>
                 </NavLink>
               </Link>
-              <Link href="/dashboard/developers/webhooks" passHref>
+              <Link
+                href="/dashboard/developers/signing-keys"
+                passHref
+                legacyBehavior>
+                <NavLink>
+                  <Text
+                    variant={id === "developers/signing-keys" ? "blue" : null}
+                    css={{
+                      fontWeight: id === "developers/signing-keys" ? 700 : 400,
+                      backgroundClip: "text",
+                      ml: 31,
+                      mt: "$1",
+                      mb: "$1",
+                      lineHeight: 1.2,
+                    }}>
+                    Signing Keys
+                  </Text>
+                </NavLink>
+              </Link>
+              <Link
+                href="/dashboard/developers/webhooks"
+                passHref
+                legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "developers/webhooks" ? "blue" : null}
@@ -256,7 +282,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
         </Box>
 
         <Box>
-          <Link href="/dashboard/billing" passHref>
+          <Link href="/dashboard/billing" passHref legacyBehavior>
             <NavLink>
               <BillingIcon active={id === "billing"} />
               <Text
@@ -281,7 +307,7 @@ const Sidebar = ({ id }: { id: SidebarId }) => {
                   mt: "$1",
                 },
               }}>
-              <Link href="/dashboard/billing/plans" passHref>
+              <Link href="/dashboard/billing/plans" passHref legacyBehavior>
                 <NavLink>
                   <Text
                     variant={id === "billing/plans" ? "blue" : null}

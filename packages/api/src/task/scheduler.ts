@@ -9,12 +9,23 @@ import { taskOutputToIpfsStorage } from "../store/asset-table";
 import { RoutingKey } from "../store/queue";
 import { EventKey } from "../store/webhook-table";
 import { sleep } from "../util";
+import sql, { SQLStatement } from "sql-template-strings";
 
 const taskInfo = (task: Task): messages.TaskInfo => ({
   id: task.id,
   type: task.type,
   snapshot: task,
 });
+
+function sqlQueryGroup(values: string[]) {
+  const query = sql`(`;
+  values.forEach((value, i) => {
+    if (i) query.append(`, `);
+    query.append(sql`${value}`);
+  });
+  query.append(`)`);
+  return query;
+}
 
 const MAX_RETRIES = 2;
 const TASK_RETRY_BASE_DELAY = 30 * 1000;
@@ -100,9 +111,10 @@ export class TaskScheduler {
     }
 
     let assetSpec: Asset;
-    switch (event.task.type) {
+    switch (task.type) {
       case "import":
-        assetSpec = event.output?.import?.assetSpec;
+      case "upload":
+        assetSpec = event.output?.[task.type]?.assetSpec;
         if (!assetSpec) {
           const error = "bad task output: missing assetSpec";
           console.error(
@@ -115,6 +127,7 @@ export class TaskScheduler {
           size: assetSpec.size,
           hash: assetSpec.hash,
           videoSpec: assetSpec.videoSpec,
+          files: assetSpec.files,
           playbackRecordingId: assetSpec.playbackRecordingId,
           status: {
             phase: "ready",
@@ -299,9 +312,21 @@ export class TaskScheduler {
 
   async updateTask(
     task: WithID<Task>,
-    updates: Pick<Task, "status" | "output">
+    updates: Pick<Task, "status" | "output">,
+    filters?: { allowedPhases: Array<Task["status"]["phase"]> }
   ) {
-    await db.task.update(task.id, updates);
+    let query = [sql`id = ${task.id}`];
+    if (filters?.allowedPhases) {
+      query.push(
+        sql`data->'status'->>'phase' IN `.append(
+          sqlQueryGroup(filters.allowedPhases)
+        )
+      );
+    }
+    const res = await db.task.update(query, updates);
+    if (!res?.rowCount) {
+      return;
+    }
     task = {
       ...task,
       ...updates,
@@ -355,7 +380,11 @@ export class TaskScheduler {
     });
   }
 
-  async updateAsset(asset: string | Asset, updates: Partial<Asset>) {
+  async updateAsset(
+    asset: string | Asset,
+    updates: Partial<Asset>,
+    filters?: { allowedPhases: Array<Asset["status"]["phase"]> }
+  ) {
     if (typeof asset === "string") {
       asset = await db.asset.get(asset);
     }
@@ -367,7 +396,18 @@ export class TaskScheduler {
         status: { ...asset.status, updatedAt: Date.now() },
       };
     }
-    await db.asset.update(asset.id, updates);
+    let query = [sql`id = ${asset.id}`];
+    if (filters?.allowedPhases) {
+      query.push(
+        sql`data->'status'->>'phase' IN `.append(
+          sqlQueryGroup(filters.allowedPhases)
+        )
+      );
+    }
+    const res = await db.asset.update(query, updates);
+    if (!res?.rowCount) {
+      return;
+    }
     asset = {
       ...asset,
       ...updates,

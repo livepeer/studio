@@ -6,8 +6,8 @@ import {
   Box,
   Link as A,
 } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
-import Guides from "@components/Site/Guides";
+import Button from "components/Site/Button";
+import Guides from "components/Site/Guides";
 import Link from "next/link";
 
 const Prefooter = ({ backgroundColor = "$loContrast" }) => (
@@ -71,7 +71,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
               flexDirection: "row",
             },
           }}>
-          <Link href="/register" passHref>
+          <Link href="/register" passHref legacyBehavior>
             <Button
               size="4"
               as="a"
@@ -86,7 +86,7 @@ const Prefooter = ({ backgroundColor = "$loContrast" }) => (
               Sign up for free
             </Button>
           </Link>
-          <Link href="/contact" passHref>
+          <Link href="/contact" passHref legacyBehavior>
             <A
               css={{
                 textDecoration: "none",

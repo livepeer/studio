@@ -46,7 +46,10 @@ const ipfsStorageToTaskOutput = (
   nftMetadataGatewayUrl: ipfs.nftMetadata?.gatewayUrl,
 });
 
-function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
+function taskWithIpfsUrls(
+  gatewayUrl: string,
+  task: WithID<Task>
+): WithID<Task> {
   if (task?.type !== "export" || !task?.output?.export?.ipfs) {
     return task;
   }
@@ -55,8 +58,8 @@ function taskWithIpfsUrls(task: WithID<Task>): WithID<Task> {
     output: {
       export: {
         ipfs: ipfsStorageToTaskOutput({
-          ...withIpfsUrls(assetIpfs),
-          nftMetadata: withIpfsUrls(assetIpfs.nftMetadata),
+          ...withIpfsUrls(gatewayUrl, assetIpfs),
+          nftMetadata: withIpfsUrls(gatewayUrl, assetIpfs.nftMetadata),
         }),
       },
     },
@@ -98,6 +101,7 @@ app.get("/", authorizer({}), async (req, res) => {
     order = "updatedAt-true,createdAt-true";
   }
 
+  const { ipfsGatewayUrl } = req.config;
   if (req.user.admin && allUsers && allUsers !== "false") {
     const query = parseFilters(fieldsMap, filters);
     if (!all || all === "false") {
@@ -121,7 +125,7 @@ app.get("/", authorizer({}), async (req, res) => {
           res.set("X-Total-Count", c);
         }
         return {
-          ...withIpfsUrls(data),
+          ...withIpfsUrls(ipfsGatewayUrl, data),
           user: db.user.cleanWriteOnlyResponse(usersdata),
         };
       },
@@ -157,7 +161,7 @@ app.get("/", authorizer({}), async (req, res) => {
       if (count) {
         res.set("X-Total-Count", c);
       }
-      return withIpfsUrls(data);
+      return withIpfsUrls(ipfsGatewayUrl, data);
     },
   });
 
@@ -186,7 +190,7 @@ app.get("/:id", authorizer({}), async (req, res) => {
     });
   }
 
-  res.json(taskWithIpfsUrls(task));
+  res.json(taskWithIpfsUrls(req.config.ipfsGatewayUrl, task));
 });
 
 app.post(
@@ -207,9 +211,14 @@ app.post(
 app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   // update status of a specific task
   const { id } = req.params;
-  const task = await db.task.get(id);
+  const task = await db.task.get(id, { useReplica: false });
   if (!task) {
     return res.status(404).json({ errors: ["not found"] });
+  } else if (
+    task.status?.phase !== "waiting" &&
+    task.status?.phase !== "running"
+  ) {
+    return res.status(400).json({ errors: ["task is not running"] });
   }
 
   const doc = req.body.status;
@@ -227,15 +236,23 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     progress: doc.progress,
     step: doc.step,
   };
-  await req.taskScheduler.updateTask(task, { status });
+  await req.taskScheduler.updateTask(
+    task,
+    { status },
+    { allowedPhases: ["waiting", "running"] }
+  );
   if (task.outputAssetId) {
-    await req.taskScheduler.updateAsset(task.outputAssetId, {
-      status: {
-        phase: "processing",
-        updatedAt: Date.now(),
-        progress: doc.progress,
+    await req.taskScheduler.updateAsset(
+      task.outputAssetId,
+      {
+        status: {
+          phase: "processing",
+          updatedAt: Date.now(),
+          progress: doc.progress,
+        },
       },
-    });
+      { allowedPhases: ["waiting", "processing"] }
+    );
   }
   if (task.inputAssetId) {
     const asset = await db.asset.get(task.inputAssetId);

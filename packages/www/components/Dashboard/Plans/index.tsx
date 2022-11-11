@@ -304,7 +304,8 @@ const Plans = ({ dashboard = false, stripeProductId }: PlanProps) => {
               <Box css={{ mb: "$4", fontSize: "$2" }}>Custom pricing</Box>
               <Link
                 href="/contact?utm_source=livepeer.studio&utm_medium=internal_page&utm_campaign=business_plan"
-                passHref>
+                passHref
+                legacyBehavior>
                 <Button
                   as="a"
                   size="3"

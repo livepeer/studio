@@ -13,17 +13,17 @@ import { print } from "graphql/language/printer";
 import { useRouter } from "next/router";
 import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
-import BlogPostCard from "@components/Site/BlogPostCard";
+import BlogPostCard from "components/Site/BlogPostCard";
 import client from "lib/client";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "@components/Site/BlogVideoPlayer";
+import Player from "components/Site/BlogVideoPlayer";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import BlogCTA from "@components/Site/BlogCTA";
+import BlogCTA from "components/Site/BlogCTA";
 
 const serializers = {
   types: {
@@ -128,7 +128,8 @@ const Post = ({
                       ? "/blog"
                       : `/blog/category/${category.slug.current}`
                   }
-                  passHref>
+                  passHref
+                  legacyBehavior>
                   <A
                     css={{
                       color: "$hiContrast",
@@ -168,11 +169,9 @@ const Post = ({
                   }}>
                   <Image
                     alt={author.image?.alt}
-                    layout="fill"
-                    objectFit="cover"
-                    width={mainImage.asset.metadata.dimensions.width}
-                    height={mainImage.asset.metadata.dimensions.width}
                     src={builder.image(author.image).url()}
+                    fill
+                    style={{ objectFit: "cover" }}
                   />
                 </Box>
                 <Box
@@ -291,7 +290,7 @@ export async function getStaticPaths() {
   const graphQLClient = new GraphQLClient(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default"
   );
-  const { allPost } = await graphQLClient.request(print(allPosts), {
+  const { allPost }: any = await graphQLClient.request(print(allPosts), {
     where: {},
   });
 

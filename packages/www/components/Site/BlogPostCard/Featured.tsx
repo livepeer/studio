@@ -13,7 +13,11 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
   const builder = imageUrlBuilder(client as any);
 
   return (
-    <Link href="/blog/[slug]" as={`/blog/${post.slug.current}`} passHref>
+    <Link
+      href="/blog/[slug]"
+      as={`/blog/${post.slug.current}`}
+      passHref
+      legacyBehavior>
       <A
         css={{
           width: "100%",
@@ -46,12 +50,10 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
               },
             }}>
             <Image
-              alt={post.mainImage?.alt}
-              layout="fill"
-              objectFit="cover"
-              width={post.mainImage.asset.metadata.dimensions.width}
-              height={post.mainImage.asset.metadata.dimensions.height}
               src={builder.image(post.mainImage).url()}
+              alt={post.mainImage?.alt}
+              fill
+              style={{ objectFit: "cover" }}
             />
           </Box>
         )}
@@ -88,10 +90,10 @@ export const FeaturedBlogPostCard = ({ post }: { post: any }) => {
                   mr: "$2",
                 }}>
                 <Image
-                  alt={post.author.image?.alt}
-                  layout="fill"
-                  objectFit="cover"
                   src={builder.image(post.author.image).url()}
+                  alt={post.author.image?.alt}
+                  fill
+                  style={{ objectFit: "cover" }}
                 />
               </Box>
               <Box

@@ -1,19 +1,17 @@
 import { useCallback, useMemo } from "react";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { useApi } from "hooks";
 import Table, { useTableState, Fetcher } from "components/Dashboard/Table";
-import { FilterItem } from "components/Dashboard/Table/filters";
-import { Flex, Heading, Box, useSnackbar } from "@livepeer/design-system";
+import { useSnackbar } from "@livepeer/design-system";
 import { useToggleState } from "hooks/use-toggle-state";
 import CreateAssetDialog from "./CreateAssetDialog";
-import EmptyState from "./EmptyState";
-import { AssetsTableData, makeColumns, rowsPageFromState } from "./helpers";
-
-const filterItems: FilterItem[] = [
-  { label: "Name", id: "name", type: "text" },
-  { label: "Created", id: "createdAt", type: "date" },
-  { label: "Updated", id: "updatedAt", type: "date" },
-];
+import {
+  AssetsTableData,
+  filterItems,
+  makeColumns,
+  makeEmptyState,
+  rowsPageFromState,
+} from "./helpers";
+import { makeCreateAction } from "../Table/helpers";
 
 const AssetsTable = ({
   userId,
@@ -46,6 +44,16 @@ const AssetsTable = ({
 
   const onUploadAssetSuccess = () => state.invalidate();
 
+  const onCreate = async ({ videoFiles }: { videoFiles: File[] }) => {
+    try {
+      await uploadAssets(videoFiles, onUploadAssetSuccess);
+      await state.invalidate();
+      createDialogState.onOff();
+    } catch (e) {
+      openSnackbar(`Error with uploading videos, please try again.`);
+    }
+  };
+
   const fetcher: Fetcher<AssetsTableData> = useCallback(
     async (state) =>
       rowsPageFromState(state, userId, getAssets, getTasks, onDeleteAsset),
@@ -55,50 +63,23 @@ const AssetsTable = ({
   return (
     <>
       <Table
+        title={title}
         columns={columns}
         fetcher={fetcher}
         fetcherOptions={{ refetchInterval: 15000 }}
         state={state}
         stateSetter={stateSetter}
         filterItems={!viewAll && filterItems}
-        emptyState={<EmptyState createDialogState={createDialogState} />}
         viewAll={viewAll}
-        header={
-          <Heading size="2">
-            <Flex>
-              <Box css={{ mr: "$3", fontWeight: 600, letterSpacing: 0 }}>
-                {title}
-              </Box>
-            </Flex>
-          </Heading>
-        }
         initialSortBy={[{ id: "createdAt", desc: true }]}
-        createAction={{
-          onClick: createDialogState.onOn,
-          css: { display: "flex", alignItems: "center", ml: "$1" },
-          children: (
-            <>
-              <PlusIcon />{" "}
-              <Box as="span" css={{ ml: "$2" }}>
-                Upload asset
-              </Box>
-            </>
-          ),
-        }}
+        emptyState={makeEmptyState(createDialogState)}
+        createAction={makeCreateAction("Upload asset", createDialogState.onOn)}
       />
 
       <CreateAssetDialog
         isOpen={createDialogState.on}
         onOpenChange={createDialogState.onToggle}
-        onCreate={async ({ videoFiles }: { videoFiles: File[] }) => {
-          try {
-            await uploadAssets(videoFiles, onUploadAssetSuccess);
-            await state.invalidate();
-            createDialogState.onOff();
-          } catch (e) {
-            openSnackbar(`Error with uploading videos, please try again.`);
-          }
-        }}
+        onCreate={onCreate}
       />
     </>
   );

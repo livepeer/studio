@@ -2,7 +2,7 @@ import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import client from "lib/client";
 import imageUrlBuilder from "@sanity/image-url";
-import DefaultError from "@components/Site/DefaultError";
+import DefaultError from "components/Site/DefaultError";
 import { GraphQLClient, request } from "graphql-request";
 import { print } from "graphql/language/printer";
 import allPages from "../queries/allPages.gql";
@@ -20,6 +20,7 @@ const Page = ({
   content,
   noindex = false,
   preview,
+  alternateNavigation,
 }) => {
   const router = useRouter();
   const builder = imageUrlBuilder(client as any);
@@ -54,7 +55,8 @@ const Page = ({
         alt: openGraphImage?.asset?.altText,
       }}
       url={metaUrl}
-      preview={preview}>
+      preview={preview}
+      navBackgroundColor={alternateNavigation ? "$hiContrast" : ""}>
       {content.map((component, i) => (
         <Fade key={i}>{getComponent(component)}</Fade>
       ))}
@@ -63,6 +65,7 @@ const Page = ({
 };
 
 export async function getStaticPaths() {
+  // @ts-ignore
   const { allPage } = await request(
     "https://dp4k3mpw.api.sanity.io/v1/graphql/production/default",
     print(allPages),

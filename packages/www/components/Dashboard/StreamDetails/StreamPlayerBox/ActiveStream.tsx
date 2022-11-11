@@ -1,4 +1,4 @@
-import AppPlayer from "@components/Site/AppPlayer";
+import AppPlayer from "components/Site/AppPlayer";
 import { Badge, Box, Status } from "@livepeer/design-system";
 
 const ActiveStream = ({ playbackUrl }: { playbackUrl: string }) => (

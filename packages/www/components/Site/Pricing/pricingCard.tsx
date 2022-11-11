@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { Box, Flex, Text, Link as A } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import { justifyContent } from "styled-system";
 
 export type PricingCard = {
@@ -102,7 +102,7 @@ const PricingCard = ({
           }}>
           {pricingDescription}
         </Text>
-        <Link href={btn.href} passHref>
+        <Link href={btn.href} passHref legacyBehavior>
           <Button
             as="a"
             arrow

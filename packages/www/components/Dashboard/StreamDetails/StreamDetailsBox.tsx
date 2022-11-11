@@ -1,5 +1,5 @@
 import { Box, Heading, Flex, Button, Tooltip } from "@livepeer/design-system";
-import ClipButton from "../ClipButton";
+import ClipButton from "../Clipping/ClipButton";
 import RelativeTime from "../RelativeTime";
 import ShowURL from "../ShowURL";
 import Record from "./Record";

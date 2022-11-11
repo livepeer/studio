@@ -7,7 +7,7 @@ import {
   Heading,
   Link as A,
 } from "@livepeer/design-system";
-import Guides from "@components/Site/Guides";
+import Guides from "components/Site/Guides";
 import Link from "next/link";
 
 const CaseStudy = ({
@@ -146,7 +146,10 @@ const CaseStudy = ({
                     {solution}
                   </Text>
                   {internalLink && (
-                    <Link href={`/blog/${internalLink.slug.current}`} passHref>
+                    <Link
+                      href={`/blog/${internalLink.slug.current}`}
+                      passHref
+                      legacyBehavior>
                       <A css={{ fontSize: "$3" }} variant="primary">
                         Read the full story
                       </A>

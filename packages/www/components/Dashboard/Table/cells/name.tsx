@@ -6,7 +6,7 @@ import ReactTooltip from "react-tooltip";
 export type NameCellProps = {
   id?: string;
   href?: string;
-  assetName: string;
+  name: string;
   isStatusFailed: boolean;
   errorMessage?: string;
 };
@@ -14,12 +14,12 @@ export type NameCellProps = {
 const NameCell = <D extends TableData>({
   cell,
 }: CellComponentProps<D, NameCellProps>) => {
-  const { id, assetName, isStatusFailed, errorMessage } = cell.value;
+  const { id, name, isStatusFailed, errorMessage } = cell.value;
 
   const displayAssetName =
-    assetName.length > 24
-      ? assetName.replace(assetName.slice(18, assetName.length - 6), "...")
-      : assetName;
+    name.length > 24
+      ? name.replace(name.slice(18, name.length - 6), "...")
+      : name;
 
   if (isStatusFailed) {
     const tooltipId = "tooltip-error-" + id;

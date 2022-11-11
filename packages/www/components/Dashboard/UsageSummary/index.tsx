@@ -180,7 +180,7 @@ const UsageSummary = () => {
               ).toFixed(2)}`}
           </Box>
         </Text>
-        <Link href="/dashboard/billing" passHref>
+        <Link href="/dashboard/billing" passHref legacyBehavior>
           <A variant="primary" css={{ display: "flex", alignItems: "center" }}>
             View billing <ArrowRightIcon />
           </A>

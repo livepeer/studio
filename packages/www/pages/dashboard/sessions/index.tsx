@@ -1,7 +1,7 @@
 import Layout from "layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
-import AllSessionsTable from "components/Dashboard/AllSessionsTable";
+import StreamSessionsTable from "components/Dashboard/StreamSessionsTable";
 
 const Sessions = () => {
   useLoggedIn();
@@ -22,7 +22,7 @@ const Sessions = () => {
             p: "$6",
           },
         }}>
-        <AllSessionsTable />
+        <StreamSessionsTable />
       </Box>
     </Layout>
   );

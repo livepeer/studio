@@ -35,6 +35,7 @@ import {
   ExportTaskParams,
   IpfsFileInfo,
   NewAssetPayload,
+  ObjectStore,
   Task,
 } from "../schema/types";
 import { WithID } from "../store/types";
@@ -45,40 +46,27 @@ import os from "os";
 
 const app = Router();
 
-const META_MAX_SIZE = 1024;
-
 function shouldUseCatalyst({ query, user, config }: Request) {
   const { upload } = toStringValues(query);
-  if (user.admin && upload === "1") {
+  if (
+    config.frontendDomain?.endsWith(".monster") &&
+    user.email?.endsWith("@livepeer.org")
+  ) {
     return true;
+  } else if (user.admin) {
+    return upload === "1";
   }
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
 }
 
-function validateAssetMeta(
-  meta: Record<string, string>,
-  asset?: WithID<Asset>
-) {
-  if (!meta) {
-    return meta;
+function defaultObjectStoreId(
+  { config }: Request,
+  useCatalyst: boolean
+): string {
+  if (!useCatalyst) {
+    return config.vodObjectStoreId;
   }
-  meta = _({ ...asset?.meta, ...meta })
-    .omitBy(_.isNull)
-    .value();
-  try {
-    if (meta && JSON.stringify(meta).length > META_MAX_SIZE) {
-      console.error(`provided meta exceeds max size of ${META_MAX_SIZE}`);
-      throw new UnprocessableEntityError(
-        `the provided meta exceeds max size of ${META_MAX_SIZE} characters`
-      );
-    }
-  } catch (e) {
-    console.error(`couldn't parse the provided meta ${meta}`);
-    throw new UnprocessableEntityError(
-      `the provided meta is not in a valid json format`
-    );
-  }
-  return meta;
+  return config.vodCatalystObjectStoreId || config.vodObjectStoreId;
 }
 
 function cleanAssetTracks(asset: WithID<Asset>) {
@@ -103,16 +91,10 @@ async function validateAssetPayload(
   source?: Asset["source"]
 ): Promise<WithID<Asset>> {
   if (payload.objectStoreId) {
-    if (payload.objectStoreId !== defaultObjectStoreId) {
-      // TODO: Allow assets Object Store to be changed at some point.
-      throw new UnprocessableEntityError(
-        `Object store is not customizable right now`
-      );
-    }
-    const os = await db.objectStore.get(payload.objectStoreId);
-    if (!os || os.deleted || os.userId !== userId || os.disabled) {
+    const os = await getActiveObjectStore(payload.objectStoreId);
+    if (os.userId !== userId) {
       throw new ForbiddenError(
-        `object store ${payload.objectStoreId} not found or disabled`
+        `the provided object store is not owned by user`
       );
     }
   }
@@ -133,60 +115,107 @@ async function validateAssetPayload(
         ? { type: "url", url: payload.url }
         : { type: "directUpload" }),
     playbackPolicy: payload.playbackPolicy,
-    meta: validateAssetMeta(payload.meta),
     objectStoreId: payload.objectStoreId || defaultObjectStoreId,
   };
 }
 
-export function getPlaybackUrl(ingest: string, asset: WithID<Asset>): string {
-  if (!asset.playbackRecordingId) {
-    return undefined;
+async function getActiveObjectStore(id: string) {
+  const os = await db.objectStore.get(id);
+  if (!os || os.deleted || os.disabled) {
+    throw new Error("Object store not found or disabled");
   }
-  return pathJoin(
-    ingest,
-    "recordings",
-    asset.playbackRecordingId,
-    "index.m3u8"
+  return os;
+}
+
+export function getPlaybackUrl(
+  { vodCatalystObjectStoreId }: Request["config"],
+  ingest: string,
+  asset: WithID<Asset>,
+  os: ObjectStore
+): string {
+  if (asset.playbackRecordingId) {
+    return pathJoin(
+      ingest,
+      "recordings",
+      asset.playbackRecordingId,
+      "index.m3u8"
+    );
+  }
+  const catalystManifest = asset.files?.find(
+    (f) => f.type === "catalyst_hls_manifest"
   );
+  if (catalystManifest) {
+    if (os.id !== vodCatalystObjectStoreId) {
+      return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
+    }
+    return pathJoin(
+      "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
+      "hls",
+      `asset+${asset.playbackId}`,
+      "index.m3u8"
+    );
+  }
+  return undefined;
 }
 
-function getDownloadUrl(ingest: string, asset: WithID<Asset>): string {
-  return pathJoin(ingest, "asset", asset.playbackId, "video");
+function getDownloadUrl(
+  { vodObjectStoreId }: Request["config"],
+  ingest: string,
+  asset: WithID<Asset>,
+  os: ObjectStore
+): string {
+  const base =
+    os.id !== vodObjectStoreId ? os.publicUrl : pathJoin(ingest, "asset");
+  const source = asset.files?.find((f) => f.type === "source_file");
+  if (source) {
+    return pathJoin(base, asset.playbackId, source.path);
+  }
+  return pathJoin(base, asset.playbackId, "video");
 }
 
-function withPlaybackUrls(ingest: string, asset: WithID<Asset>): WithID<Asset> {
+async function withPlaybackUrls(
+  { config }: Request,
+  ingest: string,
+  asset: WithID<Asset>,
+  os?: ObjectStore
+): Promise<WithID<Asset>> {
   if (asset.status.phase !== "ready") {
     return asset;
   }
+  os = os || (await getActiveObjectStore(asset.objectStoreId));
   return {
     ...asset,
-    playbackUrl: getPlaybackUrl(ingest, asset),
-    downloadUrl: getDownloadUrl(ingest, asset),
+    playbackUrl: getPlaybackUrl(config, ingest, asset, os),
+    downloadUrl: getDownloadUrl(config, ingest, asset, os),
   };
 }
 
-const ipfsGateway = "https://ipfs.livepeer.studio/ipfs/";
-
-export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(ipfs: T): T {
+export function withIpfsUrls<T extends Partial<IpfsFileInfo>>(
+  gatewayUrl: string,
+  ipfs: T
+): T {
   if (!ipfs?.cid) {
     return ipfs;
   }
   return {
     ...ipfs,
     url: `ipfs://${ipfs.cid}`,
-    gatewayUrl: pathJoin(ipfsGateway, ipfs.cid),
+    gatewayUrl: pathJoin(gatewayUrl, ipfs.cid),
   };
 }
 
-function assetWithIpfsUrls(asset: WithID<Asset>): WithID<Asset> {
+function assetWithIpfsUrls(
+  gatewayUrl: string,
+  asset: WithID<Asset>
+): WithID<Asset> {
   if (!asset?.storage?.ipfs?.cid) {
     return asset;
   }
   return _.merge({}, asset, {
     storage: {
       ipfs: {
-        ...withIpfsUrls(asset.storage.ipfs),
-        nftMetadata: withIpfsUrls(asset.storage.ipfs.nftMetadata),
+        ...withIpfsUrls(gatewayUrl, asset.storage.ipfs),
+        nftMetadata: withIpfsUrls(gatewayUrl, asset.storage.ipfs.nftMetadata),
       },
     },
   });
@@ -258,14 +287,18 @@ async function genUploadUrl(
   aud: string
 ) {
   const uploadedObjectKey = `directUpload/${playbackId}`;
-  const presignedUrl = await getS3PresignedUrl(
-    objectStoreId,
-    uploadedObjectKey
-  );
+  const os = await getActiveObjectStore(objectStoreId);
+
+  const presignedUrl = await getS3PresignedUrl(os, uploadedObjectKey);
   const uploadToken = jwt.sign({ playbackId, presignedUrl, aud }, jwtSecret, {
     algorithm: "HS256",
   });
-  return { uploadedObjectKey, uploadToken };
+
+  const osPublicUrl = new URL(os.publicUrl);
+  osPublicUrl.pathname = pathJoin(osPublicUrl.pathname, uploadedObjectKey);
+  const downloadUrl = osPublicUrl.toString();
+
+  return { uploadedObjectKey, uploadToken, downloadUrl };
 }
 
 function parseUploadUrl(
@@ -292,15 +325,16 @@ app.use(
     data: WithID<Asset>[] | WithID<Asset> | { asset: WithID<Asset> },
     req
   ) {
+    const { ipfsGatewayUrl } = req.config;
     const ingests = await req.getIngest();
     if (!ingests.length) {
       throw new InternalServerError("Ingest not configured");
     }
     const { details } = toStringValues(req.query);
     const ingest = ingests[0].base;
-    let toExternalAsset = (a: WithID<Asset>) => {
-      a = withPlaybackUrls(ingest, a);
-      a = assetWithIpfsUrls(a);
+    let toExternalAsset = async (a: WithID<Asset>) => {
+      a = await withPlaybackUrls(req, ingest, a);
+      a = assetWithIpfsUrls(ipfsGatewayUrl, a);
       if (req.user.admin) {
         return a;
       }
@@ -312,7 +346,7 @@ app.use(
     };
 
     if (Array.isArray(data)) {
-      return data.map(toExternalAsset);
+      return Promise.all(data.map(toExternalAsset));
     }
     if ("id" in data) {
       return toExternalAsset(data);
@@ -320,7 +354,7 @@ app.use(
     if ("asset" in data) {
       return {
         ...data,
-        asset: toExternalAsset(data.asset),
+        asset: await toExternalAsset(data.asset),
       };
     }
     return data;
@@ -338,7 +372,6 @@ const fieldsMap: FieldsMap = {
   playbackRecordingId: `asset.data->>'playbackRecordingId'`,
   phase: `asset.data->'status'->>'phase'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
-  meta: `asset.data->>'meta'`,
   cid: `asset.data->'storage'->'ipfs'->>'cid'`,
   nftMetadataCid: `asset.data->'storage'->'ipfs'->'nftMetadata'->>'cid'`,
 };
@@ -479,12 +512,13 @@ app.post(
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
+  const useCatalyst = shouldUseCatalyst(req);
   let asset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
     Date.now(),
-    req.config.vodObjectStoreId,
+    defaultObjectStoreId(req, useCatalyst),
     req.body
   );
   if (!req.body.url) {
@@ -494,7 +528,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   }
 
   asset = await createAsset(asset, req.queue);
-  const taskType = shouldUseCatalyst(req) ? "upload" : "import";
+  const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
@@ -545,12 +579,6 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     throw new NotFoundError(`asset not found`);
   }
 
-  const os = await db.objectStore.get(inputAsset.objectStoreId);
-  if (!os || os.deleted || os.disabled) {
-    throw new UnprocessableEntityError(
-      "Asset object store not found or disabled"
-    );
-  }
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   let outputAsset = await validateAssetPayload(
@@ -558,7 +586,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
     playbackId,
     req.user.id,
     Date.now(),
-    req.config.vodObjectStoreId,
+    defaultObjectStoreId(req, false), // transcode only in old pipeline for now
     {
       name: req.body.name ?? inputAsset.name,
     },
@@ -602,18 +630,19 @@ app.post(
     const id = uuid();
     let playbackId = await generateUniquePlaybackId(id);
 
+    const useCatalyst = shouldUseCatalyst(req);
     const { vodObjectStoreId, jwtSecret, jwtAudience } = req.config;
     let asset = await validateAssetPayload(
       id,
       playbackId,
       req.user.id,
       Date.now(),
-      vodObjectStoreId,
+      defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
-    const { uploadedObjectKey, uploadToken } = await genUploadUrl(
+    const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
-      asset.objectStoreId,
+      vodObjectStoreId,
       jwtSecret,
       jwtAudience
     );
@@ -632,7 +661,7 @@ app.post(
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
-        [taskType]: { uploadedObjectKey },
+        [taskType]: { url: downloadUrl },
       },
       null,
       asset
@@ -649,7 +678,8 @@ export const setupTus = async (objectStoreId: string): Promise<void> => {
 };
 
 async function createTusServer(objectStoreId: string) {
-  const s3config = await getObjectStoreS3Config(objectStoreId);
+  const os = await getActiveObjectStore(objectStoreId);
+  const s3config = await getObjectStoreS3Config(os);
   const opts: tus.S3StoreOptions & S3ClientConfig = {
     ...s3config,
     path: "/upload/tus",
@@ -750,7 +780,7 @@ app.post("/upload/tus", async (req, res) => {
   const { jwtSecret, jwtAudience } = req.config;
   const { playbackId } = parseUploadUrl(uploadToken, jwtSecret, jwtAudience);
   await getPendingAssetAndTask(playbackId);
-  // TODO: Consider updating asset name and meta from metadata?
+  // TODO: Consider updating asset name from metadata?
   res.setHeader("livepeer-playback-id", playbackId);
   return tusServer.handle(req, res);
 });
@@ -812,7 +842,6 @@ app.patch(
     // these are the only updateable fields
     let {
       name,
-      meta,
       playbackPolicy,
       storage: storageInput,
     } = req.body as AssetPatchPayload;
@@ -837,15 +866,12 @@ app.patch(
       throw new UnprocessableEntityError(`asset is not ready`);
     }
 
-    meta = validateAssetMeta(meta, asset);
-
     if (storage) {
       storage = await reconcileAssetStorage(req, asset, storage);
     }
 
     await req.taskScheduler.updateAsset(asset, {
       name,
-      meta,
       storage,
       playbackPolicy,
     });

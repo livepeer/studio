@@ -1,5 +1,5 @@
 import { Container, Box, Flex, Link as A } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import Link from "next/link";
 
 const HomeHero = ({ content }) => {
@@ -128,7 +128,10 @@ const HomeHero = ({ content }) => {
                 }}>
                 {content.secondaryCallToAction.title}
               </Button>
-              <Link href={content.primaryCallToAction.href} passHref>
+              <Link
+                href={content.primaryCallToAction.href}
+                passHref
+                legacyBehavior>
                 <Button
                   as={A}
                   target={

@@ -1,10 +1,10 @@
 import { Container, Box, Link as A, Heading } from "@livepeer/design-system";
-import Card from "@components/Site/Card";
+import Card from "components/Site/Card";
 import { useState, useContext, ContextType, WheelEvent, useMemo } from "react";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import useDrag from "hooks/use-drag";
 import { useRouter } from "next/router";
-import BulletedTitle from "@components/Site/BulletedTitle";
+import BulletedTitle from "components/Site/BulletedTitle";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 
 type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;

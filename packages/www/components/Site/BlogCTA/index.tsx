@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Flex } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import Link from "next/link";
 
 const BlogCTA = ({
@@ -33,7 +33,7 @@ const BlogCTA = ({
         },
       }}>
       {document && (
-        <Link href={`/${document?.slug?.current}`} passHref>
+        <Link href={`/${document?.slug?.current}`} passHref legacyBehavior>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
             {title}
           </Button>
@@ -53,7 +53,7 @@ const BlogCTA = ({
       )}
 
       {anchorLink && (
-        <Link href={anchorLink} passHref>
+        <Link href={anchorLink} passHref legacyBehavior>
           <Button as="a" arrow css={{ mr: "$4" }} variant={variant}>
             {title}
           </Button>

@@ -1,6 +1,6 @@
 import { Container, Box, Flex, Text, Heading } from "@livepeer/design-system";
-import Guides from "@components/Site/Guides";
-import Button from "@components/Site/Button";
+import Guides from "components/Site/Guides";
+import Button from "components/Site/Button";
 import Link from "next/link";
 import * as Hi from "react-icons/hi";
 import * as Fa from "react-icons/fa";
@@ -76,7 +76,7 @@ const Why = ({ backgroundColor = "$loContrast", title, heading, reasons }) => {
                 {heading}
               </Heading>
             </Flex>
-            <Link href="/register" passHref>
+            <Link href="/register" passHref legacyBehavior>
               <Button arrow as="a" size="4">
                 Sign up for free
               </Button>

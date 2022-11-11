@@ -9,7 +9,6 @@ import {
   TextField,
   useSnackbar,
 } from "@livepeer/design-system";
-import { Asset } from "livepeer";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const embedStringForAsset = (playbackId: string) =>
@@ -43,7 +42,6 @@ const EmbedVideoDialog = ({
           px: "$5",
           pt: "$4",
           pb: "$4",
-          zIndex: 5,
         }}>
         <DialogTitle asChild>
           <Heading size="1">Embed Video</Heading>

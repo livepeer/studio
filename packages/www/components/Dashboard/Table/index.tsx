@@ -36,6 +36,7 @@ import TableFilter, {
 import Link from "next/link";
 import Spinner from "components/Dashboard/Spinner";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import TableHeader from "./components/TableHeader";
 
 type Sort<T extends Record<string, unknown>> = { id: keyof T; desc: boolean };
 
@@ -48,7 +49,7 @@ type StateSetter<T extends Record<string, unknown>> = {
   setSelectedRows: Dispatch<SetStateAction<Row<T>[]>>;
 };
 
-type State<T extends Record<string, unknown>> = {
+export type State<T extends Record<string, unknown>> = {
   tableId: string;
   order: string;
   cursor: string;
@@ -78,7 +79,8 @@ export type TableData<T extends Record<string, unknown>> = {
 
 type Props<T extends Record<string, unknown>> = {
   columns: any;
-  header: React.ReactNode;
+  header?: React.ReactNode;
+  title?: string;
   rowSelection?: "individual" | "all" | null;
   initialSortBy?: Sort<T>[];
   filterItems?: FilterItem[];
@@ -105,6 +107,7 @@ type DataTableProps<T extends Record<string, unknown>> = Omit<
 export const DataTableComponent = <T extends Record<string, unknown>>({
   columns,
   header,
+  title,
   rowSelection,
   initialSortBy,
   filterItems,
@@ -263,11 +266,15 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
   };
 
   const headerCssWidth = (column, index, rowSelection): string => {
-    if (column.width) {
-      return column.width;
-    }
-    return index === 0 && rowSelection === "all" ? "$6" : "auto";
+    const isSelectColumn = index === 0 && rowSelection === "all";
+    return isSelectColumn ? "$4" : column.width || "auto";
   };
+
+  const headerComponent = header ? (
+    header
+  ) : title ? (
+    <TableHeader title={title} />
+  ) : null;
 
   return (
     <Box>
@@ -280,7 +287,10 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
           borderColor: border ? "$neutral5" : "transparent",
           pb: border ? "$2" : 0,
         }}>
-        <Box>{header}</Box>
+        {/* Header title */}
+        <Box>{headerComponent}</Box>
+
+        {/* Header actions */}
         <Flex css={{ alignItems: "center" }}>
           {state.selectedRows.length ? (
             <Flex css={{ ai: "center" }}>
@@ -378,6 +388,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                           scope="col"
                           css={{
                             pl: i === 0 ? "$1" : 0,
+                            pr: "$2",
                             width: headerCssWidth(column, i, rowSelection),
                           }}
                           {...column.getHeaderProps(
@@ -427,16 +438,16 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                         <Td
                           as={i === 0 ? Th : Td}
                           css={{
-                            py: 0,
-                            width:
-                              i === 0 && rowSelection === "all"
-                                ? "30px"
-                                : "auto",
+                            pl: 0,
+                            pr: "$2",
                             ...cell.value?.css,
                           }}
                           {...cell.getCellProps()}>
                           {cell.value?.href ? (
-                            <Link href={cell.value.href} passHref>
+                            <Link
+                              href={cell.value.href}
+                              passHref
+                              legacyBehavior>
                               <A
                                 css={{
                                   textDecoration: "none",
@@ -469,7 +480,7 @@ export const DataTableComponent = <T extends Record<string, unknown>>({
                 <b>{data?.count}</b> results
               </Text>
               {viewAll ? (
-                <Link href={viewAll} passHref>
+                <Link href={viewAll} passHref legacyBehavior>
                   <A variant="primary" css={{ display: "flex", ai: "center" }}>
                     <Box>View all</Box> <ArrowRightIcon />
                   </A>

@@ -38,15 +38,24 @@ const TeamMember = ({
       {...props}>
       <Box>
         <Box
-          as={Image}
           css={{
+            position: "relative",
+            width: 130,
+            height: 130,
+            mx: "auto",
             borderRadius: 1000,
-            objectFit: "cover",
-          }}
-          width={130}
-          height={130}
-          src={builder.image(image).url()}
-        />
+            overflow: "hidden",
+            img: {
+              objectPosition: "center",
+            },
+          }}>
+          <Image
+            src={builder.image(image).url()}
+            alt={`Photo of ${fullname}`}
+            fill
+            style={{ objectFit: "cover" }}
+          />
+        </Box>
         <Box css={{ mb: "$4" }}>
           <Heading
             as="h3"

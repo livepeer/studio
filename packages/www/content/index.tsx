@@ -4,147 +4,163 @@
  * @TODO: We will manage these contents from within the CMS in the future
  */
 
+const makeCompleteTitle = (title) => `${title} - Livepeer Studio`;
+const defaultDescription =
+  "Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.";
+const makeCompleteUrl = (suffix = "") => `https://livepeer.studio/${suffix}`;
+
+// Main website
+
 export const Home = {
   metaData: {
     title: "Livepeer Studio",
-    description:
-      "Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.",
-    url: "https://livepeer.studio/",
+    description: defaultDescription,
+    url: makeCompleteUrl(),
   },
 };
 
 export const Login = {
   metaData: {
-    title: "Login - Livepeer Studio",
-    description: `Login to your account to manage streams, get an API key, view health metrics, or manage billing.`,
-    url: "https://livepeer.studio/login",
+    title: makeCompleteTitle("Login"),
+    description:
+      "Login to your account to manage streams, get an API key, view health metrics, or manage billing.",
+    url: makeCompleteUrl("login"),
   },
 };
 
 export const Pricing = {
   metaData: {
-    title: "Pricing - Livepeer Studio",
-    description: `Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.`,
-    url: "https://livepeer.studio/pricing",
+    title: makeCompleteTitle("Pricing"),
+    description:
+      "Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.",
+    url: makeCompleteUrl("pricing"),
   },
 };
 
 export const Register = {
   metaData: {
-    title: "Register - Livepeer Studio",
-    description: `Start for free with 1,000 streaming minutes a month. Build with affordable, reliable, decentralized video infrastructure.`,
-    url: "https://livepeer.studio/register",
+    title: makeCompleteTitle("Register"),
+    description:
+      "Start for free with 1,000 streaming minutes a month. Build with affordable, reliable, decentralized video infrastructure.",
+    url: makeCompleteUrl("register"),
   },
 };
 
 export const ResetPassword = {
   metaData: {
-    title: "Reset Password - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/reset-password",
+    title: makeCompleteTitle("Reset Password"),
+    description: defaultDescription,
+    url: makeCompleteUrl("reset-password"),
   },
 };
 
 export const ForgotPassword = {
   metaData: {
-    title: "Forgot Password - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/forgot-password",
+    title: makeCompleteTitle("Forgot Password"),
+    description: defaultDescription,
+    url: makeCompleteUrl("forgot-password"),
   },
 };
 
 export const Team = {
   metaData: {
-    title: "Team - Livepeer Studio",
-    description: `Learn about the team behind Livepeer. We're building the world's open video infrastructure and software.`,
-    url: "https://livepeer.studio/team",
-  },
-};
-
-export const MintNFT = {
-  metaData: {
-    title: "Mint NFT - Livepeer Studio",
-    description: `Mint NFTs on Ethereum-compatible networks`,
-    url: "https://livepeer.studio/mint-nft",
+    title: makeCompleteTitle("Team"),
+    description:
+      "Learn about the team behind Livepeer. We're building the world's open video infrastructure and software.",
+    url: makeCompleteUrl("team"),
   },
 };
 
 export const Contact = {
   metaData: {
-    title: "Contact - Livepeer Studio",
-    description: `Get in touch. We're eager to help you take advantage of our accessible, decentralized video infrastructure and software.`,
-    url: `https://livepeer.studio/contact`,
+    title: makeCompleteTitle("Contact"),
+    description:
+      "Get in touch. We're eager to help you take advantage of our accessible, decentralized video infrastructure and software.",
+    url: makeCompleteUrl("contact"),
   },
 };
 
 export const Blog = {
   metaData: {
-    title: "Blog - Livepeer Studio",
-    description: `Discover the latest in video streaming technology. Learn what we're building next and about our vision for Livepeer Studio.`,
-    url: "https://livepeer.studio/blog",
-  },
-};
-
-export const Dashboard = {
-  metaData: {
-    title: "Dashboard - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardBilling = {
-  metaData: {
-    title: "Billing - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardPlans = {
-  metaData: {
-    title: "Plans - Livepeer Studio",
-    description: `Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardAPIkeys = {
-  metaData: {
-    title: "API Keys - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardStream = {
-  metaData: {
-    title: "Stream - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardStreamHealth = {
-  metaData: {
-    title: "Stream Health - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
-  },
-};
-
-export const DashboardAssets = {
-  metaData: {
-    title: "Assets - Livepeer Studio",
-    description: `Developer tools for building web3 video experiences powered by the Livepeer network - the world's open video infrastructure.`,
-    url: "https://livepeer.studio/",
+    title: makeCompleteTitle("Blog"),
+    description:
+      "Discover the latest in video streaming technology. Learn what we're building next and about our vision for Livepeer Studio.",
+    url: makeCompleteUrl("blog"),
   },
 };
 
 export const Jobs = {
   metaData: {
-    title: "Jobs - Livepeer Studio",
-    description: `Join the team building Livepeer. We're fully remote and on a mission to make open video infrastructure and software accessible to everyone.`,
-    url: "https://livepeer.studio/jobs",
+    title: makeCompleteTitle("Jobs"),
+    description:
+      "Join the team building Livepeer. We're fully remote and on a mission to make open video infrastructure and software accessible to everyone.",
+    url: makeCompleteUrl("jobs"),
+  },
+};
+
+// Dashboard related
+
+export const Dashboard = {
+  metaData: {
+    title: makeCompleteTitle("Dashboard"),
+    description: defaultDescription,
+    url: makeCompleteUrl("dashboard"),
+  },
+};
+
+export const DashboardStreams = {
+  metaData: {
+    title: makeCompleteTitle("Streams"),
+    description: defaultDescription,
+    url: makeCompleteUrl("streams"),
+  },
+};
+
+export const DashboardStreamHealth = {
+  metaData: {
+    title: makeCompleteTitle("Stream Health"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardAssets = {
+  metaData: {
+    title: makeCompleteTitle("Assets"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardAPIKeys = {
+  metaData: {
+    title: makeCompleteTitle("API Keys"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardSigningKeys = {
+  metaData: {
+    title: makeCompleteTitle("Signing Keys"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardBilling = {
+  metaData: {
+    title: makeCompleteTitle("Billing"),
+    description: defaultDescription,
+    url: makeCompleteUrl(),
+  },
+};
+
+export const DashboardPlans = {
+  metaData: {
+    title: makeCompleteTitle("Plans"),
+    description:
+      "Start for free, then pay as you grow. Enjoy flexible pricing for projects of all sizes.",
+    url: makeCompleteUrl(),
   },
 };

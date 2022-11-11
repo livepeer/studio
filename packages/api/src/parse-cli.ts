@@ -115,6 +115,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         type: "string",
         default: "https://{{ip}}:8935",
       },
+      "ipfs-gateway-url": {
+        describe:
+          "base URL to use for the IPFS content gateway returned on assets.",
+        type: "string",
+        default: "https://ipfs.livepeer.studio/ipfs/",
+      },
       "return-region-in-orchestrator": {
         describe: "return /api/region result also in /api/orchestrator",
         type: "boolean",
@@ -217,7 +223,11 @@ export default function parseCli(argv?: string | readonly string[]) {
         coerce: coerceArr,
       },
       vodObjectStoreId: {
-        describe: "s3 object store id for vod",
+        describe: "object store ID to use for VOD",
+        type: "string",
+      },
+      vodCatalystObjectStoreId: {
+        describe: "object store ID to use for Catalyst VOD",
         type: "string",
       },
       vodCatalystPipelineRolloutPercent: {

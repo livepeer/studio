@@ -3,7 +3,7 @@ import { useApi, useLoggedIn } from "hooks";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
-import Webhook from "@components/Dashboard/Webhook";
+import WebhookDetails from "components/Dashboard/WebhookDetails";
 
 const WebhookDetail = () => {
   useLoggedIn();
@@ -32,7 +32,7 @@ const WebhookDetail = () => {
         { title: "Webhooks", href: "/dashboard/developers/webhooks" },
         { title: data?.name },
       ]}>
-      <Webhook id={id} data={data} />
+      <WebhookDetails id={id} data={data} />
     </Layout>
   );
 };
