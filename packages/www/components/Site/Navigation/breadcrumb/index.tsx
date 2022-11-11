@@ -1,4 +1,4 @@
-import Logo from "@components/Site/Logo";
+import Logo from "components/Site/Logo";
 import { useState } from "react";
 import { Box, Link as A } from "@livepeer/design-system";
 import BreadcrumbDropdown from "./dropdown";

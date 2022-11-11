@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useApi from "hooks/use-api";
-import { fileUploadProgressForAsset } from "@components/Dashboard/AssetsTable/helpers";
+import { fileUploadProgressForAsset } from "components/Dashboard/AssetsTable/helpers";
 import { Asset } from "livepeer";
 import Progress from "./Progress";
 

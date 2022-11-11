@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import Login from "@components/Site/Login";
+import Login from "components/Site/Login";
 import {
   Flex,
   Box,

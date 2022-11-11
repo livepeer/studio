@@ -9,18 +9,18 @@ import {
   DialogContent,
   DialogClose,
 } from "@livepeer/design-system";
-import Button from "@components/Site/Button";
-import Logo from "@components/Site/Logo";
+import Button from "components/Site/Button";
+import Logo from "components/Site/Logo";
 import { useApi } from "hooks";
 import { useRouter } from "next/router";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { useDocSearch } from "@components/Site/AlgoliaDocsSearch";
-import ThemeSwitch from "@components/Dashboard/ThemeSwitch";
+import { useDocSearch } from "components/Site/AlgoliaDocsSearch";
+import ThemeSwitch from "components/Dashboard/ThemeSwitch";
 import { ListBulletIcon, Cross1Icon } from "@radix-ui/react-icons";
 import {
   MobileTableOfContents,
   MenuProps,
-} from "@components/Site/Docs/TableOfContents";
+} from "components/Site/Docs/TableOfContents";
 import Link from "next/link";
 
 type DocsNavProps = {

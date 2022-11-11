@@ -1,5 +1,5 @@
 import Layout from "layouts/main";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import {
   Container,
   Heading,

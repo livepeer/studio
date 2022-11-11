@@ -4,7 +4,7 @@ import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
 import useDrag from "hooks/use-drag";
 import { useRouter } from "next/router";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import BulletedTitle from "@components/Site/BulletedTitle";
+import BulletedTitle from "components/Site/BulletedTitle";
 
 type scrollVisibilityApiType = ContextType<typeof VisibilityContext>;
 

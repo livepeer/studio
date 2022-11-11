@@ -7,7 +7,7 @@ import {
   Heading,
   Link as A,
 } from "@livepeer/design-system";
-import Guides from "@components/Site/Guides";
+import Guides from "components/Site/Guides";
 import Link from "next/link";
 
 const CaseStudy = ({

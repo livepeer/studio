@@ -2,7 +2,7 @@ import Fade from "react-reveal/Fade";
 import { TextField, Grid, Box, Text, TextArea } from "@livepeer/design-system";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
-import Button from "@components/Site/Button";
+import Button from "components/Site/Button";
 import { useDropzone } from "react-dropzone";
 
 const activeStyle = {
