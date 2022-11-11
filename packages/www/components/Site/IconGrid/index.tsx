@@ -51,17 +51,13 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
             return (
               <Box sx={{ display: "inline-block", padding: "32px" }}>
                 <Image
+                  alt="Livepeer"
                   src={urlFor(icon).url()}
                   width={100}
                   height={100}
                   placeholder="blur"
                   blurDataURL={urlFor(icon).width(24).height(24).blur(10).url()}
                 />
-                {/* <img
-                  src={icon.asset.url}
-                  alt={"Livepeer client"}
-                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                /> */}
               </Box>
             );
           })}

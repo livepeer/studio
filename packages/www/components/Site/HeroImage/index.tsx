@@ -64,6 +64,7 @@ export default function HeroImage({
             {portableTextRaw && <PortableText value={portableTextRaw} />}
           </Box>
           <Image
+            alt="Livepeer"
             src={urlFor(defaultImage).url()}
             width={100}
             height={100}
