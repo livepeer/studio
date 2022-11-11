@@ -17,6 +17,8 @@ query allPage($where: PageFilter) {
     }
     content {
       ...hero
+      # ...heroImage
+      ...offSetPortableText
       ...valuesSection
       ...investorsSection
       ...testimonialsSection

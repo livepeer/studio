@@ -22,6 +22,7 @@ import {
   studioProvider,
   ThemeConfig,
 } from "@livepeer/react";
+import "../css/hubspot.scss";
 
 const queryClient = new QueryClient();
 

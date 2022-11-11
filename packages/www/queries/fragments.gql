@@ -42,6 +42,19 @@ fragment hero on Hero {
   }
 }
 
+# fragment heroImage on HeroImage {
+#   _type
+#   title
+#   richText
+#   image {
+#     ...imageInfo
+#   }
+# }
+
+fragment offSetPortableText on OffSetPortableText {
+  _type
+}
+
 fragment valuesSection on ValuesSection {
   _type
   heading

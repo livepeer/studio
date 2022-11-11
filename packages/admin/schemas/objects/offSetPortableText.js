@@ -15,30 +15,12 @@ export default {
       title: "Description",
       type: "portableText",
     },
-    {
-      name: "button",
-      title: "Button",
-      type: "object",
-      fields: [
-        {
-          name: "outline",
-          title: "Outline",
-          type: "boolean",
-          description: "Solid button (left) Outline button (right)",
-          initialValue: false,
-        },
-        {
-          name: "buttonText",
-          title: "Button Text",
-          type: "string",
-        },
-        {
-          name: "url",
-          title: "Url",
-          type: "string",
-        },
-      ],
-    },
+    // {
+    //   name: "buttons",
+    //   title: "Buttons",
+    //   type: "array",
+    //   of: [{ type: "button" }],
+    // },
     {
       name: "socials",
       title: "Socials",

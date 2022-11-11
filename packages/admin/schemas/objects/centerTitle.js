@@ -11,8 +11,8 @@ export default {
       type: "string",
     },
     {
-      name: "description",
-      title: "Description",
+      name: "portableText",
+      title: "Portable Text",
       type: "portableText",
     },
   ],
