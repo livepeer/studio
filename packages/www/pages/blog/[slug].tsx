@@ -19,15 +19,12 @@ import Link from "next/link";
 import BlogPlayer from "components/Site/BlogPlayer";
 import React from "react";
 import readingTime from "reading-time";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import BlogCTA from "components/Site/BlogCTA";
 
 const serializers = {
   types: {
     code: (props) => (
-      <SyntaxHighlighter language={props.node.language || "text"}>
-        {props.node.code}
-      </SyntaxHighlighter>
+      <code lang={props.node.language || "text"}>{props.node.code}</code>
     ),
     cta: (props) => (
       <BlogCTA
