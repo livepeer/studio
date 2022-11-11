@@ -25913,15 +25913,6 @@ sanity-diff-patch@^1.0.9:
   dependencies:
     diff-match-patch "^1.0.5"
 
-sanity-mux-player@^0.0.27:
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/sanity-mux-player/-/sanity-mux-player-0.0.27.tgz#2d6013ff9da54079928f9b80242ef11b5be41871"
-  integrity sha512-a07k+d08PQsim8pks9H2T1fGrh9iCZU5ZL7ZDvrKfh0CIUDebAmkkBJWYTRoatf4P0ihzbM2ps7XF5S4Gr9prw==
-  dependencies:
-    hls.js "^0.11.0"
-    lodash "^4.17.20"
-    prop-types "^15.6.0"
-
 sanity-plugin-dashboard-widget-document-list@^0.0.13:
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/sanity-plugin-dashboard-widget-document-list/-/sanity-plugin-dashboard-widget-document-list-0.0.13.tgz#a2839d82d3ce3ee3d08735877cc13f3ad890de7a"
