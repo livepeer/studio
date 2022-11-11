@@ -71,14 +71,6 @@ export const Team = {
   },
 };
 
-export const MintNFT = {
-  metaData: {
-    title: makeCompleteTitle("Mint NFT"),
-    description: "Mint NFTs on Ethereum-compatible networks",
-    url: makeCompleteUrl("mint-nft"),
-  },
-};
-
 export const Contact = {
   metaData: {
     title: makeCompleteTitle("Contact"),
