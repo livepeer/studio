@@ -78,8 +78,6 @@ export default function HeroImage({
           <Image
             src="/img/temp/example-cloud.png"
             alt="REPLACE ME"
-            width={1920}
-            height={1080}
             layout="fill"
             objectFit="cover"
           />

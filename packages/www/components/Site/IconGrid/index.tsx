@@ -47,7 +47,8 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
             paddingY: "64px",
             paddingX: "32px",
           }}>
-          {icons.map((icon) => {
+          {/* Add fallback to avoid issues */}
+          {icons?.map((icon) => {
             return (
               <Box sx={{ display: "inline-block", padding: "32px" }}>
                 <Image
