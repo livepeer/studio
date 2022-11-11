@@ -5058,19 +5058,20 @@
   resolved "https://registry.yarnpkg.com/@livepeer/prettier-config/-/prettier-config-1.0.2.tgz#3eed73b00654f295b21d3777ea42493a57900174"
   integrity sha512-dSRm9mYu/5sRzm0iDXzR0ztTDe3CJl/432JHQjIPz9e3AnnTSxvEngquna7IdrRyftYRcggWeLfPNKV4ZuWsbQ==
 
-"@livepeer/react@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-1.2.1.tgz#69381060cf9b5365e73c3164b32527d2988c4474"
-  integrity sha512-CofpHHgT1Rb4/9sl9BTwy4y+bi66X5ah5QjtpnEgVVxAIiVCS/H4zwjO9O3J6cwD3i/UXzkMV5csoMGQpheCqw==
+"@livepeer/react@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@livepeer/react/-/react-1.5.0.tgz#4fbf3e13bf88e44d7676cc9c16b711760643e81b"
+  integrity sha512-vBUISCmUVF1rcExz91htg6jEOLFyEcD6iAtVCut+GWB1rFazn6sw+hwXmhG08iy9bXkGfnIu9aqSb6n7IMUwFg==
   dependencies:
     "@stitches/react" "^1.2.8"
-    "@tanstack/query-sync-storage-persister" "4.10.1"
-    "@tanstack/react-query" "4.10.1"
-    "@tanstack/react-query-persist-client" "4.10.1"
-    core-js "^3.25.5"
-    livepeer "^1.2.1"
+    "@tanstack/query-core" "^4.14.1"
+    "@tanstack/query-sync-storage-persister" "4.14.3"
+    "@tanstack/react-query" "4.14.3"
+    "@tanstack/react-query-persist-client" "4.14.3"
+    core-js "^3.26.0"
+    livepeer "^1.4.0"
     use-sync-external-store "^1.2.0"
-    zustand "^4.1.1"
+    zustand "^4.1.3"
 
 "@livepeer/sdk@1.0.0-alpha.7":
   version "1.0.0-alpha.7"
@@ -7828,51 +7829,56 @@
     prop-types "^15.7.2"
     react-use "^15.3.4"
 
-"@tanstack/query-core@4.10.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.10.1.tgz#a587e39c28a905168bdf8a3906e36715c30ec083"
-  integrity sha512-UZRYzjgQSfYhQ+cJX0CspAbzutf8p93gR1xFjQuH3OYcb/7t3WnHkdb/qC9mbqrfWXN/JAbBTJlTU/XQHc5HbA==
+"@tanstack/query-core@4.14.3":
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.14.3.tgz#9ab6763b61d5e491816483f3aeed771c1fbd657b"
+  integrity sha512-1OrxZk5jSKAjTIDgH/OHa6GfVpgGDVbCVf3KHQjXLFdutK4PSSXQIyX7I1HvBR3mYKyvFPo6yXKNG7QrkwUj9g==
 
 "@tanstack/query-core@4.2.3":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.2.3.tgz#52d75430c9662cc85c160761c1421de483c7791f"
   integrity sha512-zdt5lYWs1dZaA3IxJbCgtAfHZJScRZONpiLL7YkeOkrme5MfjQqTpjq7LYbzpyuwPOh2Jx68le0PLl57JFv5hQ==
 
-"@tanstack/query-persist-client-core@4.10.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.10.1.tgz#20845471e70806aaf3dd176b0d0ba314727ec9ec"
-  integrity sha512-WVU3Iz396SS1Kc/DJxLrtNMxobV/5u5ej96zXZFZ6y25Z4S0NXvqvXx/DC/hfPXkOkq7l6O6AQ9O4zmvRdEsfA==
+"@tanstack/query-core@^4.14.1":
+  version "4.14.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.14.5.tgz#f8c061a9dd4d7a87f9992db4ddda35c479e93c4a"
+  integrity sha512-Su1AyrPb6xnm7wXTvpN5tt+B7LViYSh9k04vvuc6+eMVH0HkE9ktZTXibRrTvV83BI1KP5MG7v/k90ne/4zQzw==
 
-"@tanstack/query-sync-storage-persister@4.10.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.10.1.tgz#16cf7806b4c7809c2545b41d82854d570fce8fc3"
-  integrity sha512-Qe5fnnP+wUf2FEIk9EOXD6uOZ49Mo6tNykPXuyMkx4aq6KYkxUb8SS3AgIcjJKb0VPlMixdrJqpM0YHig7Ho5g==
+"@tanstack/query-persist-client-core@4.14.3":
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.14.3.tgz#3401c9eccb685b0e926c3421af3edb9194d592de"
+  integrity sha512-NXzvzhB26d3GC9HreY7m0WQ+Nqa6zW90e+CyMGo/qt8ghgZ7V6q3sjHBC4S8O+dfSk/eFC0HUpXVPtg0LMs0Tw==
+
+"@tanstack/query-sync-storage-persister@4.14.3":
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.14.3.tgz#b93d9ffc6ecc9fd47b753279e9214f6e1964d0eb"
+  integrity sha512-ueejVuQJFLXwGhoFr/KrjNoK8H/XGM2tmspWQi7TpxYwq5haTScQ4XgnFpOV5gR7gQ30H/FsDahpTZfmuco/rA==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.10.1"
+    "@tanstack/query-persist-client-core" "4.14.3"
 
 "@tanstack/query-sync-storage-persister@^4.0.10":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.2.3.tgz#603bfcb312c15469a3bd2471b7645f66d82f54a8"
   integrity sha512-JPwMocA7Qt+86p6M31BMBc/xcmCATeJsvQw5UdghgWCn0ZQn2u4EzDJqEBPowSXFV4yfkVYKq9z5zSW4YHrUgA==
 
-"@tanstack/react-query-persist-client@4.10.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.10.1.tgz#0b4ac7ffbc3dfacd0463b3c187de52b337b8d882"
-  integrity sha512-YZRwtTmesSsCQ7/XSV3LjPfHf1idq7TKHOeZSQdGUlWwrc4OAiFmvjDuRo4Nt5AQOK2glIgnsacgHp9ORvxaQw==
+"@tanstack/react-query-persist-client@4.14.3":
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.14.3.tgz#c65134d899a540300f79c2c428459edf02c17903"
+  integrity sha512-hPjixDlIFGI9o7C+ISR6T5Iczpng9FP4lVL8SSH5bzhJoxzFMSZXnFfp5e2tyC2AfCp5UjkiHo9qn/Sw4vX7Og==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.10.1"
+    "@tanstack/query-persist-client-core" "4.14.3"
 
 "@tanstack/react-query-persist-client@^4.0.10":
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.2.1.tgz#a4b054a1453c6cdc4a0491c917d1bf0a9bef27ad"
   integrity sha512-5z3oo6S8stiPTFK7hmv4O04ZTMgdCrhgV+cq+z0t2NJwd5eeKPLrAUSBM+ah9eEhUlzs5ZEhaYeSwtPopOjYdg==
 
-"@tanstack/react-query@4.10.1":
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.10.1.tgz#baab36cf41362ed75a00ef0aa31e96e20a065124"
-  integrity sha512-6GaLYAsAu/4aX6HR4krpOej9qbKWXe0X0eccikpv5hAw4CoAAPG29Pydql1nTl9cYF2zd21unVm4yApklFY0AA==
+"@tanstack/react-query@4.14.3":
+  version "4.14.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.14.3.tgz#3bafea000480463de35721c742265730e2973550"
+  integrity sha512-PP7DEFsOMl/JaGQr1B4IeGN3lqHrC5EpG+AgG03OlVIOQMtXNhb0N66Nt1pdrladvzYsKD20L3O3550rBzgLtg==
   dependencies:
-    "@tanstack/query-core" "4.10.1"
+    "@tanstack/query-core" "4.14.3"
     use-sync-external-store "^1.2.0"
 
 "@tanstack/react-query@^4.0.10":
@@ -12246,7 +12252,7 @@ core-js@^3.2.1:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.22.3.tgz#498c41d997654cb00e81c7a54b44f0ab21ab01d5"
   integrity sha512-1t+2a/d2lppW1gkLXx3pKPVGbBdxXAkqztvWb1EJ8oF8O2gIGiytzflNiFEehYwVK/t2ryUsGBoOFFvNx95mbg==
 
-core-js@^3.25.5:
+core-js@^3.26.0:
   version "3.26.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.26.0.tgz#a516db0ed0811be10eac5d94f3b8463d03faccfe"
   integrity sha512-+DkDrhoR4Y0PxDz6rurahuB+I45OsEUv8E1maPTB6OuHRohMMcznBq9TMpdpDMm/hUPob/mJJS3PqgbHpMTQgw==
@@ -16907,11 +16913,6 @@ hls.js@^0.11.0:
     string.prototype.endswith "^0.2.0"
     url-toolkit "^2.1.2"
 
-hls.js@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.2.1.tgz#09b0207c60fcb3340a88e8d3d1523799fe5fbedf"
-  integrity sha512-+m/5+ikSpmQQvb6FmVWZUZfzvTJMn/QVfiCGP1Oq9WW4RKrAvxlExkhhbcVGgGqLNPFk1kdFkVQur//wKu3JVw==
-
 hls.js@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.2.4.tgz#761d7f700c3da5c1701257c24c1db7ababea14eb"
@@ -19796,28 +19797,19 @@ live-server@^1.2.1:
     send latest
     serve-index "^1.9.1"
 
-livepeer@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-0.5.0.tgz#514d9569ab032a609f4fe51f360e6262a76da1f1"
-  integrity sha512-vJsIv17ITYjDt/9fp+4IGGr/xWU+AvjiFD/541h0j48Ui2Cc7ny4jWWn9sa6C4dj2ImmKT1G80xyETfn63xxmQ==
-  dependencies:
-    cross-fetch "^3.1.5"
-    hls.js "^1.2.1"
-    tus-js-client "^3.0.0"
-    zustand "^4.1.1"
-
-livepeer@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-1.2.1.tgz#6da72118614facdaf05684a04562ac6a1c285ab6"
-  integrity sha512-j96NdDrTeldyjhdp5t9MfWOjy9OF6WUXWy7t7FT8DosWXFFMe2bUaw+SRWwMW0k+wPJHhA/urD6J7iOKmOoSfw==
+livepeer@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/livepeer/-/livepeer-1.4.0.tgz#3baf7da8926898098aa209df6e27762b686f8b0f"
+  integrity sha512-Cl0NDcIEBhYTeK+wwUz9ljQkbex3zomZb4gSRpbovYTxhIpyRY0igJFbpSwKEQ2vAGGSEH3EPsY+4pn3VswW1A==
   dependencies:
     "@stitches/core" "^1.2.8"
-    core-js "^3.25.5"
+    core-js "^3.26.0"
     cross-fetch "^3.1.5"
     hls.js "^1.2.4"
+    ms "^3.0.0-canary.1"
     multiformats "9.9.0"
     tus-js-client "^3.0.1"
-    zustand "^4.1.1"
+    zustand "^4.1.3"
 
 livereload@^0.7.0:
   version "0.7.0"
@@ -21430,6 +21422,11 @@ ms@2.1.3, ms@^2.0.0, ms@^2.1.1, ms@^2.1.2:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
+
+ms@^3.0.0-canary.1:
+  version "3.0.0-canary.1"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-3.0.0-canary.1.tgz#c7b34fbce381492fd0b345d1cf56e14d67b77b80"
+  integrity sha512-kh8ARjh8rMN7Du2igDRO9QJnqCb2xYTJxyQYK7vJJS4TvLLmsbyhiKpSW+t+y26gyOyMd0riphX0GeWKU3ky5g==
 
 msrcrypto@^1.5.6:
   version "1.5.8"
@@ -31030,10 +31027,17 @@ zip-stream@^4.1.0:
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
 
-zustand@^4.0.0, zustand@^4.1.1:
+zustand@^4.0.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.1.1.tgz#5a61cc755a002df5f041840a414ae6e9a99ee22b"
   integrity sha512-h4F3WMqsZgvvaE0n3lThx4MM81Ls9xebjvrABNzf5+jb3/03YjNTSgZXeyrvXDArMeV9untvWXRw1tY+ntPYbA==
+  dependencies:
+    use-sync-external-store "1.2.0"
+
+zustand@^4.1.3:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.1.4.tgz#b0286da4cc9edd35e91c96414fa54bfa4652a54d"
+  integrity sha512-k2jVOlWo8p4R83mQ+/uyB8ILPO2PCJOf+QVjcL+1PbMCk1w5OoPYpAIxy9zd93FSfmJqoH6lGdwzzjwqJIRU5A==
   dependencies:
     use-sync-external-store "1.2.0"
 

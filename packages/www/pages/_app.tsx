@@ -16,8 +16,12 @@ import {
 } from "@livepeer/design-system";
 import { ThemeProvider } from "next-themes";
 import { DEFAULT_THEME } from "../lib/theme";
-import { createReactClient, LivepeerConfig } from "@livepeer/react";
-import { studioProvider } from "livepeer/providers/studio";
+import {
+  createReactClient,
+  LivepeerConfig,
+  studioProvider,
+  ThemeConfig,
+} from "@livepeer/react";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +62,12 @@ Object.keys(themes).map(
 
 const livepeerClient = createReactClient({ provider: studioProvider() });
 
+const livepeerTheme: ThemeConfig = {
+  colors: {
+    accent: "$colors$blue10",
+  },
+};
+
 const App = ({ Component, pageProps }) => {
   globalStyles();
   return (
@@ -82,7 +92,9 @@ const App = ({ Component, pageProps }) => {
               <MetaMaskProvider>
                 <ApiProvider>
                   <AnalyzerProvider>
-                    <LivepeerConfig client={livepeerClient}>
+                    <LivepeerConfig
+                      theme={livepeerTheme}
+                      client={livepeerClient}>
                       <DefaultSeo {...SEO} />
                       <Component {...pageProps} />
                     </LivepeerConfig>
