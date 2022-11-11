@@ -1,6 +1,6 @@
 import { Container, Box, Flex, Text, Heading } from "@livepeer/design-system";
-import Guides from "@components/Site/Guides";
-import Button from "@components/Site/Button";
+import Guides from "components/Site/Guides";
+import Button from "components/Site/Button";
 import Link from "next/link";
 import * as Hi from "react-icons/hi";
 import * as Fa from "react-icons/fa";

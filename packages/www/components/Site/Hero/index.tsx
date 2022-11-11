@@ -1,8 +1,8 @@
 import { Box, Flex, Container, Text } from "@livepeer/design-system";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "@components/Site/Button";
-import ArrowLink from "@components/Site/ArrowLink";
+import Button from "components/Site/Button";
+import ArrowLink from "components/Site/ArrowLink";
 
 const Hero = ({
   heading,

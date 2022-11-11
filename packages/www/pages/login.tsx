@@ -1,6 +1,6 @@
 import Layout from "layouts/main";
-import Login from "@components/Site/Login";
-import Button from "@components/Site/Button";
+import Login from "components/Site/Login";
+import Button from "components/Site/Button";
 import {
   Flex,
   Box,

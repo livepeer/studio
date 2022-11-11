@@ -1,5 +1,5 @@
-import EmbedHtml from "@components/Site/EmbedHtml";
-import Figure from "@components/Site/Figure";
+import EmbedHtml from "components/Site/EmbedHtml";
+import Figure from "components/Site/Figure";
 
 const serializers = {
   types: {

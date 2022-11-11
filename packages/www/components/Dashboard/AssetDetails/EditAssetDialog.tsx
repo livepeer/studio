@@ -1,4 +1,4 @@
-import { HttpError } from "@lib/utils";
+import { HttpError } from "lib/utils";
 import { Asset } from "livepeer";
 import {
   AlertDialog,

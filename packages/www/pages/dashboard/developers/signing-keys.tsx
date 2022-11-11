@@ -2,7 +2,7 @@ import Layout from "../../../layouts/dashboard";
 import { Box } from "@livepeer/design-system";
 import { useApi, useLoggedIn } from "hooks";
 import { DashboardSigningKeys as Content } from "content";
-import SigningKeysTable from "@components/Dashboard/SigningKeysTable";
+import SigningKeysTable from "components/Dashboard/SigningKeysTable";
 
 const SigningKeys = () => {
   useLoggedIn();

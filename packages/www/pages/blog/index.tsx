@@ -6,7 +6,7 @@ import allCategories from "../../queries/allCategories.gql";
 import allPosts from "../../queries/allPosts.gql";
 import BlogPostCard, {
   FeaturedBlogPostCard,
-} from "@components/Site/BlogPostCard";
+} from "components/Site/BlogPostCard";
 import Fade from "react-reveal/Fade";
 import Layout from "layouts/main";
 import Link from "next/link";

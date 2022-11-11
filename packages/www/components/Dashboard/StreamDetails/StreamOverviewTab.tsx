@@ -1,5 +1,5 @@
 import SessionsTable from "./SessionsTable";
-import MultistreamTargetsTable from "@components/Dashboard/StreamDetails/MultistreamTargetsTable";
+import MultistreamTargetsTable from "components/Dashboard/StreamDetails/MultistreamTargetsTable";
 import { Text } from "@livepeer/design-system";
 
 const StreamOverviewTab = ({ id, stream, streamHealth, invalidateStream }) => {
