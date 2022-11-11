@@ -1,4 +1,4 @@
-import { urlFor } from "@lib/client";
+import { urlFor } from "../../../lib/client";
 import { Link as A, Box as LiveBox } from "@livepeer/design-system";
 import { PortableText } from "@portabletext/react";
 import { Text, Container, Box } from "@theme-ui/components";
