@@ -2,7 +2,7 @@ import { ApiState, FileUpload } from "../types";
 import { SetStateAction } from "react";
 import { Asset, AssetPatchPayload } from "@livepeer.studio/api";
 import { HttpError } from "../../../lib/utils";
-import * as tus from "tus-js-client";
+import { Upload } from "tus-js-client";
 import qs from "qs";
 import { getCursor } from "../helpers";
 
@@ -80,7 +80,7 @@ export const uploadAssets = async (
   };
 
   const getTusUpload = (file: File, tusEndpoint?: string) =>
-    new tus.Upload(file, {
+    new Upload(file, {
       endpoint: tusEndpoint ?? undefined, // URL from `tusEndpoint` field in the `/request-upload` response
       metadata: {
         filetype: file.type,

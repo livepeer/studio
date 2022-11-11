@@ -1,5 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import * as snippet from "@segment/snippet";
+import { min as snippetMin } from "@segment/snippet";
 import { getCssText } from "@livepeer/design-system";
 
 class MyDocument extends Document {
@@ -16,7 +16,7 @@ class MyDocument extends Document {
       page: false,
     };
 
-    return snippet.min(opts);
+    return snippetMin(opts);
   }
 
   render() {
