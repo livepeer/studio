@@ -10,6 +10,8 @@ const withMDX = require("@next/mdx")({
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
+const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+// ⚠️ --- ⚠️
 
 const config = {
   images: {
@@ -243,6 +245,7 @@ module.exports = withPlugins(
             test: /\.svg$/,
             use: ["@svgr/webpack"],
           });
+          config.plugins.push(new DuplicatePackageCheckerPlugin());
           return config;
         },
       },
