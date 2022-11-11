@@ -19,7 +19,7 @@ import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "components/Site/BlogVideoPlayer";
+import BlogPlayer from "components/Site/BlogPlayer";
 import React from "react";
 import readingTime from "reading-time";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -41,7 +41,7 @@ const serializers = {
         externalLink={props.node.externalLink}
       />
     ),
-    "mux.video": (props) => <Player assetId={props.node.asset._ref} />,
+    "mux.video": (props) => <BlogPlayer assetId={props.node.asset._ref} />,
   },
 };
 
