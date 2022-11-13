@@ -4,21 +4,27 @@ import { Channel, ConsumeMessage } from "amqplib";
 import messages from "./messages";
 import { EventKey } from "./webhook-table";
 
-const EXCHANGES = {
-  webhooks: "webhook_default_exchange",
-  task: "lp_tasks",
-  delayed_old: "webhook_delayed_exchange",
-} as const;
-const QUEUES = {
-  events: "webhook_events_queue_v1",
-  webhooks: "webhook_cannon_single_url_v1",
-  task: "task_results_queue",
-  delayed_old: "webhook_delayed_queue",
-} as const;
+export const defaultTaskExchange = "lp_tasks";
+
+const getExchanges = (tasksExchange = defaultTaskExchange) =>
+  ({
+    webhooks: "webhook_default_exchange",
+    task: tasksExchange,
+    delayed_old: "webhook_delayed_exchange",
+  } as const);
+const getQueues = (tasksExchange = defaultTaskExchange) =>
+  ({
+    events: "webhook_events_queue_v1",
+    webhooks: "webhook_cannon_single_url_v1",
+    task: `${tasksExchange}_results`,
+    delayed_old: "webhook_delayed_queue",
+  } as const);
 const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
-type QueueName = keyof typeof QUEUES;
-type ExchangeName = keyof typeof EXCHANGES;
+type Queues = ReturnType<typeof getQueues>;
+type Exchanges = ReturnType<typeof getExchanges>;
+type QueueName = keyof Queues;
+type ExchangeName = keyof Exchanges;
 export type RoutingKey =
   | `events.${EventKey}`
   | `webhooks.${string}`
@@ -79,16 +85,25 @@ export class NoopQueue implements Queue {
 }
 
 export class RabbitQueue implements Queue {
+  private readonly queues: Queues;
+  private readonly exchanges: Exchanges;
+
   private channel: ChannelWrapper;
   private connection: AmqpConnectionManager;
 
-  public static async connect(url: string): Promise<RabbitQueue> {
-    const queue = new RabbitQueue();
+  public static async connect(
+    url: string,
+    tasksExchange = defaultTaskExchange
+  ): Promise<RabbitQueue> {
+    const queue = new RabbitQueue(tasksExchange);
     await queue.init(url);
     return queue;
   }
 
-  private constructor() {}
+  private constructor(tasksExchange = defaultTaskExchange) {
+    this.queues = getQueues(tasksExchange);
+    this.exchanges = getExchanges(tasksExchange);
+  }
 
   private init(url: string): Promise<void> {
     // Create a new connection manager
@@ -98,36 +113,52 @@ export class RabbitQueue implements Queue {
       publishTimeout: 10_000, // 10s
       setup: async (channel: Channel) => {
         await Promise.all([
-          channel.assertQueue(QUEUES.events, {
+          channel.assertQueue(this.queues.events, {
             arguments: { "x-queue-type": "quorum" },
           }),
-          channel.assertQueue(QUEUES.webhooks, {
+          channel.assertQueue(this.queues.webhooks, {
             arguments: { "x-queue-type": "quorum" },
           }),
-          channel.assertQueue(QUEUES.task, {
+          channel.assertQueue(this.queues.task, {
             arguments: { "x-queue-type": "quorum" },
           }),
-          channel.assertExchange(EXCHANGES.webhooks, "topic", {
+          channel.assertExchange(this.exchanges.webhooks, "topic", {
             durable: true,
           }),
-          channel.assertExchange(EXCHANGES.task, "topic", {
+          channel.assertExchange(this.exchanges.task, "topic", {
             durable: true,
           }),
         ]);
         await Promise.all([
-          channel.bindQueue(QUEUES.events, EXCHANGES.webhooks, "events.#"),
-          channel.bindQueue(QUEUES.webhooks, EXCHANGES.webhooks, "webhooks.#"),
-          channel.bindQueue(QUEUES.task, EXCHANGES.task, "task.result.#"),
+          channel.bindQueue(
+            this.queues.events,
+            this.exchanges.webhooks,
+            "events.#"
+          ),
+          channel.bindQueue(
+            this.queues.webhooks,
+            this.exchanges.webhooks,
+            "webhooks.#"
+          ),
+          channel.bindQueue(
+            this.queues.task,
+            this.exchanges.task,
+            "task.result.#"
+          ),
           channel.prefetch(2),
         ]);
         // TODO: Remove this once all old queues have been deleted.
         await Promise.all([
-          channel.unbindQueue(QUEUES.delayed_old, EXCHANGES.delayed_old, "#"),
-          channel.deleteQueue(QUEUES.delayed_old, {
+          channel.unbindQueue(
+            this.queues.delayed_old,
+            this.exchanges.delayed_old,
+            "#"
+          ),
+          channel.deleteQueue(this.queues.delayed_old, {
             ifUnused: true,
             ifEmpty: true,
           }),
-          channel.deleteExchange(EXCHANGES.delayed_old, {
+          channel.deleteExchange(this.exchanges.delayed_old, {
             ifUnused: true,
           }),
         ]);
@@ -174,7 +205,7 @@ export class RabbitQueue implements Queue {
     }
     console.log("adding consumer");
     await this.channel.addSetup((channel: Channel) => {
-      return channel.consume(QUEUES[queueName], func);
+      return channel.consume(this.queues[queueName], func);
     });
   }
 
@@ -201,7 +232,7 @@ export class RabbitQueue implements Queue {
         msg
       )}`
     );
-    await this._channelPublish(EXCHANGES[exchangeName], route, msg, {
+    await this._channelPublish(this.exchanges[exchangeName], route, msg, {
       persistent: true,
     });
   }
@@ -228,7 +259,7 @@ export class RabbitQueue implements Queue {
           channel.assertQueue(delayedQueueName, {
             durable: true,
             messageTtl: delay,
-            deadLetterExchange: EXCHANGES.webhooks,
+            deadLetterExchange: this.exchanges.webhooks,
             expires: delay + 15000,
           }),
         ]);
