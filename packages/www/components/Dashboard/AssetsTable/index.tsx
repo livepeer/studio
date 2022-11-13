@@ -12,6 +12,7 @@ import {
   rowsPageFromState,
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
+import { sleep } from "react-query/types/core/utils";
 
 const AssetsTable = ({
   userId,
@@ -42,7 +43,7 @@ const AssetsTable = ({
     })();
   };
 
-  const onUploadAssetSuccess = () => state.invalidate();
+  const onUploadAssetSuccess = () => sleep(2000).then(() => state.invalidate());
 
   const onCreate = async ({ videoFiles }: { videoFiles: File[] }) => {
     try {
