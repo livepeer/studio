@@ -12,7 +12,8 @@ import {
   rowsPageFromState,
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
-import { sleep } from "react-query/types/core/utils";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const AssetsTable = ({
   userId,
