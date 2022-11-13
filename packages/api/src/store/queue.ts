@@ -10,14 +10,12 @@ const getExchanges = (tasksExchange = defaultTaskExchange) =>
   ({
     webhooks: "webhook_default_exchange",
     task: tasksExchange,
-    delayed_old: "webhook_delayed_exchange",
   } as const);
 const getQueues = (tasksExchange = defaultTaskExchange) =>
   ({
     events: "webhook_events_queue_v1",
     webhooks: "webhook_cannon_single_url_v1",
     task: `${tasksExchange}_results`,
-    delayed_old: "webhook_delayed_queue",
   } as const);
 const delayedWebhookQueue = (delayMs: number) => `delayed_webhook_${delayMs}ms`;
 
@@ -146,21 +144,6 @@ export class RabbitQueue implements Queue {
             "task.result.#"
           ),
           channel.prefetch(2),
-        ]);
-        // TODO: Remove this once all old queues have been deleted.
-        await Promise.all([
-          channel.unbindQueue(
-            this.queues.delayed_old,
-            this.exchanges.delayed_old,
-            "#"
-          ),
-          channel.deleteQueue(this.queues.delayed_old, {
-            ifUnused: true,
-            ifEmpty: true,
-          }),
-          channel.deleteExchange(this.exchanges.delayed_old, {
-            ifUnused: true,
-          }),
         ]);
       },
     });
