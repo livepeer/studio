@@ -29,7 +29,7 @@ const FileItem = ({ fileUpload }: { fileUpload: FileUpload }) => {
     <Box as={CheckIcon} css={{ align: "right", color: "$green9" }} />
   ) : (
     <Text size="2" css={{ mr: "$2", width: 25 }} variant="gray">
-      {(Number(progress ?? 0) * 100).toFixed(0)}
+      {(Number(progress ?? 0) * 99).toFixed(0)}
       {"%"}
     </Text>
   );
