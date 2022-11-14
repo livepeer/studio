@@ -18,6 +18,8 @@ const DefaultError = () => {
           src="/img/404.png"
           alt="404"
           style={{ objectFit: "contain" }}
+          width={1024}
+          height={400}
           css={{
             position: "absolute",
             top: "50%",
