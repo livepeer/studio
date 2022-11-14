@@ -14,6 +14,9 @@ const config = {
     locales: ["en", "es"],
     defaultLocale: "en",
   },
+  experimental: {
+    appDir: true,
+  },
   async redirects() {
     return [
       {
