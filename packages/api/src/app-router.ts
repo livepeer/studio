@@ -76,6 +76,7 @@ export default async function makeApp(params: CliArgs) {
     insecureTestToken,
     stripeSecretKey,
     amqpUrl,
+    amqpTasksExchange,
     returnRegionInOrchestrator,
     halfRegionOrchestratorsUntrusted,
   } = params;
@@ -98,7 +99,7 @@ export default async function makeApp(params: CliArgs) {
 
   // RabbitMQ
   const queue: Queue = amqpUrl
-    ? await RabbitQueue.connect(amqpUrl)
+    ? await RabbitQueue.connect(amqpUrl, amqpTasksExchange)
     : new NoopQueue();
 
   // Task Scheduler

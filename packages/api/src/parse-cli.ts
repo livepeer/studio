@@ -1,6 +1,7 @@
 import yargs from "yargs";
 import yargsToMist from "./yargs-to-mist";
 import { CamelKeys } from "./types/common";
+import { defaultTaskExchange } from "./store/queue";
 
 function coerceArr(arg: any) {
   if (!Array.isArray(arg)) {
@@ -81,6 +82,12 @@ export default function parseCli(argv?: string | readonly string[]) {
       "amqp-url": {
         describe: "the RabbitMQ Url",
         type: "string",
+      },
+      "amqp-tasks-exchange": {
+        describe:
+          "the name of the exchange for scheduling tasks and receiving results",
+        type: "string",
+        default: defaultTaskExchange,
       },
       "client-id": {
         describe: "google auth ID",
