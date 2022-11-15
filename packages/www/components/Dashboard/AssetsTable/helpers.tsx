@@ -75,17 +75,18 @@ export const rowsPageFromState = async (
   getTasks: Function,
   onDeleteAsset: Function
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
-  const [assets, nextCursor, count] = await getAssets(userId, {
+  const assetsPromise = getAssets(userId, {
     filters: formatFiltersForApiRequest(state.filters),
     limit: state.pageSize.toString(),
     cursor: state.cursor,
     order: state.order,
     count: true,
   });
-
-  const [tasks] = await getTasks(userId, {
+  const tasksPromise = getTasks(userId, {
     limit: state.pageSize.toString(),
   });
+  const [assets, nextCursor, count] = await assetsPromise;
+  const [tasks] = await tasksPromise;
 
   const rows: AssetsTableData[] = assets.map(
     (asset: Asset): AssetsTableData => {
