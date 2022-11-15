@@ -3,7 +3,9 @@
   "name": "livepeer.studio",
   "version": "0.0.0",
   "workspaces": {
-    "packages": ["packages/*"]
+    "packages": [
+      "packages/*"
+    ]
   },
   "repository": {
     "type": "git",
@@ -16,15 +18,15 @@
     "start": "lerna run --stream --no-sort --concurrency=999 start",
     "clean": "lerna clean --yes && rm -rf node_modules",
     "cz": "git-cz",
-    "coverage": "lerna run coverage --ignore @livepeer.studio/www --ignore @livepeer.studio/admin && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
+    "coverage": "lerna run coverage --ignore @livepeer.studio/www && mkdir -p coverage && lcov-result-merger 'packages/*/coverage/lcov.info' ./coverage/lcov.info",
     "depcheck": "lerna exec --no-sort --concurrency=1 --stream 'depcheck --specials=bin --ignores='babel-*' .'",
     "docs": "lerna run docs && lerna run copy-docs && cp README.md docs/README.md",
     "prepare": "run-s prettier:check prepare:lerna",
-    "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.studio/www --ignore @livepeer.studio/admin && lerna run build --stream",
+    "prepare:lerna": "lerna run prepare --stream --ignore @livepeer.studio/www && lerna run build --stream",
     "lerna-run": "lerna run --stream",
     "release:dry-run": "lerna publish --exact --skip-git --skip-npm --cd-version prerelease --conventional-commits --yes",
     "release:alpha": "lerna publish --exact --cd-version prerelease --conventional-commits",
-    "test": "lerna run --stream test --no-sort --concurrency=999 --ignore @livepeer.studio/www --ignore @livepeer.studio/admin --",
+    "test": "lerna run --stream test --no-sort --concurrency=999 --ignore @livepeer.studio/www --",
     "dev": "touch .env.local && cp .env.local packages/www && lerna run --stream --no-sort --concurrency=999 dev",
     "updated": "lerna updated --json",
     "postinstall": "lerna run --stream postinstall",

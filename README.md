@@ -46,4 +46,3 @@ username on our
 | ----------------------------------------------------------------------------------------- | ------------------------------------------- |
 | [`@livepeer.studio/api`](https://github.com/livepeer/studio/tree/master/packages/api)     | Livepeer Studio API for controlling streams |
 | [`@livepeer.studio/www`](https://github.com/livepeer/studio/tree/master/packages/www)     | The Livepeer Studio frontend                |
-| [`@livepeer.studio/admin`](https://github.com/livepeer/studio/tree/master/packages/admin) | The Livepeer Studio Sanity CMS              |
