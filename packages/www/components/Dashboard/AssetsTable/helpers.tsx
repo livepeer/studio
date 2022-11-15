@@ -83,7 +83,9 @@ export const rowsPageFromState = async (
     count: true,
   });
 
-  const [tasks] = await getTasks(userId);
+  const [tasks] = await getTasks(userId, {
+    limit: state.pageSize.toString(),
+  });
 
   const rows: AssetsTableData[] = assets.map(
     (asset: Asset): AssetsTableData => {
