@@ -12,6 +12,7 @@ import { useLoggedIn, useApi } from "hooks";
 import { Dashboard as Content } from "content";
 
 const Dashboard = () => {
+  console.log("==> OLD DASHBOARD");
   const { user, verifyEmail, getUserProduct } = useApi();
   const { emailValid } = user;
 
