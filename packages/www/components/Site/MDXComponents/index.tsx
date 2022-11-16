@@ -1,4 +1,4 @@
-import * as React from "react";
+import { ReactNode, createContext } from "react";
 import NextLink from "next/link";
 import * as DS from "@livepeer/design-system";
 import { Link2Icon } from "@radix-ui/react-icons";
@@ -236,7 +236,7 @@ const LinkHeading = ({
   css,
 }: {
   id: string;
-  children: React.ReactNode;
+  children: ReactNode;
   css?: any;
 }) => (
   <DS.Box css={{ ...css }}>
@@ -264,7 +264,7 @@ const LinkHeading = ({
   </DS.Box>
 );
 
-export const FrontmatterContext = React.createContext<Frontmatter>({} as any);
+export const FrontmatterContext = createContext<Frontmatter>({} as any);
 
 // Custom provider for next-mdx-remote
 // https://github.com/hashicorp/next-mdx-remote#using-providers
