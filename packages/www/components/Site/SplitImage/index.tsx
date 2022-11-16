@@ -12,8 +12,6 @@ export default function SplitImage({
   portableTextRaw,
 }) {
   const { image } = defaultImage;
-  console.log("split image", defaultImage.asset.url, portableTextRaw);
-  console.log("arg:s", defaultImage);
   return (
     <Container>
       <Box
@@ -33,19 +31,23 @@ export default function SplitImage({
             color: "#000116",
             borderRadius: "12px",
             overflow: "hidden",
+            position: "relative",
+            minHeight: ["320px", "440px"],
           }}>
-          <Image
-            src={urlFor(defaultImage).url()}
-            alt={title ?? "asdad"}
-            placeholder="blur"
-            blurDataURL={urlFor(defaultImage)
-              .width(24)
-              .height(24)
-              .blur(10)
-              .url()}
-            width={1080}
-            height={1080}
-          />
+          {defaultImage.asset && (
+            <Image
+              src={urlFor(defaultImage).url()}
+              alt={title ?? "asdad"}
+              placeholder="blur"
+              blurDataURL={urlFor(defaultImage)
+                .width(24)
+                .height(24)
+                .blur(10)
+                .url()}
+              objectFit="cover"
+              layout="fill"
+            />
+          )}
           {/* <img
             src={defaultImage.asset.url}
             alt={title}
@@ -58,9 +60,10 @@ export default function SplitImage({
             color: "#000116",
             borderRadius: "12px",
             paddingX: "32px",
-            paddingY: "32px",
+            paddingTop: "32px",
             gridColumn: inverted ? ["unset", 1] : ["unset", 2],
             gridRow: 1,
+            minHeight: ["320px", "440px"],
           }}>
           <LiveBox
             css={{

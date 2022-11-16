@@ -2,9 +2,11 @@ import { Text, Link as A, Box as LiveBox } from "@livepeer/design-system";
 import { Container, Box } from "@theme-ui/components";
 import Button from "../../../components/Site/Button";
 import { PortableText } from "@portabletext/react";
+import Link from "next/link";
 
 export default function OffsetPortableText({ title, portableTextRaw }) {
-  console.log("args: ", title, portableTextRaw);
+  // console.log("args: ", title, portableTextRaw);
+  console.log(portableTextRaw);
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -55,30 +57,32 @@ export default function OffsetPortableText({ title, portableTextRaw }) {
                 the optimal video viewing experience.
               </Text> */}
               {portableTextRaw && <PortableText value={portableTextRaw} />}
-              <Button
-                as={A}
-                small
-                variant="blue"
-                css={{
-                  bc: "#0A5CD8",
-                  fontSize: 20,
-                  fontWeight: 500,
-                  borderRadius: "$1",
-                  px: "6px",
-                  py: 0,
-                  mt: 16,
-                  textDecoration: "none",
-                  "&:hover": {
+              <Link href="/login">
+                <Button
+                  as={A}
+                  small
+                  variant="blue"
+                  css={{
+                    bc: "#0A5CD8",
+                    fontSize: 20,
+                    fontWeight: 500,
+                    borderRadius: "$1",
+                    px: "6px",
+                    py: 0,
+                    mt: 16,
                     textDecoration: "none",
-                  },
-                  "@bp2": {
-                    fontSize: 34,
-                    px: "4px",
-                    py: "2px",
-                  },
-                }}>
-                Let's Go
-              </Button>
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                    "@bp2": {
+                      fontSize: 34,
+                      px: "4px",
+                      py: "2px",
+                    },
+                  }}>
+                  Let's Go
+                </Button>
+              </Link>
             </Box>
           </Box>
         </Container>
