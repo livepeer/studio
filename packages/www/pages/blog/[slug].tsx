@@ -1,10 +1,8 @@
-import Fade from "react-reveal/Fade";
 import {
   Container,
   Flex,
   Box,
   Heading,
-  Grid,
   Link as A,
 } from "@livepeer/design-system";
 import { blocksToText } from "lib/utils";
@@ -13,24 +11,20 @@ import { print } from "graphql/language/printer";
 import { useRouter } from "next/router";
 import allPosts from "../../queries/allPosts.gql";
 import BlockContent from "@sanity/block-content-to-react";
-import BlogPostCard from "components/Site/BlogPostCard";
 import client from "lib/client";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
 import Layout from "layouts/main";
 import Link from "next/link";
-import Player from "components/Site/BlogVideoPlayer";
+import BlogPlayer from "components/Site/BlogPlayer";
 import React from "react";
 import readingTime from "reading-time";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import BlogCTA from "components/Site/BlogCTA";
 
 const serializers = {
   types: {
     code: (props) => (
-      <SyntaxHighlighter language={props.node.language || "text"}>
-        {props.node.code}
-      </SyntaxHighlighter>
+      <code lang={props.node.language || "text"}>{props.node.code}</code>
     ),
     cta: (props) => (
       <BlogCTA
@@ -41,7 +35,7 @@ const serializers = {
         externalLink={props.node.externalLink}
       />
     ),
-    "mux.video": (props) => <Player assetId={props.node.asset._ref} />,
+    "mux.video": (props) => <BlogPlayer assetId={props.node.asset._ref} />,
   },
 };
 
@@ -248,34 +242,6 @@ const Post = ({
                 {...client.config()}
               />
             </Box>
-            {/* {!!furtherReading && (
-              <>
-                <Box
-                  css={{
-                    bc: "$neutral5",
-                    height: "1px",
-                    width: "100%",
-                    my: "$8",
-                  }}
-                />
-                <Heading size="2" as="h3" css={{ mb: "$6" }}>
-                  Articles you may be interested in
-                </Heading>
-                <Grid
-                  gap={4}
-                  css={{
-                    mb: "$5",
-                    gridTemplateColumns: "repeat(1,1fr)",
-                    "@bp2": {
-                      gridTemplateColumns: "repeat(2,1fr)",
-                    },
-                  }}>
-                  {furtherReading.map((p, i) => (
-                    <BlogPostCard post={p} key={`post-${i}`} />
-                  ))}
-                </Grid>
-              </>
-            )} */}
           </Box>
         </Container>
       </Box>
