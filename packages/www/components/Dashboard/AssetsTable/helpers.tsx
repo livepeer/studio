@@ -144,7 +144,7 @@ export const fileUploadProgressForAsset = (
     (upload) => upload.file.name === asset.name
   );
   return fileUpload && asset.status?.phase === "waiting"
-    ? fileUpload.progress
+    ? (fileUpload.completed ? 1 : 0.99) * fileUpload.progress
     : undefined;
 };
 

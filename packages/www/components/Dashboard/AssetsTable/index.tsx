@@ -13,6 +13,8 @@ import {
 } from "./helpers";
 import { makeCreateAction } from "../Table/helpers";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const AssetsTable = ({
   userId,
   title = "Assets",
@@ -42,7 +44,7 @@ const AssetsTable = ({
     })();
   };
 
-  const onUploadAssetSuccess = () => state.invalidate();
+  const onUploadAssetSuccess = () => sleep(2000).then(() => state.invalidate());
 
   const onCreate = async ({ videoFiles }: { videoFiles: File[] }) => {
     try {

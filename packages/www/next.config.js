@@ -6,6 +6,8 @@ const withMDX = require("@next/mdx")({
   },
 });
 
+const isAnalyzeEnabled = process.env.ANALYZE === "true";
+
 const config = {
   images: {
     domains: ["cdn.sanity.io"],
@@ -238,10 +240,17 @@ module.exports = withPlugins(
             test: /\.svg$/,
             use: ["@svgr/webpack"],
           });
+          if (isAnalyzeEnabled) {
+            const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+            config.plugins.push(new DuplicatePackageCheckerPlugin());
+          }
           return config;
         },
       },
     ],
+    ...(isAnalyzeEnabled
+      ? [require("@next/bundle-analyzer")({ enabled: isAnalyzeEnabled })]
+      : []),
   ],
   config
 );

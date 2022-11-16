@@ -148,12 +148,14 @@ export function getPlaybackUrl(
     if (os.id !== vodCatalystObjectStoreId) {
       return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
     }
-    return pathJoin(
-      "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
-      "hls",
-      `asset+${asset.playbackId}`,
-      "index.m3u8"
-    );
+    // TODO: Set up Catalyst playback or a CDN in front of the default object store.
+    return pathJoin(os.publicUrl, asset.playbackId, catalystManifest.path);
+    // return pathJoin(
+    //   "https://playback.livepeer.monster:10443/", // TODO: Make this a cli arg
+    //   "hls",
+    //   `asset+${asset.playbackId}`,
+    //   "index.m3u8"
+    // );
   }
   return undefined;
 }
