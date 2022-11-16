@@ -1,5 +1,5 @@
 import { Asset } from "livepeer";
-import { Task } from "@livepeer.studio/api";
+import { Asset as ApiAsset, Task } from "@livepeer.studio/api";
 import { Box } from "@livepeer/design-system";
 import { FileUpload } from "hooks/use-api/types";
 import { get } from "lodash";
@@ -13,6 +13,9 @@ import { stringSort, dateSort } from "../Table/sorts";
 import { RowsPageFromStateResult, SortTypeArgs } from "../Table/types";
 import { State } from "../Table";
 import TableEmptyState from "../Table/components/TableEmptyState";
+import { useApi } from "hooks";
+
+type ApiClient = ReturnType<typeof useApi>;
 
 const liveStreamHosts = ["livepeercdn.com", "cdn.livepeer.com"];
 
@@ -71,8 +74,8 @@ export const makeColumns = () => [
 export const rowsPageFromState = async (
   state: State<AssetsTableData>,
   userId: string,
-  getAssets: Function,
-  getTasks: Function,
+  getAssets: ApiClient["getAssets"],
+  getTasks: ApiClient["getTasks"],
   onDeleteAsset: Function
 ): Promise<RowsPageFromStateResult<AssetsTableData>> => {
   const assetsPromise = getAssets(userId, {
@@ -85,11 +88,13 @@ export const rowsPageFromState = async (
   const tasksPromise = getTasks(userId, {
     limit: state.pageSize.toString(),
   });
-  const [assets, nextCursor, count] = await assetsPromise;
-  const [tasks] = await tasksPromise;
+  const [[assets, nextCursor, count], [tasks]] = await Promise.all([
+    assetsPromise,
+    tasksPromise,
+  ]);
 
   const rows: AssetsTableData[] = assets.map(
-    (asset: Asset): AssetsTableData => {
+    (asset: ApiAsset): AssetsTableData => {
       const source: Task =
         tasks && tasks.find((task: Task) => task.outputAssetId === asset.id);
       const sourceUrl = get(source, "params.import.url");
@@ -118,7 +123,7 @@ export const rowsPageFromState = async (
           date: new Date(asset.createdAt),
           fallback: <Box css={{ color: "$primary8" }}>—</Box>,
           href: `/dashboard/assets/${asset.id}`,
-          asset,
+          asset: asset as Asset, // CreatedAt cell expect SDK asset instead of API
         },
         updatedAt: {
           date:
