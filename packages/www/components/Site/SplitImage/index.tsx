@@ -7,7 +7,6 @@ import Image from "next/image";
 export default function SplitImage({
   inverted,
   title,
-  richText,
   defaultImage,
   portableTextRaw,
 }) {
@@ -87,7 +86,6 @@ export default function SplitImage({
             }}>
             {title}
           </LiveBox>
-          <Box sx={{ color: "#000116" }}>{richText}</Box>
           {portableTextRaw && <PortableText value={portableTextRaw} />}
         </Box>
       </Box>
