@@ -44,7 +44,7 @@
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.8.0",
     "@theme-ui/color": "0.3.1",
-    "@theme-ui/components": "0.3.1",
+    "@theme-ui/components": "0.15.4",
     "@theme-ui/presets": "0.3.0",
     "codesandbox": "^2.2.3",
     "date-fns": "^2.16.1",
