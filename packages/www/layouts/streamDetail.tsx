@@ -15,6 +15,7 @@ const StreamDetail = ({
   breadcrumbs,
   children,
   stream,
+  concurrentViews,
   streamHealth,
   invalidateStream,
   setSwitchTab,
@@ -135,6 +136,7 @@ const StreamDetail = ({
                   }}>
                   <StreamHeadingBox
                     stream={stream}
+                    concurrentViews={concurrentViews}
                     healthState={healthState}
                     streamHealth={streamHealth}
                   />

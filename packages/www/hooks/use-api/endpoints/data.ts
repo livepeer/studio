@@ -21,3 +21,15 @@ export const getTotalViews = async (assetId: string): Promise<number> => {
   }
   return totalViews[0].startViews;
 };
+
+export const getConcurrentViews = async (streamId: string): Promise<number> => {
+  const [res, metrics] = await context.fetch(
+    `/data/views/${streamId}/concurrent`
+  );
+  if (res.status !== 200) {
+    throw metrics && typeof metrics === "object"
+      ? { ...metrics, status: res.status }
+      : new Error(metrics);
+  }
+  return metrics[0].views;
+};

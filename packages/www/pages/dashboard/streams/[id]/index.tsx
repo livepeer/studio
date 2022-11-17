@@ -6,6 +6,10 @@ import { useApi, useAnalyzer } from "hooks";
 import StreamDetail from "layouts/streamDetail";
 import StreamHealthTab from "components/Dashboard/StreamDetails/StreamHealthTab";
 import StreamOverviewTab from "components/Dashboard/StreamDetails/StreamOverviewTab";
+import {
+  getConcurrentViews,
+  getTotalViews,
+} from "hooks/use-api/endpoints/data";
 
 const refetchInterval = 5 * 1000;
 
@@ -43,10 +47,20 @@ const StreamDetails = () => {
     refetchInterval,
   });
 
+  const { data: concurrentViews } = useQuery(
+    ["concurrentViews", id],
+    () => getConcurrentViews(id),
+    {
+      refetchInterval,
+      enabled: Boolean(id),
+    }
+  );
+
   return (
     <StreamDetail
       activeTab={currentTab}
       stream={stream}
+      concurrentViews={concurrentViews}
       streamHealth={streamHealth}
       invalidateStream={invalidateStream}
       setSwitchTab={setCurrentTab}

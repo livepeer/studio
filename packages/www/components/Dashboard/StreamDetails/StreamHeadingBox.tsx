@@ -1,17 +1,19 @@
-import { Box, Heading, Flex, Badge } from "@livepeer/design-system";
+import { Box, Heading, Flex, Badge, Tooltip } from "@livepeer/design-system";
 import { HealthStatus } from "hooks/use-analyzer";
 import StatusBadge, { Variant } from "../StatusBadge";
-import { PauseIcon } from "@radix-ui/react-icons";
+import { PauseIcon, PlayIcon } from "@radix-ui/react-icons";
 import { Stream } from "livepeer";
 
 export type StreamHeadingBoxProps = {
   stream: Stream & { suspended?: boolean };
+  concurrentViews?: number;
   healthState: Variant;
   streamHealth?: HealthStatus;
 };
 
 const StreamHeadingBox = ({
   stream,
+  concurrentViews,
   healthState,
   streamHealth,
 }: StreamHeadingBoxProps) => {
@@ -41,6 +43,20 @@ const StreamHeadingBox = ({
               css={{ mt: "$1", letterSpacing: 0 }}
             />
           )}
+          {concurrentViews != undefined ? (
+            <Tooltip
+              css={{ bc: "$neutral3", color: "$neutral3" }}
+              content={
+                <Box css={{ color: "$hiContrast" }}>
+                  This is the number of users watching this stream right now.
+                </Box>
+              }>
+              <Flex align="center" css={{ mr: "$3", fontSize: "$2" }}>
+                <Box as={PlayIcon} css={{ mr: "$1" }} /> {concurrentViews}{" "}
+                viewers
+              </Flex>
+            </Tooltip>
+          ) : null}
           {stream.suspended && (
             <Badge
               size="2"
