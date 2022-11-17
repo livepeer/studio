@@ -143,8 +143,8 @@ export class RabbitQueue implements Queue {
             this.exchanges.task,
             "task.result.#"
           ),
-          channel.prefetch(2),
         ]);
+        await channel.prefetch(10);
       },
     });
     return new Promise<void>((resolve, reject) => {
