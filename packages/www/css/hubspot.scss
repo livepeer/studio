@@ -1,6 +1,7 @@
 /* Had to use this becase this is rolled up as NPM packages see here: https://nextjs.org/docs/messages/css-modules-npm */
 
 #hsForm {
+  box-sizing: border-box;
   .hs-form {
     display: grid !important;
     gap: 32px;
@@ -9,6 +10,7 @@
     .hs-input,
     .hs-textarea {
       color: #ffffff;
+      box-sizing: border-box;
       width: 100%;
       background: transparent;
       input:-webkit-autofill,
@@ -32,10 +34,13 @@
         padding-left: 16px;
         padding-right: 16px;
       }
+      option {
+        color: #000;
+      }
     }
     label {
       color: #666773;
-      width: 100%;
+      width: calc(100% - 64px);
       display: block;
       text-transform: uppercase;
       padding-left: 32px;

@@ -59,25 +59,18 @@ export default function HeroImage({
               }}>
               {title}
             </LiveBox>
-            bhasda
             <Text>{richText}</Text>
             {portableTextRaw && <PortableText value={portableTextRaw} />}
           </Box>
           <Image
             alt="Livepeer"
             src={urlFor(defaultImage).url()}
-            width={100}
-            height={100}
             placeholder="blur"
             blurDataURL={urlFor(defaultImage)
               .width(24)
               .height(24)
               .blur(10)
               .url()}
-          />
-          <Image
-            src="/img/temp/example-cloud.png"
-            alt="REPLACE ME"
             layout="fill"
             objectFit="cover"
           />
