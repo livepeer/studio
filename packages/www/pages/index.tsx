@@ -8,16 +8,39 @@ import PrinciplesSection from "components/Site/PrinciplesSection";
 import { GraphQLClient } from "graphql-request";
 import allHome from "../queries/allHome.gql";
 import { print } from "graphql/language/printer";
+import Head from "next/head";
+
+const HeadGTMScript = () => (
+  <Head>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3EELQ181ZT%22%3E</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-3EELQ181ZT');
+</script>
+`,
+      }}
+    />
+  </Head>
+);
 
 const HomePage = (props) => {
   return (
-    <Layout navBackgroundColor="$hiContrast" {...Content.metaData}>
-      <HomeHero content={props.heroSection} />
-      <ToolkitSection content={props.toolkitSection} />
-      <GuideSection content={props.guideSection} />
-      <FeaturedAppsSection content={props.featuredAppSection} />
-      <PrinciplesSection content={props.principlesSection} />
-    </Layout>
+    <>
+      <HeadGTMScript />
+      <Layout navBackgroundColor="$hiContrast" {...Content.metaData}>
+        <HomeHero content={props.heroSection} />
+        <ToolkitSection content={props.toolkitSection} />
+        <GuideSection content={props.guideSection} />
+        <FeaturedAppsSection content={props.featuredAppSection} />
+        <PrinciplesSection content={props.principlesSection} />
+      </Layout>
+    </>
   );
 };
 
