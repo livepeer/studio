@@ -41,7 +41,8 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
         <Box
           sx={{
             display: ["block", "flex"],
-            justifyContent: ["unset", "space-between"],
+            flexWrap: "wrap",
+            justifyContent: ["unset", "center"],
             width: "100%",
             borderTop: "1px solid #666774",
             borderBottom: "1px solid #666774",
@@ -55,10 +56,11 @@ export default function IconGrid({ title, richText, icons, portableTextRaw }) {
                 <Image
                   alt="Livepeer"
                   src={urlFor(icon).url()}
-                  width={100}
+                  width={200}
                   height={100}
                   placeholder="blur"
                   blurDataURL={urlFor(icon).width(24).height(24).blur(10).url()}
+                  style={{ objectFit: "contain" }}
                 />
               </Box>
             );
