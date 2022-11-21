@@ -47,15 +47,20 @@ import os from "os";
 const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
+  const { vodCatalystPipelineRolloutPercent: rollPct } = config;
+  const { email = "", admin } = user ?? {};
   const { upload } = toStringValues(query);
-  if (
-    config.frontendDomain?.endsWith(".monster") &&
-    user.email?.endsWith("@livepeer.org")
-  ) {
-    return true;
-  } else if (user.admin) {
+  if (email.endsWith("+e2e@livepeer.org") && rollPct < 100) {
+    // force e2e tests to see 50% of each
+    return 100 * Math.random() < 50;
+  } else if (admin && upload) {
+    // admin users can control what they see
     return upload === "1";
+  } else if (email.endsWith("@livepeer.org")) {
+    // livepeer users only see catalyst
+    return true;
   }
+  // everyone else will see as much as we decide to rollout the catalyst pipeline
   return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
 }
 
