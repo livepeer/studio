@@ -77,8 +77,9 @@ accessControl.post(
       }
 
       if (signingKeyOutput.length > 1) {
+        let collisionKeys = JSON.stringify(signingKeyOutput);
         console.log(`
-          access-control: gate: content contentId ${content.id} is gated but multiple public keys found for key ${req.body.pub}, disallowing playback
+          access-control: gate: content contentId ${content.id} is gated but multiple (${signingKeyOutput.length}) public keys found for key ${req.body.pub}, disallowing playback, collinding keys=${collisionKeys}
         `);
         throw new BadRequestError(
           "Multiple signing keys found for the same public key."
@@ -89,7 +90,7 @@ accessControl.post(
 
       if (signingKey.userId !== content.userId) {
         console.log(`
-          access-control: disallowing playback for contentId=${content.id} the content and the public key pub=${signingKey.id} do not share the same owner
+          access-control: disallowing playback for contentId=${content.id} the content and the public key pub=${req.body.pub} do not share the same owner
         `);
         throw new NotFoundError("Content not found");
       }
