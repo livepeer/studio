@@ -24,11 +24,17 @@ accessControl.post(
   validatePost("access-control-gate-payload"),
   async (req, res) => {
     const playbackId = req.body.stream.replace(/^\w+\+/, "");
+    console.log(`
+      access-control: gate: request for playbackId: ${playbackId}
+    `);
     const content =
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
 
     if (!content || content.deleted) {
+      console.log(`
+        access-control: gate: content not found for playbackId ${playbackId}, disallowing playback
+      `);
       throw new NotFoundError("Content not found");
     }
 
@@ -49,6 +55,9 @@ accessControl.post(
       return res.end();
     } else if (playbackPolicyType === "jwt") {
       if (!req.body.pub) {
+        console.log(`
+          access-control: gate: no pub provided for playbackId ${playbackId}, disallowing playback
+        `);
         throw new ForbiddenError("Content is gated and requires a public key");
       }
 
@@ -59,12 +68,19 @@ accessControl.post(
       });
 
       if (signingKeyOutput.length == 0) {
+        console.log(`
+          access-control: gate: content with playbackId ${playbackId} is gated but corresponding public key not found for key ${req.body.pub}, disallowing playback
+        `);
         throw new ForbiddenError(
           "Content is gated and corresponding public key not found"
         );
       }
 
       if (signingKeyOutput.length > 1) {
+        let collisionKeys = JSON.stringify(signingKeyOutput);
+        console.log(`
+          access-control: gate: content contentId ${content.id} is gated but multiple (${signingKeyOutput.length}) public keys found for key ${req.body.pub}, disallowing playback, collinding keys=${collisionKeys}
+        `);
         throw new BadRequestError(
           "Multiple signing keys found for the same public key."
         );
@@ -74,12 +90,15 @@ accessControl.post(
 
       if (signingKey.userId !== content.userId) {
         console.log(`
-          access-control: disallowing playback for contentId=${content.id} the content and the public key pub=${signingKey.id} do not share the same owner
+          access-control: disallowing playback for contentId=${content.id} the content and the public key pub=${req.body.pub} do not share the same owner
         `);
         throw new NotFoundError("Content not found");
       }
 
       if (signingKey.disabled || signingKey.deleted) {
+        console.log(`
+          access-control: disallowing playback for contentId=${content.id} the public key pub=${signingKey.id} is disabled or deleted
+        `);
         throw new ForbiddenError("The public key is disabled or deleted");
       }
 
@@ -88,6 +107,9 @@ accessControl.post(
       res.status(204);
       return res.end();
     } else {
+      console.log(`
+        access-control: gate: content with playbackId ${playbackId} is gated but playbackPolicyType ${playbackPolicyType} is not supported, disallowing playback
+      `);
       throw new BadRequestError(
         `unknown playbackPolicy type: ${playbackPolicyType}`
       );
