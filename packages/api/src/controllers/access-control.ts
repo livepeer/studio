@@ -31,16 +31,8 @@ accessControl.post(
       (await db.stream.getByPlaybackId(playbackId)) ||
       (await db.asset.getByPlaybackId(playbackId));
 
-    let contentLog;
-    let userLog;
-    let signingKeyLog;
-
     if (!content || content.deleted) {
-      try {
-        contentLog = JSON.stringify(content);
-      } catch (e) {
-        contentLog = content;
-      }
+      const contentLog = JSON.stringify(JSON.stringify(content));
 
       console.log(`
         access-control: gate: content not found for playbackId ${playbackId}, disallowing playback, content=${contentLog}
@@ -51,15 +43,11 @@ accessControl.post(
     const user = await db.user.get(content.userId);
 
     if (user.suspended || ("suspended" in content && content.suspended)) {
-      try {
-        contentLog = JSON.stringify(content);
-        userLog = JSON.stringify(user);
-      } catch (e) {
-        contentLog = content;
-      }
+      const contentLog = JSON.stringify(JSON.stringify(content));
+      const userLog = JSON.stringify(JSON.stringify(user));
 
       console.log(`
-        access-control: gate: disallowing access for contentId=${content.id}, user ${user.id} is suspended, content=${contentLog}, user=${userLog}
+        access-control: gate: disallowing access for contentId=${content.id} playbackId=${playbackId}, user ${user.id} is suspended, content=${contentLog}, user=${userLog}
       `);
       throw new NotFoundError("Content not found");
     }
@@ -96,7 +84,7 @@ accessControl.post(
       if (signingKeyOutput.length > 1) {
         let collisionKeys = JSON.stringify(signingKeyOutput);
         console.log(`
-          access-control: gate: content contentId ${content.id} is gated but multiple (${signingKeyOutput.length}) public keys found for key ${req.body.pub}, disallowing playback, colliding keys=${collisionKeys}
+          access-control: gate: content contentId ${content.id} with playbackId=${playbackId} is gated but multiple (${signingKeyOutput.length}) public keys found for key ${req.body.pub}, disallowing playback, colliding keys=${collisionKeys}
         `);
         throw new BadRequestError(
           "Multiple signing keys found for the same public key."
@@ -107,19 +95,15 @@ accessControl.post(
 
       if (signingKey.userId !== content.userId) {
         console.log(`
-          access-control: gate: disallowing playback for contentId=${content.id} the content and the public key pub=${req.body.pub} do not share the same owner, signingKeyUserId=${signingKey.userId}, contentUserId=${content.userId}
+          access-control: gate: disallowing playback for contentId=${content.id} with playbackId=${playbackId} the content and the public key pub=${req.body.pub} do not share the same owner, signingKeyUserId=${signingKey.userId}, contentUserId=${content.userId}
         `);
         throw new NotFoundError("Content not found");
       }
 
       if (signingKey.disabled || signingKey.deleted) {
-        try {
-          signingKeyLog = JSON.stringify(signingKey);
-        } catch (e) {
-          signingKeyLog = signingKey;
-        }
+        const signingKeyLog = JSON.stringify(JSON.stringify(signingKey));
         console.log(`
-          access-control: gate: disallowing playback for contentId=${content.id} the public key pub=${signingKey.id} is disabled or deleted, signingKey=${signingKeyLog}
+          access-control: gate: disallowing playback for contentId=${content.id} with playbackId=${playbackId} the public key pub=${signingKey.id} is disabled or deleted, signingKey=${signingKeyLog}
         `);
         throw new ForbiddenError("The public key is disabled or deleted");
       }
