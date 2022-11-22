@@ -74,6 +74,8 @@ const fieldsMap: FieldsMap = {
   userId: `task.data->>'userId'`,
   "user.email": { val: `users.data->>'email'`, type: "full-text" },
   type: `task.data->>'type'`,
+  inputAssetId: `task.data->>'inputAssetId'`,
+  outputAssetId: `task.data->>'outputAssetId'`,
 };
 
 app.use(
