@@ -247,7 +247,7 @@ export async function createAsset(asset: WithID<Asset>, queue: Queue) {
 }
 
 async function reconcileAssetStorage(
-  { taskScheduler }: Request,
+  { taskScheduler, user }: Request,
   asset: WithID<Asset>,
   newStorage: Asset["storage"],
   task?: WithID<Task>
@@ -266,6 +266,7 @@ async function reconcileAssetStorage(
       task = await taskScheduler.scheduleTask(
         "export",
         { export: { ipfs: newSpec } },
+        user,
         asset
       );
     }
@@ -495,6 +496,7 @@ app.post(
     const task = await req.taskScheduler.scheduleTask(
       "export",
       { export: params },
+      req.user,
       asset
     );
     if ("ipfs" in params && !params.ipfs?.pinata) {
@@ -543,6 +545,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
         url: req.body.url,
       },
     },
+    req.user,
     undefined,
     asset
   );
@@ -609,6 +612,7 @@ const transcodeAssetHandler: RequestHandler = async (req, res) => {
         profile: req.body.profile,
       },
     },
+    req.user,
     inputAsset,
     outputAsset
   );
@@ -670,6 +674,7 @@ app.post(
       {
         [taskType]: { url: downloadUrl },
       },
+      req.user,
       null,
       asset
     );

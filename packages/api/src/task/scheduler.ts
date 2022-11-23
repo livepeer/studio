@@ -2,7 +2,7 @@ import { ConsumeMessage } from "amqplib";
 import { db } from "../store";
 import messages from "../store/messages";
 import Queue from "../store/queue";
-import { Asset, Task } from "../schema/types";
+import { Asset, Task, User } from "../schema/types";
 import { v4 as uuid } from "uuid";
 import { WithID } from "../store/types";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
@@ -241,10 +241,17 @@ export class TaskScheduler {
   async scheduleTask(
     type: Task["type"],
     params: Task["params"],
+    user: User,
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
-    const task = await this.spawnTask(type, params, inputAsset, outputAsset);
+    const task = await this.spawnTask(
+      type,
+      params,
+      user,
+      inputAsset,
+      outputAsset
+    );
     await this.enqueueTask(task);
     return task;
   }
@@ -252,16 +259,22 @@ export class TaskScheduler {
   async spawnTask(
     type: Task["type"],
     params: Task["params"],
+    user: User,
     inputAsset?: Asset,
     outputAsset?: Asset
   ) {
+    const pendingTasks = db.task.find([
+      sql`data->>'userId' = ${user.id}`,
+      sql`data->'status'->>'phase' IN ('pending', 'waiting', 'running')`,
+    ]);
+    // if user.
     const task = await db.task.create({
       id: uuid(),
       createdAt: Date.now(),
       type: type,
       outputAssetId: outputAsset?.id,
       inputAssetId: inputAsset?.id,
-      userId: inputAsset?.userId || outputAsset?.userId,
+      userId: user.id,
       params,
       status: {
         phase: "pending",

@@ -508,6 +508,10 @@ export default class WebhookCannon {
     sessionId: string
   ) {
     const id = uuid();
+    const user = await this.db.user.get(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
     const playbackId = await generateUniquePlaybackId(sessionId);
 
     const createdAt = Date.now();
@@ -532,6 +536,7 @@ export default class WebhookCannon {
           recordedSessionId: sessionId,
         },
       },
+      user,
       undefined,
       asset
     );
