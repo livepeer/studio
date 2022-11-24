@@ -9,7 +9,6 @@ const withMDX = require("@next/mdx")({
 const isAnalyzeEnabled = process.env.ANALYZE === "true";
 
 const config = {
-  swcMinify: false,
   images: {
     domains: ["cdn.sanity.io"],
   },
