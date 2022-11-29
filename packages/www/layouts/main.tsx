@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { NextSeo } from "next-seo";
 import { hotjar } from "react-hotjar";
 import { DEFAULT_THEME } from "lib/theme";
+import GoogleTagManager from "components/Site/GoogleTagManager";
 
 if (process.env.NODE_ENV === "production") {
   ReactGA.initialize(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -83,37 +84,41 @@ function Layout({
   }
 
   return (
-    <Flex
-      className="main"
-      css={{
-        flexGrow: 1,
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        zIndex: 1,
-        position: "relative",
-        ...css,
-      }}>
+    <>
       <NextSeo {...seo} />
-      {preview && (
-        <Box
-          css={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 24,
-            fontSize: 12,
-            fontWeight: 500,
-            backgroundColor: "$blue9",
-            color: "white",
-            lineHeight: "32px",
-          }}>
-          Preview Mode
-        </Box>
-      )}
-      <DefaultNav navBackgroundColor={navBackgroundColor} />
-      {children}
-      <Footer />
-    </Flex>
+      <GoogleTagManager />
+
+      <Flex
+        className="main"
+        css={{
+          flexGrow: 1,
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          zIndex: 1,
+          position: "relative",
+          ...css,
+        }}>
+        {preview && (
+          <Box
+            css={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 24,
+              fontSize: 12,
+              fontWeight: 500,
+              backgroundColor: "$blue9",
+              color: "white",
+              lineHeight: "32px",
+            }}>
+            Preview Mode
+          </Box>
+        )}
+        <DefaultNav navBackgroundColor={navBackgroundColor} />
+        {children}
+        <Footer />
+      </Flex>
+    </>
   );
 }
 
