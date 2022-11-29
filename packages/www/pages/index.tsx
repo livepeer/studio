@@ -10,20 +10,20 @@ import allHome from "../queries/allHome.gql";
 import { print } from "graphql/language/printer";
 import Head from "next/head";
 
+const googleTagId = "G-3EELQ181ZT";
+
 const HeadGTMScript = () => (
   <Head>
     <script
+      async
+      src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}></script>
+    <script
       dangerouslySetInnerHTML={{
         __html: `
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3EELQ181ZT%22%3E</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-3EELQ181ZT');
-</script>
-`,
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments)};
+        gtag('js', new Date());
+        gtag('config', '${googleTagId}');`,
       }}
     />
   </Head>
