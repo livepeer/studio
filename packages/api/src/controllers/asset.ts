@@ -56,7 +56,10 @@ function shouldUseCatalyst({ query, user, config }: Request) {
   } else if (admin && upload) {
     // admin users can control what they see
     return upload === "1";
-  } else if (email.endsWith("@livepeer.org")) {
+  } else if (
+    email.endsWith("@livepeer.org") &&
+    email !== "livepeerjs@livepeer.org"
+  ) {
     // livepeer users only see catalyst
     return true;
   }
