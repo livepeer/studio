@@ -155,25 +155,27 @@ const CreateAssetDialog = ({
                 </Text>
               </Box>
             </Box>
-            {videoFiles &&
-              Object.keys(videoFiles).map((key) => (
-                <Flex key={key} align="center">
-                  <IconButton
-                    onClick={() => setVideoFiles((prev) => omit(prev, key))}
-                    css={{ color: "$whiteA12", mr: "$1", cursor: "pointer" }}>
-                    <Cross2Icon />
-                  </IconButton>
 
-                  <Text
-                    as="p"
-                    css={{
-                      my: "$1",
-                      fontSize: "$1",
-                    }}>
-                    {key}
-                  </Text>
-                </Flex>
-              ))}
+            <Box css={{ mt: "$1" }}>
+              {videoFiles &&
+                Object.keys(videoFiles).map((key) => (
+                  <Flex key={key} align="center">
+                    <IconButton
+                      onClick={() => setVideoFiles((prev) => omit(prev, key))}
+                      css={{ mr: "$1", cursor: "pointer" }}>
+                      <Cross2Icon />
+                    </IconButton>
+                    <Text
+                      as="p"
+                      css={{
+                        my: "$1",
+                        fontSize: "$1",
+                      }}>
+                      {key}
+                    </Text>
+                  </Flex>
+                ))}
+            </Box>
 
             {error && (
               <Box>
