@@ -237,10 +237,6 @@ module.exports = withPlugins(
             test: /\.md$/,
             use: "raw-loader",
           });
-          config.module.rules.push({
-            test: /\.svg$/,
-            use: ["@svgr/webpack"],
-          });
           if (isAnalyzeEnabled) {
             const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
             config.plugins.push(new DuplicatePackageCheckerPlugin());
