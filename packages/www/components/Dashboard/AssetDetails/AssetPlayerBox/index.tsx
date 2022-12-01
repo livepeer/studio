@@ -6,10 +6,13 @@ import AssetSharePopup from "../AssetSharePopup";
 import FailedProcessing from "./FailedProcessing";
 import FileUploadingProgress from "./FileUploadingProgress";
 import ProcessingProgress from "./ProcessingProgress";
+import { useMemo } from "react";
 
 const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
-  if (asset?.status?.phase === "ready" && asset.playbackUrl) {
-    return <AppPlayer playbackUrl={asset.playbackUrl} autoPlay={false} />;
+  const playbackUrl = useMemo(() => asset?.playbackUrl, [asset?.playbackUrl])
+
+  if (asset?.status?.phase === "ready" && playbackUrl) {
+    return <AppPlayer playbackUrl={playbackUrl} autoPlay={false} />;
   }
   if (asset?.status?.phase === "failed") {
     return <FailedProcessing />;
