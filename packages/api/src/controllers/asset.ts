@@ -45,6 +45,8 @@ import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
 
+const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
+
 const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
@@ -544,6 +546,18 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
+  const [duplicates] = await db.asset.findRecentDuplicateAssets(
+    url,
+    req.user.id,
+    Date.now() - DUPLICATE_ASSETS_THRESHOLD
+  );
+  if (duplicates?.length) {
+    return res.status(409).json({
+      errors: [
+        `An asset with the same URL source is already being processed: ${duplicates[0].id}`,
+      ],
+    });
+  }
 
   asset = await createAsset(asset, req.queue);
   const taskType = useCatalyst ? "upload" : "import";
