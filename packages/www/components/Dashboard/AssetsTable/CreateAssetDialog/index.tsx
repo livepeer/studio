@@ -165,6 +165,8 @@ const CreateAssetDialog = ({
               </Box>
             </Box>
 
+            <AssetsUploadError fileRejections={fileRejections} />
+
             <Box css={{ mt: "$1" }}>
               {videoFiles &&
                 Object.keys(videoFiles).map((key) => (
@@ -185,7 +187,6 @@ const CreateAssetDialog = ({
                   </Flex>
                 ))}
             </Box>
-            <AssetsUploadError fileRejections={fileRejections} />
           </Box>
           <AlertDialogDescription asChild>
             <Text
