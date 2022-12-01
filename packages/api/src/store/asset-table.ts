@@ -1,8 +1,7 @@
-import { QueryResult } from "pg";
 import sql from "sql-template-strings";
 import { Asset, Task } from "../schema/types";
 import Table from "./table";
-import { DBLegacyObject, QueryOptions, WithID } from "./types";
+import { FindOptions, QueryOptions, WithID } from "./types";
 
 export const taskOutputToIpfsStorage = (
   out: Task["output"]["export"]["ipfs"]
@@ -71,5 +70,25 @@ export default class AssetTable extends Table<WithID<Asset>> {
       return null;
     }
     return assets[0];
+  }
+
+  async findRecentDuplicateAssets(
+    url: string,
+    userId: string,
+    createdAfter: number,
+    opts: FindOptions = { limit: 10 }
+  ): Promise<[WithID<Asset>[], string]> {
+    const query = [
+      sql`asset.data->'source'->>'type' = 'url'`,
+      sql`asset.data->>'deleted' IS NULL`,
+      sql`asset.data->'status'->>'phase' IN ('waiting', 'pending')`,
+      sql`asset.data->'userId' = ${userId}`,
+      sql`asset.data->'source'->>'url' = ${url}`,
+      sql`coalesce((asset.data->'createdAt')::bigint, 0) > ${createdAfter}`,
+    ];
+    return this.find(query, {
+      order: "coalesce((asset.data->'createdAt')::bigint, 0) DESC",
+      ...opts,
+    });
   }
 }
