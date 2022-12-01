@@ -44,6 +44,8 @@ import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
 
+const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
+
 const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
@@ -531,9 +533,22 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  if (!req.body.url) {
+  const { url } = req.body as NewAssetPayload;
+  if (!url) {
     return res.status(422).json({
       errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+  const [duplicates] = await db.asset.findRecentDuplicateAssets(
+    url,
+    req.user.id,
+    Date.now() - DUPLICATE_ASSETS_THRESHOLD
+  );
+  if (duplicates?.length) {
+    return res.status(409).json({
+      errors: [
+        `An asset with the same URL source is already being processed: ${duplicates[0].id}`,
+      ],
     });
   }
 
@@ -542,9 +557,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
-      [taskType]: {
-        url: req.body.url,
-      },
+      [taskType]: { url },
     },
     undefined,
     asset
