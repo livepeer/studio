@@ -1,4 +1,5 @@
 import { Player } from "@livepeer/react";
+import { memo } from "react";
 
 interface AppPlayerProps {
   playbackUrl: string;
@@ -9,4 +10,4 @@ const AppPlayer = ({ playbackUrl, autoPlay = true }: AppPlayerProps) => (
   <Player src={playbackUrl} autoPlay={autoPlay} objectFit="contain" />
 );
 
-export default AppPlayer;
+export default memo(AppPlayer);
