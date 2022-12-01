@@ -167,6 +167,25 @@ describe("controllers/asset", () => {
     });
   });
 
+  it("should detect duplicate assets", async () => {
+    const spec = {
+      name: "test",
+      url: "https://example.com/test.mp4",
+    };
+    let res = await client.post(`/asset/upload/url`, spec);
+    expect(res.status).toBe(201);
+    const { asset } = await res.json();
+    expect(asset).toMatchObject({
+      id: expect.any(String),
+    });
+    const assetId = asset.id;
+
+    res = await client.post(`/asset/upload/url`, spec);
+    expect(res.status).toBe(409);
+    const { errors } = await res.json();
+    expect(errors).toMatchObject([expect.stringContaining(assetId)]);
+  });
+
   describe("asset inline storage", () => {
     let asset: WithID<Asset>;
 
