@@ -9,10 +9,8 @@ import ProcessingProgress from "./ProcessingProgress";
 import { useMemo } from "react";
 
 const AssetStatusBox = ({ asset }: { asset?: Asset }) => {
-  const playbackUrl = useMemo(() => asset?.playbackUrl, [asset?.playbackUrl])
-
-  if (asset?.status?.phase === "ready" && playbackUrl) {
-    return <AppPlayer playbackUrl={playbackUrl} autoPlay={false} />;
+  if (asset?.status?.phase === "ready" && asset?.playbackUrl) {
+    return <AppPlayer playbackUrl={asset?.playbackUrl} autoPlay={false} />;
   }
   if (asset?.status?.phase === "failed") {
     return <FailedProcessing />;
