@@ -1,5 +1,5 @@
 import { Player } from "@livepeer/react";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 
 interface AppPlayerProps {
   playbackUrl: string;
