@@ -4,7 +4,7 @@ import { URL } from "url";
 import fetch from "node-fetch";
 import SendgridMail from "@sendgrid/mail";
 import SendgridClient from "@sendgrid/client";
-import express from "express";
+import express, { Request } from "express";
 import sql from "sql-template-strings";
 import { createHmac } from "crypto";
 import { S3Client, PutObjectCommand, S3ClientConfig } from "@aws-sdk/client-s3";
@@ -82,6 +82,14 @@ export function toStringValues(obj: Record<string, any>) {
     strObj[key] = value.toString();
   }
   return strObj;
+}
+
+export function reqUseReplica(req: Request) {
+  if (!req.user.admin) {
+    return true;
+  }
+  // intentional single equal comparison to coalesce arrays
+  return req.query.strongConsistency != "1";
 }
 
 function bytesToHexString(bytes: Uint8Array, separate = false) {
