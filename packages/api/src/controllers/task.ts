@@ -177,7 +177,8 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const task = await db.task.get(req.params.id);
+  const useReplica = req.query.strongConsistency != "1"; // intentional single equal comparison to coalesce arrays
+  const task = await db.task.get(req.params.id, { useReplica });
   if (!task) {
     res.status(404);
     return res.json({
