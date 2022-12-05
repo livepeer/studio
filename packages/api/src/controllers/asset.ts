@@ -15,6 +15,7 @@ import {
   toStringValues,
   pathJoin,
   getObjectStoreS3Config,
+  reqUseReplica,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -463,7 +464,9 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const asset = await db.asset.get(req.params.id);
+  const asset = await db.asset.get(req.params.id, {
+    useReplica: reqUseReplica(req),
+  });
   if (!asset || asset.deleted) {
     throw new NotFoundError(`Asset not found`);
   }

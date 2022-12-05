@@ -10,6 +10,7 @@ import {
   parseOrder,
   toStringValues,
   FieldsMap,
+  reqUseReplica,
 } from "./helpers";
 import { db } from "../store";
 import sql from "sql-template-strings";
@@ -177,7 +178,9 @@ app.get("/", authorizer({}), async (req, res) => {
 });
 
 app.get("/:id", authorizer({}), async (req, res) => {
-  const task = await db.task.get(req.params.id);
+  const task = await db.task.get(req.params.id, {
+    useReplica: reqUseReplica(req),
+  });
   if (!task) {
     res.status(404);
     return res.json({
