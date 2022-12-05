@@ -50,12 +50,14 @@ const FileUpload = () => {
         p: "$4",
         maxWidth: 550,
         minWidth: 420,
+        maxHeight: "90%",
+        overflowY: "scroll",
         border: "1px solid $neutral6",
         borderRadius: "$3",
         zIndex: 2,
         backgroundColor: "$panel",
       }}>
-      <Flex direction="column" justify="center" css={{}}>
+      <Flex direction="column" justify="center">
         {!hasPendingFileUploads && (
           <Box css={{ position: "absolute", top: "$3", right: "$2" }}>
             <IconButton
