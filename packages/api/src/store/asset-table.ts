@@ -82,7 +82,7 @@ export default class AssetTable extends Table<WithID<Asset>> {
       sql`asset.data->'source'->>'type' = 'url'`,
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->'status'->>'phase' IN ('waiting', 'pending')`,
-      sql`asset.data->'userId' = ${userId}`,
+      sql`asset.data->>'userId' = ${userId}`,
       sql`asset.data->'source'->>'url' = ${url}`,
       sql`coalesce((asset.data->'createdAt')::bigint, 0) > ${createdAfter}`,
     ];
