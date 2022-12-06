@@ -242,6 +242,12 @@ export default function parseCli(argv?: string | readonly string[]) {
         default: 0,
         type: "number",
       },
+      vodMaxConcurrentTasksPerUser: {
+        describe:
+          "maximum number of tasks that can be running for a given user",
+        default: 5,
+        type: "number",
+      },
       "ingest-region": {
         describe:
           "list of ingest endpoints to use as servers to consult for /api/ingest",

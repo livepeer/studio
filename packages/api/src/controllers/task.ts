@@ -18,6 +18,9 @@ import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
+import taskScheduler from "../task/scheduler";
+
+const LOST_TASK_TIMEOUT = 15 * 60 * 1000; // 15 mins
 
 const app = Router();
 
@@ -224,6 +227,37 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     task.status?.phase !== "running"
   ) {
     return res.status(400).json({ errors: ["task is not running"] });
+  }
+  if (task.status.phase !== "running" && !task.status.retries) {
+    // first attempt to execute the task. check concurrent tasks limit
+    const query = [
+      sql`task.data->>'deleted' IS NULL`,
+      sql`task.data->>'userId' = ${task.userId}`,
+      sql`task.data->'status'->>'phase' = 'running' OR `.append(
+        `(task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL)')`
+      ),
+    ];
+    const maxAllowed = req.config.vodMaxConcurrentTasksPerUser;
+    let [tasks] = await db.task.find(query, { limit: 2 * maxAllowed });
+    const lostTaskThreshold = Date.now() - LOST_TASK_TIMEOUT;
+    tasks = tasks.filter((t) => {
+      if (t.status.updatedAt > lostTaskThreshold) {
+        return true;
+      }
+      taskScheduler
+        .failTask(task, "internal error executing task")
+        .catch((err) =>
+          console.error(`error failing task id=${task.id} err=`, err)
+        );
+      return false;
+    });
+    if (tasks.length >= maxAllowed) {
+      return res.status(429).json({
+        errors: [
+          `too many tasks running for user ${task.userId} (${tasks.length})`,
+        ],
+      });
+    }
   }
 
   const doc = req.body.status;
