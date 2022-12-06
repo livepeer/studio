@@ -237,8 +237,8 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     const query = [
       sql`task.data->>'deleted' IS NULL`,
       sql`task.data->>'userId' = ${user.id}`,
-      sql`task.data->'status'->>'phase' = 'running' OR `.append(
-        `(task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL)`
+      sql`(task.data->'status'->>'phase' = 'running'`.append(
+        ` OR (task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL))`
       ),
     ];
     const maxAllowed = req.config.vodMaxConcurrentTasksPerUser;
