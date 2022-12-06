@@ -228,11 +228,15 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   ) {
     return res.status(400).json({ errors: ["task is not running"] });
   }
-  if (task.status.phase !== "running" && !task.status.retries) {
+  const user = await db.user.get(task.userId);
+  if (!user) {
+    return res.status(500).json({ errors: ["user not found"] });
+  }
+  if (!user.admin && task.status.phase !== "running" && !task.status.retries) {
     // first attempt to execute the task. check concurrent tasks limit
     const query = [
       sql`task.data->>'deleted' IS NULL`,
-      sql`task.data->>'userId' = ${task.userId}`,
+      sql`task.data->>'userId' = ${user.id}`,
       sql`task.data->'status'->>'phase' = 'running' OR `.append(
         `(task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL)')`
       ),
@@ -254,7 +258,7 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     if (tasks.length >= maxAllowed) {
       return res.status(429).json({
         errors: [
-          `too many tasks running for user ${task.userId} (${tasks.length})`,
+          `too many tasks running for user ${user.id} (${tasks.length})`,
         ],
       });
     }
