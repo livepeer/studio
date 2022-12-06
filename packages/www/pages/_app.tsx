@@ -64,6 +64,7 @@ Object.keys(themes).map(
 
 const livepeerClient = createReactClient({
   provider: studioProvider({
+    apiKey: process.env.NEXT_PUBLIC_LIVEPEER_API_KEY ?? "",
     baseUrl: isStaging()
       ? "https://livepeer.monster"
       : "https://livepeer.studio",
