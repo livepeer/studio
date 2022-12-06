@@ -20,7 +20,7 @@ import { withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
 import taskScheduler from "../task/scheduler";
 
-const LOST_TASK_TIMEOUT = 15 * 60 * 1000; // 15 mins
+const ACTIVE_TASK_TIMEOUT = 15 * 60 * 1000; // 15 mins
 
 const app = Router();
 
@@ -234,27 +234,18 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   }
   if (!user.admin && task.status.phase !== "running" && !task.status.retries) {
     // first attempt to execute the task. check concurrent tasks limit
+    const activeTaskThreshold = Date.now() - ACTIVE_TASK_TIMEOUT;
     const query = [
       sql`task.data->>'deleted' IS NULL`,
       sql`task.data->>'userId' = ${user.id}`,
       sql`(task.data->'status'->>'phase' = 'running'`.append(
         ` OR (task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL))`
       ),
+      // TODO: Clean-up lost tasks
+      sql`coalesce((task.data->'status'->>'updatedAt')::bigint, 0) > ${activeTaskThreshold}`,
     ];
     const maxAllowed = req.config.vodMaxConcurrentTasksPerUser;
-    let [tasks] = await db.task.find(query, { limit: 2 * maxAllowed });
-    const lostTaskThreshold = Date.now() - LOST_TASK_TIMEOUT;
-    tasks = tasks.filter((t) => {
-      if (t.status.updatedAt > lostTaskThreshold) {
-        return true;
-      }
-      taskScheduler
-        .failTask(t, "internal error executing task") // don't be too explicit to users about losing tasks
-        .catch((err) =>
-          console.error(`error failing task id=${t.id} err=`, err)
-        );
-      return false;
-    });
+    let [tasks] = await db.task.find(query, { limit: maxAllowed + 1 });
     if (tasks.length >= maxAllowed) {
       return res.status(429).json({
         errors: [
