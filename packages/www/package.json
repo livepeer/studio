@@ -86,7 +86,7 @@
     "react-dates": "^21.8.0",
     "react-device-detect": "^1.13.1",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^11.4.2",
+    "react-dropzone": "^14.2.3",
     "react-ga": "^2.7.0",
     "react-google-recaptcha-v3": "^1.9.7",
     "react-hook-form": "^6.9.0",
