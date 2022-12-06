@@ -249,9 +249,9 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
         return true;
       }
       taskScheduler
-        .failTask(task, "internal error executing task")
+        .failTask(t, "internal error executing task") // don't be too explicit to users about losing tasks
         .catch((err) =>
-          console.error(`error failing task id=${task.id} err=`, err)
+          console.error(`error failing task id=${t.id} err=`, err)
         );
       return false;
     });
