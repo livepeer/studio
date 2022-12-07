@@ -56,6 +56,18 @@ function cleanUserFields(user: WithID<User>, isAdmin = false) {
 }
 
 async function findUserByEmail(email: string, useReplica = true) {
+  // Look for user by lowercase email
+  const [lowercaseUsers] = await db.user.find(
+    { email: email.toLowerCase() },
+    { useReplica }
+  );
+  if (lowercaseUsers?.length === 1) {
+    return lowercaseUsers[0];
+  } else if (lowercaseUsers.length > 1) {
+    throw new InternalServerError("multiple users found with same email");
+  }
+
+  // Look for user by original email
   const [users] = await db.user.find({ email }, { useReplica });
   if (!users?.length) {
     throw new NotFoundError("user not found");

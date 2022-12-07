@@ -307,7 +307,17 @@ describe("controllers/user", () => {
       res = await client.post("/user/token", {
         ...mockUser,
       });
+      expect(res.status).toBe(201);
+      tokenRes = await res.json();
+      expect(tokenRes.id).toBeDefined();
+      expect(tokenRes.email).toBe(mockUser.email);
+      expect(tokenRes.token).toBeDefined();
 
+      // token should be returned without error with an uppercase email
+      res = await client.post("/user/token", {
+        ...mockUser,
+        email: mockUser.email.toUpperCase(),
+      });
       expect(res.status).toBe(201);
       tokenRes = await res.json();
       expect(tokenRes.id).toBeDefined();
