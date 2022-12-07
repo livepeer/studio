@@ -67,7 +67,7 @@ function shouldUseCatalyst({ query, user, config }: Request) {
     return true;
   }
   // everyone else will see as much as we decide to rollout the catalyst pipeline
-  return 100 * Math.random() < config.vodCatalystPipelineRolloutPercent;
+  return 100 * Math.random() < rollPct;
 }
 
 function defaultObjectStoreId(
@@ -546,17 +546,22 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  const [duplicates] = await db.asset.findRecentDuplicateAssets(
+  const dupAsset = await db.task.findDuplicateUrlUpload(
     url,
     req.user.id,
-    Date.now() - DUPLICATE_ASSETS_THRESHOLD
+    DUPLICATE_ASSETS_THRESHOLD
   );
-  if (duplicates?.length) {
-    return res.status(409).json({
-      errors: [
-        `An asset with the same URL source is already being processed: ${duplicates[0].id}`,
-      ],
-    });
+  if (dupAsset) {
+    const [task] = await db.task.find({ outputAssetId: dupAsset.id });
+    if (!task.length) {
+      console.error("Found asset with no task", dupAsset);
+      // proceed as a regular new asset
+    } else {
+      // return the existing asset and task, as if created now, with a slightly
+      // different status code (200, not 201). Should be transparent to clients.
+      res.status(200).json({ asset, task: { id: task[0].id } });
+      return;
+    }
   }
 
   asset = await createAsset(asset, req.queue);
@@ -786,7 +791,7 @@ const getPendingAssetAndTask = async (playbackId: string) => {
     { outputAssetId: asset.id },
     { useReplica: false }
   );
-  if (!tasks?.length && !tasks[0]?.length) {
+  if (!tasks?.length || !tasks[0]?.length) {
     throw new NotFoundError(`task not found`);
   }
   const task = tasks[0][0];
