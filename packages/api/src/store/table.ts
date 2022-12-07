@@ -131,7 +131,9 @@ export default class Table<T extends DBObject> {
       q.append(" ");
     }
 
-    q.append(` ORDER BY ${order}`);
+    if (order) {
+      q.append(` ORDER BY ${order}`);
+    }
     if (limit) {
       q.append(sql` LIMIT ${limit}`);
     }

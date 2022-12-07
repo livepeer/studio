@@ -58,6 +58,7 @@ export default class TaskTable extends Table<WithID<Task>> {
     ];
     let [count] = await this.find(query, {
       fields: "COUNT(*) as count",
+      order: "",
       process: (row: { count: number }) => row.count,
     });
     return count[0] ?? 0;
