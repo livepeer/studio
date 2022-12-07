@@ -8,14 +8,14 @@ const ACTIVE_TASK_TIMEOUT = 5 * 60 * 1000; // 5 mins
 const ENQUEUED_TASK_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
 
 function joinOr(filters: SQLStatement[]): SQLStatement {
-  const stmt = sql`( `;
+  const stmt = sql`(`;
   filters.forEach((filter, idx) => {
     if (idx > 0) {
       stmt.append(" OR ");
     }
-    stmt.append(sql`( ${filter} )`);
+    stmt.append(`(`).append(filter).append(`)`);
   });
-  return stmt.append(` )`);
+  return stmt.append(`)`);
 }
 
 export default class TaskTable extends Table<WithID<Task>> {
@@ -48,7 +48,7 @@ export default class TaskTable extends Table<WithID<Task>> {
         sql`
           task.data->'status'->>'phase' = 'waiting'
           AND task.data->'status'->>'retries' IS NULL
-          AND coalesce((task.data->'status'->>'updatedAt')::bigint, 0) > ${enqueuedTaskThreshold}`
+          AND coalesce( (task.data->'status'->>'updatedAt')::bigint, 0) > ${enqueuedTaskThreshold}`
       );
     }
 

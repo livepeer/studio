@@ -174,16 +174,19 @@ describe("controllers/asset", () => {
     };
     let res = await client.post(`/asset/upload/url`, spec);
     expect(res.status).toBe(201);
-    const { asset } = await res.json();
-    expect(asset).toMatchObject({
-      id: expect.any(String),
-    });
-    const assetId = asset.id;
+    let {
+      asset: { id: assetId },
+      task: { id: taskId },
+    } = await res.json();
+    expect(assetId).toMatch(/^[a-f0-9-]{36}$/);
+    expect(taskId).toMatch(/^[a-f0-9-]{36}$/);
 
     res = await client.post(`/asset/upload/url`, spec);
-    expect(res.status).toBe(409);
-    const { errors } = await res.json();
-    expect(errors).toMatchObject([expect.stringContaining(assetId)]);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toMatchObject({
+      asset: { id: assetId },
+      task: { id: taskId },
+    });
   });
 
   describe("asset inline storage", () => {
