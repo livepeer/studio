@@ -238,7 +238,7 @@ async function ensureQueueCapacity(config: CliArgs, userId: string) {
   const numScheduled = await db.task.countScheduledTasks(userId);
   if (numScheduled >= config.vodMaxScheduledTasksPerUser) {
     throw new TooManyRequestsError(
-      `user ${userId} has reached the maximum number of concurrent tasks`
+      `user ${userId} has reached the maximum number of pending tasks`
     );
   }
 }
