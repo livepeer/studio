@@ -65,7 +65,18 @@ async function findUserByEmail(email: string, useReplica = true) {
   return users[0];
 }
 
-async function isEmailRegistered(email: string, useReplica = true) {
+async function isEmailRegistered(
+  email: string,
+  useReplica = true
+): Promise<boolean> {
+  // Check if lowercase email is already registered
+  const [lowercaseUsers] = await db.user.find(
+    { email: email.toLowerCase() },
+    { useReplica }
+  );
+  if (lowercaseUsers?.length > 0) return true;
+
+  // Check if original email is already registered
   const [users] = await db.user.find({ email }, { useReplica });
   return users?.length > 0;
 }
@@ -281,9 +292,11 @@ app.post("/", validatePost("user"), async (req, res) => {
     admin = true;
   }
 
+  const lowercaseEmail = email.toLowerCase();
+
   let stripeFields: Partial<User> = {};
   if (req.stripe) {
-    const customer = await getOrCreateCustomer(req.stripe, email);
+    const customer = await getOrCreateCustomer(req.stripe, lowercaseEmail);
     const subscription = await getOrCreateSubscription(
       req.stripe,
       defaultProductId,
@@ -300,7 +313,7 @@ app.post("/", validatePost("user"), async (req, res) => {
     kind: "user",
     id: id,
     createdAt: Date.now(),
-    email: email,
+    email: lowercaseEmail,
     password: hashedPassword,
     salt: salt,
     admin: admin,
@@ -324,10 +337,10 @@ app.post("/", validatePost("user"), async (req, res) => {
     try {
       // This is a test of the Sendgrid email validation API. Remove this
       // if we decide not to use it and revert to more basic Sendgrid plan.
-      sendgridValidateEmail(email, sendgridValidationApiKey);
+      sendgridValidateEmail(lowercaseEmail, sendgridValidationApiKey);
       // send email verification message to user using SendGrid
       await sendgridEmail({
-        email,
+        email: lowercaseEmail,
         supportAddr,
         sendgridTemplateId,
         sendgridApiKey,
@@ -336,7 +349,11 @@ app.post("/", validatePost("user"), async (req, res) => {
         buttonText: "Verify Email",
         buttonUrl: frontendUrl(
           req,
-          `/verify?${qs.stringify({ email, emailValidToken, selectedPlan })}`
+          `/verify?${qs.stringify({
+            email: lowercaseEmail,
+            emailValidToken,
+            selectedPlan,
+          })}`
         ),
         unsubscribe: unsubscribeUrl(req),
         text: [

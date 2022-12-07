@@ -116,6 +116,15 @@ describe("controllers/user", () => {
       let resTwoJson = await resTwo.json();
       expect(resTwo.status).toBe(409);
       expect(resTwoJson.errors[0]).toBe("email already registered");
+
+      // Registering a user with the same uppercased email should fail
+      const resThree = await client.post("/user", {
+        ...mockUser,
+        email: mockUser.email.toUpperCase(),
+      });
+      let resThreeJson = await resThree.json();
+      expect(resThree.status).toBe(409);
+      expect(resThreeJson.errors[0]).toBe("email already registered");
     });
 
     it("should make a user an admin with admin email", async () => {
