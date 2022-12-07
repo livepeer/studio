@@ -555,7 +555,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   const useCatalyst = shouldUseCatalyst(req);
-  let asset = await validateAssetPayload(
+  const newAsset = await validateAssetPayload(
     id,
     playbackId,
     req.user.id,
@@ -572,14 +572,14 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     } else {
       // return the existing asset and task, as if created now, with a slightly
       // different status code (200, not 201). Should be transparent to clients.
-      res.status(200).json({ asset, task: { id: task[0].id } });
+      res.status(200).json({ asset: dupAsset, task: { id: task[0].id } });
       return;
     }
   }
 
   await ensureQueueCapacity(req.config, req.user.id);
 
-  asset = await createAsset(asset, req.queue);
+  const asset = await createAsset(newAsset, req.queue);
   const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
