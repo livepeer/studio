@@ -5,7 +5,7 @@ import { FindOptions, WithID } from "./types";
 
 // TODO: Clean-up these lost tasks, making them failed
 const ACTIVE_TASK_TIMEOUT = 5 * 60 * 1000; // 5 mins
-const ENQUEUED_TASK_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
+const ENQUEUED_TASK_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
 
 function joinOr(filters: SQLStatement[]): SQLStatement {
   const stmt = sql`(`;
