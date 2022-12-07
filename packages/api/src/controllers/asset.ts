@@ -523,6 +523,16 @@ app.post(
 );
 
 const uploadWithUrlHandler: RequestHandler = async (req, res) => {
+  let { url, catalystPipelineStrategy } = req.body as NewAssetPayload;
+  if (!req.user.admin) {
+    catalystPipelineStrategy = undefined;
+  }
+  if (!url) {
+    return res.status(422).json({
+      errors: [`Must provide a "url" field for the asset contents`],
+    });
+  }
+
   const id = uuid();
   const playbackId = await generateUniquePlaybackId(id);
   const useCatalyst = shouldUseCatalyst(req);
@@ -534,20 +544,13 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  if (!req.body.url) {
-    return res.status(422).json({
-      errors: [`Must provide a "url" field for the asset contents`],
-    });
-  }
 
   asset = await createAsset(asset, req.queue);
   const taskType = useCatalyst ? "upload" : "import";
   const task = await req.taskScheduler.scheduleTask(
     taskType,
     {
-      [taskType]: {
-        url: req.body.url,
-      },
+      [taskType]: { url, catalystPipelineStrategy },
     },
     undefined,
     asset
@@ -653,6 +656,10 @@ app.post(
       defaultObjectStoreId(req, useCatalyst),
       { name: `asset-upload-${id}`, ...req.body }
     );
+    const { catalystPipelineStrategy = undefined } = req.user.admin
+      ? (req.body as NewAssetPayload)
+      : {};
+
     const { uploadToken, downloadUrl } = await genUploadUrl(
       playbackId,
       vodObjectStoreId,
@@ -674,7 +681,7 @@ app.post(
     const task = await req.taskScheduler.spawnTask(
       taskType,
       {
-        [taskType]: { url: downloadUrl },
+        [taskType]: { url: downloadUrl, catalystPipelineStrategy },
       },
       null,
       asset
