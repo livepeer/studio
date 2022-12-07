@@ -45,8 +45,6 @@ import taskScheduler from "../task/scheduler";
 import { S3ClientConfig } from "@aws-sdk/client-s3";
 import os from "os";
 
-const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
-
 const app = Router();
 
 function shouldUseCatalyst({ query, user, config }: Request) {
@@ -546,11 +544,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  const dupAsset = await db.asset.findDuplicateUrlUpload(
-    url,
-    req.user.id,
-    DUPLICATE_ASSETS_THRESHOLD
-  );
+  const dupAsset = await db.asset.findDuplicateUrlUpload(url, req.user.id);
   if (dupAsset) {
     const [task] = await db.task.find({ outputAssetId: dupAsset.id });
     if (!task.length) {

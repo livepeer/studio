@@ -18,9 +18,6 @@ import { Asset, Task } from "../schema/types";
 import { WithID } from "../store/types";
 import { withIpfsUrls } from "./asset";
 import { taskOutputToIpfsStorage } from "../store/asset-table";
-import taskScheduler from "../task/scheduler";
-
-const ACTIVE_TASK_TIMEOUT = 15 * 60 * 1000; // 15 mins
 
 const app = Router();
 
@@ -222,22 +219,22 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
   const task = await db.task.get(id, { useReplica: false });
   if (!task) {
     return res.status(404).json({ errors: ["not found"] });
-  } else if (
-    task.status?.phase !== "waiting" &&
-    task.status?.phase !== "running"
-  ) {
-    return res.status(400).json({ errors: ["task is not running"] });
+  } else if (!["waiting", "running"].includes(task.status?.phase)) {
+    return res
+      .status(400)
+      .json({ errors: ["task is not in an executable state"] });
   }
+
   const user = await db.user.get(task.userId);
   if (!user) {
     return res.status(500).json({ errors: ["user not found"] });
   }
-  if (!user.admin && task.status.phase !== "running" && !task.status.retries) {
-    // this is an attempt to start executing the task. check concurrent tasks limit
-    const tasks = await db.task.listRunningTasks(
-      req.user.id,
-      ACTIVE_TASK_TIMEOUT
-    );
+
+  const { phase, retries } = task.status;
+  // allow test users to run as many tasks as necessary
+  if (!user.isTestUser && phase === "waiting" && !retries) {
+    // this is an attempt to start executing the task for the first time. check concurrent tasks limit
+    const tasks = await db.task.listPendingTasks(req.user.id, true);
     if (tasks.length >= req.config.vodMaxConcurrentTasksPerUser) {
       return res.status(429).json({
         errors: [

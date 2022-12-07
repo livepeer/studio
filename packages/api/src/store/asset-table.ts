@@ -3,6 +3,8 @@ import { Asset, Task } from "../schema/types";
 import Table from "./table";
 import { QueryOptions, WithID } from "./types";
 
+const DUPLICATE_ASSETS_THRESHOLD = 15 * 60 * 1000; // 15 mins
+
 export const taskOutputToIpfsStorage = (
   out: Task["output"]["export"]["ipfs"]
 ): Omit<Asset["storage"]["ipfs"], "spec"> =>
@@ -74,10 +76,9 @@ export default class AssetTable extends Table<WithID<Asset>> {
 
   async findDuplicateUrlUpload(
     url: string,
-    userId: string,
-    maxAssetAgeMs: number
+    userId: string
   ): Promise<WithID<Asset>> {
-    const createdAfter = Date.now() - maxAssetAgeMs;
+    const createdAfter = Date.now() - DUPLICATE_ASSETS_THRESHOLD;
     const query = [
       sql`asset.data->>'deleted' IS NULL`,
       sql`asset.data->>'userId' = ${userId}`,
