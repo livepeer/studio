@@ -107,7 +107,6 @@ export class RabbitQueue implements Queue {
     // Create a new connection manager
     this.connection = amqp.connect([url]);
     this.channel = this.connection.createChannel({
-      confirm: true,
       json: true,
       publishTimeout: 10_000, // 10s
       setup: async (channel: Channel) => {
@@ -218,8 +217,8 @@ export class RabbitQueue implements Queue {
     );
     await this._channelPublish(this.exchanges[exchangeName], route, msg, {
       persistent: true,
-      // TODO: Actually handle returns from the AMQP server. Needs to setup a `return` event handler in the channel.
-      mandatory: true,
+      // TODO: Actually handle confirms and returns from the AMQP server. Needs to setup a `return` event handler in the channel.
+      // mandatory: true,
     });
   }
 
