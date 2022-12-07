@@ -546,7 +546,7 @@ const uploadWithUrlHandler: RequestHandler = async (req, res) => {
     defaultObjectStoreId(req, useCatalyst),
     req.body
   );
-  const dupAsset = await db.task.findDuplicateUrlUpload(
+  const dupAsset = await db.asset.findDuplicateUrlUpload(
     url,
     req.user.id,
     DUPLICATE_ASSETS_THRESHOLD
