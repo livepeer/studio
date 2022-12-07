@@ -64,6 +64,9 @@ Object.keys(themes).map(
 
 const livepeerClient = createReactClient({
   provider: studioProvider({
+    // we intentionally provide no API key so any requests requiring auth will fail
+    // eventually should move to using JWT from user's login
+    apiKey: "",
     baseUrl: isStaging()
       ? "https://livepeer.monster"
       : "https://livepeer.studio",
