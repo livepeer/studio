@@ -140,6 +140,7 @@ export default class Table<T extends DBObject> {
     if (cursor && cursor.includes("skip")) {
       q.append(sql` OFFSET ${cursor.replace("skip", "")}`);
     }
+    console.log("executing query ", q.text);
 
     let res: QueryResult;
     if (useReplica) {
