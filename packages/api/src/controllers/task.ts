@@ -233,20 +233,12 @@ app.post("/:id/status", authorizer({ anyAdmin: true }), async (req, res) => {
     return res.status(500).json({ errors: ["user not found"] });
   }
   if (!user.admin && task.status.phase !== "running" && !task.status.retries) {
-    // first attempt to execute the task. check concurrent tasks limit
-    const activeTaskThreshold = Date.now() - ACTIVE_TASK_TIMEOUT;
-    const query = [
-      sql`task.data->>'deleted' IS NULL`,
-      sql`task.data->>'userId' = ${user.id}`,
-      sql`(task.data->'status'->>'phase' = 'running'`.append(
-        ` OR (task.data->'status'->>'phase' = 'waiting' AND task.data->'status'->>'retries' IS NOT NULL))`
-      ),
-      // TODO: Clean-up lost tasks
-      sql`coalesce((task.data->'status'->>'updatedAt')::bigint, 0) > ${activeTaskThreshold}`,
-    ];
-    const maxAllowed = req.config.vodMaxConcurrentTasksPerUser;
-    let [tasks] = await db.task.find(query, { limit: maxAllowed + 1 });
-    if (tasks.length >= maxAllowed) {
+    // this is an attempt to start executing the task. check concurrent tasks limit
+    const tasks = await db.task.listRunningTasks(
+      req.user.id,
+      ACTIVE_TASK_TIMEOUT
+    );
+    if (tasks.length >= req.config.vodMaxConcurrentTasksPerUser) {
       return res.status(429).json({
         errors: [
           `too many tasks running for user ${user.id} (${tasks.length})`,
